@@ -1,0 +1,11 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Infection\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^7.0",
+        "nikic/php-parser": "^3.0"
+    }
+}
