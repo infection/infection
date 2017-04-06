@@ -6,9 +6,10 @@ use PhpParser\NodeTraverser;
 use PhpParser\PrettyPrinter;
 use Infection\Visitor\MutatorVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
-use Infection\Mutator\Arithmetic\Plus;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\InsideFunctionDetectorVisitor;
+use Infection\Mutator\Arithmetic\Plus;
+use Infection\Mutator\Arithmetic\Minus;
 
 $lexer = new PhpParser\Lexer(array(
     'usedAttributes' => array(
@@ -33,17 +34,19 @@ function test() {
 class A {
     public function add($a, $b)
     {
-        return $a + $b;
+        return $a + $b - 1;
     }
 }
 
 $callback = function () {
     3 + 4;
+    -1 - 2;
 };
 ';
 
 $mutators = [
     new Plus(),
+    new Minus(),
 ];
 
 $mutationsCollectorVisitor = new MutationsCollectorVisitor($mutators);

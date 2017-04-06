@@ -6,8 +6,6 @@ namespace Infection\Visitor;
 
 use Infection\Mutation;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitorAbstract;
 
 class MutationsCollectorVisitor extends NodeVisitorAbstract
