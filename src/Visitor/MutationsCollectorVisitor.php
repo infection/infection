@@ -6,9 +6,11 @@ namespace Infection\Visitor;
 
 use Infection\Mutation;
 use PhpParser\Node;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitorAbstract;
 
-class MutationsCollectorNodeVisitor extends NodeVisitorAbstract
+class MutationsCollectorVisitor extends NodeVisitorAbstract
 {
     private $mutators = [];
     private $mutations = [];
@@ -20,7 +22,10 @@ class MutationsCollectorNodeVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node)
     {
-        // TODO if we are in function/method? test it
+        if (! $node->getAttribute(InsideFunctionDetectorVisitor::IS_INSIDE_FUNCTION_KEY)) {
+            return;
+        }
+
         foreach ($this->mutators as $mutator) {
             if ($mutator->shouldMutate($node)) {
                 $this->mutations[] = new Mutation(

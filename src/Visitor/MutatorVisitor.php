@@ -8,7 +8,7 @@ use Infection\Mutation;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class MutatorNodeVisitor extends NodeVisitorAbstract
+class MutatorVisitor extends NodeVisitorAbstract
 {
     private $mutation;
 

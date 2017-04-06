@@ -2,15 +2,13 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use PhpParser\Error;
-use PhpParser\ParserFactory;
 use PhpParser\NodeTraverser;
 use PhpParser\PrettyPrinter;
-use PhpParser\NodeVisitorAbstract;
-use PhpParser\Node;
-use Infection\Visitor\MutatorNodeVisitor;
-use Infection\Visitor\MutationsCollectorNodeVisitor;
+use Infection\Visitor\MutatorVisitor;
+use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Mutator\Arithmetic\Plus;
+use Infection\Visitor\ParentConnectorVisitor;
+use Infection\Visitor\InsideFunctionDetectorVisitor;
 
 $lexer = new PhpParser\Lexer(array(
     'usedAttributes' => array(
@@ -22,24 +20,39 @@ $traverser     = new NodeTraverser;
 $prettyPrinter = new PrettyPrinter\Standard;
 $nodeDumper = new PhpParser\NodeDumper;
 
-$code = '<?php 
+$originalCode = '<?php 
+array(1) + array();
 [1] + [];
 
-1 + 0;
 13 +  15;
 
 function test() {
     1 + 0;
-}';
+}
+
+class A {
+    public function add($a, $b)
+    {
+        return $a + $b;
+    }
+}
+
+$callback = function () {
+    3 + 4;
+};
+';
 
 $mutators = [
     new Plus(),
 ];
-$mutationsCollectorVisitor = new MutationsCollectorNodeVisitor($mutators);
 
+$mutationsCollectorVisitor = new MutationsCollectorVisitor($mutators);
+
+$traverser->addVisitor(new ParentConnectorVisitor());
+$traverser->addVisitor(new InsideFunctionDetectorVisitor());
 $traverser->addVisitor($mutationsCollectorVisitor);
 
-$initialStatements = $parser->parse($code);
+$initialStatements = $parser->parse($originalCode);
 // traverse
 $stmts = $traverser->traverse($initialStatements);
 // $stmts is an array of statement nodes
@@ -49,22 +62,24 @@ echo $nodeDumper->dump($stmts), "\n";
 // pretty print
 $code = $prettyPrinter->prettyPrintFile($stmts);
 
+echo "\nOriginal Code:\n";
 echo $code . "\n";
+echo "\n\n";
 
-//var_dump($mutationsCollectorVisitor->getMutations());
-foreach($mutationsCollectorVisitor->getMutations() as $mutation) {
+$traverser = new NodeTraverser();
+
+foreach ($mutationsCollectorVisitor->getMutations() as $index => $mutation) {
 //    $code = file_get_contents($phpFileName);
 
-//    $stmts = $parser->parse($code);
-
-    $visitor = new MutatorNodeVisitor($mutation);
+    $visitor = new MutatorVisitor($mutation);
 
     $traverser->addVisitor($visitor);
 
-    $mutatedStatements = $traverser->traverse($initialStatements);
+    $originalStatements = $parser->parse($originalCode);
+    $mutatedStatements = $traverser->traverse($originalStatements);
 
     $mutatedCode = $prettyPrinter->prettyPrintFile($mutatedStatements);
-
+    echo "\nMutation #{$index}\n";
     echo $mutatedCode . "\n";
 
 //    file_put_contents('path', $mutatedCode);

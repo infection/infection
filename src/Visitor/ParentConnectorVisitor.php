@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Infection\Visitor;
+
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
+
+class ParentConnectorVisitor extends NodeVisitorAbstract
+{
+    const PARENT_KEY = 'parent';
+
+    private $stack;
+
+    public function beforeTraverse(array $nodes)
+    {
+        $this->stack = [];
+    }
+
+    public function enterNode(Node $node)
+    {
+        if (! empty($this->stack)) {
+            $node->setAttribute(self::PARENT_KEY, $this->stack[count($this->stack) - 1]);
+        }
+
+        $this->stack[] = $node;
+    }
+
+    public function leaveNode(Node $node)
+    {
+        array_pop($this->stack);
+    }
+}
