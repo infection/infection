@@ -57,50 +57,6 @@ class ReturnIntegerMutatorVisitor extends NodeVisitorAbstract
     }
 }
 
-class ReturnFunctionCallMutatorVisitor extends NodeVisitorAbstract
-{
-    public function leaveNode(Node $node) {
-        if ($node instanceof Node\Stmt\Return_) {
-            if ($node->expr instanceof Node\Expr\FuncCall) {
-                return [
-                    $node->expr,
-                    new Node\Stmt\Return_(
-                        new Node\Expr\ConstFetch(new Node\Name('null'))
-                    )
-                ];
-            }
-        }
-    }
-}
-
-class SmartMutatorVisitor extends NodeVisitorAbstract
-{
-    private $tokens;
-
-    public function setTokens(array $tokens) {
-        $this->tokens = $tokens;
-    }
-
-    public function leaveNode(Node $node) {
-        if ($node instanceof Node\Expr\BinaryOp\Smaller) {
-            $startTokenPos = $node->getAttribute('startTokenPos');
-            $endTokenPos = $node->getAttribute('endTokenPos');
-
-            $startFilePos = $node->getAttribute('startFilePos');
-            $endFilePos = $node->getAttribute('endFilePos');
-
-            var_dump(sprintf('startTokenPos=%s, token=%s', $startTokenPos, var_export($this->tokens[$startTokenPos], true)));
-            var_dump(sprintf('endTokenPos=%s, token=%s', $endTokenPos, var_export($this->tokens[$endTokenPos], true)));
-
-            // var_dump(sprintf('startFilePos=%s, token=%s', $startFilePos, var_export($this->tokens[$startFilePos], true)));
-            // var_dump(sprintf('endFilePos=%s, token=%s', $endFilePos, var_export($this->tokens[$endFilePos], true)));
-            var_dump('!!!!!!!!!!!');
-            var_dump($node);
-            var_dump($this->tokens);
-            die;
-        }
-    }
-}
 
 $smartMutatorVisitor = new SmartMutatorVisitor();
 

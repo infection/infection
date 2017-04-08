@@ -11,6 +11,7 @@ use Infection\Visitor\InsideFunctionDetectorVisitor;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Arithmetic\Minus;
 use Infection\Mutator\ReturnValue\FunctionCall;
+use \Infection\Mutator\ReturnValue\IntegerNegotiation;
 
 $lexer = new PhpParser\Lexer(array(
     'usedAttributes' => array(
@@ -44,13 +45,16 @@ class A {
 $callback = function () {
     3 + 4;
     -1 - 2;
+    
+    return -3;
 };
 ';
 
 $mutators = [
     new Plus(),
     new Minus(),
-    new FunctionCall()
+    new FunctionCall(),
+    new IntegerNegotiation(),
 ];
 
 $mutationsCollectorVisitor = new MutationsCollectorVisitor($mutators);
