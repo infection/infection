@@ -32,6 +32,10 @@ class InsideFunctionDetectorVisitor extends NodeVisitorAbstract
 
         $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
 
+        if ($parent->getAttribute(self::IS_INSIDE_FUNCTION_KEY)) {
+            return true;
+        }
+
         $isFunction = $parent instanceof Node\Stmt\Function_;
         $isClassMethod = $parent instanceof Node\Stmt\ClassMethod;
         $isClosure = $parent instanceof Node\Expr\Closure;

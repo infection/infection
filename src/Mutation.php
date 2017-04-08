@@ -13,20 +13,16 @@ class Mutation
      * @var Mutator
      */
     private $mutator;
-    /**
-     * @var mixed
-     */
-    private $mutatedNode;
+
     /**
      * @var array
      */
     private $attributes;
 
-    public function __construct(Mutator $mutator, $mutatedNode, array $attributes)
+    public function __construct(Mutator $mutator, array $attributes)
     {
 
         $this->mutator = $mutator;
-        $this->mutatedNode = $mutatedNode;
         $this->attributes = $attributes;
     }
 
@@ -36,14 +32,6 @@ class Mutation
     public function getMutator(): Mutator
     {
         return $this->mutator;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getMutatedNode()
-    {
-        return $this->mutatedNode;
     }
 
     /**

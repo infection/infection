@@ -27,7 +27,7 @@ class MutatorVisitor extends NodeVisitorAbstract
             $attributes['endTokenPos'] === $mutatedAttributes['endTokenPos'];
 
         if ($isEqualPosition && $mutator->shouldMutate($node)) {
-            return $this->mutation->getMutatedNode(); // TODO move ->mutate() here from collector?
+            return $mutator->mutate($node); // TODO move ->mutate() here from collector?
             // TODO STOP TRAVERSING
             // TODO check all built-in visitors, in particular FirstFindingVisitor
             // TODO beforeTraverse - FirstFindingVisitor

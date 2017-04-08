@@ -28,7 +28,6 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
             if ($mutator->shouldMutate($node)) {
                 $this->mutations[] = new Mutation(
                     $mutator,
-                    $mutator->mutate($node),
                     $node->getAttributes()
                 );
             }
