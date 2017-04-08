@@ -4,8 +4,16 @@
             "Infection\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Infection\\Tests\\": "tests/"
+        }
+    },
     "require": {
         "php": "^7.0",
         "nikic/php-parser": "^3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.1"
     }
 }

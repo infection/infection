@@ -44,15 +44,6 @@ $traverser     = new NodeTraverser;
 $prettyPrinter = new PrettyPrinter\Standard;
 $nodeDumper = new PhpParser\NodeDumper;
 
-class MyNodeVisitor extends NodeVisitorAbstract
-{
-    public function leaveNode(Node $node) {
-        if ($node instanceof Node\Expr\BinaryOp\Plus) {
-            return new Node\Expr\BinaryOp\Minus($node->left, $node->right, $node->getAttributes());
-        }
-    }
-}
-
 class ReturnIntegerMutatorVisitor extends NodeVisitorAbstract
 {
     public function leaveNode(Node $node) {

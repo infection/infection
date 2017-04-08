@@ -10,6 +10,7 @@ use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\InsideFunctionDetectorVisitor;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Arithmetic\Minus;
+use Infection\Mutator\ReturnValue\FunctionCall;
 
 $lexer = new PhpParser\Lexer(array(
     'usedAttributes' => array(
@@ -29,6 +30,8 @@ array(1) + array();
 
 function test() {
     1 + 0;
+    
+    return count([]);
 }
 
 class A {
@@ -47,6 +50,7 @@ $callback = function () {
 $mutators = [
     new Plus(),
     new Minus(),
+    new FunctionCall()
 ];
 
 $mutationsCollectorVisitor = new MutationsCollectorVisitor($mutators);
