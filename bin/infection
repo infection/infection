@@ -1,0 +1,20 @@
+#!/usr/bin/env php
+<?php
+
+if (PHP_SAPI !== 'cli') {
+    echo 'Warning: Humbug may only be invoked from a command line', PHP_EOL;
+}
+
+require __DIR__.'/../vendor/autoload.php';
+
+use Symfony\Component\Console\Application;
+
+$application = new Application();
+
+$infectionCommand = new \Infection\Command\InfectionCommand();
+
+$application->add($infectionCommand);
+
+$application->setDefaultCommand($infectionCommand->getName(), true);
+
+$application->run();

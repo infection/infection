@@ -11,9 +11,12 @@
     },
     "require": {
         "php": "^7.0",
-        "nikic/php-parser": "^3.0"
+        "nikic/php-parser": "^3.0",
+        "symfony/console": "^3.2",
+        "symfony/process": "^3.2"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.1"
-    }
+    },
+    "bin": ["bin/infection"]
 }
