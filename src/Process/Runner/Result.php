@@ -27,4 +27,14 @@ class Result
     {
         return $this->process->getExitCode();
     }
+
+    public function getErrorOutput()
+    {
+        return $this->process->getErrorOutput();
+    }
+
+    public function getExitCodeText()
+    {
+        return $this->process->getExitCodeText();
+    }
 }

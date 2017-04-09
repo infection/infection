@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Infection\Command;
 
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Runner\InitialTestsRunner;
-use Infection\TestFramework\Adapter\Factory;
-use Infection\TestFramework\Adapter\PhpUnit\PhpUnitAdapter;
+use Infection\TestFramework\Factory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -24,8 +25,15 @@ class InfectionCommand extends Command
         $initialTestsRunner = new InitialTestsRunner($process, $output);
         $result = $initialTestsRunner->run();
 
-        if (!$result->isSuccessful()) {
-            $output->writeln(sprintf('<error>Tests do not pass. Error code %d</error>', $result->getExitCode()));
+        if (! $result->isSuccessful()) {
+            $output->writeln(
+                sprintf(
+                    '<error>Tests do not pass. Error code %d. "%s". STDERR: %s</error>',
+                    $result->getExitCode(),
+                    $result->getExitCodeText(),
+                    $result->getErrorOutput()
+                )
+            );
         }
 
         // generate mutation
