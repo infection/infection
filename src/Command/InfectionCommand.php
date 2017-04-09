@@ -2,27 +2,23 @@
 
 namespace Infection\Command;
 
+use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Runner\InitialTestsRunner;
+use Infection\TestFramework\Adapter\Factory;
+use Infection\TestFramework\Adapter\PhpUnit\PhpUnitAdapter;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
 
 class InfectionCommand extends Command
 {
-    protected function configure()
-    {
-        $this
-            ->setName('run')
-            ->setDescription('Runs the mutation testing.')
-        ;
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $processBuilder = new ProcessBuilder(['vendor/phpunit/phpunit/phpunit']);
+        $testFrameworkFactory = new Factory();
+        $adapter = $testFrameworkFactory->create($input->getOption('test-framework'));
+
+        $processBuilder = new ProcessBuilder($adapter);
         $process = $processBuilder->getProcess();
 
         $initialTestsRunner = new InitialTestsRunner($process, $output);
@@ -31,5 +27,22 @@ class InfectionCommand extends Command
         if (!$result->isSuccessful()) {
             $output->writeln(sprintf('<error>Tests do not pass. Error code %d</error>', $result->getExitCode()));
         }
+
+        // generate mutation
+    }
+
+    protected function configure()
+    {
+        $this
+            ->setName('run')
+            ->setDescription('Runs the mutation testing.')
+            ->addOption(
+                'test-framework',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Name of the Test framework to use (phpunit, phpspec)',
+                'phpunit'
+            )
+        ;
     }
 }

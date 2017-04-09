@@ -1,18 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: borN_free
- * Date: 09/04/2017
- * Time: 12:25
- */
+
+declare(strict_types=1);
 
 namespace Infection\Process\Runner;
-
 
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
 
 class InitialTestsRunner
 {
