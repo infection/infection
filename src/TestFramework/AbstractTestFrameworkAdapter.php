@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use Infection\Finder\AbstractExecutableFinder;
+use Infection\TestFramework\Config\ConfigBuilder;
 
 abstract class AbstractTestFrameworkAdapter
 {
@@ -12,10 +13,15 @@ abstract class AbstractTestFrameworkAdapter
      * @var AbstractExecutableFinder
      */
     private $executableFinder;
+    /**
+     * @var CommandLineArgumentsAndOptionsBuilder
+     */
+    private $argumentsAndOptionsBuilder;
 
-    public function __construct(AbstractExecutableFinder $executableFinder)
+    public function __construct(AbstractExecutableFinder $executableFinder, CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder)
     {
         $this->executableFinder = $executableFinder;
+        $this->argumentsAndOptionsBuilder = $argumentsAndOptionsBuilder;
     }
 
     /**
@@ -29,6 +35,10 @@ abstract class AbstractTestFrameworkAdapter
      */
     public function getExecutableCommandLine() : string
     {
-        return $this->executableFinder->find();
+        return sprintf(
+            '%s %s',
+            $this->executableFinder->find(),
+            $this->argumentsAndOptionsBuilder->build()
+        );
     }
 }

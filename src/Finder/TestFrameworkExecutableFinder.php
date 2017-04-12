@@ -2,29 +2,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Finder;
+namespace Infection\Finder;
 
-use Infection\Finder\AbstractExecutableFinder;
-use Infection\Finder\ComposerExecutableFinder;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
-class PhpUnitExecutableFinder extends AbstractExecutableFinder
+class TestFrameworkExecutableFinder extends AbstractExecutableFinder
 {
+    /**
+     * @var
+     */
+    private $testFrameworkName;
+
+    public function __construct($testFrameworkName)
+    {
+        $this->testFrameworkName = $testFrameworkName;
+    }
+
     /**
      * @return string
      */
     public function find()
     {
-        $this->checkVendorPath();
+        $this->addVendorFolderToPath();
         return $this->findPhpunit();
     }
 
     /**
      * @return void
      */
-    private function checkVendorPath()
+    private function addVendorFolderToPath()
     {
         $vendorPath = null;
         try {
@@ -32,12 +40,13 @@ class PhpUnitExecutableFinder extends AbstractExecutableFinder
             $process = new Process(sprintf('%s %s', $composer, 'config bin-dir'));
             $process->run();
             $vendorPath = trim($process->getOutput());
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $candidate = getcwd() . '/vendor/bin';
             if (file_exists($candidate)) {
                 $vendorPath = $candidate;
             }
         }
+
         if (!is_null($vendorPath)) {
             putenv('PATH=' . $vendorPath . PATH_SEPARATOR . getenv('PATH'));
         }
@@ -58,24 +67,27 @@ class PhpUnitExecutableFinder extends AbstractExecutableFinder
      */
     private function findPhpunit()
     {
-        $probable = ['phpunit', 'phpunit.phar'];
+        $candidates = [$this->testFrameworkName, $this->testFrameworkName . '.phar'];
         $finder = new ExecutableFinder();
 
-        foreach ($probable as $name) {
+        foreach ($candidates as $name) {
             if ($path = $finder->find($name, null, [getcwd()])) {
                 return $this->makeExecutable($path);
             }
         }
 
-        $result = $this->searchNonExecutables($probable, [getcwd()]);
+        $result = $this->searchNonExecutables($candidates, [getcwd()]);
 
         if (!is_null($result)) {
             return $result;
         }
 
         throw new \RuntimeException(
-            'Unable to locate a PHPUnit executable on local system. Ensure '
-            . 'that PHPUnit is installed and available.'
+            sprintf(
+                'Unable to locate a %s executable on local system. Ensure that %s is installed and available.',
+                $this->testFrameworkName,
+                $this->testFrameworkName
+            )
         );
     }
 

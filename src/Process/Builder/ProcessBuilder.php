@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Infection\Process\Builder;
 
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\Config\Builder;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder as SymfonyProcessBuilder;
 
@@ -17,13 +18,11 @@ class ProcessBuilder
 
     public function __construct(AbstractTestFrameworkAdapter $testFrameworkAdapter)
     {
-
         $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
 
     public function getProcess() : Process
     {
-
         return new Process(
             $this->testFrameworkAdapter->getExecutableCommandLine(),
             null, // TODO make it dynamic to change testdir

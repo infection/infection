@@ -7,6 +7,7 @@ namespace Infection\Command;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Factory;
+use Infection\Utils\TempDirectoryCreator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,7 +17,8 @@ class InfectionCommand extends Command
 {
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $testFrameworkFactory = new Factory();
+        $tempDirCreator = new TempDirectoryCreator();
+        $testFrameworkFactory = new Factory($tempDirCreator->createAndGet());
         $adapter = $testFrameworkFactory->create($input->getOption('test-framework'));
 
         $processBuilder = new ProcessBuilder($adapter);

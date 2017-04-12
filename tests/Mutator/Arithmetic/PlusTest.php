@@ -20,7 +20,7 @@ class PlusTest extends AbstractMutator
         $this->assertTrue($this->mutator->shouldMutate($plusExpression));
     }
 
-    public function test_it_should_not_mutate_plus__with_arrays()
+    public function test_it_should_not_mutate_plus_with_arrays()
     {
         $plusExpression = new \PhpParser\Node\Expr\BinaryOp\Plus(
             new Array_([new LNumber(1)]),
