@@ -13,9 +13,15 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
     private $mutators = [];
     private $mutations = [];
 
-    public function __construct(array $mutators)
+    /**
+     * @var string
+     */
+    private $filePath;
+
+    public function __construct(array $mutators, string $filePath)
     {
         $this->mutators = $mutators;
+        $this->filePath = $filePath;
     }
 
     public function leaveNode(Node $node)
@@ -27,6 +33,7 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
         foreach ($this->mutators as $mutator) {
             if ($mutator->shouldMutate($node)) {
                 $this->mutations[] = new Mutation(
+                    $this->filePath,
                     $mutator,
                     $node->getAttributes()
                 );

@@ -9,23 +9,11 @@ use Infection\TestFramework\Config\ConfigBuilder;
 
 class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
-    /**
-     * @var ConfigBuilder
-     */
-    private $configBuilder;
-
-    public function __construct(ConfigBuilder $configBuilder)
-    {
-        $this->configBuilder = $configBuilder;
-    }
-
-    public function build(): string
+    public function build(string $configPath): string
     {
         $options = [];
 
-        $this->configBuilder->build();
-
-        $options[] = sprintf('--configuration %s', $this->configBuilder->getPath());
+        $options[] = sprintf('--configuration %s', $configPath);
 
         return implode(' ', $options);
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Builder;
 
+use Infection\Mutant\Mutant;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\Config\Builder;
 use Symfony\Component\Process\Process;
@@ -21,10 +22,12 @@ class ProcessBuilder
         $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
 
-    public function getProcess() : Process
+    public function build() : Process
     {
+        $configPath = $this->testFrameworkAdapter->buildConfigFile();
+
         return new Process(
-            $this->testFrameworkAdapter->getExecutableCommandLine(),
+            $this->testFrameworkAdapter->getExecutableCommandLine($configPath),
             null, // TODO make it dynamic to change testdir
             array_replace($_ENV, $_SERVER)
         );
@@ -37,5 +40,20 @@ class ProcessBuilder
 
         return $processBuilder->getProcess();
          */
+    }
+
+    /**
+     * @param Mutant $mutant
+     * @return Process
+     */
+    public function getProcessForMutant(Mutant $mutant) : Process
+    {
+        $configPath = $this->testFrameworkAdapter->buildConfigFile($mutant);
+
+        return new Process(
+            $this->testFrameworkAdapter->getExecutableCommandLine($configPath),
+            null,
+            array_replace($_ENV, $_SERVER)
+        );
     }
 }
