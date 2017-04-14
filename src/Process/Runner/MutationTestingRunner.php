@@ -51,11 +51,32 @@ class MutationTestingRunner
             $processes[] = $this->processBuilder->getProcessForMutant($mutant);
         }
 
+        $testFrameworkAdapter = $this->processBuilder->getTestFrameworkAdapter();
+
         // run multiple processes
+        $mutantCount = count($this->mutations);
+        $escapedCount = 0;
+        $killedCount = 0;
+
         foreach ($processes as $process) {
             $process->run();
 
-            echo $process->getOutput();
+            $processOutput = $process->getOutput();
+
+            if ($testFrameworkAdapter->testsPass($processOutput)) {
+                $escapedCount++;
+            } else {
+                $killedCount++;
+            }
+
+            echo $processOutput;
         }
+
+        var_dump(sprintf(
+            'Mutant count: %s. Killed: %s. Escaped: %s',
+            $mutantCount,
+            $killedCount,
+            $escapedCount
+        ));
     }
 }

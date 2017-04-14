@@ -31,6 +31,8 @@ abstract class AbstractTestFrameworkAdapter
         $this->argumentsAndOptionsBuilder = $argumentsAndOptionsBuilder;
     }
 
+    abstract public function testsPass(string $output) : bool;
+
     /**
      * Returns path to the test framework's executable
      * Example:

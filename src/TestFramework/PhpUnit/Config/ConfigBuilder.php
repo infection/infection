@@ -6,6 +6,7 @@ namespace Infection\TestFramework\PhpUnit\Config;
 
 use Infection\Mutant\Mutant;
 use Infection\TestFramework\Config\ConfigBuilder as ConfigBuilderInterface;
+use Infection\TestFramework\Config\TestFrameworkConfigurationFile;
 
 
 class ConfigBuilder implements ConfigBuilderInterface
@@ -20,13 +21,13 @@ class ConfigBuilder implements ConfigBuilderInterface
         $this->tempDirectory = $tempDirectory;
     }
 
-    public function build(Mutant $mutant = null) : PhpUnitConfigurationFile
+    public function build(Mutant $mutant = null) : TestFrameworkConfigurationFile
     {
         $path = $this->buildPath($mutant);
 
         file_put_contents($path, $this->getXml($mutant));
 
-        return new PhpUnitConfigurationFile($path);
+        return new TestFrameworkConfigurationFile($path);
     }
 
     private function buildPath(Mutant $mutant = null) : string

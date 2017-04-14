@@ -56,4 +56,12 @@ class ProcessBuilder
             array_replace($_ENV, $_SERVER)
         );
     }
+
+    /**
+     * @return AbstractTestFrameworkAdapter
+     */
+    public function getTestFrameworkAdapter(): AbstractTestFrameworkAdapter
+    {
+        return $this->testFrameworkAdapter;
+    }
 }

@@ -9,5 +9,5 @@ use Infection\Mutant\Mutant;
 
 interface ConfigBuilder
 {
-    public function build(Mutant $mutant = null);
+    public function build(Mutant $mutant = null) : TestFrameworkConfigurationFile;
 }

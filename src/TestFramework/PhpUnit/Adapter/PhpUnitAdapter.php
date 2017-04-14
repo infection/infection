@@ -10,4 +10,9 @@ use Infection\TestFramework\AbstractTestFrameworkAdapter;
 class PhpUnitAdapter extends AbstractTestFrameworkAdapter
 {
     const NAME = 'phpunit';
+
+    public function testsPass(string $output): bool
+    {
+        return (bool) preg_match('/failures!/i', $output);
+    }
 }
