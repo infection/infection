@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutation;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\MutantProcess;
-use Symfony\Component\Process\Process;
+use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 
 class MutationTestingRunner
 {
@@ -34,7 +33,7 @@ class MutationTestingRunner
         $this->mutantCreator = $mutantCreator;
     }
 
-    public function run() // TODO : MutationTestingResult
+    public function run($inParallel = false) // TODO : MutationTestingResult
     {
         /** @var MutantProcess[] $processes */
         $processes = [];
@@ -52,9 +51,16 @@ class MutationTestingRunner
         $escapedCount = 0;
         $killedCount = 0;
 
-        foreach ($processes as $process) {
-            $process->getProcess()->run();
+        if ($inParallel) {
+            $parallelProcessRunner = new ParallelProcessRunner($processes);
+            $parallelProcessRunner->run();
+        } else {
+            foreach ($processes as $process) {
+                $process->getProcess()->run();
+            }
+        }
 
+        foreach ($processes as $process) {
             $processOutput = $process->getProcess()->getOutput();
 
             if ($testFrameworkAdapter->testsPass($processOutput)) {

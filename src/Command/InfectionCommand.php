@@ -47,9 +47,10 @@ class InfectionCommand extends Command
         $mutantGenerator = new MutationsGenerator('src');
         $mutations = $mutantGenerator->generate();
 
+        $runInParallel = $input->getOption('parallel');
         $mutantCreator = new MutantCreator($tempDir, new Differ());
-        $mutationTestingRunner = new MutationTestingRunner($processBuilder, $mutantCreator, $mutations);
-        $mutationTestingRunner->run();
+        $mutationTestingRunner = new MutationTestingRunner($processBuilder, $mutantCreator, $mutations, $input);
+        $mutationTestingRunner->run($runInParallel);
 
         var_dump('tempdir=' . $tempDir);
     }
@@ -65,6 +66,12 @@ class InfectionCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'Name of the Test framework to use (phpunit, phpspec)',
                 'phpunit'
+            )
+            ->addOption(
+                'parallel',
+                null,
+                InputOption::VALUE_NONE,
+                'Run mutations in parallel'
             )
         ;
     }

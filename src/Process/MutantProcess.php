@@ -18,6 +18,8 @@ class MutantProcess
      */
     private $mutant;
 
+    private $isTimeout = false;
+
     public function __construct(Process $process, Mutant $mutant)
     {
         $this->process = $process;
@@ -27,7 +29,7 @@ class MutantProcess
     /**
      * @return Process
      */
-    public function getProcess(): Process
+    public function getProcess() : Process
     {
         return $this->process;
     }
@@ -35,8 +37,13 @@ class MutantProcess
     /**
      * @return Mutant
      */
-    public function getMutant(): Mutant
+    public function getMutant() : Mutant
     {
         return $this->mutant;
+    }
+
+    public function markTimeout()
+    {
+        $this->isTimeout = true;
     }
 }

@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\Process\Runner\Parallel;
 
+use Infection\Process\MutantProcess;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
-use Symfony\Component\Process\Process;
 
 class ParallelProcessRunner
 {
     /**
-     * @var Process[]
+     * @var MutantProcess[]
      */
     protected $processes = [];
 
     protected $timeouts = [];
 
-    public function __construct(Process ...$processes)
+    public function __construct($processes)
     {
         $this->processes = $processes;
     }
@@ -26,10 +26,13 @@ class ParallelProcessRunner
         foreach ($this->processes as $process) {
             $process->getProcess()->start();
         }
+
         usleep(1000);
+
         while ($this->stillRunning()) {
             usleep(1000);
         }
+
         $this->processes = [];
     }
 
@@ -45,10 +48,5 @@ class ParallelProcessRunner
                 return true;
             }
         }
-    }
-
-    public function reset()
-    {
-        $this->processes = [];
     }
 }
