@@ -11,6 +11,11 @@ use Symfony\Component\Process\Process;
 class TestFrameworkExecutableFinder extends AbstractExecutableFinder
 {
     /**
+     * @var string
+     */
+    private $cachedExecutable;
+
+    /**
      * @var
      */
     private $testFrameworkName;
@@ -25,8 +30,12 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
      */
     public function find()
     {
-        $this->addVendorFolderToPath();
-        return $this->findPhpunit();
+        if ($this->cachedExecutable === null) {
+            $this->addVendorFolderToPath();
+            $this->cachedExecutable = $this->findPhpunit();
+        }
+
+        return $this->cachedExecutable;
     }
 
     /**

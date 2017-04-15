@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Infection\Differ\Differ;
 use Infection\Mutant\Generator\MutationsGenerator;
-use Infection\Mutant\MutantFileCreator;
+use Infection\Mutant\MutantCreator;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -46,10 +47,8 @@ class InfectionCommand extends Command
         $mutantGenerator = new MutationsGenerator('src');
         $mutations = $mutantGenerator->generate();
 
-        var_dump($mutations);
-
-        $mutantFileCreator = new MutantFileCreator($tempDir);
-        $mutationTestingRunner = new MutationTestingRunner($processBuilder, $mutantFileCreator, $mutations);
+        $mutantCreator = new MutantCreator($tempDir, new Differ());
+        $mutationTestingRunner = new MutationTestingRunner($processBuilder, $mutantCreator, $mutations);
         $mutationTestingRunner->run();
 
         var_dump('tempdir=' . $tempDir);

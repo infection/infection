@@ -50,8 +50,8 @@ class MutationsGenerator
         $finder = new Finder();
         $finder->files()->in($this->srcDir);
 
-//        $finder->files()->name('*.php');
-        $finder->files()->name('Example*.php');
+        $finder->files()->name('*.php');
+//        $finder->files()->name('Example*.php');
 //        $finder->files()->name('Plus.php');
 
         return $finder;

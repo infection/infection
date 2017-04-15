@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Infection\Process\Builder;
 
 use Infection\Mutant\Mutant;
+use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\Config\Builder;
+use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder as SymfonyProcessBuilder;
 
@@ -43,18 +45,22 @@ class ProcessBuilder
     }
 
     /**
+     * @throws RuntimeException
      * @param Mutant $mutant
-     * @return Process
+     * @return MutantProcess
      */
-    public function getProcessForMutant(Mutant $mutant) : Process
+    public function getProcessForMutant(Mutant $mutant) : MutantProcess
     {
         $configPath = $this->testFrameworkAdapter->buildConfigFile($mutant);
 
-        return new Process(
+
+        $symfonyProcess = new Process(
             $this->testFrameworkAdapter->getExecutableCommandLine($configPath),
             null,
             array_replace($_ENV, $_SERVER)
         );
+
+        return new MutantProcess($symfonyProcess, $mutant);
     }
 
     /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
+use Infection\Differ\Differ;
 use Infection\Mutation;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\Lexer;
@@ -13,16 +14,21 @@ use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 
-class MutantFileCreator
+class MutantCreator
 {
     private $tempDir;
+    /**
+     * @var Differ
+     */
+    private $differ;
 
-    public function __construct($tempDir)
+    public function __construct($tempDir, Differ $differ)
     {
         $this->tempDir = $tempDir;
+        $this->differ = $differ;
     }
 
-    public function create(Mutation $mutation) : string
+    public function create(Mutation $mutation) : Mutant
     {
         $lexer = new Lexer([
             'usedAttributes' => [
@@ -38,15 +44,20 @@ class MutantFileCreator
         $traverser->addVisitor($visitor);
 
         $originalStatements = $parser->parse(file_get_contents($mutation->getOriginalFilePath()));
+
+        $originalPrettyPrintedFile = $prettyPrinter->prettyPrintFile($originalStatements);
+
         $mutatedStatements = $traverser->traverse($originalStatements);
 
         $mutatedCode = $prettyPrinter->prettyPrintFile($mutatedStatements);
         $mutatedFilePath = sprintf('%s/mutant.%s.infection.php', $this->tempDir, $mutation->getHash());
 
-        echo $mutatedCode;
+        $diff = $this->differ->diff($originalPrettyPrintedFile, $mutatedCode);
+
+//        echo $mutatedCode;
 
         file_put_contents($mutatedFilePath, $mutatedCode);
 
-        return $mutatedFilePath;
+        return new Mutant($mutatedFilePath, $mutation, $diff);
     }
 }

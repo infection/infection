@@ -13,6 +13,10 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter
 
     public function testsPass(string $output): bool
     {
-        return (bool) preg_match('/failures!/i', $output);
+        if (preg_match('/failures!/i', $output)) {
+            return false;
+        }
+
+        return (bool) preg_match('/OK\s\(/', $output);
     }
 }

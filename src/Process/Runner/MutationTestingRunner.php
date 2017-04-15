@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantFileCreator;
+use Infection\Mutant\MutantCreator;
 use Infection\Mutation;
 use Infection\Process\Builder\ProcessBuilder;
+use Infection\Process\MutantProcess;
 use Symfony\Component\Process\Process;
 
 class MutationTestingRunner
@@ -23,30 +23,24 @@ class MutationTestingRunner
      */
     private $mutations;
     /**
-     * @var MutantFileCreator
+     * @var MutantCreator
      */
-    private $mutantFileCreator;
+    private $mutantCreator;
 
-    public function __construct(ProcessBuilder $processBuilder, MutantFileCreator $mutantFileCreator, array $mutations)
+    public function __construct(ProcessBuilder $processBuilder, MutantCreator $mutantCreator, array $mutations)
     {
         $this->processBuilder = $processBuilder;
         $this->mutations = $mutations;
-        $this->mutantFileCreator = $mutantFileCreator;
+        $this->mutantCreator = $mutantCreator;
     }
 
     public function run() // TODO : MutationTestingResult
     {
-        /** @var Process[] $processes */
+        /** @var MutantProcess[] $processes */
         $processes = [];
 
         foreach ($this->mutations as $mutation) {
-            // generate process
-
-            $mutatedFilePath = $this->mutantFileCreator->create($mutation);
-            $mutant = new Mutant(
-                $mutatedFilePath,
-                $mutation
-            );
+            $mutant = $this->mutantCreator->create($mutation);
 
             $processes[] = $this->processBuilder->getProcessForMutant($mutant);
         }
@@ -59,9 +53,9 @@ class MutationTestingRunner
         $killedCount = 0;
 
         foreach ($processes as $process) {
-            $process->run();
+            $process->getProcess()->run();
 
-            $processOutput = $process->getOutput();
+            $processOutput = $process->getProcess()->getOutput();
 
             if ($testFrameworkAdapter->testsPass($processOutput)) {
                 $escapedCount++;
@@ -69,6 +63,7 @@ class MutationTestingRunner
                 $killedCount++;
             }
 
+            echo $process->getMutant()->getDiff();
             echo $processOutput;
         }
 
