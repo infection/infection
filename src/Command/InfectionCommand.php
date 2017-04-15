@@ -10,6 +10,7 @@ use Infection\Mutant\MutantCreator;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
+use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\TestFramework\Factory;
 use Infection\Utils\TempDirectoryCreator;
 use Symfony\Component\Console\Command\Command;
@@ -47,10 +48,11 @@ class InfectionCommand extends Command
         $mutantGenerator = new MutationsGenerator('src');
         $mutations = $mutantGenerator->generate();
 
-        $runInParallel = $input->getOption('parallel');
+        $threadCount = (int) $input->getOption('threads');
+        $parallelProcessManager = new ParallelProcessRunner($threadCount);
         $mutantCreator = new MutantCreator($tempDir, new Differ());
-        $mutationTestingRunner = new MutationTestingRunner($processBuilder, $mutantCreator, $mutations, $input);
-        $mutationTestingRunner->run($runInParallel);
+        $mutationTestingRunner = new MutationTestingRunner($processBuilder, $parallelProcessManager, $mutantCreator, $mutations);
+        $mutationTestingRunner->run();
 
         var_dump('tempdir=' . $tempDir);
     }
@@ -68,10 +70,11 @@ class InfectionCommand extends Command
                 'phpunit'
             )
             ->addOption(
-                'parallel',
+                'threads',
                 null,
-                InputOption::VALUE_NONE,
-                'Run mutations in parallel'
+                InputOption::VALUE_REQUIRED,
+                'Threads count',
+                1
             )
         ;
     }

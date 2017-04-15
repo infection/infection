@@ -5,48 +5,71 @@ declare(strict_types=1);
 namespace Infection\Process\Runner\Parallel;
 
 use Infection\Process\MutantProcess;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use Symfony\Component\Process\Exception\LogicException;
+use Symfony\Component\Process\Exception\RuntimeException;
 
+/**
+ * This ProcessManager is a simple wrapper to enable parallel processing using Symfony Process component.
+ */
 class ParallelProcessRunner
 {
+    private $threadCount;
     /**
-     * @var MutantProcess[]
+     * @var int
      */
-    protected $processes = [];
+    private $poll;
 
-    protected $timeouts = [];
-
-    public function __construct($processes)
+    /**
+     * @param int $threadCount
+     * @param int $poll
+     */
+    public function __construct(int $threadCount, int $poll = 1000)
     {
-        $this->processes = $processes;
+        $this->threadCount = $threadCount <= 0 ? 1 : $threadCount;
+        $this->poll = $poll;
     }
 
-    public function run()
+
+    /**
+     * @throws RuntimeException
+     * @throws LogicException
+     * @param MutantProcess[] $processes
+     */
+    public function runParallel(array $processes)
     {
-        foreach ($this->processes as $process) {
+        // do not modify the object pointers in the argument, copy to local working variable
+        $processesQueue = $processes;
+
+        // fix maxParallel to be max the number of processes or positive
+        $maxParallel = min(abs($this->threadCount), count($processesQueue));
+
+        // get the first stack of processes to start at the same time
+        /** @var MutantProcess[] $currentProcesses */
+        $currentProcesses = array_splice($processesQueue, 0, $maxParallel);
+
+        // start the initial stack of processes
+        foreach ($currentProcesses as $process) {
             $process->getProcess()->start();
         }
 
-        usleep(1000);
+        do {
+            // wait for the given time
+            usleep($this->poll);
 
-        while ($this->stillRunning()) {
-            usleep(1000);
-        }
+            // remove all finished processes from the stack
+            foreach ($currentProcesses as $index => $process) {
+                if (!$process->getProcess()->isRunning()) {
+                    unset($currentProcesses[$index]);
 
-        $this->processes = [];
-    }
-
-    public function stillRunning()
-    {
-        foreach ($this->processes as $index => $process) {
-            try {
-                $process->getProcess()->checkTimeout();
-            } catch (ProcessTimedOutException $e) {
-                $process->markTimeout();
+                    // directly add and start new process after the previous finished
+                    if (count($processesQueue) > 0) {
+                        $nextProcess = array_shift($processesQueue);
+                        $nextProcess->getProcess()->start();
+                        $currentProcesses[] = $nextProcess;
+                    }
+                }
             }
-            if ($process->getProcess()->isRunning()) {
-                return true;
-            }
-        }
+            // continue loop while there are processes being executed or waiting for execution
+        } while (count($processesQueue) > 0 || count($currentProcesses) > 0);
     }
 }

@@ -25,15 +25,20 @@ class MutationTestingRunner
      * @var MutantCreator
      */
     private $mutantCreator;
+    /**
+     * @var ParallelProcessRunner
+     */
+    private $parallelProcessManager;
 
-    public function __construct(ProcessBuilder $processBuilder, MutantCreator $mutantCreator, array $mutations)
+    public function __construct(ProcessBuilder $processBuilder, ParallelProcessRunner $parallelProcessManager, MutantCreator $mutantCreator, array $mutations)
     {
         $this->processBuilder = $processBuilder;
         $this->mutations = $mutations;
         $this->mutantCreator = $mutantCreator;
+        $this->parallelProcessManager = $parallelProcessManager;
     }
 
-    public function run($inParallel = false) // TODO : MutationTestingResult
+    public function run() // TODO : MutationTestingResult
     {
         /** @var MutantProcess[] $processes */
         $processes = [];
@@ -51,14 +56,7 @@ class MutationTestingRunner
         $escapedCount = 0;
         $killedCount = 0;
 
-        if ($inParallel) {
-            $parallelProcessRunner = new ParallelProcessRunner($processes);
-            $parallelProcessRunner->run();
-        } else {
-            foreach ($processes as $process) {
-                $process->getProcess()->run();
-            }
-        }
+        $this->parallelProcessManager->runParallel($processes);
 
         foreach ($processes as $process) {
             $processOutput = $process->getProcess()->getOutput();
