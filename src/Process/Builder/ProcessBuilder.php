@@ -53,7 +53,6 @@ class ProcessBuilder
     {
         $configPath = $this->testFrameworkAdapter->buildConfigFile($mutant);
 
-
         $symfonyProcess = new Process(
             $this->testFrameworkAdapter->getExecutableCommandLine($configPath),
             null,

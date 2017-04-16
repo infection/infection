@@ -2,19 +2,10 @@
 <?php
 
 if (PHP_SAPI !== 'cli') {
-    echo 'Warning: Humbug may only be invoked from a command line', PHP_EOL;
+    echo 'Warning: Infection may only be invoked from a command line', PHP_EOL;
 }
 
-require __DIR__.'/../vendor/autoload.php';
+require __DIR__ . '/../app/bootstrap.php';
 
-use Symfony\Component\Console\Application;
-
-$application = new Application();
-
-$infectionCommand = new \Infection\Command\InfectionCommand();
-
-$application->add($infectionCommand);
-
-$application->setDefaultCommand($infectionCommand->getName(), true);
-
+$application = $container['application'];
 $application->run();

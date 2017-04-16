@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use Infection\Process\Builder\ProcessBuilder;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
@@ -21,19 +22,19 @@ class InitialTestsRunner
     private $output;
 
     /**
-     * @param Process $process
+     * @param ProcessBuilder $processBuilder
      * @param OutputInterface $output
      */
-    public function __construct(Process $process, OutputInterface $output)
+    public function __construct(ProcessBuilder $processBuilder, OutputInterface $output)
     {
-        $this->process = $process;
+        $this->processBuilder = $processBuilder;
         $this->output = $output;
     }
 
     // TODO extract output logic from here
     public function run() : Result
     {
-        $process = $this->process;
+        $process = $this->processBuilder->build();
         $progressBar = new ProgressBar($this->output);
         $progressBar->setFormat('verbose');
 

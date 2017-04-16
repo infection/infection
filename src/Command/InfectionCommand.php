@@ -13,6 +13,7 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\TestFramework\Factory;
 use Infection\Utils\TempDirectoryCreator;
+use Pimple\Container;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -20,17 +21,23 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class InfectionCommand extends Command
 {
+    /**
+     * @var Container
+     */
+    private $container;
+
+    public function __construct(Container $container)
+    {
+        parent::__construct();
+        $this->container = $container;
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $tempDirCreator = new TempDirectoryCreator();
-        $tempDir = $tempDirCreator->createAndGet();
-        $testFrameworkFactory = new Factory($tempDir);
-        $adapter = $testFrameworkFactory->create($input->getOption('test-framework'));
-
+        $adapter = $this->get('test.framework.factory')->create($input->getOption('test-framework'));
         $processBuilder = new ProcessBuilder($adapter);
-        $process = $processBuilder->build();
 
-        $initialTestsRunner = new InitialTestsRunner($process, $output);
+        $initialTestsRunner = new InitialTestsRunner($processBuilder, $output);
         $result = $initialTestsRunner->run();
 
         if (! $result->isSuccessful()) {
@@ -45,16 +52,13 @@ class InfectionCommand extends Command
         }
 
         // generate mutation
-        $mutantGenerator = new MutationsGenerator('src');
-        $mutations = $mutantGenerator->generate();
+        $mutations =$this->get('mutations.generator')->generate();
 
         $threadCount = (int) $input->getOption('threads');
         $parallelProcessManager = new ParallelProcessRunner($threadCount);
-        $mutantCreator = new MutantCreator($tempDir, new Differ());
+        $mutantCreator = $this->get('mutant.creator');
         $mutationTestingRunner = new MutationTestingRunner($processBuilder, $parallelProcessManager, $mutantCreator, $mutations);
         $mutationTestingRunner->run();
-
-        var_dump('tempdir=' . $tempDir);
     }
 
     protected function configure()
@@ -77,5 +81,10 @@ class InfectionCommand extends Command
                 1
             )
         ;
+    }
+
+    private function get($name)
+    {
+        return $this->container[$name];
     }
 }
