@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner\Parallel;
 
+use Infection\EventDispatcher\EventDispatcherInterface;
+use Infection\Events\MutantProcessFinished;
 use Infection\Process\MutantProcess;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\RuntimeException;
@@ -13,35 +15,32 @@ use Symfony\Component\Process\Exception\RuntimeException;
  */
 class ParallelProcessRunner
 {
-    private $threadCount;
     /**
-     * @var int
+     * @var EventDispatcherInterface
      */
-    private $poll;
+    private $eventDispatcher;
 
-    /**
-     * @param int $threadCount
-     * @param int $poll
-     */
-    public function __construct(int $threadCount, int $poll = 1000)
+    public function __construct(EventDispatcherInterface $eventDispatcher)
     {
-        $this->threadCount = $threadCount <= 0 ? 1 : $threadCount;
-        $this->poll = $poll;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
-
     /**
+     * @param MutantProcess[] $processes
+     * @param int $threadCount
+     * @param int $poll
+     *
      * @throws RuntimeException
      * @throws LogicException
-     * @param MutantProcess[] $processes
      */
-    public function runParallel(array $processes)
+    public function runParallel(array $processes, int $threadCount, int $poll = 1000)
     {
+        $threadCount = $threadCount <= 0 ? 1 : $threadCount;
         // do not modify the object pointers in the argument, copy to local working variable
         $processesQueue = $processes;
 
         // fix maxParallel to be max the number of processes or positive
-        $maxParallel = min(abs($this->threadCount), count($processesQueue));
+        $maxParallel = min(abs($threadCount), count($processesQueue));
 
         // get the first stack of processes to start at the same time
         /** @var MutantProcess[] $currentProcesses */
@@ -53,12 +52,13 @@ class ParallelProcessRunner
         }
 
         do {
-            // wait for the given time
-            usleep($this->poll);
+            usleep($poll);
 
             // remove all finished processes from the stack
             foreach ($currentProcesses as $index => $process) {
                 if (!$process->getProcess()->isRunning()) {
+                    $this->eventDispatcher->dispatch(new MutantProcessFinished($process));
+
                     unset($currentProcesses[$index]);
 
                     // directly add and start new process after the previous finished

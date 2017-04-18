@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use Infection\EventDispatcher\EventDispatcherInterface;
+use Infection\EventDispatcher\EventSubscriberInterface;
+use Infection\Events\MutationTestingFinished;
+use Infection\Events\MutationTestingStarted;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutation;
 use Infection\Process\Builder\ProcessBuilder;
@@ -29,16 +33,21 @@ class MutationTestingRunner
      * @var ParallelProcessRunner
      */
     private $parallelProcessManager;
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
 
-    public function __construct(ProcessBuilder $processBuilder, ParallelProcessRunner $parallelProcessManager, MutantCreator $mutantCreator, array $mutations)
+    public function __construct(ProcessBuilder $processBuilder, ParallelProcessRunner $parallelProcessManager, MutantCreator $mutantCreator, EventDispatcherInterface $eventDispatcher, array $mutations)
     {
         $this->processBuilder = $processBuilder;
-        $this->mutations = $mutations;
         $this->mutantCreator = $mutantCreator;
         $this->parallelProcessManager = $parallelProcessManager;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->mutations = $mutations;
     }
 
-    public function run() // TODO : MutationTestingResult
+    public function run(int $threadCount) // TODO : MutationTestingResult
     {
         /** @var MutantProcess[] $processes */
         $processes = [];
@@ -56,9 +65,18 @@ class MutationTestingRunner
         $escapedCount = 0;
         $killedCount = 0;
 
-        $this->parallelProcessManager->runParallel($processes);
+        $this->eventDispatcher->dispatch(new MutationTestingStarted($mutantCount));
+
+        // TODO add timeout handling like in humbug
+        // TODO read event dispatcher VS observer
+        $this->parallelProcessManager->runParallel($processes, $threadCount);
+
+        $this->eventDispatcher->dispatch(new MutationTestingFinished());
 
         foreach ($processes as $process) {
+            // $resultHandler->handle($process);
+
+
             $processOutput = $process->getProcess()->getOutput();
 
             if ($testFrameworkAdapter->testsPass($processOutput)) {

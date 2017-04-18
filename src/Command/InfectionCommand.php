@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use Infection\Differ\Differ;
-use Infection\Mutant\Generator\MutationsGenerator;
-use Infection\Mutant\MutantCreator;
+use Infection\EventDispatcher\EventDispatcher;
+use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Process\Builder\ProcessBuilder;
+use Infection\Process\Events\MutantProcessFinished;
+use Infection\Process\Listener\ConsoleLoggerSubscriber;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
-use Infection\TestFramework\Factory;
-use Infection\Utils\TempDirectoryCreator;
 use Pimple\Container;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class InfectionCommand extends Command
@@ -34,6 +35,12 @@ class InfectionCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        /** @var EventDispatcher $eventDispatcher */
+        $eventDispatcher = $this->get('dispatcher');
+        $progressBar = new ProgressBar($output);
+
+        $eventDispatcher->addSubscriber(new ConsoleLoggerSubscriber($output, $progressBar));
+
         $adapter = $this->get('test.framework.factory')->create($input->getOption('test-framework'));
         $processBuilder = new ProcessBuilder($adapter);
 
@@ -49,16 +56,18 @@ class InfectionCommand extends Command
                     $result->getErrorOutput()
                 )
             );
+            return 1;
         }
 
         // generate mutation
         $mutations =$this->get('mutations.generator')->generate();
 
         $threadCount = (int) $input->getOption('threads');
-        $parallelProcessManager = new ParallelProcessRunner($threadCount);
+        $parallelProcessManager = $this->get('parallel.process.runner');
         $mutantCreator = $this->get('mutant.creator');
-        $mutationTestingRunner = new MutationTestingRunner($processBuilder, $parallelProcessManager, $mutantCreator, $mutations);
-        $mutationTestingRunner->run();
+
+        $mutationTestingRunner = new MutationTestingRunner($processBuilder, $parallelProcessManager, $mutantCreator, $eventDispatcher, $mutations);
+        $mutationTestingRunner->run($threadCount);
     }
 
     protected function configure()

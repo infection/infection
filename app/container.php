@@ -8,6 +8,9 @@ use Infection\TestFramework\Factory;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Differ\Differ;
 use Infection\Mutant\MutantCreator;
+use Infection\Command\InfectionCommand;
+use Infection\Process\Runner\Parallel\ParallelProcessRunner;
+use Infection\EventDispatcher\EventDispatcher;
 
 $c = new Pimple\Container();
 
@@ -37,9 +40,17 @@ $c['differ'] = function () : Differ {
     return new Differ();
 };
 
+$c['dispatcher'] = function () : EventDispatcher {
+    return new EventDispatcher();
+};
+
+$c['parallel.process.runner'] = function ($c) : ParallelProcessRunner {
+    return new ParallelProcessRunner($c['dispatcher']);
+};
+
 $c['application'] = function ($container) : Application {
     $application = new Application();
-    $infectionCommand = new \Infection\Command\InfectionCommand($container);
+    $infectionCommand = new InfectionCommand($container);
 
     $application->add($infectionCommand);
 
