@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use Infection\EventDispatcher\EventDispatcherInterface;
+use Infection\Events\InitialTestCaseCompleted;
+use Infection\Events\InitialTestSuiteFinished;
+use Infection\Events\InitialTestSuiteStarted;
 use Infection\Process\Builder\ProcessBuilder;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
 class InitialTestsRunner
@@ -17,38 +20,37 @@ class InitialTestsRunner
     private $process;
 
     /**
-     * @var OutputInterface
+     * @var EventDispatcherInterface
      */
-    private $output;
+    private $eventDispatcher;
 
     /**
      * @param ProcessBuilder $processBuilder
-     * @param OutputInterface $output
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(ProcessBuilder $processBuilder, OutputInterface $output)
+    public function __construct(ProcessBuilder $processBuilder, EventDispatcherInterface $eventDispatcher)
     {
         $this->processBuilder = $processBuilder;
-        $this->output = $output;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
-    // TODO extract output logic from here
     public function run() : Result
     {
         $process = $this->processBuilder->build();
-        $progressBar = new ProgressBar($this->output);
-        $progressBar->setFormat('verbose');
 
-        $process->run(function ($type) use ($process, $progressBar) {
+        $this->eventDispatcher->dispatch(new InitialTestSuiteStarted());
+
+        $process->run(function ($type) use ($process) {
             if ($process::ERR === $type) {
                 $process->stop();
             }
 
-            // TODO parse PHPUnit output and add if (!ok) {stop()}
+            $this->eventDispatcher->dispatch(new InitialTestCaseCompleted());
 
-            $progressBar->advance();
+            // TODO parse PHPUnit output and add if (!ok) {stop()}
         });
-        $progressBar->finish();
-        $this->output->writeln('');
+
+        $this->eventDispatcher->dispatch(new InitialTestSuiteFinished());
 
         return new Result($process);
     }

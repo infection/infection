@@ -5,19 +5,16 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use Infection\EventDispatcher\EventDispatcher;
-use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Process\Builder\ProcessBuilder;
-use Infection\Process\Events\MutantProcessFinished;
-use Infection\Process\Listener\ConsoleLoggerSubscriber;
+use Infection\Process\Listener\MutationConsoleLoggerSubscriber;
+use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
-use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Pimple\Container;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class InfectionCommand extends Command
@@ -37,14 +34,18 @@ class InfectionCommand extends Command
     {
         /** @var EventDispatcher $eventDispatcher */
         $eventDispatcher = $this->get('dispatcher');
-        $progressBar = new ProgressBar($output);
 
-        $eventDispatcher->addSubscriber(new ConsoleLoggerSubscriber($output, $progressBar));
+        $initialTestsProgressBar = new ProgressBar($output);
+        $initialTestsProgressBar->setFormat('verbose');
+
+        $eventDispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $initialTestsProgressBar));
+        $eventDispatcher->addSubscriber(new MutationConsoleLoggerSubscriber($output, new ProgressBar($output)));
 
         $adapter = $this->get('test.framework.factory')->create($input->getOption('test-framework'));
         $processBuilder = new ProcessBuilder($adapter);
 
-        $initialTestsRunner = new InitialTestsRunner($processBuilder, $output);
+        // TODO add setFormatter
+        $initialTestsRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
         $result = $initialTestsRunner->run();
 
         if (! $result->isSuccessful()) {
@@ -59,8 +60,10 @@ class InfectionCommand extends Command
             return 1;
         }
 
+        $output->writeln('Start mutation testing...');
+
         // generate mutation
-        $mutations =$this->get('mutations.generator')->generate();
+        $mutations = $this->get('mutations.generator')->generate();
 
         $threadCount = (int) $input->getOption('threads');
         $parallelProcessManager = $this->get('parallel.process.runner');

@@ -2,18 +2,19 @@
 
 declare(strict_types=1);
 
-
 namespace Infection\Process\Listener;
 
-
 use Infection\EventDispatcher\EventSubscriberInterface;
+use Infection\Events\InitialTestCaseCompleted;
+use Infection\Events\InitialTestSuiteFinished;
+use Infection\Events\InitialTestSuiteStarted;
 use Infection\Events\MutationTestingFinished;
 use Infection\Events\MutationTestingStarted;
 use Infection\Events\MutantProcessFinished;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ConsoleLoggerSubscriber implements EventSubscriberInterface
+class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
 {
     /**
      * @var OutputInterface
@@ -34,23 +35,23 @@ class ConsoleLoggerSubscriber implements EventSubscriberInterface
     public function getSubscribedEvents()
     {
         return [
-            MutationTestingStarted::class => [$this, 'onMutationTestingStarted'],
-            MutationTestingFinished::class => [$this, 'onMutationTestingFinished'],
-            MutantProcessFinished::class => [$this, 'onMutantProcessFinished'],
+            InitialTestSuiteStarted::class => [$this, 'onInitialTestSuiteStarted'],
+            InitialTestSuiteFinished::class => [$this, 'onInitialTestSuiteFinished'],
+            InitialTestCaseCompleted::class => [$this, 'onInitialTestCaseCompleted'],
         ];
     }
 
-    public function onMutationTestingStarted(MutationTestingStarted $event)
+    public function onInitialTestSuiteStarted(InitialTestSuiteStarted $event)
     {
-        $this->progressBar->start($event->getMutationCount());
+        $this->progressBar->start();
     }
 
-    public function onMutationTestingFinished(MutationTestingFinished $event)
+    public function onInitialTestSuiteFinished(InitialTestSuiteFinished $event)
     {
         $this->progressBar->finish();
     }
 
-    public function onMutantProcessFinished(MutantProcessFinished $event)
+    public function onInitialTestCaseCompleted(InitialTestCaseCompleted $event)
     {
         $this->progressBar->advance();
     }
