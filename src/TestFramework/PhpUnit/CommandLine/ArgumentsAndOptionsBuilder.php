@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\CommandLine;
 
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
-use Infection\TestFramework\Config\ConfigBuilder;
+use Infection\TestFramework\Config\InitialConfigBuilder;
 
 class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {

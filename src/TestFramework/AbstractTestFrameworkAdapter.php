@@ -6,7 +6,9 @@ namespace Infection\TestFramework;
 
 use Infection\Finder\AbstractExecutableFinder;
 use Infection\Mutant\Mutant;
-use Infection\TestFramework\Config\ConfigBuilder;
+use Infection\TestFramework\PhpUnit\Config\InitialConfigBuilder;
+use Infection\TestFramework\PhpUnit\Config\MutationConfigBuilder;
+use Infection\TestFramework\PhpUnit\Config\MutationXmlConfiguration;
 
 abstract class AbstractTestFrameworkAdapter
 {
@@ -20,14 +22,20 @@ abstract class AbstractTestFrameworkAdapter
     private $argumentsAndOptionsBuilder;
 
     /**
-     * @var ConfigBuilder
+     * @var InitialConfigBuilder
      */
-    private $configBuilder;
+    private $initialConfigBuilder;
 
-    public function __construct(AbstractExecutableFinder $executableFinder, ConfigBuilder $configBuilder, CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder)
+    /**
+     * @var MutationConfigBuilder
+     */
+    private $mutationConfigBuilder;
+
+    public function __construct(AbstractExecutableFinder $executableFinder, InitialConfigBuilder $initialConfigBuilder, MutationConfigBuilder $mutationConfigBuilder, CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder)
     {
         $this->executableFinder = $executableFinder;
-        $this->configBuilder = $configBuilder;
+        $this->initialConfigBuilder = $initialConfigBuilder;
+        $this->mutationConfigBuilder = $mutationConfigBuilder;
         $this->argumentsAndOptionsBuilder = $argumentsAndOptionsBuilder;
     }
 
@@ -52,8 +60,13 @@ abstract class AbstractTestFrameworkAdapter
         );
     }
 
-    public function buildConfigFile(Mutant $mutant = null) : string
+    public function buildInitialConfigFile() : string
     {
-        return $this->configBuilder->build($mutant)->getPath();
+        return $this->initialConfigBuilder->build();
+    }
+
+    public function buildMutationConfigFile(Mutant $mutant) : string
+    {
+        return $this->mutationConfigBuilder->build($mutant);
     }
 }

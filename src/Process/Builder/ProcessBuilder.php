@@ -26,7 +26,7 @@ class ProcessBuilder
 
     public function build() : Process
     {
-        $configPath = $this->testFrameworkAdapter->buildConfigFile();
+        $configPath = $this->testFrameworkAdapter->buildInitialConfigFile();
 
         return new Process(
             $this->testFrameworkAdapter->getExecutableCommandLine($configPath),
@@ -51,7 +51,7 @@ class ProcessBuilder
      */
     public function getProcessForMutant(Mutant $mutant) : MutantProcess
     {
-        $configPath = $this->testFrameworkAdapter->buildConfigFile($mutant);
+        $configPath = $this->testFrameworkAdapter->buildMutationConfigFile($mutant);
 
         $symfonyProcess = new Process(
             $this->testFrameworkAdapter->getExecutableCommandLine($configPath),

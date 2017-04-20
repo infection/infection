@@ -8,7 +8,8 @@ use Infection\Finder\TestFrameworkExecutableFinder;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
-use Infection\TestFramework\PhpUnit\Config\ConfigBuilder;
+use Infection\TestFramework\PhpUnit\Config\InitialConfigBuilder;
+use Infection\TestFramework\PhpUnit\Config\MutationConfigBuilder;
 
 class Factory
 {
@@ -27,7 +28,8 @@ class Factory
         if ($adapterName === PhpUnitAdapter::NAME) {
             return new PhpUnitAdapter(
                 new TestFrameworkExecutableFinder(PhpUnitAdapter::NAME),
-                new ConfigBuilder($this->tempDir),
+                new InitialConfigBuilder($this->tempDir),
+                new MutationConfigBuilder($this->tempDir, '/Users/user/tmp/remove/phpunit.xml'), // TODO replace hardcoded path
                 new ArgumentsAndOptionsBuilder()
             );
         }
