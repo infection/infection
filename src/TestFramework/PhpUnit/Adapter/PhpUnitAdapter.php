@@ -17,6 +17,10 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter
             return false;
         }
 
+        if (preg_match('/errors!/i', $output)) {
+            return false;
+        }
+
         return (bool) preg_match('/OK\s\(/', $output);
     }
 }

@@ -12,10 +12,13 @@ use Infection\Mutant\MutantCreator;
 use Infection\Command\InfectionCommand;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\EventDispatcher\EventDispatcher;
+use Infection\Finder\Locator;
+use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 
 $c = new Container();
 
 $c['src.dir'] = 'src';
+$c['project.dir'] = getcwd();
 
 $c['temp.dir'] = function (Container $c) : string {
     return $c['temp.dir.creator']->createAndGet();
@@ -25,8 +28,16 @@ $c['temp.dir.creator'] = function () : TempDirectoryCreator {
     return new TempDirectoryCreator();
 };
 
+$c['locator'] = function (Container $c) : Locator {
+    return new Locator($c['project.dir']);
+};
+
+$c['path.replacer'] = function(Container $c) : PathReplacer {
+    return new PathReplacer($c['locator']);
+};
+
 $c['test.framework.factory'] = function (Container $c) : Factory {
-    return new Factory($c['temp.dir']);
+    return new Factory($c['temp.dir'], $c['path.replacer']);
 };
 
 $c['mutations.generator'] = function (Container $c) : MutationsGenerator {

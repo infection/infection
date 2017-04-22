@@ -1,0 +1,36 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Infection\Tests\TestFramework\Config\Path;
+
+use Infection\Finder\Locator;
+use Infection\TestFramework\PhPunit\Config\Path\PathReplacer;
+use PHPUnit\Framework\TestCase;
+
+class PathReplacerTest extends TestCase
+{
+    /**
+     * @dataProvider pathProvider
+     */
+    public function test_it_replaces_path_with_absolute_path($originalPath, $pathPostfix)
+    {
+        $projectPath = realpath(__DIR__ . '/../../../../Files/phpunit/project-path');
+        $pathReplacer = new PathReplacer(new Locator($projectPath));
+
+        $dom = new \DOMDocument();
+        $node = $dom->createElement('phpunit', $originalPath);
+        $dom->appendChild($node);
+
+        $pathReplacer->replaceInNode($node);
+
+        $this->assertSame($projectPath . $pathPostfix, $node->nodeValue);
+    }
+
+    public function pathProvider()
+    {
+        return [
+            ['autoload.php', '/autoload.php'],
+        ];
+    }
+}
