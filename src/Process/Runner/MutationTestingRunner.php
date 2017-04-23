@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\MutationTestingFinished;
 use Infection\Events\MutationTestingStarted;
 use Infection\Mutant\MutantCreator;
@@ -68,25 +67,23 @@ class MutationTestingRunner
         $this->eventDispatcher->dispatch(new MutationTestingStarted($mutantCount));
 
         // TODO add timeout handling like in humbug
-        // TODO read event dispatcher VS observer
-        $this->parallelProcessManager->runParallel($processes, $threadCount);
+        $this->parallelProcessManager->run($processes, $threadCount);
 
         $this->eventDispatcher->dispatch(new MutationTestingFinished());
 
         foreach ($processes as $process) {
-            // $resultHandler->handle($process);
-
-
             $processOutput = $process->getProcess()->getOutput();
 
             if ($testFrameworkAdapter->testsPass($processOutput)) {
                 $escapedCount++;
+
+                echo $process->getMutant()->getMutation()->getOriginalFilePath() . "\n";
+                echo $process->getMutant()->getDiff() . "\n";
+                echo $processOutput . "\n";
+
             } else {
                 $killedCount++;
             }
-
-            echo $process->getMutant()->getDiff();
-            echo $processOutput;
         }
 
         var_dump(sprintf(

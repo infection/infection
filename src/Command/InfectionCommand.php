@@ -42,7 +42,7 @@ class InfectionCommand extends Command
         $eventDispatcher->addSubscriber(new MutationConsoleLoggerSubscriber($output, new ProgressBar($output)));
 
         $adapter = $this->get('test.framework.factory')->create($input->getOption('test-framework'));
-        $processBuilder = new ProcessBuilder($adapter);
+        $processBuilder = new ProcessBuilder($adapter, $this->get('timeout'));
 
         // TODO add setFormatter
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
@@ -71,6 +71,8 @@ class InfectionCommand extends Command
 
         $mutationTestingRunner = new MutationTestingRunner($processBuilder, $parallelProcessManager, $mutantCreator, $eventDispatcher, $mutations);
         $mutationTestingRunner->run($threadCount);
+
+        return 0;
     }
 
     protected function configure()

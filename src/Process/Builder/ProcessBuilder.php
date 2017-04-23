@@ -7,10 +7,8 @@ namespace Infection\Process\Builder;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Infection\TestFramework\Config\Builder;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder as SymfonyProcessBuilder;
 
 class ProcessBuilder
 {
@@ -19,9 +17,15 @@ class ProcessBuilder
      */
     private $testFrameworkAdapter;
 
-    public function __construct(AbstractTestFrameworkAdapter $testFrameworkAdapter)
+    /**
+     * @var int
+     */
+    private $timeout;
+
+    public function __construct(AbstractTestFrameworkAdapter $testFrameworkAdapter, int $timeout)
     {
         $this->testFrameworkAdapter = $testFrameworkAdapter;
+        $this->timeout = $timeout;
     }
 
     public function build() : Process
@@ -58,6 +62,7 @@ class ProcessBuilder
             null,
             array_replace($_ENV, $_SERVER)
         );
+        $symfonyProcess->setTimeout($this->timeout);
 
         return new MutantProcess($symfonyProcess, $mutant);
     }

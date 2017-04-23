@@ -21,6 +21,7 @@ $c = new Container();
 $c['src.dir'] = 'src';
 $c['project.dir'] = getcwd();
 $c['config.dir'] = getcwd();
+$c['timeout'] = 10; // seconds
 
 $c['temp.dir'] = function (Container $c) : string {
     return $c['temp.dir.creator']->createAndGet();

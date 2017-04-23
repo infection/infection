@@ -8,11 +8,14 @@ namespace Infection\Mutant\Generator;
 
 use Infection\Mutator\Arithmetic\Minus;
 use Infection\Mutator\Arithmetic\Plus;
+use Infection\Mutator\ConditionalBoundary\GreaterThan;
+use Infection\Mutator\ConditionalBoundary\LessThan;
+use Infection\Mutator\ConditionalNegotiation\Identical;
+use Infection\Mutator\ConditionalNegotiation\NotIdentical;
 use Infection\Mutator\ReturnValue\FunctionCall;
 use Infection\Mutator\ReturnValue\IntegerNegotiation;
 use Infection\Visitor\InsideFunctionDetectorVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
-use Infection\Visitor\MutatorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Lexer;
 use PhpParser\NodeTraverser;
@@ -86,10 +89,20 @@ class MutationsGenerator
     private function getMutators() : array
     {
         return [
+            // Arithmetic
             new Plus(),
             new Minus(),
+
             new FunctionCall(),
             new IntegerNegotiation(),
+
+            // Conditional Boundary
+            new LessThan(),
+            new GreaterThan(),
+
+            // Conditional Negotiation
+            new Identical(),
+            new NotIdentical(),
         ];
     }
 }

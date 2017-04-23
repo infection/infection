@@ -8,6 +8,7 @@ use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutantProcessFinished;
 use Infection\Process\MutantProcess;
 use Symfony\Component\Process\Exception\LogicException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
@@ -33,7 +34,7 @@ class ParallelProcessRunner
      * @throws RuntimeException
      * @throws LogicException
      */
-    public function runParallel(array $processes, int $threadCount, int $poll = 1000)
+    public function run(array $processes, int $threadCount, int $poll = 1000)
     {
         $threadCount = $threadCount <= 0 ? 1 : $threadCount;
         // do not modify the object pointers in the argument, copy to local working variable
@@ -55,9 +56,17 @@ class ParallelProcessRunner
             usleep($poll);
 
             // remove all finished processes from the stack
-            foreach ($currentProcesses as $index => $process) {
-                if (!$process->getProcess()->isRunning()) {
-                    $this->eventDispatcher->dispatch(new MutantProcessFinished($process));
+            foreach ($currentProcesses as $index => $mutantProcess) {
+                $process = $mutantProcess->getProcess();
+
+                try {
+                    $process->checkTimeout();
+                } catch (ProcessTimedOutException $e) {
+                    $mutantProcess->markTimeout();
+                }
+
+                if (!$process->isRunning()) {
+                    $this->eventDispatcher->dispatch(new MutantProcessFinished($mutantProcess));
 
                     unset($currentProcesses[$index]);
 

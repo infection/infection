@@ -8,7 +8,7 @@ use PhpParser\Node;
 
 interface Mutator
 {
-    public function shouldMutate(Node $node) : bool;
-
     public function mutate(Node $node);
+
+    public function shouldMutate(Node $node) : bool;
 }
