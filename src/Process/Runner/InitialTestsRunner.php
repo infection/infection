@@ -9,6 +9,9 @@ use Infection\Events\InitialTestCaseCompleted;
 use Infection\Events\InitialTestSuiteFinished;
 use Infection\Events\InitialTestSuiteStarted;
 use Infection\Process\Builder\ProcessBuilder;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\Tests\TestFramework\PhpUnit\Config\AbstractXmlConfiguration;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Process\Process;
 
@@ -25,13 +28,19 @@ class InitialTestsRunner
     private $eventDispatcher;
 
     /**
+     * @var string
+     */
+    private $tempDirectory;
+
+    /**
      * @param ProcessBuilder $processBuilder
      * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(ProcessBuilder $processBuilder, EventDispatcherInterface $eventDispatcher)
+    public function __construct(ProcessBuilder $processBuilder, EventDispatcherInterface $eventDispatcher, string $tempDirectory)
     {
         $this->processBuilder = $processBuilder;
         $this->eventDispatcher = $eventDispatcher;
+        $this->tempDirectory = $tempDirectory;
     }
 
     public function run() : Result
@@ -52,6 +61,8 @@ class InitialTestsRunner
 
         $this->eventDispatcher->dispatch(new InitialTestSuiteFinished());
 
-        return new Result($process);
+        $coverageFilePath = $this->tempDirectory . '/' . AbstractTestFrameworkAdapter::COVERAGE_FILE_NAME;
+
+        return new Result($process, new CodeCoverageData($coverageFilePath));
     }
 }

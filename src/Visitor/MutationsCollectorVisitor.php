@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Infection\Visitor;
 
 use Infection\Mutation;
+use Infection\TestFramework\Coverage\CodeCoverageData;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -17,16 +18,30 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
      * @var string
      */
     private $filePath;
+    /**
+     * @var CodeCoverageData
+     */
+    private $codeCoverageData;
+    /**
+     * @var bool
+     */
+    private $onlyCovered;
 
-    public function __construct(array $mutators, string $filePath)
+    public function __construct(array $mutators, string $filePath, CodeCoverageData $codeCoverageData, bool $onlyCovered)
     {
         $this->mutators = $mutators;
         $this->filePath = $filePath;
+        $this->codeCoverageData = $codeCoverageData;
+        $this->onlyCovered = $onlyCovered;
     }
 
     public function leaveNode(Node $node)
     {
         if (! $node->getAttribute(InsideFunctionDetectorVisitor::IS_INSIDE_FUNCTION_KEY)) {
+            return;
+        }
+
+        if ($this->onlyCovered && !$this->codeCoverageData->hasTestsOnLine($this->filePath, $node->getLine())) {
             return;
         }
 

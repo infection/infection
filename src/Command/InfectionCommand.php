@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use Infection\EventDispatcher\EventDispatcher;
+use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Listener\MutationConsoleLoggerSubscriber;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
@@ -45,7 +46,7 @@ class InfectionCommand extends Command
         $processBuilder = new ProcessBuilder($adapter, $this->get('timeout'));
 
         // TODO add setFormatter
-        $initialTestsRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
+        $initialTestsRunner = new InitialTestsRunner($processBuilder, $eventDispatcher, $this->get('temp.dir'));
         $result = $initialTestsRunner->run();
 
         if (! $result->isSuccessful()) {
@@ -62,8 +63,9 @@ class InfectionCommand extends Command
 
         $output->writeln('Start mutation testing...');
 
-        // generate mutation
-        $mutations = $this->get('mutations.generator')->generate();
+        $onlyCovered = $input->getOption('only-covered');
+        $mutationsGenerator = new MutationsGenerator($this->get('src.dir'), $result->getCodeCoverageData());
+        $mutations = $mutationsGenerator->generate($onlyCovered);
 
         $threadCount = (int) $input->getOption('threads');
         $parallelProcessManager = $this->get('parallel.process.runner');
@@ -93,6 +95,12 @@ class InfectionCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'Threads count',
                 1
+            )
+            ->addOption(
+                'only-covered',
+                null,
+                InputOption::VALUE_NONE,
+                'Mutate only covered by tests lines of code'
             )
         ;
     }

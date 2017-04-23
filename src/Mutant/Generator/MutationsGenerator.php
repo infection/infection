@@ -14,6 +14,7 @@ use Infection\Mutator\ConditionalNegotiation\Identical;
 use Infection\Mutator\ConditionalNegotiation\NotIdentical;
 use Infection\Mutator\ReturnValue\FunctionCall;
 use Infection\Mutator\ReturnValue\IntegerNegotiation;
+use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Visitor\InsideFunctionDetectorVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
@@ -27,18 +28,30 @@ class MutationsGenerator
 {
     private $srcDir;
 
-    public function __construct(string $srcDir)
+    /**
+     * @var CodeCoverageData
+     */
+    private $codeCoverageData;
+
+    public function __construct(string $srcDir, CodeCoverageData $codeCoverageData)
     {
         $this->srcDir = $srcDir;
+        $this->codeCoverageData = $codeCoverageData;
     }
 
-    public function generate() : array
+    /**
+     * @param bool $onlyCovered mutate only covered by tests lines of code
+     * @return array
+     */
+    public function generate(bool $onlyCovered): array
     {
         $files = $this->getSrcFiles();
         $allFilesMutations = [];
 
         foreach ($files as $file) {
-            $allFilesMutations = array_merge($allFilesMutations, $this->getMutationsFromFile($file));
+            if (!$onlyCovered || ($onlyCovered && $this->hasTests($file))) {
+                $allFilesMutations = array_merge($allFilesMutations, $this->getMutationsFromFile($file, $onlyCovered));
+            }
         }
 
         return $allFilesMutations;
@@ -60,7 +73,12 @@ class MutationsGenerator
         return $finder;
     }
 
-    private function getMutationsFromFile(SplFileInfo $file) : array
+    /**
+     * @param SplFileInfo $file
+     * @param bool $onlyCovered mutate only covered by tests lines of code
+     * @return array
+     */
+    private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered): array
     {
         $lexer = new Lexer([
             'usedAttributes' => [
@@ -71,7 +89,12 @@ class MutationsGenerator
         $traverser = new NodeTraverser();
         $mutators = $this->getMutators();
 
-        $mutationsCollectorVisitor = new MutationsCollectorVisitor($mutators, $file->getRealPath());
+        $mutationsCollectorVisitor = new MutationsCollectorVisitor(
+            $mutators,
+            $file->getRealPath(),
+            $this->codeCoverageData,
+            $onlyCovered
+        );
 
         $traverser->addVisitor(new ParentConnectorVisitor());
         $traverser->addVisitor(new InsideFunctionDetectorVisitor());
@@ -86,7 +109,12 @@ class MutationsGenerator
         return $mutationsCollectorVisitor->getMutations();
     }
 
-    private function getMutators() : array
+    private function hasTests(SplFileInfo $file): bool
+    {
+        return $this->codeCoverageData->hasTests($file->getRealPath());
+    }
+
+    private function getMutators(): array
     {
         return [
             // Arithmetic

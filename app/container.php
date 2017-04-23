@@ -6,7 +6,6 @@ use Pimple\Container;
 use Symfony\Component\Console\Application;
 use Infection\Utils\TempDirectoryCreator;
 use Infection\TestFramework\Factory;
-use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Differ\Differ;
 use Infection\Mutant\MutantCreator;
 use Infection\Command\InfectionCommand;
@@ -41,10 +40,6 @@ $c['path.replacer'] = function(Container $c) : PathReplacer {
 
 $c['test.framework.factory'] = function (Container $c) : Factory {
     return new Factory($c['temp.dir'], $c['config.locator'], $c['path.replacer']);
-};
-
-$c['mutations.generator'] = function (Container $c) : MutationsGenerator {
-    return new MutationsGenerator($c['src.dir']);
 };
 
 $c['mutant.creator'] = function (Container $c) : MutantCreator {

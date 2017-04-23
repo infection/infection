@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use Infection\TestFramework\Coverage\CodeCoverageData;
 use Symfony\Component\Process\Process;
 
 class Result
@@ -13,9 +14,15 @@ class Result
      */
     private $process;
 
-    public function __construct(Process $process)
+    /**
+     * @var CodeCoverageData
+     */
+    private $codeCoverageData;
+
+    public function __construct(Process $process, CodeCoverageData $codeCoverageData)
     {
         $this->process = $process;
+        $this->codeCoverageData = $codeCoverageData;
     }
 
     public function isSuccessful() : bool
@@ -36,5 +43,13 @@ class Result
     public function getExitCodeText()
     {
         return $this->process->getExitCodeText();
+    }
+
+    /**
+     * @return CodeCoverageData
+     */
+    public function getCodeCoverageData(): CodeCoverageData
+    {
+        return $this->codeCoverageData;
     }
 }
