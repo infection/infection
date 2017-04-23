@@ -6,9 +6,8 @@ namespace Infection\TestFramework;
 
 use Infection\Finder\AbstractExecutableFinder;
 use Infection\Mutant\Mutant;
-use Infection\TestFramework\PhpUnit\Config\InitialConfigBuilder;
-use Infection\TestFramework\PhpUnit\Config\MutationConfigBuilder;
-use Infection\TestFramework\PhpUnit\Config\MutationXmlConfiguration;
+use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
+use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 
 abstract class AbstractTestFrameworkAdapter
 {

@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Config;
+namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
 use Infection\Mutant\Mutant;
 use Infection\TestFramework\Config\ConfigBuilder;
-use Infection\TestFramework\Config\TestFrameworkConfigurationFile;
+use Infection\TestFramework\PhpUnit\Config\MutationXmlConfiguration;
+use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 
 class MutationConfigBuilder implements ConfigBuilder
 {
@@ -19,11 +20,16 @@ class MutationConfigBuilder implements ConfigBuilder
      * @var string
      */
     private $originalXmlConfigPath;
+    /**
+     * @var PathReplacer
+     */
+    private $pathReplacer;
 
-    public function __construct(string $tempDirectory, string $originalXmlConfigPath)
+    public function __construct(string $tempDirectory, string $originalXmlConfigPath, PathReplacer $pathReplacer)
     {
         $this->tempDirectory = $tempDirectory;
         $this->originalXmlConfigPath = $originalXmlConfigPath;
+        $this->pathReplacer = $pathReplacer;
     }
 
     public function build(Mutant $mutant = null): string
@@ -36,7 +42,13 @@ class MutationConfigBuilder implements ConfigBuilder
 
         file_put_contents($customAutoloadFilePath, $this->createCustomAutoloadWithInterceptor($mutant));
 
-        $xmlConfiguration = new MutationXmlConfiguration($this->originalXmlConfigPath, $customAutoloadFilePath);
+        $xmlConfiguration = new MutationXmlConfiguration(
+            $this->tempDirectory,
+            $this->originalXmlConfigPath,
+            $this->pathReplacer,
+            $customAutoloadFilePath
+        );
+
         $newXml = $xmlConfiguration->getXml();
 
         $path = $this->buildPath($mutant);

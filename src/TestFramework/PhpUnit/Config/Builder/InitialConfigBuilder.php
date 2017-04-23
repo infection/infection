@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Config;
+namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
-use Infection\Finder\Locator;
 use Infection\TestFramework\Config\ConfigBuilder ;
+use Infection\TestFramework\PhpUnit\Config\InitialXmlConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 
 class InitialConfigBuilder implements ConfigBuilder
@@ -34,13 +34,13 @@ class InitialConfigBuilder implements ConfigBuilder
     {
         $path = $this->buildPath();
 
-        $xmlConfigurationFileStrategy = new InitialXmlConfiguration(
+        $xmlConfigurationFile = new InitialXmlConfiguration(
             $this->tempDirectory,
             $this->originalXmlConfigPath,
             $this->pathReplacer
         );
 
-        file_put_contents($path, $xmlConfigurationFileStrategy->getXml());
+        file_put_contents($path, $xmlConfigurationFile->getXml());
 
         return $path;
     }

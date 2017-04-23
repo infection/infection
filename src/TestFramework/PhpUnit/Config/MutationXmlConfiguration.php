@@ -5,50 +5,45 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config;
 
+use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 
-class MutationXmlConfiguration
+class MutationXmlConfiguration extends AbstractXmlConfiguration
 {
-    /**
-     * @var string
-     */
-    private $originalXmlConfigPath;
-
     /**
      * @var string
      */
     private $customAutoloadFilePath;
 
-    public function __construct(string $originalXmlConfigPath, string $customAutoloadFilePath)
+    public function __construct(string $tempDirectory, string $originalXmlConfigPath, PathReplacer $pathReplacer, string $customAutoloadFilePath)
     {
-        $this->originalXmlConfigPath = $originalXmlConfigPath;
+        parent::__construct($tempDirectory, $originalXmlConfigPath, $pathReplacer);
+
         $this->customAutoloadFilePath = $customAutoloadFilePath;
     }
 
     public function getXml() : string
     {
-        return '<?xml version="1.0" encoding="UTF-8"?>
-                <phpunit backupGlobals="false"
-                         backupStaticAttributes="false"
-                         bootstrap="' . $this->customAutoloadFilePath . '"
-                         colors="true"
-                         convertErrorsToExceptions="true"
-                         convertNoticesToExceptions="true"
-                         convertWarningsToExceptions="true"
-                         processIsolation="false"
-                         stopOnFailure="false"
-                         syntaxCheck="false"
-                >
-                    <testsuites>
-                        <testsuite name="Application Test Suite">
-                            <directory>/Users/user/tmp/remove/tests/</directory>
-                        </testsuite>
-                    </testsuites>
-                
-                    <filter>
-                        <whitelist>
-                            <directory>/Users/user/tmp/remove/src/</directory>
-                        </whitelist>
-                    </filter>
-                </phpunit>';
+        $originalXml = file_get_contents($this->originalXmlConfigPath);
+
+        $dom = new \DOMDocument();
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($originalXml);
+
+        $xPath = new \DOMXPath($dom);
+
+        $this->replaceWithAbsolutePaths($xPath);
+        $this->setCustomAutoLoaderPath($xPath);
+        $this->setStopOnFailure($xPath);
+        $this->removeExistingLoggers($dom, $xPath);
+
+        return $dom->saveXML();
+    }
+
+    private function setCustomAutoLoaderPath(\DOMXPath $xPath)
+    {
+        $node = $xPath->query('/phpunit/@bootstrap')[0];
+
+        $node->nodeValue = $this->customAutoloadFilePath;
     }
 }

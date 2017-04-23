@@ -9,8 +9,8 @@ use Infection\TestFramework\Config\ConfigLocator;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
-use Infection\TestFramework\PhpUnit\Config\InitialConfigBuilder;
-use Infection\TestFramework\PhpUnit\Config\MutationConfigBuilder;
+use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
+use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 
 class Factory
@@ -43,7 +43,7 @@ class Factory
             return new PhpUnitAdapter(
                 new TestFrameworkExecutableFinder(PhpUnitAdapter::NAME),
                 new InitialConfigBuilder($this->tempDir, $phpUnitConfigPath, $this->pathReplacer),
-                new MutationConfigBuilder($this->tempDir, $phpUnitConfigPath),
+                new MutationConfigBuilder($this->tempDir, $phpUnitConfigPath, $this->pathReplacer),
                 new ArgumentsAndOptionsBuilder()
             );
         }
