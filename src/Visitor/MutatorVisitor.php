@@ -19,10 +19,15 @@ class MutatorVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node)
     {
+        $attributes = $node->getAttributes();
+
+        if (! array_key_exists('startTokenPos', $attributes)) {
+            return null;
+        }
+
         $mutator = $this->mutation->getMutator();
         $mutatedAttributes = $this->mutation->getAttributes();
 
-        $attributes = $node->getAttributes();
         $isEqualPosition = $attributes['startTokenPos'] === $mutatedAttributes['startTokenPos'] &&
             $attributes['endTokenPos'] === $mutatedAttributes['endTokenPos'];
 
