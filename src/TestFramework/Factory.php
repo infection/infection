@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use Infection\Finder\TestFrameworkExecutableFinder;
+use Infection\TestFramework\Config\ConfigLocator;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
@@ -23,19 +24,26 @@ class Factory
      */
     private $pathReplacer;
 
-    public function __construct(string $tempDir, PathReplacer $pathReplacer)
+    /**
+     * @var ConfigLocator
+     */
+    private $configLocator;
+
+    public function __construct(string $tempDir, ConfigLocator $configLocator, PathReplacer $pathReplacer)
     {
         $this->tempDir = $tempDir;
+        $this->configLocator = $configLocator;
         $this->pathReplacer = $pathReplacer;
     }
 
     public function create($adapterName) : AbstractTestFrameworkAdapter
     {
         if ($adapterName === PhpUnitAdapter::NAME) {
+            $phpUnitConfigPath = $this->configLocator->locate();
             return new PhpUnitAdapter(
                 new TestFrameworkExecutableFinder(PhpUnitAdapter::NAME),
-                new InitialConfigBuilder($this->tempDir, 'phpunit.xml', $this->pathReplacer),
-                new MutationConfigBuilder($this->tempDir, '/Users/user/tmp/remove/phpunit.xml'), // TODO replace hardcoded path
+                new InitialConfigBuilder($this->tempDir, $phpUnitConfigPath, $this->pathReplacer),
+                new MutationConfigBuilder($this->tempDir, $phpUnitConfigPath),
                 new ArgumentsAndOptionsBuilder()
             );
         }

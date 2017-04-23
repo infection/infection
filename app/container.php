@@ -14,11 +14,13 @@ use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Finder\Locator;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
+use Infection\TestFramework\Config\ConfigLocator;
 
 $c = new Container();
 
 $c['src.dir'] = 'src';
 $c['project.dir'] = getcwd();
+$c['config.dir'] = getcwd();
 
 $c['temp.dir'] = function (Container $c) : string {
     return $c['temp.dir.creator']->createAndGet();
@@ -37,7 +39,7 @@ $c['path.replacer'] = function(Container $c) : PathReplacer {
 };
 
 $c['test.framework.factory'] = function (Container $c) : Factory {
-    return new Factory($c['temp.dir'], $c['path.replacer']);
+    return new Factory($c['temp.dir'], $c['config.locator'], $c['path.replacer']);
 };
 
 $c['mutations.generator'] = function (Container $c) : MutationsGenerator {
@@ -59,6 +61,11 @@ $c['dispatcher'] = function () : EventDispatcher {
 $c['parallel.process.runner'] = function (Container $c) : ParallelProcessRunner {
     return new ParallelProcessRunner($c['dispatcher']);
 };
+
+$c['config.locator'] = function (Container $c) : ConfigLocator {
+    return new ConfigLocator($c['config.dir']);
+};
+
 
 $c['application'] = function (Container $container) : Application {
     $application = new Application();
