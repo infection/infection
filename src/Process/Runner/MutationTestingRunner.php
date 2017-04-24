@@ -66,7 +66,6 @@ class MutationTestingRunner
 
         $this->eventDispatcher->dispatch(new MutationTestingStarted($mutantCount));
 
-        // TODO add timeout handling like in humbug
         $this->parallelProcessManager->run($processes, $threadCount);
 
         $this->eventDispatcher->dispatch(new MutationTestingFinished());

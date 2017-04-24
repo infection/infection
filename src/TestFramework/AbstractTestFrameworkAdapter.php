@@ -52,7 +52,7 @@ abstract class AbstractTestFrameworkAdapter
      * @param string $configPath
      * @return string
      */
-    public function getExecutableCommandLine($configPath) : string
+    public function getExecutableCommandLine(string $configPath) : string
     {
         return sprintf(
             '%s %s',

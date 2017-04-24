@@ -7,23 +7,16 @@ namespace Infection\TestFramework\Coverage;
 class CodeCoverageData
 {
     /**
-     * @var string
-     */
-    private $coverageFilePath;
-
-    /**
      * @var \SebastianBergmann\CodeCoverage\CodeCoverage
      */
     private $coverage;
 
     public function __construct(string $coverageFilePath)
     {
-        $this->coverageFilePath = $coverageFilePath;
-
         $this->coverage = require $coverageFilePath;
     }
 
-    public function hasTests(string $filePath)
+    public function hasTests(string $filePath): bool
     {
         $data = $this->coverage->getData();
 
@@ -41,7 +34,7 @@ class CodeCoverageData
         return count($coveredLineTestMethods) > 0;
     }
 
-    public function hasTestsOnLine(string $filePath, int $line)
+    public function hasTestsOnLine(string $filePath, int $line): bool
     {
         $data = $this->coverage->getData();
 

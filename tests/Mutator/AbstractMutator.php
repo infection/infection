@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Infection\Tests\Mutator;
 
 use Infection\Mutator\Mutator;
 use Infection\Tests\Fixtures\SimpleMutatorVisitor;
+use Infection\Visitor\ParentConnectorVisitor;
 use PHPUnit\Framework\TestCase;
 use PhpParser\Lexer;
 use PhpParser\ParserFactory;
@@ -24,7 +27,7 @@ abstract class AbstractMutator extends TestCase
         $this->mutator = $this->getMutator();
     }
 
-    protected function getNodes($code) : array
+    protected function getNodes(string $code) : array
     {
         $lexer = new Lexer();
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
@@ -32,13 +35,14 @@ abstract class AbstractMutator extends TestCase
         return $parser->parse($code);
     }
 
-    protected function mutate($code)
+    protected function mutate(string $code)
     {
         $traverser = new NodeTraverser();
         $prettyPrinter = new Standard();
 
         $nodes = $this->getNodes($code);
 
+        $traverser->addVisitor(new ParentConnectorVisitor());
         $traverser->addVisitor(new SimpleMutatorVisitor($this->mutator));
 
         $mutatedNodes = $traverser->traverse($nodes);

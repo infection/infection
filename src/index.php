@@ -50,6 +50,8 @@ $callback = function () {
 };
 ';
 
+$originalCode = '<?php !!rand();';
+
 $mutators = [
     new Plus(),
     new Minus(),
@@ -57,11 +59,11 @@ $mutators = [
     new IntegerNegotiation(),
 ];
 
-$mutationsCollectorVisitor = new MutationsCollectorVisitor($mutators);
+//$mutationsCollectorVisitor = new MutationsCollectorVisitor($mutators);
 
 $traverser->addVisitor(new ParentConnectorVisitor());
 $traverser->addVisitor(new InsideFunctionDetectorVisitor());
-$traverser->addVisitor($mutationsCollectorVisitor);
+//$traverser->addVisitor($mutationsCollectorVisitor);
 
 $initialStatements = $parser->parse($originalCode);
 // traverse

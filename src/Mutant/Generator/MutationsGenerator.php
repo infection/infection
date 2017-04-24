@@ -8,6 +8,11 @@ namespace Infection\Mutant\Generator;
 
 use Infection\Mutator\Arithmetic\Minus;
 use Infection\Mutator\Arithmetic\Plus;
+use Infection\Mutator\Boolean\FalseValue;
+use Infection\Mutator\Boolean\LogicalAnd;
+use Infection\Mutator\Boolean\LogicalNot;
+use Infection\Mutator\Boolean\LogicalOr;
+use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\ConditionalBoundary\GreaterThan;
 use Infection\Mutator\ConditionalBoundary\LessThan;
 use Infection\Mutator\ConditionalNegotiation\Identical;
@@ -116,11 +121,22 @@ class MutationsGenerator
 
     private function getMutators(): array
     {
+        // TODO [major] check why doesn't it mutate Plus.php:: line     25
+
+
         return [
+            // Boolean
+            new LogicalAnd(),
+            new LogicalOr(),
+            new LogicalNot(),
+            new FalseValue(),
+            new TrueValue(),
+
             // Arithmetic
             new Plus(),
             new Minus(),
 
+            // Return Value
             new FunctionCall(),
             new IntegerNegotiation(),
 
