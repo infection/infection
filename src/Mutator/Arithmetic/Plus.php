@@ -10,6 +10,12 @@ use PhpParser\Node\Expr\Array_;
 
 class Plus implements Mutator
 {
+    /**
+     * Replaces "+" with "-"
+     *
+     * @param Node $node
+     * @return Node\Expr\BinaryOp\Minus
+     */
     public function mutate(Node $node)
     {
         return new Node\Expr\BinaryOp\Minus($node->left, $node->right, $node->getAttributes());
@@ -21,7 +27,7 @@ class Plus implements Mutator
             return false;
         }
 
-        if ($node->left instanceof Array_ || $node->right instanceof Array_) {
+        if ($node->left instanceof Array_ && $node->right instanceof Array_) {
             return false;
         }
 

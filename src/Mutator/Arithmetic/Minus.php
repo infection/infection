@@ -9,6 +9,12 @@ use PhpParser\Node;
 
 class Minus implements Mutator
 {
+    /**
+     * Replaces "-" with "+"
+     *
+     * @param Node $node
+     * @return Node\Expr\BinaryOp\Plus
+     */
     public function mutate(Node $node)
     {
         return new Node\Expr\BinaryOp\Plus($node->left, $node->right, $node->getAttributes());

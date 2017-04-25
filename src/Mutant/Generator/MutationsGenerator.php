@@ -6,7 +6,9 @@ declare(strict_types=1);
 namespace Infection\Mutant\Generator;
 
 
+use Infection\Mutator\Arithmetic\Division;
 use Infection\Mutator\Arithmetic\Minus;
+use Infection\Mutator\Arithmetic\Multiplication;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\FalseValue;
 use Infection\Mutator\Boolean\LogicalAnd;
@@ -17,6 +19,8 @@ use Infection\Mutator\ConditionalBoundary\GreaterThan;
 use Infection\Mutator\ConditionalBoundary\LessThan;
 use Infection\Mutator\ConditionalNegotiation\Identical;
 use Infection\Mutator\ConditionalNegotiation\NotIdentical;
+use Infection\Mutator\Number\OneZeroFloat;
+use Infection\Mutator\Number\OneZeroInteger;
 use Infection\Mutator\ReturnValue\FunctionCall;
 use Infection\Mutator\ReturnValue\IntegerNegotiation;
 use Infection\TestFramework\Coverage\CodeCoverageData;
@@ -131,6 +135,12 @@ class MutationsGenerator
             // Arithmetic
             new Plus(),
             new Minus(),
+            new Multiplication(),
+            new Division(),
+
+            // Number
+            new OneZeroInteger(),
+            new OneZeroFloat(),
 
             // Return Value
             new FunctionCall(),
