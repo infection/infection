@@ -64,8 +64,9 @@ class InfectionCommand extends Command
         $output->writeln('Start mutation testing...');
 
         $onlyCovered = $input->getOption('only-covered');
+        $filesFilter = $input->getOption('filter');
         $mutationsGenerator = new MutationsGenerator($this->get('src.dir'), $result->getCodeCoverageData());
-        $mutations = $mutationsGenerator->generate($onlyCovered);
+        $mutations = $mutationsGenerator->generate($onlyCovered, $filesFilter);
 
         $threadCount = (int) $input->getOption('threads');
         $parallelProcessManager = $this->get('parallel.process.runner');
@@ -101,6 +102,13 @@ class InfectionCommand extends Command
                 null,
                 InputOption::VALUE_NONE,
                 'Mutate only covered by tests lines of code'
+            )
+            ->addOption(
+                'filter',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Filter which files to mutate',
+                ''
             )
         ;
     }

@@ -46,11 +46,12 @@ class MutationsGenerator
 
     /**
      * @param bool $onlyCovered mutate only covered by tests lines of code
+     * @param string $filter
      * @return array
      */
-    public function generate(bool $onlyCovered): array
+    public function generate(bool $onlyCovered, string $filter = ''): array
     {
-        $files = $this->getSrcFiles();
+        $files = $this->getSrcFiles($filter);
         $allFilesMutations = [];
 
         foreach ($files as $file) {
@@ -63,17 +64,15 @@ class MutationsGenerator
     }
 
     /**
+     * @param string $filter
      * @return Finder
-     * @throws \InvalidArgumentException
      */
-    private function getSrcFiles(): Finder
+    private function getSrcFiles(string $filter = ''): Finder
     {
         $finder = new Finder();
         $finder->files()->in($this->srcDir);
 
-        $finder->files()->name('*.php');
-//        $finder->files()->name('Example*.php');
-//        $finder->files()->name('Plus.php');
+        $finder->files()->name($filter ?: '*.php');
 
         return $finder;
     }
@@ -121,9 +120,6 @@ class MutationsGenerator
 
     private function getMutators(): array
     {
-        // TODO [major] check why doesn't it mutate Plus.php:: line     25
-
-
         return [
             // Boolean
             new LogicalAnd(),

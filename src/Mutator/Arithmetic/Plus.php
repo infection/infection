@@ -21,7 +21,7 @@ class Plus implements Mutator
             return false;
         }
 
-        if ($node->left instanceof Array_ && $node->right instanceof Array_) {
+        if ($node->left instanceof Array_ || $node->right instanceof Array_) {
             return false;
         }
 
