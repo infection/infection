@@ -3,16 +3,15 @@
 declare(strict_types=1);
 
 
-namespace Infection\Mutator\ConditionalBoundary;
-
+namespace Infection\Mutator\ConditionalNegotiation;
 
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
-class LessThanOrEqualTo implements Mutator
+class GreaterThanOrEqualTo implements Mutator
 {
     /**
-     * Replaces "<=" with "<"
+     * Replaces ">=" with "<"
      *
      * @param Node $node
      * @return Node\Expr\BinaryOp\Smaller
@@ -24,6 +23,6 @@ class LessThanOrEqualTo implements Mutator
 
     public function shouldMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\SmallerOrEqual;
+        return $node instanceof Node\Expr\BinaryOp\GreaterOrEqual;
     }
 }

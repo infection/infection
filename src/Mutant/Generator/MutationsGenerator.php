@@ -6,18 +6,40 @@ declare(strict_types=1);
 namespace Infection\Mutant\Generator;
 
 
+use Infection\Mutator\Arithmetic\BitwiseAnd;
+use Infection\Mutator\Arithmetic\BitwiseNot;
+use Infection\Mutator\Arithmetic\BitwiseOr;
+use Infection\Mutator\Arithmetic\BitwiseXor;
+use Infection\Mutator\Arithmetic\DivEqual;
 use Infection\Mutator\Arithmetic\Division;
+use Infection\Mutator\Arithmetic\Exponentiation;
 use Infection\Mutator\Arithmetic\Minus;
+use Infection\Mutator\Arithmetic\MinusEqual;
+use Infection\Mutator\Arithmetic\ModEqual;
+use Infection\Mutator\Arithmetic\Modulus;
+use Infection\Mutator\Arithmetic\MulEqual;
 use Infection\Mutator\Arithmetic\Multiplication;
 use Infection\Mutator\Arithmetic\Plus;
+use Infection\Mutator\Arithmetic\PlusEqual;
+use Infection\Mutator\Arithmetic\PowEqual;
+use Infection\Mutator\Arithmetic\ShiftLeft;
+use Infection\Mutator\Arithmetic\ShiftRight;
 use Infection\Mutator\Boolean\FalseValue;
 use Infection\Mutator\Boolean\LogicalAnd;
+use Infection\Mutator\Boolean\LogicalLowerAnd;
+use Infection\Mutator\Boolean\LogicalLowerOr;
 use Infection\Mutator\Boolean\LogicalNot;
 use Infection\Mutator\Boolean\LogicalOr;
 use Infection\Mutator\Boolean\TrueValue;
+use Infection\Mutator\ConditionalBoundary\GreaterThanOrEqualTo;
 use Infection\Mutator\ConditionalBoundary\GreaterThan;
 use Infection\Mutator\ConditionalBoundary\LessThan;
+use Infection\Mutator\ConditionalBoundary\LessThanOrEqualTo;
+use Infection\Mutator\ConditionalNegotiation\Equal;
+use Infection\Mutator\ConditionalNegotiation\GreaterThan as GreaterThanNegotiation;
+use Infection\Mutator\ConditionalNegotiation\GreaterThanOrEqualTo as GreaterThanOrEqualToNegotiation;
 use Infection\Mutator\ConditionalNegotiation\Identical;
+use Infection\Mutator\ConditionalNegotiation\NotEqual;
 use Infection\Mutator\ConditionalNegotiation\NotIdentical;
 use Infection\Mutator\Number\OneZeroFloat;
 use Infection\Mutator\Number\OneZeroInteger;
@@ -125,18 +147,50 @@ class MutationsGenerator
     private function getMutators(): array
     {
         return [
+            // Arithmetic
+            new BitwiseAnd(),
+            new BitwiseNot(),
+            new BitwiseOr(),
+            new BitwiseXor(),
+            new DivEqual(),
+            new Division(),
+            new Exponentiation(),
+            new Minus(),
+            new MinusEqual(),
+            new ModEqual(),
+            new Modulus(),
+            new MulEqual(),
+            new Multiplication(),
+            new Plus(),
+            new PlusEqual(),
+            new PowEqual(),
+            new ShiftLeft(),
+            new ShiftRight(),
+
             // Boolean
-            new LogicalAnd(),
-            new LogicalOr(),
-            new LogicalNot(),
             new FalseValue(),
+            new LogicalAnd(),
+            new LogicalLowerAnd(),
+            new LogicalLowerOr(),
+            new LogicalNot(),
+            new LogicalOr(),
             new TrueValue(),
 
-            // Arithmetic
-            new Plus(),
-            new Minus(),
-            new Multiplication(),
-            new Division(),
+            // Conditional Boundary
+            new GreaterThan(),
+            new GreaterThanOrEqualTo(),
+            new LessThan(),
+            new LessThanOrEqualTo(),
+
+            // Conditional Negotiation
+            new Equal(),
+            new GreaterThanNegotiation(),
+            new GreaterThanOrEqualToNegotiation(),
+            new Identical(),
+            new LessThan(),
+            new LessThanOrEqualTo(),
+            new NotEqual(),
+            new NotIdentical(),
 
             // Number
             new OneZeroInteger(),
@@ -145,14 +199,6 @@ class MutationsGenerator
             // Return Value
             new FunctionCall(),
             new IntegerNegotiation(),
-
-            // Conditional Boundary
-            new LessThan(),
-            new GreaterThan(),
-
-            // Conditional Negotiation
-            new Identical(),
-            new NotIdentical(),
         ];
     }
 }

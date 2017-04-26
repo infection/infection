@@ -9,7 +9,7 @@ namespace Infection\Mutator\ConditionalBoundary;
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
-class GreaterOrEqualTo implements Mutator
+class GreaterThanOrEqualTo implements Mutator
 {
     /**
      * Replaces ">=" with ">"
