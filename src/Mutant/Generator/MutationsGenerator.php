@@ -49,6 +49,7 @@ use Infection\Mutator\ReturnValue\FloatNegation;
 use Infection\Mutator\ReturnValue\FunctionCall;
 use Infection\Mutator\ReturnValue\IntegerNegation;
 use Infection\Mutator\ReturnValue\NewObject;
+use Infection\Mutator\ReturnValue\This;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Tests\Mutator\ReturnValue\NewObjectTest;
 use Infection\Visitor\InsideFunctionDetectorVisitor;
@@ -204,10 +205,11 @@ class MutationsGenerator
             new OneZeroFloat(),
 
             // Return Value
+            new FloatNegation(),
             new FunctionCall(),
             new IntegerNegation(),
-            new FloatNegation(),
             new NewObject(),
+            new This(),
         ];
     }
 }
