@@ -7,7 +7,7 @@ namespace Infection\Mutator\ReturnValue;
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
-class IntegerNegotiation implements Mutator
+class IntegerNegation implements Mutator
 {
     public function mutate(Node $node) {
         $integerValue = $node->expr instanceof Node\Expr\UnaryMinus

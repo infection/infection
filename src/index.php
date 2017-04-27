@@ -11,7 +11,7 @@ use Infection\Visitor\InsideFunctionDetectorVisitor;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Arithmetic\Minus;
 use Infection\Mutator\ReturnValue\FunctionCall;
-use \Infection\Mutator\ReturnValue\IntegerNegotiation;
+use \Infection\Mutator\ReturnValue\IntegerNegation;
 
 $lexer = new PhpParser\Lexer(array(
     'usedAttributes' => array(
@@ -50,13 +50,13 @@ $callback = function () {
 };
 ';
 
-$originalCode = '<?php !!rand();';
+$originalCode = '<?php return $this;';
 
 $mutators = [
     new Plus(),
     new Minus(),
     new FunctionCall(),
-    new IntegerNegotiation(),
+    new IntegerNegation(),
 ];
 
 //$mutationsCollectorVisitor = new MutationsCollectorVisitor($mutators);
@@ -69,7 +69,7 @@ $initialStatements = $parser->parse($originalCode);
 // traverse
 $stmts = $traverser->traverse($initialStatements);
 // $stmts is an array of statement nodes
-//var_dump($stmts);
+var_dump($stmts);
 echo $nodeDumper->dump($stmts), "\n";
 
 // pretty print

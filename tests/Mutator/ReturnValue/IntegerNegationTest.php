@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Mutator\Mutator;
-use Infection\Mutator\ReturnValue\IntegerNegotiation;
+use Infection\Mutator\ReturnValue\IntegerNegation;
 use Infection\Tests\Mutator\AbstractMutator;
 
 
-class IntegerNegotiationTest extends AbstractMutator
+class IntegerNegationTest extends AbstractMutator
 {
     public function test_not_mutates_with_value_return_true()
     {
@@ -69,13 +69,13 @@ class IntegerNegotiationTest extends AbstractMutator
 
     public function test_gets_mutation_reverses_integer_sign_when_positive()
     {
-        $code = '<?php return 1;';
+        $code = '<?php return 2;';
         $mutatedCode = $this->mutate($code);
 
         $expectedMutatedCode = <<<'CODE'
 <?php
 
-return -1;
+return -2;
 CODE;
 
         $this->assertSame($expectedMutatedCode, $mutatedCode);
@@ -97,6 +97,6 @@ CODE;
 
     protected function getMutator() : Mutator
     {
-        return new IntegerNegotiation();
+        return new IntegerNegation();
     }
 }

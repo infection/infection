@@ -10,9 +10,11 @@ use Infection\Mutator\Arithmetic\BitwiseAnd;
 use Infection\Mutator\Arithmetic\BitwiseNot;
 use Infection\Mutator\Arithmetic\BitwiseOr;
 use Infection\Mutator\Arithmetic\BitwiseXor;
+use Infection\Mutator\Arithmetic\Decrement;
 use Infection\Mutator\Arithmetic\DivEqual;
 use Infection\Mutator\Arithmetic\Division;
 use Infection\Mutator\Arithmetic\Exponentiation;
+use Infection\Mutator\Arithmetic\Increment;
 use Infection\Mutator\Arithmetic\Minus;
 use Infection\Mutator\Arithmetic\MinusEqual;
 use Infection\Mutator\Arithmetic\ModEqual;
@@ -43,9 +45,12 @@ use Infection\Mutator\ConditionalNegotiation\NotEqual;
 use Infection\Mutator\ConditionalNegotiation\NotIdentical;
 use Infection\Mutator\Number\OneZeroFloat;
 use Infection\Mutator\Number\OneZeroInteger;
+use Infection\Mutator\ReturnValue\FloatNegation;
 use Infection\Mutator\ReturnValue\FunctionCall;
-use Infection\Mutator\ReturnValue\IntegerNegotiation;
+use Infection\Mutator\ReturnValue\IntegerNegation;
+use Infection\Mutator\ReturnValue\NewObject;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\Tests\Mutator\ReturnValue\NewObjectTest;
 use Infection\Visitor\InsideFunctionDetectorVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
@@ -152,9 +157,11 @@ class MutationsGenerator
             new BitwiseNot(),
             new BitwiseOr(),
             new BitwiseXor(),
+            new Decrement(),
             new DivEqual(),
             new Division(),
             new Exponentiation(),
+            new Increment(),
             new Minus(),
             new MinusEqual(),
             new ModEqual(),
@@ -198,7 +205,9 @@ class MutationsGenerator
 
             // Return Value
             new FunctionCall(),
-            new IntegerNegotiation(),
+            new IntegerNegation(),
+            new FloatNegation(),
+            new NewObject(),
         ];
     }
 }

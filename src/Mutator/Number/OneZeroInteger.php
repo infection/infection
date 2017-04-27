@@ -9,6 +9,12 @@ use PhpParser\Node;
 
 class OneZeroInteger implements Mutator
 {
+    /**
+     * Replaces "0" with "1" or "1" with "0"
+     *
+     * @param Node $node
+     * @return Node\Scalar\LNumber
+     */
     public function mutate(Node $node)
     {
         if ($node->value === 0) {
