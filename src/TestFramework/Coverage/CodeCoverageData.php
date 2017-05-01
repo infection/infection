@@ -16,24 +16,32 @@ class CodeCoverageData
      */
     private $coverage;
 
+    /**
+     * @var string
+     */
+    private $coverageDir;
+
+    /**
+     * @var CoverageXmlParser
+     */
+    private $parser;
+
     public function __construct(string $coverageDir, CoverageXmlParser $coverageXmlParser)
     {
-        $coverageIndexFilePath = $coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME;
-        $coverageIndexFileContent = file_get_contents($coverageIndexFilePath);
-
-        $this->coverage = $coverageXmlParser->parse($coverageIndexFileContent);
+        $this->coverageDir = $coverageDir;
+        $this->parser = $coverageXmlParser;
     }
 
     public function hasTests(string $filePath): bool
     {
-        $data = $this->coverage;
+        $coverageData = $this->getCoverage();
 
-        if (!isset($data[$filePath])) {
+        if (!isset($coverageData[$filePath])) {
             return false;
         }
 
         $coveredLineTestMethods = array_filter(
-            $data[$filePath],
+            $coverageData[$filePath],
             function ($testMethods) {
                 return count($testMethods) > 0;
             }
@@ -44,16 +52,28 @@ class CodeCoverageData
 
     public function hasTestsOnLine(string $filePath, int $line): bool
     {
-        $data = $this->coverage;
+        $coverageData = $this->getCoverage();
 
-        if (!isset($data[$filePath])) {
+        if (!isset($coverageData[$filePath])) {
             return false;
         }
 
-        if (!isset($data[$filePath][$line])) {
+        if (!isset($coverageData[$filePath][$line])) {
             return false;
         }
 
-        return !empty($data[$filePath][$line]);
+        return !empty($coverageData[$filePath][$line]);
+    }
+
+    private function getCoverage(): array
+    {
+        if (null === $this->coverage) {
+            $coverageIndexFilePath = $this->coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME;
+            $coverageIndexFileContent = file_get_contents($coverageIndexFilePath);
+
+            $this->coverage = $this->parser->parse($coverageIndexFileContent);
+        }
+
+        return $this->coverage;
     }
 }

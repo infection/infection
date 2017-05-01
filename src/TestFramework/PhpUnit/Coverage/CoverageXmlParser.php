@@ -61,11 +61,12 @@ class CoverageXmlParser
         $dom->loadXML($this->removeNamespace($coverageFileXml));
         $xPath = new \DOMXPath($dom);
 
-        $sourceFilePath = $this->getSourceFilePath($xPath);
+        $sourceFilePath = $this->getSourceFilePath($xPath, $relativeCoverageFilePath);
 
         $linesNode = $xPath->query('/phpunit/file/totals/lines')[0];
+        $percentage = $linesNode->getAttribute('percent');
 
-        if ($linesNode->getAttribute('percent') === '0.00') {
+        if ($percentage === '0.00' || empty($percentage)) {
             return [$sourceFilePath => []];
         }
 
@@ -92,13 +93,24 @@ class CoverageXmlParser
 
     /**
      * @param \DOMXPath $xPath
+     * @param string $relativeCoverageFilePath
      * @return string
      */
-    private function getSourceFilePath(\DOMXPath $xPath): string
+    private function getSourceFilePath(\DOMXPath $xPath, string $relativeCoverageFilePath): string
     {
         $fileNode = $xPath->query('/phpunit/file')[0];
         $fileName = $fileNode->getAttribute('name');
         $relativeFilePath = $fileNode->getAttribute('path');
+
+        if (! $relativeFilePath) {
+            // path is not present for old versions of PHPUnit, so parth the source file path from
+            // the path of XML coverage file
+            $relativeFilePath = str_replace(
+                sprintf('%s.xml', $fileName),
+                    '',
+                    $relativeCoverageFilePath
+            );
+        }
 
         return realpath($this->srcDir . '/' . $relativeFilePath . '/' . $fileName);
     }
