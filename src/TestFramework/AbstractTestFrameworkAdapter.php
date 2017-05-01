@@ -11,8 +11,6 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 
 abstract class AbstractTestFrameworkAdapter
 {
-    const COVERAGE_FILE_NAME = 'coverage.infection.php';
-
     /**
      * @var AbstractExecutableFinder
      */

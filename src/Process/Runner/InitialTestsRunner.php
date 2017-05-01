@@ -11,6 +11,7 @@ use Infection\Events\InitialTestSuiteStarted;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\Tests\TestFramework\PhpUnit\Config\AbstractXmlConfiguration;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Process\Process;
@@ -28,19 +29,21 @@ class InitialTestsRunner
     private $eventDispatcher;
 
     /**
-     * @var string
+     * @var CodeCoverageData
      */
-    private $tempDirectory;
+    private $coverageData;
 
     /**
+     * InitialTestsRunner constructor.
      * @param ProcessBuilder $processBuilder
      * @param EventDispatcherInterface $eventDispatcher
+     * @param CodeCoverageData $coverageData
      */
-    public function __construct(ProcessBuilder $processBuilder, EventDispatcherInterface $eventDispatcher, string $tempDirectory)
+    public function __construct(ProcessBuilder $processBuilder, EventDispatcherInterface $eventDispatcher, CodeCoverageData $coverageData)
     {
         $this->processBuilder = $processBuilder;
         $this->eventDispatcher = $eventDispatcher;
-        $this->tempDirectory = $tempDirectory;
+        $this->coverageData = $coverageData;
     }
 
     public function run() : Result
@@ -61,8 +64,6 @@ class InitialTestsRunner
 
         $this->eventDispatcher->dispatch(new InitialTestSuiteFinished());
 
-        $coverageFilePath = $this->tempDirectory . '/' . AbstractTestFrameworkAdapter::COVERAGE_FILE_NAME;
-
-        return new Result($process, new CodeCoverageData($coverageFilePath));
+        return new Result($process, $this->coverageData);
     }
 }

@@ -35,11 +35,8 @@ class InitialXmlConfigurationTest extends AbstractXmlConfiguration
         /** @var \DOMNodeList $logEntries */
         $logEntries = $this->queryXpath($xml, '/phpunit/logging/log');
 
-        /** @var \DOMNamedNodeMap $attributes */
-        $attributes = $logEntries[0]->attributes;
-
         $this->assertSame(1, $logEntries->length);
-        $this->assertSame($this->tempDir . '/coverage.infection.php', $attributes->getNamedItem('target')->value);
-        $this->assertSame('coverage-php', $attributes->getNamedItem('type')->value);
+        $this->assertSame($this->tempDir . '/coverage-xml', $logEntries[0]->getAttribute('target'));
+        $this->assertSame('coverage-xml', $logEntries[0]->getAttribute('type'));
     }
 }

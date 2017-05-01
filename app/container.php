@@ -14,6 +14,8 @@ use Infection\EventDispatcher\EventDispatcher;
 use Infection\Finder\Locator;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\Config\ConfigLocator;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\Coverage\CodeCoverageData;
 
 $c = new Container();
 
@@ -28,6 +30,10 @@ $c['temp.dir'] = function (Container $c) : string {
 
 $c['temp.dir.creator'] = function () : TempDirectoryCreator {
     return new TempDirectoryCreator();
+};
+
+$c['coverage.dir'] = function (Container $c) : string {
+    return $c['temp.dir'] . '/' . CodeCoverageData::COVERAGE_DIR;
 };
 
 $c['locator'] = function (Container $c) : Locator {
@@ -62,6 +68,13 @@ $c['config.locator'] = function (Container $c) : ConfigLocator {
     return new ConfigLocator($c['config.dir']);
 };
 
+$c['coverage.parser'] = function (Container $c) : CoverageXmlParser {
+    return new CoverageXmlParser($c['coverage.dir'], $c['src.dir']);
+};
+
+$c['coverage.data'] = function (Container $c) : CodeCoverageData {
+    return new CodeCoverageData($c['coverage.dir'], $c['coverage.parser']);
+};
 
 $c['application'] = function (Container $container) : Application {
     $application = new Application();

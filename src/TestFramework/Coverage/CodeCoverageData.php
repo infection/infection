@@ -4,21 +4,29 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+
 class CodeCoverageData
 {
+    const COVERAGE_DIR = 'coverage-xml';
+    const COVERAGE_INDEX_FILE_NAME = 'index.xml';
+
     /**
-     * @var \SebastianBergmann\CodeCoverage\CodeCoverage
+     * @var array
      */
     private $coverage;
 
-    public function __construct(string $coverageFilePath)
+    public function __construct(string $coverageDir, CoverageXmlParser $coverageXmlParser)
     {
-        $this->coverage = require $coverageFilePath;
+        $coverageIndexFilePath = $coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME;
+        $coverageIndexFileContent = file_get_contents($coverageIndexFilePath);
+
+        $this->coverage = $coverageXmlParser->parse($coverageIndexFileContent);
     }
 
     public function hasTests(string $filePath): bool
     {
-        $data = $this->coverage->getData();
+        $data = $this->coverage;
 
         if (!isset($data[$filePath])) {
             return false;
@@ -36,7 +44,7 @@ class CodeCoverageData
 
     public function hasTestsOnLine(string $filePath, int $line): bool
     {
-        $data = $this->coverage->getData();
+        $data = $this->coverage;
 
         if (!isset($data[$filePath])) {
             return false;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Config;
 
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 
 abstract class AbstractXmlConfiguration
@@ -70,8 +71,8 @@ abstract class AbstractXmlConfiguration
         }
 
         $log = $dom->createElement('log');
-        $log->setAttribute('type', 'coverage-php');
-        $log->setAttribute('target', $this->tempDirectory . '/' . AbstractTestFrameworkAdapter::COVERAGE_FILE_NAME);
+        $log->setAttribute('type', 'coverage-xml');
+        $log->setAttribute('target', $this->tempDirectory . '/' . CodeCoverageData::COVERAGE_DIR);
 
         $logging->appendChild($log);
     }

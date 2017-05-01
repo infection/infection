@@ -46,7 +46,7 @@ class InfectionCommand extends Command
         $processBuilder = new ProcessBuilder($adapter, $this->get('timeout'));
 
         // TODO add setFormatter
-        $initialTestsRunner = new InitialTestsRunner($processBuilder, $eventDispatcher, $this->get('temp.dir'));
+        $initialTestsRunner = new InitialTestsRunner($processBuilder, $eventDispatcher, $this->get('coverage.data'));
         $result = $initialTestsRunner->run();
 
         if (! $result->isSuccessful()) {
