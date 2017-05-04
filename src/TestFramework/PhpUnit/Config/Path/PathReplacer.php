@@ -13,17 +13,23 @@ class PathReplacer
      */
     private $locator;
 
-    public function __construct(Locator $fileLocator)
+    /**
+     * @var string|null
+     */
+    private $customPhpUnitConfigDir;
+
+    public function __construct(Locator $fileLocator, string $customPhpUnitConfigDir = null)
     {
         $this->locator = $fileLocator;
+        $this->customPhpUnitConfigDir = $customPhpUnitConfigDir;
     }
 
     public function replaceInNode(\DOMNode $domElement)
     {
         if (strpos($domElement->nodeValue, '*') === false) {
-            $domElement->nodeValue = $this->locator->locate($domElement->nodeValue);
+            $domElement->nodeValue = $this->locator->locate($domElement->nodeValue, $this->customPhpUnitConfigDir);
         } else {
-            $directories = $this->locator->locateDirectories($domElement->nodeValue);
+            $directories = $this->locator->locateDirectories($domElement->nodeValue, $this->customPhpUnitConfigDir);
 
             $domDocument = $domElement->ownerDocument;
 

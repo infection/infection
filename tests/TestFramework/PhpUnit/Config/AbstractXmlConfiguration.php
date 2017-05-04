@@ -39,7 +39,7 @@ abstract class AbstractXmlConfiguration extends TestCase
         $this->configuration = $this->getConfigurationObject();
     }
 
-    public function test_it_replaces_test_suite_director_wildcard()
+    public function test_it_replaces_test_suite_directory_wildcard()
     {
         $xml = $this->configuration->getXml();
 

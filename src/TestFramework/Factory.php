@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use Infection\Finder\TestFrameworkExecutableFinder;
-use Infection\TestFramework\Config\ConfigLocator;
+use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
@@ -25,11 +25,11 @@ class Factory
     private $pathReplacer;
 
     /**
-     * @var ConfigLocator
+     * @var TestFrameworkConfigLocator
      */
     private $configLocator;
 
-    public function __construct(string $tempDir, ConfigLocator $configLocator, PathReplacer $pathReplacer)
+    public function __construct(string $tempDir, TestFrameworkConfigLocator $configLocator, PathReplacer $pathReplacer)
     {
         $this->tempDir = $tempDir;
         $this->configLocator = $configLocator;
@@ -39,7 +39,7 @@ class Factory
     public function create($adapterName) : AbstractTestFrameworkAdapter
     {
         if ($adapterName === PhpUnitAdapter::NAME) {
-            $phpUnitConfigPath = $this->configLocator->locate();
+            $phpUnitConfigPath = $this->configLocator->locate(PhpUnitAdapter::NAME);
             return new PhpUnitAdapter(
                 new TestFrameworkExecutableFinder(PhpUnitAdapter::NAME),
                 new InitialConfigBuilder($this->tempDir, $phpUnitConfigPath, $this->pathReplacer),

@@ -33,6 +33,8 @@ class InfectionCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // TODO add to infection.json exclude <directory>../src/*Bundle/Tests</directory> from SF2.7
+
         /** @var EventDispatcher $eventDispatcher */
         $eventDispatcher = $this->get('dispatcher');
 

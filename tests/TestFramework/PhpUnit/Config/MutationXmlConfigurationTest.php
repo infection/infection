@@ -38,4 +38,23 @@ class MutationXmlConfigurationTest extends AbstractXmlConfiguration
 
         $this->assertSame('true', $value);
     }
+
+    public function test_it_replaces_test_suite_directory_wildcard_from_another_folder()
+    {
+        $phpUnitConfigDir = __DIR__ . '/../../../Files/phpunit/project-path/app';
+        $phpunitXmlPath = $phpUnitConfigDir . '/phpunit.xml';
+
+        $replacer = new PathReplacer(new Locator($this->pathToProject), $phpUnitConfigDir);
+
+        $configuration = new MutationXmlConfiguration($this->tempDir, $phpunitXmlPath, $replacer, $this->customAutoloadConfigPath);
+
+        $xml = $configuration->getXml();
+
+        /** @var \DOMNodeList $directories */
+        $directories = $this->queryXpath($xml, '/phpunit/testsuites/testsuite/directory');
+
+        $this->assertSame(2, $directories->length);
+        $this->assertSame($this->pathToProject . '/AnotherBundle', $directories[0]->nodeValue);
+        $this->assertSame($this->pathToProject . '/SomeBundle', $directories[1]->nodeValue);
+    }
 }
