@@ -30,6 +30,6 @@ class TestFrameworkConfigLocator
             return realpath($conf . '.dist');
         }
 
-        throw new \RuntimeException('Unable to locate phpunit.xml(.dist) file.');
+        throw new \RuntimeException(sprintf('Unable to locate %s.xml(.dist) file.', $testFrameworkName));
     }
 }

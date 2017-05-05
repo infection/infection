@@ -22,7 +22,7 @@ $c = new Container();
 
 $c['src.dir'] = 'src';
 $c['project.dir'] = getcwd();
-$c['timeout'] = 10; // seconds
+
 $c['phpunit.config.dir'] = function (Container $c): string {
     return $c['infection.config']->getPhpUnitConfigDir();
 };
@@ -79,7 +79,7 @@ $c['parallel.process.runner'] = function (Container $c) : ParallelProcessRunner 
 };
 
 $c['testframework.config.locator'] = function (Container $c) : TestFrameworkConfigLocator {
-    return new TestFrameworkConfigLocator($c['phpunit.config.dir']);
+    return new TestFrameworkConfigLocator($c['phpunit.config.dir']/*[phpunit.dif, phpspec.dir, ...]*/);
 };
 
 $c['coverage.parser'] = function (Container $c) : CoverageXmlParser {

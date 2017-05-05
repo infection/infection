@@ -7,6 +7,8 @@ namespace Infection\Utils;
 
 class InfectionConfig
 {
+    const PROCESS_TIMEOUT_SECONDS = 10;
+
     /**
      * @var \stdClass
      */
@@ -19,6 +21,15 @@ class InfectionConfig
 
     public function getPhpUnitConfigDir(): string
     {
-        return sprintf('%s/%s', getcwd(), $this->config->phpUnit->configDir ?? '');
+        if (isset($this->config->phpUnit->configDir)) {
+            return getcwd() . DIRECTORY_SEPARATOR . $this->config->phpUnit->configDir;
+        }
+
+        return getcwd();
+    }
+
+    public function getProcessTimeout(): int
+    {
+        return $this->config->timeout ?? self::PROCESS_TIMEOUT_SECONDS;
     }
 }
