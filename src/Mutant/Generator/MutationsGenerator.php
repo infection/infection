@@ -63,17 +63,26 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class MutationsGenerator
 {
-    private $srcDir;
+    /**
+     * @var array source directories
+     */
+    private $srcDirs;
 
     /**
      * @var CodeCoverageData
      */
     private $codeCoverageData;
 
-    public function __construct(string $srcDir, CodeCoverageData $codeCoverageData)
+    /**
+     * @var array
+     */
+    private $excludeDirs;
+
+    public function __construct(array $srcDirs, array $excludeDirs, CodeCoverageData $codeCoverageData)
     {
-        $this->srcDir = $srcDir;
+        $this->srcDirs = $srcDirs;
         $this->codeCoverageData = $codeCoverageData;
+        $this->excludeDirs = $excludeDirs;
     }
 
     /**
@@ -98,11 +107,15 @@ class MutationsGenerator
     /**
      * @param string $filter
      * @return Finder
+     * @throws \InvalidArgumentException
      */
     private function getSrcFiles(string $filter = ''): Finder
     {
         $finder = new Finder();
-        $finder->files()->in($this->srcDir);
+        $finder->files()->in($this->srcDirs);
+//        var_dump($this->excludeDirs);
+        $finder->exclude($this->excludeDirs);
+//        var_dump(iterator_to_array($finder->files()));die;
 
         $finder->files()->name($filter ?: '*.php');
 

@@ -7,19 +7,19 @@ namespace Infection\TestFramework\PhpUnit\Coverage;
 class CoverageXmlParser
 {
     /**
-     * @var string
+     * @var array
      */
-    private $srcDir;
+    private $srcDirs;
 
     /**
      * @var string
      */
     private $coverageDir;
 
-    public function __construct(string $coverageDir, string $srcDir)
+    public function __construct(string $coverageDir, array $srcDirs)
     {
         $this->coverageDir = $coverageDir;
-        $this->srcDir = $srcDir;
+        $this->srcDirs = $srcDirs;
     }
 
     /**
@@ -103,7 +103,7 @@ class CoverageXmlParser
         $relativeFilePath = $fileNode->getAttribute('path');
 
         if (! $relativeFilePath) {
-            // path is not present for old versions of PHPUnit, so parth the source file path from
+            // path is not present for old versions of PHPUnit, so parse the source file path from
             // the path of XML coverage file
             $relativeFilePath = str_replace(
                 sprintf('%s.xml', $fileName),
@@ -112,7 +112,15 @@ class CoverageXmlParser
             );
         }
 
-        return realpath($this->srcDir . '/' . $relativeFilePath . '/' . $fileName);
+        foreach ($this->srcDirs as $srcDir) {
+            $realPath = realpath($srcDir . '/' . $relativeFilePath . '/' . $fileName);
+
+            if ($realPath) {
+                return $realPath;
+            }
+        }
+
+        throw new \Exception('Source file was not found');
     }
 
     /**

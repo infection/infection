@@ -11,6 +11,7 @@ exec /usr/local/php5-7.1.0-20161202-092124/bin/php /Users/user/sites/simplehabit
     
 // TODO think about adding questinair with Guessers about phpunit locations (like app/phpunit.xml) and etc.____
 // TODO add Text Logger to file
+// TODO show "Infection.json config file has invalid json"
 // TODO may be run infection for any php library and post Issue with @infection mentions to make it popular
 // TODO add peridot support?
     

@@ -20,7 +20,14 @@ use Infection\Utils\InfectionConfig;
 
 $c = new Container();
 
-$c['src.dir'] = 'src';
+$c['src.dirs'] = function (Container $c): array {
+    return $c['infection.config']->getSourceDirs();
+};
+
+$c['exclude.dirs'] = function (Container $c): array {
+    return $c['infection.config']->getSourceExcludeDirs();
+};
+
 $c['project.dir'] = getcwd();
 
 $c['phpunit.config.dir'] = function (Container $c): string {
@@ -83,7 +90,7 @@ $c['testframework.config.locator'] = function (Container $c) : TestFrameworkConf
 };
 
 $c['coverage.parser'] = function (Container $c) : CoverageXmlParser {
-    return new CoverageXmlParser($c['coverage.dir'], $c['src.dir']);
+    return new CoverageXmlParser($c['coverage.dir'], $c['src.dirs']);
 };
 
 $c['coverage.data'] = function (Container $c) : CodeCoverageData {

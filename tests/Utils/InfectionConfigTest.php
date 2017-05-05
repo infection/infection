@@ -44,4 +44,44 @@ class InfectionConfigTest extends TestCase
 
         $this->assertSame($expected, $config->getPhpUnitConfigDir());
     }
+
+    public function test_it_returns_default_source_dirs_with_no_config()
+    {
+        $config = new InfectionConfig(new \stdClass());
+
+        $this->assertSame(InfectionConfig::DEFAULT_SOURCE_DIRS, $config->getSourceDirs());
+    }
+
+    public function test_it_returns_source_dirs_from_config()
+    {
+        $excludedFolders = '["source-folder"]';
+        $json = sprintf('{"source": {"directories": %s}}', $excludedFolders);
+        $config = new InfectionConfig(json_decode($json));
+
+        $this->assertSame(['source-folder'], $config->getSourceDirs());
+    }
+
+    public function test_it_returns_default_exclude_dirs_with_no_config()
+    {
+        $config = new InfectionConfig(new \stdClass());
+
+        $this->assertSame(InfectionConfig::DEFAULT_EXCLUDE_DIRS, $config->getSourceExcludeDirs());
+    }
+
+    public function test_it_returns_exclude_dirs_from_config()
+    {
+        $json = '{"source": {"exclude":["src/excluded-folder"], "directories": ["src"]}}';
+        $config = new InfectionConfig(json_decode($json));
+
+        $this->assertSame(['excluded-folder'], $config->getSourceExcludeDirs());
+    }
+
+//    public function test_it_returns_exclude_dirs_from_config()
+//    {
+//        $excludedFolders = '["excluded-folder"]';
+//        $json = sprintf('{"source": {"exclude": %s}}', $excludedFolders);
+//        $config = new InfectionConfig(json_decode($json));
+//
+//        $this->assertSame(['excluded-folder'], $config->getSourceExcludeDirs());
+//    }
 }

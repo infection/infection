@@ -67,7 +67,7 @@ class InfectionCommand extends Command
 
         $onlyCovered = $input->getOption('only-covered');
         $filesFilter = $input->getOption('filter');
-        $mutationsGenerator = new MutationsGenerator($this->get('src.dir'), $result->getCodeCoverageData());
+        $mutationsGenerator = new MutationsGenerator($this->get('src.dirs'), $this->get('exclude.dirs'), $result->getCodeCoverageData());
         $mutations = $mutationsGenerator->generate($onlyCovered, $filesFilter);
 
         $threadCount = (int) $input->getOption('threads');
