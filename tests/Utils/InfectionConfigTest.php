@@ -70,18 +70,30 @@ class InfectionConfigTest extends TestCase
 
     public function test_it_returns_exclude_dirs_from_config()
     {
-        $json = '{"source": {"exclude":["src/excluded-folder"], "directories": ["src"]}}';
+        $json = '{"source": {"exclude":["subfolder/excluded-folder"], "directories": ["source"]}}';
         $config = new InfectionConfig(json_decode($json));
 
-        $this->assertSame(['excluded-folder'], $config->getSourceExcludeDirs());
+        $this->assertSame(['subfolder/excluded-folder'], $config->getSourceExcludeDirs());
     }
 
-//    public function test_it_returns_exclude_dirs_from_config()
-//    {
-//        $excludedFolders = '["excluded-folder"]';
-//        $json = sprintf('{"source": {"exclude": %s}}', $excludedFolders);
-//        $config = new InfectionConfig(json_decode($json));
-//
-//        $this->assertSame(['excluded-folder'], $config->getSourceExcludeDirs());
-//    }
+    public function test_it_excludes_by_glob_patterns()
+    {
+        // TODO guess source folder from composer command lines? (like ./src)
+        // TODO google is it ok to wire container from IO *after* initialization phase?
+        // TODO blob patterns
+        // TODO config file validation (e.g. source folder exists but there is no directories. type? see humbug's impl.)
+        // TODO rewrite this logic: $fined->in(projectRoot)->exluced(vendor)->path(src)
+
+        $srcDir = __DIR__ . '/../Files/phpunit/project-path';
+        $json = sprintf(
+            '{"source": {"exclude":["exclude/exclude*"], "directories": ["%s"]}}',
+            $srcDir
+        );
+        $config = new InfectionConfig(json_decode($json));
+
+        $excludedDirs = $config->getSourceExcludeDirs();
+
+//        $this->assertSame($expectedExcludedFolders, $config->getSourceExcludeDirs());
+        $this->assertCount(2, $excludedDirs);
+    }
 }

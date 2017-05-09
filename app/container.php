@@ -86,7 +86,7 @@ $c['parallel.process.runner'] = function (Container $c) : ParallelProcessRunner 
 };
 
 $c['testframework.config.locator'] = function (Container $c) : TestFrameworkConfigLocator {
-    return new TestFrameworkConfigLocator($c['phpunit.config.dir']/*[phpunit.dif, phpspec.dir, ...]*/);
+    return new TestFrameworkConfigLocator($c['phpunit.config.dir']/*[phpunit.dir, phpspec.dir, ...]*/);
 };
 
 $c['coverage.parser'] = function (Container $c) : CoverageXmlParser {
