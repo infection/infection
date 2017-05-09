@@ -14,6 +14,7 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Pimple\Container;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -33,8 +34,7 @@ class InfectionCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // TODO add to infection.json exclude <directory>../src/*Bundle/Tests</directory> from SF2.7
-
+        $questionHelper = new QuestionHelper();
         /** @var EventDispatcher $eventDispatcher */
         $eventDispatcher = $this->get('dispatcher');
 

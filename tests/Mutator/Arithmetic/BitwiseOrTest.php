@@ -1,0 +1,31 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Infection\Tests\Mutator\Arithmetic;
+
+use Infection\Mutator\Arithmetic\BitwiseOr;
+use Infection\Mutator\Mutator;
+use Infection\Tests\Mutator\AbstractMutator;
+
+class BitwiseOrTest extends AbstractMutator
+{
+    protected function getMutator(): Mutator
+    {
+        return new BitwiseOr();
+    }
+
+    public function test_replaces_bitwise_or_with_and()
+    {
+        $code = '<?php 1 | 2;';
+        $mutatedCode = $this->mutate($code);
+
+        $expectedMutatedCode = <<<'CODE'
+<?php
+
+1 & 2;
+CODE;
+
+        $this->assertSame($expectedMutatedCode, $mutatedCode);
+    }
+}

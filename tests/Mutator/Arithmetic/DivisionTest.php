@@ -1,0 +1,31 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Infection\Tests\Mutator\Arithmetic;
+
+use Infection\Mutator\Arithmetic\Division;
+use Infection\Mutator\Mutator;
+use Infection\Tests\Mutator\AbstractMutator;
+
+class DivisionTest extends AbstractMutator
+{
+    protected function getMutator(): Mutator
+    {
+        return new Division();
+    }
+
+    public function test_replaces_division_with_multiplication()
+    {
+        $code = '<?php 1 / 2;';
+        $mutatedCode = $this->mutate($code);
+
+        $expectedMutatedCode = <<<'CODE'
+<?php
+
+1 * 2;
+CODE;
+
+        $this->assertSame($expectedMutatedCode, $mutatedCode);
+    }
+}

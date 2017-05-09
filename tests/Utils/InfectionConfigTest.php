@@ -80,9 +80,7 @@ class InfectionConfigTest extends TestCase
     {
         // TODO guess source folder from composer command lines? (like ./src)
         // TODO google is it ok to wire container from IO *after* initialization phase?
-        // TODO blob patterns
         // TODO config file validation (e.g. source folder exists but there is no directories. type? see humbug's impl.)
-        // TODO rewrite this logic: $fined->in(projectRoot)->exluced(vendor)->path(src)
 
         $srcDir = __DIR__ . '/../Files/phpunit/project-path';
         $json = sprintf(
@@ -93,7 +91,6 @@ class InfectionConfigTest extends TestCase
 
         $excludedDirs = $config->getSourceExcludeDirs();
 
-//        $this->assertSame($expectedExcludedFolders, $config->getSourceExcludeDirs());
         $this->assertCount(2, $excludedDirs);
     }
 }

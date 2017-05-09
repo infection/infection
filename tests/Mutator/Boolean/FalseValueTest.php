@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 
-namespace Mutator\Boolean;
+namespace Infection\Tests\Mutator\Boolean;
 
 
 use Infection\Mutator\Boolean\FalseValue;
