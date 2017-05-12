@@ -15,9 +15,11 @@ use Pimple\Container;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
 
 class InfectionCommand extends Command
 {
@@ -34,7 +36,14 @@ class InfectionCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $questionHelper = new QuestionHelper();
+        $c = $this->getApplication()->find('configure');
+
+        $result = $c->run(new ArrayInput([]), $output);
+
+        var_dump($result);
+
+//        $this->container['infection.config'] = 1;
+
         /** @var EventDispatcher $eventDispatcher */
         $eventDispatcher = $this->get('dispatcher');
 

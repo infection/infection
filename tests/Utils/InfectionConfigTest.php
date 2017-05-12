@@ -78,8 +78,6 @@ class InfectionConfigTest extends TestCase
 
     public function test_it_excludes_by_glob_patterns()
     {
-        // TODO guess source folder from composer command lines? (like ./src)
-        // TODO google is it ok to wire container from IO *after* initialization phase?
         // TODO config file validation (e.g. source folder exists but there is no directories. type? see humbug's impl.)
 
         $srcDir = __DIR__ . '/../Files/phpunit/project-path';

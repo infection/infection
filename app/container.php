@@ -101,9 +101,10 @@ $c['application'] = function (Container $container) : Application {
     $application = new Application();
     $infectionCommand = new InfectionCommand($container);
 
+    $application->add(new \Infection\Command\ConfigureCommand($container));
     $application->add($infectionCommand);
 
-    $application->setDefaultCommand($infectionCommand->getName(), true);
+    $application->setDefaultCommand($infectionCommand->getName());
 
     return $application;
 };
