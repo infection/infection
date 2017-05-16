@@ -22,7 +22,7 @@ class Locator
     {
         if ($this->isAbsolutePath($name)) {
             if (!file_exists($name)) {
-                throw new \Exception(sprintf('The file "%s" does not exist.', $name));
+                throw new \Exception(sprintf('The file/folder "%s" does not exist.', $name));
             }
 
             return realpath($name);
@@ -37,7 +37,7 @@ class Locator
         }
 
         throw new \Exception(
-            sprintf('The file "%s" does not exist (in: %s).', $name, implode(', ', $this->paths))
+            sprintf('The file/folder "%s" does not exist (in: %s).', $name, implode(', ', $this->paths))
         );
     }
 

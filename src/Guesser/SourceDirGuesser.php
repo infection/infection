@@ -20,13 +20,23 @@ class SourceDirGuesser implements Guesser
         $autoload = $this->composerJsonContent->autoload;
 
         if (isset($autoload->{'psr-4'})) {
-            return array_values((array) $autoload->{'psr-4'});
+            return $this->getValues('psr-4');
         }
 
         if (isset($autoload->{'psr-0'})) {
-            return array_values((array) $autoload->{'psr-0'});
+            return $this->getValues('psr-0');
         }
 
         return null;
+    }
+
+    private function getValues(string $psr)
+    {
+        return array_map(
+            function(string $dir) {
+                return trim($dir, DIRECTORY_SEPARATOR);
+            },
+            array_values((array) $this->composerJsonContent->autoload->{$psr})
+        );
     }
 }

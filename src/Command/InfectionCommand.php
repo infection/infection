@@ -36,11 +36,18 @@ class InfectionCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $c = $this->getApplication()->find('configure');
+        // TODO move this to ->initialize base method
+        $configureCommand = $this->getApplication()->find('configure');
 
-        $result = $c->run(new ArrayInput([]), $output);
+        $args = [
+            '--test-framework' => $input->getOption('test-framework')
+        ];
 
-        var_dump($result);
+        $result = $configureCommand->run(new ArrayInput($args), $output);
+
+        if ($result !== 0) {
+            throw new \Exception('Configureation aborted');
+        }
 
 //        $this->container['infection.config'] = 1;
 

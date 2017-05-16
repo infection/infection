@@ -18,9 +18,11 @@ class TestFrameworkConfigLocator
         $this->configDir = $configDir;
     }
 
-    public function locate(string $testFrameworkName): string
+    public function locate(string $testFrameworkName, string $customDir = null): string
     {
-        $conf = sprintf('%s/%s.xml', $this->configDir, $testFrameworkName);
+        $dir = $customDir ?: $this->configDir;
+
+        $conf = sprintf('%s/%s.xml', $dir, $testFrameworkName);
 
         if (file_exists($conf)) {
             return realpath($conf);
