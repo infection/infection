@@ -5,7 +5,7 @@ declare(strict_types=1);
 
 namespace Guesser;
 
-use Infection\Guesser\PhpUnitPathGuesser;
+use Infection\Config\Guesser\PhpUnitPathGuesser;
 use PHPUnit\Framework\TestCase;
 
 class PhpUnitPathGuesserTest extends TestCase

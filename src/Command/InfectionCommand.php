@@ -11,6 +11,7 @@ use Infection\Process\Listener\MutationConsoleLoggerSubscriber;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
+use Infection\Utils\InfectionConfig;
 use Pimple\Container;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -46,10 +47,20 @@ class InfectionCommand extends Command
         $result = $configureCommand->run(new ArrayInput($args), $output);
 
         if ($result !== 0) {
-            throw new \Exception('Configureation aborted');
+            throw new \Exception('Configuration aborted');
         }
 
-//        $this->container['infection.config'] = 1;
+        // TODO google populating DI container by user's input
+        $this->container['infection.config'] = function (Container $c) : InfectionConfig {
+            try {
+                $infectionConfigFile = $c['locator']->locateAnyOf(['infection.json', 'infection.json.dist']);
+                $json = file_get_contents($infectionConfigFile);
+            } catch (\Exception $e) {
+                $json = '{}';
+            }
+
+            return new InfectionConfig(json_decode($json));
+        };
 
         /** @var EventDispatcher $eventDispatcher */
         $eventDispatcher = $this->get('dispatcher');

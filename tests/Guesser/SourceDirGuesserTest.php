@@ -5,7 +5,7 @@ declare(strict_types=1);
 
 namespace Guesser;
 
-use Infection\Guesser\SourceDirGuesser;
+use Infection\Config\Guesser\SourceDirGuesser;
 use PHPUnit\Framework\TestCase;
 
 class SourceDirGuesserTest extends TestCase

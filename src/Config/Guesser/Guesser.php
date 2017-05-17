@@ -1,6 +1,6 @@
 <?php
 
-namespace Infection\Guesser;
+namespace Infection\Config\Guesser;
 
 interface Guesser
 {

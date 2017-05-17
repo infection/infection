@@ -1,6 +1,6 @@
 <?php
 
-namespace Humbug\Test\Mutator\Boolean;
+namespace Infection\Test\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\LogicalAnd;
 use Infection\Mutator\Boolean\LogicalLowerAnd;

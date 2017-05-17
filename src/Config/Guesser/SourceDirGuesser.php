@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Guesser;
+namespace Infection\Config\Guesser;
 
 class SourceDirGuesser implements Guesser
 {

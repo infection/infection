@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 
-namespace Infection\Guesser;
+namespace Infection\Config\Guesser;
 
 
 class PhpUnitPathGuesser implements Guesser

@@ -10,6 +10,7 @@ class InfectionConfig
     const PROCESS_TIMEOUT_SECONDS = 10;
     const DEFAULT_SOURCE_DIRS = ['.'];
     const DEFAULT_EXCLUDE_DIRS = ['vendor'];
+    const CONFIG_FILE_NAME = 'infection.json';
 
     /**
      * @var \stdClass

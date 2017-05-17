@@ -38,17 +38,6 @@ $c['temp.dir'] = function (Container $c) : string {
     return $c['temp.dir.creator']->createAndGet();
 };
 
-$c['infection.config'] = function (Container $c) : InfectionConfig {
-    try {
-        $infectionConfigFile = $c['locator']->locateAnyOf(['infection.json', 'infection.json.dist']);
-        $json = file_get_contents($infectionConfigFile);
-    } catch (\Exception $e) {
-        $json = '{}';
-    }
-
-    return new InfectionConfig(json_decode($json));
-};
-
 $c['temp.dir.creator'] = function () : TempDirectoryCreator {
     return new TempDirectoryCreator();
 };
@@ -101,7 +90,7 @@ $c['application'] = function (Container $container) : Application {
     $application = new Application();
     $infectionCommand = new InfectionCommand($container);
 
-    $application->add(new \Infection\Command\ConfigureCommand($container));
+    $application->add(new \Infection\Command\ConfigureCommand());
     $application->add($infectionCommand);
 
     $application->setDefaultCommand($infectionCommand->getName());
