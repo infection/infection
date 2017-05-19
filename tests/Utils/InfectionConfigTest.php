@@ -78,8 +78,6 @@ class InfectionConfigTest extends TestCase
 
     public function test_it_excludes_by_glob_patterns()
     {
-        // TODO config file validation (e.g. source folder exists but there is no directories. type? see humbug's impl.)
-
         $srcDir = __DIR__ . '/../Files/phpunit/project-path';
         $json = sprintf(
             '{"source": {"exclude":["exclude/exclude*"], "directories": ["%s"]}}',

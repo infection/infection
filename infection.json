@@ -3,6 +3,9 @@
     "source": {
         "directories": [
             "src"
+        ],
+        "exclude": [
+            "Command"
         ]
     }
 }

@@ -5,65 +5,66 @@ declare(strict_types=1);
 namespace Tests\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
+use Infection\Config\ValueProvider\ExcludeDirsProvider;
 use Infection\Config\ValueProvider\SourceDirsProvider;
 use Mockery;
 
-class SourceDirsProviderTest extends AbstractBaseProviderTest
+class ExcludeDirsProviderTest extends AbstractBaseProviderTest
 {
-    public function test_it_uses_guesser_and_default_value()
+    public function test_it_contains_vendors_when_sources_contains_current_dir()
     {
         $consoleMock = Mockery::mock(ConsoleHelper::class);
         $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
 
         $dialog = $this->getQuestionHelper();
 
-        $provider = new SourceDirsProvider($consoleMock, $dialog);
+        $provider = new ExcludeDirsProvider($consoleMock, $dialog);
 
-        $sourceDirs = $provider->get(
+        $excludeDirs = $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
             $this->createOutputInterface(),
             ['src'],
-            'phpunit'
+            ['.']
         );
 
-        $this->assertSame(['src'], $sourceDirs);
+        $this->assertContains('vendor', $excludeDirs);
     }
 
-    public function test_it_fills_choices_with_current_dir()
+    public function test_it_validates_dirs()
     {
         $consoleMock = Mockery::mock(ConsoleHelper::class);
         $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
 
         $dialog = $this->getQuestionHelper();
 
-        $provider = new SourceDirsProvider($consoleMock, $dialog);
+        $provider = new ExcludeDirsProvider($consoleMock, $dialog);
 
-        $sourceDirs = $provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream("0\n")),
+        $excludeDirs = $provider->get(
+            $this->createStreamableInputInterfaceMock($this->getInputStream("abc\n")),
             $this->createOutputInterface(),
+            ['src'],
             ['src']
         );
 
-        $this->assertSame(['.'], $sourceDirs);
+        $this->assertCount(0, $excludeDirs);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
-    public function test_it_throws_exception_when_current_dir_is_selected_with_another_dir()
+    public function test_passes_when_correct_dir_typed()
     {
         $consoleMock = Mockery::mock(ConsoleHelper::class);
         $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
 
         $dialog = $this->getQuestionHelper();
 
-        $provider = new SourceDirsProvider($consoleMock, $dialog);
+        $provider = new ExcludeDirsProvider($consoleMock, $dialog);
 
-        $provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream("0,1\n")),
+        $excludeDirs = $provider->get(
+            $this->createStreamableInputInterfaceMock($this->getInputStream("Files\n")),
             $this->createOutputInterface(),
             ['src'],
-            'phpunit'
+            ['tests']
         );
+
+        $this->assertContains('Files', $excludeDirs);
     }
 }

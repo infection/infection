@@ -16,6 +16,23 @@ class SourceDirGuesserTest extends TestCase
 {
     "autoload": {
         "psr-4": {
+            "Infection\\": "abc",
+            "Namespace\\": "namespace"
+        }
+    }
+}
+CODE;
+        $guesser = new SourceDirGuesser(json_decode($composerJson));
+
+        $this->assertSame(['abc', 'namespace'], $guesser->guess());
+    }
+
+    public function test_it_returns_only_src_if_several_are_in_psr_config()
+    {
+        $composerJson = <<<'CODE'
+{
+    "autoload": {
+        "psr-4": {
             "Infection\\": "src",
             "Namespace\\": "namespace"
         }
@@ -24,7 +41,7 @@ class SourceDirGuesserTest extends TestCase
 CODE;
         $guesser = new SourceDirGuesser(json_decode($composerJson));
 
-        $this->assertSame(['src', 'namespace'], $guesser->guess());
+        $this->assertSame(['src'], $guesser->guess());
     }
 
     public function test_it_parser_psr0()

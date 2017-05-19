@@ -55,11 +55,6 @@ class SourceDirsProvider
 
         $sourceFolders = $this->questionHelper->ask($input, $output, $question);
 
-        // TODO issue with "." https://github.com/symfony/symfony/issues/22706
-        // TODO ^ possible to solve with $timeoutQuestion->getValidator() and compose (try/catche?)
-
-        // TODO [src,app]: - why do I suggest app folder as a default?
-
         if (in_array('.', $sourceFolders, true) && count($sourceFolders) > 1) {
             throw new \LogicException('You cannot use current folder "." with other subfolders');
         }

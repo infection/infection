@@ -2,25 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Config\ValueProvider;
+namespace Tests\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\PhpUnitPathProvider;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\StreamOutput;
+use Mockery;
 
-class PhpUnitPathProviderTest extends TestCase
+class PhpUnitPathProviderTest extends AbstractBaseProviderTest
 {
-    protected function tearDown()
-    {
-        \Mockery::close();
-    }
-
     public function test_it_calls_locator_in_the_current_dir()
     {
         $locatorMock = $this->getMockBuilder(TestFrameworkConfigLocator::class)
@@ -40,7 +32,7 @@ class PhpUnitPathProviderTest extends TestCase
 
     public function test_it_asks_question_if_no_config_is_found_in_current_dir()
     {
-        $locatorMock = \Mockery::mock(TestFrameworkConfigLocator::class);
+        $locatorMock = Mockery::mock(TestFrameworkConfigLocator::class);
 
         $locatorMock->shouldReceive('locate')->once()->andThrow(new \Exception());
         $locatorMock->shouldReceive('locate')->once()->andThrow(new \Exception());
@@ -68,16 +60,15 @@ class PhpUnitPathProviderTest extends TestCase
 
     public function test_it_automatically_guesses_path()
     {
-        $locatorMock = \Mockery::mock(TestFrameworkConfigLocator::class);
-        $outputMock = \Mockery::mock(OutputInterface::class);
-        $inputMock = \Mockery::mock(InputInterface::class);
-        $inputMock->shouldReceive('isInteractive')->once()->andReturn(false);
+        $locatorMock = Mockery::mock(TestFrameworkConfigLocator::class);
+        $outputMock = Mockery::mock(OutputInterface::class);
+        $inputMock = Mockery::mock(InputInterface::class);
 
-        $locatorMock->shouldReceive('locate')->twice()->andThrow(new \Exception());
+        $locatorMock->shouldReceive('locate')->once()->andThrow(new \Exception());
+        $locatorMock->shouldReceive('locate')->once()->andReturn(true);
 
-        $consoleMock = $this->getMockBuilder(ConsoleHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $consoleMock = Mockery::mock(ConsoleHelper::class);
+        $consoleMock->shouldReceive('getQuestion')->never();
 
         $dialog = $this->getQuestionHelper();
 
@@ -93,38 +84,30 @@ class PhpUnitPathProviderTest extends TestCase
         $this->assertSame('.', $path);
     }
 
-    protected function getQuestionHelper()
+    public function test_validates_incorrect_dir()
     {
-        return new QuestionHelper();
-    }
+        $locatorMock = Mockery::mock(TestFrameworkConfigLocator::class);
 
-    protected function getInputStream($input)
-    {
-        $stream = fopen('php://memory', 'r+', false);
-        fwrite($stream, $input);
-        rewind($stream);
+        $locatorMock->shouldReceive('locate')->once()->andThrow(new \Exception());
+        $locatorMock->shouldReceive('locate')->once()->andThrow(new \Exception());
+        $locatorMock->shouldReceive('locate')->once()->andReturn(true);
 
-        return $stream;
-    }
+        $consoleMock = $this->getMockBuilder(ConsoleHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-    protected function createOutputInterface()
-    {
-        return new StreamOutput(fopen('php://memory', 'r+', false));
-    }
+        $consoleMock->expects($this->once())->method('getQuestion');
+        $dialog = $this->getQuestionHelper();
 
-    protected function createStreamableInputInterfaceMock($stream = null, $interactive = true)
-    {
-        $mock = $this->getMockBuilder(StreamableInputInterface::class)->getMock();
-        $mock->expects($this->any())
-            ->method('isInteractive')
-            ->will($this->returnValue($interactive));
+        $provider = new PhpUnitPathProvider($locatorMock, $consoleMock, $dialog);
 
-        if ($stream) {
-            $mock->expects($this->any())
-                ->method('getStream')
-                ->willReturn($stream);
-        }
+        $path = $provider->get(
+            $this->createStreamableInputInterfaceMock($this->getInputStream("abc\n")),
+            $this->createOutputInterface(),
+            [],
+            'phpunit'
+        );
 
-        return $mock;
+        $this->assertSame('.', $path); // fallbacks to default value
     }
 }

@@ -32,11 +32,18 @@ class SourceDirGuesser implements Guesser
 
     private function getValues(string $psr)
     {
-        return array_map(
+        $dirs = array_map(
             function(string $dir) {
                 return trim($dir, DIRECTORY_SEPARATOR);
             },
             array_values((array) $this->composerJsonContent->autoload->{$psr})
         );
+
+        // we don't want to mix different framework's folders like "app" for Symfony
+        if (in_array('src', $dirs, true)) {
+            return ['src'];
+        }
+
+        return $dirs;
     }
 }

@@ -54,7 +54,6 @@ class ExcludeDirsProvider
 
             $autocompleteValues = $dirsInCurrentDir;
         } elseif (count($sourceDirs) === 1) {
-            // TODO type src/Command
             $globDirs = array_filter(glob($sourceDirs[0] .'/*'), 'is_dir');
 
             $autocompleteValues = array_map(
@@ -69,8 +68,21 @@ class ExcludeDirsProvider
 
         $question = new Question($questionText, '');
         $question->setAutocompleterValues($autocompleteValues);
+        $question->setValidator($this->getValidator($locator));
 
-        $question->setValidator(function ($answer) use ($locator) {
+        while ($dir = $this->questionHelper->ask($input, $output, $question)) {
+
+            if ($dir) {
+                $excludedDirs[] = $dir;
+            }
+        }
+
+        return array_unique($excludedDirs);
+    }
+
+    private function getValidator(Locator $locator)
+    {
+        return function ($answer) use ($locator) {
             if (!$answer || strpos($answer, '*') !== false) {
                 return $answer;
             }
@@ -78,14 +90,6 @@ class ExcludeDirsProvider
             $locator->locate($answer);
 
             return $answer;
-        });
-
-        while ($dir = $this->questionHelper->ask($input, $output, $question)) {
-            if ($dir) {
-                $excludedDirs[] = $dir;
-            }
-        }
-
-        return array_unique($excludedDirs);
+        };
     }
 }
