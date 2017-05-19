@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Utils;
+namespace Infection\Config;
 
 
 class InfectionConfig

@@ -13,7 +13,7 @@ use Infection\Finder\Locator;
 use Infection\Config\Guesser\PhpUnitPathGuesser;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
-use Infection\Utils\InfectionConfig;
+use Infection\Config\InfectionConfig;
 use Pimple\Container;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;

@@ -16,6 +16,11 @@ use Symfony\Component\Console\Output\StreamOutput;
 
 class PhpUnitPathProviderTest extends TestCase
 {
+    protected function tearDown()
+    {
+        \Mockery::close();
+    }
+
     public function test_it_calls_locator_in_the_current_dir()
     {
         $locatorMock = $this->getMockBuilder(TestFrameworkConfigLocator::class)
@@ -68,7 +73,7 @@ class PhpUnitPathProviderTest extends TestCase
         $inputMock = \Mockery::mock(InputInterface::class);
         $inputMock->shouldReceive('isInteractive')->once()->andReturn(false);
 
-        $locatorMock->shouldReceive('locate')->once()->andThrow(new \Exception());
+        $locatorMock->shouldReceive('locate')->twice()->andThrow(new \Exception());
 
         $consoleMock = $this->getMockBuilder(ConsoleHelper::class)
             ->disableOriginalConstructor()

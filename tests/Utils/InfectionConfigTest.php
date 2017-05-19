@@ -6,7 +6,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Utils;
 
 
-use Infection\Utils\InfectionConfig;
+use Infection\Config\InfectionConfig;
 use PHPUnit\Framework\TestCase;
 
 class InfectionConfigTest extends TestCase
