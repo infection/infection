@@ -86,6 +86,10 @@ class PhpUnitPathProviderTest extends AbstractBaseProviderTest
 
     public function test_validates_incorrect_dir()
     {
+        if (!$this->hasSttyAvailable()) {
+            $this->markTestSkipped("Stty is not available");
+        }
+
         $locatorMock = Mockery::mock(TestFrameworkConfigLocator::class);
 
         $locatorMock->shouldReceive('locate')->once()->andThrow(new \Exception());

@@ -15,12 +15,10 @@ use Infection\Config\InfectionConfig;
 use Pimple\Container;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
 
 class InfectionCommand extends Command
 {
@@ -35,21 +33,35 @@ class InfectionCommand extends Command
         $this->container = $container;
     }
 
+    /**
+     * Run configuration command if config does not exist
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @throws \Exception
+     */
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        $configExists = file_exists(InfectionConfig::CONFIG_FILE_NAME) ||
+            file_exists(InfectionConfig::CONFIG_FILE_NAME . '.dist');
+
+        if (! $configExists) {
+            $configureCommand = $this->getApplication()->find('configure');
+
+            $args = [
+                '--test-framework' => $input->getOption('test-framework')
+            ];
+
+            $result = $configureCommand->run(new ArrayInput($args), $output);
+
+            if ($result !== 0) {
+                throw new \Exception('Configuration aborted');
+            }
+        }
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // TODO move this to ->initialize base method
-        $configureCommand = $this->getApplication()->find('configure');
-
-        $args = [
-            '--test-framework' => $input->getOption('test-framework')
-        ];
-
-        $result = $configureCommand->run(new ArrayInput($args), $output);
-
-        if ($result !== 0) {
-            throw new \Exception('Configuration aborted');
-        }
-
         // TODO google populating DI container by user's input
         $this->container['infection.config'] = function (Container $c) : InfectionConfig {
             try {

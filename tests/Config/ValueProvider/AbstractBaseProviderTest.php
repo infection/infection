@@ -13,6 +13,8 @@ use Symfony\Component\Console\Output\StreamOutput;
 
 abstract class AbstractBaseProviderTest extends TestCase
 {
+    protected static $stty;
+
     protected function tearDown()
     {
         Mockery::close();
@@ -51,5 +53,16 @@ abstract class AbstractBaseProviderTest extends TestCase
         }
 
         return $mock;
+    }
+
+    protected function hasSttyAvailable()
+    {
+        if (null !== self::$stty) {
+            return self::$stty;
+        }
+
+        exec('stty 2>&1', $output, $exitcode);
+
+        return self::$stty = $exitcode === 0;
     }
 }

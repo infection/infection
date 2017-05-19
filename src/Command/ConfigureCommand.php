@@ -9,19 +9,13 @@ use Infection\Config\ValueProvider\ExcludeDirsProvider;
 use Infection\Config\ValueProvider\PhpUnitPathProvider;
 use Infection\Config\ValueProvider\SourceDirsProvider;
 use Infection\Config\ValueProvider\TimeoutProvider;
-use Infection\Finder\Locator;
-use Infection\Config\Guesser\PhpUnitPathGuesser;
-use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\Config\InfectionConfig;
 use Pimple\Container;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Console\Question\Question;
 
 class ConfigureCommand extends Command
 {

@@ -32,6 +32,10 @@ class ExcludeDirsProviderTest extends AbstractBaseProviderTest
 
     public function test_it_validates_dirs()
     {
+        if (!$this->hasSttyAvailable()) {
+            $this->markTestSkipped("Stty is not available");
+        }
+
         $consoleMock = Mockery::mock(ConsoleHelper::class);
         $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
 
@@ -51,6 +55,10 @@ class ExcludeDirsProviderTest extends AbstractBaseProviderTest
 
     public function test_passes_when_correct_dir_typed()
     {
+        if (!$this->hasSttyAvailable()) {
+            $this->markTestSkipped("Stty is not available");
+        }
+
         $consoleMock = Mockery::mock(ConsoleHelper::class);
         $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
 
