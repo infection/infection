@@ -35,7 +35,8 @@ class ExcludeDirsProvider
         $output->writeln([
             '',
             'There can be situations when you want to exclude some folders from generating mutants.',
-            'You can use glob pattern (<comment>*Bundle/**/*/Tests</comment>) for them or just regular dir names.',
+            'You can use glob pattern (<comment>*Bundle/**/*/Tests</comment>) for them or just regular dir path.',
+            'It should be <comment>relative</comment> to the source directory.',
             'Press <comment><return></comment> to stop/skip adding dirs.',
             '',
         ]);

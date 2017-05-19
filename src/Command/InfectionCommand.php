@@ -33,33 +33,6 @@ class InfectionCommand extends Command
         $this->container = $container;
     }
 
-    /**
-     * Run configuration command if config does not exist
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @throws \Exception
-     */
-    protected function initialize(InputInterface $input, OutputInterface $output)
-    {
-        $configExists = file_exists(InfectionConfig::CONFIG_FILE_NAME) ||
-            file_exists(InfectionConfig::CONFIG_FILE_NAME . '.dist');
-
-        if (! $configExists) {
-            $configureCommand = $this->getApplication()->find('configure');
-
-            $args = [
-                '--test-framework' => $input->getOption('test-framework')
-            ];
-
-            $result = $configureCommand->run(new ArrayInput($args), $output);
-
-            if ($result !== 0) {
-                throw new \Exception('Configuration aborted');
-            }
-        }
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // TODO google populating DI container by user's input
@@ -102,10 +75,11 @@ class InfectionCommand extends Command
             return 1;
         }
 
-        $output->writeln('Start mutation testing...');
-
         $onlyCovered = $input->getOption('only-covered');
         $filesFilter = $input->getOption('filter');
+
+        $output->writeln(['', 'Generate mutants...', '']);
+
         $mutationsGenerator = new MutationsGenerator($this->get('src.dirs'), $this->get('exclude.dirs'), $result->getCodeCoverageData());
         $mutations = $mutationsGenerator->generate($onlyCovered, $filesFilter);
 
@@ -117,6 +91,33 @@ class InfectionCommand extends Command
         $mutationTestingRunner->run($threadCount);
 
         return 0;
+    }
+
+    /**
+     * Run configuration command if config does not exist
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @throws \Exception
+     */
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        $configExists = file_exists(InfectionConfig::CONFIG_FILE_NAME) ||
+            file_exists(InfectionConfig::CONFIG_FILE_NAME . '.dist');
+
+        if (! $configExists) {
+            $configureCommand = $this->getApplication()->find('configure');
+
+            $args = [
+                '--test-framework' => $input->getOption('test-framework')
+            ];
+
+            $result = $configureCommand->run(new ArrayInput($args), $output);
+
+            if ($result !== 0) {
+                throw new \Exception('Configuration aborted');
+            }
+        }
     }
 
     protected function configure()

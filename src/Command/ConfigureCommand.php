@@ -59,6 +59,15 @@ class ConfigureCommand extends Command
 
         $this->saveConfig($sourceDirs, $excludedDirs, $timeout, $phpUnitConfigPath);
 
+        $output->writeln([
+            '',
+            sprintf(
+                'Configuration file "<comment>%s</comment>" was created.',
+                InfectionConfig::CONFIG_FILE_NAME . '.dist'
+            ),
+            '',
+        ]);
+
         return 0;
     }
 
@@ -99,7 +108,7 @@ class ConfigureCommand extends Command
 
         $config = json_encode($configObject, JSON_PRETTY_PRINT);
 
-        file_put_contents(InfectionConfig::CONFIG_FILE_NAME, $config);
+        file_put_contents(InfectionConfig::CONFIG_FILE_NAME . '.dist', $config);
     }
 
     private function getQuestionHelper()
