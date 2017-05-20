@@ -16,13 +16,17 @@ use PhpParser\PrettyPrinter\Standard;
 
 class MutantCreator
 {
+    /**
+     * @var string
+     */
     private $tempDir;
+
     /**
      * @var Differ
      */
     private $differ;
 
-    public function __construct($tempDir, Differ $differ)
+    public function __construct(string $tempDir, Differ $differ)
     {
         $this->tempDir = $tempDir;
         $this->differ = $differ;
@@ -53,8 +57,6 @@ class MutantCreator
         $mutatedFilePath = sprintf('%s/mutant.%s.infection.php', $this->tempDir, $mutation->getHash());
 
         $diff = $this->differ->diff($originalPrettyPrintedFile, $mutatedCode);
-
-//        echo $mutatedCode;
 
         file_put_contents($mutatedFilePath, $mutatedCode);
 

@@ -7,5 +7,28 @@ if (PHP_SAPI !== 'cli') {
 
 require __DIR__ . '/../app/bootstrap.php';
 
+function prepareArgv()
+{
+    $argv = $_SERVER['argv'];
+
+    $found = false;
+
+    while (next($argv)) {
+        $value = current($argv);
+        if (!$value || '-' !== $value[0]) {
+            $found = true;
+        }
+    }
+
+    if (!$found) {
+        $argv[] = 'run';
+    }
+
+    return $argv;
+}
+
+
+$input = new \Symfony\Component\Console\Input\ArgvInput(prepareArgv());
 $application = $container['application'];
-$application->run();
+
+$application->run($input);

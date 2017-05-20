@@ -29,24 +29,17 @@ class InitialTestsRunner
     private $eventDispatcher;
 
     /**
-     * @var CodeCoverageData
-     */
-    private $coverageData;
-
-    /**
      * InitialTestsRunner constructor.
      * @param ProcessBuilder $processBuilder
      * @param EventDispatcherInterface $eventDispatcher
-     * @param CodeCoverageData $coverageData
      */
-    public function __construct(ProcessBuilder $processBuilder, EventDispatcherInterface $eventDispatcher, CodeCoverageData $coverageData)
+    public function __construct(ProcessBuilder $processBuilder, EventDispatcherInterface $eventDispatcher)
     {
         $this->processBuilder = $processBuilder;
         $this->eventDispatcher = $eventDispatcher;
-        $this->coverageData = $coverageData;
     }
 
-    public function run() : Result
+    public function run() : Process
     {
         $process = $this->processBuilder->build();
 
@@ -64,6 +57,6 @@ class InitialTestsRunner
 
         $this->eventDispatcher->dispatch(new InitialTestSuiteFinished());
 
-        return new Result($process, $this->coverageData);
+        return $process;
     }
 }

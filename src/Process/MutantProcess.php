@@ -13,12 +13,16 @@ class MutantProcess
      * @var Process
      */
     private $process;
+
     /**
      * @var Mutant
      */
     private $mutant;
 
-    private $isTimeout = false;
+    /**
+     * @var bool
+     */
+    private $isTimedOut = false;
 
     public function __construct(Process $process, Mutant $mutant)
     {
@@ -44,6 +48,11 @@ class MutantProcess
 
     public function markTimeout()
     {
-        $this->isTimeout = true;
+        $this->isTimedOut = true;
+    }
+
+    public function isTimedOut(): bool
+    {
+        return $this->isTimedOut;
     }
 }

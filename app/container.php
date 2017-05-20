@@ -82,18 +82,12 @@ $c['coverage.parser'] = function (Container $c) : CoverageXmlParser {
     return new CoverageXmlParser($c['coverage.dir'], $c['src.dirs']);
 };
 
-$c['coverage.data'] = function (Container $c) : CodeCoverageData {
-    return new CodeCoverageData($c['coverage.dir'], $c['coverage.parser']);
-};
-
 $c['application'] = function (Container $container) : Application {
     $application = new Application();
     $infectionCommand = new InfectionCommand($container);
 
     $application->add(new \Infection\Command\ConfigureCommand());
     $application->add($infectionCommand);
-
-    $application->setDefaultCommand($infectionCommand->getName());
 
     return $application;
 };

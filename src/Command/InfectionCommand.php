@@ -12,6 +12,7 @@ use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Config\InfectionConfig;
+use Infection\TestFramework\Coverage\CodeCoverageData;
 use Pimple\Container;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -60,16 +61,16 @@ class InfectionCommand extends Command
         $processBuilder = new ProcessBuilder($adapter, $this->get('infection.config')->getProcessTimeout());
 
         // TODO add setFormatter
-        $initialTestsRunner = new InitialTestsRunner($processBuilder, $eventDispatcher, $this->get('coverage.data'));
-        $result = $initialTestsRunner->run();
+        $initialTestsRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
+        $initialTestSuitProcess = $initialTestsRunner->run();
 
-        if (! $result->isSuccessful()) {
+        if (! $initialTestSuitProcess->isSuccessful()) {
             $output->writeln(
                 sprintf(
                     '<error>Tests do not pass. Error code %d. "%s". STDERR: %s</error>',
-                    $result->getExitCode(),
-                    $result->getExitCodeText(),
-                    $result->getErrorOutput()
+                    $initialTestSuitProcess->getExitCode(),
+                    $initialTestSuitProcess->getExitCodeText(),
+                    $initialTestSuitProcess->getErrorOutput()
                 )
             );
             return 1;
@@ -77,10 +78,11 @@ class InfectionCommand extends Command
 
         $onlyCovered = $input->getOption('only-covered');
         $filesFilter = $input->getOption('filter');
+        $codeCoverageData = new CodeCoverageData($this->get('coverage.dir'), $this->get('coverage.parser'));
 
         $output->writeln(['', 'Generate mutants...', '']);
 
-        $mutationsGenerator = new MutationsGenerator($this->get('src.dirs'), $this->get('exclude.dirs'), $result->getCodeCoverageData());
+        $mutationsGenerator = new MutationsGenerator($this->get('src.dirs'), $this->get('exclude.dirs'), $codeCoverageData);
         $mutations = $mutationsGenerator->generate($onlyCovered, $filesFilter);
 
         $threadCount = (int) $input->getOption('threads');

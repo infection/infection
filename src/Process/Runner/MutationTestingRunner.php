@@ -63,6 +63,8 @@ class MutationTestingRunner
         $mutantCount = count($this->mutations);
         $escapedCount = 0;
         $killedCount = 0;
+        $timedOut = 0;
+        $notCoveredByTests = 0;
 
         $this->eventDispatcher->dispatch(new MutationTestingStarted($mutantCount));
 
@@ -80,6 +82,8 @@ class MutationTestingRunner
                 echo $process->getMutant()->getDiff() . "\n";
                 echo $processOutput . "\n";
 
+            } else if ($process->isTimedOut()) {
+                $timedOut++;
             } else {
                 $killedCount++;
             }
