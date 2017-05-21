@@ -6,6 +6,7 @@ namespace Infection\Command;
 
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Mutant\Generator\MutationsGenerator;
+use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Listener\MutationConsoleLoggerSubscriber;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
@@ -56,7 +57,7 @@ class InfectionCommand extends Command
         $initialTestsProgressBar->setFormat('verbose');
 
         $eventDispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $initialTestsProgressBar));
-        $eventDispatcher->addSubscriber(new MutationConsoleLoggerSubscriber($output, new ProgressBar($output), $adapter));
+        $eventDispatcher->addSubscriber(new MutationConsoleLoggerSubscriber($output, new ProgressBar($output), new MetricsCalculator($adapter)));
 
         $processBuilder = new ProcessBuilder($adapter, $this->get('infection.config')->getProcessTimeout());
 

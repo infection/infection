@@ -8,6 +8,7 @@ use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\MutationTestingFinished;
 use Infection\Events\MutationTestingStarted;
 use Infection\Events\MutantProcessFinished;
+use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -36,12 +37,16 @@ class MutationConsoleLoggerSubscriber implements EventSubscriberInterface
      * @var AbstractTestFrameworkAdapter
      */
     private $testFrameworkAdapter;
+    /**
+     * @var MetricsCalculator
+     */
+    private $metricsCalculator;
 
-    public function __construct(OutputInterface $output, ProgressBar $progressBar, AbstractTestFrameworkAdapter $testFrameworkAdapter)
+    public function __construct(OutputInterface $output, ProgressBar $progressBar, MetricsCalculator $metricsCalculator)
     {
         $this->output = $output;
         $this->progressBar = $progressBar;
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
+        $this->metricsCalculator = $metricsCalculator;
     }
 
     public function getSubscribedEvents()
@@ -63,74 +68,27 @@ class MutationConsoleLoggerSubscriber implements EventSubscriberInterface
         $this->progressBar->advance();
 
         $this->mutantProcesses[] = $event->getMutantProcess();
+
+        $this->metricsCalculator->collect($event->getMutantProcess());
     }
 
     public function onMutationTestingFinished(MutationTestingFinished $event)
     {
         $this->progressBar->finish();
-
-        $killedCount = 0;
-        $escapedCount = 0;
-        $timedOutCount = 0;
-        $notCoveredByTestsCount = 0;
-        $totalMutantsCount = count($this->mutantProcesses);
-
-        // TODO think about dispatching Result instead of process, this is much cleaner code wise
-        // TODO introduce collector to move logic there and here just display
-
-        foreach ($this->mutantProcesses as $process) {
-            if (! $process->getMutant()->isCoveredByTest()) {
-                $notCoveredByTestsCount++;
-            } else if ($this->testFrameworkAdapter->testsPass($process->getProcess()->getOutput())) {
-                $escapedCount++;
-
-                echo $process->getMutant()->getMutation()->getOriginalFilePath() . "\n";
-                echo $process->getMutant()->getDiff() . "\n";
-                echo $process->getProcess()->getOutput() . "\n";
-
-            } else if ($process->isTimedOut()) {
-                $timedOutCount++;
-            } else {
-                $killedCount++;
-            }
-        }
+        // TODO [doc] write test -> run mutation for just this file. Sshould be 100%, 100%, 100%,
 
         $this->output->writeln('');
-        $this->output->writeln('<options=bold>' . $totalMutantsCount . '</options=bold> mutations were generated:');
-        $this->output->writeln('<options=bold>' . $this->getPadded($killedCount) . '</options=bold> mutants were killed');
-        $this->output->writeln('<options=bold>' . $this->getPadded($notCoveredByTestsCount) . '</options=bold> mutants were not covered by tests');
-        $this->output->writeln('<options=bold>' . $this->getPadded($escapedCount) . '</options=bold> covered mutants were not detected');
+        $this->output->writeln('<options=bold>' . $this->metricsCalculator->getTotalMutantsCount() . '</options=bold> mutations were generated:');
+        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getKilledCount()) . '</options=bold> mutants were killed');
+        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getNotCoveredByTestsCount()) . '</options=bold> mutants were not covered by tests');
+        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getEscapedCount()) . '</options=bold> covered mutants were not detected');
 //        $this->output->writeln($this->getPadded($errorCount) . ' fatal errors were encountered'); // TODO
-        $this->output->writeln('<options=bold>' . $this->getPadded($timedOutCount) . '</options=bold> time outs were encountered');
-
-        $vanquishedTotal = $killedCount + $timedOutCount/* + $errorCount*/;
-        $measurableTotal = $totalMutantsCount - $notCoveredByTestsCount;
-        $detectionRateTested  = 0;
-        $coveredRate = 0;
-        $detectionRateAll = 0;
-
-        if ($measurableTotal !== 0) {
-            $detectionRateTested  = round(100 * ($vanquishedTotal / $measurableTotal));
-        }
-
-        if ($totalMutantsCount) {
-            $coveredRate = round(100 * ($measurableTotal / $totalMutantsCount));
-            $detectionRateAll = round(100 * ($vanquishedTotal / $totalMutantsCount));
-        }
+        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getTimedOutCount()) . '</options=bold> time outs were encountered');
 
         $this->output->writeln(['', 'Metrics:']);
-
-        // $killedCount + $timeoutCount + $errorCount / $totalCount
-        //                           $vanquishedTotal / $totalCount
-        $this->output->writeln($this->addIndentation('Mutation Score Indicator (MSI): <options=bold>' . $detectionRateAll . '%</options=bold>'));
-
-        // $totalCount - $notCoveredByTestsCount / $totalCount
-        //                      $measurableTotal / $totalCount
-        $this->output->writeln($this->addIndentation('Mutation Code Coverage: <options=bold>' . $coveredRate . '%</options=bold>'));
-
-        // $killedCount + $timeoutCount + $errorCount / $totalCount - $notCoveredByTestsCount
-        //                           $vanquishedTotal / $measurableTotal
-        $this->output->writeln($this->addIndentation('Covered Code MSI: <options=bold>' . $detectionRateTested . '%</options=bold>'));
+        $this->output->writeln($this->addIndentation('Mutation Score Indicator (MSI): <options=bold>' . $this->metricsCalculator->getMutationScoreIndicator() . '%</options=bold>'));
+        $this->output->writeln($this->addIndentation('Mutation Code Coverage: <options=bold>' . $this->metricsCalculator->getCoverageRate() . '%</options=bold>'));
+        $this->output->writeln($this->addIndentation('Covered Code MSI: <options=bold>' . $this->metricsCalculator->getCoveredCodeMutationScoreIndicator() . '%</options=bold>'));
 
         $this->output->writeln('');
         $this->output->writeln('Please note that some mutants will inevitably be harmless (i.e. false positives).');
