@@ -7,6 +7,7 @@ namespace Infection\Mutant;
 
 use Infection\Differ\Differ;
 use Infection\Mutation;
+use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\Lexer;
 use PhpParser\Node;
@@ -32,7 +33,7 @@ class MutantCreator
         $this->differ = $differ;
     }
 
-    public function create(Mutation $mutation) : Mutant
+    public function create(Mutation $mutation, CodeCoverageData $codeCoverageData) : Mutant
     {
         $lexer = new Lexer([
             'usedAttributes' => [
@@ -60,6 +61,16 @@ class MutantCreator
 
         file_put_contents($mutatedFilePath, $mutatedCode);
 
-        return new Mutant($mutatedFilePath, $mutation, $diff);
+        $isCoveredByTest = $this->isCoveredByTest($mutation, $codeCoverageData);
+
+        return new Mutant($mutatedFilePath, $mutation, $diff, $isCoveredByTest);
+    }
+
+    private function isCoveredByTest(Mutation $mutation, CodeCoverageData $codeCoverageData)
+    {
+        $line = $mutation->getAttributes()['startLine'];
+        $filePath = $mutation->getOriginalFilePath();
+
+        return $codeCoverageData->hasTestsOnLine($filePath, $line);
     }
 }

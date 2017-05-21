@@ -11,20 +11,28 @@ use Infection\Mutation;
 class Mutant
 {
     private $mutatedFilePath;
+
     /**
      * @var Mutation
      */
     private $mutation;
+
     /**
      * @var string
      */
     private $diff;
 
-    public function __construct(string $mutatedFilePath, Mutation $mutation, string $diff)
+    /**
+     * @var bool
+     */
+    private $isCoveredByTest;
+
+    public function __construct(string $mutatedFilePath, Mutation $mutation, string $diff, bool $isCoveredByTest)
     {
         $this->mutatedFilePath = $mutatedFilePath;
         $this->mutation = $mutation;
         $this->diff = $diff;
+        $this->isCoveredByTest = $isCoveredByTest;
     }
 
     /**
@@ -46,5 +54,13 @@ class Mutant
     public function getDiff() : string
     {
         return $this->diff;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCoveredByTest(): bool
+    {
+        return $this->isCoveredByTest;
     }
 }

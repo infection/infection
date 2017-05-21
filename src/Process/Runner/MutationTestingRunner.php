@@ -12,6 +12,7 @@ use Infection\Mutation;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
+use Infection\TestFramework\Coverage\CodeCoverageData;
 
 class MutationTestingRunner
 {
@@ -46,13 +47,13 @@ class MutationTestingRunner
         $this->mutations = $mutations;
     }
 
-    public function run(int $threadCount) // TODO : MutationTestingResult
+    public function run(int $threadCount, CodeCoverageData $codeCoverageData)
     {
         /** @var MutantProcess[] $processes */
         $processes = [];
 
         foreach ($this->mutations as $mutation) {
-            $mutant = $this->mutantCreator->create($mutation);
+            $mutant = $this->mutantCreator->create($mutation, $codeCoverageData);
 
             $processes[] = $this->processBuilder->getProcessForMutant($mutant);
         }
@@ -73,14 +74,14 @@ class MutationTestingRunner
         $this->eventDispatcher->dispatch(new MutationTestingFinished());
 
         foreach ($processes as $process) {
-            $processOutput = $process->getProcess()->getOutput();
-
-            if ($testFrameworkAdapter->testsPass($processOutput)) {
+            if (! $process->getMutant()->isCoveredByTest()) {
+                $notCoveredByTests++;
+            } else if ($testFrameworkAdapter->testsPass($process->getProcess()->getOutput())) {
                 $escapedCount++;
 
                 echo $process->getMutant()->getMutation()->getOriginalFilePath() . "\n";
                 echo $process->getMutant()->getDiff() . "\n";
-                echo $processOutput . "\n";
+                echo $process->getProcess()->getOutput() . "\n";
 
             } else if ($process->isTimedOut()) {
                 $timedOut++;
@@ -90,10 +91,11 @@ class MutationTestingRunner
         }
 
         var_dump(sprintf(
-            'Mutant count: %s. Killed: %s. Escaped: %s',
+            'Mutant count: %s. Killed: %s. Escaped: %s. Not Covered: %s',
             $mutantCount,
             $killedCount,
-            $escapedCount
+            $escapedCount,
+            $notCoveredByTests
         ));
     }
 }

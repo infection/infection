@@ -90,7 +90,7 @@ class InfectionCommand extends Command
         $mutantCreator = $this->get('mutant.creator');
 
         $mutationTestingRunner = new MutationTestingRunner($processBuilder, $parallelProcessManager, $mutantCreator, $eventDispatcher, $mutations);
-        $mutationTestingRunner->run($threadCount);
+        $mutationTestingRunner->run($threadCount, $codeCoverageData);
 
         return 0;
     }

@@ -72,9 +72,20 @@ class ParallelProcessRunner
 
                     // directly add and start new process after the previous finished
                     if (count($processesQueue) > 0) {
-                        $nextProcess = array_shift($processesQueue);
-                        $nextProcess->getProcess()->start();
-                        $currentProcesses[] = $nextProcess;
+                        $nextProcessFound = false;
+
+                        do {
+                            $nextProcess = array_shift($processesQueue);
+                            $mutant = $nextProcess->getMutant();
+
+                            if ($mutant->isCoveredByTest()) {
+                                $nextProcess->getProcess()->start();
+                                $nextProcessFound = true;
+                                $currentProcesses[] = $nextProcess;
+                            } else {
+                                $this->eventDispatcher->dispatch(new MutantProcessFinished($nextProcess));
+                            }
+                        } while (!$nextProcessFound && count($processesQueue) > 0);
                     }
                 }
             }
