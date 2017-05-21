@@ -25,7 +25,14 @@ class CoverageXmlParserTest extends TestCase
 
     protected function getXml()
     {
-        return file_get_contents(__DIR__ . '/../../../Files/phpunit/coverage-xml/index.xml');
+        $xml = file_get_contents(__DIR__ . '/../../../Files/phpunit/coverage-xml/index.xml');
+
+        // replace dummy source path with the real path
+        return preg_replace(
+            '/(source=\").*?(\")/',
+            sprintf('$1%s$2', realpath($this->srcDir)),
+            $xml
+        );
     }
 
     public function test_it_collects_data_recursively_for_all_files()

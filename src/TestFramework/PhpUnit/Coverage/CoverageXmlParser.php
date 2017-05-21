@@ -35,11 +35,12 @@ class CoverageXmlParser
         $coverage = [];
 
         $nodes = $xPath->query('//file');
+        $projectSource = $this->getProjectSource($xPath);
 
         foreach ($nodes as $node) {
             $relativeFilePath = $node->getAttribute('href');
 
-            $fileCoverage = $this->processXmlFileCoverage($relativeFilePath, $node);
+            $fileCoverage = $this->processXmlFileCoverage($relativeFilePath, $projectSource);
 
             $coverage = array_merge($coverage, $fileCoverage);
         }
@@ -49,10 +50,10 @@ class CoverageXmlParser
 
     /**
      * @param string $relativeCoverageFilePath
-     * @param \DOMElement $indexFileNode
+     * @param string $projectSource
      * @return array
      */
-    private function processXmlFileCoverage(string $relativeCoverageFilePath, \DOMElement $indexFileNode): array
+    private function processXmlFileCoverage(string $relativeCoverageFilePath, string $projectSource): array
     {
         $absolutePath = realpath($this->coverageDir . '/' . $relativeCoverageFilePath);
         $coverageFileXml = file_get_contents($absolutePath);
@@ -61,7 +62,7 @@ class CoverageXmlParser
         $dom->loadXML($this->removeNamespace($coverageFileXml));
         $xPath = new \DOMXPath($dom);
 
-        $sourceFilePath = $this->getSourceFilePath($xPath, $relativeCoverageFilePath);
+        $sourceFilePath = $this->getSourceFilePath($xPath, $relativeCoverageFilePath, $projectSource);
 
         $linesNode = $xPath->query('/phpunit/file/totals/lines')[0];
         $percentage = $linesNode->getAttribute('percent');
@@ -94,9 +95,11 @@ class CoverageXmlParser
     /**
      * @param \DOMXPath $xPath
      * @param string $relativeCoverageFilePath
+     * @param string $projectSource
      * @return string
+     * @throws \Exception
      */
-    private function getSourceFilePath(\DOMXPath $xPath, string $relativeCoverageFilePath): string
+    private function getSourceFilePath(\DOMXPath $xPath, string $relativeCoverageFilePath, string $projectSource): string
     {
         $fileNode = $xPath->query('/phpunit/file')[0];
         $fileName = $fileNode->getAttribute('name');
@@ -112,12 +115,11 @@ class CoverageXmlParser
             );
         }
 
-        foreach ($this->srcDirs as $srcDir) {
-            $realPath = realpath($srcDir . '/' . $relativeFilePath . '/' . $fileName);
+        $path = $projectSource . '/' . ltrim($relativeFilePath, '/') . '/' . $fileName;
+        $realPath = realpath($path);
 
-            if ($realPath) {
-                return $realPath;
-            }
+        if ($realPath) {
+            return $realPath;
         }
 
         throw new \Exception('Source file was not found');
@@ -145,5 +147,18 @@ class CoverageXmlParser
         }
 
         return $fileCoverage;
+    }
+
+    private function getProjectSource(\DOMXPath $xPath): string
+    {
+        // phpunit >= 6
+        $sourceNodes = $xPath->query('//project/@source');
+
+        if ($sourceNodes->length > 0) {
+            return $sourceNodes[0]->nodeValue;
+        }
+
+        // phpunit < 6
+        return $xPath->query('//project/@name')[0]->nodeValue;
     }
 }
