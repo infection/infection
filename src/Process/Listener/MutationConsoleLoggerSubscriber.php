@@ -30,7 +30,7 @@ class MutationConsoleLoggerSubscriber implements EventSubscriberInterface
     /**
      * @var MutantProcess[]
      */
-    private $mutantProcesses;
+    private $mutantProcesses = [];
 
     /**
      * @var AbstractTestFrameworkAdapter

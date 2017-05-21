@@ -21,6 +21,12 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter
             return false;
         }
 
-        return (bool) preg_match('/OK\s\(/', $output);
+        // OK (XX tests, YY assertions)
+        $isOk = (bool) preg_match('/OK\s\(/', $output);
+
+        // "OK, but incomplete, skipped, or risky tests!"
+        $isOkWithInfo = (bool) preg_match('/OK\s?,/', $output);
+
+        return $isOk || $isOkWithInfo;
     }
 }
