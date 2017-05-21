@@ -50,14 +50,14 @@ class InfectionCommand extends Command
 
         /** @var EventDispatcher $eventDispatcher */
         $eventDispatcher = $this->get('dispatcher');
+        $adapter = $this->get('test.framework.factory')->create($input->getOption('test-framework'));
 
         $initialTestsProgressBar = new ProgressBar($output);
         $initialTestsProgressBar->setFormat('verbose');
 
         $eventDispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $initialTestsProgressBar));
-        $eventDispatcher->addSubscriber(new MutationConsoleLoggerSubscriber($output, new ProgressBar($output)));
+        $eventDispatcher->addSubscriber(new MutationConsoleLoggerSubscriber($output, new ProgressBar($output), $adapter));
 
-        $adapter = $this->get('test.framework.factory')->create($input->getOption('test-framework'));
         $processBuilder = new ProcessBuilder($adapter, $this->get('infection.config')->getProcessTimeout());
 
         // TODO add setFormatter

@@ -66,12 +66,4 @@ class ProcessBuilder
 
         return new MutantProcess($symfonyProcess, $mutant);
     }
-
-    /**
-     * @return AbstractTestFrameworkAdapter
-     */
-    public function getTestFrameworkAdapter(): AbstractTestFrameworkAdapter
-    {
-        return $this->testFrameworkAdapter;
-    }
 }

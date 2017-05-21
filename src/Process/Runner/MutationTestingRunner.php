@@ -49,53 +49,22 @@ class MutationTestingRunner
 
     public function run(int $threadCount, CodeCoverageData $codeCoverageData)
     {
-        /** @var MutantProcess[] $processes */
-        $processes = [];
+        $processes = array_map(
+            function (Mutation $mutation) use ($codeCoverageData): MutantProcess {
+                $mutant = $this->mutantCreator->create($mutation, $codeCoverageData);
 
-        foreach ($this->mutations as $mutation) {
-            $mutant = $this->mutantCreator->create($mutation, $codeCoverageData);
-
-            $processes[] = $this->processBuilder->getProcessForMutant($mutant);
-        }
-
-        $testFrameworkAdapter = $this->processBuilder->getTestFrameworkAdapter();
+                return $this->processBuilder->getProcessForMutant($mutant);
+            },
+            $this->mutations
+        );
 
         // run multiple processes
         $mutantCount = count($this->mutations);
-        $escapedCount = 0;
-        $killedCount = 0;
-        $timedOut = 0;
-        $notCoveredByTests = 0;
 
         $this->eventDispatcher->dispatch(new MutationTestingStarted($mutantCount));
 
         $this->parallelProcessManager->run($processes, $threadCount);
 
         $this->eventDispatcher->dispatch(new MutationTestingFinished());
-
-        foreach ($processes as $process) {
-            if (! $process->getMutant()->isCoveredByTest()) {
-                $notCoveredByTests++;
-            } else if ($testFrameworkAdapter->testsPass($process->getProcess()->getOutput())) {
-                $escapedCount++;
-
-                echo $process->getMutant()->getMutation()->getOriginalFilePath() . "\n";
-                echo $process->getMutant()->getDiff() . "\n";
-                echo $process->getProcess()->getOutput() . "\n";
-
-            } else if ($process->isTimedOut()) {
-                $timedOut++;
-            } else {
-                $killedCount++;
-            }
-        }
-
-        var_dump(sprintf(
-            'Mutant count: %s. Killed: %s. Escaped: %s. Not Covered: %s',
-            $mutantCount,
-            $killedCount,
-            $escapedCount,
-            $notCoveredByTests
-        ));
     }
 }
