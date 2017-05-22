@@ -77,6 +77,15 @@ class MutationConsoleLoggerSubscriber implements EventSubscriberInterface
         $this->progressBar->finish();
         // TODO [doc] write test -> run mutation for just this file. Sshould be 100%, 100%, 100%,
 
+        $processes = $this->metricsCalculator->getEscapedMutantProcesses();
+
+        foreach ($processes as $mutantProcess) {
+            echo $mutantProcess->getMutant()->getMutation()->getOriginalFilePath() . "\n";
+            echo $mutantProcess->getMutant()->getDiff() . "\n";
+            echo $mutantProcess->getProcess()->getOutput() . "\n";
+
+        }
+
         $this->output->writeln('');
         $this->output->writeln('<options=bold>' . $this->metricsCalculator->getTotalMutantsCount() . '</options=bold> mutations were generated:');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getKilledCount()) . '</options=bold> mutants were killed');

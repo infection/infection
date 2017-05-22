@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-
 namespace Infection\Mutant;
-
 
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
@@ -20,6 +18,11 @@ class MetricsCalculator
      * @var int
      */
     private $escapedCount = 0;
+
+    /**
+     * @var MutantProcess[]
+     */
+    private $escapedMutantProcesses = [];
 
     /**
      * @var int
@@ -58,6 +61,7 @@ class MetricsCalculator
             $this->notCoveredByTestsCount++;
         } else if ($this->testFrameworkAdapter->testsPass($mutantProcess->getProcess()->getOutput())) {
             $this->escapedCount++;
+            $this->escapedMutantProcesses[] = $mutantProcess;
 
 //            echo $mutantProcess->getMutant()->getMutation()->getOriginalFilePath() . "\n";
 //            echo $mutantProcess->getMutant()->getDiff() . "\n";
@@ -105,11 +109,11 @@ class MetricsCalculator
 
     public function getCoveredCodeMutationScoreIndicator(): float
     {
-        $detectionRateTested  = 0;
+        $detectionRateTested = 0;
         $coveredByTestsTotal = $this->totalMutantsCount - $this->notCoveredByTestsCount;
         $defeatedTotal = $this->killedCount + $this->timedOutCount/* + $errorCount*/;
 
-        if ($coveredByTestsTotal !== 0) {
+        if ($coveredByTestsTotal) {
             $detectionRateTested  = round(100 * ($defeatedTotal / $coveredByTestsTotal));
         }
 
@@ -154,5 +158,13 @@ class MetricsCalculator
     public function getTotalMutantsCount(): int
     {
         return $this->totalMutantsCount;
+    }
+
+    /**
+     * @return MutantProcess[]
+     */
+    public function getEscapedMutantProcesses(): array
+    {
+        return $this->escapedMutantProcesses;
     }
 }

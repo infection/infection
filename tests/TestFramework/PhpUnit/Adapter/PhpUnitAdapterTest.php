@@ -41,4 +41,9 @@ class PhpUnitAdapterTest extends TestCase
             ['ERRORS!', false],
         ];
     }
+
+    protected function tearDown()
+    {
+        Mockery::close();
+    }
 }
