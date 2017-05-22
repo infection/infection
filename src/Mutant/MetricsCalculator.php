@@ -29,6 +29,12 @@ class MetricsCalculator
      */
     private $timedOutCount = 0;
 
+
+    /**
+     * @var MutantProcess[]
+     */
+    private $timedOutProcesses = [];
+
     /**
      * @var int
      */
@@ -69,6 +75,7 @@ class MetricsCalculator
 
         } else if ($mutantProcess->isTimedOut()) {
             $this->timedOutCount++;
+            $this->timedOutProcesses[] = $mutantProcess;
         } else {
             $this->killedCount++;
         }
@@ -166,5 +173,13 @@ class MetricsCalculator
     public function getEscapedMutantProcesses(): array
     {
         return $this->escapedMutantProcesses;
+    }
+
+    /**
+     * @return MutantProcess[]
+     */
+    public function getTimedOutProcesses(): array
+    {
+        return $this->timedOutProcesses;
     }
 }

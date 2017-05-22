@@ -79,11 +79,20 @@ class MutationConsoleLoggerSubscriber implements EventSubscriberInterface
 
         $processes = $this->metricsCalculator->getEscapedMutantProcesses();
 
+        $this->output->writeln(['','Escaped:', '']);
         foreach ($processes as $mutantProcess) {
             echo $mutantProcess->getMutant()->getMutation()->getOriginalFilePath() . "\n";
             echo $mutantProcess->getMutant()->getDiff() . "\n";
             echo $mutantProcess->getProcess()->getOutput() . "\n";
+        }
 
+        $this->output->writeln(['','Timeouted:', '']);
+        $processes = $this->metricsCalculator->getTimedOutProcesses();
+
+        foreach ($processes as $mutantProcess) {
+            echo $mutantProcess->getMutant()->getMutation()->getOriginalFilePath() . "\n";
+            echo $mutantProcess->getMutant()->getDiff() . "\n";
+            echo $mutantProcess->getProcess()->getOutput() . "\n";
         }
 
         $this->output->writeln('');

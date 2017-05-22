@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Infection\Config\ConsoleHelper;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutant\MetricsCalculator;
@@ -120,6 +121,10 @@ class InfectionCommand extends Command
             if ($result !== 0) {
                 throw new \Exception('Configuration aborted');
             }
+        }
+
+        if (!defined('HHVM_VERSION') && !extension_loaded('xdebug')) {
+            throw new \Exception('You need to install and enable xDebug in order to allow for code coverage generation.');
         }
     }
 

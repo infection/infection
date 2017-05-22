@@ -113,9 +113,7 @@ class MutationsGenerator
     {
         $finder = new Finder();
         $finder->files()->in($this->srcDirs);
-//        var_dump($this->excludeDirs);
         $finder->exclude($this->excludeDirs);
-//        var_dump(iterator_to_array($finder->files()));die;
 
         $finder->files()->name($filter ?: '*.php');
 
