@@ -68,11 +68,6 @@ class MetricsCalculator
         } else if ($this->testFrameworkAdapter->testsPass($mutantProcess->getProcess()->getOutput())) {
             $this->escapedCount++;
             $this->escapedMutantProcesses[] = $mutantProcess;
-
-//            echo $mutantProcess->getMutant()->getMutation()->getOriginalFilePath() . "\n";
-//            echo $mutantProcess->getMutant()->getDiff() . "\n";
-//            echo $mutantProcess->getProcess()->getOutput() . "\n";
-
         } else if ($mutantProcess->isTimedOut()) {
             $this->timedOutCount++;
             $this->timedOutProcesses[] = $mutantProcess;

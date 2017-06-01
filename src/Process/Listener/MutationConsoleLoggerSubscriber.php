@@ -34,10 +34,6 @@ class MutationConsoleLoggerSubscriber implements EventSubscriberInterface
     private $mutantProcesses = [];
 
     /**
-     * @var AbstractTestFrameworkAdapter
-     */
-    private $testFrameworkAdapter;
-    /**
      * @var MetricsCalculator
      */
     private $metricsCalculator;

@@ -89,4 +89,20 @@ class InfectionConfigTest extends TestCase
 
         $this->assertCount(2, $excludedDirs);
     }
+
+    public function test_it_returns_text_file_log_path_when_exist()
+    {
+        $path = 'test-log.txt';
+        $json = sprintf('{"logs": {"text": "%s"}}', $path);
+        $config = new InfectionConfig(json_decode($json));
+
+        $this->assertSame($path, $config->getTextFileLogPath());
+    }
+
+    public function test_it_returns_null_for_text_file_log_path_when_it_is_skipped()
+    {
+        $config = new InfectionConfig(json_decode('{}'));
+
+        $this->assertNull($config->getTextFileLogPath());
+    }
 }

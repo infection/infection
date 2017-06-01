@@ -11,6 +11,7 @@ use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Listener\MutationConsoleLoggerSubscriber;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
+use Infection\Process\Listener\TextFileLoggerSubscriber;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Config\InfectionConfig;
@@ -57,8 +58,11 @@ class InfectionCommand extends Command
         $initialTestsProgressBar = new ProgressBar($output);
         $initialTestsProgressBar->setFormat('verbose');
 
+        $metricsCalculator = new MetricsCalculator($adapter);
+
         $eventDispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $initialTestsProgressBar));
-        $eventDispatcher->addSubscriber(new MutationConsoleLoggerSubscriber($output, new ProgressBar($output), new MetricsCalculator($adapter)));
+        $eventDispatcher->addSubscriber(new MutationConsoleLoggerSubscriber($output, new ProgressBar($output), $metricsCalculator));
+        $eventDispatcher->addSubscriber(new TextFileLoggerSubscriber($this->get('infection.config'), $metricsCalculator));
 
         $processBuilder = new ProcessBuilder($adapter, $this->get('infection.config')->getProcessTimeout());
 

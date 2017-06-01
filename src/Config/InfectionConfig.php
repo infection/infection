@@ -43,7 +43,7 @@ class InfectionConfig
 
     public function getSourceExcludeDirs(): array
     {
-      if (isset($this->config->source->exclude) && is_array($this->config->source->exclude)) {
+        if (isset($this->config->source->exclude) && is_array($this->config->source->exclude)) {
             $originalExcludedDirs = $this->config->source->exclude;
             $excludedDirs = [];
 
@@ -64,6 +64,11 @@ class InfectionConfig
         return self::DEFAULT_EXCLUDE_DIRS;
     }
 
+    public function getTextFileLogPath()
+    {
+        return $this->config->logs->text ?? null;
+    }
+
     private function getExcludedDirsByPattern(string $originalExcludedDir)
     {
         $excludedDirs = [];
@@ -71,21 +76,21 @@ class InfectionConfig
 
         foreach ($srcDirs as $srcDir) {
             $unpackedPaths = glob(
-              sprintf('%s/%s', $srcDir, $originalExcludedDir),
-              GLOB_ONLYDIR
+                sprintf('%s/%s', $srcDir, $originalExcludedDir),
+                GLOB_ONLYDIR
             );
 
             if ($unpackedPaths) {
                 $excludedDirs = array_merge(
                     $excludedDirs,
                     array_map(
-                      function ($excludeDir) use ($srcDir) {
-                          return ltrim(
-                              substr_replace($excludeDir, '', 0, strlen($srcDir)),
-                              DIRECTORY_SEPARATOR
-                          );
-                      },
-                      $unpackedPaths
+                        function ($excludeDir) use ($srcDir) {
+                            return ltrim(
+                                substr_replace($excludeDir, '', 0, strlen($srcDir)),
+                                DIRECTORY_SEPARATOR
+                            );
+                        },
+                        $unpackedPaths
                     )
                 );
             }
