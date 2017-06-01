@@ -8,6 +8,7 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
 use Infection\Config\ValueProvider\PhpUnitPathProvider;
 use Infection\Config\ValueProvider\SourceDirsProvider;
+use Infection\Config\ValueProvider\TextLogFileProvider;
 use Infection\Config\ValueProvider\TimeoutProvider;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\Config\InfectionConfig;
@@ -57,7 +58,10 @@ class ConfigureCommand extends Command
         $timeoutProvider = new TimeoutProvider($this->consoleHelper, $this->getQuestionHelper());
         $timeout = $timeoutProvider->get($input, $output);
 
-        $this->saveConfig($sourceDirs, $excludedDirs, $timeout, $phpUnitConfigPath);
+        $textLogFileProvider = new TextLogFileProvider($this->consoleHelper, $this->getQuestionHelper());
+        $textLogFilePath = $textLogFileProvider->get($input, $output, $dirsInCurrentDir);
+
+        $this->saveConfig($sourceDirs, $excludedDirs, $timeout, $phpUnitConfigPath, $textLogFilePath);
 
         $output->writeln([
             '',
@@ -86,7 +90,7 @@ class ConfigureCommand extends Command
         ;
     }
 
-    private function saveConfig(array $sourceDirs, array $excludedDirs, int $timeout, string $phpUnitConfigPath = null)
+    private function saveConfig(array $sourceDirs, array $excludedDirs, int $timeout, string $phpUnitConfigPath = null, string $textLogFilePath = null)
     {
         $configObject = new \stdClass();
 
@@ -104,6 +108,11 @@ class ConfigureCommand extends Command
         if ($phpUnitConfigPath) {
             $configObject->phpUnit = new \stdClass();
             $configObject->phpUnit->configDir = $phpUnitConfigPath;
+        }
+
+        if ($textLogFilePath) {
+            $configObject->logs = new \stdClass();
+            $configObject->logs->text = $textLogFilePath;
         }
 
         $config = json_encode($configObject, JSON_PRETTY_PRINT);
