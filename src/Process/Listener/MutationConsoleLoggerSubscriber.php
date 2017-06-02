@@ -71,25 +71,7 @@ class MutationConsoleLoggerSubscriber implements EventSubscriberInterface
     public function onMutationTestingFinished(MutationTestingFinished $event)
     {
         $this->progressBar->finish();
-        // TODO [doc] write test -> run mutation for just this file. Sshould be 100%, 100%, 100%,
-
-        $processes = $this->metricsCalculator->getEscapedMutantProcesses();
-
-        $this->output->writeln(['','Escaped:', '']);
-        foreach ($processes as $mutantProcess) {
-            echo $mutantProcess->getMutant()->getMutation()->getOriginalFilePath() . "\n";
-            echo $mutantProcess->getMutant()->getDiff() . "\n";
-            echo $mutantProcess->getProcess()->getOutput() . "\n";
-        }
-
-        $this->output->writeln(['','Timeouted:', '']);
-        $processes = $this->metricsCalculator->getTimedOutProcesses();
-
-        foreach ($processes as $mutantProcess) {
-            echo $mutantProcess->getMutant()->getMutation()->getOriginalFilePath() . "\n";
-            echo $mutantProcess->getMutant()->getDiff() . "\n";
-            echo $mutantProcess->getProcess()->getOutput() . "\n";
-        }
+        // TODO [doc] write test -> run mutation for just this file. Should be 100%, 100%, 100%,
 
         $this->output->writeln('');
         $this->output->writeln('<options=bold>' . $this->metricsCalculator->getTotalMutantsCount() . '</options=bold> mutations were generated:');

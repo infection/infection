@@ -41,17 +41,30 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
         if ($textFileLogPath) {
             $logParts = [];
 
-            $processes = $this->metricsCalculator->getEscapedMutantProcesses();
-            $logParts[] = 'Escaped mutants:';
+            $logParts = array_merge(
+                $logParts,
+                $this->getLogParts($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped')
+            );
 
-            foreach ($processes as $index => $mutantProcess) {
-                $logParts[] = sprintf('%d) %s', $index + 1, get_class($mutantProcess->getMutant()->getMutation()->getMutator()));
-                $logParts[] = $mutantProcess->getMutant()->getMutation()->getOriginalFilePath();
-                $logParts[] = $mutantProcess->getMutant()->getDiff();
-                $logParts[] = $mutantProcess->getProcess()->getOutput();
-            }
+            $logParts = array_merge(
+                $logParts,
+                $this->getLogParts($this->metricsCalculator->getTimedOutProcesses(), 'Timeout')
+            );
 
             file_put_contents($textFileLogPath, implode($logParts, "\n"));
         }
+    }
+
+    private function getLogParts(array $processes, string $headlinePrefix): array
+    {
+        $logParts = [sprintf('%s mutants:', $headlinePrefix), ''];
+
+        foreach ($processes as $index => $mutantProcess) {
+            $logParts[] = sprintf('%d) %s', $index + 1, get_class($mutantProcess->getMutant()->getMutation()->getMutator()));
+            $logParts[] = $mutantProcess->getMutant()->getMutation()->getOriginalFilePath();
+            $logParts[] = $mutantProcess->getMutant()->getDiff();
+            $logParts[] = $mutantProcess->getProcess()->getOutput();
+        }
+        return $logParts;
     }
 }
