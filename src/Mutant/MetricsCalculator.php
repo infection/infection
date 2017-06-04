@@ -63,16 +63,21 @@ class MetricsCalculator
     {
         $this->totalMutantsCount++;
 
-        if (! $mutantProcess->getMutant()->isCoveredByTest()) {
-            $this->notCoveredByTestsCount++;
-        } else if ($this->testFrameworkAdapter->testsPass($mutantProcess->getProcess()->getOutput())) {
-            $this->escapedCount++;
-            $this->escapedMutantProcesses[] = $mutantProcess;
-        } else if ($mutantProcess->isTimedOut()) {
-            $this->timedOutCount++;
-            $this->timedOutProcesses[] = $mutantProcess;
-        } else {
-            $this->killedCount++;
+        switch ($mutantProcess->getResultCode()) {
+            case MutantProcess::CODE_KILLED:
+                $this->killedCount++;
+                break;
+            case MutantProcess::CODE_NOT_COVERED:
+                $this->notCoveredByTestsCount++;
+                break;
+            case MutantProcess::CODE_ESCAPED:
+                $this->escapedCount++;
+                $this->escapedMutantProcesses[] = $mutantProcess;
+                break;
+            case MutantProcess::CODE_TIMED_OUT:
+                $this->timedOutCount++;
+                $this->timedOutProcesses[] = $mutantProcess;
+                break;
         }
     }
 

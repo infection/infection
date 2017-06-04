@@ -64,6 +64,6 @@ class ProcessBuilder
         );
         $symfonyProcess->setTimeout($this->timeout);
 
-        return new MutantProcess($symfonyProcess, $mutant);
+        return new MutantProcess($symfonyProcess, $mutant, $this->testFrameworkAdapter);
     }
 }

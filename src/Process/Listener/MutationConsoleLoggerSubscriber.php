@@ -18,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MutationConsoleLoggerSubscriber implements EventSubscriberInterface
 {
     const PAD_LENGTH = 8;
+    const DOTS_PER_ROW = 50;
 
     /**
      * @var OutputInterface
@@ -48,6 +49,13 @@ class MutationConsoleLoggerSubscriber implements EventSubscriberInterface
      */
     private $diffColorizer;
 
+    /**
+     * @var int
+     */
+    private $mutationCount = 0;
+
+    private $callsCount = 0;
+
     public function __construct(OutputInterface $output, ProgressBar $progressBar, MetricsCalculator $metricsCalculator, DiffColorizer $diffColorizer, bool $showMutations)
     {
         $this->output = $output;
@@ -55,6 +63,8 @@ class MutationConsoleLoggerSubscriber implements EventSubscriberInterface
         $this->metricsCalculator = $metricsCalculator;
         $this->showMutations = $showMutations;
         $this->diffColorizer = $diffColorizer;
+
+        $this->mutationCount = 0;
     }
 
     public function getSubscribedEvents()
@@ -68,21 +78,73 @@ class MutationConsoleLoggerSubscriber implements EventSubscriberInterface
 
     public function onMutationTestingStarted(MutationTestingStarted $event)
     {
-        $this->progressBar->start($event->getMutationCount());
+        $this->callsCount = 0;
+        $this->mutationCount = $event->getMutationCount();
+
+        $this->output->writeln([
+            '<killed>.</killed>: killed, '
+            . '<escaped>M</escaped>: escaped, '
+            . '<uncovered>S</uncovered>: uncovered, '
+            . '<with-error>E</with-error>: fatal error, '
+            . '<timeout>T</timeout>: timed out',
+            ''
+        ]);
+
+//        $this->progressBar->start($this->mutationCount);
     }
 
     public function onMutantProcessFinished(MutantProcessFinished $event)
     {
-        $this->progressBar->advance();
+//        $this->progressBar->advance();
 
+        $this->callsCount++;
         $this->mutantProcesses[] = $event->getMutantProcess();
 
         $this->metricsCalculator->collect($event->getMutantProcess());
+
+        $this->logDot($event->getMutantProcess());
+    }
+
+    private function logDot(MutantProcess $mutantProcess)
+    {
+        switch ($mutantProcess->getResultCode()) {
+            case MutantProcess::CODE_KILLED:
+                $this->output->write('<killed>.</killed>');
+                break;
+            case MutantProcess::CODE_NOT_COVERED:
+                $this->output->write('<uncovered>S</uncovered>');
+                break;
+            case MutantProcess::CODE_ESCAPED:
+                $this->output->write('<escaped>M</escaped>');
+                break;
+            case MutantProcess::CODE_TIMED_OUT:
+                $this->output->write('<timeout>T</timeout>');
+                break;
+        }
+
+        $remainder = $this->callsCount % self::DOTS_PER_ROW;
+        $endOfRow = 0 === $remainder;
+        $lastDot = $this->mutationCount === $this->callsCount;
+
+        if ($lastDot && !$endOfRow) {
+            $this->output->write(str_repeat(' ', self::DOTS_PER_ROW - $remainder));
+        }
+
+        if ($lastDot || $endOfRow) {
+            $length = strlen((string) $this->mutationCount);
+            $format = sprintf('   (%%%dd / %%%dd)', $length, $length);
+
+            $this->output->write(sprintf($format, $this->callsCount, $this->mutationCount));
+
+            if ($this->callsCount !== $this->mutationCount) {
+                $this->output->writeln('');
+            }
+        }
     }
 
     public function onMutationTestingFinished(MutationTestingFinished $event)
     {
-        $this->progressBar->finish();
+//        $this->progressBar->finish();
         // TODO [doc] write test -> run mutation for just this file. Should be 100%, 100%, 100%,
 
         $processes = $this->metricsCalculator->getEscapedMutantProcesses();
@@ -108,7 +170,7 @@ class MutationConsoleLoggerSubscriber implements EventSubscriberInterface
 
     private function showMetrics()
     {
-        $this->output->writeln('');
+        $this->output->writeln(['', '']);
         $this->output->writeln('<options=bold>' . $this->metricsCalculator->getTotalMutantsCount() . '</options=bold> mutations were generated:');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getKilledCount()) . '</options=bold> mutants were killed');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getNotCoveredByTestsCount()) . '</options=bold> mutants were not covered by tests');

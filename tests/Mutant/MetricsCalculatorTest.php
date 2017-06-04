@@ -37,33 +37,21 @@ class MetricsCalculatorTest extends TestCase
     public function test_it_collects_all_values()
     {
         $adapter = Mockery::mock(AbstractTestFrameworkAdapter::class);
-        $adapter->shouldReceive('testsPass')->times(1)->andReturn(true);
-        $adapter->shouldReceive('testsPass')->times(2)->andReturn(false);
 
         $process = Mockery::mock(Process::class);
-        $process->shouldReceive('getOutput')->times(3)->andReturn('');
         $process->shouldReceive('stop');
 
-        $mutant = Mockery::mock(Mutant::class);
-        $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(false);
-        $mutant->shouldReceive('isCoveredByTest')->times(3)->andReturn(true);
-
         $notCoveredMutantProcess = Mockery::mock(MutantProcess::class);
-        $notCoveredMutantProcess->shouldReceive('getMutant')->andReturn($mutant);
+        $notCoveredMutantProcess->shouldReceive('getResultCode')->times(1)->andReturn(MutantProcess::CODE_NOT_COVERED);
 
         $passMutantProcess = Mockery::mock(MutantProcess::class);
-        $passMutantProcess->shouldReceive('getProcess')->andReturn($process);
-        $passMutantProcess->shouldReceive('getMutant')->andReturn($mutant);
+        $passMutantProcess->shouldReceive('getResultCode')->times(1)->andReturn(MutantProcess::CODE_ESCAPED);
 
         $timedOutMutantProcess = Mockery::mock(MutantProcess::class);
-        $timedOutMutantProcess->shouldReceive('getProcess')->andReturn($process);
-        $timedOutMutantProcess->shouldReceive('getMutant')->andReturn($mutant);
-        $timedOutMutantProcess->shouldReceive('isTimedOut')->andReturn(true);
+        $timedOutMutantProcess->shouldReceive('getResultCode')->times(1)->andReturn(MutantProcess::CODE_TIMED_OUT);
 
         $killedMutantProcess = Mockery::mock(MutantProcess::class);
-        $killedMutantProcess->shouldReceive('getProcess')->andReturn($process);
-        $killedMutantProcess->shouldReceive('getMutant')->andReturn($mutant);
-        $killedMutantProcess->shouldReceive('isTimedOut')->andReturn(false);
+        $killedMutantProcess->shouldReceive('getResultCode')->times(1)->andReturn(MutantProcess::CODE_KILLED);
 
         $calculator = new MetricsCalculator($adapter);
 
