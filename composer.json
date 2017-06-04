@@ -1,4 +1,19 @@
 {
+    "name": "infectionphp/infection",
+    "description": "Infection is a Mutation Testing framework for PHP. The mutation adequacy score can be used to measure the effectiveness of a test set in terms of its ability to detect faults.",
+    "keywords": ["mutation testing", "mutation framework", "testing", "coverage", "unit testing", "mutant"],
+    "type": "library",
+    "license": "BSD-3-Clause",
+    "support": {
+        "issues": "https://github.com/infectionphp/infection/issues"
+    },
+    "authors": [
+        {
+            "name": "Maks Rafalko",
+            "email": "maks.rafalko@gmail.com",
+            "homepage": "https://twitter.com/maks_rafalko"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "Infection\\": "src/"

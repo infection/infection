@@ -22,14 +22,14 @@ class DiffColorizerTest extends TestCase
 CODE;
 
         $expectedColorizedDiff = <<<'CODE'
-<fg=white>
-<fg=red>--- Original</>
-<fg=green>+++ New</>
+<code>
+<diff-del>--- Original</diff-del>
+<diff-add>+++ New</diff-add>
 @@ @@
      function ($a) {
-<fg=red>-        return $a < 0;</>
-<fg=green>+        return $a <= 0;</>
-     }</>
+<diff-del>-        return $a < 0;</diff-del>
+<diff-add>+        return $a <= 0;</diff-add>
+     }</code>
 CODE;
 
         $colorizer = new DiffColorizer();

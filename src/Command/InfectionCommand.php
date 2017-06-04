@@ -18,6 +18,7 @@ use Infection\Config\InfectionConfig;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Pimple\Container;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -39,6 +40,7 @@ class InfectionCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // TODO --min-msi 95
         // TODO google populating DI container by user's input
         $this->container['infection.config'] = function (Container $c) : InfectionConfig {
             try {
@@ -110,6 +112,8 @@ class InfectionCommand extends Command
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
+        $this->setOutputFormatterStyles($output);
+
         $configExists = file_exists(InfectionConfig::CONFIG_FILE_NAME) ||
             file_exists(InfectionConfig::CONFIG_FILE_NAME . '.dist');
 
@@ -176,5 +180,13 @@ class InfectionCommand extends Command
     private function get($name)
     {
         return $this->container[$name];
+    }
+
+    private function setOutputFormatterStyles(OutputInterface $output)
+    {
+        $output->getFormatter()->setStyle('code', new OutputFormatterStyle('white'));
+
+        $output->getFormatter()->setStyle('diff-add', new OutputFormatterStyle('green'));
+        $output->getFormatter()->setStyle('diff-del', new OutputFormatterStyle('red'));
     }
 }

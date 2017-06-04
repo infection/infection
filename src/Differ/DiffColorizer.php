@@ -14,14 +14,14 @@ class DiffColorizer
 
         foreach (explode("\n", $diff) as $line) {
             if (0 === strpos($line, '-')) {
-                $lines[] = sprintf('<fg=red>%s</>', $line);
+                $lines[] = sprintf('<diff-del>%s</diff-del>', $line);
             } elseif (0 === strpos($line, '+')) {
-                $lines[] = sprintf('<fg=green>%s</>', $line);
+                $lines[] = sprintf('<diff-add>%s</diff-add>', $line);
             } else {
                 $lines[] = $line;
             }
         }
 
-        return sprintf("<fg=white>%s%s</>", "\n", implode("\n", $lines));
+        return sprintf("<code>%s%s</code>", "\n", implode("\n", $lines));
     }
 }

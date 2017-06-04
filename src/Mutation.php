@@ -67,10 +67,9 @@ class Mutation
             $attrs['startFilePos'],
             $attrs['startFilePos']
         ];
+
         $hashKeys = array_merge([$this->getOriginalFilePath(), $mutatorClass], $attributeValues);
 
-        return md5(
-            implode('_', $hashKeys)
-        );
+        return md5(implode('_', $hashKeys));
     }
 }

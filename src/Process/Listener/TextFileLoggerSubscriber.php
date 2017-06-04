@@ -60,6 +60,7 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
         $logParts = [sprintf('%s mutants:', $headlinePrefix), ''];
 
         foreach ($processes as $index => $mutantProcess) {
+            $logParts[] = '';
             $logParts[] = sprintf('%d) %s', $index + 1, get_class($mutantProcess->getMutant()->getMutation()->getMutator()));
             $logParts[] = $mutantProcess->getMutant()->getMutation()->getOriginalFilePath();
             $logParts[] = $mutantProcess->getMutant()->getDiff();
