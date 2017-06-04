@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Listener;
 
+use Infection\Differ\DiffColorizer;
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\MutationTestingFinished;
 use Infection\Events\MutationTestingStarted;
@@ -38,11 +39,22 @@ class MutationConsoleLoggerSubscriber implements EventSubscriberInterface
      */
     private $metricsCalculator;
 
-    public function __construct(OutputInterface $output, ProgressBar $progressBar, MetricsCalculator $metricsCalculator)
+    /**
+     * @var bool
+     */
+    private $showMutations;
+    /**
+     * @var DiffColorizer
+     */
+    private $diffColorizer;
+
+    public function __construct(OutputInterface $output, ProgressBar $progressBar, MetricsCalculator $metricsCalculator, DiffColorizer $diffColorizer, bool $showMutations)
     {
         $this->output = $output;
         $this->progressBar = $progressBar;
         $this->metricsCalculator = $metricsCalculator;
+        $this->showMutations = $showMutations;
+        $this->diffColorizer = $diffColorizer;
     }
 
     public function getSubscribedEvents()
@@ -73,6 +85,29 @@ class MutationConsoleLoggerSubscriber implements EventSubscriberInterface
         $this->progressBar->finish();
         // TODO [doc] write test -> run mutation for just this file. Should be 100%, 100%, 100%,
 
+        $processes = $this->metricsCalculator->getEscapedMutantProcesses();
+
+        if ($this->showMutations) {
+            $this->showMutations($processes);
+        }
+
+        $this->showMetrics();
+    }
+
+    private function showMutations(array $processes)
+    {
+        foreach ($processes as $index => $mutantProcess) {
+            $this->output->writeln([
+                '',
+                sprintf('%d) %s', $index + 1, get_class($mutantProcess->getMutant()->getMutation()->getMutator()))
+            ]);
+            $this->output->writeln($mutantProcess->getMutant()->getMutation()->getOriginalFilePath());
+            $this->output->writeln($this->diffColorizer->colorize($mutantProcess->getMutant()->getDiff()));
+        }
+    }
+
+    private function showMetrics()
+    {
         $this->output->writeln('');
         $this->output->writeln('<options=bold>' . $this->metricsCalculator->getTotalMutantsCount() . '</options=bold> mutations were generated:');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getKilledCount()) . '</options=bold> mutants were killed');

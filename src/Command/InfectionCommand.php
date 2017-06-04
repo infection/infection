@@ -61,7 +61,7 @@ class InfectionCommand extends Command
         $metricsCalculator = new MetricsCalculator($adapter);
 
         $eventDispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $initialTestsProgressBar));
-        $eventDispatcher->addSubscriber(new MutationConsoleLoggerSubscriber($output, new ProgressBar($output), $metricsCalculator));
+        $eventDispatcher->addSubscriber(new MutationConsoleLoggerSubscriber($output, new ProgressBar($output), $metricsCalculator, $this->get('diff.colorizer'), $input->getOption('show-mutations')));
         $eventDispatcher->addSubscriber(new TextFileLoggerSubscriber($this->get('infection.config'), $metricsCalculator));
 
         $processBuilder = new ProcessBuilder($adapter, $this->get('infection.config')->getProcessTimeout());
@@ -156,6 +156,12 @@ class InfectionCommand extends Command
                 null,
                 InputOption::VALUE_NONE,
                 'Mutate only covered by tests lines of code'
+            )
+            ->addOption(
+                'show-mutations',
+                's',
+                InputOption::VALUE_NONE,
+                'Show mutations to the console'
             )
             ->addOption(
                 'filter',

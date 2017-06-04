@@ -17,6 +17,7 @@ use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Utils\InfectionConfig;
+use Infection\Differ\DiffColorizer;
 
 $c = new Container();
 
@@ -80,6 +81,10 @@ $c['testframework.config.locator'] = function (Container $c) : TestFrameworkConf
 
 $c['coverage.parser'] = function (Container $c) : CoverageXmlParser {
     return new CoverageXmlParser($c['coverage.dir'], $c['src.dirs']);
+};
+
+$c['diff.colorizer'] = function () : DiffColorizer {
+    return new DiffColorizer();
 };
 
 $c['application'] = function (Container $container) : Application {
