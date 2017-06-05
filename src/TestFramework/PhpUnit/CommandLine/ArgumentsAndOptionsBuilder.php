@@ -14,6 +14,7 @@ class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilde
         $options = [];
 
         $options[] = sprintf('--configuration %s', $configPath);
+        $options[] = '--stop-on-failure';
 
         return implode(' ', $options);
     }

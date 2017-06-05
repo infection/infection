@@ -51,8 +51,6 @@ class InitialTestsRunner
             }
 
             $this->eventDispatcher->dispatch(new InitialTestCaseCompleted());
-
-            // TODO parse PHPUnit output and add if (!ok) {stop()}
         });
 
         $this->eventDispatcher->dispatch(new InitialTestSuiteFinished());

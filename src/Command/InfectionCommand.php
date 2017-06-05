@@ -77,8 +77,6 @@ class InfectionCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // TODO --min-msi 95
-        // TODO google populating DI container by user's input
         $this->container['infection.config'] = function (Container $c) : InfectionConfig {
             try {
                 $infectionConfigFile = $c['locator']->locateAnyOf(['infection.json', 'infection.json.dist']);
