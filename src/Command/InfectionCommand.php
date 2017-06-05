@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use Infection\Config\ConsoleHelper;
+use Infection\Console\OutputFormatter\DotFormatter;
+use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutant\MetricsCalculator;
@@ -63,7 +65,7 @@ class InfectionCommand extends Command
         $metricsCalculator = new MetricsCalculator($adapter);
 
         $eventDispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $initialTestsProgressBar));
-        $eventDispatcher->addSubscriber(new MutationConsoleLoggerSubscriber($output, new ProgressBar($output), $metricsCalculator, $this->get('diff.colorizer'), $input->getOption('show-mutations')));
+        $eventDispatcher->addSubscriber(new MutationConsoleLoggerSubscriber($output, $this->getOutputFormatter($input, $output), $metricsCalculator, $this->get('diff.colorizer'), $input->getOption('show-mutations')));
         $eventDispatcher->addSubscriber(new TextFileLoggerSubscriber($this->get('infection.config'), $metricsCalculator));
 
         $processBuilder = new ProcessBuilder($adapter, $this->get('infection.config')->getProcessTimeout());
@@ -136,6 +138,19 @@ class InfectionCommand extends Command
         }
     }
 
+    private function getOutputFormatter(InputInterface $input, OutputInterface $output)
+    {
+        if ($input->getOption('formatter') === 'progress') {
+            return new ProgressFormatter(new ProgressBar($output));
+        }
+
+        if ($input->getOption('formatter') === 'dot') {
+            return new DotFormatter($output);
+        }
+
+        throw new \InvalidArgumentException('Incorrect formatter. Possible values: dot, progress');
+    }
+
     protected function configure()
     {
         $this
@@ -173,6 +188,13 @@ class InfectionCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'Filter which files to mutate',
                 ''
+            )
+            ->addOption(
+                'formatter',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Output formatter. Possible values: dot, progress',
+                'dot'
             )
         ;
     }
