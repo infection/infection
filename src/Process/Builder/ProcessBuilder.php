@@ -34,7 +34,7 @@ class ProcessBuilder
 
         return new Process(
             $this->testFrameworkAdapter->getExecutableCommandLine($configPath),
-            null, // TODO make it dynamic to change testdir
+            null,
             array_replace($_ENV, $_SERVER)
         );
 
