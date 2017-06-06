@@ -56,7 +56,7 @@ $c['path.replacer'] = function(Container $c) : PathReplacer {
 };
 
 $c['test.framework.factory'] = function (Container $c) : Factory {
-    return new Factory($c['temp.dir'], $c['testframework.config.locator'], $c['path.replacer']);
+    return new Factory($c['temp.dir'], $c['project.dir'], $c['testframework.config.locator'], $c['path.replacer']);
 };
 
 $c['mutant.creator'] = function (Container $c) : MutantCreator {

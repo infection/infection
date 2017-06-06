@@ -24,12 +24,17 @@ class MutationConfigBuilder implements ConfigBuilder
      * @var PathReplacer
      */
     private $pathReplacer;
+    /**
+     * @var string
+     */
+    private $projectDir;
 
-    public function __construct(string $tempDirectory, string $originalXmlConfigPath, PathReplacer $pathReplacer)
+    public function __construct(string $tempDirectory, string $originalXmlConfigPath, PathReplacer $pathReplacer, string $projectDir)
     {
         $this->tempDirectory = $tempDirectory;
         $this->originalXmlConfigPath = $originalXmlConfigPath;
         $this->pathReplacer = $pathReplacer;
+        $this->projectDir = $projectDir;
     }
 
     public function build(Mutant $mutant = null): string
@@ -64,7 +69,7 @@ class MutationConfigBuilder implements ConfigBuilder
         $mutatedFilePath = $mutant->getMutatedFilePath();
 
 
-        $autoload = '/Users/user/tmp/remove/vendor/autoload.php';
+        $autoload = sprintf('%s/vendor/autoload.php', $this->projectDir);
 
         $customAutoload = <<<AUTOLOAD
 <?php
