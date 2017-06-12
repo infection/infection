@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
-use Infection\Finder\AbstractExecutableFinder;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 
 class PhpUnitAdapter extends AbstractTestFrameworkAdapter
@@ -27,6 +26,9 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter
         // "OK, but incomplete, skipped, or risky tests!"
         $isOkWithInfo = (bool) preg_match('/OK\s?,/', $output);
 
-        return $isOk || $isOkWithInfo;
+        // "Warnings!" - e.g. when deprecated functions are used, but tests pass
+        $isWarning = (bool) preg_match('/warnings!/i', $output);
+
+        return $isOk || $isOkWithInfo || $isWarning;
     }
 }

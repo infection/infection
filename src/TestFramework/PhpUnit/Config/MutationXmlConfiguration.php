@@ -35,6 +35,7 @@ class MutationXmlConfiguration extends AbstractXmlConfiguration
         $this->replaceWithAbsolutePaths($xPath);
         $this->setCustomAutoLoaderPath($xPath);
         $this->setStopOnFailure($xPath);
+        $this->deactivateColours($xPath);
         $this->removeExistingLoggers($dom, $xPath);
 
         return $dom->saveXML();

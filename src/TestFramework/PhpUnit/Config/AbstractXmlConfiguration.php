@@ -72,7 +72,7 @@ abstract class AbstractXmlConfiguration
 
         $log = $dom->createElement('log');
         $log->setAttribute('type', 'coverage-xml');
-        $log->setAttribute('target', $this->tempDirectory . '/' . CodeCoverageData::COVERAGE_DIR);
+        $log->setAttribute('target', $this->tempDirectory . '/' . CodeCoverageData::PHP_UNIT_COVERAGE_DIR);
 
         $logging->appendChild($log);
     }
@@ -86,6 +86,18 @@ abstract class AbstractXmlConfiguration
         } else {
             $node = $xPath->query('/phpunit')[0];
             $node->setAttribute('stopOnFailure', 'true');
+        }
+    }
+
+    protected function deactivateColours(\DOMXPath $xPath)
+    {
+        $nodeList = $xPath->query('/phpunit/@colors');
+
+        if ($nodeList->length) {
+            $nodeList[0]->nodeValue = 'false';
+        } else {
+            $node = $xPath->query('/phpunit')[0];
+            $node->setAttribute('colors', 'false');
         }
     }
 }

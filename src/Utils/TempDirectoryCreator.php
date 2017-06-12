@@ -11,11 +11,11 @@ class TempDirectoryCreator
      */
     private $tempDirectory;
 
-    public function createAndGet() : string
+    public function createAndGet($dirName = null) : string
     {
         if ($this->tempDirectory === null) {
             $root = sys_get_temp_dir();
-            $path = $root . '/infection';
+            $path = $root . sprintf('/%s', $dirName ?: 'infection');
 
             if (! @mkdir($path, 0777, true) && !is_dir($path)) {
                 throw new \RuntimeException('Can not create temp dir');

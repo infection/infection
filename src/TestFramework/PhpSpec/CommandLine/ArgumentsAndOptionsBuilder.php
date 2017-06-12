@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\CommandLine;
+namespace Infection\TestFramework\PhpSpec\CommandLine;
 
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 
@@ -10,9 +10,11 @@ class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilde
 {
     public function build(string $configPath): string
     {
-        $options = [];
+        $options = ['run'];
 
-        $options[] = sprintf('--configuration %s', $configPath);
+        $options[] = sprintf('--config=%s', $configPath);
+        $options[] = '--no-ansi';
+        $options[] = '--format=tap';
         $options[] = '--stop-on-failure';
 
         return implode(' ', $options);

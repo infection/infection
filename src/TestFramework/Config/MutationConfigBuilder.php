@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Config;
 
-
 use Infection\Mutant\Mutant;
 
-interface ConfigBuilder
+interface MutationConfigBuilder
 {
-    public function build() : string;
+    public function build(Mutant $mutant) : string;
 }

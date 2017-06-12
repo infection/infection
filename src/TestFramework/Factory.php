@@ -7,6 +7,9 @@ namespace Infection\TestFramework;
 use Infection\Finder\TestFrameworkExecutableFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
+use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder as PhpSpecInitialConfigBuilder;
+use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder as PhpSpecMutationConfigBuilder;
+use Infection\TestFramework\PhpSpec\CommandLine\ArgumentsAndOptionsBuilder as PhpSpecArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
@@ -46,6 +49,7 @@ class Factory
     {
         if ($adapterName === PhpUnitAdapter::NAME) {
             $phpUnitConfigPath = $this->configLocator->locate(PhpUnitAdapter::NAME);
+
             return new PhpUnitAdapter(
                 new TestFrameworkExecutableFinder(PhpUnitAdapter::NAME),
                 new InitialConfigBuilder($this->tempDir, $phpUnitConfigPath, $this->pathReplacer),
@@ -55,8 +59,13 @@ class Factory
         }
 
         if ($adapterName === PhpSpecAdapter::NAME) {
+            $phpSpecConfigPath = $this->configLocator->locate(PhpSpecAdapter::NAME);
+
             return new PhpSpecAdapter(
-                new TestFrameworkExecutableFinder(PhpSpecAdapter::NAME)
+                new TestFrameworkExecutableFinder(PhpSpecAdapter::NAME),
+                new PhpSpecInitialConfigBuilder($this->tempDir, $phpSpecConfigPath),
+                new PhpSpecMutationConfigBuilder($this->tempDir, $phpSpecConfigPath, $this->projectDir),
+                new PhpSpecArgumentsAndOptionsBuilder()
             );
         }
 

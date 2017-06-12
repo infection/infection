@@ -1,0 +1,60 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Infection\Tests\TestFramework\PhpSpec\Config;
+
+use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\PhpSpec\Config\InitialYamlConfiguration;
+use Infection\TestFramework\PhpSpec\Config\MutationYamlConfiguration;
+use Infection\TestFramework\PhpSpec\Config\NoCodeCoverageException;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Yaml\Yaml;
+
+class MutationYamlConfigurationTest extends TestCase
+{
+    protected $tempDir = '/path/to/tmp';
+
+    private $customAutoloadFilePath = '/custom/path';
+
+    private $defaultConfig = [
+        'extensions' => [
+            'PhpSpecCodeCoverageExtension' => [
+                'format' => ['xml', 'text'],
+                'output' => [
+                    'xml' => '/path'
+                ],
+            ],
+            'SomeOtherExtension' => ['option' => 123],
+        ],
+        'bootstrap' => '/path/to/adc',
+    ];
+
+    protected function getConfigurationObject(array $configArray = [])
+    {
+        return new MutationYamlConfiguration(
+            $this->tempDir,
+            $configArray ?: $this->defaultConfig,
+            $this->customAutoloadFilePath
+        );
+    }
+
+    public function test_it_removes_code_coverage_extension()
+    {
+        $configuration = $this->getConfigurationObject();
+
+        $parsedYaml = Yaml::parse($configuration->getYaml());
+
+        $this->assertCount(1, $parsedYaml['extensions']);
+        $this->assertArrayNotHasKey('PhpSpecCodeCoverageExtension', $parsedYaml['extensions']);
+    }
+
+    public function test_it_sets_custom_autoloader_path()
+    {
+        $configuration = $this->getConfigurationObject();
+
+        $parsedYaml = Yaml::parse($configuration->getYaml());
+
+        $this->assertSame($this->customAutoloadFilePath, $parsedYaml['bootstrap']);
+    }
+}

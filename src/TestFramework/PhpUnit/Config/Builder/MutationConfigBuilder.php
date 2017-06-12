@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
 use Infection\Mutant\Mutant;
-use Infection\TestFramework\Config\ConfigBuilder;
+use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\MutationXmlConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 
@@ -37,7 +37,7 @@ class MutationConfigBuilder implements ConfigBuilder
         $this->projectDir = $projectDir;
     }
 
-    public function build(Mutant $mutant = null): string
+    public function build(Mutant $mutant): string
     {
         $customAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',
@@ -67,7 +67,7 @@ class MutationConfigBuilder implements ConfigBuilder
     {
         $originalFilePath = $mutant->getMutation()->getOriginalFilePath();
         $mutatedFilePath = $mutant->getMutatedFilePath();
-        $interceptorPath = dirname(dirname(dirname(dirname(__DIR__)))) .  '/StreamWrapper/IncludeInterceptor.php';
+        $interceptorPath = dirname(__DIR__, 4) .  '/StreamWrapper/IncludeInterceptor.php';
 
         // TODO change to what it was (e.g. app/autoload - see simplehabits)
         $autoload = sprintf('%s/vendor/autoload.php', $this->projectDir);

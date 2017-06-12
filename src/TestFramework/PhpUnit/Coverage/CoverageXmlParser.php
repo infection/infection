@@ -7,19 +7,13 @@ namespace Infection\TestFramework\PhpUnit\Coverage;
 class CoverageXmlParser
 {
     /**
-     * @var array
-     */
-    private $srcDirs;
-
-    /**
      * @var string
      */
     private $coverageDir;
 
-    public function __construct(string $coverageDir, array $srcDirs)
+    public function __construct(string $coverageDir)
     {
         $this->coverageDir = $coverageDir;
-        $this->srcDirs = $srcDirs;
     }
 
     /**
