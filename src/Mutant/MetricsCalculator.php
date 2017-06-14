@@ -15,6 +15,11 @@ class MetricsCalculator
     private $killedCount = 0;
 
     /**
+     * @var MutantProcess[]
+     */
+    private $killedMutantProcesses = [];
+
+    /**
      * @var int
      */
     private $escapedCount = 0;
@@ -66,6 +71,7 @@ class MetricsCalculator
         switch ($mutantProcess->getResultCode()) {
             case MutantProcess::CODE_KILLED:
                 $this->killedCount++;
+                $this->killedMutantProcesses[] = $mutantProcess;
                 break;
             case MutantProcess::CODE_NOT_COVERED:
                 $this->notCoveredByTestsCount++;
@@ -173,6 +179,14 @@ class MetricsCalculator
     public function getEscapedMutantProcesses(): array
     {
         return $this->escapedMutantProcesses;
+    }
+
+    /**
+     * @return MutantProcess[]
+     */
+    public function getKilledMutantProcesses(): array
+    {
+        return $this->killedMutantProcesses;
     }
 
     /**

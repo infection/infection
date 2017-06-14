@@ -8,6 +8,7 @@ use Infection\Config\InfectionConfig;
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\MutationTestingFinished;
 use Infection\Mutant\MetricsCalculator;
+use Infection\Process\MutantProcess;
 
 class TextFileLoggerSubscriber implements EventSubscriberInterface
 {
@@ -55,6 +56,11 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param MutantProcess[] $processes
+     * @param string $headlinePrefix
+     * @return array
+     */
     private function getLogParts(array $processes, string $headlinePrefix): array
     {
         $logParts = [sprintf('%s mutants:', $headlinePrefix), ''];

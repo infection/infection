@@ -67,14 +67,16 @@ class MutationConfigBuilder implements ConfigBuilder
     {
         $originalFilePath = $mutant->getMutation()->getOriginalFilePath();
         $mutatedFilePath = $mutant->getMutatedFilePath();
+        $interceptorPath = dirname(dirname(dirname(dirname(__DIR__)))) .  '/StreamWrapper/IncludeInterceptor.php';
 
-
+        // TODO change to what it was (e.g. app/autoload - see simplehabits)
         $autoload = sprintf('%s/vendor/autoload.php', $this->projectDir);
 
         $customAutoload = <<<AUTOLOAD
 <?php
 
 require_once '{$autoload}';
+require_once '{$interceptorPath}';
 
 use Infection\StreamWrapper\IncludeInterceptor;
 

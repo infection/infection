@@ -16,7 +16,6 @@ use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\Coverage\CodeCoverageData;
-use Infection\Utils\InfectionConfig;
 use Infection\Differ\DiffColorizer;
 
 $c = new Container();
