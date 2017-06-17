@@ -44,6 +44,11 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
 
             $logParts = array_merge(
                 $logParts,
+                $this->getLogParts($this->metricsCalculator->getKilledMutantProcesses(), 'Killed')
+            );
+
+            $logParts = array_merge(
+                $logParts,
                 $this->getLogParts($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped')
             );
 
@@ -69,7 +74,9 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
             $logParts[] = '';
             $logParts[] = sprintf('%d) %s', $index + 1, get_class($mutantProcess->getMutant()->getMutation()->getMutator()));
             $logParts[] = $mutantProcess->getMutant()->getMutation()->getOriginalFilePath();
+            $logParts[] = $mutantProcess->getProcess()->getCommandLine();
             $logParts[] = $mutantProcess->getMutant()->getDiff();
+            $logParts[] = $mutantProcess->getProcess()->getOutput();
         }
         return $logParts;
     }

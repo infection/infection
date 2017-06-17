@@ -20,6 +20,7 @@ class InitialXmlConfiguration extends AbstractXmlConfiguration
 
         $this->replaceWithAbsolutePaths($xPath);
         $this->setStopOnFailure($xPath);
+        $this->deactivateColours($xPath);
         $this->removeExistingLoggers($dom, $xPath);
         $this->addLogger($dom, $xPath);
 

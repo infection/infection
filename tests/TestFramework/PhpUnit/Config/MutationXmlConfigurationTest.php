@@ -39,6 +39,15 @@ class MutationXmlConfigurationTest extends AbstractXmlConfiguration
         $this->assertSame('true', $value);
     }
 
+    public function test_it_sets_colors_flag()
+    {
+        $xml = $this->configuration->getXml();
+
+        $value = $this->queryXpath($xml, '/phpunit/@colors')[0]->nodeValue;
+
+        $this->assertSame('false', $value);
+    }
+
     public function test_it_replaces_test_suite_directory_wildcard_from_another_folder()
     {
         $phpUnitConfigDir = __DIR__ . '/../../../Files/phpunit/project-path/app';

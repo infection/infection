@@ -42,8 +42,12 @@ $c['temp.dir.creator'] = function () : TempDirectoryCreator {
     return new TempDirectoryCreator();
 };
 
-$c['coverage.dir'] = function (Container $c) : string {
-    return $c['temp.dir'] . '/' . CodeCoverageData::COVERAGE_DIR;
+$c['coverage.dir.phpunit'] = function (Container $c) : string {
+    return $c['temp.dir'] . '/' . CodeCoverageData::PHP_UNIT_COVERAGE_DIR;
+};
+
+$c['coverage.dir.phpspec'] = function (Container $c) : string {
+    return $c['temp.dir'] . '/' . CodeCoverageData::PHP_SPEC_COVERAGE_DIR;
 };
 
 $c['locator'] = function (Container $c) : Locator {
@@ -76,10 +80,6 @@ $c['parallel.process.runner'] = function (Container $c) : ParallelProcessRunner 
 
 $c['testframework.config.locator'] = function (Container $c) : TestFrameworkConfigLocator {
     return new TestFrameworkConfigLocator($c['phpunit.config.dir']/*[phpunit.dir, phpspec.dir, ...]*/);
-};
-
-$c['coverage.parser'] = function (Container $c) : CoverageXmlParser {
-    return new CoverageXmlParser($c['coverage.dir'], $c['src.dirs']);
 };
 
 $c['diff.colorizer'] = function () : DiffColorizer {

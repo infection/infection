@@ -17,6 +17,7 @@ use Infection\Process\Listener\TextFileLoggerSubscriber;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Pimple\Container;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -50,16 +51,15 @@ class InfectionApplication
     {
         /** @var EventDispatcher $eventDispatcher */
         $eventDispatcher = $this->get('dispatcher');
-        $adapter = $this->get('test.framework.factory')->create($this->input->getOption('test-framework'));
+        $testFrameworkKey = $this->input->getOption('test-framework');
+        $adapter = $this->get('test.framework.factory')->create($testFrameworkKey);
 
         $initialTestsProgressBar = new ProgressBar($this->output);
         $initialTestsProgressBar->setFormat('verbose');
 
         $metricsCalculator = new MetricsCalculator($adapter);
 
-        $eventDispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($this->output, $initialTestsProgressBar));
-        $eventDispatcher->addSubscriber(new MutationConsoleLoggerSubscriber($this->output, $this->getOutputFormatter(), $metricsCalculator, $this->get('diff.colorizer'), $this->input->getOption('show-mutations')));
-        $eventDispatcher->addSubscriber(new TextFileLoggerSubscriber($this->get('infection.config'), $metricsCalculator));
+        $this->addSubscribers($eventDispatcher, $initialTestsProgressBar, $metricsCalculator);
 
         $processBuilder = new ProcessBuilder($adapter, $this->get('infection.config')->getProcessTimeout());
 
@@ -80,7 +80,8 @@ class InfectionApplication
 
         $onlyCovered = $this->input->getOption('only-covered');
         $filesFilter = $this->input->getOption('filter');
-        $codeCoverageData = new CodeCoverageData($this->get('coverage.dir'), $this->get('coverage.parser'));
+        $coverageDir = $this->get(sprintf('coverage.dir.%s', $testFrameworkKey));
+        $codeCoverageData = new CodeCoverageData($coverageDir, new CoverageXmlParser($coverageDir));
 
         $this->output->writeln(['', 'Generate mutants...', '']);
 
@@ -119,5 +120,12 @@ class InfectionApplication
         }
 
         throw new \InvalidArgumentException('Incorrect formatter. Possible values: dot, progress');
+    }
+
+    private function addSubscribers(EventDispatcher $eventDispatcher, ProgressBar $initialTestsProgressBar, MetricsCalculator $metricsCalculator): void
+    {
+        $eventDispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($this->output, $initialTestsProgressBar));
+        $eventDispatcher->addSubscriber(new MutationConsoleLoggerSubscriber($this->output, $this->getOutputFormatter(), $metricsCalculator, $this->get('diff.colorizer'), $this->input->getOption('show-mutations')));
+        $eventDispatcher->addSubscriber(new TextFileLoggerSubscriber($this->get('infection.config'), $metricsCalculator));
     }
 }
