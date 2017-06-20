@@ -8,6 +8,7 @@ use Infection\Finder\AbstractExecutableFinder;
 use Infection\Mutant\Mutant;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
+use Infection\TestFramework\Coverage\CodeCoverageData;
 
 abstract class AbstractTestFrameworkAdapter
 {
@@ -64,8 +65,8 @@ abstract class AbstractTestFrameworkAdapter
         return $this->initialConfigBuilder->build();
     }
 
-    public function buildMutationConfigFile(Mutant $mutant) : string
+    public function buildMutationConfigFile(Mutant $mutant, CodeCoverageData $codeCoverageData) : string
     {
-        return $this->mutationConfigBuilder->build($mutant);
+        return $this->mutationConfigBuilder->build($mutant, $codeCoverageData);
     }
 }

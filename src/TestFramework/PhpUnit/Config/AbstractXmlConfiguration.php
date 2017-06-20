@@ -6,6 +6,7 @@ namespace Infection\TestFramework\PhpUnit\Config;
 
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 
 abstract class AbstractXmlConfiguration
@@ -59,10 +60,11 @@ abstract class AbstractXmlConfiguration
         }
     }
 
-    protected function addLogger(\DOMDocument $dom, \DOMXPath $xPath)
+    protected function addCodeCoverageLogger(\DOMDocument $dom, \DOMXPath $xPath)
     {
         $loggingList = $xPath->query('/phpunit/logging');
 
+        // TODO reuse
         if ($loggingList->length) {
             $logging = $loggingList->item(0);
         } else {
@@ -70,11 +72,11 @@ abstract class AbstractXmlConfiguration
             $dom->documentElement->appendChild($logging);
         }
 
-        $log = $dom->createElement('log');
-        $log->setAttribute('type', 'coverage-xml');
-        $log->setAttribute('target', $this->tempDirectory . '/' . CodeCoverageData::PHP_UNIT_COVERAGE_DIR);
+        $coverageXmlLog = $dom->createElement('log');
+        $coverageXmlLog->setAttribute('type', 'coverage-xml');
+        $coverageXmlLog->setAttribute('target', $this->tempDirectory . '/' . CodeCoverageData::PHP_UNIT_COVERAGE_DIR);
 
-        $logging->appendChild($log);
+        $logging->appendChild($coverageXmlLog);
     }
 
     protected function setStopOnFailure(\DOMXPath $xPath)

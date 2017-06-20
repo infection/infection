@@ -9,6 +9,7 @@ use Infection\TestFramework\AbstractTestFrameworkAdapter;
 class PhpUnitAdapter extends AbstractTestFrameworkAdapter
 {
     const NAME = 'phpunit';
+    const JUNIT_FILE_NAME = 'phpunit.junit.xml';
 
     public function testsPass(string $output): bool
     {

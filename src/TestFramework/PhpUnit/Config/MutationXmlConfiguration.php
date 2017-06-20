@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config;
 
+use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 
 class MutationXmlConfiguration extends AbstractXmlConfiguration
@@ -14,11 +15,17 @@ class MutationXmlConfiguration extends AbstractXmlConfiguration
      */
     private $customAutoloadFilePath;
 
-    public function __construct(string $tempDirectory, string $originalXmlConfigPath, PathReplacer $pathReplacer, string $customAutoloadFilePath)
+    /**
+     * @var CodeCoverageData
+     */
+    private $codeCoverageData;
+
+    public function __construct(string $tempDirectory, string $originalXmlConfigPath, PathReplacer $pathReplacer, string $customAutoloadFilePath, CodeCoverageData $codeCoverageData)
     {
         parent::__construct($tempDirectory, $originalXmlConfigPath, $pathReplacer);
 
         $this->customAutoloadFilePath = $customAutoloadFilePath;
+        $this->codeCoverageData = $codeCoverageData;
     }
 
     public function getXml() : string
@@ -37,6 +44,7 @@ class MutationXmlConfiguration extends AbstractXmlConfiguration
         $this->setStopOnFailure($xPath);
         $this->deactivateColours($xPath);
         $this->removeExistingLoggers($dom, $xPath);
+        $this->setFilteredTestsToRun($dom, $xPath);
 
         return $dom->saveXML();
     }
@@ -46,5 +54,10 @@ class MutationXmlConfiguration extends AbstractXmlConfiguration
         $node = $xPath->query('/phpunit/@bootstrap')[0];
 
         $node->nodeValue = $this->customAutoloadFilePath;
+    }
+
+    private function setFilteredTestsToRun($dom, $xPath)
+    {
+
     }
 }

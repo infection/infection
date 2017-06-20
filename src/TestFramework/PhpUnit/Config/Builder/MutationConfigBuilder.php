@@ -6,6 +6,7 @@ namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
 use Infection\Mutant\Mutant;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
+use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\PhpUnit\Config\MutationXmlConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 
@@ -37,7 +38,7 @@ class MutationConfigBuilder implements ConfigBuilder
         $this->projectDir = $projectDir;
     }
 
-    public function build(Mutant $mutant): string
+    public function build(Mutant $mutant, CodeCoverageData $codeCoverageData): string
     {
         $customAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',
@@ -51,7 +52,8 @@ class MutationConfigBuilder implements ConfigBuilder
             $this->tempDirectory,
             $this->originalXmlConfigPath,
             $this->pathReplacer,
-            $customAutoloadFilePath
+            $customAutoloadFilePath,
+            $codeCoverageData
         );
 
         $newXml = $xmlConfiguration->getXml();

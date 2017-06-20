@@ -18,6 +18,7 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\PhpUnit\Coverage\PhpUnitTestFileNameProvider;
 use Pimple\Container;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -81,7 +82,7 @@ class InfectionApplication
         $onlyCovered = $this->input->getOption('only-covered');
         $filesFilter = $this->input->getOption('filter');
         $coverageDir = $this->get(sprintf('coverage.dir.%s', $testFrameworkKey));
-        $codeCoverageData = new CodeCoverageData($coverageDir, new CoverageXmlParser($coverageDir));
+        $codeCoverageData = new CodeCoverageData($coverageDir, new CoverageXmlParser($coverageDir), $this->get('phpunit.provider.test.filename'));
 
         $this->output->writeln(['', 'Generate mutants...', '']);
 

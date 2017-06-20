@@ -7,6 +7,7 @@ namespace Infection\Process\Builder;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\Coverage\CodeCoverageData;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
@@ -53,11 +54,12 @@ class ProcessBuilder
     /**
      * @throws RuntimeException
      * @param Mutant $mutant
+     * @param CodeCoverageData $codeCoverageData
      * @return MutantProcess
      */
-    public function getProcessForMutant(Mutant $mutant) : MutantProcess
+    public function getProcessForMutant(Mutant $mutant, CodeCoverageData $codeCoverageData) : MutantProcess
     {
-        $configPath = $this->testFrameworkAdapter->buildMutationConfigFile($mutant);
+        $configPath = $this->testFrameworkAdapter->buildMutationConfigFile($mutant, $codeCoverageData);
 
         $symfonyProcess = new Process(
             $this->testFrameworkAdapter->getExecutableCommandLine($configPath),
