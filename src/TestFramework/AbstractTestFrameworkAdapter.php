@@ -65,8 +65,8 @@ abstract class AbstractTestFrameworkAdapter
         return $this->initialConfigBuilder->build();
     }
 
-    public function buildMutationConfigFile(Mutant $mutant, CodeCoverageData $codeCoverageData) : string
+    public function buildMutationConfigFile(Mutant $mutant) : string
     {
-        return $this->mutationConfigBuilder->build($mutant, $codeCoverageData);
+        return $this->mutationConfigBuilder->build($mutant);
     }
 }

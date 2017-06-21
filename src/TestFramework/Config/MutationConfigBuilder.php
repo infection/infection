@@ -9,5 +9,5 @@ use Infection\TestFramework\Coverage\CodeCoverageData;
 
 interface MutationConfigBuilder
 {
-    public function build(Mutant $mutant, CodeCoverageData $codeCoverageData) : string;
+    public function build(Mutant $mutant) : string;
 }

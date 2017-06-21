@@ -54,12 +54,11 @@ class ProcessBuilder
     /**
      * @throws RuntimeException
      * @param Mutant $mutant
-     * @param CodeCoverageData $codeCoverageData
      * @return MutantProcess
      */
-    public function getProcessForMutant(Mutant $mutant, CodeCoverageData $codeCoverageData) : MutantProcess
+    public function getProcessForMutant(Mutant $mutant) : MutantProcess
     {
-        $configPath = $this->testFrameworkAdapter->buildMutationConfigFile($mutant, $codeCoverageData);
+        $configPath = $this->testFrameworkAdapter->buildMutationConfigFile($mutant);
 
         $symfonyProcess = new Process(
             $this->testFrameworkAdapter->getExecutableCommandLine($configPath),

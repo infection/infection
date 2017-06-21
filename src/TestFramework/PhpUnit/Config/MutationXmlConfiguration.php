@@ -16,16 +16,16 @@ class MutationXmlConfiguration extends AbstractXmlConfiguration
     private $customAutoloadFilePath;
 
     /**
-     * @var CodeCoverageData
+     * @var array
      */
-    private $codeCoverageData;
+    private $coveredTests;
 
-    public function __construct(string $tempDirectory, string $originalXmlConfigPath, PathReplacer $pathReplacer, string $customAutoloadFilePath, CodeCoverageData $codeCoverageData)
+    public function __construct(string $tempDirectory, string $originalXmlConfigPath, PathReplacer $pathReplacer, string $customAutoloadFilePath, array $coveredTests)
     {
         parent::__construct($tempDirectory, $originalXmlConfigPath, $pathReplacer);
 
         $this->customAutoloadFilePath = $customAutoloadFilePath;
-        $this->codeCoverageData = $codeCoverageData;
+        $this->coveredTests = $coveredTests;
     }
 
     public function getXml() : string
@@ -58,6 +58,19 @@ class MutationXmlConfiguration extends AbstractXmlConfiguration
 
     private function setFilteredTestsToRun($dom, $xPath)
     {
+        $nodes = $xPath->query('/phpunit/testsuites/testsuite');
 
+        foreach ($nodes as $node) {
+            $dom->documentElement->removeChild($node);
+        }
+
+        $loggingList = $xPath->query('/phpunit/testsuites');
+
+        $testsuites = $loggingList->item(0);
+
+        $testsuite = $dom->createElement('testsuite');
+        $testsuite->setAttribute('name', 'Infection testsuite with filtered tests');
+
+        $testsuites->appendChild($testsuite);
     }
 }

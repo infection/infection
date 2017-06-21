@@ -23,12 +23,17 @@ class Mutation
      * @var string
      */
     private $originalFilePath;
+    /**
+     * @var array
+     */
+    private $coveredTests;
 
-    public function __construct(string $originalFilePath, Mutator $mutator, array $attributes)
+    public function __construct(string $originalFilePath, Mutator $mutator, array $attributes, array $coveredTests)
     {
         $this->originalFilePath = $originalFilePath;
         $this->mutator = $mutator;
         $this->attributes = $attributes;
+        $this->coveredTests = $coveredTests;
     }
 
     /**
@@ -53,6 +58,14 @@ class Mutation
     public function getOriginalFilePath() : string
     {
         return $this->originalFilePath;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCoveredTests(): array
+    {
+        return $this->coveredTests;
     }
 
     public function getHash() : string

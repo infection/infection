@@ -38,7 +38,7 @@ class MutationConfigBuilder implements ConfigBuilder
         $this->projectDir = $projectDir;
     }
 
-    public function build(Mutant $mutant, CodeCoverageData $codeCoverageData): string
+    public function build(Mutant $mutant): string
     {
         $customAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',
@@ -53,7 +53,7 @@ class MutationConfigBuilder implements ConfigBuilder
             $this->originalXmlConfigPath,
             $this->pathReplacer,
             $customAutoloadFilePath,
-            $codeCoverageData
+            $mutant->getMutation()->getCoveredTests()
         );
 
         $newXml = $xmlConfiguration->getXml();

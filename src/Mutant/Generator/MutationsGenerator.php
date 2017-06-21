@@ -163,6 +163,7 @@ class MutationsGenerator
 
     private function getMutators(): array
     {
+        // TODO lazy loading. it is executed in the loop
         return [
             // Arithmetic
             new BitwiseAnd(),
