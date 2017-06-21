@@ -39,18 +39,6 @@ abstract class AbstractXmlConfiguration extends TestCase
         $this->configuration = $this->getConfigurationObject();
     }
 
-    public function test_it_replaces_test_suite_directory_wildcard()
-    {
-        $xml = $this->configuration->getXml();
-
-        /** @var \DOMNodeList $directories */
-        $directories = $this->queryXpath($xml, '/phpunit/testsuites/testsuite/directory');
-
-        $this->assertSame(2, $directories->length);
-        $this->assertSame($this->pathToProject . '/AnotherBundle', $directories[0]->nodeValue);
-        $this->assertSame($this->pathToProject . '/SomeBundle', $directories[1]->nodeValue);
-    }
-
     public function test_it_removes_original_loggers()
     {
         $xml = $this->configuration->getXml();

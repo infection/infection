@@ -53,7 +53,7 @@ class MutationTestingRunner
             function (Mutation $mutation) use ($codeCoverageData): MutantProcess {
                 $mutant = $this->mutantCreator->create($mutation, $codeCoverageData);
 
-                return $this->processBuilder->getProcessForMutant($mutant, $codeCoverageData);
+                return $this->processBuilder->getProcessForMutant($mutant);
             },
             $this->mutations
         );

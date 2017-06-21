@@ -63,7 +63,13 @@ class MutantCreator
 
         $isCoveredByTest = $this->isCoveredByTest($mutation, $codeCoverageData);
 
-        return new Mutant($mutatedFilePath, $mutation, $diff, $isCoveredByTest);
+        return new Mutant(
+            $mutatedFilePath,
+            $mutation,
+            $diff,
+            $isCoveredByTest,
+            $codeCoverageData->getAllTestsFor($mutation->getOriginalFilePath(), $mutation->getAttributes()['startLine'])
+        );
     }
 
     private function isCoveredByTest(Mutation $mutation, CodeCoverageData $codeCoverageData)

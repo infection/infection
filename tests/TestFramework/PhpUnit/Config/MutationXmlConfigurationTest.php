@@ -18,7 +18,13 @@ class MutationXmlConfigurationTest extends AbstractXmlConfiguration
 
         $replacer = new PathReplacer(new Locator($this->pathToProject));
 
-        return new MutationXmlConfiguration($this->tempDir, $phpunitXmlPath, $replacer, $this->customAutoloadConfigPath);
+        return new MutationXmlConfiguration(
+            $this->tempDir,
+            $phpunitXmlPath,
+            $replacer,
+            $this->customAutoloadConfigPath,
+            []
+        );
     }
 
     public function test_it_sets_custom_autoloader()
@@ -46,24 +52,5 @@ class MutationXmlConfigurationTest extends AbstractXmlConfiguration
         $value = $this->queryXpath($xml, '/phpunit/@colors')[0]->nodeValue;
 
         $this->assertSame('false', $value);
-    }
-
-    public function test_it_replaces_test_suite_directory_wildcard_from_another_folder()
-    {
-        $phpUnitConfigDir = __DIR__ . '/../../../Files/phpunit/project-path/app';
-        $phpunitXmlPath = $phpUnitConfigDir . '/phpunit.xml';
-
-        $replacer = new PathReplacer(new Locator($this->pathToProject), $phpUnitConfigDir);
-
-        $configuration = new MutationXmlConfiguration($this->tempDir, $phpunitXmlPath, $replacer, $this->customAutoloadConfigPath);
-
-        $xml = $configuration->getXml();
-
-        /** @var \DOMNodeList $directories */
-        $directories = $this->queryXpath($xml, '/phpunit/testsuites/testsuite/directory');
-
-        $this->assertSame(2, $directories->length);
-        $this->assertSame($this->pathToProject . '/AnotherBundle', $directories[0]->nodeValue);
-        $this->assertSame($this->pathToProject . '/SomeBundle', $directories[1]->nodeValue);
     }
 }

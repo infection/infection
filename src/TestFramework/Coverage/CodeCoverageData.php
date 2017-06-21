@@ -72,6 +72,15 @@ class CodeCoverageData
         return !empty($coverageData[$filePath][$line]);
     }
 
+    public function getAllTestsFor(string $filePath, int $line): array
+    {
+        if (!$this->hasTestsOnLine($filePath, $line)) {
+            return [];
+        }
+
+        return $this->getCoverage()[$filePath][$line];
+    }
+
     private function getCoverage(): array
     {
         if (null === $this->coverage) {
@@ -80,14 +89,14 @@ class CodeCoverageData
 
             $coverage = $this->parser->parse($coverageIndexFileContent);
 
-            // coverage[sourceFilePath][line] = ['test' => '\A\B\C::test_it_works', 'testFile' => '/path/to/A/B/C.php']
+            // coverage[sourceFilePath][line] = ['test' => '\A\B\C::test_it_works', 'testFilePath' => '/path/to/A/B/C.php']
             foreach ($coverage as $sourceFilePath => &$fileCoverageData) {
                 foreach ($fileCoverageData as $line => &$lineCoverageData) {
                     foreach ($lineCoverageData as &$test) {
                         $class = explode('::', $test['testMethod'])[0];
 
                         $testFilePath = $this->testFileNameProvider->getFileNameByClass($class);
-                        $test['testFile'] = $testFilePath;
+                        $test['testFilePath'] = $testFilePath;
                     }
                     unset($test);
                 }

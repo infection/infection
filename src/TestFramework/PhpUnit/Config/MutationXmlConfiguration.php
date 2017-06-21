@@ -18,14 +18,14 @@ class MutationXmlConfiguration extends AbstractXmlConfiguration
     /**
      * @var array
      */
-    private $coveredTests;
+    private $coverageTests;
 
-    public function __construct(string $tempDirectory, string $originalXmlConfigPath, PathReplacer $pathReplacer, string $customAutoloadFilePath, array $coveredTests)
+    public function __construct(string $tempDirectory, string $originalXmlConfigPath, PathReplacer $pathReplacer, string $customAutoloadFilePath, array $coverageTests)
     {
         parent::__construct($tempDirectory, $originalXmlConfigPath, $pathReplacer);
 
         $this->customAutoloadFilePath = $customAutoloadFilePath;
-        $this->coveredTests = $coveredTests;
+        $this->coverageTests = $coverageTests;
     }
 
     public function getXml() : string
@@ -56,12 +56,12 @@ class MutationXmlConfiguration extends AbstractXmlConfiguration
         $node->nodeValue = $this->customAutoloadFilePath;
     }
 
-    private function setFilteredTestsToRun($dom, $xPath)
+    private function setFilteredTestsToRun(\DOMDocument $dom, \DOMXPath $xPath)
     {
         $nodes = $xPath->query('/phpunit/testsuites/testsuite');
 
         foreach ($nodes as $node) {
-            $dom->documentElement->removeChild($node);
+            $node->parentNode->removeChild($node);
         }
 
         $loggingList = $xPath->query('/phpunit/testsuites');
@@ -70,6 +70,14 @@ class MutationXmlConfiguration extends AbstractXmlConfiguration
 
         $testsuite = $dom->createElement('testsuite');
         $testsuite->setAttribute('name', 'Infection testsuite with filtered tests');
+
+        $uniqueTestFilePaths = array_unique(array_column($this->coverageTests, 'testFilePath'));
+
+        foreach ($uniqueTestFilePaths as $testFilePath) {
+            $file = $dom->createElement('file', $testFilePath);
+
+            $testsuite->appendChild($file);
+        }
 
         $testsuites->appendChild($testsuite);
     }

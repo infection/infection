@@ -53,7 +53,7 @@ class MutationConfigBuilder implements ConfigBuilder
             $this->originalXmlConfigPath,
             $this->pathReplacer,
             $customAutoloadFilePath,
-            $mutant->getMutation()->getCoveredTests()
+            $mutant->getCoverageTests()
         );
 
         $newXml = $xmlConfiguration->getXml();
