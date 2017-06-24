@@ -92,7 +92,7 @@ $c['phpunit.junit.file.path'] = function (Container $c): string {
     return $c['temp.dir'] . '/' . PhpUnitAdapter::JUNIT_FILE_NAME;
 };
 
-$c['phpunit.provider.test.filename'] = function (Container $c): TestFileDataProvider {
+$c['test.file.data.provider.phpunit'] = function (Container $c): TestFileDataProvider {
     return new PhpUnitTestFileDataProvider($c['phpunit.junit.file.path']);
 };
 

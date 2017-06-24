@@ -32,7 +32,7 @@ class CodeCoverageData
      */
     private $testFileDataProvider;
 
-    public function __construct(string $coverageDir, CoverageXmlParser $coverageXmlParser, TestFileDataProvider $testFileDataProvider)
+    public function __construct(string $coverageDir, CoverageXmlParser $coverageXmlParser, TestFileDataProvider $testFileDataProvider = null)
     {
         $this->coverageDir = $coverageDir;
         $this->parser = $coverageXmlParser;
@@ -101,10 +101,12 @@ class CodeCoverageData
                     foreach ($lineCoverageData as &$test) {
                         $class = explode('::', $test['testMethod'])[0];
 
-                        $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
+                        if ($this->testFileDataProvider !== null) {
+                            $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
 
-                        $test['testFilePath'] = $testFileData['path'];
-                        $test['time'] = $testFileData['time'];
+                            $test['testFilePath'] = $testFileData['path'];
+                            $test['time'] = $testFileData['time'];
+                        }
                     }
                     unset($test);
                 }
