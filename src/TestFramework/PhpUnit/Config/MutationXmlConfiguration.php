@@ -58,12 +58,22 @@ class MutationXmlConfiguration extends AbstractXmlConfiguration
 
     private function setFilteredTestsToRun(\DOMDocument $dom, \DOMXPath $xPath)
     {
+        $this->removeExistingTestSuite($xPath);
+
+        $this->addTestSuiteWIthFilteredTestFiles($dom, $xPath);
+    }
+
+    private function removeExistingTestSuite(\DOMXPath $xPath)
+    {
         $nodes = $xPath->query('/phpunit/testsuites/testsuite');
 
         foreach ($nodes as $node) {
             $node->parentNode->removeChild($node);
         }
+    }
 
+    private function addTestSuiteWIthFilteredTestFiles(\DOMDocument $dom, \DOMXPath $xPath)
+    {
         $loggingList = $xPath->query('/phpunit/testsuites');
 
         $testsuites = $loggingList->item(0);
@@ -71,7 +81,21 @@ class MutationXmlConfiguration extends AbstractXmlConfiguration
         $testsuite = $dom->createElement('testsuite');
         $testsuite->setAttribute('name', 'Infection testsuite with filtered tests');
 
-        $uniqueTestFilePaths = array_unique(array_column($this->coverageTests, 'testFilePath'));
+        $uniqueCoverageTests = $this->unique($this->coverageTests);
+
+        // sort tests to run the fastest first
+        usort(
+            $uniqueCoverageTests,
+            function (array $a, array $b) {
+                if ($a['time'] === $b['time']) {
+                    return 0;
+                }
+
+                return $a['time'] < $b['time'] ? -1 : 1;
+            }
+        );
+
+        $uniqueTestFilePaths = array_column($uniqueCoverageTests, 'testFilePath');
 
         foreach ($uniqueTestFilePaths as $testFilePath) {
             $file = $dom->createElement('file', $testFilePath);
@@ -80,5 +104,20 @@ class MutationXmlConfiguration extends AbstractXmlConfiguration
         }
 
         $testsuites->appendChild($testsuite);
+    }
+
+    private function unique(array $coverageTests): array
+    {
+        $usedFileNames = [];
+        $uniqueTests = [];
+
+        foreach ($coverageTests as $coverageTest) {
+            if (!in_array($coverageTest['testFilePath'], $usedFileNames, true)) {
+                $uniqueTests[] = $coverageTest;
+                $usedFileNames[] = $coverageTest['testFilePath'];
+            }
+        }
+
+        return $uniqueTests;
     }
 }

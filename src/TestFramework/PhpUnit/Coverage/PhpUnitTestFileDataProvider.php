@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Coverage;
 
 use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
-use Infection\TestFramework\Coverage\TestFileNameProvider;
+use Infection\TestFramework\Coverage\TestFileDataProvider;
 
-class PhpUnitTestFileNameProvider implements TestFileNameProvider
+class PhpUnitTestFileDataProvider implements TestFileDataProvider
 {
     /**
      * @var string
@@ -16,13 +16,11 @@ class PhpUnitTestFileNameProvider implements TestFileNameProvider
 
     public function __construct(string $jUnitFilePath)
     {
-
         $this->jUnitFilePath = $jUnitFilePath;
     }
 
-    public function getFileNameByClass(string $fullyQualifiedClassName): string
+    public function getTestFileInfo(string $fullyQualifiedClassName): array
     {
-
         $dom = new \DOMDocument();
         $dom->loadXML(file_get_contents($this->jUnitFilePath));
         $xPath = new \DOMXPath($dom);
@@ -33,6 +31,9 @@ class PhpUnitTestFileNameProvider implements TestFileNameProvider
             throw new TestFileNameNotFoundException(sprintf('For FQCN: %s', $fullyQualifiedClassName));
         }
 
-        return $nodes[0]->getAttribute('file');
+        return [
+            'path' => $nodes[0]->getAttribute('file'),
+            'time' => (float) $nodes[0]->getAttribute('time'),
+        ];
     }
 }

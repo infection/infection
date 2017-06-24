@@ -14,8 +14,8 @@ use Infection\EventDispatcher\EventDispatcher;
 use Infection\Finder\Locator;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
-use Infection\TestFramework\PhpUnit\Coverage\PhpUnitTestFileNameProvider;
-use Infection\TestFramework\Coverage\TestFileNameProvider;
+use Infection\TestFramework\PhpUnit\Coverage\PhpUnitTestFileDataProvider;
+use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Differ\DiffColorizer;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
@@ -92,8 +92,8 @@ $c['phpunit.junit.file.path'] = function (Container $c): string {
     return $c['temp.dir'] . '/' . PhpUnitAdapter::JUNIT_FILE_NAME;
 };
 
-$c['phpunit.provider.test.filename'] = function (Container $c): TestFileNameProvider {
-    return new PhpUnitTestFileNameProvider($c['phpunit.junit.file.path']);
+$c['phpunit.provider.test.filename'] = function (Container $c): TestFileDataProvider {
+    return new PhpUnitTestFileDataProvider($c['phpunit.junit.file.path']);
 };
 
 $c['application'] = function (Container $container) : Application {

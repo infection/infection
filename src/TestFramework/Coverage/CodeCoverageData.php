@@ -28,15 +28,15 @@ class CodeCoverageData
     private $parser;
 
     /**
-     * @var TestFileNameProvider
+     * @var TestFileDataProvider
      */
-    private $testFileNameProvider;
+    private $testFileDataProvider;
 
-    public function __construct(string $coverageDir, CoverageXmlParser $coverageXmlParser, TestFileNameProvider $testFileNameProvider)
+    public function __construct(string $coverageDir, CoverageXmlParser $coverageXmlParser, TestFileDataProvider $testFileDataProvider)
     {
         $this->coverageDir = $coverageDir;
         $this->parser = $coverageXmlParser;
-        $this->testFileNameProvider = $testFileNameProvider;
+        $this->testFileDataProvider = $testFileDataProvider;
     }
 
     public function hasTests(string $filePath): bool
@@ -89,14 +89,22 @@ class CodeCoverageData
 
             $coverage = $this->parser->parse($coverageIndexFileContent);
 
-            // coverage[sourceFilePath][line] = ['test' => '\A\B\C::test_it_works', 'testFilePath' => '/path/to/A/B/C.php']
+            /**
+             coverage[$sourceFilePath][$line] = [
+                'test' => '\A\B\C::test_it_works',
+                'testFilePath' => '/path/to/A/B/C.php',
+                'time' => 0.34325,
+             ]
+             */
             foreach ($coverage as $sourceFilePath => &$fileCoverageData) {
                 foreach ($fileCoverageData as $line => &$lineCoverageData) {
                     foreach ($lineCoverageData as &$test) {
                         $class = explode('::', $test['testMethod'])[0];
 
-                        $testFilePath = $this->testFileNameProvider->getFileNameByClass($class);
-                        $test['testFilePath'] = $testFilePath;
+                        $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
+
+                        $test['testFilePath'] = $testFileData['path'];
+                        $test['time'] = $testFileData['time'];
                     }
                     unset($test);
                 }
