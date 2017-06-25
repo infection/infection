@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 
-namespace Infection\Tests\Utils;
+namespace Infection\Tests\Config;
 
 
 use Infection\Config\InfectionConfig;

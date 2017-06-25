@@ -26,13 +26,18 @@ class Mutant
      * @var bool
      */
     private $isCoveredByTest;
+    /**
+     * @var array
+     */
+    private $coverageTests;
 
-    public function __construct(string $mutatedFilePath, Mutation $mutation, string $diff, bool $isCoveredByTest)
+    public function __construct(string $mutatedFilePath, Mutation $mutation, string $diff, bool $isCoveredByTest, array $coverageTests)
     {
         $this->mutatedFilePath = $mutatedFilePath;
         $this->mutation = $mutation;
         $this->diff = $diff;
         $this->isCoveredByTest = $isCoveredByTest;
+        $this->coverageTests = $coverageTests;
     }
 
     /**
@@ -62,5 +67,10 @@ class Mutant
     public function isCoveredByTest(): bool
     {
         return $this->isCoveredByTest;
+    }
+
+    public function getCoverageTests(): array
+    {
+        return $this->coverageTests;
     }
 }

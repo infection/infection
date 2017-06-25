@@ -135,7 +135,7 @@ class CoverageXmlParser
                 if ($coveredNode->nodeName === 'covered') {
                     $testMethod = $coveredNode->getAttribute('by');
 
-                    $fileCoverage[$lineNumber][] = $testMethod;
+                    $fileCoverage[$lineNumber][] = ['testMethod' => $testMethod];
                 }
             }
         }

@@ -37,12 +37,18 @@ class Factory
      */
     private $projectDir;
 
-    public function __construct(string $tempDir, string $projectDir, TestFrameworkConfigLocator $configLocator, PathReplacer $pathReplacer)
+    /**
+     * @var string
+     */
+    private $jUnitFilePath;
+
+    public function __construct(string $tempDir, string $projectDir, TestFrameworkConfigLocator $configLocator, PathReplacer $pathReplacer, string $jUnitFilePath)
     {
         $this->tempDir = $tempDir;
         $this->configLocator = $configLocator;
         $this->pathReplacer = $pathReplacer;
         $this->projectDir = $projectDir;
+        $this->jUnitFilePath = $jUnitFilePath;
     }
 
     public function create($adapterName) : AbstractTestFrameworkAdapter
@@ -52,7 +58,7 @@ class Factory
 
             return new PhpUnitAdapter(
                 new TestFrameworkExecutableFinder(PhpUnitAdapter::NAME),
-                new InitialConfigBuilder($this->tempDir, $phpUnitConfigPath, $this->pathReplacer),
+                new InitialConfigBuilder($this->tempDir, $phpUnitConfigPath, $this->pathReplacer, $this->jUnitFilePath),
                 new MutationConfigBuilder($this->tempDir, $phpUnitConfigPath, $this->pathReplacer, $this->projectDir),
                 new ArgumentsAndOptionsBuilder()
             );

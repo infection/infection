@@ -60,7 +60,7 @@ class CoverageXmlParserTest extends TestCase
         $this->assertCount(1, $coverage[$secondLevelAbsolutePath]);
 
         $this->assertSame(
-            'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
+            ['testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays'],
             $coverage[$firstLevelAbsolutePath][30][1]
         );
     }

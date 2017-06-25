@@ -14,9 +14,11 @@ use Infection\EventDispatcher\EventDispatcher;
 use Infection\Finder\Locator;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
-use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\PhpUnit\Coverage\PhpUnitTestFileDataProvider;
+use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Differ\DiffColorizer;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 
 $c = new Container();
 
@@ -59,7 +61,7 @@ $c['path.replacer'] = function(Container $c) : PathReplacer {
 };
 
 $c['test.framework.factory'] = function (Container $c) : Factory {
-    return new Factory($c['temp.dir'], $c['project.dir'], $c['testframework.config.locator'], $c['path.replacer']);
+    return new Factory($c['temp.dir'], $c['project.dir'], $c['testframework.config.locator'], $c['path.replacer'], $c['phpunit.junit.file.path']);
 };
 
 $c['mutant.creator'] = function (Container $c) : MutantCreator {
@@ -84,6 +86,14 @@ $c['testframework.config.locator'] = function (Container $c) : TestFrameworkConf
 
 $c['diff.colorizer'] = function () : DiffColorizer {
     return new DiffColorizer();
+};
+
+$c['phpunit.junit.file.path'] = function (Container $c): string {
+    return $c['temp.dir'] . '/' . PhpUnitAdapter::JUNIT_FILE_NAME;
+};
+
+$c['test.file.data.provider.phpunit'] = function (Container $c): TestFileDataProvider {
+    return new PhpUnitTestFileDataProvider($c['phpunit.junit.file.path']);
 };
 
 $c['application'] = function (Container $container) : Application {

@@ -22,6 +22,7 @@ use Pimple\Container;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Process;
 
 class InfectionApplication
 {
@@ -67,30 +68,20 @@ class InfectionApplication
         $initialTestSuitProcess = $initialTestsRunner->run();
 
         if (! $initialTestSuitProcess->isSuccessful()) {
-            $this->output->writeln(
-                sprintf(
-                    '<error>Tests do not pass. Error code %d. "%s". STDERR: %s</error>',
-                    $initialTestSuitProcess->getExitCode(),
-                    $initialTestSuitProcess->getExitCodeText(),
-                    $initialTestSuitProcess->getErrorOutput()
-                )
-            );
+            $this->logInitialTestsDoNotPass($initialTestSuitProcess);
+
             return 1;
         }
 
-        $onlyCovered = $this->input->getOption('only-covered');
-        $filesFilter = $this->input->getOption('filter');
-        $coverageDir = $this->get(sprintf('coverage.dir.%s', $testFrameworkKey));
-        $codeCoverageData = new CodeCoverageData($coverageDir, new CoverageXmlParser($coverageDir));
-
         $this->output->writeln(['', 'Generate mutants...', '']);
 
+        $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
         $mutationsGenerator = new MutationsGenerator($this->get('src.dirs'), $this->get('exclude.dirs'), $codeCoverageData);
-        $mutations = $mutationsGenerator->generate($onlyCovered, $filesFilter);
+        $mutations = $mutationsGenerator->generate($this->input->getOption('only-covered'), $this->input->getOption('filter'));
 
-        $threadCount = (int) $this->input->getOption('threads');
         $parallelProcessManager = $this->get('parallel.process.runner');
         $mutantCreator = $this->get('mutant.creator');
+        $threadCount = (int) $this->input->getOption('threads');
 
         $mutationTestingRunner = new MutationTestingRunner($processBuilder, $parallelProcessManager, $mutantCreator, $eventDispatcher, $mutations);
         $mutationTestingRunner->run($threadCount, $codeCoverageData);
@@ -107,6 +98,17 @@ class InfectionApplication
     private function get(string $name)
     {
         return $this->container[$name];
+    }
+
+    /**
+     * Checks whether the container has particular service
+     *
+     * @param string $serviceId
+     * @return bool
+     */
+    private function has(string $serviceId)
+    {
+        return isset($this->container[$serviceId]);
     }
 
     private function getOutputFormatter(): OutputFormatter
@@ -127,5 +129,26 @@ class InfectionApplication
         $eventDispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($this->output, $initialTestsProgressBar));
         $eventDispatcher->addSubscriber(new MutationConsoleLoggerSubscriber($this->output, $this->getOutputFormatter(), $metricsCalculator, $this->get('diff.colorizer'), $this->input->getOption('show-mutations')));
         $eventDispatcher->addSubscriber(new TextFileLoggerSubscriber($this->get('infection.config'), $metricsCalculator));
+    }
+
+    private function getCodeCoverageData(string $testFrameworkKey): CodeCoverageData
+    {
+        $coverageDir = $this->get(sprintf('coverage.dir.%s', $testFrameworkKey));
+        $testFileDataProviderServiceId = sprintf('test.file.data.provider.%s', $testFrameworkKey);
+        $testFileDataProviderService = $this->has($testFileDataProviderServiceId) ? $this->get($testFileDataProviderServiceId) : null;
+
+        return new CodeCoverageData($coverageDir, new CoverageXmlParser($coverageDir), $testFileDataProviderService);
+    }
+
+    private function logInitialTestsDoNotPass(Process $initialTestSuitProcess)
+    {
+        $this->output->writeln(
+            sprintf(
+                '<error>Tests do not pass. Error code %d. "%s". STDERR: %s</error>',
+                $initialTestSuitProcess->getExitCode(),
+                $initialTestSuitProcess->getExitCodeText(),
+                $initialTestSuitProcess->getErrorOutput()
+            )
+        );
     }
 }

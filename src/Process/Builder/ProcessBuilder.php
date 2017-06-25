@@ -7,6 +7,7 @@ namespace Infection\Process\Builder;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\Coverage\CodeCoverageData;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
@@ -39,7 +40,6 @@ class ProcessBuilder
         );
 
         // TODO debug why processBuilder does not work with env
-        // TODO next task - run only needed tests for each mutation
         // TODO read and add -vvv
         /**
         $processBuilder = new SymfonyProcessBuilder([

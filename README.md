@@ -18,3 +18,7 @@ exec /usr/local/php5-7.1.0-20161202-092124/bin/php /Users/user/sites/simplehabit
     
 export XDEBUG_CONFIG="idekey=PHPSTORM"
 
+
+
+1. parse junit
+2. compare with reflectionClass->getFileName (time)

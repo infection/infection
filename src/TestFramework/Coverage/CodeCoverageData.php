@@ -27,10 +27,16 @@ class CodeCoverageData
      */
     private $parser;
 
-    public function __construct(string $coverageDir, CoverageXmlParser $coverageXmlParser)
+    /**
+     * @var TestFileDataProvider
+     */
+    private $testFileDataProvider;
+
+    public function __construct(string $coverageDir, CoverageXmlParser $coverageXmlParser, TestFileDataProvider $testFileDataProvider = null)
     {
         $this->coverageDir = $coverageDir;
         $this->parser = $coverageXmlParser;
+        $this->testFileDataProvider = $testFileDataProvider;
     }
 
     public function hasTests(string $filePath): bool
@@ -66,13 +72,51 @@ class CodeCoverageData
         return !empty($coverageData[$filePath][$line]);
     }
 
+    public function getAllTestsFor(string $filePath, int $line): array
+    {
+        if (!$this->hasTestsOnLine($filePath, $line)) {
+            return [];
+        }
+
+        return $this->getCoverage()[$filePath][$line];
+    }
+
+    /**
+     * coverage[$sourceFilePath][$line] = [
+     *   [
+     *     'test' => '\A\B\C::test_it_works',
+     *     'testFilePath' => '/path/to/A/B/C.php',
+     *     'time' => 0.34325,
+     *   ]
+     * ]
+     */
     private function getCoverage(): array
     {
         if (null === $this->coverage) {
             $coverageIndexFilePath = $this->coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME;
             $coverageIndexFileContent = file_get_contents($coverageIndexFilePath);
 
-            $this->coverage = $this->parser->parse($coverageIndexFileContent);
+            $coverage = $this->parser->parse($coverageIndexFileContent);
+
+            foreach ($coverage as $sourceFilePath => &$fileCoverageData) {
+                foreach ($fileCoverageData as $line => &$lineCoverageData) {
+                    foreach ($lineCoverageData as &$test) {
+                        $class = explode('::', $test['testMethod'])[0];
+
+                        if ($this->testFileDataProvider !== null) {
+                            $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
+
+                            $test['testFilePath'] = $testFileData['path'];
+                            $test['time'] = $testFileData['time'];
+                        }
+                    }
+                    unset($test);
+                }
+                unset($lineCoverageData);
+            }
+            unset($fileCoverageData);
+
+            $this->coverage = $coverage;
         }
 
         return $this->coverage;
