@@ -40,7 +40,6 @@ class ProcessBuilder
         );
 
         // TODO debug why processBuilder does not work with env
-        // TODO next task - run only needed tests for each mutation
         // TODO read and add -vvv
         /**
         $processBuilder = new SymfonyProcessBuilder([

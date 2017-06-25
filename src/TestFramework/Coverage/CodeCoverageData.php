@@ -81,6 +81,15 @@ class CodeCoverageData
         return $this->getCoverage()[$filePath][$line];
     }
 
+    /**
+     * coverage[$sourceFilePath][$line] = [
+     *   [
+     *     'test' => '\A\B\C::test_it_works',
+     *     'testFilePath' => '/path/to/A/B/C.php',
+     *     'time' => 0.34325,
+     *   ]
+     * ]
+     */
     private function getCoverage(): array
     {
         if (null === $this->coverage) {
@@ -89,15 +98,6 @@ class CodeCoverageData
 
             $coverage = $this->parser->parse($coverageIndexFileContent);
 
-            /**
-             * coverage[$sourceFilePath][$line] = [
-                [
-                    'test' => '\A\B\C::test_it_works',
-                    'testFilePath' => '/path/to/A/B/C.php',
-                    'time' => 0.34325,
-                ]
-             ]
-             */
             foreach ($coverage as $sourceFilePath => &$fileCoverageData) {
                 foreach ($fileCoverageData as $line => &$lineCoverageData) {
                     foreach ($lineCoverageData as &$test) {
