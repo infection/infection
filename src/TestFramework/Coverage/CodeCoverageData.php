@@ -90,10 +90,12 @@ class CodeCoverageData
             $coverage = $this->parser->parse($coverageIndexFileContent);
 
             /**
-             coverage[$sourceFilePath][$line] = [
-                'test' => '\A\B\C::test_it_works',
-                'testFilePath' => '/path/to/A/B/C.php',
-                'time' => 0.34325,
+             * coverage[$sourceFilePath][$line] = [
+                [
+                    'test' => '\A\B\C::test_it_works',
+                    'testFilePath' => '/path/to/A/B/C.php',
+                    'time' => 0.34325,
+                ]
              ]
              */
             foreach ($coverage as $sourceFilePath => &$fileCoverageData) {
