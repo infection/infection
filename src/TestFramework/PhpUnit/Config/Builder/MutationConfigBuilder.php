@@ -6,7 +6,6 @@ namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
 use Infection\Mutant\Mutant;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
-use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\PhpUnit\Config\MutationXmlConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 

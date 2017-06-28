@@ -97,7 +97,10 @@ $c['test.file.data.provider.phpunit'] = function (Container $c): TestFileDataPro
 };
 
 $c['application'] = function (Container $container) : Application {
-    $application = new Application();
+    $application = new Application(
+        'Infection - PHP Mutation Testing Framework',
+        '0.1.0'
+    );
     $infectionCommand = new InfectionCommand($container);
 
     $application->add(new \Infection\Command\ConfigureCommand());

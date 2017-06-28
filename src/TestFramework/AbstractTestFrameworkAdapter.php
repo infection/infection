@@ -8,7 +8,6 @@ use Infection\Finder\AbstractExecutableFinder;
 use Infection\Mutant\Mutant;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
-use Infection\TestFramework\Coverage\CodeCoverageData;
 
 abstract class AbstractTestFrameworkAdapter
 {
