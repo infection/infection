@@ -5,7 +5,7 @@
     "type": "library",
     "license": "BSD-3-Clause",
     "support": {
-        "issues": "https://github.com/infectionphp/infection/issues"
+        "issues": "https://github.com/infection/infection/issues"
     },
     "authors": [
         {

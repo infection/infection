@@ -1,4 +1,10 @@
 <?xml version="1.0"?>
+<!--
+  ~ Copyright © 2017 Maks Rafalko
+  ~
+  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+  -->
+
 <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
   <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
     <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
