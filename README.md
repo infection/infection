@@ -2,3 +2,5 @@
 
 Infection - Mutation Testing framework
 =========
+
+Please read documentation here: http://infection.github.io
