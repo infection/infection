@@ -1,5 +1,5 @@
 {
-    "name": "infectionphp/infection",
+    "name": "infection/infection",
     "description": "Infection is a Mutation Testing framework for PHP. The mutation adequacy score can be used to measure the effectiveness of a test set in terms of its ability to detect faults.",
     "keywords": ["mutation testing", "mutation framework", "testing", "coverage", "unit testing", "mutant"],
     "type": "library",
