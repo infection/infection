@@ -1,3 +1,5 @@
 .idea
 vendor
 infection-log.txt
+build/*
+!build/.gitkeep
