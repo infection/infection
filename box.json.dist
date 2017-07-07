@@ -1,4 +1,5 @@
 {
+    "algorithm": "OPENSSL",
     "chmod": "0755",
     "directories": [
         "src",
@@ -28,6 +29,7 @@
     "main": "bin/infection",
     "output": "build/infection.phar",
     "stub": true,
+    "key": ".travis/infection-private.pem",
     "compactors": "Herrera\\Box\\Compactor\\Php",
     "compression": "GZ"
 }
