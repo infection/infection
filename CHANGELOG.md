@@ -1,5 +1,16 @@
 # Change Log
 
+## [0.2.0](https://github.com/infection/infection/tree/0.2.0) (2017-07-08)
+[Full Changelog](https://github.com/infection/infection/compare/0.1.0...0.2.0)
+
+**Closed issues:**
+
+- Phar distribution [\#1](https://github.com/infection/infection/issues/1)
+
+**Merged pull requests:**
+
+- Phar distribution [\#2](https://github.com/infection/infection/pull/2) ([borNfreee](https://github.com/borNfreee))
+
 ## [0.1.0](https://github.com/infection/infection/tree/0.1.0) (2017-07-01)
 
 
