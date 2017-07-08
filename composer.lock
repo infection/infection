@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "7cdbab3780794c7658144cc2b99a41b0",
+    "content-hash": "388bf31a680e6a0e6d06151d344c826b",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -182,24 +182,24 @@
         },
         {
             "name": "padraic/phar-updater",
-            "version": "1.0.3",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/humbug/phar-updater.git",
-                "reference": "c17eeb3887dc4269d1b4837dc875d39e9f8149a8"
+                "reference": "2ad8ebe3250dce2cd6c24c3c51b3954c7e775948"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/humbug/phar-updater/zipball/c17eeb3887dc4269d1b4837dc875d39e9f8149a8",
-                "reference": "c17eeb3887dc4269d1b4837dc875d39e9f8149a8",
+                "url": "https://api.github.com/repos/humbug/phar-updater/zipball/2ad8ebe3250dce2cd6c24c3c51b3954c7e775948",
+                "reference": "2ad8ebe3250dce2cd6c24c3c51b3954c7e775948",
                 "shasum": ""
             },
             "require": {
                 "padraic/humbug_get_contents": "^1.0",
-                "php": ">=5.3.3"
+                "php": "^5.6|^7.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.0"
+                "phpunit/phpunit": "^5.5|^6.0"
             },
             "type": "library",
             "extra": {
@@ -218,7 +218,7 @@
             ],
             "authors": [
                 {
-                    "name": "Pádraic Brady",
+                    "name": "Padraic Brady",
                     "email": "padraic.brady@gmail.com",
                     "homepage": "http://blog.astrumfutura.com"
                 }
@@ -230,7 +230,7 @@
                 "self-update",
                 "update"
             ],
-            "time": "2016-01-05T23:08:01+00:00"
+            "time": "2017-07-02 16:36:21"
         },
         {
             "name": "pimple/pimple",
@@ -2185,7 +2185,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "padraic/phar-updater": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
