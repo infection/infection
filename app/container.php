@@ -104,11 +104,12 @@ $c['test.file.data.provider.phpunit'] = function (Container $c): TestFileDataPro
 $c['application'] = function (Container $container) : Application {
     $application = new Application(
         'Infection - PHP Mutation Testing Framework',
-        '0.1.0'
+        '@package_version@'
     );
     $infectionCommand = new InfectionCommand($container);
 
     $application->add(new \Infection\Command\ConfigureCommand());
+    $application->add(new \Infection\Command\SelfUpdateCommand());
     $application->add($infectionCommand);
 
     return $application;

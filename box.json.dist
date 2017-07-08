@@ -1,0 +1,35 @@
+{
+    "algorithm": "OPENSSL",
+    "chmod": "0755",
+    "directories": [
+        "src",
+        "app"
+    ],
+    "files": [
+        "LICENSE"
+    ],
+    "finder": [
+        {
+            "name": [
+                "*.php",
+                "*.dist"
+            ],
+            "exclude": [
+                "tests",
+                "Tests",
+                "mockery",
+                "behat"
+            ],
+            "in": [
+                "vendor"
+            ]
+        }
+    ],
+    "git-version": "package_version",
+    "main": "bin/infection",
+    "output": "build/infection.phar",
+    "stub": true,
+    "key": ".travis/infection-private.pem",
+    "compactors": "Herrera\\Box\\Compactor\\Php",
+    "compression": "GZ"
+}
