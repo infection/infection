@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.2.1](https://github.com/infection/infection/tree/0.2.1) (2017-07-11)
+[Full Changelog](https://github.com/infection/infection/compare/0.2.0...0.2.1)
+
+**Merged pull requests:**
+
+- Add \Phar::loadPhar\(\) in custom autoloader with Stream Interceptor [\#3](https://github.com/infection/infection/pull/3) ([borNfreee](https://github.com/borNfreee))
+
 ## [0.2.0](https://github.com/infection/infection/tree/0.2.0) (2017-07-08)
 [Full Changelog](https://github.com/infection/infection/compare/0.1.0...0.2.0)
 
