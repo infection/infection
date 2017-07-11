@@ -15,7 +15,7 @@ use Infection\TestFramework\PhpSpec\Config\MutationYamlConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Symfony\Component\Yaml\Yaml;
 
-class MutationConfigBuilder implements ConfigBuilder
+class MutationConfigBuilder extends ConfigBuilder
 {
     /**
      * @var string
@@ -78,16 +78,15 @@ class MutationConfigBuilder implements ConfigBuilder
 <?php
 
 %s
-require_once '{$interceptorPath}';
-
-use Infection\StreamWrapper\IncludeInterceptor;
-
-IncludeInterceptor::intercept('{$originalFilePath}', '{$mutatedFilePath}');
-IncludeInterceptor::enable();
+%s
 
 AUTOLOAD;
 
-        return sprintf($customAutoload, $autoloadPlaceholder);
+        return sprintf(
+            $customAutoload,
+            $autoloadPlaceholder,
+            $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutatedFilePath)
+        );
     }
 
     private function buildPath(Mutant $mutant): string
