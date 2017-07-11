@@ -14,7 +14,7 @@ use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\MutationXmlConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 
-class MutationConfigBuilder implements ConfigBuilder
+class MutationConfigBuilder extends ConfigBuilder
 {
     /**
      * @var string
@@ -82,16 +82,11 @@ class MutationConfigBuilder implements ConfigBuilder
 <?php
 
 require_once '{$autoload}';
-require_once '{$interceptorPath}';
-
-use Infection\StreamWrapper\IncludeInterceptor;
-
-IncludeInterceptor::intercept('{$originalFilePath}', '{$mutatedFilePath}');
-IncludeInterceptor::enable();
+%s
 
 AUTOLOAD;
 
-        return $customAutoload;
+        return sprintf($customAutoload, $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutatedFilePath));
     }
 
     private function buildPath(Mutant $mutant): string
