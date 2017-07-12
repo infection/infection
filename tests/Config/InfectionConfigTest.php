@@ -84,10 +84,12 @@ class InfectionConfigTest extends TestCase
     public function test_it_excludes_by_glob_patterns()
     {
         $srcDir = __DIR__ . '/../Files/phpunit/project-path';
+        $srcDir = str_replace(DIRECTORY_SEPARATOR, '/', $srcDir);
         $json = sprintf(
             '{"source": {"exclude":["exclude/exclude*"], "directories": ["%s"]}}',
             $srcDir
         );
+        
         $config = new InfectionConfig(json_decode($json));
 
         $excludedDirs = $config->getSourceExcludeDirs();
