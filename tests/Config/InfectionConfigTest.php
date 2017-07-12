@@ -45,7 +45,7 @@ class InfectionConfigTest extends TestCase
         $json = sprintf('{"phpUnit": {"configDir": "%s"}}', $phpUnitConfigDir);
         $config = new InfectionConfig(json_decode($json));
 
-        $expected = getcwd() . '/app';
+        $expected = getcwd() . DIRECTORY_SEPARATOR . 'app';
 
         $this->assertSame($expected, $config->getPhpUnitConfigDir());
     }

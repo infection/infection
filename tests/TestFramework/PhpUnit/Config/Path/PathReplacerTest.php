@@ -20,7 +20,7 @@ class PathReplacerTest extends TestCase
      */
     public function test_it_replaces_path_with_absolute_path($originalPath, $pathPostfix)
     {
-        $projectPath = realpath(__DIR__ . '/../../../../Files/phpunit/project-path');
+        $projectPath = str_replace(DIRECTORY_SEPARATOR, '/', realpath(__DIR__ . '/../../../../Files/phpunit/project-path'));
         $pathReplacer = new PathReplacer(new Locator($projectPath));
 
         $dom = new \DOMDocument();
@@ -29,7 +29,7 @@ class PathReplacerTest extends TestCase
 
         $pathReplacer->replaceInNode($node);
 
-        $this->assertSame($projectPath . $pathPostfix, $node->nodeValue);
+        $this->assertSame($projectPath . $pathPostfix, str_replace(DIRECTORY_SEPARATOR, '/', $node->nodeValue));
     }
 
     public function pathProvider()
