@@ -77,6 +77,27 @@ class MutationXmlConfigurationTest extends AbstractXmlConfiguration
         $this->assertSame($expectedFiles, $files);
     }
 
+    public function test_it_handles_root_test_suite()
+    {
+        $phpunitXmlPath = __DIR__ . '/../../../Files/phpunit/phpunit_root_test_suite.xml';
+
+        $replacer = new PathReplacer(new Locator($this->pathToProject));
+
+        $configuration = new MutationXmlConfiguration(
+            $this->tempDir,
+            $phpunitXmlPath,
+            $replacer,
+            $this->customAutoloadConfigPath,
+            []
+        );
+
+        $xml = $configuration->getXml();
+
+        echo $xml;
+
+        $this->assertEquals(1, $this->queryXpath($xml, '/phpunit/testsuite')->length);
+    }
+
     public function coverageTestsProvider()
     {
         return [

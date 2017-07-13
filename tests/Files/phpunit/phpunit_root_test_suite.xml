@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2017 Maks Rafalko
+  ~
+  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+  -->
+
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         bootstrap="app/autoload2.php"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         syntaxCheck="false"
+>
+        <testsuite name="Application Test Suite">
+            <directory>./*Bundle</directory>
+        </testsuite>
+
+    <filter>
+        <whitelist>
+            <directory>src/</directory>
+            <!--<exclude>-->
+                <!--<directory>src/*Bundle/Resources</directory>-->
+                <!--<directory>src/*/*Bundle/Resources</directory>-->
+                <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
+            <!--</exclude>-->
+        </whitelist>
+    </filter>
+
+    <logging>
+        <log type="coverage-html" target="/path/to/tmp"/>
+    </logging>
+</phpunit>

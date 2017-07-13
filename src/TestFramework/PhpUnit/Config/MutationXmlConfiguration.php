@@ -75,16 +75,27 @@ class MutationXmlConfiguration extends AbstractXmlConfiguration
         foreach ($nodes as $node) {
             $node->parentNode->removeChild($node);
         }
+
+        // handle situation when test suite is directly inside root node
+        $nodes = $xPath->query('/phpunit/testsuite');
+
+        foreach ($nodes as $node) {
+            $node->parentNode->removeChild($node);
+        }
     }
 
     private function addTestSuiteWIthFilteredTestFiles(\DOMDocument $dom, \DOMXPath $xPath)
     {
-        $loggingList = $xPath->query('/phpunit/testsuites');
+        $testSuites = $xPath->query('/phpunit/testsuites');
+        $nodeToAppendTestSuite = $testSuites->item(0);
 
-        $testsuites = $loggingList->item(0);
+        // if there is no `testsuites` node, append to root
+        if (!$nodeToAppendTestSuite) {
+            $nodeToAppendTestSuite = $testSuites = $xPath->query('/phpunit')->item(0);
+        }
 
-        $testsuite = $dom->createElement('testsuite');
-        $testsuite->setAttribute('name', 'Infection testsuite with filtered tests');
+        $testSuite = $dom->createElement('testsuite');
+        $testSuite->setAttribute('name', 'Infection testsuite with filtered tests');
 
         $uniqueCoverageTests = $this->unique($this->coverageTests);
 
@@ -101,10 +112,10 @@ class MutationXmlConfiguration extends AbstractXmlConfiguration
         foreach ($uniqueTestFilePaths as $testFilePath) {
             $file = $dom->createElement('file', $testFilePath);
 
-            $testsuite->appendChild($file);
+            $testSuite->appendChild($file);
         }
 
-        $testsuites->appendChild($testsuite);
+        $nodeToAppendTestSuite->appendChild($testSuite);
     }
 
     private function unique(array $coverageTests): array
