@@ -93,8 +93,6 @@ class MutationXmlConfigurationTest extends AbstractXmlConfiguration
 
         $xml = $configuration->getXml();
 
-        echo $xml;
-
         $this->assertEquals(1, $this->queryXpath($xml, '/phpunit/testsuite')->length);
     }
 
