@@ -1,0 +1,80 @@
+<?php
+/**
+ * Copyright © 2017 Maks Rafalko
+ *
+ * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+ */
+declare(strict_types=1);
+
+namespace Infection\Config\ValueProvider;
+
+use Infection\Config\ConsoleHelper;
+use Infection\Finder\Exception\TestFrameworkExecutableFinderNotFound;
+use Infection\Finder\TestFrameworkExecutableFinder;
+use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
+
+class PhpUnitCustomExecutablePathProvider
+{
+    /**
+     * @var TestFrameworkExecutableFinder
+     */
+    private $phpUnitExecutableFinder;
+    /**
+     * @var ConsoleHelper
+     */
+    private $consoleHelper;
+
+    /**
+     * @var QuestionHelper
+     */
+    private $questionHelper;
+
+    public function __construct(TestFrameworkExecutableFinder $phpUnitExecutableFinder, ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
+    {
+        $this->phpUnitExecutableFinder = $phpUnitExecutableFinder;
+        $this->consoleHelper = $consoleHelper;
+        $this->questionHelper = $questionHelper;
+    }
+
+    public function get(InputInterface $input, OutputInterface $output)
+    {
+        try{
+            $this->phpUnitExecutableFinder->find();
+        } catch (TestFrameworkExecutableFinderNotFound $e) {
+            $questionText = $this->consoleHelper->getQuestion(
+                'We did not find phpunit executable. Please provide custom absolute path'
+            );
+
+            $question = new Question($questionText);
+            $question->setValidator($this->getValidator());
+
+            return str_replace(
+                DIRECTORY_SEPARATOR,
+                '/',
+                $this->questionHelper->ask($input, $output, $question)
+            );
+        }
+
+        return null;
+    }
+
+    private function getValidator(): \Closure
+    {
+        return function ($answerPath) {
+            if (!$answerPath) {
+                return $answerPath;
+            }
+
+            $answerPath = trim($answerPath);
+
+            if (!file_exists($answerPath)) {
+                throw new \RuntimeException(sprintf('Custom path "%s" is incorrect.', $answerPath));
+            }
+
+            return $answerPath;
+        };
+    }
+}

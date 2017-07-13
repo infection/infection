@@ -11,12 +11,15 @@ namespace Infection\Command;
 
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
+use Infection\Config\ValueProvider\PhpUnitCustomExecutablePathProvider;
 use Infection\Config\ValueProvider\PhpUnitPathProvider;
 use Infection\Config\ValueProvider\SourceDirsProvider;
 use Infection\Config\ValueProvider\TextLogFileProvider;
 use Infection\Config\ValueProvider\TimeoutProvider;
+use Infection\Finder\TestFrameworkExecutableFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\Config\InfectionConfig;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Pimple\Container;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -45,9 +48,6 @@ class ConfigureCommand extends Command
         $dirsInCurrentDir = array_filter(glob('*'), 'is_dir');
         $testFrameworkConfigLocator = new TestFrameworkConfigLocator('.');
 
-        $phpUnitConfigPathProvider = new PhpUnitPathProvider($testFrameworkConfigLocator, $this->consoleHelper, $this->getQuestionHelper());
-        $phpUnitConfigPath = $phpUnitConfigPathProvider->get($input, $output, $dirsInCurrentDir, $input->getOption('test-framework'));
-
         $sourceDirsProvider = new SourceDirsProvider($this->consoleHelper, $this->getQuestionHelper());
         $sourceDirs = $sourceDirsProvider->get($input, $output, $dirsInCurrentDir);
 
@@ -60,13 +60,20 @@ class ConfigureCommand extends Command
         $excludeDirsProvider = new ExcludeDirsProvider($this->consoleHelper, $this->getQuestionHelper());
         $excludedDirs = $excludeDirsProvider->get($input, $output, $dirsInCurrentDir, $sourceDirs);
 
+        $phpUnitConfigPathProvider = new PhpUnitPathProvider($testFrameworkConfigLocator, $this->consoleHelper, $this->getQuestionHelper());
+        $phpUnitConfigPath = $phpUnitConfigPathProvider->get($input, $output, $dirsInCurrentDir, $input->getOption('test-framework'));
+
+        $phpUnitExecutableFinder = new TestFrameworkExecutableFinder(PhpUnitAdapter::NAME);
+        $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $this->consoleHelper, $this->getQuestionHelper());
+        $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($input, $output);
+
         $timeoutProvider = new TimeoutProvider($this->consoleHelper, $this->getQuestionHelper());
         $timeout = $timeoutProvider->get($input, $output);
 
         $textLogFileProvider = new TextLogFileProvider($this->consoleHelper, $this->getQuestionHelper());
         $textLogFilePath = $textLogFileProvider->get($input, $output, $dirsInCurrentDir);
 
-        $this->saveConfig($sourceDirs, $excludedDirs, $timeout, $phpUnitConfigPath, $textLogFilePath);
+        $this->saveConfig($sourceDirs, $excludedDirs, $timeout, $phpUnitConfigPath, $phpUnitCustomExecutablePath, $textLogFilePath);
 
         $output->writeln([
             '',
@@ -95,7 +102,7 @@ class ConfigureCommand extends Command
         ;
     }
 
-    private function saveConfig(array $sourceDirs, array $excludedDirs, int $timeout, string $phpUnitConfigPath = null, string $textLogFilePath = null)
+    private function saveConfig(array $sourceDirs, array $excludedDirs, int $timeout, string $phpUnitConfigPath = null, string $phpUnitCustomExecutablePath = null, string $textLogFilePath = null)
     {
         $configObject = new \stdClass();
 
@@ -113,6 +120,14 @@ class ConfigureCommand extends Command
         if ($phpUnitConfigPath) {
             $configObject->phpUnit = new \stdClass();
             $configObject->phpUnit->configDir = $phpUnitConfigPath;
+        }
+
+        if ($phpUnitCustomExecutablePath) {
+            if (! isset($configObject->phpUnit)) {
+                $configObject->phpUnit = new \stdClass();
+            }
+
+            $configObject->phpUnit->customPath = $phpUnitCustomExecutablePath;
         }
 
         if ($textLogFilePath) {
