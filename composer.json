@@ -33,7 +33,7 @@
         "sebastian/diff": "^1.4",
         "pimple/pimple": "^3.0",
         "symfony/yaml": "^3.3",
-        "padraic/phar-updater": "dev-master"
+        "padraic/phar-updater": "^1.0.4"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.1",
