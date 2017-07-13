@@ -41,7 +41,9 @@ class ProcessBuilder
         return new Process(
             $this->testFrameworkAdapter->getExecutableCommandLine($configPath),
             null,
-            array_replace($_ENV, $_SERVER)
+            array_replace($_ENV, $_SERVER),
+            null,
+            $this->timeout
         );
 
         // TODO debug why processBuilder does not work with env
@@ -67,9 +69,10 @@ class ProcessBuilder
         $symfonyProcess = new Process(
             $this->testFrameworkAdapter->getExecutableCommandLine($configPath),
             null,
-            array_replace($_ENV, $_SERVER)
+            array_replace($_ENV, $_SERVER),
+            null,
+            $this->timeout
         );
-        $symfonyProcess->setTimeout($this->timeout);
 
         return new MutantProcess($symfonyProcess, $mutant, $this->testFrameworkAdapter);
     }
