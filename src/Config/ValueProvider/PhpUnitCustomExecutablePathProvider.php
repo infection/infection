@@ -44,6 +44,8 @@ class PhpUnitCustomExecutablePathProvider
         try{
             $this->phpUnitExecutableFinder->find();
         } catch (TestFrameworkExecutableFinderNotFound $e) {
+            $output->writeln(['']);
+
             $questionText = $this->consoleHelper->getQuestion(
                 'We did not find phpunit executable. Please provide custom absolute path'
             );
@@ -64,13 +66,9 @@ class PhpUnitCustomExecutablePathProvider
     private function getValidator(): \Closure
     {
         return function ($answerPath) {
-            if (!$answerPath) {
-                return $answerPath;
-            }
+            $answerPath = $answerPath ? trim($answerPath) : $answerPath;
 
-            $answerPath = trim($answerPath);
-
-            if (!file_exists($answerPath)) {
+            if (!$answerPath || !file_exists($answerPath)) {
                 throw new \RuntimeException(sprintf('Custom path "%s" is incorrect.', $answerPath));
             }
 

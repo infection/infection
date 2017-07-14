@@ -79,7 +79,7 @@ class Factory
             $phpSpecConfigPath = $this->configLocator->locate(PhpSpecAdapter::NAME);
 
             return new PhpSpecAdapter(
-                new TestFrameworkExecutableFinder(PhpSpecAdapter::NAME, $this->infectionConfig->getPhpSpecCustomPath()),
+                new TestFrameworkExecutableFinder(PhpSpecAdapter::NAME),
                 new PhpSpecInitialConfigBuilder($this->tempDir, $phpSpecConfigPath),
                 new PhpSpecMutationConfigBuilder($this->tempDir, $phpSpecConfigPath, $this->projectDir),
                 new PhpSpecArgumentsAndOptionsBuilder()

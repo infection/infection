@@ -44,7 +44,7 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
     {
         if ($this->cachedExecutable === null) {
             $this->addVendorFolderToPath();
-            $this->cachedExecutable = $this->findPhpunit();
+            $this->cachedExecutable = $this->findExecutable();
         }
 
         return $this->cachedExecutable;
@@ -87,7 +87,7 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
      * @return string
      * @throws TestFrameworkExecutableFinderNotFound
      */
-    private function findPhpunit()
+    private function findExecutable()
     {
         if ($this->customPath && file_exists($this->customPath)) {
             return $this->makeExecutable($this->customPath);
