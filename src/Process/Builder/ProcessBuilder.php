@@ -38,11 +38,7 @@ class ProcessBuilder
     {
         $configPath = $this->testFrameworkAdapter->buildInitialConfigFile();
 
-        return new Process(
-            $this->testFrameworkAdapter->getExecutableCommandLine($configPath),
-            null,
-            array_replace($_ENV, $_SERVER)
-        );
+        return $this->getProcess($configPath);
 
         // TODO debug why processBuilder does not work with env
         // TODO read and add -vvv
@@ -64,13 +60,19 @@ class ProcessBuilder
     {
         $configPath = $this->testFrameworkAdapter->buildMutationConfigFile($mutant);
 
-        $symfonyProcess = new Process(
-            $this->testFrameworkAdapter->getExecutableCommandLine($configPath),
-            null,
-            array_replace($_ENV, $_SERVER)
-        );
-        $symfonyProcess->setTimeout($this->timeout);
+        $symfonyProcess = $this->getProcess($configPath);
 
         return new MutantProcess($symfonyProcess, $mutant, $this->testFrameworkAdapter);
+    }
+
+    private function getProcess(string $configPath): Process
+    {
+        return new Process(
+            $this->testFrameworkAdapter->getExecutableCommandLine($configPath),
+            null,
+            array_replace($_ENV, $_SERVER),
+            null,
+            $this->timeout
+        );
     }
 }
