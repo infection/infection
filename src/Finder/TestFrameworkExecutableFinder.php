@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Finder;
 
+use Infection\Finder\Exception\TestFrameworkExecutableFinderNotFound;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
@@ -25,9 +26,15 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
      */
     private $testFrameworkName;
 
-    public function __construct($testFrameworkName)
+    /**
+     * @var string
+     */
+    private $customPath;
+
+    public function __construct(string $testFrameworkName, string $customPath = null)
     {
         $this->testFrameworkName = $testFrameworkName;
+        $this->customPath = $customPath;
     }
 
     /**
@@ -37,7 +44,7 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
     {
         if ($this->cachedExecutable === null) {
             $this->addVendorFolderToPath();
-            $this->cachedExecutable = $this->findPhpunit();
+            $this->cachedExecutable = $this->findExecutable();
         }
 
         return $this->cachedExecutable;
@@ -78,9 +85,14 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
 
     /**
      * @return string
+     * @throws TestFrameworkExecutableFinderNotFound
      */
-    private function findPhpunit()
+    private function findExecutable()
     {
+        if ($this->customPath && file_exists($this->customPath)) {
+            return $this->makeExecutable($this->customPath);
+        }
+
         $candidates = [$this->testFrameworkName, $this->testFrameworkName . '.phar'];
         $finder = new ExecutableFinder();
 
@@ -96,7 +108,7 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
             return $result;
         }
 
-        throw new \RuntimeException(
+        throw new TestFrameworkExecutableFinderNotFound(
             sprintf(
                 'Unable to locate a %s executable on local system. Ensure that %s is installed and available.',
                 $this->testFrameworkName,

@@ -36,6 +36,11 @@ class InfectionConfig
         return getcwd();
     }
 
+    public function getPhpUnitCustomPath()
+    {
+        return $this->config->phpUnit->customPath ?? null;
+    }
+
     public function getProcessTimeout(): int
     {
         return $this->config->timeout ?? self::PROCESS_TIMEOUT_SECONDS;

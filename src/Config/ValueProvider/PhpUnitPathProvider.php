@@ -106,5 +106,4 @@ class PhpUnitPathProvider
             return $answerDir;
         };
     }
-
 }
