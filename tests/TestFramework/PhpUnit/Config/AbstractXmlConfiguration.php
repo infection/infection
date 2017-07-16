@@ -39,7 +39,7 @@ abstract class AbstractXmlConfiguration extends TestCase
 
     protected function setUp()
     {
-        $this->pathToProject = realpath(__DIR__ . '/../../../Files/phpunit/project-path');
+        $this->pathToProject = str_replace(DIRECTORY_SEPARATOR, '/', realpath(__DIR__ . '/../../../Files/phpunit/project-path'));
 
         $this->configuration = $this->getConfigurationObject();
     }

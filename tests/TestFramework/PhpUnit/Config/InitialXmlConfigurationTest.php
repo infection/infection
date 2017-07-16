@@ -33,15 +33,16 @@ class InitialXmlConfigurationTest extends AbstractXmlConfiguration
         $directories = $this->queryXpath($xml, '/phpunit/testsuites/testsuite/directory');
 
         $this->assertSame(2, $directories->length);
-        $this->assertSame($this->pathToProject . '/AnotherBundle', $directories[0]->nodeValue);
-        $this->assertSame($this->pathToProject . '/SomeBundle', $directories[1]->nodeValue);
+        $this->assertSame($this->pathToProject . '/AnotherBundle', str_replace(DIRECTORY_SEPARATOR, '/', $directories[0]->nodeValue));
+        $this->assertSame($this->pathToProject . '/SomeBundle', str_replace(DIRECTORY_SEPARATOR, '/', $directories[1]->nodeValue));
     }
 
     public function test_it_replaces_bootstrap_file()
     {
         $xml = $this->configuration->getXml();
 
-        $value = $this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue;
+        $value = $value = $this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue;
+        $value = str_replace(DIRECTORY_SEPARATOR, '/', $value);
 
         $this->assertSame($this->pathToProject . '/app/autoload2.php', $value);
     }

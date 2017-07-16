@@ -25,7 +25,7 @@ class LocatorTest extends TestCase
 
         $path = $locator->locate($fileName);
 
-        $this->assertSame($projectPath . $pathPostfix, $path);
+        $this->assertSame(str_replace(DIRECTORY_SEPARATOR, '/', $projectPath . $pathPostfix), str_replace(DIRECTORY_SEPARATOR, '/', $path));
     }
 
     public function test_handles_glob_patterns()
@@ -36,8 +36,8 @@ class LocatorTest extends TestCase
         $directories = $locator->locateDirectories('*Bundle');
 
         $this->assertCount(2, $directories);
-        $this->assertSame($projectPath . '/AnotherBundle', $directories[0]);
-        $this->assertSame($projectPath . '/SomeBundle', $directories[1]);
+        $this->assertSame(str_replace(DIRECTORY_SEPARATOR, '/', $projectPath . '/AnotherBundle'), str_replace(DIRECTORY_SEPARATOR, '/', $directories[0]));
+        $this->assertSame(str_replace(DIRECTORY_SEPARATOR, '/', $projectPath . '/SomeBundle'), str_replace(DIRECTORY_SEPARATOR, '/', $directories[1]));
     }
 
     public function pathProvider()
