@@ -6,8 +6,8 @@ clone_folder: c:\projects\php-project-workspace
 ## Build matrix for lowest and highest possible targets
 environment:
   matrix:
-#  - dependencies: highest
-#    php_ver_target: 7.0
+  - dependencies: highest
+    php_ver_target: 7.0
   - dependencies: highest
     php_ver_target: 7.1
 
@@ -48,4 +48,4 @@ install:
 ## Run the actual test
 test_script:
     - cd c:\projects\php-project-workspace
-    - vendor/bin/phpunit --debug
+    - vendor/bin/phpunit
