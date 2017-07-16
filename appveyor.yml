@@ -48,4 +48,4 @@ install:
 ## Run the actual test
 test_script:
     - cd c:\projects\php-project-workspace
-    - vendor/bin/phpunit
+    - vendor/bin/phpunit --debug
