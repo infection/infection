@@ -5,7 +5,7 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Infection\TestFramework\Coverage;
 
@@ -54,7 +54,7 @@ class CodeCoverageData
 
         $coveredLineTestMethods = array_filter(
             $coverageData[$filePath],
-            function ($testMethods) {
+            function($testMethods) {
                 return count($testMethods) > 0;
             }
         );

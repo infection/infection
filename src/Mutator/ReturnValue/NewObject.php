@@ -5,7 +5,7 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 
 namespace Infection\Mutator\ReturnValue;
@@ -33,15 +33,15 @@ class NewObject implements Mutator
 
     public function shouldMutate(Node $node): bool
     {
-        if (! $node instanceof Node\Stmt\Return_) {
+        if (!$node instanceof Node\Stmt\Return_) {
             return false;
         }
 
-        if (! $node->expr instanceof Node\Expr\New_) {
+        if (!$node->expr instanceof Node\Expr\New_) {
             return false;
         }
 
-        if (! $node->expr->class instanceof Node\Name\FullyQualified) {
+        if (!$node->expr->class instanceof Node\Name\FullyQualified) {
             return false;
         }
 

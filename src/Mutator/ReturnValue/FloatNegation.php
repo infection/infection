@@ -5,7 +5,7 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Infection\Mutator\ReturnValue;
 
@@ -26,7 +26,7 @@ class FloatNegation implements Mutator
 
     public function shouldMutate(Node $node): bool
     {
-        if (! $node instanceof Node\Stmt\Return_) {
+        if (!$node instanceof Node\Stmt\Return_) {
             return false;
         }
 
@@ -36,7 +36,7 @@ class FloatNegation implements Mutator
             $expr = $node->expr->expr;
         }
 
-        if (! $expr instanceof Node\Scalar\DNumber) {
+        if (!$expr instanceof Node\Scalar\DNumber) {
             return false;
         }
 

@@ -5,7 +5,7 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Infection\Mutator\Boolean;
 
@@ -28,7 +28,7 @@ class LogicalNot implements Mutator
 
     public function shouldMutate(Node $node): bool
     {
-        if (! ($node instanceof Node\Expr\BooleanNot)) {
+        if (!($node instanceof Node\Expr\BooleanNot)) {
             return false;
         }
 

@@ -4,7 +4,7 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Infection\Config\ValueProvider;
 
@@ -41,7 +41,7 @@ class PhpUnitCustomExecutablePathProvider
 
     public function get(InputInterface $input, OutputInterface $output)
     {
-        try{
+        try {
             $this->phpUnitExecutableFinder->find();
         } catch (TestFrameworkExecutableFinderNotFound $e) {
             $output->writeln(['']);
@@ -65,7 +65,7 @@ class PhpUnitCustomExecutablePathProvider
 
     private function getValidator(): \Closure
     {
-        return function ($answerPath) {
+        return function($answerPath) {
             $answerPath = $answerPath ? trim($answerPath) : $answerPath;
 
             if (!$answerPath || !file_exists($answerPath)) {

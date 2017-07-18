@@ -5,7 +5,7 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Infection\TestFramework\PhpUnit\Coverage;
 
@@ -104,7 +104,7 @@ class CoverageXmlParser
         $fileName = $fileNode->getAttribute('name');
         $relativeFilePath = $fileNode->getAttribute('path');
 
-        if (! $relativeFilePath) {
+        if (!$relativeFilePath) {
             // path is not present for old versions of PHPUnit, so parse the source file path from
             // the path of XML coverage file
             $relativeFilePath = str_replace(
