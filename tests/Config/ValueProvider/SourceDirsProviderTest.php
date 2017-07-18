@@ -17,9 +17,9 @@ class SourceDirsProviderTest extends AbstractBaseProviderTest
 {
     public function test_it_uses_guesser_and_default_value()
     {
-//        if (stripos(PHP_OS, 'WIN') === 0) {
-//            $this->markTestSkipped('Stty is not available');
-//        }
+        if (stripos(PHP_OS, 'WIN') === 0) {
+            $this->markTestSkipped('Stty is not available');
+        }
 
         $consoleMock = Mockery::mock(ConsoleHelper::class);
         $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
@@ -29,7 +29,7 @@ class SourceDirsProviderTest extends AbstractBaseProviderTest
         $provider = new SourceDirsProvider($consoleMock, $dialog);
 
         $sourceDirs = $provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream("\r\n")),
+            $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
             $this->createOutputInterface(),
             ['src'],
             'phpunit'
