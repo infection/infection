@@ -63,7 +63,7 @@ class SourceDirsProviderTest extends AbstractBaseProviderTest
     public function test_it_throws_exception_when_current_dir_is_selected_with_another_dir()
     {
 
-        $this->markTestSkipped("Stty is not available");
+//        $this->markTestSkipped("Stty is not available");
 
         $consoleMock = Mockery::mock(ConsoleHelper::class);
         $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
