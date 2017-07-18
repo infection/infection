@@ -13,6 +13,7 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\PhpUnitCustomExecutablePathProvider;
 use Infection\Finder\Exception\TestFrameworkExecutableFinderNotFound;
 use Infection\Finder\TestFrameworkExecutableFinder;
+use function Infection\Tests\normalizePath as p;
 use Mockery;
 
 class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProviderTest
@@ -48,7 +49,7 @@ class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProviderTest
         $dialog = $this->getQuestionHelper();
 
         $provider = new PhpUnitCustomExecutablePathProvider($finderMock, $consoleMock, $dialog);
-        $customExecutable = realpath(__DIR__ . '/../../Files/phpunit/phpunit.phar');
+        $customExecutable = p(realpath(__DIR__ . '/../../Files/phpunit/phpunit.phar'));
 
         $path = $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("{$customExecutable}\n")),

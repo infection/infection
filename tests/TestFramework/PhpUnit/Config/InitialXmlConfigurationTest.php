@@ -12,6 +12,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config;
 use Infection\Finder\Locator;
 use Infection\TestFramework\PhpUnit\Config\InitialXmlConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
+use function Infection\Tests\normalizePath as p;
 
 class InitialXmlConfigurationTest extends AbstractXmlConfiguration
 {
@@ -33,15 +34,15 @@ class InitialXmlConfigurationTest extends AbstractXmlConfiguration
         $directories = $this->queryXpath($xml, '/phpunit/testsuites/testsuite/directory');
 
         $this->assertSame(2, $directories->length);
-        $this->assertSame($this->pathToProject . '/AnotherBundle', $directories[0]->nodeValue);
-        $this->assertSame($this->pathToProject . '/SomeBundle', $directories[1]->nodeValue);
+        $this->assertSame($this->pathToProject . '/AnotherBundle', p($directories[0]->nodeValue));
+        $this->assertSame($this->pathToProject . '/SomeBundle', p($directories[1]->nodeValue));
     }
 
     public function test_it_replaces_bootstrap_file()
     {
         $xml = $this->configuration->getXml();
 
-        $value = $this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue;
+        $value = p($this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue);
 
         $this->assertSame($this->pathToProject . '/app/autoload2.php', $value);
     }

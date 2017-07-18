@@ -11,6 +11,7 @@ namespace Infection\Tests\Finder;
 
 use Infection\Finder\Locator;
 use PHPUnit\Framework\TestCase;
+use function Infection\Tests\normalizePath as p;
 
 class LocatorTest extends TestCase
 {
@@ -25,7 +26,7 @@ class LocatorTest extends TestCase
 
         $path = $locator->locate($fileName);
 
-        $this->assertSame($projectPath . $pathPostfix, $path);
+        $this->assertSame(p($projectPath . $pathPostfix), p($path));
     }
 
     public function test_handles_glob_patterns()
@@ -36,8 +37,8 @@ class LocatorTest extends TestCase
         $directories = $locator->locateDirectories('*Bundle');
 
         $this->assertCount(2, $directories);
-        $this->assertSame($projectPath . '/AnotherBundle', $directories[0]);
-        $this->assertSame($projectPath . '/SomeBundle', $directories[1]);
+        $this->assertSame(p($projectPath . '/AnotherBundle'), p($directories[0]));
+        $this->assertSame(p($projectPath . '/SomeBundle'), p($directories[1]));
     }
 
     public function pathProvider()
