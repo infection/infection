@@ -22,7 +22,8 @@
     "autoload-dev": {
         "psr-4": {
             "Infection\\Tests\\": "tests/"
-        }
+        },
+        "files": ["tests/Helpers.php"]
     },
     "require": {
         "php": "^7.0",
