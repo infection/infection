@@ -9,3 +9,5 @@ Infection - Mutation Testing framework
 =========
 
 Please read documentation here: http://infection.github.io
+
+Twitter: http://twitter.com/infection_php
