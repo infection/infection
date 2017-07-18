@@ -48,7 +48,7 @@ class InfectionConfigTest extends TestCase
 
         $expected = getcwd() . '/app';
 
-        $this->assertSame(p($expected), $config->getPhpUnitConfigDir());
+        $this->assertSame(p($expected), p($config->getPhpUnitConfigDir()));
     }
 
     public function test_it_returns_default_source_dirs_with_no_config()
@@ -85,11 +85,7 @@ class InfectionConfigTest extends TestCase
     public function test_it_excludes_by_glob_patterns()
     {
         $srcDir = __DIR__ . '/../Files/phpunit/project-path';
-        $srcDir = str_replace(DIRECTORY_SEPARATOR, '/', $srcDir);
-        $json = sprintf(
-            '{"source": {"exclude":["exclude/exclude*"], "directories": ["%s"]}}',
-            $srcDir
-        );
+        $json = sprintf('{"source": {"exclude":["exclude/exclude*"], "directories": ["%s"]}}', p($srcDir));
 
         $config = new InfectionConfig(json_decode($json));
 

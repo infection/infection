@@ -13,6 +13,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
 use Infection\TestFramework\PhpUnit\Config\InitialXmlConfiguration;
 use Infection\TestFramework\PhpUnit\Config\MutationXmlConfiguration;
+use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\TestCase;
 
 abstract class AbstractXmlConfiguration extends TestCase
@@ -39,7 +40,7 @@ abstract class AbstractXmlConfiguration extends TestCase
 
     protected function setUp()
     {
-        $this->pathToProject = str_replace(DIRECTORY_SEPARATOR, '/', realpath(__DIR__ . '/../../../Files/phpunit/project-path'));
+        $this->pathToProject = p(realpath(__DIR__ . '/../../../Files/phpunit/project-path'));
 
         $this->configuration = $this->getConfigurationObject();
     }
