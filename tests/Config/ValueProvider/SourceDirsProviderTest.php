@@ -29,7 +29,7 @@ class SourceDirsProviderTest extends AbstractBaseProviderTest
         $provider = new SourceDirsProvider($consoleMock, $dialog);
 
         $sourceDirs = $provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream(PHP_EOL)),
+            $this->createStreamableInputInterfaceMock($this->getInputStream("\r\n")),
             $this->createOutputInterface(),
             ['src'],
             'phpunit'
