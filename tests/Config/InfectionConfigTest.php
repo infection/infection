@@ -13,6 +13,7 @@ namespace Infection\Tests\Config;
 
 use Infection\Config\InfectionConfig;
 use PHPUnit\Framework\TestCase;
+use function Infection\Tests\normalizePath as p;
 
 class InfectionConfigTest extends TestCase
 {
@@ -45,9 +46,9 @@ class InfectionConfigTest extends TestCase
         $json = sprintf('{"phpUnit": {"configDir": "%s"}}', $phpUnitConfigDir);
         $config = new InfectionConfig(json_decode($json));
 
-        $expected = getcwd() . DIRECTORY_SEPARATOR . 'app';
+        $expected = getcwd() . '/app';
 
-        $this->assertSame($expected, $config->getPhpUnitConfigDir());
+        $this->assertSame(p($expected), $config->getPhpUnitConfigDir());
     }
 
     public function test_it_returns_default_source_dirs_with_no_config()
@@ -89,7 +90,7 @@ class InfectionConfigTest extends TestCase
             '{"source": {"exclude":["exclude/exclude*"], "directories": ["%s"]}}',
             $srcDir
         );
-        
+
         $config = new InfectionConfig(json_decode($json));
 
         $excludedDirs = $config->getSourceExcludeDirs();
