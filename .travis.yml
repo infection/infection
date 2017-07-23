@@ -19,7 +19,7 @@ install:
 
 script:
   - vendor/bin/phpunit --coverage-clover=clover.xml
-  - php-cs-fixer fix --config=.php_cs.dist -v --dry-run --stop-on-violation --using-cache=no --path-mode=intersection
+  - /home/travis/.composer/vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v --dry-run --stop-on-violation --using-cache=no --path-mode=intersection
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
