@@ -5,7 +5,7 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Infection;
 
@@ -72,7 +72,7 @@ class InfectionApplication
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
         $initialTestSuitProcess = $initialTestsRunner->run();
 
-        if (! $initialTestSuitProcess->isSuccessful()) {
+        if (!$initialTestSuitProcess->isSuccessful()) {
             $this->logInitialTestsDoNotPass($initialTestSuitProcess);
 
             return 1;

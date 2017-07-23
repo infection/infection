@@ -5,7 +5,7 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Infection\Config\ValueProvider;
 
@@ -61,10 +61,10 @@ class ExcludeDirsProvider
 
             $autocompleteValues = $dirsInCurrentDir;
         } elseif (count($sourceDirs) === 1) {
-            $globDirs = array_filter(glob($sourceDirs[0] .'/*'), 'is_dir');
+            $globDirs = array_filter(glob($sourceDirs[0] . '/*'), 'is_dir');
 
             $autocompleteValues = array_map(
-                function (string $dir) use ($sourceDirs) {
+                function(string $dir) use ($sourceDirs) {
                     return str_replace($sourceDirs[0] . '/', '', $dir);
                 },
                 $globDirs
@@ -89,7 +89,7 @@ class ExcludeDirsProvider
 
     private function getValidator(Locator $locator)
     {
-        return function ($answer) use ($locator) {
+        return function($answer) use ($locator) {
             if (!$answer || strpos($answer, '*') !== false) {
                 return $answer;
             }

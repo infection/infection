@@ -5,7 +5,7 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 
 namespace Infection\TestFramework\PhpUnit\Config;
@@ -58,7 +58,7 @@ class InitialXmlConfiguration extends AbstractXmlConfiguration
             $dom->documentElement->appendChild($logging);
         }
 
-        $junitLog =  $dom->createElement('log');
+        $junitLog = $dom->createElement('log');
         $junitLog->setAttribute('type', 'junit');
         $junitLog->setAttribute('target', $this->jUnitFilePath);
 

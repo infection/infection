@@ -5,7 +5,7 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Infection\Config\ValueProvider;
 
@@ -90,7 +90,7 @@ class PhpUnitPathProvider
 
     private function getValidator(string $testFramework): \Closure
     {
-        return function (string $answerDir) use ($testFramework): string {
+        return function(string $answerDir) use ($testFramework): string {
             $answerDir = trim($answerDir);
 
             if (!$answerDir) {

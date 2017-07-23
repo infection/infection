@@ -5,7 +5,7 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Infection\EventDispatcher;
 
@@ -41,7 +41,7 @@ class EventDispatcher implements EventDispatcherInterface, ContainsListenersInte
      */
     public function getListeners($eventName)
     {
-        if (! $this->hasListeners($eventName)) {
+        if (!$this->hasListeners($eventName)) {
             return [];
         }
 

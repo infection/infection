@@ -5,7 +5,7 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
@@ -73,7 +73,7 @@ class MutationConfigBuilder extends ConfigBuilder
     {
         $originalFilePath = $mutant->getMutation()->getOriginalFilePath();
         $mutatedFilePath = $mutant->getMutatedFilePath();
-        $interceptorPath = dirname(__DIR__, 4) .  '/StreamWrapper/IncludeInterceptor.php';
+        $interceptorPath = dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
 
         // TODO change to what it was (e.g. app/autoload - see simplehabits)
         $autoload = sprintf('%s/vendor/autoload.php', $this->projectDir);

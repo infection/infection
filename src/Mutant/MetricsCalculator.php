@@ -5,7 +5,7 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Infection\Mutant;
 
@@ -132,7 +132,7 @@ class MetricsCalculator
         $defeatedTotal = $this->killedCount + $this->timedOutCount/* + $errorCount*/;
 
         if ($coveredByTestsTotal) {
-            $detectionRateTested  = round(100 * ($defeatedTotal / $coveredByTestsTotal));
+            $detectionRateTested = round(100 * ($defeatedTotal / $coveredByTestsTotal));
         }
 
         return $detectionRateTested;

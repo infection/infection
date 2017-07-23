@@ -5,7 +5,7 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 
 namespace Infection\Process\Runner;
@@ -56,7 +56,7 @@ class MutationTestingRunner
     public function run(int $threadCount, CodeCoverageData $codeCoverageData)
     {
         $processes = array_map(
-            function (Mutation $mutation) use ($codeCoverageData): MutantProcess {
+            function(Mutation $mutation) use ($codeCoverageData): MutantProcess {
                 $mutant = $this->mutantCreator->create($mutation, $codeCoverageData);
 
                 return $this->processBuilder->getProcessForMutant($mutant);

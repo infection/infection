@@ -5,7 +5,7 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 
 namespace Infection\TestFramework\PhpUnit\Config;
@@ -102,7 +102,7 @@ class MutationXmlConfiguration extends AbstractXmlConfiguration
         // sort tests to run the fastest first
         usort(
             $uniqueCoverageTests,
-            function (array $a, array $b) {
+            function(array $a, array $b) {
                 return $a['time'] <=> $b['time'];
             }
         );
