@@ -4,14 +4,12 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpSpec\Config\Builder;
 
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\InitialYamlConfiguration;
-use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Symfony\Component\Yaml\Yaml;
 
 class InitialConfigBuilder implements ConfigBuilder
@@ -31,7 +29,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->originalYamlConfigPath = $originalYamlConfigPath;
     }
 
-    public function build() : string
+    public function build(): string
     {
         $path = $this->buildPath();
 
@@ -45,7 +43,7 @@ class InitialConfigBuilder implements ConfigBuilder
         return $path;
     }
 
-    private function buildPath() : string
+    private function buildPath(): string
     {
         return $this->tempDirectory . '/phpspecConfiguration.initial.infection.yml';
     }

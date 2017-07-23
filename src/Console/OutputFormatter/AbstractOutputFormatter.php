@@ -4,12 +4,9 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
-
 namespace Infection\Console\OutputFormatter;
-
 
 use Infection\Process\MutantProcess;
 
@@ -27,7 +24,7 @@ class AbstractOutputFormatter implements OutputFormatter
 
     public function advance(MutantProcess $mutantProcess, int $mutationCount)
     {
-        $this->callsCount++;
+        ++$this->callsCount;
     }
 
     public function finish()

@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Finder;
@@ -15,13 +14,14 @@ class ComposerExecutableFinder extends AbstractExecutableFinder
 {
     /**
      * @return string
+     *
      * @throws \Exception
      */
     public function find()
     {
         $probable = ['composer', 'composer.phar'];
         $finder = new ExecutableFinder();
-        $immediatePaths = [getcwd(), realpath(getcwd().'/../'), realpath(getcwd().'/../../')];
+        $immediatePaths = [getcwd(), realpath(getcwd() . '/../'), realpath(getcwd() . '/../../')];
 
         foreach ($probable as $name) {
             if ($path = $finder->find($name, null, $immediatePaths)) {

@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpSpec\Config\Builder;
@@ -12,7 +11,6 @@ namespace Infection\TestFramework\PhpSpec\Config\Builder;
 use Infection\Mutant\Mutant;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\MutationYamlConfiguration;
-use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Symfony\Component\Yaml\Yaml;
 
 class MutationConfigBuilder extends ConfigBuilder
@@ -65,14 +63,14 @@ class MutationConfigBuilder extends ConfigBuilder
         return $path;
     }
 
-    private function createCustomAutoloadWithInterceptor(Mutant $mutant, array $parsedYaml) : string
+    private function createCustomAutoloadWithInterceptor(Mutant $mutant, array $parsedYaml): string
     {
         $originalFilePath = $mutant->getMutation()->getOriginalFilePath();
         $mutatedFilePath = $mutant->getMutatedFilePath();
 
         $originalBootstrap = $this->getOriginalBootstrapFilePath($parsedYaml);
         $autoloadPlaceholder = $originalBootstrap ? "require_once '{$originalBootstrap}'" : '';
-        $interceptorPath = dirname(__DIR__, 4) .  '/StreamWrapper/IncludeInterceptor.php';
+        $interceptorPath = dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
 
         $customAutoload = <<<AUTOLOAD
 <?php
@@ -98,6 +96,7 @@ AUTOLOAD;
 
     /**
      * @param array $parsedYaml
+     *
      * @return string|null
      */
     private function getOriginalBootstrapFilePath(array $parsedYaml)

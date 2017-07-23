@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Finder;
@@ -13,7 +12,6 @@ use Symfony\Component\Process\PhpExecutableFinder;
 
 abstract class AbstractExecutableFinder
 {
-
     /**
      * @return string
      */
@@ -22,6 +20,7 @@ abstract class AbstractExecutableFinder
     /**
      * @param array $probableNames
      * @param array $extraDirectories
+     *
      * @return string|null
      */
     protected function searchNonExecutables(array $probableNames, array $extraDirectories = [])
@@ -42,11 +41,13 @@ abstract class AbstractExecutableFinder
 
     /**
      * @param string $path
+     *
      * @return string
      */
     protected function makeExecutable($path)
     {
         $phpFinder = new PhpExecutableFinder();
+
         return sprintf('%s %s', $phpFinder->find(), $path);
     }
 }

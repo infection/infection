@@ -7,10 +7,8 @@
 
 namespace Infection\StreamWrapper;
 
-
 class IncludeInterceptor
 {
-
     const STREAM_OPEN_FOR_INCLUDE = 0x00000080;
 
     public $context;
@@ -61,6 +59,7 @@ class IncludeInterceptor
             if ($path == self::$intercept || realpath($path) == self::$intercept) {
                 $this->fp = fopen(self::$replacement, 'r');
                 self::enable();
+
                 return true;
             }
         }
@@ -70,12 +69,14 @@ class IncludeInterceptor
             $this->fp = fopen($path, $mode, $options);
         }
         self::enable();
+
         return $this->fp !== false;
     }
 
     public function dir_closedir()
     {
         closedir($this->fp);
+
         return true;
     }
 
@@ -88,6 +89,7 @@ class IncludeInterceptor
             $this->fp = opendir($path);
         }
         self::enable();
+
         return $this->fp !== false;
     }
 
@@ -99,6 +101,7 @@ class IncludeInterceptor
     public function dir_rewinddir()
     {
         rewinddir($this->fp);
+
         return true;
     }
 
@@ -111,6 +114,7 @@ class IncludeInterceptor
             $return = mkdir($path, $mode, $options);
         }
         self::enable();
+
         return $return;
     }
 
@@ -123,6 +127,7 @@ class IncludeInterceptor
             $return = rename($path_from, $path_to);
         }
         self::enable();
+
         return $return;
     }
 
@@ -135,6 +140,7 @@ class IncludeInterceptor
             $return = rmdir($path);
         }
         self::enable();
+
         return $return;
     }
 
@@ -189,6 +195,7 @@ class IncludeInterceptor
                 throw new \RuntimeException('Unknown stream_metadata option');
         }
         self::enable();
+
         return $return;
     }
 
@@ -245,6 +252,7 @@ class IncludeInterceptor
             $return = unlink($path);
         }
         self::enable();
+
         return $return;
     }
 
@@ -253,6 +261,7 @@ class IncludeInterceptor
         self::disable();
         $return = is_readable($path) ? stat($path) : false;
         self::enable();
+
         return $return;
     }
 }

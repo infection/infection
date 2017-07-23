@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Process;
@@ -51,7 +50,7 @@ class MutantProcess
     /**
      * @return Process
      */
-    public function getProcess() : Process
+    public function getProcess(): Process
     {
         return $this->process;
     }
@@ -59,7 +58,7 @@ class MutantProcess
     /**
      * @return Mutant
      */
-    public function getMutant() : Mutant
+    public function getMutant(): Mutant
     {
         return $this->mutant;
     }
@@ -84,7 +83,7 @@ class MutantProcess
 
     public function getResultCode(): int
     {
-        if (! $this->getMutant()->isCoveredByTest()) {
+        if (!$this->getMutant()->isCoveredByTest()) {
             return self::CODE_NOT_COVERED;
         }
 

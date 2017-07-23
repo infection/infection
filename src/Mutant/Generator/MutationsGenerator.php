@@ -4,12 +4,9 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
-
 namespace Infection\Mutant\Generator;
-
 
 use Infection\Mutator\Arithmetic\BitwiseAnd;
 use Infection\Mutator\Arithmetic\BitwiseNot;
@@ -56,7 +53,6 @@ use Infection\Mutator\ReturnValue\IntegerNegation;
 use Infection\Mutator\ReturnValue\NewObject;
 use Infection\Mutator\ReturnValue\This;
 use Infection\TestFramework\Coverage\CodeCoverageData;
-use Infection\Tests\Mutator\ReturnValue\NewObjectTest;
 use Infection\Visitor\InsideFunctionDetectorVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
@@ -93,6 +89,7 @@ class MutationsGenerator
     /**
      * @param bool $onlyCovered mutate only covered by tests lines of code
      * @param string $filter
+     *
      * @return array
      */
     public function generate(bool $onlyCovered, string $filter = ''): array
@@ -111,7 +108,9 @@ class MutationsGenerator
 
     /**
      * @param string $filter
+     *
      * @return Finder
+     *
      * @throws \InvalidArgumentException
      */
     private function getSrcFiles(string $filter = ''): Finder
@@ -128,14 +127,15 @@ class MutationsGenerator
     /**
      * @param SplFileInfo $file
      * @param bool $onlyCovered mutate only covered by tests lines of code
+     *
      * @return array
      */
     private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered): array
     {
         $lexer = new Lexer([
             'usedAttributes' => [
-                'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos'
-            ]
+                'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
+            ],
         ]);
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
         $traverser = new NodeTraverser();

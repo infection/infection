@@ -4,9 +4,7 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
-
 
 namespace Infection\Mutant;
 
@@ -15,7 +13,6 @@ use Infection\Mutation;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\Lexer;
-use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
@@ -38,12 +35,12 @@ class MutantCreator
         $this->differ = $differ;
     }
 
-    public function create(Mutation $mutation, CodeCoverageData $codeCoverageData) : Mutant
+    public function create(Mutation $mutation, CodeCoverageData $codeCoverageData): Mutant
     {
         $lexer = new Lexer([
             'usedAttributes' => [
-                'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos'
-            ]
+                'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
+            ],
         ]);
         $prettyPrinter = new Standard();
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);

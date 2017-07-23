@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Config\ValueProvider;
@@ -46,9 +45,8 @@ class TimeoutProvider
                 throw new \RuntimeException('Timeout should be an integer greater than 0');
             }
 
-            return (int)$answer;
+            return (int) $answer;
         });
-
 
         return $this->questionHelper->ask($input, $output, $timeoutQuestion);
     }

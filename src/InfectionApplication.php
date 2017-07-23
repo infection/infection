@@ -72,7 +72,7 @@ class InfectionApplication
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
         $initialTestSuitProcess = $initialTestsRunner->run();
 
-        if (! $initialTestSuitProcess->isSuccessful()) {
+        if (!$initialTestSuitProcess->isSuccessful()) {
             $this->logInitialTestsDoNotPass($initialTestSuitProcess);
 
             return 1;
@@ -98,6 +98,7 @@ class InfectionApplication
      * Shortcut for container getter
      *
      * @param string $name
+     *
      * @return mixed
      */
     private function get(string $name)
@@ -109,6 +110,7 @@ class InfectionApplication
      * Checks whether the container has particular service
      *
      * @param string $serviceId
+     *
      * @return bool
      */
     private function has(string $serviceId)

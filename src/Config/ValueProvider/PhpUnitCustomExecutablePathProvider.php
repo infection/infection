@@ -41,7 +41,7 @@ class PhpUnitCustomExecutablePathProvider
 
     public function get(InputInterface $input, OutputInterface $output)
     {
-        try{
+        try {
             $this->phpUnitExecutableFinder->find();
         } catch (TestFrameworkExecutableFinderNotFound $e) {
             $output->writeln(['']);

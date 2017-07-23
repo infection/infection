@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Process\Runner;
@@ -30,12 +29,12 @@ class Result
         $this->codeCoverageData = $codeCoverageData;
     }
 
-    public function isSuccessful() : bool
+    public function isSuccessful(): bool
     {
         return $this->process->isSuccessful();
     }
 
-    public function getExitCode() : int
+    public function getExitCode(): int
     {
         return $this->process->getExitCode();
     }

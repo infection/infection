@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Config\ValueProvider;
@@ -45,6 +44,7 @@ class PhpUnitPathProvider
      * @param OutputInterface $output
      * @param array $dirsInCurrentDir
      * @param string $testFramework
+     *
      * @return string|null
      */
     public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, string $testFramework)

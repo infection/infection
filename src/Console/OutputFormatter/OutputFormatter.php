@@ -7,7 +7,6 @@
 
 namespace Infection\Console\OutputFormatter;
 
-
 use Infection\Process\MutantProcess;
 
 interface OutputFormatter

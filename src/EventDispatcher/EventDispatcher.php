@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\EventDispatcher;
@@ -17,7 +16,7 @@ class EventDispatcher implements EventDispatcherInterface, ContainsListenersInte
     private $listeners = [];
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function dispatch($event)
     {
@@ -29,7 +28,7 @@ class EventDispatcher implements EventDispatcherInterface, ContainsListenersInte
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function addListener($eventName, callable $listener)
     {
@@ -37,11 +36,11 @@ class EventDispatcher implements EventDispatcherInterface, ContainsListenersInte
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getListeners($eventName)
     {
-        if (! $this->hasListeners($eventName)) {
+        if (!$this->hasListeners($eventName)) {
             return [];
         }
 
@@ -49,7 +48,7 @@ class EventDispatcher implements EventDispatcherInterface, ContainsListenersInte
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function hasListeners($eventName)
     {
@@ -57,7 +56,7 @@ class EventDispatcher implements EventDispatcherInterface, ContainsListenersInte
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function addSubscriber(EventSubscriberInterface $eventSubscriber)
     {

@@ -36,6 +36,7 @@ class SelfUpdateCommand extends Command
      *
      * @param InputInterface $input
      * @param OutputInterface $output
+     *
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -46,30 +47,35 @@ class SelfUpdateCommand extends Command
 
         if ($input->getOption('rollback')) {
             $this->rollback();
+
             return 0;
         }
 
         if ($input->getOption('check')) {
             $this->printAvailableUpdates();
+
             return 0;
         }
 
         if ($input->getOption('pre')) {
             $this->updateToPreReleaseBuild();
+
             return 0;
         }
 
         if ($input->getOption('stable')) {
             $this->updateToStableBuild();
+
             return 0;
         }
 
-        /**
+        /*
          * If current build is stable, only update to more recent stable
          * versions if available. User may specify otherwise using options.
          */
         if ($parser->isStable($this->version)) {
             $this->updateToStableBuild();
+
             return 0;
         }
 
@@ -116,7 +122,7 @@ class SelfUpdateCommand extends Command
 
     protected function update(Updater $updater): void
     {
-        $this->output->writeln('Updating...'.PHP_EOL);
+        $this->output->writeln('Updating...' . PHP_EOL);
         try {
             $result = $updater->update();
 

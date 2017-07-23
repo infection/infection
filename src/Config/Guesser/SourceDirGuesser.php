@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Config\Guesser;
@@ -38,7 +37,7 @@ class SourceDirGuesser implements Guesser
     private function getValues(string $psr)
     {
         $dirs = array_map(
-            function(string $dir) {
+            function (string $dir) {
                 return trim($dir, DIRECTORY_SEPARATOR);
             },
             array_values((array) $this->composerJsonContent->autoload->{$psr})

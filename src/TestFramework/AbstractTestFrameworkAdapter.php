@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\TestFramework;
@@ -43,7 +42,7 @@ abstract class AbstractTestFrameworkAdapter
         $this->argumentsAndOptionsBuilder = $argumentsAndOptionsBuilder;
     }
 
-    abstract public function testsPass(string $output) : bool;
+    abstract public function testsPass(string $output): bool;
 
     /**
      * Returns path to the test framework's executable
@@ -53,9 +52,10 @@ abstract class AbstractTestFrameworkAdapter
      *     vendor/phpunit/phpunit/phpunit
      *
      * @param string $configPath
+     *
      * @return string
      */
-    public function getExecutableCommandLine(string $configPath) : string
+    public function getExecutableCommandLine(string $configPath): string
     {
         return sprintf(
             '%s %s',
@@ -64,12 +64,12 @@ abstract class AbstractTestFrameworkAdapter
         );
     }
 
-    public function buildInitialConfigFile() : string
+    public function buildInitialConfigFile(): string
     {
         return $this->initialConfigBuilder->build();
     }
 
-    public function buildMutationConfigFile(Mutant $mutant) : string
+    public function buildMutationConfigFile(Mutant $mutant): string
     {
         return $this->mutationConfigBuilder->build($mutant);
     }

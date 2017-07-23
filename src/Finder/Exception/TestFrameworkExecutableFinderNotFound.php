@@ -10,5 +10,4 @@ namespace Infection\Finder\Exception;
 
 class TestFrameworkExecutableFinderNotFound extends \RuntimeException
 {
-
 }

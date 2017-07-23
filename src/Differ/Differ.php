@@ -4,15 +4,12 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
-
 
 namespace Infection\Differ;
 
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\LCS\LongestCommonSubsequence;
-
 
 class Differ extends BaseDiffer
 {
@@ -21,7 +18,7 @@ class Differ extends BaseDiffer
     /**
      * Overridden to show just DIFF_MAX_LINES lines of the diff
      *
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function diff($from, $to, LongestCommonSubsequence $lcs = null)
     {
@@ -30,9 +27,9 @@ class Differ extends BaseDiffer
         $characterCount = strlen($diff);
         $lineCount = 0;
 
-        for ($characterIndex = 0; $characterIndex < $characterCount; $characterIndex++) {
+        for ($characterIndex = 0; $characterIndex < $characterCount; ++$characterIndex) {
             if ($diff[$characterIndex] === "\n") {
-                $lineCount++;
+                ++$lineCount;
                 if ($lineCount >= self::DIFF_MAX_LINES) {
                     break;
                 }
@@ -41,5 +38,4 @@ class Differ extends BaseDiffer
 
         return substr($diff, 0, $characterIndex);
     }
-
 }

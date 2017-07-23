@@ -4,11 +4,9 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
-
 
 interface TestFileDataProvider
 {
@@ -21,6 +19,7 @@ interface TestFileDataProvider
      *      return: '/path/to/NameSpace/Sub/TestClass.php'
      *
      * @param string $fullyQualifiedClassName
+     *
      * @return array file path and time
      */
     public function getTestFileInfo(string $fullyQualifiedClassName): array;

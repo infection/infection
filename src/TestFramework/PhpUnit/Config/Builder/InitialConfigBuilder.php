@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
@@ -41,7 +40,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->jUnitFilePath = $jUnitFilePath;
     }
 
-    public function build() : string
+    public function build(): string
     {
         $path = $this->buildPath();
 
@@ -57,7 +56,7 @@ class InitialConfigBuilder implements ConfigBuilder
         return $path;
     }
 
-    private function buildPath() : string
+    private function buildPath(): string
     {
         return $this->tempDirectory . '/phpunitConfiguration.initial.infection.xml';
     }
