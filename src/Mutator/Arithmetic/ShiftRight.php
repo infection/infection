@@ -4,9 +4,7 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
-
 
 namespace Infection\Mutator\Arithmetic;
 
@@ -19,6 +17,7 @@ class ShiftRight implements Mutator
      * Replaces ">>" with "<<"
      *
      * @param Node $node
+     *
      * @return Node\Expr\BinaryOp\ShiftLeft
      */
     public function mutate(Node $node)

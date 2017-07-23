@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
@@ -19,6 +18,7 @@ class Plus implements Mutator
      * Replaces "+" with "-"
      *
      * @param Node $node
+     *
      * @return Node\Expr\BinaryOp\Minus
      */
     public function mutate(Node $node)
@@ -26,7 +26,7 @@ class Plus implements Mutator
         return new Node\Expr\BinaryOp\Minus($node->left, $node->right, $node->getAttributes());
     }
 
-    public function shouldMutate(Node $node) : bool
+    public function shouldMutate(Node $node): bool
     {
         if (!($node instanceof Node\Expr\BinaryOp\Plus)) {
             return false;

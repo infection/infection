@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpSpec\Adapter;
@@ -17,6 +16,7 @@ class PhpSpecAdapter extends AbstractTestFrameworkAdapter
 
     /**
      * @param string $output
+     *
      * @return bool
      */
     public function testsPass(string $output): bool
@@ -24,8 +24,8 @@ class PhpSpecAdapter extends AbstractTestFrameworkAdapter
         $lines = explode("\n", $output);
 
         foreach ($lines as $line) {
-            if (preg_match("%not ok \\d+ - %", $line)
-                && !preg_match("%# TODO%", $line)) {
+            if (preg_match('%not ok \\d+ - %', $line)
+                && !preg_match('%# TODO%', $line)) {
                 return false;
             }
         }

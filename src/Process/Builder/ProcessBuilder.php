@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Process\Builder;
@@ -12,7 +11,6 @@ namespace Infection\Process\Builder;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Infection\TestFramework\Coverage\CodeCoverageData;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
@@ -34,7 +32,7 @@ class ProcessBuilder
         $this->timeout = $timeout;
     }
 
-    public function build() : Process
+    public function build(): Process
     {
         $configPath = $this->testFrameworkAdapter->buildInitialConfigFile();
 
@@ -42,7 +40,7 @@ class ProcessBuilder
 
         // TODO debug why processBuilder does not work with env
         // TODO read and add -vvv
-        /**
+        /*
         $processBuilder = new SymfonyProcessBuilder([
         $this->testFrameworkAdapter->getExecutableCommandLine()
         ]);
@@ -53,10 +51,12 @@ class ProcessBuilder
 
     /**
      * @throws RuntimeException
+     *
      * @param Mutant $mutant
+     *
      * @return MutantProcess
      */
-    public function getProcessForMutant(Mutant $mutant) : MutantProcess
+    public function getProcessForMutant(Mutant $mutant): MutantProcess
     {
         $configPath = $this->testFrameworkAdapter->buildMutationConfigFile($mutant);
 

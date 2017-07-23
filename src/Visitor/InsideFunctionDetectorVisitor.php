@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Visitor;
@@ -27,11 +26,12 @@ class InsideFunctionDetectorVisitor extends NodeVisitorAbstract
      * Recursively determine whether the node is inside the function
      *
      * @param Node $node
+     *
      * @return bool
      */
-    private function isInsideFunction(Node $node) : bool
+    private function isInsideFunction(Node $node): bool
     {
-        if (! $node->hasAttribute(ParentConnectorVisitor::PARENT_KEY)) {
+        if (!$node->hasAttribute(ParentConnectorVisitor::PARENT_KEY)) {
             return false;
         }
 

@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Mutant;
@@ -39,7 +38,6 @@ class MetricsCalculator
      */
     private $timedOutCount = 0;
 
-
     /**
      * @var MutantProcess[]
      */
@@ -62,6 +60,7 @@ class MetricsCalculator
 
     /**
      * MetricsCalculator constructor.
+     *
      * @param AbstractTestFrameworkAdapter $testFrameworkAdapter
      */
     public function __construct(AbstractTestFrameworkAdapter $testFrameworkAdapter)
@@ -71,7 +70,7 @@ class MetricsCalculator
 
     public function collect(MutantProcess $mutantProcess)
     {
-        $this->totalMutantsCount++;
+        ++$this->totalMutantsCount;
 
         switch ($mutantProcess->getResultCode()) {
             case MutantProcess::CODE_KILLED:
@@ -94,6 +93,7 @@ class MetricsCalculator
 
     /**
      * Mutation Score Indicator (MSI)
+     *
      * @return float
      */
     public function getMutationScoreIndicator(): float
@@ -132,7 +132,7 @@ class MetricsCalculator
         $defeatedTotal = $this->killedCount + $this->timedOutCount/* + $errorCount*/;
 
         if ($coveredByTestsTotal) {
-            $detectionRateTested  = round(100 * ($defeatedTotal / $coveredByTestsTotal));
+            $detectionRateTested = round(100 * ($defeatedTotal / $coveredByTestsTotal));
         }
 
         return $detectionRateTested;

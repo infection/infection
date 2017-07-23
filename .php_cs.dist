@@ -1,0 +1,18 @@
+<?php
+
+$finder = \PhpCsFixer\Finder::create()
+   ->in('src')
+   ->in('app')
+;
+
+return \PhpCsFixer\Config::create()
+   ->setRules([
+       '@Symfony' => true,
+       '@PHP70Migration' => true,
+
+       'concat_space' => ['spacing' => 'one'],
+       'phpdoc_summary' => false,
+       'phpdoc_align' => false,
+   ])
+   ->setFinder($finder)
+;

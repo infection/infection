@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Process\Runner;
@@ -14,11 +13,6 @@ use Infection\Events\InitialTestCaseCompleted;
 use Infection\Events\InitialTestSuiteFinished;
 use Infection\Events\InitialTestSuiteStarted;
 use Infection\Process\Builder\ProcessBuilder;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Infection\TestFramework\Coverage\CodeCoverageData;
-use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
-use Infection\Tests\TestFramework\PhpUnit\Config\AbstractXmlConfiguration;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Process\Process;
 
 class InitialTestsRunner
@@ -35,6 +29,7 @@ class InitialTestsRunner
 
     /**
      * InitialTestsRunner constructor.
+     *
      * @param ProcessBuilder $processBuilder
      * @param EventDispatcherInterface $eventDispatcher
      */
@@ -44,7 +39,7 @@ class InitialTestsRunner
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function run() : Process
+    public function run(): Process
     {
         $process = $this->processBuilder->build();
 

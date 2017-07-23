@@ -11,7 +11,6 @@ namespace Infection;
 
 use Infection\Mutator\Mutator;
 
-
 class Mutation
 {
     /**
@@ -39,7 +38,7 @@ class Mutation
     /**
      * @return Mutator
      */
-    public function getMutator() : Mutator
+    public function getMutator(): Mutator
     {
         return $this->mutator;
     }
@@ -47,7 +46,7 @@ class Mutation
     /**
      * @return array
      */
-    public function getAttributes() : array
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -55,12 +54,12 @@ class Mutation
     /**
      * @return string
      */
-    public function getOriginalFilePath() : string
+    public function getOriginalFilePath(): string
     {
         return $this->originalFilePath;
     }
 
-    public function getHash() : string
+    public function getHash(): string
     {
         $mutatorClass = get_class($this->getMutator());
         $attrs = $this->getAttributes();
@@ -70,7 +69,7 @@ class Mutation
             $attrs['startTokenPos'],
             $attrs['endTokenPos'],
             $attrs['startFilePos'],
-            $attrs['startFilePos']
+            $attrs['startFilePos'],
         ];
 
         $hashKeys = array_merge([$this->getOriginalFilePath(), $mutatorClass], $attributeValues);

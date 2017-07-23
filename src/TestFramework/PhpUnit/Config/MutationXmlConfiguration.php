@@ -4,13 +4,10 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
-
 
 namespace Infection\TestFramework\PhpUnit\Config;
 
-use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 
 class MutationXmlConfiguration extends AbstractXmlConfiguration
@@ -33,7 +30,7 @@ class MutationXmlConfiguration extends AbstractXmlConfiguration
         $this->coverageTests = $coverageTests;
     }
 
-    public function getXml() : string
+    public function getXml(): string
     {
         $originalXml = file_get_contents($this->originalXmlConfigPath);
 

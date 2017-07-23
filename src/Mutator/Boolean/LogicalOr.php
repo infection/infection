@@ -4,21 +4,20 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
-
 
 namespace Infection\Mutator\Boolean;
 
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
-class LogicalOr implements  Mutator
+class LogicalOr implements Mutator
 {
     /**
      * Replaces "||" with "&&"
      *
      * @param Node $node
+     *
      * @return Node\Expr\BinaryOp\BooleanAnd
      */
     public function mutate(Node $node)

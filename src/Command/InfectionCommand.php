@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Command;
@@ -82,7 +81,7 @@ class InfectionCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->container['infection.config'] = function (Container $c) : InfectionConfig {
+        $this->container['infection.config'] = function (Container $c): InfectionConfig {
             try {
                 $infectionConfigFile = $c['locator']->locateAnyOf(['infection.json', 'infection.json.dist']);
                 $json = file_get_contents($infectionConfigFile);
@@ -103,6 +102,7 @@ class InfectionCommand extends Command
      *
      * @param InputInterface $input
      * @param OutputInterface $output
+     *
      * @throws \Exception
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
@@ -112,11 +112,11 @@ class InfectionCommand extends Command
         $configExists = file_exists(InfectionConfig::CONFIG_FILE_NAME) ||
             file_exists(InfectionConfig::CONFIG_FILE_NAME . '.dist');
 
-        if (! $configExists) {
+        if (!$configExists) {
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [
-                '--test-framework' => $input->getOption('test-framework')
+                '--test-framework' => $input->getOption('test-framework'),
             ];
 
             $result = $configureCommand->run(new ArrayInput($args), $output);

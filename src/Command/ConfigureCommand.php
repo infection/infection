@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Command;
@@ -20,7 +19,6 @@ use Infection\Finder\TestFrameworkExecutableFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\Config\InfectionConfig;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
-use Pimple\Container;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -123,7 +121,7 @@ class ConfigureCommand extends Command
         }
 
         if ($phpUnitCustomExecutablePath) {
-            if (! isset($configObject->phpUnit)) {
+            if (!isset($configObject->phpUnit)) {
                 $configObject->phpUnit = new \stdClass();
             }
 

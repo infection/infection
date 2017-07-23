@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 use Pimple\Container;
@@ -41,55 +40,55 @@ $c['phpunit.config.dir'] = function (Container $c): string {
     return $c['infection.config']->getPhpUnitConfigDir();
 };
 
-$c['temp.dir'] = function (Container $c) : string {
+$c['temp.dir'] = function (Container $c): string {
     return $c['temp.dir.creator']->createAndGet();
 };
 
-$c['temp.dir.creator'] = function () : TempDirectoryCreator {
+$c['temp.dir.creator'] = function (): TempDirectoryCreator {
     return new TempDirectoryCreator();
 };
 
-$c['coverage.dir.phpunit'] = function (Container $c) : string {
+$c['coverage.dir.phpunit'] = function (Container $c): string {
     return $c['temp.dir'] . '/' . CodeCoverageData::PHP_UNIT_COVERAGE_DIR;
 };
 
-$c['coverage.dir.phpspec'] = function (Container $c) : string {
+$c['coverage.dir.phpspec'] = function (Container $c): string {
     return $c['temp.dir'] . '/' . CodeCoverageData::PHP_SPEC_COVERAGE_DIR;
 };
 
-$c['locator'] = function (Container $c) : Locator {
+$c['locator'] = function (Container $c): Locator {
     return new Locator([$c['project.dir']]);
 };
 
-$c['path.replacer'] = function(Container $c) : PathReplacer {
+$c['path.replacer'] = function (Container $c): PathReplacer {
     return new PathReplacer($c['locator'], $c['phpunit.config.dir']);
 };
 
-$c['test.framework.factory'] = function (Container $c) : Factory {
+$c['test.framework.factory'] = function (Container $c): Factory {
     return new Factory($c['temp.dir'], $c['project.dir'], $c['testframework.config.locator'], $c['path.replacer'], $c['phpunit.junit.file.path'], $c['infection.config']);
 };
 
-$c['mutant.creator'] = function (Container $c) : MutantCreator {
+$c['mutant.creator'] = function (Container $c): MutantCreator {
     return new MutantCreator($c['temp.dir'], $c['differ']);
 };
 
-$c['differ'] = function () : Differ {
+$c['differ'] = function (): Differ {
     return new Differ();
 };
 
-$c['dispatcher'] = function () : EventDispatcher {
+$c['dispatcher'] = function (): EventDispatcher {
     return new EventDispatcher();
 };
 
-$c['parallel.process.runner'] = function (Container $c) : ParallelProcessRunner {
+$c['parallel.process.runner'] = function (Container $c): ParallelProcessRunner {
     return new ParallelProcessRunner($c['dispatcher']);
 };
 
-$c['testframework.config.locator'] = function (Container $c) : TestFrameworkConfigLocator {
+$c['testframework.config.locator'] = function (Container $c): TestFrameworkConfigLocator {
     return new TestFrameworkConfigLocator($c['phpunit.config.dir']/*[phpunit.dir, phpspec.dir, ...]*/);
 };
 
-$c['diff.colorizer'] = function () : DiffColorizer {
+$c['diff.colorizer'] = function (): DiffColorizer {
     return new DiffColorizer();
 };
 
@@ -101,7 +100,7 @@ $c['test.file.data.provider.phpunit'] = function (Container $c): TestFileDataPro
     return new PhpUnitTestFileDataProvider($c['phpunit.junit.file.path']);
 };
 
-$c['application'] = function (Container $container) : Application {
+$c['application'] = function (Container $container): Application {
     $application = new Application(
         'Infection - PHP Mutation Testing Framework',
         '@package_version@'

@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Process\Listener;
@@ -69,6 +68,7 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
     /**
      * @param MutantProcess[] $processes
      * @param string $headlinePrefix
+     *
      * @return array
      */
     private function getLogParts(array $processes, string $headlinePrefix): array
@@ -83,6 +83,7 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
             $logParts[] = $mutantProcess->getMutant()->getDiff();
             $logParts[] = $mutantProcess->getProcess()->getOutput();
         }
+
         return $logParts;
     }
 }

@@ -4,12 +4,9 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
-
 namespace Infection\Finder;
-
 
 class Locator
 {
@@ -48,7 +45,9 @@ class Locator
 
     /**
      * @param array $fileNames
+     *
      * @return string
+     *
      * @throws \Exception
      */
     public function locateAnyOf(array $fileNames): string
@@ -108,7 +107,8 @@ class Locator
     private function isAbsolutePath($file)
     {
         return $file[0] === '/' || $file[0] === '\\'
-            || (strlen($file) > 3 && ctype_alpha($file[0])
+            || (
+                strlen($file) > 3 && ctype_alpha($file[0])
                 && $file[1] === ':'
                 && ($file[2] === '\\' || $file[2] === '/')
             )

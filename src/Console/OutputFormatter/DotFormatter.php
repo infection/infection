@@ -4,12 +4,9 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
-
 namespace Infection\Console\OutputFormatter;
-
 
 use Infection\Process\MutantProcess;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -38,7 +35,7 @@ class DotFormatter extends AbstractOutputFormatter
             . '<uncovered>S</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '
             . '<timeout>T</timeout>: timed out',
-            ''
+            '',
         ]);
     }
 

@@ -4,12 +4,9 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
-
 namespace Infection\TestFramework\Config;
-
 
 class TestFrameworkConfigLocator
 {
@@ -27,7 +24,6 @@ class TestFrameworkConfigLocator
     {
         $dir = $customDir ?: $this->configDir;
 
-
         foreach (['xml', 'yml'] as $extension) {
             $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
 
@@ -39,7 +35,6 @@ class TestFrameworkConfigLocator
                 return realpath($conf . '.dist');
             }
         }
-
 
         throw new \RuntimeException(sprintf('Unable to locate %s.(xml|yml)(.dist) file.', $testFrameworkName));
     }

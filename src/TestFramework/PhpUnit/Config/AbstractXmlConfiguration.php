@@ -4,14 +4,11 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config;
 
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\Coverage\CodeCoverageData;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 
 abstract class AbstractXmlConfiguration
@@ -38,7 +35,7 @@ abstract class AbstractXmlConfiguration
         $this->pathReplacer = $pathReplacer;
     }
 
-    abstract public function getXml() : string;
+    abstract public function getXml(): string;
 
     protected function replaceWithAbsolutePaths(\DOMXPath $xPath)
     {

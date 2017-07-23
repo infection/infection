@@ -4,11 +4,9 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalNegotiation;
-
 
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
@@ -19,6 +17,7 @@ class NotIdentical implements Mutator
      * Replaces "!==" with "==="
      *
      * @param Node $node
+     *
      * @return Node\Expr\BinaryOp\Identical
      */
     public function mutate(Node $node)
@@ -30,5 +29,4 @@ class NotIdentical implements Mutator
     {
         return $node instanceof Node\Expr\BinaryOp\NotIdentical;
     }
-
 }

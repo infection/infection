@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Process\Listener;
@@ -112,7 +111,7 @@ class MutationConsoleLoggerSubscriber implements EventSubscriberInterface
         foreach ($processes as $index => $mutantProcess) {
             $this->output->writeln([
                 '',
-                sprintf('%d) %s', $index + 1, get_class($mutantProcess->getMutant()->getMutation()->getMutator()))
+                sprintf('%d) %s', $index + 1, get_class($mutantProcess->getMutant()->getMutation()->getMutator())),
             ]);
             $this->output->writeln($mutantProcess->getMutant()->getMutation()->getOriginalFilePath());
             $this->output->writeln($this->diffColorizer->colorize($mutantProcess->getMutant()->getDiff()));
@@ -126,7 +125,7 @@ class MutationConsoleLoggerSubscriber implements EventSubscriberInterface
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getKilledCount()) . '</options=bold> mutants were killed');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getNotCoveredByTestsCount()) . '</options=bold> mutants were not covered by tests');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getEscapedCount()) . '</options=bold> covered mutants were not detected');
-//        $this->output->writeln($this->getPadded($errorCount) . ' fatal errors were encountered'); // TODO
+        //        $this->output->writeln($this->getPadded($errorCount) . ' fatal errors were encountered'); // TODO
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getTimedOutCount()) . '</options=bold> time outs were encountered');
 
         $this->output->writeln(['', 'Metrics:']);

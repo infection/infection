@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\TestFramework;
@@ -62,7 +61,7 @@ class Factory
         $this->infectionConfig = $infectionConfig;
     }
 
-    public function create($adapterName) : AbstractTestFrameworkAdapter
+    public function create($adapterName): AbstractTestFrameworkAdapter
     {
         if ($adapterName === PhpUnitAdapter::NAME) {
             $phpUnitConfigPath = $this->configLocator->locate(PhpUnitAdapter::NAME);

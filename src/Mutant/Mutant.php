@@ -4,12 +4,9 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
-
 namespace Infection\Mutant;
-
 
 use Infection\Mutation;
 
@@ -61,7 +58,7 @@ class Mutant
         return $this->mutation;
     }
 
-    public function getDiff() : string
+    public function getDiff(): string
     {
         return $this->diff;
     }

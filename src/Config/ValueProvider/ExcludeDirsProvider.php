@@ -4,18 +4,15 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
-use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Finder\Locator;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 
 class ExcludeDirsProvider
@@ -61,7 +58,7 @@ class ExcludeDirsProvider
 
             $autocompleteValues = $dirsInCurrentDir;
         } elseif (count($sourceDirs) === 1) {
-            $globDirs = array_filter(glob($sourceDirs[0] .'/*'), 'is_dir');
+            $globDirs = array_filter(glob($sourceDirs[0] . '/*'), 'is_dir');
 
             $autocompleteValues = array_map(
                 function (string $dir) use ($sourceDirs) {
@@ -78,7 +75,6 @@ class ExcludeDirsProvider
         $question->setValidator($this->getValidator($locator));
 
         while ($dir = $this->questionHelper->ask($input, $output, $question)) {
-
             if ($dir) {
                 $excludedDirs[] = $dir;
             }

@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Finder;
@@ -50,9 +49,6 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
         return $this->cachedExecutable;
     }
 
-    /**
-     * @return void
-     */
     private function addVendorFolderToPath()
     {
         $vendorPath = null;
@@ -85,6 +81,7 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
 
     /**
      * @return string
+     *
      * @throws TestFrameworkExecutableFinderNotFound
      */
     private function findExecutable()
@@ -122,6 +119,7 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
      * are enforced and end PHP processes properly
      *
      * @param string $path
+     *
      * @return string
      */
     protected function makeExecutable($path)
@@ -133,6 +131,7 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
             if (false !== strpos($path, '.bat')) {
                 return $path;
             }
+
             return sprintf('%s %s', $phpFinder->find(), $path);
         }
 

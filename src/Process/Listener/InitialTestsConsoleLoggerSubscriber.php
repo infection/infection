@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Process\Listener;
@@ -13,9 +12,6 @@ use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\InitialTestCaseCompleted;
 use Infection\Events\InitialTestSuiteFinished;
 use Infection\Events\InitialTestSuiteStarted;
-use Infection\Events\MutationTestingFinished;
-use Infection\Events\MutationTestingStarted;
-use Infection\Events\MutantProcessFinished;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 

@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Coverage;
@@ -23,6 +22,7 @@ class CoverageXmlParser
 
     /**
      * @param string $coverageXmlContent
+     *
      * @return array
      */
     public function parse(string $coverageXmlContent): array
@@ -50,6 +50,7 @@ class CoverageXmlParser
     /**
      * @param string $relativeCoverageFilePath
      * @param string $projectSource
+     *
      * @return array
      */
     private function processXmlFileCoverage(string $relativeCoverageFilePath, string $projectSource): array
@@ -84,6 +85,7 @@ class CoverageXmlParser
      * Remove namespace to work with xPath without a headache
      *
      * @param string $xml
+     *
      * @return string
      */
     private function removeNamespace(string $xml): string
@@ -95,7 +97,9 @@ class CoverageXmlParser
      * @param \DOMXPath $xPath
      * @param string $relativeCoverageFilePath
      * @param string $projectSource
+     *
      * @return string
+     *
      * @throws \Exception
      */
     private function getSourceFilePath(\DOMXPath $xPath, string $relativeCoverageFilePath, string $projectSource): string
@@ -104,7 +108,7 @@ class CoverageXmlParser
         $fileName = $fileNode->getAttribute('name');
         $relativeFilePath = $fileNode->getAttribute('path');
 
-        if (! $relativeFilePath) {
+        if (!$relativeFilePath) {
             // path is not present for old versions of PHPUnit, so parse the source file path from
             // the path of XML coverage file
             $relativeFilePath = str_replace(
@@ -126,6 +130,7 @@ class CoverageXmlParser
 
     /**
      * @param \DOMNodeList $lineCoverageNodes
+     *
      * @return array
      */
     private function getCoveredLinesData(\DOMNodeList $lineCoverageNodes): array

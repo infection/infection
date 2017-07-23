@@ -12,12 +12,14 @@ cache:
 
 before_install:
   - composer selfupdate
+  - composer global require friendsofphp/php-cs-fixer
 
 install:
   - composer install
 
 script:
   - vendor/bin/phpunit --coverage-clover=clover.xml
+  - /home/travis/.composer/vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v --dry-run --stop-on-violation --using-cache=no --path-mode=intersection --allow-risky=yes
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
