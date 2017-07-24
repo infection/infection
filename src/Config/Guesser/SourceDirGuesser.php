@@ -10,6 +10,8 @@ namespace Infection\Config\Guesser;
 
 class SourceDirGuesser implements Guesser
 {
+    private $composerJsonContent;
+
     public function __construct(\stdClass $composerJsonContent)
     {
         $this->composerJsonContent = $composerJsonContent;

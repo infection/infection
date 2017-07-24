@@ -5,7 +5,7 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
-namespace Infection\Test\Mutator\Boolean;
+namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\LogicalAnd;
 use Infection\Mutator\Boolean\LogicalLowerAnd;

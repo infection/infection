@@ -13,6 +13,7 @@ cache:
 before_install:
   - composer selfupdate
   - composer global require friendsofphp/php-cs-fixer
+  - composer global require --dev 'phpstan/phpstan:^0.8'
 
 install:
   - composer install
@@ -20,6 +21,7 @@ install:
 script:
   - vendor/bin/phpunit --coverage-clover=clover.xml
   - /home/travis/.composer/vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v --dry-run --stop-on-violation --using-cache=no --path-mode=intersection --allow-risky=yes
+  - /home/travis/.composer/vendor/bin/phpstan analyse src tests --level=1 --no-interaction --no-progress
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

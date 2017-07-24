@@ -21,7 +21,7 @@ abstract class MutationConfigBuilder
         if (0 === strpos(__FILE__, 'phar:')) {
             $infectionPhar = sprintf(
                 '\Phar::loadPhar("%s", "%s");',
-                str_replace('phar://', '', \Phar::running()),
+                str_replace('phar://', '', \Phar::running(true)),
                 'infection.phar'
             );
         }

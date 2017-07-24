@@ -8,7 +8,7 @@
 declare(strict_types=1);
 
 
-namespace TestFramework\PhpSpec\CommandLine;
+namespace Infection\Tests\TestFramework\PhpSpec\CommandLine;
 
 
 use Infection\TestFramework\PhpSpec\CommandLine\ArgumentsAndOptionsBuilder;

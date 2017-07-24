@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Config\ValueProvider;
+namespace Infection\Tests\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\PhpUnitPathProvider;

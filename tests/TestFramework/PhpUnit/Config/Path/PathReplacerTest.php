@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Config\Path;
+namespace Infection\Tests\TestFramework\PhpUnit\Config\Path;
 
 use Infection\Finder\Locator;
 use Infection\TestFramework\PhPunit\Config\Path\PathReplacer;

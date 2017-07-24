@@ -8,7 +8,7 @@
 declare(strict_types=1);
 
 
-namespace Mutant;
+namespace Infection\Tests\Mutant;
 
 
 use Infection\Mutant\MetricsCalculator;

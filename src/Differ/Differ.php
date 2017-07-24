@@ -26,8 +26,9 @@ class Differ extends BaseDiffer
 
         $characterCount = strlen($diff);
         $lineCount = 0;
+        $characterIndex = 0;
 
-        for ($characterIndex = 0; $characterIndex < $characterCount; ++$characterIndex) {
+        for ($characterIndex; $characterIndex < $characterCount; ++$characterIndex) {
             if ($diff[$characterIndex] === "\n") {
                 ++$lineCount;
                 if ($lineCount >= self::DIFF_MAX_LINES) {

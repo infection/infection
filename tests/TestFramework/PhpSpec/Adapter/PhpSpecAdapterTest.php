@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace TestFramework\PhpSpec\Adapter;
+namespace Infection\Tests\TestFramework\PhpSpec\Adapter;
 
 
 use Infection\Finder\AbstractExecutableFinder;
@@ -18,7 +18,7 @@ use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use PHPUnit\Framework\TestCase;
 use Mockery;
 
-class PhpUnitAdapterTest extends TestCase
+class PhpSpecAdapterTest extends TestCase
 {
     public function test_it_determines_when_tests_do_not_pass()
     {
