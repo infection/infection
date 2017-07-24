@@ -131,7 +131,7 @@ class InfectionApplication
         throw new \InvalidArgumentException('Incorrect formatter. Possible values: dot, progress');
     }
 
-    private function addSubscribers(EventDispatcher $eventDispatcher, ProgressBar $initialTestsProgressBar, MetricsCalculator $metricsCalculator): void
+    private function addSubscribers(EventDispatcher $eventDispatcher, ProgressBar $initialTestsProgressBar, MetricsCalculator $metricsCalculator)
     {
         $eventDispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($this->output, $initialTestsProgressBar));
         $eventDispatcher->addSubscriber(new MutationConsoleLoggerSubscriber($this->output, $this->getOutputFormatter(), $metricsCalculator, $this->get('diff.colorizer'), $this->input->getOption('show-mutations')));
