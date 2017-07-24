@@ -8,7 +8,7 @@
 declare(strict_types=1);
 
 
-namespace Tests\Config\ValueProvider;
+namespace Infection\Tests\Config\ValueProvider;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;

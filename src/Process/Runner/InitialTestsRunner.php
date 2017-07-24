@@ -18,9 +18,9 @@ use Symfony\Component\Process\Process;
 class InitialTestsRunner
 {
     /**
-     * @var Process
+     * @var ProcessBuilder
      */
-    private $process;
+    private $processBuilder;
 
     /**
      * @var EventDispatcherInterface

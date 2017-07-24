@@ -26,7 +26,7 @@ class CoverageXmlParserTest extends TestCase
 
     protected function setUp()
     {
-        $this->parser = new CoverageXmlParser($this->tempDir, [$this->srcDir]);
+        $this->parser = new CoverageXmlParser($this->tempDir);
     }
 
     protected function getXml()

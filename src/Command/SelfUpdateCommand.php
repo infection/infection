@@ -120,7 +120,7 @@ class SelfUpdateCommand extends Command
         $this->update($this->getPreReleaseUpdater());
     }
 
-    protected function update(Updater $updater): void
+    protected function update(Updater $updater)
     {
         $this->output->writeln('Updating...' . PHP_EOL);
         try {
@@ -153,7 +153,7 @@ class SelfUpdateCommand extends Command
         $this->output->writeln('You can also select update stability using --pre (alpha/beta/rc) or --stable.');
     }
 
-    protected function rollback(): void
+    protected function rollback()
     {
         $updater = new Updater();
         try {
@@ -167,7 +167,7 @@ class SelfUpdateCommand extends Command
         }
     }
 
-    protected function printAvailableUpdates(): void
+    protected function printAvailableUpdates()
     {
         $this->printCurrentLocalVersion();
         $this->printCurrentStableVersion();
@@ -176,7 +176,7 @@ class SelfUpdateCommand extends Command
         $this->output->writeln('You can select update stability using --pre or --stable when self-updating.');
     }
 
-    protected function printCurrentLocalVersion(): void
+    protected function printCurrentLocalVersion()
     {
         $this->output->writeln(sprintf(
             'Your current local build version is: <options=bold>%s</options=bold>',
@@ -184,17 +184,17 @@ class SelfUpdateCommand extends Command
         ));
     }
 
-    protected function printCurrentStableVersion(): void
+    protected function printCurrentStableVersion()
     {
         $this->printVersion($this->getStableUpdater());
     }
 
-    protected function printCurrentPreReleaseVersion(): void
+    protected function printCurrentPreReleaseVersion()
     {
         $this->printVersion($this->getPreReleaseUpdater());
     }
 
-    protected function printVersion(Updater $updater): void
+    protected function printVersion(Updater $updater)
     {
         $stability = 'stable';
 
@@ -220,7 +220,7 @@ class SelfUpdateCommand extends Command
         }
     }
 
-    protected function configure(): void
+    protected function configure()
     {
         $this
             ->setName('self-update')

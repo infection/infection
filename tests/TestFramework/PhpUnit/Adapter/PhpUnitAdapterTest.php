@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace TestFramework\PhpUnit\Adapter;
+namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
 
 use Infection\Finder\AbstractExecutableFinder;

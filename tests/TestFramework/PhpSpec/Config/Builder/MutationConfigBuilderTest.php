@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace TestFramework\PhpSpec\Config\Builder;
+namespace Infection\Tests\TestFramework\PhpSpec\Config\Builder;
 
 use Infection\Mutant\Mutant;
 use Infection\Mutation;

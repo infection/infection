@@ -12,6 +12,8 @@ class PhpUnitPathGuesser implements Guesser
 {
     const CURRENT_DIR_PATH = '.';
 
+    private $composerJsonContent;
+
     public function __construct(\stdClass $composerJsonContent)
     {
         $this->composerJsonContent = $composerJsonContent;
