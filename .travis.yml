@@ -31,7 +31,7 @@ script:
   - vendor/bin/phpunit --coverage-clover=clover.xml
   - /home/travis/.composer/vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v --dry-run --stop-on-violation --using-cache=no --path-mode=intersection --allow-risky=yes
   - /home/travis/.composer/vendor/bin/phpstan analyse src tests --level=1 --no-interaction --no-progress
-  - if [[ $INFECTION == 1 ]]; then infection.phar --threads=4 --min-covered-msi=76; fi
+  - if [[ $INFECTION == 1 ]]; then ./infection.phar --threads=4 --min-covered-msi=76; fi
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
