@@ -91,7 +91,14 @@ class InfectionApplication
         $mutationTestingRunner = new MutationTestingRunner($processBuilder, $parallelProcessManager, $mutantCreator, $eventDispatcher, $mutations);
         $mutationTestingRunner->run($threadCount, $codeCoverageData);
 
-        return 0;
+        // todo read in phpstan hot to skip set of errors
+        // todo create doc PR
+        // todo add infection to infection CI ;)
+        // todo colorize percentage (red, yellow, green). Add tweet with the image
+        // todo informative error message about msi? google how to do that with return codes. Exceptions?
+        // todo the same settings in config?
+
+        return $this->hasBadMsi($metricsCalculator) ? 1 : 0;
     }
 
     /**
@@ -157,5 +164,22 @@ class InfectionApplication
                 $initialTestSuitProcess->getErrorOutput()
             )
         );
+    }
+
+    private function hasBadMsi(MetricsCalculator $metricsCalculator): bool
+    {
+        if ($minMsi = (float) $this->input->getOption('min-msi')) {
+            if ($metricsCalculator->getMutationScoreIndicator() < $minMsi) {
+                return true;
+            }
+        }
+
+        if ($minCoveredMsi = (float) $this->input->getOption('min-covered-msi')) {
+            if ($metricsCalculator->getCoveredCodeMutationScoreIndicator() < $minCoveredMsi) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

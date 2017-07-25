@@ -76,6 +76,18 @@ class InfectionCommand extends Command
                 'Output formatter. Possible values: dot, progress',
                 'dot'
             )
+            ->addOption(
+                'min-msi',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Minimum Mutation Score Indicator (MSI) percentage value. Should be used in CI server.'
+            )
+            ->addOption(
+                'min-covered-msi',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Minimum Covered Code Mutation Score Indicator (MSI) percentage value. Should be used in CI server.'
+            )
         ;
     }
 
