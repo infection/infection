@@ -49,24 +49,24 @@ class InfectionConfig
         return $this->config->source->directories ?? self::DEFAULT_SOURCE_DIRS;
     }
 
-    public function getSourceExcludeDirs(): array
+    public function getSourceExcludePaths(): array
     {
         if (isset($this->config->source->exclude) && is_array($this->config->source->exclude)) {
-            $originalExcludedDirs = $this->config->source->exclude;
-            $excludedDirs = [];
+            $originalExcludedPaths = $this->config->source->exclude;
+            $excludedPaths = [];
 
-            foreach ($originalExcludedDirs as $originalExcludedDir) {
-                if (strpos($originalExcludedDir, '*') === false) {
-                    $excludedDirs[] = $originalExcludedDir;
+            foreach ($originalExcludedPaths as $originalExcludedPath) {
+                if (strpos($originalExcludedPath, '*') === false) {
+                    $excludedPaths[] = $originalExcludedPath;
                 } else {
-                    $excludedDirs = array_merge(
-                        $excludedDirs,
-                        $this->getExcludedDirsByPattern($originalExcludedDir)
+                    $excludedPaths = array_merge(
+                        $excludedPaths,
+                        $this->getExcludedDirsByPattern($originalExcludedPath)
                     );
                 }
             }
 
-            return $excludedDirs;
+            return $excludedPaths;
         }
 
         return self::DEFAULT_EXCLUDE_DIRS;

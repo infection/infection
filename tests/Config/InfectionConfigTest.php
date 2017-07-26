@@ -71,7 +71,7 @@ class InfectionConfigTest extends TestCase
     {
         $config = new InfectionConfig(new \stdClass());
 
-        $this->assertSame(InfectionConfig::DEFAULT_EXCLUDE_DIRS, $config->getSourceExcludeDirs());
+        $this->assertSame(InfectionConfig::DEFAULT_EXCLUDE_DIRS, $config->getSourceExcludePaths());
     }
 
     public function test_it_returns_exclude_dirs_from_config()
@@ -79,7 +79,7 @@ class InfectionConfigTest extends TestCase
         $json = '{"source": {"exclude":["subfolder/excluded-folder"], "directories": ["source"]}}';
         $config = new InfectionConfig(json_decode($json));
 
-        $this->assertSame(['subfolder/excluded-folder'], $config->getSourceExcludeDirs());
+        $this->assertSame(['subfolder/excluded-folder'], $config->getSourceExcludePaths());
     }
 
     public function test_it_excludes_by_glob_patterns()
@@ -89,7 +89,7 @@ class InfectionConfigTest extends TestCase
 
         $config = new InfectionConfig(json_decode($json));
 
-        $excludedDirs = $config->getSourceExcludeDirs();
+        $excludedDirs = $config->getSourceExcludePaths();
 
         $this->assertCount(2, $excludedDirs);
     }
