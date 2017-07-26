@@ -30,8 +30,8 @@ $c['src.dirs'] = function (Container $c): array {
     return $c['infection.config']->getSourceDirs();
 };
 
-$c['exclude.dirs'] = function (Container $c): array {
-    return $c['infection.config']->getSourceExcludeDirs();
+$c['exclude.paths'] = function (Container $c): array {
+    return $c['infection.config']->getSourceExcludePaths();
 };
 
 $c['project.dir'] = getcwd();

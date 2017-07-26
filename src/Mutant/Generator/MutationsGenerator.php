@@ -77,13 +77,13 @@ class MutationsGenerator
     /**
      * @var array
      */
-    private $excludeDirs;
+    private $excludeDirsOrFiles;
 
-    public function __construct(array $srcDirs, array $excludeDirs, CodeCoverageData $codeCoverageData)
+    public function __construct(array $srcDirs, array $excludeDirsOrFiles, CodeCoverageData $codeCoverageData)
     {
         $this->srcDirs = $srcDirs;
         $this->codeCoverageData = $codeCoverageData;
-        $this->excludeDirs = $excludeDirs;
+        $this->excludeDirsOrFiles = $excludeDirsOrFiles;
     }
 
     /**
@@ -117,9 +117,12 @@ class MutationsGenerator
     {
         $finder = new Finder();
         $finder->files()->in($this->srcDirs);
-        $finder->exclude($this->excludeDirs);
 
         $finder->files()->name($filter ?: '*.php');
+
+        foreach ($this->excludeDirsOrFiles as $excludePath) {
+            $finder->notPath($excludePath);
+        }
 
         return $finder;
     }

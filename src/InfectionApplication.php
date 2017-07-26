@@ -81,7 +81,7 @@ class InfectionApplication
         $this->output->writeln(['', 'Generate mutants...', '']);
 
         $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
-        $mutationsGenerator = new MutationsGenerator($this->get('src.dirs'), $this->get('exclude.dirs'), $codeCoverageData);
+        $mutationsGenerator = new MutationsGenerator($this->get('src.dirs'), $this->get('exclude.paths'), $codeCoverageData);
         $mutations = $mutationsGenerator->generate($this->input->getOption('only-covered'), $this->input->getOption('filter'));
 
         $parallelProcessManager = $this->get('parallel.process.runner');
