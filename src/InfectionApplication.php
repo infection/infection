@@ -95,10 +95,7 @@ class InfectionApplication
 
         // todo read in phpstan hot to skip set of errors
         // todo create doc PR
-        // todo add infection to infection CI ;)
         // todo colorize percentage (red, yellow, green). Add tweet with the image
-        // todo informative error message about msi? google how to do that with return codes. Exceptions?
-        // todo the same settings in config?
 
         if ($this->hasBadMsi($metricsCalculator)) {
             $io->error($this->getBadMsiErrorMessage($metricsCalculator));

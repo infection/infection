@@ -128,10 +128,21 @@ class MutationConsoleLoggerSubscriber implements EventSubscriberInterface
         //        $this->output->writeln($this->getPadded($errorCount) . ' fatal errors were encountered'); // TODO
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getTimedOutCount()) . '</options=bold> time outs were encountered');
 
+        $msiTag = $this->getPercentageTag($this->metricsCalculator->getMutationScoreIndicator());
+        $mutationCoverageTag = $this->getPercentageTag($this->metricsCalculator->getCoverageRate());
+        $coveredMsiTag = $this->getPercentageTag($this->metricsCalculator->getCoveredCodeMutationScoreIndicator());
+
+
         $this->output->writeln(['', 'Metrics:']);
-        $this->output->writeln($this->addIndentation('Mutation Score Indicator (MSI): <options=bold>' . $this->metricsCalculator->getMutationScoreIndicator() . '%</options=bold>'));
-        $this->output->writeln($this->addIndentation('Mutation Code Coverage: <options=bold>' . $this->metricsCalculator->getCoverageRate() . '%</options=bold>'));
-        $this->output->writeln($this->addIndentation('Covered Code MSI: <options=bold>' . $this->metricsCalculator->getCoveredCodeMutationScoreIndicator() . '%</options=bold>'));
+        $this->output->writeln(
+            $this->addIndentation("Mutation Score Indicator (MSI): <{$msiTag}>{$this->metricsCalculator->getMutationScoreIndicator()}%</{$msiTag}>")
+        );
+        $this->output->writeln(
+            $this->addIndentation("Mutation Code Coverage: <{$mutationCoverageTag}>{$this->metricsCalculator->getCoverageRate()}%</{$mutationCoverageTag}>")
+        );
+        $this->output->writeln(
+            $this->addIndentation("Covered Code MSI: <{$coveredMsiTag}>{$this->metricsCalculator->getCoveredCodeMutationScoreIndicator()}%</{$coveredMsiTag}>")
+        );
 
         $this->output->writeln('');
         $this->output->writeln('Please note that some mutants will inevitably be harmless (i.e. false positives).');
@@ -145,5 +156,18 @@ class MutationConsoleLoggerSubscriber implements EventSubscriberInterface
     private function addIndentation(string $string): string
     {
         return str_repeat(' ', self::PAD_LENGTH + 1) . $string;
+    }
+
+    private function getPercentageTag(float $percentage)
+    {
+        if ($percentage >= 0 && $percentage < 50) {
+            return 'low';
+        }
+
+        if ($percentage >= 50 && $percentage < 90) {
+            return 'medium';
+        }
+
+        return 'high';
     }
 }
