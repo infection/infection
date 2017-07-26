@@ -108,40 +108,14 @@ class MutationConsoleLoggerSubscriber implements EventSubscriberInterface
     {
         $this->output->writeln('');
 
-        $logParts = [];
-
-        $logParts = array_merge(
-            $logParts,
-            $this->getLogParts($this->metricsCalculator->getKilledMutantProcesses(), 'Killed')
-        );
-
-        $logParts = array_merge(
-            $logParts,
-            $this->getLogParts($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped')
-        );
-
-        $logParts = array_merge(
-            $logParts,
-            $this->getLogParts($this->metricsCalculator->getTimedOutProcesses(), 'Timeout')
-        );
-
-        $this->output->writeln(implode($logParts, "\n"));
-    }
-
-    private function getLogParts(array $processes, string $headlinePrefix): array
-    {
-        $logParts = [sprintf('%s mutants:', $headlinePrefix), ''];
-
         foreach ($processes as $index => $mutantProcess) {
-            $logParts[] = '';
-            $logParts[] = sprintf('%d) %s', $index + 1, get_class($mutantProcess->getMutant()->getMutation()->getMutator()));
-            $logParts[] = $mutantProcess->getMutant()->getMutation()->getOriginalFilePath();
-            $logParts[] = $mutantProcess->getProcess()->getCommandLine();
-            $logParts[] = $mutantProcess->getMutant()->getDiff();
-            $logParts[] = $mutantProcess->getProcess()->getOutput();
+            $this->output->writeln([
+                '',
+                sprintf('%d) %s', $index + 1, get_class($mutantProcess->getMutant()->getMutation()->getMutator())),
+            ]);
+            $this->output->writeln($mutantProcess->getMutant()->getMutation()->getOriginalFilePath());
+            $this->output->writeln($this->diffColorizer->colorize($mutantProcess->getMutant()->getDiff()));
         }
-
-        return $logParts;
     }
 
     private function showMetrics()

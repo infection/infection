@@ -209,7 +209,7 @@ class InfectionApplication
                 $baseMessage,
                 'Covered Code MSI',
                 $minCoveredMsi,
-                $metricsCalculator->getMutationScoreIndicator()
+                $metricsCalculator->getCoveredCodeMutationScoreIndicator()
             );
         }
 
