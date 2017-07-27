@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Path;
 
 use Infection\Finder\Locator;
-use Infection\TestFramework\PhPunit\Config\Path\PathReplacer;
+use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use PHPUnit\Framework\TestCase;
 use function Infection\Tests\normalizePath as p;
 

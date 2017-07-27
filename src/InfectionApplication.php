@@ -28,6 +28,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class InfectionApplication
 {
@@ -55,6 +56,7 @@ class InfectionApplication
 
     public function run()
     {
+        $io = new SymfonyStyle($this->input, $this->output);
         /** @var EventDispatcher $eventDispatcher */
         $eventDispatcher = $this->get('dispatcher');
         $testFrameworkKey = $this->input->getOption('test-framework');
@@ -90,6 +92,12 @@ class InfectionApplication
 
         $mutationTestingRunner = new MutationTestingRunner($processBuilder, $parallelProcessManager, $mutantCreator, $eventDispatcher, $mutations);
         $mutationTestingRunner->run($threadCount, $codeCoverageData);
+
+        if ($this->hasBadMsi($metricsCalculator)) {
+            $io->error($this->getBadMsiErrorMessage($metricsCalculator));
+
+            return 1;
+        };
 
         return 0;
     }
@@ -157,5 +165,47 @@ class InfectionApplication
                 $initialTestSuitProcess->getErrorOutput()
             )
         );
+    }
+
+    private function hasBadMsi(MetricsCalculator $metricsCalculator): bool
+    {
+        if ($minMsi = (float) $this->input->getOption('min-msi')) {
+            if ($metricsCalculator->getMutationScoreIndicator() < $minMsi) {
+                return true;
+            }
+        }
+
+        if ($minCoveredMsi = (float) $this->input->getOption('min-covered-msi')) {
+            if ($metricsCalculator->getCoveredCodeMutationScoreIndicator() < $minCoveredMsi) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getBadMsiErrorMessage(MetricsCalculator $metricsCalculator): string
+    {
+        $baseMessage = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
+
+        if ($minMsi = (float) $this->input->getOption('min-msi')) {
+            return sprintf(
+                $baseMessage,
+                'MSI',
+                $minMsi,
+                $metricsCalculator->getMutationScoreIndicator()
+            );
+        }
+
+        if ($minCoveredMsi = (float) $this->input->getOption('min-covered-msi')) {
+            return sprintf(
+                $baseMessage,
+                'Covered Code MSI',
+                $minCoveredMsi,
+                $metricsCalculator->getCoveredCodeMutationScoreIndicator()
+            );
+        }
+
+        throw new \LogicException('Seems like something is wrong with calculations and min-msi options.');
     }
 }
