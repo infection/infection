@@ -93,10 +93,6 @@ class InfectionApplication
         $mutationTestingRunner = new MutationTestingRunner($processBuilder, $parallelProcessManager, $mutantCreator, $eventDispatcher, $mutations);
         $mutationTestingRunner->run($threadCount, $codeCoverageData);
 
-        // todo read in phpstan hot to skip set of errors
-        // todo create doc PR
-        // todo colorize percentage (red, yellow, green). Add tweet with the image
-
         if ($this->hasBadMsi($metricsCalculator)) {
             $io->error($this->getBadMsiErrorMessage($metricsCalculator));
 
