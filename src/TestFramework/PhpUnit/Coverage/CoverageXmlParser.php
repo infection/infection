@@ -67,18 +67,28 @@ class CoverageXmlParser
         $linesNode = $xPath->query('/phpunit/file/totals/lines')[0];
         $percentage = $linesNode->getAttribute('percent');
 
+        $defaultCoverageFileData = ['byLine' => [], 'byMethod' => []];
+
         if ($percentage === '0.00' || empty($percentage)) {
-            return [$sourceFilePath => []];
+            return [$sourceFilePath => $defaultCoverageFileData];
         }
 
         /** @var \DOMNodeList $lineCoverageNodes */
         $lineCoverageNodes = $xPath->query('/phpunit/file/coverage/line');
 
+        // TODO test when only constructor and no covered lines (empty one). Maybe modify this condition?
         if ($lineCoverageNodes->length === 0) {
-            return [$sourceFilePath => []];
+            return [$sourceFilePath => $defaultCoverageFileData];
         }
 
-        return [$sourceFilePath => $this->getCoveredLinesData($lineCoverageNodes)];
+        $methodsCoverageNodes = $xPath->query('/phpunit/file/class/method');
+
+        return [
+            $sourceFilePath => [
+                'byLine' => $this->getCoveredLinesData($lineCoverageNodes),
+                'byMethod' => $this->getMethodsCoverageData($methodsCoverageNodes),
+            ],
+        ];
     }
 
     /**
@@ -128,11 +138,6 @@ class CoverageXmlParser
         throw new \Exception('Source file was not found');
     }
 
-    /**
-     * @param \DOMNodeList $lineCoverageNodes
-     *
-     * @return array
-     */
     private function getCoveredLinesData(\DOMNodeList $lineCoverageNodes): array
     {
         $fileCoverage = [];
@@ -151,6 +156,25 @@ class CoverageXmlParser
         }
 
         return $fileCoverage;
+    }
+
+    private function getMethodsCoverageData(\DOMNodeList $methodsCoverageNodes): array
+    {
+        $methodsCoverage = [];
+
+        foreach ($methodsCoverageNodes as $methodsCoverageNode) {
+            $methodName = $methodsCoverageNode->getAttribute('name');
+
+            $methodsCoverage[$methodName][] = [
+                'startLine' => (int) $methodsCoverageNode->getAttribute('start'),
+                'endLine' => (int) $methodsCoverageNode->getAttribute('end'),
+                'executable' => (int) $methodsCoverageNode->getAttribute('executable'),
+                'executed' => (int) $methodsCoverageNode->getAttribute('executed'),
+                'coverage' => (int) $methodsCoverageNode->getAttribute('coverage'),
+            ];
+        }
+
+        return $methodsCoverage;
     }
 
     private function getProjectSource(\DOMXPath $xPath): string

@@ -52,7 +52,7 @@ class CodeCoverageData
         }
 
         $coveredLineTestMethods = array_filter(
-            $coverageData[$filePath],
+            $coverageData[$filePath]['byLine'],
             function ($testMethods) {
                 return count($testMethods) > 0;
             }
@@ -69,11 +69,11 @@ class CodeCoverageData
             return false;
         }
 
-        if (!isset($coverageData[$filePath][$line])) {
+        if (!isset($coverageData[$filePath]['byLine'][$line])) {
             return false;
         }
 
-        return !empty($coverageData[$filePath][$line]);
+        return !empty($coverageData[$filePath]['byLine'][$line]);
     }
 
     public function getAllTestsFor(string $filePath, int $line): array
@@ -82,16 +82,22 @@ class CodeCoverageData
             return [];
         }
 
-        return $this->getCoverage()[$filePath][$line];
+        return $this->getCoverage()[$filePath]['byLine'][$line];
     }
 
     /**
-     * coverage[$sourceFilePath][$line] = [
-     *   [
-     *     'test' => '\A\B\C::test_it_works',
-     *     'testFilePath' => '/path/to/A/B/C.php',
-     *     'time' => 0.34325,
-     *   ]
+     * coverage[$sourceFilePath] = [
+     *   'byMethod' => [
+     *        'mutate' => ['executed' => 3, startLine => 12, endLine => 16, ...],
+     *        ...
+     *   ],
+     *   'byLine' => [
+     *       22 => [
+     *          'testMethod' => '\A\B\C::test_it_works',
+     *          'testFilePath' => '/path/to/A/B/C.php',
+     *          'time' => 0.34325,
+     *       ]
+     *    ]
      * ]
      */
     private function getCoverage(): array
@@ -102,27 +108,36 @@ class CodeCoverageData
 
             $coverage = $this->parser->parse($coverageIndexFileContent);
 
-            foreach ($coverage as $sourceFilePath => &$fileCoverageData) {
-                foreach ($fileCoverageData as $line => &$lineCoverageData) {
-                    foreach ($lineCoverageData as &$test) {
-                        $class = explode('::', $test['testMethod'])[0];
-
-                        if ($this->testFileDataProvider !== null) {
-                            $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
-
-                            $test['testFilePath'] = $testFileData['path'];
-                            $test['time'] = $testFileData['time'];
-                        }
-                    }
-                    unset($test);
-                }
-                unset($lineCoverageData);
-            }
-            unset($fileCoverageData);
+            $coverage = $this->addTestExecutionInfo($coverage);
 
             $this->coverage = $coverage;
         }
 
         return $this->coverage;
+    }
+
+    private function addTestExecutionInfo(array $coverage): array
+    {
+        $newCoverage = $coverage;
+
+        foreach ($newCoverage as $sourceFilePath => &$fileCoverageData) {
+            foreach ($fileCoverageData['byLine'] as $line => &$lineCoverageData) {
+                foreach ($lineCoverageData as &$test) {
+                    $class = explode('::', $test['testMethod'])[0];
+
+                    if ($this->testFileDataProvider !== null) {
+                        $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
+
+                        $test['testFilePath'] = $testFileData['path'];
+                        $test['time'] = $testFileData['time'];
+                    }
+                }
+                unset($test);
+            }
+            unset($lineCoverageData);
+        }
+        unset($fileCoverageData);
+
+        return $newCoverage;
     }
 }

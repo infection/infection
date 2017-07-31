@@ -62,7 +62,7 @@ class MutationXmlConfiguration extends AbstractXmlConfiguration
     {
         $this->removeExistingTestSuite($xPath);
 
-        $this->addTestSuiteWIthFilteredTestFiles($dom, $xPath);
+        $this->addTestSuiteWithFilteredTestFiles($dom, $xPath);
     }
 
     private function removeExistingTestSuite(\DOMXPath $xPath)
@@ -81,7 +81,7 @@ class MutationXmlConfiguration extends AbstractXmlConfiguration
         }
     }
 
-    private function addTestSuiteWIthFilteredTestFiles(\DOMDocument $dom, \DOMXPath $xPath)
+    private function addTestSuiteWithFilteredTestFiles(\DOMDocument $dom, \DOMXPath $xPath)
     {
         $testSuites = $xPath->query('/phpunit/testsuites');
         $nodeToAppendTestSuite = $testSuites->item(0);
