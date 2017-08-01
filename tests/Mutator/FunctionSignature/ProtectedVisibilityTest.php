@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\FunctionSignature;
 
-use Infection\Mutator\FunctionSignature\PublicVisibility;
+use Infection\Mutator\FunctionSignature\ProtectedVisibility;
 use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutator;
 
@@ -21,7 +21,7 @@ class ProtectedVisibilityTest extends AbstractMutator
 
 class Test
 {
-    public function foo(int $param, $test = 1): bool
+    protected function foo(int $param, $test = 1): bool
     {
         echo 1;
         return false;
@@ -35,7 +35,7 @@ CODE;
 
 class Test
 {
-    protected function foo(int $param, $test = 1) : bool
+    private function foo(int $param, $test = 1) : bool
     {
         echo 1;
         return false;
@@ -48,6 +48,6 @@ CODE;
 
     protected function getMutator(): Mutator
     {
-        return new PublicVisibility();
+        return new ProtectedVisibility();
     }
 }

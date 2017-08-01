@@ -36,6 +36,6 @@ class ProtectedVisibility extends FunctionSignatureMutator
             return false;
         }
 
-        return $node->isPublic();
+        return $node->isProtected();
     }
 }

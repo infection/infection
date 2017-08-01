@@ -9,13 +9,21 @@ declare(strict_types=1);
 namespace Infection\Visitor;
 
 use Infection\Mutation;
+use Infection\Mutator\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
 class MutationsCollectorVisitor extends NodeVisitorAbstract
 {
+    /**
+     * @var Mutator[]
+     */
     private $mutators = [];
+
+    /**
+     * @var Mutation[]
+     */
     private $mutations = [];
 
     /**
@@ -41,15 +49,17 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node)
     {
-        if (!$node->getAttribute(InsideFunctionDetectorVisitor::IS_INSIDE_FUNCTION_KEY)) {
-            return;
-        }
-
+        // TODO test it with function signature mutators
         if ($this->onlyCovered && !$this->codeCoverageData->hasTestsOnLine($this->filePath, $node->getLine())) {
             return;
         }
 
         foreach ($this->mutators as $mutator) {
+            if ($mutator->isFunctionBodyMutator() &&
+                !$node->getAttribute(InsideFunctionDetectorVisitor::IS_INSIDE_FUNCTION_KEY)) {
+                continue;
+            }
+
             if ($mutator->shouldMutate($node)) {
                 $this->mutations[] = new Mutation(
                     $this->filePath,
@@ -61,7 +71,7 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
     }
 
     /**
-     * @return array
+     * @return Mutation[]
      */
     public function getMutations(): array
     {
