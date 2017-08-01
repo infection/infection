@@ -8,10 +8,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Mutator;
+use Infection\Mutator\FunctionBodyMutator;
 use PhpParser\Node;
 
-class TrueValue implements Mutator
+class TrueValue extends FunctionBodyMutator
 {
     public function mutate(Node $node)
     {

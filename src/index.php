@@ -28,7 +28,7 @@ class Test
 {
     
     public function __construct() {}
-    public function foo() {echo 1;}
+    function foo() {echo 1;}
 }
 ';
 
@@ -39,7 +39,7 @@ $mutators = [
     new IntegerNegation(),
 ];
 
-$a = new \PhpParser\Node\Stmt\ClassMethod();
+//$a = new \PhpParser\Node\Stmt\ClassMethod();
 
 //$mutationsCollectorVisitor = new MutationsCollectorVisitor($mutators);
 

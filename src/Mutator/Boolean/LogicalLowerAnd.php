@@ -8,10 +8,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Mutator;
+use Infection\Mutator\FunctionBodyMutator;
 use PhpParser\Node;
 
-class LogicalLowerAnd implements Mutator
+class LogicalLowerAnd extends FunctionBodyMutator
 {
     /**
      * Replcaes "and" with "or"

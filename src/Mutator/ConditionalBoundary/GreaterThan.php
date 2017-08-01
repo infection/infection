@@ -8,10 +8,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalBoundary;
 
-use Infection\Mutator\Mutator;
+use Infection\Mutator\FunctionBodyMutator;
 use PhpParser\Node;
 
-class GreaterThan implements Mutator
+class GreaterThan extends FunctionBodyMutator
 {
     /**
      * Replaces ">" with ">="

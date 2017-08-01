@@ -10,6 +10,11 @@ namespace Infection\TestFramework\Coverage;
 
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 
+
+// TODO test it
+
+
+
 class CodeCoverageData
 {
     const PHP_UNIT_COVERAGE_DIR = 'coverage-xml';
@@ -74,6 +79,24 @@ class CodeCoverageData
         }
 
         return !empty($coverageData[$filePath]['byLine'][$line]);
+    }
+
+    // TODO test it!!!
+    public function hasExecutedMethodOnLine(string $filePath, int $line): bool
+    {
+        $coverage = $this->getCoverage();
+
+        foreach ($coverage[$filePath]['byMethod'] as $method => $coverageInfo) {
+            if ($coverageInfo['executed'] === 0) {
+                continue;
+            }
+
+            if ($coverageInfo['startLine'] >= $line && $coverageInfo['endLine'] <= $line) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getAllTestsFor(string $filePath, int $line): array

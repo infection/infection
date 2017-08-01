@@ -8,10 +8,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalNegotiation;
 
-use Infection\Mutator\Mutator;
+use Infection\Mutator\FunctionBodyMutator;
 use PhpParser\Node;
 
-class LessThan implements Mutator
+class LessThan extends FunctionBodyMutator
 {
     /**
      * Replaces "<" with ">="

@@ -15,4 +15,8 @@ interface Mutator
     public function mutate(Node $node);
 
     public function shouldMutate(Node $node): bool;
+
+    public function isFunctionBodyMutator(): bool;
+
+    public function isFunctionSignatureMutator(): bool;
 }
