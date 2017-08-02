@@ -20,7 +20,10 @@ class MutationsGeneratorTest extends TestCase
 {
     public function test_it_collects_plus_mutation()
     {
-        $generator = $this->createMutationGenerator();
+        $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
+        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(true);
+
+        $generator = $this->createMutationGenerator($codeCoverageDataMock);
 
         $mutations = $generator->generate(false);
 
@@ -29,7 +32,9 @@ class MutationsGeneratorTest extends TestCase
 
     public function test_it_collects_public_visibility_mutation()
     {
-        $generator = $this->createMutationGenerator();
+        $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
+        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(true);
+        $generator = $this->createMutationGenerator($codeCoverageDataMock);
 
         $mutations = $generator->generate(false);
 
@@ -38,13 +43,11 @@ class MutationsGeneratorTest extends TestCase
 
     public function test_it_can_skip_not_covered_on_file_level()
     {
-        $generator = $this->createMutationGenerator(
-            [
-                'onlyCovered' => true,
-                'hasTestsOnLine' => false,
-                'hasTests' => false,
-            ]
-        );
+        $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
+        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(false);
+        $codeCoverageDataMock->shouldReceive('hasTests')->andReturn(false);
+
+        $generator = $this->createMutationGenerator($codeCoverageDataMock);
 
         $mutations = $generator->generate(true);
 
@@ -53,13 +56,27 @@ class MutationsGeneratorTest extends TestCase
 
     public function test_it_can_skip_not_covered_on_file_line_level()
     {
-        $generator = $this->createMutationGenerator(
-            [
-                'onlyCovered' => true,
-                'hasTestsOnLine' => false,
-                'hasTests' => true,
-            ]
-        );
+        $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
+        $codeCoverageDataMock->shouldReceive('hasTests')->andReturn(true);
+        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(false);
+        $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->andReturn(true);
+
+        $generator = $this->createMutationGenerator($codeCoverageDataMock);
+
+        $mutations = $generator->generate(true);
+
+        $this->assertCount(1, $mutations);
+        $this->assertInstanceOf(PublicVisibility::class, $mutations[0]->getMutator());
+    }
+
+    public function test_it_can_skip_not_covered_on_file_line_for_visibility()
+    {
+        $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
+        $codeCoverageDataMock->shouldReceive('hasTests')->andReturn(true);
+        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(false);
+        $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->andReturn(false);
+
+        $generator = $this->createMutationGenerator($codeCoverageDataMock);
 
         $mutations = $generator->generate(true);
 
@@ -71,19 +88,12 @@ class MutationsGeneratorTest extends TestCase
         Mockery::close();
     }
 
-    private function createMutationGenerator(array $options = [])
+    private function createMutationGenerator(CodeCoverageData $codeCoverageDataMock)
     {
         $srcDirs = [
-            dirname(__DIR__, 2) . '/Files/mutations/one-file',
+            dirname(__DIR__, 2) . '/Files/Mutation/OneFile',
         ];
         $excludedDirsOrFiles = [];
-
-        $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
-        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn($options['hasTestsOnLine'] ?? true);
-
-        if (isset($options['hasTests'])) {
-            $codeCoverageDataMock->shouldReceive('hasTests')->andReturn($options['hasTests']);
-        }
 
         return new MutationsGenerator($srcDirs, $excludedDirsOrFiles, $codeCoverageDataMock);
     }

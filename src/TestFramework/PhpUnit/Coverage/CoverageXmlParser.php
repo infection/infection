@@ -165,7 +165,7 @@ class CoverageXmlParser
         foreach ($methodsCoverageNodes as $methodsCoverageNode) {
             $methodName = $methodsCoverageNode->getAttribute('name');
 
-            $methodsCoverage[$methodName][] = [
+            $methodsCoverage[$methodName] = [
                 'startLine' => (int) $methodsCoverageNode->getAttribute('start'),
                 'endLine' => (int) $methodsCoverageNode->getAttribute('end'),
                 'executable' => (int) $methodsCoverageNode->getAttribute('executable'),

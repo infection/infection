@@ -6,6 +6,8 @@
  */
 declare(strict_types=1);
 
+namespace Infection\Tests\Files\Mutation\OneFile;
+
 class OneFile
 {
     public function foo(): int

@@ -79,9 +79,9 @@ class MutantCreator
         $line = $mutation->getAttributes()['startLine'];
         $filePath = $mutation->getOriginalFilePath();
 
-        $isMethodSignatureLineCovered = $codeCoverageData->hasExecutedMethodOnLine($filePath, $line)
-            && $mutation->isForMethodSignature();
+//        $isMethodSignatureLineCovered = $codeCoverageData->hasExecutedMethodOnLine($filePath, $line)
+//            && $mutation->isForMethodSignature();
 
-        return $codeCoverageData->hasTestsOnLine($filePath, $line) || $isMethodSignatureLineCovered;
+        return $codeCoverageData->hasTestsOnLine($filePath, $line); // || $isMethodSignatureLineCovered;
     }
 }

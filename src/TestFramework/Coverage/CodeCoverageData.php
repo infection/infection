@@ -81,7 +81,6 @@ class CodeCoverageData
         return !empty($coverageData[$filePath]['byLine'][$line]);
     }
 
-    // TODO test it!!!
     public function hasExecutedMethodOnLine(string $filePath, int $line): bool
     {
         $coverage = $this->getCoverage();
@@ -91,7 +90,7 @@ class CodeCoverageData
                 continue;
             }
 
-            if ($coverageInfo['startLine'] >= $line && $coverageInfo['endLine'] <= $line) {
+            if ($line >= $coverageInfo['startLine'] && $line <= $coverageInfo['endLine']) {
                 return true;
             }
         }
@@ -141,6 +140,10 @@ class CodeCoverageData
 
     private function addTestExecutionInfo(array $coverage): array
     {
+        if ($this->testFileDataProvider === null) {
+            return $coverage;
+        }
+
         $newCoverage = $coverage;
 
         foreach ($newCoverage as $sourceFilePath => &$fileCoverageData) {
@@ -148,12 +151,10 @@ class CodeCoverageData
                 foreach ($lineCoverageData as &$test) {
                     $class = explode('::', $test['testMethod'])[0];
 
-                    if ($this->testFileDataProvider !== null) {
-                        $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
+                    $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
 
-                        $test['testFilePath'] = $testFileData['path'];
-                        $test['time'] = $testFileData['time'];
-                    }
+                    $test['testFilePath'] = $testFileData['path'];
+                    $test['time'] = $testFileData['time'];
                 }
                 unset($test);
             }

@@ -70,4 +70,29 @@ class CoverageXmlParserTest extends TestCase
             $coverage[$firstLevelAbsolutePath]['byLine'][30][1]
         );
     }
+
+    public function test_it_adds_by_method_coverage_data()
+    {
+        $firstLevelAbsolutePath = realpath($this->tempDir . '/FirstLevel/firstLevel.php');
+        $expectedByMethodArray = [
+            'mutate' => [
+                'startLine' => 19,
+                'endLine' => 22,
+                'executable' => 1,
+                'executed' => 0,
+                'coverage' => 0,
+            ],
+            'shouldMutate' => [
+                'startLine' => 24,
+                'endLine' => 35,
+                'executable' => 5,
+                'executed' => 4,
+                'coverage' => 80,
+            ],
+        ];
+
+        $coverage = $this->parser->parse($this->getXml());
+
+        $this->assertSame($expectedByMethodArray, $coverage[$firstLevelAbsolutePath]['byMethod']);
+    }
 }
