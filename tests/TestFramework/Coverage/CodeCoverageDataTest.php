@@ -22,7 +22,7 @@ class CodeCoverageDataTest extends TestCase
 
     public function test_it_determines_if_method_was_executed_from_coverage_report()
     {
-        $codeCoverageData = $this->getCodeCoverageDate();
+        $codeCoverageData = $this->getCodeCoverageData();
 
         $filePath = '/tests/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
@@ -33,7 +33,7 @@ class CodeCoverageDataTest extends TestCase
 
     public function test_it_determines_line_is_not_covered_by_executed_method()
     {
-        $codeCoverageData = $this->getCodeCoverageDate();
+        $codeCoverageData = $this->getCodeCoverageData();
 
         $filePath = '/tests/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
@@ -43,9 +43,18 @@ class CodeCoverageDataTest extends TestCase
 
     public function test_it_determines_line_is_not_covered_by_not_executed_method()
     {
-        $codeCoverageData = $this->getCodeCoverageDate();
+        $codeCoverageData = $this->getCodeCoverageData();
 
         $filePath = '/tests/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
+
+        $this->assertFalse($codeCoverageData->hasExecutedMethodOnLine($filePath, 4));
+    }
+
+    public function test_it_determines_line_is_not_covered_for_unknown_path()
+    {
+        $codeCoverageData = $this->getCodeCoverageData();
+
+        $filePath = 'unknown/path';
 
         $this->assertFalse($codeCoverageData->hasExecutedMethodOnLine($filePath, 4));
     }
@@ -102,7 +111,7 @@ class CodeCoverageDataTest extends TestCase
         ];
     }
 
-    private function getCodeCoverageDate(): CodeCoverageData
+    private function getCodeCoverageData(): CodeCoverageData
     {
         $coverageXmlParserMock = Mockery::mock(CoverageXmlParser::class);
         $coverageXmlParserMock->shouldReceive('parse')->once()->andReturn($this->getParsedCodeCoverageData());

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use Infection\Mutation;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 
 
@@ -85,6 +86,10 @@ class CodeCoverageData
     {
         $coverage = $this->getCoverage();
 
+        if (!array_key_exists($filePath, $coverage)) {
+            return false;
+        }
+
         foreach ($coverage[$filePath]['byMethod'] as $method => $coverageInfo) {
             if ($coverageInfo['executed'] === 0) {
                 continue;
@@ -98,13 +103,30 @@ class CodeCoverageData
         return false;
     }
 
-    public function getAllTestsFor(string $filePath, int $line): array
+    public function getAllTestsFor(Mutation $mutation): array
     {
-        if (!$this->hasTestsOnLine($filePath, $line)) {
+        $mutator = $mutation->getMutator();
+
+        $filePath = $mutation->getOriginalFilePath();
+        $line = $mutation->getAttributes()['startLine'];
+
+        if ($mutator->isFunctionSignatureMutator()) {
+            if ($this->hasExecutedMethodOnLine($filePath, $line)) {
+                return $this->getTestsForExecutedMethodOnLine($filePath, $line);
+            }
+
             return [];
         }
 
-        return $this->getCoverage()[$filePath]['byLine'][$line];
+        if ($mutator->isFunctionBodyMutator()) {
+            if (!$this->hasTestsOnLine($filePath, $line)) {
+                return [];
+            }
+
+            return $this->getCoverage()[$filePath]['byLine'][$line];
+        }
+
+        return [];
     }
 
     /**
@@ -163,5 +185,28 @@ class CodeCoverageData
         unset($fileCoverageData);
 
         return $newCoverage;
+    }
+
+    private function getTestsForExecutedMethodOnLine(string $filePath, int $line): array
+    {
+        $coverage = $this->getCoverage();
+
+        $tests = [];
+
+        foreach ($coverage[$filePath]['byMethod'] as $method => $coverageInfo) {
+            if ($line >= $coverageInfo['startLine'] && $line <= $coverageInfo['endLine']) {
+                $allLines = range($coverageInfo['startLine'], $coverageInfo['endLine']);
+
+                foreach ($allLines as $lineInExecutedMethod) {
+                    if (array_key_exists($lineInExecutedMethod, $this->getCoverage()[$filePath]['byLine'])) {
+                        $tests = array_merge($tests, $this->getCoverage()[$filePath]['byLine'][$lineInExecutedMethod]);
+                    }
+                }
+
+                break;
+            }
+        }
+
+        return $tests;
     }
 }

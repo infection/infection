@@ -70,18 +70,24 @@ class MutantCreator
             $mutation,
             $diff,
             $isCoveredByTest,
-            $codeCoverageData->getAllTestsFor($mutation->getOriginalFilePath(), $mutation->getAttributes()['startLine'])
+            $codeCoverageData->getAllTestsFor($mutation)
         );
     }
 
     private function isCoveredByTest(Mutation $mutation, CodeCoverageData $codeCoverageData)
     {
+        $mutator = $mutation->getMutator();
         $line = $mutation->getAttributes()['startLine'];
         $filePath = $mutation->getOriginalFilePath();
 
-//        $isMethodSignatureLineCovered = $codeCoverageData->hasExecutedMethodOnLine($filePath, $line)
-//            && $mutation->isForMethodSignature();
+        if ($mutator->isFunctionBodyMutator()) {
+            return $codeCoverageData->hasTestsOnLine($filePath, $line);
+        }
 
-        return $codeCoverageData->hasTestsOnLine($filePath, $line); // || $isMethodSignatureLineCovered;
+        if ($mutator->isFunctionSignatureMutator()) {
+            return $codeCoverageData->hasExecutedMethodOnLine($filePath, $line);
+        }
+
+        return false;
     }
 }
