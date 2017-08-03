@@ -14,6 +14,12 @@ use PhpParser\Node\Stmt\ClassMethod;
 
 class ProtectedVisibility extends FunctionSignatureMutator
 {
+    /**
+     * Replaces "protected function..." with "private function ..."
+     *
+     * @param Node $node
+     * @return ClassMethod
+     */
     public function mutate(Node $node)
     {
         /** @var ClassMethod $node */

@@ -12,10 +12,6 @@ use Infection\Mutation;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 
 
-// TODO test it
-
-
-
 class CodeCoverageData
 {
     const PHP_UNIT_COVERAGE_DIR = 'coverage-xml';

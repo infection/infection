@@ -76,7 +76,6 @@ class CoverageXmlParser
         /** @var \DOMNodeList $lineCoverageNodes */
         $lineCoverageNodes = $xPath->query('/phpunit/file/coverage/line');
 
-        // TODO test when only constructor and no covered lines (empty one). Maybe modify this condition?
         if ($lineCoverageNodes->length === 0) {
             return [$sourceFilePath => $defaultCoverageFileData];
         }
