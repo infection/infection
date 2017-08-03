@@ -10,6 +10,9 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 
+use Infection\Mutation;
+use Infection\Mutator\Arithmetic\Plus;
+use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use PHPUnit\Framework\TestCase;
@@ -19,11 +22,9 @@ class CodeCoverageDataTest extends TestCase
 {
     private $coverageDir = __DIR__ . '/../../Files/phpunit/coverage-xml';
 
-
     public function test_it_determines_if_method_was_executed_from_coverage_report()
     {
         $codeCoverageData = $this->getCodeCoverageData();
-
         $filePath = '/tests/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
         $this->assertTrue($codeCoverageData->hasExecutedMethodOnLine($filePath, 19), 'Start line'); // signature line
@@ -34,7 +35,6 @@ class CodeCoverageDataTest extends TestCase
     public function test_it_determines_line_is_not_covered_by_executed_method()
     {
         $codeCoverageData = $this->getCodeCoverageData();
-
         $filePath = '/tests/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
         $this->assertFalse($codeCoverageData->hasExecutedMethodOnLine($filePath, 1), 'Before');
@@ -44,7 +44,6 @@ class CodeCoverageDataTest extends TestCase
     public function test_it_determines_line_is_not_covered_by_not_executed_method()
     {
         $codeCoverageData = $this->getCodeCoverageData();
-
         $filePath = '/tests/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
         $this->assertFalse($codeCoverageData->hasExecutedMethodOnLine($filePath, 4));
@@ -53,10 +52,106 @@ class CodeCoverageDataTest extends TestCase
     public function test_it_determines_line_is_not_covered_for_unknown_path()
     {
         $codeCoverageData = $this->getCodeCoverageData();
-
         $filePath = 'unknown/path';
 
         $this->assertFalse($codeCoverageData->hasExecutedMethodOnLine($filePath, 4));
+    }
+
+    public function test_it_determines_file_is_not_covered_for_unknown_path()
+    {
+        $codeCoverageData = $this->getCodeCoverageData();
+        $filePath = 'unknown/path';
+
+        $this->assertFalse($codeCoverageData->hasTests($filePath));
+    }
+
+    public function test_it_determines_file_is_covered()
+    {
+        $codeCoverageData = $this->getCodeCoverageData();
+        $filePath = '/tests/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
+
+        $this->assertTrue($codeCoverageData->hasTests($filePath));
+    }
+
+    public function test_it_determines_file_does_not_have_tests_on_line_for_unknown_file()
+    {
+        $codeCoverageData = $this->getCodeCoverageData();
+        $filePath = 'unknown/path';
+
+        $this->assertFalse($codeCoverageData->hasTestsOnLine($filePath, 3));
+    }
+
+    public function test_it_determines_file_does_not_have_tests_for_line()
+    {
+        $codeCoverageData = $this->getCodeCoverageData();
+        $filePath = '/tests/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
+
+        $this->assertFalse($codeCoverageData->hasTestsOnLine($filePath, 1));
+    }
+
+    public function test_it_determines_file_has_tests_for_line()
+    {
+        $codeCoverageData = $this->getCodeCoverageData();
+
+        $filePath = '/tests/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
+
+        $this->assertTrue($codeCoverageData->hasTestsOnLine($filePath, 30));
+    }
+
+    public function test_it_returns_zero_tests_for_not_covered_function_body_mutator()
+    {
+        $codeCoverageData = $this->getCodeCoverageData();
+        $filePath = '/tests/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
+
+        $mutation = new Mutation(
+            $filePath,
+            new Plus(),
+            ['startLine' => 1]
+        );
+
+        $this->assertCount(0, $codeCoverageData->getAllTestsFor($mutation));
+    }
+
+    public function test_it_returns_tests_for_covered_function_body_mutator()
+    {
+        $codeCoverageData = $this->getCodeCoverageData();
+        $filePath = '/tests/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
+
+        $mutation = new Mutation(
+            $filePath,
+            new Plus(),
+            ['startLine' => 26]
+        );
+
+        $this->assertCount(2, $codeCoverageData->getAllTestsFor($mutation));
+    }
+
+    public function test_it_returns_zero_tests_for_not_covered_function_signature_mutator()
+    {
+        $codeCoverageData = $this->getCodeCoverageData();
+        $filePath = '/tests/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
+
+        $mutation = new Mutation(
+            $filePath,
+            new PublicVisibility(),
+            ['startLine' => 1]
+        );
+
+        $this->assertCount(0, $codeCoverageData->getAllTestsFor($mutation));
+    }
+
+    public function test_it_returns_tests_for_covered_function_signature_mutator()
+    {
+        $codeCoverageData = $this->getCodeCoverageData();
+        $filePath = '/tests/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
+
+        $mutation = new Mutation(
+            $filePath,
+            new PublicVisibility(),
+            ['startLine' => 24]
+        );
+
+        $this->assertCount(6, $codeCoverageData->getAllTestsFor($mutation));
     }
 
     private function getParsedCodeCoverageData(): array
