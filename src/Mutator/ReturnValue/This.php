@@ -8,10 +8,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\Mutator;
+use Infection\Mutator\FunctionBodyMutator;
 use PhpParser\Node;
 
-class This implements Mutator
+class This extends FunctionBodyMutator
 {
     public function mutate(Node $node)
     {

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutant\Generator;
 
+use Infection\Mutation;
 use Infection\Mutator\Arithmetic\BitwiseAnd;
 use Infection\Mutator\Arithmetic\BitwiseNot;
 use Infection\Mutator\Arithmetic\BitwiseOr;
@@ -45,6 +46,8 @@ use Infection\Mutator\ConditionalNegotiation\GreaterThanOrEqualTo as GreaterThan
 use Infection\Mutator\ConditionalNegotiation\Identical;
 use Infection\Mutator\ConditionalNegotiation\NotEqual;
 use Infection\Mutator\ConditionalNegotiation\NotIdentical;
+use Infection\Mutator\FunctionSignature\ProtectedVisibility;
+use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\Mutator\Number\OneZeroFloat;
 use Infection\Mutator\Number\OneZeroInteger;
 use Infection\Mutator\ReturnValue\FloatNegation;
@@ -90,7 +93,7 @@ class MutationsGenerator
      * @param bool $onlyCovered mutate only covered by tests lines of code
      * @param string $filter
      *
-     * @return array
+     * @return Mutation[]
      */
     public function generate(bool $onlyCovered, string $filter = ''): array
     {
@@ -131,7 +134,7 @@ class MutationsGenerator
      * @param SplFileInfo $file
      * @param bool $onlyCovered mutate only covered by tests lines of code
      *
-     * @return array
+     * @return Mutation[]
      */
     private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered): array
     {
@@ -230,6 +233,10 @@ class MutationsGenerator
             new IntegerNegation(),
             new NewObject(),
             new This(),
+
+            // Function Signature
+            new PublicVisibility(),
+            new ProtectedVisibility(),
         ];
     }
 }

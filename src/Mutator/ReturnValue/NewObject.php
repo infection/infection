@@ -8,10 +8,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\Mutator;
+use Infection\Mutator\FunctionBodyMutator;
 use PhpParser\Node;
 
-class NewObject implements Mutator
+class NewObject extends FunctionBodyMutator
 {
     /**
      * Replace "return new Something(anything);" with "new Something(anything); return null;"

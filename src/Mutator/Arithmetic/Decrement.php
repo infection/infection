@@ -8,14 +8,14 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Mutator;
+use Infection\Mutator\FunctionBodyMutator;
 use PhpParser\Node;
 use PhpParser\Node\Expr\PreInc;
 use PhpParser\Node\Expr\PostInc;
 use PhpParser\Node\Expr\PostDec;
 use PhpParser\Node\Expr\PreDec;
 
-class Decrement implements Mutator
+class Decrement extends FunctionBodyMutator
 {
     /**
      * Replaces "--" with "++"

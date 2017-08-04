@@ -8,10 +8,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Mutator;
+use Infection\Mutator\FunctionBodyMutator;
 use PhpParser\Node;
 
-class Multiplication implements Mutator
+class Multiplication extends FunctionBodyMutator
 {
     /**
      * Replaces "*" with "/"

@@ -8,10 +8,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Mutator;
+use Infection\Mutator\FunctionBodyMutator;
 use PhpParser\Node;
 
-class PlusEqual implements Mutator
+class PlusEqual extends FunctionBodyMutator
 {
     /**
      * Replaces "+=" with "-="

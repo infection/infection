@@ -1,5 +1,38 @@
 # Change Log
 
+## [0.4.0](https://github.com/infection/infection/tree/0.4.0) (2017-07-27)
+[Full Changelog](https://github.com/infection/infection/compare/0.3.0...0.4.0)
+
+**Closed issues:**
+
+- Location of test framework [\#4](https://github.com/infection/infection/issues/4)
+
+**Merged pull requests:**
+
+- Add --min-msi and --min-covered-msi options to control MSI in CI and fail builds [\#16](https://github.com/infection/infection/pull/16) ([borNfreee](https://github.com/borNfreee))
+- Allow to exclude files, not only dirs in the `infection.json` config file [\#15](https://github.com/infection/infection/pull/15) ([borNfreee](https://github.com/borNfreee))
+- Fix issues reported by PHPStan. Run it for each build [\#14](https://github.com/infection/infection/pull/14) ([borNfreee](https://github.com/borNfreee))
+- Add php-cs-fixer config, apply fixes [\#13](https://github.com/infection/infection/pull/13) ([borNfreee](https://github.com/borNfreee))
+- Add arithmetic tests [\#12](https://github.com/infection/infection/pull/12) ([borNfreee](https://github.com/borNfreee))
+- Fix build on Windows. Integrate Appveyor [\#10](https://github.com/infection/infection/pull/10) ([borNfreee](https://github.com/borNfreee))
+
+## [0.3.0](https://github.com/infection/infection/tree/0.3.0) (2017-07-14)
+[Full Changelog](https://github.com/infection/infection/compare/0.2.1...0.3.0)
+
+**Fixed bugs:**
+
+- Uncaught Error: Call to a member function appendChild\(\) on null [\#5](https://github.com/infection/infection/issues/5)
+
+**Closed issues:**
+
+- Timeout [\#6](https://github.com/infection/infection/issues/6)
+
+**Merged pull requests:**
+
+- Add possibility to set custom PHPUnit executable path [\#9](https://github.com/infection/infection/pull/9) ([borNfreee](https://github.com/borNfreee))
+- Pass timeout setting to Initial Process builder to control test suite [\#8](https://github.com/infection/infection/pull/8) ([borNfreee](https://github.com/borNfreee))
+- Handle situation when PHPUnit \<testsuite /\> node is placed directly inside the root node [\#7](https://github.com/infection/infection/pull/7) ([borNfreee](https://github.com/borNfreee))
+
 ## [0.2.1](https://github.com/infection/infection/tree/0.2.1) (2017-07-11)
 [Full Changelog](https://github.com/infection/infection/compare/0.2.0...0.2.1)
 

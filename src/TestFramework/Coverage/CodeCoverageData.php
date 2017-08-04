@@ -8,7 +8,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use Infection\Mutation;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+
 
 class CodeCoverageData
 {
@@ -52,7 +54,7 @@ class CodeCoverageData
         }
 
         $coveredLineTestMethods = array_filter(
-            $coverageData[$filePath],
+            $coverageData[$filePath]['byLine'],
             function ($testMethods) {
                 return count($testMethods) > 0;
             }
@@ -69,29 +71,73 @@ class CodeCoverageData
             return false;
         }
 
-        if (!isset($coverageData[$filePath][$line])) {
+        if (!isset($coverageData[$filePath]['byLine'][$line])) {
             return false;
         }
 
-        return !empty($coverageData[$filePath][$line]);
+        return !empty($coverageData[$filePath]['byLine'][$line]);
     }
 
-    public function getAllTestsFor(string $filePath, int $line): array
+    public function hasExecutedMethodOnLine(string $filePath, int $line): bool
     {
-        if (!$this->hasTestsOnLine($filePath, $line)) {
+        $coverage = $this->getCoverage();
+
+        if (!array_key_exists($filePath, $coverage)) {
+            return false;
+        }
+
+        foreach ($coverage[$filePath]['byMethod'] as $method => $coverageInfo) {
+            if ($coverageInfo['executed'] === 0) {
+                continue;
+            }
+
+            if ($line >= $coverageInfo['startLine'] && $line <= $coverageInfo['endLine']) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function getAllTestsFor(Mutation $mutation): array
+    {
+        $mutator = $mutation->getMutator();
+
+        $filePath = $mutation->getOriginalFilePath();
+        $line = $mutation->getAttributes()['startLine'];
+
+        if ($mutator->isFunctionSignatureMutator()) {
+            if ($this->hasExecutedMethodOnLine($filePath, $line)) {
+                return $this->getTestsForExecutedMethodOnLine($filePath, $line);
+            }
+
             return [];
         }
 
-        return $this->getCoverage()[$filePath][$line];
+        if ($mutator->isFunctionBodyMutator()) {
+            if (!$this->hasTestsOnLine($filePath, $line)) {
+                return [];
+            }
+
+            return $this->getCoverage()[$filePath]['byLine'][$line];
+        }
+
+        return [];
     }
 
     /**
-     * coverage[$sourceFilePath][$line] = [
-     *   [
-     *     'test' => '\A\B\C::test_it_works',
-     *     'testFilePath' => '/path/to/A/B/C.php',
-     *     'time' => 0.34325,
-     *   ]
+     * coverage[$sourceFilePath] = [
+     *   'byMethod' => [
+     *        'mutate' => ['executed' => 3, startLine => 12, endLine => 16, ...],
+     *        ...
+     *   ],
+     *   'byLine' => [
+     *       22 => [
+     *          'testMethod' => '\A\B\C::test_it_works',
+     *          'testFilePath' => '/path/to/A/B/C.php',
+     *          'time' => 0.34325,
+     *       ]
+     *    ]
      * ]
      */
     private function getCoverage(): array
@@ -102,27 +148,61 @@ class CodeCoverageData
 
             $coverage = $this->parser->parse($coverageIndexFileContent);
 
-            foreach ($coverage as $sourceFilePath => &$fileCoverageData) {
-                foreach ($fileCoverageData as $line => &$lineCoverageData) {
-                    foreach ($lineCoverageData as &$test) {
-                        $class = explode('::', $test['testMethod'])[0];
-
-                        if ($this->testFileDataProvider !== null) {
-                            $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
-
-                            $test['testFilePath'] = $testFileData['path'];
-                            $test['time'] = $testFileData['time'];
-                        }
-                    }
-                    unset($test);
-                }
-                unset($lineCoverageData);
-            }
-            unset($fileCoverageData);
+            $coverage = $this->addTestExecutionInfo($coverage);
 
             $this->coverage = $coverage;
         }
 
         return $this->coverage;
+    }
+
+    private function addTestExecutionInfo(array $coverage): array
+    {
+        if ($this->testFileDataProvider === null) {
+            return $coverage;
+        }
+
+        $newCoverage = $coverage;
+
+        foreach ($newCoverage as $sourceFilePath => &$fileCoverageData) {
+            foreach ($fileCoverageData['byLine'] as $line => &$lineCoverageData) {
+                foreach ($lineCoverageData as &$test) {
+                    $class = explode('::', $test['testMethod'])[0];
+
+                    $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
+
+                    $test['testFilePath'] = $testFileData['path'];
+                    $test['time'] = $testFileData['time'];
+                }
+                unset($test);
+            }
+            unset($lineCoverageData);
+        }
+        unset($fileCoverageData);
+
+        return $newCoverage;
+    }
+
+    private function getTestsForExecutedMethodOnLine(string $filePath, int $line): array
+    {
+        $coverage = $this->getCoverage();
+
+        $tests = [];
+
+        foreach ($coverage[$filePath]['byMethod'] as $method => $coverageInfo) {
+            if ($line >= $coverageInfo['startLine'] && $line <= $coverageInfo['endLine']) {
+                $allLines = range($coverageInfo['startLine'], $coverageInfo['endLine']);
+
+                foreach ($allLines as $lineInExecutedMethod) {
+                    if (array_key_exists($lineInExecutedMethod, $this->getCoverage()[$filePath]['byLine'])) {
+                        $tests = array_merge($tests, $this->getCoverage()[$filePath]['byLine'][$lineInExecutedMethod]);
+                    }
+                }
+
+                break;
+            }
+        }
+
+        return $tests;
     }
 }

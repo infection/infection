@@ -48,17 +48,17 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
 
             $logParts = array_merge(
                 $logParts,
-                $this->getLogParts($this->metricsCalculator->getKilledMutantProcesses(), 'Killed')
-            );
-
-            $logParts = array_merge(
-                $logParts,
                 $this->getLogParts($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped')
             );
 
             $logParts = array_merge(
                 $logParts,
                 $this->getLogParts($this->metricsCalculator->getTimedOutProcesses(), 'Timeout')
+            );
+
+            $logParts = array_merge(
+                $logParts,
+                $this->getLogParts($this->metricsCalculator->getKilledMutantProcesses(), 'Killed')
             );
 
             file_put_contents($textFileLogPath, implode($logParts, "\n"));

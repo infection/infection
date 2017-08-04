@@ -8,10 +8,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
-use Infection\Mutator\Mutator;
+use Infection\Mutator\FunctionBodyMutator;
 use PhpParser\Node;
 
-class OneZeroFloat implements Mutator
+class OneZeroFloat extends FunctionBodyMutator
 {
     public function mutate(Node $node)
     {
