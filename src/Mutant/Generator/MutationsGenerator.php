@@ -38,11 +38,6 @@ class MutationsGenerator
     private $excludeDirsOrFiles;
 
     /**
-     * @var Container
-     */
-    private $container;
-
-    /**
      * @var array
      */
     private $whitelistedMutatorNames;
