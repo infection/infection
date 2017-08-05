@@ -10,13 +10,20 @@ namespace Infection\Mutator;
 
 use PhpParser\Node;
 
-interface Mutator
+abstract class Mutator
 {
-    public function mutate(Node $node);
+    abstract public function mutate(Node $node);
 
-    public function shouldMutate(Node $node): bool;
+    abstract public function shouldMutate(Node $node): bool;
 
-    public function isFunctionBodyMutator(): bool;
+    abstract public function isFunctionBodyMutator(): bool;
 
-    public function isFunctionSignatureMutator(): bool;
+    abstract public function isFunctionSignatureMutator(): bool;
+
+    public function getName(): string
+    {
+        $parts = explode('\\', static::class);
+
+        return $parts[count($parts) - 1];
+    }
 }

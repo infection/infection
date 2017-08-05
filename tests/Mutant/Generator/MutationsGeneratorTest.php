@@ -15,6 +15,7 @@ use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use \Mockery;
 use PHPUnit\Framework\TestCase;
+use Pimple\Container;
 
 class MutationsGeneratorTest extends TestCase
 {
@@ -83,18 +84,51 @@ class MutationsGeneratorTest extends TestCase
         $this->assertCount(0, $mutations);
     }
 
+    public function test_it_executes_only_whitelisted_mutators()
+    {
+        $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
+        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(true);
+
+        $generator = $this->createMutationGenerator($codeCoverageDataMock, ['Decrement']);
+
+        $mutations = $generator->generate(false);
+
+        $this->assertCount(0, $mutations);
+    }
+
     protected function tearDown()
     {
         Mockery::close();
     }
 
-    private function createMutationGenerator(CodeCoverageData $codeCoverageDataMock)
+    private function createMutationGenerator(CodeCoverageData $codeCoverageDataMock, array $whitelistedMutatorNames = [])
     {
         $srcDirs = [
             dirname(__DIR__, 2) . '/Files/Mutation/OneFile',
         ];
         $excludedDirsOrFiles = [];
 
-        return new MutationsGenerator($srcDirs, $excludedDirsOrFiles, $codeCoverageDataMock);
+        $container = new Container();
+
+        $container[Plus::class] = function (Container $c) {
+            return new Plus();
+        };
+
+        $container[PublicVisibility::class] = function (Container $c) {
+            return new PublicVisibility();
+        };
+
+        $defaultMutators = [
+            $container[Plus::class],
+            $container[PublicVisibility::class]
+        ];
+
+        return new MutationsGenerator(
+            $srcDirs,
+            $excludedDirsOrFiles,
+            $codeCoverageDataMock,
+            $defaultMutators,
+            $whitelistedMutatorNames
+        );
     }
 }

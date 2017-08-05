@@ -63,6 +63,12 @@ class InfectionCommand extends Command
                 'Show mutations to the console'
             )
             ->addOption(
+                'mutators',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Specify particular mutators. Example: --mutators=Plus,PublicVisibility'
+            )
+            ->addOption(
                 'filter',
                 null,
                 InputOption::VALUE_REQUIRED,

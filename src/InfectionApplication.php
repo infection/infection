@@ -9,12 +9,14 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use Infection\Console\Exception\InvalidOptionException;
 use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutant\MetricsCalculator;
+use Infection\Mutator\Mutator;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationConsoleLoggerSubscriber;
@@ -83,7 +85,13 @@ class InfectionApplication
         $this->output->writeln(['', 'Generate mutants...', '']);
 
         $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
-        $mutationsGenerator = new MutationsGenerator($this->get('src.dirs'), $this->get('exclude.paths'), $codeCoverageData);
+        $mutationsGenerator = new MutationsGenerator(
+            $this->get('src.dirs'),
+            $this->get('exclude.paths'),
+            $codeCoverageData,
+            $this->getDefaultMutators(),
+            $this->parseMutators($this->input->getOption('mutators'))
+        );
         $mutations = $mutationsGenerator->generate($this->input->getOption('only-covered'), $this->input->getOption('filter'));
 
         $parallelProcessManager = $this->get('parallel.process.runner');
@@ -207,5 +215,30 @@ class InfectionApplication
         }
 
         throw new \LogicException('Seems like something is wrong with calculations and min-msi options.');
+    }
+
+    private function parseMutators(string $mutators = null): array
+    {
+        if ($mutators === null) {
+            return [];
+        }
+
+        $trimmedMutators = trim($mutators);
+
+        if ($trimmedMutators === '') {
+            throw InvalidOptionException::withMessage('The "--mutators" option requires a value.');
+        }
+
+        return explode(',', $mutators);
+    }
+
+    private function getDefaultMutators()
+    {
+        return array_map(
+            function (string $class): Mutator {
+                return $this->container[$class];
+            },
+            Config\InfectionConfig::DEFAULT_MUTATORS
+        );
     }
 }
