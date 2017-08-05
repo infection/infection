@@ -21,7 +21,7 @@ function prepareArgv()
     }
 
     if (!$found) {
-        $argv[] = 'run';
+        array_splice($argv, 1, 0,'run');
     }
 
     return $argv;

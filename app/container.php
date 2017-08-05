@@ -23,6 +23,7 @@ use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Differ\DiffColorizer;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
+use Infection\Config\InfectionConfig;
 
 $c = new Container();
 
@@ -99,6 +100,16 @@ $c['phpunit.junit.file.path'] = function (Container $c): string {
 $c['test.file.data.provider.phpunit'] = function (Container $c): TestFileDataProvider {
     return new PhpUnitTestFileDataProvider($c['phpunit.junit.file.path']);
 };
+
+function registerMutators(array $mutators, Container $container) {
+    foreach ($mutators as $mutator) {
+        $container[$mutator] = function (Container $c) use ($mutator) {
+            return new $mutator();
+        };
+    }
+}
+
+registerMutators(InfectionConfig::DEFAULT_MUTATORS, $c);
 
 $c['application'] = function (Container $container): Application {
     $application = new Application(

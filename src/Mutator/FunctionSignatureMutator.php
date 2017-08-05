@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-abstract class FunctionSignatureMutator implements Mutator
+abstract class FunctionSignatureMutator extends Mutator
 {
     public function isFunctionBodyMutator(): bool
     {

@@ -9,52 +9,7 @@ declare(strict_types=1);
 namespace Infection\Mutant\Generator;
 
 use Infection\Mutation;
-use Infection\Mutator\Arithmetic\BitwiseAnd;
-use Infection\Mutator\Arithmetic\BitwiseNot;
-use Infection\Mutator\Arithmetic\BitwiseOr;
-use Infection\Mutator\Arithmetic\BitwiseXor;
-use Infection\Mutator\Arithmetic\Decrement;
-use Infection\Mutator\Arithmetic\DivEqual;
-use Infection\Mutator\Arithmetic\Division;
-use Infection\Mutator\Arithmetic\Exponentiation;
-use Infection\Mutator\Arithmetic\Increment;
-use Infection\Mutator\Arithmetic\Minus;
-use Infection\Mutator\Arithmetic\MinusEqual;
-use Infection\Mutator\Arithmetic\ModEqual;
-use Infection\Mutator\Arithmetic\Modulus;
-use Infection\Mutator\Arithmetic\MulEqual;
-use Infection\Mutator\Arithmetic\Multiplication;
-use Infection\Mutator\Arithmetic\Plus;
-use Infection\Mutator\Arithmetic\PlusEqual;
-use Infection\Mutator\Arithmetic\PowEqual;
-use Infection\Mutator\Arithmetic\ShiftLeft;
-use Infection\Mutator\Arithmetic\ShiftRight;
-use Infection\Mutator\Boolean\FalseValue;
-use Infection\Mutator\Boolean\LogicalAnd;
-use Infection\Mutator\Boolean\LogicalLowerAnd;
-use Infection\Mutator\Boolean\LogicalLowerOr;
-use Infection\Mutator\Boolean\LogicalNot;
-use Infection\Mutator\Boolean\LogicalOr;
-use Infection\Mutator\Boolean\TrueValue;
-use Infection\Mutator\ConditionalBoundary\GreaterThanOrEqualTo;
-use Infection\Mutator\ConditionalBoundary\GreaterThan;
-use Infection\Mutator\ConditionalBoundary\LessThan;
-use Infection\Mutator\ConditionalBoundary\LessThanOrEqualTo;
-use Infection\Mutator\ConditionalNegotiation\Equal;
-use Infection\Mutator\ConditionalNegotiation\GreaterThan as GreaterThanNegotiation;
-use Infection\Mutator\ConditionalNegotiation\GreaterThanOrEqualTo as GreaterThanOrEqualToNegotiation;
-use Infection\Mutator\ConditionalNegotiation\Identical;
-use Infection\Mutator\ConditionalNegotiation\NotEqual;
-use Infection\Mutator\ConditionalNegotiation\NotIdentical;
-use Infection\Mutator\FunctionSignature\ProtectedVisibility;
-use Infection\Mutator\FunctionSignature\PublicVisibility;
-use Infection\Mutator\Number\OneZeroFloat;
-use Infection\Mutator\Number\OneZeroInteger;
-use Infection\Mutator\ReturnValue\FloatNegation;
-use Infection\Mutator\ReturnValue\FunctionCall;
-use Infection\Mutator\ReturnValue\IntegerNegation;
-use Infection\Mutator\ReturnValue\NewObject;
-use Infection\Mutator\ReturnValue\This;
+use Infection\Mutator\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Visitor\InsideFunctionDetectorVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
@@ -82,11 +37,34 @@ class MutationsGenerator
      */
     private $excludeDirsOrFiles;
 
-    public function __construct(array $srcDirs, array $excludeDirsOrFiles, CodeCoverageData $codeCoverageData)
+    /**
+     * @var Container
+     */
+    private $container;
+
+    /**
+     * @var array
+     */
+    private $whitelistedMutatorNames;
+
+    /**
+     * @var int
+     */
+    private $whitelistedMutatorNamesCount;
+
+    /**
+     * @var Mutator[]
+     */
+    private $defaultMutators;
+
+    public function __construct(array $srcDirs, array $excludeDirsOrFiles, CodeCoverageData $codeCoverageData, array $defaultMutators, array $whitelistedMutatorNames)
     {
         $this->srcDirs = $srcDirs;
         $this->codeCoverageData = $codeCoverageData;
         $this->excludeDirsOrFiles = $excludeDirsOrFiles;
+        $this->defaultMutators = $defaultMutators;
+        $this->whitelistedMutatorNames = $whitelistedMutatorNames;
+        $this->whitelistedMutatorNamesCount = count($whitelistedMutatorNames);
     }
 
     /**
@@ -174,69 +152,15 @@ class MutationsGenerator
 
     private function getMutators(): array
     {
-        // TODO lazy loading. it is executed in the loop
-        return [
-            // Arithmetic
-            new BitwiseAnd(),
-            new BitwiseNot(),
-            new BitwiseOr(),
-            new BitwiseXor(),
-            new Decrement(),
-            new DivEqual(),
-            new Division(),
-            new Exponentiation(),
-            new Increment(),
-            new Minus(),
-            new MinusEqual(),
-            new ModEqual(),
-            new Modulus(),
-            new MulEqual(),
-            new Multiplication(),
-            new Plus(),
-            new PlusEqual(),
-            new PowEqual(),
-            new ShiftLeft(),
-            new ShiftRight(),
+        if ($this->whitelistedMutatorNamesCount > 0) {
+            return array_filter(
+                $this->defaultMutators,
+                function (Mutator $mutator): bool {
+                    return in_array($mutator->getName(), $this->whitelistedMutatorNames, true);
+                }
+            );
+        }
 
-            // Boolean
-            new FalseValue(),
-            new LogicalAnd(),
-            new LogicalLowerAnd(),
-            new LogicalLowerOr(),
-            new LogicalNot(),
-            new LogicalOr(),
-            new TrueValue(),
-
-            // Conditional Boundary
-            new GreaterThan(),
-            new GreaterThanOrEqualTo(),
-            new LessThan(),
-            new LessThanOrEqualTo(),
-
-            // Conditional Negotiation
-            new Equal(),
-            new GreaterThanNegotiation(),
-            new GreaterThanOrEqualToNegotiation(),
-            new Identical(),
-            new LessThan(),
-            new LessThanOrEqualTo(),
-            new NotEqual(),
-            new NotIdentical(),
-
-            // Number
-            new OneZeroInteger(),
-            new OneZeroFloat(),
-
-            // Return Value
-            new FloatNegation(),
-            new FunctionCall(),
-            new IntegerNegation(),
-            new NewObject(),
-            new This(),
-
-            // Function Signature
-            new PublicVisibility(),
-            new ProtectedVisibility(),
-        ];
+        return $this->defaultMutators;
     }
 }
