@@ -58,7 +58,7 @@ class MutationsGenerator
         $this->codeCoverageData = $codeCoverageData;
         $this->excludeDirsOrFiles = $excludeDirsOrFiles;
         $this->defaultMutators = $defaultMutators;
-        $this->whitelistedMutatorNames = $whitelistedMutatorNames;
+        $this->whitelistedMutatorNames = array_map('strtolower', $whitelistedMutatorNames);
         $this->whitelistedMutatorNamesCount = count($whitelistedMutatorNames);
     }
 
@@ -151,7 +151,7 @@ class MutationsGenerator
             return array_filter(
                 $this->defaultMutators,
                 function (Mutator $mutator): bool {
-                    return in_array($mutator->getName(), $this->whitelistedMutatorNames, true);
+                    return in_array(strtolower($mutator->getName()), $this->whitelistedMutatorNames, true);
                 }
             );
         }

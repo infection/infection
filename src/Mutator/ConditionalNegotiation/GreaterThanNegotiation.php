@@ -11,7 +11,7 @@ namespace Infection\Mutator\ConditionalNegotiation;
 use Infection\Mutator\FunctionBodyMutator;
 use PhpParser\Node;
 
-class GreaterThan extends FunctionBodyMutator
+class GreaterThanNegotiation extends FunctionBodyMutator
 {
     /**
      * Replaces ">" with "<="

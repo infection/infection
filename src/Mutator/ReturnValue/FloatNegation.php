@@ -13,6 +13,13 @@ use PhpParser\Node;
 
 class FloatNegation extends FunctionBodyMutator
 {
+    /**
+     * Replaces any float with negated float
+     * 33.4 => -33.4
+     *
+     * @param Node $node
+     * @return Node\Stmt\Return_
+     */
     public function mutate(Node $node)
     {
         $floatValue = $node->expr instanceof Node\Expr\UnaryMinus

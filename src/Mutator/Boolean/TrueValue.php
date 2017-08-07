@@ -13,6 +13,12 @@ use PhpParser\Node;
 
 class TrueValue extends FunctionBodyMutator
 {
+    /**
+     * Replaces "true" with "false"
+     *
+     * @param Node $node
+     * @return Node\Expr\ConstFetch
+     */
     public function mutate(Node $node)
     {
         return new Node\Expr\ConstFetch(new Node\Name('false'));

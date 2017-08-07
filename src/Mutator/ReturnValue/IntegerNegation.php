@@ -13,6 +13,13 @@ use PhpParser\Node;
 
 class IntegerNegation extends FunctionBodyMutator
 {
+    /**
+     * Replaces any integer with negated integer value.
+     * -5 => 5
+     *
+     * @param Node $node
+     * @return Node\Stmt\Return_
+     */
     public function mutate(Node $node)
     {
         $integerValue = $node->expr instanceof Node\Expr\UnaryMinus

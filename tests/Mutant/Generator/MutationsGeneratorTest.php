@@ -96,6 +96,18 @@ class MutationsGeneratorTest extends TestCase
         $this->assertCount(0, $mutations);
     }
 
+    public function test_whitelist_is_case_insensitive()
+    {
+        $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
+        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(true);
+
+        $generator = $this->createMutationGenerator($codeCoverageDataMock, ['decrement']);
+
+        $mutations = $generator->generate(false);
+
+        $this->assertCount(0, $mutations);
+    }
+
     protected function tearDown()
     {
         Mockery::close();

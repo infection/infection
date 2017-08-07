@@ -13,6 +13,12 @@ use PhpParser\Node;
 
 class FunctionCall extends FunctionBodyMutator
 {
+    /**
+     * Replaces "return func();" with "func(); return null;"
+     *
+     * @param Node $node
+     * @return array
+     */
     public function mutate(Node $node)
     {
         return [
