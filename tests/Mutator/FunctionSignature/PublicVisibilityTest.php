@@ -46,24 +46,27 @@ CODE;
         $this->assertSame($expectedMutatedCode, $mutatedCode);
     }
 
-    public function test_it_does_not_modify_construct_visibility()
+    /**
+     * @dataProvider blacklistedProvider
+     */
+    public function test_it_does_not_modify_blacklisted_functions(string $functionName)
     {
-        $code = <<<'CODE'
+        $code = <<<"CODE"
 <?php
 
 class Test
 {
-    public function __construct() {}
+    public function {$functionName}() {}
 }
 CODE;
         $mutatedCode = $this->mutate($code);
 
-        $expectedMutatedCode = <<<'CODE'
+        $expectedMutatedCode = <<<"CODE"
 <?php
 
 class Test
 {
-    public function __construct()
+    public function {$functionName}()
     {
     }
 }
@@ -96,6 +99,22 @@ class Test
 CODE;
 
         $this->assertSame($expectedMutatedCode, $mutatedCode);
+    }
+
+    public function blacklistedProvider()
+    {
+        return [
+            ['__construct'],
+            ['__invoke'],
+            ['__call'],
+            ['__callStatic'],
+            ['__get'],
+            ['__set'],
+            ['__isset'],
+            ['__unset'],
+            ['__toString'],
+            ['__debugInfo'],
+        ];
     }
 
     protected function getMutator(): Mutator

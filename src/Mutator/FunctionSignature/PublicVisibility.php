@@ -42,10 +42,30 @@ class PublicVisibility extends FunctionSignatureMutator
             return false;
         }
 
-        if ($node->name === '__construct') {
+        if ($this->isBlacklistedFunction($node->name)) {
             return false;
         }
 
         return $node->isPublic();
+    }
+
+    private function isBlacklistedFunction(string $name): bool
+    {
+        return in_array(
+            $name,
+            [
+                '__construct',
+                '__invoke',
+                '__call',
+                '__callStatic',
+                '__get',
+                '__set',
+                '__isset',
+                '__unset',
+                '__toString',
+                '__debugInfo',
+            ],
+            true
+        );
     }
 }
