@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.5.0](https://github.com/infection/infection/tree/0.5.0) (2017-08-08)
+[Full Changelog](https://github.com/infection/infection/compare/0.4.0...0.5.0)
+
+**Merged pull requests:**
+
+- Add whitelist for executed mutators. New option --mutators=X,Yy,Zzz [\#18](https://github.com/infection/infection/pull/18) ([borNfreee](https://github.com/borNfreee))
+- Public-\>protected, protected-\>private Visibility Mutators [\#17](https://github.com/infection/infection/pull/17) ([borNfreee](https://github.com/borNfreee))
+
 ## [0.4.0](https://github.com/infection/infection/tree/0.4.0) (2017-07-27)
 [Full Changelog](https://github.com/infection/infection/compare/0.3.0...0.4.0)
 
