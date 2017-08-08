@@ -11,6 +11,7 @@ namespace Infection\Mutator\FunctionSignature;
 use Infection\Mutator\FunctionSignatureMutator;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Class_;
 
 class ProtectedVisibility extends FunctionSignatureMutator
 {
@@ -26,7 +27,7 @@ class ProtectedVisibility extends FunctionSignatureMutator
         return new ClassMethod(
             $node->name,
             [
-                'flags' => Node\Stmt\Class_::MODIFIER_PRIVATE,
+                'flags' => ($node->flags & ~Class_::MODIFIER_PROTECTED) | Class_::MODIFIER_PRIVATE,
                 'byRef' => $node->returnsByRef(),
                 'params' => $node->getParams(),
                 'returnType' => $node->getReturnType(),
@@ -39,6 +40,10 @@ class ProtectedVisibility extends FunctionSignatureMutator
     public function shouldMutate(Node $node): bool
     {
         if (!$node instanceof ClassMethod) {
+            return false;
+        }
+
+        if ($node->isAbstract()) {
             return false;
         }
 

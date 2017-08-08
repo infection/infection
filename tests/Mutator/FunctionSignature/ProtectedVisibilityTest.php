@@ -46,6 +46,94 @@ CODE;
         $this->assertSame($expectedMutatedCode, $mutatedCode);
     }
 
+    public function test_it_does_not_change_static_flag()
+    {
+        $code = <<<'CODE'
+<?php
+
+class Test
+{
+    protected static function foo(int $param, $test = 1): bool
+    {
+        echo 1;
+        return false;
+    }
+}
+CODE;
+        $mutatedCode = $this->mutate($code);
+
+        $expectedMutatedCode = <<<'CODE'
+<?php
+
+class Test
+{
+    private static function foo(int $param, $test = 1) : bool
+    {
+        echo 1;
+        return false;
+    }
+}
+CODE;
+
+        $this->assertSame($expectedMutatedCode, $mutatedCode);
+    }
+
+    public function test_it_does_not_change_abstract_protected_function()
+    {
+        $code = <<<'CODE'
+<?php
+
+abstract class Test
+{
+    abstract protected function foo(int $param, $test = 1): bool;
+}
+CODE;
+        $mutatedCode = $this->mutate($code);
+
+        $expectedMutatedCode = <<<'CODE'
+<?php
+
+abstract class Test
+{
+    protected abstract function foo(int $param, $test = 1) : bool;
+}
+CODE;
+
+        $this->assertSame($expectedMutatedCode, $mutatedCode);
+    }
+
+    public function test_it_does_not_change_final_flag()
+    {
+        $code = <<<'CODE'
+<?php
+
+class Test
+{
+    final protected function foo(int $param, $test = 1): bool
+    {
+        echo 1;
+        return false;
+    }
+}
+CODE;
+        $mutatedCode = $this->mutate($code);
+
+        $expectedMutatedCode = <<<'CODE'
+<?php
+
+class Test
+{
+    private final function foo(int $param, $test = 1) : bool
+    {
+        echo 1;
+        return false;
+    }
+}
+CODE;
+
+        $this->assertSame($expectedMutatedCode, $mutatedCode);
+    }
+
     protected function getMutator(): Mutator
     {
         return new ProtectedVisibility();

@@ -11,6 +11,7 @@ namespace Infection\Mutator\FunctionSignature;
 use Infection\Mutator\FunctionSignatureMutator;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Class_;
 
 class PublicVisibility extends FunctionSignatureMutator
 {
@@ -26,7 +27,7 @@ class PublicVisibility extends FunctionSignatureMutator
         return new ClassMethod(
             $node->name,
             [
-                'flags' => Node\Stmt\Class_::MODIFIER_PROTECTED,
+                'flags' => ($node->flags & ~Class_::MODIFIER_PUBLIC) | Class_::MODIFIER_PROTECTED,
                 'byRef' => $node->returnsByRef(),
                 'params' => $node->getParams(),
                 'returnType' => $node->getReturnType(),
