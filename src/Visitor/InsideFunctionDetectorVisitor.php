@@ -15,10 +15,32 @@ class InsideFunctionDetectorVisitor extends NodeVisitorAbstract
 {
     const IS_INSIDE_FUNCTION_KEY = 'isInsideFunction';
 
+    private $scopeStack = [];
+
+    public function beforeTraverse(array $nodes)
+    {
+        $this->scopeStack = [];
+    }
+
     public function enterNode(Node $node)
     {
-        if ($this->isInsideFunction($node)) {
+        $isInsideFunction = $this->isInsideFunction($node);
+
+        if ($isInsideFunction) {
             $node->setAttribute(self::IS_INSIDE_FUNCTION_KEY, true);
+        }
+
+        if ($this->isFunctionLikeNode($node)) {
+            $this->scopeStack[] = $node;
+        } elseif ($isInsideFunction) {
+            $node->setAttribute('functionScope', $this->scopeStack[count($this->scopeStack) - 1]);
+        }
+    }
+
+    public function leaveNode(Node $node)
+    {
+        if ($this->isFunctionLikeNode($node)) {
+            array_pop($this->scopeStack);
         }
     }
 
@@ -41,14 +63,19 @@ class InsideFunctionDetectorVisitor extends NodeVisitorAbstract
             return true;
         }
 
-        $isFunction = $parent instanceof Node\Stmt\Function_;
-        $isClassMethod = $parent instanceof Node\Stmt\ClassMethod;
-        $isClosure = $parent instanceof Node\Expr\Closure;
-
-        if ($isFunction || $isClassMethod || $isClosure) {
+        if ($this->isFunctionLikeNode($parent)) {
             return true;
         }
 
         return $this->isInsideFunction($parent);
+    }
+
+    private function isFunctionLikeNode(Node $node): bool
+    {
+        $isFunction = $node instanceof Node\Stmt\Function_;
+        $isClassMethod = $node instanceof Node\Stmt\ClassMethod;
+        $isClosure = $node instanceof Node\Expr\Closure;
+
+        return $isFunction || $isClassMethod || $isClosure;
     }
 }

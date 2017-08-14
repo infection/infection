@@ -31,6 +31,34 @@ class FunctionCall extends FunctionBodyMutator
 
     public function shouldMutate(Node $node): bool
     {
-        return $node instanceof Node\Stmt\Return_ && $node->expr instanceof Node\Expr\FuncCall;
+        if (!$node instanceof Node\Stmt\Return_) {
+            return false;
+        }
+
+        if (!$node->expr instanceof Node\Expr\FuncCall) {
+            return false;
+        }
+
+        /** @var \PhpParser\Node\Stmt\Function_ $functionScope */
+        $functionScope = $node->getAttribute('functionScope');
+
+        $returnType = $functionScope->getReturnType();
+
+        // no return value specified
+        if (null === $returnType) {
+            return true;
+        }
+
+        // scalar typehint
+        if (is_string($returnType)) {
+            return false;
+        }
+
+        // nullable typehint, e.g. "?int" or "?CustomClass"
+        if ($returnType instanceof Node\NullableType) {
+            return true;
+        }
+
+        return !$returnType instanceof Node\Name;
     }
 }
