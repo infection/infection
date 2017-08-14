@@ -11,7 +11,7 @@ namespace Infection\Tests\Mutator;
 
 use Infection\Mutator\Mutator;
 use Infection\Tests\Fixtures\SimpleMutatorVisitor;
-use Infection\Visitor\InsideFunctionDetectorVisitor;
+use Infection\Visitor\WrappedFunctionInfoCollectorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use PHPUnit\Framework\TestCase;
 use PhpParser\Lexer;
@@ -49,7 +49,7 @@ abstract class AbstractMutator extends TestCase
         $nodes = $this->getNodes($code);
 
         $traverser->addVisitor(new ParentConnectorVisitor());
-        $traverser->addVisitor(new InsideFunctionDetectorVisitor());
+        $traverser->addVisitor(new WrappedFunctionInfoCollectorVisitor());
         $traverser->addVisitor(new SimpleMutatorVisitor($this->mutator));
 
         $mutatedNodes = $traverser->traverse($nodes);

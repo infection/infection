@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\ReturnValue;
 
 use Infection\Mutator\FunctionBodyMutator;
+use Infection\Visitor\WrappedFunctionInfoCollectorVisitor;
 use PhpParser\Node;
 
 class FunctionCall extends FunctionBodyMutator
@@ -40,7 +41,7 @@ class FunctionCall extends FunctionBodyMutator
         }
 
         /** @var \PhpParser\Node\Stmt\Function_ $functionScope */
-        $functionScope = $node->getAttribute('functionScope');
+        $functionScope = $node->getAttribute(WrappedFunctionInfoCollectorVisitor::FUNCTION_SCOPE_KEY);
 
         $returnType = $functionScope->getReturnType();
 

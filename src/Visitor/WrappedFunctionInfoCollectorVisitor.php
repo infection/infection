@@ -11,9 +11,10 @@ namespace Infection\Visitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class InsideFunctionDetectorVisitor extends NodeVisitorAbstract
+class WrappedFunctionInfoCollectorVisitor extends NodeVisitorAbstract
 {
     const IS_INSIDE_FUNCTION_KEY = 'isInsideFunction';
+    const FUNCTION_SCOPE_KEY = 'functionScope';
 
     private $scopeStack = [];
 
@@ -33,7 +34,7 @@ class InsideFunctionDetectorVisitor extends NodeVisitorAbstract
         if ($this->isFunctionLikeNode($node)) {
             $this->scopeStack[] = $node;
         } elseif ($isInsideFunction) {
-            $node->setAttribute('functionScope', $this->scopeStack[count($this->scopeStack) - 1]);
+            $node->setAttribute(self::FUNCTION_SCOPE_KEY, $this->scopeStack[count($this->scopeStack) - 1]);
         }
     }
 

@@ -51,7 +51,7 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
     {
         foreach ($this->mutators as $mutator) {
             if ($mutator->isFunctionBodyMutator() &&
-                !$node->getAttribute(InsideFunctionDetectorVisitor::IS_INSIDE_FUNCTION_KEY)) {
+                !$node->getAttribute(WrappedFunctionInfoCollectorVisitor::IS_INSIDE_FUNCTION_KEY)) {
                 continue;
             }
 

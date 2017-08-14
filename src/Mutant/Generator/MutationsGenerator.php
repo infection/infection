@@ -11,7 +11,7 @@ namespace Infection\Mutant\Generator;
 use Infection\Mutation;
 use Infection\Mutator\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
-use Infection\Visitor\InsideFunctionDetectorVisitor;
+use Infection\Visitor\WrappedFunctionInfoCollectorVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Lexer;
@@ -128,7 +128,7 @@ class MutationsGenerator
         );
 
         $traverser->addVisitor(new ParentConnectorVisitor());
-        $traverser->addVisitor(new InsideFunctionDetectorVisitor());
+        $traverser->addVisitor(new WrappedFunctionInfoCollectorVisitor());
         $traverser->addVisitor($mutationsCollectorVisitor);
 
         $originalCode = $file->getContents();
