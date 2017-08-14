@@ -28,11 +28,17 @@ class Mutation
      */
     private $originalFilePath;
 
-    public function __construct(string $originalFilePath, Mutator $mutator, array $attributes)
+    /**
+     * @var string
+     */
+    private $mutatedNodeClass;
+
+    public function __construct(string $originalFilePath, Mutator $mutator, array $attributes, string $mutatedNodeClass)
     {
         $this->originalFilePath = $originalFilePath;
         $this->mutator = $mutator;
         $this->attributes = $attributes;
+        $this->mutatedNodeClass = $mutatedNodeClass;
     }
 
     /**
@@ -57,6 +63,14 @@ class Mutation
     public function getOriginalFilePath(): string
     {
         return $this->originalFilePath;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMutatedNodeClass(): string
+    {
+        return $this->mutatedNodeClass;
     }
 
     public function getHash(): string

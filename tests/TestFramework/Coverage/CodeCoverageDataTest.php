@@ -106,7 +106,8 @@ class CodeCoverageDataTest extends TestCase
         $mutation = new Mutation(
             $filePath,
             new Plus(),
-            ['startLine' => 1]
+            ['startLine' => 1],
+            'PHPParser\Node\Expr\BinaryOp\Plus'
         );
 
         $this->assertCount(0, $codeCoverageData->getAllTestsFor($mutation));
@@ -120,7 +121,8 @@ class CodeCoverageDataTest extends TestCase
         $mutation = new Mutation(
             $filePath,
             new Plus(),
-            ['startLine' => 26]
+            ['startLine' => 26],
+            'PHPParser\Node\Expr\BinaryOp\Plus'
         );
 
         $this->assertCount(2, $codeCoverageData->getAllTestsFor($mutation));
@@ -134,7 +136,8 @@ class CodeCoverageDataTest extends TestCase
         $mutation = new Mutation(
             $filePath,
             new PublicVisibility(),
-            ['startLine' => 1]
+            ['startLine' => 1],
+            'PHPParser\Node\Stmt\ClassMethod'
         );
 
         $this->assertCount(0, $codeCoverageData->getAllTestsFor($mutation));
@@ -148,7 +151,8 @@ class CodeCoverageDataTest extends TestCase
         $mutation = new Mutation(
             $filePath,
             new PublicVisibility(),
-            ['startLine' => 24]
+            ['startLine' => 24],
+            'PHPParser\Node\Stmt\ClassMethod'
         );
 
         $this->assertCount(6, $codeCoverageData->getAllTestsFor($mutation));

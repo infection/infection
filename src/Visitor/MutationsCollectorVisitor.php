@@ -71,7 +71,8 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
                 $this->mutations[] = new Mutation(
                     $this->filePath,
                     $mutator,
-                    $node->getAttributes()
+                    $node->getAttributes(),
+                    get_class($node)
                 );
             }
         }
