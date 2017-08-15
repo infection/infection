@@ -11,8 +11,6 @@ namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ReturnValue\FunctionCall;
-use Mutator\ReturnValue\AbstractValueToNullReturnValueTest;
-
 
 class FunctionCallTest extends AbstractValueToNullReturnValueTest
 {

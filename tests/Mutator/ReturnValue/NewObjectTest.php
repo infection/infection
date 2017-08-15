@@ -10,12 +10,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Mutator\Mutator;
-use Infection\Mutator\ReturnValue\FloatNegation;
-use Infection\Mutator\ReturnValue\IntegerNegation;
 use Infection\Mutator\ReturnValue\NewObject;
-use Infection\Tests\Mutator\AbstractMutator;
-use Mutator\ReturnValue\AbstractValueToNullReturnValueTest;
-
 
 class NewObjectTest extends AbstractValueToNullReturnValueTest
 {

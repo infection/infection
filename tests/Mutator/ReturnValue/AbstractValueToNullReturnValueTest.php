@@ -6,7 +6,7 @@
  */
 declare(strict_types=1);
 
-namespace Mutator\ReturnValue;
+namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Tests\Mutator\AbstractMutator;
 
