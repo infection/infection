@@ -15,30 +15,24 @@ use Infection\Tests\Mutator\AbstractMutator;
 
 class ThisTest extends AbstractMutator
 {
-    public function test_does_not_mutate_returning_true()
+    public function test_mutates_returning_this()
     {
-        $code = '<?php return true;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
+        $code = <<<'CODE'
 <?php
-
-return true;
+function test()
+{
+    return $this;
+}
 CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-
-    public function test_mutates_returning_this_variable()
-    {
-        $code = '<?php return $this;';
         $mutatedCode = $this->mutate($code);
 
         $expectedMutatedCode = <<<'CODE'
 <?php
 
-return null;
+function test()
+{
+    return null;
+}
 CODE;
 
         $this->assertSame($expectedMutatedCode, $mutatedCode);

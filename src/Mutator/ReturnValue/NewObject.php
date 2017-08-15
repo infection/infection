@@ -11,7 +11,7 @@ namespace Infection\Mutator\ReturnValue;
 use Infection\Mutator\FunctionBodyMutator;
 use PhpParser\Node;
 
-class NewObject extends FunctionBodyMutator
+class NewObject extends AbstractValueToNullReturnValue
 {
     /**
      * Replace "return new Something(anything);" with "new Something(anything); return null;"
@@ -40,10 +40,10 @@ class NewObject extends FunctionBodyMutator
             return false;
         }
 
-        if (!$node->expr->class instanceof Node\Name\FullyQualified) {
+        if (!$node->expr->class instanceof Node\Name) {
             return false;
         }
 
-        return true;
+        return $this->isNullReturnValueAllowed($node);
     }
 }

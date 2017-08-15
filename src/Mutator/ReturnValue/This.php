@@ -11,7 +11,7 @@ namespace Infection\Mutator\ReturnValue;
 use Infection\Mutator\FunctionBodyMutator;
 use PhpParser\Node;
 
-class This extends FunctionBodyMutator
+class This extends AbstractValueToNullReturnValue
 {
     /**
      * Replaces "return $this;" with "return null;"
@@ -30,6 +30,7 @@ class This extends FunctionBodyMutator
     {
         return $node instanceof Node\Stmt\Return_ &&
             $node->expr instanceof Node\Expr\Variable &&
-            $node->expr->name === 'this';
+            $node->expr->name === 'this'
+            && $this->isNullReturnValueAllowed($node);
     }
 }

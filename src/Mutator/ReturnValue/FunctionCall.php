@@ -8,10 +8,9 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\FunctionBodyMutator;
 use PhpParser\Node;
 
-class FunctionCall extends FunctionBodyMutator
+class FunctionCall extends AbstractValueToNullReturnValue
 {
     /**
      * Replaces "return func();" with "func(); return null;"
@@ -31,6 +30,14 @@ class FunctionCall extends FunctionBodyMutator
 
     public function shouldMutate(Node $node): bool
     {
-        return $node instanceof Node\Stmt\Return_ && $node->expr instanceof Node\Expr\FuncCall;
+        if (!$node instanceof Node\Stmt\Return_) {
+            return false;
+        }
+
+        if (!$node->expr instanceof Node\Expr\FuncCall) {
+            return false;
+        }
+
+        return $this->isNullReturnValueAllowed($node);
     }
 }

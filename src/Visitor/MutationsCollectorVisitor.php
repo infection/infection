@@ -51,7 +51,7 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
     {
         foreach ($this->mutators as $mutator) {
             if ($mutator->isFunctionBodyMutator() &&
-                !$node->getAttribute(InsideFunctionDetectorVisitor::IS_INSIDE_FUNCTION_KEY)) {
+                !$node->getAttribute(WrappedFunctionInfoCollectorVisitor::IS_INSIDE_FUNCTION_KEY)) {
                 continue;
             }
 
@@ -71,7 +71,8 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
                 $this->mutations[] = new Mutation(
                     $this->filePath,
                     $mutator,
-                    $node->getAttributes()
+                    $node->getAttributes(),
+                    get_class($node)
                 );
             }
         }
