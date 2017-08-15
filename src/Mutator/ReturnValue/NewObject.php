@@ -40,7 +40,7 @@ class NewObject extends AbstractValueToNullReturnValue
             return false;
         }
 
-        if (!$node->expr->class instanceof Node\Name\FullyQualified) {
+        if (!$node->expr->class instanceof Node\Name) {
             return false;
         }
 

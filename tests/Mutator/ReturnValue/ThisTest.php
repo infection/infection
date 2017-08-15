@@ -15,7 +15,7 @@ use Infection\Tests\Mutator\AbstractMutator;
 
 class ThisTest extends AbstractMutator
 {
-    public function test_mutates_instantiation_of_new_object_with_params()
+    public function test_mutates_returning_this()
     {
         $code = <<<'CODE'
 <?php

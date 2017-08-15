@@ -14,57 +14,11 @@ use Infection\Mutator\ReturnValue\FloatNegation;
 use Infection\Mutator\ReturnValue\IntegerNegation;
 use Infection\Mutator\ReturnValue\NewObject;
 use Infection\Tests\Mutator\AbstractMutator;
+use Mutator\ReturnValue\AbstractValueToNullReturnValueTest;
 
 
-class NewObjectTest extends AbstractMutator
+class NewObjectTest extends AbstractValueToNullReturnValueTest
 {
-    public function test_not_mutates_with_value_return_true()
-    {
-        $code = <<<'CODE'
-<?php
-function test() : bool
-{
-    return true;
-}
-CODE;
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-function test() : bool
-{
-    return true;
-}
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-
-    public function test_not_mutates_with_value_return_true_for_new_objects()
-    {
-        $code = <<<'CODE'
-<?php
-function test()
-{
-    return new Foo();
-}
-CODE;
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-function test()
-{
-    return new Foo();
-}
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
     public function test_mutates_instantiation_of_new_object_with_params()
     {
         $code = <<<'CODE'
@@ -81,7 +35,8 @@ CODE;
 
 function test()
 {
-    return new Foo('now');
+    new Foo('now');
+    return null;
 }
 CODE;
 
@@ -91,5 +46,10 @@ CODE;
     protected function getMutator() : Mutator
     {
         return new NewObject();
+    }
+
+    protected function getMutableNodeString(): string
+    {
+        return 'new Foo()';
     }
 }
