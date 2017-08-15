@@ -8,11 +8,9 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\FunctionBodyMutator;
-use Infection\Visitor\WrappedFunctionInfoCollectorVisitor;
 use PhpParser\Node;
 
-class FunctionCall extends FunctionBodyMutator
+class FunctionCall extends AbstractValueToNullReturnValue
 {
     /**
      * Replaces "return func();" with "func(); return null;"
@@ -40,26 +38,6 @@ class FunctionCall extends FunctionBodyMutator
             return false;
         }
 
-        /** @var \PhpParser\Node\Stmt\Function_ $functionScope */
-        $functionScope = $node->getAttribute(WrappedFunctionInfoCollectorVisitor::FUNCTION_SCOPE_KEY);
-
-        $returnType = $functionScope->getReturnType();
-
-        // no return value specified
-        if (null === $returnType) {
-            return true;
-        }
-
-        // scalar typehint
-        if (is_string($returnType)) {
-            return false;
-        }
-
-        // nullable typehint, e.g. "?int" or "?CustomClass"
-        if ($returnType instanceof Node\NullableType) {
-            return true;
-        }
-
-        return !$returnType instanceof Node\Name;
+        return $this->isNullReturnValueAllowed($node);
     }
 }

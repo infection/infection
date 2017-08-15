@@ -11,57 +11,11 @@ namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ReturnValue\FunctionCall;
-use Infection\Tests\Mutator\AbstractMutator;
+use Mutator\ReturnValue\AbstractValueToNullReturnValueTest;
 
 
-class FunctionCallTest extends AbstractMutator
+class FunctionCallTest extends AbstractValueToNullReturnValueTest
 {
-    public function test_not_mutates_with_value_return_true()
-    {
-        $code = <<<'CODE'
-<?php
-function test() : bool
-{
-    return true;
-}
-CODE;
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-function test() : bool
-{
-    return true;
-}
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_not_mutates_with_value_return_true_for_new_objects()
-    {
-        $code = <<<'CODE'
-<?php
-function test()
-{
-    return new Foo();
-}
-CODE;
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-function test()
-{
-    return new Foo();
-}
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
     public function test_mutates_with_value_return_function_call_no_params()
     {
         $code = <<<'CODE'
