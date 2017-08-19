@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant\Generator;
 
+use Infection\EventDispatcher\EventDispatcher;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
@@ -135,12 +136,16 @@ class MutationsGeneratorTest extends TestCase
             $container[PublicVisibility::class]
         ];
 
+        $eventDispatcherMock = Mockery::mock(EventDispatcher::class);
+        $eventDispatcherMock->shouldReceive('dispatch');
+
         return new MutationsGenerator(
             $srcDirs,
             $excludedDirsOrFiles,
             $codeCoverageDataMock,
             $defaultMutators,
-            $whitelistedMutatorNames
+            $whitelistedMutatorNames,
+            $eventDispatcherMock
         );
     }
 }

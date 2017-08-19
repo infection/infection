@@ -30,6 +30,8 @@ class DotFormatter extends AbstractOutputFormatter
         parent::start($mutationCount);
 
         $this->output->writeln([
+            '',
+            '',
             '<killed>.</killed>: killed, '
             . '<escaped>M</escaped>: escaped, '
             . '<uncovered>S</uncovered>: uncovered, '

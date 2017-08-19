@@ -8,6 +8,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutant\Generator;
 
+use Infection\EventDispatcher\EventDispatcher;
+use Infection\Events\MutableFileProcessed;
+use Infection\Events\MutationGeneratingFinished;
+use Infection\Events\MutationGeneratingStarted;
 use Infection\Mutation;
 use Infection\Mutator\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
@@ -52,7 +56,12 @@ class MutationsGenerator
      */
     private $defaultMutators;
 
-    public function __construct(array $srcDirs, array $excludeDirsOrFiles, CodeCoverageData $codeCoverageData, array $defaultMutators, array $whitelistedMutatorNames)
+    /**
+     * @var EventDispatcher
+     */
+    private $eventDispatcher;
+
+    public function __construct(array $srcDirs, array $excludeDirsOrFiles, CodeCoverageData $codeCoverageData, array $defaultMutators, array $whitelistedMutatorNames, EventDispatcher $eventDispatcher)
     {
         $this->srcDirs = $srcDirs;
         $this->codeCoverageData = $codeCoverageData;
@@ -60,6 +69,7 @@ class MutationsGenerator
         $this->defaultMutators = $defaultMutators;
         $this->whitelistedMutatorNames = array_map('strtolower', $whitelistedMutatorNames);
         $this->whitelistedMutatorNamesCount = count($whitelistedMutatorNames);
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -73,11 +83,17 @@ class MutationsGenerator
         $files = $this->getSrcFiles($filter);
         $allFilesMutations = [];
 
+        $this->eventDispatcher->dispatch(new MutationGeneratingStarted(count($files)));
+
         foreach ($files as $file) {
             if (!$onlyCovered || ($onlyCovered && $this->hasTests($file))) {
                 $allFilesMutations = array_merge($allFilesMutations, $this->getMutationsFromFile($file, $onlyCovered));
             }
+
+            $this->eventDispatcher->dispatch(new MutableFileProcessed());
         }
+
+        $this->eventDispatcher->dispatch(new MutationGeneratingFinished());
 
         return $allFilesMutations;
     }

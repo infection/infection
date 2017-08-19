@@ -19,7 +19,8 @@ use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\Mutator;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
-use Infection\Process\Listener\MutationConsoleLoggerSubscriber;
+use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
+use Infection\Process\Listener\MutationTestingConsoleLoggerSubscriber;
 use Infection\Process\Listener\TextFileLoggerSubscriber;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -64,14 +65,13 @@ class InfectionApplication
         $testFrameworkKey = $this->input->getOption('test-framework');
         $adapter = $this->get('test.framework.factory')->create($testFrameworkKey);
 
-        $initialTestsProgressBar = new ProgressBar($this->output);
-        $initialTestsProgressBar->setFormat('verbose');
-
         $metricsCalculator = new MetricsCalculator($adapter);
 
-        $this->addSubscribers($eventDispatcher, $initialTestsProgressBar, $metricsCalculator);
+        $this->addSubscribers($eventDispatcher, $metricsCalculator);
 
         $processBuilder = new ProcessBuilder($adapter, $this->get('infection.config')->getProcessTimeout());
+
+        $this->output->writeln(['Running initial test suite...', '']);
 
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
         $initialTestSuitProcess = $initialTestsRunner->run();
@@ -82,7 +82,7 @@ class InfectionApplication
             return 1;
         }
 
-        $this->output->writeln(['', 'Generate mutants...', '']);
+        $this->output->writeln(['', '', 'Generate mutants...', '']);
 
         $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
         $mutationsGenerator = new MutationsGenerator(
@@ -90,7 +90,8 @@ class InfectionApplication
             $this->get('exclude.paths'),
             $codeCoverageData,
             $this->getDefaultMutators(),
-            $this->parseMutators($this->input->getOption('mutators'))
+            $this->parseMutators($this->input->getOption('mutators')),
+            $eventDispatcher
         );
         $mutations = $mutationsGenerator->generate($this->input->getOption('only-covered'), $this->input->getOption('filter'));
 
@@ -147,10 +148,17 @@ class InfectionApplication
         throw new \InvalidArgumentException('Incorrect formatter. Possible values: dot, progress');
     }
 
-    private function addSubscribers(EventDispatcher $eventDispatcher, ProgressBar $initialTestsProgressBar, MetricsCalculator $metricsCalculator)
+    private function addSubscribers(EventDispatcher $eventDispatcher, MetricsCalculator $metricsCalculator)
     {
-        $eventDispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($this->output, $initialTestsProgressBar));
-        $eventDispatcher->addSubscriber(new MutationConsoleLoggerSubscriber($this->output, $this->getOutputFormatter(), $metricsCalculator, $this->get('diff.colorizer'), $this->input->getOption('show-mutations')));
+        $initialTestsProgressBar = new ProgressBar($this->output);
+        $initialTestsProgressBar->setFormat('verbose');
+
+        $mutationGeneratingProgressBar = new ProgressBar($this->output);
+        $mutationGeneratingProgressBar->setFormat('Processed files: %current%/%max%');
+
+        $eventDispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($initialTestsProgressBar));
+        $eventDispatcher->addSubscriber(new MutationGeneratingConsoleLoggerSubscriber($mutationGeneratingProgressBar));
+        $eventDispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber($this->output, $this->getOutputFormatter(), $metricsCalculator, $this->get('diff.colorizer'), $this->input->getOption('show-mutations')));
         $eventDispatcher->addSubscriber(new TextFileLoggerSubscriber($this->get('infection.config'), $metricsCalculator));
     }
 
