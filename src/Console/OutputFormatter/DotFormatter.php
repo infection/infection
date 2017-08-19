@@ -31,7 +31,6 @@ class DotFormatter extends AbstractOutputFormatter
 
         $this->output->writeln([
             '',
-            '',
             '<killed>.</killed>: killed, '
             . '<escaped>M</escaped>: escaped, '
             . '<uncovered>S</uncovered>: uncovered, '

@@ -99,6 +99,8 @@ class InfectionApplication
         $mutantCreator = $this->get('mutant.creator');
         $threadCount = (int) $this->input->getOption('threads');
 
+        $this->output->writeln(['', 'Creating mutated files and processes...']);
+
         $mutationTestingRunner = new MutationTestingRunner($processBuilder, $parallelProcessManager, $mutantCreator, $eventDispatcher, $mutations);
         $mutationTestingRunner->run($threadCount, $codeCoverageData);
 
