@@ -151,7 +151,7 @@ class InfectionApplication
         $initialTestsProgressBar->setFormat('verbose');
 
         $mutationGeneratingProgressBar = new ProgressBar($this->output);
-        $mutationGeneratingProgressBar->setFormat('Processed source code files: %current%/%max%');
+        $mutationGeneratingProgressBar->setFormat('Processing source code files: %current%/%max%');
 
         $mutantCreatingProgressBar = new ProgressBar($this->output);
         $mutantCreatingProgressBar->setFormat('Creating mutated files and processes: %current%/%max%');

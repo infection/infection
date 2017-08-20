@@ -9,12 +9,9 @@ declare(strict_types=1);
 namespace Infection\Process\Listener;
 
 use Infection\EventDispatcher\EventSubscriberInterface;
-use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutantCreated;
 use Infection\Events\MutantsCreatingStarted;
-use Infection\Events\MutantsCreationFinished;
-use Infection\Events\MutationGeneratingFinished;
-use Infection\Events\MutationGeneratingStarted;
+use Infection\Events\MutantsCreatingFinished;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -41,7 +38,7 @@ class MutantCreatingConsoleLoggerSubscriber implements EventSubscriberInterface
         return [
             MutantsCreatingStarted::class => [$this, 'onMutantsCreatingStarted'],
             MutantCreated::class => [$this, 'onMutantCreated'],
-            MutantsCreationFinished::class => [$this, 'onMutantsCreationFinished'],
+            MutantsCreatingFinished::class => [$this, 'onMutantsCreatingFinished'],
         ];
     }
 
@@ -56,7 +53,7 @@ class MutantCreatingConsoleLoggerSubscriber implements EventSubscriberInterface
         $this->progressBar->advance();
     }
 
-    public function onMutantsCreationFinished(MutantsCreationFinished $event)
+    public function onMutantsCreatingFinished(MutantsCreatingFinished $event)
     {
         $this->progressBar->finish();
     }

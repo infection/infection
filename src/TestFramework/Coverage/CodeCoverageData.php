@@ -187,7 +187,7 @@ class CodeCoverageData
     {
         $coverage = $this->getCoverage();
 
-        $tests = [];
+        $tests = [[]];
 
         foreach ($coverage[$filePath]['byMethod'] as $method => $coverageInfo) {
             if ($line >= $coverageInfo['startLine'] && $line <= $coverageInfo['endLine']) {
@@ -195,7 +195,7 @@ class CodeCoverageData
 
                 foreach ($allLines as $lineInExecutedMethod) {
                     if (array_key_exists($lineInExecutedMethod, $this->getCoverage()[$filePath]['byLine'])) {
-                        $tests = array_merge($tests, $this->getCoverage()[$filePath]['byLine'][$lineInExecutedMethod]);
+                        $tests[] = $this->getCoverage()[$filePath]['byLine'][$lineInExecutedMethod];
                     }
                 }
 
@@ -203,6 +203,6 @@ class CodeCoverageData
             }
         }
 
-        return $tests;
+        return array_merge(...$tests);
     }
 }

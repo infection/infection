@@ -81,13 +81,13 @@ class MutationsGenerator
     public function generate(bool $onlyCovered, string $filter = ''): array
     {
         $files = $this->getSrcFiles($filter);
-        $allFilesMutations = [];
+        $allFilesMutations = [[]];
 
         $this->eventDispatcher->dispatch(new MutationGeneratingStarted(count($files)));
 
         foreach ($files as $file) {
             if (!$onlyCovered || ($onlyCovered && $this->hasTests($file))) {
-                $allFilesMutations = array_merge($allFilesMutations, $this->getMutationsFromFile($file, $onlyCovered));
+                $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered);
             }
 
             $this->eventDispatcher->dispatch(new MutableFileProcessed());
@@ -95,7 +95,7 @@ class MutationsGenerator
 
         $this->eventDispatcher->dispatch(new MutationGeneratingFinished());
 
-        return $allFilesMutations;
+        return array_merge(...$allFilesMutations);
     }
 
     /**

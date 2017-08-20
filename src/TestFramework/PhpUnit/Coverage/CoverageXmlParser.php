@@ -31,7 +31,7 @@ class CoverageXmlParser
         $dom->loadXML($this->removeNamespace($coverageXmlContent));
         $xPath = new \DOMXPath($dom);
 
-        $coverage = [];
+        $coverage = [[]];
 
         $nodes = $xPath->query('//file');
         $projectSource = $this->getProjectSource($xPath);
@@ -41,10 +41,10 @@ class CoverageXmlParser
 
             $fileCoverage = $this->processXmlFileCoverage($relativeFilePath, $projectSource);
 
-            $coverage = array_merge($coverage, $fileCoverage);
+            $coverage[] = $fileCoverage;
         }
 
-        return $coverage;
+        return array_merge(...$coverage);
     }
 
     /**

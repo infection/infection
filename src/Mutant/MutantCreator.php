@@ -74,7 +74,7 @@ class MutantCreator
         );
     }
 
-    private function isCoveredByTest(Mutation $mutation, CodeCoverageData $codeCoverageData)
+    private function isCoveredByTest(Mutation $mutation, CodeCoverageData $codeCoverageData): bool
     {
         $mutator = $mutation->getMutator();
         $line = $mutation->getAttributes()['startLine'];
