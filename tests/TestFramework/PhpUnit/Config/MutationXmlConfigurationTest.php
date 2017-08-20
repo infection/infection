@@ -17,7 +17,7 @@ class MutationXmlConfigurationTest extends AbstractXmlConfiguration
 {
     private $customAutoloadConfigPath = '/custom/path/autoload.php';
 
-    protected function getConfigurationObject(array $coverageTests = [])
+    protected function getConfigurationObject(string $phpunitXmlPath = null, array $coverageTests = [])
     {
         $phpunitXmlPath = __DIR__ . '/../../../Files/phpunit/phpunit.xml';
 
@@ -64,7 +64,7 @@ class MutationXmlConfigurationTest extends AbstractXmlConfiguration
      */
     public function test_it_sets_sorted_list_of_test_files(array $coverageTests, array $expectedFiles)
     {
-        $configuration = $this->getConfigurationObject($coverageTests);
+        $configuration = $this->getConfigurationObject(null, $coverageTests);
         $xml = $configuration->getXml();
 
         $files = [];

@@ -32,12 +32,18 @@ class InitialConfigBuilder implements ConfigBuilder
      */
     private $jUnitFilePath;
 
-    public function __construct(string $tempDirectory, string $originalXmlConfigPath, PathReplacer $pathReplacer, string $jUnitFilePath)
+    /**
+     * @var array
+     */
+    private $srcDirs = [];
+
+    public function __construct(string $tempDirectory, string $originalXmlConfigPath, PathReplacer $pathReplacer, string $jUnitFilePath, array $srcDirs)
     {
         $this->tempDirectory = $tempDirectory;
         $this->originalXmlConfigPath = $originalXmlConfigPath;
         $this->pathReplacer = $pathReplacer;
         $this->jUnitFilePath = $jUnitFilePath;
+        $this->srcDirs = $srcDirs;
     }
 
     public function build(): string
@@ -48,7 +54,8 @@ class InitialConfigBuilder implements ConfigBuilder
             $this->tempDirectory,
             $this->originalXmlConfigPath,
             $this->pathReplacer,
-            $this->jUnitFilePath
+            $this->jUnitFilePath,
+            $this->srcDirs
         );
 
         file_put_contents($path, $xmlConfigurationFile->getXml());

@@ -68,7 +68,7 @@ class Factory
 
             return new PhpUnitAdapter(
                 new TestFrameworkExecutableFinder(PhpUnitAdapter::NAME, $this->infectionConfig->getPhpUnitCustomPath()),
-                new InitialConfigBuilder($this->tempDir, $phpUnitConfigPath, $this->pathReplacer, $this->jUnitFilePath),
+                new InitialConfigBuilder($this->tempDir, $phpUnitConfigPath, $this->pathReplacer, $this->jUnitFilePath, $this->infectionConfig->getSourceDirs()),
                 new MutationConfigBuilder($this->tempDir, $phpUnitConfigPath, $this->pathReplacer, $this->projectDir),
                 new ArgumentsAndOptionsBuilder()
             );

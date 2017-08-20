@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config;
 
-use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 
 abstract class AbstractXmlConfiguration
@@ -60,25 +59,6 @@ abstract class AbstractXmlConfiguration
         foreach ($nodes as $node) {
             $dom->documentElement->removeChild($node);
         }
-    }
-
-    protected function addCodeCoverageLogger(\DOMDocument $dom, \DOMXPath $xPath)
-    {
-        $loggingList = $xPath->query('/phpunit/logging');
-
-        // TODO reuse
-        if ($loggingList->length) {
-            $logging = $loggingList->item(0);
-        } else {
-            $logging = $dom->createElement('logging');
-            $dom->documentElement->appendChild($logging);
-        }
-
-        $coverageXmlLog = $dom->createElement('log');
-        $coverageXmlLog->setAttribute('type', 'coverage-xml');
-        $coverageXmlLog->setAttribute('target', $this->tempDirectory . '/' . CodeCoverageData::PHP_UNIT_COVERAGE_DIR);
-
-        $logging->appendChild($coverageXmlLog);
     }
 
     protected function setStopOnFailure(\DOMXPath $xPath)
