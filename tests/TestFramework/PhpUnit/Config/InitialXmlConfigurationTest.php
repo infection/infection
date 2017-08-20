@@ -73,4 +73,16 @@ class InitialXmlConfigurationTest extends AbstractXmlConfiguration
 
         $this->assertSame(2, $filterNodes->length);
     }
+
+    public function test_it_does_not_create_coverage_filter_whitelist_node_if_already_exist()
+    {
+        $configuration = $this->getConfigurationObject();
+
+        $xml = $configuration->getXml();
+
+        /** @var \DOMNodeList $filterNodes */
+        $filterNodes = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
+
+        $this->assertSame(1, $filterNodes->length);
+    }
 }
