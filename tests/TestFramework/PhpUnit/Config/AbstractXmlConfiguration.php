@@ -34,9 +34,11 @@ abstract class AbstractXmlConfiguration extends TestCase
     protected $tempDir = '/path/to/tmp';
 
     /**
+     * @param string|null $phpunitXmlPath
+     * @param array $coverageTests
      * @return InitialXmlConfiguration|MutationXmlConfiguration
      */
-    abstract protected function getConfigurationObject();
+    abstract protected function getConfigurationObject(string $phpunitXmlPath = null, array $coverageTests = []);
 
     protected function setUp()
     {

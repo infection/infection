@@ -16,14 +16,15 @@ use function Infection\Tests\normalizePath as p;
 
 class InitialXmlConfigurationTest extends AbstractXmlConfiguration
 {
-    protected function getConfigurationObject()
+    protected function getConfigurationObject(string $phpunitXmlPath = null, array $coverageTests = [])
     {
-        $phpunitXmlPath = __DIR__ . '/../../../Files/phpunit/phpunit.xml';
-        $jUnitFilePath = '/path/to/jsunit.xml';
+        $resultPhpunitXmlPath = $phpunitXmlPath ?: __DIR__ . '/../../../Files/phpunit/phpunit.xml';
+        $jUnitFilePath = '/path/to/junit.xml';
+        $srcDirs = ['src', 'app'];
 
         $replacer = new PathReplacer(new Locator($this->pathToProject));
 
-        return new InitialXmlConfiguration($this->tempDir, $phpunitXmlPath, $replacer, $jUnitFilePath);
+        return new InitialXmlConfiguration($this->tempDir, $resultPhpunitXmlPath, $replacer, $jUnitFilePath, $srcDirs);
     }
 
     public function test_it_replaces_test_suite_directory_wildcard()
@@ -47,7 +48,7 @@ class InitialXmlConfigurationTest extends AbstractXmlConfiguration
         $this->assertSame($this->pathToProject . '/app/autoload2.php', $value);
     }
 
-    public function test_it_adds_php_logger()
+    public function test_it_adds_needed_loggers()
     {
         $xml = $this->configuration->getXml();
 
@@ -58,5 +59,30 @@ class InitialXmlConfigurationTest extends AbstractXmlConfiguration
         $this->assertSame($this->tempDir . '/coverage-xml', $logEntries[0]->getAttribute('target'));
         $this->assertSame('coverage-xml', $logEntries[0]->getAttribute('type'));
         $this->assertSame('junit', $logEntries[1]->getAttribute('type'));
+    }
+
+    public function test_it_creates_coverage_filter_whitelist_node_if_does_not_exist()
+    {
+        $phpunitXmlPath = __DIR__ . '/../../../Files/phpunit/phpunit_without_coverage_whitelist.xml';
+        $configuration = $this->getConfigurationObject($phpunitXmlPath);
+
+        $xml = $configuration->getXml();
+
+        /** @var \DOMNodeList $filterNodes */
+        $filterNodes = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
+
+        $this->assertSame(2, $filterNodes->length);
+    }
+
+    public function test_it_does_not_create_coverage_filter_whitelist_node_if_already_exist()
+    {
+        $configuration = $this->getConfigurationObject();
+
+        $xml = $configuration->getXml();
+
+        /** @var \DOMNodeList $filterNodes */
+        $filterNodes = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
+
+        $this->assertSame(1, $filterNodes->length);
     }
 }

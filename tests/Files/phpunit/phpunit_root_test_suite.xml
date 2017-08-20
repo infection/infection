@@ -15,9 +15,9 @@
          processIsolation="false"
          syntaxCheck="false"
 >
-        <testsuite name="Application Test Suite">
-            <directory>./*Bundle</directory>
-        </testsuite>
+    <testsuite name="Application Test Suite">
+        <directory>./*Bundle</directory>
+    </testsuite>
 
     <filter>
         <whitelist>
