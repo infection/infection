@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.5.1](https://github.com/infection/infection/tree/0.5.1) (2017-08-20)
+[Full Changelog](https://github.com/infection/infection/compare/0.5.0...0.5.1)
+
+**Merged pull requests:**
+
+- Auto add coverage filter whitelist for phpunit.xml.dist to make it possible to analyze coverage [\#20](https://github.com/infection/infection/pull/20) ([borNfreee](https://github.com/borNfreee))
+- Smart `ReturnValue` mutators [\#19](https://github.com/infection/infection/pull/19) ([borNfreee](https://github.com/borNfreee))
+
 ## [0.5.0](https://github.com/infection/infection/tree/0.5.0) (2017-08-08)
 [Full Changelog](https://github.com/infection/infection/compare/0.4.0...0.5.0)
 
