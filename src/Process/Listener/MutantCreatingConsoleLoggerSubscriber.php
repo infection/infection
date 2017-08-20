@@ -10,12 +10,15 @@ namespace Infection\Process\Listener;
 
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\MutableFileProcessed;
+use Infection\Events\MutantCreated;
+use Infection\Events\MutantsCreatingStarted;
+use Infection\Events\MutantsCreationFinished;
 use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MutationGeneratingConsoleLoggerSubscriber implements EventSubscriberInterface
+class MutantCreatingConsoleLoggerSubscriber implements EventSubscriberInterface
 {
     /**
      * @var OutputInterface
@@ -29,31 +32,31 @@ class MutationGeneratingConsoleLoggerSubscriber implements EventSubscriberInterf
 
     public function __construct(OutputInterface $output, ProgressBar $progressBar)
     {
-        $this->output = $output;
         $this->progressBar = $progressBar;
+        $this->output = $output;
     }
 
     public function getSubscribedEvents()
     {
         return [
-            MutationGeneratingStarted::class => [$this, 'onMutationGeneratingStarted'],
-            MutableFileProcessed::class => [$this, 'onMutableFileProcessed'],
-            MutationGeneratingFinished::class => [$this, 'onMutationGeneratingFinished'],
+            MutantsCreatingStarted::class => [$this, 'onMutantsCreatingStarted'],
+            MutantCreated::class => [$this, 'onMutantCreated'],
+            MutantsCreationFinished::class => [$this, 'onMutantsCreationFinished'],
         ];
     }
 
-    public function onMutationGeneratingStarted(MutationGeneratingStarted $event)
+    public function onMutantsCreatingStarted(MutantsCreatingStarted $event)
     {
-        $this->output->writeln(['', '', 'Generate mutants...', '']);
-        $this->progressBar->start($event->getMutableFilesCount());
+        $this->output->writeln(['']);
+        $this->progressBar->start($event->getMutantCount());
     }
 
-    public function onMutableFileProcessed(MutableFileProcessed $event)
+    public function onMutantCreated(MutantCreated $event)
     {
         $this->progressBar->advance();
     }
 
-    public function onMutationGeneratingFinished(MutationGeneratingFinished $event)
+    public function onMutantsCreationFinished(MutantsCreationFinished $event)
     {
         $this->progressBar->finish();
     }

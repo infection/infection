@@ -18,12 +18,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
 {
     /**
+     * @var OutputInterface
+     */
+    private $output;
+
+    /**
      * @var ProgressBar
      */
     private $progressBar;
 
-    public function __construct(ProgressBar $progressBar)
+    public function __construct(OutputInterface $output, ProgressBar $progressBar)
     {
+        $this->output = $output;
         $this->progressBar = $progressBar;
     }
 
@@ -38,6 +44,7 @@ class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
 
     public function onInitialTestSuiteStarted(InitialTestSuiteStarted $event)
     {
+        $this->output->writeln(['Running initial test suite...', '']);
         $this->progressBar->start();
     }
 

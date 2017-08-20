@@ -19,6 +19,7 @@ use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\Mutator;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
+use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationTestingConsoleLoggerSubscriber;
 use Infection\Process\Listener\TextFileLoggerSubscriber;
@@ -71,8 +72,6 @@ class InfectionApplication
 
         $processBuilder = new ProcessBuilder($adapter, $this->get('infection.config')->getProcessTimeout());
 
-        $this->output->writeln(['Running initial test suite...', '']);
-
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
         $initialTestSuitProcess = $initialTestsRunner->run();
 
@@ -81,8 +80,6 @@ class InfectionApplication
 
             return 1;
         }
-
-        $this->output->writeln(['', '', 'Generate mutants...', '']);
 
         $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
         $mutationsGenerator = new MutationsGenerator(
@@ -98,8 +95,6 @@ class InfectionApplication
         $parallelProcessManager = $this->get('parallel.process.runner');
         $mutantCreator = $this->get('mutant.creator');
         $threadCount = (int) $this->input->getOption('threads');
-
-        $this->output->writeln(['', 'Creating mutated files and processes...']);
 
         $mutationTestingRunner = new MutationTestingRunner($processBuilder, $parallelProcessManager, $mutantCreator, $eventDispatcher, $mutations);
         $mutationTestingRunner->run($threadCount, $codeCoverageData);
@@ -156,10 +151,14 @@ class InfectionApplication
         $initialTestsProgressBar->setFormat('verbose');
 
         $mutationGeneratingProgressBar = new ProgressBar($this->output);
-        $mutationGeneratingProgressBar->setFormat('Processed files: %current%/%max%');
+        $mutationGeneratingProgressBar->setFormat('Processed source code files: %current%/%max%');
 
-        $eventDispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($initialTestsProgressBar));
-        $eventDispatcher->addSubscriber(new MutationGeneratingConsoleLoggerSubscriber($mutationGeneratingProgressBar));
+        $mutantCreatingProgressBar = new ProgressBar($this->output);
+        $mutantCreatingProgressBar->setFormat('Creating mutated files and processes: %current%/%max%');
+
+        $eventDispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($this->output, $initialTestsProgressBar));
+        $eventDispatcher->addSubscriber(new MutationGeneratingConsoleLoggerSubscriber($this->output, $mutationGeneratingProgressBar));
+        $eventDispatcher->addSubscriber(new MutantCreatingConsoleLoggerSubscriber($this->output, $mutantCreatingProgressBar));
         $eventDispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber($this->output, $this->getOutputFormatter(), $metricsCalculator, $this->get('diff.colorizer'), $this->input->getOption('show-mutations')));
         $eventDispatcher->addSubscriber(new TextFileLoggerSubscriber($this->get('infection.config'), $metricsCalculator));
     }

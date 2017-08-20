@@ -9,6 +9,9 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use Infection\EventDispatcher\EventDispatcherInterface;
+use Infection\Events\MutantCreated;
+use Infection\Events\MutantsCreatingFinished;
+use Infection\Events\MutantsCreatingStarted;
 use Infection\Events\MutationTestingFinished;
 use Infection\Events\MutationTestingStarted;
 use Infection\Mutant\MutantCreator;
@@ -53,17 +56,24 @@ class MutationTestingRunner
 
     public function run(int $threadCount, CodeCoverageData $codeCoverageData)
     {
+        $mutantCount = count($this->mutations);
+
+        $this->eventDispatcher->dispatch(new MutantsCreatingStarted($mutantCount));
+
         $processes = array_map(
             function (Mutation $mutation) use ($codeCoverageData): MutantProcess {
                 $mutant = $this->mutantCreator->create($mutation, $codeCoverageData);
 
-                return $this->processBuilder->getProcessForMutant($mutant);
+                $process = $this->processBuilder->getProcessForMutant($mutant);
+
+                $this->eventDispatcher->dispatch(new MutantCreated());
+
+                return $process;
             },
             $this->mutations
         );
 
-        // run multiple processes
-        $mutantCount = count($this->mutations);
+        $this->eventDispatcher->dispatch(new MutantsCreatingFinished());
 
         $this->eventDispatcher->dispatch(new MutationTestingStarted($mutantCount));
 
