@@ -18,7 +18,6 @@ foreach ($files as $file) {
         break;
     }
 }
-unset($file);
 
 if (!defined('INFECTION_COMPOSER_INSTALL')) {
     fwrite(STDERR,
