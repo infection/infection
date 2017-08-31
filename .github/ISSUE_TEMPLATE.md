@@ -1,6 +1,6 @@
 | Question    | Answer
 | ------------| ---------------
-| Infection version | x.y.z (run `infection.phar --version`)
+| Infection version | x.y.z (`infection.phar --version`)
 | Test Framework version | PHPUnit/PhpSpec x.y.z
 | PHP version | x.y.z (`php -v`)
 | Platform    | e.g. Ubuntu/Windows/MacOS
@@ -12,7 +12,7 @@
 
 - Please complete the above table with a correct information.
 
-- Please include steps to reproduce your issue
+- Please include steps to reproduce your issue.
 
 - Please include any options you use when run infection
 
@@ -22,11 +22,17 @@
 <!-- Please past your phpunit.xml[.dist] if no Github link to the repo provided -->
 <details>
  <summary>phpunit.xml</summary>
- %phpunit.xml content%
+ 
+ ```xml
+  %phpunit.xml content%
+ ```
 </details>
 
 <!-- Remove this section if not needed -->
 <details>
  <summary>Output with issue</summary>
+ 
+ ```
  The long infection output (probably with stacktrace)
+ ```
 </details>
