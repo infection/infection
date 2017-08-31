@@ -40,9 +40,13 @@ class SourceDirsProvider
         $guessedSourceDirs = null;
 
         if (file_exists('composer.json')) {
-            $sourceDirGuesser = new SourceDirGuesser(
-                json_decode(file_get_contents('composer.json'))
-            );
+            $content = json_decode(file_get_contents('composer.json'));
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \LogicException('composer.json does not contain valid JSON');
+            }
+
+            $sourceDirGuesser = new SourceDirGuesser($content);
             $guessedSourceDirs = $sourceDirGuesser->guess();
         }
 

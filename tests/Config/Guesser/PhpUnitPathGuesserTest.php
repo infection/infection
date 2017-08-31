@@ -7,8 +7,7 @@
 
 declare(strict_types=1);
 
-
-namespace Infection\Tests\Guesser;
+namespace Infection\Tests\Config\Guesser;
 
 use Infection\Config\Guesser\PhpUnitPathGuesser;
 use PHPUnit\Framework\TestCase;

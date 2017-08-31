@@ -36,14 +36,9 @@ class SourceDirGuesser implements Guesser
         return null;
     }
 
-    private function getValues(string $psr)
+    private function getValues(string $psr): array
     {
-        $dirs = array_map(
-            function (string $dir) {
-                return trim($dir, DIRECTORY_SEPARATOR);
-            },
-            array_values((array) $this->composerJsonContent->autoload->{$psr})
-        );
+        $dirs = $this->parsePsrSection((array) $this->composerJsonContent->autoload->{$psr});
 
         // we don't want to mix different framework's folders like "app" for Symfony
         if (in_array('src', $dirs, true)) {
@@ -51,5 +46,40 @@ class SourceDirGuesser implements Guesser
         }
 
         return $dirs;
+    }
+
+    private function parsePsrSection(array $autoloadDirs): array
+    {
+        $dirs = [];
+
+        foreach ($autoloadDirs as $path) {
+            if (!is_array($path) && !is_string($path)) {
+                throw new \LogicException('autoload section does not match the expected JSON schema');
+            }
+
+            $this->parsePath($path, $dirs);
+        }
+
+        return $dirs;
+    }
+
+    /**
+     * @param array|string $path
+     * @param array        $dirs
+     */
+    private function parsePath($path, array &$dirs)
+    {
+        if (is_array($path)) {
+            array_walk_recursive(
+                $path,
+                function ($el) use (&$dirs) {
+                    $this->parsePath($el, $dirs);
+                }
+            );
+        }
+
+        if (is_string($path)) {
+            $dirs[] = trim($path, DIRECTORY_SEPARATOR);
+        }
     }
 }
