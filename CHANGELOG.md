@@ -1,5 +1,24 @@
 # Change Log
 
+## [0.5.2](https://github.com/infection/infection/tree/0.5.2) (2017-09-02)
+[Full Changelog](https://github.com/infection/infection/compare/0.5.1...0.5.2)
+
+**Fixed bugs:**
+
+- SourceDirGuesser failure [\#23](https://github.com/infection/infection/issues/23)
+
+**Closed issues:**
+
+- Run as project dependency [\#27](https://github.com/infection/infection/issues/27)
+- Dependency on sebastian/diff [\#21](https://github.com/infection/infection/issues/21)
+
+**Merged pull requests:**
+
+- Add ISSUE\_TEMPLATE.md to get all required info from users [\#26](https://github.com/infection/infection/pull/26) ([borNfreee](https://github.com/borNfreee))
+- Added option '-c|--configuration' for custom configuration file path. [\#28](https://github.com/infection/infection/pull/28) ([corpsee](https://github.com/corpsee))
+- Fix autoload section from composer.json and allow to use multiple paths [\#25](https://github.com/infection/infection/pull/25) ([sidz](https://github.com/sidz))
+- Fixed bootstrap.php for case with install by Composer as dependency and run from vendor/bin [\#22](https://github.com/infection/infection/pull/22) ([corpsee](https://github.com/corpsee))
+
 ## [0.5.1](https://github.com/infection/infection/tree/0.5.1) (2017-08-20)
 [Full Changelog](https://github.com/infection/infection/compare/0.5.0...0.5.1)
 
@@ -37,11 +56,8 @@
 
 **Fixed bugs:**
 
-- Uncaught Error: Call to a member function appendChild\(\) on null [\#5](https://github.com/infection/infection/issues/5)
-
-**Closed issues:**
-
 - Timeout [\#6](https://github.com/infection/infection/issues/6)
+- Uncaught Error: Call to a member function appendChild\(\) on null [\#5](https://github.com/infection/infection/issues/5)
 
 **Merged pull requests:**
 
