@@ -63,6 +63,12 @@ class InfectionCommand extends Command
                 'Show mutations to the console'
             )
             ->addOption(
+                'configuration',
+                'c',
+                InputOption::VALUE_REQUIRED,
+                'Custom configuration file path'
+            )
+            ->addOption(
                 'mutators',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -99,10 +105,18 @@ class InfectionCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->container['infection.config'] = function (Container $c): InfectionConfig {
+        $this->container['infection.config'] = function (Container $c) use ($input): InfectionConfig {
             try {
-                $infectionConfigFile = $c['locator']->locateAnyOf(['infection.json', 'infection.json.dist']);
-                $json = file_get_contents($infectionConfigFile);
+                $configPaths     = [
+                    InfectionConfig::CONFIG_FILE_NAME,
+                    InfectionConfig::CONFIG_FILE_NAME . '.dist',
+                ];
+                $customConfigPath = $input->getOption('configuration');
+                if ($customConfigPath) {
+                    $configPaths[] = $customConfigPath;
+                }
+                $infectionConfigFile = $c['locator']->locateAnyOf($configPaths);
+                $json                = file_get_contents($infectionConfigFile);
             } catch (\Exception $e) {
                 $json = '{}';
             }
@@ -127,8 +141,14 @@ class InfectionCommand extends Command
     {
         $this->setOutputFormatterStyles($output);
 
-        $configExists = file_exists(InfectionConfig::CONFIG_FILE_NAME) ||
-            file_exists(InfectionConfig::CONFIG_FILE_NAME . '.dist');
+        $customConfigPath = $input->getOption('configuration');
+        $configExists     = $customConfigPath && file_exists($customConfigPath);
+
+        if (!$configExists) {
+            $configExists = 
+                file_exists(InfectionConfig::CONFIG_FILE_NAME) ||
+                file_exists(InfectionConfig::CONFIG_FILE_NAME . '.dist');
+        }
 
         if (!$configExists) {
             $configureCommand = $this->getApplication()->find('configure');
