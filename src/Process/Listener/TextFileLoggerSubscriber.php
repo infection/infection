@@ -81,12 +81,15 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
         $logParts = [sprintf('%s mutants:', $headlinePrefix), ''];
 
         foreach ($processes as $index => $mutantProcess) {
+            $mutant = $mutantProcess->getMutant();
+            $process = $mutantProcess->getProcess();
+
             $logParts[] = '';
-            $logParts[] = sprintf('%d) %s', $index + 1, get_class($mutantProcess->getMutant()->getMutation()->getMutator()));
-            $logParts[] = $mutantProcess->getMutant()->getMutation()->getOriginalFilePath();
-            $logParts[] = $mutantProcess->getProcess()->getCommandLine();
-            $logParts[] = $mutantProcess->getMutant()->getDiff();
-            $logParts[] = $mutantProcess->getProcess()->getOutput();
+            $logParts[] = sprintf('%d) %s', $index + 1, get_class($mutant->getMutation()->getMutator()));
+            $logParts[] = $mutant->getMutation()->getOriginalFilePath();
+            $logParts[] = $process->getCommandLine();
+            $logParts[] = $mutant->getDiff();
+            $logParts[] = $mutant->isCoveredByTest() ? $process->getOutput() : '';
         }
 
         return $logParts;
