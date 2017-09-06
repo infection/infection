@@ -11,7 +11,9 @@ namespace Infection\Visitor;
 use Infection\Mutation;
 use Infection\Mutator\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use PhpParser\Builder\Interface_;
 use PhpParser\Node;
+use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 
 class MutationsCollectorVisitor extends NodeVisitorAbstract
@@ -45,6 +47,13 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
         $this->filePath = $filePath;
         $this->codeCoverageData = $codeCoverageData;
         $this->onlyCovered = $onlyCovered;
+    }
+
+    public function enterNode(Node $node)
+    {
+        if ($node instanceof Interface_) {
+            return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+        }
     }
 
     public function leaveNode(Node $node)
