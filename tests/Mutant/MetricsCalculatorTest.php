@@ -33,6 +33,9 @@ class MetricsCalculatorTest extends TestCase
         $this->assertSame(0, $calculator->getNotCoveredByTestsCount());
         $this->assertSame(0, $calculator->getTotalMutantsCount());
         $this->assertSame([], $calculator->getEscapedMutantProcesses());
+        $this->assertSame([], $calculator->getKilledMutantProcesses());
+        $this->assertSame([], $calculator->getTimedOutProcesses());
+        $this->assertSame([], $calculator->getNotCoveredMutantProcesses());
 
         $this->assertSame(0.0, $calculator->getMutationScoreIndicator());
         $this->assertSame(0.0, $calculator->getCoverageRate());
