@@ -24,6 +24,7 @@ use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Differ\DiffColorizer;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\Config\InfectionConfig;
+use Infection\Utils\VersionParser;
 
 $c = new Container();
 
@@ -66,7 +67,7 @@ $c['path.replacer'] = function (Container $c): PathReplacer {
 };
 
 $c['test.framework.factory'] = function (Container $c): Factory {
-    return new Factory($c['temp.dir'], $c['project.dir'], $c['testframework.config.locator'], $c['path.replacer'], $c['phpunit.junit.file.path'], $c['infection.config']);
+    return new Factory($c['temp.dir'], $c['project.dir'], $c['testframework.config.locator'], $c['path.replacer'], $c['phpunit.junit.file.path'], $c['infection.config'], $c['version.parser']);
 };
 
 $c['mutant.creator'] = function (Container $c): MutantCreator {
@@ -99,6 +100,10 @@ $c['phpunit.junit.file.path'] = function (Container $c): string {
 
 $c['test.file.data.provider.phpunit'] = function (Container $c): TestFileDataProvider {
     return new PhpUnitTestFileDataProvider($c['phpunit.junit.file.path']);
+};
+
+$c['version.parser'] = function (): VersionParser {
+    return new VersionParser();
 };
 
 function registerMutators(array $mutators, Container $container) {

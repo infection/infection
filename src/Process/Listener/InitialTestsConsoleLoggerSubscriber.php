@@ -12,6 +12,7 @@ use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\InitialTestCaseCompleted;
 use Infection\Events\InitialTestSuiteFinished;
 use Infection\Events\InitialTestSuiteStarted;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -27,10 +28,16 @@ class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
      */
     private $progressBar;
 
-    public function __construct(OutputInterface $output, ProgressBar $progressBar)
+    /**
+     * @var AbstractTestFrameworkAdapter
+     */
+    private $testFrameworkAdapter;
+
+    public function __construct(OutputInterface $output, ProgressBar $progressBar, AbstractTestFrameworkAdapter $testFrameworkAdapter)
     {
         $this->output = $output;
         $this->progressBar = $progressBar;
+        $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
 
     public function getSubscribedEvents()
@@ -44,7 +51,16 @@ class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
 
     public function onInitialTestSuiteStarted(InitialTestSuiteStarted $event)
     {
-        $this->output->writeln(['Running initial test suite...', '']);
+        $this->output->writeln([
+            'Running initial test suite...',
+            '',
+            sprintf(
+                '%s version: %s',
+                ucfirst($this->testFrameworkAdapter->getName()),
+                $this->testFrameworkAdapter->getVersion()
+            ),
+            ''
+        ]);
         $this->progressBar->start();
     }
 

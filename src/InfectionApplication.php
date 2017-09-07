@@ -25,6 +25,7 @@ use Infection\Process\Listener\MutationTestingConsoleLoggerSubscriber;
 use Infection\Process\Listener\TextFileLoggerSubscriber;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Pimple\Container;
@@ -68,7 +69,7 @@ class InfectionApplication
 
         $metricsCalculator = new MetricsCalculator($adapter);
 
-        $this->addSubscribers($eventDispatcher, $metricsCalculator);
+        $this->addSubscribers($eventDispatcher, $metricsCalculator, $adapter);
 
         $processBuilder = new ProcessBuilder($adapter, $this->get('infection.config')->getProcessTimeout());
 
@@ -145,7 +146,7 @@ class InfectionApplication
         throw new \InvalidArgumentException('Incorrect formatter. Possible values: dot, progress');
     }
 
-    private function addSubscribers(EventDispatcher $eventDispatcher, MetricsCalculator $metricsCalculator)
+    private function addSubscribers(EventDispatcher $eventDispatcher, MetricsCalculator $metricsCalculator, AbstractTestFrameworkAdapter $testFrameworkAdapter)
     {
         $initialTestsProgressBar = new ProgressBar($this->output);
         $initialTestsProgressBar->setFormat('verbose');
@@ -156,7 +157,7 @@ class InfectionApplication
         $mutantCreatingProgressBar = new ProgressBar($this->output);
         $mutantCreatingProgressBar->setFormat('Creating mutated files and processes: %current%/%max%');
 
-        $eventDispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($this->output, $initialTestsProgressBar));
+        $eventDispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($this->output, $initialTestsProgressBar, $testFrameworkAdapter));
         $eventDispatcher->addSubscriber(new MutationGeneratingConsoleLoggerSubscriber($this->output, $mutationGeneratingProgressBar));
         $eventDispatcher->addSubscriber(new MutantCreatingConsoleLoggerSubscriber($this->output, $mutantCreatingProgressBar));
         $eventDispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber($this->output, $this->getOutputFormatter(), $metricsCalculator, $this->get('diff.colorizer'), $this->input->getOption('show-mutations')));

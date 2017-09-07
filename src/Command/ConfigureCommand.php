@@ -18,7 +18,7 @@ use Infection\Config\ValueProvider\TimeoutProvider;
 use Infection\Finder\TestFrameworkExecutableFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\Config\InfectionConfig;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
+use Infection\TestFramework\TestFrameworkTypes;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -61,7 +61,7 @@ class ConfigureCommand extends Command
         $phpUnitConfigPathProvider = new PhpUnitPathProvider($testFrameworkConfigLocator, $this->consoleHelper, $this->getQuestionHelper());
         $phpUnitConfigPath = $phpUnitConfigPathProvider->get($input, $output, $dirsInCurrentDir, $input->getOption('test-framework'));
 
-        $phpUnitExecutableFinder = new TestFrameworkExecutableFinder(PhpUnitAdapter::NAME);
+        $phpUnitExecutableFinder = new TestFrameworkExecutableFinder(TestFrameworkTypes::PHPUNIT);
         $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $this->consoleHelper, $this->getQuestionHelper());
         $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($input, $output);
 
