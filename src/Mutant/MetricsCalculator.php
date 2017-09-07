@@ -49,6 +49,11 @@ class MetricsCalculator
     private $notCoveredByTestsCount = 0;
 
     /**
+     * @var MutantProcess[]
+     */
+    private $notCoveredMutantProcesses = [];
+
+    /**
      * @var int
      */
     private $totalMutantsCount = 0;
@@ -79,6 +84,7 @@ class MetricsCalculator
                 break;
             case MutantProcess::CODE_NOT_COVERED:
                 $this->notCoveredByTestsCount++;
+                $this->notCoveredMutantProcesses[] = $mutantProcess;
                 break;
             case MutantProcess::CODE_ESCAPED:
                 $this->escapedCount++;
@@ -200,5 +206,13 @@ class MetricsCalculator
     public function getTimedOutProcesses(): array
     {
         return $this->timedOutProcesses;
+    }
+
+    /**
+     * @return MutantProcess[]
+     */
+    public function getNotCoveredMutantProcesses(): array
+    {
+        return $this->notCoveredMutantProcesses;
     }
 }

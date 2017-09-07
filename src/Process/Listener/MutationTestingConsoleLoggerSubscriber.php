@@ -96,18 +96,28 @@ class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
     {
         // TODO [doc] write test -> run mutation for just this file. Should be 100%, 100%, 100%,
         $this->outputFormatter->finish();
-        $processes = $this->metricsCalculator->getEscapedMutantProcesses();
 
         if ($this->showMutations) {
-            $this->showMutations($processes);
+            $this->showMutations($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped');
+
+            if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
+                $this->showMutations($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not covered');
+            }
         }
 
         $this->showMetrics();
     }
 
-    private function showMutations(array $processes)
+    private function showMutations(array $processes, string $headlinePrefix)
     {
-        $this->output->writeln('');
+        $headline = sprintf('%s mutants:', $headlinePrefix);
+
+        $this->output->writeln([
+            '',
+            $headline,
+            str_repeat('=', strlen($headline)),
+            '',
+        ]);
 
         foreach ($processes as $index => $mutantProcess) {
             $this->output->writeln([

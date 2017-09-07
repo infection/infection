@@ -12,6 +12,8 @@ use Infection\Mutation;
 use Infection\Mutator\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use PhpParser\Node;
+use PhpParser\Node\Stmt\Interface_;
+use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 
 class MutationsCollectorVisitor extends NodeVisitorAbstract

@@ -205,6 +205,30 @@ CODE;
         ];
     }
 
+    public function test_it_does_not_modify_interface_methods()
+    {
+        $code = <<<"CODE"
+<?php
+
+interface TestInterface
+{
+    public function test();
+}
+CODE;
+        $mutatedCode = $this->mutate($code);
+
+        $expectedMutatedCode = <<<"CODE"
+<?php
+
+interface TestInterface
+{
+    public function test();
+}
+CODE;
+
+        $this->assertSame($expectedMutatedCode, $mutatedCode);
+    }
+
     protected function getMutator(): Mutator
     {
         return new PublicVisibility();
