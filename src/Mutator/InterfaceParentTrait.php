@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Volodimir Melko
+ * Copyright © 2017 Maks Rafalko
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
@@ -13,6 +13,8 @@ use PhpParser\Node;
 
 /**
  * Checks if given node belongs to Interface
+ *
+ * @author Volodimir Melko <v.melko28@gmail.com>
  */
 trait InterfaceParentTrait
 {
