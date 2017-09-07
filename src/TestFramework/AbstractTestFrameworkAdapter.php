@@ -12,6 +12,8 @@ use Infection\Finder\AbstractExecutableFinder;
 use Infection\Mutant\Mutant;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
+use Infection\Utils\VersionParser;
+use Symfony\Component\Process\Process;
 
 abstract class AbstractTestFrameworkAdapter
 {
@@ -34,12 +36,24 @@ abstract class AbstractTestFrameworkAdapter
      */
     private $mutationConfigBuilder;
 
-    public function __construct(AbstractExecutableFinder $executableFinder, InitialConfigBuilder $initialConfigBuilder, MutationConfigBuilder $mutationConfigBuilder, CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder)
+    /**
+     * @var VersionParser
+     */
+    private $versionParser;
+
+    public function __construct(
+        AbstractExecutableFinder $executableFinder,
+        InitialConfigBuilder $initialConfigBuilder,
+        MutationConfigBuilder $mutationConfigBuilder,
+        CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
+        VersionParser $versionParser
+    )
     {
         $this->executableFinder = $executableFinder;
         $this->initialConfigBuilder = $initialConfigBuilder;
         $this->mutationConfigBuilder = $mutationConfigBuilder;
         $this->argumentsAndOptionsBuilder = $argumentsAndOptionsBuilder;
+        $this->versionParser = $versionParser;
     }
 
     abstract public function testsPass(string $output): bool;
@@ -72,5 +86,21 @@ abstract class AbstractTestFrameworkAdapter
     public function buildMutationConfigFile(Mutant $mutant): string
     {
         return $this->mutationConfigBuilder->build($mutant);
+    }
+
+    public function getVersion(): string
+    {
+        $process = new Process(
+            sprintf(
+                '%s %s',
+                $this->executableFinder->find(),
+                '--version'
+            )
+        );
+
+        $process->mustRun();
+        $versionOutput = $process->getOutput();
+
+        return $this->versionParser->parse($versionOutput);
     }
 }

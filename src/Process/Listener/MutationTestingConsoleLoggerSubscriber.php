@@ -16,6 +16,7 @@ use Infection\Events\MutationTestingStarted;
 use Infection\Events\MutantProcessFinished;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
@@ -144,8 +145,7 @@ class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
             $this->addIndentation("Covered Code MSI: <{$coveredMsiTag}>{$this->metricsCalculator->getCoveredCodeMutationScoreIndicator()}%</{$coveredMsiTag}>")
         );
 
-        $this->output->writeln('');
-        $this->output->writeln('Please note that some mutants will inevitably be harmless (i.e. false positives).');
+        $this->output->writeln(['', 'Please note that some mutants will inevitably be harmless (i.e. false positives).']);
     }
 
     private function getPadded($subject, int $padLength = self::PAD_LENGTH): string

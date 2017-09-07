@@ -15,6 +15,7 @@ use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
+use Infection\Utils\VersionParser;
 use PHPUnit\Framework\TestCase;
 use Mockery;
 
@@ -80,8 +81,9 @@ OUTPUT;
         $initialConfigBuilder = Mockery::mock(InitialConfigBuilder::class);
         $mutationConfigBuilder = Mockery::mock(MutationConfigBuilder::class);
         $cliArgumentsBuilder = Mockery::mock(CommandLineArgumentsAndOptionsBuilder::class);
+        $versionParser = Mockery::mock(VersionParser::class);
 
-        return new PhpSpecAdapter($executableFined, $initialConfigBuilder, $mutationConfigBuilder, $cliArgumentsBuilder);
+        return new PhpSpecAdapter($executableFined, $initialConfigBuilder, $mutationConfigBuilder, $cliArgumentsBuilder, $versionParser);
     }
 
     protected function tearDown()

@@ -20,6 +20,7 @@ use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
+use Infection\Utils\VersionParser;
 
 class Factory
 {
@@ -51,7 +52,20 @@ class Factory
      */
     private $infectionConfig;
 
-    public function __construct(string $tempDir, string $projectDir, TestFrameworkConfigLocator $configLocator, PathReplacer $pathReplacer, string $jUnitFilePath, InfectionConfig $infectionConfig)
+    /**
+     * @var VersionParser
+     */
+    private $versionParser;
+
+    public function __construct(
+        string $tempDir,
+        string $projectDir,
+        TestFrameworkConfigLocator $configLocator,
+        PathReplacer $pathReplacer,
+        string $jUnitFilePath,
+        InfectionConfig $infectionConfig,
+        VersionParser $versionParser
+    )
     {
         $this->tempDir = $tempDir;
         $this->configLocator = $configLocator;
@@ -59,6 +73,7 @@ class Factory
         $this->projectDir = $projectDir;
         $this->jUnitFilePath = $jUnitFilePath;
         $this->infectionConfig = $infectionConfig;
+        $this->versionParser = $versionParser;
     }
 
     public function create($adapterName): AbstractTestFrameworkAdapter
@@ -70,7 +85,8 @@ class Factory
                 new TestFrameworkExecutableFinder(PhpUnitAdapter::NAME, $this->infectionConfig->getPhpUnitCustomPath()),
                 new InitialConfigBuilder($this->tempDir, $phpUnitConfigPath, $this->pathReplacer, $this->jUnitFilePath, $this->infectionConfig->getSourceDirs()),
                 new MutationConfigBuilder($this->tempDir, $phpUnitConfigPath, $this->pathReplacer, $this->projectDir),
-                new ArgumentsAndOptionsBuilder()
+                new ArgumentsAndOptionsBuilder(),
+                $this->versionParser
             );
         }
 
@@ -81,7 +97,8 @@ class Factory
                 new TestFrameworkExecutableFinder(PhpSpecAdapter::NAME),
                 new PhpSpecInitialConfigBuilder($this->tempDir, $phpSpecConfigPath),
                 new PhpSpecMutationConfigBuilder($this->tempDir, $phpSpecConfigPath, $this->projectDir),
-                new PhpSpecArgumentsAndOptionsBuilder()
+                new PhpSpecArgumentsAndOptionsBuilder(),
+                $this->versionParser
             );
         }
 
