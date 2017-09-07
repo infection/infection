@@ -51,15 +51,13 @@ class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
 
     public function onInitialTestSuiteStarted(InitialTestSuiteStarted $event)
     {
-        $testFramework = $this->testFrameworkAdapter;
-
         $this->output->writeln([
             'Running initial test suite...',
             '',
             sprintf(
                 '%s version: %s',
-                ucfirst($testFramework->getName()),
-                $testFramework->getVersion()
+                ucfirst($this->testFrameworkAdapter->getName()),
+                $this->testFrameworkAdapter->getVersion()
             ),
             ''
         ]);
