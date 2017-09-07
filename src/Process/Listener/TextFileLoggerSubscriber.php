@@ -11,6 +11,7 @@ namespace Infection\Process\Listener;
 use Infection\Config\InfectionConfig;
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\MutationTestingFinished;
+use Infection\Filesystem\Filesystem;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
 
@@ -26,10 +27,16 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
      */
     private $metricsCalculator;
 
-    public function __construct(InfectionConfig $infectionConfig, MetricsCalculator $metricsCalculator)
+    /**
+     * @var Filesystem
+     */
+    private $fs;
+
+    public function __construct(InfectionConfig $infectionConfig, MetricsCalculator $metricsCalculator, Filesystem $fs)
     {
         $this->infectionConfig = $infectionConfig;
         $this->metricsCalculator = $metricsCalculator;
+        $this->fs = $fs;
     }
 
     public function getSubscribedEvents()
@@ -41,32 +48,26 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
 
     public function onMutationTestingFinished(MutationTestingFinished $event)
     {
-        $textFileLogPath = $this->infectionConfig->getTextFileLogPath();
+        $logFilePath = $this->infectionConfig->getTextFileLogPath();
 
-        if ($textFileLogPath) {
-            $logParts = [];
+        if ($logFilePath) {
+            $this->fs->mkdir(\dirname($logFilePath));
 
-            $logParts = array_merge(
-                $logParts,
-                $this->getLogParts($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped')
+            $escapedParts = $this->getLogParts($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped');
+
+            $timedOutParts = $this->getLogParts($this->metricsCalculator->getTimedOutProcesses(), 'Timeout');
+
+            $killedParts = $this->getLogParts($this->metricsCalculator->getKilledMutantProcesses(), 'Killed');
+
+            $notCoveredParts = $this->getNotCoveredLogParts($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not covered');
+
+            file_put_contents(
+                $logFilePath,
+                implode(
+                    array_merge($escapedParts, $timedOutParts, $killedParts, $notCoveredParts),
+                   "\n"
+                )
             );
-
-            $logParts = array_merge(
-                $logParts,
-                $this->getLogParts($this->metricsCalculator->getTimedOutProcesses(), 'Timeout')
-            );
-
-            $logParts = array_merge(
-                $logParts,
-                $this->getLogParts($this->metricsCalculator->getKilledMutantProcesses(), 'Killed')
-            );
-
-            $logParts = array_merge(
-                $logParts,
-                $this->getNotCoveredLogParts($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not covered')
-            );
-
-            file_put_contents($textFileLogPath, implode($logParts, "\n"));
         }
     }
 
