@@ -49,14 +49,6 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
         $this->onlyCovered = $onlyCovered;
     }
 
-    public function enterNode(Node $node)
-    {
-        if ($node instanceof Interface_) {
-
-            return NodeTraverser::DONT_TRAVERSE_CHILDREN;
-        }
-    }
-
     public function leaveNode(Node $node)
     {
         foreach ($this->mutators as $mutator) {
