@@ -97,15 +97,11 @@ class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
         $this->outputFormatter->finish();
 
         if ($this->showMutations) {
-            $this->showMutations(
-                $this->metricsCalculator->getEscapedMutantProcesses(),
-                'Escaped'
-            );
+            $this->showMutations($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped');
+        }
 
-            $this->showMutations(
-                $this->metricsCalculator->getEscapedMutantProcesses(),
-                'Uncovered'
-            );
+        if ($this->showMutations && $this->output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
+            $this->showMutations($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not covered');
         }
 
         $this->showMetrics();
@@ -113,9 +109,12 @@ class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
 
     private function showMutations(array $processes, string $headlinePrefix)
     {
+        $headline = sprintf('%s mutants:', $headlinePrefix);
+
         $this->output->writeln([
             '',
-            sprintf('%s mutants:', $headlinePrefix),
+            $headline,
+            str_repeat('=', strlen($headline)),
             '',
         ]);
 
