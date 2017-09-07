@@ -58,6 +58,8 @@ abstract class AbstractTestFrameworkAdapter
 
     abstract public function testsPass(string $output): bool;
 
+    abstract public function getName(): string;
+
     /**
      * Returns path to the test framework's executable
      * Example:

@@ -78,11 +78,11 @@ class Factory
 
     public function create($adapterName): AbstractTestFrameworkAdapter
     {
-        if ($adapterName === PhpUnitAdapter::NAME) {
-            $phpUnitConfigPath = $this->configLocator->locate(PhpUnitAdapter::NAME);
+        if ($adapterName === TestFrameworkTypes::PHPUNIT) {
+            $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
             return new PhpUnitAdapter(
-                new TestFrameworkExecutableFinder(PhpUnitAdapter::NAME, $this->infectionConfig->getPhpUnitCustomPath()),
+                new TestFrameworkExecutableFinder(TestFrameworkTypes::PHPUNIT, $this->infectionConfig->getPhpUnitCustomPath()),
                 new InitialConfigBuilder($this->tempDir, $phpUnitConfigPath, $this->pathReplacer, $this->jUnitFilePath, $this->infectionConfig->getSourceDirs()),
                 new MutationConfigBuilder($this->tempDir, $phpUnitConfigPath, $this->pathReplacer, $this->projectDir),
                 new ArgumentsAndOptionsBuilder(),
@@ -90,11 +90,11 @@ class Factory
             );
         }
 
-        if ($adapterName === PhpSpecAdapter::NAME) {
-            $phpSpecConfigPath = $this->configLocator->locate(PhpSpecAdapter::NAME);
+        if ($adapterName === TestFrameworkTypes::PHPSPEC) {
+            $phpSpecConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPSPEC);
 
             return new PhpSpecAdapter(
-                new TestFrameworkExecutableFinder(PhpSpecAdapter::NAME),
+                new TestFrameworkExecutableFinder(TestFrameworkTypes::PHPSPEC),
                 new PhpSpecInitialConfigBuilder($this->tempDir, $phpSpecConfigPath),
                 new PhpSpecMutationConfigBuilder($this->tempDir, $phpSpecConfigPath, $this->projectDir),
                 new PhpSpecArgumentsAndOptionsBuilder(),
@@ -105,7 +105,7 @@ class Factory
         throw new \InvalidArgumentException(
             sprintf(
                 'Invalid name of test framework. Available names are: %s',
-                implode(', ', [PhpUnitAdapter::NAME, PhpSpecAdapter::NAME])
+                implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC])
             )
         );
     }

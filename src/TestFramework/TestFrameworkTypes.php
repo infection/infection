@@ -7,13 +7,11 @@
 declare(strict_types=1);
 
 
-namespace Infection\Mutator\FunctionSignature;
+namespace Infection\TestFramework;
 
 
-class Mok
+class TestFrameworkTypes
 {
-    public function test(int $r)
-    {
-        return 1;
-    }
+    const PHPUNIT = 'phpunit';
+    const PHPSPEC = 'phpspec';
 }

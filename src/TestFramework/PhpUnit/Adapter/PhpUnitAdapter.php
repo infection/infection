@@ -9,10 +9,10 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\TestFrameworkTypes;
 
 class PhpUnitAdapter extends AbstractTestFrameworkAdapter
 {
-    const NAME = 'phpunit';
     const JUNIT_FILE_NAME = 'phpunit.junit.xml';
 
     public function testsPass(string $output): bool
@@ -35,5 +35,10 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter
         $isWarning = (bool) preg_match('/warnings!/i', $output);
 
         return $isOk || $isOkWithInfo || $isWarning;
+    }
+
+    public function getName(): string
+    {
+        return TestFrameworkTypes::PHPUNIT;
     }
 }
