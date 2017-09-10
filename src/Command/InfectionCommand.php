@@ -164,8 +164,8 @@ class InfectionCommand extends Command
             }
         }
 
-        if (!defined('HHVM_VERSION') && !extension_loaded('xdebug')) {
-            throw new \Exception('You need to install and enable xDebug in order to allow for code coverage generation.');
+        if (PHP_SAPI !== 'phpdbg' && !defined('HHVM_VERSION') && !extension_loaded('xdebug')) {
+            throw new \Exception('You need to use phpdbg or install and enable xDebug in order to allow for code coverage generation.');
         }
     }
 
