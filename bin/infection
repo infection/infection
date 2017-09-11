@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-if (PHP_SAPI !== 'cli') {
+if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
     echo 'Warning: Infection may only be invoked from a command line', PHP_EOL;
 }
 
