@@ -32,7 +32,7 @@ class ProcessBuilder
         $this->timeout = $timeout;
     }
 
-    public function build(): Process
+    public function getProcessForInitialTestRun(): Process
     {
         $configPath = $this->testFrameworkAdapter->buildInitialConfigFile();
 
@@ -60,19 +60,19 @@ class ProcessBuilder
     {
         $configPath = $this->testFrameworkAdapter->buildMutationConfigFile($mutant);
 
-        $symfonyProcess = $this->getProcess($configPath);
+        $symfonyProcess = $this->getProcess($configPath, $this->timeout);
 
         return new MutantProcess($symfonyProcess, $mutant, $this->testFrameworkAdapter);
     }
 
-    private function getProcess(string $configPath): Process
+    private function getProcess(string $configPath, int $timeout = null): Process
     {
         return new Process(
             $this->testFrameworkAdapter->getExecutableCommandLine($configPath),
             null,
             array_replace($_ENV, $_SERVER),
             null,
-            $this->timeout
+            $timeout
         );
     }
 }
