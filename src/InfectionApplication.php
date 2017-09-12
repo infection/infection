@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use Infection\Console\Exception\InfectionException;
 use Infection\Console\Exception\InvalidOptionException;
 use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;
@@ -62,51 +63,62 @@ class InfectionApplication
     public function run()
     {
         $io = new SymfonyStyle($this->input, $this->output);
-        /** @var EventDispatcher $eventDispatcher */
-        $eventDispatcher = $this->get('dispatcher');
-        $testFrameworkKey = $this->input->getOption('test-framework');
-        $adapter = $this->get('test.framework.factory')->create($testFrameworkKey);
 
-        $metricsCalculator = new MetricsCalculator($adapter);
+        try {
+            /** @var EventDispatcher $eventDispatcher */
+            $eventDispatcher = $this->get('dispatcher');
+            $testFrameworkKey = $this->input->getOption('test-framework');
+            $adapter = $this->get('test.framework.factory')->create($testFrameworkKey);
 
-        $this->addSubscribers($eventDispatcher, $metricsCalculator, $adapter);
+            $metricsCalculator = new MetricsCalculator($adapter);
 
-        $processBuilder = new ProcessBuilder($adapter, $this->get('infection.config')->getProcessTimeout());
+            $this->addSubscribers($eventDispatcher, $metricsCalculator, $adapter);
 
-        $initialTestsRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
-        $initialTestSuitProcess = $initialTestsRunner->run();
+            $processBuilder = new ProcessBuilder($adapter, $this->get('infection.config')->getProcessTimeout());
 
-        if (!$initialTestSuitProcess->isSuccessful()) {
-            $this->logInitialTestsDoNotPass($initialTestSuitProcess);
+            $initialTestsRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
+            $initialTestSuitProcess = $initialTestsRunner->run();
+
+            if (!$initialTestSuitProcess->isSuccessful()) {
+                $this->logInitialTestsDoNotPass($initialTestSuitProcess);
+
+                return 1;
+            }
+
+            $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
+            $mutationsGenerator = new MutationsGenerator(
+                $this->get('src.dirs'),
+                $this->get('exclude.paths'),
+                $codeCoverageData,
+                $this->getDefaultMutators(),
+                $this->parseMutators($this->input->getOption('mutators')),
+                $eventDispatcher
+            );
+            $mutations = $mutationsGenerator->generate($this->input->getOption('only-covered'), $this->input->getOption('filter'));
+
+            $parallelProcessManager = $this->get('parallel.process.runner');
+            $mutantCreator = $this->get('mutant.creator');
+            $threadCount = (int) $this->input->getOption('threads');
+
+            $mutationTestingRunner = new MutationTestingRunner($processBuilder, $parallelProcessManager, $mutantCreator, $eventDispatcher, $mutations);
+            $mutationTestingRunner->run($threadCount, $codeCoverageData);
+
+            if ($this->hasBadMsi($metricsCalculator)) {
+                $io->error($this->getBadMsiErrorMessage($metricsCalculator));
+
+                return 1;
+            };
+
+            return 0;
+        } catch (InfectionException $e) {
+            $io->error($e->getMessage());
+
+            if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
+                $io->error($e->getTraceAsString());
+            }
 
             return 1;
         }
-
-        $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
-        $mutationsGenerator = new MutationsGenerator(
-            $this->get('src.dirs'),
-            $this->get('exclude.paths'),
-            $codeCoverageData,
-            $this->getDefaultMutators(),
-            $this->parseMutators($this->input->getOption('mutators')),
-            $eventDispatcher
-        );
-        $mutations = $mutationsGenerator->generate($this->input->getOption('only-covered'), $this->input->getOption('filter'));
-
-        $parallelProcessManager = $this->get('parallel.process.runner');
-        $mutantCreator = $this->get('mutant.creator');
-        $threadCount = (int) $this->input->getOption('threads');
-
-        $mutationTestingRunner = new MutationTestingRunner($processBuilder, $parallelProcessManager, $mutantCreator, $eventDispatcher, $mutations);
-        $mutationTestingRunner->run($threadCount, $codeCoverageData);
-
-        if ($this->hasBadMsi($metricsCalculator)) {
-            $io->error($this->getBadMsiErrorMessage($metricsCalculator));
-
-            return 1;
-        };
-
-        return 0;
     }
 
     /**
@@ -170,7 +182,7 @@ class InfectionApplication
         $testFileDataProviderServiceId = sprintf('test.file.data.provider.%s', $testFrameworkKey);
         $testFileDataProviderService = $this->has($testFileDataProviderServiceId) ? $this->get($testFileDataProviderServiceId) : null;
 
-        return new CodeCoverageData($coverageDir, new CoverageXmlParser($coverageDir), $testFileDataProviderService);
+        return new CodeCoverageData($coverageDir, new CoverageXmlParser($coverageDir), $testFrameworkKey, $testFileDataProviderService);
     }
 
     private function logInitialTestsDoNotPass(Process $initialTestSuitProcess)

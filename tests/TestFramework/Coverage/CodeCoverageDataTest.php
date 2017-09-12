@@ -15,6 +15,7 @@ use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\TestFrameworkTypes;
 use PHPUnit\Framework\TestCase;
 use Mockery;
 
@@ -158,6 +159,18 @@ class CodeCoverageDataTest extends TestCase
         $this->assertCount(6, $codeCoverageData->getAllTestsFor($mutation));
     }
 
+    /**
+     * @expectedException \Infection\TestFramework\Coverage\CoverageDoesNotExistException
+     */
+    public function test_it_throws_an_exception_when_no_coverage_found()
+    {
+        $coverageXmlParserMock = Mockery::mock(CoverageXmlParser::class);
+
+        $coverage = new CodeCoverageData('/abc', $coverageXmlParserMock, TestFrameworkTypes::PHPUNIT);
+
+        $coverage->hasTests('/abc/def.php');
+    }
+
     private function getParsedCodeCoverageData(): array
     {
         return [
@@ -215,6 +228,6 @@ class CodeCoverageDataTest extends TestCase
         $coverageXmlParserMock = Mockery::mock(CoverageXmlParser::class);
         $coverageXmlParserMock->shouldReceive('parse')->once()->andReturn($this->getParsedCodeCoverageData());
 
-        return new CodeCoverageData($this->coverageDir, $coverageXmlParserMock);
+        return new CodeCoverageData($this->coverageDir, $coverageXmlParserMock, TestFrameworkTypes::PHPUNIT);
     }
 }
