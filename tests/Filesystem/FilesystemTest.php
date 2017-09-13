@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Filesystem;
 
+use Infection\Filesystem\Exception\IOException;
 use Infection\Filesystem\Filesystem;
 use PHPUnit\Framework\TestCase;
 
@@ -61,6 +62,7 @@ class FilesystemTest extends TestCase
 
     /**
      * @expectedException \Infection\Filesystem\Exception\IOException
+     * @expectedExceptionCode 0
      */
     public function test_mkdir_creates_directory_fails()
     {
@@ -70,5 +72,29 @@ class FilesystemTest extends TestCase
         \file_put_contents($dir, '');
 
         $this->filesystem->mkdir($dir);
+    }
+
+    public function test_mkdir_passes_path_to_io_exceptino()
+    {
+        try {
+            $basePath = $this->workspace.DIRECTORY_SEPARATOR;
+            $dir = $basePath.'2';
+
+            \file_put_contents($dir, '');
+
+            $this->filesystem->mkdir($dir);
+        } catch (IOException $e) {
+            $this->assertSame($dir, $e->getPath());
+        }
+    }
+
+    public function test_mkdir_does_not_fail_when_dir_already_exists()
+    {
+        $dir = $this->workspace . DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR;
+
+        $this->filesystem->mkdir($dir);
+        $this->filesystem->mkdir($dir);
+
+        $this->assertTrue(\is_dir($dir));
     }
 }

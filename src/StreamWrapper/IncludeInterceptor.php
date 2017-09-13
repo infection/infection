@@ -108,10 +108,13 @@ class IncludeInterceptor
     public function mkdir($path, $mode, $options)
     {
         self::disable();
+
+        $isRecursive = (bool) ($options & STREAM_MKDIR_RECURSIVE);
+
         if (isset($this->context)) {
-            $return = mkdir($path, $mode, $options, $this->context);
+            $return = mkdir($path, $mode, $isRecursive, $this->context);
         } else {
-            $return = mkdir($path, $mode, $options);
+            $return = mkdir($path, $mode, $isRecursive);
         }
         self::enable();
 

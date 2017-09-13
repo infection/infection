@@ -18,7 +18,7 @@ class Filesystem
      * @param string $path The directory path
      * @param int $mode The directory mode
      *
-     * @throws \RuntimeException On any directory creation failure
+     * @throws IOException On any directory creation failure
      */
     public function mkdir($path, int $mode = 0755)
     {
