@@ -16,6 +16,7 @@ class FunctionCall extends AbstractValueToNullReturnValue
      * Replaces "return func();" with "func(); return null;"
      *
      * @param Node $node
+     *
      * @return array
      */
     public function mutate(Node $node)

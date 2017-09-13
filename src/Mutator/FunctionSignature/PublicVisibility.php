@@ -22,11 +22,12 @@ class PublicVisibility extends FunctionSignatureMutator
      * Replaces "public function..." with "protected function ..."
      *
      * @param Node $node
+     *
      * @return ClassMethod
      */
     public function mutate(Node $node)
     {
-        /** @var ClassMethod $node */
+        /* @var ClassMethod $node */
         return new ClassMethod(
             $node->name,
             [

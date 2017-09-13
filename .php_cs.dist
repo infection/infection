@@ -13,6 +13,7 @@ return \PhpCsFixer\Config::create()
        'concat_space' => ['spacing' => 'one'],
        'phpdoc_summary' => false,
        'phpdoc_align' => false,
+       'yoda_style' => false,
    ])
    ->setFinder($finder)
 ;

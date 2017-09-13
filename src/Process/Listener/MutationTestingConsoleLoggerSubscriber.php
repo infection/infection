@@ -16,7 +16,6 @@ use Infection\Events\MutationTestingStarted;
 use Infection\Events\MutantProcessFinished;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
@@ -142,7 +141,6 @@ class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
         $msiTag = $this->getPercentageTag($this->metricsCalculator->getMutationScoreIndicator());
         $mutationCoverageTag = $this->getPercentageTag($this->metricsCalculator->getCoverageRate());
         $coveredMsiTag = $this->getPercentageTag($this->metricsCalculator->getCoveredCodeMutationScoreIndicator());
-
 
         $this->output->writeln(['', 'Metrics:']);
         $this->output->writeln(

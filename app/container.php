@@ -111,7 +111,8 @@ $c['version.parser'] = function (): VersionParser {
     return new VersionParser();
 };
 
-function registerMutators(array $mutators, Container $container) {
+function registerMutators(array $mutators, Container $container)
+{
     foreach ($mutators as $mutator) {
         $container[$mutator] = function (Container $c) use ($mutator) {
             return new $mutator();

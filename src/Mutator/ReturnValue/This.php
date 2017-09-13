@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\FunctionBodyMutator;
 use PhpParser\Node;
 
 class This extends AbstractValueToNullReturnValue
@@ -17,6 +16,7 @@ class This extends AbstractValueToNullReturnValue
      * Replaces "return $this;" with "return null;"
      *
      * @param Node $node
+     *
      * @return Node\Stmt\Return_
      */
     public function mutate(Node $node)

@@ -23,7 +23,7 @@ class TempDirectoryCreator
     public function createAndGet(string $dirName = null): string
     {
         if ($this->tempDirectory === null) {
-            $path =  sprintf(
+            $path = sprintf(
                 '%s/%s',
                 sys_get_temp_dir(),
                 $dirName ?: 'infection'

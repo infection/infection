@@ -107,7 +107,7 @@ class InfectionApplication
                 $io->error($this->getBadMsiErrorMessage($metricsCalculator));
 
                 return 1;
-            };
+            }
 
             return 0;
         } catch (InfectionException $e) {

@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\FunctionBodyMutator;
 use PhpParser\Node;
 
 class NewObject extends AbstractValueToNullReturnValue

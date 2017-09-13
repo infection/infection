@@ -47,8 +47,7 @@ abstract class AbstractTestFrameworkAdapter
         MutationConfigBuilder $mutationConfigBuilder,
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
         VersionParser $versionParser
-    )
-    {
+    ) {
         $this->executableFinder = $executableFinder;
         $this->initialConfigBuilder = $initialConfigBuilder;
         $this->mutationConfigBuilder = $mutationConfigBuilder;

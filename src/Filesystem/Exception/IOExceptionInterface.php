@@ -4,6 +4,7 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 namespace Infection\Filesystem\Exception;
 
 interface IOExceptionInterface

@@ -107,7 +107,7 @@ class InfectionCommand extends Command
     {
         $this->container['infection.config'] = function (Container $c) use ($input): InfectionConfig {
             try {
-                $configPaths     = [
+                $configPaths = [
                     InfectionConfig::CONFIG_FILE_NAME,
                     InfectionConfig::CONFIG_FILE_NAME . '.dist',
                 ];
@@ -116,7 +116,7 @@ class InfectionCommand extends Command
                     $configPaths[] = $customConfigPath;
                 }
                 $infectionConfigFile = $c['locator']->locateAnyOf($configPaths);
-                $json                = file_get_contents($infectionConfigFile);
+                $json = file_get_contents($infectionConfigFile);
             } catch (\Exception $e) {
                 $json = '{}';
             }
@@ -142,10 +142,10 @@ class InfectionCommand extends Command
         $this->setOutputFormatterStyles($output);
 
         $customConfigPath = $input->getOption('configuration');
-        $configExists     = $customConfigPath && file_exists($customConfigPath);
+        $configExists = $customConfigPath && file_exists($customConfigPath);
 
         if (!$configExists) {
-            $configExists = 
+            $configExists =
                 file_exists(InfectionConfig::CONFIG_FILE_NAME) ||
                 file_exists(InfectionConfig::CONFIG_FILE_NAME . '.dist');
         }

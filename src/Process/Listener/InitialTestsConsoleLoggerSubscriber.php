@@ -59,7 +59,7 @@ class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
                 ucfirst($this->testFrameworkAdapter->getName()),
                 $this->testFrameworkAdapter->getVersion()
             ),
-            ''
+            '',
         ]);
         $this->progressBar->start();
     }

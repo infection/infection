@@ -17,6 +17,7 @@ class OneZeroFloat extends FunctionBodyMutator
      * Replaces "0.0" with "1.0" or "1.0" with "0.0"
      *
      * @param Node $node
+     *
      * @return Node\Scalar\DNumber
      */
     public function mutate(Node $node)

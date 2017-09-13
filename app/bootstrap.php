@@ -4,11 +4,10 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 $files = [
     __DIR__ . '/../../../autoload.php',
     __DIR__ . '/../vendor/autoload.php',
-    __DIR__ . '/vendor/autoload.php'
+    __DIR__ . '/vendor/autoload.php',
 ];
 
 foreach ($files as $file) {

@@ -11,7 +11,6 @@ namespace Infection\TestFramework\Coverage;
 use Infection\Mutation;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 
-
 class CodeCoverageData
 {
     const PHP_UNIT_COVERAGE_DIR = 'coverage-xml';
@@ -145,6 +144,7 @@ class CodeCoverageData
      *       ]
      *    ]
      * ]
+     *
      * @throws CoverageDoesNotExistException
      */
     private function getCoverage(): array

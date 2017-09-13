@@ -17,6 +17,7 @@ class FalseValue extends FunctionBodyMutator
      * Replaces "false" with "true"
      *
      * @param Node $node
+     *
      * @return Node\Expr\ConstFetch
      */
     public function mutate(Node $node)

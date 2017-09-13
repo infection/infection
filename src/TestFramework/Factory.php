@@ -65,8 +65,7 @@ class Factory
         string $jUnitFilePath,
         InfectionConfig $infectionConfig,
         VersionParser $versionParser
-    )
-    {
+    ) {
         $this->tempDir = $tempDir;
         $this->configLocator = $configLocator;
         $this->pathReplacer = $pathReplacer;

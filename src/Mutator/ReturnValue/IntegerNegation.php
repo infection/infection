@@ -18,6 +18,7 @@ class IntegerNegation extends FunctionBodyMutator
      * -5 => 5
      *
      * @param Node $node
+     *
      * @return Node\Stmt\Return_
      */
     public function mutate(Node $node)
