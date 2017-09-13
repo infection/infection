@@ -15,6 +15,7 @@ use Infection\Mutant\MutantCreator;
 use Infection\Command\InfectionCommand;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\EventDispatcher\EventDispatcher;
+use Infection\Filesystem\Filesystem;
 use Infection\Finder\Locator;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
@@ -44,6 +45,10 @@ $c['phpunit.config.dir'] = function (Container $c): string {
 
 $c['temp.dir'] = function (Container $c): string {
     return $c['temp.dir.creator']->createAndGet();
+};
+
+$c['filesystem'] = function (Container $c): Filesystem {
+    return new Filesystem();
 };
 
 $c['temp.dir.creator'] = function (): TempDirectoryCreator {

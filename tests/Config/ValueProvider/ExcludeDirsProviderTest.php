@@ -16,6 +16,26 @@ use Mockery;
 
 class ExcludeDirsProviderTest extends AbstractBaseProviderTest
 {
+    /**
+     * @var string
+     */
+    private $workspace;
+
+    private $umask;
+
+    protected function setUp()
+    {
+        $this->umask = \umask(0);
+        $this->workspace = \sys_get_temp_dir() . '/exclude' . \microtime(true) . \random_int(100, 999);
+        \mkdir($this->workspace, 0777, true);
+    }
+
+    protected function tearDown()
+    {
+        @\unlink($this->workspace);
+        \umask($this->umask);
+    }
+
     public function test_it_contains_vendors_when_sources_contains_current_dir()
     {
         $consoleMock = Mockery::mock(ConsoleHelper::class);
@@ -64,6 +84,12 @@ class ExcludeDirsProviderTest extends AbstractBaseProviderTest
             $this->markTestSkipped("Stty is not available");
         }
 
+        $dir1 = $this->workspace . DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR;
+        $dir2 = $this->workspace . DIRECTORY_SEPARATOR . 'foo' . DIRECTORY_SEPARATOR;
+
+        \mkdir($dir1);
+        \mkdir($dir2);
+
         $consoleMock = Mockery::mock(ConsoleHelper::class);
         $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
 
@@ -72,12 +98,12 @@ class ExcludeDirsProviderTest extends AbstractBaseProviderTest
         $provider = new ExcludeDirsProvider($consoleMock, $dialog);
 
         $excludeDirs = $provider->get(
-            $this->createStreamableInputInterfaceMock($this->getInputStream("Files\n")),
+            $this->createStreamableInputInterfaceMock($this->getInputStream("foo\n")),
             $this->createOutputInterface(),
             ['src'],
-            ['tests']
+            [$this->workspace]
         );
 
-        $this->assertContains('Files', $excludeDirs);
+        $this->assertContains('foo', $excludeDirs);
     }
 }
