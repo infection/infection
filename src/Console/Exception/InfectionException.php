@@ -6,12 +6,10 @@
  */
 declare(strict_types=1);
 
+
 namespace Infection\Console\Exception;
 
-class InvalidOptionException extends InfectionException
+
+class InfectionException extends \Exception
 {
-    public static function withMessage(string $message)
-    {
-        return new self($message);
-    }
 }

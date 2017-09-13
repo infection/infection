@@ -83,7 +83,7 @@ class Mutation
             $attrs['startTokenPos'],
             $attrs['endTokenPos'],
             $attrs['startFilePos'],
-            $attrs['startFilePos'],
+            $attrs['endFilePos'],
         ];
 
         $hashKeys = array_merge([$this->getOriginalFilePath(), $mutatorClass], $attributeValues);

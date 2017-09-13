@@ -38,11 +38,17 @@ class CodeCoverageData
      */
     private $testFileDataProvider;
 
-    public function __construct(string $coverageDir, CoverageXmlParser $coverageXmlParser, TestFileDataProvider $testFileDataProvider = null)
+    /**
+     * @var string
+     */
+    private $testFrameworkKey;
+
+    public function __construct(string $coverageDir, CoverageXmlParser $coverageXmlParser, string $testFrameworkKey, TestFileDataProvider $testFileDataProvider = null)
     {
         $this->coverageDir = $coverageDir;
         $this->parser = $coverageXmlParser;
         $this->testFileDataProvider = $testFileDataProvider;
+        $this->testFrameworkKey = $testFrameworkKey;
     }
 
     public function hasTests(string $filePath): bool
@@ -139,13 +145,22 @@ class CodeCoverageData
      *       ]
      *    ]
      * ]
+     * @throws CoverageDoesNotExistException
      */
     private function getCoverage(): array
     {
         if (null === $this->coverage) {
             $coverageIndexFilePath = $this->coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME;
-            $coverageIndexFileContent = file_get_contents($coverageIndexFilePath);
 
+            if (!file_exists($coverageIndexFilePath)) {
+                throw CoverageDoesNotExistException::with(
+                    $coverageIndexFilePath,
+                    $this->testFrameworkKey,
+                    dirname($coverageIndexFilePath, 2)
+                );
+            }
+
+            $coverageIndexFileContent = file_get_contents($coverageIndexFilePath);
             $coverage = $this->parser->parse($coverageIndexFileContent);
 
             $coverage = $this->addTestExecutionInfo($coverage);
