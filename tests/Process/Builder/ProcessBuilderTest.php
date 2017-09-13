@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Infection\Tests\Process\Listener;
+namespace Infection\Tests\Process\Builder;
 
 use Infection\Mutant\Mutant;
 use Infection\Process\Builder\ProcessBuilder;
@@ -38,4 +38,8 @@ class ProcessBuilderTest extends TestCase
         $this->assertSame(100.0, $process->getTimeout());
     }
 
+    protected function tearDown()
+    {
+        \Mockery::close();
+    }
 }
