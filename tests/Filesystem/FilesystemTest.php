@@ -76,12 +76,12 @@ class FilesystemTest extends TestCase
 
     public function test_mkdir_passes_path_to_io_exceptino()
     {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
+        $dir = $basePath.'2';
+
+        \file_put_contents($dir, '');
+
         try {
-            $basePath = $this->workspace.DIRECTORY_SEPARATOR;
-            $dir = $basePath.'2';
-
-            \file_put_contents($dir, '');
-
             $this->filesystem->mkdir($dir);
         } catch (IOException $e) {
             $this->assertSame($dir, $e->getPath());
