@@ -41,7 +41,7 @@ class InitialTestsRunner
 
     public function run(): Process
     {
-        $process = $this->processBuilder->build();
+        $process = $this->processBuilder->getProcessForInitialTestRun();
 
         $this->eventDispatcher->dispatch(new InitialTestSuiteStarted());
 
