@@ -67,15 +67,16 @@ abstract class AbstractTestFrameworkAdapter
      *     vendor/phpunit/phpunit/phpunit
      *
      * @param string $configPath
+     * @param string $extraOptions
      *
      * @return string
      */
-    public function getExecutableCommandLine(string $configPath): string
+    public function getExecutableCommandLine(string $configPath, string $extraOptions): string
     {
         return sprintf(
             '%s %s',
             $this->executableFinder->find(),
-            $this->argumentsAndOptionsBuilder->build($configPath)
+            $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions)
         );
     }
 

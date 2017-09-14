@@ -28,7 +28,11 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
+use Infection\TestFramework\TestFrameworkExtraOptions;
+use Infection\TestFramework\TestFrameworkTypes;
 use Pimple\Container;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -75,9 +79,10 @@ class InfectionApplication
             $this->addSubscribers($eventDispatcher, $metricsCalculator, $adapter);
 
             $processBuilder = new ProcessBuilder($adapter, $this->get('infection.config')->getProcessTimeout());
+            $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);
 
             $initialTestsRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
-            $initialTestSuitProcess = $initialTestsRunner->run();
+            $initialTestSuitProcess = $initialTestsRunner->run($testFrameworkOptions->getForInitialProcess());
 
             if (!$initialTestSuitProcess->isSuccessful()) {
                 $this->logInitialTestsDoNotPass($initialTestSuitProcess);
@@ -101,7 +106,7 @@ class InfectionApplication
             $threadCount = (int) $this->input->getOption('threads');
 
             $mutationTestingRunner = new MutationTestingRunner($processBuilder, $parallelProcessManager, $mutantCreator, $eventDispatcher, $mutations);
-            $mutationTestingRunner->run($threadCount, $codeCoverageData);
+            $mutationTestingRunner->run($threadCount, $codeCoverageData, $testFrameworkOptions->getForMutantProcess());
 
             if ($this->hasBadMsi($metricsCalculator)) {
                 $io->error($this->getBadMsiErrorMessage($metricsCalculator));
@@ -262,5 +267,14 @@ class InfectionApplication
             },
             Config\InfectionConfig::DEFAULT_MUTATORS
         );
+    }
+
+    private function getTestFrameworkExtraOptions(string $testFrameworkKey): TestFrameworkExtraOptions
+    {
+        $extraOptions = $this->input->getOption('test-framework-options');
+
+        return TestFrameworkTypes::PHPUNIT === $testFrameworkKey
+            ? new PhpUnitExtraOptions($extraOptions)
+            : new PhpSpecExtraOptions($extraOptions);
     }
 }

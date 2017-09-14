@@ -32,11 +32,11 @@ class ProcessBuilder
         $this->timeout = $timeout;
     }
 
-    public function getProcessForInitialTestRun(): Process
+    public function getProcessForInitialTestRun(string $testFrameworkExtraOptions = ''): Process
     {
         $configPath = $this->testFrameworkAdapter->buildInitialConfigFile();
 
-        return $this->getProcess($configPath);
+        return $this->getProcess($configPath, $testFrameworkExtraOptions);
 
         // TODO debug why processBuilder does not work with env
         // TODO read and add -vvv
@@ -53,22 +53,23 @@ class ProcessBuilder
      * @throws RuntimeException
      *
      * @param Mutant $mutant
+     * @param string|null $testFrameworkExtraOptions
      *
      * @return MutantProcess
      */
-    public function getProcessForMutant(Mutant $mutant): MutantProcess
+    public function getProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
     {
         $configPath = $this->testFrameworkAdapter->buildMutationConfigFile($mutant);
 
-        $symfonyProcess = $this->getProcess($configPath, $this->timeout);
+        $symfonyProcess = $this->getProcess($configPath, $testFrameworkExtraOptions, $this->timeout);
 
         return new MutantProcess($symfonyProcess, $mutant, $this->testFrameworkAdapter);
     }
 
-    private function getProcess(string $configPath, int $timeout = null): Process
+    private function getProcess(string $configPath, string $testFrameworkExtraOptions, int $timeout = null): Process
     {
         return new Process(
-            $this->testFrameworkAdapter->getExecutableCommandLine($configPath),
+            $this->testFrameworkAdapter->getExecutableCommandLine($configPath, $testFrameworkExtraOptions),
             null,
             array_replace($_ENV, $_SERVER),
             null,

@@ -7,11 +7,9 @@
 
 declare(strict_types=1);
 
+namespace Infection\Tests\TestFramework\PhpUnit\CommandLine;
 
-namespace Infection\Tests\TestFramework\PhpSpec\CommandLine;
-
-
-use Infection\TestFramework\PhpSpec\CommandLine\ArgumentsAndOptionsBuilder;
+use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use PHPUnit\Framework\TestCase;
 
 class ArgumentsAndOptionsBuilderTest extends TestCase
@@ -23,11 +21,8 @@ class ArgumentsAndOptionsBuilderTest extends TestCase
 
         $command = $builder->build($configPath, '--verbose');
 
-        $this->assertContains('run', $command);
-        $this->assertContains('--no-ansi', $command);
-        $this->assertContains('--format=tap', $command);
         $this->assertContains('--stop-on-failure', $command);
         $this->assertContains('--verbose', $command);
-        $this->assertContains(sprintf('--config=%s', $configPath), $command);
+        $this->assertContains(sprintf('--configuration %s', $configPath), $command);
     }
 }
