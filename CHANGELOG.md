@@ -1,5 +1,28 @@
 # Change Log
 
+## [0.5.3](https://github.com/infection/infection/tree/0.5.3) (2017-09-15)
+[Full Changelog](https://github.com/infection/infection/compare/0.5.2...0.5.3)
+
+**Implemented enhancements:**
+
+- Display PHPUnit/PHPSpec version under what tests are run [\#31](https://github.com/infection/infection/issues/31)
+- Provide meaningful feedback on failure [\#29](https://github.com/infection/infection/issues/29)
+- Add exceptions handling with printing trace for verbose level. [\#39](https://github.com/infection/infection/pull/39) ([borNfreee](https://github.com/borNfreee))
+
+**Closed issues:**
+
+- license is weird [\#35](https://github.com/infection/infection/issues/35)
+- request: support phpdbg [\#36](https://github.com/infection/infection/issues/36)
+
+**Merged pull requests:**
+
+- remove timeout from initial test run [\#41](https://github.com/infection/infection/pull/41) ([JanPietrzyk](https://github.com/JanPietrzyk))
+- Interface mutations fix [\#32](https://github.com/infection/infection/pull/32) ([oxidmod](https://github.com/oxidmod))
+- Add option to pass test framework extra options [\#42](https://github.com/infection/infection/pull/42) ([borNfreee](https://github.com/borNfreee))
+- Add Filesystem and add Directory Check for logs path. [\#40](https://github.com/infection/infection/pull/40) ([sidz](https://github.com/sidz))
+- Support phpdbg [\#37](https://github.com/infection/infection/pull/37) ([keradus](https://github.com/keradus))
+- Add test framework version to console [\#33](https://github.com/infection/infection/pull/33) ([borNfreee](https://github.com/borNfreee))
+
 ## [0.5.2](https://github.com/infection/infection/tree/0.5.2) (2017-09-02)
 [Full Changelog](https://github.com/infection/infection/compare/0.5.1...0.5.2)
 
