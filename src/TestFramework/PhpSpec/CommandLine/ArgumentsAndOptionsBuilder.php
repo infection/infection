@@ -12,7 +12,7 @@ use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 
 class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
-    public function build(string $configPath): string
+    public function build(string $configPath, string $extraOptions): string
     {
         $options = ['run'];
 
@@ -20,6 +20,8 @@ class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilde
         $options[] = '--no-ansi';
         $options[] = '--format=tap';
         $options[] = '--stop-on-failure';
+
+        $options[] = $extraOptions;
 
         return implode(' ', $options);
     }

@@ -54,17 +54,17 @@ class MutationTestingRunner
         $this->mutations = $mutations;
     }
 
-    public function run(int $threadCount, CodeCoverageData $codeCoverageData)
+    public function run(int $threadCount, CodeCoverageData $codeCoverageData, string $testFrameworkExtraOptions)
     {
         $mutantCount = count($this->mutations);
 
         $this->eventDispatcher->dispatch(new MutantsCreatingStarted($mutantCount));
 
         $processes = array_map(
-            function (Mutation $mutation) use ($codeCoverageData): MutantProcess {
+            function (Mutation $mutation) use ($codeCoverageData, $testFrameworkExtraOptions): MutantProcess {
                 $mutant = $this->mutantCreator->create($mutation, $codeCoverageData);
 
-                $process = $this->processBuilder->getProcessForMutant($mutant);
+                $process = $this->processBuilder->getProcessForMutant($mutant, $testFrameworkExtraOptions);
 
                 $this->eventDispatcher->dispatch(new MutantCreated());
 

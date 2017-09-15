@@ -39,9 +39,9 @@ class InitialTestsRunner
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function run(): Process
+    public function run(string $testFrameworkExtraOptions): Process
     {
-        $process = $this->processBuilder->getProcessForInitialTestRun();
+        $process = $this->processBuilder->getProcessForInitialTestRun($testFrameworkExtraOptions);
 
         $this->eventDispatcher->dispatch(new InitialTestSuiteStarted());
 

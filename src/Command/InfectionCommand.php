@@ -44,6 +44,12 @@ class InfectionCommand extends Command
                 'phpunit'
             )
             ->addOption(
+                'test-framework-options',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Options to be passed to the test framework'
+            )
+            ->addOption(
                 'threads',
                 null,
                 InputOption::VALUE_REQUIRED,
