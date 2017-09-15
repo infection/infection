@@ -1,34 +1,33 @@
 build: false
 platform:
   - x64
-clone_folder: c:\projects\php-project-workspace
+clone_folder: c:\projects\workspace
 
-## Build matrix for lowest and highest possible targets
 environment:
   matrix:
   - dependencies: highest
-    php_ver_target: 7.0
-  - dependencies: highest
     php_ver_target: 7.1
+  - dependencies: highest
+    php_ver_target: 7.0
 
-## Cache composer, chocolatey and php bits
-cache:
+cache: # cache is cleared when linked file is modified
     - '%LOCALAPPDATA%\Composer\files -> composer.lock'
     - composer.phar
-    - C:\ProgramData\chocolatey\bin -> .appveyor.yml
-    - C:\ProgramData\chocolatey\lib -> .appveyor.yml
-    - c:\tools\php -> .appveyor.yml
+    - C:\ProgramData\chocolatey\bin -> appveyor.yml
+    - C:\ProgramData\chocolatey\lib -> appveyor.yml
+    - c:\tools\php -> appveyor.yml
 
-## Set up environment varriables
 init:
     - SET PATH=C:\Program Files\OpenSSL;c:\tools\php;%PATH%
-    - SET COMPOSER_NO_INTERACTION=1
     - SET PHP=1
     - SET ANSICON=121x90 (121x90)
+    - SET COMPOSER_NO_INTERACTION=1
 
-## Install PHP and composer, and run the appropriate composer command
 install:
     - IF EXIST c:\tools\php (SET PHP=0)
+    # Enable Windows update service
+    - ps: Set-Service wuauserv -StartupType Manual
+    # Install PHP
     - ps: appveyor-retry cinst --params '""/InstallDir:C:\tools\php""' --ignore-checksums -y php --version ((choco search php --exact --all-versions -r | select-string -pattern $env:php_ver_target | sort { [version]($_ -split '\|' | select -last 1) } -Descending | Select-Object -first 1) -replace '[php|]','')
     - cd c:\tools\php
     - IF %PHP%==1 copy php.ini-production php.ini /Y
@@ -36,16 +35,14 @@ install:
     - IF %PHP%==1 echo extension_dir=ext >> php.ini
     - IF %PHP%==1 echo extension=php_openssl.dll >> php.ini
     - IF %PHP%==1 echo extension=php_mbstring.dll >> php.ini
-    - IF %PHP%==1 echo extension=php_fileinfo.dll >> php.ini
     - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
+    # Install composer and update per matrix
     - appveyor-retry appveyor DownloadFile https://getcomposer.org/composer.phar
-    - cd c:\projects\php-project-workspace
-    - IF %dependencies%==lowest appveyor-retry composer update --prefer-lowest --no-progress --profile -n
-    - IF %dependencies%==current appveyor-retry composer install --no-progress --profile
-    - IF %dependencies%==highest appveyor-retry composer update --no-progress --profile -n
+    - cd c:\projects\workspace
+    - IF %dependencies%==lowest appveyor-retry composer update --no-suggest --prefer-dist --prefer-lowest
+    - IF %dependencies%==highest appveyor-retry composer update --no-suggest --prefer-dist
     - composer show
 
-## Run the actual test
 test_script:
-    - cd c:\projects\php-project-workspace
-    - vendor/bin/phpunit
+    - cd c:\projects\workspace
+    - vendor\bin\phpunit
