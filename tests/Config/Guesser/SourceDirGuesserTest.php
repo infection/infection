@@ -74,7 +74,7 @@ CODE;
     public function test_it_returns_only_src_if_contains_array_of_paths()
     {
         $guesser = new SourceDirGuesser(
-            json_decode('{"autoload":{"psr-0": {"": ["src/", "libs"]}}}')
+            json_decode('{"autoload":{"psr-0": {"": ["src", "libs"]}}}')
         );
 
         $this->assertSame(['src'], $guesser->guess());
@@ -83,7 +83,7 @@ CODE;
     public function test_it_returns_list_if_contains_array_of_paths_without_src()
     {
         $guesser = new SourceDirGuesser(
-            json_decode('{"autoload":{"psr-4": {"NameSpace\\//": ["sources/", "libs"]}}}')
+            json_decode('{"autoload":{"psr-4": {"NameSpace\\//": ["sources", "libs"]}}}')
         );
 
         $this->assertSame(['sources', 'libs'], $guesser->guess());
@@ -96,7 +96,7 @@ CODE;
     public function test_it_throw_invalid_autoload_exception()
     {
         $guesser = new SourceDirGuesser(
-            json_decode('{"autoload":{"psr-4": [{"NameSpace\\//": ["sources/", "libs"]}]}}')
+            json_decode('{"autoload":{"psr-4": [{"NameSpace\\//": ["sources", "libs"]}]}}')
         );
 
         $guesser->guess();
