@@ -18,6 +18,16 @@ class PhpUnitTestFileDataProvider implements TestFileDataProvider
      */
     private $jUnitFilePath;
 
+    /**
+     * @var \DOMXPath
+     */
+    private $xPath;
+
+    /**
+     * @var array
+     */
+    private $testFileInfoCache = [];
+
     public function __construct(string $jUnitFilePath)
     {
         $this->jUnitFilePath = $jUnitFilePath;
@@ -25,9 +35,11 @@ class PhpUnitTestFileDataProvider implements TestFileDataProvider
 
     public function getTestFileInfo(string $fullyQualifiedClassName): array
     {
-        $dom = new \DOMDocument();
-        $dom->loadXML(file_get_contents($this->jUnitFilePath));
-        $xPath = new \DOMXPath($dom);
+        if (array_key_exists($fullyQualifiedClassName, $this->testFileInfoCache)) {
+            return $this->testFileInfoCache[$fullyQualifiedClassName];
+        }
+
+        $xPath = $this->getXPath();
 
         $nodes = $xPath->query(sprintf('//testsuite[@name="%s"]', $fullyQualifiedClassName));
 
@@ -35,9 +47,21 @@ class PhpUnitTestFileDataProvider implements TestFileDataProvider
             throw new TestFileNameNotFoundException(sprintf('For FQCN: %s', $fullyQualifiedClassName));
         }
 
-        return [
+        return $this->testFileInfoCache[$fullyQualifiedClassName] = [
             'path' => $nodes[0]->getAttribute('file'),
             'time' => (float) $nodes[0]->getAttribute('time'),
         ];
+    }
+
+    private function getXPath(): \DOMXPath
+    {
+        if ($this->xPath === null) {
+            $dom = new \DOMDocument();
+            $dom->loadXML(file_get_contents($this->jUnitFilePath));
+
+            $this->xPath = new \DOMXPath($dom);
+        }
+
+        return $this->xPath;
     }
 }
