@@ -23,11 +23,6 @@ class PhpUnitTestFileDataProvider implements TestFileDataProvider
      */
     private $xPath;
 
-    /**
-     * @var array
-     */
-    private $testFileInfoCache = [];
-
     public function __construct(string $jUnitFilePath)
     {
         $this->jUnitFilePath = $jUnitFilePath;
@@ -35,10 +30,6 @@ class PhpUnitTestFileDataProvider implements TestFileDataProvider
 
     public function getTestFileInfo(string $fullyQualifiedClassName): array
     {
-        if (array_key_exists($fullyQualifiedClassName, $this->testFileInfoCache)) {
-            return $this->testFileInfoCache[$fullyQualifiedClassName];
-        }
-
         $xPath = $this->getXPath();
 
         $nodes = $xPath->query(sprintf('//testsuite[@name="%s"]', $fullyQualifiedClassName));
@@ -47,7 +38,7 @@ class PhpUnitTestFileDataProvider implements TestFileDataProvider
             throw new TestFileNameNotFoundException(sprintf('For FQCN: %s', $fullyQualifiedClassName));
         }
 
-        return $this->testFileInfoCache[$fullyQualifiedClassName] = [
+        return [
             'path' => $nodes[0]->getAttribute('file'),
             'time' => (float) $nodes[0]->getAttribute('time'),
         ];
