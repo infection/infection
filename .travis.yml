@@ -19,16 +19,13 @@ cache:
 
 before_install:
   - composer selfupdate
-  - composer global require friendsofphp/php-cs-fixer
-  - composer global require --dev 'phpstan/phpstan:^0.8'
 
 install:
   - composer install
 
 script:
   - vendor/bin/phpunit --coverage-clover=clover.xml
-  - /home/travis/.composer/vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v --dry-run --stop-on-violation --using-cache=no --allow-risky=yes
-  - /home/travis/.composer/vendor/bin/phpstan analyse src tests --level=1 --no-interaction --no-progress
+  - composer analyze
   - if [[ $INFECTION == 1 ]]; then bin/infection --threads=4 --min-msi=57 --min-covered-msi=91; fi
 
 after_success:

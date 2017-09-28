@@ -40,5 +40,21 @@
         "phpunit/phpunit": "^6.1",
         "mockery/mockery": "^0.9.9"
     },
-    "bin": ["bin/infection"]
+    "bin": ["bin/infection"],
+    "scripts": {
+        "analyze": [
+            "@php-cs-fixer",
+            "@phpstan"
+        ],
+        "phpstan": [
+            "wget -nc https://github.com/phpstan/phpstan/releases/download/0.8.4/phpstan.phar",
+            "chmod a+x phpstan.phar",
+            "./phpstan.phar analyse src tests --level=1 --no-interaction --no-progress"
+        ],
+        "php-cs-fixer": [
+            "wget -nc http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar",
+            "chmod a+x php-cs-fixer-v2.phar",
+            "./php-cs-fixer-v2.phar fix --config=.php_cs.dist -v --dry-run --stop-on-violation --using-cache=no --allow-risky=yes"
+        ]
+    }
 }
