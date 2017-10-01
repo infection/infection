@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<testsuites>
+  <testsuite name="Application Test Suite" tests="118" assertions="155" errors="0" failures="1" skipped="0" time="0.767565">
+    <testsuite name="Infection\Tests\Config\InfectionConfigTest" file="/project/tests/Config/InfectionConfigTest.php" tests="11" assertions="11" errors="0" failures="0" skipped="0" time="0.021983">
+      <testcase name="test_it_returns_default_timeout_with_no_config" class="Infection\Tests\Config\InfectionConfigTest" classname="Infection.Tests.Config.InfectionConfigTest" file="/project/tests/Config/InfectionConfigTest.php" line="14" assertions="1" time="0.017883"/>
+      <testcase name="test_it_returns_timeout_from_config" class="Infection\Tests\Config\InfectionConfigTest" classname="Infection.Tests.Config.InfectionConfigTest" file="/project/tests/Config/InfectionConfigTest.php" line="21" assertions="1" time="0.000353"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

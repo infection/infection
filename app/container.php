@@ -26,6 +26,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\Config\InfectionConfig;
 use Infection\Utils\VersionParser;
+use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 
 $c = new Container();
 
@@ -104,7 +105,9 @@ $c['phpunit.junit.file.path'] = function (Container $c): string {
 };
 
 $c['test.file.data.provider.phpunit'] = function (Container $c): TestFileDataProvider {
-    return new PhpUnitTestFileDataProvider($c['phpunit.junit.file.path']);
+    return new CachedTestFileDataProvider(
+        new PhpUnitTestFileDataProvider($c['phpunit.junit.file.path'])
+    );
 };
 
 $c['version.parser'] = function (): VersionParser {
