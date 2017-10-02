@@ -9,8 +9,8 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
-use Infection\TestFramework\PhpUnit\Config\InitialXmlConfiguration;
-use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
+use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 
 class InitialConfigBuilder implements ConfigBuilder
 {
@@ -21,11 +21,11 @@ class InitialConfigBuilder implements ConfigBuilder
     /**
      * @var string
      */
-    private $originalXmlConfigPath;
+    private $originalXmlConfigContent;
     /**
-     * @var PathReplacer
+     * @var XmlConfigurationHelper
      */
-    private $pathReplacer;
+    private $xmlConfigurationHelper;
 
     /**
      * @var string
@@ -37,11 +37,11 @@ class InitialConfigBuilder implements ConfigBuilder
      */
     private $srcDirs = [];
 
-    public function __construct(string $tempDirectory, string $originalXmlConfigPath, PathReplacer $pathReplacer, string $jUnitFilePath, array $srcDirs)
+    public function __construct(string $tempDirectory, string $originalXmlConfigContent, XmlConfigurationHelper $xmlConfigurationHelper, string $jUnitFilePath, array $srcDirs)
     {
         $this->tempDirectory = $tempDirectory;
-        $this->originalXmlConfigPath = $originalXmlConfigPath;
-        $this->pathReplacer = $pathReplacer;
+        $this->originalXmlConfigContent = $originalXmlConfigContent;
+        $this->xmlConfigurationHelper = $xmlConfigurationHelper;
         $this->jUnitFilePath = $jUnitFilePath;
         $this->srcDirs = $srcDirs;
     }
@@ -50,15 +50,23 @@ class InitialConfigBuilder implements ConfigBuilder
     {
         $path = $this->buildPath();
 
-        $xmlConfigurationFile = new InitialXmlConfiguration(
-            $this->tempDirectory,
-            $this->originalXmlConfigPath,
-            $this->pathReplacer,
-            $this->jUnitFilePath,
-            $this->srcDirs
-        );
+        $dom = new \DOMDocument();
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($this->originalXmlConfigContent);
 
-        file_put_contents($path, $xmlConfigurationFile->getXml());
+        $xPath = new \DOMXPath($dom);
+
+        $this->addCoverageFilterWhitelistIfDoesNotExist($dom, $xPath);
+        $this->xmlConfigurationHelper->replaceWithAbsolutePaths($xPath);
+        $this->xmlConfigurationHelper->setStopOnFailure($xPath);
+        $this->xmlConfigurationHelper->deactivateColours($xPath);
+        $this->xmlConfigurationHelper->removeExistingLoggers($dom, $xPath);
+
+        $this->addCodeCoverageLogger($dom, $xPath);
+        $this->addJUnitLogger($dom, $xPath);
+
+        file_put_contents($path, $dom->saveXML());
 
         return $path;
     }
@@ -66,5 +74,79 @@ class InitialConfigBuilder implements ConfigBuilder
     private function buildPath(): string
     {
         return $this->tempDirectory . '/phpunitConfiguration.initial.infection.xml';
+    }
+
+    private function addJUnitLogger(\DOMDocument $dom, \DOMXPath $xPath)
+    {
+        $logging = $this->getOrCreateNode($dom, $xPath, 'logging');
+
+        $junitLog = $dom->createElement('log');
+        $junitLog->setAttribute('type', 'junit');
+        $junitLog->setAttribute('target', $this->jUnitFilePath);
+
+        $logging->appendChild($junitLog);
+    }
+
+    private function addCodeCoverageLogger(\DOMDocument $dom, \DOMXPath $xPath)
+    {
+        $logging = $this->getOrCreateNode($dom, $xPath, 'logging');
+
+        $coverageXmlLog = $dom->createElement('log');
+        $coverageXmlLog->setAttribute('type', 'coverage-xml');
+        $coverageXmlLog->setAttribute('target', $this->tempDirectory . '/' . CodeCoverageData::PHP_UNIT_COVERAGE_DIR);
+
+        $logging->appendChild($coverageXmlLog);
+    }
+
+    private function addCoverageFilterWhitelistIfDoesNotExist(\DOMDocument $dom, \DOMXPath $xPath)
+    {
+        $filterNode = $this->getNode($dom, $xPath, 'filter');
+
+        if ($filterNode === null) {
+            $filterNode = $this->createNode($dom, 'filter');
+
+            $whiteListNode = $dom->createElement('whitelist');
+
+            foreach ($this->srcDirs as $srcDir) {
+                $directoryNode = $dom->createElement(
+                    'directory',
+                    $srcDir
+                );
+
+                $whiteListNode->appendChild($directoryNode);
+            }
+
+            $filterNode->appendChild($whiteListNode);
+        }
+    }
+
+    private function getOrCreateNode(\DOMDocument $dom, \DOMXPath $xPath, string $nodeName): \DOMElement
+    {
+        $node = $this->getNode($dom, $xPath, $nodeName);
+
+        if ($node === null) {
+            $node = $this->createNode($dom, $nodeName);
+        }
+
+        return $node;
+    }
+
+    private function getNode(\DOMDocument $dom, \DOMXPath $xPath, string $nodeName)
+    {
+        $nodeList = $xPath->query(sprintf('/phpunit/%s', $nodeName));
+
+        if ($nodeList->length) {
+            return $nodeList->item(0);
+        }
+
+        return null;
+    }
+
+    private function createNode(\DOMDocument $dom, string $nodeName): \DOMElement
+    {
+        $node = $dom->createElement($nodeName);
+        $dom->documentElement->appendChild($node);
+
+        return $node;
     }
 }

@@ -10,33 +10,19 @@ namespace Infection\TestFramework\PhpUnit\Config;
 
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 
-abstract class AbstractXmlConfiguration
+class XmlConfigurationHelper
 {
-    /**
-     * @var string
-     */
-    protected $tempDirectory;
-
-    /**
-     * @var string
-     */
-    protected $originalXmlConfigPath;
-
     /**
      * @var PathReplacer
      */
-    protected $pathReplacer;
+    private $pathReplacer;
 
-    public function __construct(string $tempDirectory, string $originalXmlConfigPath, PathReplacer $pathReplacer)
+    public function __construct(PathReplacer $pathReplacer)
     {
-        $this->tempDirectory = $tempDirectory;
-        $this->originalXmlConfigPath = $originalXmlConfigPath;
         $this->pathReplacer = $pathReplacer;
     }
 
-    abstract public function getXml(): string;
-
-    protected function replaceWithAbsolutePaths(\DOMXPath $xPath)
+    public function replaceWithAbsolutePaths(\DOMXPath $xPath)
     {
         $queries = [
             '/phpunit/@bootstrap',
@@ -52,7 +38,7 @@ abstract class AbstractXmlConfiguration
         }
     }
 
-    protected function removeExistingLoggers(\DOMDocument $dom, \DOMXPath $xPath)
+    public function removeExistingLoggers(\DOMDocument $dom, \DOMXPath $xPath)
     {
         $nodes = $xPath->query('/phpunit/logging');
 
@@ -61,7 +47,7 @@ abstract class AbstractXmlConfiguration
         }
     }
 
-    protected function setStopOnFailure(\DOMXPath $xPath)
+    public function setStopOnFailure(\DOMXPath $xPath)
     {
         $nodeList = $xPath->query('/phpunit/@stopOnFailure');
 
@@ -73,7 +59,7 @@ abstract class AbstractXmlConfiguration
         }
     }
 
-    protected function deactivateColours(\DOMXPath $xPath)
+    public function deactivateColours(\DOMXPath $xPath)
     {
         $nodeList = $xPath->query('/phpunit/@colors');
 

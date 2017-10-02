@@ -19,7 +19,7 @@ use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
-use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\VersionParser;
 
 class Factory
@@ -28,10 +28,11 @@ class Factory
      * @var string
      */
     private $tempDir;
+
     /**
-     * @var PathReplacer
+     * @var XmlConfigurationHelper
      */
-    private $pathReplacer;
+    private $xmlConfigurationHelper;
 
     /**
      * @var TestFrameworkConfigLocator
@@ -47,6 +48,7 @@ class Factory
      * @var string
      */
     private $jUnitFilePath;
+
     /**
      * @var InfectionConfig
      */
@@ -61,14 +63,14 @@ class Factory
         string $tempDir,
         string $projectDir,
         TestFrameworkConfigLocator $configLocator,
-        PathReplacer $pathReplacer,
+        XmlConfigurationHelper $xmlConfigurationHelper,
         string $jUnitFilePath,
         InfectionConfig $infectionConfig,
         VersionParser $versionParser
     ) {
         $this->tempDir = $tempDir;
         $this->configLocator = $configLocator;
-        $this->pathReplacer = $pathReplacer;
+        $this->xmlConfigurationHelper = $xmlConfigurationHelper;
         $this->projectDir = $projectDir;
         $this->jUnitFilePath = $jUnitFilePath;
         $this->infectionConfig = $infectionConfig;
@@ -79,11 +81,12 @@ class Factory
     {
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
+            $phpUnitConfigContent = file_get_contents($phpUnitConfigPath);
 
             return new PhpUnitAdapter(
                 new TestFrameworkExecutableFinder(TestFrameworkTypes::PHPUNIT, $this->infectionConfig->getPhpUnitCustomPath()),
-                new InitialConfigBuilder($this->tempDir, $phpUnitConfigPath, $this->pathReplacer, $this->jUnitFilePath, $this->infectionConfig->getSourceDirs()),
-                new MutationConfigBuilder($this->tempDir, $phpUnitConfigPath, $this->pathReplacer, $this->projectDir),
+                new InitialConfigBuilder($this->tempDir, $phpUnitConfigContent, $this->xmlConfigurationHelper, $this->jUnitFilePath, $this->infectionConfig->getSourceDirs()),
+                new MutationConfigBuilder($this->tempDir, $phpUnitConfigContent, $this->xmlConfigurationHelper, $this->projectDir),
                 new ArgumentsAndOptionsBuilder(),
                 $this->versionParser
             );
