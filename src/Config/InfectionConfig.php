@@ -56,6 +56,7 @@ use Infection\Mutator\ReturnValue\FunctionCall;
 use Infection\Mutator\ReturnValue\IntegerNegation;
 use Infection\Mutator\ReturnValue\NewObject;
 use Infection\Mutator\ReturnValue\This;
+use Infection\Mutator\Sort\Spaceship;
 
 class InfectionConfig
 {
@@ -126,6 +127,9 @@ class InfectionConfig
         // Function Signature
         PublicVisibility::class,
         ProtectedVisibility::class,
+
+        // Sort
+        Spaceship::class,
     ];
 
     /**
