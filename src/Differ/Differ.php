@@ -43,19 +43,15 @@ class Differ
     {
         $diff = $this->differ->diff($from, $to);
 
-        $characterCount = strlen($diff);
-        $lineCount = 0;
-        $characterIndex = 0;
-
-        for (; $characterIndex < $characterCount; ++$characterIndex) {
-            if ($diff[$characterIndex] === "\n") {
-                ++$lineCount;
-                if ($lineCount >= self::DIFF_MAX_LINES) {
-                    break;
-                }
-            }
+        if (preg_match(
+            '/(?:[^\n]*(\n)){' . self::DIFF_MAX_LINES . '}/',
+            $diff,
+            $matches,
+            PREG_OFFSET_CAPTURE
+        )) {
+            $diff = substr($diff, 0, $matches[1][1]);
         }
 
-        return substr($diff, 0, $characterIndex);
+        return $diff;
     }
 }
