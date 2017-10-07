@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Differ;
 
-use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use PHPUnit\Framework\TestCase;
+use SebastianBergmann\Diff\Differ as BaseDiffer;
 
 class DifferTest extends TestCase
 {
@@ -72,8 +72,16 @@ CODE;
          if ($diff[$characterIndex] === "\n") {
 CODE;
 
-        $differ = new Differ();
+        $differ = new Differ(
+            new BaseDiffer()
+        );
 
-        $this->assertSame($expectedDiff, $differ->diff($source1, $source2));
+        $diff = $differ->diff($source1, $source2);
+
+        if (substr_count($diff, "\n") < Differ::DIFF_MAX_LINES - 1) {
+            $this->markTestSkipped('See https://github.com/sebastianbergmann/diff/pull/59');
+        }
+
+        $this->assertSame($expectedDiff, $diff);
     }
 }

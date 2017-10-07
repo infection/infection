@@ -9,26 +9,45 @@ declare(strict_types=1);
 namespace Infection\Differ;
 
 use SebastianBergmann\Diff\Differ as BaseDiffer;
-use SebastianBergmann\Diff\LCS\LongestCommonSubsequence;
 
-class Differ extends BaseDiffer
+class Differ
 {
     const DIFF_MAX_LINES = 12;
 
     /**
+     * @var BaseDiffer
+     */
+    private $differ;
+
+    /**
+     * Differ constructor.
+     *
+     * @param BaseDiffer $differ
+     */
+    public function __construct(BaseDiffer $differ)
+    {
+        $this->differ = $differ;
+    }
+
+    /**
+     * Returns the diff between two arrays or strings as string.
+     *
      * Overridden to show just DIFF_MAX_LINES lines of the diff
      *
-     * {@inheritdoc}
+     * @param array|string $from
+     * @param array|string $to
+     *
+     * @return string
      */
-    public function diff($from, $to, LongestCommonSubsequence $lcs = null)
+    public function diff($from, $to)
     {
-        $diff = parent::diff($from, $to, $lcs);
+        $diff = $this->differ->diff($from, $to);
 
         $characterCount = strlen($diff);
         $lineCount = 0;
         $characterIndex = 0;
 
-        for ($characterIndex; $characterIndex < $characterCount; ++$characterIndex) {
+        for (; $characterIndex < $characterCount; ++$characterIndex) {
             if ($diff[$characterIndex] === "\n") {
                 ++$lineCount;
                 if ($lineCount >= self::DIFF_MAX_LINES) {

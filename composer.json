@@ -31,7 +31,7 @@
         "symfony/console": "^3.2",
         "symfony/process": "^3.2",
         "symfony/finder": "^3.2",
-        "sebastian/diff": "^1.4",
+        "sebastian/diff": "^1.4|^2.0",
         "pimple/pimple": "^3.0",
         "symfony/yaml": "^3.3",
         "padraic/phar-updater": "^1.0.4"
