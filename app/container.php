@@ -27,6 +27,7 @@ use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\Config\InfectionConfig;
 use Infection\Utils\VersionParser;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 
 $c = new Container();
 
@@ -73,7 +74,11 @@ $c['path.replacer'] = function (Container $c): PathReplacer {
 };
 
 $c['test.framework.factory'] = function (Container $c): Factory {
-    return new Factory($c['temp.dir'], $c['project.dir'], $c['testframework.config.locator'], $c['path.replacer'], $c['phpunit.junit.file.path'], $c['infection.config'], $c['version.parser']);
+    return new Factory($c['temp.dir'], $c['project.dir'], $c['testframework.config.locator'], $c['xml.configuration.helper'], $c['phpunit.junit.file.path'], $c['infection.config'], $c['version.parser']);
+};
+
+$c['xml.configuration.helper'] = function (Container $c): XmlConfigurationHelper {
+    return new XmlConfigurationHelper($c['path.replacer']);
 };
 
 $c['mutant.creator'] = function (Container $c): MutantCreator {

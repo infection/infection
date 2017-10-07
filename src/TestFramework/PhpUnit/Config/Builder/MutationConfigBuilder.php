@@ -10,8 +10,7 @@ namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
 use Infection\Mutant\Mutant;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
-use Infection\TestFramework\PhpUnit\Config\MutationXmlConfiguration;
-use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 
 class MutationConfigBuilder extends ConfigBuilder
 {
@@ -23,22 +22,34 @@ class MutationConfigBuilder extends ConfigBuilder
     /**
      * @var string
      */
-    private $originalXmlConfigPath;
-    /**
-     * @var PathReplacer
-     */
-    private $pathReplacer;
-    /**
-     * @var string
-     */
     private $projectDir;
 
-    public function __construct(string $tempDirectory, string $originalXmlConfigPath, PathReplacer $pathReplacer, string $projectDir)
+    /**
+     * @var \DOMDocument
+     */
+    private $dom;
+
+    /**
+     * @var \DOMXPath
+     */
+    private $xPath;
+
+    public function __construct(string $tempDirectory, string $originalXmlConfigContent, XmlConfigurationHelper $xmlConfigurationHelper, string $projectDir)
     {
         $this->tempDirectory = $tempDirectory;
-        $this->originalXmlConfigPath = $originalXmlConfigPath;
-        $this->pathReplacer = $pathReplacer;
         $this->projectDir = $projectDir;
+
+        $this->dom = new \DOMDocument();
+        $this->dom->preserveWhiteSpace = false;
+        $this->dom->formatOutput = true;
+        $this->dom->loadXML($originalXmlConfigContent);
+
+        $this->xPath = new \DOMXPath($this->dom);
+
+        $xmlConfigurationHelper->replaceWithAbsolutePaths($this->xPath);
+        $xmlConfigurationHelper->setStopOnFailure($this->xPath);
+        $xmlConfigurationHelper->deactivateColours($this->xPath);
+        $xmlConfigurationHelper->removeExistingLoggers($this->dom, $this->xPath);
     }
 
     public function build(Mutant $mutant): string
@@ -49,21 +60,14 @@ class MutationConfigBuilder extends ConfigBuilder
             $mutant->getMutation()->getHash()
         );
 
+        $this->setCustomAutoLoaderPath($customAutoloadFilePath);
+        $this->setFilteredTestsToRun($mutant->getCoverageTests());
+
         file_put_contents($customAutoloadFilePath, $this->createCustomAutoloadWithInterceptor($mutant));
-
-        $xmlConfiguration = new MutationXmlConfiguration(
-            $this->tempDirectory,
-            $this->originalXmlConfigPath,
-            $this->pathReplacer,
-            $customAutoloadFilePath,
-            $mutant->getCoverageTests()
-        );
-
-        $newXml = $xmlConfiguration->getXml();
 
         $path = $this->buildPath($mutant);
 
-        file_put_contents($path, $newXml);
+        file_put_contents($path, $this->dom->saveXML());
 
         return $path;
     }
@@ -93,5 +97,84 @@ AUTOLOAD;
         $fileName = sprintf('phpunitConfiguration.%s.infection.xml', $mutant->getMutation()->getHash());
 
         return $this->tempDirectory . '/' . $fileName;
+    }
+
+    private function setCustomAutoLoaderPath(string $customAutoloadFilePath)
+    {
+        $node = $this->xPath->query('/phpunit/@bootstrap')[0];
+
+        $node->nodeValue = $customAutoloadFilePath;
+    }
+
+    private function setFilteredTestsToRun(array $coverageTests)
+    {
+        $this->removeExistingTestSuite();
+
+        $this->addTestSuiteWithFilteredTestFiles($coverageTests);
+    }
+
+    private function removeExistingTestSuite()
+    {
+        $nodes = $this->xPath->query('/phpunit/testsuites/testsuite');
+
+        foreach ($nodes as $node) {
+            $node->parentNode->removeChild($node);
+        }
+
+        // handle situation when test suite is directly inside root node
+        $nodes = $this->xPath->query('/phpunit/testsuite');
+
+        foreach ($nodes as $node) {
+            $node->parentNode->removeChild($node);
+        }
+    }
+
+    private function addTestSuiteWithFilteredTestFiles(array $coverageTests)
+    {
+        $testSuites = $this->xPath->query('/phpunit/testsuites');
+        $nodeToAppendTestSuite = $testSuites->item(0);
+
+        // if there is no `testsuites` node, append to root
+        if (!$nodeToAppendTestSuite) {
+            $nodeToAppendTestSuite = $testSuites = $this->xPath->query('/phpunit')->item(0);
+        }
+
+        $testSuite = $this->dom->createElement('testsuite');
+        $testSuite->setAttribute('name', 'Infection testsuite with filtered tests');
+
+        $uniqueCoverageTests = $this->unique($coverageTests);
+
+        // sort tests to run the fastest first
+        usort(
+            $uniqueCoverageTests,
+            function (array $a, array $b) {
+                return $a['time'] <=> $b['time'];
+            }
+        );
+
+        $uniqueTestFilePaths = array_column($uniqueCoverageTests, 'testFilePath');
+
+        foreach ($uniqueTestFilePaths as $testFilePath) {
+            $file = $this->dom->createElement('file', $testFilePath);
+
+            $testSuite->appendChild($file);
+        }
+
+        $nodeToAppendTestSuite->appendChild($testSuite);
+    }
+
+    private function unique(array $coverageTests): array
+    {
+        $usedFileNames = [];
+        $uniqueTests = [];
+
+        foreach ($coverageTests as $coverageTest) {
+            if (!in_array($coverageTest['testFilePath'], $usedFileNames, true)) {
+                $uniqueTests[] = $coverageTest;
+                $usedFileNames[] = $coverageTest['testFilePath'];
+            }
+        }
+
+        return $uniqueTests;
     }
 }

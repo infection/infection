@@ -18,10 +18,24 @@ use Mockery;
 
 class MutationConfigBuilderTest extends TestCase
 {
-    public function test_it_builds_path_to_mutation_config_file()
+    private $tempDir;
+
+    protected function setUp()
     {
         $tempDirCreator = new TempDirectoryCreator();
-        $tempDir = $tempDirCreator->createAndGet('infection-test');
+        $this->tempDir = $tempDirCreator->createAndGet(
+            'infection-test' . \microtime(true) . \random_int(100, 999)
+        );
+    }
+
+    protected function tearDown()
+    {
+        @\unlink($this->tempDir);
+        Mockery::close();
+    }
+
+    public function test_it_builds_path_to_mutation_config_file()
+    {
         $projectDir = '/project/dir';
         $originalYamlConfigPath = __DIR__ . '/../../../../Files/phpspec/phpspec.yml';
 
@@ -33,13 +47,10 @@ class MutationConfigBuilderTest extends TestCase
         $mutant->shouldReceive('getMutation')->andReturn($mutation);
         $mutant->shouldReceive('getMutatedFilePath')->andReturn('/mutated/file/path');
 
-        $builder = new MutationConfigBuilder($tempDir, $originalYamlConfigPath, $projectDir);
+        // TODO for PhpSpec pass file content as well
+        // TODO test phpspec after that
+        $builder = new MutationConfigBuilder($this->tempDir, $originalYamlConfigPath, $projectDir);
 
-        $this->assertSame($tempDir . '/phpspecConfiguration.a1b2c3.infection.yml', $builder->build($mutant));
-    }
-
-    protected function tearDown()
-    {
-        Mockery::close();
+        $this->assertSame($this->tempDir . '/phpspecConfiguration.a1b2c3.infection.yml', $builder->build($mutant));
     }
 }
