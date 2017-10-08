@@ -39,4 +39,3 @@ CODE;
         $this->assertSame($expectedCode, $this->mutate($code));
     }
 }
-
