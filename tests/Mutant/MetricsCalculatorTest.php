@@ -12,14 +12,12 @@ namespace Infection\Tests\Mutant;
 
 
 use Infection\Mutant\MetricsCalculator;
-use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use PHPUnit\Framework\TestCase;
 use Mockery;
 use Symfony\Component\Process\Process;
 
-class MetricsCalculatorTest extends TestCase
+class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     public function test_it_shows_zero_values_by_default()
     {
@@ -76,10 +74,5 @@ class MetricsCalculatorTest extends TestCase
         $this->assertSame(50.0, $calculator->getMutationScoreIndicator());
         $this->assertSame(75.0, $calculator->getCoverageRate());
         $this->assertSame(67.0, $calculator->getCoveredCodeMutationScoreIndicator());
-    }
-
-    protected function tearDown()
-    {
-        Mockery::close();
     }
 }

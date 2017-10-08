@@ -16,11 +16,9 @@ use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\Utils\VersionParser;
-use PharIo\Version\Version;
-use PHPUnit\Framework\TestCase;
 use Mockery;
 
-class PhpUnitAdapterTest extends TestCase
+class PhpUnitAdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     /**
      * @dataProvider passProvider
@@ -48,10 +46,5 @@ class PhpUnitAdapterTest extends TestCase
             ['FAILURES!', false],
             ['ERRORS!', false],
         ];
-    }
-
-    protected function tearDown()
-    {
-        Mockery::close();
     }
 }
