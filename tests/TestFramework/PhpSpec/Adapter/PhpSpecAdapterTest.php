@@ -16,10 +16,9 @@ use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use Infection\Utils\VersionParser;
-use PHPUnit\Framework\TestCase;
 use Mockery;
 
-class PhpSpecAdapterTest extends TestCase
+class PhpSpecAdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     public function test_it_determines_when_tests_do_not_pass()
     {
@@ -84,10 +83,5 @@ OUTPUT;
         $versionParser = Mockery::mock(VersionParser::class);
 
         return new PhpSpecAdapter($executableFined, $initialConfigBuilder, $mutationConfigBuilder, $cliArgumentsBuilder, $versionParser);
-    }
-
-    protected function tearDown()
-    {
-        Mockery::close();
     }
 }

@@ -16,11 +16,10 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\TempDirectoryCreator;
-use PHPUnit\Framework\TestCase;
 use Mockery;
 use function Infection\Tests\normalizePath as p;
 
-class MutationConfigBuilderTest extends TestCase
+class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     const HASH = 'a1b2c3';
 
@@ -72,7 +71,6 @@ class MutationConfigBuilderTest extends TestCase
     protected function tearDown()
     {
         @\unlink($this->tempDir);
-        Mockery::close();
     }
 
     public function test_it_builds_path_to_mutation_config_file()

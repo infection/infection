@@ -10,9 +10,9 @@ namespace Infection\Tests\TestFramework\Coverage;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
 use PHPUnit\Framework\TestCase;
-use \Mockery;
+use Mockery;
 
-class CachedTestFileDataProviderTest extends TestCase
+class CachedTestFileDataProviderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     public function test_the_second_call_returns_cached_result()
     {
@@ -29,14 +29,5 @@ class CachedTestFileDataProviderTest extends TestCase
         $info2 = $infoProvider->getTestFileInfo($class);
 
         $this->assertSame($info1, $info2);
-    }
-
-    protected function tearDown()
-    {
-        if ($container = Mockery::getContainer()) {
-            $this->addToAssertionCount($container->mockery_getExpectationCount());
-        }
-
-        Mockery::close();
     }
 }

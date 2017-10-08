@@ -11,19 +11,13 @@ declare(strict_types=1);
 namespace Infection\Tests\Config\ValueProvider;
 
 use Mockery;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 
-abstract class AbstractBaseProviderTest extends TestCase
+abstract class AbstractBaseProviderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     protected static $stty;
-
-    protected function tearDown()
-    {
-        Mockery::close();
-    }
 
     protected function getQuestionHelper()
     {

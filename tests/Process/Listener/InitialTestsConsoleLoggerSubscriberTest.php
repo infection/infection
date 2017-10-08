@@ -12,13 +12,11 @@ use Infection\EventDispatcher\EventDispatcher;
 use Infection\Events\InitialTestSuiteStarted;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
-use PHPUnit\Framework\TestCase;
 use Mockery;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class InitialTestsConsoleLoggerSubscriberTest extends TestCase
+class InitialTestsConsoleLoggerSubscriberTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     public function test_it_reacts_on_initial_test_suite_run()
     {
@@ -43,14 +41,5 @@ class InitialTestsConsoleLoggerSubscriberTest extends TestCase
         $dispatcher->addSubscriber($subscriber);
 
         $dispatcher->dispatch(new InitialTestSuiteStarted());
-    }
-
-    protected function tearDown()
-    {
-        if ($container = Mockery::getContainer()) {
-            $this->addToAssertionCount($container->mockery_getExpectationCount());
-        }
-
-        Mockery::close();
     }
 }

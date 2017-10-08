@@ -13,10 +13,9 @@ use Infection\Mutant\Mutant;
 use Infection\Mutation;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use Infection\Utils\TempDirectoryCreator;
-use PHPUnit\Framework\TestCase;
 use Mockery;
 
-class MutationConfigBuilderTest extends TestCase
+class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     private $tempDir;
 
@@ -31,7 +30,6 @@ class MutationConfigBuilderTest extends TestCase
     protected function tearDown()
     {
         @\unlink($this->tempDir);
-        Mockery::close();
     }
 
     public function test_it_builds_path_to_mutation_config_file()

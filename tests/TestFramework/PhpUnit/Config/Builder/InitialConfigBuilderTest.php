@@ -14,11 +14,10 @@ use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\TempDirectoryCreator;
-use PHPUnit\Framework\TestCase;
 use Mockery;
 use function Infection\Tests\normalizePath as p;
 
-class InitialConfigBuilderTest extends TestCase
+class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     const HASH = 'a1b2c3';
 
@@ -64,7 +63,6 @@ class InitialConfigBuilderTest extends TestCase
     protected function tearDown()
     {
         @\unlink($this->tempDir);
-        Mockery::close();
     }
 
     public function test_it_replaces_test_suite_directory_wildcard()

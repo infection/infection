@@ -15,10 +15,9 @@ use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use \Mockery;
-use PHPUnit\Framework\TestCase;
 use Pimple\Container;
 
-class MutationsGeneratorTest extends TestCase
+class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     public function test_it_collects_plus_mutation()
     {
@@ -107,11 +106,6 @@ class MutationsGeneratorTest extends TestCase
         $mutations = $generator->generate(false);
 
         $this->assertCount(0, $mutations);
-    }
-
-    protected function tearDown()
-    {
-        Mockery::close();
     }
 
     private function createMutationGenerator(CodeCoverageData $codeCoverageDataMock, array $whitelistedMutatorNames = [])

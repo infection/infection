@@ -16,10 +16,9 @@ use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkTypes;
-use PHPUnit\Framework\TestCase;
 use Mockery;
 
-class CodeCoverageDataTest extends TestCase
+class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     private $coverageDir = __DIR__ . '/../../Files/phpunit/coverage-xml';
 
