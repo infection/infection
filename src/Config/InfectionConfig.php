@@ -51,6 +51,8 @@ use Infection\Mutator\FunctionSignature\ProtectedVisibility;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\Mutator\Number\OneZeroFloat;
 use Infection\Mutator\Number\OneZeroInteger;
+use Infection\Mutator\Operator\Break_;
+use Infection\Mutator\Operator\Continue_;
 use Infection\Mutator\ReturnValue\FloatNegation;
 use Infection\Mutator\ReturnValue\FunctionCall;
 use Infection\Mutator\ReturnValue\IntegerNegation;
@@ -132,6 +134,8 @@ class InfectionConfig
         // Sort
         Spaceship::class,
 
+        Break_::class,
+        Continue_::class,
         Foreach_::class,
     ];
 
