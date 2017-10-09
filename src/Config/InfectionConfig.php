@@ -59,6 +59,7 @@ use Infection\Mutator\ReturnValue\IntegerNegation;
 use Infection\Mutator\ReturnValue\NewObject;
 use Infection\Mutator\ReturnValue\This;
 use Infection\Mutator\Sort\Spaceship;
+use Infection\Mutator\ZeroIteration\Foreach_;
 
 class InfectionConfig
 {
@@ -135,6 +136,7 @@ class InfectionConfig
 
         Break_::class,
         Continue_::class,
+        Foreach_::class,
     ];
 
     /**
