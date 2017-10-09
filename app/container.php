@@ -28,6 +28,7 @@ use Infection\Config\InfectionConfig;
 use Infection\Utils\VersionParser;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use SebastianBergmann\Diff\Differ as BaseDiffer;
 
 $c = new Container();
 
@@ -86,7 +87,9 @@ $c['mutant.creator'] = function (Container $c): MutantCreator {
 };
 
 $c['differ'] = function (): Differ {
-    return new Differ();
+    return new Differ(
+        new BaseDiffer()
+    );
 };
 
 $c['dispatcher'] = function (): EventDispatcher {
