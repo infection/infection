@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Operator;
 
 use Infection\Mutator\FunctionBodyMutator;
+use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 class Break_ extends FunctionBodyMutator
@@ -20,6 +21,16 @@ class Break_ extends FunctionBodyMutator
 
     public function shouldMutate(Node $node): bool
     {
-        return $node instanceof Node\Stmt\Break_;
+        if (!$node instanceof Node\Stmt\Break_) {
+            return false;
+        }
+
+        $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
+
+        if ($parentNode instanceof Node\Stmt\Case_) {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -38,4 +38,27 @@ CODE;
 
         $this->assertSame($expectedCode, $this->mutate($code));
     }
+
+    public function test_does_not_replace_continue_to_break_in_switch()
+    {
+        $code = <<<'CODE'
+<?php
+
+switch (1) {
+    case 1:
+        continue;
+}
+CODE;
+
+        $expectedCode = <<<'CODE'
+<?php
+
+switch (1) {
+    case 1:
+        continue;
+}
+CODE;
+
+        $this->assertSame($expectedCode, $this->mutate($code));
+    }
 }
