@@ -1,5 +1,22 @@
 # Change Log
 
+## [0.6.0](https://github.com/infection/infection/tree/0.6.0) (2017-10-09)
+[Full Changelog](https://github.com/infection/infection/compare/0.5.3...0.6.0)
+
+**Closed issues:**
+
+- \[New Mutator\] Swap arguments in the Spaceship operator [\#47](https://github.com/infection/infection/issues/47)
+
+**Merged pull requests:**
+
+- Upgrade Mockery to ^1.0 [\#50](https://github.com/infection/infection/pull/50) ([borNfreee](https://github.com/borNfreee))
+- Compatibility with PHPUnit 6.4 [\#49](https://github.com/infection/infection/pull/49) ([morozov](https://github.com/morozov))
+- Add composer script for static analyzing tools [\#46](https://github.com/infection/infection/pull/46) ([borNfreee](https://github.com/borNfreee))
+- Fix performance bottleneck by introducing a simple instance-level object cache [\#44](https://github.com/infection/infection/pull/44) ([borNfreee](https://github.com/borNfreee))
+- Zero iteration mutator [\#52](https://github.com/infection/infection/pull/52) ([sidz](https://github.com/sidz))
+- Add Break-Continue mutators [\#51](https://github.com/infection/infection/pull/51) ([sidz](https://github.com/sidz))
+- Swap arguments on spaceship operator [\#48](https://github.com/infection/infection/pull/48) ([marcosh](https://github.com/marcosh))
+
 ## [0.5.3](https://github.com/infection/infection/tree/0.5.3) (2017-09-15)
 [Full Changelog](https://github.com/infection/infection/compare/0.5.2...0.5.3)
 
