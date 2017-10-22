@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Infection\Process\Listener;
 
 use Infection\Config\InfectionConfig;
+use Infection\Console\LogVerbosityInterface;
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\MutationTestingFinished;
 use Infection\Filesystem\Filesystem;
@@ -32,11 +33,21 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
      */
     private $fs;
 
-    public function __construct(InfectionConfig $infectionConfig, MetricsCalculator $metricsCalculator, Filesystem $fs)
-    {
+    /**
+     * @var bool
+     */
+    private $isDebugMode;
+
+    public function __construct(
+        InfectionConfig $infectionConfig,
+        MetricsCalculator $metricsCalculator,
+        Filesystem $fs,
+        int $logVerbosity = LogVerbosityInterface::DEBUG
+    ) {
         $this->infectionConfig = $infectionConfig;
         $this->metricsCalculator = $metricsCalculator;
         $this->fs = $fs;
+        $this->isDebugMode = ($logVerbosity === LogVerbosityInterface::DEBUG);
     }
 
     public function getSubscribedEvents()
@@ -51,21 +62,23 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
         $logFilePath = $this->infectionConfig->getTextFileLogPath();
 
         if ($logFilePath) {
-            $this->fs->mkdir(\dirname($logFilePath));
+            $this->fs->mkdir(dirname($logFilePath));
 
-            $escapedParts = $this->getLogParts($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped');
+            $logs[] = $this->getLogParts($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped');
 
-            $timedOutParts = $this->getLogParts($this->metricsCalculator->getTimedOutProcesses(), 'Timeout');
+            $logs[] = $this->getLogParts($this->metricsCalculator->getTimedOutProcesses(), 'Timeout');
 
-            $killedParts = $this->getLogParts($this->metricsCalculator->getKilledMutantProcesses(), 'Killed');
+            if ($this->isDebugMode) {
+                $logs[] = $this->getLogParts($this->metricsCalculator->getKilledMutantProcesses(), 'Killed');
+            }
 
-            $notCoveredParts = $this->getNotCoveredLogParts($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not covered');
+            $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not covered');
 
             file_put_contents(
                 $logFilePath,
                 implode(
-                    array_merge($escapedParts, $timedOutParts, $killedParts, $notCoveredParts),
-                   "\n"
+                    array_merge(...$logs),
+                    "\n"
                 )
             );
         }
@@ -82,31 +95,16 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
         $logParts = $this->getHeadlineParts($headlinePrefix);
 
         foreach ($processes as $index => $mutantProcess) {
+            $isShowFullFormat = $this->isDebugMode && $mutantProcess->getProcess()->isStarted();
+
             $logParts[] = '';
-            $logParts[] = $this->getMutatorPart($index, $mutantProcess);
-            $logParts[] = $mutantProcess->getMutant()->getMutation()->getOriginalFilePath();
-            $logParts[] = $mutantProcess->getProcess()->getCommandLine();
+            $logParts[] = $this->getMutatorFirstLine($index, $mutantProcess);
+            $logParts[] = $isShowFullFormat ? $mutantProcess->getProcess()->getCommandLine() : '';
             $logParts[] = $mutantProcess->getMutant()->getDiff();
-            $logParts[] = $mutantProcess->getProcess()->getOutput();
-        }
 
-        return $logParts;
-    }
-
-    private function getNotCoveredLogParts(array $processes, string $headlinePrefix): array
-    {
-        $logParts = $this->getHeadlineParts($headlinePrefix);
-
-        foreach ($processes as $index => $mutantProcess) {
-            $logParts[] = '';
-            $logParts[] = $this->getMutatorPart($index, $mutantProcess);
-            $logParts[] = sprintf(
-                '%s:%s',
-                $mutantProcess->getMutant()->getMutation()->getOriginalFilePath(),
-                $mutantProcess->getMutant()->getMutation()->getAttributes()['startLine']
-            );
-            $logParts[] = '';
-            $logParts[] = $mutantProcess->getMutant()->getDiff();
+            if ($isShowFullFormat) {
+                $logParts[] = $mutantProcess->getProcess()->getOutput();
+            }
         }
 
         return $logParts;
@@ -123,12 +121,14 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
         ];
     }
 
-    private function getMutatorPart(int $index, MutantProcess $mutantProcess): string
+    private function getMutatorFirstLine(int $index, MutantProcess $mutantProcess): string
     {
         return sprintf(
-            '%d) %s',
+            '%d) %s:%d    [M] %s',
             $index + 1,
-            get_class($mutantProcess->getMutant()->getMutation()->getMutator())
+            $mutantProcess->getMutant()->getMutation()->getOriginalFilePath(),
+            (int) $mutantProcess->getMutant()->getMutation()->getAttributes()['startLine'],
+            $mutantProcess->getMutant()->getMutation()->getMutator()->getName()
         );
     }
 }

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Infection\Console\LogVerbosityInterface;
 use Infection\InfectionApplication;
 use Infection\Config\InfectionConfig;
 use Pimple\Container;
@@ -105,6 +106,13 @@ class InfectionCommand extends Command
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Minimum Covered Code Mutation Score Indicator (MSI) percentage value. Should be used in CI server.'
+            )
+            ->addOption(
+                'log-verbosity',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Log verbosity level. 1 - full logs format, 2 - short logs format.',
+                LogVerbosityInterface::DEBUG
             )
         ;
     }
