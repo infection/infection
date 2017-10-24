@@ -196,6 +196,9 @@ class InfectionConfig
         return self::DEFAULT_EXCLUDE_DIRS;
     }
 
+    /**
+     * @return string|null
+     */
     public function getTextFileLogPath()
     {
         return $this->config->logs->text ?? null;

@@ -62,10 +62,7 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
         $logFilePath = $this->infectionConfig->getTextFileLogPath();
 
         if ($logFilePath) {
-            $this->fs->mkdir(dirname($logFilePath));
-
             $logs[] = $this->getLogParts($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped');
-
             $logs[] = $this->getLogParts($this->metricsCalculator->getTimedOutProcesses(), 'Timeout');
 
             if ($this->isDebugMode) {
@@ -74,7 +71,7 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
 
             $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not covered');
 
-            file_put_contents(
+            $this->fs->dumpFile(
                 $logFilePath,
                 implode(
                     array_merge(...$logs),
