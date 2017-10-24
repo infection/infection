@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use Infection\Console\LogVerbosityInterface;
+use Infection\Console\LogVerbosity;
 use Infection\InfectionApplication;
 use Infection\Config\InfectionConfig;
 use Pimple\Container;
@@ -112,7 +112,7 @@ class InfectionCommand extends Command
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Log verbosity level. 1 - full logs format, 2 - short logs format.',
-                LogVerbosityInterface::DEBUG
+                LogVerbosity::DEBUG
             )
         ;
     }

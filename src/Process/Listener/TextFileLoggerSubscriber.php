@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Infection\Process\Listener;
 
 use Infection\Config\InfectionConfig;
-use Infection\Console\LogVerbosityInterface;
+use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\MutationTestingFinished;
 use Infection\Filesystem\Filesystem;
@@ -42,12 +42,12 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
         InfectionConfig $infectionConfig,
         MetricsCalculator $metricsCalculator,
         Filesystem $fs,
-        int $logVerbosity = LogVerbosityInterface::DEBUG
+        int $logVerbosity = LogVerbosity::DEBUG
     ) {
         $this->infectionConfig = $infectionConfig;
         $this->metricsCalculator = $metricsCalculator;
         $this->fs = $fs;
-        $this->isDebugMode = ($logVerbosity === LogVerbosityInterface::DEBUG);
+        $this->isDebugMode = ($logVerbosity === LogVerbosity::DEBUG);
     }
 
     public function getSubscribedEvents()

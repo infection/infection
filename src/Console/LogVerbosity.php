@@ -7,7 +7,7 @@
 
 namespace Infection\Console;
 
-interface LogVerbosityInterface
+final class LogVerbosity
 {
     const DEBUG = 1;
     const NORMAL = 2;
