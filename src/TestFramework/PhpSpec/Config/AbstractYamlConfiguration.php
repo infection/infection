@@ -42,11 +42,9 @@ abstract class AbstractYamlConfiguration
                 continue;
             }
 
-            $options = [
-                'format' => ['xml'],
-                'output' => [
-                    'xml' => $this->tempDirectory . '/' . CodeCoverageData::PHP_SPEC_COVERAGE_DIR,
-                ],
+            $options['format'] = ['xml'];
+            $options['output'] = [
+                'xml' => $this->tempDirectory . '/' . CodeCoverageData::PHP_SPEC_COVERAGE_DIR,
             ];
         }
         unset($options);
