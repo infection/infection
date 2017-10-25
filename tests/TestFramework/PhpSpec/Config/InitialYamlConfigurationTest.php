@@ -26,6 +26,7 @@ class InitialYamlConfigurationTest extends TestCase
                 'output' => [
                     'xml' => '/path'
                 ],
+                'whitelist' => ['.'],
             ],
         ],
         'bootstrap' => '/path/to/adc',
@@ -54,5 +55,14 @@ class InitialYamlConfigurationTest extends TestCase
         $expectedPath = $this->tempDir . '/' . CodeCoverageData::PHP_SPEC_COVERAGE_DIR;
 
         $this->assertSame($expectedPath, $parsedYaml['extensions']['PhpSpecCodeCoverageExtension']['output']['xml']);
+    }
+
+    public function test_it_preserves_options_form_coverage_extension()
+    {
+        $configuration = $this->getConfigurationObject();
+
+        $parsedYaml = Yaml::parse($configuration->getYaml());
+
+        $this->assertSame(['.'], $parsedYaml['extensions']['PhpSpecCodeCoverageExtension']['whitelist']);
     }
 }
