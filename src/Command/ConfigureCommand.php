@@ -11,7 +11,7 @@ namespace Infection\Command;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
 use Infection\Config\ValueProvider\PhpUnitCustomExecutablePathProvider;
-use Infection\Config\ValueProvider\PhpUnitPathProvider;
+use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Config\ValueProvider\SourceDirsProvider;
 use Infection\Config\ValueProvider\TextLogFileProvider;
 use Infection\Config\ValueProvider\TimeoutProvider;
@@ -58,7 +58,7 @@ class ConfigureCommand extends Command
         $excludeDirsProvider = new ExcludeDirsProvider($this->consoleHelper, $this->getQuestionHelper());
         $excludedDirs = $excludeDirsProvider->get($input, $output, $dirsInCurrentDir, $sourceDirs);
 
-        $phpUnitConfigPathProvider = new PhpUnitPathProvider($testFrameworkConfigLocator, $this->consoleHelper, $this->getQuestionHelper());
+        $phpUnitConfigPathProvider = new TestFrameworkConfigPathProvider($testFrameworkConfigLocator, $this->consoleHelper, $this->getQuestionHelper());
         $phpUnitConfigPath = $phpUnitConfigPathProvider->get($input, $output, $dirsInCurrentDir, $input->getOption('test-framework'));
 
         $phpUnitExecutableFinder = new TestFrameworkExecutableFinder(TestFrameworkTypes::PHPUNIT);
