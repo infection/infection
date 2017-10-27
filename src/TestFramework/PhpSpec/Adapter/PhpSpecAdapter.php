@@ -13,11 +13,11 @@ use Infection\TestFramework\TestFrameworkTypes;
 
 class PhpSpecAdapter extends AbstractTestFrameworkAdapter
 {
-    /**
-     * @param string $output
-     *
-     * @return bool
-     */
+    const ERROR_REGEXPS = [
+        '/Fatal error\:/',
+        '/Fatal error happened/i',
+    ];
+
     public function testsPass(string $output): bool
     {
         $lines = explode("\n", $output);
@@ -29,8 +29,10 @@ class PhpSpecAdapter extends AbstractTestFrameworkAdapter
             }
         }
 
-        if (preg_match('/Fatal error happened/i', $output)) {
-            return false;
+        foreach (self::ERROR_REGEXPS as $regExp) {
+            if (preg_match($regExp, $output)) {
+                return false;
+            }
         }
 
         return true;
