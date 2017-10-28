@@ -67,6 +67,7 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
 
             if ($this->isDebugMode) {
                 $logs[] = $this->getLogParts($this->metricsCalculator->getKilledMutantProcesses(), 'Killed');
+                $logs[] = $this->getLogParts($this->metricsCalculator->getErrorProcesses(), 'Errors');
             }
 
             $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not covered');
@@ -120,12 +121,14 @@ class TextFileLoggerSubscriber implements EventSubscriberInterface
 
     private function getMutatorFirstLine(int $index, MutantProcess $mutantProcess): string
     {
+        $mutation = $mutantProcess->getMutant()->getMutation();
+
         return sprintf(
             '%d) %s:%d    [M] %s',
             $index + 1,
-            $mutantProcess->getMutant()->getMutation()->getOriginalFilePath(),
-            (int) $mutantProcess->getMutant()->getMutation()->getAttributes()['startLine'],
-            $mutantProcess->getMutant()->getMutation()->getMutator()->getName()
+            $mutation->getOriginalFilePath(),
+            (int) $mutation->getAttributes()['startLine'],
+            $mutation->getMutator()->getName()
         );
     }
 }

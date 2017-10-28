@@ -9,7 +9,6 @@ namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
-use PHPUnit\Framework\TestCase;
 use Mockery;
 
 class CachedTestFileDataProviderTest extends Mockery\Adapter\Phpunit\MockeryTestCase

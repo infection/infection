@@ -21,17 +21,17 @@ class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     public function test_it_shows_zero_values_by_default()
     {
-        $adapter = Mockery::mock(AbstractTestFrameworkAdapter::class);
-
-        $calculator = new MetricsCalculator($adapter);
+        $calculator = new MetricsCalculator();
 
         $this->assertSame(0, $calculator->getEscapedCount());
         $this->assertSame(0, $calculator->getKilledCount());
+        $this->assertSame(0, $calculator->getErrorCount());
         $this->assertSame(0, $calculator->getTimedOutCount());
         $this->assertSame(0, $calculator->getNotCoveredByTestsCount());
         $this->assertSame(0, $calculator->getTotalMutantsCount());
         $this->assertSame([], $calculator->getEscapedMutantProcesses());
         $this->assertSame([], $calculator->getKilledMutantProcesses());
+        $this->assertSame([], $calculator->getErrorProcesses());
         $this->assertSame([], $calculator->getTimedOutProcesses());
         $this->assertSame([], $calculator->getNotCoveredMutantProcesses());
 
@@ -42,8 +42,6 @@ class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
     public function test_it_collects_all_values()
     {
-        $adapter = Mockery::mock(AbstractTestFrameworkAdapter::class);
-
         $process = Mockery::mock(Process::class);
         $process->shouldReceive('stop');
 
@@ -59,20 +57,25 @@ class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $killedMutantProcess = Mockery::mock(MutantProcess::class);
         $killedMutantProcess->shouldReceive('getResultCode')->times(1)->andReturn(MutantProcess::CODE_KILLED);
 
-        $calculator = new MetricsCalculator($adapter);
+        $errorMutantProcess = Mockery::mock(MutantProcess::class);
+        $errorMutantProcess->shouldReceive('getResultCode')->times(1)->andReturn(MutantProcess::CODE_ERROR);
+
+        $calculator = new MetricsCalculator();
 
         $calculator->collect($notCoveredMutantProcess);
         $calculator->collect($passMutantProcess);
         $calculator->collect($timedOutMutantProcess);
         $calculator->collect($killedMutantProcess);
+        $calculator->collect($errorMutantProcess);
 
         $this->assertSame(1, $calculator->getNotCoveredByTestsCount());
         $this->assertSame(1, $calculator->getEscapedCount());
         $this->assertSame(1, $calculator->getTimedOutCount());
         $this->assertSame(1, $calculator->getKilledCount());
+        $this->assertSame(1, $calculator->getErrorCount());
 
-        $this->assertSame(50.0, $calculator->getMutationScoreIndicator());
-        $this->assertSame(75.0, $calculator->getCoverageRate());
-        $this->assertSame(67.0, $calculator->getCoveredCodeMutationScoreIndicator());
+        $this->assertSame(60.0, $calculator->getMutationScoreIndicator());
+        $this->assertSame(80.0, $calculator->getCoverageRate());
+        $this->assertSame(75.0, $calculator->getCoveredCodeMutationScoreIndicator());
     }
 }

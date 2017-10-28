@@ -185,7 +185,7 @@ class InfectionCommand extends Command
 
     private function setOutputFormatterStyles(OutputInterface $output)
     {
-        $output->getFormatter()->setStyle('with-error', new OutputFormatterStyle('red'));
+        $output->getFormatter()->setStyle('with-error', new OutputFormatterStyle('green'));
         $output->getFormatter()->setStyle('uncovered', new OutputFormatterStyle('blue', null, ['bold']));
         $output->getFormatter()->setStyle('timeout', new OutputFormatterStyle('yellow'));
         $output->getFormatter()->setStyle('escaped', new OutputFormatterStyle('red', null, ['bold']));

@@ -57,6 +57,9 @@ class DotFormatter extends AbstractOutputFormatter
             case MutantProcess::CODE_TIMED_OUT:
                 $this->output->write('<timeout>T</timeout>');
                 break;
+            case MutantProcess::CODE_ERROR:
+                $this->output->write('<with-error>E</with-error>');
+                break;
         }
 
         $remainder = $this->callsCount % self::DOTS_PER_ROW;
