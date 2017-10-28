@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Infection\Mutant;
 
 use Infection\Process\MutantProcess;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
 
 class MetricsCalculator
 {

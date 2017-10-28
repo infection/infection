@@ -6,7 +6,7 @@
  */
 declare(strict_types=1);
 
-namespace Process;
+namespace Infection\Tests\Process;
 
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
