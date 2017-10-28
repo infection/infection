@@ -85,7 +85,7 @@ class InfectionApplication
             $initialTestSuitProcess = $initialTestsRunner->run($testFrameworkOptions->getForInitialProcess());
 
             if (!$initialTestSuitProcess->isSuccessful()) {
-                $this->logInitialTestsDoNotPass($initialTestSuitProcess);
+                $this->logInitialTestsDoNotPass($io, $initialTestSuitProcess, $testFrameworkKey);
 
                 return 1;
             }
@@ -190,16 +190,32 @@ class InfectionApplication
         return new CodeCoverageData($coverageDir, new CoverageXmlParser($coverageDir), $testFrameworkKey, $testFileDataProviderService);
     }
 
-    private function logInitialTestsDoNotPass(Process $initialTestSuitProcess)
+    private function logInitialTestsDoNotPass(SymfonyStyle $io, Process $initialTestSuitProcess, string $testFrameworkKey)
     {
-        $this->output->writeln(
+        $lines = [
+            'Project tests must be in a passing state before running Infection.',
             sprintf(
-                '<error>Tests do not pass. Error code %d. "%s". STDERR: %s</error>',
-                $initialTestSuitProcess->getExitCode(),
-                $initialTestSuitProcess->getExitCodeText(),
-                $initialTestSuitProcess->getErrorOutput()
-            )
-        );
+                '%s reported an exit code of %d.',
+                ucfirst($testFrameworkKey),
+                $initialTestSuitProcess->getExitCode()
+            ),
+            sprintf(
+                'Refer to the %s\'s output below:',
+                $testFrameworkKey
+            ),
+        ];
+
+        if ($stdOut = $initialTestSuitProcess->getOutput()) {
+            $lines[] = 'STDOUT:';
+            $lines[] = $stdOut;
+        }
+
+        if ($stdError = $initialTestSuitProcess->getErrorOutput()) {
+            $lines[] = 'STDERR:';
+            $lines[] = $stdError;
+        }
+
+        $io->error($lines);
     }
 
     private function hasBadMsi(MetricsCalculator $metricsCalculator): bool
