@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Infection\Mutant;
 
 use Infection\Process\MutantProcess;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
 
 class MetricsCalculator
 {
@@ -22,6 +21,16 @@ class MetricsCalculator
      * @var MutantProcess[]
      */
     private $killedMutantProcesses = [];
+
+    /**
+     * @var int
+     */
+    private $errorCount = 0;
+
+    /**
+     * @var MutantProcess[]
+     */
+    private $errorProcesses = [];
 
     /**
      * @var int
@@ -58,21 +67,6 @@ class MetricsCalculator
      */
     private $totalMutantsCount = 0;
 
-    /**
-     * @var AbstractTestFrameworkAdapter
-     */
-    private $testFrameworkAdapter;
-
-    /**
-     * MetricsCalculator constructor.
-     *
-     * @param AbstractTestFrameworkAdapter $testFrameworkAdapter
-     */
-    public function __construct(AbstractTestFrameworkAdapter $testFrameworkAdapter)
-    {
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
-    }
-
     public function collect(MutantProcess $mutantProcess)
     {
         ++$this->totalMutantsCount;
@@ -94,6 +88,10 @@ class MetricsCalculator
                 $this->timedOutCount++;
                 $this->timedOutProcesses[] = $mutantProcess;
                 break;
+            case MutantProcess::CODE_ERROR:
+                $this->errorCount++;
+                $this->errorProcesses[] = $mutantProcess;
+                break;
         }
     }
 
@@ -105,7 +103,7 @@ class MetricsCalculator
     public function getMutationScoreIndicator(): float
     {
         $detectionRateAll = 0;
-        $defeatedTotal = $this->killedCount + $this->timedOutCount/* + $errorCount*/;
+        $defeatedTotal = $this->killedCount + $this->timedOutCount + $this->errorCount;
 
         if ($this->totalMutantsCount) {
             $detectionRateAll = round(100 * ($defeatedTotal / $this->totalMutantsCount));
@@ -135,7 +133,7 @@ class MetricsCalculator
     {
         $detectionRateTested = 0;
         $coveredByTestsTotal = $this->totalMutantsCount - $this->notCoveredByTestsCount;
-        $defeatedTotal = $this->killedCount + $this->timedOutCount/* + $errorCount*/;
+        $defeatedTotal = $this->killedCount + $this->timedOutCount + $this->errorCount;
 
         if ($coveredByTestsTotal) {
             $detectionRateTested = round(100 * ($defeatedTotal / $coveredByTestsTotal));
@@ -214,5 +212,18 @@ class MetricsCalculator
     public function getNotCoveredMutantProcesses(): array
     {
         return $this->notCoveredMutantProcesses;
+    }
+
+    public function getErrorCount(): int
+    {
+        return $this->errorCount;
+    }
+
+    /**
+     * @return MutantProcess[]
+     */
+    public function getErrorProcesses(): array
+    {
+        return $this->errorProcesses;
     }
 }

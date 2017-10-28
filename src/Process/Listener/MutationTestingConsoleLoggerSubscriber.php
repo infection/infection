@@ -135,7 +135,7 @@ class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getKilledCount()) . '</options=bold> mutants were killed');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getNotCoveredByTestsCount()) . '</options=bold> mutants were not covered by tests');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getEscapedCount()) . '</options=bold> covered mutants were not detected');
-        //        $this->output->writeln($this->getPadded($errorCount) . ' fatal errors were encountered'); // TODO
+        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getErrorCount()) . '</options=bold> errors were encountered');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getTimedOutCount()) . '</options=bold> time outs were encountered');
 
         $msiTag = $this->getPercentageTag($this->metricsCalculator->getMutationScoreIndicator());

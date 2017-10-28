@@ -95,6 +95,10 @@ class TextFileLoggerSubscriberTest extends TestCase
             ->willReturn([]);
 
         $this->metricsCalculator->expects($this->once())
+            ->method('getErrorProcesses')
+            ->willReturn([]);
+
+        $this->metricsCalculator->expects($this->once())
             ->method('getNotCoveredMutantProcesses')
             ->willReturn([]);
 
@@ -127,6 +131,9 @@ class TextFileLoggerSubscriberTest extends TestCase
 
         $this->metricsCalculator->expects($this->never())
             ->method('getKilledMutantProcesses');
+
+        $this->metricsCalculator->expects($this->never())
+            ->method('getErrorProcesses');
 
         $this->metricsCalculator->expects($this->once())
             ->method('getNotCoveredMutantProcesses')

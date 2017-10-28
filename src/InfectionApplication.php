@@ -74,7 +74,7 @@ class InfectionApplication
             $testFrameworkKey = $this->input->getOption('test-framework');
             $adapter = $this->get('test.framework.factory')->create($testFrameworkKey);
 
-            $metricsCalculator = new MetricsCalculator($adapter);
+            $metricsCalculator = new MetricsCalculator();
 
             $this->addSubscribers($eventDispatcher, $metricsCalculator, $adapter);
 
