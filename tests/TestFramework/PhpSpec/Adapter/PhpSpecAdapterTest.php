@@ -74,6 +74,22 @@ OUTPUT;
         $this->assertFalse($adapter->testsPass($output));
     }
 
+    public function test_it_catches_fatal_errors_from_start()
+    {
+        $output = <<<OUTPUT
+TAP version 13
+
+Fatal error: Access level to Foo\Bar\Foobar::foobar() must be public (as in class Foo\Bar\FoobarInterface) in...
+
+Call Stack:
+
+OUTPUT;
+
+        $adapter = $this->getAdapter();
+
+        $this->assertFalse($adapter->testsPass($output));
+    }
+
     private function getAdapter(): PhpSpecAdapter
     {
         $executableFined = Mockery::mock(AbstractExecutableFinder::class);
