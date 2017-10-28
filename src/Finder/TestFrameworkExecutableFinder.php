@@ -42,7 +42,10 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
     public function find()
     {
         if ($this->cachedExecutable === null) {
-            $this->addVendorFolderToPath();
+            if (!$this->doesCustomPathExist()) {
+                $this->addVendorFolderToPath();
+            }
+
             $this->cachedExecutable = $this->findExecutable();
         }
 
@@ -53,8 +56,7 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
     {
         $vendorPath = null;
         try {
-            $composer = $this->findComposer();
-            $process = new Process(sprintf('%s %s', $composer, 'config bin-dir'));
+            $process = new Process(sprintf('%s %s', $this->findComposer(), 'config bin-dir'));
             $process->run();
             $vendorPath = trim($process->getOutput());
         } catch (\RuntimeException $e) {
@@ -74,9 +76,7 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
      */
     private function findComposer()
     {
-        $finder = new ComposerExecutableFinder();
-
-        return $finder->find();
+        return (new ComposerExecutableFinder())->find();
     }
 
     /**
@@ -86,7 +86,7 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
      */
     private function findExecutable()
     {
-        if ($this->customPath && file_exists($this->customPath)) {
+        if ($this->doesCustomPathExist()) {
             return $this->makeExecutable($this->customPath);
         }
 
@@ -136,5 +136,13 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
         }
 
         return sprintf('%s %s %s', 'exec', $phpFinder->find(), $path);
+    }
+
+    /**
+     * @return bool
+     */
+    private function doesCustomPathExist(): bool
+    {
+        return $this->customPath && file_exists($this->customPath);
     }
 }
