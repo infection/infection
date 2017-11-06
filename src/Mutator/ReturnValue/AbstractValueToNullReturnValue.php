@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\ReturnValue;
 
 use Infection\Mutator\Mutator;
-use Infection\Visitor\WrappedFunctionInfoCollectorVisitor;
+use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
 abstract class AbstractValueToNullReturnValue extends Mutator
@@ -18,7 +18,7 @@ abstract class AbstractValueToNullReturnValue extends Mutator
     protected function isNullReturnValueAllowed(Node $node): bool
     {
         /** @var \PhpParser\Node\Stmt\Function_ $functionScope */
-        $functionScope = $node->getAttribute(WrappedFunctionInfoCollectorVisitor::FUNCTION_SCOPE_KEY);
+        $functionScope = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY);
 
         $returnType = $functionScope->getReturnType();
 

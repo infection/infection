@@ -4,6 +4,12 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+$autoloaderInWorkingDirectory = getcwd() . '/vendor/autoload.php';
+if (is_file($autoloaderInWorkingDirectory)) {
+    require_once $autoloaderInWorkingDirectory;
+}
+unset($autoloaderInWorkingDirectory);
+
 $files = [
     __DIR__ . '/../../../autoload.php',
     __DIR__ . '/../vendor/autoload.php',

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\FunctionSignature;
 
+use Infection\Visitor\ReflectionVisitor;
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
@@ -49,6 +50,33 @@ class ProtectedVisibility extends Mutator
             return false;
         }
 
+        if ($this->hasSameProtectedParentMethod($node)) {
+            return false;
+        }
+
         return $node->isProtected();
+    }
+
+    private function hasSameProtectedParentMethod(Node $node): bool
+    {
+        /** @var \ReflectionClass $reflection */
+        $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
+
+        $parent = $reflection->getParentClass();
+        while ($parent) {
+            try {
+                $method = $parent->getMethod($node->name);
+
+                if ($method->isProtected()) {
+                    return true;
+                }
+            } catch (\ReflectionException $e) {
+                continue;
+            } finally {
+                $parent = $parent->getParentClass();
+            }
+        }
+
+        return false;
     }
 }

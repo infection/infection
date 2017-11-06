@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\FunctionSignature;
 
 use Infection\Mutator\InterfaceParentTrait;
+use Infection\Visitor\ReflectionVisitor;
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
@@ -56,6 +57,10 @@ class PublicVisibility extends Mutator
             return false;
         }
 
+        if ($this->hasSamePublicParentMethod($node)) {
+            return false;
+        }
+
         if ($node->isAbstract()) {
             return false;
         }
@@ -80,5 +85,54 @@ class PublicVisibility extends Mutator
                 '__debugInfo',
             ]
         );
+    }
+
+    private function hasSamePublicParentMethod(Node $node): bool
+    {
+        return $this->hasSamePublicMethodInInterface($node) || $this->hasSamePublicMethodInParentClass($node);
+    }
+
+    private function hasSamePublicMethodInInterface(Node $node): bool
+    {
+        /** @var \ReflectionClass $reflection */
+        $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
+
+        foreach ($reflection->getInterfaces() as $reflectionInterface) {
+            try {
+                $method = $reflectionInterface->getMethod($node->name);
+
+                if ($method->isPublic()) {
+                    // we can't mutate because interface requires the same public visibility
+                    return true;
+                }
+            } catch (\ReflectionException $e) {
+                continue;
+            }
+        }
+
+        return false;
+    }
+
+    private function hasSamePublicMethodInParentClass(Node $node): bool
+    {
+        /** @var \ReflectionClass $reflection */
+        $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
+
+        $parent = $reflection->getParentClass();
+        while ($parent) {
+            try {
+                $method = $parent->getMethod($node->name);
+
+                if ($method->isPublic()) {
+                    return true;
+                }
+            } catch (\ReflectionException $e) {
+                continue;
+            } finally {
+                $parent = $parent->getParentClass();
+            }
+        }
+
+        return false;
     }
 }

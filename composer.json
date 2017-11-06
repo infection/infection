@@ -23,7 +23,11 @@
         "psr-4": {
             "Infection\\Tests\\": "tests/"
         },
-        "files": ["tests/Helpers.php"]
+        "files": [
+            "tests/Helpers.php",
+            "tests/Fixtures/Autoloaded/Reflection/rv-inside-function.php"
+        ],
+        "classmap": ["tests/Fixtures/Autoloaded"]
     },
     "config": {
         "platform": {
@@ -36,7 +40,7 @@
     },
     "require": {
         "php": "^7.0",
-        "nikic/php-parser": "^3.0",
+        "nikic/php-parser": "^3.1",
         "padraic/phar-updater": "^1.0.4",
         "pimple/pimple": "^3.2",
         "sebastian/diff": "^1.4 || ^2.0 || ^3.0",

@@ -11,41 +11,20 @@ namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ReturnValue\This;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\AbstractMutator;
 
-class ThisTest extends AbstractMutatorTestCase
+class ThisTest extends AbstractMutator
 {
-    protected function getMutator(): Mutator
+    public function test_mutates_returning_this()
     {
-        return new This();
-    }
+        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/This_/this_return-this.php');
 
-    /**
-     * @dataProvider provideMutationCases
-     */
-    public function test_mutator($input, $expected = null)
-    {
-        $this->doTest($input, $expected);
-    }
+        $mutatedCode = $this->mutate($code);
 
-    public function provideMutationCases(): array
-    {
-        return [
-            'It mutates return this without typehint' => [
-                <<<'PHP'
+        $expectedMutatedCode = <<<'CODE'
 <?php
 
-class Test
-{
-    function test()
-    {
-        return $this;
-    }
-}
-PHP
-                ,
-                <<<'PHP'
-<?php
+namespace This_ReturnThis;
 
 class Test
 {
@@ -54,65 +33,13 @@ class Test
         return null;
     }
 }
-PHP
-                ,
-            ],
-            'It does not mutate return this with typehint' => [
-                <<<'PHP'
-<?php
+CODE;
 
-class Test
-{
-    function test() : self
-    {
-        return $this;
+        $this->assertSame($expectedMutatedCode, $mutatedCode);
     }
-}
-PHP
-                ,
-            ],
-            'It does not mutate other returns' => [
-                <<<'PHP'
-<?php
 
-class Test
-{
-    function test() : self
+    protected function getMutator(): Mutator
     {
-        $val = 3;
-        return $val;
-    }
-}
-PHP
-            ],
-            'It does not mutate non return' => [
-                <<<'PHP'
-<?php
-
-class Test
-{
-    function test()
-    {
-        $val = 3;
-        $this;
-    }
-}
-PHP
-            ],
-            'It does not mutate print' => [
-                <<<'PHP'
-<?php
-
-class Test
-{
-    function test()
-    {
-        $val = 3;
-        print $this;
-    }
-}
-PHP
-            ],
-        ];
+        return new This();
     }
 }
