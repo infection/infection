@@ -10,7 +10,7 @@ namespace Infection\Mutant\Exception;
 
 class MsiCalculationException extends \LogicException
 {
-    public static function create(string $type): MsiCalculationException
+    public static function create(string $type): self
     {
         return new self(sprintf(
             'Seems like something is wrong with calculations and %s options.', $type
