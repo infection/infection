@@ -12,7 +12,7 @@ class MsiCalculationException extends \LogicException
 {
     public static function create(string $type): MsiCalculationException
     {
-        return new MsiCalculationException(sprintf(
+        return new self(sprintf(
             'Seems like something is wrong with calculations and %s options.', $type
         ));
     }
