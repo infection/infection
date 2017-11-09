@@ -15,6 +15,7 @@ use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\EventDispatcher\EventDispatcher;
+use Infection\Mutant\Exception\MsiCalculationException;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\Mutator;
@@ -42,6 +43,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class InfectionApplication
 {
+    const CI_FLAG_ERROR = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
+
     /**
      * @var Container
      */
@@ -248,34 +251,30 @@ class InfectionApplication
 
     private function getBadMsiErrorMessage(MetricsCalculator $metricsCalculator): string
     {
-        $baseMessage = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
-
         if ($minMsi = (float) $this->input->getOption('min-msi')) {
             return sprintf(
-                $baseMessage,
+                self::CI_FLAG_ERROR,
                 'MSI',
                 $minMsi,
                 $metricsCalculator->getMutationScoreIndicator()
             );
         }
 
-        throw new \LogicException('Seems like something is wrong with calculations and min-msi options.');
+        throw MsiCalculationException::create('min-msi');
     }
 
     private function getBadCoveredMsiErrorMessage(MetricsCalculator $metricsCalculator): string
     {
-        $baseMessage = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
-
         if ($minCoveredMsi = (float) $this->input->getOption('min-covered-msi')) {
             return sprintf(
-                $baseMessage,
+                self::CI_FLAG_ERROR,
                 'Covered Code MSI',
                 $minCoveredMsi,
                 $metricsCalculator->getCoveredCodeMutationScoreIndicator()
             );
         }
 
-        throw new \LogicException('Seems like something is wrong with calculations and min-msi options.');
+        throw MsiCalculationException::create('min-covered-msi');
     }
 
     private function parseMutators(string $mutators = null): array
