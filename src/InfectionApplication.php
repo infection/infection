@@ -114,6 +114,12 @@ class InfectionApplication
                 return 1;
             }
 
+            if ($this->hasBadCoveredMsi($metricsCalculator)) {
+                $io->error($this->getBadCoveredMsiErrorMessage($metricsCalculator));
+
+                return 1;
+            }
+
             return 0;
         } catch (InfectionException $e) {
             $io->error($e->getMessage());
@@ -226,6 +232,11 @@ class InfectionApplication
             }
         }
 
+        return false;
+    }
+
+    private function hasBadCoveredMsi(MetricsCalculator $metricsCalculator): bool
+    {
         if ($minCoveredMsi = (float) $this->input->getOption('min-covered-msi')) {
             if ($metricsCalculator->getCoveredCodeMutationScoreIndicator() < $minCoveredMsi) {
                 return true;
@@ -247,6 +258,13 @@ class InfectionApplication
                 $metricsCalculator->getMutationScoreIndicator()
             );
         }
+
+        throw new \LogicException('Seems like something is wrong with calculations and min-msi options.');
+    }
+
+    private function getBadCoveredMsiErrorMessage(MetricsCalculator $metricsCalculator): string
+    {
+        $baseMessage = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
 
         if ($minCoveredMsi = (float) $this->input->getOption('min-covered-msi')) {
             return sprintf(
