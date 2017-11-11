@@ -5,12 +5,15 @@ sudo: false
 php:
   - 7.0
   - 7.1
+  - 7.2
 
 matrix:
   include:
     - php: 7.0
       env: INFECTION=1
     - php: 7.1
+      env: INFECTION=1
+    - php: 7.2
       env: INFECTION=1
 
 cache:
