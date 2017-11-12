@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-class TestFrameworkTypes
+final class TestFrameworkTypes
 {
     const PHPUNIT = 'phpunit';
     const PHPSPEC = 'phpspec';
