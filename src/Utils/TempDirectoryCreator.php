@@ -15,11 +15,6 @@ class TempDirectoryCreator
      */
     private $tempDirectory;
 
-    /**
-     * @param string|null $dir
-     *
-     * @return string
-     */
     public function createAndGet(string $dirName = null): string
     {
         if ($this->tempDirectory === null) {
