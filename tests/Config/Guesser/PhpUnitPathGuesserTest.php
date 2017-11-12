@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 
 class PhpUnitPathGuesserTest extends TestCase
 {
-    public function test_it_parser_psr0()
+    public function test_it_guesses_old_symfony_paths()
     {
         $composerJson = <<<'CODE'
 {
@@ -31,19 +31,19 @@ CODE;
         $this->assertSame('app', $guesser->guess());
     }
 
-//    public function test_it_parser_psr0()
-//    {
-//        $composerJson = <<<'CODE'
-//{
-//    "autoload": {
-//        "psr-0": {
-//            "": "src"
-//        }
-//    }
-//}
-//CODE;
-//        $guesser = new SourceDirGuesser(json_decode($composerJson));
-//
-//        $this->assertSame(['src'], $guesser->guess());
-//    }
+    public function test_it_guesses_default_paths()
+    {
+        $composerJson = <<<'CODE'
+{
+    "autoload": {
+        "psr-0": {
+            "": "src"
+        }
+    }
+}
+CODE;
+        $guesser = new PhpUnitPathGuesser(json_decode($composerJson));
+
+        $this->assertSame('.', $guesser->guess());
+    }
 }
