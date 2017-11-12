@@ -49,7 +49,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $jUnitFilePath = '/path/to/junit.xml';
         $srcDirs = ['src', 'app'];
 
-        $replacer = new PathReplacer(new Locator($this->pathToProject));
+        $replacer = new PathReplacer(new Locator([$this->pathToProject]));
 
         $this->builder = new InitialConfigBuilder(
             $this->tempDir,

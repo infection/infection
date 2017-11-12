@@ -15,12 +15,12 @@ class Locator
      */
     private $paths;
 
-    public function __construct($paths)
+    public function __construct(array $paths)
     {
-        $this->paths = (array) $paths;
+        $this->paths = $paths;
     }
 
-    public function locate($name, $additionalPath = null)
+    public function locate(string $name, string $additionalPath = null)
     {
         if ($this->isAbsolutePath($name)) {
             if (!file_exists($name)) {
@@ -43,13 +43,6 @@ class Locator
         );
     }
 
-    /**
-     * @param array $fileNames
-     *
-     * @return string
-     *
-     * @throws \Exception
-     */
     public function locateAnyOf(array $fileNames): string
     {
         if (!$fileNames) {
@@ -65,7 +58,7 @@ class Locator
         }
     }
 
-    public function locateDirectories($wildcard, $additionalPath = null)
+    public function locateDirectories(string $wildcard, string $additionalPath = null)
     {
         $allDirectoryNames = [];
 
@@ -97,14 +90,7 @@ class Locator
         return array_unique($paths);
     }
 
-    /**
-     * Returns whether the file path is an absolute path.
-     *
-     * @param string $file A file path
-     *
-     * @return bool
-     */
-    private function isAbsolutePath($file)
+    private function isAbsolutePath(string $file): bool
     {
         return $file[0] === '/' || $file[0] === '\\'
             || (
