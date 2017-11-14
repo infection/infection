@@ -10,13 +10,13 @@ declare(strict_types=1);
 namespace Infection\Tests\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
-use Infection\Config\ValueProvider\PhpUnitPathProvider;
+use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Mockery;
 
-class PhpUnitPathProviderTest extends AbstractBaseProviderTest
+class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
 {
     public function test_it_calls_locator_in_the_current_dir()
     {
@@ -30,7 +30,7 @@ class PhpUnitPathProviderTest extends AbstractBaseProviderTest
             ->disableOriginalConstructor()
             ->getMock();
 
-        $provider = new PhpUnitPathProvider($locatorMock, $consoleMock, $this->getQuestionHelper());
+        $provider = new TestFrameworkConfigPathProvider($locatorMock, $consoleMock, $this->getQuestionHelper());
 
         $provider->get($this->createStreamableInputInterfaceMock(), $this->createOutputInterface(), [], 'phpunit');
     }
@@ -50,7 +50,7 @@ class PhpUnitPathProviderTest extends AbstractBaseProviderTest
         $consoleMock->expects($this->once())->method('getQuestion');
         $dialog = $this->getQuestionHelper();
 
-        $provider = new PhpUnitPathProvider($locatorMock, $consoleMock, $dialog);
+        $provider = new TestFrameworkConfigPathProvider($locatorMock, $consoleMock, $dialog);
         $inputPhpUnitPath = realpath(__DIR__ . '/../../Files/phpunit');
 
         $path = $provider->get(
@@ -77,7 +77,7 @@ class PhpUnitPathProviderTest extends AbstractBaseProviderTest
 
         $dialog = $this->getQuestionHelper();
 
-        $provider = new PhpUnitPathProvider($locatorMock, $consoleMock, $dialog);
+        $provider = new TestFrameworkConfigPathProvider($locatorMock, $consoleMock, $dialog);
 
         $path = $provider->get(
             $inputMock,
@@ -108,7 +108,7 @@ class PhpUnitPathProviderTest extends AbstractBaseProviderTest
         $consoleMock->expects($this->once())->method('getQuestion');
         $dialog = $this->getQuestionHelper();
 
-        $provider = new PhpUnitPathProvider($locatorMock, $consoleMock, $dialog);
+        $provider = new TestFrameworkConfigPathProvider($locatorMock, $consoleMock, $dialog);
 
         $path = $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("abc\n")),
