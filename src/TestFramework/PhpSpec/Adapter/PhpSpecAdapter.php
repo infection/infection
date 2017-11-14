@@ -20,7 +20,7 @@ class PhpSpecAdapter extends AbstractTestFrameworkAdapter
 
     public function testsPass(string $output): bool
     {
-        $lines = explode("\n", $output);
+        $lines = explode(PHP_EOL, $output);
 
         foreach ($lines as $line) {
             if (preg_match('%not ok \\d+ - %', $line)

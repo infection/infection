@@ -22,7 +22,7 @@ class PathReplacerTest extends TestCase
     public function test_it_replaces_path_with_absolute_path($originalPath, $pathPostfix)
     {
         $projectPath = p(realpath(__DIR__ . '/../../../../Files/phpunit/project-path'));
-        $pathReplacer = new PathReplacer(new Locator($projectPath));
+        $pathReplacer = new PathReplacer(new Locator([$projectPath]));
 
         $dom = new \DOMDocument();
         $node = $dom->createElement('phpunit', $originalPath);

@@ -22,7 +22,7 @@ class LocatorTest extends TestCase
     {
         $projectPath = realpath(__DIR__ . '/../Files/phpunit/project-path');
 
-        $locator = new Locator($projectPath);
+        $locator = new Locator([$projectPath]);
 
         $path = $locator->locate($fileName);
 
@@ -32,7 +32,7 @@ class LocatorTest extends TestCase
     public function test_handles_glob_patterns()
     {
         $projectPath = realpath(__DIR__ . '/../Files/phpunit/project-path');
-        $locator = new Locator($projectPath);
+        $locator = new Locator([$projectPath]);
 
         $directories = $locator->locateDirectories('*Bundle');
 

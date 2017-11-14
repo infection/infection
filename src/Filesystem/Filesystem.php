@@ -20,7 +20,7 @@ class Filesystem
      *
      * @throws IOException On any directory creation failure
      */
-    public function mkdir($path, int $mode = 0755)
+    public function mkdir(string $path, int $mode = 0755)
     {
         if (\is_dir($path)) {
             return;
