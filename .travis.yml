@@ -16,6 +16,11 @@ matrix:
     - php: 7.2
       env: INFECTION=1
 
+env:
+  matrix:
+    - DEPS=lowest
+    - DEPS=highest
+
 cache:
   directories:
   - $HOME/.composer/cache
@@ -24,7 +29,9 @@ before_install:
   - composer selfupdate
 
 install:
-  - composer install
+  - if [ "$DEPS" = "lowest" ]; then composer update -n --prefer-source --prefer-lowest; fi;
+  - if [ "$DEPS" = "highest" ]; then composer update -n --prefer-source; fi;
+  - composer show
 
 script:
   - composer analyze
