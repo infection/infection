@@ -7,19 +7,10 @@ php:
   - 7.1
   - 7.2
 
-matrix:
-  include:
-    - php: 7.0
-      env: INFECTION=1
-    - php: 7.1
-      env: INFECTION=1
-    - php: 7.2
-      env: INFECTION=1
-
 env:
   matrix:
-    - DEPS=lowest
-    - DEPS=highest
+    - INFECTION=1 DEPS=lowest
+    - INFECTION=1 DEPS=highest
 
 cache:
   directories:
