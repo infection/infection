@@ -11,11 +11,11 @@ environment:
     php_ver_target: 7.1
   - dependencies: highest
     php_ver_target: 7.0
-  - dependencies: lowest
+  - dependencies: current
     php_ver_target: 7.2
-  - dependencies: lowest
+  - dependencies: current
     php_ver_target: 7.1
-  - dependencies: lowest
+  - dependencies: current
     php_ver_target: 7.0
 
 cache: # cache is cleared when linked file is modified

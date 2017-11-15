@@ -9,7 +9,7 @@ php:
 
 env:
   matrix:
-    - INFECTION=1 DEPS=lowest
+    - INFECTION=1 DEPS=current
     - INFECTION=1 DEPS=highest
 
 cache:
@@ -20,7 +20,7 @@ before_install:
   - composer selfupdate
 
 install:
-  - if [ "$DEPS" = "lowest" ]; then git checkout composer.lock; composer install; fi;
+  - if [ "$DEPS" = "current" ]; then git checkout composer.lock; composer install; fi;
   - if [ "$DEPS" = "highest" ]; then composer update -n --prefer-source; fi;
   - composer show
 
