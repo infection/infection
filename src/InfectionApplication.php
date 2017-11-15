@@ -135,26 +135,12 @@ class InfectionApplication
         }
     }
 
-    /**
-     * Shortcut for container getter
-     *
-     * @param string $name
-     *
-     * @return mixed
-     */
     private function get(string $name)
     {
         return $this->container[$name];
     }
 
-    /**
-     * Checks whether the container has particular service
-     *
-     * @param string $serviceId
-     *
-     * @return bool
-     */
-    private function has(string $serviceId)
+    private function has(string $serviceId): bool
     {
         return isset($this->container[$serviceId]);
     }
@@ -229,24 +215,16 @@ class InfectionApplication
 
     private function hasBadMsi(MetricsCalculator $metricsCalculator): bool
     {
-        if ($minMsi = (float) $this->input->getOption('min-msi')) {
-            if ($metricsCalculator->getMutationScoreIndicator() < $minMsi) {
-                return true;
-            }
-        }
+        $minMsi = (float) $this->input->getOption('min-msi');
 
-        return false;
+        return $minMsi && ($metricsCalculator->getMutationScoreIndicator() < $minMsi);
     }
 
     private function hasBadCoveredMsi(MetricsCalculator $metricsCalculator): bool
     {
-        if ($minCoveredMsi = (float) $this->input->getOption('min-covered-msi')) {
-            if ($metricsCalculator->getCoveredCodeMutationScoreIndicator() < $minCoveredMsi) {
-                return true;
-            }
-        }
+        $minCoveredMsi = (float) $this->input->getOption('min-covered-msi');
 
-        return false;
+        return $minCoveredMsi && ($metricsCalculator->getCoveredCodeMutationScoreIndicator() < $minCoveredMsi);
     }
 
     private function getBadMsiErrorMessage(MetricsCalculator $metricsCalculator): string
@@ -292,14 +270,12 @@ class InfectionApplication
         return explode(',', $mutators);
     }
 
-    private function getDefaultMutators()
+    private function getDefaultMutators(): array
     {
-        return array_map(
-            function (string $class): Mutator {
-                return $this->container[$class];
-            },
-            Config\InfectionConfig::DEFAULT_MUTATORS
-        );
+        return array_map(function (string $class): Mutator {
+            return $this->container[$class];
+        },
+        Config\InfectionConfig::DEFAULT_MUTATORS);
     }
 
     private function getTestFrameworkExtraOptions(string $testFrameworkKey): TestFrameworkExtraOptions
