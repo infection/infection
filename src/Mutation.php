@@ -41,33 +41,21 @@ class Mutation
         $this->mutatedNodeClass = $mutatedNodeClass;
     }
 
-    /**
-     * @return Mutator
-     */
     public function getMutator(): Mutator
     {
         return $this->mutator;
     }
 
-    /**
-     * @return array
-     */
     public function getAttributes(): array
     {
         return $this->attributes;
     }
 
-    /**
-     * @return string
-     */
     public function getOriginalFilePath(): string
     {
         return $this->originalFilePath;
     }
 
-    /**
-     * @return string
-     */
     public function getMutatedNodeClass(): string
     {
         return $this->mutatedNodeClass;
@@ -76,14 +64,14 @@ class Mutation
     public function getHash(): string
     {
         $mutatorClass = get_class($this->getMutator());
-        $attrs = $this->getAttributes();
+        $attributes = $this->getAttributes();
         $attributeValues = [
-            $attrs['startLine'],
-            $attrs['endLine'],
-            $attrs['startTokenPos'],
-            $attrs['endTokenPos'],
-            $attrs['startFilePos'],
-            $attrs['endFilePos'],
+            $attributes['startLine'],
+            $attributes['endLine'],
+            $attributes['startTokenPos'],
+            $attributes['endTokenPos'],
+            $attributes['startFilePos'],
+            $attributes['endFilePos'],
         ];
 
         $hashKeys = array_merge([$this->getOriginalFilePath(), $mutatorClass], $attributeValues);

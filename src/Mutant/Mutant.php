@@ -28,6 +28,7 @@ class Mutant
      * @var bool
      */
     private $isCoveredByTest;
+
     /**
      * @var array
      */
@@ -42,17 +43,11 @@ class Mutant
         $this->coverageTests = $coverageTests;
     }
 
-    /**
-     * @return string
-     */
     public function getMutatedFilePath(): string
     {
         return $this->mutatedFilePath;
     }
 
-    /**
-     * @return Mutation
-     */
     public function getMutation(): Mutation
     {
         return $this->mutation;
@@ -63,9 +58,6 @@ class Mutant
         return $this->diff;
     }
 
-    /**
-     * @return bool
-     */
     public function isCoveredByTest(): bool
     {
         return $this->isCoveredByTest;
