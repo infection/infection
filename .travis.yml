@@ -20,7 +20,7 @@ before_install:
   - composer selfupdate
 
 install:
-  - if [ "$DEPS" = "lowest" ]; then composer update -n --prefer-source --prefer-lowest; fi;
+  - if [ "$DEPS" = "lowest" ]; then git checkout composer.lock; composer install; fi;
   - if [ "$DEPS" = "highest" ]; then composer update -n --prefer-source; fi;
   - composer show
 
