@@ -100,7 +100,8 @@ class InfectionApplication
                 $codeCoverageData,
                 $this->getDefaultMutators(),
                 $this->parseMutators($this->input->getOption('mutators')),
-                $eventDispatcher
+                $eventDispatcher,
+                $this->get('parser')
             );
             $mutations = $mutationsGenerator->generate($this->input->getOption('only-covered'), $this->input->getOption('filter'));
 

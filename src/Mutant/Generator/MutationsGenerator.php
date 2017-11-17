@@ -18,9 +18,8 @@ use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Visitor\WrappedFunctionInfoCollectorVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
-use PhpParser\Lexer;
 use PhpParser\NodeTraverser;
-use PhpParser\ParserFactory;
+use PhpParser\Parser;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -61,7 +60,19 @@ class MutationsGenerator
      */
     private $eventDispatcher;
 
-    public function __construct(array $srcDirs, array $excludeDirsOrFiles, CodeCoverageData $codeCoverageData, array $defaultMutators, array $whitelistedMutatorNames, EventDispatcher $eventDispatcher)
+    /**
+     * @var Parser
+     */
+    private $parser;
+
+    public function __construct(
+        array $srcDirs,
+        array $excludeDirsOrFiles,
+        CodeCoverageData $codeCoverageData,
+        array $defaultMutators,
+        array $whitelistedMutatorNames,
+        EventDispatcher $eventDispatcher,
+        Parser $parser)
     {
         $this->srcDirs = $srcDirs;
         $this->codeCoverageData = $codeCoverageData;
@@ -70,6 +81,7 @@ class MutationsGenerator
         $this->whitelistedMutatorNames = array_map('strtolower', $whitelistedMutatorNames);
         $this->whitelistedMutatorNamesCount = count($whitelistedMutatorNames);
         $this->eventDispatcher = $eventDispatcher;
+        $this->parser = $parser;
     }
 
     /**
@@ -127,12 +139,6 @@ class MutationsGenerator
      */
     private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered): array
     {
-        $lexer = new Lexer([
-            'usedAttributes' => [
-                'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
-            ],
-        ]);
-        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
         $traverser = new NodeTraverser();
         $mutators = $this->getMutators();
 
@@ -149,7 +155,7 @@ class MutationsGenerator
 
         $originalCode = $file->getContents();
 
-        $initialStatements = $parser->parse($originalCode);
+        $initialStatements = $this->parser->parse($originalCode);
 
         $traverser->traverse($initialStatements);
 

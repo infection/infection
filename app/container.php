@@ -29,6 +29,10 @@ use Infection\Utils\VersionParser;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
+use PhpParser\Lexer;
+use PhpParser\ParserFactory;
+use PhpParser\Parser;
+use PhpParser\PrettyPrinter\Standard;
 
 $c = new Container();
 
@@ -83,7 +87,7 @@ $c['xml.configuration.helper'] = function (Container $c): XmlConfigurationHelper
 };
 
 $c['mutant.creator'] = function (Container $c): MutantCreator {
-    return new MutantCreator($c['temp.dir'], $c['differ']);
+    return new MutantCreator($c['temp.dir'], $c['differ'], $c['parser'], $c['pretty.printer']);
 };
 
 $c['differ'] = function (): Differ {
@@ -120,6 +124,22 @@ $c['test.file.data.provider.phpunit'] = function (Container $c): TestFileDataPro
 
 $c['version.parser'] = function (): VersionParser {
     return new VersionParser();
+};
+
+$c['lexer'] = function (): Lexer {
+    return new Lexer([
+        'usedAttributes' => [
+            'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
+        ],
+    ]);
+};
+
+$c['parser'] = function ($c): Parser {
+    return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $c['lexer']);
+};
+
+$c['pretty.printer'] = function ($c): Standard {
+    return new Standard();
 };
 
 function registerMutators(array $mutators, Container $container)

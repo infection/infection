@@ -15,6 +15,9 @@ use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use \Mockery;
+use PhpParser\Lexer;
+use PhpParser\Parser;
+use PhpParser\ParserFactory;
 use Pimple\Container;
 
 class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
@@ -139,7 +142,19 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             $codeCoverageDataMock,
             $defaultMutators,
             $whitelistedMutatorNames,
-            $eventDispatcherMock
+            $eventDispatcherMock,
+            $this->getParser()
         );
+    }
+
+    private function getParser(): Parser
+    {
+        $lexer = new Lexer([
+            'usedAttributes' => [
+                'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
+            ],
+        ]);
+
+        return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
     }
 }
