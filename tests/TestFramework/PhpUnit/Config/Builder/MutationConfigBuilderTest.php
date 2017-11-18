@@ -36,6 +36,8 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
      */
     private $builder;
 
+    private $xmlConfigurationHelper;
+
     protected function setUp()
     {
         $tempDirCreator = new TempDirectoryCreator();
@@ -58,12 +60,12 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->mutant->shouldReceive('getMutatedFileCode')->andReturn('<?php');
 
         $replacer = new PathReplacer(new Locator([$this->pathToProject]));
-        $xmlConfigurationHelper = new XmlConfigurationHelper($replacer);
+        $this->xmlConfigurationHelper = new XmlConfigurationHelper($replacer);
 
         $this->builder = new MutationConfigBuilder(
             $this->tempDir,
             file_get_contents($phpunitXmlPath),
-            $xmlConfigurationHelper,
+            $this->xmlConfigurationHelper,
             $projectDir
         );
     }
@@ -86,6 +88,32 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     public function test_it_sets_custom_autoloader()
     {
         $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+
+        $configurationPath = $this->builder->build($this->mutant);
+
+        $xml = file_get_contents($configurationPath);
+
+        $resultAutoLoaderFilePath = $this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue;
+
+        $expectedCustomAutoloadFilePath = sprintf(
+            '%s/interceptor.autoload.%s.infection.php',
+            $this->tempDir,
+            self::HASH
+        );
+
+        $this->assertSame($expectedCustomAutoloadFilePath, $resultAutoLoaderFilePath);
+    }
+
+    public function test_it_sets_custom_autoloader_when_attribute_is_absent()
+    {
+        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+        $phpunitXmlPath = __DIR__ . '/../../../../Files/phpunit/phpuit_without_bootstrap.xml';
+        $this->builder = new MutationConfigBuilder(
+            $this->tempDir,
+            file_get_contents($phpunitXmlPath),
+            $this->xmlConfigurationHelper,
+            'project/dir'
+        );
 
         $configurationPath = $this->builder->build($this->mutant);
 
