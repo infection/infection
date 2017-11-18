@@ -44,6 +44,7 @@ class TestFrameworkConfigPathProvider
     {
         try {
             $this->testFrameworkConfigLocator->locate($testFramework);
+
             return null;
         } catch (\Exception $e) {
             if ($testFramework !== TestFrameworkTypes::PHPUNIT) {
