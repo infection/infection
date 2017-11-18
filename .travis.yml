@@ -27,8 +27,8 @@ install:
   - composer install
 
 script:
-  - vendor/bin/phpunit --coverage-clover=clover.xml
   - composer analyze
+  - vendor/bin/phpunit --coverage-clover=clover.xml
   - if [[ $INFECTION == 1 ]]; then bin/infection --threads=4 --min-msi=60 --min-covered-msi=91; fi
 
 after_success:
