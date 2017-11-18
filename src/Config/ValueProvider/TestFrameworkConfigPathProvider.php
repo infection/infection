@@ -40,10 +40,12 @@ class TestFrameworkConfigPathProvider
         $this->questionHelper = $questionHelper;
     }
 
-    public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, string $testFramework): string
+    public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, string $testFramework)
     {
         try {
-            return $this->testFrameworkConfigLocator->locate($testFramework);
+            $this->testFrameworkConfigLocator->locate($testFramework);
+
+            return null;
         } catch (\Exception $e) {
             if ($testFramework !== TestFrameworkTypes::PHPUNIT) {
                 return $this->askTestFrameworkConfigLocation($input, $output, $dirsInCurrentDir, $testFramework, null);

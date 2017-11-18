@@ -32,7 +32,9 @@ class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
 
         $provider = new TestFrameworkConfigPathProvider($locatorMock, $consoleMock, $this->getQuestionHelper());
 
-        $provider->get($this->createStreamableInputInterfaceMock(), $this->createOutputInterface(), [], 'phpunit');
+        $result = $provider->get($this->createStreamableInputInterfaceMock(), $this->createOutputInterface(), [], 'phpunit');
+
+        $this->assertNull($result);
     }
 
     public function test_it_asks_question_if_no_config_is_found_in_current_dir()
@@ -61,6 +63,7 @@ class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
         );
 
         $this->assertSame($inputPhpUnitPath, $path);
+        $this->assertDirectoryExists($path);
     }
 
     public function test_it_automatically_guesses_path()
