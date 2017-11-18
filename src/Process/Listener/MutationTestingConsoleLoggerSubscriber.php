@@ -46,6 +46,7 @@ class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
      * @var bool
      */
     private $showMutations;
+
     /**
      * @var DiffColorizer
      */
@@ -56,8 +57,13 @@ class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
      */
     private $mutationCount = 0;
 
-    public function __construct(OutputInterface $output, OutputFormatter $outputFormatter, MetricsCalculator $metricsCalculator, DiffColorizer $diffColorizer, bool $showMutations)
-    {
+    public function __construct(
+        OutputInterface $output,
+        OutputFormatter $outputFormatter,
+        MetricsCalculator $metricsCalculator,
+        DiffColorizer $diffColorizer,
+        bool $showMutations
+    ) {
         $this->output = $output;
         $this->outputFormatter = $outputFormatter;
         $this->metricsCalculator = $metricsCalculator;
@@ -107,6 +113,10 @@ class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
         $this->showMetrics();
     }
 
+    /**
+     * @param MutantProcess[] $processes
+     * @param string $headlinePrefix
+     */
     private function showMutations(array $processes, string $headlinePrefix)
     {
         $headline = sprintf('%s mutants:', $headlinePrefix);
@@ -119,11 +129,19 @@ class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
         ]);
 
         foreach ($processes as $index => $mutantProcess) {
+            $mutation = $mutantProcess->getMutant()->getMutation();
+
             $this->output->writeln([
                 '',
-                sprintf('%d) %s', $index + 1, get_class($mutantProcess->getMutant()->getMutation()->getMutator())),
+                sprintf(
+                    '%d) %s:%d    [M] %s',
+                    $index + 1,
+                    $mutation->getOriginalFilePath(),
+                    (int) $mutation->getAttributes()['startLine'],
+                    $mutation->getMutator()->getName()
+                ),
             ]);
-            $this->output->writeln($mutantProcess->getMutant()->getMutation()->getOriginalFilePath());
+
             $this->output->writeln($this->diffColorizer->colorize($mutantProcess->getMutant()->getDiff()));
         }
     }

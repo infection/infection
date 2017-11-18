@@ -1,5 +1,43 @@
 # Change Log
 
+## [0.6.1](https://github.com/infection/infection/tree/0.6.1) (2017-11-18)
+
+[Full Changelog](https://github.com/infection/infection/compare/0.6.0...0.6.1)
+
+**Performance:**
+- Reuse Parser, Lexer, PrettyPrinter [\#76](https://github.com/infection/infection/pull/76) ([borNfreee](https://github.com/borNfreee))
+- Skip `composer config bin-dir` check if custom path exists [\#66](https://github.com/infection/infection/pull/66) ([sidz](https://github.com/sidz))
+
+**Developer Experience (DX):**
+- Display test framework output when initial tests fail [\#65](https://github.com/infection/infection/pull/65) ([borNfreee](https://github.com/borNfreee))
+- Show fatal errors in the console and file logs [\#64](https://github.com/infection/infection/pull/64) ([borNfreee](https://github.com/borNfreee))
+- Add Log verbosity [\#56](https://github.com/infection/infection/pull/56) ([sidz](https://github.com/sidz))
+- Infection can be installed via Homebrew on MacOS
+
+**Fixed bugs:**
+
+- Warning with empty PHPUnit bootstrap [\#74](https://github.com/infection/infection/issues/74)
+- PublicVisibility mutator seen as escaped mutant for a class implementing an interface [\#60](https://github.com/infection/infection/issues/60)
+- Source files outside the src folder always skipped [\#57](https://github.com/infection/infection/issues/57)
+- Show correct type of error message for CI flags [\#68](https://github.com/infection/infection/pull/68) ([dmecke](https://github.com/dmecke))
+
+**Closed issues:**
+
+- Tests do not pass. Error code 2. "Misuse of shell builtins". STDERR [\#61](https://github.com/infection/infection/issues/61)
+- Hide killed mutants in output log? [\#54](https://github.com/infection/infection/issues/54)
+- Tests do not pass. Error code 255. "Unknown error". STDERR: [\#43](https://github.com/infection/infection/issues/43)
+- Coverage data missing [\#30](https://github.com/infection/infection/issues/30)
+
+**Other merged pull requests:**
+
+- PHPUnit bootstrap attribute fix [\#77](https://github.com/infection/infection/pull/77) ([borNfreee](https://github.com/borNfreee))
+- Improve coding style [\#73](https://github.com/infection/infection/pull/73) ([Landerstraeten](https://github.com/Landerstraeten))
+- Small code cleanup changes [\#70](https://github.com/infection/infection/pull/70) ([Landerstraeten](https://github.com/Landerstraeten))
+- Add PHP 7.2 to Travis and AppVeyor matrix [\#69](https://github.com/infection/infection/pull/69) ([borNfreee](https://github.com/borNfreee))
+- Mark test with Fatal Error as failed and such Mutant as killed.  [\#62](https://github.com/infection/infection/pull/62) ([borNfreee](https://github.com/borNfreee))
+- Fix PHPSpec initial yaml config generate logic [\#59](https://github.com/infection/infection/pull/59) ([borNfreee](https://github.com/borNfreee))
+- Fix hardcoded framework name [\#58](https://github.com/infection/infection/pull/58) ([Landerstraeten](https://github.com/Landerstraeten))
+
 ## [0.6.0](https://github.com/infection/infection/tree/0.6.0) (2017-10-09)
 [Full Changelog](https://github.com/infection/infection/compare/0.5.3...0.6.0)
 
