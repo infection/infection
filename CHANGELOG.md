@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.6.1](https://github.com/infection/infection/tree/0.6.1)
+## [0.6.1](https://github.com/infection/infection/tree/0.6.1) (2017-11-18)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.6.0...0.6.1)
 
