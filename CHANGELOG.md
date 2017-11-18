@@ -1,5 +1,24 @@
 # Change Log
 
+## [0.6.2](https://github.com/infection/infection/tree/0.6.2) (2017-11-18)
+[Full Changelog](https://github.com/infection/infection/compare/0.6.1...0.6.2)
+
+**Implemented enhancements:**
+
+- Console logger output format to be compatible with TextFile logger format [\#80](https://github.com/infection/infection/pull/80) ([sidz](https://github.com/sidz))
+
+**Fixed bugs:**
+
+- Do not return path of config file when dir is expected.  [\#82](https://github.com/infection/infection/pull/82) ([borNfreee](https://github.com/borNfreee))
+
+**Closed issues:**
+
+- Uncovered Mutations not logged? [\#78](https://github.com/infection/infection/issues/78)
+
+**Merged pull requests:**
+
+- Improve the order script execution for travis [\#81](https://github.com/infection/infection/pull/81) ([sidz](https://github.com/sidz))
+
 ## [0.6.1](https://github.com/infection/infection/tree/0.6.1) (2017-11-18)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.6.0...0.6.1)
