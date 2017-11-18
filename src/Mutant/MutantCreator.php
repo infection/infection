@@ -12,9 +12,8 @@ use Infection\Differ\Differ;
 use Infection\Mutation;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Visitor\MutatorVisitor;
-use PhpParser\Lexer;
 use PhpParser\NodeTraverser;
-use PhpParser\ParserFactory;
+use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
 
 class MutantCreator
@@ -29,34 +28,42 @@ class MutantCreator
      */
     private $differ;
 
-    public function __construct(string $tempDir, Differ $differ)
+    /**
+     * @var Parser
+     */
+    private $parser;
+
+    /**
+     * @var Standard
+     */
+    private $prettyPrinter;
+
+    public function __construct(string $tempDir, Differ $differ, Parser $parser, Standard $prettyPrinter)
     {
         $this->tempDir = $tempDir;
         $this->differ = $differ;
+        $this->parser = $parser;
+        $this->prettyPrinter = $prettyPrinter;
     }
+
+    private $cache = [];
 
     public function create(Mutation $mutation, CodeCoverageData $codeCoverageData): Mutant
     {
-        $lexer = new Lexer([
-            'usedAttributes' => [
-                'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
-            ],
-        ]);
-        $prettyPrinter = new Standard();
-        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
-
         $traverser = new NodeTraverser();
         $visitor = new MutatorVisitor($mutation);
 
         $traverser->addVisitor($visitor);
 
-        $originalStatements = $parser->parse(file_get_contents($mutation->getOriginalFilePath()));
+        $originalFilePath = $mutation->getOriginalFilePath();
 
-        $originalPrettyPrintedFile = $prettyPrinter->prettyPrintFile($originalStatements);
+        $originalStatements = $this->parser->parse(file_get_contents($mutation->getOriginalFilePath()));
+
+        $originalPrettyPrintedFile = $this->cache[$originalFilePath] ?? $this->cache[$originalFilePath] = $this->prettyPrinter->prettyPrintFile($originalStatements);
 
         $mutatedStatements = $traverser->traverse($originalStatements);
 
-        $mutatedCode = $prettyPrinter->prettyPrintFile($mutatedStatements);
+        $mutatedCode = $this->prettyPrinter->prettyPrintFile($mutatedStatements);
         $mutatedFilePath = sprintf('%s/mutant.%s.infection.php', $this->tempDir, $mutation->getHash());
 
         $diff = $this->differ->diff($originalPrettyPrintedFile, $mutatedCode);
