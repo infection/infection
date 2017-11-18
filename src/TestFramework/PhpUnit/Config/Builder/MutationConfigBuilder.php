@@ -101,9 +101,14 @@ AUTOLOAD;
 
     private function setCustomAutoLoaderPath(string $customAutoloadFilePath)
     {
-        $node = $this->xPath->query('/phpunit/@bootstrap')[0];
+        $nodeList = $this->xPath->query('/phpunit/@bootstrap');
 
-        $node->nodeValue = $customAutoloadFilePath;
+        if ($nodeList->length) {
+            $nodeList[0]->nodeValue = $customAutoloadFilePath;
+        } else {
+            $node = $this->xPath->query('/phpunit')[0];
+            $node->setAttribute('bootstrap', $customAutoloadFilePath);
+        }
     }
 
     private function setFilteredTestsToRun(array $coverageTests)
