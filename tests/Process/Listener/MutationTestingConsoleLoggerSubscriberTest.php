@@ -110,4 +110,25 @@ class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $dispatcher->dispatch(new MutationTestingFinished());
     }
+
+    public function test_it_reacts_on_mutation_testing_finished_and_show_mutations_on()
+    {
+        $this->output->expects($this->once())
+            ->method('getVerbosity');
+
+        $this->outputFormatter
+            ->expects($this->once())
+            ->method('finish');
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
+            $this->output,
+            $this->outputFormatter,
+            $this->metricsCalculator,
+            $this->diffColorizer,
+            true
+        ));
+
+        $dispatcher->dispatch(new MutationTestingFinished());
+    }
 }
