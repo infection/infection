@@ -45,6 +45,15 @@ class InfectionApplication
 {
     const CI_FLAG_ERROR = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
 
+    const LOGO = <<<'ASCII'
+    ____      ____          __  _           
+   /  _/___  / __/__  _____/ /_(_)___  ____ 
+   / // __ \/ /_/ _ \/ ___/ __/ / __ \/ __ \
+ _/ // / / / __/  __/ /__/ /_/ / /_/ / / / /
+/___/_/ /_/_/  \___/\___/\__/_/\____/_/ /_/                                      
+                                            
+ASCII;
+
     /**
      * @var Container
      */
@@ -70,6 +79,7 @@ class InfectionApplication
     public function run()
     {
         $io = new SymfonyStyle($this->input, $this->output);
+        $io->writeln(self::LOGO);
 
         try {
             /** @var EventDispatcher $eventDispatcher */
