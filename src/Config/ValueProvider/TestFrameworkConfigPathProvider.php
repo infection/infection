@@ -40,7 +40,7 @@ class TestFrameworkConfigPathProvider
         $this->questionHelper = $questionHelper;
     }
 
-    public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, string $testFramework): ?string
+    public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, string $testFramework)
     {
         try {
             $this->testFrameworkConfigLocator->locate($testFramework);
