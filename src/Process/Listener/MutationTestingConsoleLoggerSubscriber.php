@@ -139,7 +139,7 @@ class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
                     $mutation->getOriginalFilePath(),
                     (int) $mutation->getAttributes()['startLine'],
                     $mutation->getMutator()->getName()
-                )
+                ),
             ]);
 
             $this->output->writeln($this->diffColorizer->colorize($mutantProcess->getMutant()->getDiff()));
