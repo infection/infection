@@ -8,46 +8,42 @@ declare(strict_types=1);
 
 namespace Infection\Finder;
 
-use Symfony\Component\Process\PhpExecutableFinder;
+use Infection\Process\ExecutableFinder\PhpExecutableFinder;
 
 abstract class AbstractExecutableFinder
 {
-    /**
-     * @return string
-     */
-    abstract public function find();
+    abstract public function find(bool $includeArgs = true): string;
 
     /**
      * @param array $probableNames
      * @param array $extraDirectories
+     * @param bool $includeArgs
      *
      * @return string|null
      */
-    protected function searchNonExecutables(array $probableNames, array $extraDirectories = [])
+    protected function searchNonExecutables(array $probableNames, array $extraDirectories = [], bool $includeArgs = true)
     {
         $dirs = array_merge(
             explode(PATH_SEPARATOR, getenv('PATH') ?: getenv('Path')),
             $extraDirectories
         );
+
         foreach ($dirs as $dir) {
             foreach ($probableNames as $name) {
                 $path = sprintf('%s/%s', $dir, $name);
                 if (file_exists($path)) {
-                    return $this->makeExecutable($path);
+                    return $this->makeExecutable($path, $includeArgs);
                 }
             }
         }
     }
 
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
-    protected function makeExecutable($path)
+    protected function makeExecutable(string $path, bool $includeArgs = true): string
     {
-        $phpFinder = new PhpExecutableFinder();
-
-        return sprintf('%s %s', $phpFinder->find(), $path);
+        return sprintf(
+            '%s %s',
+            (new PhpExecutableFinder())->find($includeArgs),
+            $path
+        );
     }
 }

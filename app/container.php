@@ -12,7 +12,6 @@ use Infection\Utils\TempDirectoryCreator;
 use Infection\TestFramework\Factory;
 use Infection\Differ\Differ;
 use Infection\Mutant\MutantCreator;
-use Infection\Command\InfectionCommand;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Filesystem\Filesystem;
@@ -26,6 +25,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\Config\InfectionConfig;
 use Infection\Utils\VersionParser;
+use Infection\Command;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
@@ -54,7 +54,7 @@ $c['temp.dir'] = function (Container $c): string {
     return $c['temp.dir.creator']->createAndGet();
 };
 
-$c['filesystem'] = function (Container $c): Filesystem {
+$c['filesystem'] = function (): Filesystem {
     return new Filesystem();
 };
 
@@ -138,14 +138,14 @@ $c['parser'] = function ($c): Parser {
     return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $c['lexer']);
 };
 
-$c['pretty.printer'] = function ($c): Standard {
+$c['pretty.printer'] = function (): Standard {
     return new Standard();
 };
 
 function registerMutators(array $mutators, Container $container)
 {
     foreach ($mutators as $mutator) {
-        $container[$mutator] = function (Container $c) use ($mutator) {
+        $container[$mutator] = function () use ($mutator) {
             return new $mutator();
         };
     }
@@ -158,11 +158,10 @@ $c['application'] = function (Container $container): Application {
         'Infection - PHP Mutation Testing Framework',
         '@package_version@'
     );
-    $infectionCommand = new InfectionCommand($container);
 
-    $application->add(new \Infection\Command\ConfigureCommand());
-    $application->add(new \Infection\Command\SelfUpdateCommand());
-    $application->add($infectionCommand);
+    $application->add(new Command\ConfigureCommand());
+    $application->add(new Command\SelfUpdateCommand());
+    $application->add(new Command\InfectionCommand($container));
 
     return $application;
 };

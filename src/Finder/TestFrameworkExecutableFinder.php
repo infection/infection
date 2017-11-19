@@ -9,8 +9,8 @@ declare(strict_types=1);
 namespace Infection\Finder;
 
 use Infection\Finder\Exception\TestFrameworkExecutableFinderNotFound;
+use Infection\Process\ExecutableFinder\PhpExecutableFinder;
 use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 class TestFrameworkExecutableFinder extends AbstractExecutableFinder
@@ -21,7 +21,7 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
     private $cachedExecutable;
 
     /**
-     * @var
+     * @var string
      */
     private $testFrameworkName;
 
@@ -30,24 +30,28 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
      */
     private $customPath;
 
+    /**
+     * @var bool
+     */
+    private $cachedIncludedArgs;
+
     public function __construct(string $testFrameworkName, string $customPath = null)
     {
         $this->testFrameworkName = $testFrameworkName;
         $this->customPath = $customPath;
     }
 
-    /**
-     * @return string
-     */
-    public function find()
+    public function find(bool $includeArgs = true): string
     {
-        if ($this->cachedExecutable === null) {
+        if ($this->cachedExecutable === null || $this->cachedIncludedArgs !== $includeArgs) {
             if (!$this->doesCustomPathExist()) {
                 $this->addVendorFolderToPath();
             }
 
-            $this->cachedExecutable = $this->findExecutable();
+            $this->cachedExecutable = $this->findExecutable($includeArgs);
         }
+
+        $this->cachedIncludedArgs = $includeArgs;
 
         return $this->cachedExecutable;
     }
@@ -66,25 +70,17 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
             }
         }
 
-        if (!is_null($vendorPath)) {
+        if (null !== $vendorPath) {
             putenv('PATH=' . $vendorPath . PATH_SEPARATOR . getenv('PATH'));
         }
     }
 
-    /**
-     * @return string
-     */
-    private function findComposer()
+    private function findComposer(): string
     {
         return (new ComposerExecutableFinder())->find();
     }
 
-    /**
-     * @return string
-     *
-     * @throws TestFrameworkExecutableFinderNotFound
-     */
-    private function findExecutable()
+    private function findExecutable(bool $includeArgs = true): string
     {
         if ($this->doesCustomPathExist()) {
             return $this->makeExecutable($this->customPath);
@@ -95,13 +91,13 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
 
         foreach ($candidates as $name) {
             if ($path = $finder->find($name, null, [getcwd()])) {
-                return $this->makeExecutable($path);
+                return $this->makeExecutable($path, $includeArgs);
             }
         }
 
-        $result = $this->searchNonExecutables($candidates, [getcwd()]);
+        $result = $this->searchNonExecutables($candidates, [getcwd()], $includeArgs);
 
-        if (!is_null($result)) {
+        if (null !== $result) {
             return $result;
         }
 
@@ -119,28 +115,26 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
      * are enforced and end PHP processes properly
      *
      * @param string $path
+     * @param bool $includeArgs
      *
      * @return string
      */
-    protected function makeExecutable($path)
+    protected function makeExecutable(string $path, bool $includeArgs = true): string
     {
         $path = realpath($path);
         $phpFinder = new PhpExecutableFinder();
 
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if (\defined('PHP_WINDOWS_VERSION_BUILD')) {
             if (false !== strpos($path, '.bat')) {
                 return $path;
             }
 
-            return sprintf('%s %s', $phpFinder->find(), $path);
+            return sprintf('%s %s', $phpFinder->find($includeArgs), $path);
         }
 
-        return sprintf('%s %s %s', 'exec', $phpFinder->find(), $path);
+        return sprintf('%s %s %s', 'exec', $phpFinder->find($includeArgs), $path);
     }
 
-    /**
-     * @return bool
-     */
     private function doesCustomPathExist(): bool
     {
         return $this->customPath && file_exists($this->customPath);

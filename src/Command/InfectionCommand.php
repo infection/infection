@@ -177,10 +177,6 @@ class InfectionCommand extends Command
                 throw new \Exception('Configuration aborted');
             }
         }
-
-        if (PHP_SAPI !== 'phpdbg' && !defined('HHVM_VERSION') && !extension_loaded('xdebug')) {
-            throw new \Exception('You need to use phpdbg or install and enable xDebug in order to allow for code coverage generation.');
-        }
     }
 
     private function setOutputFormatterStyles(OutputInterface $output)

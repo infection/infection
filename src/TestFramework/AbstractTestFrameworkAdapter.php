@@ -20,7 +20,8 @@ abstract class AbstractTestFrameworkAdapter
     /**
      * @var AbstractExecutableFinder
      */
-    private $executableFinder;
+    private $phpExecutableFinder;
+
     /**
      * @var CommandLineArgumentsAndOptionsBuilder
      */
@@ -42,13 +43,13 @@ abstract class AbstractTestFrameworkAdapter
     private $versionParser;
 
     public function __construct(
-        AbstractExecutableFinder $executableFinder,
+        AbstractExecutableFinder $phpExecutableFinder,
         InitialConfigBuilder $initialConfigBuilder,
         MutationConfigBuilder $mutationConfigBuilder,
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
         VersionParser $versionParser
     ) {
-        $this->executableFinder = $executableFinder;
+        $this->phpExecutableFinder = $phpExecutableFinder;
         $this->initialConfigBuilder = $initialConfigBuilder;
         $this->mutationConfigBuilder = $mutationConfigBuilder;
         $this->argumentsAndOptionsBuilder = $argumentsAndOptionsBuilder;
@@ -68,14 +69,15 @@ abstract class AbstractTestFrameworkAdapter
      *
      * @param string $configPath
      * @param string $extraOptions
+     * @param bool $includePhpArgs
      *
      * @return string
      */
-    public function getExecutableCommandLine(string $configPath, string $extraOptions): string
+    public function getExecutableCommandLine(string $configPath, string $extraOptions, bool $includePhpArgs = true): string
     {
         return sprintf(
             '%s %s',
-            $this->executableFinder->find(),
+            $this->phpExecutableFinder->find($includePhpArgs),
             $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions)
         );
     }
@@ -95,7 +97,7 @@ abstract class AbstractTestFrameworkAdapter
         $process = new Process(
             sprintf(
                 '%s %s',
-                $this->executableFinder->find(),
+                $this->phpExecutableFinder->find(),
                 '--version'
             )
         );
