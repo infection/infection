@@ -49,6 +49,7 @@ class VersionParserTest extends TestCase
             ['1.2.3', '1.2.3'],
             ['a 1.2.3-patch b', '1.2.3-patch'],
             ['v1.2.3', '1.2.3'],
+            ['6.5-abcde', '6.5-abcde'],
         ];
     }
 }

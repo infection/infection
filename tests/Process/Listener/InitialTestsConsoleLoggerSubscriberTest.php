@@ -42,4 +42,34 @@ class InitialTestsConsoleLoggerSubscriberTest extends Mockery\Adapter\Phpunit\Mo
 
         $dispatcher->dispatch(new InitialTestSuiteStarted());
     }
+
+    public function test_it_sets_test_framework_version_as_unknown_in_case_of_exception()
+    {
+        $output = Mockery::mock(OutputInterface::class);
+        $output->shouldReceive('isDecorated');
+        $output->shouldReceive('writeln')->once()->withArgs([[
+            'Running initial test suite...',
+            '',
+            'Phpunit version: unknown',
+            '',
+        ]]);
+        $output->shouldReceive('getVerbosity')->andReturn(OutputInterface::VERBOSITY_QUIET);
+
+        $progressBar = new ProgressBar($output);
+
+        $testFramework = Mockery::mock(AbstractTestFrameworkAdapter::class);
+        $testFramework->shouldReceive('getName')->once()->andReturn('phpunit');
+        $testFramework->shouldReceive('getVersion')->andThrow(\InvalidArgumentException::class);
+
+        $subscriber = new InitialTestsConsoleLoggerSubscriber(
+            $output,
+            $progressBar,
+            $testFramework
+        );
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($subscriber);
+
+        $dispatcher->dispatch(new InitialTestSuiteStarted());
+    }
 }
