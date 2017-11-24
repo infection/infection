@@ -12,6 +12,7 @@ use Infection\EventDispatcher\EventDispatcher;
 use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
+use Infection\Finder\SourceFilesFinder;
 use Infection\Mutation;
 use Infection\Mutator\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
@@ -20,7 +21,6 @@ use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 class MutationsGenerator
@@ -92,10 +92,11 @@ class MutationsGenerator
      */
     public function generate(bool $onlyCovered, string $filter = ''): array
     {
-        $files = $this->getSrcFiles($filter);
+        $sourceFilesFinder = new SourceFilesFinder($this->srcDirs, $this->excludeDirsOrFiles);
+        $files = $sourceFilesFinder->getSourceFiles($filter);
         $allFilesMutations = [[]];
 
-        $this->eventDispatcher->dispatch(new MutationGeneratingStarted(count($files)));
+        $this->eventDispatcher->dispatch(new MutationGeneratingStarted($files->count()));
 
         foreach ($files as $file) {
             if (!$onlyCovered || ($onlyCovered && $this->hasTests($file))) {
@@ -108,27 +109,6 @@ class MutationsGenerator
         $this->eventDispatcher->dispatch(new MutationGeneratingFinished());
 
         return array_merge(...$allFilesMutations);
-    }
-
-    /**
-     * @param string $filter
-     *
-     * @return Finder
-     *
-     * @throws \InvalidArgumentException
-     */
-    private function getSrcFiles(string $filter = ''): Finder
-    {
-        $finder = new Finder();
-        $finder->files()->in($this->srcDirs);
-
-        $finder->files()->name($filter ?: '*.php');
-
-        foreach ($this->excludeDirsOrFiles as $excludePath) {
-            $finder->notPath($excludePath);
-        }
-
-        return $finder;
     }
 
     /**

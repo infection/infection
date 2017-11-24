@@ -1,0 +1,108 @@
+<?php
+/**
+ * Copyright © 2017 Maks Rafalko
+ *
+ * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+ */
+
+declare(strict_types=1);
+
+namespace Infection\Tests\Finder;
+
+use Infection\Finder\SourceFilesFinder;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Finder\Finder;
+
+class SourceFilesFinderTest extends TestCase
+{
+    public function test_it_lists_all_files_without_a_filter()
+    {
+        $sourceFilesFinder = new SourceFilesFinder(['tests/Files/Finder'], []);
+
+        $files = $sourceFilesFinder->getSourceFiles();
+
+        $this->assertInstanceOf(Finder::class, $files);
+        $this->assertSame(2, $files->count());
+    }
+
+    public function test_it_can_filter_one_file_by_a_relative_path()
+    {
+        $sourceFilesFinder = new SourceFilesFinder(['tests/Files/Finder'], []);
+
+        $filter = 'tests/Files/Finder/FirstFile.php';
+        $files = $sourceFilesFinder->getSourceFiles($filter);
+
+        $iterator = $files->getIterator();
+        $iterator->rewind();
+        $firstFile = $iterator->current();
+
+        $this->assertInstanceOf(Finder::class, $files);
+        $this->assertSame(1, $files->count());
+        $this->assertSame('FirstFile.php', $firstFile->getFilename());
+    }
+
+    public function test_it_can_filter_one_file_by_filename()
+    {
+        $sourceFilesFinder = new SourceFilesFinder(['tests/Files/Finder'], []);
+
+        $filter = 'FirstFile.php';
+        $files = $sourceFilesFinder->getSourceFiles($filter);
+
+        $iterator = $files->getIterator();
+        $iterator->rewind();
+        $firstFile = $iterator->current();
+
+        $this->assertInstanceOf(Finder::class, $files);
+        $this->assertSame(1, $files->count());
+        $this->assertSame('FirstFile.php', $firstFile->getFilename());
+    }
+
+    public function test_it_can_filter_a_list_of_files_by_relative_paths()
+    {
+        $sourceFilesFinder = new SourceFilesFinder(['tests/Files/Finder'], []);
+
+        $filter = 'tests/Files/Finder/FirstFile.php,tests/Files/Finder/SecondFile.php';
+        $files = $sourceFilesFinder->getSourceFiles($filter);
+
+        $iterator = $files->getIterator();
+        $iterator->rewind();
+        $firstFile = $iterator->current();
+        $iterator->next();
+        $secondFile = $iterator->current();
+
+        $this->assertInstanceOf(Finder::class, $files);
+        $this->assertSame(2, $files->count());
+        $this->assertSame('FirstFile.php', $firstFile->getFilename());
+        $this->assertSame('SecondFile.php', $secondFile->getFilename());
+    }
+
+    public function test_it_can_filter_a_list_of_files_by_filename()
+    {
+        $sourceFilesFinder = new SourceFilesFinder(['tests/Files/Finder'], []);
+
+        $filter = 'FirstFile.php,SecondFile.php';
+        $files = $sourceFilesFinder->getSourceFiles($filter);
+
+        $iterator = $files->getIterator();
+        $iterator->rewind();
+        $firstFile = $iterator->current();
+        $iterator->next();
+        $secondFile = $iterator->current();
+
+        $this->assertInstanceOf(Finder::class, $files);
+        $this->assertSame(2, $files->count());
+        $this->assertSame('FirstFile.php', $firstFile->getFilename());
+        $this->assertSame('SecondFile.php', $secondFile->getFilename());
+    }
+
+    public function test_it_can_filter_to_an_empty_result()
+    {
+        $sourceFilesFinder = new SourceFilesFinder(['tests/Files/Finder'], []);
+
+        $filter = 'ThisFileDoesNotExist.php';
+        $files = $sourceFilesFinder->getSourceFiles($filter);
+
+        $this->assertInstanceOf(Finder::class, $files);
+        $this->assertSame(0, $files->count());
+    }
+}
