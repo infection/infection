@@ -10,14 +10,9 @@ namespace Infection\Finder;
 
 use Symfony\Component\Process\ExecutableFinder;
 
-class ComposerExecutableFinder extends AbstractExecutableFinder
+final class ComposerExecutableFinder extends AbstractExecutableFinder
 {
-    /**
-     * @return string
-     *
-     * @throws \Exception
-     */
-    public function find()
+    public function find(bool $includeArgs = true): string
     {
         $probable = ['composer', 'composer.phar'];
         $finder = new ExecutableFinder();
@@ -33,9 +28,9 @@ class ComposerExecutableFinder extends AbstractExecutableFinder
          * Check for options without execute permissions and prefix the PHP
          * executable instead.
          */
-        $result = $this->searchNonExecutables($probable, $immediatePaths);
+        $result = $this->searchNonExecutables($probable, $immediatePaths, $includeArgs);
 
-        if (!is_null($result)) {
+        if (null !== $result) {
             return $result;
         }
 

@@ -22,7 +22,7 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\VersionParser;
 
-class Factory
+final class Factory
 {
     /**
      * @var string
@@ -77,7 +77,7 @@ class Factory
         $this->versionParser = $versionParser;
     }
 
-    public function create($adapterName): AbstractTestFrameworkAdapter
+    public function create(string $adapterName): AbstractTestFrameworkAdapter
     {
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);

@@ -14,7 +14,7 @@ use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
-class ProcessBuilder
+final class ProcessBuilder
 {
     /**
      * @var AbstractTestFrameworkAdapter
@@ -32,21 +32,26 @@ class ProcessBuilder
         $this->timeout = $timeout;
     }
 
+    /**
+     * Creates process with enabled debugger as test framework is going to use in the code coverage.
+     *
+     * @param string $testFrameworkExtraOptions
+     *
+     * @return Process
+     */
     public function getProcessForInitialTestRun(string $testFrameworkExtraOptions = ''): Process
     {
-        $configPath = $this->testFrameworkAdapter->buildInitialConfigFile();
-
-        return $this->getProcess($configPath, $testFrameworkExtraOptions);
-
-        // TODO debug why processBuilder does not work with env
-        // TODO read and add -vvv
-        /*
-        $processBuilder = new SymfonyProcessBuilder([
-        $this->testFrameworkAdapter->getExecutableCommandLine()
-        ]);
-
-        return $processBuilder->getProcess();
-         */
+        return new Process(
+            $this->testFrameworkAdapter->getExecutableCommandLine(
+                $this->testFrameworkAdapter->buildInitialConfigFile(),
+                $testFrameworkExtraOptions,
+                false
+            ),
+            null,
+            [],
+            null,
+            null
+        );
     }
 
     /**
@@ -59,21 +64,19 @@ class ProcessBuilder
      */
     public function getProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
     {
-        $configPath = $this->testFrameworkAdapter->buildMutationConfigFile($mutant);
-
-        $symfonyProcess = $this->getProcess($configPath, $testFrameworkExtraOptions, $this->timeout);
-
-        return new MutantProcess($symfonyProcess, $mutant, $this->testFrameworkAdapter);
-    }
-
-    private function getProcess(string $configPath, string $testFrameworkExtraOptions, int $timeout = null): Process
-    {
-        return new Process(
-            $this->testFrameworkAdapter->getExecutableCommandLine($configPath, $testFrameworkExtraOptions),
+        $process = new Process(
+            $this->testFrameworkAdapter->getExecutableCommandLine(
+                $this->testFrameworkAdapter->buildMutationConfigFile($mutant),
+                $testFrameworkExtraOptions
+            ),
             null,
             array_replace($_ENV, $_SERVER),
             null,
-            $timeout
+            $this->timeout
         );
+
+        $process->inheritEnvironmentVariables();
+
+        return new MutantProcess($process, $mutant, $this->testFrameworkAdapter);
     }
 }
