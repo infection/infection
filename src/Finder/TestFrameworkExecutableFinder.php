@@ -83,7 +83,7 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
     private function findExecutable(bool $includeArgs = true): string
     {
         if ($this->doesCustomPathExist()) {
-            return $this->makeExecutable($this->customPath);
+            return $this->makeExecutable($this->customPath, $includeArgs);
         }
 
         $candidates = [$this->testFrameworkName, $this->testFrameworkName . '.phar'];
