@@ -56,7 +56,7 @@ class MutantCreator
         $originalFilePath = $mutation->getOriginalFilePath();
 
         $originalStatements = $this->originalStatementsCache[$originalFilePath]
-            ?? $this->originalStatementsCache[$originalFilePath] = $this->parser->parse(file_get_contents($mutation->getOriginalFilePath()));
+            ?? $this->originalStatementsCache[$originalFilePath] = $this->parser->parse(file_get_contents($originalFilePath));
 
         $originalPrettyPrintedFile = $this->prettyPrintedCache[$originalFilePath]
             ?? $this->prettyPrintedCache[$originalFilePath] = $this->prettyPrinter->prettyPrintFile($originalStatements);
