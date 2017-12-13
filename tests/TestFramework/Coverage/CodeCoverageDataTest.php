@@ -105,6 +105,7 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $mutation = new Mutation(
             $filePath,
+            [],
             new Plus(),
             ['startLine' => 1],
             'PHPParser\Node\Expr\BinaryOp\Plus'
@@ -120,6 +121,7 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $mutation = new Mutation(
             $filePath,
+            [],
             new Plus(),
             ['startLine' => 26],
             'PHPParser\Node\Expr\BinaryOp\Plus'
@@ -135,6 +137,7 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $mutation = new Mutation(
             $filePath,
+            [],
             new PublicVisibility(),
             ['startLine' => 1],
             'PHPParser\Node\Stmt\ClassMethod'
@@ -150,6 +153,7 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $mutation = new Mutation(
             $filePath,
+            [],
             new PublicVisibility(),
             ['startLine' => 24],
             'PHPParser\Node\Stmt\ClassMethod'
