@@ -49,14 +49,11 @@ class MutantCreator
 
     private $prettyPrintedCache = [];
 
-    private $originalStatementsCache = [];
-
     public function create(Mutation $mutation, CodeCoverageData $codeCoverageData): Mutant
     {
         $originalFilePath = $mutation->getOriginalFilePath();
 
-        $originalStatements = $this->originalStatementsCache[$originalFilePath]
-            ?? $this->originalStatementsCache[$originalFilePath] = $this->parser->parse(file_get_contents($originalFilePath));
+        $originalStatements = $mutation->getOriginalFileAst();
 
         $originalPrettyPrintedFile = $this->prettyPrintedCache[$originalFilePath]
             ?? $this->prettyPrintedCache[$originalFilePath] = $this->prettyPrinter->prettyPrintFile($originalStatements);

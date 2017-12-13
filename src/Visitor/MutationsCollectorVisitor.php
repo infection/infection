@@ -30,6 +30,12 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
      * @var string
      */
     private $filePath;
+
+    /**
+     * @var Node[]
+     */
+    private $fileAst;
+
     /**
      * @var CodeCoverageData
      */
@@ -39,10 +45,11 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
      */
     private $onlyCovered;
 
-    public function __construct(array $mutators, string $filePath, CodeCoverageData $codeCoverageData, bool $onlyCovered)
+    public function __construct(array $mutators, string $filePath, array $fileAst, CodeCoverageData $codeCoverageData, bool $onlyCovered)
     {
         $this->mutators = $mutators;
         $this->filePath = $filePath;
+        $this->fileAst = $fileAst;
         $this->codeCoverageData = $codeCoverageData;
         $this->onlyCovered = $onlyCovered;
     }
@@ -70,6 +77,7 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
             if ($mutator->shouldMutate($node)) {
                 $this->mutations[] = new Mutation(
                     $this->filePath,
+                    $this->fileAst,
                     $mutator,
                     $node->getAttributes(),
                     get_class($node)

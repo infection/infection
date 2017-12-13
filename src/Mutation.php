@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection;
 
 use Infection\Mutator\Mutator;
+use PhpParser\Node;
 
 class Mutation
 {
@@ -29,13 +30,19 @@ class Mutation
     private $originalFilePath;
 
     /**
+     * @var Node[]
+     */
+    private $originalFileAst;
+
+    /**
      * @var string
      */
     private $mutatedNodeClass;
 
-    public function __construct(string $originalFilePath, Mutator $mutator, array $attributes, string $mutatedNodeClass)
+    public function __construct(string $originalFilePath, array $originalFileAst, Mutator $mutator, array $attributes, string $mutatedNodeClass)
     {
         $this->originalFilePath = $originalFilePath;
+        $this->originalFileAst = $originalFileAst;
         $this->mutator = $mutator;
         $this->attributes = $attributes;
         $this->mutatedNodeClass = $mutatedNodeClass;
@@ -77,5 +84,10 @@ class Mutation
         $hashKeys = array_merge([$this->getOriginalFilePath(), $mutatorClass], $attributeValues);
 
         return md5(implode('_', $hashKeys));
+    }
+
+    public function getOriginalFileAst(): array
+    {
+        return $this->originalFileAst;
     }
 }
