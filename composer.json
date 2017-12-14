@@ -43,7 +43,7 @@
     "bin": ["bin/infection"],
     "scripts": {
         "analyze": [
-            "@php-cs-fixer",
+            "@cs:check",
             "@phpstan"
         ],
         "phpstan": [
@@ -51,12 +51,12 @@
             "chmod a+x phpstan.phar",
             "./phpstan.phar analyse src tests --level=1 --no-interaction --no-progress"
         ],
-        "php-cs-fixer": [
+        "cs:check": [
             "wget -nc http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar",
             "chmod a+x php-cs-fixer-v2.phar",
             "./php-cs-fixer-v2.phar fix --config=.php_cs.dist -v --dry-run --stop-on-violation --using-cache=no --allow-risky=yes"
         ],
-        "php-cs-fixer:fix": [
+        "cs:fix": [
             "./php-cs-fixer-v2.phar fix --config=.php_cs.dist -v --allow-risky=yes"
         ]
     }

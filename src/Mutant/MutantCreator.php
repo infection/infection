@@ -11,6 +11,7 @@ namespace Infection\Mutant;
 use Infection\Differ\Differ;
 use Infection\Mutation;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\Visitor\CloneVisitor;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
@@ -46,20 +47,21 @@ class MutantCreator
         $this->prettyPrinter = $prettyPrinter;
     }
 
-    private $cache = [];
+    private $prettyPrintedCache = [];
 
     public function create(Mutation $mutation, CodeCoverageData $codeCoverageData): Mutant
     {
-        $traverser = new NodeTraverser();
-        $visitor = new MutatorVisitor($mutation);
-
-        $traverser->addVisitor($visitor);
-
         $originalFilePath = $mutation->getOriginalFilePath();
 
-        $originalStatements = $this->parser->parse(file_get_contents($mutation->getOriginalFilePath()));
+        $originalStatements = $mutation->getOriginalFileAst();
 
-        $originalPrettyPrintedFile = $this->cache[$originalFilePath] ?? $this->cache[$originalFilePath] = $this->prettyPrinter->prettyPrintFile($originalStatements);
+        $originalPrettyPrintedFile = $this->prettyPrintedCache[$originalFilePath]
+            ?? $this->prettyPrintedCache[$originalFilePath] = $this->prettyPrinter->prettyPrintFile($originalStatements);
+
+        $traverser = new NodeTraverser();
+
+        $traverser->addVisitor(new CloneVisitor());
+        $traverser->addVisitor(new MutatorVisitor($mutation));
 
         $mutatedStatements = $traverser->traverse($originalStatements);
 

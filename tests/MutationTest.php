@@ -28,6 +28,7 @@ class MutationTest extends TestCase
 
         $mutation = new Mutation(
             '/abc.php',
+            [],
             $mutator,
             $attributes,
             'Interface_'

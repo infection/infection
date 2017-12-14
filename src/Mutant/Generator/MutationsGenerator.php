@@ -119,23 +119,22 @@ class MutationsGenerator
      */
     private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered): array
     {
+        $initialStatements = $this->parser->parse($file->getContents());
+
         $traverser = new NodeTraverser();
         $mutators = $this->getMutators();
 
         $mutationsCollectorVisitor = new MutationsCollectorVisitor(
             $mutators,
             $file->getRealPath(),
+            $initialStatements,
             $this->codeCoverageData,
             $onlyCovered
         );
 
+        $traverser->addVisitor($mutationsCollectorVisitor);
         $traverser->addVisitor(new ParentConnectorVisitor());
         $traverser->addVisitor(new WrappedFunctionInfoCollectorVisitor());
-        $traverser->addVisitor($mutationsCollectorVisitor);
-
-        $originalCode = $file->getContents();
-
-        $initialStatements = $this->parser->parse($originalCode);
 
         $traverser->traverse($initialStatements);
 
