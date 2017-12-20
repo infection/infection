@@ -21,17 +21,16 @@ cache:
 
 before_install:
   - composer selfupdate
-  - if [ "$TRAVIS_PHP_VERSION" != "7.0" ]; then sed -i 's/"config":\ {"platform":\ {"php":\ "7.0.8"}},//' composer.json; fi
   - if [ -n "$SYMFONY_VERSION" != "" ]; then
-      composer require "symfony/console:${SYMFONY_VERSION}" --no-update;
-      composer require "symfony/process:${SYMFONY_VERSION}" --no-update;
-      composer require "symfony/finder:${SYMFONY_VERSION}" --no-update;
-      composer require "symfony/yaml:${SYMFONY_VERSION}" --no-update;
+      composer config --unset platform.php # removes php 7.0.8 platform fake requirement
     fi
 
 install:
-  - if [ -n "$SYMFONY_VERSION" != "" ]; then
-      composer update --prefer-dist --dev;
+  - if [ -n "$LATEST_DEPENDENCIES" != "" ]; then
+      composer require "symfony/console:${SYMFONY_VERSION}"; # I removed --no-update since we update just 4 packages, not all of them
+      composer require "symfony/process:${SYMFONY_VERSION}";
+      composer require "symfony/finder:${SYMFONY_VERSION}";
+      composer require "symfony/yaml:${SYMFONY_VERSION}";
     else
       composer install;
     fi
