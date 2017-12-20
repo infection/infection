@@ -55,6 +55,8 @@ class XdebugHandlerTest extends TestCase
         $xdebug = new XdebugHandlerMock($loaded);
         $xdebug->check();
         $this->assertTrue($xdebug->restarted);
+
+        \var_dump(getenv(PhpIniHelper::ENV_ORIGINALS_PHP_INIS));
         $this->assertInternalType('string', getenv(PhpIniHelper::ENV_ORIGINALS_PHP_INIS));
     }
 
