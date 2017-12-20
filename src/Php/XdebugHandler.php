@@ -45,7 +45,7 @@ class XdebugHandler
     public function check()
     {
         $args = explode('|', (string) getenv(self::ENV_DISABLE_XDEBUG));
-        if ($this->needsRestart($args[0])) {die;
+        if ($this->needsRestart($args[0])) {
             if ($this->prepareRestart()) {
                 $this->restart($this->getCommand());
             }
@@ -63,7 +63,6 @@ class XdebugHandler
                 }
             }
         }
-
     }
 
     private function needsRestart(string $allow): bool
