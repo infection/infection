@@ -28,7 +28,7 @@ install:
    if [ "${SYMFONY_VERSION}" != "" ]; then
       composer config --unset platform.php
       composer require \
-        symfony/process:${SYMFONY_VERSION} \
+        symfony/console:${SYMFONY_VERSION} \
         symfony/finder:${SYMFONY_VERSION} \
         symfony/yaml:${SYMFONY_VERSION}
    fi
