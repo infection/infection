@@ -72,8 +72,11 @@ class SourceFilesFinderTest extends TestCase
 
         $this->assertInstanceOf(Finder::class, $files);
         $this->assertSame(2, $files->count());
-        $this->assertSame('FirstFile.php', $firstFile->getFilename());
-        $this->assertSame('SecondFile.php', $secondFile->getFilename());
+
+        $expectedFilenames = ['FirstFile.php', 'SecondFile.php'];
+        foreach ([$firstFile, $secondFile] as $file) {
+            $this->assertTrue(\in_array($file->getFilename(), $expectedFilenames, true));
+        }
     }
 
     public function test_it_can_filter_a_list_of_files_by_filename()
@@ -91,8 +94,11 @@ class SourceFilesFinderTest extends TestCase
 
         $this->assertInstanceOf(Finder::class, $files);
         $this->assertSame(2, $files->count());
-        $this->assertSame('FirstFile.php', $firstFile->getFilename());
-        $this->assertSame('SecondFile.php', $secondFile->getFilename());
+
+        $expectedFilenames = ['FirstFile.php', 'SecondFile.php'];
+        foreach ([$firstFile, $secondFile] as $file) {
+            $this->assertTrue(\in_array($file->getFilename(), $expectedFilenames, true));
+        }
     }
 
     public function test_it_can_filter_to_an_empty_result()
