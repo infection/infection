@@ -25,6 +25,11 @@
         },
         "files": ["tests/Helpers.php"]
     },
+    "config": {
+        "platform": {
+            "php": "7.0.8"
+        }
+    },
     "require": {
         "php": "^7.0",
         "nikic/php-parser": "^3.0",
