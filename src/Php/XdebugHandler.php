@@ -45,8 +45,7 @@ class XdebugHandler
     public function check()
     {
         $args = explode('|', (string) getenv(self::ENV_DISABLE_XDEBUG));
-        \var_dump(getenv(PhpIniHelper::ENV_ORIGINALS_PHP_INIS));
-        if ($this->needsRestart($args[0])) {
+        if ($this->needsRestart($args[0])) {die;
             if ($this->prepareRestart()) {
                 $this->restart($this->getCommand());
             }
@@ -69,9 +68,15 @@ class XdebugHandler
 
     private function needsRestart(string $allow): bool
     {
-        \var_dump(\PHP_SAPI);
-        \var_dump(\defined('PHP_BINARY'));
-        if (PHP_SAPI !== 'cli' || !\defined('PHP_BINARY')) {
+        \var_dump([
+            'SAPI'       => PHP_SAPI,
+            'PHP_BINARY' => \defined('PHP_BINARY'),
+            'allow'      => $allow,
+            'return a'   => (PHP_SAPI !== 'cli' || \defined('PHP_BINARY') === false),
+            'return b'   => $this->isLoaded && '' === $allow,
+        ]);
+
+        if (PHP_SAPI !== 'cli' || \defined('PHP_BINARY') === false) {
             return false;
         }
 
