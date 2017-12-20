@@ -46,6 +46,8 @@ class XdebugHandler
     {
         $args = explode('|', (string) getenv(self::ENV_DISABLE_XDEBUG));
 
+        \var_dump($args);
+
         if ($this->needsRestart($args[0])) {
             if ($this->prepareRestart()) {
                 $this->restart($this->getCommand());
