@@ -68,14 +68,6 @@ class XdebugHandler
 
     private function needsRestart(string $allow): bool
     {
-        \var_dump([
-            'SAPI'       => PHP_SAPI,
-            'PHP_BINARY' => \defined('PHP_BINARY'),
-            'allow'      => $allow,
-            'return a'   => (PHP_SAPI !== 'cli' || \defined('PHP_BINARY') === false),
-            'return b'   => $this->isLoaded && '' === $allow,
-        ]);
-
         if (PHP_SAPI !== 'cli' || \defined('PHP_BINARY') === false) {
             return false;
         }
