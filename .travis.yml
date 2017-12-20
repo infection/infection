@@ -28,7 +28,7 @@ before_install:
 
 install:
   -  |
-   if [ -n "$LATEST_DEPENDENCIES" != "" ]; then
+   if [ -n "$SYMFONY_VERSION" != "" ]; then
       composer require "symfony/console:${SYMFONY_VERSION}";
       composer require "symfony/process:${SYMFONY_VERSION}";
       composer require "symfony/finder:${SYMFONY_VERSION}";
