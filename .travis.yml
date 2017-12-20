@@ -21,21 +21,18 @@ cache:
 
 before_install:
   - composer selfupdate
-  - |
-    if [ "${SYMFONY_VERSION}" != "" ]; then
-      composer config --unset platform.php # removes php 7.0.8 platform fake requirement
-    fi
 
 install:
-  -  |
+  - composer install
+  - |
    if [ "${SYMFONY_VERSION}" != "" ]; then
-      composer require "symfony/console:${SYMFONY_VERSION}";
-      composer require "symfony/process:${SYMFONY_VERSION}";
-      composer require "symfony/finder:${SYMFONY_VERSION}";
-      composer require "symfony/yaml:${SYMFONY_VERSION}";
-    else
-      composer install;
-    fi
+      composer config --unset platform.php
+      composer require \
+        symfony/console:${SYMFONY_VERSION} \
+        symfony/process:${SYMFONY_VERSION} \
+        symfony/finder:${SYMFONY_VERSION} \
+        symfony/yaml:${SYMFONY_VERSION}
+   fi
 
 script:
   - composer analyze
