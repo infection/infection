@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Php;
 
+use Infection\Php\ConfigBuilder;
 use Infection\Php\PhpIniHelper;
 use Infection\Tests\Php\Mock\XdebugHandlerMock;
 use PHPUnit\Framework\TestCase;
@@ -21,8 +22,9 @@ class XdebugHandlerTest extends TestCase
         // Save current state
         $names = [
             XdebugHandlerMock::ENV_DISABLE_XDEBUG,
-            'PHP_INI_SCAN_DIR',
             PhpIniHelper::ENV_ORIGINALS_PHP_INIS,
+            ConfigBuilder::ENV_PHP_INI_SCAN_DIR,
+            ConfigBuilder::ENV_TEMP_PHP_CONFIG_PATH,
         ];
 
         foreach ($names as $name) {
@@ -46,6 +48,7 @@ class XdebugHandlerTest extends TestCase
     {
         putenv(PhpIniHelper::ENV_ORIGINALS_PHP_INIS);
         putenv(XdebugHandlerMock::ENV_DISABLE_XDEBUG);
+        putenv(ConfigBuilder::ENV_TEMP_PHP_CONFIG_PATH);
     }
 
     public function test_it_restart_when_loaded()
