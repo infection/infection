@@ -30,6 +30,7 @@ install:
       composer require \
         symfony/console:${SYMFONY_VERSION} \
         symfony/process:${SYMFONY_VERSION} \
+        symfony/finder:${SYMFONY_VERSION} \
         symfony/yaml:${SYMFONY_VERSION}
    fi
 
