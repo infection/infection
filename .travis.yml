@@ -2,27 +2,39 @@ language: php
 
 sudo: false
 
-php:
-  - 7.0
-  - 7.1
-  - 7.2
-
-env:
-  matrix:
-    - INFECTION=1 DEPS=current
-    - INFECTION=1 DEPS=highest
+matrix:
+  include:
+    - php: 7.0
+      env: INFECTION=1
+    - php: 7.1
+      env: INFECTION=1
+    - php: 7.1
+      env: INFECTION=1 SYMFONY_VERSION="^4.0"
+    - php: 7.2
+      env: INFECTION=1
+    - php: 7.2
+      env: INFECTION=1 SYMFONY_VERSION="^4.0"
 
 cache:
   directories:
-  - $HOME/.composer/cache
+    - $HOME/.composer/cache
 
 before_install:
   - composer selfupdate
+  - if [ "$TRAVIS_PHP_VERSION" != "7.0" ]; then sed -i 's/"config":\ {"platform":\ {"php":\ "7.0.8"}},//' composer.json; fi
+  - if [ -n "$SYMFONY_VERSION" != "" ]; then
+      composer require "symfony/console:${SYMFONY_VERSION}" --no-update;
+      composer require "symfony/process:${SYMFONY_VERSION}" --no-update;
+      composer require "symfony/finder:${SYMFONY_VERSION}" --no-update;
+      composer require "symfony/yaml:${SYMFONY_VERSION}" --no-update;
+    fi
 
 install:
-  - if [ "$DEPS" = "current" ]; then git checkout composer.lock; composer install; fi;
-  - if [ "$DEPS" = "highest" ]; then composer update -n --prefer-source; fi;
-  - composer show
+  - if [ -n "$SYMFONY_VERSION" != "" ]; then
+      composer update --prefer-dist --dev;
+    else
+      composer install;
+    fi
 
 script:
   - composer analyze
