@@ -9,7 +9,11 @@ environment:
     php_ver_target: 7.2
   - dependencies: highest
     php_ver_target: 7.1
-  - dependencies: highest
+  - dependencies: current
+    php_ver_target: 7.2
+  - dependencies: current
+    php_ver_target: 7.1
+  - dependencies: current
     php_ver_target: 7.0
 
 cache: # cache is cleared when linked file is modified
@@ -41,8 +45,8 @@ install:
     # Install composer and update per matrix
     - appveyor-retry appveyor DownloadFile https://getcomposer.org/composer.phar
     - cd c:\projects\workspace
-    - IF %dependencies%==lowest appveyor-retry composer update --no-suggest --prefer-dist --prefer-lowest
-    - IF %dependencies%==highest appveyor-retry composer update --no-suggest --prefer-dist
+    - IF %dependencies%==current appveyor-retry composer install
+    - IF %dependencies%==highest appveyor-retry composer update --no-suggest --prefer-dist --ignore-platform-reqs
     - composer show
 
 test_script:

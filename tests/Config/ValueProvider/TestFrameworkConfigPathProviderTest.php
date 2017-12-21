@@ -49,7 +49,7 @@ class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
             ->disableOriginalConstructor()
             ->getMock();
 
-        $consoleMock->expects($this->once())->method('getQuestion');
+        $consoleMock->expects($this->once())->method('getQuestion')->willReturn('foobar');
         $dialog = $this->getQuestionHelper();
 
         $provider = new TestFrameworkConfigPathProvider($locatorMock, $consoleMock, $dialog);
@@ -108,7 +108,7 @@ class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
             ->disableOriginalConstructor()
             ->getMock();
 
-        $consoleMock->expects($this->once())->method('getQuestion');
+        $consoleMock->expects($this->once())->method('getQuestion')->willReturn('foobar');
         $dialog = $this->getQuestionHelper();
 
         $provider = new TestFrameworkConfigPathProvider($locatorMock, $consoleMock, $dialog);
