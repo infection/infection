@@ -28,6 +28,9 @@ class PathReplacer
         $this->customPhpUnitConfigDir = $customPhpUnitConfigDir;
     }
 
+    /**
+     * @param \DOMNode & \DOMElement $domElement
+     */
     public function replaceInNode(\DOMNode $domElement)
     {
         if (strpos($domElement->nodeValue, '*') === false) {

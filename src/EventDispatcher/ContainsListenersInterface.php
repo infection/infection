@@ -11,7 +11,7 @@ namespace Infection\EventDispatcher;
 interface ContainsListenersInterface
 {
     /**
-     * @param $eventName
+     * @param string $eventName
      * @param callable $listener
      *
      * @return mixed

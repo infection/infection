@@ -31,8 +31,7 @@ class SourceDirsProviderTest extends AbstractBaseProviderTest
         $sourceDirs = $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
             $this->createOutputInterface(),
-            ['src'],
-            'phpunit'
+            ['src']
         );
 
         $this->assertSame(['src'], $sourceDirs);
@@ -72,8 +71,7 @@ class SourceDirsProviderTest extends AbstractBaseProviderTest
         $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("0,1\n")),
             $this->createOutputInterface(),
-            ['src'],
-            'phpunit'
+            ['src']
         );
     }
 }

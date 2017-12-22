@@ -58,7 +58,7 @@ final class ProcessBuilder
      * @throws RuntimeException
      *
      * @param Mutant $mutant
-     * @param string|null $testFrameworkExtraOptions
+     * @param string $testFrameworkExtraOptions
      *
      * @return MutantProcess
      */
