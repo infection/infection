@@ -54,7 +54,7 @@
         "phpstan": [
             "wget -nc https://github.com/phpstan/phpstan/releases/download/0.9.1/phpstan.phar",
             "chmod a+x phpstan.phar",
-            "./phpstan.phar analyse src tests --level=2 --no-interaction --no-progress"
+            "./phpstan.phar analyse src tests --level=2 -c phpstan.neon --no-interaction --no-progress"
         ],
         "cs:check": [
             "wget -nc http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar",
