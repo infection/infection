@@ -1,5 +1,30 @@
 # Change Log
 
+## [0.7.0](https://github.com/infection/infection/tree/0.7.0) (2017-12-22)
+[Full Changelog](https://github.com/infection/infection/compare/0.6.2...0.7.0)
+
+**Performance:**
+
+- Disable xdebug for all php processes except code coverage generator [\#85](https://github.com/infection/infection/pull/85) ([sidz](https://github.com/sidz))
+- Parse each source file just 1 time, cache original file AST [\#95](https://github.com/infection/infection/pull/95) ([borNfreee](https://github.com/borNfreee))
+
+**Merged pull requests:**
+
+- Symfony components 4 [\#71](https://github.com/infection/infection/pull/71) ([luispabon](https://github.com/luispabon))
+
+
+**Fixed bugs:**
+
+- Fix issue when custom path for test framework exists [\#93](https://github.com/infection/infection/pull/93) ([sidz](https://github.com/sidz))
+
+**Closed issues:**
+
+- Add comma separated files filter [\#84](https://github.com/infection/infection/pull/84) ([Landerstraeten](https://github.com/Landerstraeten))
+- Is Infection compatible with PHPUnit 5.x ? [\#83](https://github.com/infection/infection/issues/83)
+- Feature Request: Add line numbers to diffs on Escaped mutants [\#72](https://github.com/infection/infection/issues/72)
+- \[WIP\] Optimize PHP files parsing [\#86](https://github.com/infection/infection/issues/86)
+
+
 ## [0.6.2](https://github.com/infection/infection/tree/0.6.2) (2017-11-18)
 [Full Changelog](https://github.com/infection/infection/compare/0.6.1...0.6.2)
 
