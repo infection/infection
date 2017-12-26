@@ -1,0 +1,5 @@
+bootstrap: bootstrap.php
+extensions:
+    CodeCoverageExtension: ~
+    TestExtension:
+        options: 123

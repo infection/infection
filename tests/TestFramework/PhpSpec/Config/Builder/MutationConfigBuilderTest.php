@@ -51,4 +51,26 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $this->assertSame($this->tempDir . '/phpspecConfiguration.a1b2c3.infection.yml', $builder->build($mutant));
     }
+
+    public function test_it_adds_original_bootstrap_file_to_custom_autoload()
+    {
+        $projectDir = '/project/dir';
+        $originalYamlConfigPath = __DIR__ . '/../../../../Files/phpspec/phpspec.with.bootstrap.yml';
+
+        $mutation = Mockery::mock(Mutation::class);
+        $mutation->shouldReceive('getHash')->andReturn('a1b2c3');
+        $mutation->shouldReceive('getOriginalFilePath')->andReturn('/original/file/path');
+
+        $mutant = Mockery::mock(Mutant::class);
+        $mutant->shouldReceive('getMutation')->andReturn($mutation);
+        $mutant->shouldReceive('getMutatedFilePath')->andReturn('/mutated/file/path');
+
+        $builder = new MutationConfigBuilder($this->tempDir, $originalYamlConfigPath, $projectDir);
+
+        $this->assertSame($this->tempDir . '/phpspecConfiguration.a1b2c3.infection.yml', $builder->build($mutant));
+        $this->assertContains(
+            "require_once '/project/dir/bootstrap.php';",
+            file_get_contents($this->tempDir . '/interceptor.phpspec.autoload.a1b2c3.infection.php')
+        );
+    }
 }
