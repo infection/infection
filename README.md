@@ -13,3 +13,7 @@ Infection - Mutation Testing framework
 Please read documentation here: http://infection.github.io
 
 Twitter: http://twitter.com/infection_php
+
+### Credits
+
+This project is highly inspired from Pádraic Brady ([@padraic](https://github.com/padraic))'s [Humbug library](https://github.com/humbug/humbug). Humbug has since then been discountinued in favour of this project.
