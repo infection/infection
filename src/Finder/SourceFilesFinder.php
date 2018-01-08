@@ -34,7 +34,7 @@ class SourceFilesFinder
         });
 
         if ('' === $filter) {
-            $finder->in($this->sourceDirectories)->files();
+            $finder->in($this->sourceDirectories)->files()->name('*.php');
 
             return $finder;
         }

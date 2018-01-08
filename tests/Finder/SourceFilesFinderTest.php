@@ -15,7 +15,7 @@ use Symfony\Component\Finder\Finder;
 
 class SourceFilesFinderTest extends TestCase
 {
-    public function test_it_lists_all_files_without_a_filter()
+    public function test_it_lists_all_php_files_without_a_filter()
     {
         $sourceFilesFinder = new SourceFilesFinder(['tests/Files/Finder'], []);
 
