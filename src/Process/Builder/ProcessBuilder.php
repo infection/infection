@@ -41,11 +41,13 @@ final class ProcessBuilder
      */
     public function getProcessForInitialTestRun(string $testFrameworkExtraOptions = ''): Process
     {
+        $includeArgs = PHP_SAPI === 'phpdbg';
+
         return new Process(
             $this->testFrameworkAdapter->getExecutableCommandLine(
                 $this->testFrameworkAdapter->buildInitialConfigFile(),
                 $testFrameworkExtraOptions,
-                false
+                $includeArgs
             ),
             null,
             [],
