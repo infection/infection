@@ -28,7 +28,8 @@
     "config": {
         "platform": {
             "php": "7.0.8"
-        }
+        },
+        "sort-packages": true
     },
     "require": {
         "php": "^7.0",
@@ -64,5 +65,8 @@
         "cs:fix": [
             "./php-cs-fixer-v2.phar fix --config=.php_cs.dist -v --allow-risky=yes"
         ]
+    },
+    "branch-alias": {
+        "dev-master": "1.0.0-dev"
     }
 }
