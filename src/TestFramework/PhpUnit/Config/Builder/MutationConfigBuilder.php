@@ -50,6 +50,7 @@ class MutationConfigBuilder extends ConfigBuilder
         $xmlConfigurationHelper->setStopOnFailure($this->xPath);
         $xmlConfigurationHelper->deactivateColours($this->xPath);
         $xmlConfigurationHelper->removeExistingLoggers($this->dom, $this->xPath);
+        $xmlConfigurationHelper->removeExistingPrinters($this->dom, $this->xPath);
     }
 
     public function build(Mutant $mutant): string
