@@ -18,9 +18,13 @@ class NewObjectTest extends AbstractValueToNullReturnValueTest
     {
         $code = <<<'CODE'
 <?php
-function test()
+
+class Test
 {
+    function test()
+    {
     return new Foo('now');
+    }
 }
 CODE;
         $mutatedCode = $this->mutate($code);
@@ -28,10 +32,13 @@ CODE;
         $expectedMutatedCode = <<<'CODE'
 <?php
 
-function test()
+class Test
 {
-    new Foo('now');
-    return null;
+    function test()
+    {
+        new Foo('now');
+        return null;
+    }
 }
 CODE;
 

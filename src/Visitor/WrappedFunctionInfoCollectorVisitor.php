@@ -74,10 +74,9 @@ class WrappedFunctionInfoCollectorVisitor extends NodeVisitorAbstract
 
     private function isFunctionLikeNode(Node $node): bool
     {
-        $isFunction = $node instanceof Node\Stmt\Function_;
         $isClassMethod = $node instanceof Node\Stmt\ClassMethod;
         $isClosure = $node instanceof Node\Expr\Closure;
 
-        return $isFunction || $isClassMethod || $isClosure;
+        return $isClassMethod || $isClosure;
     }
 }

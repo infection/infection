@@ -19,9 +19,13 @@ class ThisTest extends AbstractMutator
     {
         $code = <<<'CODE'
 <?php
-function test()
+
+class Test
 {
-    return $this;
+    function test()
+    {
+        return $this;
+    }
 }
 CODE;
         $mutatedCode = $this->mutate($code);
@@ -29,9 +33,12 @@ CODE;
         $expectedMutatedCode = <<<'CODE'
 <?php
 
-function test()
+class Test
 {
-    return null;
+    function test()
+    {
+        return null;
+    }
 }
 CODE;
 
