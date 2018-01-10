@@ -23,7 +23,10 @@
         "psr-4": {
             "Infection\\Tests\\": "tests/"
         },
-        "files": ["tests/Helpers.php"]
+        "files": [
+            "tests/Helpers.php",
+            "tests/Files/Finder/test_functions.php"
+        ]
     },
     "config": {
         "platform": {
