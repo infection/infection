@@ -34,12 +34,12 @@ class SourceFilesFinder
         });
 
         if ('' === $filter) {
-            $finder->in($this->sourceDirectories)->files()->name('*.php');
+            $finder->in($this->sourceDirectories)->files()->name('*.php')->contains('class ');
 
             return $finder;
         }
 
-        $finder->in('.')->files();
+        $finder->in('.')->files()->contains('class ');
 
         $filters = explode(',', $filter);
         array_walk($filters, function ($fileFilter) use ($finder) {
