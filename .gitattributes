@@ -3,3 +3,6 @@
 # Denote all files that are truly binary and should not be modified.
 *.png binary
 *.jpg binary
+
+#Files we do not want to distribute
+/tests export-ignore
