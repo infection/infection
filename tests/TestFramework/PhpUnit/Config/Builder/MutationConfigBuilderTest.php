@@ -190,6 +190,19 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertSame(0, $nodeList->length);
     }
 
+    public function test_it_removes_printer_class()
+    {
+        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+
+        $configurationPath = $this->builder->build($this->mutant);
+
+        $xml = file_get_contents($configurationPath);
+
+        /** @var \DOMNodeList $filterNodes */
+        $filterNodes = $this->queryXpath($xml, '/phpunit/@printerClass');
+        $this->assertSame(0, $filterNodes->length);
+    }
+
     /**
      * @dataProvider coverageTestsProvider
      */

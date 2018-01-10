@@ -143,6 +143,17 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertSame(1, $filterNodes->length);
     }
 
+    public function test_it_removes_printer_class()
+    {
+        $configurationPath = $this->builder->build();
+
+        $xml = file_get_contents($configurationPath);
+
+        /** @var \DOMNodeList $filterNodes */
+        $filterNodes = $this->queryXpath($xml, '/phpunit/@printerClass');
+        $this->assertSame(0, $filterNodes->length);
+    }
+
     protected function queryXpath(string $xml, string $query)
     {
         $dom = new \DOMDocument();

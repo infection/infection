@@ -70,4 +70,13 @@ class XmlConfigurationHelper
             $node->setAttribute('colors', 'false');
         }
     }
+
+    public function removeExistingPrinters(\DOMDocument $dom, \DOMXPath $xPath)
+    {
+        $nodeList = $xPath->query('/phpunit/@printerClass');
+
+        if ($nodeList->length) {
+            $dom->documentElement->removeAttribute('printerClass');
+        }
+    }
 }

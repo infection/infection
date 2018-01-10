@@ -14,6 +14,7 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          syntaxCheck="false"
+         printerClass="Fake\Printer\Class"
 >
     <testsuites>
         <testsuite name="Application Test Suite">
