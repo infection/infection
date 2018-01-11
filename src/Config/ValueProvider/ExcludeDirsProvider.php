@@ -17,6 +17,8 @@ use Symfony\Component\Console\Question\Question;
 
 class ExcludeDirsProvider
 {
+    const EXCLUDED_ROOT_DIRS = ['vendor', 'tests', 'test'];
+
     /**
      * @var ConsoleHelper
      */
@@ -40,6 +42,7 @@ class ExcludeDirsProvider
             'There can be situations when you want to exclude some folders from generating mutants.',
             'You can use glob pattern (<comment>*Bundle/**/*/Tests</comment>) for them or just regular dir path.',
             'It should be <comment>relative</comment> to the source directory.',
+            '<comment>You should not mutate test suite files.</comment>',
             'Press <comment><return></comment> to stop/skip adding dirs.',
             '',
         ]);
@@ -52,8 +55,10 @@ class ExcludeDirsProvider
         $excludedDirs = [];
 
         if ($sourceDirs === ['.']) {
-            if (is_dir('vendor')) {
-                $excludedDirs[] = 'vendor';
+            foreach (self::EXCLUDED_ROOT_DIRS as $dir) {
+                if (in_array($dir, $dirsInCurrentDir, true)) {
+                    $excludedDirs[] = $dir;
+                }
             }
 
             $autocompleteValues = $dirsInCurrentDir;

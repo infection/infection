@@ -36,7 +36,10 @@ class ExcludeDirsProviderTest extends AbstractBaseProviderTest
         \umask($this->umask);
     }
 
-    public function test_it_contains_vendors_when_sources_contains_current_dir()
+    /**
+     * @dataProvider excludeDirsProvider
+     */
+    public function test_it_contains_vendors_when_sources_contains_current_dir(string $excludedRootDir, array $dirsInCurrentFolder)
     {
         $consoleMock = Mockery::mock(ConsoleHelper::class);
         $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
@@ -45,14 +48,14 @@ class ExcludeDirsProviderTest extends AbstractBaseProviderTest
 
         $provider = new ExcludeDirsProvider($consoleMock, $dialog);
 
-        $excludeDirs = $provider->get(
+        $excludedDirs = $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
             $this->createOutputInterface(),
-            ['src'],
+            $dirsInCurrentFolder,
             ['.']
         );
 
-        $this->assertContains('vendor', $excludeDirs);
+        $this->assertContains($excludedRootDir, $excludedDirs);
     }
 
     public function test_it_validates_dirs()
@@ -105,5 +108,15 @@ class ExcludeDirsProviderTest extends AbstractBaseProviderTest
         );
 
         $this->assertContains('foo', $excludeDirs);
+    }
+
+    public function excludeDirsProvider()
+    {
+        return array_map(
+            function (string $excludedRootDir) {
+                return [$excludedRootDir, [$excludedRootDir, 'src']];
+            },
+            ExcludeDirsProvider::EXCLUDED_ROOT_DIRS
+        );
     }
 }
