@@ -39,7 +39,7 @@ class ConfigureCommand extends Command
 
         $output->writeln([
             '',
-            'We did not find configuration file. The following questions will help us to generate it for you.',
+            'We did not find a configuration file. The following questions will help us to generate it for you.',
             '',
         ]);
 
