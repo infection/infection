@@ -53,7 +53,7 @@ class SourceDirsProvider
         $defaultValues = $guessedSourceDirs ? implode(',', $guessedSourceDirs) : null;
 
         $questionText = $this->consoleHelper->getQuestion(
-            'What source directories do you want to include (comma separated)?',
+            'Which source directories do you want to include (comma separated)?',
             $defaultValues
         );
 
