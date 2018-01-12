@@ -104,10 +104,23 @@ final class Factory
             );
         }
 
+        if ($adapterName === TestFrameworkTypes::CODECEPTION) {
+            $codeCeptionConfigPath = $this->configLocator->locate(TestFrameworkTypes::CODECEPTION);
+            $codeCeptionConfigContent = file_get_contents($codeCeptionConfigPath);
+
+            return new PhpUnitAdapter(
+                new TestFrameworkExecutableFinder(TestFrameworkTypes::CODECEPTION, $this->infectionConfig->getPhpUnitCustomPath()),
+                new InitialConfigBuilder($this->tempDir, $codeCeptionConfigContent, $this->xmlConfigurationHelper, $this->jUnitFilePath, $this->infectionConfig->getSourceDirs()),
+                new MutationConfigBuilder($this->tempDir, $codeCeptionConfigContent, $this->xmlConfigurationHelper, $this->projectDir),
+                new ArgumentsAndOptionsBuilder(),
+                $this->versionParser
+            );
+        }
+
         throw new \InvalidArgumentException(
             sprintf(
                 'Invalid name of test framework. Available names are: %s',
-                implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC])
+                implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC, TestFrameworkTypes::CODECEPTION])
             )
         );
     }
