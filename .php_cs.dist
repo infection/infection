@@ -11,10 +11,10 @@ return \PhpCsFixer\Config::create()
        '@PHP70Migration' => true,
 
        'concat_space' => ['spacing' => 'one'],
-       'phpdoc_summary' => false,
-       'phpdoc_align' => false,
-       'yoda_style' => false,
        'is_null' => true,
+       'phpdoc_align' => false,
+       'phpdoc_summary' => false,
+       'yoda_style' => false,
    ])
    ->setFinder($finder)
 ;
