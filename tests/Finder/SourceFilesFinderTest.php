@@ -17,7 +17,7 @@ class SourceFilesFinderTest extends TestCase
 {
     public function test_it_lists_all_php_files_without_a_filter()
     {
-        $sourceFilesFinder = new SourceFilesFinder(['tests/Files/Finder'], []);
+        $sourceFilesFinder = new SourceFilesFinder(['tests/Fixtures/Files/Finder'], []);
 
         $files = $sourceFilesFinder->getSourceFiles();
 
@@ -27,9 +27,9 @@ class SourceFilesFinderTest extends TestCase
 
     public function test_it_can_filter_one_file_by_a_relative_path()
     {
-        $sourceFilesFinder = new SourceFilesFinder(['tests/Files/Finder'], []);
+        $sourceFilesFinder = new SourceFilesFinder(['tests/Fixtures/Files/Finder'], []);
 
-        $filter = 'tests/Files/Finder/FirstFile.php';
+        $filter = 'tests/Fixtures/Files/Finder/FirstFile.php';
         $files = $sourceFilesFinder->getSourceFiles($filter);
 
         $iterator = $files->getIterator();
@@ -43,7 +43,7 @@ class SourceFilesFinderTest extends TestCase
 
     public function test_it_can_filter_one_file_by_filename()
     {
-        $sourceFilesFinder = new SourceFilesFinder(['tests/Files/Finder'], []);
+        $sourceFilesFinder = new SourceFilesFinder(['tests/Fixtures/Files/Finder'], []);
 
         $filter = 'FirstFile.php';
         $files = $sourceFilesFinder->getSourceFiles($filter);
@@ -59,9 +59,9 @@ class SourceFilesFinderTest extends TestCase
 
     public function test_it_can_filter_a_list_of_files_by_relative_paths()
     {
-        $sourceFilesFinder = new SourceFilesFinder(['tests/Files/Finder'], []);
+        $sourceFilesFinder = new SourceFilesFinder(['tests/Fixtures/Files/Finder'], []);
 
-        $filter = 'tests/Files/Finder/FirstFile.php,tests/Files/Finder/SecondFile.php';
+        $filter = 'tests/Fixtures/Files/Finder/FirstFile.php,tests/Fixtures/Files/Finder/SecondFile.php';
         $files = $sourceFilesFinder->getSourceFiles($filter);
 
         $iterator = $files->getIterator();
@@ -81,7 +81,7 @@ class SourceFilesFinderTest extends TestCase
 
     public function test_it_can_filter_a_list_of_files_by_filename()
     {
-        $sourceFilesFinder = new SourceFilesFinder(['tests/Files/Finder'], []);
+        $sourceFilesFinder = new SourceFilesFinder(['tests/Fixtures/Files/Finder'], []);
 
         $filter = 'FirstFile.php,SecondFile.php';
         $files = $sourceFilesFinder->getSourceFiles($filter);
@@ -103,7 +103,7 @@ class SourceFilesFinderTest extends TestCase
 
     public function test_it_can_filter_to_an_empty_result()
     {
-        $sourceFilesFinder = new SourceFilesFinder(['tests/Files/Finder'], []);
+        $sourceFilesFinder = new SourceFilesFinder(['tests/Fixtures/Files/Finder'], []);
 
         $filter = 'ThisFileDoesNotExist.php';
         $files = $sourceFilesFinder->getSourceFiles($filter);

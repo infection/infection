@@ -6,8 +6,8 @@
  */
 declare(strict_types=1);
 
-namespace Infection\Tests\Files\Finder;
+namespace Infection\Tests\Fixtures\Files\Finder;
 
-class SecondFile
+class FirstFile
 {
 }

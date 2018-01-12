@@ -20,7 +20,7 @@ class PhpUnitTestFileDataProviderTest extends TestCase
     protected function setUp()
     {
         $this->infoProvider = new PhpUnitTestFileDataProvider(
-            __DIR__ . '/../../../Files/phpunit/junit.xml'
+            __DIR__ . '/../../../Fixtures/Files/phpunit/junit.xml'
         );
     }
 
