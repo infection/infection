@@ -1,20 +1,32 @@
 <?php
 
+$year = date('Y');
+$header = <<<TXT
+Copyright © 2017-$year Maks Rafalko
+
+License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+TXT;
 $finder = \PhpCsFixer\Finder::create()
    ->in('src')
    ->in('app')
 ;
 
 return \PhpCsFixer\Config::create()
-   ->setRules([
-       '@Symfony' => true,
-       '@PHP70Migration' => true,
+    ->setRules([
+        '@Symfony' => true,
+        '@PHP70Migration' => true,
 
-       'concat_space' => ['spacing' => 'one'],
-       'is_null' => true,
-       'phpdoc_align' => false,
-       'phpdoc_summary' => false,
-       'yoda_style' => false,
-   ])
-   ->setFinder($finder)
+        'concat_space' => ['spacing' => 'one'],
+        'header_comment' => [
+            'commentType' => 'PHPDoc',
+            'header' => $header,
+            'location' => 'after_open',
+            'separate' => 'bottom',
+        ],
+        'is_null' => true,
+        'phpdoc_align' => false,
+        'phpdoc_summary' => false,
+        'yoda_style' => false,
+    ])
+    ->setFinder($finder)
 ;
