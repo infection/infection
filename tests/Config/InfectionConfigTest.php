@@ -7,9 +7,7 @@
 
 declare(strict_types=1);
 
-
 namespace Infection\Tests\Config;
-
 
 use Infection\Config\InfectionConfig;
 use PHPUnit\Framework\TestCase;
@@ -74,9 +72,17 @@ class InfectionConfigTest extends TestCase
         $this->assertSame(InfectionConfig::DEFAULT_EXCLUDE_DIRS, $config->getSourceExcludePaths());
     }
 
-    public function test_it_returns_exclude_dirs_from_config()
+    public function test_it_returns_exclude_dirs_from_config_with_exclude_option()
     {
         $json = '{"source": {"exclude":["subfolder/excluded-folder"], "directories": ["source"]}}';
+        $config = new InfectionConfig(json_decode($json));
+
+        $this->assertSame(['subfolder/excluded-folder'], $config->getSourceExcludePaths());
+    }
+
+    public function test_it_returns_exclude_dirs_from_config_with_excludes_option()
+    {
+        $json = '{"source": {"excludes":["subfolder/excluded-folder"], "directories": ["source"]}}';
         $config = new InfectionConfig(json_decode($json));
 
         $this->assertSame(['subfolder/excluded-folder'], $config->getSourceExcludePaths());
