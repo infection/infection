@@ -6,7 +6,7 @@
  */
 declare(strict_types=1);
 
-namespace Infection\Tests\Files\Mutation\OneFile;
+namespace Infection\Tests\Fixtures\Files\Mutation\OneFile;
 
 class OneFile
 {

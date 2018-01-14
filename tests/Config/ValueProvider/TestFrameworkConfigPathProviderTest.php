@@ -53,7 +53,7 @@ class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
         $dialog = $this->getQuestionHelper();
 
         $provider = new TestFrameworkConfigPathProvider($locatorMock, $consoleMock, $dialog);
-        $inputPhpUnitPath = realpath(__DIR__ . '/../../Files/phpunit');
+        $inputPhpUnitPath = realpath(__DIR__ . '/../../Fixtures/Files/phpunit');
 
         $path = $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("{$inputPhpUnitPath}\n")),

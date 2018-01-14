@@ -45,10 +45,10 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             'infection-test' . \microtime(true) . \random_int(100, 999)
         );
 
-        $this->pathToProject = p(realpath(__DIR__ . '/../../../../Files/phpunit/project-path'));
+        $this->pathToProject = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
 
         $projectDir = '/project/dir';
-        $phpunitXmlPath = __DIR__ . '/../../../../Files/phpunit/phpunit.xml';
+        $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit.xml';
 
         $this->mutation = Mockery::mock(Mutation::class);
         $this->mutation->shouldReceive('getHash')->andReturn(self::HASH);
@@ -107,7 +107,7 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     public function test_it_sets_custom_autoloader_when_attribute_is_absent()
     {
         $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
-        $phpunitXmlPath = __DIR__ . '/../../../../Files/phpunit/phpuit_without_bootstrap.xml';
+        $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpuit_without_bootstrap.xml';
         $this->builder = new MutationConfigBuilder(
             $this->tempDir,
             file_get_contents($phpunitXmlPath),
@@ -160,7 +160,7 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     {
         $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
 
-        $phpunitXmlPath = __DIR__ . '/../../../../Files/phpunit/phpunit_root_test_suite.xml';
+        $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit_root_test_suite.xml';
         $replacer = new PathReplacer(new Locator([$this->pathToProject]));
         $xmlConfigurationHelper = new XmlConfigurationHelper($replacer);
 

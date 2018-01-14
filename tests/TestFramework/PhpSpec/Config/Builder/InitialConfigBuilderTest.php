@@ -19,7 +19,7 @@ class InitialConfigBuilderTest extends TestCase
     {
         $tempDirCreator = new TempDirectoryCreator();
         $tempDir = $tempDirCreator->createAndGet('infection-test');
-        $originalYamlConfigPath = __DIR__ . '/../../../../Files/phpspec/phpspec.yml';
+        $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/phpspec/phpspec.yml';
 
         $builder = new InitialConfigBuilder($tempDir, $originalYamlConfigPath);
 

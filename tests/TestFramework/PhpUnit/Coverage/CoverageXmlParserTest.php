@@ -20,9 +20,9 @@ class CoverageXmlParserTest extends TestCase
      */
     private $parser;
 
-    private $tempDir = __DIR__ . '/../../../Files/phpunit/coverage-xml';
+    private $tempDir = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage-xml';
 
-    private $srcDir = __DIR__ . '/../../../Files/phpunit/coverage-xml';
+    private $srcDir = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage-xml';
 
     protected function setUp()
     {
@@ -31,7 +31,7 @@ class CoverageXmlParserTest extends TestCase
 
     protected function getXml()
     {
-        $xml = file_get_contents(__DIR__ . '/../../../Files/phpunit/coverage-xml/index.xml');
+        $xml = file_get_contents(__DIR__ . '/../../../Fixtures/Files/phpunit/coverage-xml/index.xml');
 
         // replace dummy source path with the real path
         return preg_replace(

@@ -114,7 +114,7 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     private function createMutationGenerator(CodeCoverageData $codeCoverageDataMock, array $whitelistedMutatorNames = [])
     {
         $srcDirs = [
-            dirname(__DIR__, 2) . '/Files/Mutation/OneFile',
+            dirname(__DIR__, 2) . '/Fixtures/Files/Mutation/OneFile',
         ];
         $excludedDirsOrFiles = [];
 

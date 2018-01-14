@@ -35,7 +35,7 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     public function test_it_builds_path_to_mutation_config_file()
     {
         $projectDir = '/project/dir';
-        $originalYamlConfigPath = __DIR__ . '/../../../../Files/phpspec/phpspec.yml';
+        $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/phpspec/phpspec.yml';
 
         $mutation = Mockery::mock(Mutation::class);
         $mutation->shouldReceive('getHash')->andReturn('a1b2c3');
@@ -55,7 +55,7 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     public function test_it_adds_original_bootstrap_file_to_custom_autoload()
     {
         $projectDir = '/project/dir';
-        $originalYamlConfigPath = __DIR__ . '/../../../../Files/phpspec/phpspec.with.bootstrap.yml';
+        $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/phpspec/phpspec.with.bootstrap.yml';
 
         $mutation = Mockery::mock(Mutation::class);
         $mutation->shouldReceive('getHash')->andReturn('a1b2c3');

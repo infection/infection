@@ -20,7 +20,7 @@ class LocatorTest extends TestCase
      */
     public function test_determines_real_path_to_file($fileName, $pathPostfix)
     {
-        $projectPath = realpath(__DIR__ . '/../Files/phpunit/project-path');
+        $projectPath = realpath(__DIR__ . '/../Fixtures/Files/phpunit/project-path');
 
         $locator = new Locator([$projectPath]);
 
@@ -31,7 +31,7 @@ class LocatorTest extends TestCase
 
     public function test_handles_glob_patterns()
     {
-        $projectPath = realpath(__DIR__ . '/../Files/phpunit/project-path');
+        $projectPath = realpath(__DIR__ . '/../Fixtures/Files/phpunit/project-path');
         $locator = new Locator([$projectPath]);
 
         $directories = $locator->locateDirectories('*Bundle');
