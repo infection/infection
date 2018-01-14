@@ -49,7 +49,8 @@
     "scripts": {
         "analyze": [
             "@cs:check",
-            "@phpstan"
+            "@phpstan",
+            "@composer validate --strict"
         ],
         "phpstan": [
             "wget -nc https://github.com/phpstan/phpstan/releases/download/0.9.1/phpstan.phar",
