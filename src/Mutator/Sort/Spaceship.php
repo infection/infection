@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Sort;
 
-use Infection\Mutator\FunctionBodyMutator;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
-class Spaceship extends FunctionBodyMutator
+class Spaceship extends Mutator
 {
     /**
      * Swaps the arguments in the Spaceship operator <=>

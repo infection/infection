@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\FunctionBodyMutator;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
-class FloatNegation extends FunctionBodyMutator
+class FloatNegation extends Mutator
 {
     /**
      * Replaces any float with negated float

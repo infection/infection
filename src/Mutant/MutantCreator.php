@@ -86,18 +86,13 @@ class MutantCreator
 
     private function isCoveredByTest(Mutation $mutation, CodeCoverageData $codeCoverageData): bool
     {
-        $mutator = $mutation->getMutator();
         $line = $mutation->getAttributes()['startLine'];
         $filePath = $mutation->getOriginalFilePath();
 
-        if ($mutator->isFunctionBodyMutator()) {
-            return $codeCoverageData->hasTestsOnLine($filePath, $line);
-        }
-
-        if ($mutator->isFunctionSignatureMutator()) {
+        if ($codeCoverageData->isLineFunctionSignature($filePath, $line)) {
             return $codeCoverageData->hasExecutedMethodOnLine($filePath, $line);
         }
 
-        return false;
+        return $codeCoverageData->hasTestsOnLine($filePath, $line);
     }
 }

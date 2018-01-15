@@ -107,12 +107,10 @@ class CodeCoverageData
 
     public function getAllTestsFor(Mutation $mutation): array
     {
-        $mutator = $mutation->getMutator();
-
         $filePath = $mutation->getOriginalFilePath();
         $line = $mutation->getAttributes()['startLine'];
 
-        if ($mutator->isFunctionSignatureMutator()) {
+        if ($this->isLineFunctionSignature($filePath, $line)) {
             if ($this->hasExecutedMethodOnLine($filePath, $line)) {
                 return $this->getTestsForExecutedMethodOnLine($filePath, $line);
             }
@@ -120,11 +118,7 @@ class CodeCoverageData
             return [];
         }
 
-        if ($mutator->isFunctionBodyMutator()) {
-            if (!$this->hasTestsOnLine($filePath, $line)) {
-                return [];
-            }
-
+        if ($this->hasTestsOnLine($filePath, $line)) {
             return $this->getCoverage()[$filePath]['byLine'][$line];
         }
 
@@ -197,6 +191,18 @@ class CodeCoverageData
         unset($fileCoverageData);
 
         return $newCoverage;
+    }
+
+    public function isLineFunctionSignature(string $filePath, int $line): bool
+    {
+        $coverage = $this->getCoverage();
+        foreach ($coverage[$filePath]['byMethod'] as $method => $coverageInfo) {
+            if ($line == $coverageInfo['startLine']) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function getTestsForExecutedMethodOnLine(string $filePath, int $line): array

@@ -9,11 +9,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Infection\Mutator\FunctionBodyMutator;
+use Infection\Mutator\Mutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
-class Continue_ extends FunctionBodyMutator
+class Continue_ extends Mutator
 {
     public function mutate(Node $node)
     {

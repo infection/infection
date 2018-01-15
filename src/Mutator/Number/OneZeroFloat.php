@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
-use Infection\Mutator\FunctionBodyMutator;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
-class OneZeroFloat extends FunctionBodyMutator
+class OneZeroFloat extends Mutator
 {
     /**
      * Replaces "0.0" with "1.0" or "1.0" with "0.0"

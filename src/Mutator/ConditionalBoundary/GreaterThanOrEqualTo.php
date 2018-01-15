@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalBoundary;
 
-use Infection\Mutator\FunctionBodyMutator;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
-class GreaterThanOrEqualTo extends FunctionBodyMutator
+class GreaterThanOrEqualTo extends Mutator
 {
     /**
      * Replaces ">=" with ">"

@@ -9,11 +9,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\FunctionBodyMutator;
+use Infection\Mutator\Mutator;
 use Infection\Visitor\WrappedFunctionInfoCollectorVisitor;
 use PhpParser\Node;
 
-abstract class AbstractValueToNullReturnValue extends FunctionBodyMutator
+abstract class AbstractValueToNullReturnValue extends Mutator
 {
     protected function isNullReturnValueAllowed(Node $node): bool
     {

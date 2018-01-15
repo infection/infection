@@ -58,19 +58,20 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
     public function leaveNode(Node $node)
     {
         foreach ($this->mutators as $mutator) {
-            if ($mutator->isFunctionBodyMutator() &&
-                !$node->getAttribute(WrappedFunctionInfoCollectorVisitor::IS_INSIDE_FUNCTION_KEY)) {
-                continue;
+            if (!$this->codeCoverageData->isLineFunctionSignature($this->filePath, $node->getLine())) {
+                if (!$node->getAttribute(WrappedFunctionInfoCollectorVisitor::IS_INSIDE_FUNCTION_KEY)) {
+                    continue;
+                }
             }
 
             if ($this->onlyCovered) {
-                if ($mutator->isFunctionBodyMutator()
-                    && !$this->codeCoverageData->hasTestsOnLine($this->filePath, $node->getLine())) {
+                if ($this->codeCoverageData->isLineFunctionSignature($this->filePath, $node->getLine()) &&
+                    !$this->codeCoverageData->hasExecutedMethodOnLine($this->filePath, $node->getLine())) {
                     continue;
                 }
 
-                if ($mutator->isFunctionSignatureMutator() &&
-                    !$this->codeCoverageData->hasExecutedMethodOnLine($this->filePath, $node->getLine())) {
+                if (!$this->codeCoverageData->isLineFunctionSignature($this->filePath, $node->getLine()) &&
+                    !$this->codeCoverageData->hasTestsOnLine($this->filePath, $node->getLine())) {
                     continue;
                 }
             }

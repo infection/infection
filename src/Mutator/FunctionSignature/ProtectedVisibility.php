@@ -9,12 +9,12 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\FunctionSignature;
 
-use Infection\Mutator\FunctionSignatureMutator;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Class_;
 
-class ProtectedVisibility extends FunctionSignatureMutator
+class ProtectedVisibility extends Mutator
 {
     /**
      * Replaces "protected function..." with "private function ..."

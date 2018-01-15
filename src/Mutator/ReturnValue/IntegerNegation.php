@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\FunctionBodyMutator;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
-class IntegerNegation extends FunctionBodyMutator
+class IntegerNegation extends Mutator
 {
     /**
      * Replaces any integer with negated integer value.
