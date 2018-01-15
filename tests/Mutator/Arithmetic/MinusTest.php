@@ -24,6 +24,25 @@ class MinusTest extends AbstractMutator
         $this->assertTrue($this->mutator->shouldMutate($plusExpression));
     }
 
+    public function test_it_mutates()
+    {
+        $input = <<<'CODE'
+<?php 
+
+$a = 1 - 1;
+CODE;
+        $expectedMutatedCode = <<<'CODE'
+<?php
+
+$a = 1 + 1;
+CODE;
+
+        $mutatedCode  =$this->mutate($input);
+
+        $this->assertSame($expectedMutatedCode, $mutatedCode);
+
+    }
+
     protected function getMutator(): Mutator
     {
         return new Minus();
