@@ -1,0 +1,44 @@
+<?php
+/**
+ * Copyright © 2018 Dmitriy Shkatov
+ *
+ * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+ */
+declare(strict_types=1);
+
+namespace Infection\TestFramework\Codeception\Adapter;
+
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\TestFrameworkTypes;
+
+class CodeceptionAdapter extends AbstractTestFrameworkAdapter
+{
+    const JUNIT_FILE_NAME = 'phpunit.junit.xml';
+
+    public function testsPass(string $output): bool
+    {
+        if (preg_match('/failures!/i', $output)) {
+            return false;
+        }
+
+        if (preg_match('/errors!/i', $output)) {
+            return false;
+        }
+
+        // OK (XX tests, YY assertions)
+        $isOk = (bool) preg_match('/OK\s\(/', $output);
+
+        // "OK, but incomplete, skipped, or risky tests!"
+        $isOkWithInfo = (bool) preg_match('/OK\s?,/', $output);
+
+        // "Warnings!" - e.g. when deprecated functions are used, but tests pass
+        $isWarning = (bool) preg_match('/warnings!/i', $output);
+
+        return $isOk || $isOkWithInfo || $isWarning;
+    }
+
+    public function getName(): string
+    {
+        return TestFrameworkTypes::CODECEPTION;
+    }
+}
