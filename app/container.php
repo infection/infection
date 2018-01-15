@@ -23,7 +23,7 @@ use Infection\TestFramework\PhpUnit\Coverage\PhpUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Differ\DiffColorizer;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
+use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
 use Infection\Config\InfectionConfig;
 use Infection\Utils\VersionParser;
 use Infection\Command;
@@ -65,6 +65,10 @@ $c['temp.dir.creator'] = function (): TempDirectoryCreator {
 
 $c['coverage.dir.phpunit'] = function (Container $c): string {
     return $c['temp.dir'] . '/' . CodeCoverageData::PHP_UNIT_COVERAGE_DIR;
+};
+
+$c['coverage.dir.codeception'] = function (Container $c): string {
+    return $c['temp.dir'] . '/' . CodeCoverageData::PHP_SPEC_COVERAGE_DIR;
 };
 
 $c['coverage.dir.phpspec'] = function (Container $c): string {
@@ -114,7 +118,7 @@ $c['diff.colorizer'] = function (): DiffColorizer {
 };
 
 $c['phpunit.junit.file.path'] = function (Container $c): string {
-    return $c['temp.dir'] . '/' . PhpUnitAdapter::JUNIT_FILE_NAME;
+    return $c['temp.dir'] . '/' . CodeceptionAdapter::JUNIT_FILE_NAME;
 };
 
 $c['test.file.data.provider.phpunit'] = function (Container $c): TestFileDataProvider {

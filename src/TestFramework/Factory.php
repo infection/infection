@@ -11,12 +11,15 @@ namespace Infection\TestFramework;
 
 use Infection\Config\InfectionConfig;
 use Infection\Finder\TestFrameworkExecutableFinder;
+use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
+use Infection\TestFramework\Codeception\Config\Builder\InitialConfigBuilder as CodeceptionInitialConfigBuilder;
+use Infection\TestFramework\Codeception\Config\Builder\MutationConfigBuilder as CodeceptionMutationConfigBuilder;
+use Infection\TestFramework\Codeception\CommandLine\ArgumentsAndOptionsBuilder as CodeceptionArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder as PhpSpecInitialConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder as PhpSpecMutationConfigBuilder;
 use Infection\TestFramework\PhpSpec\CommandLine\ArgumentsAndOptionsBuilder as PhpSpecArgumentsAndOptionsBuilder;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
@@ -84,7 +87,7 @@ final class Factory
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
             $phpUnitConfigContent = file_get_contents($phpUnitConfigPath);
 
-            return new PhpUnitAdapter(
+            return new CodeceptionAdapter(
                 new TestFrameworkExecutableFinder(TestFrameworkTypes::PHPUNIT, $this->infectionConfig->getPhpUnitCustomPath()),
                 new InitialConfigBuilder($this->tempDir, $phpUnitConfigContent, $this->xmlConfigurationHelper, $this->jUnitFilePath, $this->infectionConfig->getSourceDirs()),
                 new MutationConfigBuilder($this->tempDir, $phpUnitConfigContent, $this->xmlConfigurationHelper, $this->projectDir),
@@ -105,10 +108,22 @@ final class Factory
             );
         }
 
+        if ($adapterName === TestFrameworkTypes::CODECEPTION) {
+            $codeCeptionConfigPath = $this->configLocator->locate(TestFrameworkTypes::CODECEPTION);
+
+            return new CodeceptionAdapter(
+                new TestFrameworkExecutableFinder('codecept'),
+                new CodeceptionInitialConfigBuilder($this->tempDir, $codeCeptionConfigPath),
+                new CodeceptionMutationConfigBuilder($this->tempDir, $codeCeptionConfigPath, $this->projectDir),
+                new CodeceptionArgumentsAndOptionsBuilder(),
+                $this->versionParser
+            );
+        }
+
         throw new \InvalidArgumentException(
             sprintf(
                 'Invalid name of test framework. Available names are: %s',
-                implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC])
+                implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC, TestFrameworkTypes::CODECEPTION])
             )
         );
     }
