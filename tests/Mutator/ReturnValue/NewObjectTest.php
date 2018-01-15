@@ -38,6 +38,22 @@ CODE;
         $this->assertSame($expectedMutatedCode, $mutatedCode);
     }
 
+    public function test_it_does_not_mutate_if_no_class_name_found()
+    {
+        $code = <<<'CODE'
+<?php
+
+function test()
+{
+    $className = 'SimpleClass';
+    $instance = new $className();
+}
+CODE;
+        $mutatedCode = $this->mutate($code);
+
+        $this->assertSame($code, $mutatedCode);
+    }
+
     protected function getMutator() : Mutator
     {
         return new NewObject();

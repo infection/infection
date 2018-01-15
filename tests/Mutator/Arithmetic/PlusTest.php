@@ -25,6 +25,25 @@ class PlusTest extends AbstractMutator
         $this->assertTrue($this->mutator->shouldMutate($plusExpression));
     }
 
+    public function test_it_mutates()
+    {
+        $input = <<<'CODE'
+<?php 
+
+$a = 1 + 1;
+CODE;
+        $expectedMutatedCode = <<<'CODE'
+<?php
+
+$a = 1 - 1;
+CODE;
+
+        $mutatedCode  =$this->mutate($input);
+
+        $this->assertSame($expectedMutatedCode, $mutatedCode);
+
+    }
+
     public function test_it_should_not_mutate_plus_with_arrays()
     {
         $plusExpression = new \PhpParser\Node\Expr\BinaryOp\Plus(

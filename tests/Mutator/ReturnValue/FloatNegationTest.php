@@ -73,6 +73,14 @@ class FloatNegationTest extends AbstractMutator
         $this->assertTrue($this->mutator->shouldMutate($nodes[0]));
     }
 
+    public function test_does_not_mutate_with_value_of_zero()
+    {
+        $code = '<?php return 0.0;';
+        $nodes = $this->getNodes($code);
+
+        $this->assertFalse($this->mutator->shouldMutate($nodes[0]));
+    }
+
     public function test_gets_mutation_reverses_float_sign_when_positive()
     {
         $code = '<?php return 1.0;';
