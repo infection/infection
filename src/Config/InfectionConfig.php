@@ -176,22 +176,31 @@ class InfectionConfig
 
     public function getSourceExcludePaths(): array
     {
-        if (isset($this->config->source->exclude) && is_array($this->config->source->exclude)) {
-            $originalExcludedPaths = $this->config->source->exclude;
-            $excludedPaths = [];
+        $originalExcludedPaths = $this->getExcludes();
+        $excludedPaths = [];
 
-            foreach ($originalExcludedPaths as $originalExcludedPath) {
-                if (strpos($originalExcludedPath, '*') === false) {
-                    $excludedPaths[] = $originalExcludedPath;
-                } else {
-                    $excludedPaths = array_merge(
-                        $excludedPaths,
-                        $this->getExcludedDirsByPattern($originalExcludedPath)
-                    );
-                }
+        foreach ($originalExcludedPaths as $originalExcludedPath) {
+            if (strpos($originalExcludedPath, '*') === false) {
+                $excludedPaths[] = $originalExcludedPath;
+            } else {
+                $excludedPaths = array_merge(
+                    $excludedPaths,
+                    $this->getExcludedDirsByPattern($originalExcludedPath)
+                );
             }
+        }
 
-            return $excludedPaths;
+        return $excludedPaths;
+    }
+
+    private function getExcludes(): array
+    {
+        if (isset($this->config->source->exclude) && is_array($this->config->source->exclude)) {
+            return $this->config->source->exclude;
+        }
+
+        if (isset($this->config->source->excludes) && is_array($this->config->source->excludes)) {
+            return $this->config->source->excludes;
         }
 
         return self::DEFAULT_EXCLUDE_DIRS;
