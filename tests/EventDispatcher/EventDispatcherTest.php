@@ -1,4 +1,9 @@
 <?php
+/**
+ * Copyright © 2017-2018 Maks Rafalko
+ *
+ * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+ */
 
 namespace Infection\Tests\EventDispatcher;
 
@@ -34,7 +39,7 @@ class EventDispatcherTest extends TestCase
         $this->eventName = UserWasCreated::class;
 
         $this->listener = function () {
-            $this->listenerCallsCount++;
+            ++$this->listenerCallsCount;
         };
 
         $this->eventDispatcher = new EventDispatcher();

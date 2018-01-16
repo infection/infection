@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Maks Rafalko
+ * Copyright © 2017-2018 Maks Rafalko
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
@@ -11,9 +11,7 @@ namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ReturnValue\FloatNegation;
-use Infection\Mutator\ReturnValue\IntegerNegation;
 use Infection\Tests\Mutator\AbstractMutator;
-
 
 class FloatNegationTest extends AbstractMutator
 {
@@ -109,7 +107,7 @@ CODE;
         $this->assertSame($expectedMutatedCode, $mutatedCode);
     }
 
-    protected function getMutator() : Mutator
+    protected function getMutator(): Mutator
     {
         return new FloatNegation();
     }

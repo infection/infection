@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Maks Rafalko
+ * Copyright © 2017-2018 Maks Rafalko
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
@@ -9,10 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpSpec\Config;
 
-use Infection\TestFramework\Coverage\CodeCoverageData;
-use Infection\TestFramework\PhpSpec\Config\InitialYamlConfiguration;
 use Infection\TestFramework\PhpSpec\Config\MutationYamlConfiguration;
-use Infection\TestFramework\PhpSpec\Config\NoCodeCoverageException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
 
@@ -27,7 +24,7 @@ class MutationYamlConfigurationTest extends TestCase
             'PhpSpecCodeCoverageExtension' => [
                 'format' => ['xml', 'text'],
                 'output' => [
-                    'xml' => '/path'
+                    'xml' => '/path',
                 ],
             ],
             'SomeOtherExtension' => ['option' => 123],

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Maks Rafalko
+ * Copyright © 2017-2018 Maks Rafalko
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Infection\Mutator\Boolean\LogicalAnd;
-use Infection\Mutator\Boolean\LogicalLowerAnd;
 use Infection\Mutator\Boolean\LogicalLowerOr;
 use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutator;

@@ -1,9 +1,10 @@
 <?php
 /**
- * Copyright © 2017 Maks Rafalko
+ * Copyright © 2017-2018 Maks Rafalko
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Tests\Php;
@@ -37,7 +38,7 @@ class XdebugHandlerTest extends TestCase
         // Restore original state
         foreach (self::$env as $name => $value) {
             if (false !== $value) {
-                putenv($name.'='.$value);
+                putenv($name . '=' . $value);
             } else {
                 putenv($name);
             }
@@ -75,7 +76,7 @@ class XdebugHandlerTest extends TestCase
     public function test_it_not_restart_when_loaded_and_allowed()
     {
         $loaded = true;
-        putenv(XdebugHandlerMock::ENV_DISABLE_XDEBUG.'=1');
+        putenv(XdebugHandlerMock::ENV_DISABLE_XDEBUG . '=1');
 
         $xdebug = new XdebugHandlerMock($loaded);
         $xdebug->check();

@@ -1,19 +1,16 @@
 <?php
 /**
- * Copyright © 2017 Maks Rafalko
+ * Copyright © 2017-2018 Maks Rafalko
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
 declare(strict_types=1);
 
-
 namespace Infection\Tests\Mutant;
-
 
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Mockery;
 use Symfony\Component\Process\Process;
 

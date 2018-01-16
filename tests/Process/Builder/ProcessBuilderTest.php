@@ -1,9 +1,10 @@
 <?php
 /**
- * Copyright © 2017 Maks Rafalko
+ * Copyright © 2017-2018 Maks Rafalko
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Tests\Process\Builder;
@@ -21,7 +22,7 @@ class ProcessBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $fwAdapter->shouldReceive('getExecutableCommandLine', ['buildInitialConfigFile'])->andReturn('getExecutableCommandLine');
         $fwAdapter->shouldReceive('buildInitialConfigFile')->andReturn('buildInitialConfigFile');
 
-        $builder =  new ProcessBuilder($fwAdapter, 100);
+        $builder = new ProcessBuilder($fwAdapter, 100);
 
         $process = $builder->getProcessForInitialTestRun();
 
@@ -35,7 +36,7 @@ class ProcessBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $fwAdapter->shouldReceive('getExecutableCommandLine', ['buildMutationConfigFile'])->andReturn('getExecutableCommandLine');
         $fwAdapter->shouldReceive('buildMutationConfigFile')->andReturn('buildMutationConfigFile');
 
-        $builder =  new ProcessBuilder($fwAdapter, 100);
+        $builder = new ProcessBuilder($fwAdapter, 100);
 
         $process = $builder->getProcessForMutant(Mockery::mock(Mutant::class))->getProcess();
 

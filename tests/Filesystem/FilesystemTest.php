@@ -1,9 +1,10 @@
 <?php
 /**
- * Copyright © 2017 Maks Rafalko
+ * Copyright © 2017-2018 Maks Rafalko
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Tests\Filesystem;
@@ -66,8 +67,8 @@ class FilesystemTest extends TestCase
      */
     public function test_mkdir_creates_directory_fails()
     {
-        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
-        $dir = $basePath.'2';
+        $basePath = $this->workspace . DIRECTORY_SEPARATOR;
+        $dir = $basePath . '2';
 
         file_put_contents($dir, '');
 
@@ -76,8 +77,8 @@ class FilesystemTest extends TestCase
 
     public function test_mkdir_passes_path_to_io_exceptino()
     {
-        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
-        $dir = $basePath.'2';
+        $basePath = $this->workspace . DIRECTORY_SEPARATOR;
+        $dir = $basePath . '2';
 
         file_put_contents($dir, '');
 

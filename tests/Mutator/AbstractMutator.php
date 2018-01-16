@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Maks Rafalko
+ * Copyright © 2017-2018 Maks Rafalko
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
@@ -27,14 +27,14 @@ abstract class AbstractMutator extends TestCase
      */
     protected $mutator;
 
-    abstract protected function getMutator() : Mutator;
+    abstract protected function getMutator(): Mutator;
 
     protected function setUp()
     {
         $this->mutator = $this->getMutator();
     }
 
-    protected function getNodes(string $code) : array
+    protected function getNodes(string $code): array
     {
         $lexer = new Lexer();
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
@@ -57,6 +57,5 @@ abstract class AbstractMutator extends TestCase
         $mutatedNodes = $traverser->traverse($nodes);
 
         return $prettyPrinter->prettyPrintFile($mutatedNodes);
-
     }
 }

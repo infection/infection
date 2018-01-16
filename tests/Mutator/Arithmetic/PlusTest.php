@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Maks Rafalko
+ * Copyright © 2017-2018 Maks Rafalko
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
@@ -14,7 +14,6 @@ use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutator;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\LNumber;
-use PHPUnit\Framework\TestCase;
 
 class PlusTest extends AbstractMutator
 {
@@ -38,10 +37,9 @@ CODE;
 $a = 1 - 1;
 CODE;
 
-        $mutatedCode  =$this->mutate($input);
+        $mutatedCode = $this->mutate($input);
 
         $this->assertSame($expectedMutatedCode, $mutatedCode);
-
     }
 
     public function test_it_should_not_mutate_plus_with_arrays()

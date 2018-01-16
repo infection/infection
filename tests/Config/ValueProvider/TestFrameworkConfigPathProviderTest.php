@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Maks Rafalko
+ * Copyright © 2017-2018 Maks Rafalko
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
@@ -95,7 +95,7 @@ class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
     public function test_validates_incorrect_dir()
     {
         if (!$this->hasSttyAvailable()) {
-            $this->markTestSkipped("Stty is not available");
+            $this->markTestSkipped('Stty is not available');
         }
 
         $locatorMock = Mockery::mock(TestFrameworkConfigLocator::class);

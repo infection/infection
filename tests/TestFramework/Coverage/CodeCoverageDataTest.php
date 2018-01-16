@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Maks Rafalko
+ * Copyright © 2017-2018 Maks Rafalko
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
@@ -8,7 +8,6 @@
 declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
-
 
 use Infection\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
@@ -179,27 +178,22 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         return [
             '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php' => [
                 'byLine' => [
-                    26 =>
-                        [
+                    26 => [
                             ['testMethod' => 'Infection\\Tests\\Mutator\\Arithmetic\\PlusTest::test_it_should_mutate_plus_expression'],
                             ['testMethod' => 'Infection\\Tests\\Mutator\\Arithmetic\\PlusTest::test_it_should_not_mutate_plus_with_arrays'],
                         ],
-                    30 =>
-                        [
+                    30 => [
                             ['testMethod' => 'Infection\\Tests\\Mutator\\Arithmetic\\PlusTest::test_it_should_mutate_plus_expression'],
                             ['testMethod' => 'Infection\\Tests\\Mutator\\Arithmetic\\PlusTest::test_it_should_not_mutate_plus_with_arrays'],
                         ],
-                    31 =>
-                        [
+                    31 => [
                             ['testMethod' => 'Infection\\Tests\\Mutator\\Arithmetic\\PlusTest::test_it_should_not_mutate_plus_with_arrays'],
                         ],
-                    34 =>
-                        [
+                    34 => [
                             ['testMethod' => 'Infection\\Tests\\Mutator\\Arithmetic\\PlusTest::test_it_should_mutate_plus_expression'],
                         ],
                 ],
-                'byMethod' =>
-                    [
+                'byMethod' => [
                         'mutate' => [
                             'startLine' => 19,
                             'endLine' => 22,

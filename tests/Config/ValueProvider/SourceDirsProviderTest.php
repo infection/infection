@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Maks Rafalko
+ * Copyright © 2017-2018 Maks Rafalko
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
@@ -60,7 +60,6 @@ class SourceDirsProviderTest extends AbstractBaseProviderTest
      */
     public function test_it_throws_exception_when_current_dir_is_selected_with_another_dir()
     {
-
         $consoleMock = Mockery::mock(ConsoleHelper::class);
         $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
 

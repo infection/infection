@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Maks Rafalko
+ * Copyright © 2017-2018 Maks Rafalko
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
@@ -11,7 +11,6 @@ namespace Infection\Tests\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
-use Infection\Config\ValueProvider\SourceDirsProvider;
 use Mockery;
 
 class ExcludeDirsProviderTest extends AbstractBaseProviderTest
@@ -61,7 +60,7 @@ class ExcludeDirsProviderTest extends AbstractBaseProviderTest
     public function test_it_validates_dirs()
     {
         if (!$this->hasSttyAvailable()) {
-            $this->markTestSkipped("Stty is not available");
+            $this->markTestSkipped('Stty is not available');
         }
 
         $consoleMock = Mockery::mock(ConsoleHelper::class);
@@ -84,7 +83,7 @@ class ExcludeDirsProviderTest extends AbstractBaseProviderTest
     public function test_passes_when_correct_dir_typed()
     {
         if (!$this->hasSttyAvailable()) {
-            $this->markTestSkipped("Stty is not available");
+            $this->markTestSkipped('Stty is not available');
         }
 
         $dir1 = $this->workspace . DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR;

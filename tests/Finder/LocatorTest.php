@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Maks Rafalko
+ * Copyright © 2017-2018 Maks Rafalko
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
@@ -66,7 +66,7 @@ class LocatorTest extends TestCase
             $projectPath . 'autoload.php'
         ));
 
-        $locator->locate($projectPath .'autoload.php');
+        $locator->locate($projectPath . 'autoload.php');
     }
 
     public function test_handles_glob_patterns()
@@ -117,7 +117,7 @@ class LocatorTest extends TestCase
         $projectPath = realpath(__DIR__ . '/../Fixtures/Locator');
         $locator = new Locator([$projectPath]);
 
-        $found = $locator->locateAnyOf(['fakefile.txt','secondfile.txt', 'thirdfile.txt']);
+        $found = $locator->locateAnyOf(['fakefile.txt', 'secondfile.txt', 'thirdfile.txt']);
         $this->assertStringEndsWith(
             'tests/Fixtures/Locator/secondfile.txt',
             $found,

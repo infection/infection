@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Maks Rafalko
+ * Copyright © 2017-2018 Maks Rafalko
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
@@ -253,7 +253,7 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
                 [
                     '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
                     '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
-                ]
+                ],
             ],
             [
                 [
@@ -277,8 +277,8 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
                     '/path/to/C.php',
                     '/path/to/B.php',
                     '/path/to/A.php',
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

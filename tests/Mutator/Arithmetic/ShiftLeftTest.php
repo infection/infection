@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Maks Rafalko
+ * Copyright © 2017-2018 Maks Rafalko
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
@@ -9,12 +9,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Mutator\Arithmetic\Decrement;
-use Infection\Mutator\Arithmetic\DivEqual;
-use Infection\Mutator\Arithmetic\MinusEqual;
-use Infection\Mutator\Arithmetic\ModEqual;
-use Infection\Mutator\Arithmetic\MulEqual;
-use Infection\Mutator\Arithmetic\PowEqual;
 use Infection\Mutator\Arithmetic\ShiftLeft;
 use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutator;

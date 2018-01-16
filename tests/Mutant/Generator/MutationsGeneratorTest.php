@@ -1,11 +1,11 @@
 <?php
 /**
- * Copyright © 2017 Maks Rafalko
+ * Copyright © 2017-2018 Maks Rafalko
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace Infection\Tests\Mutant\Generator;
 
@@ -14,7 +14,7 @@ use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\TestFramework\Coverage\CodeCoverageData;
-use \Mockery;
+use Mockery;
 use PhpParser\Lexer;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
@@ -130,7 +130,7 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $defaultMutators = [
             $container[Plus::class],
-            $container[PublicVisibility::class]
+            $container[PublicVisibility::class],
         ];
 
         $eventDispatcherMock = Mockery::mock(EventDispatcher::class);

@@ -1,4 +1,9 @@
 <?php
+/**
+ * Copyright © 2017-2018 Maks Rafalko
+ *
+ * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+ */
 
 namespace Infection\Tests\TestFramework\Config;
 
@@ -17,7 +22,6 @@ class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('Unable to locate phpunit.(xml|yml)(.dist) file.');
 
         $locator->locate('phpunit');
-
     }
 
     public function test_it_can_find_a_dist_file()
@@ -76,6 +80,6 @@ class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->expectException(\RuntimeException::class);
-        $locator->locate('phpunit'. $dir . 'NoFiles/');
+        $locator->locate('phpunit' . $dir . 'NoFiles/');
     }
 }
