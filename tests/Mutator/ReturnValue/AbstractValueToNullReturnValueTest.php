@@ -286,6 +286,5 @@ CODE;
 
         $mutatedCode = $this->mutate($code);
         $this->assertSame($code, $mutatedCode);
-
     }
 }
