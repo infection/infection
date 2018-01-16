@@ -69,7 +69,7 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(false);
         $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->andReturn(true);
         $codeCoverageDataMock->shouldReceive('isLineFunctionSignature')
-            ->withArgs([Mockery::any(), 13])
+            ->withArgs([Mockery::any(), 14])
             ->andReturn(true);
         $codeCoverageDataMock->shouldReceive('isLineFunctionSignature')
             ->andReturn(false)
