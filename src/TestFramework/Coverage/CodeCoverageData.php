@@ -110,7 +110,7 @@ class CodeCoverageData
         $filePath = $mutation->getOriginalFilePath();
         $line = $mutation->getAttributes()['startLine'];
 
-        if ($this->isLineFunctionSignature($filePath, $line)) {
+        if ($mutation->isOnFunctionSignature()) {
             if ($this->hasExecutedMethodOnLine($filePath, $line)) {
                 return $this->getTestsForExecutedMethodOnLine($filePath, $line);
             }

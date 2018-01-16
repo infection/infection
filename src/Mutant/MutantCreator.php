@@ -89,7 +89,7 @@ class MutantCreator
         $line = $mutation->getAttributes()['startLine'];
         $filePath = $mutation->getOriginalFilePath();
 
-        if ($codeCoverageData->isLineFunctionSignature($filePath, $line)) {
+        if ($mutation->isOnFunctionSignature()) {
             return $codeCoverageData->hasExecutedMethodOnLine($filePath, $line);
         }
 

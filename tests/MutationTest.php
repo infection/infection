@@ -32,7 +32,8 @@ class MutationTest extends TestCase
             [],
             $mutator,
             $attributes,
-            'Interface_'
+            'Interface_',
+            false
         );
 
         $this->assertSame('5f52c44bcebde86a7ee79d0080c0e12a', $mutation->getHash());
