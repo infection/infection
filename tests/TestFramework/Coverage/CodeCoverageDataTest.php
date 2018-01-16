@@ -180,14 +180,13 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     /**
      * @dataProvider providesFunctionSignatureLineNumbers
      */
-    public function test_it_correctly_finds_that_line_is_signature($lineNumber)
+    public function test_it_correctly_finds_that_line_is_signature(int $lineNumber)
     {
         $coverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        //Known function signature lines
         $this->assertTrue(
-            $coverageData->isLineFunctionSignature($filePath,$lineNumber),
+            $coverageData->isLineFunctionSignature($filePath, $lineNumber),
             'isLineFunctionSignature did not return true when a line is a function signature'
         );
     }
@@ -204,14 +203,13 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     /**
      * @dataProvider providesNonFunctionSignatureLineNumbers
      */
-    public function test_it_knows_when_lines_are_not_function_signature($lineNumber)
+    public function test_it_knows_when_lines_are_not_function_signature(int $lineNumber)
     {
         $coverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        //Known function signature lines
         $this->assertFalse(
-            $coverageData->isLineFunctionSignature($filePath,$lineNumber),
+            $coverageData->isLineFunctionSignature($filePath, $lineNumber),
             'isLineFunctionSignature did not return false when a line is not a function signature'
         );
     }
