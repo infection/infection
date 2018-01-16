@@ -197,7 +197,7 @@ class CodeCoverageData
     {
         $coverage = $this->getCoverage();
         foreach ($coverage[$filePath]['byMethod'] as $method => $coverageInfo) {
-            if ($line == $coverageInfo['startLine']) {
+            if ($line === (int)$coverageInfo['startLine']) {
                 return true;
             }
         }
