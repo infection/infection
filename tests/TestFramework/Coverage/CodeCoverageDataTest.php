@@ -177,56 +177,6 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $coverage->hasTests('/abc/def.php');
     }
 
-    /**
-     * @dataProvider providesFunctionSignatureLineNumbers
-     */
-    public function test_it_correctly_finds_that_line_is_signature(int $lineNumber)
-    {
-        $coverageData = $this->getCodeCoverageData();
-        $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
-
-        $this->assertTrue(
-            $coverageData->isLineFunctionSignature($filePath, $lineNumber),
-            'isLineFunctionSignature did not return true when a line is a function signature'
-        );
-    }
-
-    public function providesFunctionSignatureLineNumbers(): array
-    {
-        return [
-            [3],
-            [19],
-            [24],
-        ];
-    }
-
-    /**
-     * @dataProvider providesNonFunctionSignatureLineNumbers
-     */
-    public function test_it_knows_when_lines_are_not_function_signature(int $lineNumber)
-    {
-        $coverageData = $this->getCodeCoverageData();
-        $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
-
-        $this->assertFalse(
-            $coverageData->isLineFunctionSignature($filePath, $lineNumber),
-            'isLineFunctionSignature did not return false when a line is not a function signature'
-        );
-    }
-
-    public function providesNonFunctionSignatureLineNumbers(): array
-    {
-        return [
-            [0],
-            [2],
-            [22],
-            [26],
-            [30],
-            [34],
-            [35],
-        ];
-    }
-
     private function getParsedCodeCoverageData(): array
     {
         return [
