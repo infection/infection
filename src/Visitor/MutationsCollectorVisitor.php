@@ -58,7 +58,8 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
     public function leaveNode(Node $node)
     {
         foreach ($this->mutators as $mutator) {
-            $isOnFunctionSignature = $this->codeCoverageData->isLineFunctionSignature($this->filePath, $node->getLine());
+            $isOnFunctionSignature = $node->getAttribute(WrappedFunctionInfoCollectorVisitor::IS_ON_FUNCTION_SIGNATURE, false);
+
             if (!$isOnFunctionSignature) {
                 if (!$node->getAttribute(WrappedFunctionInfoCollectorVisitor::IS_INSIDE_FUNCTION_KEY)) {
                     continue;

@@ -15,6 +15,7 @@ use PhpParser\NodeVisitorAbstract;
 class WrappedFunctionInfoCollectorVisitor extends NodeVisitorAbstract
 {
     const IS_INSIDE_FUNCTION_KEY = 'isInsideFunction';
+    const IS_ON_FUNCTION_SIGNATURE = 'isOnFunctionSignature';
     const FUNCTION_SCOPE_KEY = 'functionScope';
 
     private $scopeStack = [];
@@ -34,6 +35,7 @@ class WrappedFunctionInfoCollectorVisitor extends NodeVisitorAbstract
 
         if ($this->isFunctionLikeNode($node)) {
             $this->scopeStack[] = $node;
+            $node->setAttribute(self::IS_ON_FUNCTION_SIGNATURE, true);
         } elseif ($isInsideFunction) {
             $node->setAttribute(self::FUNCTION_SCOPE_KEY, $this->scopeStack[count($this->scopeStack) - 1]);
         }

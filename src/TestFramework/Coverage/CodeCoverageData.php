@@ -193,18 +193,6 @@ class CodeCoverageData
         return $newCoverage;
     }
 
-    public function isLineFunctionSignature(string $filePath, int $line): bool
-    {
-        $coverage = $this->getCoverage();
-        foreach ($coverage[$filePath]['byMethod'] as $method => $coverageInfo) {
-            if ($line === (int) $coverageInfo['startLine']) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private function getTestsForExecutedMethodOnLine(string $filePath, int $line): array
     {
         $coverage = $this->getCoverage();
