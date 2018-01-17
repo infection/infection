@@ -20,9 +20,12 @@ abstract class AbstractValueToNullReturnValueTest extends AbstractMutator
         $code = <<<"CODE"
 <?php
 
-function test()
+class Test
 {
-    return {$this->getMutableNodeString()};
+    function test()
+    {
+        return {$this->getMutableNodeString()};
+    }
 }
 CODE;
         $mutatedCode = $this->mutate($code);
@@ -30,10 +33,13 @@ CODE;
         $expectedMutatedCode = <<<"CODE"
 <?php
 
-function test()
+class Test
 {
-    {$this->getMutableNodeString()};
-    return null;
+    function test()
+    {
+        {$this->getMutableNodeString()};
+        return null;
+    }
 }
 CODE;
 
@@ -44,9 +50,13 @@ CODE;
     {
         $code = <<<"CODE"
 <?php
-function test() : int
+
+class Test
 {
-    return {$this->getMutableNodeString()};
+    function test() : int
+    {
+        return {$this->getMutableNodeString()};
+    }
 }
 CODE;
         $mutatedCode = $this->mutate($code);
@@ -54,9 +64,12 @@ CODE;
         $expectedMutatedCode = <<<"CODE"
 <?php
 
-function test() : int
+class Test
 {
-    return {$this->getMutableNodeString()};
+    function test() : int
+    {
+        return {$this->getMutableNodeString()};
+    }
 }
 CODE;
 
@@ -67,9 +80,13 @@ CODE;
     {
         $code = <<<"CODE"
 <?php
-function test() : ?int
+
+class Test
 {
-    return {$this->getMutableNodeString()};
+    function test() : ?int
+    {
+        return {$this->getMutableNodeString()};
+    }
 }
 CODE;
         $mutatedCode = $this->mutate($code);
@@ -77,10 +94,13 @@ CODE;
         $expectedMutatedCode = <<<"CODE"
 <?php
 
-function test() : ?int
+class Test
 {
-    {$this->getMutableNodeString()};
-    return null;
+    function test() : ?int
+    {
+        {$this->getMutableNodeString()};
+        return null;
+    }
 }
 CODE;
 
@@ -91,9 +111,13 @@ CODE;
     {
         $code = <<<"CODE"
 <?php
-function test() : \DateTime
+
+class Test
 {
-    return {$this->getMutableNodeString()};
+    function test() : \DateTime
+    {
+        return {$this->getMutableNodeString()};
+    }
 }
 CODE;
         $mutatedCode = $this->mutate($code);
@@ -101,9 +125,12 @@ CODE;
         $expectedMutatedCode = <<<"CODE"
 <?php
 
-function test() : \DateTime
+class Test
 {
-    return {$this->getMutableNodeString()};
+    function test() : \DateTime
+    {
+        return {$this->getMutableNodeString()};
+    }
 }
 CODE;
 
@@ -114,9 +141,13 @@ CODE;
     {
         $code = <<<"CODE"
 <?php
-function test() : ?\DateTime
+
+class Test
 {
-    return {$this->getMutableNodeString()};
+    function test() : ?\DateTime
+    {
+        return {$this->getMutableNodeString()};
+    }
 }
 CODE;
         $mutatedCode = $this->mutate($code);
@@ -124,10 +155,13 @@ CODE;
         $expectedMutatedCode = <<<"CODE"
 <?php
 
-function test() : ?\DateTime
+class Test
 {
-    {$this->getMutableNodeString()};
-    return null;
+    function test() : ?\DateTime
+    {
+        {$this->getMutableNodeString()};
+        return null;
+    }
 }
 CODE;
 
@@ -138,13 +172,17 @@ CODE;
     {
         $code = <<<"CODE"
 <?php
-function test() : array
+
+class Test
 {
-    \$a = function (\$element) : ?int {
-        return \$element;
-    };
+    function test() : array
+    {
+        \$a = function (\$element) : ?int {
+            return \$element;
+        };
     
-    return {$this->getMutableNodeString()};
+        return {$this->getMutableNodeString()};
+    }
 }
 CODE;
         $mutatedCode = $this->mutate($code);
@@ -152,12 +190,15 @@ CODE;
         $expectedMutatedCode = <<<"CODE"
 <?php
 
-function test() : array
+class Test
 {
-    \$a = function (\$element) : ?int {
-        return \$element;
-    };
-    return {$this->getMutableNodeString()};
+    function test() : array
+    {
+        \$a = function (\$element) : ?int {
+            return \$element;
+        };
+        return {$this->getMutableNodeString()};
+    }
 }
 CODE;
 
@@ -168,13 +209,17 @@ CODE;
     {
         $code = <<<"CODE"
 <?php
-function test()
+
+class Test
 {
-    \$a = function (\$element) : ?int {
-        return \$element;
-    };
+    function test()
+    {
+        \$a = function (\$element) : ?int {
+            return \$element;
+        };
     
-    return {$this->getMutableNodeString()};
+        return {$this->getMutableNodeString()};
+    }
 }
 CODE;
         $mutatedCode = $this->mutate($code);
@@ -182,13 +227,16 @@ CODE;
         $expectedMutatedCode = <<<"CODE"
 <?php
 
-function test()
+class Test
 {
-    \$a = function (\$element) : ?int {
-        return \$element;
-    };
-    {$this->getMutableNodeString()};
-    return null;
+    function test()
+    {
+        \$a = function (\$element) : ?int {
+            return \$element;
+        };
+        {$this->getMutableNodeString()};
+        return null;
+    }
 }
 CODE;
 
@@ -199,9 +247,13 @@ CODE;
     {
         $code = <<<"CODE"
 <?php
-function test(): bool
+
+class Test
 {
-    return {$this->getMutableNodeString()};
+    function test(): bool
+    {
+        return {$this->getMutableNodeString()};
+    }
 }
 CODE;
         $mutatedCode = $this->mutate($code);
@@ -209,12 +261,30 @@ CODE;
         $expectedMutatedCode = <<<"CODE"
 <?php
 
-function test() : bool
+class Test
 {
-    return {$this->getMutableNodeString()};
+    function test() : bool
+    {
+        return {$this->getMutableNodeString()};
+    }
 }
 CODE;
 
         $this->assertSame($expectedMutatedCode, $mutatedCode);
+    }
+
+    public function test_it_does_not_mutate_a_function_outside_a_class()
+    {
+        $code = <<<"CODE"
+<?php
+
+function test()
+{
+    return 1;
+}
+CODE;
+
+        $mutatedCode = $this->mutate($code);
+        $this->assertSame($code, $mutatedCode);
     }
 }
