@@ -30,6 +30,9 @@
             "php": "7.0.8"
         }
     },
+    "conflict": {
+        "symfony/process": "3.4.2"
+    },
     "require": {
         "php": "^7.0",
         "nikic/php-parser": "^3.0",
