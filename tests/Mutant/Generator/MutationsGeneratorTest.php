@@ -12,6 +12,7 @@ namespace Infection\Tests\Mutant\Generator;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutator\Arithmetic\Plus;
+use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Mockery;
@@ -32,7 +33,7 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $mutations = $generator->generate(false);
 
-        $this->assertInstanceOf(Plus::class, $mutations[0]->getMutator());
+        $this->assertInstanceOf(Plus::class, $mutations[1]->getMutator());
     }
 
     public function test_it_collects_public_visibility_mutation()
@@ -45,8 +46,8 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $mutations = $generator->generate(false);
 
-        $this->assertInstanceOf(Plus::class, $mutations[0]->getMutator());
-        $this->assertInstanceOf(PublicVisibility::class, $mutations[1]->getMutator());
+        $this->assertInstanceOf(Plus::class, $mutations[1]->getMutator());
+        $this->assertInstanceOf(PublicVisibility::class, $mutations[2]->getMutator());
     }
 
     public function test_it_can_skip_not_covered_on_file_level()
@@ -79,8 +80,9 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $mutations = $generator->generate(true);
 
-        $this->assertCount(1, $mutations);
-        $this->assertInstanceOf(PublicVisibility::class, $mutations[0]->getMutator());
+        $this->assertCount(2, $mutations);
+        $this->assertInstanceOf(TrueValue::class, $mutations[0]->getMutator());
+        $this->assertInstanceOf(PublicVisibility::class, $mutations[1]->getMutator());
     }
 
     public function test_it_can_skip_not_covered_on_file_line_for_visibility()
@@ -139,9 +141,14 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             return new PublicVisibility();
         };
 
+        $container[TrueValue::class] = function (Container $c) {
+            return new TrueValue();
+        };
+
         $defaultMutators = [
             $container[Plus::class],
             $container[PublicVisibility::class],
+            $container[TrueValue::class],
         ];
 
         $eventDispatcherMock = Mockery::mock(EventDispatcher::class);
