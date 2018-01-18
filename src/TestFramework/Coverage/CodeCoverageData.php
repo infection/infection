@@ -107,12 +107,10 @@ class CodeCoverageData
 
     public function getAllTestsFor(Mutation $mutation): array
     {
-        $mutator = $mutation->getMutator();
-
         $filePath = $mutation->getOriginalFilePath();
         $line = $mutation->getAttributes()['startLine'];
 
-        if ($mutator->isFunctionSignatureMutator()) {
+        if ($mutation->isOnFunctionSignature()) {
             if ($this->hasExecutedMethodOnLine($filePath, $line)) {
                 return $this->getTestsForExecutedMethodOnLine($filePath, $line);
             }
@@ -120,11 +118,7 @@ class CodeCoverageData
             return [];
         }
 
-        if ($mutator->isFunctionBodyMutator()) {
-            if (!$this->hasTestsOnLine($filePath, $line)) {
-                return [];
-            }
-
+        if ($this->hasTestsOnLine($filePath, $line)) {
             return $this->getCoverage()[$filePath]['byLine'][$line];
         }
 

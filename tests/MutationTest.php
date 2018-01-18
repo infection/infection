@@ -32,9 +32,34 @@ class MutationTest extends TestCase
             [],
             $mutator,
             $attributes,
-            'Interface_'
+            'Interface_',
+            false
         );
 
         $this->assertSame('5f52c44bcebde86a7ee79d0080c0e12a', $mutation->getHash());
+    }
+
+    public function test_it_correctly_sets_is_on_function_signature()
+    {
+        $mutator = new Plus();
+        $attributes = [
+            'startLine' => 3,
+            'endLine' => 5,
+            'startTokenPos' => 21,
+            'endTokenPos' => 31,
+            'startFilePos' => 43,
+            'endFilePos' => 53,
+        ];
+
+        $mutation = new Mutation(
+            '/abc.php',
+            [],
+            $mutator,
+            $attributes,
+            'Interface_',
+            false
+        );
+
+        $this->assertFalse($mutation->isOnFunctionSignature());
     }
 }

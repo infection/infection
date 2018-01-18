@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalNegotiation;
 
-use Infection\Mutator\FunctionBodyMutator;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
-class LessThanNegotiation extends FunctionBodyMutator
+class LessThanNegotiation extends Mutator
 {
     /**
      * Replaces "<" with ">="

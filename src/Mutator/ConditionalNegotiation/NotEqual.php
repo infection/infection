@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalNegotiation;
 
-use Infection\Mutator\FunctionBodyMutator;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
-class NotEqual extends FunctionBodyMutator
+class NotEqual extends Mutator
 {
     /**
      * Replaces "!=" with "=="

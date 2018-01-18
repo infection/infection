@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ZeroIteration;
 
-use Infection\Mutator\FunctionBodyMutator;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
-class Foreach_ extends FunctionBodyMutator
+class Foreach_ extends Mutator
 {
     public function mutate(Node $node)
     {

@@ -9,14 +9,14 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\FunctionBodyMutator;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 use PhpParser\Node\Expr\PreInc;
 use PhpParser\Node\Expr\PostInc;
 use PhpParser\Node\Expr\PostDec;
 use PhpParser\Node\Expr\PreDec;
 
-class Increment extends FunctionBodyMutator
+class Increment extends Mutator
 {
     /**
      * Replaces "++" with "--"

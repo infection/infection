@@ -9,11 +9,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\FunctionBodyMutator;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 
-class Plus extends FunctionBodyMutator
+class Plus extends Mutator
 {
     /**
      * Replaces "+" with "-"

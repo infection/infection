@@ -17,10 +17,6 @@ abstract class Mutator
 
     abstract public function shouldMutate(Node $node): bool;
 
-    abstract public function isFunctionBodyMutator(): bool;
-
-    abstract public function isFunctionSignatureMutator(): bool;
-
     public function getName(): string
     {
         $parts = explode('\\', static::class);

@@ -9,13 +9,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\FunctionSignature;
 
-use Infection\Mutator\FunctionSignatureMutator;
 use Infection\Mutator\InterfaceParentTrait;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Class_;
 
-class PublicVisibility extends FunctionSignatureMutator
+class PublicVisibility extends Mutator
 {
     use InterfaceParentTrait;
 

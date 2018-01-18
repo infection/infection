@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\FunctionBodyMutator;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
-class LogicalNot extends FunctionBodyMutator
+class LogicalNot extends Mutator
 {
     /**
      * Replaces "!something" with "something"
