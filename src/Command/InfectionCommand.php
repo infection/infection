@@ -122,14 +122,17 @@ class InfectionCommand extends Command
     {
         $this->container['infection.config'] = function (Container $c) use ($input): InfectionConfig {
             try {
-                $configPaths = [
-                    InfectionConfig::CONFIG_FILE_NAME,
-                    InfectionConfig::CONFIG_FILE_NAME . '.dist',
-                ];
+                $configPaths = [];
                 $customConfigPath = $input->getOption('configuration');
                 if ($customConfigPath) {
                     $configPaths[] = $customConfigPath;
                 }
+                array_push(
+                    $configPaths,
+                    InfectionConfig::CONFIG_FILE_NAME,
+                    InfectionConfig::CONFIG_FILE_NAME . '.dist'
+                );
+
                 $infectionConfigFile = $c['locator']->locateAnyOf($configPaths);
                 $json = file_get_contents($infectionConfigFile);
             } catch (\Exception $e) {
