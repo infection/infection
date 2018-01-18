@@ -62,10 +62,7 @@ class WrappedFunctionInfoCollectorVisitor extends NodeVisitorAbstract
 
         $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
 
-        if ($parent instanceof Node\Param) {
-            return true;
-        }
-        return false;
+        return $parent instanceof Node\Param;
     }
 
     /**
