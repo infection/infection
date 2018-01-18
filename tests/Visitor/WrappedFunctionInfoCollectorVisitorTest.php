@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Visitor;
+namespace Infection\Tests\Visitor;
 
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\WrappedFunctionInfoCollectorVisitor;
