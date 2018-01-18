@@ -33,10 +33,12 @@ class WrappedFunctionInfoCollectorVisitor extends NodeVisitorAbstract
             $node->setAttribute(self::IS_INSIDE_FUNCTION_KEY, true);
         }
 
+        if ($this->isPartOfFunctionSignature($node)) {
+            $node->setAttribute(self::IS_ON_FUNCTION_SIGNATURE, true);
+        }
+
         if ($this->isFunctionLikeNode($node)) {
             $this->scopeStack[] = $node;
-            $node->setAttribute(self::IS_ON_FUNCTION_SIGNATURE, true);
-        } elseif ($this->isPartOfFunctionSignature($node)) {
             $node->setAttribute(self::IS_ON_FUNCTION_SIGNATURE, true);
         } elseif ($isInsideFunction) {
             $node->setAttribute(self::FUNCTION_SCOPE_KEY, $this->scopeStack[count($this->scopeStack) - 1]);
