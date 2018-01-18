@@ -36,6 +36,8 @@ class WrappedFunctionInfoCollectorVisitor extends NodeVisitorAbstract
         if ($this->isFunctionLikeNode($node)) {
             $this->scopeStack[] = $node;
             $node->setAttribute(self::IS_ON_FUNCTION_SIGNATURE, true);
+        }elseif ($this->isPartOfFunctionSignature($node)) {
+            $node->setAttribute(self::IS_ON_FUNCTION_SIGNATURE, true);
         } elseif ($isInsideFunction) {
             $node->setAttribute(self::FUNCTION_SCOPE_KEY, $this->scopeStack[count($this->scopeStack) - 1]);
         }
@@ -46,6 +48,24 @@ class WrappedFunctionInfoCollectorVisitor extends NodeVisitorAbstract
         if ($this->isFunctionLikeNode($node)) {
             array_pop($this->scopeStack);
         }
+    }
+
+    private function isPartOfFunctionSignature(Node $node): bool
+    {
+        if ($this->isFunctionLikeNode($node)) {
+            return true;
+        }
+
+        if (!$node->hasAttribute(ParentConnectorVisitor::PARENT_KEY)) {
+            return false;
+        }
+
+        $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
+
+        if ($parent instanceof Node\Param) {
+            return true;
+        }
+        return false;
     }
 
     /**
