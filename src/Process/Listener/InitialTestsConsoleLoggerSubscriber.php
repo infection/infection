@@ -63,7 +63,7 @@ class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
             '',
             sprintf(
                 '%s version: %s',
-                ucfirst($this->testFrameworkAdapter->getName()),
+                $this->testFrameworkAdapter->getName(),
                 $version
             ),
             '',

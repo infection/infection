@@ -19,6 +19,13 @@ use Mockery;
 
 class PhpSpecAdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
+    public function test_it_has_a_name()
+    {
+        $adapter = $this->getAdapter();
+
+        $this->assertSame('PhpSpec', $adapter->getName());
+    }
+
     public function test_it_determines_when_tests_do_not_pass()
     {
         $output = <<<OUTPUT

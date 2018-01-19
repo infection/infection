@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Infection\TestFramework\TestFrameworkTypes;
 
 class PhpUnitAdapter extends AbstractTestFrameworkAdapter
 {
@@ -40,6 +39,6 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter
 
     public function getName(): string
     {
-        return TestFrameworkTypes::PHPUNIT;
+        return 'PHPUnit';
     }
 }

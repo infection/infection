@@ -19,18 +19,19 @@ use Mockery;
 
 class PhpUnitAdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
+    public function test_it_has_a_name()
+    {
+        $adapter = $this->getAdapter();
+
+        $this->assertSame('PHPUnit', $adapter->getName());
+    }
+
     /**
      * @dataProvider passProvider
      */
     public function test_it_determines_whether_tests_pass_or_not($output, $expectedResult)
     {
-        $executableFined = Mockery::mock(AbstractExecutableFinder::class);
-        $initialConfigBuilder = Mockery::mock(InitialConfigBuilder::class);
-        $mutationConfigBuilder = Mockery::mock(MutationConfigBuilder::class);
-        $cliArgumentsBuilder = Mockery::mock(CommandLineArgumentsAndOptionsBuilder::class);
-        $versionParser = Mockery::mock(VersionParser::class);
-
-        $adapter = new PhpUnitAdapter($executableFined, $initialConfigBuilder, $mutationConfigBuilder, $cliArgumentsBuilder, $versionParser);
+        $adapter = $this->getAdapter();
 
         $result = $adapter->testsPass($output);
 
@@ -45,5 +46,22 @@ class PhpUnitAdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             ['FAILURES!', false],
             ['ERRORS!', false],
         ];
+    }
+
+    private function getAdapter(): PhpUnitAdapter
+    {
+        $executableFined = Mockery::mock(AbstractExecutableFinder::class);
+        $initialConfigBuilder = Mockery::mock(InitialConfigBuilder::class);
+        $mutationConfigBuilder = Mockery::mock(MutationConfigBuilder::class);
+        $cliArgumentsBuilder = Mockery::mock(CommandLineArgumentsAndOptionsBuilder::class);
+        $versionParser = Mockery::mock(VersionParser::class);
+
+        return new PhpUnitAdapter(
+            $executableFined,
+            $initialConfigBuilder,
+            $mutationConfigBuilder,
+            $cliArgumentsBuilder,
+            $versionParser
+        );
     }
 }

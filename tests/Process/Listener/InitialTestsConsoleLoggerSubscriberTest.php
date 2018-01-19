@@ -51,7 +51,7 @@ class InitialTestsConsoleLoggerSubscriberTest extends Mockery\Adapter\Phpunit\Mo
         $output->shouldReceive('writeln')->once()->withArgs([[
             'Running initial test suite...',
             '',
-            'Phpunit version: unknown',
+            'PHPUnit version: unknown',
             '',
         ]]);
         $output->shouldReceive('getVerbosity')->andReturn(OutputInterface::VERBOSITY_QUIET);
@@ -59,7 +59,7 @@ class InitialTestsConsoleLoggerSubscriberTest extends Mockery\Adapter\Phpunit\Mo
         $progressBar = new ProgressBar($output);
 
         $testFramework = Mockery::mock(AbstractTestFrameworkAdapter::class);
-        $testFramework->shouldReceive('getName')->once()->andReturn('phpunit');
+        $testFramework->shouldReceive('getName')->once()->andReturn('PHPUnit');
         $testFramework->shouldReceive('getVersion')->andThrow(\InvalidArgumentException::class);
 
         $subscriber = new InitialTestsConsoleLoggerSubscriber(
