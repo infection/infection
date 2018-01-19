@@ -11,23 +11,33 @@ namespace Infection\Filesystem\Exception;
 
 class IOException extends \RuntimeException
 {
-    /**
-     * @var null|string
-     */
-    private $path;
-
-    public function __construct($message, $code = 0, \Exception $previous = null, $path = null)
+    public static function directoryNotWritable(string $dir): self
     {
-        $this->path = $path;
-
-        parent::__construct($message, $code, $previous);
+        return new self(
+            sprintf(
+                'Unable to write to the "%s" directory.',
+                $dir
+            )
+        );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPath()
+    public static function unableToCreate(string $path, string $message = null): self
     {
-        return $this->path;
+        $toThrow = sprintf('Failed to create "%s"', $path);
+        if ($message !== null) {
+            $toThrow .= sprintf(': %s', $message);
+        }
+
+        return new self($toThrow);
+    }
+
+    public static function unableToWriteToFile(string $filename): self
+    {
+        return new self(
+            sprintf(
+                'Failed to write file "%s".',
+                $filename
+            )
+        );
     }
 }
