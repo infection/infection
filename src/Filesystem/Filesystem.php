@@ -31,10 +31,10 @@ class Filesystem
             $error = \error_get_last();
 
             if ($error) {
-                throw new IOException(\sprintf('Failed to create "%s": %s', $path, $error['message']), 0, null, $path);
+                throw IOException::unableToCreate($path, $error['message']);
             }
 
-            throw new IOException(\sprintf('Failed to create "%s"', $path), 0, null, $path);
+            throw IOException::unableToCreate($path);
         }
     }
 
@@ -55,11 +55,11 @@ class Filesystem
         }
 
         if (!is_writable($dir)) {
-            throw new IOException(sprintf('Unable to write to the "%s" directory.', $dir), 0, null, $dir);
+            throw IOException::directoryNotWritable($dir);
         }
 
         if (false === @file_put_contents($filename, $content)) {
-            throw new IOException(sprintf('Failed to write file "%s".', $filename), 0, null, $filename);
+            throw IOException::unableToWriteToFile($filename);
         }
     }
 }
