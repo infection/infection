@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpSpec\Adapter;
 
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Infection\TestFramework\TestFrameworkTypes;
 
 class PhpSpecAdapter extends AbstractTestFrameworkAdapter
 {
@@ -41,6 +40,6 @@ class PhpSpecAdapter extends AbstractTestFrameworkAdapter
 
     public function getName(): string
     {
-        return TestFrameworkTypes::PHPSPEC;
+        return 'PhpSpec';
     }
 }
