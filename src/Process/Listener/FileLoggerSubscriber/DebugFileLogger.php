@@ -39,15 +39,7 @@ class DebugFileLogger extends FileLogger
             'Not Covered'
         );
 
-        if ($logFilePath) {
-            $this->fs->dumpFile(
-                $logFilePath,
-                implode(
-                    array_merge($logs),
-                    "\n"
-                )
-            );
-        }
+        $this->write($logs, $logFilePath);
     }
 
     /**

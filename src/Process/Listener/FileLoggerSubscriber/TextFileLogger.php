@@ -28,13 +28,7 @@ class TextFileLogger extends FileLogger
 
             $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not covered');
 
-            $this->fs->dumpFile(
-                $logFilePath,
-                implode(
-                    array_merge(...$logs),
-                    "\n"
-                )
-            );
+            $this->write($logs, $logFilePath);
         }
     }
 
@@ -42,9 +36,9 @@ class TextFileLogger extends FileLogger
      * @param MutantProcess[] $processes
      * @param string $headlinePrefix
      *
-     * @return array
+     * @return string
      */
-    private function getLogParts(array $processes, string $headlinePrefix): array
+    private function getLogParts(array $processes, string $headlinePrefix): string
     {
         $logParts = $this->getHeadlineParts($headlinePrefix);
 
@@ -61,7 +55,7 @@ class TextFileLogger extends FileLogger
             }
         }
 
-        return $logParts;
+        return implode($logParts, "\n");
     }
 
     private function getHeadlineParts(string $headlinePrefix): array

@@ -46,4 +46,17 @@ abstract class FileLogger
     }
 
     abstract public function writeToFile();
+
+    final protected function write(array $logs, string $logFilePath = null)
+    {
+        if ($logFilePath !== null) {
+            $this->fs->dumpFile(
+                $logFilePath,
+                implode(
+                    $logs,
+                    "\n"
+                )
+            );
+        }
+    }
 }

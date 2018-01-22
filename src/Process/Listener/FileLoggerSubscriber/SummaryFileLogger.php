@@ -12,28 +12,15 @@ class SummaryFileLogger extends FileLogger
     public function writeToFile()
     {
         $logFilePath = $this->infectionConfig->getLogPathInfoFor('summary');
-        if ($logFilePath === null) {
-            return;
-        }
-        $total = $this->metricsCalculator->getTotalMutantsCount();
-        $killed = $this->metricsCalculator->getKilledCount();
-        $errored = $this->metricsCalculator->getErrorCount();
-        $escaped = $this->metricsCalculator->getEscapedCount();
-        $timedOut = $this->metricsCalculator->getTimedOutCount();
-        $notCovered = $this->metricsCalculator->getNotCoveredByTestsCount();
-        $this->fs->dumpFile(
-            $logFilePath,
-            implode(
-                [
-                    'Total: ' . $total,
-                    'Killed: ' . $killed,
-                    'Errored: ' . $errored,
-                    'Escaped: ' . $escaped,
-                    'Timed Out: ' . $timedOut,
-                    'Not Covered: ' . $notCovered,
-                ],
-                "\n"
-            )
-        );
+        $logs = [];
+
+        $logs[] = 'Total: ' . $this->metricsCalculator->getTotalMutantsCount();
+        $logs[] = 'Killed: ' . $this->metricsCalculator->getKilledCount();
+        $logs[] = 'Errored: ' . $this->metricsCalculator->getErrorCount();
+        $logs[] = 'Escaped: ' . $this->metricsCalculator->getEscapedCount();
+        $logs[] = 'Timed Out: ' . $this->metricsCalculator->getTimedOutCount();
+        $logs[] = 'Not Covered: ' . $this->metricsCalculator->getNotCoveredByTestsCount();
+
+        $this->write($logs, $logFilePath);
     }
 }
