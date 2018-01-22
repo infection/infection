@@ -19,6 +19,7 @@ class BaseFileLoggerSubscriber implements EventSubscriberInterface
     const TEXT_FILE = 'text';
     const SUMMARY_FILE = 'summary';
     const DEBUG_FILE = 'debug';
+
     /**
      * @var InfectionConfig
      */
@@ -63,53 +64,63 @@ class BaseFileLoggerSubscriber implements EventSubscriberInterface
 
     public function onMutationTestingFinished(MutationTestingFinished $event)
     {
-        $logType = $this->infectionConfig->getLogsTypes();
+        $logTypes = $this->infectionConfig->getLogsTypes();
 
-        if (empty($logType)) {
+        if (empty($logTypes)) {
             return;
         }
 
-        if (isset($logType[self::TEXT_FILE])) {
-            $this->logToTextFile();
-        }
+        $logTypes = $this->filterLogTypes($logTypes);
 
-        if (isset($logType[self::SUMMARY_FILE])) {
-            $this->logSummary();
-        }
-
-        if (isset($logType[self::DEBUG_FILE])) {
-            $this->logDebug();
+        foreach ($logTypes as $logType => $directory) {
+            $this->useLogger($logType);
         }
     }
 
-    private function logToTextFile()
+    private function filterLogTypes(array $logTypes): array
     {
-        (new TextFileLogger(
-            $this->infectionConfig,
-            $this->metricsCalculator,
-            $this->fs,
-            $this->isDebugMode
-        ))
-            ->writeToFile();
+        $allowedFileTypes = [
+            self::TEXT_FILE,
+            self::DEBUG_FILE,
+            self::SUMMARY_FILE,
+        ];
+
+        foreach ($logTypes as $key => $value) {
+            if (!in_array($key, $allowedFileTypes)) {
+                unset($logTypes[$key]);
+            }
+        }
+
+        return $logTypes;
     }
 
-    private function logSummary()
+    private function useLogger(string $logType)
     {
-        (new SummaryFileLogger(
-            $this->infectionConfig,
-            $this->metricsCalculator,
-            $this->fs
-        ))
-            ->writeToFile();
-    }
-
-    private function logDebug()
-    {
-        (new DebugFileLogger(
-            $this->infectionConfig,
-            $this->metricsCalculator,
-            $this->fs
-        ))
-            ->writeToFile();
+        switch ($logType) {
+            case self::TEXT_FILE:
+                (new TextFileLogger(
+                    $this->infectionConfig,
+                    $this->metricsCalculator,
+                    $this->fs,
+                    $this->isDebugMode
+                ))->writeToFile();
+                break;
+            case self::SUMMARY_FILE:
+                (new SummaryFileLogger(
+                    $this->infectionConfig,
+                    $this->metricsCalculator,
+                    $this->fs,
+                    $this->isDebugMode
+                ))->writeToFile();
+                break;
+            case self::DEBUG_FILE:
+                (new DebugFileLogger(
+                    $this->infectionConfig,
+                    $this->metricsCalculator,
+                    $this->fs,
+                    $this->isDebugMode
+                ))->writeToFile();
+                break;
+        }
     }
 }
