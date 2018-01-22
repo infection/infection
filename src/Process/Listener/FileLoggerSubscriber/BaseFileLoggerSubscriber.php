@@ -74,6 +74,10 @@ class BaseFileLoggerSubscriber implements EventSubscriberInterface
         if (isset($logType['summary'])) {
             $this->logSummary();
         }
+
+        if (isset($logType['debug'])) {
+            $this->logDebug();
+        }
     }
 
     private function logToTextFile()
@@ -90,6 +94,16 @@ class BaseFileLoggerSubscriber implements EventSubscriberInterface
     private function logSummary()
     {
         (new SummaryFileLogger(
+            $this->infectionConfig,
+            $this->metricsCalculator,
+            $this->fs
+        ))
+            ->writeToFile();
+    }
+
+    private function logDebug()
+    {
+        (new DebugFileLogger(
             $this->infectionConfig,
             $this->metricsCalculator,
             $this->fs
