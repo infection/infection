@@ -1,11 +1,11 @@
-#Code coverage on function parameters
+# Code coverage on function parameters
 
 * Github ticket: https://github.com/infection/infection/issues/101
 
-##Summary
+## Summary
 Values in the function signature are not detected as covered.
 
-##Full ticket
+## Full ticket
 | Question    | Answer
 | ------------| ---------------
 | Infection version | 0.7.0
