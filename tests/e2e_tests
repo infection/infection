@@ -16,7 +16,7 @@ do
     cd "$d"
     if [ -f composer.json ] || [ -f composer.lock ]
     then
-        composer install
+        composer install > /dev/null 2>&1
     fi
 
     if [ -f "run_tests.bash" ]
