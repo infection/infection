@@ -9,7 +9,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "ParamCoverage\\Test\\": "test/"
+      "ParamCoverage\\Test\\": "tests/"
     }
   }
 }

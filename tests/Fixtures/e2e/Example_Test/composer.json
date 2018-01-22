@@ -14,7 +14,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Namespace_\\Test\\": "test/"
+      "Namespace_\\Test\\": "tests/"
     }
   }
 }

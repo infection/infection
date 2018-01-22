@@ -109,10 +109,10 @@ class InfectionConfigTest extends TestCase
         $this->assertSame($path, $config->getLogPathInfoFor('text'));
     }
 
-    public function test_it_returns_null_for_text_file_log_path_when_it_is_skipped()
+    public function test_it_returns_an_empty_array_for_text_file_log_path_when_it_is_skipped()
     {
         $config = new InfectionConfig(json_decode('{}'));
 
-        $this->assertNull($config->getLogPathInfoFor('text'));
+        $this->assertEmpty($config->getLogPathInfoFor('text'));
     }
 }

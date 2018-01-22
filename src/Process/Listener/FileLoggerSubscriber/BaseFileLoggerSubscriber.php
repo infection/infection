@@ -16,6 +16,9 @@ use Infection\Mutant\MetricsCalculator;
 
 class BaseFileLoggerSubscriber implements EventSubscriberInterface
 {
+    const TEXT_FILE = 'text';
+    const SUMMARY_FILE = 'summary';
+    const DEBUG_FILE = 'debug';
     /**
      * @var InfectionConfig
      */
@@ -62,20 +65,19 @@ class BaseFileLoggerSubscriber implements EventSubscriberInterface
     {
         $logType = $this->infectionConfig->getLogsTypes();
 
-        if ($logType === null) {
+        if (empty($logType)) {
             return;
         }
-        $logType = (array) $logType;
 
-        if (isset($logType['text'])) {
+        if (isset($logType[self::TEXT_FILE])) {
             $this->logToTextFile();
         }
 
-        if (isset($logType['summary'])) {
+        if (isset($logType[self::SUMMARY_FILE])) {
             $this->logSummary();
         }
 
-        if (isset($logType['debug'])) {
+        if (isset($logType[self::DEBUG_FILE])) {
             $this->logDebug();
         }
     }
