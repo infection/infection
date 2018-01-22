@@ -106,13 +106,13 @@ class InfectionConfigTest extends TestCase
         $json = sprintf('{"logs": {"text": "%s"}}', $path);
         $config = new InfectionConfig(json_decode($json));
 
-        $this->assertSame($path, $config->getTextFileLogPath());
+        $this->assertSame($path, $config->getLogPathInfoFor('text'));
     }
 
     public function test_it_returns_null_for_text_file_log_path_when_it_is_skipped()
     {
         $config = new InfectionConfig(json_decode('{}'));
 
-        $this->assertNull($config->getTextFileLogPath());
+        $this->assertNull($config->getLogPathInfoFor('text'));
     }
 }

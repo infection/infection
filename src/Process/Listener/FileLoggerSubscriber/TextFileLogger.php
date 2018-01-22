@@ -7,60 +7,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Listener;
+namespace Infection\Process\Listener\FileLoggerSubscriber;
 
-use Infection\Config\InfectionConfig;
-use Infection\Console\LogVerbosity;
-use Infection\EventDispatcher\EventSubscriberInterface;
-use Infection\Events\MutationTestingFinished;
-use Infection\Filesystem\Filesystem;
-use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
 
-class TextFileLoggerSubscriber implements EventSubscriberInterface
+class TextFileLogger extends FileLogger
 {
-    /**
-     * @var InfectionConfig
-     */
-    private $infectionConfig;
-
-    /**
-     * @var MetricsCalculator
-     */
-    private $metricsCalculator;
-
-    /**
-     * @var Filesystem
-     */
-    private $fs;
-
-    /**
-     * @var bool
-     */
-    private $isDebugMode;
-
-    public function __construct(
-        InfectionConfig $infectionConfig,
-        MetricsCalculator $metricsCalculator,
-        Filesystem $fs,
-        int $logVerbosity = LogVerbosity::DEBUG
-    ) {
-        $this->infectionConfig = $infectionConfig;
-        $this->metricsCalculator = $metricsCalculator;
-        $this->fs = $fs;
-        $this->isDebugMode = ($logVerbosity === LogVerbosity::DEBUG);
-    }
-
-    public function getSubscribedEvents()
+    public function writeToFile()
     {
-        return [
-            MutationTestingFinished::class => [$this, 'onMutationTestingFinished'],
-        ];
-    }
-
-    public function onMutationTestingFinished(MutationTestingFinished $event)
-    {
-        $logFilePath = $this->infectionConfig->getTextFileLogPath();
+        $logFilePath = $this->infectionConfig->getLogPathInfoFor('text');
 
         if ($logFilePath) {
             $logs[] = $this->getLogParts($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped');
