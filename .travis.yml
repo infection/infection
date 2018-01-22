@@ -37,6 +37,7 @@ install:
 script:
   - composer analyze
   - vendor/bin/phpunit --coverage-clover=clover.xml
+  - ./tests/e2e_tests
   - if [[ $INFECTION == 1 ]]; then bin/infection --threads=4 --min-msi=61 --min-covered-msi=87; fi
 
 after_success:
