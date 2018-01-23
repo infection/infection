@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Listener;
+namespace Infection\Tests\Process\Listener\FileLogger;
 
 use Infection\Config\InfectionConfig;
 use Infection\Console\LogVerbosity;
@@ -15,10 +15,10 @@ use Infection\EventDispatcher\EventDispatcher;
 use Infection\Events\MutationTestingFinished;
 use Infection\Filesystem\Filesystem;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Process\Listener\TextFileLoggerSubscriber;
+use Infection\Process\Listener\FileLogger\FileLoggerSubscriber;
 use PHPUnit\Framework\TestCase;
 
-class TextFileLoggerSubscriberTest extends TestCase
+class FileLoggerSubscriberTest extends TestCase
 {
     /**
      * @var InfectionConfig|\PHPUnit_Framework_MockObject_MockObject
@@ -60,15 +60,11 @@ class TextFileLoggerSubscriberTest extends TestCase
         $this->metricsCalculator->expects($this->never())
             ->method('getNotCoveredMutantProcesses');
 
-        $this->infectionConfig->expects($this->any())
-            ->method('getTextFileLogPath')
-            ->willReturn(null);
-
         $this->filesystem->expects($this->never())
             ->method('dumpFile');
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new TextFileLoggerSubscriber(
+        $dispatcher->addSubscriber(new FileLoggerSubscriber(
             $this->infectionConfig,
             $this->metricsCalculator,
             $this->filesystem
@@ -79,9 +75,11 @@ class TextFileLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_on_mutation_testing_finished()
     {
+        $logTypes = ['text' => sys_get_temp_dir() . '/infection-log.txt'];
+
         $this->infectionConfig->expects($this->once())
-            ->method('getTextFileLogPath')
-            ->willReturn(sys_get_temp_dir() . '/infection-log.txt');
+            ->method('getLogsTypes')
+            ->willReturn($logTypes);
 
         $this->metricsCalculator->expects($this->once())
             ->method('getEscapedMutantProcesses')
@@ -107,7 +105,7 @@ class TextFileLoggerSubscriberTest extends TestCase
             ->method('dumpFile');
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new TextFileLoggerSubscriber(
+        $dispatcher->addSubscriber(new FileLoggerSubscriber(
             $this->infectionConfig,
             $this->metricsCalculator,
             $this->filesystem
@@ -118,9 +116,11 @@ class TextFileLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_on_mutation_testing_finished_and_debug_mode_off()
     {
+        $logTypes = ['text' => sys_get_temp_dir() . '/infection-log.txt'];
+
         $this->infectionConfig->expects($this->once())
-            ->method('getTextFileLogPath')
-            ->willReturn(sys_get_temp_dir() . '/infection-log.txt');
+            ->method('getLogsTypes')
+            ->willReturn($logTypes);
 
         $this->metricsCalculator->expects($this->once())
             ->method('getEscapedMutantProcesses')
@@ -144,7 +144,7 @@ class TextFileLoggerSubscriberTest extends TestCase
             ->method('dumpFile');
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new TextFileLoggerSubscriber(
+        $dispatcher->addSubscriber(new FileLoggerSubscriber(
             $this->infectionConfig,
             $this->metricsCalculator,
             $this->filesystem,

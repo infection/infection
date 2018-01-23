@@ -40,7 +40,7 @@ script:
   - composer analyze
   - xdebug-enable
   - vendor/bin/phpunit --coverage-clover=clover.xml
-  - if [[ $INFECTION == 1 ]]; then bin/infection --threads=4 --min-msi=61 --min-covered-msi=87; fi
+  - if [[ $INFECTION == 1 ]]; then bin/infection --threads=4 --min-msi=61 --min-covered-msi=86; fi
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

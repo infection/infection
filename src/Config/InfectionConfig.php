@@ -206,12 +206,9 @@ class InfectionConfig
         return self::DEFAULT_EXCLUDE_DIRS;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getTextFileLogPath()
+    public function getLogsTypes(): array
     {
-        return $this->config->logs->text ?? null;
+        return (array) ($this->config->logs ?? []);
     }
 
     private function getExcludedDirsByPattern(string $originalExcludedDir)
