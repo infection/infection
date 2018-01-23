@@ -100,19 +100,39 @@ class InfectionConfigTest extends TestCase
         $this->assertCount(2, $excludedDirs);
     }
 
-    public function test_it_returns_text_file_log_path_when_exist()
+    /**
+     * @dataProvider providesFakeLogs
+     */
+    public function test_it_returns_file_log_path_when_exist_for_any_entry(string $logType, string $path)
     {
-        $path = 'test-log.txt';
-        $json = sprintf('{"logs": {"text": "%s"}}', $path);
+        $json = sprintf('{"logs": {"%s": "%s"}}', $logType, $path);
         $config = new InfectionConfig(json_decode($json));
 
-        $this->assertSame($path, $config->getTextFileLogPath());
+        $this->assertSame($path, $config->getLogsTypes()[$logType]);
     }
 
-    public function test_it_returns_null_for_text_file_log_path_when_it_is_skipped()
+    public function providesFakeLogs(): array
+    {
+        return [
+            [
+                'text',
+                'path/to/file.txt',
+            ],
+            [
+                'summary',
+                'other/file/path.dfd',
+            ],
+            [
+              'debug',
+              'debug/file/path.pdf',
+            ],
+        ];
+    }
+
+    public function test_it_returns_an_empty_array_for_text_file_log_types_when_it_is_skipped()
     {
         $config = new InfectionConfig(json_decode('{}'));
 
-        $this->assertNull($config->getTextFileLogPath());
+        $this->assertSame([], $config->getLogsTypes());
     }
 }

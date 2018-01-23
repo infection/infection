@@ -24,7 +24,6 @@ use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationTestingConsoleLoggerSubscriber;
-use Infection\Process\Listener\TextFileLoggerSubscriber;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
@@ -35,6 +34,7 @@ use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
 use Pimple\Container;
+use Infection\Process\Listener\FileLogger\FileLoggerSubscriber;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -184,7 +184,7 @@ ASCII;
         $eventDispatcher->addSubscriber(new MutationGeneratingConsoleLoggerSubscriber($this->output, $mutationGeneratingProgressBar));
         $eventDispatcher->addSubscriber(new MutantCreatingConsoleLoggerSubscriber($this->output, $mutantCreatingProgressBar));
         $eventDispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber($this->output, $this->getOutputFormatter(), $metricsCalculator, $this->get('diff.colorizer'), $this->input->getOption('show-mutations')));
-        $eventDispatcher->addSubscriber(new TextFileLoggerSubscriber($this->get('infection.config'), $metricsCalculator, $this->get('filesystem'), (int) $this->input->getOption('log-verbosity')));
+        $eventDispatcher->addSubscriber(new FileLoggerSubscriber($this->get('infection.config'), $metricsCalculator, $this->get('filesystem'), (int) $this->input->getOption('log-verbosity')));
     }
 
     private function getCodeCoverageData(string $testFrameworkKey): CodeCoverageData
