@@ -115,4 +115,18 @@ class InfectionConfigTest extends TestCase
 
         $this->assertNull($config->getTextFileLogPath());
     }
+
+    public function test_it_returns_default_temp_dir()
+    {
+        $config = new InfectionConfig(json_decode('{}'));
+
+        $this->assertSame(sys_get_temp_dir(), $config->getTempDir());
+    }
+
+    public function test_it_returns_temp_dir_from_config()
+    {
+        $config = new InfectionConfig(json_decode('{"tempDir": "/root/test"}'));
+
+        $this->assertSame('/root/test', $config->getTempDir());
+    }
 }

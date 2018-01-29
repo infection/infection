@@ -51,16 +51,12 @@ $c['phpunit.config.dir'] = function (Container $c): string {
     return $c['infection.config']->getPhpUnitConfigDir();
 };
 
-$c['temp.dir'] = function (Container $c): string {
-    return $c['temp.dir.creator']->createAndGet();
-};
-
 $c['filesystem'] = function (): Filesystem {
     return new Filesystem();
 };
 
-$c['temp.dir.creator'] = function (): TempDirectoryCreator {
-    return new TempDirectoryCreator();
+$c['temp.dir.creator'] = function (Container $c): TempDirectoryCreator {
+    return new TempDirectoryCreator($c['filesystem']);
 };
 
 $c['coverage.dir.phpunit'] = function (Container $c): string {

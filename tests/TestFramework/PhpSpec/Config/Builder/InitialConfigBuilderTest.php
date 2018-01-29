@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpSpec\Config\Builder;
 
+use Infection\Filesystem\Filesystem;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder;
 use Infection\Utils\TempDirectoryCreator;
 use PHPUnit\Framework\TestCase;
@@ -17,8 +18,8 @@ class InitialConfigBuilderTest extends TestCase
 {
     public function test_it_builds_path_to_initial_config_file()
     {
-        $tempDirCreator = new TempDirectoryCreator();
-        $tempDir = $tempDirCreator->createAndGet('infection-test');
+        $tempDirCreator = new TempDirectoryCreator(new Filesystem());
+        $tempDir = $tempDirCreator->createAndGet(sys_get_temp_dir() . '/infection-test');
         $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/phpspec/phpspec.yml';
 
         $builder = new InitialConfigBuilder($tempDir, $originalYamlConfigPath);

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpSpec\Config\Builder;
 
+use Infection\Filesystem\Filesystem;
 use Infection\Mutant\Mutant;
 use Infection\Mutation;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
@@ -21,9 +22,9 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
     protected function setUp()
     {
-        $tempDirCreator = new TempDirectoryCreator();
+        $tempDirCreator = new TempDirectoryCreator(new Filesystem());
         $this->tempDir = $tempDirCreator->createAndGet(
-            'infection-test' . \microtime(true) . \random_int(100, 999)
+            sys_get_temp_dir() . '/infection-test' . \microtime(true) . \random_int(100, 999)
         );
     }
 

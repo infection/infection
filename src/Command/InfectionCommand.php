@@ -120,13 +120,22 @@ class InfectionCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->buildDynamicDependencies($input);
+
+        return (new InfectionApplication($this->container, $input, $output))->run();
+    }
+
+    private function buildDynamicDependencies(InputInterface $input)
+    {
         $this->container['infection.config'] = function (Container $c) use ($input): InfectionConfig {
             try {
                 $configPaths = [];
                 $customConfigPath = $input->getOption('configuration');
+
                 if ($customConfigPath) {
                     $configPaths[] = $customConfigPath;
                 }
+
                 array_push(
                     $configPaths,
                     InfectionConfig::CONFIG_FILE_NAME,
@@ -142,9 +151,9 @@ class InfectionCommand extends Command
             return new InfectionConfig(json_decode($json));
         };
 
-        $app = new InfectionApplication($this->container, $input, $output);
-
-        return $app->run();
+        $this->container['temp.dir'] = function (Container $c): string {
+            return $c['temp.dir.creator']->createAndGet($c['infection.config']->getTempDir());
+        };
     }
 
     /**

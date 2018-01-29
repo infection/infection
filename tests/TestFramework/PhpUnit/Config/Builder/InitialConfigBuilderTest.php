@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
+use Infection\Filesystem\Filesystem;
 use Infection\Finder\Locator;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
@@ -32,9 +33,9 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
     protected function setUp()
     {
-        $tempDirCreator = new TempDirectoryCreator();
+        $tempDirCreator = new TempDirectoryCreator(new Filesystem());
         $this->tempDir = $tempDirCreator->createAndGet(
-            'infection-test' . \microtime(true) . \random_int(100, 999)
+            sys_get_temp_dir() . '/infection-test' . \microtime(true) . \random_int(100, 999)
         );
 
         $this->pathToProject = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));

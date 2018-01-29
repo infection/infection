@@ -9,29 +9,40 @@ declare(strict_types=1);
 
 namespace Infection\Utils;
 
+use Infection\Filesystem\Filesystem;
+
 class TempDirectoryCreator
 {
+    const BASE_DIR_NAME = 'infection';
+
+    /**
+     * @var Filesystem
+     */
+    private $fs;
+
     /**
      * @var string
      */
-    private $tempDirectory;
+    private $tempDirectoryPath;
 
-    public function createAndGet(string $dirName = null): string
+    /**
+     * @param Filesystem $fs
+     */
+    public function __construct(Filesystem $fs)
     {
-        if ($this->tempDirectory === null) {
-            $path = sprintf(
-                '%s/%s',
-                sys_get_temp_dir(),
-                $dirName ?: 'infection'
-            );
+        $this->fs = $fs;
+    }
 
-            if (!@mkdir($path, 0777, true) && !is_dir($path)) {
-                throw new \RuntimeException('Can not create temp dir');
-            }
+    public function createAndGet(string $tempDir): string
+    {
+        if ($this->tempDirectoryPath === null) {
+            $path = sprintf('%s/%s', $tempDir, self::BASE_DIR_NAME);
 
-            $this->tempDirectory = $path;
+            $this->fs->mkdir($path, 0777);
+
+            $this->tempDirectoryPath = $path;
         }
 
-        return $this->tempDirectory;
+        return $this->tempDirectoryPath;
     }
 }
