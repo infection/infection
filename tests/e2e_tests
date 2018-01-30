@@ -21,7 +21,7 @@ do
 
     if [ -f "run_tests.bash" ]
     then
-        output="$(bash run_test.bash)"
+        output="$(bash run_tests.bash)"
     else
         output="$(bash ../standard_script.bash)"
     fi
