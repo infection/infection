@@ -121,7 +121,7 @@ abstract class AbstractTestFrameworkAdapter
      *
      * @return string[]
      */
-    public function getMutantCommandLine(string $configPath, string $extraOptions): array
+    public function getMutantCommandLine(string $configPath, string $extraOptions, Mutant $mutant = null): array
     {
         return $this->getCommandLine($configPath, $extraOptions);
     }
@@ -132,10 +132,11 @@ abstract class AbstractTestFrameworkAdapter
     public function getCommandLine(
         string $configPath,
         string $extraOptions,
-        array $phpExtraArgs = []
+        array $phpExtraArgs = [],
+        Mutant $mutant = null
     ): array {
         $frameworkPath = $this->testFrameworkFinder->find();
-        $frameworkArgs = $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions);
+        $frameworkArgs = $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions, $mutant);
 
         if ($this->isBatchFile($frameworkPath)) {
             return array_merge([$frameworkPath], $frameworkArgs);

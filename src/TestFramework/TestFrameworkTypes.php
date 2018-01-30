@@ -42,9 +42,11 @@ final class TestFrameworkTypes
 {
     public const PHPUNIT = 'phpunit';
     public const PHPSPEC = 'phpspec';
+    public const CODECEPTION = 'codeception';
 
     public const TYPES = [
         self::PHPUNIT,
         self::PHPSPEC,
+        self::CODECEPTION
     ];
 }

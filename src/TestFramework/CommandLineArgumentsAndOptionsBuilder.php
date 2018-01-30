@@ -35,10 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Infection\Mutant\Mutant;
+
 /**
  * @internal
  */
 interface CommandLineArgumentsAndOptionsBuilder
 {
-    public function build(string $configPath, string $extraOptions): array;
+    public function build(string $configPath, string $extraOptions, Mutant $mutant = null): array;
 }

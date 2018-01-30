@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\CommandLine;
 
+use Infection\Mutant\Mutant;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 
 /**
@@ -42,7 +43,7 @@ use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
  */
 final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
-    public function build(string $configPath, string $extraOptions): array
+    public function build(string $configPath, string $extraOptions, Mutant $mutant = null): array
     {
         return array_filter([
             '--configuration',
