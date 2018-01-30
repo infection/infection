@@ -120,13 +120,13 @@ class InfectionConfigTest extends TestCase
     {
         $config = new InfectionConfig(json_decode('{}'));
 
-        $this->assertSame(sys_get_temp_dir(), $config->getTempDir());
+        $this->assertSame(sys_get_temp_dir(), $config->getTmpDir());
     }
 
     public function test_it_returns_temp_dir_from_config()
     {
         $config = new InfectionConfig(json_decode('{"tempDir": "/root/test"}'));
 
-        $this->assertSame('/root/test', $config->getTempDir());
+        $this->assertSame('/root/test', $config->getTmpDir());
     }
 }

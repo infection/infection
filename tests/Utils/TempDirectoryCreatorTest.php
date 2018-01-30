@@ -42,6 +42,6 @@ class TempDirectoryCreatorTest extends TestCase
 
         $fullPath = sprintf('%s/%s', $this->tempDir, TempDirectoryCreator::BASE_DIR_NAME);
 
-        $this->assertTrue(is_dir($fullPath));
+        $this->assertDirectoryExists($fullPath);
     }
 }

@@ -13,36 +13,36 @@ use Infection\Filesystem\Filesystem;
 
 class TempDirectoryCreator
 {
+    /**
+     * @private
+     */
     const BASE_DIR_NAME = 'infection';
 
     /**
      * @var Filesystem
      */
-    private $fs;
+    private $fileSystem;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $tempDirectoryPath;
+    private $path;
 
-    /**
-     * @param Filesystem $fs
-     */
-    public function __construct(Filesystem $fs)
+    public function __construct(Filesystem $fileSystem)
     {
-        $this->fs = $fs;
+        $this->fileSystem = $fileSystem;
     }
 
     public function createAndGet(string $tempDir): string
     {
-        if ($this->tempDirectoryPath === null) {
+        if ($this->path === null) {
             $path = sprintf('%s/%s', $tempDir, self::BASE_DIR_NAME);
 
-            $this->fs->mkdir($path, 0777);
+            $this->fileSystem->mkdir($path, 0777);
 
-            $this->tempDirectoryPath = $path;
+            $this->path = $path;
         }
 
-        return $this->tempDirectoryPath;
+        return $this->path;
     }
 }

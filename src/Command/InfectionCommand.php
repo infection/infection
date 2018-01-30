@@ -152,7 +152,7 @@ class InfectionCommand extends Command
         };
 
         $this->container['temp.dir'] = function (Container $c): string {
-            return $c['temp.dir.creator']->createAndGet($c['infection.config']->getTempDir());
+            return $c['temp.dir.creator']->createAndGet($c['infection.config']->getTmpDir());
         };
     }
 
