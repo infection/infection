@@ -11,7 +11,7 @@ namespace Infection\Utils;
 
 use Infection\Filesystem\Filesystem;
 
-class TempDirectoryCreator
+class TmpDirectoryCreator
 {
     /**
      * @private

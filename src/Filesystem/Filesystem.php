@@ -62,4 +62,44 @@ class Filesystem
             throw IOException::unableToWriteToFile($filename);
         }
     }
+
+    /**
+     * Removes files or directories.
+     *
+     * @param string|iterable $files A filename, an array of files, or a \Traversable instance to remove
+     *
+     * @throws IOException When removal fails
+     */
+    public function remove($files)
+    {
+        if ($files instanceof \Traversable) {
+            $files = iterator_to_array($files, false);
+        } elseif (!is_array($files)) {
+            $files = [$files];
+        }
+
+        $files = array_reverse($files);
+
+        foreach ($files as $file) {
+            if (is_link($file)) {
+                if (!@(unlink($file) || '\\' !== DIRECTORY_SEPARATOR || rmdir($file)) && file_exists($file)) {
+                    $error = error_get_last();
+
+                    throw IOException::unableToRemoveSymlink($file, $error['message']);
+                }
+            } elseif (is_dir($file)) {
+                $this->remove(new \FilesystemIterator($file, \FilesystemIterator::CURRENT_AS_PATHNAME | \FilesystemIterator::SKIP_DOTS));
+
+                if (!@rmdir($file) && file_exists($file)) {
+                    $error = error_get_last();
+
+                    throw IOException::unableToRemoveDirectory($file, $error['message']);
+                }
+            } elseif (!@unlink($file) && file_exists($file)) {
+                $error = error_get_last();
+
+                throw IOException::unableToRemoveFile($file, $error['message']);
+            }
+        }
+    }
 }

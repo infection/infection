@@ -151,8 +151,8 @@ class InfectionCommand extends Command
             return new InfectionConfig(json_decode($json));
         };
 
-        $this->container['temp.dir'] = function (Container $c): string {
-            return $c['temp.dir.creator']->createAndGet($c['infection.config']->getTmpDir());
+        $this->container['tmp.dir'] = function (Container $c): string {
+            return $c['tmp.dir.creator']->createAndGet($c['infection.config']->getTmpDir());
         };
     }
 

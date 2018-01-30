@@ -14,7 +14,7 @@ use Infection\Finder\Locator;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
-use Infection\Utils\TempDirectoryCreator;
+use Infection\Utils\TmpDirectoryCreator;
 use Mockery;
 use function Infection\Tests\normalizePath as p;
 
@@ -22,7 +22,15 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     const HASH = 'a1b2c3';
 
-    private $tempDir;
+    /**
+     * @var string
+     */
+    private $tmpDir;
+
+    /**
+     * @var Filesystem
+     */
+    private $fileSystem;
 
     private $pathToProject;
 
@@ -31,10 +39,12 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
      */
     private $builder;
 
+
     protected function setUp()
     {
-        $tempDirCreator = new TempDirectoryCreator(new Filesystem());
-        $this->tempDir = $tempDirCreator->createAndGet(
+        $this->fileSystem = new Filesystem();
+        $tmpDirCreator = new TmpDirectoryCreator($this->fileSystem);
+        $this->tmpDir = $tmpDirCreator->createAndGet(
             sys_get_temp_dir() . '/infection-test' . \microtime(true) . \random_int(100, 999)
         );
 
@@ -53,7 +63,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $replacer = new PathReplacer(new Locator([$this->pathToProject]));
 
         $this->builder = new InitialConfigBuilder(
-            $this->tempDir,
+            $this->tmpDir,
             file_get_contents($phpunitXmlPath),
             new XmlConfigurationHelper($replacer),
             $jUnitFilePath,
@@ -63,7 +73,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
     protected function tearDown()
     {
-        @\unlink($this->tempDir);
+        $this->fileSystem->remove($this->tmpDir);
     }
 
     public function test_it_replaces_test_suite_directory_wildcard()
@@ -112,7 +122,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $logEntries = $this->queryXpath($xml, '/phpunit/logging/log');
 
         $this->assertSame(2, $logEntries->length);
-        $this->assertSame($this->tempDir . '/coverage-xml', $logEntries[0]->getAttribute('target'));
+        $this->assertSame($this->tmpDir . '/coverage-xml', $logEntries[0]->getAttribute('target'));
         $this->assertSame('coverage-xml', $logEntries[0]->getAttribute('type'));
         $this->assertSame('junit', $logEntries[1]->getAttribute('type'));
     }

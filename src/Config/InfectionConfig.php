@@ -246,6 +246,6 @@ class InfectionConfig
 
     public function getTmpDir(): string
     {
-        return $this->config->tempDir ?? sys_get_temp_dir();
+        return $this->config->tmpDir ?? sys_get_temp_dir();
     }
 }

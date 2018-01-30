@@ -125,7 +125,7 @@ class InfectionConfigTest extends TestCase
 
     public function test_it_returns_temp_dir_from_config()
     {
-        $config = new InfectionConfig(json_decode('{"tempDir": "/root/test"}'));
+        $config = new InfectionConfig(json_decode('{"tmpDir": "/root/test"}'));
 
         $this->assertSame('/root/test', $config->getTmpDir());
     }
