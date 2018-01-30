@@ -4,4 +4,3 @@ infection-log.txt
 build/*
 !build/.gitkeep
 .php_cs.cache
-tests/e2e/error.log
