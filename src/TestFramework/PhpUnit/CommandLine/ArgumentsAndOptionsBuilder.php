@@ -9,11 +9,12 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\CommandLine;
 
+use Infection\Mutant\Mutant;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 
 class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
-    public function build(string $configPath, string $extraOptions): string
+    public function build(string $configPath, string $extraOptions, Mutant $mutant = null): string
     {
         $options = [];
 

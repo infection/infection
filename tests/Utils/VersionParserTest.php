@@ -45,6 +45,7 @@ class VersionParserTest extends TestCase
     public function versionProvider()
     {
         return [
+            ['Codeception 2.3.8', '2.3.8'],
             ['phpspec version 1.2.3', '1.2.3'],
             ['PHPUnit 1.2.3 by Sebastian Bergmann and contributors.', '1.2.3'],
             ['1.2.3', '1.2.3'],

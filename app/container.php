@@ -17,6 +17,7 @@ use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Filesystem\Filesystem;
 use Infection\Finder\Locator;
+use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\PhpUnit\Coverage\PhpUnitTestFileDataProvider;
@@ -69,6 +70,10 @@ $c['coverage.dir.phpunit'] = function (Container $c): string {
 
 $c['coverage.dir.phpspec'] = function (Container $c): string {
     return $c['temp.dir'] . '/' . CodeCoverageData::PHP_SPEC_COVERAGE_DIR;
+};
+
+$c['coverage.dir.codeception'] = function (Container $c): string {
+    return $c['temp.dir'] . '/' . CodeCoverageData::CODECEPTION_COVERAGE_DIR;
 };
 
 $c['locator'] = function (Container $c): Locator {

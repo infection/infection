@@ -70,7 +70,9 @@ final class ProcessBuilder
         $process = new Process(
             $this->testFrameworkAdapter->getExecutableCommandLine(
                 $this->testFrameworkAdapter->buildMutationConfigFile($mutant),
-                $testFrameworkExtraOptions
+                $testFrameworkExtraOptions,
+                true,
+                $mutant
             ),
             null,
             array_replace($_ENV, $_SERVER),

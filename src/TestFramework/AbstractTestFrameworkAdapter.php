@@ -74,12 +74,12 @@ abstract class AbstractTestFrameworkAdapter
      *
      * @return string
      */
-    public function getExecutableCommandLine(string $configPath, string $extraOptions, bool $includePhpArgs = true): string
+    public function getExecutableCommandLine(string $configPath, string $extraOptions, bool $includePhpArgs = true, Mutant $mutant = null): string
     {
         return sprintf(
             '%s %s',
             $this->phpExecutableFinder->find($includePhpArgs),
-            $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions)
+            $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions, $mutant)
         );
     }
 

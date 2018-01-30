@@ -11,6 +11,10 @@ namespace Infection\TestFramework;
 
 use Infection\Config\InfectionConfig;
 use Infection\Finder\TestFrameworkExecutableFinder;
+use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
+use Infection\TestFramework\Codeception\Config\Builder\InitialConfigBuilder as CodeceptionInitialConfigBuilder;
+use Infection\TestFramework\Codeception\Config\Builder\MutationConfigBuilder as CodeceptionMutationConfigBuilder;
+use Infection\TestFramework\Codeception\CommandLine\ArgumentsAndOptionsBuilder as CodeceptionArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder as PhpSpecInitialConfigBuilder;
@@ -105,10 +109,22 @@ final class Factory
             );
         }
 
+        if ($adapterName === TestFrameworkTypes::CODECEPTION) {
+            $codeceptionConfigPath = $this->configLocator->locate(TestFrameworkTypes::CODECEPTION);
+
+            return new CodeceptionAdapter(
+                new TestFrameworkExecutableFinder(CodeceptionAdapter::EXECUTABLE),
+                new CodeceptionInitialConfigBuilder($codeceptionConfigPath),
+                new CodeceptionMutationConfigBuilder($this->tempDir, $this->projectDir, $codeceptionConfigPath),
+                new CodeceptionArgumentsAndOptionsBuilder($this->tempDir),
+                $this->versionParser
+            );
+        }
+
         throw new \InvalidArgumentException(
             sprintf(
                 'Invalid name of test framework. Available names are: %s',
-                implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC])
+                implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC, TestFrameworkTypes::CODECEPTION])
             )
         );
     }
