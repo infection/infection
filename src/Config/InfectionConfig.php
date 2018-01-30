@@ -209,9 +209,14 @@ class InfectionConfig
     /**
      * @return string|null
      */
-    public function getTextFileLogPath()
+    public function getLogPathInfoFor(string $log)
     {
-        return $this->config->logs->text ?? null;
+        return $this->config->logs->$log ?? null;
+    }
+
+    public function getLogsTypes(): array
+    {
+        return (array) $this->config->logs ?? [];
     }
 
     private function getExcludedDirsByPattern(string $originalExcludedDir)

@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+cd tests/Fixtures/e2e
+
+failure="false"
+
+if [ -f error.log ]
+then
+    :> error.log
+fi
+
+touch error.log
+
+for d in  */
+do
+    cd "$d"
+    if [ -f composer.json ] || [ -f composer.lock ]
+    then
+        composer install > /dev/null 2>&1
+    fi
+
+    if [ -f "run_tests.bash" ]
+    then
+        output="$(bash run_test.bash)"
+    else
+        output="$(bash ../standard_script.bash)"
+    fi
+
+    if [ $? != 0 ]
+    then
+        failure="true"
+        echo "$d" >> ../error.log
+        echo "$output" >> ../error.log
+        echo "" >> ../error.log
+    fi
+    cd ..
+done
+
+if [ $failure = "true" ]
+then
+    echo "One of the e2e tests failed, check the logs";
+    cat error.log
+    exit 1
+fi
+
+echo "Success"
+exit 0

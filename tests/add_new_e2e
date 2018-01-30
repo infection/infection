@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+echo What is the directory name of you new test
+
+read dirname
+
+if [ -d tests/Fixtures/e2e/"$dirname" ]
+then
+    echo A directory already exists with the name "$dirname"
+    exit 1
+fi
+
+cd tests/Fixtures/e2e
+mkdir $dirname
+
+cp -r Example_Test/src "$dirname"/src
+cp -r Example_Test/tests $dirname/tests
+cp  Example_Test/composer.json $dirname/composer.json
+cp  Example_Test/expected-output.txt $dirname/expected-output.txt
+cp  Example_Test/infection.json $dirname/infection.json
+cp  Example_Test/phpunit.xml $dirname/phpunit.xml
+cp  Example_Test/README.md $dirname/README.md
+
+echo created the base for a new  e2e test name $dirname
+
+
+
+

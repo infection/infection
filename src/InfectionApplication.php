@@ -20,11 +20,11 @@ use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\Mutator;
 use Infection\Process\Builder\ProcessBuilder;
+use Infection\Process\Listener\FileLoggerSubscriber\BaseFileLoggerSubscriber;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationTestingConsoleLoggerSubscriber;
-use Infection\Process\Listener\TextFileLoggerSubscriber;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
@@ -184,7 +184,7 @@ ASCII;
         $eventDispatcher->addSubscriber(new MutationGeneratingConsoleLoggerSubscriber($this->output, $mutationGeneratingProgressBar));
         $eventDispatcher->addSubscriber(new MutantCreatingConsoleLoggerSubscriber($this->output, $mutantCreatingProgressBar));
         $eventDispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber($this->output, $this->getOutputFormatter(), $metricsCalculator, $this->get('diff.colorizer'), $this->input->getOption('show-mutations')));
-        $eventDispatcher->addSubscriber(new TextFileLoggerSubscriber($this->get('infection.config'), $metricsCalculator, $this->get('filesystem'), (int) $this->input->getOption('log-verbosity')));
+        $eventDispatcher->addSubscriber(new BaseFileLoggerSubscriber($this->get('infection.config'), $metricsCalculator, $this->get('filesystem'), (int) $this->input->getOption('log-verbosity')));
     }
 
     private function getCodeCoverageData(string $testFrameworkKey): CodeCoverageData

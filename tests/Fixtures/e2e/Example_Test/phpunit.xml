@@ -11,9 +11,8 @@
          syntaxCheck="false"
 >
     <testsuites>
-        <testsuite name="Application Test Suite">
+        <testsuite name="Test Suite">
             <directory>./tests/</directory>
-            <exclude>./tests/Fixtures</exclude>
         </testsuite>
     </testsuites>
 
@@ -22,8 +21,4 @@
             <directory>./src/</directory>
         </whitelist>
     </filter>
-
-    <listeners>
-        <listener class="\Mockery\Adapter\Phpunit\TestListener"></listener>
-    </listeners>
 </phpunit>

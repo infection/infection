@@ -1,0 +1,32 @@
+Total: 4
+Killed mutants:
+===============
+
+
+Mutator: FalseValue
+Line 15
+
+Mutator: Identical
+Line 17
+
+Mutator: PublicVisibility
+Line 15
+
+Errors mutants:
+===============
+
+
+Escaped mutants:
+================
+
+
+Mutator: FalseValue
+Line 17
+
+Timed Out mutants:
+==================
+
+
+Not Covered mutants:
+====================
+
