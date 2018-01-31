@@ -58,7 +58,7 @@ ASCII;
             new Command\InfectionCommand(),
         ]);
 
-        if ('phar:' === substr(__FILE__, 0, 5)) {
+        if (0 === strpos(__FILE__, 'phar:')) {
             $commands[] = new Command\SelfUpdateCommand();
         }
 
