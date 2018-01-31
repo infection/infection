@@ -23,7 +23,7 @@ class TmpDirectoryCreatorTest extends TestCase
     /**
      * @var string
      */
-    private $tmpDir;
+    private $workspace;
 
     /**
      * @var Filesystem
@@ -34,18 +34,16 @@ class TmpDirectoryCreatorTest extends TestCase
     {
         $this->fileSystem = new Filesystem();
         $this->creator = new TmpDirectoryCreator($this->fileSystem);
-        $this->tmpDir = sprintf('%s/%s', sys_get_temp_dir(), TmpDirectoryCreator::BASE_DIR_NAME);
+        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
     }
 
     protected function tearDown()
     {
-        $this->fileSystem->remove($this->tmpDir);
+        $this->fileSystem->remove($this->workspace);
     }
 
     public function test_it_creates_and_return_path()
     {
-        $this->creator->createAndGet($this->tmpDir);
-
-        $this->assertDirectoryExists($this->tmpDir);
+        $this->assertDirectoryExists($this->creator->createAndGet($this->workspace));
     }
 }

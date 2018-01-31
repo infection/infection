@@ -36,7 +36,7 @@ class FilesystemTest extends TestCase
 
     protected function tearDown()
     {
-        @unlink($this->workspace);
+        $this->filesystem->remove($this->workspace);
         umask($this->umask);
     }
 

@@ -39,14 +39,17 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
      */
     private $builder;
 
+    /**
+     * @var string
+     */
+    private $workspace;
 
     protected function setUp()
     {
+        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
+
         $this->fileSystem = new Filesystem();
-        $tmpDirCreator = new TmpDirectoryCreator($this->fileSystem);
-        $this->tmpDir = $tmpDirCreator->createAndGet(
-            sys_get_temp_dir() . '/infection-test' . \microtime(true) . \random_int(100, 999)
-        );
+        $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
 
         $this->pathToProject = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
 
@@ -73,7 +76,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
     protected function tearDown()
     {
-        $this->fileSystem->remove($this->tmpDir);
+        $this->fileSystem->remove($this->workspace);
     }
 
     public function test_it_replaces_test_suite_directory_wildcard()
@@ -130,7 +133,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     public function test_it_creates_coverage_filter_whitelist_node_if_does_not_exist()
     {
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit_without_coverage_whitelist.xml';
-        $configuration = $this->createConfigBuilder($phpunitXmlPath);
+        $this->createConfigBuilder($phpunitXmlPath);
 
         $configurationPath = $this->builder->build();
 

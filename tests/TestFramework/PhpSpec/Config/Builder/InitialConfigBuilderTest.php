@@ -26,16 +26,22 @@ class InitialConfigBuilderTest extends TestCase
      */
     private $tmpDir;
 
+    /**
+     * @var string
+     */
+    private $workspace;
+
     protected function setUp()
     {
+        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
         $this->fileSystem = new Filesystem();
-        $tmpDirCreator = new TmpDirectoryCreator($this->fileSystem);
-        $this->tmpDir = $tmpDirCreator->createAndGet(sys_get_temp_dir() . '/infection-test');
+
+        $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
     }
 
     protected function tearDown()
     {
-        $this->fileSystem->remove($this->tmpDir);
+        $this->fileSystem->remove($this->workspace);
     }
 
     public function test_it_builds_path_to_initial_config_file()
