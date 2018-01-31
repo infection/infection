@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
-php ../../../../bin/infection
+if [[ $PHPDBG=1 ]]
+then
+    phpdbg -qrr ../../../../bin/infection
+else
+    php ../../../../bin/infection
+fi
+
 if [ $? != 0 ]
 then
     echo "error - fault while running infection"
