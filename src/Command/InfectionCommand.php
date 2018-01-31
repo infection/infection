@@ -9,34 +9,53 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Infection\Console\Application;
+use Infection\Console\Exception\InfectionException;
+use Infection\Console\Exception\InvalidOptionException;
 use Infection\Console\LogVerbosity;
-use Infection\InfectionApplication;
+use Infection\Console\OutputFormatter\DotFormatter;
+use Infection\Console\OutputFormatter\OutputFormatter;
+use Infection\Console\OutputFormatter\ProgressFormatter;
+use Infection\EventDispatcher\EventDispatcher;
 use Infection\Config\InfectionConfig;
-use Pimple\Container;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Infection\Mutant\Exception\MsiCalculationException;
+use Infection\Mutant\Generator\MutationsGenerator;
+use Infection\Mutant\MetricsCalculator;
+use Infection\Mutator\Mutator;
+use Infection\Process\Builder\ProcessBuilder;
+use Infection\Process\Listener;
+use Infection\Process\Runner\InitialTestsRunner;
+use Infection\Process\Runner\MutationTestingRunner;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
+use Infection\TestFramework\TestFrameworkExtraOptions;
+use Infection\TestFramework\TestFrameworkTypes;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Process\Process;
 
-class InfectionCommand extends Command
+/**
+ * @method Application getApplication()
+ */
+class InfectionCommand extends BaseCommand
 {
-    /**
-     * @var Container
-     */
-    private $container;
+    const CI_FLAG_ERROR = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
 
-    public function __construct(Container $container)
-    {
-        parent::__construct();
-        $this->container = $container;
-    }
+    /**
+     * @var SymfonyStyle
+     */
+    private $io;
 
     protected function configure()
     {
-        $this
-            ->setName('run')
+        $this->setName('run')
             ->setDescription('Runs the mutation testing.')
             ->addOption(
                 'test-framework',
@@ -120,40 +139,226 @@ class InfectionCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->buildDynamicDependencies($input);
+        try {
+            /** @var EventDispatcher $eventDispatcher */
+            $eventDispatcher = $this->getContainer()->get('dispatcher');
+            $testFrameworkKey = $input->getOption('test-framework');
+            $adapter = $this->getContainer()->get('test.framework.factory')->create($testFrameworkKey);
 
-        return (new InfectionApplication($this->container, $input, $output))->run();
-    }
+            $metricsCalculator = new MetricsCalculator();
 
-    private function buildDynamicDependencies(InputInterface $input)
-    {
-        $this->container['infection.config'] = function (Container $c) use ($input): InfectionConfig {
-            try {
-                $configPaths = [];
-                $customConfigPath = $input->getOption('configuration');
+            $this->addSubscribers($eventDispatcher, $metricsCalculator, $adapter);
 
-                if ($customConfigPath) {
-                    $configPaths[] = $customConfigPath;
-                }
+            $processBuilder = new ProcessBuilder($adapter, $this->getContainer()->get('infection.config')->getProcessTimeout());
+            $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);
 
-                array_push(
-                    $configPaths,
-                    InfectionConfig::CONFIG_FILE_NAME,
-                    InfectionConfig::CONFIG_FILE_NAME . '.dist'
-                );
+            $initialTestsRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
+            $initialTestSuitProcess = $initialTestsRunner->run($testFrameworkOptions->getForInitialProcess());
 
-                $infectionConfigFile = $c['locator']->locateAnyOf($configPaths);
-                $json = file_get_contents($infectionConfigFile);
-            } catch (\Exception $e) {
-                $json = '{}';
+            if (!$initialTestSuitProcess->isSuccessful()) {
+                $this->logInitialTestsDoNotPass($initialTestSuitProcess, $testFrameworkKey);
+
+                return 1;
             }
 
-            return new InfectionConfig(json_decode($json));
-        };
+            $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
+            $mutationsGenerator = new MutationsGenerator(
+                $this->getContainer()->get('src.dirs'),
+                $this->getContainer()->get('exclude.paths'),
+                $codeCoverageData,
+                $this->getDefaultMutators(),
+                $this->parseMutators($input->getOption('mutators')),
+                $eventDispatcher,
+                $this->getContainer()->get('parser')
+            );
 
-        $this->container['tmp.dir'] = function (Container $c): string {
-            return $c['tmp.dir.creator']->createAndGet($c['infection.config']->getTmpDir());
-        };
+            $mutations = $mutationsGenerator->generate($input->getOption('only-covered'), $input->getOption('filter'));
+
+            $mutationTestingRunner = new MutationTestingRunner(
+                $processBuilder,
+                $this->getContainer()->get('parallel.process.runner'),
+                $this->getContainer()->get('mutant.creator'),
+                $eventDispatcher,
+                $mutations
+            );
+
+            $mutationTestingRunner->run(
+                (int) $this->input->getOption('threads'),
+                $codeCoverageData,
+                $testFrameworkOptions->getForMutantProcess()
+            );
+
+            if ($this->hasBadMsi($metricsCalculator)) {
+                $this->io->error($this->getBadMsiErrorMessage($metricsCalculator));
+
+                return 1;
+            }
+
+            if ($this->hasBadCoveredMsi($metricsCalculator)) {
+                $this->io->error($this->getBadCoveredMsiErrorMessage($metricsCalculator));
+
+                return 1;
+            }
+
+            return 0;
+        } catch (InfectionException $e) {
+            $this->io->error($e->getMessage());
+
+            if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
+                $this->io->error($e->getTraceAsString());
+            }
+
+            return 1;
+        }
+    }
+
+    private function getOutputFormatter(): OutputFormatter
+    {
+        if ($this->input->getOption('formatter') === 'progress') {
+            return new ProgressFormatter(new ProgressBar($this->output));
+        }
+
+        if ($this->input->getOption('formatter') === 'dot') {
+            return new DotFormatter($this->output);
+        }
+
+        throw new \InvalidArgumentException('Incorrect formatter. Possible values: dot, progress');
+    }
+
+    private function addSubscribers(
+        EventDispatcher $eventDispatcher,
+        MetricsCalculator $metricsCalculator,
+        AbstractTestFrameworkAdapter $testFrameworkAdapter
+    ) {
+        $initialTestsProgressBar = new ProgressBar($this->output);
+        $initialTestsProgressBar->setFormat('verbose');
+
+        $mutationGeneratingProgressBar = new ProgressBar($this->output);
+        $mutationGeneratingProgressBar->setFormat('Processing source code files: %current%/%max%');
+
+        $mutantCreatingProgressBar = new ProgressBar($this->output);
+        $mutantCreatingProgressBar->setFormat('Creating mutated files and processes: %current%/%max%');
+
+        $eventDispatcher->addSubscriber(new Listener\InitialTestsConsoleLoggerSubscriber($this->output, $initialTestsProgressBar, $testFrameworkAdapter));
+        $eventDispatcher->addSubscriber(new Listener\MutationGeneratingConsoleLoggerSubscriber($this->output, $mutationGeneratingProgressBar));
+        $eventDispatcher->addSubscriber(new Listener\MutantCreatingConsoleLoggerSubscriber($this->output, $mutantCreatingProgressBar));
+        $eventDispatcher->addSubscriber(new Listener\MutationTestingConsoleLoggerSubscriber($this->output, $this->getOutputFormatter(), $metricsCalculator, $this->getContainer()->get('diff.colorizer'), $this->input->getOption('show-mutations')));
+        $eventDispatcher->addSubscriber(new Listener\FileLoggerSubscriber\BaseFileLoggerSubscriber($this->getContainer()->get('infection.config'), $metricsCalculator, $this->getContainer()->get('filesystem'), (int) $this->input->getOption('log-verbosity')));
+    }
+
+    private function getCodeCoverageData(string $testFrameworkKey): CodeCoverageData
+    {
+        $coverageDir = $this->getContainer()->get(sprintf('coverage.dir.%s', $testFrameworkKey));
+        $testFileDataProviderServiceId = sprintf('test.file.data.provider.%s', $testFrameworkKey);
+        $testFileDataProviderService = $this->getContainer()->has($testFileDataProviderServiceId)
+            ? $this->getContainer()->get($testFileDataProviderServiceId)
+            : null;
+
+        return new CodeCoverageData($coverageDir, new CoverageXmlParser($coverageDir), $testFrameworkKey, $testFileDataProviderService);
+    }
+
+    private function logInitialTestsDoNotPass(Process $initialTestSuitProcess, string $testFrameworkKey)
+    {
+        $lines = [
+            'Project tests must be in a passing state before running Infection.',
+            sprintf(
+                '%s reported an exit code of %d.',
+                ucfirst($testFrameworkKey),
+                $initialTestSuitProcess->getExitCode()
+            ),
+            sprintf(
+                'Refer to the %s\'s output below:',
+                $testFrameworkKey
+            ),
+        ];
+
+        if ($stdOut = $initialTestSuitProcess->getOutput()) {
+            $lines[] = 'STDOUT:';
+            $lines[] = $stdOut;
+        }
+
+        if ($stdError = $initialTestSuitProcess->getErrorOutput()) {
+            $lines[] = 'STDERR:';
+            $lines[] = $stdError;
+        }
+
+        $this->io->error($lines);
+    }
+
+    private function hasBadMsi(MetricsCalculator $metricsCalculator): bool
+    {
+        $minMsi = (float) $this->input->getOption('min-msi');
+
+        return $minMsi && ($metricsCalculator->getMutationScoreIndicator() < $minMsi);
+    }
+
+    private function hasBadCoveredMsi(MetricsCalculator $metricsCalculator): bool
+    {
+        $minCoveredMsi = (float) $this->input->getOption('min-covered-msi');
+
+        return $minCoveredMsi && ($metricsCalculator->getCoveredCodeMutationScoreIndicator() < $minCoveredMsi);
+    }
+
+    private function getBadMsiErrorMessage(MetricsCalculator $metricsCalculator): string
+    {
+        if ($minMsi = (float) $this->input->getOption('min-msi')) {
+            return sprintf(
+                self::CI_FLAG_ERROR,
+                'MSI',
+                $minMsi,
+                $metricsCalculator->getMutationScoreIndicator()
+            );
+        }
+
+        throw MsiCalculationException::create('min-msi');
+    }
+
+    private function getBadCoveredMsiErrorMessage(MetricsCalculator $metricsCalculator): string
+    {
+        if ($minCoveredMsi = (float) $this->input->getOption('min-covered-msi')) {
+            return sprintf(
+                self::CI_FLAG_ERROR,
+                'Covered Code MSI',
+                $minCoveredMsi,
+                $metricsCalculator->getCoveredCodeMutationScoreIndicator()
+            );
+        }
+
+        throw MsiCalculationException::create('min-covered-msi');
+    }
+
+    private function parseMutators(string $mutators = null): array
+    {
+        if ($mutators === null) {
+            return [];
+        }
+
+        $trimmedMutators = trim($mutators);
+
+        if ($trimmedMutators === '') {
+            throw InvalidOptionException::withMessage('The "--mutators" option requires a value.');
+        }
+
+        return explode(',', $mutators);
+    }
+
+    private function getDefaultMutators(): array
+    {
+        return array_map(
+            function (string $class): Mutator {
+                return $this->getContainer()->get($class);
+            },
+            InfectionConfig::DEFAULT_MUTATORS
+        );
+    }
+
+    private function getTestFrameworkExtraOptions(string $testFrameworkKey): TestFrameworkExtraOptions
+    {
+        $extraOptions = $this->input->getOption('test-framework-options');
+
+        return TestFrameworkTypes::PHPUNIT === $testFrameworkKey
+            ? new PhpUnitExtraOptions($extraOptions)
+            : new PhpSpecExtraOptions($extraOptions);
     }
 
     /**
@@ -162,19 +367,18 @@ class InfectionCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      *
-     * @throws \Exception
+     * @throws \RuntimeException
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        $this->setOutputFormatterStyles($output);
+        parent::initialize($input, $output);
 
         $customConfigPath = $input->getOption('configuration');
         $configExists = $customConfigPath && file_exists($customConfigPath);
 
         if (!$configExists) {
-            $configExists =
-                file_exists(InfectionConfig::CONFIG_FILE_NAME) ||
-                file_exists(InfectionConfig::CONFIG_FILE_NAME . '.dist');
+            $configExists = file_exists(InfectionConfig::CONFIG_FILE_NAME)
+                || file_exists(InfectionConfig::CONFIG_FILE_NAME . '.dist');
         }
 
         if (!$configExists) {
@@ -187,25 +391,10 @@ class InfectionCommand extends Command
             $result = $configureCommand->run(new ArrayInput($args), $output);
 
             if ($result !== 0) {
-                throw new \Exception('Configuration aborted');
+                throw new \RuntimeException('Configuration aborted');
             }
         }
-    }
 
-    private function setOutputFormatterStyles(OutputInterface $output)
-    {
-        $output->getFormatter()->setStyle('with-error', new OutputFormatterStyle('green'));
-        $output->getFormatter()->setStyle('uncovered', new OutputFormatterStyle('blue', null, ['bold']));
-        $output->getFormatter()->setStyle('timeout', new OutputFormatterStyle('yellow'));
-        $output->getFormatter()->setStyle('escaped', new OutputFormatterStyle('red', null, ['bold']));
-        $output->getFormatter()->setStyle('killed', new OutputFormatterStyle('green'));
-        $output->getFormatter()->setStyle('code', new OutputFormatterStyle('white'));
-
-        $output->getFormatter()->setStyle('diff-add', new OutputFormatterStyle('green'));
-        $output->getFormatter()->setStyle('diff-del', new OutputFormatterStyle('red'));
-
-        $output->getFormatter()->setStyle('low', new OutputFormatterStyle('red', null, ['bold']));
-        $output->getFormatter()->setStyle('medium', new OutputFormatterStyle('yellow', null, ['bold']));
-        $output->getFormatter()->setStyle('high', new OutputFormatterStyle('green', null, ['bold']));
+        $this->io = new SymfonyStyle($input, $output);
     }
 }
