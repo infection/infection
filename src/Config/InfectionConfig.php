@@ -248,4 +248,9 @@ class InfectionConfig
 
         return $excludedDirs;
     }
+
+    public function getTmpDir(): string
+    {
+        return $this->config->tmpDir ?? sys_get_temp_dir();
+    }
 }

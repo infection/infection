@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 use Pimple\Container;
 use Symfony\Component\Console\Application;
-use Infection\Utils\TempDirectoryCreator;
+use Infection\Utils\TmpDirectoryCreator;
 use Infection\TestFramework\Factory;
 use Infection\Differ\Differ;
 use Infection\Mutant\MutantCreator;
@@ -51,24 +51,20 @@ $c['phpunit.config.dir'] = function (Container $c): string {
     return $c['infection.config']->getPhpUnitConfigDir();
 };
 
-$c['temp.dir'] = function (Container $c): string {
-    return $c['temp.dir.creator']->createAndGet();
-};
-
 $c['filesystem'] = function (): Filesystem {
     return new Filesystem();
 };
 
-$c['temp.dir.creator'] = function (): TempDirectoryCreator {
-    return new TempDirectoryCreator();
+$c['tmp.dir.creator'] = function (Container $c): TmpDirectoryCreator {
+    return new TmpDirectoryCreator($c['filesystem']);
 };
 
 $c['coverage.dir.phpunit'] = function (Container $c): string {
-    return $c['temp.dir'] . '/' . CodeCoverageData::PHP_UNIT_COVERAGE_DIR;
+    return $c['tmp.dir'] . '/' . CodeCoverageData::PHP_UNIT_COVERAGE_DIR;
 };
 
 $c['coverage.dir.phpspec'] = function (Container $c): string {
-    return $c['temp.dir'] . '/' . CodeCoverageData::PHP_SPEC_COVERAGE_DIR;
+    return $c['tmp.dir'] . '/' . CodeCoverageData::PHP_SPEC_COVERAGE_DIR;
 };
 
 $c['locator'] = function (Container $c): Locator {
@@ -80,7 +76,7 @@ $c['path.replacer'] = function (Container $c): PathReplacer {
 };
 
 $c['test.framework.factory'] = function (Container $c): Factory {
-    return new Factory($c['temp.dir'], $c['project.dir'], $c['testframework.config.locator'], $c['xml.configuration.helper'], $c['phpunit.junit.file.path'], $c['infection.config'], $c['version.parser']);
+    return new Factory($c['tmp.dir'], $c['project.dir'], $c['testframework.config.locator'], $c['xml.configuration.helper'], $c['phpunit.junit.file.path'], $c['infection.config'], $c['version.parser']);
 };
 
 $c['xml.configuration.helper'] = function (Container $c): XmlConfigurationHelper {
@@ -88,7 +84,7 @@ $c['xml.configuration.helper'] = function (Container $c): XmlConfigurationHelper
 };
 
 $c['mutant.creator'] = function (Container $c): MutantCreator {
-    return new MutantCreator($c['temp.dir'], $c['differ'], $c['parser'], $c['pretty.printer']);
+    return new MutantCreator($c['tmp.dir'], $c['differ'], $c['parser'], $c['pretty.printer']);
 };
 
 $c['differ'] = function (): Differ {
@@ -114,7 +110,7 @@ $c['diff.colorizer'] = function (): DiffColorizer {
 };
 
 $c['phpunit.junit.file.path'] = function (Container $c): string {
-    return $c['temp.dir'] . '/' . PhpUnitAdapter::JUNIT_FILE_NAME;
+    return $c['tmp.dir'] . '/' . PhpUnitAdapter::JUNIT_FILE_NAME;
 };
 
 $c['test.file.data.provider.phpunit'] = function (Container $c): TestFileDataProvider {

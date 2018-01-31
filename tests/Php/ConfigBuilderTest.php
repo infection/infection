@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Php;
 
+use Infection\Filesystem\Filesystem;
 use Infection\Php\ConfigBuilder;
 use PHPUnit\Framework\TestCase;
 
@@ -45,7 +46,7 @@ class ConfigBuilderTest extends TestCase
 
     protected function tearDown()
     {
-        @unlink($this->workspace);
+        (new Filesystem())->remove($this->workspace);
     }
 
     public function test_it_builds_return_existing_path()

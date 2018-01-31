@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\ExecutableFinder;
 
+use Infection\Filesystem\Filesystem;
 use Infection\Php\ConfigBuilder;
 use Infection\Process\ExecutableFinder\PhpExecutableFinder;
 use PHPUnit\Framework\TestCase;
@@ -43,6 +44,6 @@ class PhpExecutableFinderTest extends TestCase
 
     public function tearDown()
     {
-        @unlink($this->workspace);
+        (new Filesystem())->remove($this->workspace);
     }
 }
