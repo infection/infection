@@ -15,5 +15,4 @@ class InfectionException extends \Exception
     {
         return new self('Configuration aborted');
     }
-
 }
