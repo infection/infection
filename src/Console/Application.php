@@ -35,11 +35,11 @@ ASCII;
      */
     private $container;
 
-    public function __construct(Container $container)
+    public function __construct(Container $container, string $name = self::NAME, string $version = self::VERSION)
     {
         $this->container = $container;
 
-        parent::__construct(self::NAME, self::VERSION);
+        parent::__construct($name, $version);
     }
 
     public function doRun(InputInterface $input, OutputInterface $output)
