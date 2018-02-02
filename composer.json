@@ -39,7 +39,7 @@
         "nikic/php-parser": "^3.0",
         "padraic/phar-updater": "^1.0.4",
         "pimple/pimple": "^3.2",
-        "sebastian/diff": "^1.4|^2.0",
+        "sebastian/diff": "^1.4 || ^2.0 || ^3.0",
         "symfony/console": "^3.2 || ^4.0",
         "symfony/finder": "^3.2 || ^4.0",
         "symfony/process": "^3.2 || ^4.0",
