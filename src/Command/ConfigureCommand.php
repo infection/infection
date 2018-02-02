@@ -27,16 +27,24 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ConfigureCommand extends Command
 {
-    /**
-     * @var ConsoleHelper
-     */
-    private $consoleHelper;
+    protected function configure()
+    {
+        $this->setName('configure')
+            ->setDescription('Create Infection config')
+            ->addOption(
+                'test-framework',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Name of the Test framework to use (' . implode(', ', TestFrameworkTypes::TYPES) . ')',
+                TestFrameworkTypes::PHPUNIT
+            );
+    }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->consoleHelper = new ConsoleHelper($this->getHelper('formatter'));
+        $consoleHelper = new ConsoleHelper($this->getHelper('formatter'));
 
-        $this->consoleHelper->writeSection($output, 'Welcome to the Infection config generator');
+        $consoleHelper->writeSection($output, 'Welcome to the Infection config generator');
 
         $output->writeln([
             '',
@@ -47,7 +55,9 @@ class ConfigureCommand extends Command
         $dirsInCurrentDir = array_filter(glob('*'), 'is_dir');
         $testFrameworkConfigLocator = new TestFrameworkConfigLocator('.');
 
-        $sourceDirsProvider = new SourceDirsProvider($this->consoleHelper, $this->getQuestionHelper());
+        $questionHelper = $this->getHelper('question');
+
+        $sourceDirsProvider = new SourceDirsProvider($consoleHelper, $questionHelper);
         $sourceDirs = $sourceDirsProvider->get($input, $output, $dirsInCurrentDir);
 
         if (empty($sourceDirs)) {
@@ -56,20 +66,20 @@ class ConfigureCommand extends Command
             return 1;
         }
 
-        $excludeDirsProvider = new ExcludeDirsProvider($this->consoleHelper, $this->getQuestionHelper());
+        $excludeDirsProvider = new ExcludeDirsProvider($consoleHelper, $questionHelper);
         $excludedDirs = $excludeDirsProvider->get($input, $output, $dirsInCurrentDir, $sourceDirs);
 
-        $phpUnitConfigPathProvider = new TestFrameworkConfigPathProvider($testFrameworkConfigLocator, $this->consoleHelper, $this->getQuestionHelper());
+        $phpUnitConfigPathProvider = new TestFrameworkConfigPathProvider($testFrameworkConfigLocator, $consoleHelper, $questionHelper);
         $phpUnitConfigPath = $phpUnitConfigPathProvider->get($input, $output, $dirsInCurrentDir, $input->getOption('test-framework'));
 
         $phpUnitExecutableFinder = new TestFrameworkExecutableFinder(TestFrameworkTypes::PHPUNIT);
-        $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $this->consoleHelper, $this->getQuestionHelper());
+        $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $consoleHelper, $questionHelper);
         $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($input, $output);
 
-        $timeoutProvider = new TimeoutProvider($this->consoleHelper, $this->getQuestionHelper());
+        $timeoutProvider = new TimeoutProvider($consoleHelper, $questionHelper);
         $timeout = $timeoutProvider->get($input, $output);
 
-        $textLogFileProvider = new TextLogFileProvider($this->consoleHelper, $this->getQuestionHelper());
+        $textLogFileProvider = new TextLogFileProvider($consoleHelper, $questionHelper);
         $textLogFilePath = $textLogFileProvider->get($input, $output, $dirsInCurrentDir);
 
         $this->saveConfig($sourceDirs, $excludedDirs, $timeout, $phpUnitConfigPath, $phpUnitCustomExecutablePath, $textLogFilePath);
@@ -86,23 +96,14 @@ class ConfigureCommand extends Command
         return 0;
     }
 
-    protected function configure()
-    {
-        $this
-            ->setName('configure')
-            ->setDescription('Configure ....')
-            ->addOption(
-                'test-framework',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Name of the Test framework to use (phpunit, phpspec)',
-                'phpunit'
-            )
-        ;
-    }
-
-    private function saveConfig(array $sourceDirs, array $excludedDirs, int $timeout, string $phpUnitConfigPath = null, string $phpUnitCustomExecutablePath = null, string $textLogFilePath = null)
-    {
+    private function saveConfig(
+        array $sourceDirs,
+        array $excludedDirs,
+        int $timeout,
+        string $phpUnitConfigPath = null,
+        string $phpUnitCustomExecutablePath = null,
+        string $textLogFilePath = null
+    ) {
         $configObject = new \stdClass();
 
         $configObject->timeout = $timeout;
@@ -134,13 +135,6 @@ class ConfigureCommand extends Command
             $configObject->logs->text = $textLogFilePath;
         }
 
-        $config = json_encode($configObject, JSON_PRETTY_PRINT);
-
-        file_put_contents(InfectionConfig::CONFIG_FILE_NAME . '.dist', $config);
-    }
-
-    private function getQuestionHelper()
-    {
-        return $this->getHelper('question');
+        file_put_contents(InfectionConfig::CONFIG_FILE_NAME . '.dist', json_encode($configObject, JSON_PRETTY_PRINT));
     }
 }

@@ -13,4 +13,9 @@ final class TestFrameworkTypes
 {
     const PHPUNIT = 'phpunit';
     const PHPSPEC = 'phpspec';
+
+    const TYPES = [
+        self::PHPUNIT,
+        self::PHPSPEC,
+    ];
 }

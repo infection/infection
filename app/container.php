@@ -8,7 +8,6 @@
 declare(strict_types=1);
 
 use Pimple\Container;
-use Symfony\Component\Console\Application;
 use Infection\Utils\TmpDirectoryCreator;
 use Infection\TestFramework\Factory;
 use Infection\Differ\Differ;
@@ -26,7 +25,6 @@ use Infection\Differ\DiffColorizer;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\Config\InfectionConfig;
 use Infection\Utils\VersionParser;
-use Infection\Command;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
@@ -149,18 +147,5 @@ function registerMutators(array $mutators, Container $container)
 }
 
 registerMutators(InfectionConfig::DEFAULT_MUTATORS, $c);
-
-$c['application'] = function (Container $container): Application {
-    $application = new Application(
-        'Infection - PHP Mutation Testing Framework',
-        '@package_version@'
-    );
-
-    $application->add(new Command\ConfigureCommand());
-    $application->add(new Command\SelfUpdateCommand());
-    $application->add(new Command\InfectionCommand($container));
-
-    return $application;
-};
 
 return $c;

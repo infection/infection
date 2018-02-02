@@ -7,6 +7,9 @@ if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
 
 require __DIR__ . '/../app/bootstrap.php';
 
+use Infection\Console\Application;
+use Symfony\Component\Console\Input\ArgvInput;
+
 function prepareArgv()
 {
     $argv = $_SERVER['argv'];
@@ -27,8 +30,7 @@ function prepareArgv()
     return $argv;
 }
 
+$input = new ArgvInput(prepareArgv());
 
-$input = new \Symfony\Component\Console\Input\ArgvInput(prepareArgv());
-$application = $container['application'];
-
+$application = new Application($container);
 $application->run($input);
