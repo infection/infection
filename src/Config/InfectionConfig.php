@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Infection\Config;
 
+use Infection\Filesystem\Filesystem;
 use Infection\Mutator\Arithmetic\BitwiseAnd;
 use Infection\Mutator\Arithmetic\BitwiseNot;
 use Infection\Mutator\Arithmetic\BitwiseOr;
@@ -144,9 +145,15 @@ class InfectionConfig
      */
     private $config;
 
-    public function __construct(\stdClass $config)
+    /**
+     * @var Filesystem
+     */
+    private $filesystem;
+
+    public function __construct(\stdClass $config, Filesystem $filesystem)
     {
         $this->config = $config;
+        $this->filesystem = $filesystem;
     }
 
     public function getPhpUnitConfigDir(): string
@@ -246,6 +253,12 @@ class InfectionConfig
 
     public function getTmpDir(): string
     {
-        return $this->config->tmpDir ?? sys_get_temp_dir();
+        $tmpDir = $this->config->tmpDir ?? sys_get_temp_dir();
+
+        if ($this->filesystem->isAbsolutePath($tmpDir)) {
+            return $tmpDir;
+        }
+
+        return sprintf('%s/%s', getcwd(), $tmpDir);
     }
 }

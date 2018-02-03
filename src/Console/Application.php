@@ -111,7 +111,7 @@ ASCII;
                 $json = '{}';
             }
 
-            return new InfectionConfig(json_decode($json));
+            return new InfectionConfig(json_decode($json), $c['filesystem']);
         };
 
         $this->container['tmp.dir'] = function (Container $c): string {

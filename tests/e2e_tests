@@ -11,9 +11,11 @@ fi
 
 touch error.log
 
-for d in  */
+for dir in  */
 do
-    cd "$d"
+    cd "$dir"
+    echo -e "\n$dir\n";
+
     if [ -f composer.json ] || [ -f composer.lock ]
     then
         composer install > /dev/null 2>&1
@@ -29,7 +31,7 @@ do
     if [ $? != 0 ]
     then
         failure="true"
-        echo "$d" >> ../error.log
+        echo "$dir" >> ../error.log
         echo "$output" >> ../error.log
         echo "" >> ../error.log
     fi
