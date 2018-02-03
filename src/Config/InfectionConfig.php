@@ -253,7 +253,11 @@ class InfectionConfig
 
     public function getTmpDir(): string
     {
-        $tmpDir = $this->config->tmpDir ?? sys_get_temp_dir();
+        if (empty($this->config->tmpDir)) {
+            return sys_get_temp_dir();
+        }
+
+        $tmpDir = $this->config->tmpDir;
 
         if ($this->filesystem->isAbsolutePath($tmpDir)) {
             return $tmpDir;

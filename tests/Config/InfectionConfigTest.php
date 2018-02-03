@@ -125,6 +125,13 @@ class InfectionConfigTest extends TestCase
         $this->assertSame(sys_get_temp_dir(), $config->getTmpDir());
     }
 
+    public function test_it_returns_default_temp_dir_with_empty_setting()
+    {
+        $config = new InfectionConfig(json_decode('{"tmpDir": ""}'), $this->filesystem);
+
+        $this->assertSame(sys_get_temp_dir(), $config->getTmpDir());
+    }
+
     public function test_it_returns_temp_dir_from_config_with_absolute_path()
     {
         $config = new InfectionConfig(json_decode('{"tmpDir": "/root/test"}'), $this->filesystem);
