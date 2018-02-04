@@ -46,7 +46,6 @@
         "symfony/yaml": "^3.2 || ^4.0"
     },
     "require-dev": {
-        "codeception/codeception": "^2.3.8",
         "mockery/mockery": "^1.0",
         "phpunit/phpunit": "^6.1"
     },

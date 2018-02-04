@@ -15,10 +15,10 @@ use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
 use Infection\TestFramework\Codeception\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\Codeception\Config\Builder\MutationConfigBuilder;
 use Infection\Utils\VersionParser;
-use PHPUnit\Framework\TestCase;
+use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery;
 
-class CodeceptionAdapterTest extends TestCase
+class CodeceptionAdapterTest extends MockeryTestCase
 {
     /**
      * @dataProvider passProvider
@@ -46,10 +46,5 @@ class CodeceptionAdapterTest extends TestCase
             ['FAILURES!', false],
             ['ERRORS!', false],
         ];
-    }
-
-    protected function tearDown()
-    {
-        Mockery::close();
     }
 }
