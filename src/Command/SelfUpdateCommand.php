@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Command;
@@ -25,21 +24,44 @@ class SelfUpdateCommand extends Command
     /**
      * @var OutputInterface
      */
-    protected $output;
+    private $output;
 
     /**
      * @var string
      */
-    protected $version;
+    private $version;
 
-    /**
-     * Execute the command.
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     *
-     * @return int
-     */
+    protected function configure()
+    {
+        $this->setName('self-update')
+            ->setDescription('Update infection.phar to most recent stable or pre-release build.')
+            ->addOption(
+                'pre',
+                'p',
+                InputOption::VALUE_NONE,
+                'Update to most recent pre-release version of Infection (alpha/beta/rc) tagged on Github.'
+            )
+            ->addOption(
+                'stable',
+                's',
+                InputOption::VALUE_NONE,
+                'Update to most recent stable version tagged on Github.'
+            )
+            ->addOption(
+                'rollback',
+                'r',
+                InputOption::VALUE_NONE,
+                'Rollback to previous version of Infection if available on filesystem.'
+            )
+            ->addOption(
+                'check',
+                'c',
+                InputOption::VALUE_NONE,
+                'Checks what updates are available across all possible stability tracks.'
+            )
+        ;
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->output = $output;
@@ -127,10 +149,11 @@ class SelfUpdateCommand extends Command
         try {
             $result = $updater->update();
 
-            $newVersion = $updater->getNewVersion();
             $oldVersion = $updater->getOldVersion();
 
             if ($result) {
+                $newVersion = $updater->getNewVersion();
+
                 $this->output->writeln('<fg=green>Infection has been updated.</fg=green>');
                 $this->output->writeln(sprintf(
                     '<fg=green>Current version is:</fg=green> <options=bold>%s</options=bold>.',
@@ -200,7 +223,8 @@ class SelfUpdateCommand extends Command
         $stability = 'stable';
 
         if ($updater->getStrategy() instanceof GithubStrategy
-            && $updater->getStrategy()->getStability() == GithubStrategy::UNSTABLE) {
+            && $updater->getStrategy()->getStability() == GithubStrategy::UNSTABLE
+        ) {
             $stability = 'pre-release';
         }
 
@@ -219,37 +243,5 @@ class SelfUpdateCommand extends Command
         } catch (\Exception $e) {
             $this->output->writeln(sprintf('Error: <fg=yellow>%s</fg=yellow>', $e->getMessage()));
         }
-    }
-
-    protected function configure()
-    {
-        $this
-            ->setName('self-update')
-            ->setDescription('Update infection.phar to most recent stable or pre-release build.')
-            ->addOption(
-                'pre',
-                'p',
-                InputOption::VALUE_NONE,
-                'Update to most recent pre-release version of Infection (alpha/beta/rc) tagged on Github.'
-            )
-            ->addOption(
-                'stable',
-                's',
-                InputOption::VALUE_NONE,
-                'Update to most recent stable version tagged on Github.'
-            )
-            ->addOption(
-                'rollback',
-                'r',
-                InputOption::VALUE_NONE,
-                'Rollback to previous version of Infection if available on filesystem.'
-            )
-            ->addOption(
-                'check',
-                'c',
-                InputOption::VALUE_NONE,
-                'Checks what updates are available across all possible stability tracks.'
-            )
-        ;
     }
 }

@@ -4,13 +4,13 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Tests\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
+use Infection\Filesystem\Filesystem;
 use Mockery;
 
 class ExcludeDirsProviderTest extends AbstractBaseProviderTest
@@ -31,7 +31,7 @@ class ExcludeDirsProviderTest extends AbstractBaseProviderTest
 
     protected function tearDown()
     {
-        @\unlink($this->workspace);
+        (new Filesystem())->remove($this->workspace);
         \umask($this->umask);
     }
 

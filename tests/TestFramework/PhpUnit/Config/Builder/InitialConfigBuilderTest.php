@@ -4,16 +4,16 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
+use Infection\Filesystem\Filesystem;
 use Infection\Finder\Locator;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
-use Infection\Utils\TempDirectoryCreator;
+use Infection\Utils\TmpDirectoryCreator;
 use Mockery;
 use function Infection\Tests\normalizePath as p;
 
@@ -21,7 +21,15 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     const HASH = 'a1b2c3';
 
-    private $tempDir;
+    /**
+     * @var string
+     */
+    private $tmpDir;
+
+    /**
+     * @var Filesystem
+     */
+    private $fileSystem;
 
     private $pathToProject;
 
@@ -30,12 +38,17 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
      */
     private $builder;
 
+    /**
+     * @var string
+     */
+    private $workspace;
+
     protected function setUp()
     {
-        $tempDirCreator = new TempDirectoryCreator();
-        $this->tempDir = $tempDirCreator->createAndGet(
-            'infection-test' . \microtime(true) . \random_int(100, 999)
-        );
+        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
+
+        $this->fileSystem = new Filesystem();
+        $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
 
         $this->pathToProject = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
 
@@ -52,7 +65,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $replacer = new PathReplacer(new Locator([$this->pathToProject]));
 
         $this->builder = new InitialConfigBuilder(
-            $this->tempDir,
+            $this->tmpDir,
             file_get_contents($phpunitXmlPath),
             new XmlConfigurationHelper($replacer),
             $jUnitFilePath,
@@ -62,7 +75,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
     protected function tearDown()
     {
-        @\unlink($this->tempDir);
+        $this->fileSystem->remove($this->workspace);
     }
 
     public function test_it_replaces_test_suite_directory_wildcard()
@@ -111,7 +124,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $logEntries = $this->queryXpath($xml, '/phpunit/logging/log');
 
         $this->assertSame(2, $logEntries->length);
-        $this->assertSame($this->tempDir . '/coverage-xml', $logEntries[0]->getAttribute('target'));
+        $this->assertSame($this->tmpDir . '/coverage-xml', $logEntries[0]->getAttribute('target'));
         $this->assertSame('coverage-xml', $logEntries[0]->getAttribute('type'));
         $this->assertSame('junit', $logEntries[1]->getAttribute('type'));
     }
@@ -119,7 +132,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     public function test_it_creates_coverage_filter_whitelist_node_if_does_not_exist()
     {
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit_without_coverage_whitelist.xml';
-        $configuration = $this->createConfigBuilder($phpunitXmlPath);
+        $this->createConfigBuilder($phpunitXmlPath);
 
         $configurationPath = $this->builder->build();
 

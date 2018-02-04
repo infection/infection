@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Config;
@@ -209,9 +208,14 @@ class InfectionConfig
     /**
      * @return string|null
      */
-    public function getTextFileLogPath()
+    public function getLogPathInfoFor(string $log)
     {
-        return $this->config->logs->text ?? null;
+        return $this->config->logs->$log ?? null;
+    }
+
+    public function getLogsTypes(): array
+    {
+        return (array) $this->config->logs ?? [];
     }
 
     private function getExcludedDirsByPattern(string $originalExcludedDir)
@@ -242,5 +246,10 @@ class InfectionConfig
         }
 
         return $excludedDirs;
+    }
+
+    public function getTmpDir(): string
+    {
+        return $this->config->tmpDir ?? sys_get_temp_dir();
     }
 }

@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\TestFramework;
@@ -14,4 +13,10 @@ final class TestFrameworkTypes
     const PHPUNIT = 'phpunit';
     const PHPSPEC = 'phpspec';
     const CODECEPTION = 'codeception';
+
+    const TYPES = [
+        self::PHPUNIT,
+        self::PHPSPEC,
+        self::CODECEPTION,
+    ];
 }

@@ -1,5 +1,59 @@
 # Change Log
 
+## [0.7.1](https://github.com/infection/infection/tree/0.7.1) (2018-02-02)
+
+[Full Changelog](https://github.com/infection/infection/compare/0.7.0...0.7.1)
+
+**Deprecated:**
+
+- `exclude` option in `infection.json` is  **Deprecated!** and will be removed in `0.8.0`. Use `excludes` instead
+
+**Implemented enhancements:**
+
+- PHPUnit ^7.0 support
+- Remove tests/test folders when infection is run for root directory. W… [\#117](https://github.com/infection/infection/pull/117) ([borNfreee](https://github.com/borNfreee))
+- Config setting for temp files [\#140](https://github.com/infection/infection/pull/140) ([sidz](https://github.com/sidz))
+- Make Humbug's config to be compatible with Infection [\#120](https://github.com/infection/infection/pull/120) ([sidz](https://github.com/sidz))
+- added new types of logs (debug, summary) [\#135](https://github.com/infection/infection/pull/135) ([BackEndTea](https://github.com/BackEndTea))
+
+**Fixed bugs:**
+
+- PHP DOM Extension not working when explicitly enabled twice [\#125](https://github.com/infection/infection/issues/125)
+- Infection not working if using custom printer [\#108](https://github.com/infection/infection/issues/108)
+- Infection not working with phpdbg [\#106](https://github.com/infection/infection/issues/106)
+- Startup problem [\#104](https://github.com/infection/infection/issues/104)
+- Default values of functions not being found by coverage [\#101](https://github.com/infection/infection/issues/101)
+- disable colors options [\#99](https://github.com/infection/infection/issues/99)
+- Mutations not working well with function\_exists [\#97](https://github.com/infection/infection/issues/97)
+- Not covered mutant with `switch(true) -> switch(false)` mutation [\#34](https://github.com/infection/infection/issues/34)
+- Fix: mutate methods but not functions [\#113](https://github.com/infection/infection/pull/113) ([BackEndTea](https://github.com/BackEndTea))
+
+**Merged pull requests:**
+
+- Feature: e2e tests [\#135](https://github.com/infection/infection/pull/135) ([BackEndTea](https://github.com/BackEndTea))
+- Enhancement: Keep packages sorted [\#149](https://github.com/infection/infection/pull/149) ([localheinz](https://github.com/localheinz))
+- Enhancement: Allow to install sebastian/diff:^3.0 [\#148](https://github.com/infection/infection/pull/148) ([localheinz](https://github.com/localheinz))
+- Rework InfectionApplication class and remove 'application' service [\#146](https://github.com/infection/infection/pull/146) ([sidz](https://github.com/sidz))
+- Skip XdebugHandlerTest when infection is running via phpdbg [\#145](https://github.com/infection/infection/pull/145) ([sidz](https://github.com/sidz))
+- Fix: Disable xdebug before composer analyze on travis [\#136](https://github.com/infection/infection/pull/136) ([BackEndTea](https://github.com/BackEndTea))
+- Fix: Use actual name [\#133](https://github.com/infection/infection/pull/133) ([localheinz](https://github.com/localheinz))
+- Update IOException [\#132](https://github.com/infection/infection/pull/132) ([BackEndTea](https://github.com/BackEndTea))
+- Update symfony/process as it has an issue which introduced by 3.4.2 [\#131](https://github.com/infection/infection/pull/131) ([sidz](https://github.com/sidz))
+- Give higher priority to custom config path [\#130](https://github.com/infection/infection/pull/130) ([BackEndTea](https://github.com/BackEndTea))
+- Ignore fixtures from cs fixer [\#128](https://github.com/infection/infection/pull/128) ([BackEndTea](https://github.com/BackEndTea))
+- Add tests [\#124](https://github.com/infection/infection/pull/124) ([BackEndTea](https://github.com/BackEndTea))
+- Fix: Change is function signature check [\#123](https://github.com/infection/infection/pull/123) ([BackEndTea](https://github.com/BackEndTea))
+- Add header comment to php-cs fixer [\#119](https://github.com/infection/infection/pull/119) ([BackEndTea](https://github.com/BackEndTea))
+- Move Files folder into the Fixtures folder [\#118](https://github.com/infection/infection/pull/118) ([BackEndTea](https://github.com/BackEndTea))
+- fix small typos [\#116](https://github.com/infection/infection/pull/116) ([teiling88](https://github.com/teiling88))
+- Update gitattributes [\#112](https://github.com/infection/infection/pull/112) ([BackEndTea](https://github.com/BackEndTea))
+- Fix: remove printer attributes from phpunit [\#110](https://github.com/infection/infection/pull/110) ([BackEndTea](https://github.com/BackEndTea))
+- Fix phpdbg issue caused by xdebug disabling feature [\#107](https://github.com/infection/infection/pull/107) ([sidz](https://github.com/sidz))
+- Parse only PHP files by default [\#105](https://github.com/infection/infection/pull/105) ([borNfreee](https://github.com/borNfreee))
+- Add credits [\#102](https://github.com/infection/infection/pull/102) ([theofidry](https://github.com/theofidry))
+- Fix issue with --no-ansi flag [\#100](https://github.com/infection/infection/pull/100) ([sidz](https://github.com/sidz))
+- PHPSPEC -  If you had a custom bootstrap file in the phpspec.yml it would generate the autoload without the semicolon. [\#98](https://github.com/infection/infection/pull/98) ([AliceIW](https://github.com/AliceIW))
+
 ## [0.7.0](https://github.com/infection/infection/tree/0.7.0) (2017-12-22)
 [Full Changelog](https://github.com/infection/infection/compare/0.6.2...0.7.0)
 

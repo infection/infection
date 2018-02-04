@@ -9,10 +9,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Codeception\Config\Builder;
 
+use Infection\Filesystem\Filesystem;
 use Infection\Mutant\Mutant;
 use Infection\Mutation;
 use Infection\TestFramework\Codeception\Config\Builder\MutationConfigBuilder;
-use Infection\Utils\TempDirectoryCreator;
+use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Mockery;
 
@@ -20,7 +21,7 @@ class MutationConfigBuilderTest extends TestCase
 {
     public function test_it_builds_path_to_mutation_config_file()
     {
-        $tempDirCreator = new TempDirectoryCreator();
+        $tempDirCreator = new TmpDirectoryCreator(new Filesystem);
 
         $tempDir = $tempDirCreator->createAndGet('infection-test');
         $projectDir = 'project/dir';

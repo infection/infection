@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Filesystem\Exception;
@@ -37,6 +36,39 @@ class IOException extends \RuntimeException
             sprintf(
                 'Failed to write file "%s".',
                 $filename
+            )
+        );
+    }
+
+    public static function unableToRemoveSymlink(string $file, string $message = null): self
+    {
+        return new self(
+            sprintf(
+                'Failed to remove symlink "%s": %s.',
+                $file,
+                $message
+            )
+        );
+    }
+
+    public static function unableToRemoveDirectory(string $directory, string $message = null): self
+    {
+        return new self(
+            sprintf(
+                'Failed to remove directory "%s": %s.',
+                $directory,
+                $message
+            )
+        );
+    }
+
+    public static function unableToRemoveFile(string $file, string $message = null): self
+    {
+        return new self(
+            sprintf(
+                'Failed to remove file "%s": %s.',
+                $file,
+                $message
             )
         );
     }

@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Tests\Config;
@@ -106,13 +105,27 @@ class InfectionConfigTest extends TestCase
         $json = sprintf('{"logs": {"text": "%s"}}', $path);
         $config = new InfectionConfig(json_decode($json));
 
-        $this->assertSame($path, $config->getTextFileLogPath());
+        $this->assertSame($path, $config->getLogPathInfoFor('text'));
     }
 
-    public function test_it_returns_null_for_text_file_log_path_when_it_is_skipped()
+    public function test_it_returns_an_empty_array_for_text_file_log_path_when_it_is_skipped()
     {
         $config = new InfectionConfig(json_decode('{}'));
 
-        $this->assertNull($config->getTextFileLogPath());
+        $this->assertEmpty($config->getLogPathInfoFor('text'));
+    }
+
+    public function test_it_returns_default_temp_dir()
+    {
+        $config = new InfectionConfig(json_decode('{}'));
+
+        $this->assertSame(sys_get_temp_dir(), $config->getTmpDir());
+    }
+
+    public function test_it_returns_temp_dir_from_config()
+    {
+        $config = new InfectionConfig(json_decode('{"tmpDir": "/root/test"}'));
+
+        $this->assertSame('/root/test', $config->getTmpDir());
     }
 }

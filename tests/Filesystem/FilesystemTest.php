@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 declare(strict_types=1);
 
 namespace Infection\Tests\Filesystem;
@@ -36,7 +35,7 @@ class FilesystemTest extends TestCase
 
     protected function tearDown()
     {
-        @unlink($this->workspace);
+        $this->filesystem->remove($this->workspace);
         umask($this->umask);
     }
 
@@ -102,5 +101,52 @@ class FilesystemTest extends TestCase
 
         $this->assertFileExists($filename);
         $this->assertSame('bar', file_get_contents($filename));
+    }
+
+    public function test_remove_cleans_files_and_directories_iteratively()
+    {
+        $basePath = $this->workspace . DIRECTORY_SEPARATOR . 'directory' . DIRECTORY_SEPARATOR;
+
+        mkdir($basePath);
+        mkdir($basePath . 'dir');
+        touch($basePath . 'file');
+
+        $this->filesystem->remove($basePath);
+
+        $this->assertFileNotExists($basePath);
+    }
+
+    public function test_remove_cleans_array_of_files_and_directories()
+    {
+        $basePath = $this->workspace . DIRECTORY_SEPARATOR;
+
+        mkdir($basePath . 'dir');
+        touch($basePath . 'file');
+
+        $files = [
+            $basePath . 'dir',
+            $basePath . 'file',
+        ];
+
+        $this->filesystem->remove($files);
+
+        $this->assertFileNotExists($basePath . 'dir');
+        $this->assertFileNotExists($basePath . 'file');
+    }
+
+    public function test_remove_ignores_non_existing_files()
+    {
+        $basePath = $this->workspace . DIRECTORY_SEPARATOR;
+
+        mkdir($basePath . 'dir');
+
+        $files = [
+            $basePath . 'dir',
+            $basePath . 'file',
+        ];
+
+        $this->filesystem->remove($files);
+
+        $this->assertFileNotExists($basePath . 'dir');
     }
 }
