@@ -4,7 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-
 use Infection\Php\XdebugHandler;
 use Infection\Php\ConfigBuilder;
 
