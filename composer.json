@@ -68,6 +68,10 @@
         ],
         "cs:fix": [
             "./php-cs-fixer-v2.phar fix --config=.php_cs.dist -v --allow-risky=yes"
+        ],
+        "tests": [
+            "./vendor/bin/phpunit",
+            "./tests/e2e_tests"
         ]
     }
 }
