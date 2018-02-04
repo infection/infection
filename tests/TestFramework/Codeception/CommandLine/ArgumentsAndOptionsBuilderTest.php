@@ -13,10 +13,10 @@ use Infection\Mutant\Mutant;
 use Infection\Mutation;
 use Infection\TestFramework\Codeception\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
-class ArgumentsAndOptionsBuilderTest extends TestCase
+class ArgumentsAndOptionsBuilderTest extends MockeryTestCase
 {
     public function test_it_builds_correct_command()
     {

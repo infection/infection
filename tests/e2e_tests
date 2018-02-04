@@ -21,7 +21,7 @@ do
         composer install > /dev/null 2>&1
     fi
 
-    if [ -f "run_tests.bash" ]
+    if [ -f "run_test.bash" ]
     then
         output="$(bash run_tests.bash)"
     else

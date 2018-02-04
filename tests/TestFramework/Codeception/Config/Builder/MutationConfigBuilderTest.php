@@ -13,10 +13,9 @@ use Infection\Mutant\Mutant;
 use Infection\Mutation;
 use Infection\TestFramework\Codeception\Config\Builder\MutationConfigBuilder;
 use Infection\Utils\TempDirectoryCreator;
-use PHPUnit\Framework\TestCase;
 use Mockery;
 
-class MutationConfigBuilderTest extends TestCase
+class MutationConfigBuilderTest extends MockeryTestCase
 {
     public function test_it_builds_path_to_mutation_config_file()
     {
@@ -37,10 +36,5 @@ class MutationConfigBuilderTest extends TestCase
         $builder = new MutationConfigBuilder($tempDir, $projectDir, $originalConfigPath);
 
         $this->assertSame($originalConfigPath, $builder->build($mutant));
-    }
-
-    protected function tearDown()
-    {
-        Mockery::close();
     }
 }

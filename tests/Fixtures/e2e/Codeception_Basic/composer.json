@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+      "codeception/codeception": "^2.3.8"
+    },
+    "autoload": {
+      "psr-4": {
+        "Codeception_Basic\\": "src/"
+      }
+    },
+    "autoload-dev": {
+      "psr-4": {
+        "Codeception_Basic\\Test\\": "tests/unit/"
+      }
+    }
+  }
