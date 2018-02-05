@@ -8,6 +8,7 @@
 namespace Infection\Tests\TestFramework\Config;
 
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
+use function Infection\Tests\normalizePath as p;
 
 class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
 {
@@ -33,7 +34,7 @@ class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertStringEndsWith(
             'tests/Fixtures/ConfigLocator/DistFile/phpunit.xml.dist',
-            $output,
+            p($output),
             'Did not find the correct phpunit.xml.dist file.'
         );
     }
@@ -47,7 +48,7 @@ class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertStringEndsWith(
             'tests/Fixtures/ConfigLocator/XmlFile/phpunit.xml',
-            $output,
+            p($output),
             'Did not find the correct phpunit.xml file.'
         );
     }
@@ -61,7 +62,7 @@ class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertStringEndsWith(
             'tests/Fixtures/ConfigLocator/BothXmlAndDist/phpunit.xml',
-            $output,
+            p($output),
             'Did not find the correct phpunit.xml file.'
         );
     }
@@ -75,7 +76,7 @@ class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertStringEndsWith(
             'tests/Fixtures/ConfigLocator/DistFile/phpunit.xml.dist',
-            $output,
+            p($output),
             'Did not find the correct phpunit.xml.dist file.'
         );
 

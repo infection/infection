@@ -99,14 +99,15 @@ class LocatorTest extends TestCase
         $found = $locator->locateAnyOf(['file.txt', 'secondfile.txt']);
         $this->assertStringEndsWith(
             'tests/Fixtures/Locator/file.txt',
-            $found,
+            p($found),
             'Found an incorrect file, orders may be broken.'
         );
 
         $found = $locator->locateAnyOf(['secondfile.txt', 'file.txt']);
+
         $this->assertStringEndsWith(
             'tests/Fixtures/Locator/secondfile.txt',
-            $found,
+            p($found),
             'Found an incorrect file, orders may be broken.'
         );
     }
@@ -117,9 +118,10 @@ class LocatorTest extends TestCase
         $locator = new Locator([$projectPath]);
 
         $found = $locator->locateAnyOf(['fakefile.txt', 'secondfile.txt', 'thirdfile.txt']);
+
         $this->assertStringEndsWith(
             'tests/Fixtures/Locator/secondfile.txt',
-            $found,
+            p($found),
             'Found an incorrect file, orders may be broken.'
         );
     }
