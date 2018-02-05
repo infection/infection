@@ -100,6 +100,7 @@ final class MutatorProfile
     const NUMBER = [
         Mutator\Number\DecrementInteger::class,
         Mutator\Number\IncrementInteger::class,
+        Mutator\Number\NumberToString::class,
         Mutator\Number\OneZeroInteger::class,
         Mutator\Number\OneZeroFloat::class,
     ];
