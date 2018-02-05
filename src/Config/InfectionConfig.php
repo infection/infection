@@ -194,10 +194,6 @@ class InfectionConfig
 
     private function getExcludes(): array
     {
-        if (isset($this->config->source->exclude) && is_array($this->config->source->exclude)) {
-            return $this->config->source->exclude;
-        }
-
         if (isset($this->config->source->excludes) && is_array($this->config->source->excludes)) {
             return $this->config->source->excludes;
         }
