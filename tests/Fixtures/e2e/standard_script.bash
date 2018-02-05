@@ -1,22 +1,14 @@
 #!/usr/bin/env bash
 
+readonly INFECTION=../../../../bin/infection
+
+set -o pipefail
+
 if [[ $PHPDBG=1 ]]
 then
-    phpdbg -qrr ../../../../bin/infection
+    phpdbg -qrr $INFECTION
 else
-    php ../../../../bin/infection
-fi
-
-if [ $? != 0 ]
-then
-    echo "error - fault while running infection"
-    exit 1
+    php $INFECTION
 fi
 
 diff expected-output.txt infection-log.txt
-
-if [ $? != 0 ]
-then
-    echo "error - Difference between files"
-    exit 1
-fi

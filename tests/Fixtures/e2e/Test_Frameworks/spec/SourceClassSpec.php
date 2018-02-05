@@ -6,7 +6,7 @@ use PhpSpec\ObjectBehavior;
 
 class SourceClassSpec extends ObjectBehavior
 {
-    public function it_returns_hello()
+    public function it_adds_numbers()
     {
         $this->add(1,2)->shouldReturn(3);
     }
