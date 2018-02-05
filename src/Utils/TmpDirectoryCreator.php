@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Infection\Utils;
 
-use Infection\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Filesystem;
 
 class TmpDirectoryCreator
 {

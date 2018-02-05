@@ -14,7 +14,7 @@ class IOExceptionTest extends TestCase
 {
     public function test_it_is_a_runtime_exception()
     {
-        $exception = new IOException();
+        $exception = new IOException('error');
         $this->assertInstanceOf(\RuntimeException::class, $exception);
     }
 

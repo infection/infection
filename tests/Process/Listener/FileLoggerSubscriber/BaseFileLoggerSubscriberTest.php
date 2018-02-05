@@ -12,7 +12,7 @@ use Infection\Config\InfectionConfig;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Events\MutationTestingFinished;
-use Infection\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Filesystem;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Listener\FileLoggerSubscriber\BaseFileLoggerSubscriber;
 use PHPUnit\Framework\TestCase;

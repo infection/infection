@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Php;
 
-use Infection\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Filesystem;
 use Infection\Php\ConfigBuilder;
 use PHPUnit\Framework\TestCase;
 

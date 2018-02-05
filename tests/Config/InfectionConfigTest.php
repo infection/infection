@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Config;
 
 use Infection\Config\InfectionConfig;
-use Infection\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Filesystem;
 use PHPUnit\Framework\TestCase;
 use function Infection\Tests\normalizePath as p;
 
