@@ -24,7 +24,7 @@ matrix:
 
 env:
   global:
-    - INFECTION_FLAGS='--threads=4 --min-msi=59 --min-covered-msi=86'
+    - INFECTION_FLAGS='--threads=4 --min-msi=57 --min-covered-msi=84'
 
 cache:
   directories:

@@ -50,6 +50,8 @@ use Infection\Mutator\ConditionalNegotiation\NotEqual;
 use Infection\Mutator\ConditionalNegotiation\NotIdentical;
 use Infection\Mutator\FunctionSignature\ProtectedVisibility;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
+use Infection\Mutator\Number\DecrementInteger;
+use Infection\Mutator\Number\IncrementInteger;
 use Infection\Mutator\Number\OneZeroFloat;
 use Infection\Mutator\Number\OneZeroInteger;
 use Infection\Mutator\Operator\Break_;
@@ -118,6 +120,8 @@ class InfectionConfig
         NotIdentical::class,
 
         // Number
+        DecrementInteger::class,
+        IncrementInteger::class,
         OneZeroInteger::class,
         OneZeroFloat::class,
 
