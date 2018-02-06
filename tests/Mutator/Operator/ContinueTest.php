@@ -10,9 +10,9 @@ namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Operator\Continue_;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ContinueTest extends AbstractMutator
+class ContinueTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {

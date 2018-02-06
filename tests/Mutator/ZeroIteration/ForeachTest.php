@@ -10,9 +10,9 @@ namespace Infection\Tests\Mutator\ZeroIteration;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ZeroIteration\Foreach_;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ForeachTest extends AbstractMutator
+class ForeachTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {

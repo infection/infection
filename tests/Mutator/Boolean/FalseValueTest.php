@@ -10,11 +10,11 @@ namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\FalseValue;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
 
-class FalseValueTest extends AbstractMutator
+class FalseValueTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {

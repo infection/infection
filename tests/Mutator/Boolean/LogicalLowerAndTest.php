@@ -9,9 +9,9 @@ namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\LogicalLowerAnd;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class LogicalLowerAndTest extends AbstractMutator
+class LogicalLowerAndTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {

@@ -10,10 +10,10 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\Minus;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node\Scalar\LNumber;
 
-class MinusTest extends AbstractMutator
+class MinusTest extends AbstractMutatorTestCase
 {
     public function test_it_should_mutate_minus_expression()
     {

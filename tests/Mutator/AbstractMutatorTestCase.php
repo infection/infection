@@ -19,7 +19,7 @@ use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PHPUnit\Framework\TestCase;
 
-abstract class AbstractMutator extends TestCase
+abstract class AbstractMutatorTestCase extends TestCase
 {
     /**
      * @var Mutator

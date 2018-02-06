@@ -10,9 +10,9 @@ namespace Infection\Tests\Mutator\FunctionSignature;
 
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class PublicVisibilityTest extends AbstractMutator
+class PublicVisibilityTest extends AbstractMutatorTestCase
 {
     public function test_changes_public_to_protected_method_visibility()
     {

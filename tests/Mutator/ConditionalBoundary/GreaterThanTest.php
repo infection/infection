@@ -10,9 +10,9 @@ namespace Infection\Tests\Mutator\ConditionalBoundary;
 
 use Infection\Mutator\ConditionalBoundary\GreaterThan;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class GreaterThanTest extends AbstractMutator
+class GreaterThanTest extends AbstractMutatorTestCase
 {
     public function test_replaces_greater_sign()
     {

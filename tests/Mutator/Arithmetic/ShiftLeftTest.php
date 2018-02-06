@@ -10,9 +10,9 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\ShiftLeft;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ShiftLeftTest extends AbstractMutator
+class ShiftLeftTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {

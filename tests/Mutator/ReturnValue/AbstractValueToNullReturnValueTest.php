@@ -8,9 +8,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ReturnValue;
 
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-abstract class AbstractValueToNullReturnValueTest extends AbstractMutator
+abstract class AbstractValueToNullReturnValueTest extends AbstractMutatorTestCase
 {
     abstract protected function getMutableNodeString(): string;
 

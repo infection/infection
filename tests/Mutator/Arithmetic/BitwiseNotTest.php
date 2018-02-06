@@ -10,9 +10,9 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\BitwiseNot;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class BitwiseNotTest extends AbstractMutator
+class BitwiseNotTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {

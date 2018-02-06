@@ -10,9 +10,9 @@ namespace Infection\Tests\Mutator\ConditionalNegotiation;
 
 use Infection\Mutator\ConditionalNegotiation\LessThanNegotiation;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class LessThanNegotiationTest extends AbstractMutator
+class LessThanNegotiationTest extends AbstractMutatorTestCase
 {
     public function test_it_mutates_equal_to_not_equal()
     {

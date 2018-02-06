@@ -11,9 +11,9 @@ namespace Infection\Tests\Mutator\Number;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Number\DecrementInteger;
 use Infection\Mutator\Number\OneZeroInteger;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class DecrementIntegerTest extends AbstractMutator
+class DecrementIntegerTest extends AbstractMutatorTestCase
 {
     public function test_it_decrements_an_integer()
     {

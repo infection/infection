@@ -10,9 +10,9 @@ namespace Infection\Tests\Mutator\Sort;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Sort\Spaceship;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class SpaceshipTest extends AbstractMutator
+class SpaceshipTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {

@@ -10,11 +10,11 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\LNumber;
 
-class PlusTest extends AbstractMutator
+class PlusTest extends AbstractMutatorTestCase
 {
     public function test_it_should_mutate_plus_expression()
     {

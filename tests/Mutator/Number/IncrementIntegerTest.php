@@ -11,9 +11,9 @@ namespace Infection\Tests\Mutator\Number;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Number\IncrementInteger;
 use Infection\Mutator\Number\OneZeroInteger;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class IncrementIntegerTest extends AbstractMutator
+class IncrementIntegerTest extends AbstractMutatorTestCase
 {
     public function test_it_increments_an_integer()
     {

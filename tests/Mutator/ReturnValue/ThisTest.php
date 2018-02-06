@@ -10,9 +10,9 @@ namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ReturnValue\This;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ThisTest extends AbstractMutator
+class ThisTest extends AbstractMutatorTestCase
 {
     public function test_mutates_returning_this()
     {

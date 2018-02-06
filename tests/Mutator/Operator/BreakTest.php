@@ -10,9 +10,9 @@ namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Operator\Break_;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class BreakTest extends AbstractMutator
+class BreakTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {

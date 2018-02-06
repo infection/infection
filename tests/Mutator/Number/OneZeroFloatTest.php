@@ -10,9 +10,9 @@ namespace Infection\Tests\Mutator\Number;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Number\OneZeroFloat;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class OneZeroFloatTest extends AbstractMutator
+class OneZeroFloatTest extends AbstractMutatorTestCase
 {
     public function test_it_mutates_zero_to_one_float()
     {

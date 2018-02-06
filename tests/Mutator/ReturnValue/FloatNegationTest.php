@@ -10,9 +10,9 @@ namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ReturnValue\FloatNegation;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class FloatNegationTest extends AbstractMutator
+class FloatNegationTest extends AbstractMutatorTestCase
 {
     public function test_not_mutates_with_value_return_true()
     {

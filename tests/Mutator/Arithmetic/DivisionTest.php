@@ -10,9 +10,9 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\Division;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class DivisionTest extends AbstractMutator
+class DivisionTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {

@@ -10,9 +10,9 @@ namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\LogicalOr;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class LogicalOrTest extends AbstractMutator
+class LogicalOrTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {

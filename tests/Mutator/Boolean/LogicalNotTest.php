@@ -10,12 +10,12 @@ namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\LogicalNot;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node\Expr\BooleanNot;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
 
-class LogicalNotTest extends AbstractMutator
+class LogicalNotTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {
