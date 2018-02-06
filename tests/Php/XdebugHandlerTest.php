@@ -13,6 +13,9 @@ use Infection\Php\PhpIniHelper;
 use Infection\Tests\Php\Mock\XdebugHandlerMock;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \Infection\Php\XdebugHandler
+ */
 class XdebugHandlerTest extends TestCase
 {
     private static $env = [];
