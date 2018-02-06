@@ -1,23 +1,23 @@
 {
-  "config": {
-    "platform": {
-      "php": "7.0"
+    "config": {
+        "platform": {
+            "php": "7.0"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Namespace_\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "spec\\": "spec/",
+            "Namespace\\Test\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "phpspec/phpspec": "^4.3",
+        "leanphp/phpspec-code-coverage": "^4.0",
+        "phpunit/phpunit": "^6.0"
     }
-  },
-  "autoload": {
-    "psr-4": {
-      "Namespace_\\": "src/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "spec\\": "spec/",
-      "Namespace\\Test\\": "tests/"
-    }
-  },
-  "require-dev": {
-    "phpspec/phpspec": "^4.3",
-    "leanphp/phpspec-code-coverage": "^4.0",
-    "phpunit/phpunit": "^6.0"
-  }
 }
