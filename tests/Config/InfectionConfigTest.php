@@ -9,14 +9,25 @@ declare(strict_types=1);
 namespace Infection\Tests\Config;
 
 use Infection\Config\InfectionConfig;
+use Symfony\Component\Filesystem\Filesystem;
 use PHPUnit\Framework\TestCase;
 use function Infection\Tests\normalizePath as p;
 
 class InfectionConfigTest extends TestCase
 {
+    /**
+     * @var Filesystem
+     */
+    private $filesystem;
+
+    protected function setUp()
+    {
+        $this->filesystem = new Filesystem();
+    }
+
     public function test_it_returns_default_timeout_with_no_config()
     {
-        $config = new InfectionConfig(new \stdClass());
+        $config = new InfectionConfig(new \stdClass(), $this->filesystem);
 
         $this->assertSame(InfectionConfig::PROCESS_TIMEOUT_SECONDS, $config->getProcessTimeout());
     }
@@ -25,14 +36,14 @@ class InfectionConfigTest extends TestCase
     {
         $timeout = 3;
         $json = sprintf('{"timeout": %d}', $timeout);
-        $config = new InfectionConfig(json_decode($json));
+        $config = new InfectionConfig(json_decode($json), $this->filesystem);
 
         $this->assertSame($timeout, $config->getProcessTimeout());
     }
 
     public function test_it_returns_default_phpunit_config_dir_with_no_config()
     {
-        $config = new InfectionConfig(new \stdClass());
+        $config = new InfectionConfig(new \stdClass(), $this->filesystem);
 
         $this->assertSame(getcwd(), $config->getPhpUnitConfigDir());
     }
@@ -41,7 +52,7 @@ class InfectionConfigTest extends TestCase
     {
         $phpUnitConfigDir = 'app';
         $json = sprintf('{"phpUnit": {"configDir": "%s"}}', $phpUnitConfigDir);
-        $config = new InfectionConfig(json_decode($json));
+        $config = new InfectionConfig(json_decode($json), $this->filesystem);
 
         $expected = getcwd() . '/app';
 
@@ -50,7 +61,7 @@ class InfectionConfigTest extends TestCase
 
     public function test_it_returns_default_source_dirs_with_no_config()
     {
-        $config = new InfectionConfig(new \stdClass());
+        $config = new InfectionConfig(new \stdClass(), $this->filesystem);
 
         $this->assertSame(InfectionConfig::DEFAULT_SOURCE_DIRS, $config->getSourceDirs());
     }
@@ -59,30 +70,22 @@ class InfectionConfigTest extends TestCase
     {
         $excludedFolders = '["source-folder"]';
         $json = sprintf('{"source": {"directories": %s}}', $excludedFolders);
-        $config = new InfectionConfig(json_decode($json));
+        $config = new InfectionConfig(json_decode($json), $this->filesystem);
 
         $this->assertSame(['source-folder'], $config->getSourceDirs());
     }
 
     public function test_it_returns_default_exclude_dirs_with_no_config()
     {
-        $config = new InfectionConfig(new \stdClass());
+        $config = new InfectionConfig(new \stdClass(), $this->filesystem);
 
         $this->assertSame(InfectionConfig::DEFAULT_EXCLUDE_DIRS, $config->getSourceExcludePaths());
-    }
-
-    public function test_it_returns_exclude_dirs_from_config_with_exclude_option()
-    {
-        $json = '{"source": {"exclude":["subfolder/excluded-folder"], "directories": ["source"]}}';
-        $config = new InfectionConfig(json_decode($json));
-
-        $this->assertSame(['subfolder/excluded-folder'], $config->getSourceExcludePaths());
     }
 
     public function test_it_returns_exclude_dirs_from_config_with_excludes_option()
     {
         $json = '{"source": {"excludes":["subfolder/excluded-folder"], "directories": ["source"]}}';
-        $config = new InfectionConfig(json_decode($json));
+        $config = new InfectionConfig(json_decode($json), $this->filesystem);
 
         $this->assertSame(['subfolder/excluded-folder'], $config->getSourceExcludePaths());
     }
@@ -90,9 +93,9 @@ class InfectionConfigTest extends TestCase
     public function test_it_excludes_by_glob_patterns()
     {
         $srcDir = __DIR__ . '/../Fixtures/Files/phpunit/project-path';
-        $json = sprintf('{"source": {"exclude":["exclude/exclude*"], "directories": ["%s"]}}', p($srcDir));
+        $json = sprintf('{"source": {"excludes":["exclude/exclude*"], "directories": ["%s"]}}', p($srcDir));
 
-        $config = new InfectionConfig(json_decode($json));
+        $config = new InfectionConfig(json_decode($json), $this->filesystem);
 
         $excludedDirs = $config->getSourceExcludePaths();
 
@@ -103,29 +106,43 @@ class InfectionConfigTest extends TestCase
     {
         $path = 'test-log.txt';
         $json = sprintf('{"logs": {"text": "%s"}}', $path);
-        $config = new InfectionConfig(json_decode($json));
+        $config = new InfectionConfig(json_decode($json), $this->filesystem);
 
         $this->assertSame($path, $config->getLogPathInfoFor('text'));
     }
 
     public function test_it_returns_an_empty_array_for_text_file_log_path_when_it_is_skipped()
     {
-        $config = new InfectionConfig(json_decode('{}'));
+        $config = new InfectionConfig(json_decode('{}'), $this->filesystem);
 
         $this->assertEmpty($config->getLogPathInfoFor('text'));
     }
 
     public function test_it_returns_default_temp_dir()
     {
-        $config = new InfectionConfig(json_decode('{}'));
+        $config = new InfectionConfig(json_decode('{}'), $this->filesystem);
 
         $this->assertSame(sys_get_temp_dir(), $config->getTmpDir());
     }
 
-    public function test_it_returns_temp_dir_from_config()
+    public function test_it_returns_default_temp_dir_with_empty_setting()
     {
-        $config = new InfectionConfig(json_decode('{"tmpDir": "/root/test"}'));
+        $config = new InfectionConfig(json_decode('{"tmpDir": ""}'), $this->filesystem);
+
+        $this->assertSame(sys_get_temp_dir(), $config->getTmpDir());
+    }
+
+    public function test_it_returns_temp_dir_from_config_with_absolute_path()
+    {
+        $config = new InfectionConfig(json_decode('{"tmpDir": "/root/test"}'), $this->filesystem);
 
         $this->assertSame('/root/test', $config->getTmpDir());
+    }
+
+    public function test_it_returns_temp_dir_from_config_with_relative_path()
+    {
+        $config = new InfectionConfig(json_decode('{"tmpDir": "relative/folder"}'), $this->filesystem);
+
+        $this->assertSame(getcwd() . '/relative/folder', $config->getTmpDir());
     }
 }

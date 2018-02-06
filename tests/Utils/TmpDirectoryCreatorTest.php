@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Utils;
 
-use Infection\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Filesystem;
 use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 

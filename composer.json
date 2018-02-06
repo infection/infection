@@ -41,6 +41,7 @@
         "pimple/pimple": "^3.2",
         "sebastian/diff": "^1.4 || ^2.0 || ^3.0",
         "symfony/console": "^3.2 || ^4.0",
+        "symfony/filesystem": "^3.2 || ^4.0",
         "symfony/finder": "^3.2 || ^4.0",
         "symfony/process": "^3.2 || ^4.0",
         "symfony/yaml": "^3.2 || ^4.0"
@@ -68,6 +69,10 @@
         ],
         "cs:fix": [
             "./php-cs-fixer-v2.phar fix --config=.php_cs.dist -v --allow-risky=yes"
+        ],
+        "tests": [
+            "./vendor/bin/phpunit",
+            "./tests/e2e_tests"
         ]
     }
 }
