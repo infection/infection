@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Infection\Config;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Infection\Mutator\Arithmetic\BitwiseAnd;
 use Infection\Mutator\Arithmetic\BitwiseNot;
 use Infection\Mutator\Arithmetic\BitwiseOr;
@@ -36,8 +35,8 @@ use Infection\Mutator\Boolean\LogicalLowerOr;
 use Infection\Mutator\Boolean\LogicalNot;
 use Infection\Mutator\Boolean\LogicalOr;
 use Infection\Mutator\Boolean\TrueValue;
-use Infection\Mutator\ConditionalBoundary\GreaterThanOrEqualTo;
 use Infection\Mutator\ConditionalBoundary\GreaterThan;
+use Infection\Mutator\ConditionalBoundary\GreaterThanOrEqualTo;
 use Infection\Mutator\ConditionalBoundary\LessThan;
 use Infection\Mutator\ConditionalBoundary\LessThanOrEqualTo;
 use Infection\Mutator\ConditionalNegotiation\Equal;
@@ -63,6 +62,7 @@ use Infection\Mutator\ReturnValue\NewObject;
 use Infection\Mutator\ReturnValue\This;
 use Infection\Mutator\Sort\Spaceship;
 use Infection\Mutator\ZeroIteration\Foreach_;
+use Symfony\Component\Filesystem\Filesystem;
 
 class InfectionConfig
 {

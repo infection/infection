@@ -8,13 +8,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Infection\Finder\Locator;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\TmpDirectoryCreator;
 use Mockery;
+use Symfony\Component\Filesystem\Filesystem;
 use function Infection\Tests\normalizePath as p;
 
 class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase

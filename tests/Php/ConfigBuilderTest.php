@@ -8,9 +8,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Php;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Infection\Php\ConfigBuilder;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 
 class ConfigBuilderTest extends TestCase
 {

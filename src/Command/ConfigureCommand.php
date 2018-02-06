@@ -9,15 +9,15 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use Infection\Config\ConsoleHelper;
+use Infection\Config\InfectionConfig;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
 use Infection\Config\ValueProvider\PhpUnitCustomExecutablePathProvider;
-use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Config\ValueProvider\SourceDirsProvider;
+use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Config\ValueProvider\TextLogFileProvider;
 use Infection\Config\ValueProvider\TimeoutProvider;
 use Infection\Finder\TestFrameworkExecutableFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
-use Infection\Config\InfectionConfig;
 use Infection\TestFramework\TestFrameworkTypes;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

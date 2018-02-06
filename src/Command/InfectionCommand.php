@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Infection\Config\InfectionConfig;
 use Infection\Console\Application;
 use Infection\Console\Exception\InfectionException;
 use Infection\Console\Exception\InvalidOptionException;
@@ -16,7 +17,6 @@ use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\EventDispatcher\EventDispatcher;
-use Infection\Config\InfectionConfig;
 use Infection\Mutant\Exception\MsiCalculationException;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutant\MetricsCalculator;

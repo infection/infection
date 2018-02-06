@@ -8,8 +8,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Operator;
 
-use Infection\Mutator\Operator\Break_;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\Operator\Break_;
 use Infection\Tests\Mutator\AbstractMutator;
 
 class BreakTest extends AbstractMutator

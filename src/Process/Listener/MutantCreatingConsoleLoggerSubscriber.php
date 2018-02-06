@@ -10,8 +10,8 @@ namespace Infection\Process\Listener;
 
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\MutantCreated;
-use Infection\Events\MutantsCreatingStarted;
 use Infection\Events\MutantsCreatingFinished;
+use Infection\Events\MutantsCreatingStarted;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 

@@ -8,10 +8,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpSpec\Config\Builder;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder;
 use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 
 class InitialConfigBuilderTest extends TestCase
 {

@@ -12,8 +12,8 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\PhpUnitCustomExecutablePathProvider;
 use Infection\Finder\Exception\TestFrameworkExecutableFinderNotFound;
 use Infection\Finder\TestFrameworkExecutableFinder;
-use function Infection\Tests\normalizePath as p;
 use Mockery;
+use function Infection\Tests\normalizePath as p;
 
 class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProviderTest
 {

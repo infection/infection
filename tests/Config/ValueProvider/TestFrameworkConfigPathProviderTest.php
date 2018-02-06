@@ -11,9 +11,9 @@ namespace Infection\Tests\Config\ValueProvider;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
+use Mockery;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Mockery;
 
 class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
 {
