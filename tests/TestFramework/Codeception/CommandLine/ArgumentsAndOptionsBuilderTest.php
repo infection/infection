@@ -29,8 +29,7 @@ class ArgumentsAndOptionsBuilderTest extends MockeryTestCase
 
         $this->assertContains('run', $command);
         $this->assertContains('--no-colors', $command);
-        $this->assertContains(sprintf('-o "paths: output: %s"', $tempPath), $command);
-        $this->assertContains('-o "coverage: enabled: true"', $command);
+        $this->assertContains('--config=' . $configPath, $command);
         $this->assertContains('--coverage-phpunit ' . CodeCoverageData::CODECEPTION_COVERAGE_DIR, $command);
     }
 
@@ -51,14 +50,9 @@ class ArgumentsAndOptionsBuilderTest extends MockeryTestCase
 
         $this->assertContains('run', $command);
         $this->assertContains('--no-colors', $command);
-        $this->assertContains(sprintf('-o "paths: output: %s"', $tempPath. '/' . $mutant->getMutation()->getHash()), $command);
-        $this->assertContains('-o "coverage: enabled: false"', $command);
+        $this->assertContains('--config=' . $configPath, $command);
         $this->assertContains('--ext "Infection\TestFramework\Codeception\CustomAutoloadFilePath"', $command);
         $this->assertContains('--fail-fast', $command);
-    }
-
-    protected function tearDown()
-    {
-        Mockery::close();
+        $this->assertContains('--verbose', $command);
     }
 }

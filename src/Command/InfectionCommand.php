@@ -69,7 +69,7 @@ class InfectionCommand extends BaseCommand
                 'test-framework',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Name of the Test framework to use (phpunit, phpspec, codeception)',
+                'Name of the Test framework to use (' . implode(', ', TestFrameworkTypes::TYPES) . ')',
                 'phpunit'
             )
             ->addOption(
