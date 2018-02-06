@@ -148,11 +148,12 @@ final class Factory
 
         if ($adapterName === TestFrameworkTypes::CODECEPTION) {
             $codeceptionConfigPath = $this->configLocator->locate(TestFrameworkTypes::CODECEPTION);
+            $codeceptionConfigContent = file_get_contents($codeceptionConfigPath);
 
             return new CodeceptionAdapter(
                 new TestFrameworkExecutableFinder(CodeceptionAdapter::EXECUTABLE),
-                new CodeceptionInitialConfigBuilder($codeceptionConfigPath),
-                new CodeceptionMutationConfigBuilder($this->tempDir, $this->projectDir, $codeceptionConfigPath),
+                new CodeceptionInitialConfigBuilder($this->tempDir, $this->projectDir, $codeceptionConfigContent, $this->infectionConfig->getSourceDirs()),
+                new CodeceptionMutationConfigBuilder($this->tempDir, $this->projectDir, $codeceptionConfigContent),
                 new CodeceptionArgumentsAndOptionsBuilder($this->tempDir),
                 $this->versionParser
             );
@@ -161,7 +162,7 @@ final class Factory
         throw new \InvalidArgumentException(
             sprintf(
                 'Invalid name of test framework. Available names are: %s',
-                implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC, TestFrameworkTypes::CODECEPTION])
+                implode(', ', TestFrameworkTypes::TYPES)
             )
         );
     }

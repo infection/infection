@@ -9,7 +9,7 @@ class MathTest extends Unit
 {
     private $math;
 
-    protected function _before() 
+    protected function _before()
     {
         $this->math = new Math();
     }

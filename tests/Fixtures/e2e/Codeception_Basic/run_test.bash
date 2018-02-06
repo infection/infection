@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-if [[ $PHPDBG = 1 ]]
+if [ "$PHPDBG" = "1" ]
 then
     phpdbg -qrr ../../../../bin/infection --test-framework=codeception
 else
