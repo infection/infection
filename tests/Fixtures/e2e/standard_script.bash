@@ -4,7 +4,7 @@ readonly INFECTION=../../../../bin/infection
 
 set -o pipefail
 
-if [[ $PHPDBG=1 ]]
+if [ "$PHPDBG" = "1" ]
 then
     phpdbg -qrr $INFECTION
 else

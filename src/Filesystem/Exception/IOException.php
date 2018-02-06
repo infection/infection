@@ -8,7 +8,9 @@ declare(strict_types=1);
 
 namespace Infection\Filesystem\Exception;
 
-class IOException extends \RuntimeException
+use Symfony\Component\Filesystem\Exception\IOException as BaseIOException;
+
+class IOException extends BaseIOException
 {
     public static function directoryNotWritable(string $dir): self
     {
