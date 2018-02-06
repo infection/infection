@@ -19,17 +19,31 @@ class BitwiseOrTest extends AbstractMutatorTestCase
         return new BitwiseOr();
     }
 
-    public function test_replaces_bitwise_or_with_and()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = '<?php 1 | 2;';
-        $mutatedCode = $this->mutate($code);
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): array
+    {
+        return [
+            [
+                <<<'CODE'
+<?php
+
+1 | 2;
+CODE
+                ,
+                <<<'CODE'
 <?php
 
 1 & 2;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+CODE
+                ,
+            ],
+        ];
     }
 }

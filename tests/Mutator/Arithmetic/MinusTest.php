@@ -22,22 +22,41 @@ class MinusTest extends AbstractMutatorTestCase
         $this->assertTrue($this->mutator->shouldMutate($plusExpression));
     }
 
-    public function test_it_mutates()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $input = <<<'CODE'
-<?php 
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates normal minus' => [
+                <<<'CODE'
+<?php
 
 $a = 1 - 1;
-CODE;
-        $expectedMutatedCode = <<<'CODE'
+CODE
+                ,
+                <<<'CODE'
 <?php
 
 $a = 1 + 1;
-CODE;
+CODE
+                ,
+            ],
+            'It does not mutate minus equals' => [
+                <<<'CODE'
+<?php
 
-        $mutatedCode = $this->mutate($input);
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+$a = 1;
+$a -= 2;
+CODE
+                ,
+            ],
+        ];
     }
 
     protected function getMutator(): Mutator

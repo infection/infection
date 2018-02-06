@@ -19,47 +19,57 @@ class DecrementTest extends AbstractMutatorTestCase
         return new Decrement();
     }
 
-    public function test_replaces_post_decrement()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = '<?php $a = 1; $a--;';
-        $mutatedCode = $this->mutate($code);
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): array
+    {
+        return [
+            'It replaces post decrement' => [
+                <<<'CODE'
+<?php
+
+$a = 1; 
+$a--;
+CODE
+                ,
+                <<<'CODE'
 <?php
 
 $a = 1;
 $a++;
-CODE;
+CODE
+                ,
+            ],
+            'It replaces pre decrement' => [
+                <<<'CODE'
+<?php
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_replaces_pre_decrement()
-    {
-        $code = '<?php $a = 1; --$a;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
+$a = 1;
+--$a;
+CODE
+                ,
+                <<<'CODE'
 <?php
 
 $a = 1;
 ++$a;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_parses_decrement_correctly()
-    {
-        $code = '<?php 1 - -1;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
+CODE
+                ,
+            ],
+            'It does not change when its not a real decrement' => [
+                <<<'CODE'
 <?php
 
-1 - -1;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+$b - -$a;
+CODE
+                ,
+            ],
+        ];
     }
 }

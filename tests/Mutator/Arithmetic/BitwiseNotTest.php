@@ -19,17 +19,31 @@ class BitwiseNotTest extends AbstractMutatorTestCase
         return new BitwiseNot();
     }
 
-    public function test_replaces_bitwise_not_with_empty_string()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = '<?php ~2;';
-        $mutatedCode = $this->mutate($code);
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): array
+    {
+        return [
+            [
+                <<<'CODE'
+<?php
+
+~2;
+CODE
+                ,
+                <<<'CODE'
 <?php
 
 2;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+CODE
+                ,
+            ],
+        ];
     }
 }

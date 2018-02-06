@@ -19,18 +19,42 @@ class MinusEqualTest extends AbstractMutatorTestCase
         return new MinusEqual();
     }
 
-    public function test_replaces_post_decrement()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = '<?php $a = 1; $a -= 2;';
-        $mutatedCode = $this->mutate($code);
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates minus equals' => [
+                <<<'CODE'
+<?php
+
+$a = 1;
+$a -=2;
+CODE
+                ,
+                <<<'CODE'
 <?php
 
 $a = 1;
 $a += 2;
-CODE;
+CODE
+                ,
+            ],
+            'It does not mutate normal minus' => [
+                <<<'CODE'
+<?php
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+$a = 1;
+$a = $a - 2;
+CODE
+                ,
+            ],
+        ];
     }
 }

@@ -19,6 +19,43 @@ class DivisionTest extends AbstractMutatorTestCase
         return new Division();
     }
 
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It changes regular divison' => [
+                <<<'CODE'
+<?php
+
+$a = 10 / 2;
+CODE
+                ,
+                <<<'CODE'
+<?php
+
+$a = 10 * 2;
+CODE
+                ,
+            ],
+            'It does not change division equals' => [
+                <<<'CODE'
+<?php
+
+$a = 10;
+$a /= 5;
+CODE
+                ,
+            ],
+        ];
+    }
+
     public function test_replaces_division_with_multiplication()
     {
         $code = '<?php 1 / 2;';

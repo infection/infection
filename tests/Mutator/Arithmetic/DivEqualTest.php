@@ -19,18 +19,41 @@ class DivEqualTest extends AbstractMutatorTestCase
         return new DivEqual();
     }
 
-    public function test_replaces_post_decrement()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = '<?php $a = 1; $a /= 2;';
-        $mutatedCode = $this->mutate($code);
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): array
+    {
+        return [
+            'It changes divison equals' => [
+                <<<'CODE'
+<?php
+
+$a = 1;
+$a /=2;
+CODE
+                ,
+                <<<'CODE'
 <?php
 
 $a = 1;
 $a *= 2;
-CODE;
+CODE
+                ,
+            ],
+            'It does not change normal division' => [
+                <<<'CODE'
+<?php
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+$a = 10 / 2;
+CODE
+                ,
+            ],
+        ];
     }
 }
