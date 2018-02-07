@@ -8,8 +8,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Coverage;
 
-use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
+use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
 
 class PhpUnitTestFileDataProvider implements TestFileDataProvider
 {

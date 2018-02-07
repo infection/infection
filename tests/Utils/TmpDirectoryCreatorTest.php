@@ -8,9 +8,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Utils;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 
 class TmpDirectoryCreatorTest extends TestCase
 {

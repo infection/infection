@@ -26,6 +26,7 @@ return \PhpCsFixer\Config::create()
             'separate' => 'bottom',
         ],
         'is_null' => true,
+        'ordered_imports' => true,
         'phpdoc_align' => false,
         'phpdoc_summary' => false,
         'yoda_style' => false,

@@ -6,31 +6,31 @@
  */
 declare(strict_types=1);
 
-use Pimple\Container;
-use Infection\Utils\TmpDirectoryCreator;
-use Infection\TestFramework\Factory;
+use Infection\Config\InfectionConfig;
+use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
-use Infection\Mutant\MutantCreator;
-use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Finder\Locator;
-use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
+use Infection\Mutant\MutantCreator;
+use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
-use Infection\TestFramework\PhpUnit\Coverage\PhpUnitTestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileDataProvider;
-use Infection\TestFramework\Coverage\CodeCoverageData;
-use Infection\Differ\DiffColorizer;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
-use Infection\Config\InfectionConfig;
-use Infection\Utils\VersionParser;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
+use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\Coverage\TestFileDataProvider;
+use Infection\TestFramework\Factory;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
+use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use Infection\TestFramework\PhpUnit\Coverage\PhpUnitTestFileDataProvider;
+use Infection\Utils\TmpDirectoryCreator;
+use Infection\Utils\VersionParser;
+use PhpParser\Lexer;
+use PhpParser\Parser;
+use PhpParser\ParserFactory;
+use PhpParser\PrettyPrinter\Standard;
+use Pimple\Container;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Filesystem\Filesystem;
-use PhpParser\Lexer;
-use PhpParser\ParserFactory;
-use PhpParser\Parser;
-use PhpParser\PrettyPrinter\Standard;
 
 $c = new Container();
 

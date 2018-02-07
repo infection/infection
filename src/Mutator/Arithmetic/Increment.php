@@ -10,10 +10,10 @@ namespace Infection\Mutator\Arithmetic;
 
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
-use PhpParser\Node\Expr\PreInc;
-use PhpParser\Node\Expr\PostInc;
 use PhpParser\Node\Expr\PostDec;
+use PhpParser\Node\Expr\PostInc;
 use PhpParser\Node\Expr\PreDec;
+use PhpParser\Node\Expr\PreInc;
 
 class Increment extends Mutator
 {

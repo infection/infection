@@ -10,8 +10,8 @@ namespace Infection\Tests\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
-use Symfony\Component\Filesystem\Filesystem;
 use Mockery;
+use Symfony\Component\Filesystem\Filesystem;
 
 class ExcludeDirsProviderTest extends AbstractBaseProviderTest
 {
