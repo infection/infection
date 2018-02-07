@@ -19,17 +19,40 @@ class MultiplicationTest extends AbstractMutatorTestCase
         return new Multiplication();
     }
 
-    public function test_replaces_multiplication_with_division()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = '<?php 1 * 2;';
-        $mutatedCode = $this->mutate($code);
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates normal multiplication' => [
+                <<<'CODE'
 <?php
 
-1 / 2;
-CODE;
+$a = 10 * 3;
+CODE
+                ,
+                <<<'CODE'
+<?php
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+$a = 10 / 3;
+CODE
+                ,
+            ],
+            'It does not mutate multiplication equals' => [
+                <<<'CODE'
+<?php
+
+$a = 1;
+$a *= 2;
+CODE
+                ,
+            ],
+        ];
     }
 }

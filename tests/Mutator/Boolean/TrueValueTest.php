@@ -21,6 +21,56 @@ class TrueValueTest extends AbstractMutatorTestCase
         return new TrueValue();
     }
 
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates true to false' => [
+                <<<'CODE'
+<?php
+
+return true;
+CODE
+                ,
+                <<<'CODE'
+<?php
+
+return false;
+CODE
+                ,
+            ],
+            'It does not mutate the string true to false' => [
+                <<<'CODE'
+<?php
+
+return 'true';
+CODE
+                ,
+            ],
+            'It mutates all caps true to false' => [
+                <<<'CODE'
+<?php
+
+return TRUE;
+CODE
+                ,
+                <<<'CODE'
+<?php
+
+return false;
+CODE
+                ,
+            ],
+        ];
+    }
+
     public function test_mutates_true_value()
     {
         $falseValue = new ConstFetch(new Name('true'));
@@ -33,19 +83,5 @@ class TrueValueTest extends AbstractMutatorTestCase
         $trueValue = new ConstFetch(new Name('false'));
 
         $this->assertFalse($this->mutator->shouldMutate($trueValue));
-    }
-
-    public function test_replaces_true_with_false()
-    {
-        $code = '<?php return true;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-return false;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
     }
 }

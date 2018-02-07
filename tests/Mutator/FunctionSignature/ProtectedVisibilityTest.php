@@ -14,23 +14,38 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class ProtectedVisibilityTest extends AbstractMutatorTestCase
 {
-    public function test_changes_protected_to_private_method_visibility()
+    protected function getMutator(): Mutator
     {
-        $code = <<<'CODE'
+        return new ProtectedVisibility();
+    }
+
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates protected to private' => [
+                <<<'CODE'
 <?php
+
 
 class Test
 {
-    protected function foo(int $param, $test = 1): bool
+    protected function foo(int $param, $test = 1) : bool
     {
         echo 1;
         return false;
     }
 }
-CODE;
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
+CODE
+                ,
+                <<<'CODE'
 <?php
 
 class Test
@@ -41,84 +56,24 @@ class Test
         return false;
     }
 }
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_does_not_change_static_flag()
-    {
-        $code = <<<'CODE'
+CODE
+                ,
+            ],
+            'It does not mutate final flag' => [
+                <<<'CODE'
 <?php
 
 class Test
 {
-    protected static function foo(int $param, $test = 1): bool
+    protected final function foo(int $param, $test = 1) : bool
     {
         echo 1;
         return false;
     }
 }
-CODE;
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-class Test
-{
-    private static function foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_does_not_change_abstract_protected_function()
-    {
-        $code = <<<'CODE'
-<?php
-
-abstract class Test
-{
-    abstract protected function foo(int $param, $test = 1): bool;
-}
-CODE;
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-abstract class Test
-{
-    protected abstract function foo(int $param, $test = 1) : bool;
-}
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_does_not_change_final_flag()
-    {
-        $code = <<<'CODE'
-<?php
-
-class Test
-{
-    final protected function foo(int $param, $test = 1): bool
-    {
-        echo 1;
-        return false;
-    }
-}
-CODE;
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
+CODE
+                ,
+                <<<'CODE'
 <?php
 
 class Test
@@ -129,13 +84,76 @@ class Test
         return false;
     }
 }
-CODE;
+CODE
+                ,
+            ],
+            'It does not mutate abstract protected to private' => [
+                <<<'CODE'
+<?php
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
+abstract class Test
+{
+    protected abstract function foo(int $param, $test = 1) : bool;
+}
+CODE
+                ,
+            ],
+            'It does mutate not abstract protected to private in an abstract class' => [
+        <<<'CODE'
+<?php
 
-    protected function getMutator(): Mutator
+abstract class Test
+{
+    protected function foo(int $param, $test = 1) : bool
     {
-        return new ProtectedVisibility();
+        echo 1;
+        return false;
+    }
+}
+CODE
+                ,
+                <<<'CODE'
+<?php
+
+abstract class Test
+{
+    private function foo(int $param, $test = 1) : bool
+    {
+        echo 1;
+        return false;
+    }
+}
+CODE
+                ,
+            ],
+            'It does not mutate stratic flag' => [
+                <<<'CODE'
+<?php
+
+class Test
+{
+    protected static function foo(int $param, $test = 1) : bool
+    {
+        echo 1;
+        return false;
+    }
+}
+CODE
+                ,
+                <<<'CODE'
+<?php
+
+class Test
+{
+    private static function foo(int $param, $test = 1) : bool
+    {
+        echo 1;
+        return false;
+    }
+}
+CODE
+                ,
+            ],
+        ];
     }
 }

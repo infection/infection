@@ -19,17 +19,39 @@ class LogicalOrTest extends AbstractMutatorTestCase
         return new LogicalOr();
     }
 
-    public function test_replaces_logical_or_with_and()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = '<?php true || false;';
-        $mutatedCode = $this->mutate($code);
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates logical or' => [
+                <<<'CODE'
+<?php
+
+true || false;
+CODE
+                ,
+                <<<'CODE'
 <?php
 
 true && false;
-CODE;
+CODE
+                ,
+            ],
+            'It does not mutate logical lower or' => [
+                <<<'CODE'
+<?php
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+true or false;
+CODE
+                ,
+            ],
+        ];
     }
 }

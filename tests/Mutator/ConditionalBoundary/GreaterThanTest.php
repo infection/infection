@@ -14,22 +14,36 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class GreaterThanTest extends AbstractMutatorTestCase
 {
-    public function test_replaces_greater_sign()
-    {
-        $code = '<?php 1 > 2;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-1 >= 2;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
     protected function getMutator(): Mutator
     {
         return new GreaterThan();
+    }
+
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates greater than' => [
+                <<<'CODE'
+<?php
+
+1 > 2;
+CODE
+                ,
+                <<<'CODE'
+<?php
+
+1 >= 2;
+CODE
+                ,
+            ],
+        ];
     }
 }

@@ -19,17 +19,31 @@ class SpaceshipTest extends AbstractMutatorTestCase
         return new Spaceship();
     }
 
-    public function test_swap_spaceship_operator_arguments()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = '<?php $a <=> $b;';
-        $mutatedCode = $this->mutate($code);
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): array
+    {
+        return [
+            'It swaps spaceship operators' => [
+                <<<'CODE'
+<?php
+
+$a <=> $b;
+CODE
+                ,
+                <<<'CODE'
 <?php
 
 $b <=> $a;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+CODE
+                ,
+            ],
+        ];
     }
 }

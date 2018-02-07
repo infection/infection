@@ -19,17 +19,40 @@ class ModulusTest extends AbstractMutatorTestCase
         return new Modulus();
     }
 
-    public function test_replaces_modulus_with_multiplication()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = '<?php 1 % 2;';
-        $mutatedCode = $this->mutate($code);
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates normal mod' => [
+                <<<'CODE'
 <?php
 
-1 * 2;
-CODE;
+$a = 10 % 3;
+CODE
+                ,
+                <<<'CODE'
+<?php
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+$a = 10 * 3;
+CODE
+                ,
+            ],
+            'It does not mutate mod equals' => [
+                <<<'CODE'
+<?php
+
+$a = 1;
+$a %= 2;
+CODE
+                ,
+            ],
+        ];
     }
 }

@@ -11,7 +11,7 @@ namespace Infection\Tests\Mutator\ReturnValue;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ReturnValue\NewObject;
 
-class NewObjectTest extends AbstractValueToNullReturnValueTest
+class NewObjectTest extends AbstractValueToNullReturnValueTestCase
 {
     public function test_mutates_instantiation_of_new_object_with_params()
     {
@@ -26,7 +26,6 @@ class Test
     }
 }
 CODE;
-        $mutatedCode = $this->mutate($code);
 
         $expectedMutatedCode = <<<'CODE'
 <?php
@@ -40,8 +39,7 @@ class Test
     }
 }
 CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+        $this->doTest($code, $expectedMutatedCode);
     }
 
     public function test_it_does_not_mutate_if_no_class_name_found()
@@ -55,9 +53,7 @@ function test()
     $instance = new $className();
 }
 CODE;
-        $mutatedCode = $this->mutate($code);
-
-        $this->assertSame($code, $mutatedCode);
+        $this->doTest($code);
     }
 
     protected function getMutator(): Mutator

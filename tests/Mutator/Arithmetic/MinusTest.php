@@ -56,6 +56,31 @@ $a -= 2;
 CODE
                 ,
             ],
+            'It does not mutate decrement' => [
+                <<<'CODE'
+<?php
+
+$a = 1;
+$a--;
+CODE
+                ,
+            ],
+            'It does mutate a fake decrement' => [
+                <<<'CODE'
+<?php
+
+$a = 1;
+$a - -1;
+CODE
+                ,
+                <<<'CODE'
+<?php
+
+$a = 1;
+$a + -1;
+CODE
+                ,
+            ],
         ];
     }
 

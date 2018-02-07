@@ -19,25 +19,36 @@ class ForeachTest extends AbstractMutatorTestCase
         return new Foreach_();
     }
 
-    public function test_zero_iteration()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = <<<'CODE'
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates to new array in foreach' => [
+                <<<'CODE'
 <?php
 
 $array = [1, 2];
 
 foreach ($array as $value) {
 }
-CODE;
-
-        $expectedCode = <<<'CODE'
+CODE
+                ,
+                <<<'CODE'
 <?php
 
 $array = [1, 2];
 foreach (array() as $value) {
 }
-CODE;
-
-        $this->assertSame($expectedCode, $this->mutate($code));
+CODE
+                ,
+            ],
+        ];
     }
 }

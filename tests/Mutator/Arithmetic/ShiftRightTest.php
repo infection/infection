@@ -19,6 +19,45 @@ class ShiftRightTest extends AbstractMutatorTestCase
         return new ShiftRight();
     }
 
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates shift right' => [
+                <<<'CODE'
+<?php
+
+$a = 1;
+$a >> 2;
+CODE
+                ,
+                <<<'CODE'
+<?php
+
+$a = 1;
+$a << 2;
+CODE
+                ,
+            ],
+            'It does not mutate shift left' => [
+                <<<'CODE'
+<?php
+
+$a = 1;
+$a << 2;
+CODE
+                ,
+            ],
+        ];
+    }
+
     public function test_replaces_post_decrement()
     {
         $code = '<?php $a = 1; $a >> 2;';

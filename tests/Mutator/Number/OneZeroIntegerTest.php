@@ -14,36 +14,66 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class OneZeroIntegerTest extends AbstractMutatorTestCase
 {
-    public function test_it_mutates_zero_to_one_integer()
-    {
-        $code = '<?php 10 + 0;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-10 + 1;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_mutates_one_to_zero_integer()
-    {
-        $code = '<?php 10 + 1;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-10 + 0;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
     protected function getMutator(): Mutator
     {
         return new OneZeroInteger();
+    }
+
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates int one to zero' => [
+                <<<'CODE'
+<?php
+
+10 + 1;
+CODE
+                ,
+                <<<'CODE'
+<?php
+
+10 + 0;
+CODE
+                ,
+            ],
+            'It mutates int zero to one' => [
+                <<<'CODE'
+<?php
+
+10 + 0;
+CODE
+                ,
+                <<<'CODE'
+<?php
+
+10 + 1;
+CODE
+                ,
+            ],
+            'It does not mutate float zero to one' => [
+                <<<'CODE'
+<?php
+
+10 + 0.0;
+CODE
+                ,
+            ],
+            'It does not mutate float one to zer0' => [
+                <<<'CODE'
+<?php
+
+10 + 1.0;
+CODE
+                ,
+            ],
+        ];
     }
 }

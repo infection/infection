@@ -22,6 +22,42 @@ class LogicalNotTest extends AbstractMutatorTestCase
         return new LogicalNot();
     }
 
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It removes logical not' => [
+                <<<'CODE'
+<?php
+
+return !false;
+CODE
+                ,
+                <<<'CODE'
+<?php
+
+return false;
+CODE
+                ,
+            ],
+            'It does not remove double logical not' => [
+                <<<'CODE'
+<?php
+
+return !!false;
+CODE
+                ,
+            ],
+        ];
+    }
+
     public function test_it_mutates_logical_not()
     {
         $expr = new BooleanNot(new ConstFetch(new Name('false')));
@@ -36,33 +72,5 @@ class LogicalNotTest extends AbstractMutatorTestCase
         );
 
         $this->assertFalse($this->mutator->shouldMutate($expr));
-    }
-
-    public function test_replaces_logical_not_with_empty_string()
-    {
-        $code = '<?php return !mt_rand();';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-return mt_rand();
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_does_not_replace_doubled_logical_not_with_empty_string()
-    {
-        $code = '<?php return !!false;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-return !!false;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
     }
 }

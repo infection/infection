@@ -14,22 +14,36 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class GreaterThanNegotiationTest extends AbstractMutatorTestCase
 {
-    public function test_it_mutates_equal_to_not_equal()
-    {
-        $code = '<?php 1 > 1;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-1 <= 1;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
     protected function getMutator(): Mutator
     {
         return new GreaterThanNegotiation();
+    }
+
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates greater than' => [
+                <<<'CODE'
+<?php
+
+1 > 1;
+CODE
+                ,
+                <<<'CODE'
+<?php
+
+1 <= 1;
+CODE
+                ,
+            ],
+        ];
     }
 }

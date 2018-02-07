@@ -19,46 +19,46 @@ class BreakTest extends AbstractMutatorTestCase
         return new Break_();
     }
 
-    public function test_replace_break_to_continue()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = <<<'CODE'
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It replaces break with continue in while' => [
+                <<<'CODE'
 <?php
+
 while (true) {
     break;
 }
-CODE;
-
-        $expectedCode = <<<'CODE'
+CODE
+                ,
+                <<<'CODE'
 <?php
 
 while (true) {
     continue;
 }
-CODE;
-
-        $this->assertSame($expectedCode, $this->mutate($code));
-    }
-
-    public function test_does_not_replace_break_to_continue_in_switch()
-    {
-        $code = <<<'CODE'
+CODE
+                ,
+            ],
+            'It does not replaces break with continue in switch' => [
+                <<<'CODE'
 <?php
 
 switch (1) {
     case 1:
         break;
 }
-CODE;
-
-        $expectedCode = <<<'CODE'
-<?php
-
-switch (1) {
-    case 1:
-        break;
-}
-CODE;
-
-        $this->assertSame($expectedCode, $this->mutate($code));
+CODE
+                ,
+            ],
+        ];
     }
 }

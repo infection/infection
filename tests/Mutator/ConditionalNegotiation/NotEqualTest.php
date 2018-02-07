@@ -14,22 +14,52 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class NotEqualTest extends AbstractMutatorTestCase
 {
-    public function test_it_mutates_equal_to_not_equal()
-    {
-        $code = '<?php 1 != 1;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-1 == 1;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
     protected function getMutator(): Mutator
     {
         return new NotEqual();
+    }
+
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates not strict comparison' => [
+                <<<'CODE'
+<?php
+
+1 != 1;
+CODE
+                ,
+                <<<'CODE'
+<?php
+
+1 == 1;
+CODE
+                ,
+            ],
+            'It does not mutate strict comparison' => [
+                <<<'CODE'
+<?php
+
+1 !== 1;
+CODE
+                ,
+            ],
+            'It does not mutate normal equals comparison' => [
+                <<<'CODE'
+<?php
+
+1 == 1;
+CODE
+                ,
+            ],
+        ];
     }
 }

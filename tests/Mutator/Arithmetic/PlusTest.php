@@ -16,29 +16,73 @@ use PhpParser\Node\Scalar\LNumber;
 
 class PlusTest extends AbstractMutatorTestCase
 {
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates normal plus' => [
+                <<<'CODE'
+<?php
+
+$a = 10 + 3;
+CODE
+                ,
+                <<<'CODE'
+<?php
+
+$a = 10 - 3;
+CODE
+                ,
+            ],
+            'It does not mutate plus equals' => [
+                <<<'CODE'
+<?php
+
+$a = 1;
+$a += 2;
+CODE
+                ,
+            ],
+            'It does not mutate increment' => [
+                <<<'CODE'
+<?php
+
+$a = 1;
+$a++;
+CODE
+                ,
+            ],
+            'It does mutate a fake increment' => [
+                <<<'CODE'
+<?php
+
+$a = 1;
+$a + +1;
+CODE
+                ,
+                <<<'CODE'
+<?php
+
+$a = 1;
+$a - +1;
+CODE
+                ,
+            ],
+        ];
+    }
+
     public function test_it_should_mutate_plus_expression()
     {
         $plusExpression = new \PhpParser\Node\Expr\BinaryOp\Plus(new LNumber(1), new LNumber(2));
 
         $this->assertTrue($this->mutator->shouldMutate($plusExpression));
-    }
-
-    public function test_it_mutates()
-    {
-        $input = <<<'CODE'
-<?php 
-
-$a = 1 + 1;
-CODE;
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-$a = 1 - 1;
-CODE;
-
-        $mutatedCode = $this->mutate($input);
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
     }
 
     public function test_it_should_not_mutate_plus_with_arrays()

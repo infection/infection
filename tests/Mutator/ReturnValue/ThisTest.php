@@ -14,9 +14,24 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class ThisTest extends AbstractMutatorTestCase
 {
-    public function test_mutates_returning_this()
+    protected function getMutator(): Mutator
     {
-        $code = <<<'CODE'
+        return new This();
+    }
+
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates return this without typehint' => [
+                <<<'CODE'
 <?php
 
 class Test
@@ -26,10 +41,9 @@ class Test
         return $this;
     }
 }
-CODE;
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
+CODE
+                ,
+                <<<'CODE'
 <?php
 
 class Test
@@ -39,13 +53,23 @@ class Test
         return null;
     }
 }
-CODE;
+CODE
+                ,
+            ],
+            'It does not mutate return this with typehint' => [
+                <<<'CODE'
+<?php
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    protected function getMutator(): Mutator
+class Test
+{
+    function test() : self
     {
-        return new This();
+        return $this;
+    }
+}
+CODE
+                ,
+            ],
+        ];
     }
 }
