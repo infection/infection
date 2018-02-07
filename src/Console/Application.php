@@ -10,6 +10,8 @@ namespace Infection\Console;
 
 use Infection\Command;
 use Infection\Config\InfectionConfig;
+use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Pimple\Container;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -116,8 +118,28 @@ ASCII;
             return new InfectionConfig(json_decode($json), $c['filesystem'], $dir);
         };
 
-        $this->container['tmp.dir'] = function (Container $c): string {
-            return $c['tmp.dir.creator']->createAndGet($c['infection.config']->getTmpDir());
+        $this->container['coverage.path'] = function (Container $c) use ($input): string {
+            $existingCoveragePath = $this->getExistingCoveragePath($input);
+
+            return $existingCoveragePath ?: $c['tmp.dir'];
         };
+    }
+
+    private function getExistingCoveragePath(InputInterface $input): string
+    {
+        $existingCoveragePath = $input->getOption('coverage');
+
+        if (strlen($existingCoveragePath) === 0) {
+            return '';
+        }
+
+        /** @var Filesystem $fileSystem */
+        $fileSystem = $this->container['filesystem'];
+
+        if ($fileSystem->isAbsolutePath($existingCoveragePath)) {
+            return $existingCoveragePath;
+        }
+
+        return sprintf('%s/%s', getcwd(), $existingCoveragePath);
     }
 }

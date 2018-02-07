@@ -39,9 +39,11 @@ class InitialTestsRunner
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function run(string $testFrameworkExtraOptions): Process
+    public function run(string $testFrameworkExtraOptions, bool $skipCoverage): Process
     {
-        $process = $this->processBuilder->getProcessForInitialTestRun($testFrameworkExtraOptions);
+        $process = $this->processBuilder->getProcessForInitialTestRun($testFrameworkExtraOptions, $skipCoverage);
+
+        var_dump($process->getCommandLine());
 
         $this->eventDispatcher->dispatch(new InitialTestSuiteStarted());
 
