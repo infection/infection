@@ -1,4 +1,4 @@
-Total: 4
+Total: 5
 Killed mutants:
 ===============
 
@@ -30,3 +30,6 @@ Timed Out mutants:
 Not Covered mutants:
 ====================
 
+
+Mutator: Throw_
+Line 18
