@@ -75,6 +75,14 @@ $a = 1;
 $a - +1;
 PHP
                 ,
+                ],
+                'It does not mutate additon of arrays' => [
+                    <<<'PHP'
+<?php
+
+$a = [1] + [3];
+PHP
+                    ,
             ],
         ];
     }

@@ -34,13 +34,13 @@ class IntegerNegationTest extends AbstractMutatorTestCase
                 <<<'PHP'
 <?php
 
-return -2;
+return -1;
 PHP
                 ,
                 <<<'PHP'
 <?php
 
-return 2;
+return 1;
 PHP
                 ,
             ],
@@ -48,13 +48,13 @@ PHP
                 <<<'PHP'
 <?php
 
-return 2;
+return 1;
 PHP
                 ,
                 <<<'PHP'
 <?php
 
-return -2;
+return -1;
 PHP
                 ,
             ],

@@ -74,6 +74,13 @@ PHP
 PHP
                 ,
             ],
+            'It does not mutate the string zero' => [
+                <<<'PHP'
+<?php
+
+'a' . '0';
+PHP
+            ],
         ];
     }
 }
