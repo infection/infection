@@ -23,4 +23,9 @@ class CoverageDoesNotExistException extends InfectionException
             )
         );
     }
+
+    public static function forJunit(string $filePath)
+    {
+        return new self(sprintf('Coverage report `junit` is not found in %s', $filePath));
+    }
 }

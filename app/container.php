@@ -31,6 +31,7 @@ use PhpParser\PrettyPrinter\Standard;
 use Pimple\Container;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Filesystem\Filesystem;
+use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 
 $c = new Container();
 
@@ -69,6 +70,12 @@ $c['coverage.dir.phpspec'] = function (Container $c) {
 };
 
 $c['phpunit.junit.file.path'] = function (Container $c) {
+    $filePath = sprintf('%s/%s', $c['coverage.path'], PhpUnitAdapter::JUNIT_FILE_NAME);
+
+    if (!file_exists($filePath)) {
+        throw CoverageDoesNotExistException::forJunit($filePath);
+    }
+
     return sprintf('%s/%s', $c['coverage.path'], PhpUnitAdapter::JUNIT_FILE_NAME);
 };
 

@@ -155,7 +155,6 @@ class InfectionCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // todo throw exception if one of the report is absent
         $container = $this->getContainer();
         $testFrameworkKey = $input->getOption('test-framework');
         $skipCoverage = strlen($input->getOption('coverage')) > 0;

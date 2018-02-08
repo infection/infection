@@ -99,7 +99,6 @@ class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
 
     public function onMutationTestingFinished(MutationTestingFinished $event)
     {
-        // TODO [doc] write test -> run mutation for just this file. Should be 100%, 100%, 100%,
         $this->outputFormatter->finish();
 
         if ($this->showMutations) {
