@@ -31,43 +31,43 @@ class DecrementTest extends AbstractMutatorTestCase
     {
         return [
             'It replaces post decrement' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1; 
 $a--;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a++;
-CODE
+PHP
                 ,
             ],
             'It replaces pre decrement' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 --$a;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 ++$a;
-CODE
+PHP
                 ,
             ],
             'It does not change when its not a real decrement' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $b - -$a;
-CODE
+PHP
                 ,
             ],
         ];

@@ -31,33 +31,33 @@ class GreaterThanOrEqualToTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates greater than or equal to' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 1 >= 2;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 1 > 2;
-CODE
+PHP
                 ,
             ],
             'It does not mutate an arrow' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 [1 => 2];
-CODE
+PHP
                 ,
             ],
             'It does not mutate a spaceship' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 1 <=> 2;
-CODE
+PHP
                 ,
             ],
         ];

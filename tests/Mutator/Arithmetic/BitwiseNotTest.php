@@ -31,17 +31,17 @@ class BitwiseNotTest extends AbstractMutatorTestCase
     {
         return [
             [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 ~2;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 2;
-CODE
+PHP
                 ,
             ],
         ];

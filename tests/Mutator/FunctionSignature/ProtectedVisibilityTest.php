@@ -31,7 +31,7 @@ class ProtectedVisibilityTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates protected to private' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 
@@ -43,9 +43,9 @@ class Test
         return false;
     }
 }
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 class Test
@@ -56,11 +56,11 @@ class Test
         return false;
     }
 }
-CODE
+PHP
                 ,
             ],
             'It does not mutate final flag' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 class Test
@@ -71,9 +71,9 @@ class Test
         return false;
     }
 }
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 class Test
@@ -84,22 +84,22 @@ class Test
         return false;
     }
 }
-CODE
+PHP
                 ,
             ],
             'It does not mutate abstract protected to private' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 abstract class Test
 {
     protected abstract function foo(int $param, $test = 1) : bool;
 }
-CODE
+PHP
                 ,
             ],
             'It does mutate not abstract protected to private in an abstract class' => [
-        <<<'CODE'
+        <<<'PHP'
 <?php
 
 abstract class Test
@@ -110,9 +110,9 @@ abstract class Test
         return false;
     }
 }
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 abstract class Test
@@ -123,11 +123,11 @@ abstract class Test
         return false;
     }
 }
-CODE
+PHP
                 ,
             ],
             'It does not mutate stratic flag' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 class Test
@@ -138,9 +138,9 @@ class Test
         return false;
     }
 }
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 class Test
@@ -151,7 +151,7 @@ class Test
         return false;
     }
 }
-CODE
+PHP
                 ,
             ],
         ];

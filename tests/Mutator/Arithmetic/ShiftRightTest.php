@@ -31,28 +31,28 @@ class ShiftRightTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates shift right' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a >> 2;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a << 2;
-CODE
+PHP
                 ,
             ],
             'It does not mutate shift left' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a << 2;
-CODE
+PHP
                 ,
             ],
         ];
@@ -63,12 +63,12 @@ CODE
         $code = '<?php $a = 1; $a >> 2;';
         $mutatedCode = $this->mutate($code);
 
-        $expectedMutatedCode = <<<'CODE'
+        $expectedMutatedCode = <<<'PHP'
 <?php
 
 $a = 1;
 $a << 2;
-CODE;
+PHP;
 
         $this->assertSame($expectedMutatedCode, $mutatedCode);
     }

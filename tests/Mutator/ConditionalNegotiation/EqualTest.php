@@ -31,33 +31,33 @@ class EqualTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates not strict comparison' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 1 == 1;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 1 != 1;
-CODE
+PHP
                 ,
             ],
             'It does not mutate strict comparison' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 1 === 1;
-CODE
+PHP
                 ,
             ],
             'It does not mutate not equals comparison' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 1 !== 1;
-CODE
+PHP
                 ,
             ],
         ];

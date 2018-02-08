@@ -11,9 +11,9 @@ namespace Infection\Tests\Mutator\Arithmetic;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\LNumber;
-use \PhpParser\Node;
 
 class PlusTest extends AbstractMutatorTestCase
 {
@@ -29,51 +29,51 @@ class PlusTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates normal plus' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 10 + 3;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 10 - 3;
-CODE
+PHP
                 ,
             ],
             'It does not mutate plus equals' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a += 2;
-CODE
+PHP
                 ,
             ],
             'It does not mutate increment' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a++;
-CODE
+PHP
                 ,
             ],
             'It does mutate a fake increment' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a + +1;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a - +1;
-CODE
+PHP
                 ,
             ],
         ];

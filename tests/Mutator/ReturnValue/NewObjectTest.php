@@ -15,7 +15,7 @@ class NewObjectTest extends AbstractValueToNullReturnValueTestCase
 {
     public function test_mutates_instantiation_of_new_object_with_params()
     {
-        $code = <<<'CODE'
+        $code = <<<'PHP'
 <?php
 
 class Test
@@ -25,9 +25,9 @@ class Test
     return new Foo('now');
     }
 }
-CODE;
+PHP;
 
-        $expectedMutatedCode = <<<'CODE'
+        $expectedMutatedCode = <<<'PHP'
 <?php
 
 class Test
@@ -38,13 +38,13 @@ class Test
         return null;
     }
 }
-CODE;
+PHP;
         $this->doTest($code, $expectedMutatedCode);
     }
 
     public function test_it_does_not_mutate_if_no_class_name_found()
     {
-        $code = <<<'CODE'
+        $code = <<<'PHP'
 <?php
 
 function test()
@@ -52,7 +52,7 @@ function test()
     $className = 'SimpleClass';
     $instance = new $className();
 }
-CODE;
+PHP;
         $this->doTest($code);
     }
 

@@ -31,17 +31,17 @@ class SpaceshipTest extends AbstractMutatorTestCase
     {
         return [
             'It swaps spaceship operators' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a <=> $b;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $b <=> $a;
-CODE
+PHP
                 ,
             ],
         ];

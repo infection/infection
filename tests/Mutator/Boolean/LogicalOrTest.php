@@ -31,25 +31,25 @@ class LogicalOrTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates logical or' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 true || false;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 true && false;
-CODE
+PHP
                 ,
             ],
             'It does not mutate logical lower or' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 true or false;
-CODE
+PHP
                 ,
             ],
         ];

@@ -31,28 +31,28 @@ class ShiftLeftTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates shift left' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a << 2;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a >> 2;
-CODE
+PHP
                 ,
             ],
             'It does not mutate shift right' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a >> 2;
-CODE
+PHP
                 ,
             ],
         ];

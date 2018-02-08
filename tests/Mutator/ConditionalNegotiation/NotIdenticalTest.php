@@ -31,33 +31,33 @@ class NotIdenticalTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates strict comparison' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 1 !== 1;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 1 === 1;
-CODE
+PHP
                 ,
             ],
             'It does not mutate not strict comparison' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 1 != 1;
-CODE
+PHP
                 ,
             ],
             'It does not mutate normal comparison' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 1 === 1;
-CODE
+PHP
                 ,
             ],
         ];

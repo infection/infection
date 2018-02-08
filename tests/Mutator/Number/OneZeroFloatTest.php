@@ -31,47 +31,47 @@ class OneZeroFloatTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates float one to zero' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 10 + 1.0;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 10 + 0.0;
-CODE
+PHP
                 ,
             ],
             'It mutates float zero to one' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 10 + 0.0;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 10 + 1.0;
-CODE
+PHP
                 ,
             ],
             'It does not mutate int zero to one' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 10 + 0;
-CODE
+PHP
                 ,
             ],
             'It does not mutate int one to zer0' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 10 + 1;
-CODE
+PHP
                 ,
             ],
         ];

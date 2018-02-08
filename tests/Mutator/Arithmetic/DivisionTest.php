@@ -31,26 +31,26 @@ class DivisionTest extends AbstractMutatorTestCase
     {
         return [
             'It changes regular divison' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 10 / 2;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 10 * 2;
-CODE
+PHP
                 ,
             ],
             'It does not change division equals' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 10;
 $a /= 5;
-CODE
+PHP
                 ,
             ],
         ];
@@ -61,11 +61,11 @@ CODE
         $code = '<?php 1 / 2;';
         $mutatedCode = $this->mutate($code);
 
-        $expectedMutatedCode = <<<'CODE'
+        $expectedMutatedCode = <<<'PHP'
 <?php
 
 1 * 2;
-CODE;
+PHP;
 
         $this->assertSame($expectedMutatedCode, $mutatedCode);
     }

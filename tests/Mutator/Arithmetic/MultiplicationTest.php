@@ -31,26 +31,26 @@ class MultiplicationTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates normal multiplication' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 10 * 3;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 10 / 3;
-CODE
+PHP
                 ,
             ],
             'It does not mutate multiplication equals' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a *= 2;
-CODE
+PHP
                 ,
             ],
         ];

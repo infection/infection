@@ -33,39 +33,39 @@ class FalseValueTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates false to true' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 return false;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 return true;
-CODE
+PHP
                 ,
             ],
             'It does not mutate the string false to true' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 return 'false';
-CODE
+PHP
                 ,
             ],
             'It mutates all caps false to true' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 return FALSE;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 return true;
-CODE
+PHP
                 ,
             ],
         ];

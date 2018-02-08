@@ -31,22 +31,22 @@ class ForeachTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates to new array in foreach' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $array = [1, 2];
 
 foreach ($array as $value) {
 }
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $array = [1, 2];
 foreach (array() as $value) {
 }
-CODE
+PHP
                 ,
             ],
         ];

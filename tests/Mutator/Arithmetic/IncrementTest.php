@@ -31,43 +31,43 @@ class IncrementTest extends AbstractMutatorTestCase
     {
         return [
             'It replaces post increment' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1; 
 $a++;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a--;
-CODE
+PHP
                 ,
             ],
             'It replaces pre increment' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 ++$a;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 --$a;
-CODE
+PHP
                 ,
             ],
             'It does not change when its not a real increment' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $b + +$a;
-CODE
+PHP
                 ,
             ],
         ];

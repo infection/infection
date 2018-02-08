@@ -31,26 +31,26 @@ class ModulusTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates normal mod' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 10 % 3;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 10 * 3;
-CODE
+PHP
                 ,
             ],
             'It does not mutate mod equals' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a %= 2;
-CODE
+PHP
                 ,
             ],
         ];

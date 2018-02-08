@@ -31,27 +31,27 @@ class MulEqualTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates multiply equal' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a *= 2;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a /= 2;
-CODE
+PHP
                 ,
             ],
             'It does not mutate normal multiply' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 10 * 3;
-CODE
+PHP
                 ,
             ],
         ];

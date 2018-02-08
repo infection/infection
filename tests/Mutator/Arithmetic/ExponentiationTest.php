@@ -31,17 +31,17 @@ class ExponentiationTest extends AbstractMutatorTestCase
     {
         return [
             [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 1 ** 2;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 1 / 2;
-CODE
+PHP
                 ,
             ],
         ];

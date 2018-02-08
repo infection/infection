@@ -31,7 +31,7 @@ class ThisTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates return this without typehint' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 class Test
@@ -41,9 +41,9 @@ class Test
         return $this;
     }
 }
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 class Test
@@ -53,11 +53,11 @@ class Test
         return null;
     }
 }
-CODE
+PHP
                 ,
             ],
             'It does not mutate return this with typehint' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 class Test
@@ -67,7 +67,7 @@ class Test
         return $this;
     }
 }
-CODE
+PHP
                 ,
             ],
         ];

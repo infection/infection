@@ -19,7 +19,7 @@ class PublicVisibilityTest extends AbstractMutatorTestCase
      */
     public function test_it_does_not_modify_blacklisted_functions(string $functionName)
     {
-        $code = <<<"CODE"
+        $code = <<<"PHP"
 <?php
 
 class Test
@@ -28,7 +28,7 @@ class Test
     {
     }
 }
-CODE;
+PHP;
         $this->doTest($code);
     }
 
@@ -65,7 +65,7 @@ CODE;
     {
         return [
             'It mutates public to protected' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 
@@ -77,9 +77,9 @@ class Test
         return false;
     }
 }
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 class Test
@@ -90,11 +90,11 @@ class Test
         return false;
     }
 }
-CODE
+PHP
                 ,
             ],
             'It does not mutate final flag' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 class Test
@@ -105,9 +105,9 @@ class Test
         return false;
     }
 }
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 class Test
@@ -118,11 +118,11 @@ class Test
         return false;
     }
 }
-CODE
+PHP
                 ,
             ],
             'It mutates non abstract public to protected in an abstract class' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 abstract class Test
@@ -133,9 +133,9 @@ abstract class Test
         return false;
     }
 }
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 abstract class Test
@@ -146,11 +146,11 @@ abstract class Test
         return false;
     }
 }
-CODE
+PHP
                 ,
             ],
             'It does not mutate static flag' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 class Test
@@ -161,9 +161,9 @@ class Test
         return false;
     }
 }
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 class Test
@@ -174,11 +174,11 @@ class Test
         return false;
     }
 }
-CODE
+PHP
                 ,
             ],
             'It replaces visibility if not set' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 class Test
@@ -189,9 +189,9 @@ class Test
         return false;
     }
 }
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 class Test
@@ -202,18 +202,18 @@ class Test
         return false;
     }
 }
-CODE
+PHP
                 ,
             ],
             'It does not mutate an interface' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 interface TestInterface
 {
     public function test();
 }
-CODE
+PHP
             ],
         ];
     }

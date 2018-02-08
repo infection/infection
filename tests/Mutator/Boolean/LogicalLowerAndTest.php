@@ -30,25 +30,25 @@ class LogicalLowerAndTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates logical lower and' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 true and false;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 true or false;
-CODE
+PHP
                 ,
             ],
             'It does not mutate logical and' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 true && false;
-CODE
+PHP
                 ,
             ],
         ];

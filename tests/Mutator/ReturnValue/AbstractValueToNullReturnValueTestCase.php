@@ -26,7 +26,7 @@ abstract class AbstractValueToNullReturnValueTestCase extends AbstractMutatorTes
     {
         return [
             'It mutates without typehint' => [
-                <<<"CODE"
+                <<<"PHP"
 <?php
 
 class Test
@@ -36,9 +36,9 @@ class Test
         return {$this->getMutableNodeString()};
     }
 }
-CODE
+PHP
                 ,
-                <<<"CODE"
+                <<<"PHP"
 <?php
 
 class Test
@@ -49,11 +49,11 @@ class Test
         return null;
     }
 }
-CODE
+PHP
                 ,
             ],
             'It does not mutate when scalar typehint does not allow null' => [
-                <<<"CODE"
+                <<<"PHP"
 <?php
 
 class Test
@@ -63,11 +63,11 @@ class Test
         return {$this->getMutableNodeString()};
     }
 }
-CODE
+PHP
                 ,
             ],
             'It mutates when scalar typehint allows null' => [
-                <<<"CODE"
+                <<<"PHP"
 <?php
 
 class Test
@@ -77,9 +77,9 @@ class Test
         return {$this->getMutableNodeString()};
     }
 }
-CODE
+PHP
                 ,
-                <<<"CODE"
+                <<<"PHP"
 <?php
 
 class Test
@@ -90,11 +90,11 @@ class Test
         return null;
     }
 }
-CODE
+PHP
                 ,
             ],
             'It does not mutate when FQN typehint does not allow null' => [
-                <<<"CODE"
+                <<<"PHP"
 <?php
 
 class Test
@@ -104,11 +104,11 @@ class Test
         return {$this->getMutableNodeString()};
     }
 }
-CODE
+PHP
                 ,
             ],
             'It mutates when FQL typehint allows null' => [
-                <<<"CODE"
+                <<<"PHP"
 <?php
 
 class Test
@@ -118,9 +118,9 @@ class Test
         return {$this->getMutableNodeString()};
     }
 }
-CODE
+PHP
                 ,
-                <<<"CODE"
+                <<<"PHP"
 <?php
 
 class Test
@@ -131,32 +131,32 @@ class Test
         return null;
     }
 }
-CODE
+PHP
                 ,
             ],
             'It does not mutate return of a function outside of a class' => [
-                <<<"CODE"
+                <<<"PHP"
 <?php
 
 function test()
 {
     {$this->getMutableNodeString()};
 }
-CODE
+PHP
             ],
         ];
     }
 
     public function test_it_does_not_mutate_a_function_outside_a_class()
     {
-        $code = <<<"CODE"
+        $code = <<<"PHP"
 <?php
 
 function test()
 {
     return 1;
 }
-CODE;
+PHP;
 
         $mutatedCode = $this->mutate($code);
         $this->assertSame($code, $mutatedCode);

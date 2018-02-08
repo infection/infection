@@ -34,51 +34,51 @@ class MinusTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates normal minus' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1 - 1;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1 + 1;
-CODE
+PHP
                 ,
             ],
             'It does not mutate minus equals' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a -= 2;
-CODE
+PHP
                 ,
             ],
             'It does not mutate decrement' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a--;
-CODE
+PHP
                 ,
             ],
             'It does mutate a fake decrement' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a - -1;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a + -1;
-CODE
+PHP
                 ,
             ],
         ];

@@ -31,76 +31,76 @@ class IncrementIntegerTest extends AbstractMutatorTestCase
     {
         return [
             'It increments an integer' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 if ($foo < 10) {
     echo 'bar';
 }
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 if ($foo < 11) {
     echo 'bar';
 }
-CODE
+PHP
                 ,
             ],
             'It does not increment the number zero' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 if ($foo < 0) {
     echo 'bar';
 }
-CODE
+PHP
                 ,
             ],
             'It increments one' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 if ($foo < 1) {
     echo 'bar';
 }
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 if ($foo < 2) {
     echo 'bar';
 }
-CODE
+PHP
                 ,
             ],
             'It does not increment floats' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 if ($foo < 1.0) {
     echo 'bar';
 }
-CODE
+PHP
             ],
             'It decrements a negative integer' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 if ($foo < -10) {
     echo 'bar';
 }
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 if ($foo < -11) {
     echo 'bar';
 }
-CODE
+PHP
                 ,
             ],
         ];

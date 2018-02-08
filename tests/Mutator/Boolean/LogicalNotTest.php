@@ -34,25 +34,25 @@ class LogicalNotTest extends AbstractMutatorTestCase
     {
         return [
             'It removes logical not' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 return !false;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 return false;
-CODE
+PHP
                 ,
             ],
             'It does not remove double logical not' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 return !!false;
-CODE
+PHP
                 ,
             ],
         ];

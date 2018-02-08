@@ -31,27 +31,27 @@ class DivEqualTest extends AbstractMutatorTestCase
     {
         return [
             'It changes divison equals' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a /=2;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a *= 2;
-CODE
+PHP
                 ,
             ],
             'It does not change normal division' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 10 / 2;
-CODE
+PHP
                 ,
             ],
         ];

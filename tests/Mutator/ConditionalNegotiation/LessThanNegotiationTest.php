@@ -31,17 +31,17 @@ class LessThanNegotiationTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates less than' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 1 < 1;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 1 >= 1;
-CODE
+PHP
                 ,
             ],
         ];

@@ -31,47 +31,47 @@ class FloatNegationTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates negative float return to positive' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 return -2.0;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 return 2.0;
-CODE
+PHP
                 ,
             ],
             'It mutates positive float return to negative' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 return 2.0;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 return -2.0;
-CODE
+PHP
                 ,
             ],
             'It does not mutate float zero' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 return 0.0;
-CODE
+PHP
                 ,
             ],
             'It does not mutate integers' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 return 1;
-CODE
+PHP
                 ,
             ],
         ];

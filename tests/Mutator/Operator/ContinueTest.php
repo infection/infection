@@ -31,32 +31,32 @@ class ContinueTest extends AbstractMutatorTestCase
     {
         return [
             'It replaces continue with break in while' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 while (true) {
     continue;
 }
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 while (true) {
     break;
 }
-CODE
+PHP
                 ,
             ],
             'It does not replaces continue with break in switch' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 switch (1) {
     case 1:
         continue;
 }
-CODE
+PHP
                 ,
             ],
         ];

@@ -31,27 +31,27 @@ class PowEqualTest extends AbstractMutatorTestCase
     {
         return [
             'It mutates pow equal' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a **= 2;
-CODE
+PHP
                 ,
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a /= 2;
-CODE
+PHP
                 ,
             ],
             'It does not mutate normal pow' => [
-                <<<'CODE'
+                <<<'PHP'
 <?php
 
 $a = 10 ** 3;
-CODE
+PHP
                 ,
             ],
         ];
