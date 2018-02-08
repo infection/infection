@@ -13,6 +13,7 @@ use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\LNumber;
+use \PhpParser\Node;
 
 class PlusTest extends AbstractMutatorTestCase
 {
@@ -80,14 +81,14 @@ CODE
 
     public function test_it_should_mutate_plus_expression()
     {
-        $plusExpression = new \PhpParser\Node\Expr\BinaryOp\Plus(new LNumber(1), new LNumber(2));
+        $plusExpression = new Node\Expr\BinaryOp\Plus(new LNumber(1), new LNumber(2));
 
         $this->assertTrue($this->mutator->shouldMutate($plusExpression));
     }
 
     public function test_it_should_not_mutate_plus_with_arrays()
     {
-        $plusExpression = new \PhpParser\Node\Expr\BinaryOp\Plus(
+        $plusExpression = new Node\Expr\BinaryOp\Plus(
             new Array_([new LNumber(1)]),
             new Array_([new LNumber(1)])
         );
