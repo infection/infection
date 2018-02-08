@@ -55,6 +55,7 @@ use Infection\Mutator\Number\OneZeroFloat;
 use Infection\Mutator\Number\OneZeroInteger;
 use Infection\Mutator\Operator\Break_;
 use Infection\Mutator\Operator\Continue_;
+use Infection\Mutator\Operator\Throw_;
 use Infection\Mutator\ReturnValue\FloatNegation;
 use Infection\Mutator\ReturnValue\FunctionCall;
 use Infection\Mutator\ReturnValue\IntegerNegation;
@@ -141,6 +142,7 @@ class InfectionConfig
 
         Break_::class,
         Continue_::class,
+        Throw_::class,
         Foreach_::class,
     ];
 
