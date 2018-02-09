@@ -10,56 +10,66 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\Increment;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class IncrementTest extends AbstractMutator
+class IncrementTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {
         return new Increment();
     }
 
-    public function test_replaces_post_decrement()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = '<?php $a = 1; $a++;';
-        $mutatedCode = $this->mutate($code);
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): array
+    {
+        return [
+            'It replaces post increment' => [
+                <<<'PHP'
+<?php
+
+$a = 1; 
+$a++;
+PHP
+                ,
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a--;
-CODE;
+PHP
+                ,
+            ],
+            'It replaces pre increment' => [
+                <<<'PHP'
+<?php
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_replaces_pre_decrement()
-    {
-        $code = '<?php $a = 1; ++$a;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
+$a = 1;
+++$a;
+PHP
+                ,
+                <<<'PHP'
 <?php
 
 $a = 1;
 --$a;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_parses_decrement_correctly()
-    {
-        $code = '<?php 1 + +1;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
+PHP
+                ,
+            ],
+            'It does not change when its not a real increment' => [
+                <<<'PHP'
 <?php
 
-1 + +1;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+$b + +$a;
+PHP
+                ,
+            ],
+        ];
     }
 }

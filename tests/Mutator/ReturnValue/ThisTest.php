@@ -10,13 +10,28 @@ namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ReturnValue\This;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ThisTest extends AbstractMutator
+class ThisTest extends AbstractMutatorTestCase
 {
-    public function test_mutates_returning_this()
+    protected function getMutator(): Mutator
     {
-        $code = <<<'CODE'
+        return new This();
+    }
+
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates return this without typehint' => [
+                <<<'PHP'
 <?php
 
 class Test
@@ -26,10 +41,9 @@ class Test
         return $this;
     }
 }
-CODE;
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
+PHP
+                ,
+                <<<'PHP'
 <?php
 
 class Test
@@ -39,13 +53,23 @@ class Test
         return null;
     }
 }
-CODE;
+PHP
+                ,
+            ],
+            'It does not mutate return this with typehint' => [
+                <<<'PHP'
+<?php
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    protected function getMutator(): Mutator
+class Test
+{
+    function test() : self
     {
-        return new This();
+        return $this;
+    }
+}
+PHP
+                ,
+            ],
+        ];
     }
 }

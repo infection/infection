@@ -31,6 +31,6 @@ class TrueValue extends Mutator
             return false;
         }
 
-        return $node->name->getFirst() === 'true';
+        return strtolower($node->name->getFirst()) === 'true';
     }
 }

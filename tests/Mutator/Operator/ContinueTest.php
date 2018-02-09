@@ -10,55 +10,55 @@ namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Operator\Continue_;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ContinueTest extends AbstractMutator
+class ContinueTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {
         return new Continue_();
     }
 
-    public function test_replace_continue_to_break()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = <<<'CODE'
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It replaces continue with break in while' => [
+                <<<'PHP'
 <?php
+
 while (true) {
     continue;
 }
-CODE;
-
-        $expectedCode = <<<'CODE'
+PHP
+                ,
+                <<<'PHP'
 <?php
 
 while (true) {
     break;
 }
-CODE;
-
-        $this->assertSame($expectedCode, $this->mutate($code));
-    }
-
-    public function test_does_not_replace_continue_to_break_in_switch()
-    {
-        $code = <<<'CODE'
+PHP
+                ,
+            ],
+            'It does not replaces continue with break in switch' => [
+                <<<'PHP'
 <?php
 
 switch (1) {
     case 1:
         continue;
 }
-CODE;
-
-        $expectedCode = <<<'CODE'
-<?php
-
-switch (1) {
-    case 1:
-        continue;
-}
-CODE;
-
-        $this->assertSame($expectedCode, $this->mutate($code));
+PHP
+                ,
+            ],
+        ];
     }
 }

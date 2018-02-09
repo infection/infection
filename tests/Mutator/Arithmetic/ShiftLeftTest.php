@@ -10,27 +10,51 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\ShiftLeft;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ShiftLeftTest extends AbstractMutator
+class ShiftLeftTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {
         return new ShiftLeft();
     }
 
-    public function test_replaces_post_decrement()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = '<?php $a = 1; $a << 2;';
-        $mutatedCode = $this->mutate($code);
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates shift left' => [
+                <<<'PHP'
+<?php
+
+$a = 1;
+$a << 2;
+PHP
+                ,
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a >> 2;
-CODE;
+PHP
+                ,
+            ],
+            'It does not mutate shift right' => [
+                <<<'PHP'
+<?php
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+$a = 1;
+$a >> 2;
+PHP
+                ,
+            ],
+        ];
     }
 }

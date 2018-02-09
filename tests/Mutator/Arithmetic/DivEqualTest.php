@@ -10,27 +10,50 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\DivEqual;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class DivEqualTest extends AbstractMutator
+class DivEqualTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {
         return new DivEqual();
     }
 
-    public function test_replaces_post_decrement()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = '<?php $a = 1; $a /= 2;';
-        $mutatedCode = $this->mutate($code);
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): array
+    {
+        return [
+            'It changes divison equals' => [
+                <<<'PHP'
+<?php
+
+$a = 1;
+$a /=2;
+PHP
+                ,
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a *= 2;
-CODE;
+PHP
+                ,
+            ],
+            'It does not change normal division' => [
+                <<<'PHP'
+<?php
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+$a = 10 / 2;
+PHP
+                ,
+            ],
+        ];
     }
 }

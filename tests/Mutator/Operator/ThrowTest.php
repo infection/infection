@@ -10,29 +10,40 @@ namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Operator\Throw_;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ThrowTest extends AbstractMutator
+class ThrowTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {
         return new Throw_();
     }
 
-    public function test_replace_break_to_continue()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = <<<'CODE'
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It removes the throw statement' => [
+                <<<'PHP'
 <?php
 
 throw new \Exception();
-CODE;
-
-        $expectedCode = <<<'CODE'
+PHP
+                ,
+                <<<'PHP'
 <?php
 
 new \Exception();
-CODE;
-
-        $this->assertSame($expectedCode, $this->mutate($code));
+PHP
+                ,
+            ],
+        ];
     }
 }

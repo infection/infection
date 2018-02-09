@@ -19,12 +19,26 @@ use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PHPUnit\Framework\TestCase;
 
-abstract class AbstractMutator extends TestCase
+abstract class AbstractMutatorTestCase extends TestCase
 {
     /**
      * @var Mutator
      */
     protected $mutator;
+
+    public function doTest(string $inputCode, string $expectedCode = null)
+    {
+        if ($inputCode === $expectedCode) {
+            throw new \LogicException('Input code cant be the same as mutated code');
+        }
+
+        $realMutatedCode = $this->mutate($inputCode);
+        if ($expectedCode !== null) {
+            $this->assertSame($expectedCode, $realMutatedCode);
+        } else {
+            $this->assertSame($inputCode, $realMutatedCode);
+        }
+    }
 
     abstract protected function getMutator(): Mutator;
 

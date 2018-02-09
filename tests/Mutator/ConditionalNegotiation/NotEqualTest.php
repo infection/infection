@@ -10,26 +10,56 @@ namespace Infection\Tests\Mutator\ConditionalNegotiation;
 
 use Infection\Mutator\ConditionalNegotiation\NotEqual;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class NotEqualTest extends AbstractMutator
+class NotEqualTest extends AbstractMutatorTestCase
 {
-    public function test_it_mutates_equal_to_not_equal()
-    {
-        $code = '<?php 1 != 1;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-1 == 1;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
     protected function getMutator(): Mutator
     {
         return new NotEqual();
+    }
+
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates not strict comparison' => [
+                <<<'PHP'
+<?php
+
+1 != 1;
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+1 == 1;
+PHP
+                ,
+            ],
+            'It does not mutate strict comparison' => [
+                <<<'PHP'
+<?php
+
+1 !== 1;
+PHP
+                ,
+            ],
+            'It does not mutate normal equals comparison' => [
+                <<<'PHP'
+<?php
+
+1 == 1;
+PHP
+                ,
+            ],
+        ];
     }
 }

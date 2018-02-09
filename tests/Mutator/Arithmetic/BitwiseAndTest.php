@@ -10,26 +10,40 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\BitwiseAnd;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class BitwiseAndTest extends AbstractMutator
+class BitwiseAndTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {
         return new BitwiseAnd();
     }
 
-    public function test_replaces_bitwise_and_with_or()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = '<?php 1 & 2;';
-        $mutatedCode = $this->mutate($code);
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): array
+    {
+        return [
+            [
+                <<<'PHP'
+<?php
+
+1 & 2;
+PHP
+                ,
+                <<<'PHP'
 <?php
 
 1 | 2;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+PHP
+                ,
+            ],
+        ];
     }
 }

@@ -10,26 +10,49 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\Modulus;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ModulusTest extends AbstractMutator
+class ModulusTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {
         return new Modulus();
     }
 
-    public function test_replaces_modulus_with_multiplication()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = '<?php 1 % 2;';
-        $mutatedCode = $this->mutate($code);
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates normal mod' => [
+                <<<'PHP'
 <?php
 
-1 * 2;
-CODE;
+$a = 10 % 3;
+PHP
+                ,
+                <<<'PHP'
+<?php
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+$a = 10 * 3;
+PHP
+                ,
+            ],
+            'It does not mutate mod equals' => [
+                <<<'PHP'
+<?php
+
+$a = 1;
+$a %= 2;
+PHP
+                ,
+            ],
+        ];
     }
 }

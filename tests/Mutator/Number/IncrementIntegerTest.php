@@ -10,64 +10,99 @@ namespace Infection\Tests\Mutator\Number;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Number\IncrementInteger;
-use Infection\Mutator\Number\OneZeroInteger;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class IncrementIntegerTest extends AbstractMutator
+class IncrementIntegerTest extends AbstractMutatorTestCase
 {
-    public function test_it_increments_an_integer()
+    protected function getMutator(): Mutator
     {
-        $code = <<<'PHP'
+        return new IncrementInteger();
+    }
+
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It increments an integer' => [
+                <<<'PHP'
 <?php
 
 if ($foo < 10) {
     echo 'bar';
 }
-PHP;
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'PHP'
+PHP
+                ,
+                <<<'PHP'
 <?php
 
 if ($foo < 11) {
     echo 'bar';
 }
-PHP;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    /**
-     * Mutator should skip 0 to reduce the number of mutations.
-     *
-     * @see OneZeroInteger::mutate()
-     */
-    public function test_it_does_not_increment_zero()
-    {
-        $code = <<<'PHP'
+PHP
+                ,
+            ],
+            'It does not increment the number zero' => [
+                <<<'PHP'
 <?php
 
 if ($foo < 0) {
     echo 'bar';
 }
-PHP;
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'PHP'
+PHP
+                ,
+            ],
+            'It increments one' => [
+                <<<'PHP'
 <?php
 
-if ($foo < 0) {
+if ($foo < 1) {
     echo 'bar';
 }
-PHP;
+PHP
+                ,
+                <<<'PHP'
+<?php
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
+if ($foo < 2) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
+            'It does not increment floats' => [
+                <<<'PHP'
+<?php
 
-    protected function getMutator(): Mutator
-    {
-        return new IncrementInteger();
+if ($foo < 1.0) {
+    echo 'bar';
+}
+PHP
+            ],
+            'It decrements a negative integer' => [
+                <<<'PHP'
+<?php
+
+if ($foo < -10) {
+    echo 'bar';
+}
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+if ($foo < -11) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
+        ];
     }
 }

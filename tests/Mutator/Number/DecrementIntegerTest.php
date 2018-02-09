@@ -10,64 +10,90 @@ namespace Infection\Tests\Mutator\Number;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Number\DecrementInteger;
-use Infection\Mutator\Number\OneZeroInteger;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class DecrementIntegerTest extends AbstractMutator
+class DecrementIntegerTest extends AbstractMutatorTestCase
 {
-    public function test_it_decrements_an_integer()
+    protected function getMutator(): Mutator
     {
-        $code = <<<'PHP'
+        return new DecrementInteger();
+    }
+
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It decrements an integer' => [
+                <<<'PHP'
 <?php
 
 if ($foo < 10) {
     echo 'bar';
 }
-PHP;
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'PHP'
+PHP
+                ,
+                <<<'PHP'
 <?php
 
 if ($foo < 9) {
     echo 'bar';
 }
-PHP;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    /**
-     * Mutator should skip 1 to reduce the number of mutations.
-     *
-     * @see OneZeroInteger::mutate()
-     */
-    public function test_it_does_not_decrement_one()
-    {
-        $code = <<<'PHP'
+PHP
+                ,
+            ],
+            'It does not decrement the number one' => [
+                <<<'PHP'
 <?php
 
 if ($foo < 1) {
     echo 'bar';
 }
-PHP;
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'PHP'
+PHP
+                ,
+            ],
+            'It decrements zero' => [
+                <<<'PHP'
 <?php
 
-if ($foo < 1) {
+if ($foo < 0) {
     echo 'bar';
 }
-PHP;
+PHP
+                ,
+                <<<'PHP'
+<?php
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
+if ($foo < -1) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
+            'It increments a negative integer' => [
+                <<<'PHP'
+<?php
 
-    protected function getMutator(): Mutator
-    {
-        return new DecrementInteger();
+if ($foo < -10) {
+    echo 'bar';
+}
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+if ($foo < -9) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
+        ];
     }
 }

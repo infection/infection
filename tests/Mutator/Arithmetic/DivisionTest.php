@@ -10,13 +10,50 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\Division;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class DivisionTest extends AbstractMutator
+class DivisionTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {
         return new Division();
+    }
+
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It changes regular divison' => [
+                <<<'PHP'
+<?php
+
+$a = 10 / 2;
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = 10 * 2;
+PHP
+                ,
+            ],
+            'It does not change division equals' => [
+                <<<'PHP'
+<?php
+
+$a = 10;
+$a /= 5;
+PHP
+                ,
+            ],
+        ];
     }
 
     public function test_replaces_division_with_multiplication()
@@ -24,11 +61,11 @@ class DivisionTest extends AbstractMutator
         $code = '<?php 1 / 2;';
         $mutatedCode = $this->mutate($code);
 
-        $expectedMutatedCode = <<<'CODE'
+        $expectedMutatedCode = <<<'PHP'
 <?php
 
 1 * 2;
-CODE;
+PHP;
 
         $this->assertSame($expectedMutatedCode, $mutatedCode);
     }
