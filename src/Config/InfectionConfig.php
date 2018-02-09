@@ -156,19 +156,25 @@ class InfectionConfig
      */
     private $filesystem;
 
-    public function __construct(\stdClass $config, Filesystem $filesystem)
+    /**
+     * @var string
+     */
+    private $configLocation;
+
+    public function __construct(\stdClass $config, Filesystem $filesystem, string $configLocation)
     {
         $this->config = $config;
         $this->filesystem = $filesystem;
+        $this->configLocation = $configLocation;
     }
 
     public function getPhpUnitConfigDir(): string
     {
         if (isset($this->config->phpUnit->configDir)) {
-            return getcwd() . DIRECTORY_SEPARATOR . $this->config->phpUnit->configDir;
+            return $this->configLocation . DIRECTORY_SEPARATOR . $this->config->phpUnit->configDir;
         }
 
-        return getcwd();
+        return $this->configLocation;
     }
 
     public function getPhpUnitCustomPath()
@@ -269,6 +275,6 @@ class InfectionConfig
             return $tmpDir;
         }
 
-        return sprintf('%s/%s', getcwd(), $tmpDir);
+        return sprintf('%s/%s', $this->configLocation, $tmpDir);
     }
 }

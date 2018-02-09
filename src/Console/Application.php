@@ -106,12 +106,14 @@ ASCII;
                 );
 
                 $infectionConfigFile = $c['locator']->locateAnyOf($configPaths);
+                $dir = \pathinfo($infectionConfigFile, PATHINFO_DIRNAME);
                 $json = file_get_contents($infectionConfigFile);
             } catch (\Exception $e) {
                 $json = '{}';
+                $dir = getcwd();
             }
 
-            return new InfectionConfig(json_decode($json), $c['filesystem']);
+            return new InfectionConfig(json_decode($json), $c['filesystem'], $dir);
         };
 
         $this->container['tmp.dir'] = function (Container $c): string {
