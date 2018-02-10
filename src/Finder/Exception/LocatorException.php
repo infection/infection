@@ -10,19 +10,19 @@ namespace Infection\Finder\Exception;
 
 class LocatorException extends \RuntimeException
 {
-    public static function fileOrDirectorieDoesNotExist(string $name)
+    public static function fileOrDirectoryDoesNotExist(string $name): self
     {
         return new self(sprintf('The file/directory "%s" does not exist.', $name));
     }
 
-    public function filesOrDirectoriesDoNotExist(string $name, array $paths)
+    public static function filesOrDirectoriesDoNotExist(string $name, array $paths): self
     {
         return new self(
             sprintf('The file/folder "%s" does not exist (in: %s).', $name, implode(', ', $paths))
         );
     }
 
-    public static function filesNotFound()
+    public static function filesNotFound(): self
     {
         return new self('Files are not found');
     }

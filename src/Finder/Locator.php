@@ -36,7 +36,7 @@ class Locator
                 return realpath($name);
             }
 
-            throw LocatorException::fileOrDirectorieDoesNotExist($name);
+            throw LocatorException::fileOrDirectoryDoesNotExist($name);
         }
 
         $paths = $this->getUniqueMergedPaths($additionalPath);
