@@ -9,43 +9,38 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Config\Path;
 
 use Infection\Finder\Locator;
+use Symfony\Component\Filesystem\Filesystem;
 
 class PathReplacer
 {
     /**
      * @var Locator
      */
-    private $locator;
+    private $filesystem;
 
     /**
      * @var string|null
      */
-    private $customPhpUnitConfigDir;
+    private $phpUnitConfigDir;
 
-    public function __construct(Locator $fileLocator, string $customPhpUnitConfigDir = null)
+    public function __construct(Filesystem $filesystem, string $phpUnitConfigDir = null)
     {
-        $this->locator = $fileLocator;
-        $this->customPhpUnitConfigDir = $customPhpUnitConfigDir;
+        $this->filesystem = $filesystem;
+        $this->phpUnitConfigDir = $phpUnitConfigDir;
     }
 
     /**
-     * @param \DOMNode & \DOMElement $domElement
+     * @param \DOMNode|\DOMElement $domElement
      */
     public function replaceInNode(\DOMNode $domElement)
     {
-        if (strpos($domElement->nodeValue, '*') === false) {
-            $domElement->nodeValue = $this->locator->locate($domElement->nodeValue, $this->customPhpUnitConfigDir);
-        } else {
-            $directories = $this->locator->locateDirectories($domElement->nodeValue, $this->customPhpUnitConfigDir);
-
-            $domDocument = $domElement->ownerDocument;
-
-            $parentNode = $domElement->parentNode;
-            $domElement->parentNode->removeChild($domElement);
-
-            foreach ($directories as $directory) {
-                $parentNode->appendChild($domDocument->createElement($domElement->tagName, $directory));
-            }
+        if (!$this->filesystem->isAbsolutePath($domElement->nodeValue)) {
+            $domElement->nodeValue = sprintf(
+                '%s%s%s',
+                $this->phpUnitConfigDir,
+                DIRECTORY_SEPARATOR,
+                ltrim($domElement->nodeValue, '\.\/')
+            );
         }
     }
 }

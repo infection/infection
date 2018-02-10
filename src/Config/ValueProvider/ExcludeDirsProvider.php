@@ -14,6 +14,7 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Filesystem\Filesystem;
 
 class ExcludeDirsProvider
 {
@@ -29,10 +30,16 @@ class ExcludeDirsProvider
      */
     private $questionHelper;
 
-    public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
+    /**
+     * @var Filesystem
+     */
+    private $filesystem;
+
+    public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper, Filesystem $filesystem)
     {
         $this->consoleHelper = $consoleHelper;
         $this->questionHelper = $questionHelper;
+        $this->filesystem = $filesystem;
     }
 
     public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, array $sourceDirs): array
@@ -73,11 +80,9 @@ class ExcludeDirsProvider
             );
         }
 
-        $locator = new Locator($sourceDirs);
-
         $question = new Question($questionText, '');
         $question->setAutocompleterValues($autocompleteValues);
-        $question->setValidator($this->getValidator($locator));
+        $question->setValidator($this->getValidator(new Locator($sourceDirs, $this->filesystem)));
 
         while ($dir = $this->questionHelper->ask($input, $output, $question)) {
             if ($dir) {

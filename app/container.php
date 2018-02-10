@@ -65,11 +65,11 @@ $c['coverage.dir.phpspec'] = function (Container $c): string {
 };
 
 $c['locator'] = function (Container $c): Locator {
-    return new Locator([$c['project.dir']]);
+    return new Locator([$c['project.dir']], $c['filesystem']);
 };
 
 $c['path.replacer'] = function (Container $c): PathReplacer {
-    return new PathReplacer($c['locator'], $c['phpunit.config.dir']);
+    return new PathReplacer($c['filesystem'], $c['phpunit.config.dir']);
 };
 
 $c['test.framework.factory'] = function (Container $c): Factory {
@@ -81,7 +81,7 @@ $c['xml.configuration.helper'] = function (Container $c): XmlConfigurationHelper
 };
 
 $c['mutant.creator'] = function (Container $c): MutantCreator {
-    return new MutantCreator($c['tmp.dir'], $c['differ'], $c['parser'], $c['pretty.printer']);
+    return new MutantCreator($c['tmp.dir'], $c['differ'], $c['pretty.printer']);
 };
 
 $c['differ'] = function (): Differ {

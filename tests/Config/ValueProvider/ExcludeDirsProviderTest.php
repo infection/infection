@@ -20,19 +20,22 @@ class ExcludeDirsProviderTest extends AbstractBaseProviderTest
      */
     private $workspace;
 
-    private $umask;
+    /**
+     * @var Filesystem
+     */
+    private $fileSystem;
 
     protected function setUp()
     {
-        $this->umask = \umask(0);
         $this->workspace = \sys_get_temp_dir() . '/exclude' . \microtime(true) . \random_int(100, 999);
         \mkdir($this->workspace, 0777, true);
+
+        $this->fileSystem = new Filesystem();
     }
 
     protected function tearDown()
     {
-        (new Filesystem())->remove($this->workspace);
-        \umask($this->umask);
+        $this->fileSystem->remove($this->workspace);
     }
 
     /**
@@ -45,7 +48,7 @@ class ExcludeDirsProviderTest extends AbstractBaseProviderTest
 
         $dialog = $this->getQuestionHelper();
 
-        $provider = new ExcludeDirsProvider($consoleMock, $dialog);
+        $provider = new ExcludeDirsProvider($consoleMock, $dialog, $this->fileSystem);
 
         $excludedDirs = $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
@@ -68,7 +71,7 @@ class ExcludeDirsProviderTest extends AbstractBaseProviderTest
 
         $dialog = $this->getQuestionHelper();
 
-        $provider = new ExcludeDirsProvider($consoleMock, $dialog);
+        $provider = new ExcludeDirsProvider($consoleMock, $dialog, $this->fileSystem);
 
         $excludeDirs = $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("abc\n")),
@@ -97,7 +100,7 @@ class ExcludeDirsProviderTest extends AbstractBaseProviderTest
 
         $dialog = $this->getQuestionHelper();
 
-        $provider = new ExcludeDirsProvider($consoleMock, $dialog);
+        $provider = new ExcludeDirsProvider($consoleMock, $dialog, $this->fileSystem);
 
         $excludeDirs = $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("foo\n")),
