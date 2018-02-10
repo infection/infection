@@ -5,10 +5,13 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "^6.1"
+        "phpunit/phpunit": "^6.1",
+        "phpspec/phpspec": "^4.3",
+        "leanphp/phpspec-code-coverage": "^4.0"
     },
     "autoload": {
         "psr-4": {
+            "spec\\": "spec/",
             "Namespace_\\": "src/"
         }
     },

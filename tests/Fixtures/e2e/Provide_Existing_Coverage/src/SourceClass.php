@@ -4,8 +4,16 @@ namespace Namespace_;
 
 class SourceClass
 {
-    public function hello(): string
+    public function add($num1, $num2)
     {
-        return 'hello';
+        return $num1 + $num2;
+    }
+
+    public function isTrue($value = true)
+    {
+        if ($value !== false) {
+            return true;
+        }
+        return false;
     }
 }
