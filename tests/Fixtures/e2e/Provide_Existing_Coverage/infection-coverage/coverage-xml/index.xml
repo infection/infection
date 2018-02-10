@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+  <build time="Fri Feb 9 17:52:50 GMT+0000 2018" phpunit="6.5.6" coverage="5.3.0">
+    <runtime name="PHP" version="7.1.7" url="https://secure.php.net/"/>
+    <driver name="xdebug" version="2.6.0RC2"/>
+  </build>
+  <project source="src">
+    <tests>
+      <test name="Namespace_\Test\SourceClassTest::test_hello" size="unknown" result="0" status="PASSED"/>
+    </tests>
+    <directory name="/">
+      <totals>
+        <lines total="11" comments="0" code="11" executable="1" executed="1" percent="100.00"/>
+        <methods count="1" tested="1" percent="100.00"/>
+        <functions count="0" tested="0" percent="0"/>
+        <classes count="1" tested="1" percent="100.00"/>
+        <traits count="0" tested="0" percent="0"/>
+      </totals>
+      <file name="SourceClass.php" href="SourceClass.php.xml">
+        <totals>
+          <lines total="11" comments="0" code="11" executable="1" executed="1" percent="100.00"/>
+          <methods count="1" tested="1" percent="100.00"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="1" tested="1" percent="100.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+    </directory>
+  </project>
+</phpunit>

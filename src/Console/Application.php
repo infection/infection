@@ -10,8 +10,6 @@ namespace Infection\Console;
 
 use Infection\Command;
 use Infection\Config\InfectionConfig;
-use Infection\TestFramework\Coverage\CodeCoverageData;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Pimple\Container;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;

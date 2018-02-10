@@ -45,5 +45,5 @@ then
     exit 1
 fi
 
-echo "Success"
+echo -e "\nSuccess"
 exit 0
