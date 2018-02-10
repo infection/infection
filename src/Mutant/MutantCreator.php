@@ -14,7 +14,6 @@ use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Visitor\CloneVisitor;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\NodeTraverser;
-use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
 
 class MutantCreator
@@ -30,20 +29,14 @@ class MutantCreator
     private $differ;
 
     /**
-     * @var Parser
-     */
-    private $parser;
-
-    /**
      * @var Standard
      */
     private $prettyPrinter;
 
-    public function __construct(string $tempDir, Differ $differ, Parser $parser, Standard $prettyPrinter)
+    public function __construct(string $tempDir, Differ $differ, Standard $prettyPrinter)
     {
         $this->tempDir = $tempDir;
         $this->differ = $differ;
-        $this->parser = $parser;
         $this->prettyPrinter = $prettyPrinter;
     }
 
