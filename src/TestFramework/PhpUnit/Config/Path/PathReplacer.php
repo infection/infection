@@ -8,13 +8,12 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Path;
 
-use Infection\Finder\Locator;
 use Symfony\Component\Filesystem\Filesystem;
 
 class PathReplacer
 {
     /**
-     * @var Locator
+     * @var Filesystem
      */
     private $filesystem;
 
