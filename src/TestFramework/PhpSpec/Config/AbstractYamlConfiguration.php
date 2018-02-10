@@ -8,8 +8,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpSpec\Config;
 
-use Infection\TestFramework\Coverage\CodeCoverageData;
-
 abstract class AbstractYamlConfiguration
 {
     /**
@@ -33,21 +31,6 @@ abstract class AbstractYamlConfiguration
     protected function isCodeCoverageExtension(string $extensionName): bool
     {
         return strpos($extensionName, 'CodeCoverage') !== false;
-    }
-
-    protected function updateCodeCoveragePath(array &$parsedYaml)
-    {
-        foreach ($parsedYaml['extensions'] as $extensionName => &$options) {
-            if (!$this->isCodeCoverageExtension($extensionName)) {
-                continue;
-            }
-
-            $options['format'] = ['xml'];
-            $options['output'] = [
-                'xml' => $this->tempDirectory . '/' . CodeCoverageData::PHP_SPEC_COVERAGE_DIR,
-            ];
-        }
-        unset($options);
     }
 
     protected function hasCodeCoverageExtension(array $parsedYaml): bool

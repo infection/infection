@@ -7,6 +7,6 @@
         ]
     },
     "logs": {
-        "summary": "infection-log.txt"
+        "debug": "infection-log.txt"
     }
 }

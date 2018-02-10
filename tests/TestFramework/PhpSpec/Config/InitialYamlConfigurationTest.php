@@ -32,7 +32,7 @@ class InitialYamlConfigurationTest extends TestCase
 
     protected function getConfigurationObject(array $configArray = [])
     {
-        return new InitialYamlConfiguration($this->tempDir, $configArray ?: $this->defaultConfig);
+        return new InitialYamlConfiguration($this->tempDir, $configArray ?: $this->defaultConfig, false);
     }
 
     /**

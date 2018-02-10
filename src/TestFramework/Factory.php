@@ -104,8 +104,7 @@ final class Factory
 
             return new PhpSpecAdapter(
                 new TestFrameworkExecutableFinder(TestFrameworkTypes::PHPSPEC),
-                // todo $skipCoverage ?
-                new PhpSpecInitialConfigBuilder($this->tmpDir, $phpSpecConfigPath),
+                new PhpSpecInitialConfigBuilder($this->tmpDir, $phpSpecConfigPath, $skipCoverage),
                 new PhpSpecMutationConfigBuilder($this->tmpDir, $phpSpecConfigPath, $this->projectDir),
                 new PhpSpecArgumentsAndOptionsBuilder(),
                 $this->versionParser

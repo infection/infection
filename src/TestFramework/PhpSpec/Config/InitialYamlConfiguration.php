@@ -8,10 +8,23 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpSpec\Config;
 
+use Infection\TestFramework\Coverage\CodeCoverageData;
 use Symfony\Component\Yaml\Yaml;
 
 class InitialYamlConfiguration extends AbstractYamlConfiguration
 {
+    /**
+     * @var bool
+     */
+    private $skipCoverage;
+
+    public function __construct(string $tempDirectory, array $parsedYaml, bool $skipCoverage)
+    {
+        parent::__construct($tempDirectory, $parsedYaml);
+
+        $this->skipCoverage = $skipCoverage;
+    }
+
     /**
      * @var string
      */
@@ -19,12 +32,46 @@ class InitialYamlConfiguration extends AbstractYamlConfiguration
 
     public function getYaml(): string
     {
-        if (!$this->hasCodeCoverageExtension($this->parsedYaml)) {
-            throw new NoCodeCoverageException("No code coverage Extension detected for PhpSpec. \nWithout code coverage, running Infection is not useful.");
+        if ($this->skipCoverage) {
+            $this->removeCoverageExtension($this->parsedYaml);
+        } else {
+            if (!$this->hasCodeCoverageExtension($this->parsedYaml)) {
+                throw new NoCodeCoverageException("No code coverage Extension detected for PhpSpec. \nWithout code coverage, running Infection is not useful.");
+            }
+
+            $this->updateCodeCoveragePath($this->parsedYaml);
         }
 
-        $this->updateCodeCoveragePath($this->parsedYaml);
-
         return Yaml::dump($this->parsedYaml);
+    }
+
+    private function updateCodeCoveragePath(array &$parsedYaml)
+    {
+        foreach ($parsedYaml['extensions'] as $extensionName => &$options) {
+            if (!$this->isCodeCoverageExtension($extensionName)) {
+                continue;
+            }
+
+            $options['format'] = ['xml'];
+            $options['output'] = [
+                'xml' => $this->tempDirectory . '/' . CodeCoverageData::PHP_SPEC_COVERAGE_DIR,
+            ];
+        }
+        unset($options);
+    }
+
+    private function removeCoverageExtension(array &$parsedYaml)
+    {
+        foreach ($parsedYaml['extensions'] as $extensionName => &$options) {
+            if (!$this->isCodeCoverageExtension($extensionName)) {
+                continue;
+            }
+
+            unset($parsedYaml['extensions'][$extensionName]);
+
+            break;
+        }
+
+        unset($options);
     }
 }
