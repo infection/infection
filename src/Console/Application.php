@@ -26,6 +26,7 @@ class Application extends BaseApplication
 {
     const NAME = 'Infection - PHP Mutation Testing Framework';
     const VERSION = '@package_version@';
+    const RUNNING_WITH_NOTE = 'You are running Infection with %s enabled.';
     const LOGO = <<<'ASCII'
     ____      ____          __  _
    /  _/___  / __/__  _____/ /_(_)___  ____ 
@@ -76,9 +77,9 @@ ASCII;
         $this->io = new SymfonyStyle($input, $output);
 
         if (PHP_SAPI === 'phpdbg') {
-            $this->io->note('You are running Infection with phpdbg enabled.');
+            $this->io->note(sprintf(self::RUNNING_WITH_NOTE, PHP_SAPI));
         } elseif ($this->isXdebugLoaded) {
-            $this->io->note('You are running Infection with xdebug enabled.');
+            $this->io->note(sprintf(self::RUNNING_WITH_NOTE, 'xdebug'));
         }
 
         $xdebug = new XdebugHandler(new ConfigBuilder(sys_get_temp_dir()));
