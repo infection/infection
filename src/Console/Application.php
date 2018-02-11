@@ -59,7 +59,8 @@ ASCII;
     public function __construct(Container $container, string $name = self::NAME, string $version = self::VERSION)
     {
         $this->container = $container;
-        $this->isDebuggerDisabled = empty((string) getenv(XdebugHandler::ENV_DISABLE_XDEBUG));
+        $this->isDebuggerDisabled = ('' === trim((string) getenv(XdebugHandler::ENV_DISABLE_XDEBUG)));
+        $this->isXdebugLoaded = \extension_loaded('xdebug');
 
         parent::__construct($name, $version);
     }
@@ -84,12 +85,11 @@ ASCII;
 
         $xdebug = new XdebugHandler(new ConfigBuilder(sys_get_temp_dir()));
         $xdebug->check();
-        unset($xdebug);
 
-        if (PHP_SAPI !== 'phpdbg' && $this->isDebuggerDisabled && !\extension_loaded('xdebug')) {
+        if (PHP_SAPI !== 'phpdbg' && $this->isDebuggerDisabled && !$this->isXdebugLoaded) {
             $this->io->error('You need to use phpdbg or install and enable xdebug in order to allow for code coverage generation.');
 
-            die(1);
+            return 1;
         }
 
         return parent::run($input, $output);
