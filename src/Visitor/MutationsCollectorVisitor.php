@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Visitor;
 
+use Infection\Finder\IgnoredMutatorsFinder;
 use Infection\Mutation;
 use Infection\Mutator\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
@@ -46,19 +47,35 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
      */
     private $onlyCovered;
 
-    public function __construct(array $mutators, string $filePath, array $fileAst, CodeCoverageData $codeCoverageData, bool $onlyCovered)
+    /**
+     * @var IgnoredMutatorsFinder
+     */
+    private $ignoredMutatorsFinder;
+
+    public function __construct(
+        array $mutators,
+        string $filePath,
+        array $fileAst,
+        CodeCoverageData $codeCoverageData,
+        bool $onlyCovered,
+        IgnoredMutatorsFinder $ignoredMutatorsFinder
+    )
     {
         $this->mutators = $mutators;
         $this->filePath = $filePath;
         $this->fileAst = $fileAst;
         $this->codeCoverageData = $codeCoverageData;
         $this->onlyCovered = $onlyCovered;
+        $this->ignoredMutatorsFinder = $ignoredMutatorsFinder;
     }
 
     public function leaveNode(Node $node)
     {
         foreach ($this->mutators as $mutator) {
             $isOnFunctionSignature = $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
+            if($this->ignoredMutatorsFinder->isIgnored($mutator->getName(), $this->filePath)) {
+                continue;
+            }
 
             if (!$isOnFunctionSignature) {
                 if (!$node->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY)) {

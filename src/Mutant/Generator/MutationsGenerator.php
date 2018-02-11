@@ -13,6 +13,7 @@ use Infection\EventDispatcher\EventDispatcher;
 use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
+use Infection\Finder\IgnoredMutatorsFinder;
 use Infection\Finder\SourceFilesFinder;
 use Infection\Mutation;
 use Infection\Mutator\Mutator;
@@ -67,6 +68,8 @@ class MutationsGenerator
      */
     private $parser;
 
+    private $ignoredMutatorsFinder;
+
     public function __construct(
         array $srcDirs,
         array $excludeDirsOrFiles,
@@ -74,8 +77,9 @@ class MutationsGenerator
         array $defaultMutators,
         array $whitelistedMutatorNames,
         EventDispatcher $eventDispatcher,
-        Parser $parser)
-    {
+        Parser $parser,
+        IgnoredMutatorsFinder $ignoredMutatorsFinder
+    ) {
         $this->srcDirs = $srcDirs;
         $this->codeCoverageData = $codeCoverageData;
         $this->excludeDirsOrFiles = $excludeDirsOrFiles;
@@ -84,6 +88,7 @@ class MutationsGenerator
         $this->whitelistedMutatorNamesCount = count($whitelistedMutatorNames);
         $this->eventDispatcher = $eventDispatcher;
         $this->parser = $parser;
+        $this->ignoredMutatorsFinder = $ignoredMutatorsFinder;
     }
 
     /**
@@ -131,7 +136,8 @@ class MutationsGenerator
             $file->getRealPath(),
             $initialStatements,
             $this->codeCoverageData,
-            $onlyCovered
+            $onlyCovered,
+            $this->ignoredMutatorsFinder
         );
 
         $traverser->addVisitor($mutationsCollectorVisitor);

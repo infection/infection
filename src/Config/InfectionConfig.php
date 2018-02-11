@@ -283,4 +283,9 @@ class InfectionConfig
     {
         return (array) $this->config->mutators->ignore ?? [];
     }
+
+    public function getConfigLocation(): string
+    {
+        return $this->configLocation;
+    }
 }
