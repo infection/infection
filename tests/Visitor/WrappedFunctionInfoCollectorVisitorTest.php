@@ -46,6 +46,7 @@ class WrappedFunctionInfoCollectorVisitorTest extends Mockery\Adapter\Phpunit\Mo
 
 class Test
 {
+    private $var = 3;
     public function foo(int $param, $test = 2.0): bool
     {
         return count([]) === 1;
@@ -76,6 +77,7 @@ CODE;
             [Node\Expr\BinaryOp\Identical::class, false], // ===
             [Node\Arg::class, false],
             [Node\Expr\Array_::class, false], // []
+            [Node\Stmt\Class_::class, false], // class Test
         ];
     }
 
