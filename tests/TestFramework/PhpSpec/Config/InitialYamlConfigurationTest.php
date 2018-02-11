@@ -55,7 +55,7 @@ class InitialYamlConfigurationTest extends TestCase
         $this->assertSame($expectedPath, $parsedYaml['extensions']['PhpSpecCodeCoverageExtension']['output']['xml']);
     }
 
-    public function test_it_removes_coverage_extension_if_it_coverage_should_be_skipped()
+    public function test_it_removes_coverage_extension_if_coverage_should_be_skipped()
     {
         $configuration = $this->getConfigurationObject([], true);
 
