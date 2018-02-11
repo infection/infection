@@ -81,6 +81,16 @@ PHP
 'a' . '0.0';
 PHP
             ],
+            'It does not mutate other floats' => [
+                <<<'PHP'
+<?php
+
+10 + 2.0;
+10 + 1.1;
+10 + 0.5;
+PHP
+                ,
+            ],
         ];
     }
 }

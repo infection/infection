@@ -11,6 +11,8 @@ namespace Infection\Tests\Mutator\ReturnValue;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ReturnValue\IntegerNegation;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use PhpParser\Node\Scalar\LNumber;
+use PhpParser\Node\Stmt\Return_;
 
 class IntegerNegationTest extends AbstractMutatorTestCase
 {
@@ -35,12 +37,14 @@ class IntegerNegationTest extends AbstractMutatorTestCase
 <?php
 
 return -1;
+return -2;
 PHP
                 ,
                 <<<'PHP'
 <?php
 
 return 1;
+return 2;
 PHP
                 ,
             ],
@@ -49,12 +53,14 @@ PHP
 <?php
 
 return 1;
+return 2;
 PHP
                 ,
                 <<<'PHP'
 <?php
 
 return -1;
+return -2;
 PHP
                 ,
             ],
@@ -75,5 +81,11 @@ PHP
                 ,
             ],
         ];
+    }
+
+    public function test_it_does_not_mutate_zero()
+    {
+        $node = new Return_(new LNumber(0));
+        $this->assertFalse($this->getMutator()->shouldMutate($node));
     }
 }
