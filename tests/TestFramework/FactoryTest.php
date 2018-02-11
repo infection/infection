@@ -31,6 +31,6 @@ class FactoryTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         );
 
         $this->expectException(\InvalidArgumentException::class);
-        $factory->create('Fake Test Framework');
+        $factory->create('Fake Test Framework', false);
     }
 }
