@@ -15,6 +15,7 @@ use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 class Application extends BaseApplication
 {
@@ -106,28 +107,28 @@ ASCII;
                 );
 
                 $infectionConfigFile = $c['locator']->locateAnyOf($configPaths);
-                $dir = \pathinfo($infectionConfigFile, PATHINFO_DIRNAME);
+                $configLocation = \pathinfo($infectionConfigFile, PATHINFO_DIRNAME);
                 $json = file_get_contents($infectionConfigFile);
             } catch (\Exception $e) {
                 $json = '{}';
-                $dir = getcwd();
+                $configLocation = getcwd();
             }
 
-            return new InfectionConfig(json_decode($json), $c['filesystem'], $dir);
+            return new InfectionConfig(json_decode($json), $c['filesystem'], $configLocation);
         };
 
         $this->container['coverage.path'] = function (Container $c) use ($input): string {
-            $existingCoveragePath = $this->getExistingCoveragePath($input);
+            $existingCoveragePath = $this->getExistingCoveragePath($input, $c['infection.config']->getPhpUnitConfigDir());
 
             return $existingCoveragePath ?: $c['tmp.dir'];
         };
     }
 
-    private function getExistingCoveragePath(InputInterface $input): string
+    private function getExistingCoveragePath(InputInterface $input, string $configLocation): string
     {
         $existingCoveragePath = $input->getOption('coverage');
 
-        if (strlen($existingCoveragePath) === 0) {
+        if ($existingCoveragePath === '') {
             return '';
         }
 
@@ -138,6 +139,6 @@ ASCII;
             return $existingCoveragePath;
         }
 
-        return sprintf('%s/%s', getcwd(), $existingCoveragePath);
+        return sprintf('%s/%s', $configLocation, $existingCoveragePath);
     }
 }
