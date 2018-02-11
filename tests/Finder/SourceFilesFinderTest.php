@@ -110,4 +110,17 @@ class SourceFilesFinderTest extends TestCase
         $this->assertInstanceOf(Finder::class, $files);
         $this->assertSame(0, $files->count());
     }
+
+    public function test_it_can_exclude_a_directory()
+    {
+        $sourceFilesFinder = new SourceFilesFinder(['tests/Fixtures/Files/ExcludeFinder'], ['Folder2']);
+
+        $files = $sourceFilesFinder->getSourceFiles();
+
+        $this->assertInstanceOf(Finder::class, $files);
+        $this->assertSame(1, $files->count());
+        foreach ($files as $file) {
+            $this->assertSame('File.php', $file->getFilename());
+        }
+    }
 }

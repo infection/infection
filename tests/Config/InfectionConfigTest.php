@@ -145,4 +145,18 @@ class InfectionConfigTest extends TestCase
 
         $this->assertSame('/path/to/config/relative/folder', $config->getTmpDir());
     }
+
+    public function test_it_returns_correct_phpunit_custom_path()
+    {
+        $config = new InfectionConfig(json_decode('{"phpUnit": {"customPath":"app"}}'), $this->filesystem, '/path/to/config');
+
+        $this->assertSame('app', $config->getPhpUnitCustomPath());
+    }
+
+    public function test_it_correctly_gets_config_logs()
+    {
+        $config = new InfectionConfig(json_decode('{"logs": {"text":"app", "debug":"location"}}'), $this->filesystem, '/path/to/config');
+
+        $this->assertSame(['text' => 'app', 'debug' => 'location'], $config->getLogsTypes());
+    }
 }

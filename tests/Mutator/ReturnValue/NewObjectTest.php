@@ -50,7 +50,7 @@ PHP;
 function test()
 {
     $className = 'SimpleClass';
-    $instance = new $className();
+    return new $className();
 }
 PHP;
         $this->doTest($code);
