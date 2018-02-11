@@ -77,8 +77,7 @@ class PublicVisibility extends Mutator
                 '__unset',
                 '__toString',
                 '__debugInfo',
-            ],
-            true
+            ]
         );
     }
 }
