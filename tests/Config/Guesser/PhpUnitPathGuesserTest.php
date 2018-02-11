@@ -13,9 +13,34 @@ use PHPUnit\Framework\TestCase;
 
 class PhpUnitPathGuesserTest extends TestCase
 {
-    public function test_it_guesses_old_symfony_paths()
+    /**
+     * @dataProvider providesJsonComposerAndLocations
+     */
+    public function test_it_guesses_correctly(string $composerJson, string $directory)
     {
-        $composerJson = <<<'CODE'
+        $guesser = new PhpUnitPathGuesser(json_decode($composerJson));
+
+        $this->assertSame($directory, $guesser->guess());
+    }
+
+    public function providesJsonComposerAndLocations(): \Generator
+    {
+        yield [
+            <<<'CODE'
+{
+    "autoload": {
+        "psr-0": {
+            "": "src"
+        }
+    }
+}
+CODE
+            ,
+            '.',
+        ];
+
+        yield [
+            <<<'CODE'
 {
     "autoload": {
         "psr-0": {
@@ -24,25 +49,78 @@ class PhpUnitPathGuesserTest extends TestCase
         }
     }
 }
-CODE;
-        $guesser = new PhpUnitPathGuesser(json_decode($composerJson));
+CODE
+            ,
+            'app',
+        ];
 
-        $this->assertSame('app', $guesser->guess());
-    }
-
-    public function test_it_guesses_default_paths()
-    {
-        $composerJson = <<<'CODE'
+        yield [
+            <<<'CODE'
 {
     "autoload": {
         "psr-0": {
+            "SymfonyStandard": "src/"
+        }
+    }
+}
+CODE
+            ,
+            '.',
+        ];
+
+        yield [
+            <<<'CODE'
+{
+    "autoload": {
+        "psr-4": {
+            "App": "src/"
+        }
+    }
+}
+CODE
+            ,
+            '.',
+        ];
+
+        yield [
+            <<<'CODE'
+{
+    "autoload-dev": {
+        "psr-4": {
+            "App": "src/"
+        }
+    }
+}
+CODE
+            ,
+            '.',
+        ];
+        yield [
+            <<<'CODE'
+{
+    "autoload": {
+        "files": {
             "": "src"
         }
     }
 }
-CODE;
-        $guesser = new PhpUnitPathGuesser(json_decode($composerJson));
+CODE
+            ,
+            '.',
+        ];
 
-        $this->assertSame('.', $guesser->guess());
+        yield [
+            <<<'CODE'
+{
+    "autoload": {
+        "psr-0": {
+            "App": "app/"
+        }
+    }
+}
+CODE
+            ,
+            '.',
+        ];
     }
 }
