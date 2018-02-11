@@ -15,7 +15,7 @@ class CoverageDoesNotExistException extends InfectionException
     public static function with(string $coverageIndexFilePath, string $testFrameworkKey, string $tempDir): self
     {
         return new self(
-            sprintf(
+            \sprintf(
                 'Code Coverage does not exist. File %s is not found. Check %s version Infection was run with and generated config files inside %s.',
                 $coverageIndexFilePath,
                 $testFrameworkKey,

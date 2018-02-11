@@ -21,12 +21,12 @@ class IncludeInterceptor
 
     public static function intercept($file, $with)
     {
-        if (!file_exists($file)) {
+        if (!\file_exists($file)) {
             throw new \InvalidArgumentException(
                 'File to intercept and replace does not exist: ' . $file
             );
         }
-        if (!file_exists($with)) {
+        if (!\file_exists($with)) {
             throw new \InvalidArgumentException(
                 'File to replace intercepted file with does not exist: ' . $file
             );
@@ -42,13 +42,13 @@ class IncludeInterceptor
                 'Set a file to intercept and its replacement before enabling wrapper'
             );
         }
-        stream_wrapper_unregister('file');
-        stream_wrapper_register('file', __CLASS__);
+        \stream_wrapper_unregister('file');
+        \stream_wrapper_register('file', __CLASS__);
     }
 
     public static function disable()
     {
-        stream_wrapper_restore('file');
+        \stream_wrapper_restore('file');
     }
 
     public function stream_open($path, $mode, $options)
@@ -56,17 +56,17 @@ class IncludeInterceptor
         self::disable();
         $including = (bool) ($options & self::STREAM_OPEN_FOR_INCLUDE);
         if ($including) {
-            if ($path == self::$intercept || realpath($path) == self::$intercept) {
-                $this->fp = fopen(self::$replacement, 'r');
+            if ($path == self::$intercept || \realpath($path) == self::$intercept) {
+                $this->fp = \fopen(self::$replacement, 'r');
                 self::enable();
 
                 return true;
             }
         }
         if (isset($this->context)) {
-            $this->fp = fopen($path, $mode, $options, $this->context);
+            $this->fp = \fopen($path, $mode, $options, $this->context);
         } else {
-            $this->fp = fopen($path, $mode, $options);
+            $this->fp = \fopen($path, $mode, $options);
         }
         self::enable();
 
@@ -75,7 +75,7 @@ class IncludeInterceptor
 
     public function dir_closedir()
     {
-        closedir($this->fp);
+        \closedir($this->fp);
 
         return true;
     }
@@ -84,9 +84,9 @@ class IncludeInterceptor
     {
         self::disable();
         if (isset($this->context)) {
-            $this->fp = opendir($path, $this->context);
+            $this->fp = \opendir($path, $this->context);
         } else {
-            $this->fp = opendir($path);
+            $this->fp = \opendir($path);
         }
         self::enable();
 
@@ -95,12 +95,12 @@ class IncludeInterceptor
 
     public function dir_readdir()
     {
-        return readdir($this->fp);
+        return \readdir($this->fp);
     }
 
     public function dir_rewinddir()
     {
-        rewinddir($this->fp);
+        \rewinddir($this->fp);
 
         return true;
     }
@@ -112,9 +112,9 @@ class IncludeInterceptor
         $isRecursive = (bool) ($options & STREAM_MKDIR_RECURSIVE);
 
         if (isset($this->context)) {
-            $return = mkdir($path, $mode, $isRecursive, $this->context);
+            $return = \mkdir($path, $mode, $isRecursive, $this->context);
         } else {
-            $return = mkdir($path, $mode, $isRecursive);
+            $return = \mkdir($path, $mode, $isRecursive);
         }
         self::enable();
 
@@ -125,9 +125,9 @@ class IncludeInterceptor
     {
         self::disable();
         if (isset($this->context)) {
-            $return = rename($path_from, $path_to, $this->context);
+            $return = \rename($path_from, $path_to, $this->context);
         } else {
-            $return = rename($path_from, $path_to);
+            $return = \rename($path_from, $path_to);
         }
         self::enable();
 
@@ -138,9 +138,9 @@ class IncludeInterceptor
     {
         self::disable();
         if (isset($this->context)) {
-            $return = rmdir($path, $this->context);
+            $return = \rmdir($path, $this->context);
         } else {
-            $return = rmdir($path);
+            $return = \rmdir($path);
         }
         self::enable();
 
@@ -154,22 +154,22 @@ class IncludeInterceptor
 
     public function stream_close()
     {
-        return fclose($this->fp);
+        return \fclose($this->fp);
     }
 
     public function stream_eof()
     {
-        return feof($this->fp);
+        return \feof($this->fp);
     }
 
     public function stream_flush()
     {
-        return fflush($this->fp);
+        return \fflush($this->fp);
     }
 
     public function stream_lock($operation)
     {
-        return flock($this->fp, $operation);
+        return \flock($this->fp, $operation);
     }
 
     public function stream_metadata($path, $option, $value)
@@ -178,21 +178,21 @@ class IncludeInterceptor
         switch ($option) {
             case STREAM_META_TOUCH:
                 if (empty($value)) {
-                    $return = touch($path);
+                    $return = \touch($path);
                 } else {
-                    $return = touch($path, $value[0], $value[1]);
+                    $return = \touch($path, $value[0], $value[1]);
                 }
                 break;
             case STREAM_META_OWNER_NAME:
             case STREAM_META_OWNER:
-                $return = chown($path, $value);
+                $return = \chown($path, $value);
                 break;
             case STREAM_META_GROUP_NAME:
             case STREAM_META_GROUP:
-                $return = chgrp($path, $value);
+                $return = \chgrp($path, $value);
                 break;
             case STREAM_META_ACCESS:
-                $return = chmod($path, $value);
+                $return = \chmod($path, $value);
                 break;
             default:
                 throw new \RuntimeException('Unknown stream_metadata option');
@@ -204,55 +204,55 @@ class IncludeInterceptor
 
     public function stream_read($count)
     {
-        return fread($this->fp, $count);
+        return \fread($this->fp, $count);
     }
 
     public function stream_seek($offset, $whence = SEEK_SET)
     {
-        return fseek($this->fp, $offset, $whence) === 0;
+        return \fseek($this->fp, $offset, $whence) === 0;
     }
 
     public function stream_set_option($option, $arg1, $arg2)
     {
         switch ($option) {
             case STREAM_OPTION_BLOCKING:
-                return stream_set_blocking($this->fp, $arg1);
+                return \stream_set_blocking($this->fp, $arg1);
             case STREAM_OPTION_READ_TIMEOUT:
-                return stream_set_timeout($this->fp, $arg1, $arg2);
+                return \stream_set_timeout($this->fp, $arg1, $arg2);
             case STREAM_OPTION_WRITE_BUFFER:
-                return stream_set_write_buffer($this->fp, $arg1);
+                return \stream_set_write_buffer($this->fp, $arg1);
             case STREAM_OPTION_READ_BUFFER:
-                return stream_set_read_buffer($this->fp, $arg1);
+                return \stream_set_read_buffer($this->fp, $arg1);
         }
     }
 
     public function stream_stat()
     {
-        return fstat($this->fp);
+        return \fstat($this->fp);
     }
 
     public function stream_tell()
     {
-        return ftell($this->fp);
+        return \ftell($this->fp);
     }
 
     public function stream_truncate($new_size)
     {
-        return ftruncate($this->fp, $new_size);
+        return \ftruncate($this->fp, $new_size);
     }
 
     public function stream_write($data)
     {
-        return fwrite($this->fp, $data);
+        return \fwrite($this->fp, $data);
     }
 
     public function unlink($path)
     {
         self::disable();
         if (isset($this->context)) {
-            $return = unlink($path, $this->context);
+            $return = \unlink($path, $this->context);
         } else {
-            $return = unlink($path);
+            $return = \unlink($path);
         }
         self::enable();
 
@@ -262,7 +262,7 @@ class IncludeInterceptor
     public function url_stat($path)
     {
         self::disable();
-        $return = is_readable($path) ? stat($path) : false;
+        $return = \is_readable($path) ? \stat($path) : false;
         self::enable();
 
         return $return;

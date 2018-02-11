@@ -17,9 +17,9 @@ final class PhpExecutableFinder extends BasePhpExecutableFinder
     {
         $arguments = [];
 
-        $tempConfigPath = (string) getenv(ConfigBuilder::ENV_TEMP_PHP_CONFIG_PATH);
+        $tempConfigPath = (string) \getenv(ConfigBuilder::ENV_TEMP_PHP_CONFIG_PATH);
 
-        if (!empty($tempConfigPath) && file_exists($tempConfigPath)) {
+        if (!empty($tempConfigPath) && \file_exists($tempConfigPath)) {
             $arguments[] = '-c';
             $arguments[] = $tempConfigPath;
         } elseif ('phpdbg' === PHP_SAPI) {

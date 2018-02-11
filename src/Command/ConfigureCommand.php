@@ -33,7 +33,7 @@ class ConfigureCommand extends BaseCommand
                 'test-framework',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Name of the Test framework to use (' . implode(', ', TestFrameworkTypes::TYPES) . ')',
+                'Name of the Test framework to use (' . \implode(', ', TestFrameworkTypes::TYPES) . ')',
                 TestFrameworkTypes::PHPUNIT
             );
     }
@@ -50,7 +50,7 @@ class ConfigureCommand extends BaseCommand
             '',
         ]);
 
-        $dirsInCurrentDir = array_filter(glob('*'), 'is_dir');
+        $dirsInCurrentDir = \array_filter(\glob('*'), 'is_dir');
         $testFrameworkConfigLocator = new TestFrameworkConfigLocator('.');
 
         $questionHelper = $this->getHelper('question');
@@ -89,7 +89,7 @@ class ConfigureCommand extends BaseCommand
 
         $output->writeln([
             '',
-            sprintf(
+            \sprintf(
                 'Configuration file "<comment>%s</comment>" was created.',
                 InfectionConfig::CONFIG_FILE_NAME . '.dist'
             ),
@@ -138,6 +138,6 @@ class ConfigureCommand extends BaseCommand
             $configObject->logs->text = $textLogFilePath;
         }
 
-        file_put_contents(InfectionConfig::CONFIG_FILE_NAME . '.dist', json_encode($configObject, JSON_PRETTY_PRINT));
+        \file_put_contents(InfectionConfig::CONFIG_FILE_NAME . '.dist', \json_encode($configObject, JSON_PRETTY_PRINT));
     }
 }

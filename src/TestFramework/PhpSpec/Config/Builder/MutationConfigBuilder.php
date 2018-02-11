@@ -38,15 +38,15 @@ class MutationConfigBuilder extends ConfigBuilder
 
     public function build(Mutant $mutant): string
     {
-        $customAutoloadFilePath = sprintf(
+        $customAutoloadFilePath = \sprintf(
             '%s/interceptor.phpspec.autoload.%s.infection.php',
             $this->tempDirectory,
             $mutant->getMutation()->getHash()
         );
 
-        $parsedYaml = Yaml::parse(file_get_contents($this->originalYamlConfigPath));
+        $parsedYaml = Yaml::parse(\file_get_contents($this->originalYamlConfigPath));
 
-        file_put_contents($customAutoloadFilePath, $this->createCustomAutoloadWithInterceptor($mutant, $parsedYaml));
+        \file_put_contents($customAutoloadFilePath, $this->createCustomAutoloadWithInterceptor($mutant, $parsedYaml));
 
         $yamlConfiguration = new MutationYamlConfiguration(
             $this->tempDirectory,
@@ -58,7 +58,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
         $path = $this->buildPath($mutant);
 
-        file_put_contents($path, $newYaml);
+        \file_put_contents($path, $newYaml);
 
         return $path;
     }
@@ -70,7 +70,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
         $originalBootstrap = $this->getOriginalBootstrapFilePath($parsedYaml);
         $autoloadPlaceholder = $originalBootstrap ? "require_once '{$originalBootstrap}';" : '';
-        $interceptorPath = dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
+        $interceptorPath = \dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
 
         $customAutoload = <<<AUTOLOAD
 <?php
@@ -80,7 +80,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
 AUTOLOAD;
 
-        return sprintf(
+        return \sprintf(
             $customAutoload,
             $autoloadPlaceholder,
             $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutatedFilePath)
@@ -89,7 +89,7 @@ AUTOLOAD;
 
     private function buildPath(Mutant $mutant): string
     {
-        $fileName = sprintf('phpspecConfiguration.%s.infection.yml', $mutant->getMutation()->getHash());
+        $fileName = \sprintf('phpspecConfiguration.%s.infection.yml', $mutant->getMutation()->getHash());
 
         return $this->tempDirectory . '/' . $fileName;
     }
@@ -101,10 +101,10 @@ AUTOLOAD;
      */
     private function getOriginalBootstrapFilePath(array $parsedYaml)
     {
-        if (!array_key_exists('bootstrap', $parsedYaml)) {
+        if (!\array_key_exists('bootstrap', $parsedYaml)) {
             return null;
         }
 
-        return sprintf('%s/%s', $this->projectDir, $parsedYaml['bootstrap']);
+        return \sprintf('%s/%s', $this->projectDir, $parsedYaml['bootstrap']);
     }
 }

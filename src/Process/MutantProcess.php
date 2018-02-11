@@ -87,7 +87,7 @@ class MutantProcess
             return self::CODE_TIMED_OUT;
         }
 
-        if (!in_array($this->getProcess()->getExitCode(), self::NOT_FATAL_ERROR_CODES, true)) {
+        if (!\in_array($this->getProcess()->getExitCode(), self::NOT_FATAL_ERROR_CODES, true)) {
             return self::CODE_ERROR;
         }
 

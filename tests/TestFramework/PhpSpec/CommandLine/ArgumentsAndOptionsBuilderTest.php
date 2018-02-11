@@ -25,6 +25,6 @@ class ArgumentsAndOptionsBuilderTest extends TestCase
         $this->assertContains('--format=tap', $command);
         $this->assertContains('--stop-on-failure', $command);
         $this->assertContains('--verbose', $command);
-        $this->assertContains(sprintf('--config=%s', $configPath), $command);
+        $this->assertContains(\sprintf('--config=%s', $configPath), $command);
     }
 }

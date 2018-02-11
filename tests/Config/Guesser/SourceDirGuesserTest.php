@@ -25,7 +25,7 @@ class SourceDirGuesserTest extends TestCase
     }
 }
 CODE;
-        $guesser = new SourceDirGuesser(json_decode($composerJson));
+        $guesser = new SourceDirGuesser(\json_decode($composerJson));
 
         $this->assertSame(['abc', 'namespace'], $guesser->guess());
     }
@@ -42,7 +42,7 @@ CODE;
     }
 }
 CODE;
-        $guesser = new SourceDirGuesser(json_decode($composerJson));
+        $guesser = new SourceDirGuesser(\json_decode($composerJson));
 
         $this->assertSame(['src'], $guesser->guess());
     }
@@ -58,14 +58,14 @@ CODE;
     }
 }
 CODE;
-        $guesser = new SourceDirGuesser(json_decode($composerJson));
+        $guesser = new SourceDirGuesser(\json_decode($composerJson));
 
         $this->assertSame(['src'], $guesser->guess());
     }
 
     public function test_it_returns_null_when_does_not_have_autoload()
     {
-        $guesser = new SourceDirGuesser(json_decode('{}'));
+        $guesser = new SourceDirGuesser(\json_decode('{}'));
 
         $this->assertNull($guesser->guess());
     }
@@ -73,7 +73,7 @@ CODE;
     public function test_it_returns_only_src_if_contains_array_of_paths()
     {
         $guesser = new SourceDirGuesser(
-            json_decode('{"autoload":{"psr-0": {"": ["src", "libs"]}}}')
+            \json_decode('{"autoload":{"psr-0": {"": ["src", "libs"]}}}')
         );
 
         $this->assertSame(['src'], $guesser->guess());
@@ -82,7 +82,7 @@ CODE;
     public function test_it_returns_list_if_contains_array_of_paths_without_src()
     {
         $guesser = new SourceDirGuesser(
-            json_decode('{"autoload":{"psr-4": {"NameSpace\\//": ["sources", "libs"]}}}')
+            \json_decode('{"autoload":{"psr-4": {"NameSpace\\//": ["sources", "libs"]}}}')
         );
 
         $this->assertSame(['sources', 'libs'], $guesser->guess());
@@ -95,7 +95,7 @@ CODE;
     public function test_it_throw_invalid_autoload_exception()
     {
         $guesser = new SourceDirGuesser(
-            json_decode('{"autoload":{"psr-4": [{"NameSpace\\//": ["sources", "libs"]}]}}')
+            \json_decode('{"autoload":{"psr-4": [{"NameSpace\\//": ["sources", "libs"]}]}}')
         );
 
         $guesser->guess();

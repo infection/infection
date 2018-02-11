@@ -17,17 +17,17 @@ final class PhpIniHelper
      */
     public static function get(): array
     {
-        if ($env = (string) getenv(self::ENV_ORIGINALS_PHP_INIS)) {
-            return explode(PATH_SEPARATOR, $env);
+        if ($env = (string) \getenv(self::ENV_ORIGINALS_PHP_INIS)) {
+            return \explode(PATH_SEPARATOR, $env);
         }
 
-        $paths = [(string) php_ini_loaded_file()];
+        $paths = [(string) \php_ini_loaded_file()];
 
-        if ($scanned = php_ini_scanned_files()) {
-            $paths = array_merge($paths, array_map('trim', explode(',', $scanned)));
+        if ($scanned = \php_ini_scanned_files()) {
+            $paths = \array_merge($paths, \array_map('trim', \explode(',', $scanned)));
         }
 
-        putenv(self::ENV_ORIGINALS_PHP_INIS . '=' . implode(PATH_SEPARATOR, $paths));
+        \putenv(self::ENV_ORIGINALS_PHP_INIS . '=' . \implode(PATH_SEPARATOR, $paths));
 
         return $paths;
     }

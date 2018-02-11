@@ -77,7 +77,7 @@ CODE;
 
         $diff = $differ->diff($source1, $source2);
 
-        if (substr_count($diff, "\n") < Differ::DIFF_MAX_LINES - 1) {
+        if (\substr_count($diff, "\n") < Differ::DIFF_MAX_LINES - 1) {
             $this->markTestSkipped('See https://github.com/sebastianbergmann/diff/pull/59');
         }
 

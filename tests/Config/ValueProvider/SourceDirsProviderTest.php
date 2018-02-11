@@ -16,7 +16,7 @@ class SourceDirsProviderTest extends AbstractBaseProviderTest
 {
     public function test_it_uses_guesser_and_default_value()
     {
-        if (stripos(PHP_OS, 'WIN') === 0) {
+        if (\stripos(PHP_OS, 'WIN') === 0) {
             $this->markTestSkipped('Stty is not available');
         }
 

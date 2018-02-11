@@ -38,13 +38,13 @@ class XdebugHandler
     {
         $this->configBuilder = $configBuilder;
 
-        $this->isLoaded = extension_loaded('xdebug');
-        $this->envScanDir = (string) getenv(ConfigBuilder::ENV_PHP_INI_SCAN_DIR);
+        $this->isLoaded = \extension_loaded('xdebug');
+        $this->envScanDir = (string) \getenv(ConfigBuilder::ENV_PHP_INI_SCAN_DIR);
     }
 
     public function check()
     {
-        $args = explode('|', (string) getenv(self::ENV_DISABLE_XDEBUG));
+        $args = \explode('|', (string) \getenv(self::ENV_DISABLE_XDEBUG));
         if ($this->needsRestart($args[0])) {
             if ($this->prepareRestart()) {
                 $this->restart($this->getCommand());
@@ -52,14 +52,14 @@ class XdebugHandler
         }
 
         if (self::RESTART_HANDLE === $args[0]) {
-            putenv(self::ENV_DISABLE_XDEBUG);
+            \putenv(self::ENV_DISABLE_XDEBUG);
 
             if (false !== $this->envScanDir) {
                 // $args[1] contains the original value
                 if (isset($args[1])) {
-                    putenv(ConfigBuilder::ENV_PHP_INI_SCAN_DIR . '=' . $args[1]);
+                    \putenv(ConfigBuilder::ENV_PHP_INI_SCAN_DIR . '=' . $args[1]);
                 } else {
-                    putenv(ConfigBuilder::ENV_PHP_INI_SCAN_DIR);
+                    \putenv(ConfigBuilder::ENV_PHP_INI_SCAN_DIR);
                 }
             }
         }
@@ -90,7 +90,7 @@ class XdebugHandler
      */
     private function setEnvironment(): bool
     {
-        return putenv(self::ENV_DISABLE_XDEBUG . '=' . self::RESTART_HANDLE);
+        return \putenv(self::ENV_DISABLE_XDEBUG . '=' . self::RESTART_HANDLE);
     }
 
     /**
@@ -100,12 +100,12 @@ class XdebugHandler
      */
     private function getCommand(): string
     {
-        $params = array_merge(
+        $params = \array_merge(
             [PHP_BINARY, '-c', $this->tmpIniPath],
             $this->getScriptArgs($_SERVER['argv'])
         );
 
-        return implode(' ', array_map([$this, 'escape'], $params));
+        return \implode(' ', \array_map([$this, 'escape'], $params));
     }
 
     /**
@@ -125,7 +125,7 @@ class XdebugHandler
         }
 
         $offset = \count($args) > 1 ? 2 : 1;
-        array_splice($args, $offset, 0, '--ansi');
+        \array_splice($args, $offset, 0, '--ansi');
 
         return $args;
     }
@@ -143,28 +143,28 @@ class XdebugHandler
      */
     private function escape(string $arg, bool $meta = true): string
     {
-        if (!defined('PHP_WINDOWS_VERSION_BUILD')) {
-            return escapeshellarg($arg);
+        if (!\defined('PHP_WINDOWS_VERSION_BUILD')) {
+            return \escapeshellarg($arg);
         }
 
-        $quote = strpbrk($arg, " \t") !== false || $arg === '';
-        $arg = preg_replace('/(\\\\*)"/', '$1$1\\"', $arg, -1, $quotesCount);
+        $quote = \strpbrk($arg, " \t") !== false || $arg === '';
+        $arg = \preg_replace('/(\\\\*)"/', '$1$1\\"', $arg, -1, $quotesCount);
 
         if ($meta) {
-            $meta = $quotesCount || preg_match('/%[^%]+%/', $arg);
+            $meta = $quotesCount || \preg_match('/%[^%]+%/', $arg);
 
             if (!$meta && !$quote) {
-                $quote = strpbrk($arg, '^&|<>()') !== false;
+                $quote = \strpbrk($arg, '^&|<>()') !== false;
             }
         }
 
         if ($quote) {
-            $arg = preg_replace('/(\\\\*)$/', '$1$1', $arg);
+            $arg = \preg_replace('/(\\\\*)$/', '$1$1', $arg);
             $arg = '"' . $arg . '"';
         }
 
         if ($meta) {
-            $arg = preg_replace('/(["^&|<>()%])/', '^$1', $arg);
+            $arg = \preg_replace('/(["^&|<>()%])/', '^$1', $arg);
         }
 
         return $arg;
@@ -177,7 +177,7 @@ class XdebugHandler
      */
     protected function restart(string $command)
     {
-        passthru($command, $exitCode);
+        \passthru($command, $exitCode);
 
         exit($exitCode);
     }

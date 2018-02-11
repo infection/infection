@@ -24,16 +24,16 @@ abstract class AbstractBaseProviderTest extends Mockery\Adapter\Phpunit\MockeryT
 
     protected function getInputStream($input)
     {
-        $stream = fopen('php://memory', 'r+', false);
-        fwrite($stream, $input);
-        rewind($stream);
+        $stream = \fopen('php://memory', 'r+', false);
+        \fwrite($stream, $input);
+        \rewind($stream);
 
         return $stream;
     }
 
     protected function createOutputInterface()
     {
-        return new StreamOutput(fopen('php://memory', 'r+', false));
+        return new StreamOutput(\fopen('php://memory', 'r+', false));
     }
 
     protected function createStreamableInputInterfaceMock($stream = null, $interactive = true)
@@ -58,7 +58,7 @@ abstract class AbstractBaseProviderTest extends Mockery\Adapter\Phpunit\MockeryT
             return self::$stty;
         }
 
-        exec('stty 2>&1', $output, $exitcode);
+        \exec('stty 2>&1', $output, $exitcode);
 
         return self::$stty = $exitcode === 0;
     }

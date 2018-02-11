@@ -18,16 +18,16 @@ class PhpIniHelperTest extends TestCase
     public static function setUpBeforeClass()
     {
         // Save current state
-        self::$envOriginal = getenv(PhpIniHelper::ENV_ORIGINALS_PHP_INIS);
+        self::$envOriginal = \getenv(PhpIniHelper::ENV_ORIGINALS_PHP_INIS);
     }
 
     public static function tearDownAfterClass()
     {
         // Restore original state
         if (false !== self::$envOriginal) {
-            putenv(PhpIniHelper::ENV_ORIGINALS_PHP_INIS . '=' . self::$envOriginal);
+            \putenv(PhpIniHelper::ENV_ORIGINALS_PHP_INIS . '=' . self::$envOriginal);
         } else {
-            putenv(PhpIniHelper::ENV_ORIGINALS_PHP_INIS);
+            \putenv(PhpIniHelper::ENV_ORIGINALS_PHP_INIS);
         }
     }
 
@@ -55,6 +55,6 @@ class PhpIniHelperTest extends TestCase
 
     private function setEnv(array $paths)
     {
-        putenv(PhpIniHelper::ENV_ORIGINALS_PHP_INIS . '=' . implode(PATH_SEPARATOR, $paths));
+        \putenv(PhpIniHelper::ENV_ORIGINALS_PHP_INIS . '=' . \implode(PATH_SEPARATOR, $paths));
     }
 }

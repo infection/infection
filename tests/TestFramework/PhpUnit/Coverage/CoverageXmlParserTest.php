@@ -29,12 +29,12 @@ class CoverageXmlParserTest extends TestCase
 
     protected function getXml()
     {
-        $xml = file_get_contents(__DIR__ . '/../../../Fixtures/Files/phpunit/coverage-xml/index.xml');
+        $xml = \file_get_contents(__DIR__ . '/../../../Fixtures/Files/phpunit/coverage-xml/index.xml');
 
         // replace dummy source path with the real path
-        return preg_replace(
+        return \preg_replace(
             '/(source=\").*?(\")/',
-            sprintf('$1%s$2', realpath($this->srcDir)),
+            \sprintf('$1%s$2', \realpath($this->srcDir)),
             $xml
         );
     }
@@ -51,9 +51,9 @@ class CoverageXmlParserTest extends TestCase
     {
         $coverage = $this->parser->parse($this->getXml());
 
-        $zeroLevelAbsolutePath = realpath($this->tempDir . '/zeroLevel.php');
-        $firstLevelAbsolutePath = realpath($this->tempDir . '/FirstLevel/firstLevel.php');
-        $secondLevelAbsolutePath = realpath($this->tempDir . '/FirstLevel/SecondLevel/secondLevel.php');
+        $zeroLevelAbsolutePath = \realpath($this->tempDir . '/zeroLevel.php');
+        $firstLevelAbsolutePath = \realpath($this->tempDir . '/FirstLevel/firstLevel.php');
+        $secondLevelAbsolutePath = \realpath($this->tempDir . '/FirstLevel/SecondLevel/secondLevel.php');
 
         $this->assertArrayHasKey($zeroLevelAbsolutePath, $coverage);
         $this->assertArrayHasKey($firstLevelAbsolutePath, $coverage);
@@ -71,7 +71,7 @@ class CoverageXmlParserTest extends TestCase
 
     public function test_it_adds_by_method_coverage_data()
     {
-        $firstLevelAbsolutePath = realpath($this->tempDir . '/FirstLevel/firstLevel.php');
+        $firstLevelAbsolutePath = \realpath($this->tempDir . '/FirstLevel/firstLevel.php');
         $expectedByMethodArray = [
             'mutate' => [
                 'startLine' => 19,

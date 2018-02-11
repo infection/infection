@@ -78,11 +78,11 @@ class BaseFileLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_on_mutation_testing_finished()
     {
-        $logTypes = ['text' => sys_get_temp_dir() . '/infection-log.txt'];
+        $logTypes = ['text' => \sys_get_temp_dir() . '/infection-log.txt'];
         $this->infectionConfig->expects($this->once())
             ->method('getLogPathInfoFor')
             ->with('text')
-            ->willReturn(sys_get_temp_dir() . '/infection-log.txt');
+            ->willReturn(\sys_get_temp_dir() . '/infection-log.txt');
 
         $this->infectionConfig->expects($this->once())
             ->method('getLogsTypes')
@@ -123,7 +123,7 @@ class BaseFileLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_on_mutation_testing_finished_and_debug_mode_off()
     {
-        $logTypes = ['text' => sys_get_temp_dir() . '/infection-log.txt'];
+        $logTypes = ['text' => \sys_get_temp_dir() . '/infection-log.txt'];
 
         $this->infectionConfig->expects($this->once())
             ->method('getLogsTypes')
@@ -131,7 +131,7 @@ class BaseFileLoggerSubscriberTest extends TestCase
 
         $this->infectionConfig->expects($this->once())
             ->method('getLogPathInfoFor')
-            ->willReturn(sys_get_temp_dir() . '/infection-log.txt');
+            ->willReturn(\sys_get_temp_dir() . '/infection-log.txt');
 
         $this->metricsCalculator->expects($this->once())
             ->method('getEscapedMutantProcesses')

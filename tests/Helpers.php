@@ -17,5 +17,5 @@ namespace Infection\Tests;
  */
 function normalizePath(string $value): string
 {
-    return str_replace(DIRECTORY_SEPARATOR, '/', $value);
+    return \str_replace(DIRECTORY_SEPARATOR, '/', $value);
 }

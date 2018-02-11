@@ -119,12 +119,12 @@ class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
      */
     private function showMutations(array $processes, string $headlinePrefix)
     {
-        $headline = sprintf('%s mutants:', $headlinePrefix);
+        $headline = \sprintf('%s mutants:', $headlinePrefix);
 
         $this->output->writeln([
             '',
             $headline,
-            str_repeat('=', strlen($headline)),
+            \str_repeat('=', \strlen($headline)),
             '',
         ]);
 
@@ -133,7 +133,7 @@ class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
 
             $this->output->writeln([
                 '',
-                sprintf(
+                \sprintf(
                     '%d) %s:%d    [M] %s',
                     $index + 1,
                     $mutation->getOriginalFilePath(),
@@ -176,12 +176,12 @@ class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
 
     private function getPadded($subject, int $padLength = self::PAD_LENGTH): string
     {
-        return str_pad((string) $subject, $padLength, ' ', STR_PAD_LEFT);
+        return \str_pad((string) $subject, $padLength, ' ', STR_PAD_LEFT);
     }
 
     private function addIndentation(string $string): string
     {
-        return str_repeat(' ', self::PAD_LENGTH + 1) . $string;
+        return \str_repeat(' ', self::PAD_LENGTH + 1) . $string;
     }
 
     private function getPercentageTag(float $percentage)

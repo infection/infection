@@ -56,11 +56,11 @@ class MutationTestingRunner
 
     public function run(int $threadCount, CodeCoverageData $codeCoverageData, string $testFrameworkExtraOptions)
     {
-        $mutantCount = count($this->mutations);
+        $mutantCount = \count($this->mutations);
 
         $this->eventDispatcher->dispatch(new MutantsCreatingStarted($mutantCount));
 
-        $processes = array_map(
+        $processes = \array_map(
             function (Mutation $mutation) use ($codeCoverageData, $testFrameworkExtraOptions): MutantProcess {
                 $mutant = $this->mutantCreator->create($mutation, $codeCoverageData);
 

@@ -33,7 +33,7 @@ class TmpDirectoryCreatorTest extends TestCase
     {
         $this->fileSystem = new Filesystem();
         $this->creator = new TmpDirectoryCreator($this->fileSystem);
-        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
+        $this->workspace = \sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
     }
 
     protected function tearDown()

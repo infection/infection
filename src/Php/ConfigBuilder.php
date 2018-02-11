@@ -37,16 +37,16 @@ final class ConfigBuilder
      */
     public function build()
     {
-        $tmpIniPath = (string) getenv(self::ENV_TEMP_PHP_CONFIG_PATH);
+        $tmpIniPath = (string) \getenv(self::ENV_TEMP_PHP_CONFIG_PATH);
 
-        if (!empty($tmpIniPath) && file_exists($tmpIniPath)) {
+        if (!empty($tmpIniPath) && \file_exists($tmpIniPath)) {
             return $tmpIniPath;
         }
 
         $iniPaths = PhpIniHelper::get();
 
         if ($this->writeTempIni($iniPaths)) {
-            $additional = count($iniPaths) > 1;
+            $additional = \count($iniPaths) > 1;
 
             $this->setEnvironment($additional);
 
@@ -63,31 +63,31 @@ final class ConfigBuilder
      */
     private function writeTempIni(array $originalIniPaths): bool
     {
-        if (!($this->tmpIniPath = tempnam($this->tempDir, 'infection'))) {
+        if (!($this->tmpIniPath = \tempnam($this->tempDir, 'infection'))) {
             return false;
         }
 
         // $originalIniPaths is either empty or has at least one element
         if (empty($originalIniPaths[0])) {
-            array_shift($originalIniPaths);
+            \array_shift($originalIniPaths);
         }
 
         $content = '';
         $regex = '/^\s*(zend_extension\s*=.*xdebug.*)$/mi';
 
         foreach ($originalIniPaths as $iniPath) {
-            $content .= preg_replace($regex, ';$1', file_get_contents($iniPath)) . PHP_EOL;
+            $content .= \preg_replace($regex, ';$1', \file_get_contents($iniPath)) . PHP_EOL;
         }
 
-        return (bool) @file_put_contents($this->tmpIniPath, $content);
+        return (bool) @\file_put_contents($this->tmpIniPath, $content);
     }
 
     private function setEnvironment(bool $additional): bool
     {
-        if ($additional && !putenv(self::ENV_PHP_INI_SCAN_DIR . '=')) {
+        if ($additional && !\putenv(self::ENV_PHP_INI_SCAN_DIR . '=')) {
             return false;
         }
 
-        return putenv(self::ENV_TEMP_PHP_CONFIG_PATH . '=' . $this->tmpIniPath);
+        return \putenv(self::ENV_TEMP_PHP_CONFIG_PATH . '=' . $this->tmpIniPath);
     }
 }

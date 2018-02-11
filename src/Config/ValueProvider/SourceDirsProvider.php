@@ -39,10 +39,10 @@ class SourceDirsProvider
 
         $guessedSourceDirs = null;
 
-        if (file_exists('composer.json')) {
-            $content = json_decode(file_get_contents('composer.json'));
+        if (\file_exists('composer.json')) {
+            $content = \json_decode(\file_get_contents('composer.json'));
 
-            if (json_last_error() !== JSON_ERROR_NONE) {
+            if (\json_last_error() !== JSON_ERROR_NONE) {
                 throw new \LogicException('composer.json does not contain valid JSON');
             }
 
@@ -50,21 +50,21 @@ class SourceDirsProvider
             $guessedSourceDirs = $sourceDirGuesser->guess();
         }
 
-        $defaultValues = $guessedSourceDirs ? implode(',', $guessedSourceDirs) : null;
+        $defaultValues = $guessedSourceDirs ? \implode(',', $guessedSourceDirs) : null;
 
         $questionText = $this->consoleHelper->getQuestion(
             'Which source directories do you want to include (comma separated)?',
             $defaultValues
         );
 
-        $choices = array_merge(['.'], array_values($dirsInCurrentDir));
+        $choices = \array_merge(['.'], \array_values($dirsInCurrentDir));
 
         $question = new ChoiceQuestion($questionText, $choices, $defaultValues);
         $question->setMultiselect(true);
 
         $sourceFolders = $this->questionHelper->ask($input, $output, $question);
 
-        if (in_array('.', $sourceFolders, true) && count($sourceFolders) > 1) {
+        if (\in_array('.', $sourceFolders, true) && \count($sourceFolders) > 1) {
             throw new \LogicException('You cannot use current folder "." with other subfolders');
         }
 

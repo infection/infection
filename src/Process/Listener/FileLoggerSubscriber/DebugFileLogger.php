@@ -59,16 +59,16 @@ class DebugFileLogger extends FileLogger
             $logParts[] = 'Line ' . $mutation->getAttributes()['startLine'];
         }
 
-        return implode($logParts, "\n") . "\n";
+        return \implode($logParts, "\n") . "\n";
     }
 
     private function getHeadlineParts(string $headlinePrefix): array
     {
-        $headline = sprintf('%s mutants:', $headlinePrefix);
+        $headline = \sprintf('%s mutants:', $headlinePrefix);
 
         return [
             $headline,
-            str_repeat('=', strlen($headline)),
+            \str_repeat('=', \strlen($headline)),
             '',
         ];
     }

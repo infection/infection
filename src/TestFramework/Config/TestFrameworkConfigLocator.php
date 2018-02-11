@@ -25,17 +25,17 @@ class TestFrameworkConfigLocator
         $dir = $customDir ?: $this->configDir;
 
         foreach (['xml', 'yml'] as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
+            $conf = \sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
 
-            if (file_exists($conf)) {
-                return realpath($conf);
+            if (\file_exists($conf)) {
+                return \realpath($conf);
             }
 
-            if (file_exists($conf . '.dist')) {
-                return realpath($conf . '.dist');
+            if (\file_exists($conf . '.dist')) {
+                return \realpath($conf . '.dist');
             }
         }
 
-        throw new \RuntimeException(sprintf('Unable to locate %s.(xml|yml)(.dist) file.', $testFrameworkName));
+        throw new \RuntimeException(\sprintf('Unable to locate %s.(xml|yml)(.dist) file.', $testFrameworkName));
     }
 }

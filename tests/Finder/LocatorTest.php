@@ -31,7 +31,7 @@ class LocatorTest extends TestCase
      */
     public function test_determines_real_path_to_file(string $fileName, string $pathPostfix)
     {
-        $projectPath = realpath(__DIR__ . '/../Fixtures/Files/phpunit/project-path');
+        $projectPath = \realpath(__DIR__ . '/../Fixtures/Files/phpunit/project-path');
 
         $locator = new Locator([$projectPath], $this->filesystem);
 
@@ -57,7 +57,7 @@ class LocatorTest extends TestCase
         $locator = new Locator([$projectPath], $this->filesystem);
 
         $this->expectException(LocatorException::class);
-        $this->expectExceptionMessage(sprintf(
+        $this->expectExceptionMessage(\sprintf(
             'The file/folder "autoload.php" does not exist (in: %s).',
             $projectPath
         ));
@@ -67,14 +67,14 @@ class LocatorTest extends TestCase
 
     public function test_it_throws_an_exception_if_file_or_folder_does_not_exist_when_absolute_path_is_given()
     {
-        $projectPath = realpath(__DIR__ . '/../Fixtures/Locator');
+        $projectPath = \realpath(__DIR__ . '/../Fixtures/Locator');
 
         $locator = new Locator([''], $this->filesystem);
 
         $invalidPath = $projectPath . 'autoload.php';
 
         $this->expectException(LocatorException::class);
-        $this->expectExceptionMessage(sprintf(
+        $this->expectExceptionMessage(\sprintf(
             'The file/directory "%s" does not exist.',
             $invalidPath
         ));
@@ -84,7 +84,7 @@ class LocatorTest extends TestCase
 
     public function test_locate_any_throws_exception_if_empty_array_provided()
     {
-        $projectPath = realpath(__DIR__ . '/../Fixtures/Files/phpunit/project-path');
+        $projectPath = \realpath(__DIR__ . '/../Fixtures/Files/phpunit/project-path');
         $locator = new Locator([$projectPath], $this->filesystem);
 
         $this->expectException(LocatorException::class);
@@ -95,7 +95,7 @@ class LocatorTest extends TestCase
 
     public function test_it_returns_first_possible_file()
     {
-        $projectPath = realpath(__DIR__ . '/../Fixtures/Locator');
+        $projectPath = \realpath(__DIR__ . '/../Fixtures/Locator');
         $locator = new Locator([$projectPath], $this->filesystem);
 
         $found = $locator->locateAnyOf(['file.txt', 'secondfile.txt']);
@@ -116,7 +116,7 @@ class LocatorTest extends TestCase
 
     public function test_it_returns_the_file_even_if_some_dont_exists()
     {
-        $projectPath = realpath(__DIR__ . '/../Fixtures/Locator');
+        $projectPath = \realpath(__DIR__ . '/../Fixtures/Locator');
         $locator = new Locator([$projectPath], $this->filesystem);
 
         $found = $locator->locateAnyOf(['fakefile.txt', 'secondfile.txt', 'thirdfile.txt']);
@@ -130,7 +130,7 @@ class LocatorTest extends TestCase
 
     public function test_it_throws_an_error_if_none_of_the_files_exist()
     {
-        $projectPath = realpath(__DIR__ . '/../Fixtures/Files/phpunit/project-path');
+        $projectPath = \realpath(__DIR__ . '/../Fixtures/Files/phpunit/project-path');
         $locator = new Locator([$projectPath], $this->filesystem);
 
         $this->expectException(LocatorException::class);

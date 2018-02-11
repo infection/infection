@@ -17,10 +17,10 @@ class XdebugHandlerMock extends XdebugHandler
 
     public function __construct($isLoaded = null)
     {
-        parent::__construct(new ConfigBuilder(sys_get_temp_dir()));
+        parent::__construct(new ConfigBuilder(\sys_get_temp_dir()));
 
         $isLoaded = null === $isLoaded ? true : $isLoaded;
-        $class = new \ReflectionClass(get_parent_class($this));
+        $class = new \ReflectionClass(\get_parent_class($this));
 
         $prop = $class->getProperty('isLoaded');
         $prop->setAccessible(true);

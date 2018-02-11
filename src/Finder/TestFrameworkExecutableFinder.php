@@ -60,18 +60,18 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
     {
         $vendorPath = null;
         try {
-            $process = new Process(sprintf('%s %s', $this->findComposer(), 'config bin-dir'));
+            $process = new Process(\sprintf('%s %s', $this->findComposer(), 'config bin-dir'));
             $process->run();
-            $vendorPath = trim($process->getOutput());
+            $vendorPath = \trim($process->getOutput());
         } catch (\RuntimeException $e) {
-            $candidate = getcwd() . '/vendor/bin';
-            if (file_exists($candidate)) {
+            $candidate = \getcwd() . '/vendor/bin';
+            if (\file_exists($candidate)) {
                 $vendorPath = $candidate;
             }
         }
 
         if (null !== $vendorPath) {
-            putenv('PATH=' . $vendorPath . PATH_SEPARATOR . getenv('PATH'));
+            \putenv('PATH=' . $vendorPath . PATH_SEPARATOR . \getenv('PATH'));
         }
     }
 
@@ -90,19 +90,19 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
         $finder = new ExecutableFinder();
 
         foreach ($candidates as $name) {
-            if ($path = $finder->find($name, null, [getcwd()])) {
+            if ($path = $finder->find($name, null, [\getcwd()])) {
                 return $this->makeExecutable($path, $includeArgs);
             }
         }
 
-        $result = $this->searchNonExecutables($candidates, [getcwd()], $includeArgs);
+        $result = $this->searchNonExecutables($candidates, [\getcwd()], $includeArgs);
 
         if (null !== $result) {
             return $result;
         }
 
         throw new TestFrameworkExecutableFinderNotFound(
-            sprintf(
+            \sprintf(
                 'Unable to locate a %s executable on local system. Ensure that %s is installed and available.',
                 $this->testFrameworkName,
                 $this->testFrameworkName
@@ -121,22 +121,22 @@ class TestFrameworkExecutableFinder extends AbstractExecutableFinder
      */
     protected function makeExecutable(string $path, bool $includeArgs = true): string
     {
-        $path = realpath($path);
+        $path = \realpath($path);
         $phpFinder = new PhpExecutableFinder();
 
         if (\defined('PHP_WINDOWS_VERSION_BUILD')) {
-            if (false !== strpos($path, '.bat')) {
+            if (false !== \strpos($path, '.bat')) {
                 return $path;
             }
 
-            return sprintf('%s %s', $phpFinder->find($includeArgs), $path);
+            return \sprintf('%s %s', $phpFinder->find($includeArgs), $path);
         }
 
-        return sprintf('%s %s %s', 'exec', $phpFinder->find($includeArgs), $path);
+        return \sprintf('%s %s %s', 'exec', $phpFinder->find($includeArgs), $path);
     }
 
     private function doesCustomPathExist(): bool
     {
-        return $this->customPath && file_exists($this->customPath);
+        return $this->customPath && \file_exists($this->customPath);
     }
 }

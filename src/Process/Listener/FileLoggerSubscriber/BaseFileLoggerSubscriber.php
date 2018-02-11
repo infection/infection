@@ -86,7 +86,7 @@ class BaseFileLoggerSubscriber implements EventSubscriberInterface
         ];
 
         foreach ($logTypes as $key => $value) {
-            if (!in_array($key, $allowedFileTypes)) {
+            if (!\in_array($key, $allowedFileTypes)) {
                 unset($logTypes[$key]);
             }
         }

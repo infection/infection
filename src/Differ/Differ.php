@@ -43,13 +43,13 @@ class Differ
     {
         $diff = $this->differ->diff($from, $to);
 
-        if (preg_match(
+        if (\preg_match(
             '/(?:[^\n]*(\n)){' . self::DIFF_MAX_LINES . '}/',
             $diff,
             $matches,
             PREG_OFFSET_CAPTURE
         )) {
-            $diff = substr($diff, 0, $matches[1][1]);
+            $diff = \substr($diff, 0, $matches[1][1]);
         }
 
         return $diff;

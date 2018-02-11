@@ -49,12 +49,12 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
     protected function setUp()
     {
-        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
+        $this->workspace = \sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
 
         $this->fileSystem = new Filesystem();
         $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
 
-        $this->pathToProject = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
+        $this->pathToProject = p(\realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
 
         $projectDir = '/project/dir';
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit.xml';
@@ -72,7 +72,7 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $this->builder = new MutationConfigBuilder(
             $this->tmpDir,
-            file_get_contents($phpunitXmlPath),
+            \file_get_contents($phpunitXmlPath),
             $this->xmlConfigurationHelper,
             $projectDir
         );
@@ -99,11 +99,11 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $configurationPath = $this->builder->build($this->mutant);
 
-        $xml = file_get_contents($configurationPath);
+        $xml = \file_get_contents($configurationPath);
 
         $resultAutoLoaderFilePath = $this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue;
 
-        $expectedCustomAutoloadFilePath = sprintf(
+        $expectedCustomAutoloadFilePath = \sprintf(
             '%s/interceptor.autoload.%s.infection.php',
             $this->tmpDir,
             self::HASH
@@ -118,18 +118,18 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpuit_without_bootstrap.xml';
         $this->builder = new MutationConfigBuilder(
             $this->tmpDir,
-            file_get_contents($phpunitXmlPath),
+            \file_get_contents($phpunitXmlPath),
             $this->xmlConfigurationHelper,
             'project/dir'
         );
 
         $configurationPath = $this->builder->build($this->mutant);
 
-        $xml = file_get_contents($configurationPath);
+        $xml = \file_get_contents($configurationPath);
 
         $resultAutoLoaderFilePath = $this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue;
 
-        $expectedCustomAutoloadFilePath = sprintf(
+        $expectedCustomAutoloadFilePath = \sprintf(
             '%s/interceptor.autoload.%s.infection.php',
             $this->tmpDir,
             self::HASH
@@ -144,7 +144,7 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $configurationPath = $this->builder->build($this->mutant);
 
-        $xml = file_get_contents($configurationPath);
+        $xml = \file_get_contents($configurationPath);
 
         $value = $this->queryXpath($xml, '/phpunit/@stopOnFailure')[0]->nodeValue;
 
@@ -157,7 +157,7 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $configurationPath = $this->builder->build($this->mutant);
 
-        $xml = file_get_contents($configurationPath);
+        $xml = \file_get_contents($configurationPath);
 
         $value = $this->queryXpath($xml, '/phpunit/@colors')[0]->nodeValue;
 
@@ -174,14 +174,14 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $this->builder = new MutationConfigBuilder(
             $this->tmpDir,
-            file_get_contents($phpunitXmlPath),
+            \file_get_contents($phpunitXmlPath),
             $xmlConfigurationHelper,
             $this->pathToProject
         );
 
         $configurationPath = $this->builder->build($this->mutant);
 
-        $this->assertEquals(1, $this->queryXpath(file_get_contents($configurationPath), '/phpunit/testsuite')->length);
+        $this->assertEquals(1, $this->queryXpath(\file_get_contents($configurationPath), '/phpunit/testsuite')->length);
     }
 
     public function test_it_removes_original_loggers()
@@ -190,7 +190,7 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $configurationPath = $this->builder->build($this->mutant);
 
-        $xml = file_get_contents($configurationPath);
+        $xml = \file_get_contents($configurationPath);
         $nodeList = $this->queryXpath($xml, '/phpunit/logging/log[@type="coverage-html"]');
 
         $this->assertSame(0, $nodeList->length);
@@ -202,7 +202,7 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $configurationPath = $this->builder->build($this->mutant);
 
-        $xml = file_get_contents($configurationPath);
+        $xml = \file_get_contents($configurationPath);
 
         /** @var \DOMNodeList $filterNodes */
         $filterNodes = $this->queryXpath($xml, '/phpunit/@printerClass');
@@ -218,7 +218,7 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $configurationPath = $this->builder->build($this->mutant);
 
-        $xml = file_get_contents($configurationPath);
+        $xml = \file_get_contents($configurationPath);
 
         $files = [];
         $nodes = $this->queryXpath($xml, '/phpunit/testsuites/testsuite/file');

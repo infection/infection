@@ -18,10 +18,10 @@ abstract class MutationConfigBuilder
     {
         $infectionPhar = '';
 
-        if (0 === strpos(__FILE__, 'phar:')) {
-            $infectionPhar = sprintf(
+        if (0 === \strpos(__FILE__, 'phar:')) {
+            $infectionPhar = \sprintf(
                 '\Phar::loadPhar("%s", "%s");',
-                str_replace('phar://', '', \Phar::running(true)),
+                \str_replace('phar://', '', \Phar::running(true)),
                 'infection.phar'
             );
         }

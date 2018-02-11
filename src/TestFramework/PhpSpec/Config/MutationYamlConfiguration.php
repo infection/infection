@@ -46,7 +46,7 @@ class MutationYamlConfiguration extends AbstractYamlConfiguration
             }
         }
 
-        return array_merge($parsedYaml, ['extensions' => $filteredExtensions]);
+        return \array_merge($parsedYaml, ['extensions' => $filteredExtensions]);
     }
 
     private function setCustomAutoLoaderPath(array $config): array

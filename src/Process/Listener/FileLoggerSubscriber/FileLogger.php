@@ -52,7 +52,7 @@ abstract class FileLogger
         if ($logFilePath !== null) {
             $this->fs->dumpFile(
                 $logFilePath,
-                implode(
+                \implode(
                     $logs,
                     "\n"
                 )

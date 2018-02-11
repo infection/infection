@@ -19,17 +19,17 @@ class PhpSpecAdapter extends AbstractTestFrameworkAdapter
 
     public function testsPass(string $output): bool
     {
-        $lines = explode(PHP_EOL, $output);
+        $lines = \explode(PHP_EOL, $output);
 
         foreach ($lines as $line) {
-            if (preg_match('%not ok \\d+ - %', $line)
-                && !preg_match('%# TODO%', $line)) {
+            if (\preg_match('%not ok \\d+ - %', $line)
+                && !\preg_match('%# TODO%', $line)) {
                 return false;
             }
         }
 
         foreach (self::ERROR_REGEXPS as $regExp) {
-            if (preg_match($regExp, $output)) {
+            if (\preg_match($regExp, $output)) {
                 return false;
             }
         }

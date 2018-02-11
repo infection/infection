@@ -20,7 +20,7 @@ class EventDispatcher implements EventDispatcherInterface, ContainsListenersInte
      */
     public function dispatch($event)
     {
-        $name = get_class($event);
+        $name = \get_class($event);
 
         foreach ($this->getListeners($name) as $listener) {
             $listener($event);

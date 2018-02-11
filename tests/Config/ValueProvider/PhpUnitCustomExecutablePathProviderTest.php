@@ -48,7 +48,7 @@ class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProviderTest
         $dialog = $this->getQuestionHelper();
 
         $provider = new PhpUnitCustomExecutablePathProvider($finderMock, $consoleMock, $dialog);
-        $customExecutable = p(realpath(__DIR__ . '/../../Fixtures/Files/phpunit/phpunit.phar'));
+        $customExecutable = p(\realpath(__DIR__ . '/../../Fixtures/Files/phpunit/phpunit.phar'));
 
         $path = $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("{$customExecutable}\n")),

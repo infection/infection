@@ -32,7 +32,7 @@ abstract class AbstractYamlConfiguration
 
     protected function isCodeCoverageExtension(string $extensionName): bool
     {
-        return strpos($extensionName, 'CodeCoverage') !== false;
+        return \strpos($extensionName, 'CodeCoverage') !== false;
     }
 
     protected function updateCodeCoveragePath(array &$parsedYaml)
@@ -52,7 +52,7 @@ abstract class AbstractYamlConfiguration
 
     protected function hasCodeCoverageExtension(array $parsedYaml): bool
     {
-        if (!array_key_exists('extensions', $parsedYaml)) {
+        if (!\array_key_exists('extensions', $parsedYaml)) {
             return false;
         }
 

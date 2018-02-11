@@ -25,7 +25,7 @@ class MutatorVisitor extends NodeVisitorAbstract
     {
         $attributes = $node->getAttributes();
 
-        if (!array_key_exists('startTokenPos', $attributes)) {
+        if (!\array_key_exists('startTokenPos', $attributes)) {
             return null;
         }
 
@@ -35,7 +35,7 @@ class MutatorVisitor extends NodeVisitorAbstract
         $isEqualPosition = $attributes['startTokenPos'] === $mutatedAttributes['startTokenPos'] &&
             $attributes['endTokenPos'] === $mutatedAttributes['endTokenPos'];
 
-        if ($isEqualPosition && $this->mutation->getMutatedNodeClass() === get_class($node)) {
+        if ($isEqualPosition && $this->mutation->getMutatedNodeClass() === \get_class($node)) {
             return $mutator->mutate($node);
             // TODO STOP TRAVERSING
             // TODO check all built-in visitors, in particular FirstFindingVisitor

@@ -25,7 +25,7 @@ class PhpUnitPathGuesserTest extends TestCase
     }
 }
 CODE;
-        $guesser = new PhpUnitPathGuesser(json_decode($composerJson));
+        $guesser = new PhpUnitPathGuesser(\json_decode($composerJson));
 
         $this->assertSame('app', $guesser->guess());
     }
@@ -41,7 +41,7 @@ CODE;
     }
 }
 CODE;
-        $guesser = new PhpUnitPathGuesser(json_decode($composerJson));
+        $guesser = new PhpUnitPathGuesser(\json_decode($composerJson));
 
         $this->assertSame('.', $guesser->guess());
     }
