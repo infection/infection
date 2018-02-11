@@ -79,8 +79,7 @@ PHP;
             [Node\Expr\Array_::class, false], // []
             [Node\Stmt\Class_::class, false], // class Test
             [Node\Stmt\Return_::class, false],
-            [Node\Stmt\Property::class, false],// private $var = 3;
-
+            [Node\Stmt\Property::class, false], // private $var = 3;
         ];
     }
 
@@ -127,7 +126,7 @@ PHP;
             [Node\Expr\Array_::class, true], // []
             [Node\Stmt\Class_::class, false], // class Test
             [Node\Stmt\Return_::class, true],
-            [Node\Stmt\Property::class, false],// private $var = 3;
+            [Node\Stmt\Property::class, false], // private $var = 3;
         ];
     }
 
@@ -204,37 +203,35 @@ PHP;
         $traverser->traverse($statements);
         $scopes = $spyVisitor->getFunctionScope();
 
-        foreach ($scopes[6] as $line =>$scope) {
+        foreach ($scopes[6] as $scope) {
             $this->assertNull($scope->getReturnType());
         }
 
-        foreach ($scopes[8] as $line =>$scope) {
+        foreach ($scopes[8] as $scope) {
             $this->assertNull($scope->getReturnType());
         }
 
-        foreach ($scopes[12] as $line =>$scope) {
+        foreach ($scopes[12] as $scope) {
             $this->assertSame('string', $scope->getReturnType());
         }
 
-        foreach ($scopes[14] as $line =>$scope) {
+        foreach ($scopes[14] as $scope) {
             $this->assertInstanceOf(Node\NullableType::class, $scope->getReturnType());
             $this->assertSame('string', $scope->getReturnType()->type);
         }
 
-        foreach ($scopes[16] as $line =>$scope) {
+        foreach ($scopes[16] as $scope) {
             $this->assertInstanceOf(Node\NullableType::class, $scope->getReturnType());
             $this->assertSame('string', $scope->getReturnType()->type);
         }
 
         //Only these 5 lines have FUNCTION_SCOPE_KEY set
         $this->assertCount(5, $scopes);
-
     }
 
     private function getFunctionScopeSpyVisitor()
     {
         return new class() extends NodeVisitorAbstract {
-
             private $functionScope = [];
 
             public function leaveNode(Node $node)
