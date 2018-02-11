@@ -43,8 +43,6 @@ class InitialTestsRunner
     {
         $process = $this->processBuilder->getProcessForInitialTestRun($testFrameworkExtraOptions, $skipCoverage);
 
-        var_dump($process->getCommandLine());
-
         $this->eventDispatcher->dispatch(new InitialTestSuiteStarted());
 
         $process->run(function ($type) use ($process) {

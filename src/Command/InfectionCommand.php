@@ -168,10 +168,7 @@ class InfectionCommand extends BaseCommand
         $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);
 
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
-        $initialTestSuitProcess = $initialTestsRunner->run(
-            $testFrameworkOptions->getForInitialProcess(),
-            $skipCoverage
-        );
+        $initialTestSuitProcess = $initialTestsRunner->run($testFrameworkOptions->getForInitialProcess(), $skipCoverage);
 
         if (!$initialTestSuitProcess->isSuccessful()) {
             $this->logInitialTestsDoNotPass($initialTestSuitProcess, $testFrameworkKey);

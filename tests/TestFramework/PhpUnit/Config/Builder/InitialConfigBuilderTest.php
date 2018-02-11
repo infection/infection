@@ -62,7 +62,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->fileSystem->remove($this->workspace);
     }
 
-    private function createConfigBuilder($phpUnitXmlConfigPath = null)
+    private function createConfigBuilder(string $phpUnitXmlConfigPath = null, bool $skipCoverage = false)
     {
         $phpunitXmlPath = $phpUnitXmlConfigPath ?: __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit.xml';
 
@@ -77,7 +77,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             new XmlConfigurationHelper($replacer),
             $jUnitFilePath,
             $srcDirs,
-            false
+            $skipCoverage
         );
     }
 
@@ -129,6 +129,19 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertSame($this->tmpDir . '/coverage-xml', $logEntries[0]->getAttribute('target'));
         $this->assertSame('coverage-xml', $logEntries[0]->getAttribute('type'));
         $this->assertSame('junit', $logEntries[1]->getAttribute('type'));
+    }
+
+    public function test_it_does_not_add_coverage_loggers_if_should_be_skipped()
+    {
+        $this->createConfigBuilder(null, true);
+        $configurationPath = $this->builder->build();
+
+        $xml = file_get_contents($configurationPath);
+
+        /** @var \DOMNodeList $logEntries */
+        $logEntries = $this->queryXpath($xml, '/phpunit/logging/log');
+
+        $this->assertSame(0, $logEntries->length);
     }
 
     public function test_it_creates_coverage_filter_whitelist_node_if_does_not_exist()

@@ -30,9 +30,9 @@ class InitialYamlConfigurationTest extends TestCase
         'bootstrap' => '/path/to/adc',
     ];
 
-    protected function getConfigurationObject(array $configArray = [])
+    protected function getConfigurationObject(array $configArray = [], bool $skipCoverage = false)
     {
-        return new InitialYamlConfiguration($this->tempDir, $configArray ?: $this->defaultConfig, false);
+        return new InitialYamlConfiguration($this->tempDir, $configArray ?: $this->defaultConfig, $skipCoverage);
     }
 
     /**
@@ -53,6 +53,15 @@ class InitialYamlConfigurationTest extends TestCase
         $expectedPath = $this->tempDir . '/' . CodeCoverageData::PHP_SPEC_COVERAGE_DIR;
 
         $this->assertSame($expectedPath, $parsedYaml['extensions']['PhpSpecCodeCoverageExtension']['output']['xml']);
+    }
+
+    public function test_it_removes_coverage_extension_if_it_coverage_should_be_skipped()
+    {
+        $configuration = $this->getConfigurationObject([], true);
+
+        $parsedYaml = Yaml::parse($configuration->getYaml());
+
+        $this->assertArrayNotHasKey('PhpSpecCodeCoverageExtension', $parsedYaml['extensions']);
     }
 
     public function test_it_preserves_options_form_coverage_extension()
