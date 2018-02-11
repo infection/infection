@@ -158,7 +158,6 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $mock = Mockery::mock(IgnoredMutatorsFinder::class);
         $mock->shouldReceive('isIgnored')->andReturn(false);
 
-
         return new MutationsGenerator(
             $srcDirs,
             $excludedDirsOrFiles,

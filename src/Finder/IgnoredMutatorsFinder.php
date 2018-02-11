@@ -4,6 +4,7 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Finder;
@@ -39,7 +40,7 @@ class IgnoredMutatorsFinder
 
         $toIgnore = (array) $this->ignoreCases[$mutator];
 
-        if(in_array('*', $toIgnore)) {
+        if (in_array('*', $toIgnore)) {
             return true;
         }
 
@@ -49,23 +50,23 @@ class IgnoredMutatorsFinder
 
     private function getCalculatedPaths(): array
     {
-        if($this->calculatedPaths !== null) {
+        if ($this->calculatedPaths !== null) {
             return $this->calculatedPaths;
         }
         $calculated = [];
 
         foreach ($this->ignoreCases as $mutator => $paths) {
             if (!is_array($paths)) {
-                $calculated[$mutator][$this->relativePath . '/' .$paths] = '*';
+                $calculated[$mutator][$this->relativePath . '/' . $paths] = '*';
                 continue;
             }
-            foreach ((array)$paths as $key => $path) {
+            foreach ((array) $paths as $key => $path) {
                 if (!is_array($path)) {
-                    $calculated[$mutator][$this->relativePath . '/' .$path] = '*';
+                    $calculated[$mutator][$this->relativePath . '/' . $path] = '*';
                     continue;
                 }
                 foreach ($path as $method) {
-                    $calculated[$mutator][$this->relativePath . '/' .$key] = $method;
+                    $calculated[$mutator][$this->relativePath . '/' . $key] = $method;
                 }
             }
         }
@@ -73,5 +74,4 @@ class IgnoredMutatorsFinder
 
         return $this->calculatedPaths;
     }
-
 }
