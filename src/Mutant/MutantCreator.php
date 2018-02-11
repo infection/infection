@@ -59,11 +59,11 @@ class MutantCreator
         $mutatedStatements = $traverser->traverse($originalStatements);
 
         $mutatedCode = $this->prettyPrinter->prettyPrintFile($mutatedStatements);
-        $mutatedFilePath = sprintf('%s/mutant.%s.infection.php', $this->tempDir, $mutation->getHash());
+        $mutatedFilePath = \sprintf('%s/mutant.%s.infection.php', $this->tempDir, $mutation->getHash());
 
         $diff = $this->differ->diff($originalPrettyPrintedFile, $mutatedCode);
 
-        file_put_contents($mutatedFilePath, $mutatedCode);
+        \file_put_contents($mutatedFilePath, $mutatedCode);
 
         $isCoveredByTest = $this->isCoveredByTest($mutation, $codeCoverageData);
 

@@ -31,7 +31,7 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
     protected function setUp()
     {
-        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
+        $this->workspace = \sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
 
         $this->fileSystem = new Filesystem();
         $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
@@ -80,7 +80,7 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertSame($this->tmpDir . '/phpspecConfiguration.a1b2c3.infection.yml', $builder->build($mutant));
         $this->assertContains(
             "require_once '/project/dir/bootstrap.php';",
-            file_get_contents($this->tmpDir . '/interceptor.phpspec.autoload.a1b2c3.infection.php')
+            \file_get_contents($this->tmpDir . '/interceptor.phpspec.autoload.a1b2c3.infection.php')
         );
     }
 }

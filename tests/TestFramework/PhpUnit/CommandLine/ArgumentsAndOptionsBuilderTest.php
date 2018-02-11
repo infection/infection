@@ -22,6 +22,6 @@ class ArgumentsAndOptionsBuilderTest extends TestCase
 
         $this->assertContains('--stop-on-failure', $command);
         $this->assertContains('--verbose', $command);
-        $this->assertContains(sprintf('--configuration %s', $configPath), $command);
+        $this->assertContains(\sprintf('--configuration %s', $configPath), $command);
     }
 }

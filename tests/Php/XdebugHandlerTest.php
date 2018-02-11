@@ -31,7 +31,7 @@ class XdebugHandlerTest extends TestCase
         ];
 
         foreach ($names as $name) {
-            self::$env[$name] = getenv($name);
+            self::$env[$name] = \getenv($name);
         }
     }
 
@@ -40,9 +40,9 @@ class XdebugHandlerTest extends TestCase
         // Restore original state
         foreach (self::$env as $name => $value) {
             if (false !== $value) {
-                putenv($name . '=' . $value);
+                \putenv($name . '=' . $value);
             } else {
-                putenv($name);
+                \putenv($name);
             }
         }
     }
@@ -53,9 +53,9 @@ class XdebugHandlerTest extends TestCase
             $this->markTestSkipped();
         }
 
-        putenv(PhpIniHelper::ENV_ORIGINALS_PHP_INIS);
-        putenv(XdebugHandlerMock::ENV_DISABLE_XDEBUG);
-        putenv(ConfigBuilder::ENV_TEMP_PHP_CONFIG_PATH);
+        \putenv(PhpIniHelper::ENV_ORIGINALS_PHP_INIS);
+        \putenv(XdebugHandlerMock::ENV_DISABLE_XDEBUG);
+        \putenv(ConfigBuilder::ENV_TEMP_PHP_CONFIG_PATH);
     }
 
     public function test_it_restart_when_loaded()
@@ -66,7 +66,7 @@ class XdebugHandlerTest extends TestCase
         $xdebug->check();
         $this->assertTrue($xdebug->restarted);
 
-        $this->assertInternalType('string', getenv(PhpIniHelper::ENV_ORIGINALS_PHP_INIS));
+        $this->assertInternalType('string', \getenv(PhpIniHelper::ENV_ORIGINALS_PHP_INIS));
     }
 
     public function test_it_not_restart_when_loaded()
@@ -76,13 +76,13 @@ class XdebugHandlerTest extends TestCase
         $xdebug = new XdebugHandlerMock($loaded);
         $xdebug->check();
         $this->assertFalse($xdebug->restarted);
-        $this->assertFalse(getenv(PhpIniHelper::ENV_ORIGINALS_PHP_INIS));
+        $this->assertFalse(\getenv(PhpIniHelper::ENV_ORIGINALS_PHP_INIS));
     }
 
     public function test_it_not_restart_when_loaded_and_allowed()
     {
         $loaded = true;
-        putenv(XdebugHandlerMock::ENV_DISABLE_XDEBUG . '=1');
+        \putenv(XdebugHandlerMock::ENV_DISABLE_XDEBUG . '=1');
 
         $xdebug = new XdebugHandlerMock($loaded);
         $xdebug->check();
@@ -96,12 +96,12 @@ class XdebugHandlerTest extends TestCase
         $xdebug = new XdebugHandlerMock($loaded);
         $xdebug->check();
         $expected = XdebugHandlerMock::RESTART_HANDLE;
-        $this->assertEquals($expected, getenv(XdebugHandlerMock::ENV_DISABLE_XDEBUG));
+        $this->assertEquals($expected, \getenv(XdebugHandlerMock::ENV_DISABLE_XDEBUG));
 
         // Mimic restart
         $xdebug = new XdebugHandlerMock($loaded);
         $xdebug->check();
         $this->assertFalse($xdebug->restarted);
-        $this->assertFalse(getenv(XdebugHandlerMock::ENV_DISABLE_XDEBUG));
+        $this->assertFalse(\getenv(XdebugHandlerMock::ENV_DISABLE_XDEBUG));
     }
 }

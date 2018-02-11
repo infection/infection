@@ -155,23 +155,23 @@ class SelfUpdateCommand extends Command
                 $newVersion = $updater->getNewVersion();
 
                 $this->output->writeln('<fg=green>Infection has been updated.</fg=green>');
-                $this->output->writeln(sprintf(
+                $this->output->writeln(\sprintf(
                     '<fg=green>Current version is:</fg=green> <options=bold>%s</options=bold>.',
                     $newVersion
                 ));
-                $this->output->writeln(sprintf(
+                $this->output->writeln(\sprintf(
                     '<fg=green>Previous version was:</fg=green> <options=bold>%s</options=bold>.',
                     $oldVersion
                 ));
             } else {
                 $this->output->writeln('<fg=green>Infection is currently up to date.</fg=green>');
-                $this->output->writeln(sprintf(
+                $this->output->writeln(\sprintf(
                     '<fg=green>Current version is:</fg=green> <options=bold>%s</options=bold>.',
                     $oldVersion
                 ));
             }
         } catch (\Exception $e) {
-            $this->output->writeln(sprintf('Error: <fg=yellow>%s</fg=yellow>', $e->getMessage()));
+            $this->output->writeln(\sprintf('Error: <fg=yellow>%s</fg=yellow>', $e->getMessage()));
         }
         $this->output->write(PHP_EOL);
         $this->output->writeln('You can also select update stability using --pre (alpha/beta/rc) or --stable.');
@@ -187,7 +187,7 @@ class SelfUpdateCommand extends Command
                 $this->output->writeln('<fg=red>Rollback failed for reasons unknown.</fg=red>');
             }
         } catch (\Exception $e) {
-            $this->output->writeln(sprintf('Error: <fg=yellow>%s</fg=yellow>', $e->getMessage()));
+            $this->output->writeln(\sprintf('Error: <fg=yellow>%s</fg=yellow>', $e->getMessage()));
         }
     }
 
@@ -202,7 +202,7 @@ class SelfUpdateCommand extends Command
 
     protected function printCurrentLocalVersion()
     {
-        $this->output->writeln(sprintf(
+        $this->output->writeln(\sprintf(
             'Your current local build version is: <options=bold>%s</options=bold>',
             $this->version
         ));
@@ -230,18 +230,18 @@ class SelfUpdateCommand extends Command
 
         try {
             if ($updater->hasUpdate()) {
-                $this->output->writeln(sprintf(
+                $this->output->writeln(\sprintf(
                     'The current %s build available remotely is: <options=bold>%s</options=bold>',
                     $stability,
                     $updater->getNewVersion()
                 ));
             } elseif (false == $updater->getNewVersion()) {
-                $this->output->writeln(sprintf('There are no %s builds available.', $stability));
+                $this->output->writeln(\sprintf('There are no %s builds available.', $stability));
             } else {
-                $this->output->writeln(sprintf('You have the current %s build installed.', $stability));
+                $this->output->writeln(\sprintf('You have the current %s build installed.', $stability));
             }
         } catch (\Exception $e) {
-            $this->output->writeln(sprintf('Error: <fg=yellow>%s</fg=yellow>', $e->getMessage()));
+            $this->output->writeln(\sprintf('Error: <fg=yellow>%s</fg=yellow>', $e->getMessage()));
         }
     }
 }

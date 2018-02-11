@@ -39,14 +39,14 @@ class WrappedFunctionInfoCollectorVisitor extends NodeVisitorAbstract
         if ($this->isFunctionLikeNode($node)) {
             $this->scopeStack[] = $node;
         } elseif ($isInsideFunction) {
-            $node->setAttribute(self::FUNCTION_SCOPE_KEY, $this->scopeStack[count($this->scopeStack) - 1]);
+            $node->setAttribute(self::FUNCTION_SCOPE_KEY, $this->scopeStack[\count($this->scopeStack) - 1]);
         }
     }
 
     public function leaveNode(Node $node)
     {
         if ($this->isFunctionLikeNode($node)) {
-            array_pop($this->scopeStack);
+            \array_pop($this->scopeStack);
         }
     }
 

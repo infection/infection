@@ -24,23 +24,23 @@ class ConfigBuilderTest extends TestCase
     public static function setUpBeforeClass()
     {
         // Save current state
-        self::$envOriginal = getenv(ConfigBuilder::ENV_TEMP_PHP_CONFIG_PATH);
+        self::$envOriginal = \getenv(ConfigBuilder::ENV_TEMP_PHP_CONFIG_PATH);
     }
 
     public static function tearDownAfterClass()
     {
         // Restore original state
         if (false !== self::$envOriginal) {
-            putenv(ConfigBuilder::ENV_TEMP_PHP_CONFIG_PATH . '=' . self::$envOriginal);
+            \putenv(ConfigBuilder::ENV_TEMP_PHP_CONFIG_PATH . '=' . self::$envOriginal);
         } else {
-            putenv(ConfigBuilder::ENV_TEMP_PHP_CONFIG_PATH);
+            \putenv(ConfigBuilder::ENV_TEMP_PHP_CONFIG_PATH);
         }
     }
 
     protected function setUp()
     {
-        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . microtime(true) . random_int(100, 999);
-        mkdir($this->workspace, 0777, true);
+        $this->workspace = \sys_get_temp_dir() . DIRECTORY_SEPARATOR . \microtime(true) . \random_int(100, 999);
+        \mkdir($this->workspace, 0777, true);
     }
 
     protected function tearDown()
@@ -50,11 +50,11 @@ class ConfigBuilderTest extends TestCase
 
     public function test_it_builds_return_existing_path()
     {
-        $builder = new ConfigBuilder(sys_get_temp_dir());
+        $builder = new ConfigBuilder(\sys_get_temp_dir());
 
         $file = $this->workspace . DIRECTORY_SEPARATOR . 'infectionTest';
 
-        touch($file);
+        \touch($file);
 
         $this->setEnv($file);
 
@@ -63,6 +63,6 @@ class ConfigBuilderTest extends TestCase
 
     private function setEnv(string $path)
     {
-        putenv(ConfigBuilder::ENV_TEMP_PHP_CONFIG_PATH . '=' . $path);
+        \putenv(ConfigBuilder::ENV_TEMP_PHP_CONFIG_PATH . '=' . $path);
     }
 }

@@ -44,7 +44,7 @@ class CoverageXmlParser
             $coverage[] = $fileCoverage;
         }
 
-        return array_merge(...$coverage);
+        return \array_merge(...$coverage);
     }
 
     /**
@@ -55,8 +55,8 @@ class CoverageXmlParser
      */
     private function processXmlFileCoverage(string $relativeCoverageFilePath, string $projectSource): array
     {
-        $absolutePath = realpath($this->coverageDir . '/' . $relativeCoverageFilePath);
-        $coverageFileXml = file_get_contents($absolutePath);
+        $absolutePath = \realpath($this->coverageDir . '/' . $relativeCoverageFilePath);
+        $coverageFileXml = \file_get_contents($absolutePath);
 
         $dom = new \DOMDocument();
         $dom->loadXML($this->removeNamespace($coverageFileXml));
@@ -99,7 +99,7 @@ class CoverageXmlParser
      */
     private function removeNamespace(string $xml): string
     {
-        return preg_replace('/xmlns=\".*?\"/', '', $xml);
+        return \preg_replace('/xmlns=\".*?\"/', '', $xml);
     }
 
     /**
@@ -120,15 +120,15 @@ class CoverageXmlParser
         if (!$relativeFilePath) {
             // path is not present for old versions of PHPUnit, so parse the source file path from
             // the path of XML coverage file
-            $relativeFilePath = str_replace(
-                sprintf('%s.xml', $fileName),
+            $relativeFilePath = \str_replace(
+                \sprintf('%s.xml', $fileName),
                     '',
                     $relativeCoverageFilePath
             );
         }
 
-        $path = $projectSource . '/' . ltrim($relativeFilePath, '/') . '/' . $fileName;
-        $realPath = realpath($path);
+        $path = $projectSource . '/' . \ltrim($relativeFilePath, '/') . '/' . $fileName;
+        $realPath = \realpath($path);
 
         if ($realPath) {
             return $realPath;

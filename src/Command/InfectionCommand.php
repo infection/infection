@@ -275,8 +275,8 @@ class InfectionCommand extends BaseCommand
 
     private function getCodeCoverageData(string $testFrameworkKey): CodeCoverageData
     {
-        $coverageDir = $this->getContainer()->get(sprintf('coverage.dir.%s', $testFrameworkKey));
-        $testFileDataProviderServiceId = sprintf('test.file.data.provider.%s', $testFrameworkKey);
+        $coverageDir = $this->getContainer()->get(\sprintf('coverage.dir.%s', $testFrameworkKey));
+        $testFileDataProviderServiceId = \sprintf('test.file.data.provider.%s', $testFrameworkKey);
         $testFileDataProviderService = $this->getContainer()->has($testFileDataProviderServiceId)
             ? $this->getContainer()->get($testFileDataProviderServiceId)
             : null;
@@ -288,12 +288,12 @@ class InfectionCommand extends BaseCommand
     {
         $lines = [
             'Project tests must be in a passing state before running Infection.',
-            sprintf(
+            \sprintf(
                 '%s reported an exit code of %d.',
-                ucfirst($testFrameworkKey),
+                \ucfirst($testFrameworkKey),
                 $initialTestSuitProcess->getExitCode()
             ),
-            sprintf(
+            \sprintf(
                 'Refer to the %s\'s output below:',
                 $testFrameworkKey
             ),
@@ -329,7 +329,7 @@ class InfectionCommand extends BaseCommand
     private function getBadMsiErrorMessage(MetricsCalculator $metricsCalculator): string
     {
         if ($minMsi = (float) $this->input->getOption('min-msi')) {
-            return sprintf(
+            return \sprintf(
                 self::CI_FLAG_ERROR,
                 'MSI',
                 $minMsi,
@@ -343,7 +343,7 @@ class InfectionCommand extends BaseCommand
     private function getBadCoveredMsiErrorMessage(MetricsCalculator $metricsCalculator): string
     {
         if ($minCoveredMsi = (float) $this->input->getOption('min-covered-msi')) {
-            return sprintf(
+            return \sprintf(
                 self::CI_FLAG_ERROR,
                 'Covered Code MSI',
                 $minCoveredMsi,
@@ -360,18 +360,18 @@ class InfectionCommand extends BaseCommand
             return [];
         }
 
-        $trimmedMutators = trim($mutators);
+        $trimmedMutators = \trim($mutators);
 
         if ($trimmedMutators === '') {
             throw InvalidOptionException::withMessage('The "--mutators" option requires a value.');
         }
 
-        return explode(',', $mutators);
+        return \explode(',', $mutators);
     }
 
     private function getDefaultMutators(): array
     {
-        return array_map(
+        return \array_map(
             function (string $class): Mutator {
                 return $this->getContainer()->get($class);
             },
@@ -401,11 +401,11 @@ class InfectionCommand extends BaseCommand
         parent::initialize($input, $output);
 
         $customConfigPath = $input->getOption('configuration');
-        $configExists = $customConfigPath && file_exists($customConfigPath);
+        $configExists = $customConfigPath && \file_exists($customConfigPath);
 
         if (!$configExists) {
-            $configExists = file_exists(InfectionConfig::CONFIG_FILE_NAME)
-                || file_exists(InfectionConfig::CONFIG_FILE_NAME . '.dist');
+            $configExists = \file_exists(InfectionConfig::CONFIG_FILE_NAME)
+                || \file_exists(InfectionConfig::CONFIG_FILE_NAME . '.dist');
         }
 
         if (!$configExists) {

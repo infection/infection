@@ -67,7 +67,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->addCodeCoverageLogger($dom, $xPath);
         $this->addJUnitLogger($dom, $xPath);
 
-        file_put_contents($path, $dom->saveXML());
+        \file_put_contents($path, $dom->saveXML());
 
         return $path;
     }
@@ -134,7 +134,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function getNode(\DOMDocument $dom, \DOMXPath $xPath, string $nodeName)
     {
-        $nodeList = $xPath->query(sprintf('/phpunit/%s', $nodeName));
+        $nodeList = $xPath->query(\sprintf('/phpunit/%s', $nodeName));
 
         if ($nodeList->length) {
             return $nodeList->item(0);

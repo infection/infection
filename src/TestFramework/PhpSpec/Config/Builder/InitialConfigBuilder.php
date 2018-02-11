@@ -35,10 +35,10 @@ class InitialConfigBuilder implements ConfigBuilder
 
         $yamlConfiguration = new InitialYamlConfiguration(
             $this->tempDirectory,
-            Yaml::parse(file_get_contents($this->originalYamlConfigPath))
+            Yaml::parse(\file_get_contents($this->originalYamlConfigPath))
         );
 
-        file_put_contents($path, $yamlConfiguration->getYaml());
+        \file_put_contents($path, $yamlConfiguration->getYaml());
 
         return $path;
     }

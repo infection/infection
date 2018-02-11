@@ -63,18 +63,18 @@ class ExcludeDirsProvider
 
         if ($sourceDirs === ['.']) {
             foreach (self::EXCLUDED_ROOT_DIRS as $dir) {
-                if (in_array($dir, $dirsInCurrentDir, true)) {
+                if (\in_array($dir, $dirsInCurrentDir, true)) {
                     $excludedDirs[] = $dir;
                 }
             }
 
             $autocompleteValues = $dirsInCurrentDir;
-        } elseif (count($sourceDirs) === 1) {
-            $globDirs = array_filter(glob($sourceDirs[0] . '/*'), 'is_dir');
+        } elseif (\count($sourceDirs) === 1) {
+            $globDirs = \array_filter(\glob($sourceDirs[0] . '/*'), 'is_dir');
 
-            $autocompleteValues = array_map(
+            $autocompleteValues = \array_map(
                 function (string $dir) use ($sourceDirs) {
-                    return str_replace($sourceDirs[0] . '/', '', $dir);
+                    return \str_replace($sourceDirs[0] . '/', '', $dir);
                 },
                 $globDirs
             );
@@ -90,13 +90,13 @@ class ExcludeDirsProvider
             }
         }
 
-        return array_unique($excludedDirs);
+        return \array_unique($excludedDirs);
     }
 
     private function getValidator(Locator $locator)
     {
         return function ($answer) use ($locator) {
-            if (!$answer || strpos($answer, '*') !== false) {
+            if (!$answer || \strpos($answer, '*') !== false) {
                 return $answer;
             }
 

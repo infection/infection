@@ -52,12 +52,12 @@ ASCII;
 
     protected function getDefaultCommands()
     {
-        $commands = array_merge(parent::getDefaultCommands(), [
+        $commands = \array_merge(parent::getDefaultCommands(), [
             new Command\ConfigureCommand(),
             new Command\InfectionCommand(),
         ]);
 
-        if (0 === strpos(__FILE__, 'phar:')) {
+        if (0 === \strpos(__FILE__, 'phar:')) {
             $commands[] = new Command\SelfUpdateCommand();
         }
 
@@ -99,7 +99,7 @@ ASCII;
                     $configPaths[] = $customConfigPath;
                 }
 
-                array_push(
+                \array_push(
                     $configPaths,
                     InfectionConfig::CONFIG_FILE_NAME,
                     InfectionConfig::CONFIG_FILE_NAME . '.dist'
@@ -107,13 +107,13 @@ ASCII;
 
                 $infectionConfigFile = $c['locator']->locateAnyOf($configPaths);
                 $dir = \pathinfo($infectionConfigFile, PATHINFO_DIRNAME);
-                $json = file_get_contents($infectionConfigFile);
+                $json = \file_get_contents($infectionConfigFile);
             } catch (\Exception $e) {
                 $json = '{}';
-                $dir = getcwd();
+                $dir = \getcwd();
             }
 
-            return new InfectionConfig(json_decode($json), $c['filesystem'], $dir);
+            return new InfectionConfig(\json_decode($json), $c['filesystem'], $dir);
         };
 
         $this->container['tmp.dir'] = function (Container $c): string {

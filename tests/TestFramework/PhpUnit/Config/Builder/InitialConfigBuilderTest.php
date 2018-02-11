@@ -47,12 +47,12 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
     protected function setUp()
     {
-        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
+        $this->workspace = \sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
 
         $this->fileSystem = new Filesystem();
         $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
 
-        $this->pathToProject = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
+        $this->pathToProject = p(\realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
 
         $this->createConfigBuilder();
     }
@@ -73,7 +73,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $this->builder = new InitialConfigBuilder(
             $this->tmpDir,
-            file_get_contents($phpunitXmlPath),
+            \file_get_contents($phpunitXmlPath),
             new XmlConfigurationHelper($replacer),
             $jUnitFilePath,
             $srcDirs
@@ -84,7 +84,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     {
         $configurationPath = $this->builder->build();
 
-        $xml = file_get_contents($configurationPath);
+        $xml = \file_get_contents($configurationPath);
 
         /** @var \DOMNodeList $directories */
         $directories = $this->queryXpath($xml, '/phpunit/testsuites/testsuite/directory');
@@ -97,7 +97,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     {
         $configurationPath = $this->builder->build();
 
-        $xml = file_get_contents($configurationPath);
+        $xml = \file_get_contents($configurationPath);
 
         $value = p($this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue);
 
@@ -108,7 +108,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     {
         $configurationPath = $this->builder->build();
 
-        $xml = file_get_contents($configurationPath);
+        $xml = \file_get_contents($configurationPath);
 
         $nodeList = $this->queryXpath($xml, '/phpunit/logging/log[@type="coverage-html"]');
 
@@ -119,7 +119,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     {
         $configurationPath = $this->builder->build();
 
-        $xml = file_get_contents($configurationPath);
+        $xml = \file_get_contents($configurationPath);
 
         /** @var \DOMNodeList $logEntries */
         $logEntries = $this->queryXpath($xml, '/phpunit/logging/log');
@@ -137,7 +137,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $configurationPath = $this->builder->build();
 
-        $xml = file_get_contents($configurationPath);
+        $xml = \file_get_contents($configurationPath);
 
         /** @var \DOMNodeList $filterNodes */
         $filterNodes = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
@@ -149,7 +149,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     {
         $configurationPath = $this->builder->build();
 
-        $xml = file_get_contents($configurationPath);
+        $xml = \file_get_contents($configurationPath);
 
         /** @var \DOMNodeList $filterNodes */
         $filterNodes = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
@@ -161,7 +161,7 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     {
         $configurationPath = $this->builder->build();
 
-        $xml = file_get_contents($configurationPath);
+        $xml = \file_get_contents($configurationPath);
 
         /** @var \DOMNodeList $filterNodes */
         $filterNodes = $this->queryXpath($xml, '/phpunit/@printerClass');

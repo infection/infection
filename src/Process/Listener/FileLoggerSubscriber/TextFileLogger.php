@@ -54,16 +54,16 @@ class TextFileLogger extends FileLogger
             }
         }
 
-        return implode($logParts, "\n");
+        return \implode($logParts, "\n");
     }
 
     private function getHeadlineParts(string $headlinePrefix): array
     {
-        $headline = sprintf('%s mutants:', $headlinePrefix);
+        $headline = \sprintf('%s mutants:', $headlinePrefix);
 
         return [
             $headline,
-            str_repeat('=', strlen($headline)),
+            \str_repeat('=', \strlen($headline)),
             '',
         ];
     }
@@ -72,7 +72,7 @@ class TextFileLogger extends FileLogger
     {
         $mutation = $mutantProcess->getMutant()->getMutation();
 
-        return sprintf(
+        return \sprintf(
             '%d) %s:%d    [M] %s',
             $index + 1,
             $mutation->getOriginalFilePath(),

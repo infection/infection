@@ -29,7 +29,7 @@ class SourceFilesFinder
     {
         $finder = new Finder();
 
-        array_walk($this->excludeDirectories, function ($excludePath) use ($finder) {
+        \array_walk($this->excludeDirectories, function ($excludePath) use ($finder) {
             $finder->notPath($excludePath);
         });
 
@@ -41,8 +41,8 @@ class SourceFilesFinder
 
         $finder->in('.')->files();
 
-        $filters = explode(',', $filter);
-        array_walk($filters, function ($fileFilter) use ($finder) {
+        $filters = \explode(',', $filter);
+        \array_walk($filters, function ($fileFilter) use ($finder) {
             $finder->path($fileFilter);
         });
 

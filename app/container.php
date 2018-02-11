@@ -42,7 +42,7 @@ $c['exclude.paths'] = function (Container $c): array {
     return $c['infection.config']->getSourceExcludePaths();
 };
 
-$c['project.dir'] = getcwd();
+$c['project.dir'] = \getcwd();
 
 $c['phpunit.config.dir'] = function (Container $c): string {
     return $c['infection.config']->getPhpUnitConfigDir();

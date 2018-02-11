@@ -198,10 +198,10 @@ class InfectionConfig
         $excludedPaths = [];
 
         foreach ($originalExcludedPaths as $originalExcludedPath) {
-            if (strpos($originalExcludedPath, '*') === false) {
+            if (\strpos($originalExcludedPath, '*') === false) {
                 $excludedPaths[] = $originalExcludedPath;
             } else {
-                $excludedPaths = array_merge(
+                $excludedPaths = \array_merge(
                     $excludedPaths,
                     $this->getExcludedDirsByPattern($originalExcludedPath)
                 );
@@ -213,7 +213,7 @@ class InfectionConfig
 
     private function getExcludes(): array
     {
-        if (isset($this->config->source->excludes) && is_array($this->config->source->excludes)) {
+        if (isset($this->config->source->excludes) && \is_array($this->config->source->excludes)) {
             return $this->config->source->excludes;
         }
 
@@ -239,18 +239,18 @@ class InfectionConfig
         $srcDirs = $this->getSourceDirs();
 
         foreach ($srcDirs as $srcDir) {
-            $unpackedPaths = glob(
-                sprintf('%s/%s', $srcDir, $originalExcludedDir),
+            $unpackedPaths = \glob(
+                \sprintf('%s/%s', $srcDir, $originalExcludedDir),
                 GLOB_ONLYDIR
             );
 
             if ($unpackedPaths) {
-                $excludedDirs = array_merge(
+                $excludedDirs = \array_merge(
                     $excludedDirs,
-                    array_map(
+                    \array_map(
                         function ($excludeDir) use ($srcDir) {
-                            return ltrim(
-                                substr_replace($excludeDir, '', 0, strlen($srcDir)),
+                            return \ltrim(
+                                \substr_replace($excludeDir, '', 0, \strlen($srcDir)),
                                 DIRECTORY_SEPARATOR
                             );
                         },
@@ -266,7 +266,7 @@ class InfectionConfig
     public function getTmpDir(): string
     {
         if (empty($this->config->tmpDir)) {
-            return sys_get_temp_dir();
+            return \sys_get_temp_dir();
         }
 
         $tmpDir = $this->config->tmpDir;
@@ -275,6 +275,6 @@ class InfectionConfig
             return $tmpDir;
         }
 
-        return sprintf('%s/%s', $this->configLocation, $tmpDir);
+        return \sprintf('%s/%s', $this->configLocation, $tmpDir);
     }
 }

@@ -31,7 +31,7 @@ class XmlConfigurationHelper
             '//file',
         ];
 
-        $nodes = $xPath->query(implode('|', $queries));
+        $nodes = $xPath->query(\implode('|', $queries));
 
         foreach ($nodes as $node) {
             $this->pathReplacer->replaceInNode($node);

@@ -27,7 +27,7 @@ class CachedTestFileDataProvider implements TestFileDataProvider
 
     public function getTestFileInfo(string $fullyQualifiedClassName): array
     {
-        if (array_key_exists($fullyQualifiedClassName, $this->testFileInfoCache)) {
+        if (\array_key_exists($fullyQualifiedClassName, $this->testFileInfoCache)) {
             return $this->testFileInfoCache[$fullyQualifiedClassName];
         }
 

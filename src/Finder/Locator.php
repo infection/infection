@@ -33,7 +33,7 @@ class Locator
     {
         if ($this->filesystem->isAbsolutePath($name)) {
             if ($this->filesystem->exists($name)) {
-                return realpath($name);
+                return \realpath($name);
             }
 
             throw LocatorException::fileOrDirectoryDoesNotExist($name);
@@ -45,7 +45,7 @@ class Locator
             $file = $path . DIRECTORY_SEPARATOR . $name;
 
             if ($this->filesystem->exists($file)) {
-                return realpath($file);
+                return \realpath($file);
             }
         }
 
@@ -61,7 +61,7 @@ class Locator
         try {
             return $this->locate($fileNames[0]);
         } catch (\Exception $e) {
-            array_shift($fileNames);
+            \array_shift($fileNames);
 
             return $this->locateAnyOf($fileNames);
         }
@@ -76,9 +76,9 @@ class Locator
         $paths = $this->paths;
 
         if ($additionalPath !== null) {
-            array_unshift($paths, $additionalPath);
+            \array_unshift($paths, $additionalPath);
         }
 
-        return array_unique($paths);
+        return \array_unique($paths);
     }
 }

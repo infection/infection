@@ -72,7 +72,7 @@ final class ProcessBuilder
                 $testFrameworkExtraOptions
             ),
             null,
-            array_replace($_ENV, $_SERVER),
+            \array_replace($_ENV, $_SERVER),
             null,
             $this->timeout
         );

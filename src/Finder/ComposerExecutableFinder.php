@@ -16,7 +16,7 @@ final class ComposerExecutableFinder extends AbstractExecutableFinder
     {
         $probable = ['composer', 'composer.phar'];
         $finder = new ExecutableFinder();
-        $immediatePaths = [getcwd(), realpath(getcwd() . '/../'), realpath(getcwd() . '/../../')];
+        $immediatePaths = [\getcwd(), \realpath(\getcwd() . '/../'), \realpath(\getcwd() . '/../../')];
 
         foreach ($probable as $name) {
             if ($path = $finder->find($name, null, $immediatePaths)) {

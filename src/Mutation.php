@@ -81,7 +81,7 @@ class Mutation
 
     public function getHash(): string
     {
-        $mutatorClass = get_class($this->getMutator());
+        $mutatorClass = \get_class($this->getMutator());
         $attributes = $this->getAttributes();
         $attributeValues = [
             $attributes['startLine'],
@@ -92,9 +92,9 @@ class Mutation
             $attributes['endFilePos'],
         ];
 
-        $hashKeys = array_merge([$this->getOriginalFilePath(), $mutatorClass], $attributeValues);
+        $hashKeys = \array_merge([$this->getOriginalFilePath(), $mutatorClass], $attributeValues);
 
-        return md5(implode('_', $hashKeys));
+        return \md5(\implode('_', $hashKeys));
     }
 
     public function getOriginalFileAst(): array

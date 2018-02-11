@@ -53,7 +53,7 @@ class PhpUnitCustomExecutablePathProvider
             $question = new Question($questionText);
             $question->setValidator($this->getValidator());
 
-            return str_replace(
+            return \str_replace(
                 DIRECTORY_SEPARATOR,
                 '/',
                 $this->questionHelper->ask($input, $output, $question)
@@ -66,10 +66,10 @@ class PhpUnitCustomExecutablePathProvider
     private function getValidator(): \Closure
     {
         return function ($answerPath) {
-            $answerPath = $answerPath ? trim($answerPath) : $answerPath;
+            $answerPath = $answerPath ? \trim($answerPath) : $answerPath;
 
-            if (!$answerPath || !file_exists($answerPath)) {
-                throw new \RuntimeException(sprintf('Custom path "%s" is incorrect.', $answerPath));
+            if (!$answerPath || !\file_exists($answerPath)) {
+                throw new \RuntimeException(\sprintf('Custom path "%s" is incorrect.', $answerPath));
             }
 
             return $answerPath;

@@ -60,7 +60,7 @@ class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
         $this->output->writeln([
             'Running initial test suite...',
             '',
-            sprintf(
+            \sprintf(
                 '%s version: %s',
                 $this->testFrameworkAdapter->getName(),
                 $version

@@ -15,7 +15,7 @@ class VersionParser
     public function parse(string $content): string
     {
         $matches = [];
-        $matched = preg_match(self::VERSION_REGEX, $content, $matches);
+        $matched = \preg_match(self::VERSION_REGEX, $content, $matches);
 
         if (!$matched) {
             throw new \InvalidArgumentException('Parameter does not contain a valid SemVer (sub)string.');

@@ -31,6 +31,6 @@ class FalseValue extends Mutator
             return false;
         }
 
-        return strtolower($node->name->getFirst()) === 'false';
+        return \strtolower($node->name->getFirst()) === 'false';
     }
 }

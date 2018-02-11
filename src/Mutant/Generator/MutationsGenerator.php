@@ -78,8 +78,8 @@ class MutationsGenerator
         $this->codeCoverageData = $codeCoverageData;
         $this->excludeDirsOrFiles = $excludeDirsOrFiles;
         $this->defaultMutators = $defaultMutators;
-        $this->whitelistedMutatorNames = array_map('strtolower', $whitelistedMutatorNames);
-        $this->whitelistedMutatorNamesCount = count($whitelistedMutatorNames);
+        $this->whitelistedMutatorNames = \array_map('strtolower', $whitelistedMutatorNames);
+        $this->whitelistedMutatorNamesCount = \count($whitelistedMutatorNames);
         $this->eventDispatcher = $eventDispatcher;
         $this->parser = $parser;
     }
@@ -108,7 +108,7 @@ class MutationsGenerator
 
         $this->eventDispatcher->dispatch(new MutationGeneratingFinished());
 
-        return array_merge(...$allFilesMutations);
+        return \array_merge(...$allFilesMutations);
     }
 
     /**
@@ -149,10 +149,10 @@ class MutationsGenerator
     private function getMutators(): array
     {
         if ($this->whitelistedMutatorNamesCount > 0) {
-            return array_filter(
+            return \array_filter(
                 $this->defaultMutators,
                 function (Mutator $mutator): bool {
-                    return in_array(strtolower($mutator->getName()), $this->whitelistedMutatorNames, true);
+                    return \in_array(\strtolower($mutator->getName()), $this->whitelistedMutatorNames, true);
                 }
             );
         }

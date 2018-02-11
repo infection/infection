@@ -32,10 +32,10 @@ class PhpUnitTestFileDataProvider implements TestFileDataProvider
     {
         $xPath = $this->getXPath();
 
-        $nodes = $xPath->query(sprintf('//testsuite[@name="%s"]', $fullyQualifiedClassName));
+        $nodes = $xPath->query(\sprintf('//testsuite[@name="%s"]', $fullyQualifiedClassName));
 
         if ($nodes->length === 0) {
-            throw new TestFileNameNotFoundException(sprintf('For FQCN: %s', $fullyQualifiedClassName));
+            throw new TestFileNameNotFoundException(\sprintf('For FQCN: %s', $fullyQualifiedClassName));
         }
 
         return [
@@ -48,7 +48,7 @@ class PhpUnitTestFileDataProvider implements TestFileDataProvider
     {
         if ($this->xPath === null) {
             $dom = new \DOMDocument();
-            $dom->loadXML(file_get_contents($this->jUnitFilePath));
+            $dom->loadXML(\file_get_contents($this->jUnitFilePath));
 
             $this->xPath = new \DOMXPath($dom);
         }

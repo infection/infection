@@ -16,13 +16,13 @@ class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilde
     {
         $options = ['run'];
 
-        $options[] = sprintf('--config=%s', $configPath);
+        $options[] = \sprintf('--config=%s', $configPath);
         $options[] = '--no-ansi';
         $options[] = '--format=tap';
         $options[] = '--stop-on-failure';
 
         $options[] = $extraOptions;
 
-        return implode(' ', $options);
+        return \implode(' ', $options);
     }
 }

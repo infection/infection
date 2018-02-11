@@ -55,7 +55,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
     public function build(Mutant $mutant): string
     {
-        $customAutoloadFilePath = sprintf(
+        $customAutoloadFilePath = \sprintf(
             '%s/interceptor.autoload.%s.infection.php',
             $this->tempDirectory,
             $mutant->getMutation()->getHash()
@@ -64,11 +64,11 @@ class MutationConfigBuilder extends ConfigBuilder
         $this->setCustomAutoLoaderPath($customAutoloadFilePath);
         $this->setFilteredTestsToRun($mutant->getCoverageTests());
 
-        file_put_contents($customAutoloadFilePath, $this->createCustomAutoloadWithInterceptor($mutant));
+        \file_put_contents($customAutoloadFilePath, $this->createCustomAutoloadWithInterceptor($mutant));
 
         $path = $this->buildPath($mutant);
 
-        file_put_contents($path, $this->dom->saveXML());
+        \file_put_contents($path, $this->dom->saveXML());
 
         return $path;
     }
@@ -77,10 +77,10 @@ class MutationConfigBuilder extends ConfigBuilder
     {
         $originalFilePath = $mutant->getMutation()->getOriginalFilePath();
         $mutatedFilePath = $mutant->getMutatedFilePath();
-        $interceptorPath = dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
+        $interceptorPath = \dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
 
         // TODO change to what it was (e.g. app/autoload - see simplehabits)
-        $autoload = sprintf('%s/vendor/autoload.php', $this->projectDir);
+        $autoload = \sprintf('%s/vendor/autoload.php', $this->projectDir);
 
         $customAutoload = <<<AUTOLOAD
 <?php
@@ -90,12 +90,12 @@ require_once '{$autoload}';
 
 AUTOLOAD;
 
-        return sprintf($customAutoload, $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutatedFilePath));
+        return \sprintf($customAutoload, $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutatedFilePath));
     }
 
     private function buildPath(Mutant $mutant): string
     {
-        $fileName = sprintf('phpunitConfiguration.%s.infection.xml', $mutant->getMutation()->getHash());
+        $fileName = \sprintf('phpunitConfiguration.%s.infection.xml', $mutant->getMutation()->getHash());
 
         return $this->tempDirectory . '/' . $fileName;
     }
@@ -151,14 +151,14 @@ AUTOLOAD;
         $uniqueCoverageTests = $this->unique($coverageTests);
 
         // sort tests to run the fastest first
-        usort(
+        \usort(
             $uniqueCoverageTests,
             function (array $a, array $b) {
                 return $a['time'] <=> $b['time'];
             }
         );
 
-        $uniqueTestFilePaths = array_column($uniqueCoverageTests, 'testFilePath');
+        $uniqueTestFilePaths = \array_column($uniqueCoverageTests, 'testFilePath');
 
         foreach ($uniqueTestFilePaths as $testFilePath) {
             $file = $this->dom->createElement('file', $testFilePath);
@@ -175,7 +175,7 @@ AUTOLOAD;
         $uniqueTests = [];
 
         foreach ($coverageTests as $coverageTest) {
-            if (!in_array($coverageTest['testFilePath'], $usedFileNames, true)) {
+            if (!\in_array($coverageTest['testFilePath'], $usedFileNames, true)) {
                 $uniqueTests[] = $coverageTest;
                 $usedFileNames[] = $coverageTest['testFilePath'];
             }

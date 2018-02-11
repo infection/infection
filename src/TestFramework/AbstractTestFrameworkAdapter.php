@@ -75,7 +75,7 @@ abstract class AbstractTestFrameworkAdapter
      */
     public function getExecutableCommandLine(string $configPath, string $extraOptions, bool $includePhpArgs = true): string
     {
-        return sprintf(
+        return \sprintf(
             '%s %s',
             $this->phpExecutableFinder->find($includePhpArgs),
             $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions)
@@ -95,7 +95,7 @@ abstract class AbstractTestFrameworkAdapter
     public function getVersion(): string
     {
         $process = new Process(
-            sprintf(
+            \sprintf(
                 '%s %s',
                 $this->phpExecutableFinder->find(),
                 '--version'

@@ -81,7 +81,7 @@ final class Factory
     {
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
-            $phpUnitConfigContent = file_get_contents($phpUnitConfigPath);
+            $phpUnitConfigContent = \file_get_contents($phpUnitConfigPath);
 
             return new PhpUnitAdapter(
                 new TestFrameworkExecutableFinder(TestFrameworkTypes::PHPUNIT, $this->infectionConfig->getPhpUnitCustomPath()),
@@ -105,9 +105,9 @@ final class Factory
         }
 
         throw new \InvalidArgumentException(
-            sprintf(
+            \sprintf(
                 'Invalid name of test framework. Available names are: %s',
-                implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC])
+                \implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC])
             )
         );
     }

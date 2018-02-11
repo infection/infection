@@ -58,14 +58,14 @@ class CodeCoverageData
             return false;
         }
 
-        $coveredLineTestMethods = array_filter(
+        $coveredLineTestMethods = \array_filter(
             $coverageData[$filePath]['byLine'],
             function ($testMethods) {
-                return count($testMethods) > 0;
+                return \count($testMethods) > 0;
             }
         );
 
-        return count($coveredLineTestMethods) > 0;
+        return \count($coveredLineTestMethods) > 0;
     }
 
     public function hasTestsOnLine(string $filePath, int $line): bool
@@ -87,7 +87,7 @@ class CodeCoverageData
     {
         $coverage = $this->getCoverage();
 
-        if (!array_key_exists($filePath, $coverage)) {
+        if (!\array_key_exists($filePath, $coverage)) {
             return false;
         }
 
@@ -146,15 +146,15 @@ class CodeCoverageData
         if (null === $this->coverage) {
             $coverageIndexFilePath = $this->coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME;
 
-            if (!file_exists($coverageIndexFilePath)) {
+            if (!\file_exists($coverageIndexFilePath)) {
                 throw CoverageDoesNotExistException::with(
                     $coverageIndexFilePath,
                     $this->testFrameworkKey,
-                    dirname($coverageIndexFilePath, 2)
+                    \dirname($coverageIndexFilePath, 2)
                 );
             }
 
-            $coverageIndexFileContent = file_get_contents($coverageIndexFilePath);
+            $coverageIndexFileContent = \file_get_contents($coverageIndexFilePath);
             $coverage = $this->parser->parse($coverageIndexFileContent);
 
             $coverage = $this->addTestExecutionInfo($coverage);
@@ -176,7 +176,7 @@ class CodeCoverageData
         foreach ($newCoverage as $sourceFilePath => &$fileCoverageData) {
             foreach ($fileCoverageData['byLine'] as $line => &$lineCoverageData) {
                 foreach ($lineCoverageData as &$test) {
-                    $class = explode('::', $test['testMethod'])[0];
+                    $class = \explode('::', $test['testMethod'])[0];
 
                     $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
 
@@ -200,10 +200,10 @@ class CodeCoverageData
 
         foreach ($coverage[$filePath]['byMethod'] as $method => $coverageInfo) {
             if ($line >= $coverageInfo['startLine'] && $line <= $coverageInfo['endLine']) {
-                $allLines = range($coverageInfo['startLine'], $coverageInfo['endLine']);
+                $allLines = \range($coverageInfo['startLine'], $coverageInfo['endLine']);
 
                 foreach ($allLines as $lineInExecutedMethod) {
-                    if (array_key_exists($lineInExecutedMethod, $this->getCoverage()[$filePath]['byLine'])) {
+                    if (\array_key_exists($lineInExecutedMethod, $this->getCoverage()[$filePath]['byLine'])) {
                         $tests[] = $this->getCoverage()[$filePath]['byLine'][$lineInExecutedMethod];
                     }
                 }
@@ -212,6 +212,6 @@ class CodeCoverageData
             }
         }
 
-        return array_merge(...$tests);
+        return \array_merge(...$tests);
     }
 }

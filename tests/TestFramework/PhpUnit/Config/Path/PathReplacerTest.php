@@ -22,7 +22,7 @@ class PathReplacerTest extends TestCase
 
     protected function setUp()
     {
-        $this->projectPath = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
+        $this->projectPath = p(\realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
     }
 
     /**

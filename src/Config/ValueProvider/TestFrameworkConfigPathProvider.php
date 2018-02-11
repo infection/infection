@@ -51,11 +51,11 @@ class TestFrameworkConfigPathProvider
                 return $this->askTestFrameworkConfigLocation($input, $output, $dirsInCurrentDir, $testFramework, null);
             }
 
-            if (!file_exists('composer.json')) {
+            if (!\file_exists('composer.json')) {
                 return $this->askTestFrameworkConfigLocation($input, $output, $dirsInCurrentDir, $testFramework, null);
             }
 
-            $phpUnitPathGuesser = new PhpUnitPathGuesser(json_decode(file_get_contents('composer.json')));
+            $phpUnitPathGuesser = new PhpUnitPathGuesser(\json_decode(\file_get_contents('composer.json')));
             $defaultValue = $phpUnitPathGuesser->guess();
 
             if ($defaultValue) {
@@ -75,14 +75,14 @@ class TestFrameworkConfigPathProvider
     private function getValidator(string $testFramework): \Closure
     {
         return function (string $answerDir) use ($testFramework): string {
-            $answerDir = trim($answerDir);
+            $answerDir = \trim($answerDir);
 
             if (!$answerDir) {
                 return $answerDir;
             }
 
-            if (!is_dir($answerDir)) {
-                throw new \RuntimeException(sprintf('Could not find "%s" directory.', $answerDir));
+            if (!\is_dir($answerDir)) {
+                throw new \RuntimeException(\sprintf('Could not find "%s" directory.', $answerDir));
             }
 
             $this->testFrameworkConfigLocator->locate($testFramework, $answerDir);
@@ -93,7 +93,7 @@ class TestFrameworkConfigPathProvider
 
     private function askTestFrameworkConfigLocation(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, string $testFramework, $defaultValue): string
     {
-        $question = sprintf(
+        $question = \sprintf(
             'Where is your <comment>%s.(xml|yml)(.dist)</comment> configuration located?',
             $testFramework
         );

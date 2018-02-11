@@ -12,13 +12,13 @@ class LocatorException extends \RuntimeException
 {
     public static function fileOrDirectoryDoesNotExist(string $name): self
     {
-        return new self(sprintf('The file/directory "%s" does not exist.', $name));
+        return new self(\sprintf('The file/directory "%s" does not exist.', $name));
     }
 
     public static function filesOrDirectoriesDoNotExist(string $name, array $paths): self
     {
         return new self(
-            sprintf('The file/folder "%s" does not exist (in: %s).', $name, implode(', ', $paths))
+            \sprintf('The file/folder "%s" does not exist (in: %s).', $name, \implode(', ', $paths))
         );
     }
 

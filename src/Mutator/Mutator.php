@@ -18,8 +18,8 @@ abstract class Mutator
 
     public function getName(): string
     {
-        $parts = explode('\\', static::class);
+        $parts = \explode('\\', static::class);
 
-        return $parts[count($parts) - 1];
+        return $parts[\count($parts) - 1];
     }
 }

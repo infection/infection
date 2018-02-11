@@ -34,11 +34,11 @@ class PathReplacer
     public function replaceInNode(\DOMNode $domElement)
     {
         if (!$this->filesystem->isAbsolutePath($domElement->nodeValue)) {
-            $domElement->nodeValue = sprintf(
+            $domElement->nodeValue = \sprintf(
                 '%s%s%s',
                 $this->phpUnitConfigDir,
                 DIRECTORY_SEPARATOR,
-                ltrim($domElement->nodeValue, '\.\/')
+                \ltrim($domElement->nodeValue, '\.\/')
             );
         }
     }

@@ -67,14 +67,14 @@ class DotFormatter extends AbstractOutputFormatter
         $lastDot = $mutationCount === $this->callsCount;
 
         if ($lastDot && !$endOfRow) {
-            $this->output->write(str_repeat(' ', self::DOTS_PER_ROW - $remainder));
+            $this->output->write(\str_repeat(' ', self::DOTS_PER_ROW - $remainder));
         }
 
         if ($lastDot || $endOfRow) {
-            $length = strlen((string) $mutationCount);
-            $format = sprintf('   (%%%dd / %%%dd)', $length, $length);
+            $length = \strlen((string) $mutationCount);
+            $format = \sprintf('   (%%%dd / %%%dd)', $length, $length);
 
-            $this->output->write(sprintf($format, $this->callsCount, $mutationCount));
+            $this->output->write(\sprintf($format, $this->callsCount, $mutationCount));
 
             if ($this->callsCount !== $mutationCount) {
                 $this->output->writeln('');

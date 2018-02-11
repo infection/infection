@@ -23,15 +23,15 @@ abstract class AbstractExecutableFinder
      */
     protected function searchNonExecutables(array $probableNames, array $extraDirectories = [], bool $includeArgs = true)
     {
-        $dirs = array_merge(
-            explode(PATH_SEPARATOR, getenv('PATH') ?: getenv('Path')),
+        $dirs = \array_merge(
+            \explode(PATH_SEPARATOR, \getenv('PATH') ?: \getenv('Path')),
             $extraDirectories
         );
 
         foreach ($dirs as $dir) {
             foreach ($probableNames as $name) {
-                $path = sprintf('%s/%s', $dir, $name);
-                if (file_exists($path)) {
+                $path = \sprintf('%s/%s', $dir, $name);
+                if (\file_exists($path)) {
                     return $this->makeExecutable($path, $includeArgs);
                 }
             }
@@ -40,7 +40,7 @@ abstract class AbstractExecutableFinder
 
     protected function makeExecutable(string $path, bool $includeArgs = true): string
     {
-        return sprintf(
+        return \sprintf(
             '%s %s',
             (new PhpExecutableFinder())->find($includeArgs),
             $path
