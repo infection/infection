@@ -4,7 +4,7 @@
     <runtime name="PHP" version="7.1.7" url="https://secure.php.net/"/>
     <driver name="xdebug" version="2.6.0RC2"/>
   </build>
-  <project source="/Users/maksrafalko/sites/infection/tests/Fixtures/e2e/Provide_Existing_Coverage/src">
+  <project source="src">
     <tests>
       <test name="spec\Namespace_\SourceClassSpec::it_adds_numbers" size="unknown" result="0" status="PASSED"/>
       <test name="spec\Namespace_\SourceClassSpec::it_returns_true" size="unknown" result="0" status="PASSED"/>
