@@ -49,7 +49,7 @@ class LocatorTest extends TestCase
             ['app/../autoload.php', '/autoload.php'],
             [
                 realpath(__DIR__ . '/../Fixtures/Files/phpunit/project-path/autoload.php'),
-                '/autoload.php'
+                '/autoload.php',
             ],
         ];
     }
