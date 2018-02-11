@@ -137,5 +137,58 @@ PHP
                 true
             ),
         ];
+        $badLexer = new Lexer([
+            'usedAttributes' => [
+                'comments', 'startLine', 'endLine', 'endTokenPos', 'startFilePos', 'endFilePos',
+            ],
+        ]);
+
+        $badParser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $badLexer);
+
+        yield 'It does not mutate if the parser does not contain startTokenPos' => [
+            $inputAst = $badParser->parse(<<<'PHP'
+<?php
+
+class Test
+{
+    public function hello() : string
+    {
+        return 'hello';
+    }
+    public function bye() : string
+    {
+        return 'bye';
+    }
+}
+PHP
+            ),
+            <<<'PHP'
+<?php
+
+class Test
+{
+    public function hello() : string
+    {
+        return 'hello';
+    }
+    public function bye() : string
+    {
+        return 'bye';
+    }
+}
+PHP
+            ,
+            new Mutation(
+                'file/to/path',
+                $inputAst,
+                new PublicVisibility(),
+                [
+                    'startTokenPos' => 29,
+                    'endTokenPos' => 48,
+                ],
+                ClassMethod::class,
+                true
+            ),
+        ];
     }
 }
