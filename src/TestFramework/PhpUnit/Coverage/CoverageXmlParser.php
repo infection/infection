@@ -134,7 +134,8 @@ class CoverageXmlParser
             return $realPath;
         }
 
-        throw new \Exception('Source file was not found');
+        throw new \Exception(
+            spritnf('Source file %s was not found at %s', $fileName, $path));
     }
 
     private function getCoveredLinesData(\DOMNodeList $lineCoverageNodes): array
