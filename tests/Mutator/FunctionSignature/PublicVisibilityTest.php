@@ -215,6 +215,16 @@ interface TestInterface
 }
 PHP
             ],
+            'It does not mutate an abstract function' => [
+                <<<'PHP'
+<?php
+
+abstract class Test
+{
+    public abstract function foo(int $param, $test = 1) : bool;
+}
+PHP
+            ],
         ];
     }
 }

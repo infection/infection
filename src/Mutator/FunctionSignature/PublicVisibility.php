@@ -55,6 +55,10 @@ class PublicVisibility extends Mutator
             return false;
         }
 
+        if ($node->isAbstract()) {
+            return false;
+        }
+
         return $node->isPublic();
     }
 
