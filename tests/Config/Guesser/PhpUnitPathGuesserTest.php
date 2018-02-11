@@ -26,7 +26,7 @@ class PhpUnitPathGuesserTest extends TestCase
     public function providesJsonComposerAndLocations(): \Generator
     {
         yield [
-            <<<'CODE'
+            <<<'JSON'
 {
     "autoload": {
         "psr-0": {
@@ -34,13 +34,13 @@ class PhpUnitPathGuesserTest extends TestCase
         }
     }
 }
-CODE
+JSON
             ,
             '.',
         ];
 
         yield [
-            <<<'CODE'
+            <<<'JSON'
 {
     "autoload": {
         "psr-0": {
@@ -49,13 +49,13 @@ CODE
         }
     }
 }
-CODE
+JSON
             ,
             'app',
         ];
 
         yield [
-            <<<'CODE'
+            <<<'JSON'
 {
     "autoload": {
         "psr-0": {
@@ -63,13 +63,13 @@ CODE
         }
     }
 }
-CODE
+JSON
             ,
             '.',
         ];
 
         yield [
-            <<<'CODE'
+            <<<'JSON'
 {
     "autoload": {
         "psr-4": {
@@ -77,13 +77,13 @@ CODE
         }
     }
 }
-CODE
+JSON
             ,
             '.',
         ];
 
         yield [
-            <<<'CODE'
+            <<<'JSON'
 {
     "autoload-dev": {
         "psr-4": {
@@ -91,12 +91,12 @@ CODE
         }
     }
 }
-CODE
+JSON
             ,
             '.',
         ];
         yield [
-            <<<'CODE'
+            <<<'JSON'
 {
     "autoload": {
         "files": {
@@ -104,13 +104,13 @@ CODE
         }
     }
 }
-CODE
+JSON
             ,
             '.',
         ];
 
         yield [
-            <<<'CODE'
+            <<<'JSON'
 {
     "autoload": {
         "psr-0": {
@@ -118,7 +118,7 @@ CODE
         }
     }
 }
-CODE
+JSON
             ,
             '.',
         ];
