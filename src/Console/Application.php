@@ -10,12 +10,17 @@ namespace Infection\Console;
 
 use Infection\Command;
 use Infection\Config\InfectionConfig;
+use Infection\Php\ConfigBuilder;
+use Infection\Php\XdebugHandler;
 use Pimple\Container;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class Application extends BaseApplication
 {
@@ -35,11 +40,58 @@ ASCII;
      */
     private $container;
 
+    /**
+     * @var SymfonyStyle
+     */
+    private $io;
+
+    /**
+     * @var bool
+     */
+    private $isXdebugLoaded;
+
+    /**
+     * @var bool
+     */
+    private $isDebuggerDisabled;
+
     public function __construct(Container $container, string $name = self::NAME, string $version = self::VERSION)
     {
         $this->container = $container;
+        $this->isDebuggerDisabled = empty((string) getenv(XdebugHandler::ENV_DISABLE_XDEBUG));
 
         parent::__construct($name, $version);
+    }
+
+    public function run(InputInterface $input = null, OutputInterface $output = null)
+    {
+        if (null === $input) {
+            $input = new ArgvInput();
+        }
+
+        if (null === $output) {
+            $output = new ConsoleOutput();
+        }
+
+        $this->io = new SymfonyStyle($input, $output);
+
+        if (PHP_SAPI === 'phpdbg') {
+            $this->io->note('You are running Infection with phpdbg enabled.');
+        } elseif ($this->isXdebugLoaded) {
+            $this->io->note('You are running Infection with xdebug enabled.');
+        }
+
+        $xdebug = new XdebugHandler(new ConfigBuilder(sys_get_temp_dir()));
+        $xdebug->check();
+        unset($xdebug);
+
+        if (PHP_SAPI !== 'phpdbg' && $this->isDebuggerDisabled && !\extension_loaded('xdebug')) {
+            $this->io->error('You need to use phpdbg or install and enable xdebug in order to allow for code coverage generation.');
+
+            die(1);
+        }
+
+        return parent::run($input, $output);
     }
 
     public function doRun(InputInterface $input, OutputInterface $output)
@@ -87,6 +139,11 @@ ASCII;
     public function getContainer(): Container
     {
         return $this->container;
+    }
+
+    public function getIO(): SymfonyStyle
+    {
+        return $this->io;
     }
 
     private function buildDynamicDependencies(InputInterface $input)
