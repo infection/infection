@@ -78,16 +78,19 @@ ASCII;
         $this->io = new SymfonyStyle($input, $output);
 
         if (PHP_SAPI === 'phpdbg') {
-            $this->io->note(sprintf(self::RUNNING_WITH_NOTE, PHP_SAPI));
+            $this->io->writeln(sprintf(self::RUNNING_WITH_NOTE, PHP_SAPI));
         } elseif ($this->isXdebugLoaded) {
-            $this->io->note(sprintf(self::RUNNING_WITH_NOTE, 'xdebug'));
+            $this->io->writeln(sprintf(self::RUNNING_WITH_NOTE, 'xdebug'));
         }
 
         $xdebug = new XdebugHandler(new ConfigBuilder(sys_get_temp_dir()));
         $xdebug->check();
 
         if (PHP_SAPI !== 'phpdbg' && $this->isDebuggerDisabled && !$this->isXdebugLoaded) {
-            $this->io->error('You need to use phpdbg or install and enable xdebug in order to allow for code coverage generation.');
+            $this->io->error([
+                'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:',
+                '- Enable xdebug and run infection again' . PHP_EOL . '- Use phpdbg: phpdbg -qrr infection',
+            ]);
 
             return 1;
         }
