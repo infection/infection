@@ -68,8 +68,6 @@ class InitialYamlConfiguration extends AbstractYamlConfiguration
             }
 
             unset($parsedYaml['extensions'][$extensionName]);
-
-            break;
         }
 
         unset($options);

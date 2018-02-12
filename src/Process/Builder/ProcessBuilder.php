@@ -14,7 +14,7 @@ use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
-final class ProcessBuilder
+class ProcessBuilder
 {
     /**
      * @var AbstractTestFrameworkAdapter
