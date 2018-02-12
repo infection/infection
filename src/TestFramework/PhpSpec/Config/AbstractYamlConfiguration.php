@@ -20,9 +20,9 @@ abstract class AbstractYamlConfiguration
      */
     protected $parsedYaml;
 
-    public function __construct(string $tempDirectory, array $parsedYaml)
+    public function __construct(string $tmpDir, array $parsedYaml)
     {
-        $this->tempDirectory = $tempDirectory;
+        $this->tempDirectory = $tmpDir;
         $this->parsedYaml = $parsedYaml;
     }
 

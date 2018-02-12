@@ -157,7 +157,7 @@ class InfectionCommand extends BaseCommand
     {
         $container = $this->getContainer();
         $testFrameworkKey = $input->getOption('test-framework');
-        $skipCoverage = strlen($input->getOption('coverage')) > 0;
+        $skipCoverage = strlen(trim($input->getOption('coverage'))) > 0;
         $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $skipCoverage);
 
         $metricsCalculator = new MetricsCalculator();

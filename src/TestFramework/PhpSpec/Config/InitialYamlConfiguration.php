@@ -18,9 +18,9 @@ class InitialYamlConfiguration extends AbstractYamlConfiguration
      */
     private $skipCoverage;
 
-    public function __construct(string $tempDirectory, array $parsedYaml, bool $skipCoverage)
+    public function __construct(string $tmpDir, array $parsedYaml, bool $skipCoverage)
     {
-        parent::__construct($tempDirectory, $parsedYaml);
+        parent::__construct($tmpDir, $parsedYaml);
 
         $this->skipCoverage = $skipCoverage;
     }
