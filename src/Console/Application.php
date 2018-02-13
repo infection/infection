@@ -118,28 +118,15 @@ ASCII;
         };
 
         $this->container['coverage.path'] = function (Container $c) use ($input): string {
-            $existingCoveragePath = $this->getExistingCoveragePath(
-                $input,
-                $c['infection.config']->getPhpUnitConfigDir(),
-                $this->container['filesystem']
-            );
+            $existingCoveragePath = trim($input->getOption('coverage'));
 
-            return $existingCoveragePath ?: $c['tmp.dir'];
+            if ($existingCoveragePath === '') {
+                return $c['tmp.dir'];
+            }
+
+            return $c['filesystem']->isAbsolutePath($existingCoveragePath)
+                ? $existingCoveragePath
+                : sprintf('%s/%s', getcwd(), $existingCoveragePath);
         };
-    }
-
-    private function getExistingCoveragePath(InputInterface $input, string $configLocation, Filesystem $fileSystem): string
-    {
-        $existingCoveragePath = trim($input->getOption('coverage'));
-
-        if ($existingCoveragePath === '') {
-            return '';
-        }
-
-        if ($fileSystem->isAbsolutePath($existingCoveragePath)) {
-            return $existingCoveragePath;
-        }
-
-        return sprintf('%s/%s', $configLocation, $existingCoveragePath);
     }
 }
