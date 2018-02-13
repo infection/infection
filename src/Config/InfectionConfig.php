@@ -279,9 +279,9 @@ class InfectionConfig
         return sprintf('%s/%s', $this->configLocation, $tmpDir);
     }
 
-    public function getDisabledMutators(): array
+    public function getMutatorConfiguration(): array
     {
-        return (array) $this->config->mutators->ignore ?? [];
+        return (array) $this->config->mutators ?? [];
     }
 
     public function getConfigLocation(): string

@@ -195,7 +195,7 @@ class InfectionCommand extends BaseCommand
         }
 
         $config = $this->getContainer()->get('infection.config');
-        $ignoreFinder = new IgnoredMutatorsFinder($config->getDisabledMutators(), $config->getConfigLocation());
+        $ignoreFinder = new IgnoredMutatorsFinder($config->getMutatorConfiguration()['ignore'] ?? [], $config->getConfigLocation());
 
         $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
         $mutationsGenerator = new MutationsGenerator(

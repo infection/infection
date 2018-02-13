@@ -16,7 +16,7 @@ class IgnoredMutatorsFinderTest extends TestCase
     {
         $ignore = new IgnoredMutatorsFinder(['Plus' => 'foo/bar'], 'path');
 
-        $this->assertFalse($ignore->isIgnored('GreaterThan', '', ''));
+        $this->assertFalse($ignore->isIgnored('GreaterThan', ''));
     }
 
     public function test_it_returns_true_if_star_is_an_option()

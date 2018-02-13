@@ -179,8 +179,14 @@ class InfectionConfigTest extends TestCase
 JSON;
 
         $config = new InfectionConfig(json_decode($config), $this->filesystem, '/path/to/config');
-        $this->assertSame(['PublicVisibility' => ["Ignore\For\Particular\Class",
-            "Ignore\For\Another\Class::method",
-            "Ignore\For\**\*\Glob\Pattern\Or\Namespace", ], 'Plus' => '*'], $config->getDisabledMutators());
+        $this->assertSame(
+            ['PublicVisibility' => [
+                    "Ignore\For\Particular\Class",
+                    "Ignore\For\Another\Class::method",
+                    "Ignore\For\**\*\Glob\Pattern\Or\Namespace",
+                ],
+                'Plus' => '*',
+            ],
+            (array) $config->getMutatorConfiguration()['ignore']);
     }
 }
