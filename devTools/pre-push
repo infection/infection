@@ -1,0 +1,3 @@
+#!/bin/bash
+
+composer analyze && ./vendor/bin/phpunit

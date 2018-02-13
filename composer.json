@@ -65,7 +65,7 @@
         "cs:check": [
             "wget -nc http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar",
             "chmod a+x php-cs-fixer-v2.phar",
-            "./php-cs-fixer-v2.phar fix --config=.php_cs.dist -v --dry-run --stop-on-violation --using-cache=no --allow-risky=yes"
+            "./php-cs-fixer-v2.phar fix --config=.php_cs.dist -v --dry-run --stop-on-violation --allow-risky=yes"
         ],
         "cs:fix": [
             "./php-cs-fixer-v2.phar fix --config=.php_cs.dist -v --allow-risky=yes"
