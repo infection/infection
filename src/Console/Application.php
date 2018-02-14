@@ -15,6 +15,7 @@ use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 class Application extends BaseApplication
 {
@@ -106,18 +107,26 @@ ASCII;
                 );
 
                 $infectionConfigFile = $c['locator']->locateAnyOf($configPaths);
-                $dir = \pathinfo($infectionConfigFile, PATHINFO_DIRNAME);
+                $configLocation = \pathinfo($infectionConfigFile, PATHINFO_DIRNAME);
                 $json = file_get_contents($infectionConfigFile);
             } catch (\Exception $e) {
                 $json = '{}';
-                $dir = getcwd();
+                $configLocation = getcwd();
             }
 
-            return new InfectionConfig(json_decode($json), $c['filesystem'], $dir);
+            return new InfectionConfig(json_decode($json), $c['filesystem'], $configLocation);
         };
 
-        $this->container['tmp.dir'] = function (Container $c): string {
-            return $c['tmp.dir.creator']->createAndGet($c['infection.config']->getTmpDir());
+        $this->container['coverage.path'] = function (Container $c) use ($input): string {
+            $existingCoveragePath = trim($input->getOption('coverage'));
+
+            if ($existingCoveragePath === '') {
+                return $c['tmp.dir'];
+            }
+
+            return $c['filesystem']->isAbsolutePath($existingCoveragePath)
+                ? $existingCoveragePath
+                : sprintf('%s/%s', getcwd(), $existingCoveragePath);
         };
     }
 }

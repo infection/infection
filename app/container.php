@@ -56,12 +56,20 @@ $c['tmp.dir.creator'] = function (Container $c): TmpDirectoryCreator {
     return new TmpDirectoryCreator($c['filesystem']);
 };
 
-$c['coverage.dir.phpunit'] = function (Container $c): string {
-    return $c['tmp.dir'] . '/' . CodeCoverageData::PHP_UNIT_COVERAGE_DIR;
+$c['tmp.dir'] = function (Container $c): string {
+    return $c['tmp.dir.creator']->createAndGet($c['infection.config']->getTmpDir());
 };
 
-$c['coverage.dir.phpspec'] = function (Container $c): string {
-    return $c['tmp.dir'] . '/' . CodeCoverageData::PHP_SPEC_COVERAGE_DIR;
+$c['coverage.dir.phpunit'] = function (Container $c) {
+    return sprintf('%s/%s', $c['coverage.path'], CodeCoverageData::PHP_UNIT_COVERAGE_DIR);
+};
+
+$c['coverage.dir.phpspec'] = function (Container $c) {
+    return sprintf('%s/%s', $c['coverage.path'], CodeCoverageData::PHP_SPEC_COVERAGE_DIR);
+};
+
+$c['phpunit.junit.file.path'] = function (Container $c) {
+    return sprintf('%s/%s', $c['coverage.path'], PhpUnitAdapter::JUNIT_FILE_NAME);
 };
 
 $c['locator'] = function (Container $c): Locator {
@@ -104,10 +112,6 @@ $c['testframework.config.locator'] = function (Container $c): TestFrameworkConfi
 
 $c['diff.colorizer'] = function (): DiffColorizer {
     return new DiffColorizer();
-};
-
-$c['phpunit.junit.file.path'] = function (Container $c): string {
-    return $c['tmp.dir'] . '/' . PhpUnitAdapter::JUNIT_FILE_NAME;
 };
 
 $c['test.file.data.provider.phpunit'] = function (Container $c): TestFileDataProvider {

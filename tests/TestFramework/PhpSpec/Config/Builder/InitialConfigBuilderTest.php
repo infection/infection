@@ -47,7 +47,7 @@ class InitialConfigBuilderTest extends TestCase
     {
         $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/phpspec/phpspec.yml';
 
-        $builder = new InitialConfigBuilder($this->tmpDir, $originalYamlConfigPath);
+        $builder = new InitialConfigBuilder($this->tmpDir, $originalYamlConfigPath, false);
 
         $this->assertSame($this->tmpDir . '/phpspecConfiguration.initial.infection.yml', $builder->build());
     }

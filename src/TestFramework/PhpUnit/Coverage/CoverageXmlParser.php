@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Coverage;
 
+use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
+
 class CoverageXmlParser
 {
     /**
@@ -134,7 +136,7 @@ class CoverageXmlParser
             return $realPath;
         }
 
-        throw new \Exception('Source file was not found');
+        throw CoverageDoesNotExistException::forFileAtPath($fileName, $path);
     }
 
     private function getCoveredLinesData(\DOMNodeList $lineCoverageNodes): array

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -o pipefail
+set -e pipefail
 
 readonly INFECTION=../../../../bin/infection
 
@@ -19,7 +19,7 @@ if [ "$PHPDBG" = "1" ]
 then
     phpdbg -qrr $INFECTION --test-framework=phpspec
 else
-    php $INFECTION
+    php $INFECTION --test-framework=phpspec
 fi
 
 diff expected-output.txt infection-log.txt

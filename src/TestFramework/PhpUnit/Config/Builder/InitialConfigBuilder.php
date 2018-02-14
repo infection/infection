@@ -17,7 +17,7 @@ class InitialConfigBuilder implements ConfigBuilder
     /**
      * @var string
      */
-    private $tempDirectory;
+    private $tmpDir;
     /**
      * @var string
      */
@@ -37,13 +37,25 @@ class InitialConfigBuilder implements ConfigBuilder
      */
     private $srcDirs = [];
 
-    public function __construct(string $tempDirectory, string $originalXmlConfigContent, XmlConfigurationHelper $xmlConfigurationHelper, string $jUnitFilePath, array $srcDirs)
-    {
-        $this->tempDirectory = $tempDirectory;
+    /**
+     * @var bool
+     */
+    private $skipCoverage;
+
+    public function __construct(
+        string $tmpDir,
+        string $originalXmlConfigContent,
+        XmlConfigurationHelper $xmlConfigurationHelper,
+        string $jUnitFilePath,
+        array $srcDirs,
+        bool $skipCoverage
+    ) {
+        $this->tmpDir = $tmpDir;
         $this->originalXmlConfigContent = $originalXmlConfigContent;
         $this->xmlConfigurationHelper = $xmlConfigurationHelper;
         $this->jUnitFilePath = $jUnitFilePath;
         $this->srcDirs = $srcDirs;
+        $this->skipCoverage = $skipCoverage;
     }
 
     public function build(): string
@@ -64,8 +76,10 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->xmlConfigurationHelper->removeExistingLoggers($dom, $xPath);
         $this->xmlConfigurationHelper->removeExistingPrinters($dom, $xPath);
 
-        $this->addCodeCoverageLogger($dom, $xPath);
-        $this->addJUnitLogger($dom, $xPath);
+        if (!$this->skipCoverage) {
+            $this->addCodeCoverageLogger($dom, $xPath);
+            $this->addJUnitLogger($dom, $xPath);
+        }
 
         file_put_contents($path, $dom->saveXML());
 
@@ -74,7 +88,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function buildPath(): string
     {
-        return $this->tempDirectory . '/phpunitConfiguration.initial.infection.xml';
+        return $this->tmpDir . '/phpunitConfiguration.initial.infection.xml';
     }
 
     private function addJUnitLogger(\DOMDocument $dom, \DOMXPath $xPath)
@@ -94,7 +108,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
         $coverageXmlLog = $dom->createElement('log');
         $coverageXmlLog->setAttribute('type', 'coverage-xml');
-        $coverageXmlLog->setAttribute('target', $this->tempDirectory . '/' . CodeCoverageData::PHP_UNIT_COVERAGE_DIR);
+        $coverageXmlLog->setAttribute('target', $this->tmpDir . '/' . CodeCoverageData::PHP_UNIT_COVERAGE_DIR);
 
         $logging->appendChild($coverageXmlLog);
     }

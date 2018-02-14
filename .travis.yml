@@ -24,7 +24,8 @@ matrix:
 
 env:
   global:
-    - INFECTION_FLAGS='--threads=4 --min-msi=59 --min-covered-msi=88'
+    - INFECTION_FLAGS='--threads=4 --min-msi=62 --min-covered-msi=88 --coverage=coverage'
+    - PHPUNIT_BIN='vendor/bin/phpunit --coverage-clover=clover.xml --coverage-xml=coverage/coverage-xml --log-junit=coverage/phpunit.junit.xml'
 
 cache:
   directories:
@@ -50,7 +51,7 @@ install:
 script:
   - composer analyze
   - if [[ $PHPDBG != 1 ]]; then xdebug-enable; fi
-  - if [[ $PHPDBG != 1 ]]; then vendor/bin/phpunit --coverage-clover=clover.xml; else phpdbg -qrr vendor/bin/phpunit --coverage-clover=clover.xml; fi
+  - if [[ $PHPDBG != 1 ]]; then $PHPUNIT_BIN; else phpdbg -qrr $PHPUNIT_BIN; fi
   - ./tests/e2e_tests
   - if [[ $PHPDBG != 1 ]]; then bin/infection $INFECTION_FLAGS; else phpdbg -qrr bin/infection $INFECTION_FLAGS; fi
 

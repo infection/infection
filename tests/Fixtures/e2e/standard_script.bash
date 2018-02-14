@@ -2,7 +2,7 @@
 
 readonly INFECTION=../../../../bin/infection
 
-set -o pipefail
+set -e pipefail
 
 if [ "$PHPDBG" = "1" ]
 then

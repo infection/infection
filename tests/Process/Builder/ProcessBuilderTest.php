@@ -23,7 +23,7 @@ class ProcessBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $builder = new ProcessBuilder($fwAdapter, 100);
 
-        $process = $builder->getProcessForInitialTestRun();
+        $process = $builder->getProcessForInitialTestRun('', false);
 
         $this->assertContains('getExecutableCommandLine', $process->getCommandLine());
         $this->assertNull($process->getTimeout());

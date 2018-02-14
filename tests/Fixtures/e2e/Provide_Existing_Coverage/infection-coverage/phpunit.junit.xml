@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Test Suite" tests="2" assertions="2" errors="0" failures="0" skipped="0" time="0.010499">
+    <testsuite name="Namespace_\Test\SourceClassTest" file="tests/SourceClassTest.php" tests="2" assertions="2" errors="0" failures="0" skipped="0" time="0.010499">
+      <testcase name="test_it_adds" class="Namespace_\Test\SourceClassTest" classname="Namespace_.Test.SourceClassTest" file="tests/SourceClassTest.php" line="10" assertions="1" time="0.007975"/>
+      <testcase name="test_it_returns_true" class="Namespace_\Test\SourceClassTest" classname="Namespace_.Test.SourceClassTest" file="tests/SourceClassTest.php" line="16" assertions="1" time="0.002524"/>
+    </testsuite>
+  </testsuite>
+</testsuites>
