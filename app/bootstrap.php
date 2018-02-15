@@ -4,9 +4,6 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
-use Infection\Php\ConfigBuilder;
-use Infection\Php\XdebugHandler;
-
 $files = [
     __DIR__ . '/../../../autoload.php',
     __DIR__ . '/../vendor/autoload.php',
@@ -35,20 +32,5 @@ if (!defined('INFECTION_COMPOSER_INSTALL')) {
 }
 
 require INFECTION_COMPOSER_INSTALL;
-
-$isDebuggerDisabled = empty((string) getenv(XdebugHandler::ENV_DISABLE_XDEBUG));
-
-$xdebug = new XdebugHandler(new ConfigBuilder(sys_get_temp_dir()));
-$xdebug->check();
-unset($xdebug);
-
-if (PHP_SAPI !== 'phpdbg' && $isDebuggerDisabled && !extension_loaded('xdebug')) {
-    fwrite(
-        STDERR,
-        'You need to use phpdbg or install and enable xdebug in order to allow for code coverage generation.' . PHP_EOL
-    );
-
-    die(1);
-}
 
 $container = require __DIR__ . '/container.php';

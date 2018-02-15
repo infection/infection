@@ -10,17 +10,23 @@ namespace Infection\Console;
 
 use Infection\Command;
 use Infection\Config\InfectionConfig;
+use Infection\Php\ConfigBuilder;
+use Infection\Php\XdebugHandler;
 use Pimple\Container;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class Application extends BaseApplication
 {
     const NAME = 'Infection - PHP Mutation Testing Framework';
     const VERSION = '@package_version@';
+    const RUNNING_WITH_NOTE = 'You are running Infection with %s enabled.';
     const LOGO = <<<'ASCII'
     ____      ____          __  _
    /  _/___  / __/__  _____/ /_(_)___  ____ 
@@ -35,11 +41,61 @@ ASCII;
      */
     private $container;
 
+    /**
+     * @var SymfonyStyle
+     */
+    private $io;
+
+    /**
+     * @var bool
+     */
+    private $isXdebugLoaded;
+
+    /**
+     * @var bool
+     */
+    private $isDebuggerDisabled;
+
     public function __construct(Container $container, string $name = self::NAME, string $version = self::VERSION)
     {
         $this->container = $container;
+        $this->isDebuggerDisabled = ('' === trim((string) getenv(XdebugHandler::ENV_DISABLE_XDEBUG)));
+        $this->isXdebugLoaded = \extension_loaded('xdebug');
 
         parent::__construct($name, $version);
+    }
+
+    public function run(InputInterface $input = null, OutputInterface $output = null)
+    {
+        if (null === $input) {
+            $input = new ArgvInput();
+        }
+
+        if (null === $output) {
+            $output = new ConsoleOutput();
+        }
+
+        $this->io = new SymfonyStyle($input, $output);
+
+        if (PHP_SAPI === 'phpdbg') {
+            $this->io->writeln(sprintf(self::RUNNING_WITH_NOTE, PHP_SAPI));
+        } elseif ($this->isXdebugLoaded) {
+            $this->io->writeln(sprintf(self::RUNNING_WITH_NOTE, 'xdebug'));
+        }
+
+        $xdebug = new XdebugHandler(new ConfigBuilder(sys_get_temp_dir()));
+        $xdebug->check();
+
+        if (PHP_SAPI !== 'phpdbg' && $this->isDebuggerDisabled && !$this->isXdebugLoaded) {
+            $this->io->error([
+                'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:',
+                '- Enable xdebug and run infection again' . PHP_EOL . '- Use phpdbg: phpdbg -qrr infection',
+            ]);
+
+            return 1;
+        }
+
+        return parent::run($input, $output);
     }
 
     public function doRun(InputInterface $input, OutputInterface $output)
@@ -87,6 +143,11 @@ ASCII;
     public function getContainer(): Container
     {
         return $this->container;
+    }
+
+    public function getIO(): SymfonyStyle
+    {
+        return $this->io;
     }
 
     private function buildDynamicDependencies(InputInterface $input)

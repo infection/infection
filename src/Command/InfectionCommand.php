@@ -47,6 +47,7 @@ use Symfony\Component\Process\Process;
 
 /**
  * @method Application getApplication()
+ * @method SymfonyStyle getIO()
  */
 class InfectionCommand extends BaseCommand
 {
@@ -432,7 +433,7 @@ class InfectionCommand extends BaseCommand
             }
         }
 
-        $this->io = new SymfonyStyle($input, $output);
+        $this->io = $this->getApplication()->getIO();
         $this->eventDispatcher = $this->getContainer()->get('dispatcher');
     }
 }
