@@ -42,12 +42,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
 /**
  * @method Application getApplication()
- * @method SymfonyStyle getIO()
  */
 class InfectionCommand extends BaseCommand
 {
@@ -62,6 +60,11 @@ class InfectionCommand extends BaseCommand
      * @var EventDispatcher
      */
     private $eventDispatcher;
+
+    /**
+     * @var bool
+     */
+    private $skipCoverage;
 
     protected function configure()
     {
@@ -158,8 +161,7 @@ class InfectionCommand extends BaseCommand
     {
         $container = $this->getContainer();
         $testFrameworkKey = $input->getOption('test-framework');
-        $skipCoverage = strlen(trim($input->getOption('coverage'))) > 0;
-        $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $skipCoverage);
+        $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $this->skipCoverage);
 
         $metricsCalculator = new MetricsCalculator();
 
@@ -168,13 +170,20 @@ class InfectionCommand extends BaseCommand
         $processBuilder = new ProcessBuilder($adapter, $container->get('infection.config')->getProcessTimeout());
         $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);
 
-        $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
-        $initialTestSuitProcess = $initialTestsRunner->run($testFrameworkOptions->getForInitialProcess(), $skipCoverage);
+        if (!$this->skipCoverage) {
+            $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
+            $initialTestSuitProcess = $initialTestsRunner->run($testFrameworkOptions->getForInitialProcess());
 
-        if (!$initialTestSuitProcess->isSuccessful()) {
-            $this->logInitialTestsDoNotPass($initialTestSuitProcess, $testFrameworkKey);
+            if (!$initialTestSuitProcess->isSuccessful()) {
+                $this->logInitialTestsDoNotPass($initialTestSuitProcess, $testFrameworkKey);
 
-            return 1;
+                return 1;
+            }
+        } else {
+            $this->io->write(sprintf(
+                '%s Skipped...',
+                InitialTestsConsoleLoggerSubscriber::RUNNING_INITIAL_TEST_SUITE_MESSAGE
+            ));
         }
 
         $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
@@ -254,12 +263,7 @@ class InfectionCommand extends BaseCommand
         $mutantCreatingProgressBar = new ProgressBar($this->output);
         $mutantCreatingProgressBar->setFormat('Creating mutated files and processes: %current%/%max%');
 
-        return [
-            new InitialTestsConsoleLoggerSubscriber(
-                $this->output,
-                $initialTestsProgressBar,
-                $testFrameworkAdapter
-            ),
+        $subscribers = [
             new MutationGeneratingConsoleLoggerSubscriber(
                 $this->output,
                 $mutationGeneratingProgressBar
@@ -282,6 +286,16 @@ class InfectionCommand extends BaseCommand
                 (int) $this->input->getOption('log-verbosity')
             ),
         ];
+
+        if (!$this->skipCoverage) {
+            $subscribers[] = new InitialTestsConsoleLoggerSubscriber(
+                $this->output,
+                $initialTestsProgressBar,
+                $testFrameworkAdapter
+            );
+        }
+
+        return $subscribers;
     }
 
     private function getCodeCoverageData(string $testFrameworkKey): CodeCoverageData
@@ -435,5 +449,6 @@ class InfectionCommand extends BaseCommand
 
         $this->io = $this->getApplication()->getIO();
         $this->eventDispatcher = $this->getContainer()->get('dispatcher');
+        $this->skipCoverage = \strlen(trim($input->getOption('coverage'))) > 0;
     }
 }

@@ -36,13 +36,12 @@ class ProcessBuilder
      * Creates process with enabled debugger as test framework is going to use in the code coverage.
      *
      * @param string $testFrameworkExtraOptions
-     * @param bool $skipCoverage
      *
      * @return Process
      */
-    public function getProcessForInitialTestRun(string $testFrameworkExtraOptions, bool $skipCoverage): Process
+    public function getProcessForInitialTestRun(string $testFrameworkExtraOptions): Process
     {
-        $includeArgs = PHP_SAPI === 'phpdbg' || $skipCoverage;
+        $includeArgs = PHP_SAPI === 'phpdbg';
 
         return new Process(
             $this->testFrameworkAdapter->getExecutableCommandLine(

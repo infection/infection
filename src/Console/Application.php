@@ -25,7 +25,10 @@ class Application extends BaseApplication
 {
     const NAME = 'Infection - PHP Mutation Testing Framework';
     const VERSION = '@package_version@';
-    const RUNNING_WITH_NOTE = 'You are running Infection with %s enabled.';
+    const RUNNING_WITH_DEBUGGER_NOTE = 'You are running Infection with %s enabled.';
+    const RUNNING_WITH_DEBUGGER_PERFORMANCE_NOTE = self::RUNNING_WITH_DEBUGGER_NOTE . ' This has a major impact on runtime performance.';
+    const PERFORMANCE_IMPACT = '';
+
     const LOGO = <<<'ASCII'
     ____      ____          __  _
    /  _/___  / __/__  _____/ /_(_)___  ____ 
@@ -76,19 +79,31 @@ ASCII;
 
         $this->io = new SymfonyStyle($input, $output);
 
+        $hasCoverageOption = $input->hasParameterOption(['--coverage'], true);
+
         if (PHP_SAPI === 'phpdbg') {
-            $this->io->writeln(sprintf(self::RUNNING_WITH_NOTE, PHP_SAPI));
+            if ($hasCoverageOption) {
+                $this->io->writeln('<comment>' . sprintf(self::RUNNING_WITH_DEBUGGER_PERFORMANCE_NOTE, PHP_SAPI) . '</comment>');
+            } else {
+                $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, PHP_SAPI));
+            }
         } elseif ($this->isXdebugLoaded) {
-            $this->io->writeln(sprintf(self::RUNNING_WITH_NOTE, 'xdebug'));
+            if ($hasCoverageOption) {
+                $this->io->writeln('<comment>' . sprintf(self::RUNNING_WITH_DEBUGGER_PERFORMANCE_NOTE, 'xdebug') . '</comment>');
+            } else {
+                $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, 'xdebug'));
+            }
         }
 
         $xdebug = new XdebugHandler(new ConfigBuilder(sys_get_temp_dir()));
         $xdebug->check();
 
-        if (PHP_SAPI !== 'phpdbg' && $this->isDebuggerDisabled && !$this->isXdebugLoaded) {
-            $this->io->error([
+        if (PHP_SAPI !== 'phpdbg' && $this->isDebuggerDisabled && !$this->isXdebugLoaded && !$hasCoverageOption) {
+            $this->io->writeln([
                 'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:',
-                '- Enable xdebug and run infection again' . PHP_EOL . '- Use phpdbg: phpdbg -qrr infection',
+                '- Enable xdebug and run infection again' . PHP_EOL .
+                '- Use phpdbg: phpdbg -qrr infection' . PHP_EOL .
+                '- Use --coverage option with path to the existing coverage report',
             ]);
 
             return 1;
