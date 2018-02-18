@@ -151,6 +151,13 @@ class InfectionCommand extends BaseCommand
                 'Log verbosity level. 1 - full logs format, 2 - short logs format.',
                 LogVerbosity::DEBUG
             )
+            ->addOption(
+                'initial-tests-php-options',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Extra php options for the initial test runner. Will be ignored if --coverage option presented.',
+                ''
+            )
         ;
     }
 
@@ -168,7 +175,11 @@ class InfectionCommand extends BaseCommand
         $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);
 
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
-        $initialTestSuitProcess = $initialTestsRunner->run($testFrameworkOptions->getForInitialProcess(), $this->skipCoverage);
+        $initialTestSuitProcess = $initialTestsRunner->run(
+            $testFrameworkOptions->getForInitialProcess(),
+            $this->skipCoverage,
+            explode(' ', $input->getOption('initial-tests-php-options'))
+        );
 
         if (!$initialTestSuitProcess->isSuccessful()) {
             $this->logInitialTestsDoNotPass($initialTestSuitProcess, $testFrameworkKey);

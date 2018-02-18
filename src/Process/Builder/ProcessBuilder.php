@@ -38,18 +38,23 @@ class ProcessBuilder
      *
      * @param string $testFrameworkExtraOptions
      * @param bool $skipCoverage
+     * @param array $phpExtraOptions
      *
      * @return Process
      */
-    public function getProcessForInitialTestRun(string $testFrameworkExtraOptions, bool $skipCoverage): Process
-    {
+    public function getProcessForInitialTestRun(
+        string $testFrameworkExtraOptions,
+        bool $skipCoverage,
+        array $phpExtraOptions = []
+    ): Process {
         $includeArgs = PHP_SAPI === 'phpdbg' || $skipCoverage;
 
         $process = new Process(
             $this->testFrameworkAdapter->getExecutableCommandLine(
                 $this->testFrameworkAdapter->buildInitialConfigFile(),
                 $testFrameworkExtraOptions,
-                $includeArgs
+                $includeArgs,
+                $phpExtraOptions
             ),
             null,
             $includeArgs ? array_replace($_ENV, $_SERVER) : [],

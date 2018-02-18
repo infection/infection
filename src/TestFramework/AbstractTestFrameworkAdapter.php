@@ -63,6 +63,7 @@ abstract class AbstractTestFrameworkAdapter
 
     /**
      * Returns path to the test framework's executable
+     *
      * Example:
      *     bin/phpspec [arguments] [--options]
      *     bin/phpunit
@@ -71,14 +72,20 @@ abstract class AbstractTestFrameworkAdapter
      * @param string $configPath
      * @param string $extraOptions
      * @param bool $includePhpArgs
+     * @param array $phpExtraOptions
      *
      * @return string
      */
-    public function getExecutableCommandLine(string $configPath, string $extraOptions, bool $includePhpArgs = true): string
-    {
+    public function getExecutableCommandLine(
+        string $configPath,
+        string $extraOptions,
+        bool $includePhpArgs = true,
+        array $phpExtraOptions = []
+    ): string {
         return sprintf(
-            '%s %s',
+            '%s %s %s',
             $this->phpExecutableFinder->find($includePhpArgs),
+            implode(' ', $phpExtraOptions),
             $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions)
         );
     }

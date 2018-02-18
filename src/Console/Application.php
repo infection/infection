@@ -91,18 +91,28 @@ ASCII;
             && $this->isDebuggerDisabled
             && !$this->isXdebugLoaded
             && !$input->hasParameterOption('--coverage', true)
+            && !$this->isInitialTestPhpOptionHasXdebug($input)
         ) {
             $this->io->writeln([
                 'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:',
                 '- Enable xdebug and run infection again' . PHP_EOL .
                 '- Use phpdbg: phpdbg -qrr infection' . PHP_EOL .
-                '- Use --coverage option with path to the existing coverage report',
+                '- Use --coverage option with path to the existing coverage report' . PHP_EOL .
+                '- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters',
             ]);
 
             return 1;
         }
 
         return parent::run($input, $output);
+    }
+
+    private function isInitialTestPhpOptionHasXdebug(InputInterface $input): bool
+    {
+        return (bool) preg_match(
+            '/(zend_extension\s*=.*xdebug.*)/mi',
+            (string) $input->getParameterOption('--initial-tests-php-options', true)
+        );
     }
 
     public function doRun(InputInterface $input, OutputInterface $output)

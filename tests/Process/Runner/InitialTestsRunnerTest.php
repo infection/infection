@@ -29,7 +29,7 @@ class InitialTestsRunnerTest extends MockeryTestCase
         $processBuilder = Mockery::mock(ProcessBuilder::class);
         $processBuilder
             ->shouldReceive('getProcessForInitialTestRun')
-            ->withArgs(['', false])
+            ->withArgs(['', false, []])
             ->andReturn($process);
 
         $eventDispatcher = Mockery::mock(EventDispatcherInterface::class);
