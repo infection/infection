@@ -18,8 +18,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
 {
-    const RUNNING_INITIAL_TEST_SUITE_MESSAGE = 'Running initial test suite...';
-
     /**
      * @var OutputInterface
      */
@@ -35,11 +33,8 @@ class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
      */
     private $testFrameworkAdapter;
 
-    public function __construct(
-        OutputInterface $output,
-        ProgressBar $progressBar,
-        AbstractTestFrameworkAdapter $testFrameworkAdapter
-    ) {
+    public function __construct(OutputInterface $output, ProgressBar $progressBar, AbstractTestFrameworkAdapter $testFrameworkAdapter)
+    {
         $this->output = $output;
         $this->progressBar = $progressBar;
         $this->testFrameworkAdapter = $testFrameworkAdapter;
@@ -63,7 +58,7 @@ class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
         }
 
         $this->output->writeln([
-            self::RUNNING_INITIAL_TEST_SUITE_MESSAGE,
+            'Running initial test suite...',
             '',
             sprintf(
                 '%s version: %s',

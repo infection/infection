@@ -170,20 +170,13 @@ class InfectionCommand extends BaseCommand
         $processBuilder = new ProcessBuilder($adapter, $container->get('infection.config')->getProcessTimeout());
         $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);
 
-        if (!$this->skipCoverage) {
-            $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
-            $initialTestSuitProcess = $initialTestsRunner->run($testFrameworkOptions->getForInitialProcess());
+        $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
+        $initialTestSuitProcess = $initialTestsRunner->run($testFrameworkOptions->getForInitialProcess(), $this->skipCoverage);
 
-            if (!$initialTestSuitProcess->isSuccessful()) {
-                $this->logInitialTestsDoNotPass($initialTestSuitProcess, $testFrameworkKey);
+        if (!$initialTestSuitProcess->isSuccessful()) {
+            $this->logInitialTestsDoNotPass($initialTestSuitProcess, $testFrameworkKey);
 
-                return 1;
-            }
-        } else {
-            $this->io->write(sprintf(
-                '%s Skipped...',
-                InitialTestsConsoleLoggerSubscriber::RUNNING_INITIAL_TEST_SUITE_MESSAGE
-            ));
+            return 1;
         }
 
         $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
@@ -263,7 +256,12 @@ class InfectionCommand extends BaseCommand
         $mutantCreatingProgressBar = new ProgressBar($this->output);
         $mutantCreatingProgressBar->setFormat('Creating mutated files and processes: %current%/%max%');
 
-        $subscribers = [
+        return [
+            new InitialTestsConsoleLoggerSubscriber(
+                $this->output,
+                $initialTestsProgressBar,
+                $testFrameworkAdapter
+            ),
             new MutationGeneratingConsoleLoggerSubscriber(
                 $this->output,
                 $mutationGeneratingProgressBar
@@ -286,16 +284,6 @@ class InfectionCommand extends BaseCommand
                 (int) $this->input->getOption('log-verbosity')
             ),
         ];
-
-        if (!$this->skipCoverage) {
-            $subscribers[] = new InitialTestsConsoleLoggerSubscriber(
-                $this->output,
-                $initialTestsProgressBar,
-                $testFrameworkAdapter
-            );
-        }
-
-        return $subscribers;
     }
 
     private function getCodeCoverageData(string $testFrameworkKey): CodeCoverageData
