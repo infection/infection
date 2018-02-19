@@ -13,14 +13,21 @@ use Symfony\Component\Finder\Finder;
 
 class SourceFilesFinder extends Finder
 {
+    /**
+     * @var string[]
+     */
     private $sourceDirectories;
-    private $excludeDirectories;
-    private $filter = [];
 
     /**
-     * @param string[] $sourceDirectories
-     * @param string[] $excludeDirectories
+     * @var string[]
      */
+    private $excludeDirectories;
+
+    /**
+     * @var string[]
+     */
+    private $filters = [];
+
     public function __construct(array $sourceDirectories, array $excludeDirectories)
     {
         parent::__construct();
@@ -31,9 +38,9 @@ class SourceFilesFinder extends Finder
 
     public function getSourceFiles(string $filter = ''): Finder
     {
-        array_walk($this->excludeDirectories, function ($excludePath) {
-            $this->notPath($excludePath);
-        });
+        foreach ($this->excludeDirectories as $excludeDirectory) {
+            $this->notPath($excludeDirectory);
+        }
 
         $this->in($this->sourceDirectories)->files();
 
@@ -44,9 +51,9 @@ class SourceFilesFinder extends Finder
         }
 
         $filters = explode(',', $filter);
-        array_walk($filters, function ($fileFilter) {
-            $this->realPath($fileFilter);
-        });
+        foreach ($filters as $filter) {
+            $this->filters[] = $filter;
+        }
 
         return $this;
     }
@@ -55,17 +62,10 @@ class SourceFilesFinder extends Finder
     {
         $iterator = parent::getIterator();
 
-        if ($this->filter) {
-            $iterator = new RealPathFilterIterator($iterator, $this->filter, []);
+        if ($this->filters) {
+            $iterator = new RealPathFilterIterator($iterator, $this->filters, []);
         }
 
         return $iterator;
-    }
-
-    private function realPath(string $filter)
-    {
-        $this->filter[] = $filter;
-
-        return $this;
     }
 }
