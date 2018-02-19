@@ -29,7 +29,7 @@ class Locator
         $this->filesystem = $filesystem;
     }
 
-    public function locate(string $name, string $additionalPath = null)
+    public function locate(string $name)
     {
         if ($this->filesystem->isAbsolutePath($name)) {
             if ($this->filesystem->exists($name)) {
@@ -39,9 +39,7 @@ class Locator
             throw LocatorException::fileOrDirectoryDoesNotExist($name);
         }
 
-        $paths = $this->getUniqueMergedPaths($additionalPath);
-
-        foreach ($paths as $path) {
+        foreach ($this->paths as $path) {
             $file = $path . DIRECTORY_SEPARATOR . $name;
 
             if ($this->filesystem->exists($file)) {
@@ -65,20 +63,5 @@ class Locator
 
             return $this->locateAnyOf($fileNames);
         }
-    }
-
-    private function getUniqueMergedPaths(string $additionalPath = null): array
-    {
-        if ($additionalPath === null) {
-            return $this->paths;
-        }
-
-        $paths = $this->paths;
-
-        if ($additionalPath !== null) {
-            array_unshift($paths, $additionalPath);
-        }
-
-        return array_unique($paths);
     }
 }
