@@ -8,7 +8,7 @@ This PR:
 Remove if not relevant
 -->
 
-Fixes https://github.com/infection/infection/XXX
+Fixes https://github.com/infection/infection/issues/XXX
 
 <!--
 - Replace this comment by a detailed description of what your PR is solving.
