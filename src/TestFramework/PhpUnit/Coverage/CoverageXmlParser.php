@@ -84,6 +84,10 @@ class CoverageXmlParser
 
         $methodsCoverageNodes = $xPath->query('/phpunit/file/class/method');
 
+        if (!$methodsCoverageNodes->length) {
+            $methodsCoverageNodes = $xPath->query('/phpunit/file/trait/method');
+        }
+
         return [
             $sourceFilePath => [
                 'byLine' => $this->getCoveredLinesData($lineCoverageNodes),
