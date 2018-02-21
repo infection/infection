@@ -44,7 +44,7 @@ class CoverageXmlParserTest extends TestCase
         $coverage = $this->parser->parse($this->getXml());
 
         // zeroLevel / firstLevel / secondLevel
-        $this->assertCount(3, $coverage);
+        $this->assertCount(4, $coverage);
     }
 
     public function test_it_has_correct_coverage_data_for_each_file()
@@ -92,5 +92,31 @@ class CoverageXmlParserTest extends TestCase
         $coverage = $this->parser->parse($this->getXml());
 
         $this->assertSame($expectedByMethodArray, $coverage[$firstLevelAbsolutePath]['byMethod']);
+    }
+
+    public function test_it_adds_by_method_coverage_data_for_traits()
+    {
+        $pathToTrait = realpath($this->tempDir . '/FirstLevel/SecondLevel/secondLevelTrait.php');
+
+        $expectedByMethodArray = [
+            'mutate' => [
+                'startLine' => 19,
+                'endLine' => 22,
+                'executable' => 1,
+                'executed' => 0,
+                'coverage' => 0,
+            ],
+            'shouldMutate' => [
+                'startLine' => 24,
+                'endLine' => 35,
+                'executable' => 5,
+                'executed' => 4,
+                'coverage' => 80,
+            ],
+        ];
+
+        $coverage = $this->parser->parse($this->getXml());
+
+        $this->assertSame($expectedByMethodArray, $coverage[$pathToTrait]['byMethod']);
     }
 }
