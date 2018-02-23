@@ -11,9 +11,9 @@ namespace Infection\Process\Listener;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\EventDispatcher\EventSubscriberInterface;
+use Infection\Events\MutantProcessFinished;
 use Infection\Events\MutationTestingFinished;
 use Infection\Events\MutationTestingStarted;
-use Infection\Events\MutantProcessFinished;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -99,7 +99,6 @@ class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
 
     public function onMutationTestingFinished(MutationTestingFinished $event)
     {
-        // TODO [doc] write test -> run mutation for just this file. Should be 100%, 100%, 100%,
         $this->outputFormatter->finish();
 
         if ($this->showMutations) {

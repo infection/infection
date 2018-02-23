@@ -57,6 +57,15 @@
               <traits count="0" tested="0" percent="0"/>
             </totals>
           </file>
+          <file name="secondLevelTrait.php" href="FirstLevel/SecondLevel/secondLevelTrait.php.xml">
+            <totals>
+              <lines total="114" comments="22" code="92" executable="59" executed="0" percent="0.00"/>
+              <methods count="6" tested="0" percent="0.00"/>
+              <functions count="0" tested="0" percent="0"/>
+              <classes count="1" tested="0" percent="0.00"/>
+              <traits count="0" tested="0" percent="0"/>
+            </totals>
+          </file>
         </directory>
       </directory>
       <file name="zeroLevel.php" href="zeroLevel.php.xml">

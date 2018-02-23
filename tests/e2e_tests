@@ -11,17 +11,19 @@ fi
 
 touch error.log
 
-for d in  */
+for dir in  */
 do
-    cd "$d"
+    cd "$dir"
+    echo -e "\n$dir\n";
+
     if [ -f composer.json ] || [ -f composer.lock ]
     then
         composer install > /dev/null 2>&1
     fi
 
-    if [ -f "run_test.bash" ]
+    if [ -f "run_tests.bash" ]
     then
-        output="$(bash run_test.bash)"
+        output="$(bash run_tests.bash)"
     else
         output="$(bash ../standard_script.bash)"
     fi
@@ -29,7 +31,7 @@ do
     if [ $? != 0 ]
     then
         failure="true"
-        echo "$d" >> ../error.log
+        echo "$dir" >> ../error.log
         echo "$output" >> ../error.log
         echo "" >> ../error.log
     fi
@@ -43,5 +45,5 @@ then
     exit 1
 fi
 
-echo "Success"
+echo -e "\nSuccess"
 exit 0

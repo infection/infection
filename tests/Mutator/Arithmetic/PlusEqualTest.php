@@ -10,27 +10,50 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\PlusEqual;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class PlusEqualTest extends AbstractMutator
+class PlusEqualTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {
         return new PlusEqual();
     }
 
-    public function test_replaces_post_decrement()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = '<?php $a = 1; $a += 2;';
-        $mutatedCode = $this->mutate($code);
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates plus equal' => [
+                <<<'PHP'
+<?php
+
+$a = 1;
+$a += 2;
+PHP
+                ,
+                <<<'PHP'
 <?php
 
 $a = 1;
 $a -= 2;
-CODE;
+PHP
+                ,
+            ],
+            'It does not mutate normal plus' => [
+                <<<'PHP'
+<?php
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+$a = 10 + 3;
+PHP
+                ,
+            ],
+        ];
     }
-}//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+}

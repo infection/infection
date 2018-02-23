@@ -11,8 +11,8 @@ namespace Infection\Mutator\FunctionSignature;
 use Infection\Mutator\InterfaceParentTrait;
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
-use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\ClassMethod;
 
 class PublicVisibility extends Mutator
 {
@@ -55,6 +55,10 @@ class PublicVisibility extends Mutator
             return false;
         }
 
+        if ($node->isAbstract()) {
+            return false;
+        }
+
         return $node->isPublic();
     }
 
@@ -73,8 +77,7 @@ class PublicVisibility extends Mutator
                 '__unset',
                 '__toString',
                 '__debugInfo',
-            ],
-            true
+            ]
         );
     }
 }

@@ -10,40 +10,87 @@ namespace Infection\Tests\Mutator\Number;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Number\OneZeroFloat;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class OneZeroFloatTest extends AbstractMutator
+class OneZeroFloatTest extends AbstractMutatorTestCase
 {
-    public function test_it_mutates_zero_to_one_float()
-    {
-        $code = '<?php 10 + 0.0;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-10 + 1.0;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_mutates_one_to_zero_float()
-    {
-        $code = '<?php 10 + 1.0;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-10 + 0.0;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
     protected function getMutator(): Mutator
     {
         return new OneZeroFloat();
+    }
+
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates float one to zero' => [
+                <<<'PHP'
+<?php
+
+10 + 1.0;
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+10 + 0.0;
+PHP
+                ,
+            ],
+            'It mutates float zero to one' => [
+                <<<'PHP'
+<?php
+
+10 + 0.0;
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+10 + 1.0;
+PHP
+                ,
+            ],
+            'It does not mutate int zero to one' => [
+                <<<'PHP'
+<?php
+
+10 + 0;
+PHP
+                ,
+            ],
+            'It does not mutate int one to zer0' => [
+                <<<'PHP'
+<?php
+
+10 + 1;
+PHP
+                ,
+            ],
+            'It does not mutate the string 0.0' => [
+                <<<'PHP'
+<?php
+
+'a' . '0.0';
+PHP
+            ],
+            'It does not mutate other floats' => [
+                <<<'PHP'
+<?php
+
+10 + 2.0;
+10 + 1.1;
+10 + 0.5;
+PHP
+                ,
+            ],
+        ];
     }
 }

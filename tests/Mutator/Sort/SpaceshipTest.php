@@ -10,26 +10,45 @@ namespace Infection\Tests\Mutator\Sort;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Sort\Spaceship;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class SpaceshipTest extends AbstractMutator
+class SpaceshipTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {
         return new Spaceship();
     }
 
-    public function test_swap_spaceship_operator_arguments()
+    public function test_get_name()
     {
-        $code = '<?php $a <=> $b;';
-        $mutatedCode = $this->mutate($code);
+        $this->assertSame('Spaceship', $this->getMutator()->getName());
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It swaps spaceship operators' => [
+                <<<'PHP'
+<?php
+
+$a <=> $b;
+PHP
+                ,
+                <<<'PHP'
 <?php
 
 $b <=> $a;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+PHP
+                ,
+            ],
+        ];
     }
 }

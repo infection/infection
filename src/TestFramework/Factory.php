@@ -16,9 +16,9 @@ use Infection\TestFramework\Codeception\Config\Builder\MutationConfigBuilder as 
 use Infection\TestFramework\Codeception\CommandLine\ArgumentsAndOptionsBuilder as CodeceptionArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
+use Infection\TestFramework\PhpSpec\CommandLine\ArgumentsAndOptionsBuilder as PhpSpecArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder as PhpSpecInitialConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder as PhpSpecMutationConfigBuilder;
-use Infection\TestFramework\PhpSpec\CommandLine\ArgumentsAndOptionsBuilder as PhpSpecArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
@@ -31,7 +31,7 @@ final class Factory
     /**
      * @var string
      */
-    private $tempDir;
+    private $tmpDir;
 
     /**
      * @var XmlConfigurationHelper
@@ -64,7 +64,7 @@ final class Factory
     private $versionParser;
 
     public function __construct(
-        string $tempDir,
+        string $tmpDir,
         string $projectDir,
         TestFrameworkConfigLocator $configLocator,
         XmlConfigurationHelper $xmlConfigurationHelper,
@@ -72,7 +72,7 @@ final class Factory
         InfectionConfig $infectionConfig,
         VersionParser $versionParser
     ) {
-        $this->tempDir = $tempDir;
+        $this->tmpDir = $tmpDir;
         $this->configLocator = $configLocator;
         $this->xmlConfigurationHelper = $xmlConfigurationHelper;
         $this->projectDir = $projectDir;
@@ -81,7 +81,7 @@ final class Factory
         $this->versionParser = $versionParser;
     }
 
-    public function create(string $adapterName): AbstractTestFrameworkAdapter
+    public function create(string $adapterName, bool $skipCoverage): AbstractTestFrameworkAdapter
     {
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
@@ -89,8 +89,15 @@ final class Factory
 
             return new PhpUnitAdapter(
                 new TestFrameworkExecutableFinder(TestFrameworkTypes::PHPUNIT, $this->infectionConfig->getPhpUnitCustomPath()),
-                new InitialConfigBuilder($this->tempDir, $phpUnitConfigContent, $this->xmlConfigurationHelper, $this->jUnitFilePath, $this->infectionConfig->getSourceDirs()),
-                new MutationConfigBuilder($this->tempDir, $phpUnitConfigContent, $this->xmlConfigurationHelper, $this->projectDir),
+                new InitialConfigBuilder(
+                    $this->tmpDir,
+                    $phpUnitConfigContent,
+                    $this->xmlConfigurationHelper,
+                    $this->jUnitFilePath,
+                    $this->infectionConfig->getSourceDirs(),
+                    $skipCoverage
+                ),
+                new MutationConfigBuilder($this->tmpDir, $phpUnitConfigContent, $this->xmlConfigurationHelper, $this->projectDir),
                 new ArgumentsAndOptionsBuilder(),
                 $this->versionParser
             );
@@ -101,8 +108,8 @@ final class Factory
 
             return new PhpSpecAdapter(
                 new TestFrameworkExecutableFinder(TestFrameworkTypes::PHPSPEC),
-                new PhpSpecInitialConfigBuilder($this->tempDir, $phpSpecConfigPath),
-                new PhpSpecMutationConfigBuilder($this->tempDir, $phpSpecConfigPath, $this->projectDir),
+                new PhpSpecInitialConfigBuilder($this->tmpDir, $phpSpecConfigPath, $skipCoverage),
+                new PhpSpecMutationConfigBuilder($this->tmpDir, $phpSpecConfigPath, $this->projectDir),
                 new PhpSpecArgumentsAndOptionsBuilder(),
                 $this->versionParser
             );

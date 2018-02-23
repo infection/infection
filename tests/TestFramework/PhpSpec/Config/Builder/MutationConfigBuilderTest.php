@@ -8,12 +8,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpSpec\Config\Builder;
 
-use Infection\Filesystem\Filesystem;
 use Infection\Mutant\Mutant;
 use Infection\Mutation;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use Infection\Utils\TmpDirectoryCreator;
 use Mockery;
+use Symfony\Component\Filesystem\Filesystem;
 
 class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {

@@ -35,8 +35,8 @@ use Infection\Mutator\Boolean\LogicalLowerOr;
 use Infection\Mutator\Boolean\LogicalNot;
 use Infection\Mutator\Boolean\LogicalOr;
 use Infection\Mutator\Boolean\TrueValue;
-use Infection\Mutator\ConditionalBoundary\GreaterThanOrEqualTo;
 use Infection\Mutator\ConditionalBoundary\GreaterThan;
+use Infection\Mutator\ConditionalBoundary\GreaterThanOrEqualTo;
 use Infection\Mutator\ConditionalBoundary\LessThan;
 use Infection\Mutator\ConditionalBoundary\LessThanOrEqualTo;
 use Infection\Mutator\ConditionalNegotiation\Equal;
@@ -49,10 +49,13 @@ use Infection\Mutator\ConditionalNegotiation\NotEqual;
 use Infection\Mutator\ConditionalNegotiation\NotIdentical;
 use Infection\Mutator\FunctionSignature\ProtectedVisibility;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
+use Infection\Mutator\Number\DecrementInteger;
+use Infection\Mutator\Number\IncrementInteger;
 use Infection\Mutator\Number\OneZeroFloat;
 use Infection\Mutator\Number\OneZeroInteger;
 use Infection\Mutator\Operator\Break_;
 use Infection\Mutator\Operator\Continue_;
+use Infection\Mutator\Operator\Throw_;
 use Infection\Mutator\ReturnValue\FloatNegation;
 use Infection\Mutator\ReturnValue\FunctionCall;
 use Infection\Mutator\ReturnValue\IntegerNegation;
@@ -60,6 +63,7 @@ use Infection\Mutator\ReturnValue\NewObject;
 use Infection\Mutator\ReturnValue\This;
 use Infection\Mutator\Sort\Spaceship;
 use Infection\Mutator\ZeroIteration\Foreach_;
+use Symfony\Component\Filesystem\Filesystem;
 
 class InfectionConfig
 {
@@ -117,6 +121,8 @@ class InfectionConfig
         NotIdentical::class,
 
         // Number
+        DecrementInteger::class,
+        IncrementInteger::class,
         OneZeroInteger::class,
         OneZeroFloat::class,
 
@@ -136,6 +142,7 @@ class InfectionConfig
 
         Break_::class,
         Continue_::class,
+        Throw_::class,
         Foreach_::class,
     ];
 
@@ -144,18 +151,30 @@ class InfectionConfig
      */
     private $config;
 
-    public function __construct(\stdClass $config)
+    /**
+     * @var Filesystem
+     */
+    private $filesystem;
+
+    /**
+     * @var string
+     */
+    private $configLocation;
+
+    public function __construct(\stdClass $config, Filesystem $filesystem, string $configLocation)
     {
         $this->config = $config;
+        $this->filesystem = $filesystem;
+        $this->configLocation = $configLocation;
     }
 
     public function getPhpUnitConfigDir(): string
     {
         if (isset($this->config->phpUnit->configDir)) {
-            return getcwd() . DIRECTORY_SEPARATOR . $this->config->phpUnit->configDir;
+            return $this->configLocation . DIRECTORY_SEPARATOR . $this->config->phpUnit->configDir;
         }
 
-        return getcwd();
+        return $this->configLocation;
     }
 
     public function getPhpUnitCustomPath()
@@ -194,10 +213,6 @@ class InfectionConfig
 
     private function getExcludes(): array
     {
-        if (isset($this->config->source->exclude) && is_array($this->config->source->exclude)) {
-            return $this->config->source->exclude;
-        }
-
         if (isset($this->config->source->excludes) && is_array($this->config->source->excludes)) {
             return $this->config->source->excludes;
         }
@@ -250,6 +265,16 @@ class InfectionConfig
 
     public function getTmpDir(): string
     {
-        return $this->config->tmpDir ?? sys_get_temp_dir();
+        if (empty($this->config->tmpDir)) {
+            return sys_get_temp_dir();
+        }
+
+        $tmpDir = $this->config->tmpDir;
+
+        if ($this->filesystem->isAbsolutePath($tmpDir)) {
+            return $tmpDir;
+        }
+
+        return sprintf('%s/%s', $this->configLocation, $tmpDir);
     }
 }

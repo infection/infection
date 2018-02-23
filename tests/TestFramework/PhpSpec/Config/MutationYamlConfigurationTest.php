@@ -20,6 +20,7 @@ class MutationYamlConfigurationTest extends TestCase
 
     private $defaultConfig = [
         'extensions' => [
+            'FirstExtension' => [],
             'PhpSpecCodeCoverageExtension' => [
                 'format' => ['xml', 'text'],
                 'output' => [
@@ -46,8 +47,18 @@ class MutationYamlConfigurationTest extends TestCase
 
         $parsedYaml = Yaml::parse($configuration->getYaml());
 
-        $this->assertCount(1, $parsedYaml['extensions']);
+        $this->assertCount(2, $parsedYaml['extensions']);
         $this->assertArrayNotHasKey('PhpSpecCodeCoverageExtension', $parsedYaml['extensions']);
+    }
+
+    public function test_it_returns_same_extensions_when_no_coverage_extension_found()
+    {
+        $originalParsedYaml = ['bootstrap' => '/path/to/adc', 'extensions' => []];
+        $configuration = $this->getConfigurationObject($originalParsedYaml);
+
+        $parsedYaml = Yaml::parse($configuration->getYaml());
+
+        $this->assertCount(0, $parsedYaml['extensions']);
     }
 
     public function test_it_sets_custom_autoloader_path()

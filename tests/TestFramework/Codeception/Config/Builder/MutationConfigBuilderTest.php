@@ -9,7 +9,7 @@ declare (strict_types = 1);
 
 namespace Infection\Tests\TestFramework\Codeception\Config\Builder;
 
-use Infection\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Filesystem;;
 use Infection\Mutant\Mutant;
 use Infection\Mutation;
 use Infection\TestFramework\Codeception\Config\Builder\MutationConfigBuilder;

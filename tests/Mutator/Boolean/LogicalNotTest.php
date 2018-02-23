@@ -10,16 +10,52 @@ namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\LogicalNot;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node\Expr\BooleanNot;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
 
-class LogicalNotTest extends AbstractMutator
+class LogicalNotTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {
         return new LogicalNot();
+    }
+
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It removes logical not' => [
+                <<<'PHP'
+<?php
+
+return !false;
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+return false;
+PHP
+                ,
+            ],
+            'It does not remove double logical not' => [
+                <<<'PHP'
+<?php
+
+return !!false;
+PHP
+                ,
+            ],
+        ];
     }
 
     public function test_it_mutates_logical_not()
@@ -36,33 +72,5 @@ class LogicalNotTest extends AbstractMutator
         );
 
         $this->assertFalse($this->mutator->shouldMutate($expr));
-    }
-
-    public function test_replaces_logical_not_with_empty_string()
-    {
-        $code = '<?php return !mt_rand();';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-return mt_rand();
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_does_not_replace_doubled_logical_not_with_empty_string()
-    {
-        $code = '<?php return !!false;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-return !!false;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
     }
 }

@@ -8,10 +8,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\ExecutableFinder;
 
-use Infection\Filesystem\Filesystem;
 use Infection\Php\ConfigBuilder;
 use Infection\Process\ExecutableFinder\PhpExecutableFinder;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 
 class PhpExecutableFinderTest extends TestCase
 {

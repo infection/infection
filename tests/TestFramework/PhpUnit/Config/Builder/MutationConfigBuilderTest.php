@@ -8,8 +8,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
-use Infection\Filesystem\Filesystem;
-use Infection\Finder\Locator;
 use Infection\Mutant\Mutant;
 use Infection\Mutation;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
@@ -17,6 +15,7 @@ use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\TmpDirectoryCreator;
 use Mockery;
+use Symfony\Component\Filesystem\Filesystem;
 use function Infection\Tests\normalizePath as p;
 
 class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
@@ -69,8 +68,7 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->mutant->shouldReceive('getMutatedFilePath')->andReturn('/mutated/file/path');
         $this->mutant->shouldReceive('getMutatedFileCode')->andReturn('<?php');
 
-        $replacer = new PathReplacer(new Locator([$this->pathToProject]));
-        $this->xmlConfigurationHelper = new XmlConfigurationHelper($replacer);
+        $this->xmlConfigurationHelper = new XmlConfigurationHelper(new PathReplacer($this->fileSystem, $this->pathToProject));
 
         $this->builder = new MutationConfigBuilder(
             $this->tmpDir,
@@ -171,7 +169,7 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
 
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit_root_test_suite.xml';
-        $replacer = new PathReplacer(new Locator([$this->pathToProject]));
+        $replacer = new PathReplacer($this->fileSystem, $this->pathToProject);
         $xmlConfigurationHelper = new XmlConfigurationHelper($replacer);
 
         $this->builder = new MutationConfigBuilder(
@@ -183,9 +181,7 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $configurationPath = $this->builder->build($this->mutant);
 
-        $xml = file_get_contents($configurationPath);
-
-        $this->assertEquals(1, $this->queryXpath($xml, '/phpunit/testsuite')->length);
+        $this->assertEquals(1, $this->queryXpath(file_get_contents($configurationPath), '/phpunit/testsuite')->length);
     }
 
     public function test_it_removes_original_loggers()
@@ -234,7 +230,7 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertSame($expectedFiles, $files);
     }
 
-    public function coverageTestsProvider()
+    public function coverageTestsProvider(): array
     {
         return [
             [

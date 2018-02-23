@@ -61,4 +61,29 @@ class MutationTest extends TestCase
 
         $this->assertFalse($mutation->isOnFunctionSignature());
     }
+
+    public function test_it_correctly_sets_original_file_ast()
+    {
+        $mutator = new Plus();
+        $attributes = [
+            'startLine' => 3,
+            'endLine' => 5,
+            'startTokenPos' => 21,
+            'endTokenPos' => 31,
+            'startFilePos' => 43,
+            'endFilePos' => 53,
+        ];
+        $fileAst = ['file' => 'ast'];
+
+        $mutation = new Mutation(
+            '/abc.php',
+            $fileAst,
+            $mutator,
+            $attributes,
+            'Interface_',
+            false
+        );
+
+        $this->assertSame($fileAst, $mutation->getOriginalFileAst());
+    }
 }

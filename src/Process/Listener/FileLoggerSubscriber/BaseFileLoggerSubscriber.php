@@ -11,8 +11,8 @@ use Infection\Config\InfectionConfig;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\MutationTestingFinished;
-use Infection\Filesystem\Filesystem;
 use Infection\Mutant\MetricsCalculator;
+use Symfony\Component\Filesystem\Filesystem;
 
 class BaseFileLoggerSubscriber implements EventSubscriberInterface
 {

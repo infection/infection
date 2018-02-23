@@ -10,15 +10,65 @@ namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\FalseValue;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
 
-class FalseValueTest extends AbstractMutator
+class FalseValueTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {
         return new FalseValue();
+    }
+
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates false to true' => [
+                <<<'PHP'
+<?php
+
+return false;
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+return true;
+PHP
+                ,
+            ],
+            'It does not mutate the string false to true' => [
+                <<<'PHP'
+<?php
+
+return 'false';
+PHP
+                ,
+            ],
+            'It mutates all caps false to true' => [
+                <<<'PHP'
+<?php
+
+return FALSE;
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+return true;
+PHP
+                ,
+            ],
+        ];
     }
 
     public function test_mutates_false_value()
@@ -33,19 +83,5 @@ class FalseValueTest extends AbstractMutator
         $falseValue = new ConstFetch(new Name('true'));
 
         $this->assertFalse($this->mutator->shouldMutate($falseValue));
-    }
-
-    public function test_replaces_false_with_true()
-    {
-        $code = '<?php return false;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-return true;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
     }
 }

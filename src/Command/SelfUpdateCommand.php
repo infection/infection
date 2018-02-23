@@ -8,13 +8,13 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Humbug\SelfUpdate\Strategy\GithubStrategy;
+use Humbug\SelfUpdate\Updater;
+use Humbug\SelfUpdate\VersionParser;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Humbug\SelfUpdate\Updater;
-use Humbug\SelfUpdate\VersionParser;
-use Humbug\SelfUpdate\Strategy\GithubStrategy;
 
 class SelfUpdateCommand extends Command
 {

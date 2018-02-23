@@ -10,26 +10,40 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\BitwiseNot;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class BitwiseNotTest extends AbstractMutator
+class BitwiseNotTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {
         return new BitwiseNot();
     }
 
-    public function test_replaces_bitwise_not_with_empty_string()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = '<?php ~2;';
-        $mutatedCode = $this->mutate($code);
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): array
+    {
+        return [
+            [
+                <<<'PHP'
+<?php
+
+~2;
+PHP
+                ,
+                <<<'PHP'
 <?php
 
 2;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+PHP
+                ,
+            ],
+        ];
     }
 }

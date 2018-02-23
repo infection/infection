@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Infection\Config\InfectionConfig;
 use Infection\Console\Application;
 use Infection\Console\Exception\InfectionException;
 use Infection\Console\Exception\InvalidOptionException;
@@ -16,7 +17,6 @@ use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\EventDispatcher\EventDispatcher;
-use Infection\Config\InfectionConfig;
 use Infection\Mutant\Exception\MsiCalculationException;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutant\MetricsCalculator;
@@ -42,10 +42,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
 /**
  * @method Application getApplication()
+ * @method SymfonyStyle getIO()
  */
 class InfectionCommand extends BaseCommand
 {
@@ -104,6 +106,13 @@ class InfectionCommand extends BaseCommand
                 'Custom configuration file path'
             )
             ->addOption(
+                'coverage',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Path to existing coverage (`xml` and `junit` reports are required)',
+                ''
+            )
+            ->addOption(
                 'mutators',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -147,18 +156,20 @@ class InfectionCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $container = $this->getContainer();
         $testFrameworkKey = $input->getOption('test-framework');
-        $adapter = $this->getContainer()->get('test.framework.factory')->create($testFrameworkKey);
+        $skipCoverage = strlen(trim($input->getOption('coverage'))) > 0;
+        $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $skipCoverage);
 
         $metricsCalculator = new MetricsCalculator();
 
         $this->registerSubscribers($metricsCalculator, $adapter);
 
-        $processBuilder = new ProcessBuilder($adapter, $this->getContainer()->get('infection.config')->getProcessTimeout());
+        $processBuilder = new ProcessBuilder($adapter, $container->get('infection.config')->getProcessTimeout());
         $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);
 
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
-        $initialTestSuitProcess = $initialTestsRunner->run($testFrameworkOptions->getForInitialProcess());
+        $initialTestSuitProcess = $initialTestsRunner->run($testFrameworkOptions->getForInitialProcess(), $skipCoverage);
 
         if (!$initialTestSuitProcess->isSuccessful()) {
             $this->logInitialTestsDoNotPass($initialTestSuitProcess, $testFrameworkKey);
@@ -168,21 +179,21 @@ class InfectionCommand extends BaseCommand
 
         $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
         $mutationsGenerator = new MutationsGenerator(
-            $this->getContainer()->get('src.dirs'),
-            $this->getContainer()->get('exclude.paths'),
+            $container->get('src.dirs'),
+            $container->get('exclude.paths'),
             $codeCoverageData,
             $this->getDefaultMutators(),
             $this->parseMutators($input->getOption('mutators')),
             $this->eventDispatcher,
-            $this->getContainer()->get('parser')
+            $container->get('parser')
         );
 
         $mutations = $mutationsGenerator->generate($input->getOption('only-covered'), $input->getOption('filter'));
 
         $mutationTestingRunner = new MutationTestingRunner(
             $processBuilder,
-            $this->getContainer()->get('parallel.process.runner'),
-            $this->getContainer()->get('mutant.creator'),
+            $container->get('parallel.process.runner'),
+            $container->get('mutant.creator'),
             $this->eventDispatcher,
             $mutations
         );
@@ -422,7 +433,7 @@ class InfectionCommand extends BaseCommand
             }
         }
 
-        $this->io = new SymfonyStyle($input, $output);
+        $this->io = $this->getApplication()->getIO();
         $this->eventDispatcher = $this->getContainer()->get('dispatcher');
     }
 }

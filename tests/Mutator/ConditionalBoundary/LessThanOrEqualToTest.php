@@ -10,26 +10,56 @@ namespace Infection\Tests\Mutator\ConditionalBoundary;
 
 use Infection\Mutator\ConditionalBoundary\LessThanOrEqualTo;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class LessThanOrEqualToTest extends AbstractMutator
+class LessThanOrEqualToTest extends AbstractMutatorTestCase
 {
-    public function test_replaces_greater_sign()
-    {
-        $code = '<?php 1 <= 2;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-1 < 2;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
     protected function getMutator(): Mutator
     {
         return new LessThanOrEqualTo();
+    }
+
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates less than or equal to' => [
+                <<<'PHP'
+<?php
+
+1 <= 2;
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+1 < 2;
+PHP
+                ,
+            ],
+            'It does not mutate an arrow' => [
+                <<<'PHP'
+<?php
+
+[1 => 2];
+PHP
+                ,
+            ],
+            'It does not mutate a spaceship' => [
+                <<<'PHP'
+<?php
+
+1 <=> 2;
+PHP
+                ,
+            ],
+        ];
     }
 }

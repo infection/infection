@@ -11,7 +11,7 @@ namespace Infection\Tests\Mutator\ReturnValue;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ReturnValue\FunctionCall;
 
-class FunctionCallTest extends AbstractValueToNullReturnValueTest
+class FunctionCallTest extends AbstractValueToNullReturnValueTestCase
 {
     protected function getMutator(): Mutator
     {

@@ -9,26 +9,48 @@ namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\LogicalLowerAnd;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class LogicalLowerAndTest extends AbstractMutator
+class LogicalLowerAndTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {
         return new LogicalLowerAnd();
     }
 
-    public function test_replaces_logical_lower_and_with_or()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = '<?php true and false;';
-        $mutatedCode = $this->mutate($code);
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates logical lower and' => [
+                <<<'PHP'
+<?php
+
+true and false;
+PHP
+                ,
+                <<<'PHP'
 <?php
 
 true or false;
-CODE;
+PHP
+                ,
+            ],
+            'It does not mutate logical and' => [
+                <<<'PHP'
+<?php
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+true && false;
+PHP
+                ,
+            ],
+        ];
     }
 }

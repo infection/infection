@@ -10,26 +10,40 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\Exponentiation;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ExponentiationTest extends AbstractMutator
+class ExponentiationTest extends AbstractMutatorTestCase
 {
     protected function getMutator(): Mutator
     {
         return new Exponentiation();
     }
 
-    public function test_replaces_multiplication_with_division()
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
     {
-        $code = '<?php 1 ** 2;';
-        $mutatedCode = $this->mutate($code);
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): array
+    {
+        return [
+            [
+                <<<'PHP'
+<?php
+
+1 ** 2;
+PHP
+                ,
+                <<<'PHP'
 <?php
 
 1 / 2;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+PHP
+                ,
+            ],
+        ];
     }
 }

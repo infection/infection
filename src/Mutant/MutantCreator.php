@@ -14,7 +14,6 @@ use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Visitor\CloneVisitor;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\NodeTraverser;
-use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
 
 class MutantCreator
@@ -30,20 +29,14 @@ class MutantCreator
     private $differ;
 
     /**
-     * @var Parser
-     */
-    private $parser;
-
-    /**
      * @var Standard
      */
     private $prettyPrinter;
 
-    public function __construct(string $tempDir, Differ $differ, Parser $parser, Standard $prettyPrinter)
+    public function __construct(string $tempDir, Differ $differ, Standard $prettyPrinter)
     {
         $this->tempDir = $tempDir;
         $this->differ = $differ;
-        $this->parser = $parser;
         $this->prettyPrinter = $prettyPrinter;
     }
 
@@ -51,26 +44,31 @@ class MutantCreator
 
     public function create(Mutation $mutation, CodeCoverageData $codeCoverageData): Mutant
     {
-        $originalFilePath = $mutation->getOriginalFilePath();
-
         $originalStatements = $mutation->getOriginalFileAst();
+
+        $mutatedFilePath = sprintf('%s/mutant.%s.infection.php', $this->tempDir, $mutation->getHash());
+
+        if (file_exists($mutatedFilePath)) {
+            $mutatedCode = file_get_contents($mutatedFilePath);
+        } else {
+            $traverser = new NodeTraverser();
+
+            $traverser->addVisitor(new CloneVisitor());
+            $traverser->addVisitor(new MutatorVisitor($mutation));
+
+            $mutatedStatements = $traverser->traverse($originalStatements);
+
+            $mutatedCode = $this->prettyPrinter->prettyPrintFile($mutatedStatements);
+
+            file_put_contents($mutatedFilePath, $mutatedCode);
+        }
+
+        $originalFilePath = $mutation->getOriginalFilePath();
 
         $originalPrettyPrintedFile = $this->prettyPrintedCache[$originalFilePath]
             ?? $this->prettyPrintedCache[$originalFilePath] = $this->prettyPrinter->prettyPrintFile($originalStatements);
 
-        $traverser = new NodeTraverser();
-
-        $traverser->addVisitor(new CloneVisitor());
-        $traverser->addVisitor(new MutatorVisitor($mutation));
-
-        $mutatedStatements = $traverser->traverse($originalStatements);
-
-        $mutatedCode = $this->prettyPrinter->prettyPrintFile($mutatedStatements);
-        $mutatedFilePath = sprintf('%s/mutant.%s.infection.php', $this->tempDir, $mutation->getHash());
-
         $diff = $this->differ->diff($originalPrettyPrintedFile, $mutatedCode);
-
-        file_put_contents($mutatedFilePath, $mutatedCode);
 
         $isCoveredByTest = $this->isCoveredByTest($mutation, $codeCoverageData);
 

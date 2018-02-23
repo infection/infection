@@ -8,10 +8,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpSpec\Config\Builder;
 
-use Infection\Filesystem\Filesystem;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder;
 use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 
 class InitialConfigBuilderTest extends TestCase
 {
@@ -47,7 +47,7 @@ class InitialConfigBuilderTest extends TestCase
     {
         $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/phpspec/phpspec.yml';
 
-        $builder = new InitialConfigBuilder($this->tmpDir, $originalYamlConfigPath);
+        $builder = new InitialConfigBuilder($this->tmpDir, $originalYamlConfigPath, false);
 
         $this->assertSame($this->tmpDir . '/phpspecConfiguration.initial.infection.yml', $builder->build());
     }

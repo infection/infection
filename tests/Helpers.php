@@ -10,8 +10,12 @@ namespace Infection\Tests;
 
 /**
  * Normalizes path. Replaces backslashes with forward ones
+ *
+ * @param string $value
+ *
+ * @return string
  */
-function normalizePath(string $value)
+function normalizePath(string $value): string
 {
     return str_replace(DIRECTORY_SEPARATOR, '/', $value);
 }

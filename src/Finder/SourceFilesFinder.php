@@ -8,44 +8,64 @@ declare(strict_types=1);
 
 namespace Infection\Finder;
 
+use Infection\Finder\Iterator\RealPathFilterIterator;
 use Symfony\Component\Finder\Finder;
 
-class SourceFilesFinder
+class SourceFilesFinder extends Finder
 {
+    /**
+     * @var string[]
+     */
     private $sourceDirectories;
+
+    /**
+     * @var string[]
+     */
     private $excludeDirectories;
 
     /**
-     * @param string[] $sourceDirectories
-     * @param string[] $excludeDirectories
+     * @var string[]
      */
+    private $filters = [];
+
     public function __construct(array $sourceDirectories, array $excludeDirectories)
     {
+        parent::__construct();
+
         $this->sourceDirectories = $sourceDirectories;
         $this->excludeDirectories = $excludeDirectories;
     }
 
     public function getSourceFiles(string $filter = ''): Finder
     {
-        $finder = new Finder();
-
-        array_walk($this->excludeDirectories, function ($excludePath) use ($finder) {
-            $finder->notPath($excludePath);
-        });
-
-        if ('' === $filter) {
-            $finder->in($this->sourceDirectories)->files()->name('*.php');
-
-            return $finder;
+        foreach ($this->excludeDirectories as $excludeDirectory) {
+            $this->notPath($excludeDirectory);
         }
 
-        $finder->in('.')->files();
+        $this->in($this->sourceDirectories)->files();
+
+        if ('' === $filter) {
+            $this->name('*.php');
+
+            return $this;
+        }
 
         $filters = explode(',', $filter);
-        array_walk($filters, function ($fileFilter) use ($finder) {
-            $finder->path($fileFilter);
-        });
+        foreach ($filters as $filter) {
+            $this->filters[] = $filter;
+        }
 
-        return $finder;
+        return $this;
+    }
+
+    public function getIterator()
+    {
+        $iterator = parent::getIterator();
+
+        if ($this->filters) {
+            $iterator = new RealPathFilterIterator($iterator, $this->filters, []);
+        }
+
+        return $iterator;
     }
 }

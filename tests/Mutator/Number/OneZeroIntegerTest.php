@@ -10,40 +10,77 @@ namespace Infection\Tests\Mutator\Number;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Number\OneZeroInteger;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class OneZeroIntegerTest extends AbstractMutator
+class OneZeroIntegerTest extends AbstractMutatorTestCase
 {
-    public function test_it_mutates_zero_to_one_integer()
-    {
-        $code = '<?php 10 + 0;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-10 + 1;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_mutates_one_to_zero_integer()
-    {
-        $code = '<?php 10 + 1;';
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-10 + 0;
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
     protected function getMutator(): Mutator
     {
         return new OneZeroInteger();
+    }
+
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): array
+    {
+        return [
+            'It mutates int one to zero' => [
+                <<<'PHP'
+<?php
+
+10 + 1;
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+10 + 0;
+PHP
+                ,
+            ],
+            'It mutates int zero to one' => [
+                <<<'PHP'
+<?php
+
+10 + 0;
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+10 + 1;
+PHP
+                ,
+            ],
+            'It does not mutate float zero to one' => [
+                <<<'PHP'
+<?php
+
+10 + 0.0;
+PHP
+                ,
+            ],
+            'It does not mutate float one to zer0' => [
+                <<<'PHP'
+<?php
+
+10 + 1.0;
+PHP
+                ,
+            ],
+            'It does not mutate the string zero' => [
+                <<<'PHP'
+<?php
+
+'a' . '0';
+PHP
+            ],
+        ];
     }
 }

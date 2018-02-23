@@ -6,32 +6,32 @@
  */
 declare(strict_types=1);
 
-use Pimple\Container;
-use Infection\Utils\TmpDirectoryCreator;
-use Infection\TestFramework\Factory;
+use Infection\Config\InfectionConfig;
+use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
+use Infection\EventDispatcher\EventDispatcher;
+use Infection\Finder\Locator;
 use Infection\Mutant\MutantCreator;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
-use Infection\EventDispatcher\EventDispatcher;
-use Infection\Filesystem\Filesystem;
-use Infection\Finder\Locator;
 use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
-use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
-use Infection\TestFramework\PhpUnit\Coverage\PhpUnitTestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileDataProvider;
-use Infection\TestFramework\Coverage\CodeCoverageData;
-use Infection\Differ\DiffColorizer;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
-use Infection\Config\InfectionConfig;
-use Infection\Utils\VersionParser;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
+use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\Coverage\TestFileDataProvider;
+use Infection\TestFramework\Factory;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
+use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
-use SebastianBergmann\Diff\Differ as BaseDiffer;
+use Infection\TestFramework\PhpUnit\Coverage\PhpUnitTestFileDataProvider;
+use Infection\Utils\TmpDirectoryCreator;
+use Infection\Utils\VersionParser;
 use PhpParser\Lexer;
-use PhpParser\ParserFactory;
 use PhpParser\Parser;
+use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
+use Pimple\Container;
+use SebastianBergmann\Diff\Differ as BaseDiffer;
+use Symfony\Component\Filesystem\Filesystem;
 
 $c = new Container();
 
@@ -57,12 +57,20 @@ $c['tmp.dir.creator'] = function (Container $c): TmpDirectoryCreator {
     return new TmpDirectoryCreator($c['filesystem']);
 };
 
-$c['coverage.dir.phpunit'] = function (Container $c): string {
-    return $c['tmp.dir'] . '/' . CodeCoverageData::PHP_UNIT_COVERAGE_DIR;
+$c['tmp.dir'] = function (Container $c): string {
+    return $c['tmp.dir.creator']->createAndGet($c['infection.config']->getTmpDir());
 };
 
-$c['coverage.dir.phpspec'] = function (Container $c): string {
-    return $c['tmp.dir'] . '/' . CodeCoverageData::PHP_SPEC_COVERAGE_DIR;
+$c['coverage.dir.phpunit'] = function (Container $c) {
+    return sprintf('%s/%s', $c['coverage.path'], CodeCoverageData::PHP_UNIT_COVERAGE_DIR);
+};
+
+$c['coverage.dir.phpspec'] = function (Container $c) {
+    return sprintf('%s/%s', $c['coverage.path'], CodeCoverageData::PHP_SPEC_COVERAGE_DIR);
+};
+
+$c['phpunit.junit.file.path'] = function (Container $c) {
+    return sprintf('%s/%s', $c['coverage.path'], PhpUnitAdapter::JUNIT_FILE_NAME);
 };
 
 $c['coverage.dir.codeception'] = function (Container $c): string {
@@ -70,11 +78,11 @@ $c['coverage.dir.codeception'] = function (Container $c): string {
 };
 
 $c['locator'] = function (Container $c): Locator {
-    return new Locator([$c['project.dir']]);
+    return new Locator([$c['project.dir']], $c['filesystem']);
 };
 
 $c['path.replacer'] = function (Container $c): PathReplacer {
-    return new PathReplacer($c['locator'], $c['phpunit.config.dir']);
+    return new PathReplacer($c['filesystem'], $c['phpunit.config.dir']);
 };
 
 $c['test.framework.factory'] = function (Container $c): Factory {
@@ -86,7 +94,7 @@ $c['xml.configuration.helper'] = function (Container $c): XmlConfigurationHelper
 };
 
 $c['mutant.creator'] = function (Container $c): MutantCreator {
-    return new MutantCreator($c['tmp.dir'], $c['differ'], $c['parser'], $c['pretty.printer']);
+    return new MutantCreator($c['tmp.dir'], $c['differ'], $c['pretty.printer']);
 };
 
 $c['differ'] = function (): Differ {
@@ -109,10 +117,6 @@ $c['testframework.config.locator'] = function (Container $c): TestFrameworkConfi
 
 $c['diff.colorizer'] = function (): DiffColorizer {
     return new DiffColorizer();
-};
-
-$c['phpunit.junit.file.path'] = function (Container $c): string {
-    return $c['tmp.dir'] . '/' . PhpUnitAdapter::JUNIT_FILE_NAME;
 };
 
 $c['test.file.data.provider.phpunit'] = function (Container $c): TestFileDataProvider {

@@ -8,8 +8,8 @@
 namespace Infection\Process\Listener\FileLoggerSubscriber;
 
 use Infection\Config\InfectionConfig;
-use Infection\Filesystem\Filesystem;
 use Infection\Mutant\MetricsCalculator;
+use Symfony\Component\Filesystem\Filesystem;
 
 abstract class FileLogger
 {

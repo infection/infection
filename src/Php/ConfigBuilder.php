@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Infection\Php;
 
-use Infection\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Exception\IOException;
 
 final class ConfigBuilder
 {

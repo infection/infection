@@ -8,13 +8,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
-use Infection\Filesystem\Filesystem;
-use Infection\Finder\Locator;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\TmpDirectoryCreator;
 use Mockery;
+use Symfony\Component\Filesystem\Filesystem;
 use function Infection\Tests\normalizePath as p;
 
 class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
@@ -31,6 +30,9 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
      */
     private $fileSystem;
 
+    /**
+     * @var string
+     */
     private $pathToProject;
 
     /**
@@ -55,30 +57,31 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->createConfigBuilder();
     }
 
-    private function createConfigBuilder($phpUnitXmlConfigPath = null)
+    protected function tearDown()
+    {
+        $this->fileSystem->remove($this->workspace);
+    }
+
+    private function createConfigBuilder(string $phpUnitXmlConfigPath = null, bool $skipCoverage = false)
     {
         $phpunitXmlPath = $phpUnitXmlConfigPath ?: __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit.xml';
 
         $jUnitFilePath = '/path/to/junit.xml';
         $srcDirs = ['src', 'app'];
 
-        $replacer = new PathReplacer(new Locator([$this->pathToProject]));
+        $replacer = new PathReplacer($this->fileSystem, $this->pathToProject);
 
         $this->builder = new InitialConfigBuilder(
             $this->tmpDir,
             file_get_contents($phpunitXmlPath),
             new XmlConfigurationHelper($replacer),
             $jUnitFilePath,
-            $srcDirs
+            $srcDirs,
+            $skipCoverage
         );
     }
 
-    protected function tearDown()
-    {
-        $this->fileSystem->remove($this->workspace);
-    }
-
-    public function test_it_replaces_test_suite_directory_wildcard()
+    public function test_it_replaces_relative_path_to_absolute_path()
     {
         $configurationPath = $this->builder->build();
 
@@ -87,9 +90,8 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         /** @var \DOMNodeList $directories */
         $directories = $this->queryXpath($xml, '/phpunit/testsuites/testsuite/directory');
 
-        $this->assertSame(2, $directories->length);
-        $this->assertSame($this->pathToProject . '/AnotherBundle', p($directories[0]->nodeValue));
-        $this->assertSame($this->pathToProject . '/SomeBundle', p($directories[1]->nodeValue));
+        $this->assertSame(1, $directories->length);
+        $this->assertSame($this->pathToProject . '/*Bundle', p($directories[0]->nodeValue));
     }
 
     public function test_it_replaces_bootstrap_file()
@@ -127,6 +129,19 @@ class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertSame($this->tmpDir . '/coverage-xml', $logEntries[0]->getAttribute('target'));
         $this->assertSame('coverage-xml', $logEntries[0]->getAttribute('type'));
         $this->assertSame('junit', $logEntries[1]->getAttribute('type'));
+    }
+
+    public function test_it_does_not_add_coverage_loggers_if_should_be_skipped()
+    {
+        $this->createConfigBuilder(null, true);
+        $configurationPath = $this->builder->build();
+
+        $xml = file_get_contents($configurationPath);
+
+        /** @var \DOMNodeList $logEntries */
+        $logEntries = $this->queryXpath($xml, '/phpunit/logging/log');
+
+        $this->assertSame(0, $logEntries->length);
     }
 
     public function test_it_creates_coverage_filter_whitelist_node_if_does_not_exist()

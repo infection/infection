@@ -23,10 +23,16 @@ class InitialConfigBuilder implements ConfigBuilder
      */
     private $originalYamlConfigPath;
 
-    public function __construct(string $tempDirectory, string $originalYamlConfigPath)
+    /**
+     * @var bool
+     */
+    private $skipCoverage;
+
+    public function __construct(string $tempDirectory, string $originalYamlConfigPath, bool $skipCoverage)
     {
         $this->tempDirectory = $tempDirectory;
         $this->originalYamlConfigPath = $originalYamlConfigPath;
+        $this->skipCoverage = $skipCoverage;
     }
 
     public function build(): string
@@ -35,7 +41,8 @@ class InitialConfigBuilder implements ConfigBuilder
 
         $yamlConfiguration = new InitialYamlConfiguration(
             $this->tempDirectory,
-            Yaml::parse(file_get_contents($this->originalYamlConfigPath))
+            Yaml::parse(file_get_contents($this->originalYamlConfigPath)),
+            $this->skipCoverage
         );
 
         file_put_contents($path, $yamlConfiguration->getYaml());

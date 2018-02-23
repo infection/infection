@@ -11,20 +11,34 @@ namespace Infection\Tests\Mutator;
 use Infection\Mutator\Mutator;
 use Infection\Tests\Fixtures\SimpleMutatorVisitor;
 use Infection\Visitor\CloneVisitor;
-use Infection\Visitor\WrappedFunctionInfoCollectorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
-use PHPUnit\Framework\TestCase;
+use Infection\Visitor\WrappedFunctionInfoCollectorVisitor;
 use PhpParser\Lexer;
+use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
-use PhpParser\NodeTraverser;
+use PHPUnit\Framework\TestCase;
 
-abstract class AbstractMutator extends TestCase
+abstract class AbstractMutatorTestCase extends TestCase
 {
     /**
      * @var Mutator
      */
     protected $mutator;
+
+    public function doTest(string $inputCode, string $expectedCode = null)
+    {
+        if ($inputCode === $expectedCode) {
+            throw new \LogicException('Input code cant be the same as mutated code');
+        }
+
+        $realMutatedCode = $this->mutate($inputCode);
+        if ($expectedCode !== null) {
+            $this->assertSame($expectedCode, $realMutatedCode);
+        } else {
+            $this->assertSame($inputCode, $realMutatedCode);
+        }
+    }
 
     abstract protected function getMutator(): Mutator;
 
