@@ -23,7 +23,7 @@ class CodeceptionAdapterTest extends MockeryTestCase
     /**
      * @dataProvider passProvider
      */
-    public function test_it_determines_whether_tests_pass_or_not($output, $expectedResult)
+    public function test_it_determines_whether_tests_pass_or_not(string $output, bool $expectedResult)
     {
         $executableFined = Mockery::mock(AbstractExecutableFinder::class);
         $initialConfigBuilder = Mockery::mock(InitialConfigBuilder::class);
@@ -40,11 +40,9 @@ class CodeceptionAdapterTest extends MockeryTestCase
 
     public function passProvider()
     {
-        return [
-            ['OK, but incomplete, skipped, or risky tests!', true],
-            ['OK (5 tests, 3 assertions)', true],
-            ['FAILURES!', false],
-            ['ERRORS!', false],
-        ];
+        yield ['OK, but incomplete, skipped, or risky tests!', true];
+        yield ['OK (5 tests, 3 assertions)', true];
+        yield ['FAILURES!', false];
+        yield ['ERRORS!', false];
     }
 }

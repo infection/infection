@@ -17,11 +17,11 @@ class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilde
     /**
      * @var string
      */
-    private $tempDir;
+    private $tmpDir;
 
-    public function __construct(string $tempDir)
+    public function __construct(string $tmpDir)
     {
-        $this->tempDir = $tempDir;
+        $this->tmpDir = $tmpDir;
     }
 
     public function build(string $configPath, string $extraOptions, Mutant $mutant = null): string
