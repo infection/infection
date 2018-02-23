@@ -14,11 +14,6 @@ use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
 
-function rp(string $path) : string
-{
-    return realpath(substr($path, 0, -1)) . '*';
-}
-
 class YamlConfigurationHelperTest extends TestCase
 {
     /**
@@ -100,7 +95,7 @@ EOS;
         $config = Yaml::parse($configurationHelper->getTransformedConfig());
 
         $this->assertSame(true, $config['coverage']['enabled']);
-        $this->assertSame([rp($this->projectDir . '/src/*')], array_map('\Infection\Tests\TestFramework\Codeception\Config\rp', $config['coverage']['include']));
+        $this->assertSame([self::rp($this->projectDir . '/src/*')], array_map(YamlConfigurationHelperTest::class . '::rp', $config['coverage']['include']));
         $this->assertSame([], $config['coverage']['exclude']);
     }
 
@@ -138,7 +133,12 @@ EOS;
         $config = Yaml::parse($configurationHelper->getTransformedConfig('.', true));
 
         $this->assertSame(true, $config['coverage']['enabled']);
-        $this->assertSame([rp($this->projectDir . '/src/*')], array_map('\Infection\Tests\TestFramework\Codeception\Config\rp', $config['coverage']['include']));
+        $this->assertSame([self::rp($this->projectDir . '/src/*')], array_map(YamlConfigurationHelperTest::class . '::rp', $config['coverage']['include']));
         $this->assertSame([], $config['coverage']['exclude']);
+    }
+
+    private static function rp(string $path) : string
+    {
+        return realpath(substr($path, 0, -1)) . '*';
     }
 }

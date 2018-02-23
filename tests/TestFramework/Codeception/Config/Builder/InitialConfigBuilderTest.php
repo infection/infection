@@ -10,7 +10,6 @@ namespace Infection\Tests\TestFramework\Codeception\Config\Builder;
 
 use Infection\Filesystem\Filesystem;
 use Infection\TestFramework\Codeception\Config\Builder\InitialConfigBuilder;
-use function Infection\Tests\TestFramework\Codeception\Config\rp;
 use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
@@ -65,7 +64,12 @@ class InitialConfigBuilderTest extends TestCase
         $this->assertSame(realpath($this->projectDir . '/tests/_support'), realpath($config['paths']['support']));
         $this->assertSame(realpath($this->projectDir . '/tests/_envs'), realpath($config['paths']['envs']));
         $this->assertSame(true, $config['coverage']['enabled']);
-        $this->assertSame([rp($this->projectDir . '/src/*')], array_map('\Infection\Tests\TestFramework\Codeception\Config\rp', $config['coverage']['include']));
+        $this->assertSame([self::rp($this->projectDir . '/src/*')], array_map(InitialConfigBuilderTest::class . '::rp', $config['coverage']['include']));
         $this->assertSame([], $config['coverage']['exclude']);
+    }
+
+    private static function rp(string $path) : string
+    {
+        return realpath(substr($path, 0, -1)) . '*';
     }
 }
