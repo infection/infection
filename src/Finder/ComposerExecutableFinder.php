@@ -9,11 +9,13 @@ declare(strict_types=1);
 
 namespace Infection\Finder;
 
+use Infection\Finder\Exception\FinderException;
+use Infection\Process\ExecutableFinder\PhpExecutableFinder;
 use Symfony\Component\Process\ExecutableFinder;
 
 final class ComposerExecutableFinder extends AbstractExecutableFinder
 {
-    public function find(bool $includeArgs = true): string
+    public function find(): string
     {
         $probable = ['composer', 'composer.phar'];
         $finder = new ExecutableFinder();
@@ -29,15 +31,21 @@ final class ComposerExecutableFinder extends AbstractExecutableFinder
          * Check for options without execute permissions and prefix the PHP
          * executable instead.
          */
-        $result = $this->searchNonExecutables($probable, $immediatePaths, $includeArgs);
+        $path = $this->searchNonExecutables($probable, $immediatePaths);
 
-        if (null !== $result) {
-            return $result;
+        if (null !== $path) {
+            return $this->makeExecutable($path);
         }
 
-        throw new \RuntimeException(
-            'Unable to locate a Composer executable on local system. Ensure '
-            . 'that Composer is installed and available.'
+        throw FinderException::composerNotFound();
+    }
+
+    private function makeExecutable(string $path): string
+    {
+        return sprintf(
+            '%s %s',
+            (new PhpExecutableFinder())->find(),
+            $path
         );
     }
 }

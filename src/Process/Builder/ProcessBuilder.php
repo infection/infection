@@ -12,7 +12,6 @@ namespace Infection\Process\Builder;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
 class ProcessBuilder
@@ -69,14 +68,6 @@ class ProcessBuilder
         return $process;
     }
 
-    /**
-     * @throws RuntimeException
-     *
-     * @param Mutant $mutant
-     * @param string $testFrameworkExtraOptions
-     *
-     * @return MutantProcess
-     */
     public function getProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
     {
         $process = new Process(

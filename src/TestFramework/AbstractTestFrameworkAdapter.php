@@ -11,6 +11,7 @@ namespace Infection\TestFramework;
 
 use Infection\Finder\AbstractExecutableFinder;
 use Infection\Mutant\Mutant;
+use Infection\Process\ExecutableFinder\PhpExecutableFinder;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\Utils\VersionParser;
@@ -21,7 +22,7 @@ abstract class AbstractTestFrameworkAdapter
     /**
      * @var AbstractExecutableFinder
      */
-    private $phpExecutableFinder;
+    private $testFrameworkFinder;
 
     /**
      * @var CommandLineArgumentsAndOptionsBuilder
@@ -43,14 +44,24 @@ abstract class AbstractTestFrameworkAdapter
      */
     private $versionParser;
 
+    /**
+     * @var string
+     */
+    private $cachedPhpPath;
+
+    /**
+     * @var bool
+     */
+    private $cachedIncludedArgs;
+
     public function __construct(
-        AbstractExecutableFinder $phpExecutableFinder,
+        AbstractExecutableFinder $testFrameworkFinder,
         InitialConfigBuilder $initialConfigBuilder,
         MutationConfigBuilder $mutationConfigBuilder,
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
         VersionParser $versionParser
     ) {
-        $this->phpExecutableFinder = $phpExecutableFinder;
+        $this->testFrameworkFinder = $testFrameworkFinder;
         $this->initialConfigBuilder = $initialConfigBuilder;
         $this->mutationConfigBuilder = $mutationConfigBuilder;
         $this->argumentsAndOptionsBuilder = $argumentsAndOptionsBuilder;
@@ -64,10 +75,12 @@ abstract class AbstractTestFrameworkAdapter
     /**
      * Returns path to the test framework's executable
      *
-     * Example:
+     * Examples:
      *     bin/phpspec [arguments] [--options]
      *     bin/phpunit
      *     vendor/phpunit/phpunit/phpunit
+     *     /usr/bin/php bin/phpunit
+     *     bin/phpunit.bat
      *
      * @param string $configPath
      * @param string $extraOptions
@@ -83,13 +96,60 @@ abstract class AbstractTestFrameworkAdapter
         array $phpExtraOptions = []
     ): string {
         return sprintf(
-            '%s %s %s',
-            $this->phpExecutableFinder->find($includePhpArgs),
-            implode(' ', $phpExtraOptions),
+            '%s %s',
+            $this->makeExecutable(
+                $this->testFrameworkFinder->find(),
+                $includePhpArgs,
+                $phpExtraOptions
+            ),
             $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions)
         );
     }
 
+    /**
+     * Prefix commands with exec outside Windows to ensure process timeouts are enforced and end PHP processes properly.
+     *
+     * @param string $frameworkPath
+     * @param bool $includeArgs
+     * @param array $phpExtraArgs
+     *
+     * @return string
+     */
+    private function makeExecutable(string $frameworkPath, bool $includeArgs = true, array $phpExtraArgs = []): string
+    {
+        $frameworkPath = realpath($frameworkPath);
+
+        if (\defined('PHP_WINDOWS_VERSION_BUILD')) {
+            if (false !== strpos($frameworkPath, '.bat')) {
+                return $frameworkPath;
+            }
+
+            return sprintf(
+                '%s %s %s',
+                $this->findPhp($includeArgs),
+                implode(' ', $phpExtraArgs),
+                $frameworkPath
+            );
+        }
+
+        return sprintf(
+            '%s %s %s %s',
+            'exec',
+            $this->findPhp($includeArgs),
+            implode(' ', $phpExtraArgs),
+            $frameworkPath
+        );
+    }
+
+    private function findPhp(bool $includeArgs = true): string
+    {
+        if ($this->cachedPhpPath === null || $this->cachedIncludedArgs !== $includeArgs ) {
+            $this->cachedPhpPath = (new PhpExecutableFinder())->find($includeArgs);
+        }
+
+        return $this->cachedPhpPath;
+    }
+    
     public function buildInitialConfigFile(): string
     {
         return $this->initialConfigBuilder->build();
@@ -105,14 +165,13 @@ abstract class AbstractTestFrameworkAdapter
         $process = new Process(
             sprintf(
                 '%s %s',
-                $this->phpExecutableFinder->find(),
+                $this->makeExecutable($this->testFrameworkFinder->find()),
                 '--version'
             )
         );
 
         $process->mustRun();
-        $versionOutput = $process->getOutput();
 
-        return $this->versionParser->parse($versionOutput);
+        return $this->versionParser->parse($process->getOutput());
     }
 }

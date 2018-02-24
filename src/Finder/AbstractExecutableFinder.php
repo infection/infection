@@ -9,20 +9,17 @@ declare(strict_types=1);
 
 namespace Infection\Finder;
 
-use Infection\Process\ExecutableFinder\PhpExecutableFinder;
-
 abstract class AbstractExecutableFinder
 {
-    abstract public function find(bool $includeArgs = true): string;
+    abstract public function find(): string;
 
     /**
      * @param array $probableNames
      * @param array $extraDirectories
-     * @param bool $includeArgs
      *
      * @return string|null
      */
-    protected function searchNonExecutables(array $probableNames, array $extraDirectories = [], bool $includeArgs = true)
+    protected function searchNonExecutables(array $probableNames, array $extraDirectories = [])
     {
         $dirs = array_merge(
             explode(PATH_SEPARATOR, getenv('PATH') ?: getenv('Path')),
@@ -32,19 +29,11 @@ abstract class AbstractExecutableFinder
         foreach ($dirs as $dir) {
             foreach ($probableNames as $name) {
                 $path = sprintf('%s/%s', $dir, $name);
+
                 if (file_exists($path)) {
-                    return $this->makeExecutable($path, $includeArgs);
+                    return $path;
                 }
             }
         }
-    }
-
-    protected function makeExecutable(string $path, bool $includeArgs = true): string
-    {
-        return sprintf(
-            '%s %s',
-            (new PhpExecutableFinder())->find($includeArgs),
-            $path
-        );
     }
 }

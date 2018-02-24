@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace Infection\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
-use Infection\Finder\Exception\TestFrameworkExecutableFinderNotFound;
-use Infection\Finder\TestFrameworkExecutableFinder;
+use Infection\Finder\Exception\FinderException;
+use Infection\Finder\TestFrameworkFinder;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,7 +20,7 @@ use Symfony\Component\Console\Question\Question;
 class PhpUnitCustomExecutablePathProvider
 {
     /**
-     * @var TestFrameworkExecutableFinder
+     * @var TestFrameworkFinder
      */
     private $phpUnitExecutableFinder;
     /**
@@ -33,7 +33,7 @@ class PhpUnitCustomExecutablePathProvider
      */
     private $questionHelper;
 
-    public function __construct(TestFrameworkExecutableFinder $phpUnitExecutableFinder, ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
+    public function __construct(TestFrameworkFinder $phpUnitExecutableFinder, ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
     {
         $this->phpUnitExecutableFinder = $phpUnitExecutableFinder;
         $this->consoleHelper = $consoleHelper;
@@ -44,7 +44,7 @@ class PhpUnitCustomExecutablePathProvider
     {
         try {
             $this->phpUnitExecutableFinder->find();
-        } catch (TestFrameworkExecutableFinderNotFound $e) {
+        } catch (FinderException $e) {
             $output->writeln(['']);
 
             $questionText = $this->consoleHelper->getQuestion(
