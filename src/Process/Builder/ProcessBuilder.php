@@ -51,12 +51,14 @@ class ProcessBuilder
                 $includeArgs
             ),
             null,
-            array_replace($_ENV, $_SERVER),
+            $includeArgs ? array_replace($_ENV, $_SERVER) : [],
             null,
             null
         );
 
-        $process->inheritEnvironmentVariables();
+        if ($includeArgs) {
+            $process->inheritEnvironmentVariables();
+        }
 
         return $process;
     }
