@@ -28,7 +28,7 @@ class FullyQualifiedClassNameVisitorTest extends TestCase
 
     public function test_it_adds_fqcl_to_class_node()
     {
-        $code = file_get_contents(__DIR__ . '/../Fixtures/Autoloaded/Fqcn/fqcn-empty-class.php');
+        $code = $this->getFileContent('fqcn-empty-class.php');
 
         $this->parseAndTraverse($code);
 
@@ -41,7 +41,7 @@ class FullyQualifiedClassNameVisitorTest extends TestCase
 
     public function test_it_adds_fqcl_to_class_with_interface()
     {
-        $code = file_get_contents(__DIR__ . '/../Fixtures/Autoloaded/Fqcn/fqcn-class-interface.php');
+        $code = $this->getFileContent('fqcn-class-interface.php');
 
         $this->parseAndTraverse($code);
 
@@ -54,7 +54,7 @@ class FullyQualifiedClassNameVisitorTest extends TestCase
 
     public function test_it_adds_fqcl_to_class_with_anonymous_class()
     {
-        $code = file_get_contents(__DIR__ . '/../Fixtures/Autoloaded/Fqcn/fqcn-anonymous-class.php');
+        $code = $this->getFileContent('fqcn-anonymous-class.php');
 
         $this->parseAndTraverse($code);
 
@@ -97,5 +97,10 @@ class FullyQualifiedClassNameVisitorTest extends TestCase
         $traverser->addVisitor($this->spyVisitor);
 
         $traverser->traverse($nodes);
+    }
+
+    private function getFileContent(string $file): string
+    {
+        return file_get_contents(sprintf(__DIR__ . '/../Fixtures/Autoloaded/Fqcn/%s', $file));
     }
 }

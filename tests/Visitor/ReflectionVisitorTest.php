@@ -45,7 +45,7 @@ class ReflectionVisitorTest extends TestCase
         ]);
 
         $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
-        $this->code = file_get_contents(__DIR__ . '/../Fixtures/Autoloaded/Reflection/rv-part-of-signature-flag.php');
+        $this->code = $this->getFileContent('rv-part-of-signature-flag.php');
     }
 
     /**
@@ -70,7 +70,7 @@ class ReflectionVisitorTest extends TestCase
 
     public function test_it_detects_if_traversed_inside_class_method()
     {
-        $code = file_get_contents(__DIR__ . '/../Fixtures/Autoloaded/Reflection/rv-inside-class-method.php');
+        $code = $this->getFileContent('rv-inside-class-method.php');
 
         $this->parseAndTraverse($code);
 
@@ -79,7 +79,7 @@ class ReflectionVisitorTest extends TestCase
 
     public function test_it_detects_if_traversed_inside_function()
     {
-        $code = file_get_contents(__DIR__ . '/../Fixtures/Autoloaded/Reflection/rv-inside-function.php');
+        $code = $this->getFileContent('rv-inside-function.php');
 
         $this->parseAndTraverse($code);
 
@@ -88,7 +88,7 @@ class ReflectionVisitorTest extends TestCase
 
     public function test_it_detects_if_traversed_inside_closure()
     {
-        $code = file_get_contents(__DIR__ . '/../Fixtures/Autoloaded/Reflection/rv-inside-closure.php');
+        $code = $this->getFileContent('rv-inside-closure.php');
 
         $this->parseAndTraverse($code);
 
@@ -97,7 +97,7 @@ class ReflectionVisitorTest extends TestCase
 
     public function test_it_does_not_add_inside_function_flag_if_not_needed()
     {
-        $code = file_get_contents(__DIR__ . '/../Fixtures/Autoloaded/Reflection/rv-without-function.php');
+        $code = $this->getFileContent('rv-without-function.php');
 
         $this->parseAndTraverse($code);
 
@@ -180,5 +180,10 @@ class ReflectionVisitorTest extends TestCase
         $traverser->addVisitor($this->spyVisitor);
 
         $traverser->traverse($nodes);
+    }
+
+    private function getFileContent(string $file): string
+    {
+        return file_get_contents(sprintf(__DIR__ . '/../Fixtures/Autoloaded/Reflection/%s', $file));
     }
 }
