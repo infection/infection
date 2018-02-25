@@ -4,12 +4,12 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Command;
 
 use Infection\Config\InfectionConfig;
-use Infection\Console\Application;
 use Infection\Console\Exception\InfectionException;
 use Infection\Console\Exception\InvalidOptionException;
 use Infection\Console\LogVerbosity;
@@ -42,13 +42,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
-/**
- * @method Application getApplication()
- * @method SymfonyStyle getIO()
- */
 class InfectionCommand extends BaseCommand
 {
     const CI_FLAG_ERROR = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
@@ -62,6 +57,11 @@ class InfectionCommand extends BaseCommand
      * @var EventDispatcher
      */
     private $eventDispatcher;
+
+    /**
+     * @var bool
+     */
+    private $skipCoverage;
 
     protected function configure()
     {
@@ -158,8 +158,7 @@ class InfectionCommand extends BaseCommand
     {
         $container = $this->getContainer();
         $testFrameworkKey = $input->getOption('test-framework');
-        $skipCoverage = strlen(trim($input->getOption('coverage'))) > 0;
-        $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $skipCoverage);
+        $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $this->skipCoverage);
 
         $metricsCalculator = new MetricsCalculator();
 
@@ -169,7 +168,7 @@ class InfectionCommand extends BaseCommand
         $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);
 
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
-        $initialTestSuitProcess = $initialTestsRunner->run($testFrameworkOptions->getForInitialProcess(), $skipCoverage);
+        $initialTestSuitProcess = $initialTestsRunner->run($testFrameworkOptions->getForInitialProcess(), $this->skipCoverage);
 
         if (!$initialTestSuitProcess->isSuccessful()) {
             $this->logInitialTestsDoNotPass($initialTestSuitProcess, $testFrameworkKey);
@@ -435,5 +434,6 @@ class InfectionCommand extends BaseCommand
 
         $this->io = $this->getApplication()->getIO();
         $this->eventDispatcher = $this->getContainer()->get('dispatcher');
+        $this->skipCoverage = \strlen(trim($input->getOption('coverage'))) > 0;
     }
 }

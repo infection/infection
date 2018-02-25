@@ -4,6 +4,7 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Process\Builder;
@@ -44,17 +45,23 @@ class ProcessBuilder
     {
         $includeArgs = PHP_SAPI === 'phpdbg' || $skipCoverage;
 
-        return new Process(
+        $process = new Process(
             $this->testFrameworkAdapter->getExecutableCommandLine(
                 $this->testFrameworkAdapter->buildInitialConfigFile(),
                 $testFrameworkExtraOptions,
                 $includeArgs
             ),
             null,
-            [],
+            $includeArgs ? array_replace($_ENV, $_SERVER) : [],
             null,
             null
         );
+
+        if ($includeArgs) {
+            $process->inheritEnvironmentVariables();
+        }
+
+        return $process;
     }
 
     /**

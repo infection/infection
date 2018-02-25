@@ -4,6 +4,7 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Console;
@@ -25,7 +26,8 @@ class Application extends BaseApplication
 {
     const NAME = 'Infection - PHP Mutation Testing Framework';
     const VERSION = '@package_version@';
-    const RUNNING_WITH_NOTE = 'You are running Infection with %s enabled.';
+    const RUNNING_WITH_DEBUGGER_NOTE = 'You are running Infection with %s enabled.';
+
     const LOGO = <<<'ASCII'
     ____      ____          __  _
    /  _/___  / __/__  _____/ /_(_)___  ____ 
@@ -77,18 +79,24 @@ ASCII;
         $this->io = new SymfonyStyle($input, $output);
 
         if (PHP_SAPI === 'phpdbg') {
-            $this->io->writeln(sprintf(self::RUNNING_WITH_NOTE, PHP_SAPI));
+            $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, PHP_SAPI));
         } elseif ($this->isXdebugLoaded) {
-            $this->io->writeln(sprintf(self::RUNNING_WITH_NOTE, 'xdebug'));
+            $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, 'xdebug'));
         }
 
         $xdebug = new XdebugHandler(new ConfigBuilder(sys_get_temp_dir()));
         $xdebug->check();
 
-        if (PHP_SAPI !== 'phpdbg' && $this->isDebuggerDisabled && !$this->isXdebugLoaded) {
-            $this->io->error([
+        if (PHP_SAPI !== 'phpdbg'
+            && $this->isDebuggerDisabled
+            && !$this->isXdebugLoaded
+            && !$input->hasParameterOption('--coverage', true)
+        ) {
+            $this->io->writeln([
                 'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:',
-                '- Enable xdebug and run infection again' . PHP_EOL . '- Use phpdbg: phpdbg -qrr infection',
+                '- Enable xdebug and run infection again' . PHP_EOL .
+                '- Use phpdbg: phpdbg -qrr infection' . PHP_EOL .
+                '- Use --coverage option with path to the existing coverage report',
             ]);
 
             return 1;
