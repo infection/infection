@@ -93,7 +93,7 @@ ASCII;
             && !$input->hasParameterOption('--coverage', true)
             && !$this->isInitialTestPhpOptionHasXdebug($input)
         ) {
-            $this->io->writeln([
+            $this->io->error([
                 'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:',
                 '- Enable xdebug and run infection again' . PHP_EOL .
                 '- Use phpdbg: phpdbg -qrr infection' . PHP_EOL .

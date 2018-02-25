@@ -143,13 +143,13 @@ abstract class AbstractTestFrameworkAdapter
 
     private function findPhp(bool $includeArgs = true): string
     {
-        if ($this->cachedPhpPath === null || $this->cachedIncludedArgs !== $includeArgs ) {
+        if ($this->cachedPhpPath === null || $this->cachedIncludedArgs !== $includeArgs) {
             $this->cachedPhpPath = (new PhpExecutableFinder())->find($includeArgs);
         }
 
         return $this->cachedPhpPath;
     }
-    
+
     public function buildInitialConfigFile(): string
     {
         return $this->initialConfigBuilder->build();
