@@ -23,6 +23,10 @@ final class ComposerExecutableFinder extends AbstractExecutableFinder
 
         foreach ($probable as $name) {
             if ($path = $finder->find($name, null, $immediatePaths)) {
+                if (false === strpos($path, '.phar')) {
+                    return $path;
+                }
+
                 return $this->makeExecutable($path);
             }
         }
