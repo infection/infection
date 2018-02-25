@@ -4,10 +4,13 @@ namespace SameParent;
 
 class SameParent
 {
-    public function foo() {}
+    public function foo()
+    {
+    }
 }
-
 class Child extends SameParent
 {
-    public function foo() {}
+    public function foo()
+    {
+    }
 }

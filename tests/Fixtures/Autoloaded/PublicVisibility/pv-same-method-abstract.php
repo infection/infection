@@ -4,10 +4,11 @@ namespace SameAbstract;
 
 abstract class SameAbstract
 {
-    abstract public function foo();
+    public abstract function foo();
 }
-
 class Child extends SameAbstract
 {
-    public function foo() {}
+    public function foo()
+    {
+    }
 }

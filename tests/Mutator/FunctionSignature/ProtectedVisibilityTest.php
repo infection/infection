@@ -11,17 +11,28 @@ namespace Infection\Tests\Mutator\FunctionSignature;
 
 use Infection\Mutator\FunctionSignature\ProtectedVisibility;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ProtectedVisibilityTest extends AbstractMutator
+class ProtectedVisibilityTest extends AbstractMutatorTestCase
 {
-    public function test_changes_protected_to_private_method_visibility()
+    protected function getMutator(): Mutator
     {
-        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/ProtectedVisibility/pv-one-class.php');
+        return new ProtectedVisibility();
+    }
 
-        $mutatedCode = $this->mutate($code);
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): \Generator
+    {
+        yield 'It mutates protected to private' => [
+            $this->getFileContent('pv-one-class.php'),
+            <<<'PHP'
 <?php
 
 namespace ProtectedVisibilityOneClass;
@@ -34,18 +45,55 @@ class Test
         return false;
     }
 }
-CODE;
+PHP
+            ,
+        ];
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
+        yield 'It does not mutate final flag' => [
+            $this->getFileContent('pv-final.php'),
+            <<<'PHP'
+<?php
 
-    public function test_it_does_not_change_static_flag()
+namespace ProtectedVisibilityFinal;
+
+class Test
+{
+    private final function foo(int $param, $test = 1) : bool
     {
-        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/ProtectedVisibility/pv-static.php');
+        echo 1;
+        return false;
+    }
+}
+PHP
+            ,
+        ];
 
-        $mutatedCode = $this->mutate($code);
+        yield 'It does not mutate abstract protected to private' => [
+            $this->getFileContent('pv-abstract.php'),
+        ];
 
-        $expectedMutatedCode = <<<'CODE'
+        yield 'It does mutate not abstract protected to private in an abstract class' => [
+            $this->getFileContent('pv-abstract-class-protected-method.php'),
+            <<<'PHP'
+<?php
+
+namespace ProtectedVisibilityAbstractClassProtectedMethod;
+
+abstract class Test
+{
+    private function foo(int $param, $test = 1) : bool
+    {
+        echo 1;
+        return false;
+    }
+}
+PHP
+            ,
+        ];
+
+        yield 'It does not mutate static flag' => [
+            $this->getFileContent('pv-static.php'),
+            <<<'PHP'
 <?php
 
 namespace ProtectedVisibilityStatic;
@@ -58,38 +106,13 @@ class Test
         return false;
     }
 }
-CODE;
+PHP
+            ,
+        ];
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_does_not_change_abstract_protected_function()
-    {
-        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/ProtectedVisibility/pv-abstract.php');
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-namespace ProtectedVisibilityAbstract;
-
-abstract class Test
-{
-    protected abstract function foo(int $param, $test = 1) : bool;
-}
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_does_not_mutate_if_parent_abstract_has_same_protected_method()
-    {
-        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/ProtectedVisibility/pv-same-method-abstract.php');
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
+        yield 'It does not mutate if parent abstract has same protected method' => [
+            $this->getFileContent('pv-same-method-abstract.php'),
+            <<<'PHP'
 <?php
 
 namespace ProtectedSameAbstract;
@@ -104,18 +127,13 @@ class Child extends SameAbstract
     {
     }
 }
-CODE;
+PHP
+            ,
+        ];
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_does_not_mutate_if_parent_class_has_same_protected_method()
-    {
-        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/ProtectedVisibility/pv-same-method-parent.php');
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
+        yield 'It does not mutate if parent class has same protected method' => [
+            $this->getFileContent('pv-same-method-parent.php'),
+            <<<'PHP'
 <?php
 
 namespace ProtectedSameParent;
@@ -132,18 +150,13 @@ class Child extends SameParent
     {
     }
 }
-CODE;
+PHP
+            ,
+        ];
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_does_not_mutate_if_grand_parent_class_has_same_protected_method()
-    {
-        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/ProtectedVisibility/pv-same-method-grandparent.php');
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
+        yield 'it does not mutate if grand parent class has same protected method' => [
+            $this->getFileContent('pv-same-method-grandparent.php'),
+            <<<'PHP'
 <?php
 
 namespace ProtectedSameGrandParent;
@@ -163,37 +176,13 @@ class Child extends SameParent
     {
     }
 }
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+PHP
+            ,
+        ];
     }
 
-    public function test_it_does_not_change_final_flag()
+    private function getFileContent(string $file): string
     {
-        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/ProtectedVisibility/pv-final.php');
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-namespace ProtectedVisibilityFinal;
-
-class Test
-{
-    private final function foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    protected function getMutator(): Mutator
-    {
-        return new ProtectedVisibility();
+        return file_get_contents(sprintf(__DIR__ . '/../../Fixtures/Autoloaded/ProtectedVisibility/%s', $file));
     }
 }

@@ -4,7 +4,7 @@ namespace FunctionCall_NotMutatesWithNotNullableTypehint;
 
 class Test
 {
-    function test(): bool
+    function test() : bool
     {
         return count([]);
     }

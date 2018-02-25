@@ -11,16 +11,67 @@ namespace Infection\Tests\Mutator\FunctionSignature;
 
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\Mutator\Mutator;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class PublicVisibilityTest extends AbstractMutator
+class PublicVisibilityTest extends AbstractMutatorTestCase
 {
-    public function test_changes_public_to_protected_method_visibility()
+    /**
+     * @dataProvider blacklistedProvider
+     */
+    public function test_it_does_not_modify_blacklisted_functions(string $functionName, string $args = '', string $modifier = '')
     {
-        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/PublicVisibility/pv-one-class.php');
-        $mutatedCode = $this->mutate($code);
+        $code = $this->getFileContent("pv-{$functionName}.php");
 
-        $expectedMutatedCode = <<<'CODE'
+        $expectedMutatedCode = <<<"PHP"
+<?php
+
+namespace PublicVisibility{$functionName};
+
+class Test
+{
+    public {$modifier}function {$functionName}($args)
+    {
+    }
+}
+PHP;
+
+        $this->doTest($code, $expectedMutatedCode);
+    }
+
+    public function blacklistedProvider(): array
+    {
+        return [
+            ['__construct'],
+            ['__invoke'],
+            ['__call', '$n, $v'],
+            ['__callStatic', '$n, $v', 'static '],
+            ['__get', '$n'],
+            ['__set', '$n, $v'],
+            ['__isset', '$n'],
+            ['__unset', '$n'],
+            ['__toString'],
+            ['__debugInfo'],
+        ];
+    }
+
+    protected function getMutator(): Mutator
+    {
+        return new PublicVisibility();
+    }
+
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): \Generator
+    {
+        yield 'It mutates public to protected' => [
+            $this->getFileContent('pv-one-class.php'),
+                <<<'PHP'
 <?php
 
 namespace PublicVisibilityOneClass;
@@ -33,62 +84,13 @@ class Test
         return false;
     }
 }
-CODE;
+PHP
+                ,
+            ];
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_does_not_change_static_flag()
-    {
-        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/PublicVisibility/pv-static.php');
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-namespace PublicVisibilityStatic;
-
-class Test
-{
-    protected static function foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_does_not_change_abstract_flag()
-    {
-        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/PublicVisibility/pv-abstract.php');
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-namespace PublicVisibilityAbstract;
-
-abstract class Test
-{
-    protected abstract function foo(int $param, $test = 1) : bool;
-}
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_does_not_change_final_flag()
-    {
-        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/PublicVisibility/pv-final.php');
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
+        yield 'It does not mutate final flag' => [
+            $this->getFileContent('pv-final.php'),
+            <<<'PHP'
 <?php
 
 namespace PublicVisibilityFinal;
@@ -101,43 +103,51 @@ class Test
         return false;
     }
 }
-CODE;
+PHP
+            ,
+        ];
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    /**
-     * @dataProvider blacklistedProvider
-     */
-    public function test_it_does_not_modify_blacklisted_functions(string $functionName, string $args = '', string $modifier = '')
-    {
-        $code = file_get_contents(__DIR__ . "/../../Fixtures/Autoloaded/PublicVisibility/pv-{$functionName}.php");
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<"CODE"
+        yield 'It mutates non abstract public to protected in an abstract class' => [
+            $this->getFileContent('pv-non-abstract-in-abstract-class.php'),
+            <<<'PHP'
 <?php
 
-namespace PublicVisibility{$functionName};
+namespace PublicVisibilityNonAbstractInAbstractClass;
+
+abstract class Test
+{
+    protected function foo(int $param, $test = 1) : bool
+    {
+        echo 1;
+        return false;
+    }
+}
+PHP
+            ,
+        ];
+
+        yield 'It does not mutate static flag' => [
+            $this->getFileContent('pv-static.php'),
+        <<<'PHP'
+<?php
+
+namespace PublicVisibilityStatic;
 
 class Test
 {
-    public {$modifier}function {$functionName}($args)
+    protected static function foo(int $param, $test = 1) : bool
     {
+        echo 1;
+        return false;
     }
 }
-CODE;
+PHP
+        ,
+        ];
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_replaces_visibility_if_not_set()
-    {
-        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/PublicVisibility/pv-not-set.php');
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
+        yield 'It replaces visibility if not set' => [
+            $this->getFileContent('pv-not-set.php'),
+            <<<'PHP'
 <?php
 
 namespace PublicVisibilityNotSet;
@@ -148,102 +158,33 @@ class Test
     {
     }
 }
-CODE;
+PHP
+            ,
+        ];
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
+        yield 'It does not mutate an interface' => [
+            $this->getFileContent('pv-interface.php'),
+        ];
 
-    public function test_it_does_not_mutate_if_interface_has_same_public_method()
-    {
-        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/PublicVisibility/pv-same-method-interface.php');
+        yield 'It does not mutate an abstract function' => [
+            $this->getFileContent('pv-abstract.php'),
+        ];
 
-        $mutatedCode = $this->mutate($code);
+        yield 'It does not mutate if interface has same public method' => [
+            $this->getFileContent('pv-same-method-interface.php'),
+        ];
 
-        $expectedMutatedCode = <<<'CODE'
-<?php
+        yield 'It does not mutate if any of interfaces has same public method' => [
+            $this->getFileContent('pv-same-method-any-interface.php'),
+        ];
 
-namespace Infection\Tests\Files\Autoloaded;
+        yield 'It does not mutate if parent abstract has same public method' => [
+            $this->getFileContent('pv-same-method-abstract.php'),
+        ];
 
-interface SomeInterface
-{
-    public function foo();
-}
-class Child implements SomeInterface
-{
-    public function foo()
-    {
-    }
-}
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_does_not_mutate_if_any_of_interfaces_has_same_public_method()
-    {
-        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/PublicVisibility/pv-same-method-any-interface.php');
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-namespace PublicVisibility_AnyInterface;
-
-interface FirstInterface
-{
-}
-interface SecondInterface
-{
-    public function foo();
-}
-interface ThirdInterface
-{
-}
-class Child implements FirstInterface, SecondInterface, ThirdInterface
-{
-    public function foo()
-    {
-    }
-}
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_does_not_mutate_if_parent_abstract_has_same_public_method()
-    {
-        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/PublicVisibility/pv-same-method-abstract.php');
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
-<?php
-
-namespace SameAbstract;
-
-abstract class SameAbstract
-{
-    protected abstract function foo();
-}
-class Child extends SameAbstract
-{
-    public function foo()
-    {
-    }
-}
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_does_not_mutate_if_parent_class_has_same_public_method()
-    {
-        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/PublicVisibility/pv-same-method-parent.php');
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
+        yield 'It does not mutate if parent class has same public method' => [
+            $this->getFileContent('pv-same-method-parent.php'),
+            <<<'PHP'
 <?php
 
 namespace SameParent;
@@ -260,38 +201,13 @@ class Child extends SameParent
     {
     }
 }
-CODE;
+PHP
+            ,
+        ];
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_does_not_modify_interface_methods()
-    {
-        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/PublicVisibility/pv-interface.php');
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<"CODE"
-<?php
-
-namespace TestInterface;
-
-interface TestInterface
-{
-    public function test();
-}
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_does_not_mutate_if_grandparent_class_has_same_public_method()
-    {
-        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/PublicVisibility/pv-same-method-grandparent.php');
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'CODE'
+        yield 'it does not mutate if grandparent class has same public method' => [
+            file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/PublicVisibility/pv-same-method-grandparent.php'),
+            <<<'PHP'
 <?php
 
 namespace SameGrandParent;
@@ -311,29 +227,13 @@ class Child extends SameParent
     {
     }
 }
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function blacklistedProvider()
-    {
-        return [
-            ['__construct'],
-            ['__invoke'],
-            ['__call', '$n, $v'],
-            ['__callStatic', '$n, $v', 'static '],
-            ['__get', '$n'],
-            ['__set', '$n, $v'],
-            ['__isset', '$n'],
-            ['__unset', '$n'],
-            ['__toString'],
-            ['__debugInfo'],
+PHP
+            ,
         ];
     }
 
-    protected function getMutator(): Mutator
+    private function getFileContent(string $file): string
     {
-        return new PublicVisibility();
+        return file_get_contents(sprintf(__DIR__ . '/../../Fixtures/Autoloaded/PublicVisibility/%s', $file));
     }
 }

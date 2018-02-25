@@ -11,17 +11,28 @@ namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ReturnValue\This;
-use Infection\Tests\Mutator\AbstractMutator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ThisTest extends AbstractMutator
+class ThisTest extends AbstractMutatorTestCase
 {
-    public function test_mutates_returning_this()
+    protected function getMutator(): Mutator
     {
-        $code = file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/This_/this_return-this.php');
+        return new This();
+    }
 
-        $mutatedCode = $this->mutate($code);
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null)
+    {
+        $this->doTest($input, $expected);
+    }
 
-        $expectedMutatedCode = <<<'CODE'
+    public function provideMutationCases(): \Generator
+    {
+        yield 'It does not mutate with not nullable return typehint' => [
+            $this->getFileContent('this_return-this.php'),
+            <<<'PHP'
 <?php
 
 namespace This_ReturnThis;
@@ -33,13 +44,12 @@ class Test
         return null;
     }
 }
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+PHP
+        ];
     }
 
-    protected function getMutator(): Mutator
+    private function getFileContent(string $file): string
     {
-        return new This();
+        return file_get_contents(sprintf(__DIR__ . '/../../Fixtures/Autoloaded/This_/%s', $file));
     }
 }

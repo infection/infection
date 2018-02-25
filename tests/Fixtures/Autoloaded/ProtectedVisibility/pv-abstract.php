@@ -4,5 +4,5 @@ namespace ProtectedVisibilityAbstract;
 
 abstract class Test
 {
-    abstract protected function foo(int $param, $test = 1): bool;
+    protected abstract function foo(int $param, $test = 1) : bool;
 }

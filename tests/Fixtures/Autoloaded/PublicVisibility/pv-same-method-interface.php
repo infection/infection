@@ -6,8 +6,9 @@ interface SomeInterface
 {
     public function foo();
 }
-
 class Child implements SomeInterface
 {
-    public function foo() {}
+    public function foo()
+    {
+    }
 }

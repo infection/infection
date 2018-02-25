@@ -4,7 +4,7 @@ namespace NewObject_NotMutatesWithNotNullableTypehint;
 
 class Test
 {
-    function test(): \stdClass
+    function test() : \stdClass
     {
         return new \stdClass();
     }
