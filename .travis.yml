@@ -30,7 +30,7 @@ matrix:
 
 env:
   global:
-    - INFECTION_FLAGS='--threads=4 --min-msi=62 --min-covered-msi=89 --coverage=coverage'
+    - INFECTION_FLAGS='--threads=4 --min-msi=61 --min-covered-msi=89 --coverage=coverage'
     - PHPUNIT_BIN='vendor/bin/phpunit --coverage-clover=clover.xml --coverage-xml=coverage/coverage-xml --log-junit=coverage/phpunit.junit.xml'
 
 cache:
