@@ -11,11 +11,10 @@ namespace Infection\Tests\Mutator;
 
 use Infection\Mutator\Mutator;
 use Infection\Tests\Fixtures\SimpleMutatorVisitor;
-use Infection\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\Visitor\ReflectionVisitor;
 use Infection\Visitor\CloneVisitor;
+use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
-use Infection\Visitor\WrappedFunctionInfoCollectorVisitor;
+use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Lexer;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;

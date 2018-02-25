@@ -4,13 +4,14 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Visitor;
 
 use PhpParser\Node;
-use PhpParser\Node\Stmt;
 use PhpParser\Node\Name;
+use PhpParser\Node\Stmt;
 use PhpParser\NodeVisitorAbstract;
 
 /**

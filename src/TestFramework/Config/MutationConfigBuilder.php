@@ -15,7 +15,7 @@ abstract class MutationConfigBuilder
 {
     abstract public function build(Mutant $mutant): string;
 
-    protected function getInterceptorFileContent(string $interceptorPath, string $originalFilePath, string $mutatedFilePath)
+    protected function getInterceptorFileContent(string $interceptorPath, string $originalFilePath, string $mutatedFilePath): string
     {
         $infectionPhar = '';
 
@@ -40,7 +40,7 @@ IncludeInterceptor::enable();
 CONTENT;
     }
 
-    private function getInterceptorNamespacePrefix()
+    private function getInterceptorNamespacePrefix(): string
     {
         return strstr(__NAMESPACE__, 'Infection', true);
     }

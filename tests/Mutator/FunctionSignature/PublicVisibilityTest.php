@@ -206,7 +206,7 @@ PHP
         ];
 
         yield 'it does not mutate if grandparent class has same public method' => [
-            file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/PublicVisibility/pv-same-method-grandparent.php'),
+            $this->getFileContent('pv-same-method-grandparent.php'),
             <<<'PHP'
 <?php
 
