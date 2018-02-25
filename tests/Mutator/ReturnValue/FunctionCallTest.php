@@ -34,27 +34,6 @@ class FunctionCallTest extends AbstractMutatorTestCase
             $this->getFileContent('fc-not-mutates-with-not-nullable-typehint.php'),
         ];
 
-        yield 'It mutates when function contains another function but returns function call and null allowed' => [
-            $this->getFileContent('fc-contains-another-func-and-null-allowed.php'),
-            <<<"PHP"
-<?php
-
-namespace FunctionCall_ContainsAnotherFunctionAndNullAllowed;
-
-class Test
-{
-    function test()
-    {
-        \$a = function (\$element) : ?int {
-            return \$element;
-        };
-        count([]);
-        return null;
-    }
-}
-PHP
-        ];
-
         yield 'It does not mutates when return typehint FQCN does not allow null' => [
             $this->getFileContent('fc-not-mutates-return-typehint-fqcn-does-not-allow-null.php'),
         ];
@@ -172,6 +151,36 @@ class Test
 {
     function test() : ?int
     {
+        count([]);
+        return null;
+    }
+}
+PHP;
+
+        $this->assertSame($expectedMutatedCode, $mutatedCode);
+    }
+
+    public function test_it_mutates_when_function_contains_another_function_but_returns_function_call_and_null_allowed()
+    {
+        if (\PHP_VERSION_ID < 70100) {
+            $this->markTestSkipped('Current PHP version does not support nullable return typehint.');
+        }
+
+        $code = $this->getFileContent('fc-contains-another-func-and-null-allowed.php');
+        $mutatedCode = $this->mutate($code);
+
+        $expectedMutatedCode = <<<"PHP"
+<?php
+
+namespace FunctionCall_ContainsAnotherFunctionAndNullAllowed;
+
+class Test
+{
+    function test()
+    {
+        \$a = function (\$element) : ?int {
+            return \$element;
+        };
         count([]);
         return null;
     }
