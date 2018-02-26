@@ -12,7 +12,6 @@ namespace Infection\Process\Builder;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
 class ProcessBuilder
@@ -38,18 +37,23 @@ class ProcessBuilder
      *
      * @param string $testFrameworkExtraOptions
      * @param bool $skipCoverage
+     * @param array $phpExtraOptions
      *
      * @return Process
      */
-    public function getProcessForInitialTestRun(string $testFrameworkExtraOptions, bool $skipCoverage): Process
-    {
+    public function getProcessForInitialTestRun(
+        string $testFrameworkExtraOptions,
+        bool $skipCoverage,
+        array $phpExtraOptions = []
+    ): Process {
         $includeArgs = PHP_SAPI === 'phpdbg' || $skipCoverage;
 
         $process = new Process(
             $this->testFrameworkAdapter->getExecutableCommandLine(
                 $this->testFrameworkAdapter->buildInitialConfigFile(),
                 $testFrameworkExtraOptions,
-                $includeArgs
+                $includeArgs,
+                $phpExtraOptions
             ),
             null,
             $includeArgs ? array_replace($_ENV, $_SERVER) : [],
@@ -64,14 +68,6 @@ class ProcessBuilder
         return $process;
     }
 
-    /**
-     * @throws RuntimeException
-     *
-     * @param Mutant $mutant
-     * @param string $testFrameworkExtraOptions
-     *
-     * @return MutantProcess
-     */
     public function getProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
     {
         $process = new Process(
