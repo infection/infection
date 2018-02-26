@@ -34,7 +34,7 @@ class ReflectionVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node)
     {
-        if ($node instanceof Node\Stmt\ClassLike) {
+        if ($node instanceof Node\Stmt\ClassLike && $node->fullyQualifiedClassName !== null) {
             $this->reflectionClass = new \ReflectionClass($node->fullyQualifiedClassName->toString());
         }
 

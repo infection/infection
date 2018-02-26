@@ -104,7 +104,16 @@ class ReflectionVisitorTest extends TestCase
         $this->assertFalse($this->spyVisitor->isInsideFunction);
     }
 
-    public function isPartOfSignatureFlagProvider()
+    public function test_it_correctly_works_with_anonymous_classes()
+    {
+        $code = $this->getFileContent('rv-anonymous-class.php');
+
+        $this->parseAndTraverse($code);
+
+        $this->assertTrue($this->spyVisitor->isInsideFunction);
+    }
+
+    public function isPartOfSignatureFlagProvider(): array
     {
         return [
             [Node\Stmt\ClassMethod::class, true],
