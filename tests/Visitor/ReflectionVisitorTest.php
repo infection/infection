@@ -15,6 +15,7 @@ use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Lexer;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
@@ -113,6 +114,17 @@ class ReflectionVisitorTest extends TestCase
         $this->assertTrue($this->spyVisitor->isInsideFunction);
     }
 
+    public function test_it_sets_reflection_class_to_nodes()
+    {
+        $code = $this->getFileContent('rv-inside-class-method.php');
+        $reflectionSpyVisitor = $this->getReflectionClassSpyVisitor();
+
+        $this->parseAndTraverse($code, $reflectionSpyVisitor);
+
+        $this->assertInstanceOf(\ReflectionClass::class, $reflectionSpyVisitor->reflectionClass);
+        $this->assertSame(\InfectionReflectionClassMethod\Foo::class, $reflectionSpyVisitor->reflectionClass->getName());
+    }
+
     public function isPartOfSignatureFlagProvider(): array
     {
         return [
@@ -177,7 +189,24 @@ class ReflectionVisitorTest extends TestCase
         };
     }
 
-    private function parseAndTraverse($code)
+    private function getReflectionClassSpyVisitor()
+    {
+        return new class() extends NodeVisitorAbstract {
+            /** @var \ReflectionClass */
+            public $reflectionClass;
+
+            public function enterNode(Node $node)
+            {
+                if ($node->hasAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY)) {
+                    $this->reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
+
+                    return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+                }
+            }
+        };
+    }
+
+    private function parseAndTraverse(string $code, NodeVisitor $nodeVisitor = null)
     {
         $nodes = $this->getNodes($code);
 
@@ -186,7 +215,7 @@ class ReflectionVisitorTest extends TestCase
         $traverser->addVisitor(new ParentConnectorVisitor());
         $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
         $traverser->addVisitor(new ReflectionVisitor());
-        $traverser->addVisitor($this->spyVisitor);
+        $traverser->addVisitor($nodeVisitor ?: $this->spyVisitor);
 
         $traverser->traverse($nodes);
     }
