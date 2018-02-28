@@ -43,11 +43,7 @@ class PathReplacer
             );
 
             // remove all occurrences of "/./". realpath can't be used because of glob patterns
-            $newPath = str_replace(
-                sprintf('%s.%s', DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR),
-                DIRECTORY_SEPARATOR,
-                $newPath
-            );
+            $newPath = str_replace('/./', DIRECTORY_SEPARATOR, $newPath);
 
             $domElement->nodeValue = $newPath;
         }
