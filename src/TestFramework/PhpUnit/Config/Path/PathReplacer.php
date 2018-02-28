@@ -35,12 +35,21 @@ class PathReplacer
     public function replaceInNode(\DOMNode $domElement)
     {
         if (!$this->filesystem->isAbsolutePath($domElement->nodeValue)) {
-            $domElement->nodeValue = sprintf(
+            $newPath = sprintf(
                 '%s%s%s',
                 $this->phpUnitConfigDir,
                 DIRECTORY_SEPARATOR,
-                ltrim($domElement->nodeValue, '\.\/')
+                ltrim($domElement->nodeValue, '\/')
             );
+
+            // remove all occurrences of "/./". realpath can't be used because of glob patterns
+            $newPath = str_replace(
+                sprintf('%s.%s', DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR),
+                DIRECTORY_SEPARATOR,
+                $newPath
+            );
+
+            $domElement->nodeValue = $newPath;
         }
     }
 }
