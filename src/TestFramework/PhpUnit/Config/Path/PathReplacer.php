@@ -36,14 +36,13 @@ class PathReplacer
     {
         if (!$this->filesystem->isAbsolutePath($domElement->nodeValue)) {
             $newPath = sprintf(
-                '%s%s%s',
+                '%s/%s',
                 $this->phpUnitConfigDir,
-                DIRECTORY_SEPARATOR,
                 ltrim($domElement->nodeValue, '\/')
             );
 
             // remove all occurrences of "/./". realpath can't be used because of glob patterns
-            $newPath = str_replace('/./', DIRECTORY_SEPARATOR, $newPath);
+            $newPath = str_replace('/./', '/', $newPath);
 
             $domElement->nodeValue = $newPath;
         }
