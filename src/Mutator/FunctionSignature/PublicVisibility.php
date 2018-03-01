@@ -49,6 +49,14 @@ class PublicVisibility extends Mutator
             return false;
         }
 
+        if (!$node->isPublic()) {
+            return false;
+        }
+
+        if ($node->isAbstract()) {
+            return false;
+        }
+
         if ($this->isBlacklistedFunction($node->name)) {
             return false;
         }
@@ -57,15 +65,7 @@ class PublicVisibility extends Mutator
             return false;
         }
 
-        if ($this->hasSamePublicParentMethod($node)) {
-            return false;
-        }
-
-        if ($node->isAbstract()) {
-            return false;
-        }
-
-        return $node->isPublic();
+        return !$this->hasSamePublicParentMethod($node);
     }
 
     private function isBlacklistedFunction(string $name): bool

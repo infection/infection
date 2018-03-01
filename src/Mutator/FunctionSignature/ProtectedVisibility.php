@@ -50,11 +50,11 @@ class ProtectedVisibility extends Mutator
             return false;
         }
 
-        if ($this->hasSameProtectedParentMethod($node)) {
+        if (!$node->isProtected()) {
             return false;
         }
 
-        return $node->isProtected();
+        return !$this->hasSameProtectedParentMethod($node);
     }
 
     private function hasSameProtectedParentMethod(Node $node): bool
