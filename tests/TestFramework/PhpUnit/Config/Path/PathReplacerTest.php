@@ -47,6 +47,7 @@ class PathReplacerTest extends TestCase
         return [
             ['autoload.php', $this->projectPath . '/autoload.php'],
             ['./autoload.php', $this->projectPath . '/autoload.php'],
+            ['../autoload.php', $this->projectPath . '/../autoload.php'],
             ['/autoload.php', '/autoload.php'],
             ['./*Bundle', $this->projectPath . '/*Bundle'],
         ];
