@@ -34,6 +34,11 @@ class MutantCreator
      */
     private $prettyPrinter;
 
+    /**
+     * @var string[]
+     */
+    private $prettyPrintedCache = [];
+
     public function __construct(string $tempDir, Differ $differ, Standard $prettyPrinter)
     {
         $this->tempDir = $tempDir;
@@ -41,33 +46,13 @@ class MutantCreator
         $this->prettyPrinter = $prettyPrinter;
     }
 
-    private $prettyPrintedCache = [];
-
     public function create(Mutation $mutation, CodeCoverageData $codeCoverageData): Mutant
     {
-        $originalStatements = $mutation->getOriginalFileAst();
-
         $mutatedFilePath = sprintf('%s/mutant.%s.infection.php', $this->tempDir, $mutation->getHash());
 
-        if (file_exists($mutatedFilePath)) {
-            $mutatedCode = file_get_contents($mutatedFilePath);
-        } else {
-            $traverser = new NodeTraverser();
+        $mutatedCode = $this->createMutatedCode($mutation, $mutatedFilePath);
 
-            $traverser->addVisitor(new CloneVisitor());
-            $traverser->addVisitor(new MutatorVisitor($mutation));
-
-            $mutatedStatements = $traverser->traverse($originalStatements);
-
-            $mutatedCode = $this->prettyPrinter->prettyPrintFile($mutatedStatements);
-
-            file_put_contents($mutatedFilePath, $mutatedCode);
-        }
-
-        $originalFilePath = $mutation->getOriginalFilePath();
-
-        $originalPrettyPrintedFile = $this->prettyPrintedCache[$originalFilePath]
-            ?? $this->prettyPrintedCache[$originalFilePath] = $this->prettyPrinter->prettyPrintFile($originalStatements);
+        $originalPrettyPrintedFile = $this->getOriginalPrettyPrintedFile($mutation->getOriginalFilePath(), $mutation->getOriginalFileAst());
 
         $diff = $this->differ->diff($originalPrettyPrintedFile, $mutatedCode);
 
@@ -92,5 +77,29 @@ class MutantCreator
         }
 
         return $codeCoverageData->hasTestsOnLine($filePath, $line);
+    }
+
+    private function createMutatedCode(Mutation $mutation, string $mutatedFilePath): string
+    {
+        if (file_exists($mutatedFilePath)) {
+            return file_get_contents($mutatedFilePath);
+        }
+        $traverser = new NodeTraverser();
+
+        $traverser->addVisitor(new CloneVisitor());
+        $traverser->addVisitor(new MutatorVisitor($mutation));
+
+        $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
+
+        $mutatedCode = $this->prettyPrinter->prettyPrintFile($mutatedStatements);
+        file_put_contents($mutatedFilePath, $mutatedCode);
+
+        return $mutatedCode;
+    }
+
+    private function getOriginalPrettyPrintedFile(string $originalFilePath, array $originalStatements): string
+    {
+        return $this->prettyPrintedCache[$originalFilePath]
+            ?? $this->prettyPrintedCache[$originalFilePath] = $this->prettyPrinter->prettyPrintFile($originalStatements);
     }
 }
