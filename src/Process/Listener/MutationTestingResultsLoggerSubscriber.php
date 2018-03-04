@@ -17,6 +17,7 @@ use Infection\Logger\DebugFileLogger;
 use Infection\Logger\SummaryFileLogger;
 use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
@@ -47,12 +48,19 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
      */
     private $isDebugMode;
 
+    /**
+     * @var OutputInterface
+     */
+    private $output;
+
     public function __construct(
+        OutputInterface $output,
         InfectionConfig $infectionConfig,
         MetricsCalculator $metricsCalculator,
         Filesystem $fs,
         int $logVerbosity = LogVerbosity::DEBUG
     ) {
+        $this->output = $output;
         $this->infectionConfig = $infectionConfig;
         $this->metricsCalculator = $metricsCalculator;
         $this->fs = $fs;
@@ -131,7 +139,8 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
                 break;
             case self::BADGE:
                 (new BadgeLogger(
-                    new BadgeApiClient(),
+                    $this->output,
+                    new BadgeApiClient($this->output),
                     $this->metricsCalculator,
                     $config
                 ))->log();

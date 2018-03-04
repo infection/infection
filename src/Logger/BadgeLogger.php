@@ -11,6 +11,7 @@ namespace Infection\Logger;
 
 use Infection\Http\BadgeApiClient;
 use Infection\Mutant\MetricsCalculator;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class BadgeLogger implements MutationTestingResultsLogger
 {
@@ -29,8 +30,14 @@ class BadgeLogger implements MutationTestingResultsLogger
      */
     private $config;
 
-    public function __construct(BadgeApiClient $badgeApiClient, MetricsCalculator $metricsCalculator, \stdClass $config)
+    /**
+     * @var OutputInterface
+     */
+    private $output;
+
+    public function __construct(OutputInterface $output, BadgeApiClient $badgeApiClient, MetricsCalculator $metricsCalculator, \stdClass $config)
     {
+        $this->output = $output;
         $this->badgeApiClient = $badgeApiClient;
         $this->metricsCalculator = $metricsCalculator;
         $this->config = $config;
@@ -41,12 +48,16 @@ class BadgeLogger implements MutationTestingResultsLogger
         $travisBuild = getenv('TRAVIS');
 
         if ($travisBuild !== 'true') {
+            $this->showInfo('it is not a Travis CI');
+
             return;
         }
 
         $pullRequest = getenv('TRAVIS_PULL_REQUEST');
 
         if ($pullRequest !== 'false') {
+            $this->showInfo("build is for a pull request (TRAVIS_PULL_REQUEST={$pullRequest})");
+
             return;
         }
 
@@ -61,6 +72,19 @@ class BadgeLogger implements MutationTestingResultsLogger
                 $currentBranch,
                 $this->metricsCalculator->getMutationScoreIndicator()
             );
+        } else {
+            $this->showInfo(
+                sprintf(
+                    'Repository Slug=%s, Branch=%s',
+                    $repositorySlug,
+                    $currentBranch
+                )
+            );
         }
+    }
+
+    private function showInfo(string $message)
+    {
+        $this->output->writeln(sprintf('Dashboard report has not been sent: %s', $message));
     }
 }

@@ -298,6 +298,7 @@ class InfectionCommand extends BaseCommand
                 $this->input->getOption('show-mutations')
             ),
             new MutationTestingResultsLoggerSubscriber(
+                $this->output,
                 $this->getContainer()->get('infection.config'),
                 $metricsCalculator,
                 $this->getContainer()->get('filesystem'),

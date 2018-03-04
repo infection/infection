@@ -16,10 +16,16 @@ use Infection\Events\MutationTestingFinished;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Listener\MutationTestingResultsLoggerSubscriber;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 class MutationTestingResultsLoggerSubscriberTest extends TestCase
 {
+    /**
+     * @var OutputInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $output;
+
     /**
      * @var InfectionConfig|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -37,6 +43,9 @@ class MutationTestingResultsLoggerSubscriberTest extends TestCase
 
     protected function setUp()
     {
+        $this->output = $this->getMockBuilder(OutputInterface::class)
+            ->getMock();
+
         $this->infectionConfig = $this->getMockBuilder(InfectionConfig::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -65,6 +74,7 @@ class MutationTestingResultsLoggerSubscriberTest extends TestCase
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(
+            $this->output,
             $this->infectionConfig,
             $this->metricsCalculator,
             $this->filesystem
@@ -106,6 +116,7 @@ class MutationTestingResultsLoggerSubscriberTest extends TestCase
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(
+            $this->output,
             $this->infectionConfig,
             $this->metricsCalculator,
             $this->filesystem
@@ -145,6 +156,7 @@ class MutationTestingResultsLoggerSubscriberTest extends TestCase
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(
+            $this->output,
             $this->infectionConfig,
             $this->metricsCalculator,
             $this->filesystem,
