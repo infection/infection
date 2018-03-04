@@ -5,16 +5,14 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
-namespace Infection\Process\Listener\FileLoggerSubscriber;
+namespace Infection\Logger;
 
 use Infection\Process\MutantProcess;
 
 class DebugFileLogger extends FileLogger
 {
-    public function writeToFile()
+    protected function getLogLines(): array
     {
-        $logFilePath = $this->infectionConfig->getLogPathInfoFor('debug');
-
         $logs = [];
 
         $logs[] = 'Total: ' . $this->metricsCalculator->getTotalMutantsCount();
@@ -39,7 +37,7 @@ class DebugFileLogger extends FileLogger
             'Not Covered'
         );
 
-        $this->write($logs, $logFilePath);
+        return $logs;
     }
 
     /**

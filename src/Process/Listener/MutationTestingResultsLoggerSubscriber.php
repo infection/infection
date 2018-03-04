@@ -5,20 +5,27 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
-namespace Infection\Process\Listener\FileLoggerSubscriber;
+namespace Infection\Process\Listener;
 
 use Infection\Config\InfectionConfig;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\MutationTestingFinished;
+use Infection\Http\BadgeApiClient;
+use Infection\Logger\BadgeLogger;
+use Infection\Logger\DebugFileLogger;
+use Infection\Logger\SummaryFileLogger;
+use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
 use Symfony\Component\Filesystem\Filesystem;
 
-class BaseFileLoggerSubscriber implements EventSubscriberInterface
+class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
 {
+    // TODO move to final class
     const TEXT_FILE = 'text';
     const SUMMARY_FILE = 'summary';
     const DEBUG_FILE = 'debug';
+    const BADGE = 'badge';
 
     /**
      * @var InfectionConfig
@@ -72,8 +79,8 @@ class BaseFileLoggerSubscriber implements EventSubscriberInterface
 
         $logTypes = $this->filterLogTypes($logTypes);
 
-        foreach ($logTypes as $logType => $directory) {
-            $this->useLogger($logType);
+        foreach ($logTypes as $logType => $config) {
+            $this->useLogger($logType, $config);
         }
     }
 
@@ -83,10 +90,11 @@ class BaseFileLoggerSubscriber implements EventSubscriberInterface
             self::TEXT_FILE,
             self::DEBUG_FILE,
             self::SUMMARY_FILE,
+            self::BADGE,
         ];
 
         foreach ($logTypes as $key => $value) {
-            if (!in_array($key, $allowedFileTypes)) {
+            if (!in_array($key, $allowedFileTypes, true)) {
                 unset($logTypes[$key]);
             }
         }
@@ -94,32 +102,39 @@ class BaseFileLoggerSubscriber implements EventSubscriberInterface
         return $logTypes;
     }
 
-    private function useLogger(string $logType)
+    private function useLogger(string $logType, $config)
     {
         switch ($logType) {
             case self::TEXT_FILE:
                 (new TextFileLogger(
-                    $this->infectionConfig,
+                    $config,
                     $this->metricsCalculator,
                     $this->fs,
                     $this->isDebugMode
-                ))->writeToFile();
+                ))->log();
                 break;
             case self::SUMMARY_FILE:
                 (new SummaryFileLogger(
-                    $this->infectionConfig,
+                    $config,
                     $this->metricsCalculator,
                     $this->fs,
                     $this->isDebugMode
-                ))->writeToFile();
+                ))->log();
                 break;
             case self::DEBUG_FILE:
                 (new DebugFileLogger(
-                    $this->infectionConfig,
+                    $config,
                     $this->metricsCalculator,
                     $this->fs,
                     $this->isDebugMode
-                ))->writeToFile();
+                ))->log();
+                break;
+            case self::BADGE:
+                (new BadgeLogger(
+                    new BadgeApiClient(),
+                    $this->metricsCalculator,
+                    $config
+                ))->log();
                 break;
         }
     }

@@ -9,6 +9,9 @@
         ]
     },
     "logs": {
-        "text": "infection-log.txt"
+        "text": "infection-log.txt",
+        "badge": {
+            "branch": "mutation-badge"
+        }
     }
 }

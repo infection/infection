@@ -5,13 +5,12 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
-namespace Infection\Process\Listener\FileLoggerSubscriber;
+namespace Infection\Logger;
 
 class SummaryFileLogger extends FileLogger
 {
-    public function writeToFile()
+    protected function getLogLines(): array
     {
-        $logFilePath = $this->infectionConfig->getLogPathInfoFor('summary');
         $logs = [];
 
         $logs[] = 'Total: ' . $this->metricsCalculator->getTotalMutantsCount();
@@ -21,6 +20,6 @@ class SummaryFileLogger extends FileLogger
         $logs[] = 'Timed Out: ' . $this->metricsCalculator->getTimedOutCount();
         $logs[] = 'Not Covered: ' . $this->metricsCalculator->getNotCoveredByTestsCount();
 
-        $this->write($logs, $logFilePath);
+        return $logs;
     }
 }

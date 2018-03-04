@@ -7,29 +7,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Listener\FileLoggerSubscriber;
+namespace Infection\Logger;
 
 use Infection\Process\MutantProcess;
 
 class TextFileLogger extends FileLogger
 {
-    public function writeToFile()
+    protected function getLogLines(): array
     {
-        $logFilePath = $this->infectionConfig->getLogPathInfoFor('text');
+        $logs[] = $this->getLogParts($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped');
+        $logs[] = $this->getLogParts($this->metricsCalculator->getTimedOutProcesses(), 'Timeout');
 
-        if ($logFilePath) {
-            $logs[] = $this->getLogParts($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped');
-            $logs[] = $this->getLogParts($this->metricsCalculator->getTimedOutProcesses(), 'Timeout');
-
-            if ($this->isDebugMode) {
-                $logs[] = $this->getLogParts($this->metricsCalculator->getKilledMutantProcesses(), 'Killed');
-                $logs[] = $this->getLogParts($this->metricsCalculator->getErrorProcesses(), 'Errors');
-            }
-
-            $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not covered');
-
-            $this->write($logs, $logFilePath);
+        if ($this->isDebugMode) {
+            $logs[] = $this->getLogParts($this->metricsCalculator->getKilledMutantProcesses(), 'Killed');
+            $logs[] = $this->getLogParts($this->metricsCalculator->getErrorProcesses(), 'Errors');
         }
+
+        $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not covered');
+
+        return $logs;
     }
 
     /**
