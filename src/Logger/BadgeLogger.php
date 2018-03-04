@@ -15,6 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class BadgeLogger implements MutationTestingResultsLogger
 {
+    const ENV_INFECTION_BADGE_API_KEY = 'INFECTION_BADGE_API_KEY';
     /**
      * @var BadgeApiClient
      */
@@ -61,7 +62,7 @@ class BadgeLogger implements MutationTestingResultsLogger
             return;
         }
 
-        $apiKey = getenv('INFECTION_BADGE_API_KEY');
+        $apiKey = getenv(self::ENV_INFECTION_BADGE_API_KEY);
         $repositorySlug = getenv('TRAVIS_REPO_SLUG');
         $currentBranch = getenv('TRAVIS_BRANCH');
 
