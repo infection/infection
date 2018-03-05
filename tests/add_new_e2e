@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-echo What is the directory name of you new test
+echo 'What is the directory name of your new test?'
 
 read dirname
 
 if [ -d tests/Fixtures/e2e/"$dirname" ]
 then
-    echo A directory already exists with the name "$dirname"
+    echo "A directory with the name $dirname already exists."
     exit 1
 fi
 
@@ -21,7 +21,7 @@ cp  Example_Test/infection.json $dirname/infection.json
 cp  Example_Test/phpunit.xml $dirname/phpunit.xml
 cp  Example_Test/README.md $dirname/README.md
 
-echo created the base for a new  e2e test name $dirname
+echo "Created the base for a new end-to-end test in directory $dirname"
 
 
 
