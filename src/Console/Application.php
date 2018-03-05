@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use Infection\Command;
+use Infection\Config\Exception\InvalidConfigException;
 use Infection\Config\InfectionConfig;
 use Infection\Php\ConfigBuilder;
 use Infection\Php\XdebugHandler;
@@ -167,6 +168,11 @@ ASCII;
         return $this->io;
     }
 
+    /**
+     * @param InputInterface $input
+     *
+     * @throws InvalidConfigException
+     */
     private function buildDynamicDependencies(InputInterface $input)
     {
         $this->container['infection.config'] = function (Container $c) use ($input): InfectionConfig {
@@ -188,11 +194,21 @@ ASCII;
                 $configLocation = \pathinfo($infectionConfigFile, PATHINFO_DIRNAME);
                 $json = file_get_contents($infectionConfigFile);
             } catch (\Exception $e) {
+                $infectionConfigFile = null;
                 $json = '{}';
                 $configLocation = getcwd();
             }
 
-            return new InfectionConfig(json_decode($json), $c['filesystem'], $configLocation);
+            $config = json_decode($json);
+
+            if (is_string($infectionConfigFile) && null === $config && JSON_ERROR_NONE !== json_last_error()) {
+                throw InvalidConfigException::invalidJson(
+                    $infectionConfigFile,
+                    json_last_error_msg()
+                );
+            }
+
+            return new InfectionConfig($config, $c['filesystem'], $configLocation);
         };
 
         $this->container['coverage.path'] = function (Container $c) use ($input): string {
