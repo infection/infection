@@ -17,9 +17,10 @@ use Infection\Finder\SourceFilesFinder;
 use Infection\Mutation;
 use Infection\Mutator\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
-use Infection\Visitor\WrappedFunctionInfoCollectorVisitor;
+use Infection\Visitor\ReflectionVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use Symfony\Component\Finder\SplFileInfo;
@@ -135,7 +136,8 @@ class MutationsGenerator
 
         $traverser->addVisitor($mutationsCollectorVisitor);
         $traverser->addVisitor(new ParentConnectorVisitor());
-        $traverser->addVisitor(new WrappedFunctionInfoCollectorVisitor());
+        $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
+        $traverser->addVisitor(new ReflectionVisitor());
 
         $traverser->traverse($initialStatements);
 

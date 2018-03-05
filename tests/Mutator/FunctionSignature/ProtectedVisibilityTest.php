@@ -28,26 +28,14 @@ class ProtectedVisibilityTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): array
+    public function provideMutationCases(): \Generator
     {
-        return [
-            'It mutates protected to private' => [
-                <<<'PHP'
+        yield 'It mutates protected to private' => [
+            $this->getFileContent('pv-one-class.php'),
+            <<<'PHP'
 <?php
 
-
-class Test
-{
-    protected function foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-PHP
-                ,
-                <<<'PHP'
-<?php
+namespace ProtectedVisibilityOneClass;
 
 class Test
 {
@@ -58,24 +46,15 @@ class Test
     }
 }
 PHP
-                ,
-            ],
-            'It does not mutate final flag' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate final flag' => [
+            $this->getFileContent('pv-final.php'),
+            <<<'PHP'
 <?php
 
-class Test
-{
-    protected final function foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-PHP
-                ,
-                <<<'PHP'
-<?php
+namespace ProtectedVisibilityFinal;
 
 class Test
 {
@@ -86,35 +65,19 @@ class Test
     }
 }
 PHP
-                ,
-            ],
-            'It does not mutate abstract protected to private' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate abstract protected to private' => [
+            $this->getFileContent('pv-abstract.php'),
+        ];
+
+        yield 'It does mutate not abstract protected to private in an abstract class' => [
+            $this->getFileContent('pv-abstract-class-protected-method.php'),
+            <<<'PHP'
 <?php
 
-abstract class Test
-{
-    protected abstract function foo(int $param, $test = 1) : bool;
-}
-PHP
-                ,
-            ],
-            'It does mutate not abstract protected to private in an abstract class' => [
-        <<<'PHP'
-<?php
-
-abstract class Test
-{
-    protected function foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-PHP
-                ,
-                <<<'PHP'
-<?php
+namespace ProtectedVisibilityAbstractClassProtectedMethod;
 
 abstract class Test
 {
@@ -125,24 +88,15 @@ abstract class Test
     }
 }
 PHP
-                ,
-            ],
-            'It does not mutate stratic flag' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate static flag' => [
+            $this->getFileContent('pv-static.php'),
+            <<<'PHP'
 <?php
 
-class Test
-{
-    protected static function foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-PHP
-                ,
-                <<<'PHP'
-<?php
+namespace ProtectedVisibilityStatic;
 
 class Test
 {
@@ -153,8 +107,82 @@ class Test
     }
 }
 PHP
-                ,
-            ],
+            ,
         ];
+
+        yield 'It does not mutate if parent abstract has same protected method' => [
+            $this->getFileContent('pv-same-method-abstract.php'),
+            <<<'PHP'
+<?php
+
+namespace ProtectedSameAbstract;
+
+abstract class SameAbstract
+{
+    protected abstract function foo();
+}
+class Child extends SameAbstract
+{
+    protected function foo()
+    {
+    }
+}
+PHP
+            ,
+        ];
+
+        yield 'It does not mutate if parent class has same protected method' => [
+            $this->getFileContent('pv-same-method-parent.php'),
+            <<<'PHP'
+<?php
+
+namespace ProtectedSameParent;
+
+class SameParent
+{
+    private function foo()
+    {
+    }
+}
+class Child extends SameParent
+{
+    protected function foo()
+    {
+    }
+}
+PHP
+            ,
+        ];
+
+        yield 'it does not mutate if grand parent class has same protected method' => [
+            $this->getFileContent('pv-same-method-grandparent.php'),
+            <<<'PHP'
+<?php
+
+namespace ProtectedSameGrandParent;
+
+class SameGrandParent
+{
+    private function foo()
+    {
+    }
+}
+class SameParent extends SameGrandParent
+{
+}
+class Child extends SameParent
+{
+    protected function foo()
+    {
+    }
+}
+PHP
+            ,
+        ];
+    }
+
+    private function getFileContent(string $file): string
+    {
+        return file_get_contents(sprintf(__DIR__ . '/../../Fixtures/Autoloaded/ProtectedVisibility/%s', $file));
     }
 }
