@@ -14,6 +14,7 @@ use Infection\Events\MutationTestingFinished;
 use Infection\Http\BadgeApiClient;
 use Infection\Logger\BadgeLogger;
 use Infection\Logger\DebugFileLogger;
+use Infection\Logger\ResultsLoggerTypes;
 use Infection\Logger\SummaryFileLogger;
 use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
@@ -22,12 +23,6 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
 {
-    // TODO move to final class
-    const TEXT_FILE = 'text';
-    const SUMMARY_FILE = 'summary';
-    const DEBUG_FILE = 'debug';
-    const BADGE = 'badge';
-
     /**
      * @var InfectionConfig
      */
@@ -95,10 +90,10 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
     private function filterLogTypes(array $logTypes): array
     {
         $allowedFileTypes = [
-            self::TEXT_FILE,
-            self::DEBUG_FILE,
-            self::SUMMARY_FILE,
-            self::BADGE,
+            ResultsLoggerTypes::TEXT_FILE,
+            ResultsLoggerTypes::DEBUG_FILE,
+            ResultsLoggerTypes::SUMMARY_FILE,
+            ResultsLoggerTypes::BADGE,
         ];
 
         foreach ($logTypes as $key => $value) {
@@ -113,7 +108,7 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
     private function useLogger(string $logType, $config)
     {
         switch ($logType) {
-            case self::TEXT_FILE:
+            case ResultsLoggerTypes::TEXT_FILE:
                 (new TextFileLogger(
                     $config,
                     $this->metricsCalculator,
@@ -121,7 +116,7 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
                     $this->isDebugMode
                 ))->log();
                 break;
-            case self::SUMMARY_FILE:
+            case ResultsLoggerTypes::SUMMARY_FILE:
                 (new SummaryFileLogger(
                     $config,
                     $this->metricsCalculator,
@@ -129,7 +124,7 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
                     $this->isDebugMode
                 ))->log();
                 break;
-            case self::DEBUG_FILE:
+            case ResultsLoggerTypes::DEBUG_FILE:
                 (new DebugFileLogger(
                     $config,
                     $this->metricsCalculator,
@@ -137,7 +132,7 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
                     $this->isDebugMode
                 ))->log();
                 break;
-            case self::BADGE:
+            case ResultsLoggerTypes::BADGE:
                 (new BadgeLogger(
                     $this->output,
                     new BadgeApiClient($this->output),
