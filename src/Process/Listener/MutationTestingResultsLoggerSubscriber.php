@@ -89,7 +89,7 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
 
     private function filterLogTypes(array $logTypes): array
     {
-        foreach (ResultsLoggerTypes::ALL as $key => $value) {
+        foreach ($logTypes as $key => $value) {
             if (!in_array($key, ResultsLoggerTypes::ALL, true)) {
                 unset($logTypes[$key]);
             }
