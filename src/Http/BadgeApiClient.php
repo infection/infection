@@ -20,9 +20,6 @@ class BadgeApiClient
      */
     private $output;
 
-    /**
-     * BadgeApiClient constructor.
-     */
     public function __construct(OutputInterface $output)
     {
         $this->output = $output;
