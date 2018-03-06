@@ -161,7 +161,7 @@ class MutationsGenerator
             return array_filter(
                 $this->defaultMutators,
                 function (Mutator $mutator): bool {
-                    return in_array(strtolower($mutator->getName()), $this->whitelistedMutatorNames, true);
+                    return in_array(strtolower($mutator::getName()), $this->whitelistedMutatorNames, true);
                 }
             );
         }

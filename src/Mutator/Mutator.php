@@ -17,7 +17,7 @@ abstract class Mutator
 
     abstract public function shouldMutate(Node $node): bool;
 
-    public function getName(): string
+    public static function getName(): string
     {
         $parts = explode('\\', static::class);
 

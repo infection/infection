@@ -72,7 +72,7 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
     {
         foreach ($this->mutators as $mutator) {
             $isOnFunctionSignature = $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
-            if ($this->ignoredMutatorsFinder->isIgnored($mutator->getName(), $this->filePath)) {
+            if ($this->ignoredMutatorsFinder->isIgnored($mutator::getName(), $this->filePath)) {
                 continue;
             }
 
