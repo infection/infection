@@ -9,12 +9,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Namespace_\\": "src/"
+            "NamespaceIgnore_\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Namespace_\\Test\\": "tests/"
+            "NamespaceIgnore_\\Test\\": "tests/"
         }
     }
 }

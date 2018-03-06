@@ -1,9 +1,3 @@
 # Title
 
-* Link to github ticket if relevant
-
-## Summary
-Short summary of the ticket
-
-## Full Ticket
-Full github ticket
+When no mutations are generated, MSI should be ignored
