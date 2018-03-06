@@ -205,8 +205,6 @@ class InfectionCommand extends BaseCommand
         );
 
         $mutations = $mutationsGenerator->generate($input->getOption('only-covered'), $input->getOption('filter'));
-        $ignoreMsi = (bool) $input->getOption('ignore-msi-with-no-mutations');
-        $hasGeneratedMutations = \count($mutations) > 0;
 
         $mutationTestingRunner = new MutationTestingRunner(
             $processBuilder,
@@ -222,22 +220,20 @@ class InfectionCommand extends BaseCommand
             $testFrameworkOptions->getForMutantProcess()
         );
 
+        $ignoreMsi = (bool) $input->getOption('ignore-msi-with-no-mutations');
+
+        if ($ignoreMsi && \count($mutations) === 0) {
+            return 0;
+        }
+
         if ($this->hasBadMsi($metricsCalculator)) {
             $this->io->error($this->getBadMsiErrorMessage($metricsCalculator));
-
-            if (!$hasGeneratedMutations && $ignoreMsi) {
-                return 0;
-            }
 
             return 1;
         }
 
         if ($this->hasBadCoveredMsi($metricsCalculator)) {
             $this->io->error($this->getBadCoveredMsiErrorMessage($metricsCalculator));
-
-            if (!$hasGeneratedMutations && $ignoreMsi) {
-                return 0;
-            }
 
             return 1;
         }
