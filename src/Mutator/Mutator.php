@@ -22,7 +22,7 @@ abstract class Mutator
 
     abstract public function shouldMutate(Node $node): bool;
 
-    public static function getName(): string
+    public function getName(): string
     {
         $parts = explode('\\', static::class);
 

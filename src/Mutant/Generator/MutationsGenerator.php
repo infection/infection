@@ -134,10 +134,10 @@ class MutationsGenerator
         $traverser = new NodeTraverser();
         $mutators = $this->getMutators();
         foreach ($mutators as $mutator) {
-            if (isset($this->mutatorConfig[$mutator::getName()])) {
+            if (isset($this->mutatorConfig[$mutator->getName()])) {
                 $mutator->addConfig(
                     new MutatorConfig(
-                        (array) $this->mutatorConfig[$mutator::getName()]
+                        (array) $this->mutatorConfig[$mutator->getName()]
                     )
                 );
                 continue;
@@ -177,7 +177,7 @@ class MutationsGenerator
             return array_filter(
                 $this->defaultMutators,
                 function (Mutator $mutator): bool {
-                    return in_array(strtolower($mutator::getName()), $this->whitelistedMutatorNames, true);
+                    return in_array(strtolower($mutator->getName()), $this->whitelistedMutatorNames, true);
                 }
             );
         }
