@@ -17,7 +17,6 @@ use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\EventDispatcher\EventDispatcher;
-use Infection\Finder\IgnoredMutatorsFinder;
 use Infection\Mutant\Exception\MsiCalculationException;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutant\MetricsCalculator;
@@ -195,7 +194,7 @@ class InfectionCommand extends BaseCommand
         }
 
         $config = $this->getContainer()->get('infection.config');
-        $ignoreFinder = new IgnoredMutatorsFinder($config->getMutatorConfiguration()['ignore'] ?? [], $config->getConfigLocation());
+        $mutatorOptions = $config->getMutatorConfiguration();
 
         $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
         $mutationsGenerator = new MutationsGenerator(
@@ -206,7 +205,7 @@ class InfectionCommand extends BaseCommand
             $this->parseMutators($input->getOption('mutators')),
             $this->eventDispatcher,
             $container->get('parser'),
-            $ignoreFinder
+            $mutatorOptions
         );
 
         $mutations = $mutationsGenerator->generate($input->getOption('only-covered'), $input->getOption('filter'));

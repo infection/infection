@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutant\Generator;
 
 use Infection\EventDispatcher\EventDispatcher;
-use Infection\Finder\IgnoredMutatorsFinder;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\TrueValue;
@@ -155,9 +154,6 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $eventDispatcherMock = Mockery::mock(EventDispatcher::class);
         $eventDispatcherMock->shouldReceive('dispatch');
 
-        $mock = Mockery::mock(IgnoredMutatorsFinder::class);
-        $mock->shouldReceive('isIgnored')->andReturn(false);
-
         return new MutationsGenerator(
             $srcDirs,
             $excludedDirsOrFiles,
@@ -166,7 +162,7 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             $whitelistedMutatorNames,
             $eventDispatcherMock,
             $this->getParser(),
-            $mock
+            []
         );
     }
 

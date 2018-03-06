@@ -2,16 +2,12 @@
 
 namespace TmpNamespace_;
 
-class SourceClass
+class OtherClass
 {
-    public function hello(): string
+
+    public function hello()
     {
         return 'hello';
-    }
-
-    protected function bye(): string
-    {
-        return 'bye';
     }
 
     public function isTrue()
@@ -23,4 +19,5 @@ class SourceClass
     {
         return false;
     }
+
 }

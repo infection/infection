@@ -13,6 +13,11 @@ use PhpParser\Node;
 
 abstract class Mutator
 {
+    /**
+     * @var MutatorConfig
+     */
+    private $config;
+
     abstract public function mutate(Node $node);
 
     abstract public function shouldMutate(Node $node): bool;
@@ -22,5 +27,15 @@ abstract class Mutator
         $parts = explode('\\', static::class);
 
         return $parts[count($parts) - 1];
+    }
+
+    public function addConfig(MutatorConfig $config)
+    {
+        $this->config = $config;
+    }
+
+    public function getConfig(): MutatorConfig
+    {
+        return $this->config;
     }
 }

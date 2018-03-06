@@ -13,10 +13,10 @@ use Infection\EventDispatcher\EventDispatcher;
 use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
-use Infection\Finder\IgnoredMutatorsFinder;
 use Infection\Finder\SourceFilesFinder;
 use Infection\Mutation;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorConfig;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
@@ -68,7 +68,10 @@ class MutationsGenerator
      */
     private $parser;
 
-    private $ignoredMutatorsFinder;
+    /**
+     * @var array
+     */
+    private $mutatorConfig;
 
     public function __construct(
         array $srcDirs,
@@ -78,7 +81,7 @@ class MutationsGenerator
         array $whitelistedMutatorNames,
         EventDispatcher $eventDispatcher,
         Parser $parser,
-        IgnoredMutatorsFinder $ignoredMutatorsFinder
+        array $mutatorConfig
     ) {
         $this->srcDirs = $srcDirs;
         $this->codeCoverageData = $codeCoverageData;
@@ -88,7 +91,7 @@ class MutationsGenerator
         $this->whitelistedMutatorNamesCount = count($whitelistedMutatorNames);
         $this->eventDispatcher = $eventDispatcher;
         $this->parser = $parser;
-        $this->ignoredMutatorsFinder = $ignoredMutatorsFinder;
+        $this->mutatorConfig = $mutatorConfig;
     }
 
     /**
@@ -130,14 +133,24 @@ class MutationsGenerator
 
         $traverser = new NodeTraverser();
         $mutators = $this->getMutators();
+        foreach ($mutators as $mutator) {
+            if (isset($this->mutatorConfig[$mutator::getName()])) {
+                $mutator->addConfig(
+                    new MutatorConfig(
+                        (array) $this->mutatorConfig[$mutator::getName()]
+                    )
+                );
+                continue;
+            }
+            $mutator->addConfig(new MutatorConfig([]));
+        }
 
         $mutationsCollectorVisitor = new MutationsCollectorVisitor(
             $mutators,
             $file->getRealPath(),
             $initialStatements,
             $this->codeCoverageData,
-            $onlyCovered,
-            $this->ignoredMutatorsFinder
+            $onlyCovered
         );
 
         $traverser->addVisitor($mutationsCollectorVisitor);
@@ -155,6 +168,9 @@ class MutationsGenerator
         return $this->codeCoverageData->hasTests($file->getRealPath());
     }
 
+    /**
+     * @return array|Mutator[]
+     */
     private function getMutators(): array
     {
         if ($this->whitelistedMutatorNamesCount > 0) {

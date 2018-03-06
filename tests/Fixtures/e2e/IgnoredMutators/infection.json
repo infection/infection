@@ -6,14 +6,20 @@
         ]
     },
     "logs": {
-        "summary": "infection-log.txt",
+        "debug": "infection-log.txt",
         "text": "tell.txt"
     },
     "mutators": {
-    "ignore": {
-        "PublicVisibility": [
-            "src/SourceClass.php"
-        ]
+        "PublicVisibility": {
+            "ignore": [
+                "*\\SourceClass*",
+                "*\\OtherClass::hello"
+            ]
+        },
+        "FalseValue": {
+            "ignore": [
+                "**::isFalse"
+            ]
+        }
     }
-}
 }
