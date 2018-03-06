@@ -6,8 +6,7 @@
         ]
     },
     "logs": {
-        "debug": "infection-log.txt",
-        "text": "tell.txt"
+        "summary": "infection-log.txt"
     },
     "mutators": {
         "PublicVisibility": {

@@ -281,7 +281,7 @@ class InfectionConfig
 
     public function getMutatorConfiguration(): array
     {
-        return (array) $this->config->mutators ?? [];
+        return (array) ($this->config->mutators ?? []);
     }
 
     public function getConfigLocation(): string
