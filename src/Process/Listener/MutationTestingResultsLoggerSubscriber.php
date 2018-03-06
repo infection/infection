@@ -89,15 +89,8 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
 
     private function filterLogTypes(array $logTypes): array
     {
-        $allowedFileTypes = [
-            ResultsLoggerTypes::TEXT_FILE,
-            ResultsLoggerTypes::DEBUG_FILE,
-            ResultsLoggerTypes::SUMMARY_FILE,
-            ResultsLoggerTypes::BADGE,
-        ];
-
-        foreach ($logTypes as $key => $value) {
-            if (!in_array($key, $allowedFileTypes, true)) {
+        foreach (ResultsLoggerTypes::ALL as $key => $value) {
+            if (!in_array($key, ResultsLoggerTypes::ALL, true)) {
                 unset($logTypes[$key]);
             }
         }

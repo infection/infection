@@ -15,4 +15,11 @@ final class ResultsLoggerTypes
     const SUMMARY_FILE = 'summary';
     const DEBUG_FILE = 'debug';
     const BADGE = 'badge';
+
+    const ALL = [
+        ResultsLoggerTypes::TEXT_FILE,
+        ResultsLoggerTypes::DEBUG_FILE,
+        ResultsLoggerTypes::SUMMARY_FILE,
+        ResultsLoggerTypes::BADGE,
+    ];
 }
