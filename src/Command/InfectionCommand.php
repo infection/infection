@@ -158,6 +158,12 @@ class InfectionCommand extends BaseCommand
                 'Extra php options for the initial test runner. Will be ignored if --coverage option presented.',
                 ''
             )
+            ->addOption(
+                'ignore-msi-with-no-mutations',
+                null,
+                InputOption::VALUE_NONE,
+                'Ignore MSI violations with zero mutations'
+            )
         ;
     }
 
@@ -213,6 +219,12 @@ class InfectionCommand extends BaseCommand
             $codeCoverageData,
             $testFrameworkOptions->getForMutantProcess()
         );
+
+        $ignoreMsi = (bool) $input->getOption('ignore-msi-with-no-mutations');
+
+        if ($ignoreMsi && \count($mutations) === 0) {
+            return 0;
+        }
 
         if ($this->hasBadMsi($metricsCalculator)) {
             $this->io->error($this->getBadMsiErrorMessage($metricsCalculator));
