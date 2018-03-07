@@ -29,8 +29,8 @@ class BadgeApiClient
         string $apiKey,
         string $repositorySlug,
         string $branch,
-        float $mutationScore)
-    {
+        float $mutationScore
+    ) {
         $json = json_encode([
             'apiKey' => $apiKey,
             'repositorySlug' => $repositorySlug,
