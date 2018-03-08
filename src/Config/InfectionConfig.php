@@ -283,9 +283,4 @@ class InfectionConfig
     {
         return (array) ($this->config->mutators ?? []);
     }
-
-    public function getConfigLocation(): string
-    {
-        return $this->configLocation;
-    }
 }
