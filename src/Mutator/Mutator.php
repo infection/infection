@@ -34,8 +34,8 @@ abstract class Mutator
         $this->config = $config;
     }
 
-    public function getConfig(): MutatorConfig
+    public function isIgnored(string $class, string $method): bool
     {
-        return $this->config;
+        return $this->config->isIgnored($class, $method);
     }
 }

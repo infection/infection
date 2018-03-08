@@ -71,7 +71,7 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
                 }
             }
 
-            if ($mutator->getConfig()->isIgnored(
+            if ($mutator->isIgnored(
                 $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY)->getName(),
                 $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, '')
             )) {
