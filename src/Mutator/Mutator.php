@@ -18,20 +18,23 @@ abstract class Mutator
      */
     private $config;
 
+    public function __construct(MutatorConfig $config = null)
+    {
+        if ($config === null) {
+            $config = new MutatorConfig([]);
+        }
+        $this->config = $config;
+    }
+
     abstract public function mutate(Node $node);
 
     abstract public function shouldMutate(Node $node): bool;
 
-    public function getName(): string
+    public static function getName(): string
     {
         $parts = explode('\\', static::class);
 
         return $parts[count($parts) - 1];
-    }
-
-    public function addConfig(MutatorConfig $config)
-    {
-        $this->config = $config;
     }
 
     public function isIgnored(string $class, string $method): bool

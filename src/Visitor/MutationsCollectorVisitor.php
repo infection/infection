@@ -71,11 +71,13 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
                 }
             }
 
-            if ($mutator->isIgnored(
-                $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY)->getName(),
-                $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, '')
-            )) {
-                continue;
+            if ($reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY, false)) {
+                if ($mutator->isIgnored(
+                    $reflectionClass->getName(),
+                    $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, '')
+                )) {
+                    continue;
+                }
             }
 
             if ($this->onlyCovered) {

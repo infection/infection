@@ -193,9 +193,6 @@ class InfectionCommand extends BaseCommand
             return 1;
         }
 
-        $config = $container->get('infection.config');
-        $mutatorOptions = $config->getMutatorsConfiguration();
-
         $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
         $mutationsGenerator = new MutationsGenerator(
             $container->get('src.dirs'),
@@ -204,8 +201,7 @@ class InfectionCommand extends BaseCommand
             $this->getDefaultMutators(),
             $this->parseMutators($input->getOption('mutators')),
             $this->eventDispatcher,
-            $container->get('parser'),
-            $mutatorOptions
+            $container->get('parser')
         );
 
         $mutations = $mutationsGenerator->generate($input->getOption('only-covered'), $input->getOption('filter'));
