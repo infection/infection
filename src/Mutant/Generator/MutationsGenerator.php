@@ -97,12 +97,13 @@ class MutationsGenerator
         $sourceFilesFinder = new SourceFilesFinder($this->srcDirs, $this->excludeDirsOrFiles);
         $files = $sourceFilesFinder->getSourceFiles($filter);
         $allFilesMutations = [[]];
+        $mutators = $this->getMutators();
 
         $this->eventDispatcher->dispatch(new MutationGeneratingStarted($files->count()));
 
         foreach ($files as $file) {
             if (!$onlyCovered || ($onlyCovered && $this->hasTests($file))) {
-                $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered, $this->getMutators());
+                $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered, $mutators);
             }
 
             $this->eventDispatcher->dispatch(new MutableFileProcessed());
