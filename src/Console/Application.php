@@ -230,13 +230,13 @@ ASCII;
     {
         foreach ($mutators as $mutator) {
             $this->container[$mutator] = function () use ($mutator) {
-                return new $mutator(
-                    new MutatorConfig(
-                        (array) $this->container['infection.config']
-                            ->getMutatorsConfiguration()[$mutator::getName()]
-                        ?? []
-                    )
-                );
+                $config = $this->container['infection.config']->getMutatorsConfiguration();
+
+                if (isset($config[$mutator::getName()])) {
+                    return new $mutator(new MutatorConfig((array) $config[$mutator::getName()]));
+                }
+
+                return new $mutator(new MutatorConfig([]));
             };
         }
     }
