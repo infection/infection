@@ -232,7 +232,7 @@ ASCII;
             $this->container[$mutator] = function () use ($mutator) {
                 return new $mutator(
                     new MutatorConfig(
-                        (array)$this->container['infection.config']
+                        (array) $this->container['infection.config']
                             ->getMutatorsConfiguration()[$mutator::getName()]
                         ?? []
                     )
