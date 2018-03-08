@@ -102,6 +102,19 @@ class MutationsGenerator
      */
     public function generate(bool $onlyCovered, string $filter = ''): array
     {
+        $mutators = $this->getMutators();
+        foreach ($mutators as $mutator) {
+            if (isset($this->mutatorConfig[$mutator->getName()])) {
+                $mutator->addConfig(
+                    new MutatorConfig(
+                        (array) $this->mutatorConfig[$mutator->getName()]
+                    )
+                );
+                continue;
+            }
+            $mutator->addConfig(new MutatorConfig([]));
+        }
+
         $sourceFilesFinder = new SourceFilesFinder($this->srcDirs, $this->excludeDirsOrFiles);
         $files = $sourceFilesFinder->getSourceFiles($filter);
         $allFilesMutations = [[]];
@@ -110,7 +123,7 @@ class MutationsGenerator
 
         foreach ($files as $file) {
             if (!$onlyCovered || ($onlyCovered && $this->hasTests($file))) {
-                $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered);
+                $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered, $mutators);
             }
 
             $this->eventDispatcher->dispatch(new MutableFileProcessed());
@@ -124,26 +137,15 @@ class MutationsGenerator
     /**
      * @param SplFileInfo $file
      * @param bool $onlyCovered mutate only covered by tests lines of code
+     * @param array $mutators
      *
      * @return Mutation[]
      */
-    private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered): array
+    private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered, array $mutators): array
     {
         $initialStatements = $this->parser->parse($file->getContents());
 
         $traverser = new NodeTraverser();
-        $mutators = $this->getMutators();
-        foreach ($mutators as $mutator) {
-            if (isset($this->mutatorConfig[$mutator->getName()])) {
-                $mutator->addConfig(
-                    new MutatorConfig(
-                        (array) $this->mutatorConfig[$mutator->getName()]
-                    )
-                );
-                continue;
-            }
-            $mutator->addConfig(new MutatorConfig([]));
-        }
 
         $mutationsCollectorVisitor = new MutationsCollectorVisitor(
             $mutators,
