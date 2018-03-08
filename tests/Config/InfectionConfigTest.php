@@ -166,13 +166,12 @@ class InfectionConfigTest extends TestCase
         $config = <<<'JSON'
 {
 	"mutators": {
-		"ignore": {
-			"PublicVisibility": [
+		"PublicVisibility": {
+			"ignore": [
 				"Ignore\\For\\Particular\\Class",
 				"Ignore\\For\\Another\\Class::method",
 				"Ignore\\For\\**\\*\\Glob\\Pattern\\Or\\Namespace"
-			],
-			"Plus": "*"
+			]
 		}
 	}
 }
@@ -180,13 +179,12 @@ JSON;
 
         $config = new InfectionConfig(json_decode($config), $this->filesystem, '/path/to/config');
         $this->assertSame(
-            ['PublicVisibility' => [
+            ['ignore' => [
                     "Ignore\For\Particular\Class",
                     "Ignore\For\Another\Class::method",
                     "Ignore\For\**\*\Glob\Pattern\Or\Namespace",
                 ],
-                'Plus' => '*',
             ],
-            (array) $config->getMutatorsConfiguration()['ignore']);
+            (array) $config->getMutatorsConfiguration()['PublicVisibility']);
     }
 }
