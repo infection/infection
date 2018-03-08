@@ -187,6 +187,6 @@ JSON;
                 ],
                 'Plus' => '*',
             ],
-            (array) $config->getMutatorConfiguration()['ignore']);
+            (array) $config->getMutatorsConfiguration()['ignore']);
     }
 }

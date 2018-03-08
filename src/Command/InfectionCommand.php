@@ -193,8 +193,8 @@ class InfectionCommand extends BaseCommand
             return 1;
         }
 
-        $config = $this->getContainer()->get('infection.config');
-        $mutatorOptions = $config->getMutatorConfiguration();
+        $config = $container->get('infection.config');
+        $mutatorOptions = $config->getMutatorsConfiguration();
 
         $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
         $mutationsGenerator = new MutationsGenerator(
