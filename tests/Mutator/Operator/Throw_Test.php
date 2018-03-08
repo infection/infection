@@ -9,17 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Operator;
 
-use Infection\Mutator\Mutator;
-use Infection\Mutator\Operator\Continue_;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ContinueTest extends AbstractMutatorTestCase
+class Throw_Test extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new Continue_();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */
@@ -31,32 +24,17 @@ class ContinueTest extends AbstractMutatorTestCase
     public function provideMutationCases(): array
     {
         return [
-            'It replaces continue with break in while' => [
+            'It removes the throw statement' => [
                 <<<'PHP'
 <?php
 
-while (true) {
-    continue;
-}
+throw new \Exception();
 PHP
                 ,
                 <<<'PHP'
 <?php
 
-while (true) {
-    break;
-}
-PHP
-                ,
-            ],
-            'It does not replaces continue with break in switch' => [
-                <<<'PHP'
-<?php
-
-switch (1) {
-    case 1:
-        continue;
-}
+new \Exception();
 PHP
                 ,
             ],

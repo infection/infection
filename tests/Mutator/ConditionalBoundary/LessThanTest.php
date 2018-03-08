@@ -9,17 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ConditionalBoundary;
 
-use Infection\Mutator\ConditionalBoundary\LessThan;
-use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class LessThanTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new LessThan();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

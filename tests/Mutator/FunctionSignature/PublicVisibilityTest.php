@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\FunctionSignature;
 
 use Infection\Mutator\FunctionSignature\PublicVisibility;
-use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class PublicVisibilityTest extends AbstractMutatorTestCase
@@ -52,11 +51,6 @@ PHP;
             ['__toString'],
             ['__debugInfo'],
         ];
-    }
-
-    protected function getMutator(): Mutator
-    {
-        return new PublicVisibility();
     }
 
     /**

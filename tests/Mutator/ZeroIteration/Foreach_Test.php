@@ -7,19 +7,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\Operator;
+namespace Infection\Tests\Mutator\ZeroIteration;
 
-use Infection\Mutator\Mutator;
-use Infection\Mutator\Operator\Throw_;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ThrowTest extends AbstractMutatorTestCase
+class Foreach_Test extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new Throw_();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */
@@ -31,17 +24,22 @@ class ThrowTest extends AbstractMutatorTestCase
     public function provideMutationCases(): array
     {
         return [
-            'It removes the throw statement' => [
+            'It mutates to new array in foreach' => [
                 <<<'PHP'
 <?php
 
-throw new \Exception();
+$array = [1, 2];
+
+foreach ($array as $value) {
+}
 PHP
                 ,
                 <<<'PHP'
 <?php
 
-new \Exception();
+$array = [1, 2];
+foreach (array() as $value) {
+}
 PHP
                 ,
             ],

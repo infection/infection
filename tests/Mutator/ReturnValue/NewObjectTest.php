@@ -9,17 +9,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ReturnValue;
 
-use Infection\Mutator\Mutator;
 use Infection\Mutator\ReturnValue\NewObject;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class NewObjectTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new NewObject();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

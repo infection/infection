@@ -11,13 +11,14 @@ namespace Infection\Tests;
 
 use Infection\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
+use Infection\Mutator\MutatorConfig;
 use PHPUnit\Framework\TestCase;
 
 class MutationTest extends TestCase
 {
     public function test_it_correctly_generates_hash()
     {
-        $mutator = new Plus();
+        $mutator = new Plus(new MutatorConfig([]));
         $attributes = [
             'startLine' => 3,
             'endLine' => 5,
@@ -41,7 +42,7 @@ class MutationTest extends TestCase
 
     public function test_it_correctly_sets_is_on_function_signature()
     {
-        $mutator = new Plus();
+        $mutator = new Plus(new MutatorConfig([]));
         $attributes = [
             'startLine' => 3,
             'endLine' => 5,
@@ -65,7 +66,7 @@ class MutationTest extends TestCase
 
     public function test_it_correctly_sets_original_file_ast()
     {
-        $mutator = new Plus();
+        $mutator = new Plus(new MutatorConfig([]));
         $attributes = [
             'startLine' => 3,
             'endLine' => 5,

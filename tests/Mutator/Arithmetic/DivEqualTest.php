@@ -9,17 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Mutator\Arithmetic\DivEqual;
-use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class DivEqualTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new DivEqual();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

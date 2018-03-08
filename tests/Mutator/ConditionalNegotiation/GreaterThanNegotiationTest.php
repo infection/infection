@@ -9,17 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ConditionalNegotiation;
 
-use Infection\Mutator\ConditionalNegotiation\GreaterThanNegotiation;
-use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class GreaterThanNegotiationTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new GreaterThanNegotiation();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

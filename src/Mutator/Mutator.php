@@ -18,11 +18,8 @@ abstract class Mutator
      */
     private $config;
 
-    public function __construct(MutatorConfig $config = null)
+    public function __construct(MutatorConfig $config)
     {
-        if ($config === null) {
-            $config = new MutatorConfig([]);
-        }
         $this->config = $config;
     }
 

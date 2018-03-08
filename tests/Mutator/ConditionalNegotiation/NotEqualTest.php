@@ -9,17 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ConditionalNegotiation;
 
-use Infection\Mutator\ConditionalNegotiation\NotEqual;
-use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class NotEqualTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new NotEqual();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

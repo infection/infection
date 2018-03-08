@@ -9,19 +9,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ReturnValue;
 
-use Infection\Mutator\Mutator;
-use Infection\Mutator\ReturnValue\IntegerNegation;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Stmt\Return_;
 
 class IntegerNegationTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new IntegerNegation();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

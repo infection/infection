@@ -9,19 +9,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Infection\Mutator\Boolean\TrueValue;
-use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
 
 class TrueValueTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new TrueValue();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

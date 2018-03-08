@@ -9,17 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Mutator\Arithmetic\BitwiseAnd;
-use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class BitwiseAndTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new BitwiseAnd();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator;
 
 use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorConfig;
 use Infection\Tests\Fixtures\SimpleMutatorVisitor;
 use Infection\Visitor\CloneVisitor;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
@@ -42,7 +43,13 @@ abstract class AbstractMutatorTestCase extends TestCase
         }
     }
 
-    abstract protected function getMutator(): Mutator;
+    protected function getMutator(): Mutator
+    {
+        $class = get_class($this);
+        $mutator = substr(str_replace('\Tests', '', $class), 0, -4);
+
+        return new $mutator(new MutatorConfig([]));
+    }
 
     protected function setUp()
     {

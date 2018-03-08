@@ -11,6 +11,7 @@ namespace Infection\Tests\Visitor;
 
 use Infection\Mutation;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
+use Infection\Mutator\MutatorConfig;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\Lexer;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -83,7 +84,7 @@ PHP
             new Mutation(
                 'file/to/path',
                 $inputAst,
-                new PublicVisibility(),
+                new PublicVisibility(new MutatorConfig([])),
                 [
                     'startTokenPos' => 29,
                     'endTokenPos' => 48,
@@ -129,7 +130,7 @@ PHP
             new Mutation(
                 'file/to/path',
                 $inputAst,
-                new PublicVisibility(),
+                new PublicVisibility(new MutatorConfig([])),
                 [
                     'startTokenPos' => 29,
                     'endTokenPos' => 50,
@@ -182,7 +183,7 @@ PHP
             new Mutation(
                 'file/to/path',
                 $inputAst,
-                new PublicVisibility(),
+                new PublicVisibility(new MutatorConfig([])),
                 [
                     'startTokenPos' => 29,
                     'endTokenPos' => 48,
