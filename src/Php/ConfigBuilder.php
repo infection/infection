@@ -79,6 +79,13 @@ final class ConfigBuilder
         foreach ($originalIniPaths as $iniPath) {
             $content .= preg_replace($regex, ';$1', file_get_contents($iniPath)) . PHP_EOL;
         }
+        
+        $contents = implode(
+            PHP_EOL,
+            array_unique(
+                explode(PHP_EOL, $contents)
+            )
+        );
 
         return (bool) @file_put_contents($this->tmpIniPath, $content);
     }
