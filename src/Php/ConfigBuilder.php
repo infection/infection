@@ -83,7 +83,7 @@ final class ConfigBuilder
         $content = implode(
             PHP_EOL,
             array_unique(
-                explode(PHP_EOL, $contents)
+                explode(PHP_EOL, $content)
             )
         );
 
