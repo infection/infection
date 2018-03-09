@@ -80,7 +80,7 @@ final class ConfigBuilder
             $content .= preg_replace($regex, ';$1', file_get_contents($iniPath)) . PHP_EOL;
         }
         
-        $contents = implode(
+        $content = implode(
             PHP_EOL,
             array_unique(
                 explode(PHP_EOL, $contents)
