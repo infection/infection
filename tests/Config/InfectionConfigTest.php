@@ -165,15 +165,15 @@ class InfectionConfigTest extends TestCase
     {
         $config = <<<'JSON'
 {
-	"mutators": {
-		"PublicVisibility": {
-			"ignore": [
-				"Ignore\\For\\Particular\\Class",
-				"Ignore\\For\\Another\\Class::method",
-				"Ignore\\For\\**\\*\\Glob\\Pattern\\Or\\Namespace"
-			]
-		}
-	}
+    "mutators": {
+        "PublicVisibility": {
+            "ignore": [
+                "Ignore\\For\\Particular\\Class",
+                "Ignore\\For\\Another\\Class::method",
+                "Ignore\\For\\**\\*\\Glob\\Pattern\\Or\\Namespace"
+            ]
+        }
+    }
 }
 JSON;
 
