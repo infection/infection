@@ -82,7 +82,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
     private function findTestFramework(): string
     {
         if ($this->doesCustomPathExist()) {
-            $this->customPath;
+            return $this->customPath;
         }
 
         $candidates = [$this->testFrameworkName, $this->testFrameworkName . '.phar'];
