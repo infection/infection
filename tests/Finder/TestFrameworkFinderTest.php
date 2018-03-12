@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Finder;
 
+use Infection\Finder\Exception\FinderException;
 use Infection\Finder\SourceFilesFinder;
 use Infection\Finder\TestFrameworkFinder;
 use PHPUnit\Framework\TestCase;
@@ -25,5 +26,17 @@ class TestFrameworkFinderTest extends TestCase
         $frameworkFinder = new TestFrameworkFinder('not-used', $filename);
 
         static::assertEquals($filename, $frameworkFinder->find(), 'Should return the custom path');
+    }
+
+    public function test_invalid_custom_path_throws_exception(): void
+    {
+        $filename = '/tmp/infection-test-framework-finder-test' . uniqid('', false);
+
+        $frameworkFinder = new TestFrameworkFinder('not-used', $filename);
+
+        $this->expectException(FinderException::class);
+        $this->expectExceptionMessageRegExp('/custom path/');
+
+        $frameworkFinder->find();
     }
 }
