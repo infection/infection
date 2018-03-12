@@ -14,14 +14,14 @@ use PHPUnit\Framework\TestCase;
 
 final class InvalidConfigExceptionTest extends TestCase
 {
-    public function testExtendsRuntimeException()
+    public function test_extends_runtime_exception()
     {
         $exception = new InvalidConfigException();
 
         $this->assertInstanceOf(\RuntimeException::class, $exception);
     }
 
-    public function testInvalidJsonCreatesException()
+    public function test_invalid_json_creates_exception()
     {
         $configFile = __DIR__ . '/../../../infection.json.dist';
         $errorMessage = 'That does not look right.';
