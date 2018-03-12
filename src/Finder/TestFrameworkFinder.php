@@ -39,7 +39,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
     public function find(): string
     {
         if ($this->cachedPath === null) {
-            if (!$this->doesCustomPathExist()) {
+            if (!$this->shouldUseCustomPath()) {
                 $this->addVendorFolderToPath();
             }
 
@@ -49,9 +49,17 @@ class TestFrameworkFinder extends AbstractExecutableFinder
         return $this->cachedPath;
     }
 
-    private function doesCustomPathExist(): bool
+    private function shouldUseCustomPath(): bool
     {
-        return $this->customPath && file_exists($this->customPath);
+        if (null === $this->customPath) {
+            return false;
+        }
+
+        if (file_exists($this->customPath)) {
+            return true;
+        }
+
+        throw FinderException::testCustomPathDoesNotExist($this->testFrameworkName, $this->customPath);
     }
 
     private function addVendorFolderToPath()
@@ -81,7 +89,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
 
     private function findTestFramework(): string
     {
-        if ($this->doesCustomPathExist()) {
+        if ($this->shouldUseCustomPath()) {
             return $this->customPath;
         }
 
