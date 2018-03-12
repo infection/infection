@@ -10,16 +10,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\Decrement;
-use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class DecrementTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new Decrement();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

@@ -160,4 +160,31 @@ class InfectionConfigTest extends TestCase
 
         $this->assertSame(['text' => 'app', 'debug' => 'location'], $config->getLogsTypes());
     }
+
+    public function test_it_sets_ignored_mutators()
+    {
+        $config = <<<'JSON'
+{
+    "mutators": {
+        "PublicVisibility": {
+            "ignore": [
+                "Ignore\\For\\Particular\\Class",
+                "Ignore\\For\\Another\\Class::method",
+                "Ignore\\For\\**\\*\\Glob\\Pattern\\Or\\Namespace"
+            ]
+        }
+    }
+}
+JSON;
+
+        $config = new InfectionConfig(json_decode($config), $this->filesystem, '/path/to/config');
+        $this->assertSame(
+            ['ignore' => [
+                    "Ignore\For\Particular\Class",
+                    "Ignore\For\Another\Class::method",
+                    "Ignore\For\**\*\Glob\Pattern\Or\Namespace",
+                ],
+            ],
+            (array) $config->getMutatorsConfiguration()['PublicVisibility']);
+    }
 }

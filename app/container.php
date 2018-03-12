@@ -7,7 +7,6 @@
 
 declare(strict_types=1);
 
-use Infection\Config\InfectionConfig;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\EventDispatcher\EventDispatcher;
@@ -140,16 +139,5 @@ $c['parser'] = function ($c): Parser {
 $c['pretty.printer'] = function (): Standard {
     return new Standard();
 };
-
-function registerMutators(array $mutators, Container $container)
-{
-    foreach ($mutators as $mutator) {
-        $container[$mutator] = function () use ($mutator) {
-            return new $mutator();
-        };
-    }
-}
-
-registerMutators(InfectionConfig::DEFAULT_MUTATORS, $c);
 
 return $c;

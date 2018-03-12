@@ -9,17 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Number;
 
-use Infection\Mutator\Mutator;
-use Infection\Mutator\Number\IncrementInteger;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class IncrementIntegerTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new IncrementInteger();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

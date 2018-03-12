@@ -278,4 +278,9 @@ class InfectionConfig
 
         return sprintf('%s/%s', $this->configLocation, $tmpDir);
     }
+
+    public function getMutatorsConfiguration(): array
+    {
+        return (array) ($this->config->mutators ?? []);
+    }
 }

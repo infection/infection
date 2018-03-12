@@ -7,19 +7,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\ZeroIteration;
+namespace Infection\Tests\Mutator\Operator;
 
-use Infection\Mutator\Mutator;
-use Infection\Mutator\ZeroIteration\Foreach_;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ForeachTest extends AbstractMutatorTestCase
+class Break_Test extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new Foreach_();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */
@@ -31,21 +24,31 @@ class ForeachTest extends AbstractMutatorTestCase
     public function provideMutationCases(): array
     {
         return [
-            'It mutates to new array in foreach' => [
+            'It replaces break with continue in while' => [
                 <<<'PHP'
 <?php
 
-$array = [1, 2];
-
-foreach ($array as $value) {
+while (true) {
+    break;
 }
 PHP
                 ,
                 <<<'PHP'
 <?php
 
-$array = [1, 2];
-foreach (array() as $value) {
+while (true) {
+    continue;
+}
+PHP
+                ,
+            ],
+            'It does not replaces break with continue in switch' => [
+                <<<'PHP'
+<?php
+
+switch (1) {
+    case 1:
+        break;
 }
 PHP
                 ,

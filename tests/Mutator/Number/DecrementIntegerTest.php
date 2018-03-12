@@ -9,17 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Number;
 
-use Infection\Mutator\Mutator;
-use Infection\Mutator\Number\DecrementInteger;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class DecrementIntegerTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new DecrementInteger();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

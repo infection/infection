@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Infection\Mutator\Boolean\LogicalNot;
-use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node\Expr\BooleanNot;
 use PhpParser\Node\Expr\ConstFetch;
@@ -18,11 +16,6 @@ use PhpParser\Node\Name;
 
 class LogicalNotTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new LogicalNot();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

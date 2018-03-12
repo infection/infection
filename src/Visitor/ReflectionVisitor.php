@@ -18,6 +18,7 @@ class ReflectionVisitor extends NodeVisitorAbstract
     const IS_INSIDE_FUNCTION_KEY = 'isInsideFunction';
     const IS_ON_FUNCTION_SIGNATURE = 'isOnFunctionSignature';
     const FUNCTION_SCOPE_KEY = 'functionScope';
+    const FUNCTION_NAME = 'functionName';
 
     private $scopeStack = [];
 
@@ -26,16 +27,26 @@ class ReflectionVisitor extends NodeVisitorAbstract
      */
     private $reflectionClass;
 
+    /**
+     * @var string
+     */
+    private $methodName;
+
     public function beforeTraverse(array $nodes)
     {
         $this->scopeStack = [];
         $this->reflectionClass = null;
+        $this->methodName = null;
     }
 
     public function enterNode(Node $node)
     {
         if ($node instanceof Node\Stmt\ClassLike && $node->fullyQualifiedClassName !== null) {
             $this->reflectionClass = new \ReflectionClass($node->fullyQualifiedClassName->toString());
+        }
+
+        if ($node instanceof Node\Stmt\ClassMethod) {
+            $this->methodName = $node->name;
         }
 
         $isInsideFunction = $this->isInsideFunction($node);
@@ -51,9 +62,11 @@ class ReflectionVisitor extends NodeVisitorAbstract
         if ($this->isFunctionLikeNode($node)) {
             $this->scopeStack[] = $node;
             $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->reflectionClass);
+            $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
         } elseif ($isInsideFunction) {
             $node->setAttribute(self::FUNCTION_SCOPE_KEY, $this->scopeStack[count($this->scopeStack) - 1]);
             $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->reflectionClass);
+            $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
         }
     }
 

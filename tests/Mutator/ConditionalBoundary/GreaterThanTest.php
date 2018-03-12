@@ -9,17 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ConditionalBoundary;
 
-use Infection\Mutator\ConditionalBoundary\GreaterThan;
-use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class GreaterThanTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new GreaterThan();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

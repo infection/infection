@@ -10,16 +10,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\FunctionSignature;
 
 use Infection\Mutator\FunctionSignature\ProtectedVisibility;
-use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class ProtectedVisibilityTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new ProtectedVisibility();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

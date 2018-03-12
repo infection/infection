@@ -74,8 +74,8 @@ class MutationsGenerator
         array $defaultMutators,
         array $whitelistedMutatorNames,
         EventDispatcher $eventDispatcher,
-        Parser $parser)
-    {
+        Parser $parser
+    ) {
         $this->srcDirs = $srcDirs;
         $this->codeCoverageData = $codeCoverageData;
         $this->excludeDirsOrFiles = $excludeDirsOrFiles;
@@ -97,12 +97,13 @@ class MutationsGenerator
         $sourceFilesFinder = new SourceFilesFinder($this->srcDirs, $this->excludeDirsOrFiles);
         $files = $sourceFilesFinder->getSourceFiles($filter);
         $allFilesMutations = [[]];
+        $mutators = $this->getMutators();
 
         $this->eventDispatcher->dispatch(new MutationGeneratingStarted($files->count()));
 
         foreach ($files as $file) {
             if (!$onlyCovered || ($onlyCovered && $this->hasTests($file))) {
-                $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered);
+                $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered, $mutators);
             }
 
             $this->eventDispatcher->dispatch(new MutableFileProcessed());
@@ -116,15 +117,15 @@ class MutationsGenerator
     /**
      * @param SplFileInfo $file
      * @param bool $onlyCovered mutate only covered by tests lines of code
+     * @param array $mutators
      *
      * @return Mutation[]
      */
-    private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered): array
+    private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered, array $mutators): array
     {
         $initialStatements = $this->parser->parse($file->getContents());
 
         $traverser = new NodeTraverser();
-        $mutators = $this->getMutators();
 
         $mutationsCollectorVisitor = new MutationsCollectorVisitor(
             $mutators,
@@ -149,13 +150,16 @@ class MutationsGenerator
         return $this->codeCoverageData->hasTests($file->getRealPath());
     }
 
+    /**
+     * @return array|Mutator[]
+     */
     private function getMutators(): array
     {
         if ($this->whitelistedMutatorNamesCount > 0) {
             return array_filter(
                 $this->defaultMutators,
                 function (Mutator $mutator): bool {
-                    return in_array(strtolower($mutator->getName()), $this->whitelistedMutatorNames, true);
+                    return in_array(strtolower($mutator::getName()), $this->whitelistedMutatorNames, true);
                 }
             );
         }

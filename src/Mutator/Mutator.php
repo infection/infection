@@ -13,14 +13,29 @@ use PhpParser\Node;
 
 abstract class Mutator
 {
+    /**
+     * @var MutatorConfig
+     */
+    private $config;
+
+    public function __construct(MutatorConfig $config)
+    {
+        $this->config = $config;
+    }
+
     abstract public function mutate(Node $node);
 
     abstract public function shouldMutate(Node $node): bool;
 
-    public function getName(): string
+    public static function getName(): string
     {
         $parts = explode('\\', static::class);
 
         return $parts[count($parts) - 1];
+    }
+
+    public function isIgnored(string $class, string $method): bool
+    {
+        return $this->config->isIgnored($class, $method);
     }
 }

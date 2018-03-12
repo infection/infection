@@ -9,17 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Infection\Mutator\Boolean\LogicalAnd;
-use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class LogicalAndTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new LogicalAnd();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

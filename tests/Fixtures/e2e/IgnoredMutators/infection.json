@@ -1,0 +1,24 @@
+{
+    "timeout": 25,
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "logs": {
+        "summary": "infection-log.txt"
+    },
+    "mutators": {
+        "PublicVisibility": {
+            "ignore": [
+                "*\\SourceClass*",
+                "*\\OtherClass::hello"
+            ]
+        },
+        "FalseValue": {
+            "ignore": [
+                "**::isFalse"
+            ]
+        }
+    }
+}

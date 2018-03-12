@@ -78,7 +78,7 @@ class TextFileLogger extends FileLogger
             $index + 1,
             $mutation->getOriginalFilePath(),
             (int) $mutation->getAttributes()['startLine'],
-            $mutation->getMutator()->getName()
+            $mutation->getMutator()::getName()
         );
     }
 }

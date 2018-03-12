@@ -9,17 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Number;
 
-use Infection\Mutator\Mutator;
-use Infection\Mutator\Number\OneZeroInteger;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class OneZeroIntegerTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new OneZeroInteger();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

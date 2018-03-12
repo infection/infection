@@ -14,6 +14,7 @@ use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
+use Infection\Mutator\MutatorConfig;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Mockery;
 use PhpParser\Lexer;
@@ -134,15 +135,15 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $container = new Container();
 
         $container[Plus::class] = function (Container $c) {
-            return new Plus();
+            return new Plus(new MutatorConfig([]));
         };
 
         $container[PublicVisibility::class] = function (Container $c) {
-            return new PublicVisibility();
+            return new PublicVisibility(new MutatorConfig([]));
         };
 
         $container[TrueValue::class] = function (Container $c) {
-            return new TrueValue();
+            return new TrueValue(new MutatorConfig([]));
         };
 
         $defaultMutators = [
