@@ -3,25 +3,25 @@ Killed mutants:
 ===============
 
 
-Mutator: Plus
+Mutator: Arithmetic-Plus
 Line 9
 
-Mutator: PublicVisibility
+Mutator: FunctionSignature-PublicVisibility
 Line 7
 
-Mutator: TrueValue
+Mutator: Boolean-TrueValue
 Line 12
 
-Mutator: FalseValue
+Mutator: Boolean-FalseValue
 Line 14
 
-Mutator: NotIdentical
+Mutator: ConditionalNegotiation-NotIdentical
 Line 14
 
-Mutator: TrueValue
+Mutator: Boolean-TrueValue
 Line 15
 
-Mutator: PublicVisibility
+Mutator: FunctionSignature-PublicVisibility
 Line 12
 
 Errors mutants:
@@ -40,5 +40,5 @@ Not Covered mutants:
 ====================
 
 
-Mutator: FalseValue
+Mutator: Boolean-FalseValue
 Line 17

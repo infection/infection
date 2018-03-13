@@ -20,7 +20,6 @@ use Infection\EventDispatcher\EventDispatcher;
 use Infection\Mutant\Exception\MsiCalculationException;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Mutator\Mutator;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
@@ -198,7 +197,7 @@ class InfectionCommand extends BaseCommand
             $container->get('src.dirs'),
             $container->get('exclude.paths'),
             $codeCoverageData,
-            $this->getDefaultMutators(),
+            $container->get('mutators'),
             $this->parseMutators($input->getOption('mutators')),
             $this->eventDispatcher,
             $container->get('parser')
@@ -401,16 +400,6 @@ class InfectionCommand extends BaseCommand
         }
 
         return explode(',', $mutators);
-    }
-
-    private function getDefaultMutators(): array
-    {
-        return array_map(
-            function (string $class): Mutator {
-                return $this->getContainer()->get($class);
-            },
-            InfectionConfig::DEFAULT_MUTATORS
-        );
     }
 
     private function getTestFrameworkExtraOptions(string $testFrameworkKey): TestFrameworkExtraOptions

@@ -12,6 +12,7 @@ use Infection\Differ\Differ;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Finder\Locator;
 use Infection\Mutant\MutantCreator;
+use Infection\Mutator\MutatorGenerator;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
@@ -138,6 +139,12 @@ $c['parser'] = function ($c): Parser {
 
 $c['pretty.printer'] = function (): Standard {
     return new Standard();
+};
+
+$c['mutators'] = function (Container $c): array {
+    $mutatorConfig = $c['infection.config']->getMutatorsConfiguration();
+
+    return (new MutatorGenerator($mutatorConfig))->create();
 };
 
 return $c;

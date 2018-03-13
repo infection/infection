@@ -9,13 +9,13 @@
         "summary": "infection-log.txt"
     },
     "mutators": {
-        "PublicVisibility": {
+        "FunctionSignature-PublicVisibility": {
             "ignore": [
                 "*\\SourceClass*",
                 "*\\OtherClass::hello"
             ]
         },
-        "FalseValue": {
+        "Boolean-FalseValue": {
             "ignore": [
                 "**::isFalse"
             ]

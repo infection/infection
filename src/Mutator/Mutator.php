@@ -31,7 +31,7 @@ abstract class Mutator
     {
         $parts = explode('\\', static::class);
 
-        return $parts[count($parts) - 1];
+        return implode('-', array_slice($parts, -2));
     }
 
     public function isIgnored(string $class, string $method): bool

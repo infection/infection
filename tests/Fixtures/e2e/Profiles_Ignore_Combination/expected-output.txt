@@ -1,0 +1,32 @@
+Total: 4
+Killed mutants:
+===============
+
+
+Errors mutants:
+===============
+
+
+Escaped mutants:
+================
+
+
+Timed Out mutants:
+==================
+
+
+Not Covered mutants:
+====================
+
+
+Mutator: Boolean-TrueValue
+Line 19
+
+Mutator: FunctionSignature-PublicVisibility
+Line 8
+
+Mutator: Boolean-TrueValue
+Line 15
+
+Mutator: FunctionSignature-PublicVisibility
+Line 13
