@@ -11,4 +11,4 @@ else
     php $INFECTION
 fi
 
-diff expected-output.txt infection-log.txt
+diff -w expected-output.txt infection-log.txt

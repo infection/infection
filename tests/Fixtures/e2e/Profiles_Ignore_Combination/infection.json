@@ -6,7 +6,7 @@
         ]
     },
     "logs": {
-        "debug": "infection-log.txt"
+        "summary": "infection-log.txt"
     },
     "mutators": {
         "@function_signature": {
