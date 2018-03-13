@@ -6,4 +6,4 @@ build/*
 .php_cs.cache
 infection-cache
 .travis/infection-private.pem
-infection.json
+/infection.json
