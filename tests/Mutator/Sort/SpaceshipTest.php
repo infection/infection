@@ -16,7 +16,7 @@ class SpaceshipTest extends AbstractMutatorTestCase
 {
     public function test_get_name()
     {
-        $this->assertSame('Sort-Spaceship', $this->getMutator()::getName());
+        $this->assertSame('Spaceship', $this->getMutator()::getName());
     }
 
     /**

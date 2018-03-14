@@ -3,19 +3,19 @@ Killed mutants:
 ===============
 
 
-Mutator: FunctionSignature-PublicVisibility
+Mutator: PublicVisibility
 Line 10
 
-Mutator: FunctionSignature-PublicVisibility
+Mutator: PublicVisibility
 Line 7
 
-Mutator: Boolean-TrueValue
+Mutator: TrueValue
 Line 12
 
-Mutator: Arithmetic-Plus
+Mutator: Plus
 Line 15
 
-Mutator: FunctionSignature-PublicVisibility
+Mutator: PublicVisibility
 Line 12
 
 Errors mutants:
@@ -34,8 +34,8 @@ Not Covered mutants:
 ====================
 
 
-Mutator: Number-DecrementInteger
+Mutator: DecrementInteger
 Line 18
 
-Mutator: Number-OneZeroInteger
+Mutator: OneZeroInteger
 Line 18

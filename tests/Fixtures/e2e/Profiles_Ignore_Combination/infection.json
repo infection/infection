@@ -14,12 +14,12 @@
                 "*\\SourceClass*"
             ]
         },
-        "FunctionSignature-ProtectedVisibility": false,
-        "Boolean-FalseValue": {
+        "ProtectedVisibility": false,
+        "FalseValue": {
             "ignore": [
                 "**::isFalse"
             ]
         },
-        "Boolean-TrueValue": true
+        "TrueValue": true
     }
 }

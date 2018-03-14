@@ -9,64 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-use Infection\Mutator\Arithmetic\Assignment;
-use Infection\Mutator\Arithmetic\AssignmentEqual;
-use Infection\Mutator\Arithmetic\BitwiseAnd;
-use Infection\Mutator\Arithmetic\BitwiseNot;
-use Infection\Mutator\Arithmetic\BitwiseOr;
-use Infection\Mutator\Arithmetic\BitwiseXor;
-use Infection\Mutator\Arithmetic\Decrement;
-use Infection\Mutator\Arithmetic\DivEqual;
-use Infection\Mutator\Arithmetic\Division;
-use Infection\Mutator\Arithmetic\Exponentiation;
-use Infection\Mutator\Arithmetic\Increment;
-use Infection\Mutator\Arithmetic\Minus;
-use Infection\Mutator\Arithmetic\MinusEqual;
-use Infection\Mutator\Arithmetic\ModEqual;
-use Infection\Mutator\Arithmetic\Modulus;
-use Infection\Mutator\Arithmetic\MulEqual;
-use Infection\Mutator\Arithmetic\Multiplication;
-use Infection\Mutator\Arithmetic\Plus;
-use Infection\Mutator\Arithmetic\PlusEqual;
-use Infection\Mutator\Arithmetic\PowEqual;
-use Infection\Mutator\Arithmetic\ShiftLeft;
-use Infection\Mutator\Arithmetic\ShiftRight;
-use Infection\Mutator\Boolean\FalseValue;
-use Infection\Mutator\Boolean\LogicalAnd;
-use Infection\Mutator\Boolean\LogicalLowerAnd;
-use Infection\Mutator\Boolean\LogicalLowerOr;
-use Infection\Mutator\Boolean\LogicalNot;
-use Infection\Mutator\Boolean\LogicalOr;
-use Infection\Mutator\Boolean\TrueValue;
-use Infection\Mutator\ConditionalBoundary\GreaterThan;
-use Infection\Mutator\ConditionalBoundary\GreaterThanOrEqualTo;
-use Infection\Mutator\ConditionalBoundary\LessThan;
-use Infection\Mutator\ConditionalBoundary\LessThanOrEqualTo;
-use Infection\Mutator\ConditionalNegotiation\Equal;
-use Infection\Mutator\ConditionalNegotiation\GreaterThanNegotiation;
-use Infection\Mutator\ConditionalNegotiation\GreaterThanOrEqualToNegotiation;
-use Infection\Mutator\ConditionalNegotiation\Identical;
-use Infection\Mutator\ConditionalNegotiation\LessThanNegotiation;
-use Infection\Mutator\ConditionalNegotiation\LessThanOrEqualToNegotiation;
-use Infection\Mutator\ConditionalNegotiation\NotEqual;
-use Infection\Mutator\ConditionalNegotiation\NotIdentical;
-use Infection\Mutator\FunctionSignature\ProtectedVisibility;
-use Infection\Mutator\FunctionSignature\PublicVisibility;
-use Infection\Mutator\Number\DecrementInteger;
-use Infection\Mutator\Number\IncrementInteger;
-use Infection\Mutator\Number\OneZeroFloat;
-use Infection\Mutator\Number\OneZeroInteger;
-use Infection\Mutator\Operator\Break_;
-use Infection\Mutator\Operator\Continue_;
-use Infection\Mutator\Operator\Throw_;
-use Infection\Mutator\ReturnValue\FloatNegation;
-use Infection\Mutator\ReturnValue\FunctionCall;
-use Infection\Mutator\ReturnValue\IntegerNegation;
-use Infection\Mutator\ReturnValue\NewObject;
-use Infection\Mutator\ReturnValue\This;
-use Infection\Mutator\Sort\Spaceship;
-use Infection\Mutator\ZeroIteration\For_;
-use Infection\Mutator\ZeroIteration\Foreach_;
+use Infection\Mutator;
 
 class MutatorProfile
 {
@@ -88,91 +31,91 @@ class MutatorProfile
     ];
 
     const ARITHMETIC = [
-        Assignment::class,
-        AssignmentEqual::class,
-        BitwiseAnd::class,
-        BitwiseNot::class,
-        BitwiseOr::class,
-        BitwiseXor::class,
-        Decrement::class,
-        DivEqual::class,
-        Division::class,
-        Exponentiation::class,
-        Increment::class,
-        Minus::class,
-        MinusEqual::class,
-        ModEqual::class,
-        Modulus::class,
-        MulEqual::class,
-        Multiplication::class,
-        Plus::class,
-        PlusEqual::class,
-        PowEqual::class,
-        ShiftLeft::class,
-        ShiftRight::class,
+        Mutator\Arithmetic\Assignment::class,
+        Mutator\Arithmetic\AssignmentEqual::class,
+        Mutator\Arithmetic\BitwiseAnd::class,
+        Mutator\Arithmetic\BitwiseNot::class,
+        Mutator\Arithmetic\BitwiseOr::class,
+        Mutator\Arithmetic\BitwiseXor::class,
+        Mutator\Arithmetic\Decrement::class,
+        Mutator\Arithmetic\DivEqual::class,
+        Mutator\Arithmetic\Division::class,
+        Mutator\Arithmetic\Exponentiation::class,
+        Mutator\Arithmetic\Increment::class,
+        Mutator\Arithmetic\Minus::class,
+        Mutator\Arithmetic\MinusEqual::class,
+        Mutator\Arithmetic\ModEqual::class,
+        Mutator\Arithmetic\Modulus::class,
+        Mutator\Arithmetic\MulEqual::class,
+        Mutator\Arithmetic\Multiplication::class,
+        Mutator\Arithmetic\Plus::class,
+        Mutator\Arithmetic\PlusEqual::class,
+        Mutator\Arithmetic\PowEqual::class,
+        Mutator\Arithmetic\ShiftLeft::class,
+        Mutator\Arithmetic\ShiftRight::class,
     ];
 
     const BOOLEAN = [
-        FalseValue::class,
-        LogicalAnd::class,
-        LogicalLowerAnd::class,
-        LogicalLowerOr::class,
-        LogicalNot::class,
-        LogicalOr::class,
-        TrueValue::class,
+        Mutator\Boolean\FalseValue::class,
+        Mutator\Boolean\LogicalAnd::class,
+        Mutator\Boolean\LogicalLowerAnd::class,
+        Mutator\Boolean\LogicalLowerOr::class,
+        Mutator\Boolean\LogicalNot::class,
+        Mutator\Boolean\LogicalOr::class,
+        Mutator\Boolean\TrueValue::class,
     ];
 
     const CONDITIONAL_BOUNDARY = [
-        GreaterThan::class,
-        GreaterThanOrEqualTo::class,
-        LessThan::class,
-        LessThanOrEqualTo::class,
+        Mutator\ConditionalBoundary\GreaterThan::class,
+        Mutator\ConditionalBoundary\GreaterThanOrEqualTo::class,
+        Mutator\ConditionalBoundary\LessThan::class,
+        Mutator\ConditionalBoundary\LessThanOrEqualTo::class,
     ];
 
     const CONDITIONAL_NEGOTIATION = [
-        Equal::class,
-        GreaterThanNegotiation::class,
-        GreaterThanOrEqualToNegotiation::class,
-        Identical::class,
-        LessThanNegotiation::class,
-        LessThanOrEqualToNegotiation::class,
-        NotEqual::class,
-        NotIdentical::class,
+        Mutator\ConditionalNegotiation\Equal::class,
+        Mutator\ConditionalNegotiation\GreaterThanNegotiation::class,
+        Mutator\ConditionalNegotiation\GreaterThanOrEqualToNegotiation::class,
+        Mutator\ConditionalNegotiation\Identical::class,
+        Mutator\ConditionalNegotiation\LessThanNegotiation::class,
+        Mutator\ConditionalNegotiation\LessThanOrEqualToNegotiation::class,
+        Mutator\ConditionalNegotiation\NotEqual::class,
+        Mutator\ConditionalNegotiation\NotIdentical::class,
     ];
 
     const FUNCTION_SIGNATURE = [
-        PublicVisibility::class,
-        ProtectedVisibility::class,
+        Mutator\FunctionSignature\PublicVisibility::class,
+        Mutator\FunctionSignature\ProtectedVisibility::class,
     ];
 
     const NUMBER = [
-        DecrementInteger::class,
-        IncrementInteger::class,
-        OneZeroInteger::class,
-        OneZeroFloat::class,
+        Mutator\Number\DecrementInteger::class,
+        Mutator\Number\IncrementInteger::class,
+        Mutator\Number\OneZeroInteger::class,
+        Mutator\Number\OneZeroFloat::class,
     ];
 
     const OPERATOR = [
-        Break_::class,
-        Continue_::class,
-        Throw_::class,
+        Mutator\Operator\Break_::class,
+        Mutator\Operator\Continue_::class,
+        Mutator\Operator\Throw_::class,
     ];
 
     const RETURN_VALUE = [
-        FloatNegation::class,
-        FunctionCall::class,
-        IntegerNegation::class,
-        NewObject::class,
-        This::class,
+        Mutator\ReturnValue\FloatNegation::class,
+        Mutator\ReturnValue\FunctionCall::class,
+        Mutator\ReturnValue\IntegerNegation::class,
+        Mutator\ReturnValue\NewObject::class,
+        Mutator\ReturnValue\This::class,
     ];
 
     const SORT = [
-        Spaceship::class,
+        Mutator\Sort\Spaceship::class,
     ];
 
     const ZERO_ITERATION = [
-        Foreach_::class,
-        For_::class
+        Mutator\ZeroIteration\Foreach_::class,
+        Mutator\ZeroIteration\For_::class,
     ];
 
     const DEFAULT = [
@@ -186,5 +129,85 @@ class MutatorProfile
         '@return_value',
         '@sort',
         '@zero_iteration',
+    ];
+
+    const FULL_MUTATOR_LIST = [
+        //Arithmetic
+        'Assignment' => Mutator\Arithmetic\Assignment::class,
+        'AssignmentEqual' => Mutator\Arithmetic\AssignmentEqual::class,
+        'BitwiseAnd' => Mutator\Arithmetic\BitwiseAnd::class,
+        'BitwiseNot' => Mutator\Arithmetic\BitwiseNot::class,
+        'BitwiseOr' => Mutator\Arithmetic\BitwiseOr::class,
+        'BitwiseXor' => Mutator\Arithmetic\BitwiseXor::class,
+        'Decrement' => Mutator\Arithmetic\Decrement::class,
+        'DivEqual' => Mutator\Arithmetic\DivEqual::class,
+        'Division' => Mutator\Arithmetic\Division::class,
+        'Exponentiation' => Mutator\Arithmetic\Exponentiation::class,
+        'Increment' => Mutator\Arithmetic\Increment::class,
+        'Minus' => Mutator\Arithmetic\Minus::class,
+        'MinusEqual' => Mutator\Arithmetic\MinusEqual::class,
+        'ModEqual' => Mutator\Arithmetic\ModEqual::class,
+        'Modulus' => Mutator\Arithmetic\Modulus::class,
+        'MulEqual' => Mutator\Arithmetic\MulEqual::class,
+        'Multiplication' => Mutator\Arithmetic\Multiplication::class,
+        'Plus' => Mutator\Arithmetic\Plus::class,
+        'PlusEqual' => Mutator\Arithmetic\PlusEqual::class,
+        'PowEqual' => Mutator\Arithmetic\PowEqual::class,
+        'ShiftLeft' => Mutator\Arithmetic\ShiftLeft::class,
+        'ShiftRight' => Mutator\Arithmetic\ShiftRight::class,
+
+        //Boolean
+        'FalseValue' => Mutator\Boolean\FalseValue::class,
+        'LogicalAnd' => Mutator\Boolean\LogicalAnd::class,
+        'LogicalLowerAnd' => Mutator\Boolean\LogicalLowerAnd::class,
+        'LogicalLowerOr' => Mutator\Boolean\LogicalLowerOr::class,
+        'LogicalNot' => Mutator\Boolean\LogicalNot::class,
+        'LogicalOr' => Mutator\Boolean\LogicalOr::class,
+        'TrueValue' => Mutator\Boolean\TrueValue::class,
+
+        //Conditional Boundary
+        'GreaterThan' => Mutator\ConditionalBoundary\GreaterThan::class,
+        'GreaterThanOrEqualTo' => Mutator\ConditionalBoundary\GreaterThanOrEqualTo::class,
+        'LessThan' => Mutator\ConditionalBoundary\LessThan::class,
+        'LessThanOrEqualTo' => Mutator\ConditionalBoundary\LessThanOrEqualTo::class,
+
+        //Conditional Negotiation
+        'Equal' => Mutator\ConditionalNegotiation\Equal::class,
+        'GreaterThanNegotiation' => Mutator\ConditionalNegotiation\GreaterThanNegotiation::class,
+        'GreaterThanOrEqualToNegotiation' => Mutator\ConditionalNegotiation\GreaterThanOrEqualToNegotiation::class,
+        'Identical' => Mutator\ConditionalNegotiation\Identical::class,
+        'LessThanNegotiation' => Mutator\ConditionalNegotiation\LessThanNegotiation::class,
+        'LessThanOrEqualToNegotiation' => Mutator\ConditionalNegotiation\LessThanOrEqualToNegotiation::class,
+        'NotEqual' => Mutator\ConditionalNegotiation\NotEqual::class,
+        'NotIdentical' => Mutator\ConditionalNegotiation\NotIdentical::class,
+
+        //Function Signature
+        'PublicVisibility' => Mutator\FunctionSignature\PublicVisibility::class,
+        'ProtectedVisibility' => Mutator\FunctionSignature\ProtectedVisibility::class,
+
+        //Number
+        'DecrementInteger' => Mutator\Number\DecrementInteger::class,
+        'IncrementInteger' => Mutator\Number\IncrementInteger::class,
+        'OneZeroInteger' => Mutator\Number\OneZeroInteger::class,
+        'OneZeroFloat' => Mutator\Number\OneZeroFloat::class,
+
+        //Operator
+        'Break_' => Mutator\Operator\Break_::class,
+        'Continue_' => Mutator\Operator\Continue_::class,
+        'Throw_' => Mutator\Operator\Throw_::class,
+
+        //Return Value
+        'FloatNegation' => Mutator\ReturnValue\FloatNegation::class,
+        'FunctionCall' => Mutator\ReturnValue\FunctionCall::class,
+        'IntegerNegation' => Mutator\ReturnValue\IntegerNegation::class,
+        'NewObject' => Mutator\ReturnValue\NewObject::class,
+        'This' => Mutator\ReturnValue\This::class,
+
+        //Sort
+        'Spaceship' => Mutator\Sort\Spaceship::class,
+
+        //Zero Iteration
+        'Foreach_' => Mutator\ZeroIteration\Foreach_::class,
+        'For_' => Mutator\ZeroIteration\For_::class,
     ];
 }

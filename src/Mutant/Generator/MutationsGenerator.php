@@ -81,7 +81,7 @@ class MutationsGenerator
         $this->codeCoverageData = $codeCoverageData;
         $this->excludeDirsOrFiles = $excludeDirsOrFiles;
         $this->defaultMutators = $defaultMutators;
-        $this->whitelistedMutatorNames = array_map('strtolower', $whitelistedMutatorNames);
+        $this->whitelistedMutatorNames = $whitelistedMutatorNames;
         $this->whitelistedMutatorNamesCount = count($whitelistedMutatorNames);
         $this->eventDispatcher = $eventDispatcher;
         $this->parser = $parser;
@@ -157,9 +157,13 @@ class MutationsGenerator
     private function getMutators(): array
     {
         if ($this->whitelistedMutatorNamesCount > 0) {
-            $generator = new MutatorGenerator();
+            $mutatorList = [];
+            foreach ($this->whitelistedMutatorNames as $mutatorName) {
+                $mutatorList[$mutatorName] = true;
+            }
+            $generator = new MutatorGenerator($mutatorList);
 
-            return $generator->createFromNameList($this->whitelistedMutatorNames);
+            return $generator->create();
         }
 
         return $this->defaultMutators;

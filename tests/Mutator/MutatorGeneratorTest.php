@@ -23,7 +23,7 @@ class MutatorGeneratorTest extends TestCase
         $mutatorGenerator = new MutatorGenerator([]);
         $mutators = $mutatorGenerator->create();
 
-        $this->assertCount(55, $mutators);
+        $this->assertCount(58, $mutators);
     }
 
     public function test_boolean_mutator_returns_boolean_mutators()
@@ -44,7 +44,7 @@ class MutatorGeneratorTest extends TestCase
         ]);
         $mutators = $mutatorGenerator->create();
 
-        $this->assertCount(54, $mutators);
+        $this->assertCount(57, $mutators);
     }
 
     public function test_profiles_can_be_ignored()
@@ -55,7 +55,7 @@ class MutatorGeneratorTest extends TestCase
         ]);
         $mutators = $mutatorGenerator->create();
 
-        $this->assertCount(48, $mutators);
+        $this->assertCount(51, $mutators);
     }
 
     public function test_names_can_be_ignored()
@@ -66,7 +66,7 @@ class MutatorGeneratorTest extends TestCase
         ]);
         $mutators = $mutatorGenerator->create();
 
-        $this->assertCount(54, $mutators);
+        $this->assertCount(57, $mutators);
     }
 
     public function test_it_throws_an_error_if_profile_does_not_exist()
@@ -87,7 +87,7 @@ class MutatorGeneratorTest extends TestCase
         ]);
         $mutators = $mutatorGenerator->create();
 
-        $this->assertCount(55, $mutators);
+        $this->assertCount(58, $mutators);
 
         $this->assertInstanceOf(Plus::class, $mutators[Plus::getName()]);
 
@@ -102,7 +102,7 @@ class MutatorGeneratorTest extends TestCase
         ]);
         $mutators = $mutatorGenerator->create();
 
-        $this->assertCount(55, $mutators);
+        $this->assertCount(58, $mutators);
 
         $this->assertInstanceOf(Plus::class, $mutators[Plus::getName()]);
 

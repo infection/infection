@@ -60,17 +60,6 @@ class MutatorGenerator
         return $this->createFromList($this->mutatorList);
     }
 
-    public function createFromNameList(array $list)
-    {
-        $this->mutatorList = [];
-
-        foreach ($list as $key => $mutatorName) {
-            $this->registerFromName($mutatorName, true);
-        }
-
-        return $this->createFromList($this->mutatorList);
-    }
-
     /**
      * @param string $profile
      * @param array|bool $setting
@@ -120,14 +109,8 @@ class MutatorGenerator
      */
     private function registerFromName(string $mutator, $setting)
     {
-        $mutatorName = str_replace('-', '\\', $mutator);
-        $currentName = explode('\\', static::class);
-
-        array_splice($currentName, -1);
-        $mutatorFqn = implode('\\', $currentName);
-
-        if (class_exists($mutatorFqn . '\\' . $mutatorName)) {
-            $this->registerFromClass($mutatorFqn . '\\' . $mutatorName, $setting);
+        if (array_key_exists($mutator, MutatorProfile::FULL_MUTATOR_LIST)) {
+            $this->registerFromClass(MutatorProfile::FULL_MUTATOR_LIST[$mutator], $setting);
         } else {
             throw InvalidConfigException::invalidMutator($mutator);
         }

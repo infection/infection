@@ -3,13 +3,13 @@ Killed mutants:
 ===============
 
 
-Mutator: Boolean-FalseValue
+Mutator: FalseValue
 Line 15
 
-Mutator: ConditionalNegotiation-Identical
+Mutator: Identical
 Line 17
 
-Mutator: FunctionSignature-PublicVisibility
+Mutator: PublicVisibility
 Line 15
 
 Errors mutants:
@@ -20,7 +20,7 @@ Escaped mutants:
 ================
 
 
-Mutator: Boolean-FalseValue
+Mutator: FalseValue
 Line 17
 
 Timed Out mutants:
@@ -31,5 +31,5 @@ Not Covered mutants:
 ====================
 
 
-Mutator: Operator-Throw_
+Mutator: Throw_
 Line 18
