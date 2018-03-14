@@ -5,14 +5,14 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
+declare(strict_types=1);
+
 namespace Infection\Process\Listener;
 
 use Infection\Config\InfectionConfig;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\MutationTestingFinished;
-use Infection\Http\BadgeApiClient;
-use Infection\Logger\BadgeLogger;
 use Infection\Logger\DebugFileLogger;
 use Infection\Logger\ResultsLoggerTypes;
 use Infection\Logger\SummaryFileLogger;
@@ -39,9 +39,9 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
     private $fs;
 
     /**
-     * @var bool
+     * @var int
      */
-    private $isDebugMode;
+    private $logVerbosity;
 
     /**
      * @var OutputInterface
@@ -59,7 +59,7 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
         $this->infectionConfig = $infectionConfig;
         $this->metricsCalculator = $metricsCalculator;
         $this->fs = $fs;
-        $this->isDebugMode = ($logVerbosity === LogVerbosity::DEBUG);
+        $this->logVerbosity = $logVerbosity;
     }
 
     /**
@@ -83,7 +83,9 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
         $logTypes = $this->filterLogTypes($logTypes);
 
         foreach ($logTypes as $logType => $config) {
-            $this->useLogger($logType, $config);
+            if ($this->logVerbosity !== LogVerbosity::NONE) {
+                $this->useLogger($logType, $config);
+            }
         }
     }
 
@@ -100,13 +102,14 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
 
     private function useLogger(string $logType, $config)
     {
+        $isDebugMode = $this->logVerbosity === LogVerbosity::DEBUG;
         switch ($logType) {
             case ResultsLoggerTypes::TEXT_FILE:
                 (new TextFileLogger(
                     $config,
                     $this->metricsCalculator,
                     $this->fs,
-                    $this->isDebugMode
+                    $isDebugMode
                 ))->log();
                 break;
             case ResultsLoggerTypes::SUMMARY_FILE:
@@ -114,7 +117,7 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
                     $config,
                     $this->metricsCalculator,
                     $this->fs,
-                    $this->isDebugMode
+                     $isDebugMode
                 ))->log();
                 break;
             case ResultsLoggerTypes::DEBUG_FILE:
@@ -122,15 +125,8 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
                     $config,
                     $this->metricsCalculator,
                     $this->fs,
-                    $this->isDebugMode
-                ))->log();
-                break;
-            case ResultsLoggerTypes::BADGE:
-                (new BadgeLogger(
-                    $this->output,
-                    new BadgeApiClient($this->output),
-                    $this->metricsCalculator,
-                    $config
+
+                    $isDebugMode
                 ))->log();
                 break;
         }
