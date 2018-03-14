@@ -148,7 +148,7 @@ class InfectionCommand extends BaseCommand
                 'log-verbosity',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Log verbosity level. 1 - full logs format, 2 - short logs format.',
+                'Log verbosity level. 1 - full logs format, 2 - short logs format, 3 - no logs.',
                 LogVerbosity::DEBUG
             )
             ->addOption(
@@ -176,6 +176,9 @@ class InfectionCommand extends BaseCommand
         $metricsCalculator = new MetricsCalculator();
 
         $this->registerSubscribers($metricsCalculator, $adapter);
+        if (!$input->getOption('log-verbosity') === LogVerbosity::NONE) {
+            $this->registerFileLoggerSubscriber($metricsCalculator);
+        }
 
         $processBuilder = new ProcessBuilder($adapter, $container->get('infection.config')->getProcessTimeout());
         $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);
@@ -297,14 +300,20 @@ class InfectionCommand extends BaseCommand
                 $this->getContainer()->get('diff.colorizer'),
                 $this->input->getOption('show-mutations')
             ),
+        ];
+    }
+
+    private function registerFileLoggerSubscriber(MetricsCalculator $metricsCalculator)
+    {
+        $this->eventDispatcher->addSubscriber(
             new MutationTestingResultsLoggerSubscriber(
                 $this->output,
                 $this->getContainer()->get('infection.config'),
                 $metricsCalculator,
                 $this->getContainer()->get('filesystem'),
                 (int) $this->input->getOption('log-verbosity')
-            ),
-        ];
+            )
+        );
     }
 
     private function getCodeCoverageData(string $testFrameworkKey): CodeCoverageData

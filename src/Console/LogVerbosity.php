@@ -11,4 +11,5 @@ final class LogVerbosity
 {
     const DEBUG = 1;
     const NORMAL = 2;
+    const NONE = 3;
 }
