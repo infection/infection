@@ -221,14 +221,6 @@ class InfectionConfig
         return self::DEFAULT_EXCLUDE_DIRS;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getLogPathInfoFor(string $log)
-    {
-        return $this->config->logs->$log ?? null;
-    }
-
     public function getLogsTypes(): array
     {
         return (array) $this->config->logs ?? [];

@@ -5,18 +5,17 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
-namespace Infection\Process\Listener\FileLoggerSubscriber;
+namespace Infection\Logger;
 
-use Infection\Config\InfectionConfig;
 use Infection\Mutant\MetricsCalculator;
 use Symfony\Component\Filesystem\Filesystem;
 
-abstract class FileLogger
+abstract class FileLogger implements MutationTestingResultsLogger
 {
     /**
-     * @var InfectionConfig
+     * @var string
      */
-    protected $infectionConfig;
+    private $logFilePath;
 
     /**
      * @var MetricsCalculator
@@ -34,29 +33,21 @@ abstract class FileLogger
     protected $isDebugMode;
 
     public function __construct(
-        InfectionConfig $infectionConfig,
+        string $logFilePath,
         MetricsCalculator $metricsCalculator,
         Filesystem $fs,
-        bool $isDebugMode = true
+        bool $isDebugMode
     ) {
-        $this->infectionConfig = $infectionConfig;
         $this->metricsCalculator = $metricsCalculator;
         $this->fs = $fs;
         $this->isDebugMode = $isDebugMode;
+        $this->logFilePath = $logFilePath;
     }
 
-    abstract public function writeToFile();
-
-    final protected function write(array $logs, string $logFilePath = null)
+    public function log()
     {
-        if ($logFilePath !== null) {
-            $this->fs->dumpFile(
-                $logFilePath,
-                implode(
-                    $logs,
-                    "\n"
-                )
-            );
-        }
+        $this->fs->dumpFile($this->logFilePath, implode($this->getLogLines(), "\n"));
     }
+
+    abstract protected function getLogLines(): array;
 }

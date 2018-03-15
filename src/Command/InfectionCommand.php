@@ -22,11 +22,11 @@ use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\Mutator;
 use Infection\Process\Builder\ProcessBuilder;
-use Infection\Process\Listener\FileLoggerSubscriber\BaseFileLoggerSubscriber;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationTestingConsoleLoggerSubscriber;
+use Infection\Process\Listener\MutationTestingResultsLoggerSubscriber;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
@@ -297,7 +297,8 @@ class InfectionCommand extends BaseCommand
                 $this->getContainer()->get('diff.colorizer'),
                 $this->input->getOption('show-mutations')
             ),
-            new BaseFileLoggerSubscriber(
+            new MutationTestingResultsLoggerSubscriber(
+                $this->output,
                 $this->getContainer()->get('infection.config'),
                 $metricsCalculator,
                 $this->getContainer()->get('filesystem'),

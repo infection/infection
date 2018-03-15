@@ -7,19 +7,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Listener\FileLoggerSubscriber;
+namespace Infection\Tests\Process\Listener;
 
 use Infection\Config\InfectionConfig;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Events\MutationTestingFinished;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Process\Listener\FileLoggerSubscriber\BaseFileLoggerSubscriber;
+use Infection\Process\Listener\MutationTestingResultsLoggerSubscriber;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-class BaseFileLoggerSubscriberTest extends TestCase
+class MutationTestingResultsLoggerSubscriberTest extends TestCase
 {
+    /**
+     * @var OutputInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $output;
+
     /**
      * @var InfectionConfig|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -37,6 +43,9 @@ class BaseFileLoggerSubscriberTest extends TestCase
 
     protected function setUp()
     {
+        $this->output = $this->getMockBuilder(OutputInterface::class)
+            ->getMock();
+
         $this->infectionConfig = $this->getMockBuilder(InfectionConfig::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -60,15 +69,12 @@ class BaseFileLoggerSubscriberTest extends TestCase
         $this->metricsCalculator->expects($this->never())
             ->method('getNotCoveredMutantProcesses');
 
-        $this->infectionConfig->expects($this->any())
-            ->method('getLogPathInfoFor')
-            ->willReturn(null);
-
         $this->filesystem->expects($this->never())
             ->method('dumpFile');
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new BaseFileLoggerSubscriber(
+        $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(
+            $this->output,
             $this->infectionConfig,
             $this->metricsCalculator,
             $this->filesystem
@@ -80,10 +86,6 @@ class BaseFileLoggerSubscriberTest extends TestCase
     public function test_it_reacts_on_mutation_testing_finished()
     {
         $logTypes = ['text' => sys_get_temp_dir() . '/infection-log.txt'];
-        $this->infectionConfig->expects($this->once())
-            ->method('getLogPathInfoFor')
-            ->with('text')
-            ->willReturn(sys_get_temp_dir() . '/infection-log.txt');
 
         $this->infectionConfig->expects($this->once())
             ->method('getLogsTypes')
@@ -113,7 +115,8 @@ class BaseFileLoggerSubscriberTest extends TestCase
             ->method('dumpFile');
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new BaseFileLoggerSubscriber(
+        $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(
+            $this->output,
             $this->infectionConfig,
             $this->metricsCalculator,
             $this->filesystem
@@ -129,10 +132,6 @@ class BaseFileLoggerSubscriberTest extends TestCase
         $this->infectionConfig->expects($this->once())
             ->method('getLogsTypes')
             ->willReturn($logTypes);
-
-        $this->infectionConfig->expects($this->once())
-            ->method('getLogPathInfoFor')
-            ->willReturn(sys_get_temp_dir() . '/infection-log.txt');
 
         $this->metricsCalculator->expects($this->once())
             ->method('getEscapedMutantProcesses')
@@ -156,7 +155,8 @@ class BaseFileLoggerSubscriberTest extends TestCase
             ->method('dumpFile');
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new BaseFileLoggerSubscriber(
+        $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(
+            $this->output,
             $this->infectionConfig,
             $this->metricsCalculator,
             $this->filesystem,
