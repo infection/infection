@@ -60,6 +60,13 @@ class SourceDirsProvider
 
         $choices = array_merge(['.'], array_values($dirsInCurrentDir));
 
+        // if a guessed value is not any of current choices, add it to allowed values
+        foreach ($guessedSourceDirs as $guessedSourceDir) {
+            if (!in_array($guessedSourceDir, $choices, true)) {
+                $choices[] = $guessedSourceDir;
+            }
+        }
+
         $question = new ChoiceQuestion($questionText, $choices, $defaultValues);
         $question->setMultiselect(true);
 
