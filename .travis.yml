@@ -37,6 +37,7 @@ env:
 cache:
   directories:
     - $HOME/.composer/cache
+    - build/cache
 
 before_install:
   - composer selfupdate
