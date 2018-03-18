@@ -41,8 +41,13 @@ class ConfigureCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $consoleHelper = new ConsoleHelper($this->getHelper('formatter'));
+        if (!$input->isInteractive()) {
+            $output->writeln('Infection config generator requires an interactive mode.');
 
+            return 1;
+        }
+
+        $consoleHelper = new ConsoleHelper($this->getHelper('formatter'));
         $consoleHelper->writeSection($output, 'Welcome to the Infection config generator');
 
         $output->writeln([
