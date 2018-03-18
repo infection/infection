@@ -37,6 +37,44 @@ class SourceDirsProviderTest extends AbstractBaseProviderTest
         $this->assertSame(['src'], $sourceDirs);
     }
 
+    public function test_it_uses_guesser_and_non_default_guessed_value()
+    {
+        $consoleMock = Mockery::mock(ConsoleHelper::class);
+        $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
+
+        $dialog = $this->getQuestionHelper();
+
+        $provider = new SourceDirsProvider($consoleMock, $dialog);
+
+        $sourceDirs = $provider->get(
+            $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
+            $this->createOutputInterface(),
+            ['src'],
+            ['src/Namespace']
+        );
+
+        $this->assertSame(['src/Namespace'], $sourceDirs);
+    }
+
+    public function test_it_uses_guesser_and_multiple_guessed_dirs()
+    {
+        $consoleMock = Mockery::mock(ConsoleHelper::class);
+        $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
+
+        $dialog = $this->getQuestionHelper();
+
+        $provider = new SourceDirsProvider($consoleMock, $dialog);
+
+        $sourceDirs = $provider->get(
+            $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
+            $this->createOutputInterface(),
+            ['src'],
+            ['foo', 'bar']
+        );
+
+        $this->assertSame(['foo', 'bar'], $sourceDirs);
+    }
+
     public function test_it_fills_choices_with_current_dir()
     {
         $consoleMock = Mockery::mock(ConsoleHelper::class);

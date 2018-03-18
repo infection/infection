@@ -34,13 +34,11 @@ class SourceDirsProvider
         $this->questionHelper = $questionHelper;
     }
 
-    public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir): array
+    public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, array $guessedSourceDirs = []): array
     {
         $output->writeln(['']);
 
-        $guessedSourceDirs = null;
-
-        if (file_exists('composer.json')) {
+        if (empty($guessedSourceDirs) && file_exists('composer.json')) {
             $content = json_decode(file_get_contents('composer.json'));
 
             if (json_last_error() !== JSON_ERROR_NONE) {
