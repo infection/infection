@@ -449,7 +449,9 @@ class InfectionCommand extends BaseCommand
                 '--test-framework' => $input->getOption('test-framework'),
             ];
 
-            $result = $configureCommand->run(new ArrayInput($args), $output);
+            $newInput = new ArrayInput($args);
+            $newInput->setInteractive($input->isInteractive());
+            $result = $configureCommand->run($newInput, $output);
 
             if ($result !== 0) {
                 throw InfectionException::configurationAborted();
