@@ -48,7 +48,25 @@ if (1 == $a) {
 }
 PHP
                         ,
-                ],
+            ],
+            'It does not try to assign a variable to a class constant' => [
+                        <<<'PHP'
+<?php
+
+if (BaseClass::CLASS_CONST == $a) {
+}
+PHP
+                        ,
+            ],
+            'It does not try to assign a variable to a built in constant' => [
+                        <<<'PHP'
+<?php
+
+if (PHP_EOL == $a) {
+}
+PHP
+                        ,
+            ],
         ];
     }
 }
