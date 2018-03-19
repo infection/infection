@@ -67,6 +67,15 @@ if (PHP_EOL == $a) {
 PHP
                         ,
             ],
+            'It does not try to assign a scalar to a result of a function call' => [
+                        <<<'PHP'
+<?php
+
+if ($x->getFoo() == 1) {
+}
+PHP
+                        ,
+            ],
         ];
     }
 }
