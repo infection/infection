@@ -63,6 +63,7 @@ use Infection\Mutator\ReturnValue\IntegerNegation;
 use Infection\Mutator\ReturnValue\NewObject;
 use Infection\Mutator\ReturnValue\This;
 use Infection\Mutator\Sort\Spaceship;
+use Infection\Mutator\Value\String_;
 use Infection\Mutator\ZeroIteration\Foreach_;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -140,6 +141,9 @@ class InfectionConfig
 
         // Sort
         Spaceship::class,
+
+        //Value
+        String_::class,
 
         Break_::class,
         Continue_::class,
