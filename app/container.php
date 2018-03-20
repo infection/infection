@@ -12,7 +12,7 @@ use Infection\Differ\Differ;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Finder\Locator;
 use Infection\Mutant\MutantCreator;
-use Infection\Mutator\MutatorGenerator;
+use Infection\Mutator\Util\MutatorGenerator;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;

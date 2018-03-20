@@ -7,11 +7,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator;
+namespace Infection\Mutator\Util;
 
 use Infection\Mutator;
 
-class MutatorProfile
+final class MutatorProfile
 {
     const MUTATOR_PROFILE_LIST = [
         //Per category

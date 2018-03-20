@@ -9,8 +9,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use Infection\Mutator\MutatorProfile;
+use Infection\Mutator\Util\MutatorProfile;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Finder\Finder;
 
 class MutatorProfileTest extends TestCase
 {
@@ -25,6 +26,31 @@ class MutatorProfileTest extends TestCase
                     $name,
                     $class,
                     $class::getName()
+                )
+            );
+        }
+    }
+
+    public function test_all_mutators_are_part_of_the_full_mutators_list()
+    {
+        /** @var Finder $files */
+        $files = Finder::create()
+            ->name('*.php')
+            ->in('src/Mutator')
+            ->exclude('Util')
+            ->files();
+
+        foreach ($files as $file) {
+            $class = substr($file->getFilename(), 0, -4);
+
+            $this->assertArrayHasKey(
+                $class,
+                MutatorProfile::FULL_MUTATOR_LIST,
+                sprintf(
+                    'The mutator "%s" located in "%s" has not been added to the FULL_MUTATOR_LIST in the Mutator Profile class' .
+                    'Please add it to ensure it can be used.',
+                    $class,
+                    $file->getPath()
                 )
             );
         }

@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures;
 
-use Infection\Mutator\Mutator;
+use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 

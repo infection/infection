@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator;
+namespace Infection\Mutator\Util;
 
 use PhpParser\Node;
 

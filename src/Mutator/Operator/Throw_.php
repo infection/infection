@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Infection\Mutator\Mutator;
+use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 class Throw_ extends Mutator

@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Infection\Visitor;
 
 use Infection\Mutation;
-use Infection\Mutator\Mutator;
+use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;

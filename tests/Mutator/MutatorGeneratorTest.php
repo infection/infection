@@ -13,7 +13,7 @@ use Infection\Config\Exception\InvalidConfigException;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\FalseValue;
 use Infection\Mutator\Boolean\TrueValue;
-use Infection\Mutator\MutatorGenerator;
+use Infection\Mutator\Util\MutatorGenerator;
 use PHPUnit\Framework\TestCase;
 
 class MutatorGeneratorTest extends TestCase

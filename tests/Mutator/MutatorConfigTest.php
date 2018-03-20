@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use Infection\Mutator\MutatorConfig;
+use Infection\Mutator\Util\MutatorConfig;
 use PHPUnit\Framework\TestCase;
 
 class MutatorConfigTest extends TestCase
