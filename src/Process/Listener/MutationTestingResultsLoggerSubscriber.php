@@ -85,15 +85,19 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
         $logTypes = $this->filterLogTypes($logTypes);
 
         foreach ($logTypes as $logType => $config) {
-            if ($this->logVerbosity !== LogVerbosity::NONE) {
-                $this->useLogger($logType, $config);
-            }
+            $this->useLogger($logType, $config);
         }
     }
 
     private function filterLogTypes(array $logTypes): array
     {
         foreach ($logTypes as $key => $value) {
+            if ($this->logVerbosity === LogVerbosity::NONE) {
+                if (!in_array($key, ResultsLoggerTypes::ALLOWED_WITHOUT_LOGGING, true)) {
+                    unset($logTypes[$key]);
+                }
+                continue;
+            }
             if (!in_array($key, ResultsLoggerTypes::ALL, true)) {
                 unset($logTypes[$key]);
             }

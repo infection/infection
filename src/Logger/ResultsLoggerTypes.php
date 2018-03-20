@@ -22,4 +22,8 @@ final class ResultsLoggerTypes
         ResultsLoggerTypes::SUMMARY_FILE,
         ResultsLoggerTypes::BADGE,
     ];
+
+    const ALLOWED_WITHOUT_LOGGING = [
+        ResultsLoggerTypes::BADGE,
+    ];
 }
