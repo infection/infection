@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use Infection\Config\ConsoleHelper;
+use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\InfectionConfig;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
 use Infection\Config\ValueProvider\PhpUnitCustomExecutablePathProvider;
@@ -61,7 +62,19 @@ class ConfigureCommand extends BaseCommand
 
         $questionHelper = $this->getHelper('question');
 
-        $sourceDirsProvider = new SourceDirsProvider($consoleHelper, $questionHelper);
+        if (file_exists('composer.json')) {
+            $content = json_decode(file_get_contents('composer.json'));
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \LogicException('composer.json does not contain valid JSON');
+            }
+
+            $sourceDirGuesser = new SourceDirGuesser($content);
+        } else {
+            $sourceDirGuesser = new SourceDirGuesser(new \stdClass());
+        }
+
+        $sourceDirsProvider = new SourceDirsProvider($consoleHelper, $questionHelper, $sourceDirGuesser);
         $sourceDirs = $sourceDirsProvider->get($input, $output, $dirsInCurrentDir);
 
         if (empty($sourceDirs)) {

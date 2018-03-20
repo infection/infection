@@ -28,28 +28,25 @@ class SourceDirsProvider
      */
     private $questionHelper;
 
-    public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
+    /**
+     * @var SourceDirGuesser
+     */
+    private $sourceDirGuesser;
+
+    public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper, SourceDirGuesser $sourceDirGuesser)
     {
         $this->consoleHelper = $consoleHelper;
         $this->questionHelper = $questionHelper;
+        $this->sourceDirGuesser = $sourceDirGuesser;
     }
 
     public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir): array
     {
         $output->writeln(['']);
 
-        $guessedSourceDirs = null;
+        $guessedSourceDirs = (array) $this->sourceDirGuesser->guess();
 
-        if (file_exists('composer.json')) {
-            $content = json_decode(file_get_contents('composer.json'));
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new \LogicException('composer.json does not contain valid JSON');
-            }
-
-            $sourceDirGuesser = new SourceDirGuesser($content);
-            $guessedSourceDirs = $sourceDirGuesser->guess();
-        }
+        $choices = array_unique(array_merge(['.'], array_values($dirsInCurrentDir), $guessedSourceDirs));
 
         $defaultValues = $guessedSourceDirs ? implode(',', $guessedSourceDirs) : null;
 
@@ -57,8 +54,6 @@ class SourceDirsProvider
             'Which source directories do you want to include (comma separated)?',
             $defaultValues
         );
-
-        $choices = array_merge(['.'], array_values($dirsInCurrentDir));
 
         $question = new ChoiceQuestion($questionText, $choices, $defaultValues);
         $question->setMultiselect(true);
