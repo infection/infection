@@ -12,7 +12,6 @@ namespace Infection\Console;
 use Infection\Command;
 use Infection\Config\Exception\InvalidConfigException;
 use Infection\Config\InfectionConfig;
-use Infection\Mutator\MutatorConfig;
 use Infection\Php\ConfigBuilder;
 use Infection\Php\XdebugHandler;
 use Pimple\Container;
@@ -120,7 +119,6 @@ ASCII;
     public function doRun(InputInterface $input, OutputInterface $output)
     {
         $this->buildDynamicDependencies($input);
-        $this->registerMutators(InfectionConfig::DEFAULT_MUTATORS);
 
         $output->writeln(self::LOGO);
 
@@ -224,20 +222,5 @@ ASCII;
                 ? $existingCoveragePath
                 : sprintf('%s/%s', getcwd(), $existingCoveragePath);
         };
-    }
-
-    private function registerMutators(array $mutators)
-    {
-        foreach ($mutators as $mutator) {
-            $this->container[$mutator] = function () use ($mutator) {
-                $config = $this->container['infection.config']->getMutatorsConfiguration();
-
-                if (isset($config[$mutator::getName()])) {
-                    return new $mutator(new MutatorConfig((array) $config[$mutator::getName()]));
-                }
-
-                return new $mutator(new MutatorConfig([]));
-            };
-        }
     }
 }

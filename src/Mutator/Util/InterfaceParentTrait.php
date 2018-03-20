@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator;
+namespace Infection\Mutator\Util;
 
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;

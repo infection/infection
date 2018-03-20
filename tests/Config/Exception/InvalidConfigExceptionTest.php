@@ -41,4 +41,41 @@ final class InvalidConfigExceptionTest extends TestCase
 
         $this->assertSame($expected, $exception->getMessage());
     }
+
+    public function test_invalid_mutator_creates_exception()
+    {
+        $wrongMutator = 'NonExistent Mutator';
+
+        $exception = InvalidConfigException::invalidMutator($wrongMutator);
+
+        $this->assertInstanceOf(InvalidConfigException::class, $exception);
+
+        $expected = sprintf(
+            'The "%s" mutator/profile was not recognized.',
+            $wrongMutator
+        );
+
+        $this->assertSame($expected, $exception->getMessage());
+    }
+
+    public function test_invalid_profile_creates_exception()
+    {
+        $configFile = '@hello';
+        $errorMessage = 'Wrong Mutator';
+
+        $exception = InvalidConfigException::invalidProfile(
+            $configFile,
+            $errorMessage
+        );
+
+        $this->assertInstanceOf(InvalidConfigException::class, $exception);
+
+        $expected = sprintf(
+            'The "%s" profile contains the "%s" mutator which was not recognized.',
+            $configFile,
+            $errorMessage
+        );
+
+        $this->assertSame($expected, $exception->getMessage());
+    }
 }

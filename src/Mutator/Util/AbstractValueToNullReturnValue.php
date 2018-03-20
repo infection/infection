@@ -7,9 +7,8 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\ReturnValue;
+namespace Infection\Mutator\Util;
 
-use Infection\Mutator\Mutator;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 

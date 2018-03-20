@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\FunctionSignature;
 
-use Infection\Mutator\InterfaceParentTrait;
-use Infection\Mutator\Mutator;
+use Infection\Mutator\Util\InterfaceParentTrait;
+use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;

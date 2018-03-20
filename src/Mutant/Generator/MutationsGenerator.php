@@ -15,7 +15,8 @@ use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
 use Infection\Finder\SourceFilesFinder;
 use Infection\Mutation;
-use Infection\Mutator\Mutator;
+use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\MutatorsGenerator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
@@ -80,7 +81,7 @@ class MutationsGenerator
         $this->codeCoverageData = $codeCoverageData;
         $this->excludeDirsOrFiles = $excludeDirsOrFiles;
         $this->defaultMutators = $defaultMutators;
-        $this->whitelistedMutatorNames = array_map('strtolower', $whitelistedMutatorNames);
+        $this->whitelistedMutatorNames = $whitelistedMutatorNames;
         $this->whitelistedMutatorNamesCount = count($whitelistedMutatorNames);
         $this->eventDispatcher = $eventDispatcher;
         $this->parser = $parser;
@@ -156,12 +157,14 @@ class MutationsGenerator
     private function getMutators(): array
     {
         if ($this->whitelistedMutatorNamesCount > 0) {
-            return array_filter(
-                $this->defaultMutators,
-                function (Mutator $mutator): bool {
-                    return in_array(strtolower($mutator::getName()), $this->whitelistedMutatorNames, true);
-                }
-            );
+            $mutatorSettings = [];
+
+            foreach ($this->whitelistedMutatorNames as $mutatorName) {
+                $mutatorSettings[$mutatorName] = true;
+            }
+            $generator = new MutatorsGenerator($mutatorSettings);
+
+            return $generator->generate();
         }
 
         return $this->defaultMutators;

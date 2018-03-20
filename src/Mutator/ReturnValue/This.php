@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
+use Infection\Mutator\Util\AbstractValueToNullReturnValue;
 use PhpParser\Node;
 
 class This extends AbstractValueToNullReturnValue

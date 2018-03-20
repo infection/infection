@@ -19,4 +19,21 @@ final class InvalidConfigException extends \RuntimeException
             $errorMessage
         ));
     }
+
+    public static function invalidMutator(string $mutator): self
+    {
+        return new self(sprintf(
+           'The "%s" mutator/profile was not recognized.',
+           $mutator
+        ));
+    }
+
+    public static function invalidProfile(string $profile, string $mutator): self
+    {
+        return new self(sprintf(
+            'The "%s" profile contains the "%s" mutator which was not recognized.',
+            $profile,
+            $mutator
+        ));
+    }
 }

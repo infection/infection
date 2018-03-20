@@ -15,6 +15,11 @@ class OtherClass
         return true;
     }
 
+    protected function thisIsProtected()
+    {
+        return 'protected';
+    }
+
     private function isFalse()
     {
         return false;

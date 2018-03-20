@@ -9,16 +9,17 @@
         "summary": "infection-log.txt"
     },
     "mutators": {
-        "PublicVisibility": {
+        "@function_signature": {
             "ignore": [
-                "*\\SourceClass*",
-                "*\\OtherClass::hello"
+                "*\\SourceClass*"
             ]
         },
+        "ProtectedVisibility": false,
         "FalseValue": {
             "ignore": [
                 "**::isFalse"
             ]
-        }
+        },
+        "TrueValue": true
     }
 }

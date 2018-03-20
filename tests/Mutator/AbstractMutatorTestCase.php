@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorConfig;
+use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\MutatorConfig;
 use Infection\Tests\Fixtures\SimpleMutatorVisitor;
 use Infection\Visitor\CloneVisitor;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;

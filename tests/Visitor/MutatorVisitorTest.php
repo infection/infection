@@ -11,7 +11,7 @@ namespace Infection\Tests\Visitor;
 
 use Infection\Mutation;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
-use Infection\Mutator\MutatorConfig;
+use Infection\Mutator\Util\MutatorConfig;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\Lexer;
 use PhpParser\Node\Stmt\ClassMethod;
