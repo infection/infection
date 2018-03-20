@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator;
+namespace Infection\Tests\Mutator\Util;
 
 use Infection\Config\Exception\InvalidConfigException;
 use Infection\Mutator\Arithmetic\Plus;
