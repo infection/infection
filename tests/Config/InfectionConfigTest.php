@@ -145,6 +145,13 @@ class InfectionConfigTest extends TestCase
         $this->assertSame(['text' => 'app', 'debug' => 'location'], $config->getLogsTypes());
     }
 
+    public function test_it_correctly_gets_config_logs_if_missing()
+    {
+        $config = new InfectionConfig(new \stdClass(), $this->filesystem, '/path/to/config');
+
+        $this->assertSame([], $config->getLogsTypes());
+    }
+
     public function test_it_sets_ignored_mutators()
     {
         $config = <<<'JSON'

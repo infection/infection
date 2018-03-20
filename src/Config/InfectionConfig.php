@@ -223,7 +223,7 @@ class InfectionConfig
 
     public function getLogsTypes(): array
     {
-        return (array) $this->config->logs ?? [];
+        return (array) ($this->config->logs ?? []);
     }
 
     private function getExcludedDirsByPattern(string $originalExcludedDir)
