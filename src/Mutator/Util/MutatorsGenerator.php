@@ -11,7 +11,7 @@ namespace Infection\Mutator\Util;
 
 use Infection\Config\Exception\InvalidConfigException;
 
-class MutatorGenerator
+class MutatorsGenerator
 {
     /**
      * @var array
@@ -35,7 +35,7 @@ class MutatorGenerator
      *
      * @return Mutator[]
      */
-    public function create(): array
+    public function generate(): array
     {
         if (empty($this->mutatorSettings)) {
             $this->mutatorSettings = [

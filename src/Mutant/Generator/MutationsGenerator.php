@@ -16,7 +16,7 @@ use Infection\Events\MutationGeneratingStarted;
 use Infection\Finder\SourceFilesFinder;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
-use Infection\Mutator\Util\MutatorGenerator;
+use Infection\Mutator\Util\MutatorsGenerator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
@@ -162,9 +162,9 @@ class MutationsGenerator
             foreach ($this->whitelistedMutatorNames as $mutatorName) {
                 $mutatorSettings[$mutatorName] = true;
             }
-            $generator = new MutatorGenerator($mutatorSettings);
+            $generator = new MutatorsGenerator($mutatorSettings);
 
-            return $generator->create();
+            return $generator->generate();
         }
 
         return $this->defaultMutators;
