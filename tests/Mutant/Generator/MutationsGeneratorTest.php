@@ -29,7 +29,7 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
         $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(true);
-        $codeCoverageDataMock->shouldReceive('isLineFunctionSignature')->andReturn(false);
+        $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->andReturn(false);
 
         $generator = $this->createMutationGenerator($codeCoverageDataMock);
 
@@ -42,7 +42,7 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
         $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(true);
-        $codeCoverageDataMock->shouldReceive('isLineFunctionSignature')->andReturn(true);
+        $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->andReturn(true);
 
         $generator = $this->createMutationGenerator($codeCoverageDataMock);
 
@@ -71,12 +71,6 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $codeCoverageDataMock->shouldReceive('hasTests')->andReturn(true);
         $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(false);
         $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->andReturn(true);
-        $codeCoverageDataMock->shouldReceive('isLineFunctionSignature')
-            ->withArgs([Mockery::any(), 14])
-            ->andReturn(true);
-        $codeCoverageDataMock->shouldReceive('isLineFunctionSignature')
-            ->andReturn(false)
-            ->byDefault();
 
         $generator = $this->createMutationGenerator($codeCoverageDataMock);
 
@@ -92,7 +86,6 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
         $codeCoverageDataMock->shouldReceive('hasTests')->andReturn(true);
         $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(false);
-        $codeCoverageDataMock->shouldReceive('isLineFunctionSignature')->andReturn(false);
         $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->andReturn(false);
 
         $generator = $this->createMutationGenerator($codeCoverageDataMock);
