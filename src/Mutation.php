@@ -44,13 +44,19 @@ class Mutation
      */
     private $isOnFunctionSignature;
 
+    /**
+     * @var bool
+     */
+    private $isCoveredByTest;
+
     public function __construct(
         string $originalFilePath,
         array $originalFileAst,
         Mutator $mutator,
         array $attributes,
         string $mutatedNodeClass,
-        bool $isOnFunctionSignature
+        bool $isOnFunctionSignature,
+        bool $isCoveredByTest
     ) {
         $this->originalFilePath = $originalFilePath;
         $this->originalFileAst = $originalFileAst;
@@ -58,6 +64,7 @@ class Mutation
         $this->attributes = $attributes;
         $this->mutatedNodeClass = $mutatedNodeClass;
         $this->isOnFunctionSignature = $isOnFunctionSignature;
+        $this->isCoveredByTest = $isCoveredByTest;
     }
 
     public function getMutator(): Mutator
@@ -106,5 +113,10 @@ class Mutation
     public function isOnFunctionSignature(): bool
     {
         return $this->isOnFunctionSignature;
+    }
+
+    public function isCoveredByTest(): bool
+    {
+        return $this->isCoveredByTest;
     }
 }

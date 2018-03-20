@@ -63,6 +63,10 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
     public function leaveNode(Node $node)
     {
         foreach ($this->mutators as $mutator) {
+            if (!$mutator->shouldMutate($node)) {
+                continue;
+            }
+
             $isOnFunctionSignature = $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
 
             if (!$isOnFunctionSignature) {
@@ -80,29 +84,31 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
                 }
             }
 
-            if ($this->onlyCovered) {
-                if ($isOnFunctionSignature &&
-                    !$this->codeCoverageData->hasExecutedMethodOnLine($this->filePath, $node->getLine())) {
-                    continue;
-                }
+            $isCoveredByTest = $this->isCoveredByTest($isOnFunctionSignature, $node);
 
-                if (!$isOnFunctionSignature &&
-                    !$this->codeCoverageData->hasTestsOnLine($this->filePath, $node->getLine())) {
-                    continue;
-                }
+            if ($this->onlyCovered && !$isCoveredByTest) {
+                continue;
             }
 
-            if ($mutator->shouldMutate($node)) {
-                $this->mutations[] = new Mutation(
-                    $this->filePath,
-                    $this->fileAst,
-                    $mutator,
-                    $node->getAttributes(),
-                    get_class($node),
-                    $isOnFunctionSignature
-                );
-            }
+            $this->mutations[] = new Mutation(
+                $this->filePath,
+                $this->fileAst,
+                $mutator,
+                $node->getAttributes(),
+                get_class($node),
+                $isOnFunctionSignature,
+                $isCoveredByTest
+            );
         }
+    }
+
+    private function isCoveredByTest(bool $isOnFunctionSignature, Node $node): bool
+    {
+        if ($isOnFunctionSignature) {
+            return $this->codeCoverageData->hasExecutedMethodOnLine($this->filePath, $node->getLine());
+        }
+
+        return $this->codeCoverageData->hasTestsOnLine($this->filePath, $node->getLine());
     }
 
     /**
