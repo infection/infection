@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Infection\Config;
 
+use Infection\Mutator\Arithmetic\Assignment;
+use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Arithmetic\BitwiseAnd;
 use Infection\Mutator\Arithmetic\BitwiseNot;
 use Infection\Mutator\Arithmetic\BitwiseOr;
@@ -63,6 +65,7 @@ use Infection\Mutator\ReturnValue\IntegerNegation;
 use Infection\Mutator\ReturnValue\NewObject;
 use Infection\Mutator\ReturnValue\This;
 use Infection\Mutator\Sort\Spaceship;
+use Infection\Mutator\ZeroIteration\For_;
 use Infection\Mutator\ZeroIteration\Foreach_;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -75,6 +78,8 @@ class InfectionConfig
 
     const DEFAULT_MUTATORS = [
         // Arithmetic
+        Assignment::class,
+        AssignmentEqual::class,
         BitwiseAnd::class,
         BitwiseNot::class,
         BitwiseOr::class,
@@ -145,6 +150,7 @@ class InfectionConfig
         Continue_::class,
         Throw_::class,
         Foreach_::class,
+        For_::class,
     ];
 
     /**
