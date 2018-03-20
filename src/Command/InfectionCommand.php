@@ -82,7 +82,7 @@ class InfectionCommand extends BaseCommand
             )
             ->addOption(
                 'threads',
-                null,
+                'j',
                 InputOption::VALUE_REQUIRED,
                 'Threads count',
                 1
