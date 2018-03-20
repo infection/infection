@@ -158,6 +158,7 @@ class MutationsGenerator
     {
         if ($this->whitelistedMutatorNamesCount > 0) {
             $mutatorSettings = [];
+
             foreach ($this->whitelistedMutatorNames as $mutatorName) {
                 $mutatorSettings[$mutatorName] = true;
             }
