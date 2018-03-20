@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
+use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\ValueProvider\SourceDirsProvider;
 use Mockery;
 
@@ -26,7 +27,10 @@ class SourceDirsProviderTest extends AbstractBaseProviderTest
 
         $dialog = $this->getQuestionHelper();
 
-        $provider = new SourceDirsProvider($consoleMock, $dialog);
+        $sourceDirGuesser = $this->createMock(SourceDirGuesser::class);
+        $sourceDirGuesser->method('guess')->willReturn(['src']);
+
+        $provider = new SourceDirsProvider($consoleMock, $dialog, $sourceDirGuesser);
 
         $sourceDirs = $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
@@ -44,13 +48,15 @@ class SourceDirsProviderTest extends AbstractBaseProviderTest
 
         $dialog = $this->getQuestionHelper();
 
-        $provider = new SourceDirsProvider($consoleMock, $dialog);
+        $sourceDirGuesser = $this->createMock(SourceDirGuesser::class);
+        $sourceDirGuesser->method('guess')->willReturn(['src/Namespace']);
+
+        $provider = new SourceDirsProvider($consoleMock, $dialog, $sourceDirGuesser);
 
         $sourceDirs = $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
             $this->createOutputInterface(),
-            ['src'],
-            ['src/Namespace']
+            ['src']
         );
 
         $this->assertSame(['src/Namespace'], $sourceDirs);
@@ -63,13 +69,15 @@ class SourceDirsProviderTest extends AbstractBaseProviderTest
 
         $dialog = $this->getQuestionHelper();
 
-        $provider = new SourceDirsProvider($consoleMock, $dialog);
+        $sourceDirGuesser = $this->createMock(SourceDirGuesser::class);
+        $sourceDirGuesser->method('guess')->willReturn(['foo', 'bar']);
+
+        $provider = new SourceDirsProvider($consoleMock, $dialog, $sourceDirGuesser);
 
         $sourceDirs = $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
             $this->createOutputInterface(),
-            ['src'],
-            ['foo', 'bar']
+            ['src']
         );
 
         $this->assertSame(['foo', 'bar'], $sourceDirs);
@@ -82,7 +90,10 @@ class SourceDirsProviderTest extends AbstractBaseProviderTest
 
         $dialog = $this->getQuestionHelper();
 
-        $provider = new SourceDirsProvider($consoleMock, $dialog);
+        $sourceDirGuesser = $this->createMock(SourceDirGuesser::class);
+        $sourceDirGuesser->method('guess')->willReturn(['src']);
+
+        $provider = new SourceDirsProvider($consoleMock, $dialog, $sourceDirGuesser);
 
         $sourceDirs = $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("0\n")),
@@ -103,7 +114,10 @@ class SourceDirsProviderTest extends AbstractBaseProviderTest
 
         $dialog = $this->getQuestionHelper();
 
-        $provider = new SourceDirsProvider($consoleMock, $dialog);
+        $sourceDirGuesser = $this->createMock(SourceDirGuesser::class);
+        $sourceDirGuesser->method('guess')->willReturn(['src']);
+
+        $provider = new SourceDirsProvider($consoleMock, $dialog, $sourceDirGuesser);
 
         $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("0,1\n")),
