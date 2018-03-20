@@ -46,7 +46,7 @@ class ReflectionVisitor extends NodeVisitorAbstract
         }
 
         if ($node instanceof Node\Stmt\ClassMethod) {
-            $this->methodName = $node->name;
+            $this->methodName = $node->name->name;
         }
 
         $isInsideFunction = $this->isInsideFunction($node);

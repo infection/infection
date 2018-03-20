@@ -68,10 +68,10 @@ class PublicVisibility extends Mutator
         return !$this->hasSamePublicParentMethod($node);
     }
 
-    private function isBlacklistedFunction(string $name): bool
+    private function isBlacklistedFunction(Node\Identifier $name): bool
     {
         return in_array(
-            $name,
+            $name->name,
             [
                 '__construct',
                 '__invoke',
@@ -99,7 +99,7 @@ class PublicVisibility extends Mutator
 
         foreach ($reflection->getInterfaces() as $reflectionInterface) {
             try {
-                $method = $reflectionInterface->getMethod($node->name);
+                $method = $reflectionInterface->getMethod($node->name->name);
 
                 if ($method->isPublic()) {
                     // we can't mutate because interface requires the same public visibility
@@ -121,7 +121,7 @@ class PublicVisibility extends Mutator
         $parent = $reflection->getParentClass();
         while ($parent) {
             try {
-                $method = $parent->getMethod($node->name);
+                $method = $parent->getMethod($node->name->name);
 
                 if ($method->isPublic()) {
                     return true;

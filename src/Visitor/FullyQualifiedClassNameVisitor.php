@@ -30,7 +30,7 @@ class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
         } elseif ($node instanceof Stmt\ClassLike) {
             $node->fullyQualifiedClassName = null === $node->name
                 ? null
-                : Name::concat($this->namespace, $node->name);
+                : Name::concat($this->namespace, $node->name->name);
         }
     }
 }
