@@ -13,6 +13,8 @@ use Infection\Config\InfectionConfig;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\MutationTestingFinished;
+use Infection\Http\BadgeApiClient;
+use Infection\Logger\BadgeLogger;
 use Infection\Logger\DebugFileLogger;
 use Infection\Logger\ResultsLoggerTypes;
 use Infection\Logger\SummaryFileLogger;
@@ -127,6 +129,14 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
                     $this->fs,
 
                     $isDebugMode
+                ))->log();
+                break;
+            case ResultsLoggerTypes::BADGE:
+                (new BadgeLogger(
+                    $this->output,
+                    new BadgeApiClient($this->output),
+                    $this->metricsCalculator,
+                    $config
                 ))->log();
                 break;
         }
