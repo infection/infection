@@ -11,6 +11,8 @@ namespace Infection\Tests\Fixtures\Files\Mutation\OneFile;
 
 class OneFile
 {
+    const FOO = 1 + 2;
+
     public function foo($value = true): int
     {
         return 33 + 44;
