@@ -90,6 +90,7 @@ PHP
                     'endTokenPos' => 48,
                 ],
                 ClassMethod::class,
+                true,
                 true
             ),
         ];
@@ -136,6 +137,7 @@ PHP
                     'endTokenPos' => 50,
                 ],
                 ClassMethod::class,
+                true,
                 true
             ),
         ];
@@ -189,6 +191,7 @@ PHP
                     'endTokenPos' => 48,
                 ],
                 ClassMethod::class,
+                true,
                 true
             ),
         ];
