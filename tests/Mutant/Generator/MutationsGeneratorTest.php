@@ -17,6 +17,7 @@ use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\Tests\Fixtures\Files\Mutation\OneFile\OneFile;
 use Mockery;
 use PhpParser\Lexer;
 use PhpParser\Parser;
@@ -95,6 +96,24 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertCount(0, $mutations);
     }
 
+    public function test_it_can_skip_ignored_classes()
+    {
+        $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
+        $codeCoverageDataMock->shouldReceive('hasTests')->andReturn(true);
+        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(false);
+        $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->andReturn(false);
+
+        $generator = $this->createMutationGenerator($codeCoverageDataMock, [], new MutatorConfig([
+            'ignore' => [
+                OneFile::class,
+            ],
+        ]));
+
+        $mutations = $generator->generate(true);
+
+        $this->assertCount(0, $mutations);
+    }
+
     public function test_it_executes_only_whitelisted_mutators()
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
@@ -119,7 +138,7 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertCount(0, $mutations);
     }
 
-    private function createMutationGenerator(CodeCoverageData $codeCoverageDataMock, array $whitelistedMutatorNames = [])
+    private function createMutationGenerator(CodeCoverageData $codeCoverageDataMock, array $whitelistedMutatorNames = [], MutatorConfig $mutatorConfig = null)
     {
         $srcDirs = [
             dirname(__DIR__, 2) . '/Fixtures/Files/Mutation/OneFile',
@@ -128,16 +147,18 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $container = new Container();
 
-        $container[Plus::class] = function (Container $c) {
-            return new Plus(new MutatorConfig([]));
+        $mutatorConfig = $mutatorConfig ?? new MutatorConfig([]);
+
+        $container[Plus::class] = function (Container $c) use ($mutatorConfig) {
+            return new Plus($mutatorConfig);
         };
 
-        $container[PublicVisibility::class] = function (Container $c) {
-            return new PublicVisibility(new MutatorConfig([]));
+        $container[PublicVisibility::class] = function (Container $c) use ($mutatorConfig) {
+            return new PublicVisibility($mutatorConfig);
         };
 
-        $container[TrueValue::class] = function (Container $c) {
-            return new TrueValue(new MutatorConfig([]));
+        $container[TrueValue::class] = function (Container $c) use ($mutatorConfig) {
+            return new TrueValue($mutatorConfig);
         };
 
         $defaultMutators = [
