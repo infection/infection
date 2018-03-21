@@ -68,14 +68,14 @@ class YamlConfigurationHelperTest extends TestCase
 
     public function test_it_can_build_config_with_custom_paths()
     {
-        $originalContent = <<<EOS
+        $originalContent = <<<YAML
 paths:
     tests: test
     output: test/output
     data: test/data
     support: test/support
     envs: test/envs
-EOS;
+YAML;
         $configurationHelper = new YamlConfigurationHelper($this->tempDir, $this->projectDir, $originalContent, []);
 
         $config = Yaml::parse($configurationHelper->getTransformedConfig('output'));
@@ -101,14 +101,14 @@ EOS;
 
     public function test_it_can_build_config_with_disabled_coverage()
     {
-        $originalContent = <<<EOS
+        $originalContent = <<<YAML
 coverage:
     enabled: true
     include:
         - abc
     exclude:
         - def
-EOS;
+YAML;
         $configurationHelper = new YamlConfigurationHelper($this->tempDir, $this->projectDir, $originalContent, ['src']);
 
         $config = Yaml::parse($configurationHelper->getTransformedConfig('.', false));
@@ -120,14 +120,14 @@ EOS;
 
     public function test_it_can_build_config_with_enabled_coverage()
     {
-        $originalContent = <<<EOS
+        $originalContent = <<<YAML
 coverage:
     enabled: false
     include:
         - abc
     exclude:
         - def
-EOS;
+YAML;
         $configurationHelper = new YamlConfigurationHelper($this->tempDir, $this->projectDir, $originalContent, ['src']);
 
         $config = Yaml::parse($configurationHelper->getTransformedConfig('.', true));
