@@ -5,10 +5,13 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
+declare(strict_types=1);
+
 namespace Infection\Console;
 
 final class LogVerbosity
 {
     const DEBUG = 1;
     const NORMAL = 2;
+    const NONE = 3;
 }

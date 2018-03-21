@@ -147,7 +147,7 @@ class InfectionCommand extends BaseCommand
                 'log-verbosity',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Log verbosity level. 1 - full logs format, 2 - short logs format.',
+                'Log verbosity level. 1 - full logs format, 2 - short logs format, 3 - no logs.',
                 LogVerbosity::DEBUG
             )
             ->addOption(

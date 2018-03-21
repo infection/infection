@@ -5,6 +5,8 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
+declare(strict_types=1);
+
 namespace Infection\Process\Listener;
 
 use Infection\Config\InfectionConfig;
@@ -39,9 +41,9 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
     private $fs;
 
     /**
-     * @var bool
+     * @var int
      */
-    private $isDebugMode;
+    private $logVerbosity;
 
     /**
      * @var OutputInterface
@@ -59,7 +61,7 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
         $this->infectionConfig = $infectionConfig;
         $this->metricsCalculator = $metricsCalculator;
         $this->fs = $fs;
-        $this->isDebugMode = ($logVerbosity === LogVerbosity::DEBUG);
+        $this->logVerbosity = $logVerbosity;
     }
 
     /**
@@ -90,6 +92,12 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
     private function filterLogTypes(array $logTypes): array
     {
         foreach ($logTypes as $key => $value) {
+            if ($this->logVerbosity === LogVerbosity::NONE) {
+                if (!in_array($key, ResultsLoggerTypes::ALLOWED_WITHOUT_LOGGING, true)) {
+                    unset($logTypes[$key]);
+                }
+                continue;
+            }
             if (!in_array($key, ResultsLoggerTypes::ALL, true)) {
                 unset($logTypes[$key]);
             }
@@ -100,13 +108,14 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
 
     private function useLogger(string $logType, $config)
     {
+        $isDebugMode = $this->logVerbosity === LogVerbosity::DEBUG;
         switch ($logType) {
             case ResultsLoggerTypes::TEXT_FILE:
                 (new TextFileLogger(
                     $config,
                     $this->metricsCalculator,
                     $this->fs,
-                    $this->isDebugMode
+                    $isDebugMode
                 ))->log();
                 break;
             case ResultsLoggerTypes::SUMMARY_FILE:
@@ -114,7 +123,7 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
                     $config,
                     $this->metricsCalculator,
                     $this->fs,
-                    $this->isDebugMode
+                     $isDebugMode
                 ))->log();
                 break;
             case ResultsLoggerTypes::DEBUG_FILE:
@@ -122,7 +131,8 @@ class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
                     $config,
                     $this->metricsCalculator,
                     $this->fs,
-                    $this->isDebugMode
+
+                    $isDebugMode
                 ))->log();
                 break;
             case ResultsLoggerTypes::BADGE:
