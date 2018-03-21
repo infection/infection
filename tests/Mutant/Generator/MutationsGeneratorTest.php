@@ -29,8 +29,8 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     public function test_it_collects_plus_mutation()
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
-        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(true);
-        $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->andReturn(false);
+        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->once()->andReturn(true);
+        $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->twice()->andReturn(false);
 
         $generator = $this->createMutationGenerator($codeCoverageDataMock);
 
@@ -42,8 +42,8 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     public function test_it_collects_public_visibility_mutation()
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
-        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(true);
-        $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->andReturn(true);
+        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->once()->andReturn(true);
+        $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->twice()->andReturn(true);
 
         $generator = $this->createMutationGenerator($codeCoverageDataMock);
 
@@ -56,8 +56,7 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     public function test_it_can_skip_not_covered_on_file_level()
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
-        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(false);
-        $codeCoverageDataMock->shouldReceive('hasTests')->andReturn(false);
+        $codeCoverageDataMock->shouldReceive('hasTests')->once()->andReturn(false);
 
         $generator = $this->createMutationGenerator($codeCoverageDataMock);
 
@@ -69,9 +68,9 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     public function test_it_can_skip_not_covered_on_file_line_level()
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
-        $codeCoverageDataMock->shouldReceive('hasTests')->andReturn(true);
-        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(false);
-        $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->andReturn(true);
+        $codeCoverageDataMock->shouldReceive('hasTests')->once()->andReturn(true);
+        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->once()->andReturn(false);
+        $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->twice()->andReturn(true);
 
         $generator = $this->createMutationGenerator($codeCoverageDataMock);
 
@@ -85,9 +84,9 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     public function test_it_can_skip_not_covered_on_file_line_for_visibility()
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
-        $codeCoverageDataMock->shouldReceive('hasTests')->andReturn(true);
-        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(false);
-        $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->andReturn(false);
+        $codeCoverageDataMock->shouldReceive('hasTests')->once()->andReturn(true);
+        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->once()->andReturn(false);
+        $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->twice()->andReturn(false);
 
         $generator = $this->createMutationGenerator($codeCoverageDataMock);
 
@@ -99,9 +98,7 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     public function test_it_can_skip_ignored_classes()
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
-        $codeCoverageDataMock->shouldReceive('hasTests')->andReturn(true);
-        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(false);
-        $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->andReturn(false);
+        $codeCoverageDataMock->shouldReceive('hasTests')->once()->andReturn(true);
 
         $generator = $this->createMutationGenerator($codeCoverageDataMock, [], new MutatorConfig([
             'ignore' => [
@@ -117,7 +114,6 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     public function test_it_executes_only_whitelisted_mutators()
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
-        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(true);
 
         $generator = $this->createMutationGenerator($codeCoverageDataMock, [Decrement::getName()]);
 
@@ -129,7 +125,6 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     public function test_whitelist_is_case_insensitive()
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
-        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(true);
 
         $generator = $this->createMutationGenerator($codeCoverageDataMock, [Decrement::getName()]);
 
