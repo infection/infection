@@ -13,17 +13,27 @@ use Infection\Config\Exception\InvalidConfigException;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\FalseValue;
 use Infection\Mutator\Boolean\TrueValue;
+use Infection\Mutator\Util\MutatorProfile;
 use Infection\Mutator\Util\MutatorsGenerator;
 use PHPUnit\Framework\TestCase;
 
 class MutatorsGeneratorTest extends TestCase
 {
+    private static $countDefaultMutators = 0;
+
+    public static function setUpBeforeClass()
+    {
+        foreach (MutatorProfile::DEFAULT as $profileName) {
+            self::$countDefaultMutators += count(MutatorProfile::MUTATOR_PROFILE_LIST[$profileName]);
+        }
+    }
+
     public function test_no_setting_returns_the_default_mutators()
     {
         $mutatorGenerator = new MutatorsGenerator([]);
         $mutators = $mutatorGenerator->generate();
 
-        $this->assertCount(58, $mutators);
+        $this->assertCount(self::$countDefaultMutators, $mutators);
     }
 
     public function test_boolean_mutator_returns_boolean_mutators()
@@ -33,7 +43,7 @@ class MutatorsGeneratorTest extends TestCase
         ]);
         $mutators = $mutatorGenerator->generate();
 
-        $this->assertCount(7, $mutators);
+        $this->assertCount(count(MutatorProfile::BOOLEAN), $mutators);
     }
 
     public function test_mutators_can_be_ignored()
@@ -44,7 +54,7 @@ class MutatorsGeneratorTest extends TestCase
         ]);
         $mutators = $mutatorGenerator->generate();
 
-        $this->assertCount(57, $mutators);
+        $this->assertCount(self::$countDefaultMutators - 1, $mutators);
     }
 
     public function test_profiles_can_be_ignored()
@@ -55,7 +65,7 @@ class MutatorsGeneratorTest extends TestCase
         ]);
         $mutators = $mutatorGenerator->generate();
 
-        $this->assertCount(51, $mutators);
+        $this->assertCount(self::$countDefaultMutators - count(MutatorProfile::BOOLEAN), $mutators);
     }
 
     public function test_names_can_be_ignored()
@@ -66,7 +76,7 @@ class MutatorsGeneratorTest extends TestCase
         ]);
         $mutators = $mutatorGenerator->generate();
 
-        $this->assertCount(57, $mutators);
+        $this->assertCount(self::$countDefaultMutators - 1, $mutators);
     }
 
     public function test_it_throws_an_error_if_profile_does_not_exist()
@@ -87,7 +97,7 @@ class MutatorsGeneratorTest extends TestCase
         ]);
         $mutators = $mutatorGenerator->generate();
 
-        $this->assertCount(58, $mutators);
+        $this->assertCount(self::$countDefaultMutators, $mutators);
 
         $this->assertInstanceOf(Plus::class, $mutators[Plus::getName()]);
 
@@ -102,7 +112,7 @@ class MutatorsGeneratorTest extends TestCase
         ]);
         $mutators = $mutatorGenerator->generate();
 
-        $this->assertCount(58, $mutators);
+        $this->assertCount(self::$countDefaultMutators, $mutators);
 
         $this->assertInstanceOf(Plus::class, $mutators[Plus::getName()]);
 
