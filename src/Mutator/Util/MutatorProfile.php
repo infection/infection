@@ -56,6 +56,7 @@ final class MutatorProfile
     ];
 
     const BOOLEAN = [
+        Mutator\Boolean\ArrayItem::class,
         Mutator\Boolean\FalseValue::class,
         Mutator\Boolean\LogicalAnd::class,
         Mutator\Boolean\LogicalLowerAnd::class,
@@ -158,6 +159,7 @@ final class MutatorProfile
         'ShiftRight' => Mutator\Arithmetic\ShiftRight::class,
 
         //Boolean
+        'ArrayItem' => Mutator\Boolean\ArrayItem::class,
         'FalseValue' => Mutator\Boolean\FalseValue::class,
         'LogicalAnd' => Mutator\Boolean\LogicalAnd::class,
         'LogicalLowerAnd' => Mutator\Boolean\LogicalLowerAnd::class,
