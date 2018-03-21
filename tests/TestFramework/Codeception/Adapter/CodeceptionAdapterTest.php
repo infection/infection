@@ -10,13 +10,13 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Codeception\Adapter;
 
 use Infection\Finder\AbstractExecutableFinder;
-use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
 use Infection\TestFramework\Codeception\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\Codeception\Config\Builder\MutationConfigBuilder;
+use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\Utils\VersionParser;
-use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery;
+use Mockery\Adapter\Phpunit\MockeryTestCase;
 
 class CodeceptionAdapterTest extends MockeryTestCase
 {
