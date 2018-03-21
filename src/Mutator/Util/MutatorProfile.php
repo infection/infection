@@ -164,6 +164,7 @@ final class MutatorProfile
         'LogicalNot' => Mutator\Boolean\LogicalNot::class,
         'LogicalOr' => Mutator\Boolean\LogicalOr::class,
         'TrueValue' => Mutator\Boolean\TrueValue::class,
+        'Yield_' => Mutator\Boolean\Yield_::class,
 
         //Conditional Boundary
         'GreaterThan' => Mutator\ConditionalBoundary\GreaterThan::class,
