@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant\Generator;
 
+use Infection\Config\Exception\InvalidConfigException;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutator\Arithmetic\Decrement;
@@ -122,15 +123,16 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertCount(0, $mutations);
     }
 
-    public function test_whitelist_is_case_insensitive()
+    public function test_whitelist_is_case_sensitive()
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
 
-        $generator = $this->createMutationGenerator($codeCoverageDataMock, [Decrement::getName()]);
+        $generator = $this->createMutationGenerator($codeCoverageDataMock, [strtolower(Decrement::getName())]);
 
-        $mutations = $generator->generate(false);
+        $this->expectException(InvalidConfigException::class);
+        $this->expectExceptionMessage('not recognized');
 
-        $this->assertCount(0, $mutations);
+        $generator->generate(false);
     }
 
     private function createMutationGenerator(CodeCoverageData $codeCoverageDataMock, array $whitelistedMutatorNames = [], MutatorConfig $mutatorConfig = null)
