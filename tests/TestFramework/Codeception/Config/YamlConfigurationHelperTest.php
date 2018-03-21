@@ -4,14 +4,15 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Codeception\Config;
 
-use Symfony\Component\Filesystem\Filesystem;;
 use Infection\TestFramework\Codeception\Config\YamlConfigurationHelper;
 use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 
 class YamlConfigurationHelperTest extends TestCase
@@ -25,7 +26,6 @@ class YamlConfigurationHelperTest extends TestCase
      * @var string
      */
     private $workspace;
-
 
     /**
      * @var string
@@ -137,7 +137,7 @@ EOS;
         $this->assertSame([], $config['coverage']['exclude']);
     }
 
-    private static function rp(string $path) : string
+    private static function rp(string $path): string
     {
         return realpath(substr($path, 0, -1)) . '*';
     }
