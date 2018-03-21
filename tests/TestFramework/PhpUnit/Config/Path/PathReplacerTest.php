@@ -4,6 +4,7 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Path;
@@ -46,6 +47,7 @@ class PathReplacerTest extends TestCase
         return [
             ['autoload.php', $this->projectPath . '/autoload.php'],
             ['./autoload.php', $this->projectPath . '/autoload.php'],
+            ['../autoload.php', $this->projectPath . '/../autoload.php'],
             ['/autoload.php', '/autoload.php'],
             ['./*Bundle', $this->projectPath . '/*Bundle'],
         ];

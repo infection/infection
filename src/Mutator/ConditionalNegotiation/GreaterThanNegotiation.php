@@ -4,11 +4,12 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalNegotiation;
 
-use Infection\Mutator\Mutator;
+use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 class GreaterThanNegotiation extends Mutator

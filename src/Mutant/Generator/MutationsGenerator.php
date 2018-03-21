@@ -4,6 +4,7 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Mutant\Generator;
@@ -14,11 +15,13 @@ use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
 use Infection\Finder\SourceFilesFinder;
 use Infection\Mutation;
-use Infection\Mutator\Mutator;
+use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\MutatorsGenerator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
-use Infection\Visitor\WrappedFunctionInfoCollectorVisitor;
+use Infection\Visitor\ReflectionVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use Symfony\Component\Finder\SplFileInfo;
@@ -72,13 +75,13 @@ class MutationsGenerator
         array $defaultMutators,
         array $whitelistedMutatorNames,
         EventDispatcher $eventDispatcher,
-        Parser $parser)
-    {
+        Parser $parser
+    ) {
         $this->srcDirs = $srcDirs;
         $this->codeCoverageData = $codeCoverageData;
         $this->excludeDirsOrFiles = $excludeDirsOrFiles;
         $this->defaultMutators = $defaultMutators;
-        $this->whitelistedMutatorNames = array_map('strtolower', $whitelistedMutatorNames);
+        $this->whitelistedMutatorNames = $whitelistedMutatorNames;
         $this->whitelistedMutatorNamesCount = count($whitelistedMutatorNames);
         $this->eventDispatcher = $eventDispatcher;
         $this->parser = $parser;
@@ -95,12 +98,13 @@ class MutationsGenerator
         $sourceFilesFinder = new SourceFilesFinder($this->srcDirs, $this->excludeDirsOrFiles);
         $files = $sourceFilesFinder->getSourceFiles($filter);
         $allFilesMutations = [[]];
+        $mutators = $this->getMutators();
 
         $this->eventDispatcher->dispatch(new MutationGeneratingStarted($files->count()));
 
         foreach ($files as $file) {
             if (!$onlyCovered || ($onlyCovered && $this->hasTests($file))) {
-                $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered);
+                $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered, $mutators);
             }
 
             $this->eventDispatcher->dispatch(new MutableFileProcessed());
@@ -114,15 +118,15 @@ class MutationsGenerator
     /**
      * @param SplFileInfo $file
      * @param bool $onlyCovered mutate only covered by tests lines of code
+     * @param array $mutators
      *
      * @return Mutation[]
      */
-    private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered): array
+    private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered, array $mutators): array
     {
         $initialStatements = $this->parser->parse($file->getContents());
 
         $traverser = new NodeTraverser();
-        $mutators = $this->getMutators();
 
         $mutationsCollectorVisitor = new MutationsCollectorVisitor(
             $mutators,
@@ -134,7 +138,8 @@ class MutationsGenerator
 
         $traverser->addVisitor($mutationsCollectorVisitor);
         $traverser->addVisitor(new ParentConnectorVisitor());
-        $traverser->addVisitor(new WrappedFunctionInfoCollectorVisitor());
+        $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
+        $traverser->addVisitor(new ReflectionVisitor());
 
         $traverser->traverse($initialStatements);
 
@@ -146,15 +151,20 @@ class MutationsGenerator
         return $this->codeCoverageData->hasTests($file->getRealPath());
     }
 
+    /**
+     * @return array|Mutator[]
+     */
     private function getMutators(): array
     {
         if ($this->whitelistedMutatorNamesCount > 0) {
-            return array_filter(
-                $this->defaultMutators,
-                function (Mutator $mutator): bool {
-                    return in_array(strtolower($mutator->getName()), $this->whitelistedMutatorNames, true);
-                }
-            );
+            $mutatorSettings = [];
+
+            foreach ($this->whitelistedMutatorNames as $mutatorName) {
+                $mutatorSettings[$mutatorName] = true;
+            }
+            $generator = new MutatorsGenerator($mutatorSettings);
+
+            return $generator->generate();
         }
 
         return $this->defaultMutators;

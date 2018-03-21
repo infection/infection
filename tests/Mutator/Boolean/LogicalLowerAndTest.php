@@ -7,17 +7,10 @@
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Infection\Mutator\Boolean\LogicalLowerAnd;
-use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class LogicalLowerAndTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new LogicalLowerAnd();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

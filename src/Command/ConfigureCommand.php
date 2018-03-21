@@ -4,11 +4,13 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Command;
 
 use Infection\Config\ConsoleHelper;
+use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\InfectionConfig;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
 use Infection\Config\ValueProvider\PhpUnitCustomExecutablePathProvider;
@@ -16,7 +18,7 @@ use Infection\Config\ValueProvider\SourceDirsProvider;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Config\ValueProvider\TextLogFileProvider;
 use Infection\Config\ValueProvider\TimeoutProvider;
-use Infection\Finder\TestFrameworkExecutableFinder;
+use Infection\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\TestFrameworkTypes;
 use Symfony\Component\Console\Input\InputInterface;
@@ -40,8 +42,13 @@ class ConfigureCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $consoleHelper = new ConsoleHelper($this->getHelper('formatter'));
+        if (!$input->isInteractive()) {
+            $output->writeln('Infection config generator requires an interactive mode.');
 
+            return 1;
+        }
+
+        $consoleHelper = new ConsoleHelper($this->getHelper('formatter'));
         $consoleHelper->writeSection($output, 'Welcome to the Infection config generator');
 
         $output->writeln([
@@ -55,7 +62,19 @@ class ConfigureCommand extends BaseCommand
 
         $questionHelper = $this->getHelper('question');
 
-        $sourceDirsProvider = new SourceDirsProvider($consoleHelper, $questionHelper);
+        if (file_exists('composer.json')) {
+            $content = json_decode(file_get_contents('composer.json'));
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \LogicException('composer.json does not contain valid JSON');
+            }
+
+            $sourceDirGuesser = new SourceDirGuesser($content);
+        } else {
+            $sourceDirGuesser = new SourceDirGuesser(new \stdClass());
+        }
+
+        $sourceDirsProvider = new SourceDirsProvider($consoleHelper, $questionHelper, $sourceDirGuesser);
         $sourceDirs = $sourceDirsProvider->get($input, $output, $dirsInCurrentDir);
 
         if (empty($sourceDirs)) {
@@ -75,7 +94,7 @@ class ConfigureCommand extends BaseCommand
         $phpUnitConfigPathProvider = new TestFrameworkConfigPathProvider($testFrameworkConfigLocator, $consoleHelper, $questionHelper);
         $phpUnitConfigPath = $phpUnitConfigPathProvider->get($input, $output, $dirsInCurrentDir, $input->getOption('test-framework'));
 
-        $phpUnitExecutableFinder = new TestFrameworkExecutableFinder(TestFrameworkTypes::PHPUNIT);
+        $phpUnitExecutableFinder = new TestFrameworkFinder(TestFrameworkTypes::PHPUNIT);
         $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $consoleHelper, $questionHelper);
         $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($input, $output);
 

@@ -4,21 +4,16 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\Multiplication;
-use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class MultiplicationTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new Multiplication();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

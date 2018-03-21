@@ -4,21 +4,15 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ConditionalNegotiation;
 
-use Infection\Mutator\ConditionalNegotiation\NotIdentical;
-use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class NotIdenticalTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new NotIdentical();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

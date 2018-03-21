@@ -4,6 +4,7 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
@@ -104,7 +105,7 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $mutation = new Mutation(
             $filePath,
             [],
-            new Plus(),
+            Mockery::mock(Plus::class),
             ['startLine' => 1],
             'PHPParser\Node\Expr\BinaryOp\Plus',
             false
@@ -121,7 +122,7 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $mutation = new Mutation(
             $filePath,
             [],
-            new Plus(),
+            Mockery::mock(Plus::class),
             ['startLine' => 26],
             'PHPParser\Node\Expr\BinaryOp\Plus',
             false
@@ -138,7 +139,7 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $mutation = new Mutation(
             $filePath,
             [],
-            new PublicVisibility(),
+            Mockery::mock(PublicVisibility::class),
             ['startLine' => 1],
             'PHPParser\Node\Stmt\ClassMethod',
             true
@@ -155,7 +156,7 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $mutation = new Mutation(
             $filePath,
             [],
-            new PublicVisibility(),
+            Mockery::mock(PublicVisibility::class),
             ['startLine' => 24],
             'PHPParser\Node\Stmt\ClassMethod',
             true

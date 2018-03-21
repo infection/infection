@@ -1,6 +1,6 @@
 parameters:
     excludes_analyse:
-        - %currentWorkingDirectory%/tests/Fixtures/e2e/*
+        - %currentWorkingDirectory%/tests/Fixtures/*
 
     ignoreErrors:
         - '#Access to an undefined property PhpParser\\Node(.*?)#'

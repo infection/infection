@@ -4,15 +4,18 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Tests\Mutant\Generator;
 
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Mutant\Generator\MutationsGenerator;
+use Infection\Mutator\Arithmetic\Decrement;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
+use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Mockery;
 use PhpParser\Lexer;
@@ -104,7 +107,7 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
         $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(true);
 
-        $generator = $this->createMutationGenerator($codeCoverageDataMock, ['Decrement']);
+        $generator = $this->createMutationGenerator($codeCoverageDataMock, [Decrement::getName()]);
 
         $mutations = $generator->generate(false);
 
@@ -116,7 +119,7 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
         $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->andReturn(true);
 
-        $generator = $this->createMutationGenerator($codeCoverageDataMock, ['decrement']);
+        $generator = $this->createMutationGenerator($codeCoverageDataMock, [Decrement::getName()]);
 
         $mutations = $generator->generate(false);
 
@@ -133,15 +136,15 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $container = new Container();
 
         $container[Plus::class] = function (Container $c) {
-            return new Plus();
+            return new Plus(new MutatorConfig([]));
         };
 
         $container[PublicVisibility::class] = function (Container $c) {
-            return new PublicVisibility();
+            return new PublicVisibility(new MutatorConfig([]));
         };
 
         $container[TrueValue::class] = function (Container $c) {
-            return new TrueValue();
+            return new TrueValue(new MutatorConfig([]));
         };
 
         $defaultMutators = [

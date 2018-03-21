@@ -1,5 +1,40 @@
 # Change Log
 
+## [0.8.0](https://github.com/infection/infection/tree/0.8.0) (2018-02-27) 
+
+[Full Changelog](https://github.com/infection/infection/compare/0.7.1...0.8.0)
+
+**BC Breaks:**
+
+- Make paths in config file relative to config file [\#165](https://github.com/infection/infection/pull/165) ([BackEndTea](https://github.com/BackEndTea))
+- Remove `exclude` option from config [\#155](https://github.com/infection/infection/pull/155) ([sidz](https://github.com/sidz))
+
+**Implemented enhancements:**
+
+- Implement integer increment and decrement mutators [\#152](https://github.com/infection/infection/pull/152) ([localheinz](https://github.com/localheinz))
+- Implement Throw mutator [\#164](https://github.com/infection/infection/pull/164) ([BackEndTea](https://github.com/BackEndTea))
+- Use existing coverage reports [\#176](https://github.com/infection/infection/pull/176) ([borNfreee](https://github.com/borNfreee))
+- Do not require Xdebug/phpdbg when existing coverage is provided  [\#183](https://github.com/infection/infection/pull/183) ([sidz](https://github.com/sidz))
+- Add an option to pass additional parameters to the PHP binary [\#185](https://github.com/infection/infection/pull/185) ([sidz](https://github.com/sidz))
+- Allow relative path for `tmpDir` config setting.  [\#151](https://github.com/infection/infection/pull/151) ([borNfreee](https://github.com/borNfreee))
+- Allow coverage of function signatures of traits [\#191](https://github.com/infection/infection/pull/191) ([BackEndTea](https://github.com/BackEndTea))
+
+**Performance:**
+
+- Fix performance issue in SourceFilesFinder [\#186](https://github.com/infection/infection/pull/186) ([borNfreee](https://github.com/borNfreee))
+- Reuse created mutant files to avoid traversing and pretty printing [\#184](https://github.com/infection/infection/pull/184) ([borNfreee](https://github.com/borNfreee))
+
+**Fixed bugs:**
+
+- Windows can't open this file when composer.phar is found [\#196](https://github.com/infection/infection/issues/196)
+- Infection ignores coverage on trait\(s\) [\#189](https://github.com/infection/infection/issues/189)
+- Existing coverage: "cannot load zend opcache" [\#182](https://github.com/infection/infection/issues/182)
+- Phpunit "excludes" are not properly parsed [\#167](https://github.com/infection/infection/issues/167)
+- Allow coverage of function signatures of traits [\#191](https://github.com/infection/infection/pull/191) ([BackEndTea](https://github.com/BackEndTea))
+- Fix: Don't mutate abstract methods [\#169](https://github.com/infection/infection/pull/169) ([BackEndTea](https://github.com/BackEndTea))
+- Don't try to expand directories with `\*` and `\*\*` \(glob pattern\) [\#171](https://github.com/infection/infection/pull/171) ([sidz](https://github.com/sidz))
+
+
 ## [0.7.1](https://github.com/infection/infection/tree/0.7.1) (2018-02-02)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.7.0...0.7.1)

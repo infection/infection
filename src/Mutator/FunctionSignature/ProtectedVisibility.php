@@ -4,11 +4,13 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Mutator\FunctionSignature;
 
-use Infection\Mutator\Mutator;
+use Infection\Mutator\Util\Mutator;
+use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -48,6 +50,33 @@ class ProtectedVisibility extends Mutator
             return false;
         }
 
-        return $node->isProtected();
+        if (!$node->isProtected()) {
+            return false;
+        }
+
+        return !$this->hasSameProtectedParentMethod($node);
+    }
+
+    private function hasSameProtectedParentMethod(Node $node): bool
+    {
+        /** @var \ReflectionClass $reflection */
+        $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
+
+        $parent = $reflection->getParentClass();
+        while ($parent) {
+            try {
+                $method = $parent->getMethod($node->name);
+
+                if ($method->isProtected()) {
+                    return true;
+                }
+            } catch (\ReflectionException $e) {
+                continue;
+            } finally {
+                $parent = $parent->getParentClass();
+            }
+        }
+
+        return false;
     }
 }

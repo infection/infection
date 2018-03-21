@@ -4,6 +4,7 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
@@ -28,7 +29,7 @@ class InitialTestsRunnerTest extends MockeryTestCase
         $processBuilder = Mockery::mock(ProcessBuilder::class);
         $processBuilder
             ->shouldReceive('getProcessForInitialTestRun')
-            ->withArgs(['', false])
+            ->withArgs(['', false, []])
             ->andReturn($process);
 
         $eventDispatcher = Mockery::mock(EventDispatcherInterface::class);

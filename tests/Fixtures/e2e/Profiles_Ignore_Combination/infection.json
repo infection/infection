@@ -1,0 +1,25 @@
+{
+    "timeout": 25,
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "logs": {
+        "summary": "infection-log.txt"
+    },
+    "mutators": {
+        "@function_signature": {
+            "ignore": [
+                "*\\SourceClass*"
+            ]
+        },
+        "ProtectedVisibility": false,
+        "FalseValue": {
+            "ignore": [
+                "**::isFalse"
+            ]
+        },
+        "TrueValue": true
+    }
+}

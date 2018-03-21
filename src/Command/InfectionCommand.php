@@ -4,12 +4,12 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Command;
 
 use Infection\Config\InfectionConfig;
-use Infection\Console\Application;
 use Infection\Console\Exception\InfectionException;
 use Infection\Console\Exception\InvalidOptionException;
 use Infection\Console\LogVerbosity;
@@ -20,13 +20,12 @@ use Infection\EventDispatcher\EventDispatcher;
 use Infection\Mutant\Exception\MsiCalculationException;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Mutator\Mutator;
 use Infection\Process\Builder\ProcessBuilder;
-use Infection\Process\Listener\FileLoggerSubscriber\BaseFileLoggerSubscriber;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationTestingConsoleLoggerSubscriber;
+use Infection\Process\Listener\MutationTestingResultsLoggerSubscriber;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
@@ -42,13 +41,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
-/**
- * @method Application getApplication()
- * @method SymfonyStyle getIO()
- */
 class InfectionCommand extends BaseCommand
 {
     const CI_FLAG_ERROR = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
@@ -62,6 +56,11 @@ class InfectionCommand extends BaseCommand
      * @var EventDispatcher
      */
     private $eventDispatcher;
+
+    /**
+     * @var bool
+     */
+    private $skipCoverage;
 
     protected function configure()
     {
@@ -82,7 +81,7 @@ class InfectionCommand extends BaseCommand
             )
             ->addOption(
                 'threads',
-                null,
+                'j',
                 InputOption::VALUE_REQUIRED,
                 'Threads count',
                 1
@@ -151,6 +150,19 @@ class InfectionCommand extends BaseCommand
                 'Log verbosity level. 1 - full logs format, 2 - short logs format.',
                 LogVerbosity::DEBUG
             )
+            ->addOption(
+                'initial-tests-php-options',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Extra php options for the initial test runner. Will be ignored if --coverage option presented.',
+                ''
+            )
+            ->addOption(
+                'ignore-msi-with-no-mutations',
+                null,
+                InputOption::VALUE_NONE,
+                'Ignore MSI violations with zero mutations'
+            )
         ;
     }
 
@@ -158,8 +170,7 @@ class InfectionCommand extends BaseCommand
     {
         $container = $this->getContainer();
         $testFrameworkKey = $input->getOption('test-framework');
-        $skipCoverage = strlen(trim($input->getOption('coverage'))) > 0;
-        $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $skipCoverage);
+        $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $this->skipCoverage);
 
         $metricsCalculator = new MetricsCalculator();
 
@@ -169,7 +180,11 @@ class InfectionCommand extends BaseCommand
         $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);
 
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
-        $initialTestSuitProcess = $initialTestsRunner->run($testFrameworkOptions->getForInitialProcess(), $skipCoverage);
+        $initialTestSuitProcess = $initialTestsRunner->run(
+            $testFrameworkOptions->getForInitialProcess(),
+            $this->skipCoverage,
+            explode(' ', $input->getOption('initial-tests-php-options'))
+        );
 
         if (!$initialTestSuitProcess->isSuccessful()) {
             $this->logInitialTestsDoNotPass($initialTestSuitProcess, $testFrameworkKey);
@@ -182,7 +197,7 @@ class InfectionCommand extends BaseCommand
             $container->get('src.dirs'),
             $container->get('exclude.paths'),
             $codeCoverageData,
-            $this->getDefaultMutators(),
+            $container->get('mutators'),
             $this->parseMutators($input->getOption('mutators')),
             $this->eventDispatcher,
             $container->get('parser')
@@ -203,6 +218,12 @@ class InfectionCommand extends BaseCommand
             $codeCoverageData,
             $testFrameworkOptions->getForMutantProcess()
         );
+
+        $ignoreMsi = (bool) $input->getOption('ignore-msi-with-no-mutations');
+
+        if ($ignoreMsi && \count($mutations) === 0) {
+            return 0;
+        }
 
         if ($this->hasBadMsi($metricsCalculator)) {
             $this->io->error($this->getBadMsiErrorMessage($metricsCalculator));
@@ -275,7 +296,8 @@ class InfectionCommand extends BaseCommand
                 $this->getContainer()->get('diff.colorizer'),
                 $this->input->getOption('show-mutations')
             ),
-            new BaseFileLoggerSubscriber(
+            new MutationTestingResultsLoggerSubscriber(
+                $this->output,
                 $this->getContainer()->get('infection.config'),
                 $metricsCalculator,
                 $this->getContainer()->get('filesystem'),
@@ -380,16 +402,6 @@ class InfectionCommand extends BaseCommand
         return explode(',', $mutators);
     }
 
-    private function getDefaultMutators(): array
-    {
-        return array_map(
-            function (string $class): Mutator {
-                return $this->getContainer()->get($class);
-            },
-            InfectionConfig::DEFAULT_MUTATORS
-        );
-    }
-
     private function getTestFrameworkExtraOptions(string $testFrameworkKey): TestFrameworkExtraOptions
     {
         $extraOptions = $this->input->getOption('test-framework-options');
@@ -426,7 +438,9 @@ class InfectionCommand extends BaseCommand
                 '--test-framework' => $input->getOption('test-framework'),
             ];
 
-            $result = $configureCommand->run(new ArrayInput($args), $output);
+            $newInput = new ArrayInput($args);
+            $newInput->setInteractive($input->isInteractive());
+            $result = $configureCommand->run($newInput, $output);
 
             if ($result !== 0) {
                 throw InfectionException::configurationAborted();
@@ -435,5 +449,6 @@ class InfectionCommand extends BaseCommand
 
         $this->io = $this->getApplication()->getIO();
         $this->eventDispatcher = $this->getContainer()->get('dispatcher');
+        $this->skipCoverage = \strlen(trim($input->getOption('coverage'))) > 0;
     }
 }

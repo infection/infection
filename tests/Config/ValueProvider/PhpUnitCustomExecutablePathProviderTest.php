@@ -4,14 +4,15 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Tests\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\PhpUnitCustomExecutablePathProvider;
-use Infection\Finder\Exception\TestFrameworkExecutableFinderNotFound;
-use Infection\Finder\TestFrameworkExecutableFinder;
+use Infection\Finder\Exception\FinderException;
+use Infection\Finder\TestFrameworkFinder;
 use Mockery;
 use function Infection\Tests\normalizePath as p;
 
@@ -19,7 +20,7 @@ class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProviderTest
 {
     public function test_it_returns_null_if_executable_is_found()
     {
-        $finderMock = Mockery::mock(TestFrameworkExecutableFinder::class);
+        $finderMock = Mockery::mock(TestFrameworkFinder::class);
 
         $finderMock->shouldReceive('find')->once();
 
@@ -36,9 +37,9 @@ class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProviderTest
 
     public function test_it_asks_question_if_no_config_is_found_in_current_dir()
     {
-        $finderMock = Mockery::mock(TestFrameworkExecutableFinder::class);
+        $finderMock = Mockery::mock(TestFrameworkFinder::class);
 
-        $finderMock->shouldReceive('find')->once()->andThrow(new TestFrameworkExecutableFinderNotFound());
+        $finderMock->shouldReceive('find')->once()->andThrow(new FinderException());
 
         $consoleMock = $this->getMockBuilder(ConsoleHelper::class)
             ->disableOriginalConstructor()
@@ -67,9 +68,9 @@ class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProviderTest
             $this->markTestSkipped('Stty is not available');
         }
 
-        $finderMock = Mockery::mock(TestFrameworkExecutableFinder::class);
+        $finderMock = Mockery::mock(TestFrameworkFinder::class);
 
-        $finderMock->shouldReceive('find')->once()->andThrow(new TestFrameworkExecutableFinderNotFound());
+        $finderMock->shouldReceive('find')->once()->andThrow(new FinderException());
 
         $consoleMock = $this->getMockBuilder(ConsoleHelper::class)
             ->disableOriginalConstructor()

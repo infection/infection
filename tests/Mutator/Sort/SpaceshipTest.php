@@ -4,24 +4,19 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Sort;
 
-use Infection\Mutator\Mutator;
 use Infection\Mutator\Sort\Spaceship;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class SpaceshipTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new Spaceship();
-    }
-
     public function test_get_name()
     {
-        $this->assertSame('Spaceship', $this->getMutator()->getName());
+        $this->assertSame('Spaceship', $this->getMutator()::getName());
     }
 
     /**

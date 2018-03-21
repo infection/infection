@@ -4,12 +4,13 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Visitor;
 
 use Infection\Mutation;
-use Infection\Mutator\Mutator;
+use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
@@ -45,8 +46,13 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
      */
     private $onlyCovered;
 
-    public function __construct(array $mutators, string $filePath, array $fileAst, CodeCoverageData $codeCoverageData, bool $onlyCovered)
-    {
+    public function __construct(
+        array $mutators,
+        string $filePath,
+        array $fileAst,
+        CodeCoverageData $codeCoverageData,
+        bool $onlyCovered
+    ) {
         $this->mutators = $mutators;
         $this->filePath = $filePath;
         $this->fileAst = $fileAst;
@@ -57,10 +63,19 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
     public function leaveNode(Node $node)
     {
         foreach ($this->mutators as $mutator) {
-            $isOnFunctionSignature = $node->getAttribute(WrappedFunctionInfoCollectorVisitor::IS_ON_FUNCTION_SIGNATURE, false);
+            $isOnFunctionSignature = $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
 
             if (!$isOnFunctionSignature) {
-                if (!$node->getAttribute(WrappedFunctionInfoCollectorVisitor::IS_INSIDE_FUNCTION_KEY)) {
+                if (!$node->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY)) {
+                    continue;
+                }
+            }
+
+            if ($reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY, false)) {
+                if ($mutator->isIgnored(
+                    $reflectionClass->getName(),
+                    $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, '')
+                )) {
                     continue;
                 }
             }

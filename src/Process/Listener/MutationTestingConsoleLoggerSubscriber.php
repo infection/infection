@@ -4,6 +4,7 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Process\Listener;
@@ -137,7 +138,7 @@ class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
                     $index + 1,
                     $mutation->getOriginalFilePath(),
                     (int) $mutation->getAttributes()['startLine'],
-                    $mutation->getMutator()->getName()
+                    $mutation->getMutator()::getName()
                 ),
             ]);
 

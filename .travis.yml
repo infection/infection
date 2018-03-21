@@ -6,8 +6,12 @@ matrix:
   include:
     - php: 7.0
     - php: 7.0
+      env: NO_DEBUGGER=1
+    - php: 7.0
       env: PHPDBG=1
     - php: 7.1
+    - php: 7.1
+      env: NO_DEBUGGER=1
     - php: 7.1
       env: PHPDBG=1
     - php: 7.1
@@ -15,6 +19,8 @@ matrix:
     - php: 7.1
       env: SYMFONY_VERSION="^4.0" PHPDBG=1
     - php: 7.2
+    - php: 7.2
+      env: NO_DEBUGGER=1
     - php: 7.2
       env: PHPDBG=1
     - php: 7.2
@@ -24,12 +30,14 @@ matrix:
 
 env:
   global:
-    - INFECTION_FLAGS='--threads=4 --min-msi=61 --min-covered-msi=88 --coverage=coverage'
+    - INFECTION_FLAGS='--threads=4 --min-msi=57 --min-covered-msi=86 --coverage=coverage'
     - PHPUNIT_BIN='vendor/bin/phpunit --coverage-clover=clover.xml --coverage-xml=coverage/coverage-xml --log-junit=coverage/phpunit.junit.xml'
+    - secure: RT8az62c2YI2j7Xccamhw0eCFbPMphfK2c5aZ0cUyQCFeLuc7qJ5Q0y0DIapOf7YbpLBwVwf53LQtV8doyhZ2ltTRHM2NDmOxUrkxFpc50+I2FGlsrlPWPSDL69Dc6VxEy6+S1rvUUJu6KIs1lGCrUG3lOxt/avzctyY1g8KdqkhIfNADH6pwMzRxkhOacsKkdnT24RoFdN4M4uXyn16VclFOCeLaVdEHYCdD248L0MuhTZQF5u0jq0SdgNGOPnetRQXHjQLVSfmuB2bI5FUTxHVwvf4nU3aKYXONi+EzBauDZXdO/opgNydbmhVUZtRsTeSh1OANhAPTvW+qdFcMbc3K90q3UMdIp8pZS9krRzJyfXe7BodnvkOu0ej2S4x2eE2EZphK7L21nu016CDo1y434UCJX+DI3Pn7SZ7ood8nOi7yfOzNeVklW6+n6k6bSmS2ya/DcpS6y/OuH/awtLat0hzmXUCHVNV9YiES1KwtlkUSJqtaZwtj8iXuuBwOWWV4u71bivpKEbF2L7+1GYy56ftv57JHbh6m2tWCoeUQc9oAzDb0sHeBhj4YFVhAd598860Q4WhRG9BWJT8guySRI0iXOSxDrvgtgr5okG3WD2/CJtnsVukdgXMvcXiLbxMXKeF7LMRJfkNjrn++311ZAMaRWJSfGNEivZlooQ=
 
 cache:
   directories:
     - $HOME/.composer/cache
+    - build/cache
 
 before_install:
   - composer selfupdate
@@ -53,7 +61,12 @@ script:
   - if [[ $PHPDBG != 1 ]]; then xdebug-enable; fi
   - if [[ $PHPDBG != 1 ]]; then $PHPUNIT_BIN; else phpdbg -qrr $PHPUNIT_BIN; fi
   - ./tests/e2e_tests
-  - if [[ $PHPDBG != 1 ]]; then bin/infection $INFECTION_FLAGS; else phpdbg -qrr bin/infection $INFECTION_FLAGS; fi
+  - if [[ $NO_DEBUGGER == 1 ]]; then xdebug-disable; fi
+  - if [[ $PHPDBG != 1 ]]; then
+      bin/infection $INFECTION_FLAGS;
+    else
+      phpdbg -qrr bin/infection $INFECTION_FLAGS;
+    fi
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

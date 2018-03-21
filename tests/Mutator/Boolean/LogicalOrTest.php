@@ -4,21 +4,15 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Infection\Mutator\Boolean\LogicalOr;
-use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class LogicalOrTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new LogicalOr();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

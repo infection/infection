@@ -4,11 +4,13 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Console;
 
 use Infection\Command;
+use Infection\Config\Exception\InvalidConfigException;
 use Infection\Config\InfectionConfig;
 use Infection\Php\ConfigBuilder;
 use Infection\Php\XdebugHandler;
@@ -25,7 +27,8 @@ class Application extends BaseApplication
 {
     const NAME = 'Infection - PHP Mutation Testing Framework';
     const VERSION = '@package_version@';
-    const RUNNING_WITH_NOTE = 'You are running Infection with %s enabled.';
+    const RUNNING_WITH_DEBUGGER_NOTE = 'You are running Infection with %s enabled.';
+
     const LOGO = <<<'ASCII'
     ____      ____          __  _
    /  _/___  / __/__  _____/ /_(_)___  ____ 
@@ -77,24 +80,40 @@ ASCII;
         $this->io = new SymfonyStyle($input, $output);
 
         if (PHP_SAPI === 'phpdbg') {
-            $this->io->writeln(sprintf(self::RUNNING_WITH_NOTE, PHP_SAPI));
+            $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, PHP_SAPI));
         } elseif ($this->isXdebugLoaded) {
-            $this->io->writeln(sprintf(self::RUNNING_WITH_NOTE, 'xdebug'));
+            $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, 'xdebug'));
         }
 
         $xdebug = new XdebugHandler(new ConfigBuilder(sys_get_temp_dir()));
         $xdebug->check();
 
-        if (PHP_SAPI !== 'phpdbg' && $this->isDebuggerDisabled && !$this->isXdebugLoaded) {
+        if (PHP_SAPI !== 'phpdbg'
+            && $this->isDebuggerDisabled
+            && !$this->isXdebugLoaded
+            && !$input->hasParameterOption('--coverage', true)
+            && !$this->isInitialTestPhpOptionHasXdebug($input)
+        ) {
             $this->io->error([
                 'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:',
-                '- Enable xdebug and run infection again' . PHP_EOL . '- Use phpdbg: phpdbg -qrr infection',
+                '- Enable xdebug and run infection again' . PHP_EOL .
+                '- Use phpdbg: phpdbg -qrr infection' . PHP_EOL .
+                '- Use --coverage option with path to the existing coverage report' . PHP_EOL .
+                '- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters',
             ]);
 
             return 1;
         }
 
         return parent::run($input, $output);
+    }
+
+    private function isInitialTestPhpOptionHasXdebug(InputInterface $input): bool
+    {
+        return (bool) preg_match(
+            '/(zend_extension\s*=.*xdebug.*)/mi',
+            (string) $input->getParameterOption('--initial-tests-php-options', true)
+        );
     }
 
     public function doRun(InputInterface $input, OutputInterface $output)
@@ -149,6 +168,11 @@ ASCII;
         return $this->io;
     }
 
+    /**
+     * @param InputInterface $input
+     *
+     * @throws InvalidConfigException
+     */
     private function buildDynamicDependencies(InputInterface $input)
     {
         $this->container['infection.config'] = function (Container $c) use ($input): InfectionConfig {
@@ -170,11 +194,21 @@ ASCII;
                 $configLocation = \pathinfo($infectionConfigFile, PATHINFO_DIRNAME);
                 $json = file_get_contents($infectionConfigFile);
             } catch (\Exception $e) {
+                $infectionConfigFile = null;
                 $json = '{}';
                 $configLocation = getcwd();
             }
 
-            return new InfectionConfig(json_decode($json), $c['filesystem'], $configLocation);
+            $config = json_decode($json);
+
+            if (is_string($infectionConfigFile) && null === $config && JSON_ERROR_NONE !== json_last_error()) {
+                throw InvalidConfigException::invalidJson(
+                    $infectionConfigFile,
+                    json_last_error_msg()
+                );
+            }
+
+            return new InfectionConfig($config, $c['filesystem'], $configLocation);
         };
 
         $this->container['coverage.path'] = function (Container $c) use ($input): string {

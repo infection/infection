@@ -4,12 +4,12 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\Plus;
-use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
@@ -104,10 +104,5 @@ PHP
         );
 
         $this->assertFalse($this->mutator->shouldMutate($plusExpression));
-    }
-
-    protected function getMutator(): Mutator
-    {
-        return new Plus();
     }
 }

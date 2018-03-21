@@ -4,6 +4,7 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Tests\Config;
@@ -102,22 +103,6 @@ class InfectionConfigTest extends TestCase
         $this->assertCount(2, $excludedDirs);
     }
 
-    public function test_it_returns_text_file_log_path_when_exist()
-    {
-        $path = 'test-log.txt';
-        $json = sprintf('{"logs": {"text": "%s"}}', $path);
-        $config = new InfectionConfig(json_decode($json), $this->filesystem, '/path/to/config');
-
-        $this->assertSame($path, $config->getLogPathInfoFor('text'));
-    }
-
-    public function test_it_returns_an_empty_array_for_text_file_log_path_when_it_is_skipped()
-    {
-        $config = new InfectionConfig(json_decode('{}'), $this->filesystem, '/path/to/config');
-
-        $this->assertEmpty($config->getLogPathInfoFor('text'));
-    }
-
     public function test_it_returns_default_temp_dir()
     {
         $config = new InfectionConfig(json_decode('{}'), $this->filesystem, '/path/to/config');
@@ -158,5 +143,39 @@ class InfectionConfigTest extends TestCase
         $config = new InfectionConfig(json_decode('{"logs": {"text":"app", "debug":"location"}}'), $this->filesystem, '/path/to/config');
 
         $this->assertSame(['text' => 'app', 'debug' => 'location'], $config->getLogsTypes());
+    }
+
+    public function test_it_correctly_gets_config_logs_if_missing()
+    {
+        $config = new InfectionConfig(new \stdClass(), $this->filesystem, '/path/to/config');
+
+        $this->assertSame([], $config->getLogsTypes());
+    }
+
+    public function test_it_sets_ignored_mutators()
+    {
+        $config = <<<'JSON'
+{
+    "mutators": {
+        "PublicVisibility": {
+            "ignore": [
+                "Ignore\\For\\Particular\\Class",
+                "Ignore\\For\\Another\\Class::method",
+                "Ignore\\For\\**\\*\\Glob\\Pattern\\Or\\Namespace"
+            ]
+        }
+    }
+}
+JSON;
+
+        $config = new InfectionConfig(json_decode($config), $this->filesystem, '/path/to/config');
+        $this->assertSame(
+            ['ignore' => [
+                    "Ignore\For\Particular\Class",
+                    "Ignore\For\Another\Class::method",
+                    "Ignore\For\**\*\Glob\Pattern\Or\Namespace",
+                ],
+            ],
+            (array) $config->getMutatorsConfiguration()['PublicVisibility']);
     }
 }

@@ -4,21 +4,15 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ConditionalBoundary;
 
-use Infection\Mutator\ConditionalBoundary\GreaterThanOrEqualTo;
-use Infection\Mutator\Mutator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 class GreaterThanOrEqualToTest extends AbstractMutatorTestCase
 {
-    protected function getMutator(): Mutator
-    {
-        return new GreaterThanOrEqualTo();
-    }
-
     /**
      * @dataProvider provideMutationCases
      */

@@ -4,12 +4,13 @@
  *
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
 declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
 use Infection\Config\InfectionConfig;
-use Infection\Finder\TestFrameworkExecutableFinder;
+use Infection\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
 use Infection\TestFramework\Codeception\Config\Builder\InitialConfigBuilder as CodeceptionInitialConfigBuilder;
 use Infection\TestFramework\Codeception\Config\Builder\MutationConfigBuilder as CodeceptionMutationConfigBuilder;
@@ -88,7 +89,7 @@ final class Factory
             $phpUnitConfigContent = file_get_contents($phpUnitConfigPath);
 
             return new PhpUnitAdapter(
-                new TestFrameworkExecutableFinder(TestFrameworkTypes::PHPUNIT, $this->infectionConfig->getPhpUnitCustomPath()),
+                new TestFrameworkFinder(TestFrameworkTypes::PHPUNIT, $this->infectionConfig->getPhpUnitCustomPath()),
                 new InitialConfigBuilder(
                     $this->tmpDir,
                     $phpUnitConfigContent,
@@ -107,7 +108,7 @@ final class Factory
             $phpSpecConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPSPEC);
 
             return new PhpSpecAdapter(
-                new TestFrameworkExecutableFinder(TestFrameworkTypes::PHPSPEC),
+                new TestFrameworkFinder(TestFrameworkTypes::PHPSPEC),
                 new PhpSpecInitialConfigBuilder($this->tmpDir, $phpSpecConfigPath, $skipCoverage),
                 new PhpSpecMutationConfigBuilder($this->tmpDir, $phpSpecConfigPath, $this->projectDir),
                 new PhpSpecArgumentsAndOptionsBuilder(),
@@ -121,9 +122,9 @@ final class Factory
 
             return new CodeceptionAdapter(
                 new TestFrameworkExecutableFinder(CodeceptionAdapter::EXECUTABLE),
-                new CodeceptionInitialConfigBuilder($this->tempDir, $this->projectDir, $codeceptionConfigContent, $this->infectionConfig->getSourceDirs()),
-                new CodeceptionMutationConfigBuilder($this->tempDir, $this->projectDir, $codeceptionConfigContent),
-                new CodeceptionArgumentsAndOptionsBuilder($this->tempDir),
+                new CodeceptionInitialConfigBuilder($this->tmpDir, $this->projectDir, $codeceptionConfigContent, $this->infectionConfig->getSourceDirs()),
+                new CodeceptionMutationConfigBuilder($this->tmpDir, $this->projectDir, $codeceptionConfigContent),
+                new CodeceptionArgumentsAndOptionsBuilder($this->tmpDir),
                 $this->versionParser
             );
         }

@@ -23,7 +23,11 @@
         "psr-4": {
             "Infection\\Tests\\": "tests/"
         },
-        "files": ["tests/Helpers.php"]
+        "files": [
+            "tests/Helpers.php",
+            "tests/Fixtures/Autoloaded/Reflection/rv-inside-function.php"
+        ],
+        "classmap": ["tests/Fixtures/Autoloaded"]
     },
     "config": {
         "platform": {
@@ -36,7 +40,7 @@
     },
     "require": {
         "php": "^7.0",
-        "nikic/php-parser": "^3.0",
+        "nikic/php-parser": "^3.1",
         "padraic/phar-updater": "^1.0.4",
         "pimple/pimple": "^3.2",
         "sebastian/diff": "^1.4 || ^2.0 || ^3.0",
@@ -63,12 +67,14 @@
             "./phpstan.phar analyse src tests --level=2 -c phpstan.neon --no-interaction --no-progress"
         ],
         "cs:check": [
+            "mkdir -p build/cache",
             "wget -nc http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar",
             "chmod a+x php-cs-fixer-v2.phar",
-            "./php-cs-fixer-v2.phar fix --config=.php_cs.dist -v --dry-run --stop-on-violation --allow-risky=yes"
+            "./php-cs-fixer-v2.phar fix -v --cache-file=build/cache/.php_cs.cache --dry-run --stop-on-violation"
         ],
         "cs:fix": [
-            "./php-cs-fixer-v2.phar fix --config=.php_cs.dist -v --allow-risky=yes"
+            "mkdir -p build/cache",
+            "./php-cs-fixer-v2.phar fix -v --cache-file=build/cache/.php_cs.cache"
         ],
         "tests": [
             "./vendor/bin/phpunit",
