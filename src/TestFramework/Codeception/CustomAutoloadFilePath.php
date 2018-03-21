@@ -20,7 +20,7 @@ class CustomAutoloadFilePath extends Extension
 
     public function autoloadFilePath()
     {
-        $customAutoloadFilePath = getenv('CUSTOM_AUTOLOAD_FILE_PATH');
+        $customAutoloadFilePath = getenv('INFECTION_CODECEPTION_CUSTOM_AUTOLOAD_FILE_PATH');
         if ($customAutoloadFilePath !== null) {
             require_once $customAutoloadFilePath;
         }

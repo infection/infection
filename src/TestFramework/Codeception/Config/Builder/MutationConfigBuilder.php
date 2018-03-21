@@ -27,7 +27,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
     public function build(Mutant $mutant): string
     {
-        $_SERVER['CUSTOM_AUTOLOAD_FILE_PATH'] = $customAutoloadFilePath = sprintf(
+        $_SERVER['INFECTION_CODECEPTION_CUSTOM_AUTOLOAD_FILE_PATH'] = $customAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',
             $this->configurationHelper->getTempDir(),
             $mutant->getMutation()->getHash()
