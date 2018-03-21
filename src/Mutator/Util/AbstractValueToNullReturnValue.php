@@ -20,6 +20,9 @@ abstract class AbstractValueToNullReturnValue extends Mutator
         $functionScope = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY);
 
         $returnType = $functionScope->getReturnType();
+        if ($returnType instanceof Node\Identifier) {
+            $returnType = $returnType->name;
+        }
 
         // no return value specified
         if (null === $returnType) {

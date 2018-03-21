@@ -24,7 +24,7 @@ class FunctionCall extends AbstractValueToNullReturnValue
     public function mutate(Node $node)
     {
         return [
-            $node->expr,
+            new Node\Stmt\Expression($node->expr),
             new Node\Stmt\Return_(
                 new Node\Expr\ConstFetch(new Node\Name('null'))
             ),

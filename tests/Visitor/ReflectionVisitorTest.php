@@ -39,7 +39,7 @@ class ReflectionVisitorTest extends TestCase
     {
         $this->spyVisitor = $this->getInsideFunctionSpyVisitor();
 
-        $lexer = new Lexer([
+        $lexer = new Lexer\Emulative([
             'usedAttributes' => [
                 'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
             ],
@@ -167,7 +167,7 @@ class ReflectionVisitorTest extends TestCase
 
     private function getNodes(string $code): array
     {
-        $lexer = new Lexer();
+        $lexer = new Lexer\Emulative();
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
 
         return $parser->parse($code);

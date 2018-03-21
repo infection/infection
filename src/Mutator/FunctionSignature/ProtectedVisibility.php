@@ -65,7 +65,7 @@ class ProtectedVisibility extends Mutator
         $parent = $reflection->getParentClass();
         while ($parent) {
             try {
-                $method = $parent->getMethod($node->name);
+                $method = $parent->getMethod($node->name->name);
 
                 if ($method->isProtected()) {
                     return true;

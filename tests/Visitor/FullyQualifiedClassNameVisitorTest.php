@@ -67,7 +67,7 @@ class FullyQualifiedClassNameVisitorTest extends TestCase
 
     private function getNodes(string $code): array
     {
-        $lexer = new Lexer();
+        $lexer = new Lexer\Emulative();
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
 
         return $parser->parse($code);

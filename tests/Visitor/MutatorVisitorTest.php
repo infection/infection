@@ -40,7 +40,7 @@ class MutatorVisitorTest extends TestCase
 
     public function providesMutationCases(): \Generator
     {
-        $lexer = new Lexer([
+        $lexer = new Lexer\Emulative([
             'usedAttributes' => [
                 'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
             ],
@@ -139,7 +139,7 @@ PHP
                 true
             ),
         ];
-        $badLexer = new Lexer([
+        $badLexer = new Lexer\Emulative([
             'usedAttributes' => [
                 'comments', 'startLine', 'endLine', 'endTokenPos', 'startFilePos', 'endFilePos',
             ],

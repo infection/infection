@@ -169,7 +169,7 @@ class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
     private function getParser(): Parser
     {
-        $lexer = new Lexer([
+        $lexer = new Lexer\Emulative([
             'usedAttributes' => [
                 'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
             ],
