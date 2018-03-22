@@ -210,6 +210,70 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertSame(0, $filterNodes->length);
     }
 
+    public function test_it_adds_memory_limit_if_not_exist()
+    {
+        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+
+        $configurationPath = $this->builder->build($this->mutant);
+
+        $xml = file_get_contents($configurationPath);
+
+        /** @var \DOMNodeList $filterNodes */
+        $filterNodes = $this->queryXpath($xml, '/phpunit/php/ini[@name="memory_limit"]');
+
+        $this->assertSame(1, $filterNodes->length);
+    }
+
+    public function test_it_does_not_add_memory_limit_if_exist()
+    {
+        $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit_with_memory_limit.xml';
+        $replacer = new PathReplacer($this->fileSystem, $this->pathToProject);
+        $xmlConfigurationHelper = new XmlConfigurationHelper($replacer);
+
+        $this->builder = new MutationConfigBuilder(
+            $this->tmpDir,
+            file_get_contents($phpunitXmlPath),
+            $xmlConfigurationHelper,
+            $this->pathToProject
+        );
+
+        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+
+        $configurationPath = $this->builder->build($this->mutant);
+
+        $xml = file_get_contents($configurationPath);
+
+        /** @var \DOMNodeList $filterNodes */
+        $filterNodes = $this->queryXpath($xml, '/phpunit/php/ini[@name="memory_limit"]');
+
+        $this->assertSame(1, $filterNodes->length);
+    }
+
+    public function test_it_does_not_extra_php_node()
+    {
+        $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit_with_ini_set.xml';
+        $replacer = new PathReplacer($this->fileSystem, $this->pathToProject);
+        $xmlConfigurationHelper = new XmlConfigurationHelper($replacer);
+
+        $this->builder = new MutationConfigBuilder(
+            $this->tmpDir,
+            file_get_contents($phpunitXmlPath),
+            $xmlConfigurationHelper,
+            $this->pathToProject
+        );
+
+        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+
+        $configurationPath = $this->builder->build($this->mutant);
+
+        $xml = file_get_contents($configurationPath);
+
+        /** @var \DOMNodeList $filterNodes */
+        $filterNodes = $this->queryXpath($xml, '/phpunit/php');
+
+        $this->assertSame(1, $filterNodes->length);
+    }
+
     /**
      * @dataProvider coverageTestsProvider
      */
