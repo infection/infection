@@ -116,6 +116,9 @@ final class MutatorProfile
 
     const STATEMENT = [
         Mutator\Statement\Assign::class,
+        Mutator\Statement\MethodCallFalse::class,
+        Mutator\Statement\MethodCallNull::class,
+        Mutator\Statement\MethodCallTrue::class,
     ];
 
     const ZERO_ITERATION = [
@@ -214,6 +217,9 @@ final class MutatorProfile
 
         //Statement
         'Assign' => Mutator\Statement\Assign::class,
+        'MethodCallFalse' => Mutator\Statement\MethodCallFalse::class,
+        'MethodCallNull' => Mutator\Statement\MethodCallNull::class,
+        'MethodCallTrue' => Mutator\Statement\MethodCallTrue::class,
 
         //Zero Iteration
         'Foreach_' => Mutator\ZeroIteration\Foreach_::class,
