@@ -24,6 +24,7 @@ final class MutatorProfile
         '@operator' => self::OPERATOR,
         '@return_value' => self::RETURN_VALUE,
         '@sort' => self::SORT,
+        '@statement' => self::STATEMENT,
         '@zero_iteration' => self::ZERO_ITERATION,
 
         //Special Profiles
@@ -113,6 +114,9 @@ final class MutatorProfile
         Mutator\Sort\Spaceship::class,
     ];
 
+    const STATEMENT = [
+    ];
+
     const ZERO_ITERATION = [
         Mutator\ZeroIteration\Foreach_::class,
         Mutator\ZeroIteration\For_::class,
@@ -128,6 +132,7 @@ final class MutatorProfile
         '@operator',
         '@return_value',
         '@sort',
+        '@statement',
         '@zero_iteration',
     ];
 
