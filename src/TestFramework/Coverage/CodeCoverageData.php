@@ -107,6 +107,10 @@ class CodeCoverageData
 
     public function getAllTestsFor(Mutation $mutation): array
     {
+        if (!$mutation->isCoveredByTest()) {
+            return [];
+        }
+
         $filePath = $mutation->getOriginalFilePath();
         $line = $mutation->getAttributes()['startLine'];
 

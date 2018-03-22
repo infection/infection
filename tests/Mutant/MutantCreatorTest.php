@@ -36,6 +36,7 @@ class MutantCreatorTest extends MockeryTestCase
         $mutation->shouldReceive('getOriginalFileAst')->andReturn(['ast']);
         $mutation->shouldReceive('getAttributes')->andReturn(['startLine' => 1]);
         $mutation->shouldReceive('isOnFunctionSignature')->andReturn(true);
+        $mutation->shouldReceive('isCoveredByTest')->once()->andReturn(true);
 
         $coverage = \Mockery::mock(CodeCoverageData::class);
         $coverage->shouldReceive('hasExecutedMethodOnLine')->andReturn(true);
