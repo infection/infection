@@ -63,6 +63,7 @@ final class MutatorProfile
         Mutator\Boolean\LogicalNot::class,
         Mutator\Boolean\LogicalOr::class,
         Mutator\Boolean\TrueValue::class,
+        Mutator\Boolean\Yield_::class,
     ];
 
     const CONDITIONAL_BOUNDARY = [
