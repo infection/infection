@@ -121,7 +121,7 @@ final class Factory
             $codeceptionConfigContent = file_get_contents($codeceptionConfigPath);
 
             return new CodeceptionAdapter(
-                new TestFrameworkExecutableFinder(CodeceptionAdapter::EXECUTABLE),
+                new TestFrameworkFinder(CodeceptionAdapter::EXECUTABLE),
                 new CodeceptionInitialConfigBuilder($this->tmpDir, $this->projectDir, $codeceptionConfigContent, $this->infectionConfig->getSourceDirs()),
                 new CodeceptionMutationConfigBuilder($this->tmpDir, $this->projectDir, $codeceptionConfigContent),
                 new CodeceptionArgumentsAndOptionsBuilder($this->tmpDir),
