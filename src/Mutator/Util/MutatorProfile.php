@@ -115,6 +115,7 @@ final class MutatorProfile
     ];
 
     const STATEMENT = [
+        Mutator\Statement\Assign::class,
     ];
 
     const ZERO_ITERATION = [
@@ -210,6 +211,9 @@ final class MutatorProfile
 
         //Sort
         'Spaceship' => Mutator\Sort\Spaceship::class,
+
+        //Statement
+        'Assign' => Mutator\Statement\Assign::class,
 
         //Zero Iteration
         'Foreach_' => Mutator\ZeroIteration\Foreach_::class,
