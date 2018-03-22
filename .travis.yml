@@ -40,6 +40,9 @@ cache:
     - build/cache
 
 before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y daemontools
+  - "echo 'PHP memory limit is...'; php --ini | grep '/php.ini' | cut -f2 -d: | xargs grep memory_limit"
   - composer selfupdate
   - source .travis/xdebug.sh
   - xdebug-disable
@@ -63,9 +66,9 @@ script:
   - ./tests/e2e_tests
   - if [[ $NO_DEBUGGER == 1 ]]; then xdebug-disable; fi
   - if [[ $PHPDBG != 1 ]]; then
-      bin/infection $INFECTION_FLAGS;
+      softlimit -d $((128*1024*1024)) bin/infection $INFECTION_FLAGS;
     else
-      phpdbg -qrr bin/infection $INFECTION_FLAGS;
+      softlimit -d $((128*1024*1024)) phpdbg -qrr bin/infection $INFECTION_FLAGS;
     fi
 
 after_success:
