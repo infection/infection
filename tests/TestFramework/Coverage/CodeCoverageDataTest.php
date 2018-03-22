@@ -108,7 +108,8 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             Mockery::mock(Plus::class),
             ['startLine' => 1],
             'PHPParser\Node\Expr\BinaryOp\Plus',
-            false
+            false,
+            true
         );
 
         $this->assertCount(0, $codeCoverageData->getAllTestsFor($mutation));
@@ -125,7 +126,8 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             Mockery::mock(Plus::class),
             ['startLine' => 26],
             'PHPParser\Node\Expr\BinaryOp\Plus',
-            false
+            false,
+            true
         );
 
         $this->assertCount(2, $codeCoverageData->getAllTestsFor($mutation));
@@ -142,6 +144,7 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             Mockery::mock(PublicVisibility::class),
             ['startLine' => 1],
             'PHPParser\Node\Stmt\ClassMethod',
+            true,
             true
         );
 
@@ -159,6 +162,7 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             Mockery::mock(PublicVisibility::class),
             ['startLine' => 24],
             'PHPParser\Node\Stmt\ClassMethod',
+            true,
             true
         );
 

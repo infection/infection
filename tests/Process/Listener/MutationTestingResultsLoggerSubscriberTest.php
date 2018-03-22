@@ -165,4 +165,24 @@ class MutationTestingResultsLoggerSubscriberTest extends TestCase
 
         $dispatcher->dispatch(new MutationTestingFinished());
     }
+
+    public function test_it_reacts_on_mutation_testing_finished_and_no_file_logging()
+    {
+        $logTypes = ['text' => sys_get_temp_dir() . '/infection-log.txt'];
+
+        $this->infectionConfig->expects($this->once())
+            ->method('getLogsTypes')
+            ->willReturn($logTypes);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(
+            $this->output,
+            $this->infectionConfig,
+            $this->metricsCalculator,
+            $this->filesystem,
+            LogVerbosity::NONE
+        ));
+
+        $dispatcher->dispatch(new MutationTestingFinished());
+    }
 }

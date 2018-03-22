@@ -130,7 +130,7 @@ $c['version.parser'] = function (): VersionParser {
 };
 
 $c['lexer'] = function (): Lexer {
-    return new Lexer([
+    return new Lexer\Emulative([
         'usedAttributes' => [
             'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
         ],

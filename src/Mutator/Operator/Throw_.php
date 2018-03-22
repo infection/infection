@@ -16,7 +16,7 @@ class Throw_ extends Mutator
 {
     public function mutate(Node $node)
     {
-        return $node->expr;
+        return new Node\Stmt\Expression($node->expr);
     }
 
     public function shouldMutate(Node $node): bool

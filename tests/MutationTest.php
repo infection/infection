@@ -34,7 +34,8 @@ class MutationTest extends TestCase
             $mutator,
             $attributes,
             'Interface_',
-            false
+            false,
+            true
         );
 
         $this->assertSame('5f52c44bcebde86a7ee79d0080c0e12a', $mutation->getHash());
@@ -58,7 +59,8 @@ class MutationTest extends TestCase
             $mutator,
             $attributes,
             'Interface_',
-            false
+            false,
+            true
         );
 
         $this->assertFalse($mutation->isOnFunctionSignature());
@@ -83,7 +85,8 @@ class MutationTest extends TestCase
             $mutator,
             $attributes,
             'Interface_',
-            false
+            false,
+            true
         );
 
         $this->assertSame($fileAst, $mutation->getOriginalFileAst());

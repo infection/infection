@@ -56,27 +56,13 @@ class MutantCreator
 
         $diff = $this->differ->diff($originalPrettyPrintedFile, $mutatedCode);
 
-        $isCoveredByTest = $this->isCoveredByTest($mutation, $codeCoverageData);
-
         return new Mutant(
             $mutatedFilePath,
             $mutation,
             $diff,
-            $isCoveredByTest,
+            $mutation->isCoveredByTest(),
             $codeCoverageData->getAllTestsFor($mutation)
         );
-    }
-
-    private function isCoveredByTest(Mutation $mutation, CodeCoverageData $codeCoverageData): bool
-    {
-        $line = $mutation->getAttributes()['startLine'];
-        $filePath = $mutation->getOriginalFilePath();
-
-        if ($mutation->isOnFunctionSignature()) {
-            return $codeCoverageData->hasExecutedMethodOnLine($filePath, $line);
-        }
-
-        return $codeCoverageData->hasTestsOnLine($filePath, $line);
     }
 
     private function createMutatedCode(Mutation $mutation, string $mutatedFilePath): string
