@@ -208,6 +208,22 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertSame(0, $filterNodes->length);
     }
 
+    public function test_it_removes_infinite_memory_limit_if_set()
+    {
+        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+
+        $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit_with_no_memory_limit.xml';
+
+        $configurationPath = $this->builderFromFile($phpunitXmlPath)->build($this->mutant);
+
+        $xml = file_get_contents($configurationPath);
+
+        /** @var \DOMNodeList $filterNodes */
+        $filterNodes = $this->queryXpath($xml, '/phpunit/php/ini[@name="memory_limit" and @value="-1"]');
+
+        $this->assertSame(0, $filterNodes->length);
+    }
+
     /**
      * @dataProvider coverageTestsProvider
      */

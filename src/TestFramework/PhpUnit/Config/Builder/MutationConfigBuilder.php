@@ -52,6 +52,7 @@ class MutationConfigBuilder extends ConfigBuilder
         $xmlConfigurationHelper->deactivateColours($this->xPath);
         $xmlConfigurationHelper->removeExistingLoggers($this->dom, $this->xPath);
         $xmlConfigurationHelper->removeExistingPrinters($this->dom, $this->xPath);
+        $xmlConfigurationHelper->removeInfiniteMemoryLimit($this->xPath);
     }
 
     public function build(Mutant $mutant): string
