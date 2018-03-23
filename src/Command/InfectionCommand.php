@@ -20,6 +20,7 @@ use Infection\EventDispatcher\EventDispatcher;
 use Infection\Mutant\Exception\MsiCalculationException;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutant\MetricsCalculator;
+use Infection\Php\ConfigBuilder;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
@@ -213,6 +214,8 @@ class InfectionCommand extends BaseCommand
             $mutations
         );
 
+        $this->applyMemoryLimit();
+
         $mutationTestingRunner->run(
             (int) $this->input->getOption('threads'),
             $codeCoverageData,
@@ -251,6 +254,15 @@ class InfectionCommand extends BaseCommand
         }
 
         throw new \InvalidArgumentException('Incorrect formatter. Possible values: "dot", "progress"');
+    }
+
+    private function applyMemoryLimit()
+    {
+        $tempConfigPath = (string) getenv(ConfigBuilder::ENV_TEMP_PHP_CONFIG_PATH);
+
+        if (!empty($tempConfigPath) && file_exists($tempConfigPath)) {
+            file_put_contents($tempConfigPath, PHP_EOL . 'memory_limit = ' . $this->getContainer()->get('infection.config')->getProcessMemoryLimit(), FILE_APPEND);
+        }
     }
 
     private function registerSubscribers(
