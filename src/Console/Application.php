@@ -14,6 +14,7 @@ use Infection\Config\Exception\InvalidConfigException;
 use Infection\Config\InfectionConfig;
 use Infection\Php\ConfigBuilder;
 use Infection\Php\XdebugHandler;
+use PackageVersions\Versions;
 use Pimple\Container;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -123,6 +124,17 @@ ASCII;
         $output->writeln(self::LOGO);
 
         return parent::doRun($input, $output);
+    }
+
+    public function getLongVersion()
+    {
+        if (self::VERSION === $this->getVersion()) {
+            $version = Versions::getVersion('infection/infection');
+
+            return sprintf('%s <info>%s</info>', $this->getName(), explode('@', $version)[0]);
+        }
+
+        return parent::getLongVersion();
     }
 
     protected function getDefaultCommands()
