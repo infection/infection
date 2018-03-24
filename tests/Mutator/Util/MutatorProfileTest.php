@@ -47,7 +47,7 @@ class MutatorProfileTest extends TestCase
                 $class,
                 MutatorProfile::FULL_MUTATOR_LIST,
                 sprintf(
-                    'The mutator "%s" located in "%s" has not been added to the FULL_MUTATOR_LIST in the Mutator Profile class' .
+                    'The mutator "%s" located in "%s" has not been added to the FULL_MUTATOR_LIST in the MutatorProfile class. ' .
                     'Please add it to ensure it can be used.',
                     $class,
                     $file->getPath()
