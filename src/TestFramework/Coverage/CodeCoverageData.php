@@ -93,12 +93,8 @@ class CodeCoverageData
         }
 
         foreach ($coverage[$filePath]['byMethod'] as $method => $coverageInfo) {
-            if ($coverageInfo['executed'] === 0) {
-                continue;
-            }
-
             if ($line >= $coverageInfo['startLine'] && $line <= $coverageInfo['endLine']) {
-                return true;
+                return $coverageInfo['executed'] || $coverageInfo['coverage'];
             }
         }
 

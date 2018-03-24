@@ -221,7 +221,7 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
                             'endLine' => 5,
                             'executable' => 5,
                             'executed' => 0,
-                            'coverage' => 80,
+                            'coverage' => 0, // not executed method can't be covered
                         ],
                     ],
             ],
