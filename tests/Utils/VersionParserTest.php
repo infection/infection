@@ -48,6 +48,7 @@ class VersionParserTest extends TestCase
             ['phpspec version 1.2.3', '1.2.3'],
             ['PHPUnit 1.2.3 by Sebastian Bergmann and contributors.', '1.2.3'],
             ['1.2.3', '1.2.3'],
+            ['10.20.13', '10.20.13'],
             ['a 1.2.3-patch b', '1.2.3-patch'],
             ['v1.2.3', '1.2.3'],
             ['6.5-abcde', '6.5-abcde'],
