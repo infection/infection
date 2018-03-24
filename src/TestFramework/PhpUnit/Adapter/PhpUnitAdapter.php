@@ -37,6 +37,15 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter
         return $isOk || $isOkWithInfo || $isWarning;
     }
 
+    public function getMemoryUsed(string $output): float
+    {
+        if (preg_match('/Memory: (\d+(?:\.\d+))MB/', $output, $match)) {
+            return (float) $match[1];
+        }
+
+        return -1;
+    }
+
     public function getName(): string
     {
         return 'PHPUnit';

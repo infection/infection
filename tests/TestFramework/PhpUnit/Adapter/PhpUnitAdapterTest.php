@@ -48,6 +48,27 @@ class PhpUnitAdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         ];
     }
 
+    /**
+     * @dataProvider memoryReportProvider
+     */
+    public function test_it_determines_used_memory_amount($output, $expectedResult)
+    {
+        $adapter = $this->getAdapter();
+
+        $result = $adapter->getMemoryUsed($output);
+
+        $this->assertSame($expectedResult, $result);
+    }
+
+    public function memoryReportProvider()
+    {
+        return [
+            ['Memory: 8.00MB', 8.0],
+            ['Memory: 68.00MB', 68.0],
+            ['Time: 2.51 seconds', -1.0],
+        ];
+    }
+
     private function getAdapter(): PhpUnitAdapter
     {
         $executableFined = Mockery::mock(AbstractExecutableFinder::class);
