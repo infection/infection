@@ -85,7 +85,7 @@ final class ConfigBuilder
 
         $content .= $this->mergeLoadedConfig($loaded, $config);
         // Work-around for https://bugs.php.net/bug.php?id=75932
-        $content .= 'opcache.enable_cli=0'.PHP_EOL;
+        $content .= 'opcache.enable_cli=0' . PHP_EOL;
 
         return (bool) @file_put_contents($this->tmpIniPath, $content);
     }
@@ -112,6 +112,7 @@ final class ConfigBuilder
      * @return string
      *
      * @see https://github.com/composer/xdebug-handler/blob/master/src/XdebugHandler.php
+     *
      * @license MIT composer/xdebug-handler
      */
     private function mergeLoadedConfig(array $loadedConfig, array $iniConfig)
@@ -125,11 +126,12 @@ final class ConfigBuilder
             if (!isset($iniConfig[$name]) || $iniConfig[$name] !== $value) {
                 // Based on main -d option handling in php-src/sapi/cli/php_cli.c
                 if ($value && !ctype_alnum($value)) {
-                    $value = '"'.str_replace('"', '\\"', $value).'"';
+                    $value = '"' . str_replace('"', '\\"', $value) . '"';
                 }
-                $content .= $name.'='.$value.PHP_EOL;
+                $content .= $name . '=' . $value . PHP_EOL;
             }
         }
+
         return $content;
     }
 }
