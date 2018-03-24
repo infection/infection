@@ -20,7 +20,7 @@ class Break_ extends Mutator
         return new Node\Stmt\Continue_();
     }
 
-    public function shouldMutate(Node $node): bool
+    protected function mutatesNode(Node $node): bool
     {
         if (!$node instanceof Node\Stmt\Break_) {
             return false;
@@ -28,10 +28,6 @@ class Break_ extends Mutator
 
         $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
 
-        if ($parentNode instanceof Node\Stmt\Case_) {
-            return false;
-        }
-
-        return true;
+        return !$parentNode instanceof Node\Stmt\Case_;
     }
 }

@@ -28,7 +28,7 @@ class This extends AbstractValueToNullReturnValue
         );
     }
 
-    public function shouldMutate(Node $node): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Stmt\Return_ &&
             $node->expr instanceof Node\Expr\Variable &&

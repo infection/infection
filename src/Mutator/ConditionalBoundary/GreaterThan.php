@@ -26,7 +26,7 @@ class GreaterThan extends Mutator
         return new Node\Expr\BinaryOp\GreaterOrEqual($node->left, $node->right, $node->getAttributes());
     }
 
-    public function shouldMutate(Node $node): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\Greater;
     }

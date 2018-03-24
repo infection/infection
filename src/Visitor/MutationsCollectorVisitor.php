@@ -75,15 +75,6 @@ class MutationsCollectorVisitor extends NodeVisitorAbstract
                 }
             }
 
-            if ($reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY, false)) {
-                if ($mutator->isIgnored(
-                    $reflectionClass->getName(),
-                    $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, '')
-                )) {
-                    continue;
-                }
-            }
-
             $isCoveredByTest = $this->isCoveredByTest($isOnFunctionSignature, $node);
 
             if ($this->onlyCovered && !$isCoveredByTest) {

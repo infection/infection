@@ -26,7 +26,7 @@ class BitwiseNot extends Mutator
         return $node->expr;
     }
 
-    public function shouldMutate(Node $node): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Expr\BitwiseNot;
     }

@@ -26,7 +26,7 @@ class TrueValue extends Mutator
         return new Node\Expr\ConstFetch(new Node\Name('false'));
     }
 
-    public function shouldMutate(Node $node): bool
+    protected function mutatesNode(Node $node): bool
     {
         if (!($node instanceof Node\Expr\ConstFetch)) {
             return false;

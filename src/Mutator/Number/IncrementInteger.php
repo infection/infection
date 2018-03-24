@@ -26,7 +26,7 @@ class IncrementInteger extends Mutator
         return new Node\Scalar\LNumber($node->value + 1);
     }
 
-    public function shouldMutate(Node $node): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Scalar\LNumber && $node->value !== 0;
     }

@@ -26,7 +26,7 @@ class Spaceship extends Mutator
         return new Node\Expr\BinaryOp\Spaceship($node->right, $node->left);
     }
 
-    public function shouldMutate(Node $node): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\Spaceship;
     }

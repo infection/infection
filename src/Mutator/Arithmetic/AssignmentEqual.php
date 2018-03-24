@@ -26,7 +26,7 @@ class AssignmentEqual extends Mutator
         return new Node\Expr\Assign($node->left, $node->right, $node->getAttributes());
     }
 
-    public function shouldMutate(Node $node): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\Equal && $node->left instanceof Node\Expr\Variable;
     }

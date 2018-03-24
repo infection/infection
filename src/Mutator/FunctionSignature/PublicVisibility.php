@@ -43,7 +43,7 @@ class PublicVisibility extends Mutator
         );
     }
 
-    public function shouldMutate(Node $node): bool
+    protected function mutatesNode(Node $node): bool
     {
         if (!$node instanceof ClassMethod) {
             return false;

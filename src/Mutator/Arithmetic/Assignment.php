@@ -26,7 +26,7 @@ class Assignment extends Mutator
         return new Node\Expr\Assign($node->var, $node->expr, $node->getAttributes());
     }
 
-    public function shouldMutate(Node $node): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Expr\AssignOp;
     }

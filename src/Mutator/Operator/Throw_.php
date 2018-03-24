@@ -19,7 +19,7 @@ class Throw_ extends Mutator
         return new Node\Stmt\Expression($node->expr);
     }
 
-    public function shouldMutate(Node $node): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Stmt\Throw_;
     }
