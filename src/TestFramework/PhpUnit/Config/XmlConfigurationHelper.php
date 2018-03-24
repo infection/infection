@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config;
 
+use Infection\Config\InfectionConfig;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 
 class XmlConfigurationHelper
@@ -79,5 +80,26 @@ class XmlConfigurationHelper
         if ($nodeList->length) {
             $dom->documentElement->removeAttribute('printerClass');
         }
+    }
+
+    public function addMemoryLimit(\DOMXPath $xPath, \DOMDocument $dom)
+    {
+        if ($xPath->query('/phpunit/php/ini[@name="memory_limit"]')->length) {
+            return;
+        }
+
+        $nodeList = $xPath->query('/phpunit/php');
+
+        if ($nodeList->length) {
+            $node = $nodeList[0];
+        } else {
+            $node = $dom->createElement('php');
+            $xPath->query('/phpunit')[0]->appendChild($node);
+        }
+
+        $element = $dom->createElement('ini');
+        $element->setAttribute('name', 'memory_limit');
+        $element->setAttribute('value', InfectionConfig::PROCESS_MEMORY_LIMIT);
+        $node->appendChild($element);
     }
 }
