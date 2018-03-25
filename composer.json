@@ -53,6 +53,7 @@
     },
     "require": {
         "php": "^7.0",
+        "composer/xdebug-handler": "^1.1",
         "nikic/php-parser": "^4.0",
         "ocramius/package-versions": "^1.2",
         "padraic/phar-updater": "^1.0.4",

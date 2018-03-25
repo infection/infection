@@ -3,9 +3,6 @@
     "source": {
         "directories": [
             "src"
-        ],
-        "excludes": [
-            "Php/XdebugHandler.php"
         ]
     },
     "logs": {

@@ -9,11 +9,10 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
+use Composer\XdebugHandler\XdebugHandler;
 use Infection\Command;
 use Infection\Config\Exception\InvalidConfigException;
 use Infection\Config\InfectionConfig;
-use Infection\Php\ConfigBuilder;
-use Infection\Php\XdebugHandler;
 use PackageVersions\Versions;
 use Pimple\Container;
 use Symfony\Component\Console\Application as BaseApplication;
@@ -29,6 +28,8 @@ final class Application extends BaseApplication
     const NAME = 'Infection - PHP Mutation Testing Framework';
     const VERSION = '@package_version@';
     const RUNNING_WITH_DEBUGGER_NOTE = 'You are running Infection with %s enabled.';
+
+    const INFECTION_PREFIX = 'INFECTION';
 
     const LOGO = <<<'ASCII'
     ____      ____          __  _
@@ -54,15 +55,9 @@ ASCII;
      */
     private $isXdebugLoaded;
 
-    /**
-     * @var bool
-     */
-    private $isDebuggerDisabled;
-
     public function __construct(Container $container, string $name = self::NAME, string $version = self::VERSION)
     {
         $this->container = $container;
-        $this->isDebuggerDisabled = ('' === trim((string) getenv(XdebugHandler::ENV_DISABLE_XDEBUG)));
         $this->isXdebugLoaded = \extension_loaded('xdebug');
 
         parent::__construct($name, $version);
@@ -90,23 +85,23 @@ ASCII;
 
         if (!$this->isAutoExitEnabled()) {
             // When we're not in control of exit codes, that means it's the caller
-            // responsibilty to disable xdebug if it isn't needed. As of writing
+            // responsibility to disable xdebug if it isn't needed. As of writing
             // that's only the case during E2E testing. Show a warning nevertheless.
 
             $this->io->warning([
                 'Infection cannot control exit codes and unable to relaunch itself.' . PHP_EOL .
-                'It is your responsibilty to disable xdebug/phpdbg unless needed.',
+                'It is your responsibility to disable xdebug/phpdbg unless needed.',
             ]);
 
             return parent::run($input, $output);
         }
 
-        $xdebug = new XdebugHandler(new ConfigBuilder(sys_get_temp_dir()));
+        $xdebug = new XdebugHandler(self::INFECTION_PREFIX, '--ansi');
         $xdebug->check();
 
         if (PHP_SAPI !== 'phpdbg'
-            && $this->isDebuggerDisabled
             && !$this->isXdebugLoaded
+            && !XdebugHandler::getSkippedVersion()
             && !$input->hasParameterOption('--coverage', true)
             && !$this->isInitialTestPhpOptionHasXdebug($input)
         ) {
