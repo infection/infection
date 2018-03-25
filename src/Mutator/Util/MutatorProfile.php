@@ -199,6 +199,7 @@ final class MutatorProfile
         'Break_' => Mutator\Operator\Break_::class,
         'Continue_' => Mutator\Operator\Continue_::class,
         'Throw_' => Mutator\Operator\Throw_::class,
+        'Finally_' => Mutator\Operator\Finally_::class,
 
         //Return Value
         'FloatNegation' => Mutator\ReturnValue\FloatNegation::class,
