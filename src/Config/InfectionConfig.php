@@ -14,6 +14,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class InfectionConfig
 {
     const PROCESS_TIMEOUT_SECONDS = 10;
+    const PROCESS_MEMORY_LIMIT = '128M';
     const DEFAULT_SOURCE_DIRS = ['.'];
     const DEFAULT_EXCLUDE_DIRS = ['vendor'];
     const CONFIG_FILE_NAME = 'infection.json';
@@ -57,6 +58,11 @@ class InfectionConfig
     public function getProcessTimeout(): int
     {
         return $this->config->timeout ?? self::PROCESS_TIMEOUT_SECONDS;
+    }
+
+    public function getProcessMemoryLimit(): string
+    {
+        return (string) ($this->config->memoryLimit ?? self::PROCESS_MEMORY_LIMIT);
     }
 
     public function getSourceDirs(): array

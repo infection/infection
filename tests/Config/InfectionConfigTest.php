@@ -42,6 +42,20 @@ class InfectionConfigTest extends TestCase
         $this->assertSame($timeout, $config->getProcessTimeout());
     }
 
+    public function test_it_returns_default_memory_limit_with_no_config()
+    {
+        $config = new InfectionConfig(new \stdClass(), $this->filesystem, '/path/to/config');
+
+        $this->assertSame(InfectionConfig::PROCESS_MEMORY_LIMIT, $config->getProcessMemoryLimit());
+    }
+
+    public function test_it_returns_memory_limit_from_config()
+    {
+        $config = new InfectionConfig(json_decode('{"memoryLimit": "64M"}'), $this->filesystem, '/path/to/config');
+
+        $this->assertSame('64M', $config->getProcessMemoryLimit());
+    }
+
     public function test_it_returns_default_phpunit_config_dir_with_no_config()
     {
         $config = new InfectionConfig(new \stdClass(), $this->filesystem, '/path/to/config');

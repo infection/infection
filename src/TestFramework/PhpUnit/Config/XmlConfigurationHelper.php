@@ -80,4 +80,14 @@ class XmlConfigurationHelper
             $dom->documentElement->removeAttribute('printerClass');
         }
     }
+
+    public function removeInfiniteMemoryLimit(\DOMXPath $xPath)
+    {
+        $nodes = $xPath->query('/phpunit/php/ini[@name="memory_limit" and @value="-1"]');
+
+        /** @var \DOMElement[] $nodes */
+        foreach ($nodes as $node) {
+            $node->parentNode->removeChild($node);
+        }
+    }
 }

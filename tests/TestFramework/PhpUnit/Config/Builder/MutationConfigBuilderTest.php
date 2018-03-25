@@ -113,18 +113,25 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertSame($expectedCustomAutoloadFilePath, $resultAutoLoaderFilePath);
     }
 
+    private function builderFromFile(string $phpunitXmlPath): MutationConfigBuilder
+    {
+        $replacer = new PathReplacer($this->fileSystem, $this->pathToProject);
+        $xmlConfigurationHelper = new XmlConfigurationHelper($replacer);
+
+        return new MutationConfigBuilder(
+            $this->tmpDir,
+            file_get_contents($phpunitXmlPath),
+            $xmlConfigurationHelper,
+            $this->pathToProject
+        );
+    }
+
     public function test_it_sets_custom_autoloader_when_attribute_is_absent()
     {
         $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpuit_without_bootstrap.xml';
-        $this->builder = new MutationConfigBuilder(
-            $this->tmpDir,
-            file_get_contents($phpunitXmlPath),
-            $this->xmlConfigurationHelper,
-            'project/dir'
-        );
 
-        $configurationPath = $this->builder->build($this->mutant);
+        $configurationPath = $this->builderFromFile($phpunitXmlPath)->build($this->mutant);
 
         $xml = file_get_contents($configurationPath);
 
@@ -170,17 +177,8 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
 
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit_root_test_suite.xml';
-        $replacer = new PathReplacer($this->fileSystem, $this->pathToProject);
-        $xmlConfigurationHelper = new XmlConfigurationHelper($replacer);
 
-        $this->builder = new MutationConfigBuilder(
-            $this->tmpDir,
-            file_get_contents($phpunitXmlPath),
-            $xmlConfigurationHelper,
-            $this->pathToProject
-        );
-
-        $configurationPath = $this->builder->build($this->mutant);
+        $configurationPath = $this->builderFromFile($phpunitXmlPath)->build($this->mutant);
 
         $this->assertEquals(1, $this->queryXpath(file_get_contents($configurationPath), '/phpunit/testsuite')->length);
     }
@@ -207,6 +205,22 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         /** @var \DOMNodeList $filterNodes */
         $filterNodes = $this->queryXpath($xml, '/phpunit/@printerClass');
+        $this->assertSame(0, $filterNodes->length);
+    }
+
+    public function test_it_removes_infinite_memory_limit_if_set()
+    {
+        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+
+        $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit_with_no_memory_limit.xml';
+
+        $configurationPath = $this->builderFromFile($phpunitXmlPath)->build($this->mutant);
+
+        $xml = file_get_contents($configurationPath);
+
+        /** @var \DOMNodeList $filterNodes */
+        $filterNodes = $this->queryXpath($xml, '/phpunit/php/ini[@name="memory_limit" and @value="-1"]');
+
         $this->assertSame(0, $filterNodes->length);
     }
 
