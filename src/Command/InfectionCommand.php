@@ -30,6 +30,7 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
@@ -194,7 +195,7 @@ class InfectionCommand extends BaseCommand
         }
 
         // We only apply a memory limit if there isn't one set
-        if ($adapter instanceof PhpUnitAdapter && ini_get('memory_limit') === '-1') {
+        if ($adapter instanceof MemoryUsageAware && ini_get('memory_limit') === '-1') {
             $this->applyMemoryLimitFromPhpUnitProcess($initialTestSuitProcess, $adapter);
         }
 
