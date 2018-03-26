@@ -47,6 +47,6 @@ abstract class Mutator
     {
         $parts = explode('\\', static::class);
 
-        return $parts[count($parts) - 1];
+        return end($parts);
     }
 }
