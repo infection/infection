@@ -15,6 +15,11 @@ Please read documentation here: http://infection.github.io
 
 Twitter: http://twitter.com/infection_php
 
+### Contributing
+
+Infection is an open source project that welcomes pull requests and issues from anyone.
+Before opening pull requests, please read our short [Contribution Guide](https://github.com/infection/infection/blob/master/.github/CONTRIBUTING.md).
+
 ### Credits
 
 This project is highly inspired from Pádraic Brady ([@padraic](https://github.com/padraic))'s [Humbug library](https://github.com/humbug/humbug). Humbug has since then been discountinued in favour of this project.

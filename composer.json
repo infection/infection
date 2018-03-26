@@ -12,6 +12,19 @@
             "name": "Maks Rafalko",
             "email": "maks.rafalko@gmail.com",
             "homepage": "https://twitter.com/maks_rafalko"
+        },
+        {
+            "name": "$iD",
+            "homepage": "https://github.com/sidz"
+        },
+        {
+            "name": "Gert de Pagter",
+            "homepage": "https://github.com/BackEndTea"
+        },
+        {
+            "name": "Théo FIDRY",
+            "email": "theo.fidry@gmail.com",
+            "homepage": "https://twitter.com/tfidry"
         }
     ],
     "autoload": {
