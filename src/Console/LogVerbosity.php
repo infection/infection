@@ -11,7 +11,31 @@ namespace Infection\Console;
 
 final class LogVerbosity
 {
-    const DEBUG = 1;
-    const NORMAL = 2;
-    const NONE = 3;
+    const DEBUG = 'all';
+    const NORMAL = 'default';
+    const NONE = 'none';
+
+    /**
+     * @deprecated
+     */
+    const DEBUG_INTEGER = 1;
+
+    /**
+     * @deprecated
+     */
+    const NORMAL_INTEGER = 2;
+
+    /**
+     * @deprecated
+     */
+    const NONE_INTEGER = 3;
+
+    const ALLOWED_OPTIONS = [
+        self::DEBUG,
+        self::NORMAL,
+        self::NONE,
+        self::DEBUG_INTEGER,
+        self::NORMAL_INTEGER,
+        self::NONE_INTEGER,
+    ];
 }

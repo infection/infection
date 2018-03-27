@@ -150,8 +150,8 @@ final class InfectionCommand extends BaseCommand
                 'log-verbosity',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Log verbosity level. 1 - full logs format, 2 - short logs format, 3 - no logs.',
-                LogVerbosity::DEBUG
+                'Log verbosity level. \'all\' - full logs format, \'default\' - short logs format, \'none\' - no logs.',
+                LogVerbosity::NORMAL
             )
             ->addOption(
                 'initial-tests-php-options',
@@ -186,8 +186,9 @@ final class InfectionCommand extends BaseCommand
         $testFrameworkKey = $input->getOption('test-framework') ?: $config->getTestFramework();
         $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $this->skipCoverage);
 
-        $metricsCalculator = new MetricsCalculator();
+        $this->checkLoggingLevels($input->getOption('log-verbosity'));
 
+        $metricsCalculator = new MetricsCalculator();
         $this->registerSubscribers($metricsCalculator, $adapter);
 
         $processBuilder = new ProcessBuilder($adapter, $config->getProcessTimeout());
@@ -351,7 +352,7 @@ final class InfectionCommand extends BaseCommand
                 $this->getContainer()->get('infection.config'),
                 $metricsCalculator,
                 $this->getContainer()->get('filesystem'),
-                (int) $this->input->getOption('log-verbosity')
+                $this->input->getOption('log-verbosity')
             ),
         ];
     }
@@ -500,5 +501,18 @@ final class InfectionCommand extends BaseCommand
         $this->io = $this->getApplication()->getIO();
         $this->eventDispatcher = $this->getContainer()->get('dispatcher');
         $this->skipCoverage = \strlen(trim($input->getOption('coverage'))) > 0;
+    }
+
+    /**
+     * @param int|string $loggingLevel
+     */
+    private function checkLoggingLevels($loggingLevel)
+    {
+        if (in_array($loggingLevel, LogVerbosity::ALLOWED_OPTIONS, false)) {
+            return;
+        }
+
+        $this->io->note('Running infection with an unknown log-verbosity option, falling back to \'default\' option');
+        $this->input->setOption('log-verbosity', LogVerbosity::NORMAL);
     }
 }
