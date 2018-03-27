@@ -36,7 +36,7 @@ class Decrement extends Mutator
         }
     }
 
-    public function shouldMutate(Node $node): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof PreDec || $node instanceof PostDec;
     }

@@ -28,7 +28,7 @@ class Foreach_ extends Mutator
         );
     }
 
-    public function shouldMutate(Node $node): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Stmt\Foreach_;
     }

@@ -26,7 +26,7 @@ class PlusEqual extends Mutator
         return new Node\Expr\AssignOp\Minus($node->var, $node->expr, $node->getAttributes());
     }
 
-    public function shouldMutate(Node $node): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Expr\AssignOp\Plus;
     }

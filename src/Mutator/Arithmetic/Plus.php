@@ -27,7 +27,7 @@ class Plus extends Mutator
         return new Node\Expr\BinaryOp\Minus($node->left, $node->right, $node->getAttributes());
     }
 
-    public function shouldMutate(Node $node): bool
+    protected function mutatesNode(Node $node): bool
     {
         if (!($node instanceof Node\Expr\BinaryOp\Plus)) {
             return false;

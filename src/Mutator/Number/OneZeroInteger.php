@@ -30,7 +30,7 @@ class OneZeroInteger extends Mutator
         return new Node\Scalar\LNumber(0);
     }
 
-    public function shouldMutate(Node $node): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Scalar\LNumber && ($node->value === 0 || $node->value === 1);
     }

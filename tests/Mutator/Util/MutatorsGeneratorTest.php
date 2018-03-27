@@ -15,9 +15,13 @@ use Infection\Mutator\Boolean\FalseValue;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\Util\MutatorProfile;
 use Infection\Mutator\Util\MutatorsGenerator;
-use PHPUnit\Framework\TestCase;
+use Infection\Visitor\ReflectionVisitor;
+use Mockery;
+use PhpParser\Node;
+use PhpParser\Node\Expr\BinaryOp\Plus as PlusNode;
+use PhpParser\Node\Scalar\DNumber;
 
-class MutatorsGeneratorTest extends TestCase
+class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     private static $countDefaultMutators = 0;
 
@@ -91,6 +95,10 @@ class MutatorsGeneratorTest extends TestCase
 
     public function test_it_keeps_settings()
     {
+        $reflectionMock = Mockery::mock(\ReflectionClass::class);
+        $reflectionMock->shouldReceive('getName')->once()->andReturn('A');
+        $plusNode = $this->getPlusNode('B', $reflectionMock);
+
         $mutatorGenerator = new MutatorsGenerator([
             '@default' => true,
             Plus::getName() => ['ignore' => ['A::B']],
@@ -101,11 +109,17 @@ class MutatorsGeneratorTest extends TestCase
 
         $this->assertInstanceOf(Plus::class, $mutators[Plus::getName()]);
 
-        $this->assertTrue($mutators[Plus::getName()]->isIgnored('A', 'B'));
+        $this->assertFalse($mutators[Plus::getName()]->shouldMutate($plusNode));
     }
 
     public function test_it_keeps_settings_when_applied_to_profiles()
     {
+        $reflectionMock = Mockery::mock(\ReflectionClass::class);
+        $reflectionMock->shouldReceive('getName')->times(3)->andReturn('A');
+        $plusNode = $this->getPlusNode('B', $reflectionMock);
+        $falseNode = $this->getBoolNode('false', 'B', $reflectionMock);
+        $trueNode = $this->getBoolNode('true', 'B', $reflectionMock);
+
         $mutatorGenerator = new MutatorsGenerator([
             '@default' => true,
             '@boolean' => ['ignore' => ['A::B']],
@@ -116,9 +130,32 @@ class MutatorsGeneratorTest extends TestCase
 
         $this->assertInstanceOf(Plus::class, $mutators[Plus::getName()]);
 
-        $this->assertTrue($mutators[TrueValue::getName()]->isIgnored('A', 'B'));
-        $this->assertTrue($mutators[FalseValue::getName()]->isIgnored('A', 'B'));
+        $this->assertFalse($mutators[TrueValue::getName()]->shouldMutate($trueNode));
+        $this->assertFalse($mutators[FalseValue::getName()]->shouldMutate($falseNode));
 
-        $this->assertFalse($mutators[Plus::getName()]->isIgnored('A', 'B'));
+        $this->assertTrue($mutators[Plus::getName()]->shouldMutate($plusNode));
+    }
+
+    private function getPlusNode(string $functionName, \ReflectionClass $reflectionMock): Node
+    {
+        return new PlusNode(
+            new DNumber(1.23),
+            new DNumber(1.23),
+            [
+                ReflectionVisitor::REFLECTION_CLASS_KEY => $reflectionMock,
+                ReflectionVisitor::FUNCTION_NAME => $functionName,
+            ]
+        );
+    }
+
+    private function getBoolNode(string $boolean, string $functionName, \ReflectionClass $reflectionMock): Node
+    {
+        return new Node\Expr\ConstFetch(
+            new Node\Name($boolean),
+            [
+                ReflectionVisitor::REFLECTION_CLASS_KEY => $reflectionMock,
+                ReflectionVisitor::FUNCTION_NAME => $functionName,
+            ]
+        );
     }
 }

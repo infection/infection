@@ -29,7 +29,7 @@ class Yield_ extends Mutator
         return $node;
     }
 
-    public function shouldMutate(Node $node): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Expr\Yield_ && $node->key;
     }

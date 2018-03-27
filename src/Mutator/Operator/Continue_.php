@@ -20,7 +20,7 @@ class Continue_ extends Mutator
         return new Node\Stmt\Break_();
     }
 
-    public function shouldMutate(Node $node): bool
+    protected function mutatesNode(Node $node): bool
     {
         if (!$node instanceof Node\Stmt\Continue_) {
             return false;

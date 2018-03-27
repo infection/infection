@@ -26,7 +26,7 @@ class LogicalOr extends Mutator
         return new Node\Expr\BinaryOp\BooleanAnd($node->left, $node->right, $node->getAttributes());
     }
 
-    public function shouldMutate(Node $node): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\BooleanOr;
     }

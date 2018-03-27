@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
+use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
 abstract class Mutator
@@ -25,17 +26,27 @@ abstract class Mutator
 
     abstract public function mutate(Node $node);
 
-    abstract public function shouldMutate(Node $node): bool;
+    abstract protected function mutatesNode(Node $node): bool;
 
-    public static function getName(): string
+    final public function shouldMutate(Node $node): bool
+    {
+        if (!$this->mutatesNode($node)) {
+            return false;
+        }
+
+        $reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY, false);
+
+        if (!$reflectionClass) {
+            return true;
+        }
+
+        return !$this->config->isIgnored($reflectionClass->getName(), $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''));
+    }
+
+    final public static function getName(): string
     {
         $parts = explode('\\', static::class);
 
-        return $parts[count($parts) - 1];
-    }
-
-    public function isIgnored(string $class, string $method): bool
-    {
-        return $this->config->isIgnored($class, $method);
+        return end($parts);
     }
 }
