@@ -31,6 +31,11 @@ return \PhpCsFixer\Config::create()
         'phpdoc_align' => false,
         'phpdoc_summary' => false,
         'yoda_style' => false,
+        'ordered_class_elements' => [
+            'use_trait',
+            'constant_public',
+            'property_public',
+        ],
     ])
     ->setFinder($finder)
 ;
