@@ -20,7 +20,7 @@ class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
         $locator = new TestFrameworkConfigLocator($dir);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Unable to locate phpunit.(xml|yml)(.dist) file.');
+        $this->expectExceptionMessage('Unable to locate phpunit(.dist).(xml|yml)(.dist) file.');
 
         $locator->locate('phpunit');
     }
@@ -34,6 +34,20 @@ class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertStringEndsWith(
             'tests/Fixtures/ConfigLocator/DistFile/phpunit.xml.dist',
+            p($output),
+            'Did not find the correct phpunit.xml.dist file.'
+        );
+    }
+
+    public function test_it_can_find_an_alt_dist_file()
+    {
+        $dir = $this->baseDir . 'AltDistFile/';
+        $locator = new TestFrameworkConfigLocator($dir);
+
+        $output = $locator->locate('phpunit');
+
+        $this->assertStringEndsWith(
+            'tests/Fixtures/ConfigLocator/AltDistFile/phpunit.dist.xml',
             p($output),
             'Did not find the correct phpunit.xml.dist file.'
         );
