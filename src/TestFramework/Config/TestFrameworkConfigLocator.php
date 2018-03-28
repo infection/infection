@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Config;
 
+use Infection\Finder\Exception\LocatorException;
+
 class TestFrameworkConfigLocator
 {
     /**
@@ -24,20 +26,33 @@ class TestFrameworkConfigLocator
     public function locate(string $testFrameworkName, string $customDir = null): string
     {
         $dir = $customDir ?: $this->configDir;
+        $triedFiles = [];
 
-        foreach (['xml', 'yml'] as $extension) {
+        foreach ($this->getDefaultExtensions() as $extension) {
             $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
-            $altConf = sprintf('%s/%s.dist.%s', $dir, $testFrameworkName, $extension);
 
             if (file_exists($conf)) {
                 return realpath($conf);
-            } elseif (file_exists($conf . '.dist')) {
-                return realpath($conf . '.dist');
-            } elseif (file_exists($altConf)) {
-                return realpath($altConf);
             }
+
+            $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
         }
 
-        throw new \RuntimeException(sprintf('Unable to locate %s(.dist).(xml|yml)(.dist) file.', $testFrameworkName));
+        throw LocatorException::multipleFilesDoNoExist(
+            $dir,
+            $triedFiles
+        );
+    }
+
+    private function getDefaultExtensions() : array
+    {
+        return [
+            'xml',
+            'yml',
+            'xml.dist',
+            'yml.dist',
+            'dist.xml',
+            'dist.yml'
+        ];
     }
 }
