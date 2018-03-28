@@ -27,16 +27,17 @@ class TestFrameworkConfigLocator
 
         foreach (['xml', 'yml'] as $extension) {
             $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
+            $altConf = sprintf('%s/%s.dist.%s', $dir, $testFrameworkName, $extension);
 
             if (file_exists($conf)) {
                 return realpath($conf);
-            }
-
-            if (file_exists($conf . '.dist')) {
+            } elseif (file_exists($conf . '.dist')) {
                 return realpath($conf . '.dist');
+            } elseif (file_exists($altConf)) {
+                return realpath($altConf);
             }
         }
 
-        throw new \RuntimeException(sprintf('Unable to locate %s.(xml|yml)(.dist) file.', $testFrameworkName));
+        throw new \RuntimeException(sprintf('Unable to locate %s(.dist).(xml|yml)(.dist) file.', $testFrameworkName));
     }
 }
