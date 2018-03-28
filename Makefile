@@ -1,4 +1,6 @@
 PHP_CS_FIXER_FUTURE_MODE=1
+PHPSTAN=./phpstan.phar
+PHP-CS-FIXER=./php-cs-fixer-v2.phar
 
 .PHONY: all
 #Run all checks, default when running 'make'
@@ -11,13 +13,13 @@ vendor: composer.json composer.lock
 build/cache:
 	mkdir -p build/cache
 
-php-cs-fixer-v2.phar:
-	wget -nc http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar
-	chmod a+x php-cs-fixer-v2.phar
+$(PHP-CS-FIXER):
+	wget http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar
+	chmod a+x $(PHP-CS-FIXER)
 
-phpstan.phar:
-	wget -nc https://github.com/phpstan/phpstan/releases/download/0.9.1/phpstan.phar
-	chmod a+x phpstan.phar
+$(PHPSTAN):
+	wget https://github.com/phpstan/phpstan/releases/download/0.9.1/phpstan.phar
+	chmod a+x $(PHPSTAN)
 
 
 #All tests, (infection itself, phpunit, e2e) for different php version/ environments (xdebug or phpdbg)
@@ -112,14 +114,14 @@ build-xdebug-72: vendor
 .PHONY: analyze cs-fix cs-check phpstan validate update
 analyze: cs-check phpstan validate
 
-cs-fix: build/cache php-cs-fixer-v2.phar
-	./php-cs-fixer-v2.phar fix -v --cache-file=build/cache/.php_cs.cache
+cs-fix: build/cache $(PHP-CS-FIXER)
+	$(PHP-CS-FIXER) fix -v --cache-file=build/cache/.php_cs.cache
 
-cs-check: build/cache php-cs-fixer-v2.phar
-	./php-cs-fixer-v2.phar fix -v --cache-file=build/cache/.php_cs.cache --dry-run --stop-on-violation
+cs-check: build/cache $(PHP-CS-FIXER)
+	$(PHP-CS-FIXER) fix -v --cache-file=build/cache/.php_cs.cache --dry-run --stop-on-violation
 
-phpstan: phpstan.phar
-	./phpstan.phar analyse src tests --level=2 -c phpstan.neon --no-interaction --no-progress
+phpstan: vendor $(PHPSTAN)
+	$(PHPSTAN) analyse src tests --level=2 -c phpstan.neon --no-interaction --no-progress
 
 validate:
 	composer validate --strict
