@@ -48,7 +48,7 @@ PHP
             ,
         ];
 
-        yield 'It does not mutates when no catch() blocks are present' => [
+        yield 'It does not mutate when no catch() blocks are present' => [
             <<<'PHP'
 <?php
 
