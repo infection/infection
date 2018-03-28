@@ -9,7 +9,9 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Statement;
 
-class MethodCallFalse extends MethodCallTrue
+use Infection\Mutator\Util\AbstractMethodCall;
+
+class MethodCallFalse extends AbstractMethodCall
 {
     const REPLACEMENT = 'false';
 }

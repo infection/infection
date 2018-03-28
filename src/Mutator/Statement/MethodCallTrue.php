@@ -9,20 +9,9 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Statement;
 
-use Infection\Mutator\Util\Mutator;
-use PhpParser\Node;
+use Infection\Mutator\Util\AbstractMethodCall;
 
-class MethodCallTrue extends Mutator
+class MethodCallTrue extends AbstractMethodCall
 {
     const REPLACEMENT = 'true';
-
-    public function mutate(Node $node)
-    {
-        return new Node\Expr\ConstFetch(new Node\Name(static::REPLACEMENT));
-    }
-
-    public function shouldMutate(Node $node): bool
-    {
-        return $node instanceof Node\Expr\MethodCall || $node instanceof Node\Expr\FuncCall;
-    }
 }
