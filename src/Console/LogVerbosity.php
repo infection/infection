@@ -31,11 +31,28 @@ final class LogVerbosity
     const NONE_INTEGER = 3;
 
     const ALLOWED_OPTIONS = [
-        self::DEBUG,
-        self::NORMAL,
-        self::NONE,
-        self::DEBUG_INTEGER,
-        self::NORMAL_INTEGER,
-        self::NONE_INTEGER,
+        self::DEBUG_INTEGER => self::DEBUG,
+        self::NORMAL_INTEGER => self::NORMAL,
+        self::NONE_INTEGER => self::NONE,
     ];
+
+    /**
+     * @param int|string $verbosityLevel
+     *
+     * @return string
+     *
+     * @throws \Exception
+     */
+    public static function convertVerbosityLevel($verbosityLevel): string
+    {
+        if (in_array($verbosityLevel, self::ALLOWED_OPTIONS)) {
+            return $verbosityLevel;
+        }
+
+        if (array_key_exists((int) $verbosityLevel, self::ALLOWED_OPTIONS)) {
+            return self::ALLOWED_OPTIONS[$verbosityLevel];
+        }
+
+        throw new \Exception();
+    }
 }

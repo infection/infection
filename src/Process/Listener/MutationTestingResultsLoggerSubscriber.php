@@ -41,7 +41,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
     private $fs;
 
     /**
-     * @var int|string
+     * @var string
      */
     private $logVerbosity;
 
@@ -55,7 +55,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
         InfectionConfig $infectionConfig,
         MetricsCalculator $metricsCalculator,
         Filesystem $fs,
-        $logVerbosity = LogVerbosity::NORMAL
+        string $logVerbosity = LogVerbosity::NORMAL
     ) {
         $this->output = $output;
         $this->infectionConfig = $infectionConfig;

@@ -65,6 +65,11 @@ final class InfectionCommand extends BaseCommand
      */
     private $skipCoverage;
 
+    /**
+     * @var string
+     */
+    private $verbosity;
+
     protected function configure()
     {
         $this->setName('run')
@@ -352,7 +357,7 @@ final class InfectionCommand extends BaseCommand
                 $this->getContainer()->get('infection.config'),
                 $metricsCalculator,
                 $this->getContainer()->get('filesystem'),
-                $this->input->getOption('log-verbosity')
+                $this->verbosity
             ),
         ];
     }
@@ -508,11 +513,11 @@ final class InfectionCommand extends BaseCommand
      */
     private function checkLoggingLevels($loggingLevel)
     {
-        if (in_array($loggingLevel, LogVerbosity::ALLOWED_OPTIONS, false)) {
-            return;
+        try {
+            $this->verbosity = LogVerbosity::convertVerbosityLevel($loggingLevel);
+        } catch (\Exception $e) {
+            $this->io->note('Running infection with an unknown log-verbosity option, falling back to \'default\' option');
+            $this->verbosity = LogVerbosity::NORMAL;
         }
-
-        $this->io->note('Running infection with an unknown log-verbosity option, falling back to \'default\' option');
-        $this->input->setOption('log-verbosity', LogVerbosity::NORMAL);
     }
 }
