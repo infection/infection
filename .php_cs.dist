@@ -36,6 +36,7 @@ return \PhpCsFixer\Config::create()
             'constant_public',
             'property_public',
         ],
+        'no_useless_else'=> true,
     ])
     ->setFinder($finder)
 ;
