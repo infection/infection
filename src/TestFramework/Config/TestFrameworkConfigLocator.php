@@ -44,7 +44,7 @@ class TestFrameworkConfigLocator
         );
     }
 
-    private function getDefaultExtensions() : array
+    private function getDefaultExtensions(): array
     {
         return [
             'xml',
@@ -52,7 +52,7 @@ class TestFrameworkConfigLocator
             'xml.dist',
             'yml.dist',
             'dist.xml',
-            'dist.yml'
+            'dist.yml',
         ];
     }
 }
