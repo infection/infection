@@ -30,7 +30,9 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use Infection\TestFramework\TestFrameworkExtraOptions;
@@ -192,6 +194,11 @@ class InfectionCommand extends BaseCommand
             return 1;
         }
 
+        // We only apply a memory limit if there isn't one set
+        if ($adapter instanceof MemoryUsageAware && ini_get('memory_limit') === '-1') {
+            $this->applyMemoryLimitFromPhpUnitProcess($initialTestSuitProcess, $adapter);
+        }
+
         $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
         $mutationsGenerator = new MutationsGenerator(
             $container->get('src.dirs'),
@@ -251,6 +258,37 @@ class InfectionCommand extends BaseCommand
         }
 
         throw new \InvalidArgumentException('Incorrect formatter. Possible values: "dot", "progress"');
+    }
+
+    private function applyMemoryLimitFromPhpUnitProcess(Process $process, PhpUnitAdapter $adapter)
+    {
+        $tempConfigPath = \php_ini_loaded_file();
+
+        if (empty($tempConfigPath) || !file_exists($tempConfigPath)) {
+            // Cannot add a memory limit when there's no php.ini
+            return;
+        }
+
+        $memoryLimit = $adapter->getMemoryUsed($process->getOutput());
+
+        if ($memoryLimit < 0) {
+            // Cannot detect memory used, not setting any limits
+            return;
+        }
+
+        /*
+         * Since we know how much memory the initial test suite used,
+         * and only if we know, we can enforce a memory limit upon all
+         * mutation processes. Limit is set to be twice the known amount,
+         * because if we know that a normal test suite used X megabytes,
+         * if a mutants uses a lot more, this is a definite error.
+         *
+         * By default we let a mutant process use twice as much more
+         * memory as an initial test suite consumed.
+         */
+        $memoryLimit *= 2;
+
+        file_put_contents($tempConfigPath, PHP_EOL . sprintf('memory_limit = %dM', $memoryLimit), FILE_APPEND);
     }
 
     private function registerSubscribers(

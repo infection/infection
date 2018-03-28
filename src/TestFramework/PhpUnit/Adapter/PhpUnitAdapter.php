@@ -10,8 +10,9 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\MemoryUsageAware;
 
-class PhpUnitAdapter extends AbstractTestFrameworkAdapter
+class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware
 {
     const JUNIT_FILE_NAME = 'phpunit.junit.xml';
 
@@ -35,6 +36,15 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter
         $isWarning = (bool) preg_match('/warnings!/i', $output);
 
         return $isOk || $isOkWithInfo || $isWarning;
+    }
+
+    public function getMemoryUsed(string $output): float
+    {
+        if (preg_match('/Memory: (\d+(?:\.\d+))MB/', $output, $match)) {
+            return (float) $match[1];
+        }
+
+        return -1;
     }
 
     public function getName(): string

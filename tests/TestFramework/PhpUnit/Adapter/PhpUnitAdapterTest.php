@@ -11,6 +11,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
 use Infection\Finder\AbstractExecutableFinder;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
+use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
@@ -45,6 +46,33 @@ class PhpUnitAdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             ['OK (5 tests, 3 assertions)', true],
             ['FAILURES!', false],
             ['ERRORS!', false],
+        ];
+    }
+
+    public function test_it_conforms_to_memory_usage_aware()
+    {
+        $adapter = $this->getAdapter();
+        $this->assertInstanceOf(MemoryUsageAware::class, $adapter);
+    }
+
+    /**
+     * @dataProvider memoryReportProvider
+     */
+    public function test_it_determines_used_memory_amount($output, $expectedResult)
+    {
+        $adapter = $this->getAdapter();
+
+        $result = $adapter->getMemoryUsed($output);
+
+        $this->assertSame($expectedResult, $result);
+    }
+
+    public function memoryReportProvider()
+    {
+        return [
+            ['Memory: 8.00MB', 8.0],
+            ['Memory: 68.00MB', 68.0],
+            ['Time: 2.51 seconds', -1.0],
         ];
     }
 
