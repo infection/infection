@@ -68,7 +68,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
 
         try {
             $process = new Process(sprintf('%s %s', $this->findComposer(), 'config bin-dir'));
-            $process->run();
+            $process->mustRun();
             $vendorPath = trim($process->getOutput());
         } catch (\RuntimeException $e) {
             $candidate = getcwd() . '/vendor/bin';
