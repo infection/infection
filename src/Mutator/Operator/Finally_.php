@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Operator;
 
 use Infection\Mutator\Util\Mutator;
+use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 class Finally_ extends Mutator
@@ -21,6 +22,18 @@ class Finally_ extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Stmt\Finally_;
+        if (!$node instanceof Node\Stmt\Finally_) {
+            return false;
+        }
+
+        return $this->hasAtLeastOneCatchBlock($node);
+    }
+
+    private function hasAtLeastOneCatchBlock(Node $node): bool
+    {
+        /** @var Node\Stmt\TryCatch $parentNode */
+        $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
+
+        return \count($parentNode->catches) > 0;
     }
 }
