@@ -23,6 +23,17 @@ class LocatorException extends \RuntimeException
         );
     }
 
+    public static function multipleFilesDoNotExist(string $path, array $files): self
+    {
+        return new self(
+            sprintf(
+                'The path %s does not contain any of the requested files: %s',
+                $path,
+                implode(', ', $files)
+            )
+        );
+    }
+
     public static function filesNotFound(): self
     {
         return new self('Files are not found');

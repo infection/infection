@@ -7,6 +7,7 @@
 
 namespace Infection\Tests\TestFramework\Config;
 
+use Infection\Finder\Exception\LocatorException;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use function Infection\Tests\normalizePath as p;
 
@@ -19,8 +20,13 @@ class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
         $dir = $this->baseDir . 'NoFiles/';
         $locator = new TestFrameworkConfigLocator($dir);
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Unable to locate phpunit.(xml|yml)(.dist) file.');
+        $this->expectException(LocatorException::class);
+        $this->expectExceptionMessage(
+            sprintf(
+                'The path %s does not contain any of the requested files: phpunit.xml, phpunit.yml, phpunit.xml.dist, phpunit.yml.dist, phpunit.dist.xml, phpunit.dist.yml',
+                $dir
+            )
+        );
 
         $locator->locate('phpunit');
     }
@@ -34,6 +40,20 @@ class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertStringEndsWith(
             'tests/Fixtures/ConfigLocator/DistFile/phpunit.xml.dist',
+            p($output),
+            'Did not find the correct phpunit.xml.dist file.'
+        );
+    }
+
+    public function test_it_can_find_an_alt_dist_file()
+    {
+        $dir = $this->baseDir . 'AltDistFile/';
+        $locator = new TestFrameworkConfigLocator($dir);
+
+        $output = $locator->locate('phpunit');
+
+        $this->assertStringEndsWith(
+            'tests/Fixtures/ConfigLocator/AltDistFile/phpunit.dist.xml',
             p($output),
             'Did not find the correct phpunit.xml.dist file.'
         );
@@ -80,7 +100,7 @@ class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
             'Did not find the correct phpunit.xml.dist file.'
         );
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(LocatorException::class);
         $locator->locate('phpunit' . $dir . 'NoFiles/');
     }
 }
