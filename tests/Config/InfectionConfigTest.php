@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Config;
 
 use Infection\Config\InfectionConfig;
+use Infection\Tests\Fixtures\StubMutator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use function Infection\Tests\normalizePath as p;
@@ -190,6 +191,22 @@ JSON;
                 ],
             ],
             (array) $config->getMutatorsConfiguration()['PublicVisibility']);
+    }
+
+    public function test_it_accepts_custom_mutators()
+    {
+        $config = <<<'JSON'
+{
+    "mutators": {
+        "Infection\\Tests\\Fixtures\\StubMutator": true
+    }
+}
+JSON;
+
+        $config = new InfectionConfig(json_decode($config), $this->filesystem, '/path/to/config');
+        $this->assertSame(
+            [StubMutator::class => true],
+            $config->getMutatorsConfiguration());
     }
 
     /**
