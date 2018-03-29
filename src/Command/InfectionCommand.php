@@ -130,7 +130,7 @@ class InfectionCommand extends BaseCommand
                 'formatter',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Output formatter. Possible values: dot, progress',
+                'Output formatter. Possible values: dot, progress, or custom class name (must implement \Infection\Console\OutputFormatter)',
                 'dot'
             )
             ->addOption(
@@ -249,15 +249,25 @@ class InfectionCommand extends BaseCommand
 
     private function getOutputFormatter(): OutputFormatter
     {
-        if ($this->input->getOption('formatter') === 'progress') {
+        $formatter = $this->input->getOption('formatter');
+
+        if ($formatter === 'progress') {
             return new ProgressFormatter(new ProgressBar($this->output));
         }
 
-        if ($this->input->getOption('formatter') === 'dot') {
+        if ($formatter === 'dot') {
             return new DotFormatter($this->output);
         }
 
-        throw new \InvalidArgumentException('Incorrect formatter. Possible values: "dot", "progress"');
+        if ($formatter && class_exists($formatter)) {
+            if (!is_subclass_of($formatter, OutputFormatter::class)) {
+                throw new \LogicException('Formatter must implement ' . OutputFormatter::class);
+            }
+
+            return new $formatter($this->output);
+        }
+
+        throw new \InvalidArgumentException('Incorrect formatter. Possible values: "dot", "progress", or an instance of ' . OutputFormatter::class);
     }
 
     private function applyMemoryLimitFromPhpUnitProcess(Process $process, PhpUnitAdapter $adapter)
