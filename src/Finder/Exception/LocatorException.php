@@ -23,7 +23,7 @@ class LocatorException extends \RuntimeException
         );
     }
 
-    public static function multipleFilesDoNoExist(string $path, array $files): self
+    public static function multipleFilesDoNotExist(string $path, array $files): self
     {
         return new self(
             sprintf(

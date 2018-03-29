@@ -47,7 +47,7 @@ class TestFrameworkConfigLocator
             $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
         }
 
-        throw LocatorException::multipleFilesDoNoExist(
+        throw LocatorException::multipleFilesDoNotExist(
             $dir,
             $triedFiles
         );
