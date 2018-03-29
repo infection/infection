@@ -13,6 +13,15 @@ use Infection\Finder\Exception\LocatorException;
 
 class TestFrameworkConfigLocator
 {
+    const DEFAULT_EXTENSIONS = [
+        'xml',
+        'yml',
+        'xml.dist',
+        'yml.dist',
+        'dist.xml',
+        'dist.yml',
+    ];
+
     /**
      * @var string
      */
@@ -28,7 +37,7 @@ class TestFrameworkConfigLocator
         $dir = $customDir ?: $this->configDir;
         $triedFiles = [];
 
-        foreach ($this->getDefaultExtensions() as $extension) {
+        foreach (static::DEFAULT_EXTENSIONS as $extension) {
             $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
 
             if (file_exists($conf)) {
@@ -42,17 +51,5 @@ class TestFrameworkConfigLocator
             $dir,
             $triedFiles
         );
-    }
-
-    private function getDefaultExtensions(): array
-    {
-        return [
-            'xml',
-            'yml',
-            'xml.dist',
-            'yml.dist',
-            'dist.xml',
-            'dist.yml',
-        ];
     }
 }
