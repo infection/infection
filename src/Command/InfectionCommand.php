@@ -130,7 +130,7 @@ class InfectionCommand extends BaseCommand
                 'formatter',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Output formatter. Possible values: dot, progress, or custom class name (must implement \Infection\Console\OutputFormatter)',
+                'Output formatter. Possible values: dot, progress, or custom class name (must implement ' . OutputFormatter::class . ')',
                 'dot'
             )
             ->addOption(
