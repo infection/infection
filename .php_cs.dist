@@ -31,9 +31,11 @@ return \PhpCsFixer\Config::create()
         ],
         'no_useless_else'=> true,
         'ordered_class_elements' => [
-            'use_trait',
-            'constant_public',
-            'property_public',
+            'order' => [
+                'use_trait',
+                'constant_public',
+                'property_public',
+            ],
         ],
         'ordered_imports' => true,
         'phpdoc_align' => false,
