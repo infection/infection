@@ -21,11 +21,10 @@ class Finally_Test extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): array
+    public function provideMutationCases(): \Generator
     {
-        return [
-            'It removes the finally statement' => [
-                <<<'PHP'
+        yield 'It removes the finally statement' => [
+            <<<'PHP'
 <?php
 
 try {
@@ -36,8 +35,8 @@ try {
     $a = 3;
 }
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 try {
@@ -46,8 +45,20 @@ try {
     $a = 2;
 } 
 PHP
-                ,
-            ],
+            ,
+        ];
+
+        yield 'It does not mutate when no catch() blocks are present' => [
+            <<<'PHP'
+<?php
+
+try {
+    $a = 1;
+} finally {
+    $a = 2;
+}
+PHP
+            ,
         ];
     }
 }
