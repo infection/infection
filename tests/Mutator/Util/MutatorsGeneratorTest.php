@@ -15,6 +15,7 @@ use Infection\Mutator\Boolean\FalseValue;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\Util\MutatorProfile;
 use Infection\Mutator\Util\MutatorsGenerator;
+use Infection\Tests\Fixtures\StubMutator;
 use Infection\Visitor\ReflectionVisitor;
 use Mockery;
 use PhpParser\Node;
@@ -98,6 +99,7 @@ final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
 
     public function test_it_keeps_settings()
     {
+        /** @var \Mockery\MockInterface|\ReflectionClass $reflectionMock */
         $reflectionMock = Mockery::mock(\ReflectionClass::class);
         $reflectionMock->shouldReceive('getName')->once()->andReturn('A');
         $plusNode = $this->getPlusNode('B', $reflectionMock);
@@ -117,6 +119,7 @@ final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
 
     public function test_it_keeps_settings_when_applied_to_profiles()
     {
+        /** @var \Mockery\MockInterface|\ReflectionClass $reflectionMock */
         $reflectionMock = Mockery::mock(\ReflectionClass::class);
         $reflectionMock->shouldReceive('getName')->times(3)->andReturn('A');
         $plusNode = $this->getPlusNode('B', $reflectionMock);
@@ -137,6 +140,29 @@ final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
         $this->assertFalse($mutators[FalseValue::getName()]->shouldMutate($falseNode));
 
         $this->assertTrue($mutators[Plus::getName()]->shouldMutate($plusNode));
+    }
+
+    public function test_it_accepts_custom_mutators()
+    {
+        $mutatorGenerator = new MutatorsGenerator([
+            'Infection\\Tests\\Fixtures\\StubMutator' => true,
+        ]);
+        $mutators = $mutatorGenerator->generate();
+
+        $this->assertArrayHasKey('StubMutator', $mutators);
+        $this->assertInstanceOf(StubMutator::class, $mutators['StubMutator']);
+    }
+
+    public function test_it_combines_custom_mutators_with_the_other_mutators()
+    {
+        $mutatorGenerator = new MutatorsGenerator([
+            '@default' => true,
+            'Infection\\Tests\\Fixtures\\StubMutator' => true,
+        ]);
+        $mutators = $mutatorGenerator->generate();
+
+        $this->assertNotCount(1, $mutators);
+        $this->assertCount(self::$countDefaultMutators + 1, $mutators);
     }
 
     public function test_it_can_set_a_single_item_with_a_setting()
