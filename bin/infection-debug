@@ -1,0 +1,8 @@
+#!/usr/bin/env php
+<?php
+
+set_error_handler(function($errno, $errstr) {
+    var_dump($errno, $errstr);
+}, E_ALL);
+
+require __DIR__ . '/infection';
