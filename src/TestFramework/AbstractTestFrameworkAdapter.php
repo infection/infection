@@ -93,7 +93,8 @@ abstract class AbstractTestFrameworkAdapter
         string $configPath,
         string $extraOptions,
         bool $includePhpArgs = true,
-        array $phpExtraOptions = []
+        array $phpExtraOptions = [],
+        Mutant $mutant = null
     ): string {
         return sprintf(
             '%s %s',
@@ -102,7 +103,7 @@ abstract class AbstractTestFrameworkAdapter
                 $includePhpArgs,
                 $phpExtraOptions
             ),
-            $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions)
+            $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions, $mutant)
         );
     }
 

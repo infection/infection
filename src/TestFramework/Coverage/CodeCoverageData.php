@@ -16,6 +16,7 @@ class CodeCoverageData
 {
     const PHP_UNIT_COVERAGE_DIR = 'coverage-xml';
     const PHP_SPEC_COVERAGE_DIR = 'phpspec-coverage-xml';
+    const CODECEPTION_COVERAGE_DIR = 'codeception-coverage-xml';
     const COVERAGE_INDEX_FILE_NAME = 'index.xml';
 
     /**

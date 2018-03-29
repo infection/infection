@@ -1,0 +1,26 @@
+Total: 2
+Killed mutants:
+===============
+
+
+Mutator: Plus
+Line 9
+
+Mutator: PublicVisibility
+Line 7
+
+Errors mutants:
+===============
+
+
+Escaped mutants:
+================
+
+
+Timed Out mutants:
+==================
+
+
+Not Covered mutants:
+====================
+

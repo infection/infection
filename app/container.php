@@ -73,6 +73,10 @@ $c['phpunit.junit.file.path'] = function (Container $c) {
     return sprintf('%s/%s', $c['coverage.path'], PhpUnitAdapter::JUNIT_FILE_NAME);
 };
 
+$c['coverage.dir.codeception'] = function (Container $c): string {
+    return $c['tmp.dir'] . '/' . CodeCoverageData::CODECEPTION_COVERAGE_DIR;
+};
+
 $c['locator'] = function (Container $c): Locator {
     return new Locator([$c['project.dir']], $c['filesystem']);
 };

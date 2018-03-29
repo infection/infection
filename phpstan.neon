@@ -5,4 +5,5 @@ parameters:
     ignoreErrors:
         - '#Access to an undefined property PhpParser\\Node(.*?)#'
         - '#Call to an undefined method PhpParser\\Node(.*?)#'
+        - '#Call to an undefined method Mockery\\MockInterface(.*?)#'
         - '#Cannot access property \$name on string.#'
