@@ -80,7 +80,7 @@ class YamlConfigurationHelper
             'enabled' => $coverageEnabled,
             'include' => $coverageEnabled ? array_map(
                 function ($dir) use ($pathToProjectDir) {
-                    return $pathToProjectDir . trim($dir, '/') . '/';
+                    return $pathToProjectDir . trim($dir, '/') . '/*.php';
                 },
                 $this->srcDirs
             ) : [],
