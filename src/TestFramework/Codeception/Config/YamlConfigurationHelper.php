@@ -64,6 +64,10 @@ class YamlConfigurationHelper
         $pathToProjectDir = str_repeat('../', count($tempDirParts)) . implode('/', $projectDirParts) . '/';
 
         $config = Yaml::parse($this->originalConfig);
+        if (!$config !== null) {
+            $config = $this->updatePaths($config, $pathToProjectDir);
+        }
+
         $config['paths'] = [
             'tests' => $pathToProjectDir . ($config['paths']['tests'] ?? 'tests'),
             'output' => $this->tempDir . '/' . $outputDir,
@@ -83,5 +87,22 @@ class YamlConfigurationHelper
         ];
 
         return Yaml::dump($config);
+    }
+
+
+    private function updatePaths(array $config, string $projectPath): array
+    {
+        $returnConfig = [];
+        foreach($config as $key => $value) {
+            if (is_array($value)) {
+                $value = $this->updatePaths($value, $projectPath);
+            } else if (substr($value, 0, 2) === './') {
+                $value = $projectPath . '/' . substr($value, 2);
+            }
+
+            $returnConfig[$key] = $value;
+        }
+
+        return $returnConfig;
     }
 }
