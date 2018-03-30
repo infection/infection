@@ -69,11 +69,11 @@ class YamlConfigurationHelper
         }
 
         $config['paths'] = [
-            'tests' => $pathToProjectDir . ($config['paths']['tests'] ?? 'tests'),
-            'output' => $this->tempDir . '/' . $outputDir,
-            'data' => $pathToProjectDir . ($config['paths']['data'] ?? 'tests/_data'),
-            'support' => $pathToProjectDir . ($config['paths']['support'] ?? 'tests/_support'),
-            'envs' => $pathToProjectDir . ($config['paths']['envs'] ?? 'tests/_envs'),
+            'tests'   => ($config['paths']['tests'] ?? $pathToProjectDir . 'tests'),
+            'output'  => $this->tempDir . '/' . $outputDir,
+            'data'    => ($config['paths']['data'] ?? $pathToProjectDir . 'tests/_data'),
+            'support' => ($config['paths']['support'] ?? $pathToProjectDir . 'tests/_support'),
+            'envs'    => ($config['paths']['envs'] ?? $pathToProjectDir . 'tests/_envs'),
         ];
         $config['coverage'] = [
             'enabled' => $coverageEnabled,
@@ -97,7 +97,7 @@ class YamlConfigurationHelper
             if (is_array($value)) {
                 $value = $this->updatePaths($value, $projectPath);
             } else if (is_string($value) && file_exists($projectPath . $value)) {
-                $value = $projectPath . '/' . $value;
+                $value = $projectPath . $value;
             }
 
             $returnConfig[$key] = $value;
