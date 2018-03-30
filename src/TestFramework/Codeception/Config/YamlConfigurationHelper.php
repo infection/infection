@@ -97,7 +97,7 @@ class YamlConfigurationHelper
             if (is_array($value)) {
                 $value = $this->updatePaths($value, $projectPath);
             } else if (is_string($value) && file_exists($projectPath . $value)) {
-                $value = $projectPath . '/';
+                $value = $projectPath . '/' . $value;
             }
 
             $returnConfig[$key] = $value;
