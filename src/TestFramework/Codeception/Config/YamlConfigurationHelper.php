@@ -96,7 +96,7 @@ class YamlConfigurationHelper
         foreach($config as $key => $value) {
             if (is_array($value)) {
                 $value = $this->updatePaths($value, $projectPath);
-            } else if (substr($value, 0, 2) === './') {
+            } else if (is_string($value) && substr($value, 0, 2) === './') {
                 $value = $projectPath . '/' . substr($value, 2);
             }
 
