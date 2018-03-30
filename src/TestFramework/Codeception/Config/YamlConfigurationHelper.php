@@ -75,11 +75,12 @@ class YamlConfigurationHelper
             'support' => ($config['paths']['support'] ?? $pathToProjectDir . 'tests/_support'),
             'envs'    => ($config['paths']['envs'] ?? $pathToProjectDir . 'tests/_envs'),
         ];
+
         $config['coverage'] = [
             'enabled' => $coverageEnabled,
             'include' => $coverageEnabled ? array_map(
                 function ($dir) use ($pathToProjectDir) {
-                    return $pathToProjectDir . $dir . '/*';
+                    return $pathToProjectDir . trim($dir, '/') . '/';
                 },
                 $this->srcDirs
             ) : [],
