@@ -9,6 +9,6 @@ declare(strict_types=1);
 
 namespace Infection\Events;
 
-class InitialTestCaseCompleted
+final class InitialTestCaseCompleted
 {
 }

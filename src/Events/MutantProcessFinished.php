@@ -11,7 +11,7 @@ namespace Infection\Events;
 
 use Infection\Process\MutantProcess;
 
-class MutantProcessFinished
+final class MutantProcessFinished
 {
     /**
      * @var MutantProcess

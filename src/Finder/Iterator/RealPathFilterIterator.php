@@ -11,7 +11,7 @@ namespace Infection\Finder\Iterator;
 
 use Symfony\Component\Finder\Iterator\MultiplePcreFilterIterator;
 
-class RealPathFilterIterator extends MultiplePcreFilterIterator
+final class RealPathFilterIterator extends MultiplePcreFilterIterator
 {
     /**
      * Filters the iterator values.

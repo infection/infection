@@ -12,7 +12,7 @@ namespace Infection\Mutator\Arithmetic;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class AssignmentEqual extends Mutator
+final class AssignmentEqual extends Mutator
 {
     /**
      * Replaces "==" with a "=".

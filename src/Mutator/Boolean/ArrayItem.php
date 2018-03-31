@@ -12,7 +12,7 @@ namespace Infection\Mutator\Boolean;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class ArrayItem extends Mutator
+final class ArrayItem extends Mutator
 {
     /**
      * Replaces [$a->foo => $b->bar] with [$a->foo > $b->bar]

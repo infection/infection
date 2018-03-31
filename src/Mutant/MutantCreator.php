@@ -17,7 +17,7 @@ use Infection\Visitor\MutatorVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\PrettyPrinter\Standard;
 
-class MutantCreator
+final class MutantCreator
 {
     /**
      * @var string

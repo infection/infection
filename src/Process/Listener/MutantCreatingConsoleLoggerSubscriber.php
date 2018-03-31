@@ -16,7 +16,7 @@ use Infection\Events\MutantsCreatingStarted;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MutantCreatingConsoleLoggerSubscriber implements EventSubscriberInterface
+final class MutantCreatingConsoleLoggerSubscriber implements EventSubscriberInterface
 {
     /**
      * @var OutputInterface

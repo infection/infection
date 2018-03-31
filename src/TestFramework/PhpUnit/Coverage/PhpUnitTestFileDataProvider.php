@@ -13,7 +13,7 @@ use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
 
-class PhpUnitTestFileDataProvider implements TestFileDataProvider
+final class PhpUnitTestFileDataProvider implements TestFileDataProvider
 {
     /**
      * @var string

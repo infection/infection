@@ -12,7 +12,7 @@ namespace Infection\Visitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class ParentConnectorVisitor extends NodeVisitorAbstract
+final class ParentConnectorVisitor extends NodeVisitorAbstract
 {
     const PARENT_KEY = 'parent';
 

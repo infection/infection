@@ -25,7 +25,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ConfigureCommand extends BaseCommand
+final class ConfigureCommand extends BaseCommand
 {
     protected function configure()
     {

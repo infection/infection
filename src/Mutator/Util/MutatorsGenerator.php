@@ -11,7 +11,7 @@ namespace Infection\Mutator\Util;
 
 use Infection\Config\Exception\InvalidConfigException;
 
-class MutatorsGenerator
+final class MutatorsGenerator
 {
     /**
      * @var array

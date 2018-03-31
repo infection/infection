@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Config\Guesser;
 
-class PhpUnitPathGuesser implements Guesser
+final class PhpUnitPathGuesser implements Guesser
 {
     const CURRENT_DIR_PATH = '.';
 

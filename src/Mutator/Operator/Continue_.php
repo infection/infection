@@ -13,7 +13,7 @@ use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
-class Continue_ extends Mutator
+final class Continue_ extends Mutator
 {
     public function mutate(Node $node)
     {

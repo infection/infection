@@ -11,7 +11,7 @@ namespace Infection\TestFramework\PhpSpec\Config;
 
 use Symfony\Component\Yaml\Yaml;
 
-class MutationYamlConfiguration extends AbstractYamlConfiguration
+final class MutationYamlConfiguration extends AbstractYamlConfiguration
 {
     /**
      * @var string

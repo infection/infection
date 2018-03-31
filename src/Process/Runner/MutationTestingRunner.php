@@ -22,7 +22,7 @@ use Infection\Process\MutantProcess;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 
-class MutationTestingRunner
+final class MutationTestingRunner
 {
     /**
      * @var ProcessBuilder

@@ -17,7 +17,7 @@ use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
+final class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
 {
     /**
      * @var OutputInterface

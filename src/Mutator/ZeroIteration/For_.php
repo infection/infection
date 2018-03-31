@@ -12,7 +12,7 @@ namespace Infection\Mutator\ZeroIteration;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class For_ extends Mutator
+final class For_ extends Mutator
 {
     public function mutate(Node $node)
     {

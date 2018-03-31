@@ -12,7 +12,7 @@ namespace Infection\Mutator\Sort;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class Spaceship extends Mutator
+final class Spaceship extends Mutator
 {
     /**
      * Swaps the arguments in the Spaceship operator <=>

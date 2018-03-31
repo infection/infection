@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-class CachedTestFileDataProvider implements TestFileDataProvider
+final class CachedTestFileDataProvider implements TestFileDataProvider
 {
     /**
      * @var TestFileDataProvider

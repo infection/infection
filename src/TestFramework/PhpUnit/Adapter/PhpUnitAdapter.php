@@ -12,7 +12,7 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\MemoryUsageAware;
 
-class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware
+final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware
 {
     const JUNIT_FILE_NAME = 'phpunit.junit.xml';
 

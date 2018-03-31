@@ -11,7 +11,7 @@ namespace Infection\Logger;
 
 use Infection\Process\MutantProcess;
 
-class TextFileLogger extends FileLogger
+final class TextFileLogger extends FileLogger
 {
     protected function getLogLines(): array
     {

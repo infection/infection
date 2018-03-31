@@ -12,7 +12,7 @@ namespace Infection\Mutator\ConditionalNegotiation;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class GreaterThanNegotiation extends Mutator
+final class GreaterThanNegotiation extends Mutator
 {
     /**
      * Replaces ">" with "<="

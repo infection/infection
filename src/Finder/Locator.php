@@ -12,7 +12,7 @@ namespace Infection\Finder;
 use Infection\Finder\Exception\LocatorException;
 use Symfony\Component\Filesystem\Filesystem;
 
-class Locator
+final class Locator
 {
     /**
      * @var string[]

@@ -16,7 +16,7 @@ use PhpParser\Node\Expr\PostInc;
 use PhpParser\Node\Expr\PreDec;
 use PhpParser\Node\Expr\PreInc;
 
-class Increment extends Mutator
+final class Increment extends Mutator
 {
     /**
      * Replaces "++" with "--"

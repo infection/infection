@@ -12,7 +12,7 @@ namespace Infection\Console\OutputFormatter;
 use Infection\Process\MutantProcess;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DotFormatter extends AbstractOutputFormatter
+final class DotFormatter extends AbstractOutputFormatter
 {
     const DOTS_PER_ROW = 50;
 

@@ -19,7 +19,7 @@ use Symfony\Component\Process\Exception\RuntimeException;
 /**
  * This ProcessManager is a simple wrapper to enable parallel processing using Symfony Process component.
  */
-class ParallelProcessRunner
+final class ParallelProcessRunner
 {
     /**
      * @var EventDispatcherInterface

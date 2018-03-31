@@ -12,7 +12,7 @@ namespace Infection\Mutator\Arithmetic;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class Modulus extends Mutator
+final class Modulus extends Mutator
 {
     /**
      * Replaces "%" with "*"

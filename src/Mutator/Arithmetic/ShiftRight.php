@@ -12,7 +12,7 @@ namespace Infection\Mutator\Arithmetic;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class ShiftRight extends Mutator
+final class ShiftRight extends Mutator
 {
     /**
      * Replaces ">>" with "<<"

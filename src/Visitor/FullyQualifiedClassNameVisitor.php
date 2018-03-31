@@ -19,7 +19,7 @@ use PhpParser\NodeVisitorAbstract;
  *      $node->name                    // Plus
  *      $node->fullyQualifiedClassName // Infection\Mutator\Plus
  */
-class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
+final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
 {
     private $namespace;
 

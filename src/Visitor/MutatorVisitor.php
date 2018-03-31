@@ -13,7 +13,7 @@ use Infection\Mutation;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class MutatorVisitor extends NodeVisitorAbstract
+final class MutatorVisitor extends NodeVisitorAbstract
 {
     /**
      * @var Mutation

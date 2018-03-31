@@ -16,7 +16,7 @@ use Infection\Events\InitialTestSuiteStarted;
 use Infection\Process\Builder\ProcessBuilder;
 use Symfony\Component\Process\Process;
 
-class InitialTestsRunner
+final class InitialTestsRunner
 {
     /**
      * @var ProcessBuilder

@@ -12,7 +12,7 @@ namespace Infection\Mutator\ReturnValue;
 use Infection\Mutator\Util\AbstractValueToNullReturnValue;
 use PhpParser\Node;
 
-class NewObject extends AbstractValueToNullReturnValue
+final class NewObject extends AbstractValueToNullReturnValue
 {
     /**
      * Replace "return new Something(anything);" with "new Something(anything); return null;"

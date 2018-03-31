@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Events;
 
-class MutantsCreatingStarted
+final class MutantsCreatingStarted
 {
     /**
      * @var int

@@ -13,7 +13,7 @@ use Infection\Http\BadgeApiClient;
 use Infection\Mutant\MetricsCalculator;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class BadgeLogger implements MutationTestingResultsLogger
+final class BadgeLogger implements MutationTestingResultsLogger
 {
     const ENV_INFECTION_BADGE_API_KEY = 'INFECTION_BADGE_API_KEY';
 

@@ -12,7 +12,7 @@ namespace Infection\Mutator\Boolean;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class LogicalAnd extends Mutator
+final class LogicalAnd extends Mutator
 {
     /**
      * Replaces "&&" with "||"

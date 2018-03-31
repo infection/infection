@@ -12,7 +12,7 @@ namespace Infection\Mutator\Number;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class OneZeroFloat extends Mutator
+final class OneZeroFloat extends Mutator
 {
     /**
      * Replaces "0.0" with "1.0" or "1.0" with "0.0"

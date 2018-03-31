@@ -12,7 +12,7 @@ namespace Infection\Mutator\ConditionalNegotiation;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class Identical extends Mutator
+final class Identical extends Mutator
 {
     /**
      * Replaces "===" with "!=="
