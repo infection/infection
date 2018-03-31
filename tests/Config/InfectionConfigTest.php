@@ -166,6 +166,7 @@ class InfectionConfigTest extends TestCase
         }
     }
 }
+
 JSON;
 
         $config = new InfectionConfig(json_decode($config), $this->filesystem, '/path/to/config');
@@ -177,5 +178,62 @@ JSON;
                 ],
             ],
             (array) $config->getMutatorsConfiguration()['PublicVisibility']);
+    }
+
+    /**
+     * @dataProvider configDataProvider
+     *
+     * @param \stdClass $config Settings
+     * @param string $methodName Method To Call
+     * @param string $result Correct Response
+     */
+    public function test_config(\stdClass $config, string $methodName, string $result)
+    {
+        $testSubject = new InfectionConfig(
+            $config,
+            $this->filesystem,
+            '/path/to/config'
+        );
+
+        $this->assertEquals($result, $testSubject->{$methodName}());
+    }
+
+    public function configDataProvider(): \Generator
+    {
+        yield 'It uses the default framework (PHPUnit)' => [
+            (object) [
+                'system' => [],
+            ],
+            'getTestFramework',
+            'phpunit',
+        ];
+
+        yield 'It uses the registered framework (phpspec)' => [
+            (object) [
+                'system' => (object) [
+                    'testFramework' => 'phpspec',
+                ],
+            ],
+            'getTestFramework',
+            'phpspec',
+        ];
+
+        yield 'It returns an empty bootstrap' => [
+            (object) [
+                'system' => (object) [],
+            ],
+            'getBootstrap',
+            '',
+        ];
+
+        yield 'It returns the bootstrap file' => [
+            (object) [
+                'system' => (object) [
+                    'bootstrap' => 'bootstrap.php',
+                ],
+            ],
+            'getBootstrap',
+            'bootstrap.php',
+        ];
     }
 }

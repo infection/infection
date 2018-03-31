@@ -172,8 +172,9 @@ class InfectionCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $container = $this->getContainer();
+        $config = $container->get('infection.config');
 
-        $bootstrap = $container->get('infection.config')->getBootstrap();
+        $bootstrap = $config->getBootstrap();
         if ($bootstrap) {
             if (!file_exists($bootstrap)) {
                 throw LocatorException::fileOrDirectoryDoesNotExist($bootstrap);
@@ -182,14 +183,14 @@ class InfectionCommand extends BaseCommand
             require_once $bootstrap;
         }
 
-        $testFrameworkKey = $input->getOption('test-framework') ?? $container->get('infection.config')->getTestFramework();
+        $testFrameworkKey = $input->getOption('test-framework') ?? $config->getTestFramework();
         $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $this->skipCoverage);
 
         $metricsCalculator = new MetricsCalculator();
 
         $this->registerSubscribers($metricsCalculator, $adapter);
 
-        $processBuilder = new ProcessBuilder($adapter, $container->get('infection.config')->getProcessTimeout());
+        $processBuilder = new ProcessBuilder($adapter, $config->getProcessTimeout());
         $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);
 
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
