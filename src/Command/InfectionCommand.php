@@ -182,7 +182,6 @@ class InfectionCommand extends BaseCommand
             require_once $bootstrap;
         }
 
-
         $testFrameworkKey = $input->getOption('test-framework') ?? $container->get('infection.config')->getTestFramework();
         $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $this->skipCoverage);
 

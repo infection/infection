@@ -1,9 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: fenikkusu
- * Date: 3/30/18
- * Time: 8:33 PM
+ * Copyright © 2017-2018 Maks Rafalko
+ *
+ * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
 namespace Infection\Tests\TestFramework\Config;
@@ -30,6 +29,7 @@ class InfectionConfigTest extends TestCase
 
     /**
      * @dataProvider dpConfig
+     *
      * @param \stdClass $config Settings
      * @param string $testFramework Correct Testing Framework
      */
@@ -49,36 +49,36 @@ class InfectionConfigTest extends TestCase
         return [
             [
                 (object) [
-                    'system' => []
+                    'system' => [],
                 ],
                 'getTestFramework',
-                'phpunit'
+                'phpunit',
             ],
             [
                 (object) [
                     'system' => (object) [
-                        'testFramework' => 'phpspec'
-                    ]
+                        'testFramework' => 'phpspec',
+                    ],
                 ],
                 'getTestFramework',
-                'phpspec'
+                'phpspec',
             ],
             [
                 (object) [
-                    'system' => []
+                    'system' => [],
                 ],
                 'getBootstrap',
-                ''
+                '',
             ],
             [
                 (object) [
                     'system' => (object) [
-                        'bootstrap' => 'bootstrap.php'
-                    ]
+                        'bootstrap' => 'bootstrap.php',
+                    ],
                 ],
                 'getBootstrap',
-                'bootstrap.php'
-            ]
+                'bootstrap.php',
+            ],
         ];
     }
 }
