@@ -31,7 +31,8 @@ class InfectionConfigTest extends TestCase
      * @dataProvider dpConfig
      *
      * @param \stdClass $config Settings
-     * @param string $testFramework Correct Testing Framework
+     * @param string $methodName Method To Call
+     * @param string $result Correct Response
      */
     public function test_config(\stdClass $config, string $methodName, string $result)
     {
