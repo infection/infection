@@ -13,7 +13,7 @@ use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 
-class Plus extends Mutator
+final class Plus extends Mutator
 {
     /**
      * Replaces "+" with "-"
