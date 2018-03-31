@@ -146,4 +146,9 @@ class InfectionConfig
     {
         return (array) ($this->config->mutators ?? []);
     }
+
+    public function getTestFramework(): string
+    {
+        return $this->config->system->testFramework ?? 'phpunit';
+    }
 }

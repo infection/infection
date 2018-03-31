@@ -73,7 +73,7 @@ class InfectionCommand extends BaseCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Name of the Test framework to use (phpunit, phpspec)',
-                'phpunit'
+                null
             )
             ->addOption(
                 'test-framework-options',
@@ -171,7 +171,7 @@ class InfectionCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $container = $this->getContainer();
-        $testFrameworkKey = $input->getOption('test-framework');
+        $testFrameworkKey = $input->getOption('test-framework') ?? $container->get('infection.config')->getTestFramework();
         $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $this->skipCoverage);
 
         $metricsCalculator = new MetricsCalculator();
