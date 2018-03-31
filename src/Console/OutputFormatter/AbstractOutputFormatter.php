@@ -14,7 +14,7 @@ use Infection\Process\MutantProcess;
 /**
  * Abstract empty class to simplify particular implementations
  */
-class AbstractOutputFormatter implements OutputFormatter
+abstract class AbstractOutputFormatter implements OutputFormatter
 {
     protected $callsCount = 0;
 
