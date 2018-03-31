@@ -18,6 +18,9 @@ abstract class AbstractValueToNullReturnValue extends Mutator
     {
         /** @var \PhpParser\Node\Stmt\Function_ $functionScope */
         $functionScope = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY);
+        if (!$functionScope) {
+            return true;
+        }
 
         $returnType = $functionScope->getReturnType();
         if ($returnType instanceof Node\Identifier) {
