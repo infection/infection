@@ -11,6 +11,7 @@ namespace Infection\Tests\Mutant;
 
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
+use Infection\Process\MutantProcessInterface;
 use Mockery;
 use Symfony\Component\Process\Process;
 
@@ -42,19 +43,19 @@ class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $process = Mockery::mock(Process::class);
         $process->shouldReceive('stop');
 
-        $notCoveredMutantProcess = Mockery::mock(MutantProcess::class);
+        $notCoveredMutantProcess = Mockery::mock(MutantProcessInterface::class);
         $notCoveredMutantProcess->shouldReceive('getResultCode')->times(1)->andReturn(MutantProcess::CODE_NOT_COVERED);
 
-        $passMutantProcess = Mockery::mock(MutantProcess::class);
+        $passMutantProcess = Mockery::mock(MutantProcessInterface::class);
         $passMutantProcess->shouldReceive('getResultCode')->times(1)->andReturn(MutantProcess::CODE_ESCAPED);
 
-        $timedOutMutantProcess = Mockery::mock(MutantProcess::class);
+        $timedOutMutantProcess = Mockery::mock(MutantProcessInterface::class);
         $timedOutMutantProcess->shouldReceive('getResultCode')->times(1)->andReturn(MutantProcess::CODE_TIMED_OUT);
 
-        $killedMutantProcess = Mockery::mock(MutantProcess::class);
+        $killedMutantProcess = Mockery::mock(MutantProcessInterface::class);
         $killedMutantProcess->shouldReceive('getResultCode')->times(1)->andReturn(MutantProcess::CODE_KILLED);
 
-        $errorMutantProcess = Mockery::mock(MutantProcess::class);
+        $errorMutantProcess = Mockery::mock(MutantProcessInterface::class);
         $errorMutantProcess->shouldReceive('getResultCode')->times(1)->andReturn(MutantProcess::CODE_ERROR);
 
         $calculator = new MetricsCalculator();

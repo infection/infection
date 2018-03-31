@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use Infection\Process\MutantProcess;
+use Infection\Process\MutantProcessInterface;
 
 final class TextFileLogger extends FileLogger
 {
@@ -65,7 +66,7 @@ final class TextFileLogger extends FileLogger
         ];
     }
 
-    private function getMutatorFirstLine(int $index, MutantProcess $mutantProcess): string
+    private function getMutatorFirstLine(int $index, MutantProcessInterface $mutantProcess): string
     {
         $mutation = $mutantProcess->getMutant()->getMutation();
 
