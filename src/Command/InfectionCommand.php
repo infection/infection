@@ -17,6 +17,7 @@ use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\EventDispatcher\EventDispatcher;
+use Infection\Finder\Exception\LocatorException;
 use Infection\Mutant\Exception\MsiCalculationException;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutant\MetricsCalculator;
@@ -171,6 +172,17 @@ class InfectionCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $container = $this->getContainer();
+
+        $bootstrap = $container->get('infection.config')->getBootstrap();
+        if ($bootstrap) {
+            if (!file_exists($bootstrap)) {
+                throw LocatorException::fileOrDirectoryDoesNotExist($bootstrap);
+            }
+
+            require_once $bootstrap;
+        }
+
+
         $testFrameworkKey = $input->getOption('test-framework') ?? $container->get('infection.config')->getTestFramework();
         $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $this->skipCoverage);
 

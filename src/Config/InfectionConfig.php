@@ -147,6 +147,11 @@ class InfectionConfig
         return (array) ($this->config->mutators ?? []);
     }
 
+    public function getBootstrap(): string
+    {
+        return $this->config->system->bootstrap ?? '';
+    }
+
     public function getTestFramework(): string
     {
         return $this->config->system->testFramework ?? 'phpunit';

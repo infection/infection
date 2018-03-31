@@ -29,11 +29,11 @@ class InfectionConfigTest extends TestCase
     }
 
     /**
-     * @dataProvider dpGetTestFramework
+     * @dataProvider dpConfig
      * @param \stdClass $config Settings
      * @param string $testFramework Correct Testing Framework
      */
-    public function testGetTestFramework(\stdClass $config, string $testFramework)
+    public function test_config(\stdClass $config, string $methodName, string $result)
     {
         $testSubject = new InfectionConfig(
             $config,
@@ -41,16 +41,17 @@ class InfectionConfigTest extends TestCase
             ''
         );
 
-        $this->assertEquals($testFramework, $testSubject->getTestFramework());
+        $this->assertEquals($result, $testSubject->{$methodName}());
     }
 
-    public function dpGetTestFramework()
+    public function dpConfig()
     {
         return [
             [
                 (object) [
                     'system' => []
                 ],
+                'getTestFramework',
                 'phpunit'
             ],
             [
@@ -59,7 +60,24 @@ class InfectionConfigTest extends TestCase
                         'testFramework' => 'phpspec'
                     ]
                 ],
+                'getTestFramework',
                 'phpspec'
+            ],
+            [
+                (object) [
+                    'system' => []
+                ],
+                'getBootstrap',
+                ''
+            ],
+            [
+                (object) [
+                    'system' => (object) [
+                        'bootstrap' => 'bootstrap.php'
+                    ]
+                ],
+                'getBootstrap',
+                'bootstrap.php'
             ]
         ];
     }
