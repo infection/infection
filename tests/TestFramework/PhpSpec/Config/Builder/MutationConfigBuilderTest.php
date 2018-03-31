@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpSpec\Config\Builder;
 
-use Infection\Mutant\Mutant;
-use Infection\Mutation;
+use Infection\Mutant\MutantInterface;
+use Infection\MutationInterface;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use Infection\Utils\TmpDirectoryCreator;
 use Mockery;
@@ -48,11 +48,11 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $projectDir = '/project/dir';
         $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/phpspec/phpspec.yml';
 
-        $mutation = Mockery::mock(Mutation::class);
+        $mutation = Mockery::mock(MutationInterface::class);
         $mutation->shouldReceive('getHash')->andReturn('a1b2c3');
         $mutation->shouldReceive('getOriginalFilePath')->andReturn('/original/file/path');
 
-        $mutant = Mockery::mock(Mutant::class);
+        $mutant = Mockery::mock(MutantInterface::class);
         $mutant->shouldReceive('getMutation')->andReturn($mutation);
         $mutant->shouldReceive('getMutatedFilePath')->andReturn('/mutated/file/path');
 
@@ -68,11 +68,11 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $projectDir = '/project/dir';
         $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/phpspec/phpspec.with.bootstrap.yml';
 
-        $mutation = Mockery::mock(Mutation::class);
+        $mutation = Mockery::mock(MutationInterface::class);
         $mutation->shouldReceive('getHash')->andReturn('a1b2c3');
         $mutation->shouldReceive('getOriginalFilePath')->andReturn('/original/file/path');
 
-        $mutant = Mockery::mock(Mutant::class);
+        $mutant = Mockery::mock(MutantInterface::class);
         $mutant->shouldReceive('getMutation')->andReturn($mutation);
         $mutant->shouldReceive('getMutatedFilePath')->andReturn('/mutated/file/path');
 

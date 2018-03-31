@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Builder;
 
-use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantInterface;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Mockery;
@@ -38,7 +38,7 @@ class ProcessBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
         $builder = new ProcessBuilder($fwAdapter, 100);
 
-        $process = $builder->getProcessForMutant(Mockery::mock(Mutant::class))->getProcess();
+        $process = $builder->getProcessForMutant(Mockery::mock(MutantInterface::class))->getProcess();
 
         $this->assertContains('getExecutableCommandLine', $process->getCommandLine());
         $this->assertSame(100.0, $process->getTimeout());

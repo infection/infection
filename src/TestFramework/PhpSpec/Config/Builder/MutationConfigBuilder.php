@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpSpec\Config\Builder;
 
-use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\MutationYamlConfiguration;
 use Symfony\Component\Yaml\Yaml;
@@ -37,7 +37,7 @@ class MutationConfigBuilder extends ConfigBuilder
         $this->projectDir = $projectDir;
     }
 
-    public function build(Mutant $mutant): string
+    public function build(MutantInterface $mutant): string
     {
         $customAutoloadFilePath = sprintf(
             '%s/interceptor.phpspec.autoload.%s.infection.php',
@@ -64,7 +64,7 @@ class MutationConfigBuilder extends ConfigBuilder
         return $path;
     }
 
-    private function createCustomAutoloadWithInterceptor(Mutant $mutant, array $parsedYaml): string
+    private function createCustomAutoloadWithInterceptor(MutantInterface $mutant, array $parsedYaml): string
     {
         $originalFilePath = $mutant->getMutation()->getOriginalFilePath();
         $mutatedFilePath = $mutant->getMutatedFilePath();
@@ -88,7 +88,7 @@ AUTOLOAD;
         );
     }
 
-    private function buildPath(Mutant $mutant): string
+    private function buildPath(MutantInterface $mutant): string
     {
         $fileName = sprintf('phpspecConfiguration.%s.infection.yml', $mutant->getMutation()->getHash());
 

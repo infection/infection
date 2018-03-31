@@ -12,7 +12,7 @@ namespace Infection;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class Mutation
+final class Mutation implements MutationInterface
 {
     /**
      * @var Mutator
