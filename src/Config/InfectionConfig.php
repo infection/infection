@@ -149,11 +149,11 @@ class InfectionConfig
 
     public function getBootstrap(): string
     {
-        return $this->config->system->bootstrap ?? '';
+        return $this->config->bootstrap ?? '';
     }
 
     public function getTestFramework(): string
     {
-        return $this->config->system->testFramework ?? 'phpunit';
+        return $this->config->testFramework ?? 'phpunit';
     }
 }

@@ -201,36 +201,28 @@ JSON;
     public function configDataProvider(): \Generator
     {
         yield 'It uses the default framework (PHPUnit)' => [
-            (object) [
-                'system' => [],
-            ],
+            (object) [],
             'getTestFramework',
             'phpunit',
         ];
 
         yield 'It uses the registered framework (phpspec)' => [
             (object) [
-                'system' => (object) [
-                    'testFramework' => 'phpspec',
-                ],
+                'testFramework' => 'phpspec',
             ],
             'getTestFramework',
             'phpspec',
         ];
 
         yield 'It returns an empty bootstrap' => [
-            (object) [
-                'system' => (object) [],
-            ],
+            (object) [],
             'getBootstrap',
             '',
         ];
 
         yield 'It returns the bootstrap file' => [
             (object) [
-                'system' => (object) [
-                    'bootstrap' => 'bootstrap.php',
-                ],
+                'bootstrap' => 'bootstrap.php',
             ],
             'getBootstrap',
             'bootstrap.php',
