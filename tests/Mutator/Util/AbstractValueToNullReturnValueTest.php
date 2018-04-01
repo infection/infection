@@ -25,7 +25,6 @@ class AbstractValueToNullReturnValueTest extends TestCase
 
     private function mockNode($returnValue): Node
     {
-        /** @var Node|\PHPUnit\Framework\MockObject\MockObject $mockNode */
         $mockNode = $this->getMockBuilder(Node::class)
                          ->disableOriginalConstructor()
                          ->setMethods(['getAttribute'])
@@ -65,6 +64,7 @@ class AbstractValueToNullReturnValueTest extends TestCase
 
     public function test_return_type_is_node_identifier()
     {
+        /** @var Node\Identifier $mockNode */
         $mockNode = $this->getMockBuilder(Node\Identifier::class)
             ->disableOriginalConstructor()
             ->getMock();
