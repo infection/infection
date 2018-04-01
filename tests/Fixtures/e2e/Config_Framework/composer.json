@@ -1,0 +1,21 @@
+{
+    "config": {
+        "platform": {
+            "php": "7.0"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Namespace_\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "spec\\": "spec/"
+        }
+    },
+    "require-dev": {
+        "phpspec/phpspec": "^4.3",
+        "leanphp/phpspec-code-coverage": "^4.0"
+    }
+}

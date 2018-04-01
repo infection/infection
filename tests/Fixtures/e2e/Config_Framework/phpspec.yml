@@ -1,0 +1,7 @@
+suites:
+  source_suite:
+    namespace: Namespace_
+    psr4_prefix: Namespace_
+
+extensions:
+  LeanPHP\PhpSpec\CodeCoverage\CodeCoverageExtension: ~
