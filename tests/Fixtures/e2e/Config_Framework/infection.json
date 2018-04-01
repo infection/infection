@@ -8,7 +8,5 @@
     "logs": {
         "debug": "infection-log.txt"
     },
-    "system": {
-        "testFramework" : "phpspec"
-    }
+    "testFramework" : "phpspec"
 }

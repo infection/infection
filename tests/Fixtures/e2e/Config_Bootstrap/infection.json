@@ -8,7 +8,5 @@
     "logs": {
         "summary": "infection-log.txt"
     },
-    "system":{
-        "bootstrap": "src/bootstrap.php"
-    }
+    "bootstrap": "src/bootstrap.php"
 }
