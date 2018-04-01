@@ -84,11 +84,11 @@
             "mkdir -p build/cache",
             "wget -nc http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar",
             "chmod a+x php-cs-fixer-v2.phar",
-            "./php-cs-fixer-v2.phar fix -v --cache-file=build/cache/.php_cs.cache --dry-run --stop-on-violation"
+            "PHP_CS_FIXER_FUTURE_MODE=1 ./php-cs-fixer-v2.phar fix -v --cache-file=build/cache/.php_cs.cache --dry-run --stop-on-violation"
         ],
         "cs:fix": [
             "mkdir -p build/cache",
-            "./php-cs-fixer-v2.phar fix -v --cache-file=build/cache/.php_cs.cache"
+            "PHP_CS_FIXER_FUTURE_MODE=1 ./php-cs-fixer-v2.phar fix -v --cache-file=build/cache/.php_cs.cache"
         ],
         "tests": [
             "./vendor/bin/phpunit",

@@ -17,13 +17,13 @@ final class ResultsLoggerTypes
     const BADGE = 'badge';
 
     const ALL = [
-        ResultsLoggerTypes::TEXT_FILE,
-        ResultsLoggerTypes::DEBUG_FILE,
-        ResultsLoggerTypes::SUMMARY_FILE,
-        ResultsLoggerTypes::BADGE,
+        self::TEXT_FILE,
+        self::DEBUG_FILE,
+        self::SUMMARY_FILE,
+        self::BADGE,
     ];
 
     const ALLOWED_WITHOUT_LOGGING = [
-        ResultsLoggerTypes::BADGE,
+        self::BADGE,
     ];
 }

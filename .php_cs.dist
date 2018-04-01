@@ -17,26 +17,30 @@ return \PhpCsFixer\Config::create()
     ->setRiskyAllowed(true)
     ->setRules([
         '@Symfony' => true,
+        '@Symfony:risky' => true,
         '@PHP70Migration' => true,
+        '@PHP70Migration:risky' => true,
 
         'concat_space' => ['spacing' => 'one'],
+        'declare_strict_types' => false,
         'header_comment' => [
             'commentType' => 'PHPDoc',
             'header' => $header,
             'location' => 'after_open',
             'separate' => 'bottom',
         ],
-        'is_null' => true,
+        'no_useless_else'=> true,
+        'ordered_class_elements' => [
+            'order' => [
+                'use_trait',
+                'constant_public',
+                'property_public',
+            ],
+        ],
         'ordered_imports' => true,
         'phpdoc_align' => false,
         'phpdoc_summary' => false,
         'yoda_style' => false,
-        'ordered_class_elements' => [
-            'use_trait',
-            'constant_public',
-            'property_public',
-        ],
-        'no_useless_else'=> true,
     ])
     ->setFinder($finder)
 ;
