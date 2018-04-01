@@ -92,7 +92,8 @@
         ],
         "tests": [
             "./vendor/bin/phpunit",
-            "./tests/e2e_tests"
+            "./tests/e2e_tests",
+            "./tests/final_private_test"
         ]
     }
 }

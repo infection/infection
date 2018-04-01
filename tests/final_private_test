@@ -1,0 +1,9 @@
+#!/bin/sh
+cd $(dirname "$0")/..
+
+for file in $(git grep -l ^class src/); do
+    grep -q "@internal" $file && continue;
+    echo "$file should be made either final or internal";
+    trap 'exit 1' EXIT
+done
+
