@@ -12,6 +12,9 @@ namespace Infection\Process;
 use Infection\Mutant\MutantInterface;
 use Symfony\Component\Process\Process;
 
+/**
+ * @see MutantProcess
+ */
 interface MutantProcessInterface
 {
     public function getProcess(): Process;

@@ -11,6 +11,9 @@ namespace Infection;
 
 use Infection\Mutator\Util\Mutator;
 
+/**
+ * @see Mutation
+ */
 interface MutationInterface
 {
     public function getMutator(): Mutator;

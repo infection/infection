@@ -11,6 +11,9 @@ namespace Infection\Mutant;
 
 use Infection\MutationInterface;
 
+/**
+ * @see Mutant
+ */
 interface MutantInterface
 {
     public function getMutatedFilePath(): string;
