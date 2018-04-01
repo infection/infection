@@ -14,6 +14,9 @@ use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Process\Process;
 
+/**
+ * @internal
+ */
 class ProcessBuilder
 {
     /**

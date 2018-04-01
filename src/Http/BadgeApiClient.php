@@ -11,6 +11,9 @@ namespace Infection\Http;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @internal
+ */
 class BadgeApiClient
 {
     const STRYKER_DASHBOARD_API_URL = 'https://dashboard.stryker-mutator.io/api/reports';

@@ -12,6 +12,9 @@ namespace Infection\TestFramework\Coverage;
 use Infection\MutationInterface;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 
+/**
+ * @internal
+ */
 class CodeCoverageData
 {
     const PHP_UNIT_COVERAGE_DIR = 'coverage-xml';

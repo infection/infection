@@ -12,6 +12,9 @@ namespace Infection\Mutant;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessInterface;
 
+/**
+ * @internal
+ */
 class MetricsCalculator
 {
     /**

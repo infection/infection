@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Infection\Console\Exception;
 
+/**
+ * @internal
+ */
 class InfectionException extends \Exception
 {
     public static function configurationAborted()

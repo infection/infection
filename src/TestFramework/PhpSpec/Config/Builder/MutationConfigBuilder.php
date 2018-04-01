@@ -14,6 +14,9 @@ use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\MutationYamlConfiguration;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * @internal
+ */
 class MutationConfigBuilder extends ConfigBuilder
 {
     /**

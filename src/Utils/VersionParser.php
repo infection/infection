@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Infection\Utils;
 
+/**
+ * @internal
+ */
 class VersionParser
 {
     const VERSION_REGEX = '/(?<version>[0-9]+\.[0-9]+\.?[0-9]*)(?<prerelease>-[0-9a-zA-Z.]+)?(?<build>\+[0-9a-zA-Z.]+)?/';

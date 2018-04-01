@@ -13,6 +13,9 @@ use Infection\Finder\Exception\FinderException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 
+/**
+ * @internal
+ */
 class TestFrameworkFinder extends AbstractExecutableFinder
 {
     /**

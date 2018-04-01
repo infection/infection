@@ -13,6 +13,9 @@ use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 
+/**
+ * @internal
+ */
 class MutationConfigBuilder extends ConfigBuilder
 {
     /**

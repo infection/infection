@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Infection\Differ;
 
+/**
+ * @internal
+ */
 class DiffColorizer
 {
     public function colorize(string $diff)

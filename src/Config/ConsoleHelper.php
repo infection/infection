@@ -12,6 +12,9 @@ namespace Infection\Config;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @internal
+ */
 class ConsoleHelper
 {
     /**

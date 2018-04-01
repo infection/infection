@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Infection\Config\Guesser;
 
+/**
+ * @internal
+ */
 class SourceDirGuesser implements Guesser
 {
     private $composerJsonContent;
