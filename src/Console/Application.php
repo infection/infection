@@ -66,6 +66,8 @@ ASCII;
         $this->isXdebugLoaded = \extension_loaded('xdebug');
 
         parent::__construct($name, $version);
+
+        $this->setDefaultCommand('run');
     }
 
     public function run(InputInterface $input = null, OutputInterface $output = null)
