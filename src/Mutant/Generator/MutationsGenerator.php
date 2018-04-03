@@ -26,7 +26,7 @@ use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use Symfony\Component\Finder\SplFileInfo;
 
-class MutationsGenerator
+final class MutationsGenerator
 {
     /**
      * @var array source directories

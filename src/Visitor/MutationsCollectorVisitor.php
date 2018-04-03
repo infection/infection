@@ -15,7 +15,7 @@ use Infection\TestFramework\Coverage\CodeCoverageData;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class MutationsCollectorVisitor extends NodeVisitorAbstract
+final class MutationsCollectorVisitor extends NodeVisitorAbstract
 {
     /**
      * @var Mutator[]

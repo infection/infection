@@ -10,10 +10,11 @@ declare(strict_types=1);
 namespace Infection\Process;
 
 use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Process\Process;
 
-class MutantProcess
+final class MutantProcess implements MutantProcessInterface
 {
     const CODE_KILLED = 0;
     const CODE_ESCAPED = 1;
@@ -51,7 +52,7 @@ class MutantProcess
      */
     private $testFrameworkAdapter;
 
-    public function __construct(Process $process, Mutant $mutant, AbstractTestFrameworkAdapter $testFrameworkAdapter)
+    public function __construct(Process $process, MutantInterface $mutant, AbstractTestFrameworkAdapter $testFrameworkAdapter)
     {
         $this->process = $process;
         $this->mutant = $mutant;
@@ -68,7 +69,7 @@ class MutantProcess
         return $this->process;
     }
 
-    public function getMutant(): Mutant
+    public function getMutant(): MutantInterface
     {
         return $this->mutant;
     }

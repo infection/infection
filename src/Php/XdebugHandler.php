@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Infection\Php;
 
+/**
+ * @internal
+ */
 class XdebugHandler
 {
     const ENV_DISABLE_XDEBUG = 'INFECTION_DISABLE_XDEBUG';

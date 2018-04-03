@@ -9,11 +9,11 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Config;
 
-use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantInterface;
 
 abstract class MutationConfigBuilder
 {
-    abstract public function build(Mutant $mutant): string;
+    abstract public function build(MutantInterface $mutant): string;
 
     protected function getInterceptorFileContent(string $interceptorPath, string $originalFilePath, string $mutatedFilePath): string
     {

@@ -11,7 +11,7 @@ namespace Infection\TestFramework\Config;
 
 use Infection\Finder\Exception\LocatorException;
 
-class TestFrameworkConfigLocator
+final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
 {
     const DEFAULT_EXTENSIONS = [
         'xml',

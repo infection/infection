@@ -11,6 +11,9 @@ namespace Infection\TestFramework\PhpUnit\Coverage;
 
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 
+/**
+ * @internal
+ */
 class CoverageXmlParser
 {
     /**

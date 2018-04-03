@@ -12,7 +12,7 @@ namespace Infection\Mutator\ReturnValue;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class FloatNegation extends Mutator
+final class FloatNegation extends Mutator
 {
     /**
      * Replaces any float with negated float

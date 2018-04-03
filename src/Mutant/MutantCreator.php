@@ -10,14 +10,14 @@ declare(strict_types=1);
 namespace Infection\Mutant;
 
 use Infection\Differ\Differ;
-use Infection\Mutation;
+use Infection\MutationInterface;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Visitor\CloneVisitor;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\PrettyPrinter\Standard;
 
-class MutantCreator
+final class MutantCreator
 {
     /**
      * @var string
@@ -46,7 +46,7 @@ class MutantCreator
         $this->prettyPrinter = $prettyPrinter;
     }
 
-    public function create(Mutation $mutation, CodeCoverageData $codeCoverageData): Mutant
+    public function create(MutationInterface $mutation, CodeCoverageData $codeCoverageData): MutantInterface
     {
         $mutatedFilePath = sprintf('%s/mutant.%s.infection.php', $this->tempDir, $mutation->getHash());
 
@@ -65,7 +65,7 @@ class MutantCreator
         );
     }
 
-    private function createMutatedCode(Mutation $mutation, string $mutatedFilePath): string
+    private function createMutatedCode(MutationInterface $mutation, string $mutatedFilePath): string
     {
         if (file_exists($mutatedFilePath)) {
             return file_get_contents($mutatedFilePath);

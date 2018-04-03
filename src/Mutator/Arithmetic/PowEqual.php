@@ -12,7 +12,7 @@ namespace Infection\Mutator\Arithmetic;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class PowEqual extends Mutator
+final class PowEqual extends Mutator
 {
     /**
      * Replaces "**=" with "/="

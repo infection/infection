@@ -12,7 +12,7 @@ namespace Infection\Mutator\Number;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class OneZeroInteger extends Mutator
+final class OneZeroInteger extends Mutator
 {
     /**
      * Replaces "0" with "1" or "1" with "0"

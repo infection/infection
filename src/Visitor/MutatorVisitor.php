@@ -10,17 +10,18 @@ declare(strict_types=1);
 namespace Infection\Visitor;
 
 use Infection\Mutation;
+use Infection\MutationInterface;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class MutatorVisitor extends NodeVisitorAbstract
+final class MutatorVisitor extends NodeVisitorAbstract
 {
     /**
      * @var Mutation
      */
     private $mutation;
 
-    public function __construct(Mutation $mutation)
+    public function __construct(MutationInterface $mutation)
     {
         $this->mutation = $mutation;
     }

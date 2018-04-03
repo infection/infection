@@ -12,7 +12,7 @@ namespace Infection\Finder;
 use Infection\Finder\Iterator\RealPathFilterIterator;
 use Symfony\Component\Finder\Finder;
 
-class SourceFilesFinder extends Finder
+final class SourceFilesFinder extends Finder
 {
     /**
      * @var string[]

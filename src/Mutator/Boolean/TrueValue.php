@@ -12,7 +12,7 @@ namespace Infection\Mutator\Boolean;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class TrueValue extends Mutator
+final class TrueValue extends Mutator
 {
     /**
      * Replaces "true" with "false"

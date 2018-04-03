@@ -11,6 +11,9 @@ namespace Infection\TestFramework\PhpUnit\Config;
 
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 
+/**
+ * @internal
+ */
 class XmlConfigurationHelper
 {
     /**

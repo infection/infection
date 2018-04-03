@@ -12,7 +12,7 @@ namespace Infection\Mutator\Arithmetic;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class Minus extends Mutator
+final class Minus extends Mutator
 {
     /**
      * Replaces "-" with "+"

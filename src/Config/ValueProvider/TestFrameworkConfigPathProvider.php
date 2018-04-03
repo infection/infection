@@ -12,13 +12,14 @@ namespace Infection\Config\ValueProvider;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\PhpUnitPathGuesser;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
+use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\TestFrameworkTypes;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 
-class TestFrameworkConfigPathProvider
+final class TestFrameworkConfigPathProvider
 {
     /**
      * @var TestFrameworkConfigLocator
@@ -34,7 +35,7 @@ class TestFrameworkConfigPathProvider
      */
     private $questionHelper;
 
-    public function __construct(TestFrameworkConfigLocator $testFrameworkConfigLocator, ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
+    public function __construct(TestFrameworkConfigLocatorInterface $testFrameworkConfigLocator, ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
     {
         $this->testFrameworkConfigLocator = $testFrameworkConfigLocator;
         $this->consoleHelper = $consoleHelper;

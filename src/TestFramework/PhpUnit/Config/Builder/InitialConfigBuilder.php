@@ -13,6 +13,9 @@ use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 
+/**
+ * @internal
+ */
 class InitialConfigBuilder implements ConfigBuilder
 {
     /**

@@ -12,7 +12,7 @@ namespace Infection\TestFramework\PhpSpec\Config;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Symfony\Component\Yaml\Yaml;
 
-class InitialYamlConfiguration extends AbstractYamlConfiguration
+final class InitialYamlConfiguration extends AbstractYamlConfiguration
 {
     /**
      * @var bool

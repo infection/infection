@@ -9,11 +9,14 @@ declare(strict_types=1);
 
 namespace Infection\Process\Builder;
 
-use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantInterface;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Process\Process;
 
+/**
+ * @internal
+ */
 class ProcessBuilder
 {
     /**
@@ -68,7 +71,7 @@ class ProcessBuilder
         return $process;
     }
 
-    public function getProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
+    public function getProcessForMutant(MutantInterface $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
     {
         $process = new Process(
             $this->testFrameworkAdapter->getExecutableCommandLine(

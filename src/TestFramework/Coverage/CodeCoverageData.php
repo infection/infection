@@ -9,9 +9,12 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Infection\Mutation;
+use Infection\MutationInterface;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 
+/**
+ * @internal
+ */
 class CodeCoverageData
 {
     const PHP_UNIT_COVERAGE_DIR = 'coverage-xml';
@@ -101,7 +104,7 @@ class CodeCoverageData
         return false;
     }
 
-    public function getAllTestsFor(Mutation $mutation): array
+    public function getAllTestsFor(MutationInterface $mutation): array
     {
         if (!$mutation->isCoveredByTest()) {
             return [];

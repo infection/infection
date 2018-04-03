@@ -10,8 +10,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\Mutation;
-use Infection\Mutator\Arithmetic\Plus;
-use Infection\Mutator\FunctionSignature\PublicVisibility;
+use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -105,7 +104,7 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $mutation = new Mutation(
             $filePath,
             [],
-            Mockery::mock(Plus::class),
+            Mockery::mock(Mutator::class),
             ['startLine' => 1],
             'PHPParser\Node\Expr\BinaryOp\Plus',
             false,
@@ -123,7 +122,7 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $mutation = new Mutation(
             $filePath,
             [],
-            Mockery::mock(Plus::class),
+            Mockery::mock(Mutator::class),
             ['startLine' => 26],
             'PHPParser\Node\Expr\BinaryOp\Plus',
             false,
@@ -141,7 +140,7 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $mutation = new Mutation(
             $filePath,
             [],
-            Mockery::mock(PublicVisibility::class),
+            Mockery::mock(Mutator::class),
             ['startLine' => 1],
             'PHPParser\Node\Stmt\ClassMethod',
             true,
@@ -159,7 +158,7 @@ class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $mutation = new Mutation(
             $filePath,
             [],
-            Mockery::mock(PublicVisibility::class),
+            Mockery::mock(Mutator::class),
             ['startLine' => 24],
             'PHPParser\Node\Stmt\ClassMethod',
             true,

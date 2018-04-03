@@ -12,7 +12,7 @@ namespace Infection\Mutator\Boolean;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class Yield_ extends Mutator
+final class Yield_ extends Mutator
 {
     /**
      * Replaces `yield $a => $b;` with `yield $a > $b;`

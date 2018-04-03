@@ -12,7 +12,7 @@ namespace Infection\Mutator\Arithmetic;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class BitwiseAnd extends Mutator
+final class BitwiseAnd extends Mutator
 {
     /**
      * Replaces "&" with "|"

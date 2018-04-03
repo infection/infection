@@ -11,7 +11,7 @@ namespace Infection\Utils;
 
 use Symfony\Component\Filesystem\Filesystem;
 
-class TmpDirectoryCreator
+final class TmpDirectoryCreator
 {
     /**
      * @private

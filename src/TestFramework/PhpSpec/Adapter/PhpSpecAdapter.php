@@ -11,7 +11,7 @@ namespace Infection\TestFramework\PhpSpec\Adapter;
 
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 
-class PhpSpecAdapter extends AbstractTestFrameworkAdapter
+final class PhpSpecAdapter extends AbstractTestFrameworkAdapter
 {
     const ERROR_REGEXPS = [
         '/Fatal error\:/',

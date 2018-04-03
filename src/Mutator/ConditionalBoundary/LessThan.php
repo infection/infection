@@ -12,7 +12,7 @@ namespace Infection\Mutator\ConditionalBoundary;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class LessThan extends Mutator
+final class LessThan extends Mutator
 {
     /**
      * Replaces "<" with "<="

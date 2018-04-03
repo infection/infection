@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
-use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantInterface;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Mockery;
@@ -21,7 +21,7 @@ class MutantProcessTest extends MockeryTestCase
     public function test_it_handles_not_covered_mutant()
     {
         $process = Mockery::mock(Process::class);
-        $mutant = Mockery::mock(Mutant::class);
+        $mutant = Mockery::mock(MutantInterface::class);
         $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(false);
         $testFrameworkAdapter = Mockery::mock(AbstractTestFrameworkAdapter::class);
 
@@ -33,7 +33,7 @@ class MutantProcessTest extends MockeryTestCase
     public function test_it_handles_timeout()
     {
         $process = Mockery::mock(Process::class);
-        $mutant = Mockery::mock(Mutant::class);
+        $mutant = Mockery::mock(MutantInterface::class);
         $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(true);
         $testFrameworkAdapter = Mockery::mock(AbstractTestFrameworkAdapter::class);
 
@@ -47,7 +47,7 @@ class MutantProcessTest extends MockeryTestCase
     {
         $process = Mockery::mock(Process::class);
         $process->shouldReceive('getExitCode')->once()->andReturn(126);
-        $mutant = Mockery::mock(Mutant::class);
+        $mutant = Mockery::mock(MutantInterface::class);
         $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(true);
         $testFrameworkAdapter = Mockery::mock(AbstractTestFrameworkAdapter::class);
 
@@ -62,7 +62,7 @@ class MutantProcessTest extends MockeryTestCase
         $process->shouldReceive('getExitCode')->once()->andReturn(0);
         $process->shouldReceive('getOutput')->once()->andReturn('...');
 
-        $mutant = Mockery::mock(Mutant::class);
+        $mutant = Mockery::mock(MutantInterface::class);
         $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(true);
 
         $testFrameworkAdapter = Mockery::mock(AbstractTestFrameworkAdapter::class);
@@ -79,7 +79,7 @@ class MutantProcessTest extends MockeryTestCase
         $process->shouldReceive('getExitCode')->once()->andReturn(0);
         $process->shouldReceive('getOutput')->once()->andReturn('...');
 
-        $mutant = Mockery::mock(Mutant::class);
+        $mutant = Mockery::mock(MutantInterface::class);
         $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(true);
 
         $testFrameworkAdapter = Mockery::mock(AbstractTestFrameworkAdapter::class);

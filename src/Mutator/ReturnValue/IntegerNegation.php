@@ -12,7 +12,7 @@ namespace Infection\Mutator\ReturnValue;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class IntegerNegation extends Mutator
+final class IntegerNegation extends Mutator
 {
     /**
      * Replaces any integer with negated integer value.

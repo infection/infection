@@ -12,7 +12,7 @@ namespace Infection\Mutator\Arithmetic;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class BitwiseNot extends Mutator
+final class BitwiseNot extends Mutator
 {
     /**
      * Replaces "~" with "" (removed)

@@ -23,7 +23,7 @@ use Infection\Mutant\MetricsCalculator;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
+final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
 {
     /**
      * @var InfectionConfig

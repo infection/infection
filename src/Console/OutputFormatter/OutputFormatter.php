@@ -8,6 +8,7 @@
 namespace Infection\Console\OutputFormatter;
 
 use Infection\Process\MutantProcess;
+use Infection\Process\MutantProcessInterface;
 
 interface OutputFormatter
 {
@@ -24,7 +25,7 @@ interface OutputFormatter
      * @param MutantProcess $mutantProcess
      * @param int $mutationCount
      */
-    public function advance(MutantProcess $mutantProcess, int $mutationCount);
+    public function advance(MutantProcessInterface $mutantProcess, int $mutationCount);
 
     /**
      * Triggered when mutation testing is finished

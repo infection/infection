@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
-use Infection\Mutant\Mutant;
-use Infection\Mutation;
+use Infection\Mutant\MutantInterface;
+use Infection\MutationInterface;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
@@ -60,11 +60,11 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $projectDir = '/project/dir';
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit.xml';
 
-        $this->mutation = Mockery::mock(Mutation::class);
+        $this->mutation = Mockery::mock(MutationInterface::class);
         $this->mutation->shouldReceive('getHash')->andReturn(self::HASH);
         $this->mutation->shouldReceive('getOriginalFilePath')->andReturn('/original/file/path');
 
-        $this->mutant = Mockery::mock(Mutant::class);
+        $this->mutant = Mockery::mock(MutantInterface::class);
         $this->mutant->shouldReceive('getMutation')->andReturn($this->mutation);
         $this->mutant->shouldReceive('getMutatedFilePath')->andReturn('/mutated/file/path');
         $this->mutant->shouldReceive('getMutatedFileCode')->andReturn('<?php');

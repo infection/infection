@@ -9,10 +9,13 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
-use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 
+/**
+ * @internal
+ */
 class MutationConfigBuilder extends ConfigBuilder
 {
     /**
@@ -54,7 +57,7 @@ class MutationConfigBuilder extends ConfigBuilder
         $xmlConfigurationHelper->removeExistingPrinters($this->dom, $this->xPath);
     }
 
-    public function build(Mutant $mutant): string
+    public function build(MutantInterface $mutant): string
     {
         $customAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',
@@ -74,7 +77,7 @@ class MutationConfigBuilder extends ConfigBuilder
         return $path;
     }
 
-    private function createCustomAutoloadWithInterceptor(Mutant $mutant): string
+    private function createCustomAutoloadWithInterceptor(MutantInterface $mutant): string
     {
         $originalFilePath = $mutant->getMutation()->getOriginalFilePath();
         $mutatedFilePath = $mutant->getMutatedFilePath();
@@ -94,7 +97,7 @@ AUTOLOAD;
         return sprintf($customAutoload, $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutatedFilePath));
     }
 
-    private function buildPath(Mutant $mutant): string
+    private function buildPath(MutantInterface $mutant): string
     {
         $fileName = sprintf('phpunitConfiguration.%s.infection.xml', $mutant->getMutation()->getHash());
 

@@ -11,6 +11,9 @@ namespace Infection\Differ;
 
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 
+/**
+ * @internal
+ */
 class Differ
 {
     const DIFF_MAX_LINES = 12;

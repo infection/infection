@@ -11,7 +11,7 @@ namespace Infection\Tests\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
-use Infection\TestFramework\Config\TestFrameworkConfigLocator;
+use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Mockery;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,7 +20,7 @@ class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
 {
     public function test_it_calls_locator_in_the_current_dir()
     {
-        $locatorMock = $this->getMockBuilder(TestFrameworkConfigLocator::class)
+        $locatorMock = $this->getMockBuilder(TestFrameworkConfigLocatorInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -39,7 +39,7 @@ class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
 
     public function test_it_asks_question_if_no_config_is_found_in_current_dir()
     {
-        $locatorMock = Mockery::mock(TestFrameworkConfigLocator::class);
+        $locatorMock = Mockery::mock(TestFrameworkConfigLocatorInterface::class);
 
         $locatorMock->shouldReceive('locate')->once()->andThrow(new \Exception());
         $locatorMock->shouldReceive('locate')->once()->andThrow(new \Exception());
@@ -68,7 +68,7 @@ class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
 
     public function test_it_automatically_guesses_path()
     {
-        $locatorMock = Mockery::mock(TestFrameworkConfigLocator::class);
+        $locatorMock = Mockery::mock(TestFrameworkConfigLocatorInterface::class);
         $outputMock = Mockery::mock(OutputInterface::class);
         $inputMock = Mockery::mock(InputInterface::class);
 
@@ -98,7 +98,7 @@ class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
             $this->markTestSkipped('Stty is not available');
         }
 
-        $locatorMock = Mockery::mock(TestFrameworkConfigLocator::class);
+        $locatorMock = Mockery::mock(TestFrameworkConfigLocatorInterface::class);
 
         $locatorMock->shouldReceive('locate')->once()->andThrow(new \Exception());
         $locatorMock->shouldReceive('locate')->once()->andThrow(new \Exception());

@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Finder\Exception;
 
-class LocatorException extends \RuntimeException
+final class LocatorException extends \RuntimeException
 {
     public static function fileOrDirectoryDoesNotExist(string $name): self
     {

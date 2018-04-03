@@ -11,7 +11,7 @@ namespace Infection\Tests\Mutant;
 
 use Infection\Differ\Differ;
 use Infection\Mutant\MutantCreator;
-use Infection\Mutation;
+use Infection\MutationInterface;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PhpParser\PrettyPrinter\Standard;
@@ -30,7 +30,7 @@ class MutantCreatorTest extends MockeryTestCase
             ->withArgs(['The Print', '<?php return \'This is a diff\';'])
             ->andReturn('This is the Diff');
 
-        $mutation = \Mockery::mock(Mutation::class);
+        $mutation = \Mockery::mock(MutationInterface::class);
         $mutation->shouldReceive('getHash')->andReturn('hash');
         $mutation->shouldReceive('getOriginalFilePath')->andReturn('original/path');
         $mutation->shouldReceive('getOriginalFileAst')->andReturn(['ast']);

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Visitor;
 
 use Infection\Mutation;
+use Infection\MutationInterface;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Visitor\MutatorVisitor;
@@ -25,7 +26,7 @@ class MutatorVisitorTest extends TestCase
     /**
      * @dataProvider providesMutationCases
      */
-    public function test_it_mutates_the_correct_node(array $inputAst, string $outputCode, Mutation $mutation)
+    public function test_it_mutates_the_correct_node(array $inputAst, string $outputCode, MutationInterface $mutation)
     {
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new MutatorVisitor($mutation));

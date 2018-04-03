@@ -24,7 +24,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class Application extends BaseApplication
+final class Application extends BaseApplication
 {
     const NAME = 'Infection - PHP Mutation Testing Framework';
     const VERSION = '@package_version@';

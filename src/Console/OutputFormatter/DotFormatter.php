@@ -10,9 +10,10 @@ declare(strict_types=1);
 namespace Infection\Console\OutputFormatter;
 
 use Infection\Process\MutantProcess;
+use Infection\Process\MutantProcessInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DotFormatter extends AbstractOutputFormatter
+final class DotFormatter extends AbstractOutputFormatter
 {
     const DOTS_PER_ROW = 50;
 
@@ -41,7 +42,7 @@ class DotFormatter extends AbstractOutputFormatter
         ]);
     }
 
-    public function advance(MutantProcess $mutantProcess, int $mutationCount)
+    public function advance(MutantProcessInterface $mutantProcess, int $mutationCount)
     {
         parent::advance($mutantProcess, $mutationCount);
 

@@ -12,7 +12,7 @@ namespace Infection\Mutator\Operator;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class Throw_ extends Mutator
+final class Throw_ extends Mutator
 {
     public function mutate(Node $node)
     {

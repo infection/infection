@@ -15,7 +15,7 @@ use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 
-class ProtectedVisibility extends Mutator
+final class ProtectedVisibility extends Mutator
 {
     /**
      * Replaces "protected function..." with "private function ..."

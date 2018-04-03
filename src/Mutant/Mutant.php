@@ -10,8 +10,9 @@ declare(strict_types=1);
 namespace Infection\Mutant;
 
 use Infection\Mutation;
+use Infection\MutationInterface;
 
-class Mutant
+final class Mutant implements MutantInterface
 {
     private $mutatedFilePath;
 
@@ -35,7 +36,7 @@ class Mutant
      */
     private $coverageTests;
 
-    public function __construct(string $mutatedFilePath, Mutation $mutation, string $diff, bool $isCoveredByTest, array $coverageTests)
+    public function __construct(string $mutatedFilePath, MutationInterface $mutation, string $diff, bool $isCoveredByTest, array $coverageTests)
     {
         $this->mutatedFilePath = $mutatedFilePath;
         $this->mutation = $mutation;
@@ -49,7 +50,7 @@ class Mutant
         return $this->mutatedFilePath;
     }
 
-    public function getMutation(): Mutation
+    public function getMutation(): MutationInterface
     {
         return $this->mutation;
     }

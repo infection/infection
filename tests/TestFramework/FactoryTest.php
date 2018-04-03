@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework;
 
 use Infection\Config\InfectionConfig;
-use Infection\TestFramework\Config\TestFrameworkConfigLocator;
+use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\VersionParser;
@@ -24,7 +24,7 @@ class FactoryTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $factory = new Factory(
             '',
             '',
-            Mockery::mock(TestFrameworkConfigLocator::class),
+            Mockery::mock(TestFrameworkConfigLocatorInterface::class),
             Mockery::mock(XmlConfigurationHelper::class),
             '',
             new InfectionConfig(new \stdClass(), new Filesystem(), ''),

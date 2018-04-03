@@ -12,7 +12,7 @@ namespace Infection\Mutator\Boolean;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class LogicalNot extends Mutator
+final class LogicalNot extends Mutator
 {
     /**
      * Replaces "!something" with "something"

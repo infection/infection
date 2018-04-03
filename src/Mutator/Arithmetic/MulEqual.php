@@ -12,7 +12,7 @@ namespace Infection\Mutator\Arithmetic;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class MulEqual extends Mutator
+final class MulEqual extends Mutator
 {
     /**
      * Replaces "*=" with "/="

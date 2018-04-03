@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use Infection\Finder\AbstractExecutableFinder;
-use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantInterface;
 use Infection\Process\ExecutableFinder\PhpExecutableFinder;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
@@ -155,7 +155,7 @@ abstract class AbstractTestFrameworkAdapter
         return $this->initialConfigBuilder->build();
     }
 
-    public function buildMutationConfigFile(Mutant $mutant): string
+    public function buildMutationConfigFile(MutantInterface $mutant): string
     {
         return $this->mutationConfigBuilder->build($mutant);
     }

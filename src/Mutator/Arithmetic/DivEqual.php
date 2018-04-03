@@ -12,7 +12,7 @@ namespace Infection\Mutator\Arithmetic;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class DivEqual extends Mutator
+final class DivEqual extends Mutator
 {
     /**
      * Replaces "/=" with "*="

@@ -12,7 +12,7 @@ namespace Infection\Mutator\Number;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class DecrementInteger extends Mutator
+final class DecrementInteger extends Mutator
 {
     /**
      * Decrements an integer by 1.

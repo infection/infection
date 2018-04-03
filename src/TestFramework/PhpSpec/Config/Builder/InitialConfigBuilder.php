@@ -13,6 +13,9 @@ use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\InitialYamlConfiguration;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * @internal
+ */
 class InitialConfigBuilder implements ConfigBuilder
 {
     /**

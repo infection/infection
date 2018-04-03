@@ -12,7 +12,7 @@ namespace Infection\Mutator\Arithmetic;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class Exponentiation extends Mutator
+final class Exponentiation extends Mutator
 {
     /**
      * Replaces "**" with "/"

@@ -12,7 +12,7 @@ namespace Infection\Mutator\Arithmetic;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class Assignment extends Mutator
+final class Assignment extends Mutator
 {
     /**
      * Replaces "+=", "*=", ".=", and similar with a plain "="

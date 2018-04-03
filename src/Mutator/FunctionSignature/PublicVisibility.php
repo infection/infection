@@ -16,7 +16,7 @@ use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 
-class PublicVisibility extends Mutator
+final class PublicVisibility extends Mutator
 {
     use InterfaceParentTrait;
 

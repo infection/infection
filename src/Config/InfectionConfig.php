@@ -11,6 +11,9 @@ namespace Infection\Config;
 
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @internal
+ */
 class InfectionConfig
 {
     const PROCESS_TIMEOUT_SECONDS = 10;

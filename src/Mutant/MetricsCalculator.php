@@ -10,7 +10,11 @@ declare(strict_types=1);
 namespace Infection\Mutant;
 
 use Infection\Process\MutantProcess;
+use Infection\Process\MutantProcessInterface;
 
+/**
+ * @internal
+ */
 class MetricsCalculator
 {
     /**
@@ -68,7 +72,7 @@ class MetricsCalculator
      */
     private $totalMutantsCount = 0;
 
-    public function collect(MutantProcess $mutantProcess)
+    public function collect(MutantProcessInterface $mutantProcess)
     {
         ++$this->totalMutantsCount;
 
