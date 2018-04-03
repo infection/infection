@@ -276,8 +276,8 @@ final class InfectionCommand extends BaseCommand
     {
         $tempConfigPath = \php_ini_loaded_file();
 
-        if (empty($tempConfigPath) || !file_exists($tempConfigPath)) {
-            // Cannot add a memory limit when there's no php.ini
+        if (empty($tempConfigPath) || !file_exists($tempConfigPath) || !is_writable($tempConfigPath)) {
+            // Cannot add a memory limit: there is no php.ini file or it is not writeable
             return;
         }
 
