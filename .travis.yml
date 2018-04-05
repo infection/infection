@@ -39,6 +39,11 @@ cache:
     - $HOME/.composer/cache
     - build/cache
 
+addons:
+  apt:
+    packages:
+    - expect
+
 before_install:
   - composer selfupdate
   - source .travis/xdebug.sh

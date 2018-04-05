@@ -1,0 +1,24 @@
+#!/usr/bin/env expect
+set timeout 20
+eval spawn ../../../../bin/infection
+
+proc configure {input} {
+    expect $input {
+        send "\r"
+    } timeout {
+        send_user "Test failed\n"
+        exit 1
+    }
+}
+
+configure "directories do you want to include"
+configure "Any directories to exclude from"
+configure "configuration located?"
+configure "timeout in seconds"
+configure "text log file?"
+
+expect "Please note that some mutants will inevitably be harmless"
+expect eof
+
+send_user "Test succeeded!\n"
+
