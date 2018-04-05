@@ -50,11 +50,11 @@ final class TestFrameworkConfigPathProvider
             return null;
         } catch (\Exception $e) {
             if ($testFramework !== TestFrameworkTypes::PHPUNIT) {
-                return $this->askTestFrameworkConfigLocation($input, $output, $dirsInCurrentDir, $testFramework, null);
+                return $this->askTestFrameworkConfigLocation($input, $output, $dirsInCurrentDir, $testFramework, '');
             }
 
             if (!file_exists('composer.json')) {
-                return $this->askTestFrameworkConfigLocation($input, $output, $dirsInCurrentDir, $testFramework, null);
+                return $this->askTestFrameworkConfigLocation($input, $output, $dirsInCurrentDir, $testFramework, '');
             }
 
             $phpUnitPathGuesser = new PhpUnitPathGuesser(json_decode(file_get_contents('composer.json')));
@@ -93,7 +93,7 @@ final class TestFrameworkConfigPathProvider
         };
     }
 
-    private function askTestFrameworkConfigLocation(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, string $testFramework, $defaultValue): string
+    private function askTestFrameworkConfigLocation(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, string $testFramework, string $defaultValue): string
     {
         $question = sprintf(
             'Where is your <comment>%s.(xml|yml)(.dist)</comment> configuration located?',
