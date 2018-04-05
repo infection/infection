@@ -74,7 +74,7 @@ PHP
         $creator = new MutantCreator($this->directory, $differ, $standard);
         $mutant = $creator->create($mutation, $coverage);
 
-        $this->assertSame($this->directory . '/mutant.hash.infection.php', $mutant->getMutatedFilePath());
+        $this->assertSame($this->directory . $this->fileName, $mutant->getMutatedFilePath());
         $this->assertSame('This is the Diff', $mutant->getDiff());
         $this->assertTrue($mutant->isCoveredByTest());
         $this->assertSame(['test', 'list'], $mutant->getCoverageTests());
