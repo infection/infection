@@ -11,6 +11,14 @@ rm -f infection.json.dist
 
 set -e
 
+if [ "$PHPDBG" = "1" ]
+then
+    INFECTION="phpdbg -qrr ../../../../bin/infection"
+else
+    INFECTION="php ../../../../bin/infection"
+fi
+export INFECTION
+
 ./do_configure.expect
 
 test -f infection.json.dist

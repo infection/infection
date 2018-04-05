@@ -1,6 +1,6 @@
 #!/usr/bin/env expect
 set timeout 20
-eval spawn ../../../../bin/infection
+eval spawn $env(INFECTION)
 
 proc configure {input} {
     expect $input {
@@ -18,7 +18,6 @@ configure "timeout in seconds"
 configure "text log file?"
 
 expect "Please note that some mutants will inevitably be harmless"
-#expect eof
 
 send_user "Test succeeded!\n"
 exit 0
