@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+
 final class LogVerbosity
 {
     const DEBUG = 'all';
@@ -36,23 +39,20 @@ final class LogVerbosity
         self::NONE_INTEGER => self::NONE,
     ];
 
-    /**
-     * @param int|string $verbosityLevel
-     *
-     * @return string
-     *
-     * @throws \Exception
-     */
-    public static function convertVerbosityLevel($verbosityLevel): string
+    public static function convertVerbosityLevel(InputInterface $input, SymfonyStyle $io)
     {
+        $verbosityLevel = $input->getOption('log-verbosity');
         if (in_array($verbosityLevel, self::ALLOWED_OPTIONS)) {
-            return $verbosityLevel;
+            return;
         }
 
         if (array_key_exists((int) $verbosityLevel, self::ALLOWED_OPTIONS)) {
-            return self::ALLOWED_OPTIONS[$verbosityLevel];
+            $input->setOption('log-verbosity', self::ALLOWED_OPTIONS[$verbosityLevel]);
+
+            return;
         }
 
-        throw new \Exception();
+        $io->note('Running infection with an unknown log-verbosity option, falling back to \'default\' option');
+        $input->setOption('log-verbosity', self::NORMAL);
     }
 }

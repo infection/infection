@@ -65,11 +65,6 @@ final class InfectionCommand extends BaseCommand
      */
     private $skipCoverage;
 
-    /**
-     * @var string
-     */
-    private $verbosity;
-
     protected function configure()
     {
         $this->setName('run')
@@ -191,7 +186,7 @@ final class InfectionCommand extends BaseCommand
         $testFrameworkKey = $input->getOption('test-framework') ?: $config->getTestFramework();
         $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $this->skipCoverage);
 
-        $this->checkLoggingLevels($input->getOption('log-verbosity'));
+        LogVerbosity::convertVerbosityLevel($input, $this->io);
 
         $metricsCalculator = new MetricsCalculator();
         $this->registerSubscribers($metricsCalculator, $adapter);
@@ -357,7 +352,7 @@ final class InfectionCommand extends BaseCommand
                 $this->getContainer()->get('infection.config'),
                 $metricsCalculator,
                 $this->getContainer()->get('filesystem'),
-                $this->verbosity
+                $this->input->getOption('log-verbosity')
             ),
         ];
     }
@@ -506,18 +501,5 @@ final class InfectionCommand extends BaseCommand
         $this->io = $this->getApplication()->getIO();
         $this->eventDispatcher = $this->getContainer()->get('dispatcher');
         $this->skipCoverage = \strlen(trim($input->getOption('coverage'))) > 0;
-    }
-
-    /**
-     * @param int|string $loggingLevel
-     */
-    private function checkLoggingLevels($loggingLevel)
-    {
-        try {
-            $this->verbosity = LogVerbosity::convertVerbosityLevel($loggingLevel);
-        } catch (\Exception $e) {
-            $this->io->note('Running infection with an unknown log-verbosity option, falling back to \'default\' option');
-            $this->verbosity = LogVerbosity::NORMAL;
-        }
     }
 }

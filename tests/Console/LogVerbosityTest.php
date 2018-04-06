@@ -10,42 +10,91 @@ declare(strict_types=1);
 namespace Infection\Tests\Console;
 
 use Infection\Console\LogVerbosity;
-use PHPUnit\Framework\TestCase;
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryTestCase;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
-class LogVerbosityTest extends TestCase
+class LogVerbosityTest extends MockeryTestCase
 {
-    /**
-     * @dataProvider providesLogVerbosity
-     *
-     * @param string|int $input
-     * @param string $output
-     */
-    public function test_covert_log_verbosity($input, string $output)
+    public function test_it_works_if_verbosity_is_valid()
     {
-        $this->assertSame($output, LogVerbosity::convertVerbosityLevel($input));
+        $input = $this->set_input_expectations_when_it_does_not_change(LogVerbosity::NORMAL);
+
+        LogVerbosity::convertVerbosityLevel($input, Mockery::mock(SymfonyStyle::class));
     }
 
-    public function providesLogVerbosity(): \Generator
+    /**
+     * @dataProvider provideConvertedLogVerbosity
+     *
+     * @param int $input
+     * @param string $output
+     */
+    public function test_it_converts_int_version_to_string_version_of_verbosity(int $input, string $output)
     {
-        yield 'It keeps the same input if it is correct' => [
-            LogVerbosity::NORMAL,
-            LogVerbosity::NORMAL,
-        ];
+        $input = $this->set_input_expectations_when_it_does_change($input, $output);
 
-        yield 'It converts integer versions to its correct version' => [
+        LogVerbosity::convertVerbosityLevel($input, Mockery::mock(SymfonyStyle::class));
+    }
+
+    public function provideConvertedLogVerbosity()
+    {
+        yield 'It converts none integer to none' => [
             LogVerbosity::NONE_INTEGER,
             LogVerbosity::NONE,
         ];
 
-        yield 'It converts integer versions to its correct version, even if it is a string' => [
-            (string) LogVerbosity::DEBUG_INTEGER,
+        yield 'It converts normal integer to normal' => [
+            LogVerbosity::NORMAL_INTEGER,
+            LogVerbosity::NORMAL,
+        ];
+
+        yield 'It converts debug integer to debug' => [
+            LogVerbosity::DEBUG_INTEGER,
             LogVerbosity::DEBUG,
         ];
     }
 
-    public function test_conversion_throws_an_exception_if_level_is_not_found()
+    public function test_it_converts_to_normal_and_writes_notice_when_invalid_verbosity()
     {
-        $this->expectException(\Exception::class);
-        LogVerbosity::convertVerbosityLevel(5);
+        $input = $this->set_input_expectations_when_it_does_change('asdf', LogVerbosity::NORMAL);
+        $io = Mockery::mock(SymfonyStyle::class);
+        $io->shouldReceive('note')
+            ->withArgs(['Running infection with an unknown log-verbosity option, falling back to \'default\' option'])
+            ->once();
+
+        LogVerbosity::convertVerbosityLevel($input, $io);
+    }
+
+    /**
+     * @param string|int $inputVerbosity
+     *
+     * @return InputInterface|Mockery\MockInterface
+     */
+    private function set_input_expectations_when_it_does_not_change($inputVerbosity)
+    {
+        $input = Mockery::mock(InputInterface::class);
+        $input->shouldReceive('getOption')
+            ->withArgs(['log-verbosity'])
+            ->once()
+            ->andReturn($inputVerbosity);
+
+        return $input;
+    }
+
+    /**
+     * @param string|int $input
+     * @param string $output
+     *
+     * @return InputInterface|Mockery\MockInterface
+     */
+    private function set_input_expectations_when_it_does_change($input, string $output)
+    {
+        $input = $this->set_input_expectations_when_it_does_not_change($input);
+        $input->shouldReceive('setOption')
+            ->withArgs(['log-verbosity', $output])
+            ->once();
+
+        return $input;
     }
 }
