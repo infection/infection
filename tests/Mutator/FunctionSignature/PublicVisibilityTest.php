@@ -224,6 +224,29 @@ class Child extends SameParent
 PHP
             ,
         ];
+
+        yield 'it does mutate non-inherited methods' => [
+            $this->getFileContent('pv-non-same-method-parent.php'),
+            <<<'PHP'
+<?php
+
+namespace NonSameAbstract;
+
+abstract class NonSameAbstract
+{
+    public abstract function foo();
+}
+class Child extends NonSameAbstract
+{
+    public function foo()
+    {
+    }
+    protected function bar()
+    {
+    }
+}
+PHP
+        ];
     }
 
     private function getFileContent(string $file): string
