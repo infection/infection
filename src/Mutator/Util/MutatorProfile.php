@@ -125,6 +125,7 @@ final class MutatorProfile
 
     const CAST = [
         Mutator\Cast\CastInt::class,
+        Mutator\Cast\CastFloat::class,
     ];
 
     const DEFAULT = [
@@ -226,5 +227,6 @@ final class MutatorProfile
 
         // Cast
         'CastInt' => Mutator\Cast\CastInt::class,
+        'CastFloat' => Mutator\Cast\CastFloat::class,
     ];
 }
