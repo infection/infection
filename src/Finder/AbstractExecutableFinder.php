@@ -22,7 +22,8 @@ abstract class AbstractExecutableFinder
     protected function searchNonExecutables(array $probableNames, array $extraDirectories = [])
     {
         $dirs = array_merge(
-            explode(PATH_SEPARATOR, getenv('PATH') ?: getenv('Path')),
+            // We are not guaranteed to have a path set, even though that's usually the case
+            explode(PATH_SEPARATOR, getenv('PATH') ?: getenv('Path') ?: ''),
             $extraDirectories
         );
 
