@@ -21,7 +21,7 @@ class MutantCreatorTest extends MockeryTestCase
     /**
      * @var string
      */
-    private $fileName = '/mutant.hash.infection.php';
+    const TEST_FILE_NAME = '/mutant.hash.infection.php';
 
     /**
      * @var string
@@ -33,9 +33,9 @@ class MutantCreatorTest extends MockeryTestCase
         parent::setUp();
         $this->directory = \sys_get_temp_dir() . '/infection/MutantCreator';
         mkdir($this->directory, 0777, true);
-        touch($this->directory . $this->fileName);
+        touch($this->directory . self::TEST_FILE_NAME);
 
-        file_put_contents($this->directory . $this->fileName,
+        file_put_contents($this->directory . self::TEST_FILE_NAME,
             <<<PHP
 <?php return 'This is a diff';
 PHP
@@ -45,7 +45,7 @@ PHP
     public function tearDown()
     {
         parent::tearDown();
-        unlink($this->directory . $this->fileName);
+        unlink($this->directory . self::TEST_FILE_NAME);
         rmdir($this->directory);
     }
 
@@ -74,7 +74,7 @@ PHP
         $creator = new MutantCreator($this->directory, $differ, $standard);
         $mutant = $creator->create($mutation, $coverage);
 
-        $this->assertSame($this->directory . $this->fileName, $mutant->getMutatedFilePath());
+        $this->assertSame($this->directory . self::TEST_FILE_NAME, $mutant->getMutatedFilePath());
         $this->assertSame('This is the Diff', $mutant->getDiff());
         $this->assertTrue($mutant->isCoveredByTest());
         $this->assertSame(['test', 'list'], $mutant->getCoverageTests());
