@@ -18,9 +18,6 @@ use PhpParser\PrettyPrinter\Standard;
 
 class MutantCreatorTest extends MockeryTestCase
 {
-    /**
-     * @var string
-     */
     const TEST_FILE_NAME = '/mutant.hash.infection.php';
 
     /**
