@@ -18,10 +18,36 @@ use PhpParser\PrettyPrinter\Standard;
 
 class MutantCreatorTest extends MockeryTestCase
 {
+    const TEST_FILE_NAME = '/mutant.hash.infection.php';
+
+    /**
+     * @var string
+     */
+    private $directory;
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->directory = \sys_get_temp_dir() . '/infection/MutantCreator';
+        mkdir($this->directory, 0777, true);
+        touch($this->directory . self::TEST_FILE_NAME);
+
+        file_put_contents($this->directory . self::TEST_FILE_NAME,
+            <<<PHP
+<?php return 'This is a diff';
+PHP
+);
+    }
+
+    public function tearDown()
+    {
+        parent::tearDown();
+        unlink($this->directory . self::TEST_FILE_NAME);
+        rmdir($this->directory);
+    }
+
     public function test_it_uses_avaialable_file_if_hash_is_the_same()
     {
-        $tempdir = realpath(__DIR__ . '/../Fixtures/MutantCreator/HasMutation');
-
         $standard = \Mockery::mock(Standard::class);
         $standard->shouldReceive('prettyPrintFile')->andReturn('The Print');
 
@@ -42,10 +68,10 @@ class MutantCreatorTest extends MockeryTestCase
         $coverage->shouldReceive('hasExecutedMethodOnLine')->andReturn(true);
         $coverage->shouldReceive('getAllTestsFor')->andReturn(['test', 'list']);
 
-        $creator = new MutantCreator($tempdir, $differ, $standard);
+        $creator = new MutantCreator($this->directory, $differ, $standard);
         $mutant = $creator->create($mutation, $coverage);
 
-        $this->assertSame($tempdir . '/mutant.hash.infection.php', $mutant->getMutatedFilePath());
+        $this->assertSame($this->directory . self::TEST_FILE_NAME, $mutant->getMutatedFilePath());
         $this->assertSame('This is the Diff', $mutant->getDiff());
         $this->assertTrue($mutant->isCoveredByTest());
         $this->assertSame(['test', 'list'], $mutant->getCoverageTests());
