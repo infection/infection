@@ -13,13 +13,13 @@ vendor: composer.json composer.lock
 build/cache:
 	mkdir -p build/cache
 
-$(PHP-CS-FIXER):
+./php-cs-fixer-v2.phar:
 	wget http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar
-	chmod a+x $(PHP-CS-FIXER)
+	chmod a+x ./php-cs-fixer-v2.phar
 
-$(PHPSTAN):
+./phpstan.phar:
 	wget https://github.com/phpstan/phpstan/releases/download/0.9.1/phpstan.phar
-	chmod a+x $(PHPSTAN)
+	chmod a+x ./phpstan.phar
 
 
 #All tests, (infection itself, phpunit, e2e) for different php version/ environments (xdebug or phpdbg)
