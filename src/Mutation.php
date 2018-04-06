@@ -92,6 +92,7 @@ final class Mutation implements MutationInterface
         $mutatorClass = get_class($this->getMutator());
         $attributes = $this->getAttributes();
         $attributeValues = [
+            $mutatorClass,
             $attributes['startLine'],
             $attributes['endLine'],
             $attributes['startTokenPos'],

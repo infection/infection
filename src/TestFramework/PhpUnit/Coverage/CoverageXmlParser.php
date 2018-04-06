@@ -153,7 +153,7 @@ class CoverageXmlParser
 
         foreach ($lineCoverageNodes as $lineCoverageNode) {
             /** @var \DOMNode $lineCoverageNode */
-            $lineNumber = (int) $lineCoverageNode->getAttribute('nr');
+            $lineNumber = $lineCoverageNode->getAttribute('nr');
 
             foreach ($lineCoverageNode->childNodes as $coveredNode) {
                 if ($coveredNode->nodeName == 'covered') {
