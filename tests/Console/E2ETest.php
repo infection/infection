@@ -47,6 +47,34 @@ class E2ETest extends TestCase
     }
 
     /**
+     * Longest test: runs under about 160-200 sec
+     *
+     * To be run with:
+     *
+     * php -dmemory_limit=128M vendor/bin/phpunit --group=large
+     *
+     * @group e2e
+     * @large
+     */
+    public function test_it_runs_on_itself()
+    {
+        if (ini_get('memory_limit') === '-1') {
+            $this->markTestSkipped(implode("\n", [
+                'Refusing to run Infection on itself with no memory limit set: it is dangerous.',
+                'To run this test with a memory limit set please use:',
+                'php -dmemory_limit=128M vendor/bin/phpunit --group=large',
+            ]));
+        }
+
+        $output = $this->runInfection(self::EXPECT_SUCCESS, [
+            '--test-framework-options="--exclude-group=e2e"',
+        ]);
+
+        $this->assertRegExp('/\d+ mutations were generated/', $output);
+        $this->assertRegExp('/\d{2,} mutants were killed/', $output);
+    }
+
+    /**
      * @group e2e
      */
     public function test_it_runs_configure_command_if_no_configuration()
