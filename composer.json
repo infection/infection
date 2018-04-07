@@ -68,32 +68,5 @@
         "mockery/mockery": "^1.0",
         "phpunit/phpunit": "^6.1"
     },
-    "bin": ["bin/infection"],
-    "scripts": {
-        "analyze": [
-            "@cs:check",
-            "@phpstan",
-            "@composer validate --strict"
-        ],
-        "phpstan": [
-            "wget -nc https://github.com/phpstan/phpstan/releases/download/0.9.1/phpstan.phar",
-            "chmod a+x phpstan.phar",
-            "./phpstan.phar analyse src tests --level=2 -c phpstan.neon --no-interaction --no-progress"
-        ],
-        "cs:check": [
-            "mkdir -p build/cache",
-            "wget -nc http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar",
-            "chmod a+x php-cs-fixer-v2.phar",
-            "PHP_CS_FIXER_FUTURE_MODE=1 ./php-cs-fixer-v2.phar fix -v --cache-file=build/cache/.php_cs.cache --dry-run --stop-on-violation"
-        ],
-        "cs:fix": [
-            "mkdir -p build/cache",
-            "PHP_CS_FIXER_FUTURE_MODE=1 ./php-cs-fixer-v2.phar fix -v --cache-file=build/cache/.php_cs.cache"
-        ],
-        "tests": [
-            "./vendor/bin/phpunit",
-            "./tests/e2e_tests",
-            "./tests/final_private_test"
-        ]
-    }
+    "bin": ["bin/infection"]
 }

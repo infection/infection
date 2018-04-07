@@ -62,7 +62,7 @@ install:
    fi
 
 script:
-  - composer analyze
+  - make analyze --keep-going
   - if [[ $PHPDBG != 1 ]]; then xdebug-enable; fi
   - if [[ $PHPDBG != 1 ]]; then $PHPUNIT_BIN; else phpdbg -qrr $PHPUNIT_BIN; fi
   - ./tests/e2e_tests
