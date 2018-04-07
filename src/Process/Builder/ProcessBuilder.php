@@ -59,7 +59,7 @@ class ProcessBuilder
                 $phpExtraOptions
             ),
             null,
-            $includeArgs ? array_replace($_ENV, $_SERVER) : [],
+            $includeArgs ? array_replace($_ENV, $_SERVER) : null,
             null,
             null
         );
