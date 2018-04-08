@@ -11,7 +11,7 @@ namespace Infection\Tests\Mutator\Cast;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class CastFloatTest extends AbstractMutatorTestCase
+class CastArrayTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases
@@ -23,21 +23,17 @@ class CastFloatTest extends AbstractMutatorTestCase
 
     public function provideMutationCases(): \Generator
     {
-        yield 'It removes casting to float' => [
+        yield 'It removes casting to array' => [
             <<<'PHP'
 <?php
 
-(float) '1.1';
-(double) '1.1';
-(real) '1.1';
+(array) 1.0;
 PHP
             ,
             <<<'PHP'
 <?php
 
-'1.1';
-'1.1';
-'1.1';
+1.0;
 PHP
             ,
         ];

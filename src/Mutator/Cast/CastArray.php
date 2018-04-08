@@ -12,7 +12,7 @@ namespace Infection\Mutator\Cast;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-class CastInt extends Mutator
+class CastArray extends Mutator
 {
     public function mutate(Node $node)
     {
@@ -21,6 +21,6 @@ class CastInt extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Expr\Cast\Int_;
+        return $node instanceof Node\Expr\Cast\Array_;
     }
 }
