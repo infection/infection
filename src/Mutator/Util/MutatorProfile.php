@@ -64,6 +64,7 @@ final class MutatorProfile
         Mutator\Boolean\LogicalLowerOr::class,
         Mutator\Boolean\LogicalNot::class,
         Mutator\Boolean\LogicalOr::class,
+        Mutator\Boolean\NotIdenticalNotEqual::class,
         Mutator\Boolean\TrueValue::class,
         Mutator\Boolean\Yield_::class,
     ];
@@ -168,6 +169,7 @@ final class MutatorProfile
         'LogicalLowerOr' => Mutator\Boolean\LogicalLowerOr::class,
         'LogicalNot' => Mutator\Boolean\LogicalNot::class,
         'LogicalOr' => Mutator\Boolean\LogicalOr::class,
+        'NotIdenticalNotEqual' => Mutator\Boolean\NotIdenticalNotEqual::class,
         'TrueValue' => Mutator\Boolean\TrueValue::class,
         'Yield_' => Mutator\Boolean\Yield_::class,
 
