@@ -12,7 +12,6 @@ namespace Infection\Tests\Mutator;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Tests\Fixtures\SimpleMutatorVisitor;
-use Infection\Utils\TmpDirectoryCreator;
 use Infection\Visitor\CloneVisitor;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
@@ -22,7 +21,6 @@ use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
 
 abstract class AbstractMutatorTestCase extends TestCase
 {
@@ -30,21 +28,6 @@ abstract class AbstractMutatorTestCase extends TestCase
      * @var Mutator
      */
     protected $mutator;
-
-    /**
-     * @var Filesystem
-     */
-    private $fileSystem;
-
-    /**
-     * @var string
-     */
-    private $workspace;
-
-    /**
-     * @var string
-     */
-    private $tmpDir;
 
     public function doTest(string $inputCode, string $expectedCode = null)
     {
@@ -72,16 +55,6 @@ abstract class AbstractMutatorTestCase extends TestCase
     protected function setUp()
     {
         $this->mutator = $this->getMutator();
-
-        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
-
-        $this->fileSystem = new Filesystem();
-        $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
-    }
-
-    protected function tearDown()
-    {
-        $this->fileSystem->remove($this->workspace);
     }
 
     protected function getNodes(string $code): array
@@ -110,20 +83,16 @@ abstract class AbstractMutatorTestCase extends TestCase
         return $prettyPrinter->prettyPrintFile($mutatedNodes);
     }
 
-    private function assertSyntaxIsValid($realMutatedCode)
+    private function assertSyntaxIsValid(string $realMutatedCode)
     {
-        $filename = $this->fileSystem->tempnam($this->tmpDir, 'mutator');
-        file_put_contents($filename, $realMutatedCode);
-
-        exec(sprintf('php -l %s', $filename), $output, $returnCode);
+        exec(sprintf('echo %s | php -l', escapeshellarg($realMutatedCode)), $output, $returnCode);
 
         $this->assertSame(
             0,
             $returnCode,
             sprintf(
-                'Mutator %s produces invalid code in %s',
-                $this->getMutator()::getName(),
-                $filename
+                'Mutator %s produces invalid code',
+                $this->getMutator()::getName()
             )
         );
     }
