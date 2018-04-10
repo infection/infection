@@ -28,9 +28,7 @@ final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
         if ($node instanceof Stmt\Namespace_) {
             $this->namespace = $node->name;
         } elseif ($node instanceof Stmt\ClassLike) {
-            $node->fullyQualifiedClassName = null === $node->name
-                ? null
-                : Name::concat($this->namespace, $node->name->name);
+            $node->fullyQualifiedClassName = $node->name ? Name::concat($this->namespace, $node->name->name) : null;
         }
     }
 }

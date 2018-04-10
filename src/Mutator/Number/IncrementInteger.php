@@ -28,6 +28,6 @@ final class IncrementInteger extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Scalar\LNumber && $node->value !== 0;
+        return $node instanceof Node\Scalar\LNumber && $node->value != 0;
     }
 }

@@ -41,7 +41,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
 
     public function find(): string
     {
-        if ($this->cachedPath === null) {
+        if (!isset($this->cachedPath)) {
             if (!$this->shouldUseCustomPath()) {
                 $this->addVendorFolderToPath();
             }
@@ -54,7 +54,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
 
     private function shouldUseCustomPath(): bool
     {
-        if (null === $this->customPath) {
+        if (!isset($this->customPath)) {
             return false;
         }
 

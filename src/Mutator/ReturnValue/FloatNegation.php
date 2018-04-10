@@ -49,7 +49,7 @@ final class FloatNegation extends Mutator
             return false;
         }
 
-        if ($expr->value === 0.0) {
+        if ($expr->value == 0.0) {
             return false;
         }
 

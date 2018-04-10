@@ -28,6 +28,6 @@ final class DecrementInteger extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Scalar\LNumber && $node->value !== 1;
+        return $node instanceof Node\Scalar\LNumber && $node->value != 1;
     }
 }

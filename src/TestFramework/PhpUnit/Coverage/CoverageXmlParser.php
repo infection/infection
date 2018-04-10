@@ -75,14 +75,14 @@ class CoverageXmlParser
 
         $defaultCoverageFileData = ['byLine' => [], 'byMethod' => []];
 
-        if ($percentage === '0.00' || empty($percentage)) {
+        if (!$percentage) {
             return [$sourceFilePath => $defaultCoverageFileData];
         }
 
         /** @var \DOMNodeList $lineCoverageNodes */
         $lineCoverageNodes = $xPath->query('/phpunit/file/coverage/line');
 
-        if ($lineCoverageNodes->length === 0) {
+        if (!$lineCoverageNodes->length) {
             return [$sourceFilePath => $defaultCoverageFileData];
         }
 
@@ -156,7 +156,7 @@ class CoverageXmlParser
             $lineNumber = (int) $lineCoverageNode->getAttribute('nr');
 
             foreach ($lineCoverageNode->childNodes as $coveredNode) {
-                if ($coveredNode->nodeName === 'covered') {
+                if ($coveredNode->nodeName == 'covered') {
                     $testMethod = $coveredNode->getAttribute('by');
 
                     $fileCoverage[$lineNumber][] = ['testMethod' => $testMethod];

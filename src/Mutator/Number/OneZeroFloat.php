@@ -23,7 +23,7 @@ final class OneZeroFloat extends Mutator
      */
     public function mutate(Node $node)
     {
-        if ($node->value === 0.0) {
+        if ($node->value == 0.0) {
             return new Node\Scalar\DNumber(1.0);
         }
 
@@ -32,6 +32,6 @@ final class OneZeroFloat extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Scalar\DNumber && ($node->value === 0.0 || $node->value === 1.0);
+        return $node instanceof Node\Scalar\DNumber && ($node->value == 0.0 || $node->value == 1.0);
     }
 }
