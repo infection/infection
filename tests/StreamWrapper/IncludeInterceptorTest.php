@@ -150,7 +150,7 @@ class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
         touch($tempnam);
         touch($tempnam, time());
         chown($tempnam, stat($tempnam)['uid']);
-        chgrp($tempnam, stat($tempnam)['uid']);
+        chgrp($tempnam, stat($tempnam)['gid']);
         chmod($tempnam, stat($tempnam)['mode']);
 
         $newname = tempnam('', basename(__FILE__, 'php'));
