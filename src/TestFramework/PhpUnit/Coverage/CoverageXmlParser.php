@@ -71,7 +71,7 @@ class CoverageXmlParser
         $sourceFilePath = $this->getSourceFilePath($xPath, $relativeCoverageFilePath, $projectSource);
 
         $linesNode = $xPath->query('/phpunit/file/totals/lines')[0];
-        $percentage = $linesNode->getAttribute('percent');
+        $percentage = (float) $linesNode->getAttribute('percent');
 
         $defaultCoverageFileData = ['byLine' => [], 'byMethod' => []];
 
