@@ -1,4 +1,4 @@
-Total: 8
+Total: 9
 Killed mutants:
 ===============
 
@@ -13,6 +13,9 @@ Mutator: TrueValue
 Line 12
 
 Mutator: FalseValue
+Line 14
+
+Mutator: NotIdenticalNotEqual
 Line 14
 
 Mutator: NotIdentical

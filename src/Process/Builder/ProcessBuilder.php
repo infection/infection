@@ -49,7 +49,7 @@ class ProcessBuilder
         bool $skipCoverage,
         array $phpExtraOptions = []
     ): Process {
-        $includeArgs = PHP_SAPI === 'phpdbg' || $skipCoverage;
+        $includeArgs = PHP_SAPI == 'phpdbg' || $skipCoverage;
 
         $process = new Process(
             $this->testFrameworkAdapter->getExecutableCommandLine(

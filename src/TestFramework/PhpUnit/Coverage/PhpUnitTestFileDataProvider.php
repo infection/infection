@@ -36,7 +36,7 @@ final class PhpUnitTestFileDataProvider implements TestFileDataProvider
 
         $nodes = $xPath->query(sprintf('//testsuite[@name="%s"]', $fullyQualifiedClassName));
 
-        if ($nodes->length === 0) {
+        if (!$nodes->length) {
             throw new TestFileNameNotFoundException(sprintf('For FQCN: %s', $fullyQualifiedClassName));
         }
 
@@ -48,7 +48,7 @@ final class PhpUnitTestFileDataProvider implements TestFileDataProvider
 
     private function getXPath(): \DOMXPath
     {
-        if ($this->xPath === null) {
+        if (!$this->xPath) {
             if (!file_exists($this->jUnitFilePath)) {
                 throw CoverageDoesNotExistException::forJunit($this->jUnitFilePath);
             }

@@ -22,7 +22,7 @@ final class RealPathFilterIterator extends MultiplePcreFilterIterator
     {
         $filename = $this->current()->getRealPath();
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' == DIRECTORY_SEPARATOR) {
             $filename = str_replace('\\', '/', $filename);
         }
 

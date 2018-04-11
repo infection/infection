@@ -147,7 +147,7 @@ class CodeCoverageData
      */
     private function getCoverage(): array
     {
-        if (null === $this->coverage) {
+        if (!isset($this->coverage)) {
             $coverageIndexFilePath = $this->coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME;
 
             if (!file_exists($coverageIndexFilePath)) {
@@ -171,7 +171,7 @@ class CodeCoverageData
 
     private function addTestExecutionInfo(array $coverage): array
     {
-        if ($this->testFileDataProvider === null) {
+        if (!$this->testFileDataProvider) {
             return $coverage;
         }
 

@@ -58,11 +58,13 @@ final class MutatorProfile
     const BOOLEAN = [
         Mutator\Boolean\ArrayItem::class,
         Mutator\Boolean\FalseValue::class,
+        Mutator\Boolean\IdenticalEqual::class,
         Mutator\Boolean\LogicalAnd::class,
         Mutator\Boolean\LogicalLowerAnd::class,
         Mutator\Boolean\LogicalLowerOr::class,
         Mutator\Boolean\LogicalNot::class,
         Mutator\Boolean\LogicalOr::class,
+        Mutator\Boolean\NotIdenticalNotEqual::class,
         Mutator\Boolean\TrueValue::class,
         Mutator\Boolean\Yield_::class,
     ];
@@ -161,11 +163,13 @@ final class MutatorProfile
         //Boolean
         'ArrayItem' => Mutator\Boolean\ArrayItem::class,
         'FalseValue' => Mutator\Boolean\FalseValue::class,
+        'IdenticalEqual' => Mutator\Boolean\IdenticalEqual::class,
         'LogicalAnd' => Mutator\Boolean\LogicalAnd::class,
         'LogicalLowerAnd' => Mutator\Boolean\LogicalLowerAnd::class,
         'LogicalLowerOr' => Mutator\Boolean\LogicalLowerOr::class,
         'LogicalNot' => Mutator\Boolean\LogicalNot::class,
         'LogicalOr' => Mutator\Boolean\LogicalOr::class,
+        'NotIdenticalNotEqual' => Mutator\Boolean\NotIdenticalNotEqual::class,
         'TrueValue' => Mutator\Boolean\TrueValue::class,
         'Yield_' => Mutator\Boolean\Yield_::class,
 

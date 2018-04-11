@@ -45,7 +45,7 @@ final class SourceFilesFinder extends Finder
 
         $this->in($this->sourceDirectories)->files();
 
-        if ('' === $filter) {
+        if ('' == $filter) {
             $this->name('*.php');
 
             return $this;

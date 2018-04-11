@@ -121,7 +121,7 @@ class InitialConfigBuilder implements ConfigBuilder
     {
         $filterNode = $this->getNode($dom, $xPath, 'filter');
 
-        if ($filterNode === null) {
+        if (!$filterNode) {
             $filterNode = $this->createNode($dom, 'filter');
 
             $whiteListNode = $dom->createElement('whitelist');
@@ -143,7 +143,7 @@ class InitialConfigBuilder implements ConfigBuilder
     {
         $node = $this->getNode($dom, $xPath, $nodeName);
 
-        if ($node === null) {
+        if (!$node) {
             $node = $this->createNode($dom, $nodeName);
         }
 

@@ -35,7 +35,7 @@ final class TmpDirectoryCreator
 
     public function createAndGet(string $tempDir): string
     {
-        if ($this->path === null) {
+        if (!$this->path) {
             $path = sprintf('%s/%s', $tempDir, self::BASE_DIR_NAME);
 
             $this->fileSystem->mkdir($path, 0777);

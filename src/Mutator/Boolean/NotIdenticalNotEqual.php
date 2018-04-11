@@ -7,27 +7,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Number;
+namespace Infection\Mutator\Boolean;
 
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
-final class IncrementInteger extends Mutator
+final class NotIdenticalNotEqual extends Mutator
 {
     /**
-     * Increments an integer by 1.
+     * Replaces "!==" with "!="
      *
      * @param Node $node
      *
-     * @return Node\Scalar\LNumber
+     * @return Node\Expr\BinaryOp\Equal
      */
     public function mutate(Node $node)
     {
-        return new Node\Scalar\LNumber($node->value + 1);
+        return new Node\Expr\BinaryOp\NotEqual($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Scalar\LNumber && $node->value != 0;
+        return $node instanceof Node\Expr\BinaryOp\NotIdentical;
     }
 }

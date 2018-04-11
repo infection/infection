@@ -98,7 +98,7 @@ final class MutatorsGenerator
             if (!array_key_exists($mutator, $this->mutatorList)) {
                 $this->mutatorList[$mutator] = [];
             }
-        } elseif (!array_key_exists($mutator, $this->mutatorList) || $this->mutatorList[$mutator] === []) {
+        } elseif (!array_key_exists($mutator, $this->mutatorList) || !$this->mutatorList[$mutator]) {
             $this->mutatorList[$mutator] = (array) $setting;
         }
     }

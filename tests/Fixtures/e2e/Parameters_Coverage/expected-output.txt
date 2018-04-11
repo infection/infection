@@ -1,4 +1,4 @@
-Total: 5
+Total: 6
 Killed mutants:
 ===============
 
@@ -21,6 +21,9 @@ Escaped mutants:
 
 
 Mutator: FalseValue
+Line 17
+
+Mutator: IdenticalEqual
 Line 17
 
 Timed Out mutants:
