@@ -39,4 +39,4 @@ if (!defined('INFECTION_COMPOSER_INSTALL')) {
 
 require INFECTION_COMPOSER_INSTALL;
 
-$container = require __DIR__ . '/container.php';
+$container = new \Infection\Console\InfectionContainer();
