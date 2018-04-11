@@ -107,6 +107,6 @@ final class TestFrameworkConfigPathProvider
 
         $testFrameworkConfigLocation = $this->questionHelper->ask($input, $output, $question);
 
-        return (string) $testFrameworkConfigLocation;
+        return $testFrameworkConfigLocation;
     }
 }

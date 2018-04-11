@@ -128,6 +128,7 @@ final class MutatorProfile
         Mutator\Cast\CastBool::class,
         Mutator\Cast\CastFloat::class,
         Mutator\Cast\CastArray::class,
+        Mutator\Cast\CastString::class,
     ];
 
     const DEFAULT = [
@@ -228,9 +229,10 @@ final class MutatorProfile
         'For_' => Mutator\ZeroIteration\For_::class,
 
         // Cast
-        'CastInt' => Mutator\Cast\CastInt::class,
+        'CastArray' => Mutator\Cast\CastArray::class,
         'CastBool' => Mutator\Cast\CastBool::class,
         'CastFloat' => Mutator\Cast\CastFloat::class,
-        'CastArray' => Mutator\Cast\CastArray::class,
+        'CastInt' => Mutator\Cast\CastInt::class,
+        'CastString' => Mutator\Cast\CastString::class,
     ];
 }
