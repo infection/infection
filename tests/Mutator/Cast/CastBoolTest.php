@@ -11,7 +11,7 @@ namespace Infection\Tests\Mutator\Cast;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class CastIntTest extends AbstractMutatorTestCase
+class CastBoolTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases
@@ -23,19 +23,19 @@ class CastIntTest extends AbstractMutatorTestCase
 
     public function provideMutationCases(): \Generator
     {
-        yield 'It removes casting to int' => [
+        yield 'It removes casting to bool' => [
             <<<'PHP'
 <?php
 
-(int) 1.0;
-(integer) 1.0;
+(bool) 1;
+(boolean) 1;
 PHP
             ,
             <<<'PHP'
 <?php
 
-1.0;
-1.0;
+1;
+1;
 PHP
             ,
         ];

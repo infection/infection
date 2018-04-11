@@ -27,13 +27,13 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         }
 
         // OK (XX tests, YY assertions)
-        $isOk = (bool) preg_match('/OK\s\(/', $output);
+        $isOk = preg_match('/OK\s\(/', $output);
 
         // "OK, but incomplete, skipped, or risky tests!"
-        $isOkWithInfo = (bool) preg_match('/OK\s?,/', $output);
+        $isOkWithInfo = preg_match('/OK\s?,/', $output);
 
         // "Warnings!" - e.g. when deprecated functions are used, but tests pass
-        $isWarning = (bool) preg_match('/warnings!/i', $output);
+        $isWarning = preg_match('/warnings!/i', $output);
 
         return $isOk || $isOkWithInfo || $isWarning;
     }

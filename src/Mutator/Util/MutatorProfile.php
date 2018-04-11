@@ -125,6 +125,7 @@ final class MutatorProfile
 
     const CAST = [
         Mutator\Cast\CastInt::class,
+        Mutator\Cast\CastBool::class,
         Mutator\Cast\CastFloat::class,
         Mutator\Cast\CastArray::class,
     ];
@@ -228,6 +229,7 @@ final class MutatorProfile
 
         // Cast
         'CastInt' => Mutator\Cast\CastInt::class,
+        'CastBool' => Mutator\Cast\CastBool::class,
         'CastFloat' => Mutator\Cast\CastFloat::class,
         'CastArray' => Mutator\Cast\CastArray::class,
     ];
