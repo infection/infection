@@ -38,6 +38,7 @@ class MutatorProfileTest extends TestCase
             ->name('*.php')
             ->in('src/Mutator')
             ->exclude('Util')
+            ->notName('/Abstract.*/')
             ->files();
 
         foreach ($files as $file) {

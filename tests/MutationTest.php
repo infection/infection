@@ -38,7 +38,7 @@ class MutationTest extends TestCase
             true
         );
 
-        $this->assertSame('5f52c44bcebde86a7ee79d0080c0e12a', $mutation->getHash());
+        $this->assertSame('e5e3a33955c4819395090c16e8df6f76', $mutation->getHash());
     }
 
     public function test_it_correctly_sets_is_on_function_signature()

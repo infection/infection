@@ -25,6 +25,7 @@ final class MutatorProfile
         '@return_value' => self::RETURN_VALUE,
         '@sort' => self::SORT,
         '@zero_iteration' => self::ZERO_ITERATION,
+        '@cast' => self::CAST,
 
         //Special Profiles
         '@default' => self::DEFAULT,
@@ -120,6 +121,15 @@ final class MutatorProfile
     const ZERO_ITERATION = [
         Mutator\ZeroIteration\Foreach_::class,
         Mutator\ZeroIteration\For_::class,
+    ];
+
+    const CAST = [
+        Mutator\Cast\CastArray::class,
+        Mutator\Cast\CastBool::class,
+        Mutator\Cast\CastFloat::class,
+        Mutator\Cast\CastInt::class,
+        Mutator\Cast\CastObject::class,
+        Mutator\Cast\CastString::class,
     ];
 
     const DEFAULT = [
@@ -218,5 +228,13 @@ final class MutatorProfile
         //Zero Iteration
         'Foreach_' => Mutator\ZeroIteration\Foreach_::class,
         'For_' => Mutator\ZeroIteration\For_::class,
+
+        // Cast
+        'CastArray' => Mutator\Cast\CastArray::class,
+        'CastBool' => Mutator\Cast\CastBool::class,
+        'CastFloat' => Mutator\Cast\CastFloat::class,
+        'CastInt' => Mutator\Cast\CastInt::class,
+        'CastObject' => Mutator\Cast\CastObject::class,
+        'CastString' => Mutator\Cast\CastString::class,
     ];
 }

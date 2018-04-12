@@ -33,6 +33,23 @@ class TimeoutProviderTest extends AbstractBaseProviderTest
         $this->assertSame(InfectionConfig::PROCESS_TIMEOUT_SECONDS, $timeout);
     }
 
+    public function test_it_casts_any_value_to_integer()
+    {
+        $consoleMock = Mockery::mock(ConsoleHelper::class);
+        $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
+
+        $dialog = $this->getQuestionHelper();
+
+        $provider = new TimeoutProvider($consoleMock, $dialog);
+
+        $timeout = $provider->get(
+            $this->createStreamableInputInterfaceMock($this->getInputStream("13\n")),
+            $this->createOutputInterface()
+        );
+
+        $this->assertSame(13, $timeout);
+    }
+
     /**
      * @dataProvider validatorProvider
      * @expectedException \RuntimeException
@@ -60,6 +77,7 @@ class TimeoutProviderTest extends AbstractBaseProviderTest
             ['str'],
             [0],
             [-1],
+            [0.1],
         ];
     }
 }
