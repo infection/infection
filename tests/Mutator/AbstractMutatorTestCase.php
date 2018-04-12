@@ -38,6 +38,7 @@ abstract class AbstractMutatorTestCase extends TestCase
         $realMutatedCode = $this->mutate($inputCode);
         if ($expectedCode !== null) {
             $this->assertSame($expectedCode, $realMutatedCode);
+            $this->assertSyntaxIsValid($realMutatedCode);
         } else {
             $this->assertSame($inputCode, $realMutatedCode);
         }
@@ -80,5 +81,19 @@ abstract class AbstractMutatorTestCase extends TestCase
         $mutatedNodes = $traverser->traverse($nodes);
 
         return $prettyPrinter->prettyPrintFile($mutatedNodes);
+    }
+
+    private function assertSyntaxIsValid(string $realMutatedCode)
+    {
+        exec(sprintf('echo %s | php -l', escapeshellarg($realMutatedCode)), $output, $returnCode);
+
+        $this->assertSame(
+            0,
+            $returnCode,
+            sprintf(
+                'Mutator %s produces invalid code',
+                $this->getMutator()::getName()
+            )
+        );
     }
 }
