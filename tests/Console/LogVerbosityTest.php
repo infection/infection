@@ -19,7 +19,7 @@ class LogVerbosityTest extends MockeryTestCase
 {
     public function test_it_works_if_verbosity_is_valid()
     {
-        $input = $this->set_input_expectations_when_it_does_not_change(LogVerbosity::NORMAL);
+        $input = $this->setInputExpectationsWhenItDoesNotChange(LogVerbosity::NORMAL);
 
         LogVerbosity::convertVerbosityLevel($input, Mockery::mock(SymfonyStyle::class));
     }
@@ -32,7 +32,7 @@ class LogVerbosityTest extends MockeryTestCase
      */
     public function test_it_converts_int_version_to_string_version_of_verbosity(int $input, string $output)
     {
-        $input = $this->set_input_expectations_when_it_does_change($input, $output);
+        $input = $this->setInputExpectationsWhenItDoesChange($input, $output);
         $io = Mockery::mock(SymfonyStyle::class);
         $io->shouldReceive('note')
             ->withArgs(['Numeric versions of log-verbosity have been deprecated, please use, ' . $output . ' to keep the same result'])
@@ -61,7 +61,7 @@ class LogVerbosityTest extends MockeryTestCase
 
     public function test_it_converts_to_normal_and_writes_notice_when_invalid_verbosity()
     {
-        $input = $this->set_input_expectations_when_it_does_change('asdf', LogVerbosity::NORMAL);
+        $input = $this->setInputExpectationsWhenItDoesChange('asdf', LogVerbosity::NORMAL);
         $io = Mockery::mock(SymfonyStyle::class);
         $io->shouldReceive('note')
             ->withArgs(['Running infection with an unknown log-verbosity option, falling back to \'default\' option'])
@@ -75,7 +75,7 @@ class LogVerbosityTest extends MockeryTestCase
      *
      * @return InputInterface|Mockery\MockInterface
      */
-    private function set_input_expectations_when_it_does_not_change($inputVerbosity)
+    private function setInputExpectationsWhenItDoesNotChange($inputVerbosity)
     {
         $input = Mockery::mock(InputInterface::class);
         $input->shouldReceive('getOption')
@@ -92,9 +92,9 @@ class LogVerbosityTest extends MockeryTestCase
      *
      * @return InputInterface|Mockery\MockInterface
      */
-    private function set_input_expectations_when_it_does_change($input, string $output)
+    private function setInputExpectationsWhenItDoesChange($input, string $output)
     {
-        $input = $this->set_input_expectations_when_it_does_not_change($input);
+        $input = $this->setInputExpectationsWhenItDoesNotChange($input);
         $input->shouldReceive('setOption')
             ->withArgs(['log-verbosity', $output])
             ->once();
