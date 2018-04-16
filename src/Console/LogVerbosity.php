@@ -48,6 +48,7 @@ final class LogVerbosity
 
         if (array_key_exists((int) $verbosityLevel, self::ALLOWED_OPTIONS)) {
             $input->setOption('log-verbosity', self::ALLOWED_OPTIONS[$verbosityLevel]);
+            $io->note('Numeric versions of log-verbosity have been deprecated, please use, ' . self::ALLOWED_OPTIONS[$verbosityLevel] . ' to keep the same result');
 
             return;
         }

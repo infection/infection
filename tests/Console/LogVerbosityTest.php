@@ -33,8 +33,12 @@ class LogVerbosityTest extends MockeryTestCase
     public function test_it_converts_int_version_to_string_version_of_verbosity(int $input, string $output)
     {
         $input = $this->set_input_expectations_when_it_does_change($input, $output);
+        $io = Mockery::mock(SymfonyStyle::class);
+        $io->shouldReceive('note')
+            ->withArgs(['Numeric versions of log-verbosity have been deprecated, please use, ' . $output . ' to keep the same result'])
+            ->once();
 
-        LogVerbosity::convertVerbosityLevel($input, Mockery::mock(SymfonyStyle::class));
+        LogVerbosity::convertVerbosityLevel($input, $io);
     }
 
     public function provideConvertedLogVerbosity()
