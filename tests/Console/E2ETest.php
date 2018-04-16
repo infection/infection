@@ -165,6 +165,14 @@ class E2ETest extends TestCase
         }
 
         /*
+         * Now we need to handle autoloading. This is important because Infection uses
+         * reflection, and reflection should know how to autoload files. But best if
+         * we could avoid autoloading non-essential to Infection files, especially
+         * those from vendor folder, because they're likely to interfere by breaking
+         * other tests and causing a debugging hell. If it breaks, it better be here.
+         */
+
+        /*
          * E2E tests are expected to follow PSR-4.
          *
          * We exploit this to autoload only classes belonging to the test,
