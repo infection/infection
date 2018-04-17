@@ -3,7 +3,7 @@ PHPSTAN=./phpstan.phar
 PHP-CS-FIXER=./php-cs-fixer-v2.phar
 PHPUNIT=vendor/bin/phpunit
 
-DOCKER_RUN=docker run -t --rm -e PHPDBG=1 -v "$$PWD":/opt/infection -w /opt/infection
+DOCKER_RUN=docker run -t --rm -v "$$PWD":/opt/infection -w /opt/infection
 DOCKER_RUN_70=$(DOCKER_RUN) infection_php70
 DOCKER_RUN_71=$(DOCKER_RUN) infection_php71
 DOCKER_RUN_72=$(DOCKER_RUN) infection_php72
@@ -67,13 +67,13 @@ test-infection-phpdbg-72: build-xdebug-72
 test-e2e-phpdbg: test-e2e-phpdbg-70 test-e2e-phpdbg-71 test-e2e-phpdbg-72
 
 test-e2e-phpdbg-70: build-xdebug-70
-	$(DOCKER_RUN_70) ./tests/e2e_tests
+	$(DOCKER_RUN_70) env PHPDBG=1 ./tests/e2e_tests
 
 test-e2e-phpdbg-71: build-xdebug-71
-	$(DOCKER_RUN_71) ./tests/e2e_tests
+	$(DOCKER_RUN_71) env PHPDBG=1 ./tests/e2e_tests
 
 test-e2e-phpdbg-72: build-xdebug-72
-	$(DOCKER_RUN_72) ./tests/e2e_tests
+	$(DOCKER_RUN_72) env PHPDBG=1 ./tests/e2e_tests
 
 
 .PHONY: test-infection-xdebug test-infection-xdebug-70 test-infection-xdebug-71 test-infection-xdebug-72
