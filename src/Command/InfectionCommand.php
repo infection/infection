@@ -172,7 +172,7 @@ final class InfectionCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $container = $this->getContainer();
-        $config = $container->get('infection.config');
+        $config = $container->getInfectionConfig();
 
         $bootstrap = $config->getBootstrap();
         if ($bootstrap) {

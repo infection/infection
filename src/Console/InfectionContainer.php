@@ -33,13 +33,14 @@ use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use Pimple\Container;
+use Psr\Container\ContainerInterface;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
  */
-final class InfectionContainer extends Container
+final class InfectionContainer extends Container implements ContainerInterface
 {
     public function __construct(array $values = [])
     {
@@ -172,8 +173,28 @@ final class InfectionContainer extends Container
         };
     }
 
-    private function getInfectionConfig(): InfectionConfig
+    public function getInfectionConfig(): InfectionConfig
     {
         return $this['infection.config'];
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @see \Psr\Container\ContainerInterface::get()
+     */
+    public function get($id)
+    {
+        return $this[$id];
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @see \Psr\Container\ContainerInterface::has()
+     */
+    public function has($id)
+    {
+        return isset($this[$id]);
     }
 }

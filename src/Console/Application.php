@@ -172,7 +172,7 @@ ASCII;
         $output->getFormatter()->setStyle('high', new OutputFormatterStyle('green', null, ['bold']));
     }
 
-    public function getContainer(): Container
+    public function getContainer(): InfectionContainer
     {
         return $this->container;
     }
