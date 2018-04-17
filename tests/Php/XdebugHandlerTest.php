@@ -50,8 +50,12 @@ class XdebugHandlerTest extends TestCase
 
     protected function setUp()
     {
-        if (PHP_SAPI === 'phpdbg') {
-            $this->markTestSkipped();
+        if (PHP_SAPI == 'phpdbg') {
+            $this->markTestSkipped('Not testing XdebugHandler under phpdbg');
+        }
+
+        if (!extension_loaded('xdebug')) {
+            $this->fail('Cannot test XdebugHandler without xdebug');
         }
 
         putenv(PhpIniHelper::ENV_ORIGINALS_PHP_INIS);
