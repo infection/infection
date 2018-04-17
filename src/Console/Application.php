@@ -57,6 +57,11 @@ ASCII;
     /**
      * @var bool
      */
+    private $isUnderPhpdbg;
+
+    /**
+     * @var bool
+     */
     private $isDebuggerDisabled;
 
     public function __construct(Container $container, string $name = self::NAME, string $version = self::VERSION)
@@ -64,6 +69,7 @@ ASCII;
         $this->container = $container;
         $this->isDebuggerDisabled = ('' === trim((string) getenv(XdebugHandler::ENV_DISABLE_XDEBUG)));
         $this->isXdebugLoaded = \extension_loaded('xdebug');
+        $this->isUnderPhpdbg = PHP_SAPI == 'phpdbg';
 
         parent::__construct($name, $version);
 
@@ -82,7 +88,7 @@ ASCII;
 
         $this->io = new SymfonyStyle($input, $output);
 
-        if (PHP_SAPI === 'phpdbg') {
+        if ($this->isUnderPhpdbg) {
             $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, PHP_SAPI));
         } elseif ($this->isXdebugLoaded) {
             $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, 'xdebug'));
@@ -91,7 +97,7 @@ ASCII;
         $xdebug = new XdebugHandler(new ConfigBuilder(sys_get_temp_dir()));
         $xdebug->check();
 
-        if (PHP_SAPI !== 'phpdbg'
+        if (!$this->isUnderPhpdbg
             && $this->isDebuggerDisabled
             && !$this->isXdebugLoaded
             && !$input->hasParameterOption('--coverage', true)
