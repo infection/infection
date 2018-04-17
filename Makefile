@@ -4,9 +4,9 @@ PHP-CS-FIXER=./php-cs-fixer-v2.phar
 PHPUNIT=vendor/bin/phpunit
 
 DOCKER_RUN=docker run -t --rm -v "$$PWD":/opt/infection -w /opt/infection
-DOCKER_RUN_70=$(DOCKER_RUN) infection_php70
-DOCKER_RUN_71=$(DOCKER_RUN) infection_php71
-DOCKER_RUN_72=$(DOCKER_RUN) infection_php72
+DOCKER_RUN_70=flock devTools/*php70*.json $(DOCKER_RUN) infection_php70
+DOCKER_RUN_71=flock devTools/*php71*.json $(DOCKER_RUN) infection_php71
+DOCKER_RUN_72=flock devTools/*php72*.json $(DOCKER_RUN) infection_php72
 
 .PHONY: all
 #Run all checks, default when running 'make'
