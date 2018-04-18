@@ -17,5 +17,5 @@ run () {
 }
 
 
-run "../../../../bin/infection --mutators=FalseValue" "-n -c php.ini"
+run "../../../../bin/infection --mutators=FalseValue" "-c php.ini"
 
