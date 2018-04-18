@@ -16,6 +16,7 @@ use Infection\EventDispatcher\EventDispatcher;
 use Infection\Finder\Locator;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutator\Util\MutatorsGenerator;
+use Infection\Php\XdebugHandler;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
@@ -33,14 +34,17 @@ use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use Pimple\Container;
+use Psr\Container\ContainerInterface;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
  */
-final class InfectionContainer extends Container
+final class InfectionContainer extends Container implements ContainerInterface
 {
+    const KEY_INFECTION_CONFIG = 'infection.config';
+
     public function __construct(array $values = [])
     {
         parent::__construct($values);
@@ -170,10 +174,47 @@ final class InfectionContainer extends Container
 
             return (new MutatorsGenerator($mutatorConfig))->generate();
         };
+
+        $this['environment.debugger.disabled'] = function (): bool {
+            return '' == trim((string) getenv(XdebugHandler::ENV_DISABLE_XDEBUG));
+        };
+
+        $this['environment.xdebug.loaded'] = function (): bool {
+            return \extension_loaded('xdebug');
+        };
+
+        $this['environment.phpdbg.used'] = function (): bool {
+            return PHP_SAPI == 'phpdbg';
+        };
     }
 
-    private function getInfectionConfig(): InfectionConfig
+    public function setInfectionConfigInitializer(\Closure $initializer)
     {
-        return $this['infection.config'];
+        $this[self::KEY_INFECTION_CONFIG] = $initializer;
+    }
+
+    public function getInfectionConfig(): InfectionConfig
+    {
+        return $this[self::KEY_INFECTION_CONFIG];
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @see \Psr\Container\ContainerInterface::get()
+     */
+    public function get($id)
+    {
+        return $this[$id];
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @see \Psr\Container\ContainerInterface::has()
+     */
+    public function has($id)
+    {
+        return isset($this[$id]);
     }
 }

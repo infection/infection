@@ -40,7 +40,7 @@ final class Application extends BaseApplication
 ASCII;
 
     /**
-     * @var Container
+     * @var InfectionContainer
      */
     private $container;
 
@@ -57,13 +57,19 @@ ASCII;
     /**
      * @var bool
      */
+    private $isUnderPhpdbg;
+
+    /**
+     * @var bool
+     */
     private $isDebuggerDisabled;
 
-    public function __construct(Container $container, string $name = self::NAME, string $version = self::VERSION)
+    public function __construct(InfectionContainer $container, string $name = self::NAME, string $version = self::VERSION)
     {
         $this->container = $container;
-        $this->isDebuggerDisabled = ('' === trim((string) getenv(XdebugHandler::ENV_DISABLE_XDEBUG)));
-        $this->isXdebugLoaded = \extension_loaded('xdebug');
+        $this->isDebuggerDisabled = $this->container['environment.debugger.disabled'];
+        $this->isXdebugLoaded = $this->container['environment.xdebug.loaded'];
+        $this->isUnderPhpdbg = $this->container['environment.phpdbg.used'];
 
         parent::__construct($name, $version);
 
@@ -82,7 +88,7 @@ ASCII;
 
         $this->io = new SymfonyStyle($input, $output);
 
-        if (PHP_SAPI === 'phpdbg') {
+        if ($this->isUnderPhpdbg) {
             $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, PHP_SAPI));
         } elseif ($this->isXdebugLoaded) {
             $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, 'xdebug'));
@@ -91,7 +97,7 @@ ASCII;
         $xdebug = new XdebugHandler(new ConfigBuilder(sys_get_temp_dir()));
         $xdebug->check();
 
-        if (PHP_SAPI !== 'phpdbg'
+        if (!$this->isUnderPhpdbg
             && $this->isDebuggerDisabled
             && !$this->isXdebugLoaded
             && !$input->hasParameterOption('--coverage', true)
@@ -172,7 +178,7 @@ ASCII;
         $output->getFormatter()->setStyle('high', new OutputFormatterStyle('green', null, ['bold']));
     }
 
-    public function getContainer(): Container
+    public function getContainer(): InfectionContainer
     {
         return $this->container;
     }
@@ -189,7 +195,7 @@ ASCII;
      */
     private function buildDynamicDependencies(InputInterface $input)
     {
-        $this->container['infection.config'] = function (Container $c) use ($input): InfectionConfig {
+        $this->container->setInfectionConfigInitializer(function (Container $c) use ($input): InfectionConfig {
             try {
                 $configPaths = [];
                 $customConfigPath = $input->getOption('configuration');
@@ -223,7 +229,7 @@ ASCII;
             }
 
             return new InfectionConfig($config, $c['filesystem'], $configLocation);
-        };
+        });
 
         $this->container['coverage.path'] = function (Container $c) use ($input): string {
             $existingCoveragePath = trim($input->getOption('coverage'));

@@ -172,7 +172,7 @@ final class InfectionCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $container = $this->getContainer();
-        $config = $container->get('infection.config');
+        $config = $container->getInfectionConfig();
 
         $bootstrap = $config->getBootstrap();
         if ($bootstrap) {
@@ -348,7 +348,7 @@ final class InfectionCommand extends BaseCommand
             ),
             new MutationTestingResultsLoggerSubscriber(
                 $this->output,
-                $this->getContainer()->get('infection.config'),
+                $this->getContainer()->getInfectionConfig(),
                 $metricsCalculator,
                 $this->getContainer()->get('filesystem'),
                 (int) $this->input->getOption('log-verbosity')

@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use Infection\Console\Application;
-use Pimple\Psr11\Container;
+use Infection\Console\InfectionContainer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 abstract class BaseCommand extends Command
 {
     /**
-     * @var Container
+     * @var InfectionContainer
      */
     private $container;
 
@@ -35,10 +35,10 @@ abstract class BaseCommand extends Command
      */
     protected $output;
 
-    public function getContainer(): Container
+    public function getContainer(): InfectionContainer
     {
-        if ($this->container === null) {
-            $this->container = new Container($this->getApplication()->getContainer());
+        if (!$this->container) {
+            $this->container = $this->getApplication()->getContainer();
         }
 
         return $this->container;
