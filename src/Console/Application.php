@@ -64,12 +64,12 @@ ASCII;
      */
     private $isDebuggerDisabled;
 
-    public function __construct(Container $container, string $name = self::NAME, string $version = self::VERSION)
+    public function __construct(InfectionContainer $container, string $name = self::NAME, string $version = self::VERSION)
     {
         $this->container = $container;
-        $this->isDebuggerDisabled = ('' === trim((string) getenv(XdebugHandler::ENV_DISABLE_XDEBUG)));
-        $this->isXdebugLoaded = \extension_loaded('xdebug');
-        $this->isUnderPhpdbg = PHP_SAPI == 'phpdbg';
+        $this->isDebuggerDisabled = $this->container['environment.debugger.disabled'];
+        $this->isXdebugLoaded = $this->container['environment.xdebug.loaded'];
+        $this->isUnderPhpdbg = $this->container['environment.phpdbg.used'];
 
         parent::__construct($name, $version);
 

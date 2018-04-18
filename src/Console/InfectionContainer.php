@@ -16,6 +16,7 @@ use Infection\EventDispatcher\EventDispatcher;
 use Infection\Finder\Locator;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutator\Util\MutatorsGenerator;
+use Infection\Php\XdebugHandler;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
@@ -172,6 +173,18 @@ final class InfectionContainer extends Container implements ContainerInterface
             $mutatorConfig = $this->getInfectionConfig()->getMutatorsConfiguration();
 
             return (new MutatorsGenerator($mutatorConfig))->generate();
+        };
+
+        $this['environment.debugger.disabled'] = function (): bool {
+            return '' == trim((string) getenv(XdebugHandler::ENV_DISABLE_XDEBUG));
+        };
+
+        $this['environment.xdebug.loaded'] = function (): bool {
+            return \extension_loaded('xdebug');
+        };
+
+        $this['environment.phpdbg.used'] = function (): bool {
+            return PHP_SAPI == 'phpdbg';
         };
     }
 
