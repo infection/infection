@@ -100,9 +100,12 @@ class ProcessBuilder
 
         $this->envCache = array_replace($_ENV, $_SERVER);
         /*
-         * We use our own php.ini, hence all other .ini files must be ignored.
+         * We use our own php.ini for CLI, hence all other .ini files must be ignored.
+         * For phpdbg no workarounds needed.
          */
-        $this->envCache[ConfigBuilder::ENV_PHP_INI_SCAN_DIR] = '';
+        if ('phpdbg' != PHP_SAPI) {
+            $this->envCache[ConfigBuilder::ENV_PHP_INI_SCAN_DIR] = '';
+        }
 
         return $this->envCache;
     }
