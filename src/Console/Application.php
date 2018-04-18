@@ -40,7 +40,7 @@ final class Application extends BaseApplication
 ASCII;
 
     /**
-     * @var Container
+     * @var InfectionContainer
      */
     private $container;
 
@@ -195,7 +195,7 @@ ASCII;
      */
     private function buildDynamicDependencies(InputInterface $input)
     {
-        $this->container['infection.config'] = function (Container $c) use ($input): InfectionConfig {
+        $this->container->setInfectionConfigInitializer(function (Container $c) use ($input): InfectionConfig {
             try {
                 $configPaths = [];
                 $customConfigPath = $input->getOption('configuration');
@@ -229,7 +229,7 @@ ASCII;
             }
 
             return new InfectionConfig($config, $c['filesystem'], $configLocation);
-        };
+        });
 
         $this->container['coverage.path'] = function (Container $c) use ($input): string {
             $existingCoveragePath = trim($input->getOption('coverage'));

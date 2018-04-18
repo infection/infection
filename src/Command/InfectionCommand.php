@@ -348,7 +348,7 @@ final class InfectionCommand extends BaseCommand
             ),
             new MutationTestingResultsLoggerSubscriber(
                 $this->output,
-                $this->getContainer()->get('infection.config'),
+                $this->getContainer()->getInfectionConfig(),
                 $metricsCalculator,
                 $this->getContainer()->get('filesystem'),
                 (int) $this->input->getOption('log-verbosity')

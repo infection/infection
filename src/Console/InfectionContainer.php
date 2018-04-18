@@ -42,6 +42,8 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class InfectionContainer extends Container implements ContainerInterface
 {
+    const KEY_INFECTION_CONFIG = 'infection.config';
+
     public function __construct(array $values = [])
     {
         parent::__construct($values);
@@ -173,9 +175,14 @@ final class InfectionContainer extends Container implements ContainerInterface
         };
     }
 
+    public function setInfectionConfigInitializer(\Closure $initializer)
+    {
+        $this[self::KEY_INFECTION_CONFIG] = $initializer;
+    }
+
     public function getInfectionConfig(): InfectionConfig
     {
-        return $this['infection.config'];
+        return $this[self::KEY_INFECTION_CONFIG];
     }
 
     /**
