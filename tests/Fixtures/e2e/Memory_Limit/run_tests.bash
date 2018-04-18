@@ -14,6 +14,7 @@ run () {
     fi
 
     diff -u -w expected-output.txt infection-log.txt
+    git diff --exit-code php.ini
 }
 
 
