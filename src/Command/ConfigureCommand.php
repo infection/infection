@@ -25,8 +25,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @internal
+ */
 final class ConfigureCommand extends BaseCommand
 {
+    const NONINTERACTIVE_MODE_ERROR = 'Infection config generator requires an interactive mode.';
+
     protected function configure()
     {
         $this->setName('configure')
@@ -43,7 +48,7 @@ final class ConfigureCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if (!$input->isInteractive()) {
-            $output->writeln('Infection config generator requires an interactive mode.');
+            $output->writeln(self::NONINTERACTIVE_MODE_ERROR);
 
             return 1;
         }

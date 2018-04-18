@@ -20,4 +20,11 @@
     <listeners>
         <listener class="\Mockery\Adapter\Phpunit\TestListener"></listener>
     </listeners>
+
+    <groups>
+        <exclude>
+            <group>large</group>
+        </exclude>
+    </groups>
+
 </phpunit>
