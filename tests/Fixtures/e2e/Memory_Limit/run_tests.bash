@@ -14,8 +14,9 @@ run () {
     fi
 
     diff -u -w expected-output.txt infection-log.txt
+    git diff --exit-code php.ini
 }
 
 
-run "../../../../bin/infection --mutators=FalseValue" "-n -c php.ini"
+run "../../../../bin/infection --mutators=FalseValue" "-c php.ini"
 
