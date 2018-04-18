@@ -43,7 +43,7 @@ class XdebugHandler
         $this->configBuilder = $configBuilder;
 
         $this->isLoaded = extension_loaded('xdebug');
-        $this->envScanDir = (string) getenv(ConfigBuilder::ENV_PHP_INI_SCAN_DIR);
+        $this->envScanDir = getenv(ConfigBuilder::ENV_PHP_INI_SCAN_DIR);
     }
 
     public function check()
@@ -64,6 +64,14 @@ class XdebugHandler
                     putenv(ConfigBuilder::ENV_PHP_INI_SCAN_DIR . '=' . $args[1]);
                 } else {
                     putenv(ConfigBuilder::ENV_PHP_INI_SCAN_DIR);
+                    /*
+                     * We need to remove this variable not only from global environment,
+                     * but also from our internal environment, because our subprocesses
+                     * may inherit from it in certain circumstances.
+                     *
+                     * @see \Infection\Process\Builder\ProcessBuilder
+                     */
+                    unset($_SERVER[ConfigBuilder::ENV_PHP_INI_SCAN_DIR], $_ENV[ConfigBuilder::ENV_PHP_INI_SCAN_DIR]);
                 }
             }
         }

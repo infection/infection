@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\Process\Builder;
 
 use Infection\Mutant\MutantInterface;
+use Infection\Php\ConfigBuilder;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Process\Process;
@@ -59,7 +60,7 @@ class ProcessBuilder
                 $phpExtraOptions
             ),
             null,
-            $includeArgs ? array_replace($_ENV, $_SERVER) : null,
+            $includeArgs ? $this->getOurEnvironment() : null,
             null,
             null
         );
@@ -79,7 +80,7 @@ class ProcessBuilder
                 $testFrameworkExtraOptions
             ),
             null,
-            array_replace($_ENV, $_SERVER),
+            $this->getOurEnvironment(),
             null,
             $this->timeout
         );
@@ -87,5 +88,22 @@ class ProcessBuilder
         $process->inheritEnvironmentVariables();
 
         return new MutantProcess($process, $mutant, $this->testFrameworkAdapter);
+    }
+
+    private $envCache;
+
+    private function getOurEnvironment()
+    {
+        if (isset($this->envCache)) {
+            return $this->envCache;
+        }
+
+        $this->envCache = array_replace($_ENV, $_SERVER);
+        /*
+         * We use our own php.ini, hence all other .ini files must be ignored.
+         */
+        $this->envCache[ConfigBuilder::ENV_PHP_INI_SCAN_DIR] = '';
+
+        return $this->envCache;
     }
 }
