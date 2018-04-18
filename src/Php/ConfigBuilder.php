@@ -31,6 +31,11 @@ final class ConfigBuilder
         $this->tempDir = $tempDir;
     }
 
+    public static function hasBuiltTempPhpConfig(): bool
+    {
+        return getenv(self::ENV_TEMP_PHP_CONFIG_PATH) !== false;
+    }
+
     /**
      * @return string|null config path
      *
@@ -38,7 +43,7 @@ final class ConfigBuilder
      */
     public function build()
     {
-        $tmpIniPath = (string) getenv(self::ENV_TEMP_PHP_CONFIG_PATH);
+        $tmpIniPath = getenv(self::ENV_TEMP_PHP_CONFIG_PATH);
 
         if (!empty($tmpIniPath) && file_exists($tmpIniPath)) {
             return $tmpIniPath;
