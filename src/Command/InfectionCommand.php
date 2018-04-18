@@ -277,6 +277,11 @@ final class InfectionCommand extends BaseCommand
 
     private function applyMemoryLimitFromPhpUnitProcess(Process $process, PhpUnitAdapter $adapter)
     {
+        if (PHP_SAPI == 'phpdbg') {
+            // Under phpdbg we're using a system php.ini, can't add a memory limit there
+            return;
+        }
+
         $tempConfigPath = \php_ini_loaded_file();
 
         if (empty($tempConfigPath) || !file_exists($tempConfigPath) || !is_writable($tempConfigPath)) {
