@@ -20,9 +20,16 @@ final class VanillaPhpProcess extends Process
     {
         // Save previous state
         $before = [
-            ConfigBuilder::ENV_PHP_INI_SCAN_DIR => $_ENV[ConfigBuilder::ENV_PHP_INI_SCAN_DIR] ?? $_SERVER[ConfigBuilder::ENV_PHP_INI_SCAN_DIR],
-            ConfigBuilder::ENV_PHPRC => $_ENV[ConfigBuilder::ENV_PHPRC] ?? $_SERVER[ConfigBuilder::ENV_PHPRC],
+            ConfigBuilder::ENV_PHP_INI_SCAN_DIR => $_ENV[ConfigBuilder::ENV_PHP_INI_SCAN_DIR] ?? $_SERVER[ConfigBuilder::ENV_PHP_INI_SCAN_DIR] ?? null,
+            ConfigBuilder::ENV_PHPRC => $_ENV[ConfigBuilder::ENV_PHPRC] ?? $_SERVER[ConfigBuilder::ENV_PHPRC] ?? null,
         ];
+
+        // No previous state - no problem; starting it as it is
+        if (!array_filter($before)) {
+            parent::start($callback, $env);
+
+            return;
+        }
 
         // Remove directions to use our custom php.ini without xdebug
         unset($_ENV[ConfigBuilder::ENV_PHP_INI_SCAN_DIR]);
@@ -37,9 +44,11 @@ final class VanillaPhpProcess extends Process
 
         // Restore previous state
         foreach ($before as $key => $value) {
-            $_ENV[$key] = $value;
-            $_SERVER[$key] = $value;
-            putenv($key . '=' . $value);
+            if (null !== $value) {
+                $_ENV[$key] = $value;
+                $_SERVER[$key] = $value;
+                putenv($key . '=' . $value);
+            }
         }
     }
 }
