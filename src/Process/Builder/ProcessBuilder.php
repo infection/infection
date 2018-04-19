@@ -51,7 +51,9 @@ class ProcessBuilder
         array $phpExtraOptions = []
     ): Process {
         // If we're expecting to receive a code coverage, test process must run in a vanilla environment
-        $process = new VanillaPhpProcess(
+        $processType = $skipCoverage ? Process::class : VanillaPhpProcess::class;
+
+        $process = new $processType(
             $this->testFrameworkAdapter->getExecutableCommandLine(
                 $this->testFrameworkAdapter->buildInitialConfigFile(),
                 $testFrameworkExtraOptions,
