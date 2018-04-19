@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Infection\Process\Builder;
 
 use Infection\Mutant\MutantInterface;
-use Infection\Php\ConfigBuilder;
+use Infection\Php\VanillaPhpProcess;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Process\Process;
@@ -50,17 +50,8 @@ class ProcessBuilder
         bool $skipCoverage,
         array $phpExtraOptions = []
     ): Process {
-        $env = array_replace($_ENV, $_SERVER);
-
         // If we're expecting to receive a code coverage, test process must run in a vanilla environment
-        if (!$skipCoverage) {
-            $env = array_replace($_ENV, $_SERVER);
-            // Remove directions to use our custom php.ini without xdebug
-            unset($env[ConfigBuilder::ENV_PHP_INI_SCAN_DIR]);
-            unset($env[ConfigBuilder::ENV_PHPRC]);
-        }
-
-        $process = new Process(
+        $process = new VanillaPhpProcess(
             $this->testFrameworkAdapter->getExecutableCommandLine(
                 $this->testFrameworkAdapter->buildInitialConfigFile(),
                 $testFrameworkExtraOptions,
@@ -68,14 +59,12 @@ class ProcessBuilder
                 $phpExtraOptions
             ),
             null,
-            $env,
+            null,
             null,
             null
         );
 
-        if ($skipCoverage) {
-            $process->inheritEnvironmentVariables();
-        }
+        $process->inheritEnvironmentVariables();
 
         return $process;
     }
@@ -88,7 +77,7 @@ class ProcessBuilder
                 $testFrameworkExtraOptions
             ),
             null,
-            array_replace($_ENV, $_SERVER),
+            null,
             null,
             $this->timeout
         );
