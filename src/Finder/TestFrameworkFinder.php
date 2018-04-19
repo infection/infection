@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace Infection\Finder;
 
 use Infection\Finder\Exception\FinderException;
+use Infection\Php\VanillaPhpProcess;
 use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\Process;
 
 /**
  * @internal
@@ -70,8 +70,10 @@ class TestFrameworkFinder extends AbstractExecutableFinder
         $vendorPath = null;
 
         try {
-            $process = new Process(sprintf('%s %s', $this->findComposer(), 'config bin-dir'));
+            // Composer has its own workarounds for xdebug etc
+            $process = new VanillaPhpProcess(sprintf('%s %s', $this->findComposer(), 'config bin-dir'));
             $process->mustRun();
+
             $vendorPath = trim($process->getOutput());
         } catch (\RuntimeException $e) {
             $candidate = getcwd() . '/vendor/bin';

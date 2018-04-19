@@ -14,11 +14,11 @@ use Infection\Command\ConfigureCommand;
 use Infection\Console\Application;
 use Infection\Console\InfectionContainer;
 use Infection\Finder\ComposerExecutableFinder;
+use Infection\Php\VanillaPhpProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Process\Process;
 
 class E2ETest extends TestCase
 {
@@ -160,7 +160,7 @@ class E2ETest extends TestCase
             // Install deps only if there's none
             $this->assertNotEmpty(getenv('PATH') ?: getenv('Path'), 'E2E tests need a system composer installed, but it could not be found without a PATH set');
 
-            $process = new Process(sprintf('%s %s', (new ComposerExecutableFinder())->find(), 'install'));
+            $process = new VanillaPhpProcess(sprintf('%s %s', (new ComposerExecutableFinder())->find(), 'install'));
             $process->mustRun();
         }
 
