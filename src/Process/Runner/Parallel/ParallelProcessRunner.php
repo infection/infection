@@ -26,6 +26,16 @@ final class ParallelProcessRunner
      */
     private $eventDispatcher;
 
+    /**
+     * @var MutantProcess[]
+     */
+    private $processesQueue;
+
+    /**
+     * @var MutantProcess[]
+     */
+    private $currentProcesses = [];
+
     public function __construct(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
@@ -41,27 +51,25 @@ final class ParallelProcessRunner
      */
     public function run(array $processes, int $threadCount, int $poll = 1000)
     {
-        $threadCount = $threadCount <= 0 ? 1 : $threadCount;
-        // do not modify the object pointers in the argument, copy to local working variable
-        $processesQueue = $processes;
+        if (!$this->processesQueue = $processes) {
+            // nothing to do here
+            return;
+        }
 
         // fix maxParallel to be max the number of processes or positive
-        $maxParallel = min(abs($threadCount), count($processesQueue));
+        $maxParallel = min(max($threadCount, 1), count($this->processesQueue));
 
-        // get the first stack of processes to start at the same time
-        /** @var MutantProcess[] $currentProcesses */
-        $currentProcesses = array_splice($processesQueue, 0, $maxParallel);
-
-        // start the initial stack of processes
-        foreach ($currentProcesses as $process) {
-            $process->getProcess()->start();
-        }
+        // start the initial batch of processes
+        do {
+            $this->startProcess();
+        } while ($this->processesQueue && count($this->currentProcesses) < $maxParallel);
 
         do {
             usleep($poll);
 
             // remove all finished processes from the stack
-            foreach ($currentProcesses as $index => $mutantProcess) {
+            foreach ($this->currentProcesses as $index => $mutantProcess) {
+                /** @var MutantProcess $mutantProcess */
                 $process = $mutantProcess->getProcess();
 
                 try {
@@ -73,28 +81,36 @@ final class ParallelProcessRunner
                 if (!$process->isRunning()) {
                     $this->eventDispatcher->dispatch(new MutantProcessFinished($mutantProcess));
 
-                    unset($currentProcesses[$index]);
+                    unset($this->currentProcesses[$index]);
 
-                    // directly add and start new process after the previous finished
-                    if (count($processesQueue) > 0) {
-                        $nextProcessFound = false;
-
-                        do {
-                            $nextProcess = array_shift($processesQueue);
-                            $mutant = $nextProcess->getMutant();
-
-                            if ($mutant->isCoveredByTest()) {
-                                $nextProcess->getProcess()->start();
-                                $nextProcessFound = true;
-                                $currentProcesses[] = $nextProcess;
-                            } else {
-                                $this->eventDispatcher->dispatch(new MutantProcessFinished($nextProcess));
-                            }
-                        } while (!$nextProcessFound && count($processesQueue) > 0);
+                    // directly add and start a new process after the previous finished
+                    while ($this->processesQueue) {
+                        if ($this->startProcess()) {
+                            break;
+                        }
                     }
                 }
             }
             // continue loop while there are processes being executed or waiting for execution
-        } while (count($processesQueue) > 0 || count($currentProcesses) > 0);
+        } while ($this->processesQueue || $this->currentProcesses);
+    }
+
+    private function startProcess(): bool
+    {
+        $mutantProcess = array_shift($this->processesQueue);
+        /** @var MutantProcess $mutantProcess */
+        $mutant = $mutantProcess->getMutant();
+
+        if (!$mutant->isCoveredByTest()) {
+            $this->eventDispatcher->dispatch(new MutantProcessFinished($mutantProcess));
+
+            return false;
+        }
+
+        $mutantProcess->getProcess()->start();
+
+        $this->currentProcesses[] = $mutantProcess;
+
+        return true;
     }
 }
