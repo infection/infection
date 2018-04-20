@@ -48,9 +48,7 @@ final class ConfigBuilder
         $iniPaths = PhpIniHelper::get();
 
         if ($this->writeTempIni($iniPaths)) {
-            $additional = count($iniPaths) > 1;
-
-            $this->setEnvironment($additional);
+            $this->setEnvironment();
 
             return $this->tmpIniPath;
         }
@@ -112,14 +110,13 @@ final class ConfigBuilder
         return (bool) @file_put_contents($this->tmpIniPath, $content);
     }
 
-    private function setEnvironment(bool $additional)
+    private function setEnvironment()
     {
-        if ($additional) {
-            // if there are any additional .ini files, we need to ignore them
-            putenv(self::ENV_PHP_INI_SCAN_DIR . '=');
-        }
-
+        // Set all child processes to use our php.ini
         putenv(self::ENV_PHPRC . '=' . dirname($this->tmpIniPath));
+        // We need to ignore all additional .ini files (our php.ini has everything)
+        putenv(self::ENV_PHP_INI_SCAN_DIR . '=');
+
         putenv(self::ENV_TEMP_PHP_CONFIG_PATH . '=' . $this->tmpIniPath);
     }
 }
