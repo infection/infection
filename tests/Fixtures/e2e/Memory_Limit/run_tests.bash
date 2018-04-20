@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+if [ "$PHPDBG" = "1" ]
+then
+    # Memory limit cannot be enforced from our custom php.ini
+    # under PHPDBG, hence this test shows nothing under PHPDBG
+    exit 0
+fi
+
 set -e
 
 run () {
