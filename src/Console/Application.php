@@ -88,6 +88,19 @@ ASCII;
             $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, 'xdebug'));
         }
 
+        if (!$this->isAutoExitEnabled()) {
+            // When we're not in control of exit codes, that means it's the caller
+            // responsibilty to disable xdebug if it isn't needed. As of writing
+            // that's only the case during E2E testing. Show a warning nevertheless.
+
+            $this->io->warning([
+                'Infection cannot control exit codes and unable to relaunch itself.' . PHP_EOL .
+                'It is your responsibilty to disable xdebug/phpdbg unless needed.',
+            ]);
+
+            return parent::run($input, $output);
+        }
+
         $xdebug = new XdebugHandler(new ConfigBuilder(sys_get_temp_dir()));
         $xdebug->check();
 
