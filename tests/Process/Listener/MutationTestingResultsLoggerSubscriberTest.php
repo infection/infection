@@ -119,7 +119,8 @@ class MutationTestingResultsLoggerSubscriberTest extends TestCase
             $this->output,
             $this->infectionConfig,
             $this->metricsCalculator,
-            $this->filesystem
+            $this->filesystem,
+            LogVerbosity::DEBUG
         ));
 
         $dispatcher->dispatch(new MutationTestingFinished());
@@ -159,8 +160,7 @@ class MutationTestingResultsLoggerSubscriberTest extends TestCase
             $this->output,
             $this->infectionConfig,
             $this->metricsCalculator,
-            $this->filesystem,
-            LogVerbosity::NORMAL
+            $this->filesystem
         ));
 
         $dispatcher->dispatch(new MutationTestingFinished());
