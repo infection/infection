@@ -1,9 +1,8 @@
 # Title
 
-* Link to github ticket if relevant
+Fixes https://github.com/infection/infection/issues/295
 
 ## Summary
-Short summary of the ticket
 
-## Full Ticket
-Full github ticket
+If PATH/Path is not set, fall back to `vendor/bin` in ComposerExecutableFinder
+and continue Infection execution instead of displaying a weird error
