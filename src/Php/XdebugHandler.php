@@ -31,11 +31,6 @@ class XdebugHandler
     /**
      * @var string
      */
-    private $envScanDir;
-
-    /**
-     * @var string
-     */
     private $tmpIniPath;
 
     public function __construct(ConfigBuilder $configBuilder)
@@ -43,39 +38,30 @@ class XdebugHandler
         $this->configBuilder = $configBuilder;
 
         $this->isLoaded = extension_loaded('xdebug');
-        $this->envScanDir = (string) getenv(ConfigBuilder::ENV_PHP_INI_SCAN_DIR);
     }
 
     public function check()
     {
-        $args = explode('|', (string) getenv(self::ENV_DISABLE_XDEBUG));
-        if ($this->needsRestart($args[0])) {
+        $status = (string) getenv(self::ENV_DISABLE_XDEBUG);
+
+        if ($this->needsRestart($status)) {
             if ($this->prepareRestart()) {
                 $this->restart($this->getCommand());
             }
         }
 
-        if (self::RESTART_HANDLE === $args[0]) {
+        if (self::RESTART_HANDLE == $status) {
             putenv(self::ENV_DISABLE_XDEBUG);
-
-            if (false !== $this->envScanDir) {
-                // $args[1] contains the original value
-                if (isset($args[1])) {
-                    putenv(ConfigBuilder::ENV_PHP_INI_SCAN_DIR . '=' . $args[1]);
-                } else {
-                    putenv(ConfigBuilder::ENV_PHP_INI_SCAN_DIR);
-                }
-            }
         }
     }
 
     private function needsRestart(string $allow): bool
     {
-        if (PHP_SAPI !== 'cli' || \defined('PHP_BINARY') === false) {
+        if (PHP_SAPI != 'cli' || \defined('PHP_BINARY') == false) {
             return false;
         }
 
-        return $this->isLoaded && '' === $allow;
+        return $this->isLoaded && '' == $allow;
     }
 
     private function prepareRestart(): bool

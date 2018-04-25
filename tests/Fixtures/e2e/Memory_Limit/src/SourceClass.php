@@ -9,7 +9,7 @@ class SourceClass
         $result = [];
 
         do {
-            $result[] = new \SplFixedArray(1<<23);
+            $result[] = new \SplFixedArray(1<<22);
         } while (false);
 
         return count($result);

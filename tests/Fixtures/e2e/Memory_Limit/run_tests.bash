@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+if [ "$PHPDBG" = "1" ]
+then
+    # Memory limit cannot be enforced from our custom php.ini
+    # under PHPDBG, hence this test shows nothing under PHPDBG
+    exit 0
+fi
+
 set -e
 
 run () {
@@ -14,8 +21,9 @@ run () {
     fi
 
     diff -u -w expected-output.txt infection-log.txt
+    git diff --exit-code php.ini
 }
 
 
-run "../../../../bin/infection --mutators=FalseValue" "-n -c php.ini"
+run "../../../../bin/infection --mutators=FalseValue" "-c php.ini"
 

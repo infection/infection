@@ -9,41 +9,21 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\ExecutableFinder;
 
-use Infection\Php\ConfigBuilder;
 use Infection\Process\ExecutableFinder\PhpExecutableFinder;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
 
 class PhpExecutableFinderTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private $workspace;
-
-    public function setUp()
-    {
-        putenv(ConfigBuilder::ENV_TEMP_PHP_CONFIG_PATH);
-
-        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . microtime(true) . random_int(100, 999);
-        mkdir($this->workspace, 0777, true);
-    }
-
-    public function test_it_find_temp_php_config()
+    public function test_it_finds_needed_args()
     {
         $finder = new PhpExecutableFinder();
 
-        $tempConfig = $this->workspace . DIRECTORY_SEPARATOR . 'php.ini';
+        if ('phpdbg' == PHP_SAPI) {
+            $this->assertSame(['-qrr'], $finder->findArguments());
 
-        touch($tempConfig);
+            return;
+        }
 
-        putenv(ConfigBuilder::ENV_TEMP_PHP_CONFIG_PATH . '=' . $tempConfig);
-
-        $this->assertSame(['-c', $tempConfig], $finder->findArguments());
-    }
-
-    public function tearDown()
-    {
-        (new Filesystem())->remove($this->workspace);
+        $this->assertSame([], $finder->findArguments());
     }
 }
