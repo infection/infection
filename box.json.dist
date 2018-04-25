@@ -1,4 +1,5 @@
 {
+    "output": "build/bin/infection.phar",
     "chmod": "0755",
 
     "algorithm": "OPENSSL",

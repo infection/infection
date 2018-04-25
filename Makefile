@@ -125,7 +125,7 @@ phpstan: vendor $(PHPSTAN)
 validate:
 	composer validate --strict
 
-bin/infection.phar: app bin src vendor box.json.dist scoper.inc.php box.phar
+build/bin/infection.phar: app bin src vendor box.json.dist scoper.inc.php box.phar
 	php box.phar compile
 
 box.phar:

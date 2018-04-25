@@ -8,4 +8,5 @@
 /.travis/infection-private.pem
 /infection.json
 /*.phar
-/bin/infection.phar
+/build/bin/infection.phar
+/build/bin/infection.phar.pubkey
