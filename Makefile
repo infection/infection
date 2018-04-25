@@ -14,7 +14,7 @@ build/cache:
 	mkdir -p build/cache
 
 ./php-cs-fixer-v2.phar:
-	wget http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar
+	wget https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar
 	chmod a+x ./php-cs-fixer-v2.phar
 
 ./phpstan.phar:
