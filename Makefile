@@ -21,7 +21,6 @@ build/cache:
 	wget https://github.com/phpstan/phpstan/releases/download/0.9.1/phpstan.phar
 	chmod a+x ./phpstan.phar
 
-
 #All tests, (infection itself, phpunit, e2e) for different php version/ environments (xdebug or phpdbg)
 .PHONY: test test-unit test-infection-phpdbg test-e2e-phpdbg test-infection-xdebug test-e2e-xdebug test-final-private
 test: test-unit test-infection-phpdbg test-e2e-phpdbg test-infection-xdebug test-e2e-xdebug test-final-private
@@ -125,3 +124,10 @@ phpstan: vendor $(PHPSTAN)
 
 validate:
 	composer validate --strict
+
+build/bin/infection.phar: app bin src vendor box.json.dist scoper.inc.php box.phar
+	php box.phar compile
+
+box.phar:
+	wget https://github.com/humbug/box/releases/download/3.0.0-alpha.2/box.phar
+	chmod a+x box.phar
