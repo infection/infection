@@ -90,7 +90,7 @@ class E2ETest extends TestCase
      * @dataProvider e2eTestSuiteDataProvider
      * @group e2e
      */
-    public function test_it_runs_an_e2e_test_with_success(string $e2eTestName, string $fullPath)
+    public function test_it_runs_an_e2e_test_with_success(string $fullPath)
     {
         $this->runOnE2EFixture($fullPath);
     }
@@ -109,12 +109,7 @@ class E2ETest extends TestCase
                 continue;
             }
 
-            yield [
-                // Makes PHPUnit report readable errors on failure:
-                // ...with data set #0 ('Foo_bar', ...
-                basename((string) $dirName),
-                $dirName,
-            ];
+            yield basename((string) $dirName) => [$dirName];
         }
     }
 
