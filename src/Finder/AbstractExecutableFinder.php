@@ -21,17 +21,23 @@ abstract class AbstractExecutableFinder
      */
     protected function searchNonExecutables(array $probableNames, array $extraDirectories = [])
     {
+        $path = getenv('PATH') ?: getenv('Path');
+
+        if (!$path) {
+            return null;
+        }
+
         $dirs = array_merge(
-            explode(PATH_SEPARATOR, getenv('PATH') ?: getenv('Path')),
+            explode(PATH_SEPARATOR, $path),
             $extraDirectories
         );
 
         foreach ($dirs as $dir) {
             foreach ($probableNames as $name) {
-                $path = sprintf('%s/%s', $dir, $name);
+                $fileName = sprintf('%s/%s', $dir, $name);
 
-                if (file_exists($path)) {
-                    return $path;
+                if (file_exists($fileName)) {
+                    return $fileName;
                 }
             }
         }
