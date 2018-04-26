@@ -135,6 +135,7 @@ final class MutatorProfile
     const DEFAULT = [
         '@arithmetic',
         '@boolean',
+        '@cast',
         '@conditional_boundary',
         '@conditional_negotiation',
         '@function_signature',
