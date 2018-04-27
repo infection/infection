@@ -125,9 +125,21 @@ phpstan: vendor $(PHPSTAN)
 validate:
 	composer validate --strict
 
-build/bin/infection.phar: app bin src vendor box.json.dist scoper.inc.php box.phar
+build/bin/infection.phar: app bin src vendor box.json.dist scoper.inc.php box.phar .travis/infection-private.pem
 	php box.phar compile
 
 box.phar:
 	wget https://github.com/humbug/box/releases/download/3.0.0-alpha.2/box.phar
 	chmod a+x box.phar
+
+.travis/infection-private.pem:
+	openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout .travis/infection-private.pem -subj "/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=example.com"
+
+.PHONY: clean
+clean:
+	rm -rf build/bin/infection.phar
+	rm -rf /usr/local/bin/infection
+
+.PHONY: link
+link: build/bin/infection.phar
+	ln -s $(pwd)/build/bin/infection.phar /usr/local/bin/infection
