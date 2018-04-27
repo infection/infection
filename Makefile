@@ -133,10 +133,11 @@ box.phar:
 	chmod a+x box.phar
 
 .travis/infection-private.pem:
-	openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout .travis/infection-private.pem -subj "/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=example.com"
+	openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout .travis/infection-private.pem -out /dev/null -subj "/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=example.com"
 
 .PHONY: clean
 clean:
+	rm -rf box.phar*
 	rm -rf build/bin/infection.phar
 	rm -rf /usr/local/bin/infection
 
