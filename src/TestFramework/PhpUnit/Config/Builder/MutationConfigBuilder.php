@@ -65,10 +65,12 @@ class MutationConfigBuilder extends ConfigBuilder
             $mutant->getMutation()->getHash()
         );
 
-        $this->setCustomAutoLoaderPath($customAutoloadFilePath);
+        $originalAutoloadFile = $this->getOriginalBootstrapFilePath();
+
+        $this->setCustomBootstrapPath($customAutoloadFilePath);
         $this->setFilteredTestsToRun($mutant->getCoverageTests());
 
-        file_put_contents($customAutoloadFilePath, $this->createCustomAutoloadWithInterceptor($mutant));
+        file_put_contents($customAutoloadFilePath, $this->createCustomAutoloadWithInterceptor($mutant, $originalAutoloadFile));
 
         $path = $this->buildPath($mutant);
 
@@ -77,20 +79,17 @@ class MutationConfigBuilder extends ConfigBuilder
         return $path;
     }
 
-    private function createCustomAutoloadWithInterceptor(MutantInterface $mutant): string
+    private function createCustomAutoloadWithInterceptor(MutantInterface $mutant, string $originalAutoloadFile): string
     {
         $originalFilePath = $mutant->getMutation()->getOriginalFilePath();
         $mutatedFilePath = $mutant->getMutatedFilePath();
         $interceptorPath = dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
 
-        // TODO change to what it was (e.g. app/autoload - see simplehabits)
-        $autoload = sprintf('%s/vendor/autoload.php', $this->projectDir);
-
         $customAutoload = <<<AUTOLOAD
 <?php
 
-require_once '{$autoload}';
 %s
+require_once '{$originalAutoloadFile}';
 
 AUTOLOAD;
 
@@ -104,7 +103,7 @@ AUTOLOAD;
         return $this->tempDirectory . '/' . $fileName;
     }
 
-    private function setCustomAutoLoaderPath(string $customAutoloadFilePath)
+    private function setCustomBootstrapPath(string $customAutoloadFilePath)
     {
         $nodeList = $this->xPath->query('/phpunit/@bootstrap');
 
@@ -186,5 +185,16 @@ AUTOLOAD;
         }
 
         return $uniqueTests;
+    }
+
+    private function getOriginalBootstrapFilePath(): string
+    {
+        $nodeList = $this->xPath->query('/phpunit/@bootstrap');
+
+        if ($nodeList->length) {
+            return $nodeList[0]->nodeValue;
+        }
+
+        return sprintf('%s/vendor/autoload.php', $this->projectDir);
     }
 }
