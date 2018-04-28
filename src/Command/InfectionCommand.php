@@ -482,13 +482,8 @@ final class InfectionCommand extends BaseCommand
     {
         parent::initialize($input, $output);
 
-        $customConfigPath = $input->getOption('configuration');
-
-        if ($customConfigPath && !file_exists($customConfigPath)) {
-            throw LocatorException::fileOrDirectoryDoesNotExist($customConfigPath);
-        }
-
-        if ($customConfigPath) {
+        if ($customConfigPath = $input->getOption('configuration')) {
+            $this->getContainer()->get('locator')->locate($customConfigPath);
             $this->doInitialize($input);
 
             return;
