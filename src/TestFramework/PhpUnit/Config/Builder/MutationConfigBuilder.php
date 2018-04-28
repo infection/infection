@@ -38,6 +38,11 @@ class MutationConfigBuilder extends ConfigBuilder
      */
     private $originalXmlConfigContent;
 
+    /**
+     * @var \DOMDocument
+     */
+    private $dom;
+
     public function __construct(string $tempDirectory, string $originalXmlConfigContent, XmlConfigurationHelper $xmlConfigurationHelper, string $projectDir)
     {
         $this->tempDirectory = $tempDirectory;
@@ -45,14 +50,17 @@ class MutationConfigBuilder extends ConfigBuilder
 
         $this->xmlConfigurationHelper = $xmlConfigurationHelper;
         $this->originalXmlConfigContent = $originalXmlConfigContent;
+
+        $this->dom = new \DOMDocument();
+        $this->dom->preserveWhiteSpace = false;
+        $this->dom->formatOutput = true;
+        $this->dom->loadXML($this->originalXmlConfigContent);
     }
 
     public function build(MutantInterface $mutant): string
     {
-        $dom = new \DOMDocument();
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $dom->loadXML($this->originalXmlConfigContent);
+        // clone the dom document because it's mutated later
+        $dom = clone $this->dom;
 
         $xPath = new \DOMXPath($dom);
 
