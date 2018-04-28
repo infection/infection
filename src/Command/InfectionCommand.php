@@ -483,14 +483,22 @@ final class InfectionCommand extends BaseCommand
         parent::initialize($input, $output);
 
         $customConfigPath = $input->getOption('configuration');
-        $configExists = $customConfigPath && file_exists($customConfigPath);
 
-        if (!$configExists) {
-            $configExists = file_exists(InfectionConfig::CONFIG_FILE_NAME)
-                || file_exists(InfectionConfig::CONFIG_FILE_NAME . '.dist');
+        if ($customConfigPath && !file_exists($customConfigPath)) {
+            throw LocatorException::fileOrDirectoryDoesNotExist($customConfigPath);
         }
 
-        if (!$configExists) {
+        if ($customConfigPath) {
+            $this->doInitialize($input);
+
+            return;
+        }
+
+        try {
+            $this->getContainer()
+                ->get('locator')
+                ->locateAnyOf(InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES);
+        } catch (\Exception $e) {
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [
@@ -505,7 +513,11 @@ final class InfectionCommand extends BaseCommand
                 throw InfectionException::configurationAborted();
             }
         }
+        $this->doInitialize($input);
+    }
 
+    private function doInitialize(InputInterface $input)
+    {
         $this->io = $this->getApplication()->getIO();
         $this->eventDispatcher = $this->getContainer()->get('dispatcher');
         $this->skipCoverage = \strlen(trim($input->getOption('coverage'))) > 0;

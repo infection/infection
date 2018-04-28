@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
+use Infection\Config\Exception\InvalidConfigException;
 use Infection\Config\InfectionConfig;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
@@ -34,6 +35,7 @@ use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use Pimple\Container;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -175,5 +177,55 @@ final class InfectionContainer extends Container
     private function getInfectionConfig(): InfectionConfig
     {
         return $this['infection.config'];
+    }
+
+    public function buildDynamicDependencies(InputInterface $input)
+    {
+        $this['infection.config'] = function () use ($input): InfectionConfig {
+            try {
+                $configPaths = [];
+                $customConfigPath = $input->getOption('configuration');
+
+                if ($customConfigPath) {
+                    $configPaths[] = $customConfigPath;
+                }
+
+                $configPaths = array_merge(
+                    $configPaths,
+                    InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES
+                );
+
+                $infectionConfigFile = $this['locator']->locateAnyOf($configPaths);
+                $configLocation = \pathinfo($infectionConfigFile, PATHINFO_DIRNAME);
+                $json = file_get_contents($infectionConfigFile);
+            } catch (\Exception $e) {
+                $infectionConfigFile = null;
+                $json = '{}';
+                $configLocation = getcwd();
+            }
+
+            $config = json_decode($json);
+
+            if (is_string($infectionConfigFile) && null === $config && JSON_ERROR_NONE !== json_last_error()) {
+                throw InvalidConfigException::invalidJson(
+                    $infectionConfigFile,
+                    json_last_error_msg()
+                );
+            }
+
+            return new InfectionConfig($config, $this['filesystem'], $configLocation);
+        };
+
+        $this['coverage.path'] = function () use ($input): string {
+            $existingCoveragePath = trim($input->getOption('coverage'));
+
+            if ($existingCoveragePath === '') {
+                return $this['tmp.dir'];
+            }
+
+            return $this['filesystem']->isAbsolutePath($existingCoveragePath)
+                ? $existingCoveragePath
+                : sprintf('%s/%s', getcwd(), $existingCoveragePath);
+        };
     }
 }
