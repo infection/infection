@@ -56,6 +56,7 @@ install:
       composer config --unset platform.php
       composer require \
         symfony/console:${SYMFONY_VERSION} \
+        symfony/filesystem:${SYMFONY_VERSION} \
         symfony/process:${SYMFONY_VERSION} \
         symfony/finder:${SYMFONY_VERSION} \
         symfony/yaml:${SYMFONY_VERSION}

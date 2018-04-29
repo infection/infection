@@ -144,6 +144,7 @@ abstract class AbstractTestFrameworkAdapter
     private function findPhp(bool $includeArgs = true): string
     {
         if ($this->cachedPhpPath === null || $this->cachedIncludedArgs !== $includeArgs) {
+            $this->cachedIncludedArgs = $includeArgs;
             $this->cachedPhpPath = (new PhpExecutableFinder())->find($includeArgs);
         }
 
