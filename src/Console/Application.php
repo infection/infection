@@ -11,10 +11,7 @@ namespace Infection\Console;
 
 use Composer\XdebugHandler\XdebugHandler;
 use Infection\Command;
-use Infection\Config\Exception\InvalidConfigException;
-use Infection\Config\InfectionConfig;
 use PackageVersions\Versions;
-use Pimple\Container;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -41,7 +38,7 @@ final class Application extends BaseApplication
 ASCII;
 
     /**
-     * @var Container
+     * @var InfectionContainer
      */
     private $container;
 
@@ -55,7 +52,7 @@ ASCII;
      */
     private $isXdebugLoaded;
 
-    public function __construct(Container $container, string $name = self::NAME, string $version = self::VERSION)
+    public function __construct(InfectionContainer $container, string $name = self::NAME, string $version = self::VERSION)
     {
         $this->container = $container;
         $this->isXdebugLoaded = \extension_loaded('xdebug');
@@ -129,7 +126,7 @@ ASCII;
 
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        $this->buildDynamicDependencies($input);
+        $this->getContainer()->buildDynamicDependencies($input);
 
         $output->writeln(self::LOGO);
 
@@ -180,7 +177,7 @@ ASCII;
         $output->getFormatter()->setStyle('high', new OutputFormatterStyle('green', null, ['bold']));
     }
 
-    public function getContainer(): Container
+    public function getContainer(): InfectionContainer
     {
         return $this->container;
     }
@@ -188,61 +185,5 @@ ASCII;
     public function getIO(): SymfonyStyle
     {
         return $this->io;
-    }
-
-    /**
-     * @param InputInterface $input
-     *
-     * @throws InvalidConfigException
-     */
-    private function buildDynamicDependencies(InputInterface $input)
-    {
-        $this->container['infection.config'] = function (Container $c) use ($input): InfectionConfig {
-            try {
-                $configPaths = [];
-                $customConfigPath = $input->getOption('configuration');
-
-                if ($customConfigPath) {
-                    $configPaths[] = $customConfigPath;
-                }
-
-                array_push(
-                    $configPaths,
-                    InfectionConfig::CONFIG_FILE_NAME,
-                    InfectionConfig::CONFIG_FILE_NAME . '.dist'
-                );
-
-                $infectionConfigFile = $c['locator']->locateAnyOf($configPaths);
-                $configLocation = \pathinfo($infectionConfigFile, PATHINFO_DIRNAME);
-                $json = file_get_contents($infectionConfigFile);
-            } catch (\Exception $e) {
-                $infectionConfigFile = null;
-                $json = '{}';
-                $configLocation = getcwd();
-            }
-
-            $config = json_decode($json);
-
-            if (is_string($infectionConfigFile) && null === $config && JSON_ERROR_NONE !== json_last_error()) {
-                throw InvalidConfigException::invalidJson(
-                    $infectionConfigFile,
-                    json_last_error_msg()
-                );
-            }
-
-            return new InfectionConfig($config, $c['filesystem'], $configLocation);
-        };
-
-        $this->container['coverage.path'] = function (Container $c) use ($input): string {
-            $existingCoveragePath = trim($input->getOption('coverage'));
-
-            if ($existingCoveragePath === '') {
-                return $c['tmp.dir'];
-            }
-
-            return $c['filesystem']->isAbsolutePath($existingCoveragePath)
-                ? $existingCoveragePath
-                : sprintf('%s/%s', getcwd(), $existingCoveragePath);
-        };
     }
 }

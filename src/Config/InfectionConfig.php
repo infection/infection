@@ -20,6 +20,10 @@ class InfectionConfig
     const DEFAULT_SOURCE_DIRS = ['.'];
     const DEFAULT_EXCLUDE_DIRS = ['vendor'];
     const CONFIG_FILE_NAME = 'infection.json';
+    const POSSIBLE_CONFIG_FILE_NAMES = [
+        self::CONFIG_FILE_NAME,
+        self::CONFIG_FILE_NAME . '.dist',
+    ];
 
     /**
      * @var \stdClass
