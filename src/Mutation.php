@@ -49,6 +49,11 @@ final class Mutation implements MutationInterface
      */
     private $isCoveredByTest;
 
+    /**
+     * @var string
+     */
+    private $hash;
+
     public function __construct(
         string $originalFilePath,
         array $originalFileAst,
@@ -89,21 +94,25 @@ final class Mutation implements MutationInterface
 
     public function getHash(): string
     {
-        $mutatorClass = get_class($this->getMutator());
-        $attributes = $this->getAttributes();
-        $attributeValues = [
-            $mutatorClass,
-            $attributes['startLine'],
-            $attributes['endLine'],
-            $attributes['startTokenPos'],
-            $attributes['endTokenPos'],
-            $attributes['startFilePos'],
-            $attributes['endFilePos'],
-        ];
+        if (!isset($this->hash)) {
+            $mutatorClass = get_class($this->getMutator());
+            $attributes = $this->getAttributes();
+            $attributeValues = [
+                $mutatorClass,
+                $attributes['startLine'],
+                $attributes['endLine'],
+                $attributes['startTokenPos'],
+                $attributes['endTokenPos'],
+                $attributes['startFilePos'],
+                $attributes['endFilePos'],
+            ];
 
-        $hashKeys = array_merge([$this->getOriginalFilePath(), $mutatorClass], $attributeValues);
+            $hashKeys = array_merge([$this->getOriginalFilePath(), $mutatorClass], $attributeValues);
 
-        return md5(implode('_', $hashKeys));
+            $this->hash = md5(implode('_', $hashKeys));
+        }
+
+        return $this->hash;
     }
 
     public function getOriginalFileAst(): array
