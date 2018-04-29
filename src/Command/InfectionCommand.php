@@ -481,18 +481,16 @@ final class InfectionCommand extends BaseCommand
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         parent::initialize($input, $output);
-
+        $locator = $this->getContainer()->get('locator');
         if ($customConfigPath = $input->getOption('configuration')) {
-            $this->getContainer()->get('locator')->locate($customConfigPath);
+            $locator->locate($customConfigPath);
             $this->doInitialize($input);
 
             return;
         }
 
         try {
-            $this->getContainer()
-                ->get('locator')
-                ->locateAnyOf(InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES);
+            $locator->locateAnyOf(InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES);
         } catch (\Exception $e) {
             $configureCommand = $this->getApplication()->find('configure');
 
