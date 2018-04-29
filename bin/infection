@@ -33,7 +33,7 @@ if (!isset($file)) {
         'You can learn all about Composer on https://getcomposer.org/.' . PHP_EOL
     );
 
-    die(1);
+    exit(1);
 }
 
 require $file;
