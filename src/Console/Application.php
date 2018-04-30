@@ -11,6 +11,7 @@ namespace Infection\Console;
 
 use Composer\XdebugHandler\XdebugHandler;
 use Infection\Command;
+use Infection\Console\Util\PhpProcess;
 use PackageVersions\Versions;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -114,6 +115,13 @@ ASCII;
             ]);
 
             return 1;
+        }
+
+        /*
+         * If we're skipping Xdebug, setup a default Xdebug-free environment for all subprocesses
+         */
+        if ('' != XdebugHandler::getSkippedVersion()) {
+            PhpProcess::setupEnvironment();
         }
 
         return parent::run($input, $output);

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Builder;
 
+use Infection\Console\Util\PhpProcess;
 use Infection\Mutant\MutantInterface;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
@@ -49,9 +50,12 @@ class ProcessBuilder
         bool $skipCoverage,
         array $phpExtraOptions = []
     ): Process {
-        $includeArgs = PHP_SAPI == 'phpdbg' || $skipCoverage;
+        $includeArgs = PHP_SAPI == 'phpdbg';
 
-        $process = new Process(
+        // If we're expecting to receive a code coverage, test process must run in a vanilla environment
+        $processType = $skipCoverage ? Process::class : PhpProcess::class;
+
+        $process = new $processType(
             $this->testFrameworkAdapter->getExecutableCommandLine(
                 $this->testFrameworkAdapter->buildInitialConfigFile(),
                 $testFrameworkExtraOptions,
@@ -59,14 +63,12 @@ class ProcessBuilder
                 $phpExtraOptions
             ),
             null,
-            $includeArgs ? array_replace($_ENV, $_SERVER) : null,
+            null,
             null,
             null
         );
 
-        if ($includeArgs) {
-            $process->inheritEnvironmentVariables();
-        }
+        $process->inheritEnvironmentVariables();
 
         return $process;
     }
@@ -79,7 +81,7 @@ class ProcessBuilder
                 $testFrameworkExtraOptions
             ),
             null,
-            array_replace($_ENV, $_SERVER),
+            null,
             null,
             $this->timeout
         );
