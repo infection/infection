@@ -111,6 +111,7 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         );
 
         $this->assertSame($expectedCustomAutoloadFilePath, $resultAutoLoaderFilePath);
+        $this->assertContains('app/autoload2.php', file_get_contents($expectedCustomAutoloadFilePath));
     }
 
     public function test_it_sets_custom_autoloader_when_attribute_is_absent()
@@ -137,6 +138,7 @@ class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         );
 
         $this->assertSame($expectedCustomAutoloadFilePath, $resultAutoLoaderFilePath);
+        $this->assertContains('vendor/autoload.php', file_get_contents($expectedCustomAutoloadFilePath));
     }
 
     public function test_it_sets_stop_on_failure_flag()

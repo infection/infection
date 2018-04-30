@@ -29,68 +29,78 @@ class MutationConfigBuilder extends ConfigBuilder
     private $projectDir;
 
     /**
+     * @var XmlConfigurationHelper
+     */
+    private $xmlConfigurationHelper;
+
+    /**
+     * @var string
+     */
+    private $originalXmlConfigContent;
+
+    /**
      * @var \DOMDocument
      */
     private $dom;
-
-    /**
-     * @var \DOMXPath
-     */
-    private $xPath;
 
     public function __construct(string $tempDirectory, string $originalXmlConfigContent, XmlConfigurationHelper $xmlConfigurationHelper, string $projectDir)
     {
         $this->tempDirectory = $tempDirectory;
         $this->projectDir = $projectDir;
 
+        $this->xmlConfigurationHelper = $xmlConfigurationHelper;
+        $this->originalXmlConfigContent = $originalXmlConfigContent;
+
         $this->dom = new \DOMDocument();
         $this->dom->preserveWhiteSpace = false;
         $this->dom->formatOutput = true;
-        $this->dom->loadXML($originalXmlConfigContent);
-
-        $this->xPath = new \DOMXPath($this->dom);
-
-        $xmlConfigurationHelper->replaceWithAbsolutePaths($this->xPath);
-        $xmlConfigurationHelper->setStopOnFailure($this->xPath);
-        $xmlConfigurationHelper->deactivateColours($this->xPath);
-        $xmlConfigurationHelper->removeExistingLoggers($this->dom, $this->xPath);
-        $xmlConfigurationHelper->removeExistingPrinters($this->dom, $this->xPath);
+        $this->dom->loadXML($this->originalXmlConfigContent);
     }
 
     public function build(MutantInterface $mutant): string
     {
+        // clone the dom document because it's mutated later
+        $dom = clone $this->dom;
+
+        $xPath = new \DOMXPath($dom);
+
+        $this->xmlConfigurationHelper->replaceWithAbsolutePaths($xPath);
+        $this->xmlConfigurationHelper->setStopOnFailure($xPath);
+        $this->xmlConfigurationHelper->deactivateColours($xPath);
+        $this->xmlConfigurationHelper->removeExistingLoggers($dom, $xPath);
+        $this->xmlConfigurationHelper->removeExistingPrinters($dom, $xPath);
+
         $customAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',
             $this->tempDirectory,
             $mutant->getMutation()->getHash()
         );
 
-        $this->setCustomAutoLoaderPath($customAutoloadFilePath);
-        $this->setFilteredTestsToRun($mutant->getCoverageTests());
+        $originalAutoloadFile = $this->getOriginalBootstrapFilePath($xPath);
 
-        file_put_contents($customAutoloadFilePath, $this->createCustomAutoloadWithInterceptor($mutant));
+        $this->setCustomBootstrapPath($customAutoloadFilePath, $xPath);
+        $this->setFilteredTestsToRun($mutant->getCoverageTests(), $dom, $xPath);
+
+        file_put_contents($customAutoloadFilePath, $this->createCustomAutoloadWithInterceptor($mutant, $originalAutoloadFile));
 
         $path = $this->buildPath($mutant);
 
-        file_put_contents($path, $this->dom->saveXML());
+        file_put_contents($path, $dom->saveXML());
 
         return $path;
     }
 
-    private function createCustomAutoloadWithInterceptor(MutantInterface $mutant): string
+    private function createCustomAutoloadWithInterceptor(MutantInterface $mutant, string $originalAutoloadFile): string
     {
         $originalFilePath = $mutant->getMutation()->getOriginalFilePath();
         $mutatedFilePath = $mutant->getMutatedFilePath();
         $interceptorPath = dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
 
-        // TODO change to what it was (e.g. app/autoload - see simplehabits)
-        $autoload = sprintf('%s/vendor/autoload.php', $this->projectDir);
-
         $customAutoload = <<<AUTOLOAD
 <?php
 
-require_once '{$autoload}';
 %s
+require_once '{$originalAutoloadFile}';
 
 AUTOLOAD;
 
@@ -104,52 +114,52 @@ AUTOLOAD;
         return $this->tempDirectory . '/' . $fileName;
     }
 
-    private function setCustomAutoLoaderPath(string $customAutoloadFilePath)
+    private function setCustomBootstrapPath(string $customAutoloadFilePath, \DOMXPath $xPath)
     {
-        $nodeList = $this->xPath->query('/phpunit/@bootstrap');
+        $nodeList = $xPath->query('/phpunit/@bootstrap');
 
         if ($nodeList->length) {
             $nodeList[0]->nodeValue = $customAutoloadFilePath;
         } else {
-            $node = $this->xPath->query('/phpunit')[0];
+            $node = $xPath->query('/phpunit')[0];
             $node->setAttribute('bootstrap', $customAutoloadFilePath);
         }
     }
 
-    private function setFilteredTestsToRun(array $coverageTests)
+    private function setFilteredTestsToRun(array $coverageTests, \DOMDocument $dom, \DOMXPath $xPath)
     {
-        $this->removeExistingTestSuite();
+        $this->removeExistingTestSuite($xPath);
 
-        $this->addTestSuiteWithFilteredTestFiles($coverageTests);
+        $this->addTestSuiteWithFilteredTestFiles($coverageTests, $dom, $xPath);
     }
 
-    private function removeExistingTestSuite()
+    private function removeExistingTestSuite(\DOMXPath $xPath)
     {
-        $nodes = $this->xPath->query('/phpunit/testsuites/testsuite');
+        $nodes = $xPath->query('/phpunit/testsuites/testsuite');
 
         foreach ($nodes as $node) {
             $node->parentNode->removeChild($node);
         }
 
         // handle situation when test suite is directly inside root node
-        $nodes = $this->xPath->query('/phpunit/testsuite');
+        $nodes = $xPath->query('/phpunit/testsuite');
 
         foreach ($nodes as $node) {
             $node->parentNode->removeChild($node);
         }
     }
 
-    private function addTestSuiteWithFilteredTestFiles(array $coverageTests)
+    private function addTestSuiteWithFilteredTestFiles(array $coverageTests, \DOMDocument $dom, \DOMXPath $xPath)
     {
-        $testSuites = $this->xPath->query('/phpunit/testsuites');
+        $testSuites = $xPath->query('/phpunit/testsuites');
         $nodeToAppendTestSuite = $testSuites->item(0);
 
         // if there is no `testsuites` node, append to root
         if (!$nodeToAppendTestSuite) {
-            $nodeToAppendTestSuite = $testSuites = $this->xPath->query('/phpunit')->item(0);
+            $nodeToAppendTestSuite = $testSuites = $xPath->query('/phpunit')->item(0);
         }
 
-        $testSuite = $this->dom->createElement('testsuite');
+        $testSuite = $dom->createElement('testsuite');
         $testSuite->setAttribute('name', 'Infection testsuite with filtered tests');
 
         $uniqueCoverageTests = $this->unique($coverageTests);
@@ -165,7 +175,7 @@ AUTOLOAD;
         $uniqueTestFilePaths = array_column($uniqueCoverageTests, 'testFilePath');
 
         foreach ($uniqueTestFilePaths as $testFilePath) {
-            $file = $this->dom->createElement('file', $testFilePath);
+            $file = $dom->createElement('file', $testFilePath);
 
             $testSuite->appendChild($file);
         }
@@ -186,5 +196,16 @@ AUTOLOAD;
         }
 
         return $uniqueTests;
+    }
+
+    private function getOriginalBootstrapFilePath(\DOMXPath $xPath): string
+    {
+        $nodeList = $xPath->query('/phpunit/@bootstrap');
+
+        if ($nodeList->length) {
+            return $nodeList[0]->nodeValue;
+        }
+
+        return sprintf('%s/vendor/autoload.php', $this->projectDir);
     }
 }
