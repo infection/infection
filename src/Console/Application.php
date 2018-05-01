@@ -51,18 +51,11 @@ ASCII;
      */
     private $io;
 
-    /**
-     * @var bool
-     */
-    private $isXdebugLoaded;
-
     public function __construct(InfectionContainer $container, string $name = self::NAME, string $version = self::VERSION)
     {
-        $this->container = $container;
-        $this->isXdebugLoaded = \extension_loaded('xdebug');
-
         parent::__construct($name, $version);
 
+        $this->container = $container;
         $this->setDefaultCommand('run');
     }
 
@@ -80,7 +73,7 @@ ASCII;
 
         if (PHP_SAPI === 'phpdbg') {
             $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, PHP_SAPI));
-        } elseif ($this->isXdebugLoaded) {
+        } elseif (\extension_loaded('xdebug')) {
             $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, 'xdebug'));
         }
 
@@ -100,23 +93,6 @@ ASCII;
         $xdebug = new XdebugHandler(self::INFECTION_PREFIX, '--ansi');
         $xdebug->check();
 
-        if (PHP_SAPI !== 'phpdbg'
-            && !$this->isXdebugLoaded
-            && !XdebugHandler::getSkippedVersion()
-            && !$input->hasParameterOption('--coverage', true)
-            && !$this->isInitialTestPhpOptionHasXdebug($input)
-        ) {
-            $this->io->error([
-                'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:',
-                '- Enable xdebug and run infection again' . PHP_EOL .
-                '- Use phpdbg: phpdbg -qrr infection' . PHP_EOL .
-                '- Use --coverage option with path to the existing coverage report' . PHP_EOL .
-                '- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters',
-            ]);
-
-            return 1;
-        }
-
         /*
          * If we're skipping Xdebug, setup a default Xdebug-free environment for all subprocesses
          */
@@ -125,14 +101,6 @@ ASCII;
         }
 
         return parent::run($input, $output);
-    }
-
-    private function isInitialTestPhpOptionHasXdebug(InputInterface $input): bool
-    {
-        return (bool) preg_match(
-            '/(zend_extension\s*=.*xdebug.*)/mi',
-            (string) $input->getParameterOption('--initial-tests-php-options', true)
-        );
     }
 
     public function doRun(InputInterface $input, OutputInterface $output)

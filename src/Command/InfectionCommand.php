@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Composer\XdebugHandler\XdebugHandler;
 use Infection\Config\InfectionConfig;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
@@ -20,6 +21,7 @@ use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Finder\Exception\LocatorException;
+use Infection\Finder\Locator;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Builder\ProcessBuilder;
@@ -173,6 +175,10 @@ final class InfectionCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (!$this->isDebuggerOrAdditionalParametersExist()) {
+            return 1;
+        }
+
         $container = $this->getContainer();
         $config = $container->get('infection.config');
 
@@ -397,39 +403,69 @@ final class InfectionCommand extends BaseCommand
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         parent::initialize($input, $output);
+
         $locator = $this->getContainer()->get('locator');
+
         if ($customConfigPath = $input->getOption('configuration')) {
             $locator->locate($customConfigPath);
-            $this->doInitialize($input);
-
-            return;
+        } else {
+            $this->runConfigurationCommand($locator);
         }
 
+        $this->io = $this->getApplication()->getIO();
+        $this->skipCoverage = \strlen(trim($input->getOption('coverage'))) > 0;
+        $this->eventDispatcher = $this->getContainer()->get('dispatcher');
+    }
+
+    public function isDebuggerOrAdditionalParametersExist(): bool
+    {
+        if (!$this->skipCoverage
+            && PHP_SAPI !== 'phpdbg'
+            && !\extension_loaded('xdebug')
+            && !XdebugHandler::getSkippedVersion()
+            && !$this->isInitialTestPhpOptionHasXdebug()
+        ) {
+            $this->io->error([
+                'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:',
+                '- Enable xdebug and run infection again' . PHP_EOL .
+                '- Use phpdbg: phpdbg -qrr infection' . PHP_EOL .
+                '- Use --coverage option with path to the existing coverage report' . PHP_EOL .
+                '- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters',
+            ]);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private function runConfigurationCommand(Locator $locator)
+    {
         try {
             $locator->locateAnyOf(InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES);
         } catch (\Exception $e) {
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [
-                '--test-framework' => $input->getOption('test-framework'),
+                '--test-framework' => $this->input->getOption('test-framework'),
             ];
 
             $newInput = new ArrayInput($args);
-            $newInput->setInteractive($input->isInteractive());
-            $result = $configureCommand->run($newInput, $output);
+            $newInput->setInteractive($this->input->isInteractive());
+            $result = $configureCommand->run($newInput, $this->output);
 
             if ($result !== 0) {
                 throw ConfigurationException::configurationAborted();
             }
         }
-        $this->doInitialize($input);
     }
 
-    private function doInitialize(InputInterface $input)
+    private function isInitialTestPhpOptionHasXdebug(): bool
     {
-        $this->consoleOutput = new ConsoleOutput($this->getApplication()->getIO());
-        $this->eventDispatcher = $this->getContainer()->get('dispatcher');
-        $this->skipCoverage = \strlen(trim($input->getOption('coverage'))) > 0;
+        return (bool) preg_match(
+            '/(zend_extension\s*=.*xdebug.*)/mi',
+            $this->input->getOption('initial-tests-php-options')
+        );
     }
 
     /**
