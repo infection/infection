@@ -43,19 +43,10 @@ class MutationTestingResultsLoggerSubscriberTest extends TestCase
 
     protected function setUp()
     {
-        $this->output = $this->getMockBuilder(OutputInterface::class)
-            ->getMock();
-
-        $this->infectionConfig = $this->getMockBuilder(InfectionConfig::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->metricsCalculator = $this->getMockBuilder(MetricsCalculator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->filesystem = $this->getMockBuilder(Filesystem::class)
-            ->getMock();
+        $this->output = $this->createMock(OutputInterface::class);
+        $this->infectionConfig = $this->createMock(InfectionConfig::class);
+        $this->metricsCalculator = $this->createMock(MetricsCalculator::class);
+        $this->filesystem = $this->createMock(Filesystem::class);
     }
 
     public function test_it_do_nothing_when_file_log_path_is_not_defined()

@@ -39,7 +39,7 @@ abstract class AbstractBaseProviderTest extends Mockery\Adapter\Phpunit\MockeryT
 
     protected function createStreamableInputInterfaceMock($stream = null, $interactive = true)
     {
-        $mock = $this->getMockBuilder(StreamableInputInterface::class)->getMock();
+        $mock = $this->createMock(StreamableInputInterface::class);
         $mock->expects($this->any())
             ->method('isInteractive')
             ->will($this->returnValue($interactive));

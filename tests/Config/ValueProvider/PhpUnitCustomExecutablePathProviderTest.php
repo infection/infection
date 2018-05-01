@@ -21,14 +21,13 @@ class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProviderTest
     public function test_it_returns_null_if_executable_is_found()
     {
         $finderMock = Mockery::mock(TestFrameworkFinder::class);
-
         $finderMock->shouldReceive('find')->once();
 
-        $consoleMock = $this->getMockBuilder(ConsoleHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $provider = new PhpUnitCustomExecutablePathProvider($finderMock, $consoleMock, $this->getQuestionHelper());
+        $provider = new PhpUnitCustomExecutablePathProvider(
+            $finderMock,
+            $this->createMock(ConsoleHelper::class),
+            $this->getQuestionHelper()
+        );
 
         $result = $provider->get($this->createStreamableInputInterfaceMock(), $this->createOutputInterface());
 
@@ -38,17 +37,17 @@ class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProviderTest
     public function test_it_asks_question_if_no_config_is_found_in_current_dir()
     {
         $finderMock = Mockery::mock(TestFrameworkFinder::class);
-
         $finderMock->shouldReceive('find')->once()->andThrow(new FinderException());
 
-        $consoleMock = $this->getMockBuilder(ConsoleHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $consoleMock = $this->createMock(ConsoleHelper::class);
         $consoleMock->expects($this->once())->method('getQuestion')->willReturn('foobar');
-        $dialog = $this->getQuestionHelper();
 
-        $provider = new PhpUnitCustomExecutablePathProvider($finderMock, $consoleMock, $dialog);
+        $provider = new PhpUnitCustomExecutablePathProvider(
+            $finderMock,
+            $consoleMock,
+            $this->getQuestionHelper()
+        );
+
         $customExecutable = p(realpath(__DIR__ . '/../../Fixtures/Files/phpunit/phpunit.phar'));
 
         $path = $provider->get(
@@ -72,14 +71,14 @@ class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProviderTest
 
         $finderMock->shouldReceive('find')->once()->andThrow(new FinderException());
 
-        $consoleMock = $this->getMockBuilder(ConsoleHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $consoleMock = $this->createMock(ConsoleHelper::class);
         $consoleMock->expects($this->once())->method('getQuestion')->willReturn('foobar');
-        $dialog = $this->getQuestionHelper();
 
-        $provider = new PhpUnitCustomExecutablePathProvider($finderMock, $consoleMock, $dialog);
+        $provider = new PhpUnitCustomExecutablePathProvider(
+            $finderMock,
+            $consoleMock,
+            $this->getQuestionHelper()
+        );
 
         $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("abc\n")),
