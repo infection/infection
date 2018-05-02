@@ -19,6 +19,9 @@ use Symfony\Component\Process\Process;
  */
 final class PhpProcess extends Process
 {
+    /**
+     * @var string|bool
+     */
     private static $phprc;
 
     /**
@@ -61,7 +64,11 @@ final class PhpProcess extends Process
         self::putenv('PHP_INI_SCAN_DIR', XdebugHandler::getRestartSettings()['scanDir']);
     }
 
-    private static function putenv($name, $value)
+    /**
+     * @param string $name
+     * @param string|bool $value either string or false
+     */
+    private static function putenv(string $name, $value)
     {
         // getenv returns false if there was no variable => we must delete it
         putenv(false === $value ? $name : $name . '=' . $value);
