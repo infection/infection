@@ -145,5 +145,52 @@ PHP
 $a = 'bbbb';
 PHP
         ];
+
+        yield 'It mutates correctly when preg_quote uses another function as input' => [
+            <<<'PHP'
+<?php
+
+$a = preg_quote($foo->bar(),'/');
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = $foo->bar();
+PHP
+        ];
+
+        yield 'It mutates correctly within a more complex situation' => [
+            <<<'PHP'
+<?php
+
+function bar($input)
+{
+    return array_map(function ($key, $value) {
+        return strtolower(preg_quote($key . (ctype_alnum($value) ? '' : $value), '/'));
+    }, $input);
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+function bar($input)
+{
+    return array_map(function ($key, $value) {
+        return strtolower($key . (ctype_alnum($value) ? '' : $value));
+    }, $input);
+}
+PHP
+        ];
+
+        yield 'It does not mutate when the function name is a variable' => [
+            <<<'PHP'
+<?php
+
+$b = 'preg_quote';
+$a = $b($foo->bar(), '/');
+PHP
+        ];
     }
 }
