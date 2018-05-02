@@ -222,6 +222,9 @@ final class MutatorProfile
         'Throw_' => Mutator\Operator\Throw_::class,
         'Finally_' => Mutator\Operator\Finally_::class,
 
+        //Regex
+        'PregQuote' => Mutator\Regex\PregQuote::class,
+
         //Return Value
         'FloatNegation' => Mutator\ReturnValue\FloatNegation::class,
         'FunctionCall' => Mutator\ReturnValue\FunctionCall::class,
@@ -243,8 +246,5 @@ final class MutatorProfile
         'CastInt' => Mutator\Cast\CastInt::class,
         'CastObject' => Mutator\Cast\CastObject::class,
         'CastString' => Mutator\Cast\CastString::class,
-
-        //Regex
-        'PregQuote' => Mutator\Regex\PregQuote::class,
     ];
 }
