@@ -21,7 +21,8 @@ final class PregQuote extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Expr\FuncCall
-            && strtolower((string) $node->name) == 'preg_quote';
+        return $node instanceof Node\Expr\FuncCall &&
+            !$node->name instanceof Node\Expr\Variable &&
+            strtolower((string) $node->name) == 'preg_quote';
     }
 }
