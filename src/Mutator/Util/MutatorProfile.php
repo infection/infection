@@ -22,6 +22,7 @@ final class MutatorProfile
         '@function_signature' => self::FUNCTION_SIGNATURE,
         '@number' => self::NUMBER,
         '@operator' => self::OPERATOR,
+        '@regex' => self::REGEX,
         '@return_value' => self::RETURN_VALUE,
         '@sort' => self::SORT,
         '@zero_iteration' => self::ZERO_ITERATION,
@@ -106,6 +107,10 @@ final class MutatorProfile
         Mutator\Operator\Throw_::class,
     ];
 
+    const REGEX = [
+        Mutator\Regex\PregQuote::class,
+    ];
+
     const RETURN_VALUE = [
         Mutator\ReturnValue\FloatNegation::class,
         Mutator\ReturnValue\FunctionCall::class,
@@ -141,6 +146,7 @@ final class MutatorProfile
         '@function_signature',
         '@number',
         '@operator',
+        '@regex',
         '@return_value',
         '@sort',
         '@zero_iteration',
@@ -237,5 +243,8 @@ final class MutatorProfile
         'CastInt' => Mutator\Cast\CastInt::class,
         'CastObject' => Mutator\Cast\CastObject::class,
         'CastString' => Mutator\Cast\CastString::class,
+
+        //Regex
+        'PregQuote' => Mutator\Regex\PregQuote::class,
     ];
 }
