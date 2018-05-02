@@ -47,10 +47,7 @@ class MutationTestingConsoleLoggerSubscriberTest extends TestCase
     {
         $this->output = $this->createMock(OutputInterface::class);
         $this->outputFormatter = $this->createMock(OutputFormatter::class);
-        $this->metricsCalculator = $this->getMockBuilder(MetricsCalculator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->metricsCalculator = $this->createMock(MetricsCalculator::class);
         $this->diffColorizer = $this->createMock(DiffColorizer::class);
     }
 

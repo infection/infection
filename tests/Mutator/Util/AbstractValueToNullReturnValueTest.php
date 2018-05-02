@@ -65,9 +65,7 @@ class AbstractValueToNullReturnValueTest extends TestCase
     public function test_return_type_is_node_identifier()
     {
         /** @var Node\Identifier $mockNode */
-        $mockNode = $this->getMockBuilder(Node\Identifier::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockNode = $this->createMock(Node\Identifier::class);
 
         $mockNode->name = null;
 
@@ -93,15 +91,11 @@ class AbstractValueToNullReturnValueTest extends TestCase
 
     public function test_return_type_is_nullable()
     {
-        $mockNode = $this->getMockBuilder(Node\NullableType::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->assertTrue(
             $this->invokeMethod(
                 $this->mockNode(
                     $this->mockFunction(
-                        $mockNode
+                        $this->createMock(Node\NullableType::class)
                     )
                 )
             )
@@ -123,15 +117,11 @@ class AbstractValueToNullReturnValueTest extends TestCase
 
     public function test_return_type_is_not_node_name()
     {
-        $mockNode = $this->getMockBuilder(Node\Name::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->assertFalse(
             $this->invokeMethod(
                 $this->mockNode(
                     $this->mockFunction(
-                        $mockNode
+                        $this->createMock(Node\Name::class)
                     )
                 )
             )
