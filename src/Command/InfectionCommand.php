@@ -175,7 +175,15 @@ final class InfectionCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!$this->isDebuggerOrAdditionalParametersExist()) {
+        if (!$this->hasDebuggerOrCoverageOption()) {
+            $this->io->error([
+                'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:',
+                '- Enable xdebug and run infection again' . PHP_EOL .
+                '- Use phpdbg: phpdbg -qrr infection' . PHP_EOL .
+                '- Use --coverage option with path to the existing coverage report' . PHP_EOL .
+                '- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters',
+            ]);
+
             return 1;
         }
 
@@ -417,22 +425,14 @@ final class InfectionCommand extends BaseCommand
         $this->eventDispatcher = $this->getContainer()->get('dispatcher');
     }
 
-    public function isDebuggerOrAdditionalParametersExist(): bool
+    public function hasDebuggerOrCoverageOption(): bool
     {
         if (!$this->skipCoverage
             && PHP_SAPI !== 'phpdbg'
             && !\extension_loaded('xdebug')
             && !XdebugHandler::getSkippedVersion()
-            && !$this->isInitialTestPhpOptionHasXdebug()
+            && !$this->isXdebugIncludedInInitialTestPhpOptions()
         ) {
-            $this->io->error([
-                'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:',
-                '- Enable xdebug and run infection again' . PHP_EOL .
-                '- Use phpdbg: phpdbg -qrr infection' . PHP_EOL .
-                '- Use --coverage option with path to the existing coverage report' . PHP_EOL .
-                '- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters',
-            ]);
-
             return false;
         }
 
@@ -460,7 +460,7 @@ final class InfectionCommand extends BaseCommand
         }
     }
 
-    private function isInitialTestPhpOptionHasXdebug(): bool
+    private function isXdebugIncludedInInitialTestPhpOptions(): bool
     {
         return (bool) preg_match(
             '/(zend_extension\s*=.*xdebug.*)/mi',
