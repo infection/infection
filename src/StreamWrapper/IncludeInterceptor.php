@@ -5,18 +5,32 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 
+declare(strict_types=1);
+
 namespace Infection\StreamWrapper;
 
 final class IncludeInterceptor
 {
     const STREAM_OPEN_FOR_INCLUDE = 0x00000080;
 
+    /**
+     * @var resource
+     */
     public $context;
 
+    /**
+     * @var bool|resource
+     */
     private $fp;
 
+    /**
+     * @var string
+     */
     private static $intercept;
 
+    /**
+     * @var string
+     */
     private static $replacement;
 
     public static function intercept($file, $with)
@@ -64,9 +78,9 @@ final class IncludeInterceptor
             }
         }
         if (isset($this->context)) {
-            $this->fp = fopen($path, $mode, $options, $this->context);
+            $this->fp = fopen($path, $mode, (bool) $options, $this->context);
         } else {
-            $this->fp = fopen($path, $mode, $options);
+            $this->fp = fopen($path, $mode, (bool) $options);
         }
         self::enable();
 
@@ -216,7 +230,7 @@ final class IncludeInterceptor
     {
         switch ($option) {
             case STREAM_OPTION_BLOCKING:
-                return stream_set_blocking($this->fp, $arg1);
+                return stream_set_blocking($this->fp, (bool) $arg1);
             case STREAM_OPTION_READ_TIMEOUT:
                 return stream_set_timeout($this->fp, $arg1, $arg2);
             case STREAM_OPTION_WRITE_BUFFER:
