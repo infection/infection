@@ -33,7 +33,6 @@ use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use Infection\TestFramework\TestFrameworkExtraOptions;
@@ -276,7 +275,7 @@ final class InfectionCommand extends BaseCommand
         throw new \InvalidArgumentException('Incorrect formatter. Possible values: "dot", "progress"');
     }
 
-    private function applyMemoryLimitFromPhpUnitProcess(Process $process, PhpUnitAdapter $adapter)
+    private function applyMemoryLimitFromPhpUnitProcess(Process $process, MemoryUsageAware $adapter)
     {
         if (PHP_SAPI == 'phpdbg') {
             // Under phpdbg we're using a system php.ini, can't add a memory limit there

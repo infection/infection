@@ -88,7 +88,7 @@ final class MutatorsGenerator
 
     /**
      * @param string $mutator
-     * @param array|bool $setting
+     * @param array|bool|\stdClass $setting
      */
     private function registerFromClass(string $mutator, $setting)
     {

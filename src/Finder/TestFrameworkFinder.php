@@ -33,7 +33,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
      */
     private $cachedPath;
 
-    public function __construct(string $testFrameworkName, string $customPath = null)
+    public function __construct(string $testFrameworkName, string $customPath = '')
     {
         $this->testFrameworkName = $testFrameworkName;
         $this->customPath = $customPath;
@@ -54,7 +54,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
 
     private function shouldUseCustomPath(): bool
     {
-        if (!isset($this->customPath)) {
+        if (!$this->customPath) {
             return false;
         }
 

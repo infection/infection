@@ -37,7 +37,7 @@ class CodeCoverageData
     private $parser;
 
     /**
-     * @var TestFileDataProvider
+     * @var TestFileDataProvider|null
      */
     private $testFileDataProvider;
 

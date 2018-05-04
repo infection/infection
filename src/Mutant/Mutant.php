@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\Mutation;
 use Infection\MutationInterface;
 
 final class Mutant implements MutantInterface
@@ -17,7 +16,7 @@ final class Mutant implements MutantInterface
     private $mutatedFilePath;
 
     /**
-     * @var Mutation
+     * @var MutationInterface
      */
     private $mutation;
 

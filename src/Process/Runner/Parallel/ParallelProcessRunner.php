@@ -12,6 +12,7 @@ namespace Infection\Process\Runner\Parallel;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutantProcessFinished;
 use Infection\Process\MutantProcess;
+use Infection\Process\MutantProcessInterface;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
@@ -27,12 +28,12 @@ final class ParallelProcessRunner
     private $eventDispatcher;
 
     /**
-     * @var MutantProcess[]
+     * @var MutantProcessInterface[]
      */
     private $processesQueue;
 
     /**
-     * @var MutantProcess[]
+     * @var MutantProcessInterface[]
      */
     private $currentProcesses = [];
 
@@ -42,7 +43,7 @@ final class ParallelProcessRunner
     }
 
     /**
-     * @param MutantProcess[] $processes
+     * @param MutantProcessInterface[] $processes
      * @param int $threadCount
      * @param int $poll
      *
@@ -98,7 +99,7 @@ final class ParallelProcessRunner
     private function startProcess(): bool
     {
         $mutantProcess = array_shift($this->processesQueue);
-        /** @var MutantProcess $mutantProcess */
+        /** @var MutantProcessInterface $mutantProcess */
         $mutant = $mutantProcess->getMutant();
 
         if (!$mutant->isCoveredByTest()) {

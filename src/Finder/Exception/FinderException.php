@@ -18,6 +18,13 @@ final class FinderException extends \RuntimeException
         );
     }
 
+    public static function phpExecutableNotFound(): self
+    {
+        return new self(
+            'Unable to locate the PHP executable on the local system. Please report this issue, and include details about your setup.'
+        );
+    }
+
     public static function testFrameworkNotFound(string $testFrameworkName): self
     {
         return new self(

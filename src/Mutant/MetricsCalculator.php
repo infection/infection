@@ -23,7 +23,7 @@ class MetricsCalculator
     private $killedCount = 0;
 
     /**
-     * @var MutantProcess[]
+     * @var MutantProcessInterface[]
      */
     private $killedMutantProcesses = [];
 
@@ -33,7 +33,7 @@ class MetricsCalculator
     private $errorCount = 0;
 
     /**
-     * @var MutantProcess[]
+     * @var MutantProcessInterface[]
      */
     private $errorProcesses = [];
 
@@ -43,7 +43,7 @@ class MetricsCalculator
     private $escapedCount = 0;
 
     /**
-     * @var MutantProcess[]
+     * @var MutantProcessInterface[]
      */
     private $escapedMutantProcesses = [];
 
@@ -53,7 +53,7 @@ class MetricsCalculator
     private $timedOutCount = 0;
 
     /**
-     * @var MutantProcess[]
+     * @var MutantProcessInterface[]
      */
     private $timedOutProcesses = [];
 
@@ -63,7 +63,7 @@ class MetricsCalculator
     private $notCoveredByTestsCount = 0;
 
     /**
-     * @var MutantProcess[]
+     * @var MutantProcessInterface[]
      */
     private $notCoveredMutantProcesses = [];
 
@@ -188,7 +188,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutantProcess[]
+     * @return MutantProcessInterface[]
      */
     public function getEscapedMutantProcesses(): array
     {
@@ -196,7 +196,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutantProcess[]
+     * @return MutantProcessInterface[]
      */
     public function getKilledMutantProcesses(): array
     {
@@ -204,7 +204,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutantProcess[]
+     * @return MutantProcessInterface[]
      */
     public function getTimedOutProcesses(): array
     {
@@ -212,7 +212,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutantProcess[]
+     * @return MutantProcessInterface[]
      */
     public function getNotCoveredMutantProcesses(): array
     {
@@ -225,7 +225,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutantProcess[]
+     * @return MutantProcessInterface[]
      */
     public function getErrorProcesses(): array
     {

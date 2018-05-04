@@ -23,12 +23,12 @@ final class ReflectionVisitor extends NodeVisitorAbstract
     private $scopeStack = [];
 
     /**
-     * @var \ReflectionClass
+     * @var \ReflectionClass|null
      */
     private $reflectionClass;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $methodName;
 

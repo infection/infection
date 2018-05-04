@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use Infection\Finder\AbstractExecutableFinder;
+use Infection\Finder\Exception\FinderException;
 use Infection\Mutant\MutantInterface;
 use Infection\Process\ExecutableFinder\PhpExecutableFinder;
 use Infection\TestFramework\Config\InitialConfigBuilder;
@@ -145,7 +146,11 @@ abstract class AbstractTestFrameworkAdapter
     {
         if ($this->cachedPhpPath === null || $this->cachedIncludedArgs !== $includeArgs) {
             $this->cachedIncludedArgs = $includeArgs;
-            $this->cachedPhpPath = (new PhpExecutableFinder())->find($includeArgs);
+            $phpPath = (new PhpExecutableFinder())->find($includeArgs);
+            if ($phpPath === false) {
+                throw FinderException::phpExecutableNotFound();
+            }
+            $this->cachedPhpPath = $phpPath;
         }
 
         return $this->cachedPhpPath;

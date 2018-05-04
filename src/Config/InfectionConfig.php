@@ -56,9 +56,9 @@ class InfectionConfig
         return $this->configLocation;
     }
 
-    public function getPhpUnitCustomPath()
+    public function getPhpUnitCustomPath(): string
     {
-        return $this->config->phpUnit->customPath ?? null;
+        return $this->config->phpUnit->customPath ?? '';
     }
 
     public function getProcessTimeout(): int
