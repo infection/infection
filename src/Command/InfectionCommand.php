@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use Infection\Config\InfectionConfig;
+use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\InfectionException;
 use Infection\Console\Exception\InvalidOptionException;
 use Infection\Console\LogVerbosity;
@@ -18,7 +19,6 @@ use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Finder\Exception\LocatorException;
-use Infection\Mutant\Exception\MsiCalculationException;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Builder\ProcessBuilder;
@@ -43,7 +43,6 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Process;
 
 /**
@@ -54,9 +53,9 @@ final class InfectionCommand extends BaseCommand
     const CI_FLAG_ERROR = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
 
     /**
-     * @var SymfonyStyle
+     * @var ConsoleOutput
      */
-    private $io;
+    private $consoleOutput;
 
     /**
      * @var EventDispatcher
@@ -177,19 +176,12 @@ final class InfectionCommand extends BaseCommand
         $container = $this->getContainer();
         $config = $container->get('infection.config');
 
-        $bootstrap = $config->getBootstrap();
-        if ($bootstrap) {
-            if (!file_exists($bootstrap)) {
-                throw LocatorException::fileOrDirectoryDoesNotExist($bootstrap);
-            }
-
-            require_once $bootstrap;
-        }
+        $this->includeUserBootstrap($config);
 
         $testFrameworkKey = $input->getOption('test-framework') ?: $config->getTestFramework();
         $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $this->skipCoverage);
 
-        LogVerbosity::convertVerbosityLevel($input, $this->io);
+        LogVerbosity::convertVerbosityLevel($input, $this->consoleOutput);
 
         $metricsCalculator = new MetricsCalculator();
         $this->registerSubscribers($metricsCalculator, $adapter);
@@ -205,7 +197,7 @@ final class InfectionCommand extends BaseCommand
         );
 
         if (!$initialTestSuitProcess->isSuccessful()) {
-            $this->logInitialTestsDoNotPass($initialTestSuitProcess, $testFrameworkKey);
+            $this->consoleOutput->logInitialTestsDoNotPass($initialTestSuitProcess, $adapter->getName());
 
             return 1;
         }
@@ -242,25 +234,19 @@ final class InfectionCommand extends BaseCommand
             $testFrameworkOptions->getForMutantProcess()
         );
 
-        $ignoreMsi = (bool) $input->getOption('ignore-msi-with-no-mutations');
+        return $this->didRunPassConstraints($metricsCalculator);
+    }
 
-        if ($ignoreMsi && \count($mutations) === 0) {
-            return 0;
+    private function includeUserBootstrap(InfectionConfig $config)
+    {
+        $bootstrap = $config->getBootstrap();
+        if ($bootstrap) {
+            if (!file_exists($bootstrap)) {
+                throw LocatorException::fileOrDirectoryDoesNotExist($bootstrap);
+            }
+
+            require_once $bootstrap;
         }
-
-        if ($this->hasBadMsi($metricsCalculator)) {
-            $this->io->error($this->getBadMsiErrorMessage($metricsCalculator));
-
-            return 1;
-        }
-
-        if ($this->hasBadCoveredMsi($metricsCalculator)) {
-            $this->io->error($this->getBadCoveredMsiErrorMessage($metricsCalculator));
-
-            return 1;
-        }
-
-        return 0;
     }
 
     private function getOutputFormatter(): OutputFormatter
@@ -376,76 +362,6 @@ final class InfectionCommand extends BaseCommand
         return new CodeCoverageData($coverageDir, new CoverageXmlParser($coverageDir), $testFrameworkKey, $testFileDataProviderService);
     }
 
-    private function logInitialTestsDoNotPass(Process $initialTestSuitProcess, string $testFrameworkKey)
-    {
-        $lines = [
-            'Project tests must be in a passing state before running Infection.',
-            sprintf(
-                '%s reported an exit code of %d.',
-                ucfirst($testFrameworkKey),
-                $initialTestSuitProcess->getExitCode()
-            ),
-            sprintf(
-                'Refer to the %s\'s output below:',
-                $testFrameworkKey
-            ),
-        ];
-
-        if ($stdOut = $initialTestSuitProcess->getOutput()) {
-            $lines[] = 'STDOUT:';
-            $lines[] = $stdOut;
-        }
-
-        if ($stdError = $initialTestSuitProcess->getErrorOutput()) {
-            $lines[] = 'STDERR:';
-            $lines[] = $stdError;
-        }
-
-        $this->io->error($lines);
-    }
-
-    private function hasBadMsi(MetricsCalculator $metricsCalculator): bool
-    {
-        $minMsi = (float) $this->input->getOption('min-msi');
-
-        return $minMsi && ($metricsCalculator->getMutationScoreIndicator() < $minMsi);
-    }
-
-    private function hasBadCoveredMsi(MetricsCalculator $metricsCalculator): bool
-    {
-        $minCoveredMsi = (float) $this->input->getOption('min-covered-msi');
-
-        return $minCoveredMsi && ($metricsCalculator->getCoveredCodeMutationScoreIndicator() < $minCoveredMsi);
-    }
-
-    private function getBadMsiErrorMessage(MetricsCalculator $metricsCalculator): string
-    {
-        if ($minMsi = (float) $this->input->getOption('min-msi')) {
-            return sprintf(
-                self::CI_FLAG_ERROR,
-                'MSI',
-                $minMsi,
-                $metricsCalculator->getMutationScoreIndicator()
-            );
-        }
-
-        throw MsiCalculationException::create('min-msi');
-    }
-
-    private function getBadCoveredMsiErrorMessage(MetricsCalculator $metricsCalculator): string
-    {
-        if ($minCoveredMsi = (float) $this->input->getOption('min-covered-msi')) {
-            return sprintf(
-                self::CI_FLAG_ERROR,
-                'Covered Code MSI',
-                $minCoveredMsi,
-                $metricsCalculator->getCoveredCodeMutationScoreIndicator()
-            );
-        }
-
-        throw MsiCalculationException::create('min-covered-msi');
-    }
-
     private function parseMutators(string $mutators = null): array
     {
         if ($mutators === null) {
@@ -511,8 +427,53 @@ final class InfectionCommand extends BaseCommand
 
     private function doInitialize(InputInterface $input)
     {
-        $this->io = $this->getApplication()->getIO();
+        $this->consoleOutput = new ConsoleOutput($this->getApplication()->getIO());
         $this->eventDispatcher = $this->getContainer()->get('dispatcher');
         $this->skipCoverage = \strlen(trim($input->getOption('coverage'))) > 0;
+    }
+
+    /**
+     * Checks if the infection run passed the constraints like min msi & covered msi.
+     *
+     * @param MetricsCalculator $metricsCalculator
+     *
+     * @return int
+     */
+    private function didRunPassConstraints(MetricsCalculator $metricsCalculator): int
+    {
+        if ($this->input->getOption('ignore-msi-with-no-mutations') && $metricsCalculator->getTotalMutantsCount() === 0) {
+            return 0;
+        }
+
+        if ($this->hasBadMsi($metricsCalculator)) {
+            $this->consoleOutput->logBadMsiErrorMessage($metricsCalculator, (float) $this->input->getOption('min-msi'));
+
+            return 1;
+        }
+
+        if ($this->hasBadCoveredMsi($metricsCalculator)) {
+            $this->consoleOutput->logBadCoveredMsiErrorMessage(
+                $metricsCalculator,
+                (float) $this->input->getOption('min-covered-msi')
+            );
+
+            return 1;
+        }
+
+        return 0;
+    }
+
+    private function hasBadMsi(MetricsCalculator $metricsCalculator): bool
+    {
+        $minMsi = (float) $this->input->getOption('min-msi');
+
+        return $minMsi && ($metricsCalculator->getMutationScoreIndicator() < $minMsi);
+    }
+
+    private function hasBadCoveredMsi(MetricsCalculator $metricsCalculator): bool
+    {
+        $minCoveredMsi = (float) $this->input->getOption('min-covered-msi');
+
+        return $minCoveredMsi && ($metricsCalculator->getCoveredCodeMutationScoreIndicator() < $minCoveredMsi);
     }
 }

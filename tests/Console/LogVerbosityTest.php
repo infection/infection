@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Console;
 
+use Infection\Console\ConsoleOutput;
 use Infection\Console\LogVerbosity;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
@@ -21,7 +22,7 @@ class LogVerbosityTest extends MockeryTestCase
     {
         $input = $this->setInputExpectationsWhenItDoesNotChange(LogVerbosity::NORMAL);
 
-        LogVerbosity::convertVerbosityLevel($input, Mockery::mock(SymfonyStyle::class));
+        LogVerbosity::convertVerbosityLevel($input, new ConsoleOutput(Mockery::mock(SymfonyStyle::class)));
     }
 
     /**
@@ -38,7 +39,7 @@ class LogVerbosityTest extends MockeryTestCase
             ->withArgs(['Numeric versions of log-verbosity have been deprecated, please use, ' . $output . ' to keep the same result'])
             ->once();
 
-        LogVerbosity::convertVerbosityLevel($input, $io);
+        LogVerbosity::convertVerbosityLevel($input, new ConsoleOutput($io));
     }
 
     public function provideConvertedLogVerbosity()
@@ -64,10 +65,10 @@ class LogVerbosityTest extends MockeryTestCase
         $input = $this->setInputExpectationsWhenItDoesChange('asdf', LogVerbosity::NORMAL);
         $io = Mockery::mock(SymfonyStyle::class);
         $io->shouldReceive('note')
-            ->withArgs(['Running infection with an unknown log-verbosity option, falling back to \'default\' option'])
+            ->withArgs(['Running infection with an unknown log-verbosity option, falling back to default option'])
             ->once();
 
-        LogVerbosity::convertVerbosityLevel($input, $io);
+        LogVerbosity::convertVerbosityLevel($input, new ConsoleOutput($io));
     }
 
     /**
