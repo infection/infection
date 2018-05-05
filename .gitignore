@@ -7,6 +7,6 @@
 /infection-cache
 /.travis/infection-private.pem
 /infection.json
-/*.phar
+/*.phar*
 /build/bin/infection.phar
 /build/bin/infection.phar.pubkey
