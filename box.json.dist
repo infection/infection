@@ -5,10 +5,6 @@
     "algorithm": "OPENSSL",
     "key": ".travis/infection-private.pem",
 
-    "files": [
-        "app/bootstrap.php"
-    ],
-
     "git-version": "package_version",
 
     "compression": "GZ",
