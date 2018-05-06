@@ -88,6 +88,10 @@ final class ProjectCodeTest extends TestCase
 
     public function test_infection_bin_is_executable()
     {
+        if (DIRECTORY_SEPARATOR === '\\') {
+            $this->markTestSkipped('Unable to check if the file is executable on windows.');
+        }
+
         $infectionFile = __DIR__ . '/../../bin/infection';
         $this->assertFileExists($infectionFile);
         $this->assertTrue(is_executable($infectionFile));
