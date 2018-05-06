@@ -68,37 +68,37 @@ final class ConsoleOutput
 
     public function logBadMsiErrorMessage(MetricsCalculator $metricsCalculator, float $minMsi)
     {
-        if ($minMsi) {
-            $this->io->error(
-                sprintf(
-                    self::CI_FLAG_ERROR,
-                    'MSI',
-                    $minMsi,
-                    $metricsCalculator->getMutationScoreIndicator()
-                )
-            );
-
-            return;
+        if (!$minMsi) {
+            throw MsiCalculationException::create('min-msi');
         }
 
-        throw MsiCalculationException::create('min-msi');
+        $this->io->error(
+            sprintf(
+                self::CI_FLAG_ERROR,
+                'MSI',
+                $minMsi,
+                $metricsCalculator->getMutationScoreIndicator()
+            )
+        );
+
+        return;
     }
 
     public function logBadCoveredMsiErrorMessage(MetricsCalculator $metricsCalculator, float $minCoveredMsi)
     {
-        if ($minCoveredMsi) {
-            $this->io->error(
-                sprintf(
-                    self::CI_FLAG_ERROR,
-                    'Covered Code MSI',
-                    $minCoveredMsi,
-                    $metricsCalculator->getCoveredCodeMutationScoreIndicator()
-                )
-            );
-
-            return;
+        if (!$minCoveredMsi) {
+            throw MsiCalculationException::create('min-covered-msi');
         }
 
-        throw MsiCalculationException::create('min-covered-msi');
+        $this->io->error(
+            sprintf(
+                self::CI_FLAG_ERROR,
+                'Covered Code MSI',
+                $minCoveredMsi,
+                $metricsCalculator->getCoveredCodeMutationScoreIndicator()
+            )
+        );
+
+        return;
     }
 }
