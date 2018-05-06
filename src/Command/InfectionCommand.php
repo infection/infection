@@ -234,7 +234,7 @@ final class InfectionCommand extends BaseCommand
             $testFrameworkOptions->getForMutantProcess()
         );
 
-        return $this->didRunPassConstraints($metricsCalculator);
+        return $this->hasRunPassedConstraints($metricsCalculator);
     }
 
     private function includeUserBootstrap(InfectionConfig $config)
@@ -439,7 +439,7 @@ final class InfectionCommand extends BaseCommand
      *
      * @return int
      */
-    private function didRunPassConstraints(MetricsCalculator $metricsCalculator): int
+    private function hasRunPassedConstraints(MetricsCalculator $metricsCalculator): int
     {
         if ($this->input->getOption('ignore-msi-with-no-mutations') && $metricsCalculator->getTotalMutantsCount() === 0) {
             return 0;
