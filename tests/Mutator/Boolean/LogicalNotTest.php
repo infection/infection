@@ -14,7 +14,10 @@ use PhpParser\Node\Expr\BooleanNot;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
 
-class LogicalNotTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class LogicalNotTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

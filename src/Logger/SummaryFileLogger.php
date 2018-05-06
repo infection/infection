@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+/**
+ * @internal
+ */
 final class SummaryFileLogger extends FileLogger
 {
     protected function getLogLines(): array

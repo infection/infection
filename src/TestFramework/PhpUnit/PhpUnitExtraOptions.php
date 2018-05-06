@@ -11,6 +11,9 @@ namespace Infection\TestFramework\PhpUnit;
 
 use Infection\TestFramework\TestFrameworkExtraOptions;
 
+/**
+ * @internal
+ */
 final class PhpUnitExtraOptions extends TestFrameworkExtraOptions
 {
     protected function getInitialRunOnlyOptions(): array

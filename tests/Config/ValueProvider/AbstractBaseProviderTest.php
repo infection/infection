@@ -14,6 +14,9 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 
+/**
+ * @internal
+ */
 abstract class AbstractBaseProviderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     protected static $stty;

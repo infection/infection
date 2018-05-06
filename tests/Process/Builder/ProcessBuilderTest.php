@@ -14,7 +14,10 @@ use Infection\Process\Builder\ProcessBuilder;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Mockery;
 
-class ProcessBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+/**
+ * @internal
+ */
+final class ProcessBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     public function test_getProcessForInitialTestRun_has_no_timeout()
     {

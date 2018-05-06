@@ -15,7 +15,10 @@ use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\LNumber;
 
-class PlusTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class PlusTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

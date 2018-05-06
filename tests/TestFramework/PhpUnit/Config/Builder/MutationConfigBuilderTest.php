@@ -19,7 +19,10 @@ use Mockery;
 use Symfony\Component\Filesystem\Filesystem;
 use function Infection\Tests\normalizePath as p;
 
-class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+/**
+ * @internal
+ */
+final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     const HASH = 'a1b2c3';
 

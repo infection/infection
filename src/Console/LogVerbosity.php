@@ -11,6 +11,9 @@ namespace Infection\Console;
 
 use Symfony\Component\Console\Input\InputInterface;
 
+/**
+ * @internal
+ */
 final class LogVerbosity
 {
     const DEBUG = 'all';

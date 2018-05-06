@@ -13,7 +13,10 @@ use Infection\Finder\SourceFilesFinder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
 
-class SourceFilesFinderTest extends TestCase
+/**
+ * @internal
+ */
+final class SourceFilesFinderTest extends TestCase
 {
     public function test_it_lists_all_php_files_without_a_filter()
     {

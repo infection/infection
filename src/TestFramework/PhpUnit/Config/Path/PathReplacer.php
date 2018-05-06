@@ -11,6 +11,9 @@ namespace Infection\TestFramework\PhpUnit\Config\Path;
 
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @internal
+ */
 final class PathReplacer
 {
     /**

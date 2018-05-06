@@ -12,7 +12,10 @@ namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use PHPUnit\Framework\TestCase;
 
-class CoverageXmlParserTest extends TestCase
+/**
+ * @internal
+ */
+final class CoverageXmlParserTest extends TestCase
 {
     /**
      * @var CoverageXmlParser

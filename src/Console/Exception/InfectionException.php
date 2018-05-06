@@ -12,10 +12,6 @@ namespace Infection\Console\Exception;
 /**
  * @internal
  */
-class InfectionException extends \Exception
+abstract class InfectionException extends \Exception
 {
-    public static function configurationAborted()
-    {
-        return new self('Configuration aborted');
-    }
 }

@@ -12,6 +12,9 @@ namespace Infection\Tests\Config\Exception;
 use Infection\Config\Exception\InvalidConfigException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ */
 final class InvalidConfigExceptionTest extends TestCase
 {
     public function test_extends_runtime_exception()

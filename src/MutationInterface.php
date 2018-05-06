@@ -12,6 +12,8 @@ namespace Infection;
 use Infection\Mutator\Util\Mutator;
 
 /**
+ * @internal
+ *
  * @see Mutation
  */
 interface MutationInterface

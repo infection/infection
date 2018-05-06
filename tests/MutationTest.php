@@ -14,7 +14,10 @@ use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Util\MutatorConfig;
 use PHPUnit\Framework\TestCase;
 
-class MutationTest extends TestCase
+/**
+ * @internal
+ */
+final class MutationTest extends TestCase
 {
     public function test_it_correctly_generates_hash()
     {

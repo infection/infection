@@ -17,7 +17,10 @@ use PhpParser\NodeVisitorAbstract;
 use PhpParser\ParserFactory;
 use PHPUnit\Framework\TestCase;
 
-class FullyQualifiedClassNameVisitorTest extends TestCase
+/**
+ * @internal
+ */
+final class FullyQualifiedClassNameVisitorTest extends TestCase
 {
     private $spyVisitor;
 

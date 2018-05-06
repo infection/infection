@@ -12,6 +12,9 @@ namespace Infection\Mutator\ZeroIteration;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
+/**
+ * @internal
+ */
 final class Foreach_ extends Mutator
 {
     public function mutate(Node $node)

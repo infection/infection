@@ -13,7 +13,10 @@ use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Mockery;
 
-class CachedTestFileDataProviderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+/**
+ * @internal
+ */
+final class CachedTestFileDataProviderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     public function test_the_second_call_returns_cached_result()
     {

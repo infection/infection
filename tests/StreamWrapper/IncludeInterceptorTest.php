@@ -12,6 +12,8 @@ namespace Infection\Tests\StreamWrapper;
 use Infection\StreamWrapper\IncludeInterceptor;
 
 /**
+ * @internal
+ *
  * Tests IncludeInterceptor for correct operation.
  *
  * We mainly interested in methods, essential to interception:
@@ -26,7 +28,7 @@ use Infection\StreamWrapper\IncludeInterceptor;
  * Other methods are not essential for interception to work,
  * but still are required to be implemented by a full wrapper.
  */
-class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
+final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
 {
     private static $files = [];
 

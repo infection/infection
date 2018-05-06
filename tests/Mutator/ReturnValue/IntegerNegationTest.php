@@ -13,7 +13,10 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Stmt\Return_;
 
-class IntegerNegationTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class IntegerNegationTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

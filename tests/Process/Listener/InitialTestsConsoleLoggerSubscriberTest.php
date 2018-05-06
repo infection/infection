@@ -17,7 +17,10 @@ use Mockery;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class InitialTestsConsoleLoggerSubscriberTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+/**
+ * @internal
+ */
+final class InitialTestsConsoleLoggerSubscriberTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     public function test_it_reacts_on_initial_test_suite_run()
     {

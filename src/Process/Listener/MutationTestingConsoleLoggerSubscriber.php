@@ -19,6 +19,9 @@ use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcessInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @internal
+ */
 final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
 {
     const PAD_LENGTH = 8;

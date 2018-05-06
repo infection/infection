@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Infection\StreamWrapper;
 
+/**
+ * @internal
+ */
 final class IncludeInterceptor
 {
     const STREAM_OPEN_FOR_INCLUDE = 0x00000080;

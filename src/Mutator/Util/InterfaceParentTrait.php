@@ -15,6 +15,8 @@ use PhpParser\Node;
 /**
  * Checks if given node belongs to Interface
  *
+ * @internal
+ *
  * @author Volodimir Melko <v.melko28@gmail.com>
  */
 trait InterfaceParentTrait

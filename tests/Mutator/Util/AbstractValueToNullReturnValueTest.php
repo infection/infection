@@ -14,7 +14,10 @@ use PhpParser\Node;
 use PhpParser\Node\Stmt\Function_;
 use PHPUnit\Framework\TestCase;
 
-class AbstractValueToNullReturnValueTest extends TestCase
+/**
+ * @internal
+ */
+final class AbstractValueToNullReturnValueTest extends TestCase
 {
     protected $testSubject = null;
 

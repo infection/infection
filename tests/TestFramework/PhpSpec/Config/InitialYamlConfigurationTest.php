@@ -14,7 +14,10 @@ use Infection\TestFramework\PhpSpec\Config\InitialYamlConfiguration;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
 
-class InitialYamlConfigurationTest extends TestCase
+/**
+ * @internal
+ */
+final class InitialYamlConfigurationTest extends TestCase
 {
     protected $tempDir = '/path/to/tmp';
 

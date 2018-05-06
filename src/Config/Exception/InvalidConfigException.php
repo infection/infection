@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Infection\Config\Exception;
 
+/**
+ * @internal
+ */
 final class InvalidConfigException extends \RuntimeException
 {
     public static function invalidJson(string $configFile, string $errorMessage): self

@@ -12,6 +12,9 @@ namespace Infection\Mutator\Cast;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
+/**
+ * @internal
+ */
 abstract class AbstractCastMutator extends Mutator
 {
     public function mutate(Node $node)

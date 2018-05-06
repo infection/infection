@@ -14,7 +14,10 @@ use Infection\Config\ValueProvider\ExcludeDirsProvider;
 use Mockery;
 use Symfony\Component\Filesystem\Filesystem;
 
-class ExcludeDirsProviderTest extends AbstractBaseProviderTest
+/**
+ * @internal
+ */
+final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
 {
     /**
      * @var string

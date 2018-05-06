@@ -11,7 +11,10 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ExponentiationTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class ExponentiationTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

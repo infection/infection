@@ -19,7 +19,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-class MutationTestingResultsLoggerSubscriberTest extends TestCase
+/**
+ * @internal
+ */
+final class MutationTestingResultsLoggerSubscriberTest extends TestCase
 {
     /**
      * @var OutputInterface|\PHPUnit_Framework_MockObject_MockObject

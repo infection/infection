@@ -11,6 +11,9 @@ namespace Infection\TestFramework\Config;
 
 use Infection\Mutant\MutantInterface;
 
+/**
+ * @internal
+ */
 abstract class MutationConfigBuilder
 {
     abstract public function build(MutantInterface $mutant): string;

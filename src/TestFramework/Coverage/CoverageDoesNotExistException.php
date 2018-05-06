@@ -11,6 +11,9 @@ namespace Infection\TestFramework\Coverage;
 
 use Infection\Console\Exception\InfectionException;
 
+/**
+ * @internal
+ */
 final class CoverageDoesNotExistException extends InfectionException
 {
     public static function with(string $coverageIndexFilePath, string $testFrameworkKey, string $tempDir): self

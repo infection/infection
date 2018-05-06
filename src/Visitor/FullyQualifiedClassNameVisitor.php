@@ -15,6 +15,8 @@ use PhpParser\Node\Stmt;
 use PhpParser\NodeVisitorAbstract;
 
 /**
+ * @internal
+ *
  * Adds FullyQualifiedClassName (FQCN) string to class node:
  *      $node->name                    // Plus
  *      $node->fullyQualifiedClassName // Infection\Mutator\Plus

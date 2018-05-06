@@ -13,7 +13,10 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TextLogFileProvider;
 use Mockery;
 
-class TextLogFileProviderTest extends AbstractBaseProviderTest
+/**
+ * @internal
+ */
+final class TextLogFileProviderTest extends AbstractBaseProviderTest
 {
     public function test_it_uses_default_value()
     {

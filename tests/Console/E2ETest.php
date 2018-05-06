@@ -20,7 +20,10 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 
-class E2ETest extends TestCase
+/**
+ * @internal
+ */
+final class E2ETest extends TestCase
 {
     const EXPECT_ERROR = 1;
     const EXPECT_SUCCESS = 0;

@@ -3,6 +3,7 @@
          xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="./vendor/autoload.php"
          colors="true"
+         verbose="true"
 >
     <testsuites>
         <testsuite name="Application Test Suite">
@@ -24,6 +25,7 @@
     <groups>
         <exclude>
             <group>large</group>
+            <group>auto-review</group>
         </exclude>
     </groups>
 

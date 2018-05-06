@@ -12,7 +12,10 @@ namespace Infection\Tests\Mutator\Sort;
 use Infection\Mutator\Sort\Spaceship;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class SpaceshipTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class SpaceshipTest extends AbstractMutatorTestCase
 {
     public function test_get_name()
     {

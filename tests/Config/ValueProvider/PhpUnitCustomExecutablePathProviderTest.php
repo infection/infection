@@ -16,7 +16,10 @@ use Infection\Finder\TestFrameworkFinder;
 use Mockery;
 use function Infection\Tests\normalizePath as p;
 
-class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProviderTest
+/**
+ * @internal
+ */
+final class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProviderTest
 {
     public function test_it_returns_null_if_executable_is_found()
     {

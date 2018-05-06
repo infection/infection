@@ -12,6 +12,9 @@ namespace Infection\Mutator\ConditionalBoundary;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
+/**
+ * @internal
+ */
 final class GreaterThanOrEqualTo extends Mutator
 {
     /**

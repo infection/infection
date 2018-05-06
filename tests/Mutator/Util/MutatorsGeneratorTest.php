@@ -21,7 +21,10 @@ use PhpParser\Node;
 use PhpParser\Node\Expr\BinaryOp\Plus as PlusNode;
 use PhpParser\Node\Scalar\DNumber;
 
-class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+/**
+ * @internal
+ */
+final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     private static $countDefaultMutators = 0;
 

@@ -21,7 +21,10 @@ use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PHPUnit\Framework\TestCase;
 
-class ReflectionVisitorTest extends TestCase
+/**
+ * @internal
+ */
+final class ReflectionVisitorTest extends TestCase
 {
     private $spyVisitor;
 

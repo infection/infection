@@ -23,6 +23,9 @@ use Infection\Mutant\MetricsCalculator;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @internal
+ */
 final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
 {
     /**

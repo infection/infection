@@ -12,7 +12,10 @@ namespace Infection\Tests\Console;
 use Infection\Console\InfectionContainer;
 use PHPUnit\Framework\TestCase;
 
-class InfectionContainerTest extends TestCase
+/**
+ * @internal
+ */
+final class InfectionContainerTest extends TestCase
 {
     public function test_it_is_a_usable_container()
     {

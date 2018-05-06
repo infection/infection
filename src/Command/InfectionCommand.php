@@ -11,6 +11,7 @@ namespace Infection\Command;
 
 use Infection\Config\InfectionConfig;
 use Infection\Console\ConsoleOutput;
+use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Exception\InfectionException;
 use Infection\Console\Exception\InvalidOptionException;
 use Infection\Console\LogVerbosity;
@@ -418,7 +419,7 @@ final class InfectionCommand extends BaseCommand
             $result = $configureCommand->run($newInput, $output);
 
             if ($result !== 0) {
-                throw InfectionException::configurationAborted();
+                throw ConfigurationException::configurationAborted();
             }
         }
         $this->doInitialize($input);

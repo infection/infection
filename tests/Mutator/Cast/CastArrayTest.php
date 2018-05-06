@@ -11,7 +11,10 @@ namespace Infection\Tests\Mutator\Cast;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class CastArrayTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class CastArrayTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

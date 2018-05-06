@@ -11,7 +11,10 @@ namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class Yield_Test extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class Yield_Test extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

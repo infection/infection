@@ -12,6 +12,9 @@ namespace Infection\Mutator\ConditionalNegotiation;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
+/**
+ * @internal
+ */
 final class LessThanOrEqualToNegotiation extends Mutator
 {
     /**

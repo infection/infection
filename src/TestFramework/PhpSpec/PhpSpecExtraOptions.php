@@ -11,6 +11,9 @@ namespace Infection\TestFramework\PhpSpec;
 
 use Infection\TestFramework\TestFrameworkExtraOptions;
 
+/**
+ * @internal
+ */
 final class PhpSpecExtraOptions extends TestFrameworkExtraOptions
 {
     protected function getInitialRunOnlyOptions(): array

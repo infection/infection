@@ -15,6 +15,9 @@ use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 
+/**
+ * @internal
+ */
 final class ProtectedVisibility extends Mutator
 {
     /**

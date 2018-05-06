@@ -13,6 +13,9 @@ use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
 
+/**
+ * @internal
+ */
 final class PhpUnitTestFileDataProvider implements TestFileDataProvider
 {
     /**

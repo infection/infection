@@ -12,7 +12,10 @@ namespace Infection\Tests\Config\Guesser;
 use Infection\Config\Guesser\SourceDirGuesser;
 use PHPUnit\Framework\TestCase;
 
-class SourceDirGuesserTest extends TestCase
+/**
+ * @internal
+ */
+final class SourceDirGuesserTest extends TestCase
 {
     public function test_it_parser_psr4()
     {

@@ -19,7 +19,10 @@ use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
-class ParallelProcessRunnerTest extends MockeryTestCase
+/**
+ * @internal
+ */
+final class ParallelProcessRunnerTest extends MockeryTestCase
 {
     private function buildEventDispatcherWithEventCount($eventCount): EventDispatcherInterface
     {

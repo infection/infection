@@ -14,7 +14,10 @@ use Infection\Config\InfectionConfig;
 use Infection\Config\ValueProvider\TimeoutProvider;
 use Mockery;
 
-class TimeoutProviderTest extends AbstractBaseProviderTest
+/**
+ * @internal
+ */
+final class TimeoutProviderTest extends AbstractBaseProviderTest
 {
     public function test_it_uses_default_value()
     {

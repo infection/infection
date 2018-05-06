@@ -22,6 +22,9 @@ use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ */
 abstract class AbstractMutatorTestCase extends TestCase
 {
     /**

@@ -14,7 +14,10 @@ use Infection\Tests\Fixtures\UserEventSubscriber;
 use Infection\Tests\Fixtures\UserWasCreated;
 use PHPUnit\Framework\TestCase;
 
-class EventDispatcherTest extends TestCase
+/**
+ * @internal
+ */
+final class EventDispatcherTest extends TestCase
 {
     /**
      * @var EventDispatcher

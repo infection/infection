@@ -15,7 +15,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use function Infection\Tests\normalizePath as p;
 
-class LocatorTest extends TestCase
+/**
+ * @internal
+ */
+final class LocatorTest extends TestCase
 {
     /**
      * @var Filesystem

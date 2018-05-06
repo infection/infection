@@ -12,7 +12,10 @@ namespace Infection\Tests\Mutator\ReturnValue;
 use Infection\Mutator\ReturnValue\FunctionCall;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class FunctionCallTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class FunctionCallTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

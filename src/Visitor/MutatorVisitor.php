@@ -14,6 +14,9 @@ use Infection\MutationInterface;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
+/**
+ * @internal
+ */
 final class MutatorVisitor extends NodeVisitorAbstract
 {
     /**

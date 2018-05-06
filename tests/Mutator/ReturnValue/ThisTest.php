@@ -12,7 +12,10 @@ namespace Infection\Tests\Mutator\ReturnValue;
 use Infection\Mutator\ReturnValue\This;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ThisTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class ThisTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

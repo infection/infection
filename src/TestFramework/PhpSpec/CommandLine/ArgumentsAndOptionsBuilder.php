@@ -11,6 +11,9 @@ namespace Infection\TestFramework\PhpSpec\CommandLine;
 
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 
+/**
+ * @internal
+ */
 final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
     public function build(string $configPath, string $extraOptions): string

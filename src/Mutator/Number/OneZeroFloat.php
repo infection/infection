@@ -12,6 +12,9 @@ namespace Infection\Mutator\Number;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
+/**
+ * @internal
+ */
 final class OneZeroFloat extends Mutator
 {
     /**

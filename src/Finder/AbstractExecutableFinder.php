@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Infection\Finder;
 
+/**
+ * @internal
+ */
 abstract class AbstractExecutableFinder
 {
     abstract public function find(): string;

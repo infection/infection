@@ -12,6 +12,9 @@ namespace Infection\Mutator\Util;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
+/**
+ * @internal
+ */
 abstract class AbstractValueToNullReturnValue extends Mutator
 {
     protected function isNullReturnValueAllowed(Node $node): bool

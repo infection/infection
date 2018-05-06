@@ -11,6 +11,9 @@ namespace Infection\Mutator\Util;
 
 use Infection\Mutator;
 
+/**
+ * @internal
+ */
 final class MutatorProfile
 {
     const MUTATOR_PROFILE_LIST = [

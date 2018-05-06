@@ -11,7 +11,10 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class BitwiseOrTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class BitwiseOrTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

@@ -18,7 +18,9 @@ use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
- * This ProcessManager is a simple wrapper to enable parallel processing using Symfony Process component.
+ * @internal
+ *
+ * This ProcessManager is a simple wrapper to enable parallel processing using Symfony Process component
  */
 final class ParallelProcessRunner
 {
