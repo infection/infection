@@ -125,9 +125,9 @@ phpstan: vendor $(PHPSTAN)
 validate:
 	composer validate --strict
 
-build/bin/infection.phar: app bin src vendor box.json.dist scoper.inc.php box.phar
+build/bin/infection.phar: bin src vendor box.json.dist scoper.inc.php box.phar
 	php box.phar compile
 
 box.phar:
-	wget https://github.com/humbug/box/releases/download/3.0.0-alpha.2/box.phar
+	wget https://github.com/humbug/box/releases/download/3.0.0-alpha.5/box.phar
 	chmod a+x box.phar
