@@ -111,7 +111,7 @@ build-xdebug-72: vendor
 
 #style checks/ static analysis
 .PHONY: analyze cs-fix cs-check phpstan validate auto-review
-analyze: cs-check phpstan validate auto-review
+analyze: cs-check phpstan validate
 
 cs-fix: build/cache $(PHP-CS-FIXER)
 	$(PHP-CS-FIXER) fix -v --cache-file=build/cache/.php_cs.cache

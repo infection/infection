@@ -15,7 +15,7 @@ The following commands can be ran to test on your local environment
 
  - `./tests/e2e_tests` for end to end tests
  - `bin/infection` to run infection on itself.
- - `make analyze` to run PHPCSFixer, PHPStan, and our own auto review tests.
+ - `make analyze` to run PHPCSFixer and PHPStan.
 
 We also provide a way to run these commands in different environments, e.g. different php versions and debuggers.
 

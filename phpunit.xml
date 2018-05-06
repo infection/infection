@@ -25,7 +25,6 @@
     <groups>
         <exclude>
             <group>large</group>
-            <group>auto-review</group>
         </exclude>
     </groups>
 
