@@ -425,18 +425,13 @@ final class InfectionCommand extends BaseCommand
         $this->eventDispatcher = $this->getContainer()->get('dispatcher');
     }
 
-    public function hasDebuggerOrCoverageOption(): bool
+    private function hasDebuggerOrCoverageOption(): bool
     {
-        if (!$this->skipCoverage
-            && PHP_SAPI !== 'phpdbg'
-            && !\extension_loaded('xdebug')
-            && !XdebugHandler::getSkippedVersion()
-            && !$this->isXdebugIncludedInInitialTestPhpOptions()
-        ) {
-            return false;
-        }
-
-        return true;
+        return $this->skipCoverage
+            || PHP_SAPI === 'phpdbg'
+            || \extension_loaded('xdebug')
+            || XdebugHandler::getSkippedVersion()
+            || $this->isXdebugIncludedInInitialTestPhpOptions();
     }
 
     private function runConfigurationCommand(Locator $locator)
