@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-readonly INFECTION=../../../../bin/infection
+readonly INFECTION=../../../../build/bin/infection.phar
 
 set -e pipefail
 
