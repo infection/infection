@@ -12,9 +12,9 @@ namespace Infection\Mutant;
 use Infection\Differ\Differ;
 use Infection\MutationInterface;
 use Infection\TestFramework\Coverage\CodeCoverageData;
-use Infection\Visitor\CloneVisitor;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\PrettyPrinter\Standard;
 
 /**
@@ -75,7 +75,7 @@ final class MutantCreator
         }
         $traverser = new NodeTraverser();
 
-        $traverser->addVisitor(new CloneVisitor());
+        $traverser->addVisitor(new CloningVisitor());
         $traverser->addVisitor(new MutatorVisitor($mutation));
 
         $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
