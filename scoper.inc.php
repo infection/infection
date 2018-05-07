@@ -11,11 +11,11 @@ return [
     //
     // For more see: https://github.com/humbug/php-scoper#finders-and-paths
     'finders' => [
-        Finder::create()->files()->in(['src', 'app', 'bin']),
+        Finder::create()->files()->in(['src', 'bin']),
         Finder::create()
             ->files()
             ->ignoreVCS(true)
-            ->notName('/LICENSE|.*\\.md|.*\\.dist|Makefile|composer\\.json|composer\\.lock/')
+            ->notName('/.*\\.md|.*\\.dist|Makefile|composer\\.json|composer\\.lock/')
             ->exclude([
                 'doc',
                 'test',

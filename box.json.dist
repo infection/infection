@@ -10,6 +10,7 @@
     "compression": "GZ",
     "compactors": [
         "Herrera\\Box\\Compactor\\Json",
-        "Herrera\\Box\\Compactor\\Php"
+        "Herrera\\Box\\Compactor\\Php",
+        "KevinGH\\Box\\Compactor\\PhpScoper"
     ]
 }
