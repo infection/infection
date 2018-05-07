@@ -6,6 +6,7 @@
 /.php_cs.cache
 /infection-cache
 /.travis/infection-private.pem
+/.travis/secrets.tar
 /infection.json
 /*.phar
 /build/bin/infection.phar

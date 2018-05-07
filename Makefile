@@ -64,13 +64,13 @@ test-infection-phpdbg-72: build-xdebug-72
 #e2e tests with phpdbg
 test-e2e-phpdbg: test-e2e-phpdbg-70 test-e2e-phpdbg-71 test-e2e-phpdbg-72
 
-test-e2e-phpdbg-70: build-xdebug-70
+test-e2e-phpdbg-70: build-xdebug-70 build/bin/infection.phar
 	$(DOCKER_RUN_70) env PHPDBG=1 ./tests/e2e_tests
 
-test-e2e-phpdbg-71: build-xdebug-71
+test-e2e-phpdbg-71: build-xdebug-71 build/bin/infection.phar
 	$(DOCKER_RUN_71) env PHPDBG=1 ./tests/e2e_tests
 
-test-e2e-phpdbg-72: build-xdebug-72
+test-e2e-phpdbg-72: build-xdebug-72 build/bin/infection.phar
 	$(DOCKER_RUN_72) env PHPDBG=1 ./tests/e2e_tests
 
 
@@ -92,13 +92,13 @@ test-infection-xdebug-72: build-xdebug-72
 #e2e tests with xdebug
 test-e2e-xdebug: test-e2e-xdebug-70 test-e2e-xdebug-71 test-e2e-xdebug-72
 
-test-e2e-xdebug-70: build-xdebug-70
+test-e2e-xdebug-70: build-xdebug-70 build/bin/infection.phar
 	$(DOCKER_RUN_70) ./tests/e2e_tests
 
-test-e2e-xdebug-71: vendor
+test-e2e-xdebug-71: build-xdebug-71 build/bin/infection.phar
 	$(DOCKER_RUN_71) ./tests/e2e_tests
 
-test-e2e-xdebug-72: vendor
+test-e2e-xdebug-72: build-xdebug-72 build/bin/infection.phar
 	$(DOCKER_RUN_72) ./tests/e2e_tests
 
 
