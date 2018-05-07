@@ -14,6 +14,9 @@ use Infection\Mutant\MetricsCalculator;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Process;
 
+/**
+ * @internal
+ */
 final class ConsoleOutput
 {
     const CI_FLAG_ERROR = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
