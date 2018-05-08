@@ -11,7 +11,6 @@ namespace Infection\TestFramework;
 
 use Infection\Config\InfectionConfig;
 use Infection\Finder\TestFrameworkFinder;
-use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
 use Infection\TestFramework\PhpSpec\CommandLine\ArgumentsAndOptionsBuilder as PhpSpecArgumentsAndOptionsBuilder;
@@ -37,7 +36,7 @@ final class Factory
     private $xmlConfigurationHelper;
 
     /**
-     * @var TestFrameworkConfigLocator
+     * @var TestFrameworkConfigLocatorInterface
      */
     private $configLocator;
 

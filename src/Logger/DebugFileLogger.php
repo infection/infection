@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
-use Infection\Process\MutantProcess;
+use Infection\Process\MutantProcessInterface;
 
 final class DebugFileLogger extends FileLogger
 {
@@ -43,7 +43,7 @@ final class DebugFileLogger extends FileLogger
     }
 
     /**
-     * @param MutantProcess[] $processes
+     * @param MutantProcessInterface[] $processes
      * @param string $headlinePrefix
      *
      * @return string

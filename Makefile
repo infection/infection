@@ -120,7 +120,8 @@ cs-check: build/cache $(PHP-CS-FIXER)
 	$(PHP-CS-FIXER) fix -v --cache-file=build/cache/.php_cs.cache --dry-run --stop-on-violation
 
 phpstan: vendor $(PHPSTAN)
-	$(PHPSTAN) analyse src tests --level=2 -c phpstan.neon --no-interaction --no-progress
+	$(PHPSTAN) analyse src --level=max -c ./devTools/phpstan-src.neon --no-interaction --no-progress
+	$(PHPSTAN) analyse tests --level=2 -c ./devTools/phpstan-tests.neon --no-interaction --no-progress
 
 validate:
 	composer validate --strict

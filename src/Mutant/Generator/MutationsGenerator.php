@@ -22,6 +22,7 @@ use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
+use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use Symfony\Component\Finder\SplFileInfo;
@@ -124,6 +125,7 @@ final class MutationsGenerator
      */
     private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered, array $mutators): array
     {
+        /** @var Node[] $initialStatements */
         $initialStatements = $this->parser->parse($file->getContents());
 
         $traverser = new NodeTraverser();

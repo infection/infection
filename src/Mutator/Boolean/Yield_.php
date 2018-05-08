@@ -19,7 +19,7 @@ final class Yield_ extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Expr\Yield_
+     * @return Node|Node\Expr\Yield_
      */
     public function mutate(Node $node)
     {

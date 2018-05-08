@@ -16,7 +16,7 @@ use Infection\Events\MutantProcessFinished;
 use Infection\Events\MutationTestingFinished;
 use Infection\Events\MutationTestingStarted;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Process\MutantProcess;
+use Infection\Process\MutantProcessInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
@@ -34,7 +34,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInt
     private $outputFormatter;
 
     /**
-     * @var MutantProcess[]
+     * @var MutantProcessInterface[]
      */
     private $mutantProcesses = [];
 
@@ -114,7 +114,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInt
     }
 
     /**
-     * @param MutantProcess[] $processes
+     * @param MutantProcessInterface[] $processes
      * @param string $headlinePrefix
      */
     private function showMutations(array $processes, string $headlinePrefix)

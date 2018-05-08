@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
-use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Process\Process;
@@ -38,7 +37,7 @@ final class MutantProcess implements MutantProcessInterface
     private $process;
 
     /**
-     * @var Mutant
+     * @var MutantInterface
      */
     private $mutant;
 

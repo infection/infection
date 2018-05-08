@@ -19,7 +19,7 @@ final class NotIdenticalNotEqual extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Expr\BinaryOp\Equal
+     * @return Node\Expr\BinaryOp\NotEqual
      */
     public function mutate(Node $node)
     {

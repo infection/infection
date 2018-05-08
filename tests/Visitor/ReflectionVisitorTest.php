@@ -138,7 +138,7 @@ class ReflectionVisitorTest extends TestCase
         ];
     }
 
-    private function getSpyVisitor(string $nodeClass): NodeVisitorAbstract
+    private function getSpyVisitor(string $nodeClass)
     {
         return new class($nodeClass) extends NodeVisitorAbstract {
             /** @var string */

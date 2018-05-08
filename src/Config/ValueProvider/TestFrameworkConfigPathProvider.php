@@ -11,7 +11,6 @@ namespace Infection\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\PhpUnitPathGuesser;
-use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\TestFrameworkTypes;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -22,7 +21,7 @@ use Symfony\Component\Console\Question\Question;
 final class TestFrameworkConfigPathProvider
 {
     /**
-     * @var TestFrameworkConfigLocator
+     * @var TestFrameworkConfigLocatorInterface
      */
     private $testFrameworkConfigLocator;
     /**
