@@ -59,7 +59,7 @@ install:
   - composer install
   - |
    if [ "${SYMFONY_VERSION}" != "" ]; then
-      composer config --unset platform.php
+      composer config --unset platform
       composer require \
         symfony/console:${SYMFONY_VERSION} \
         symfony/filesystem:${SYMFONY_VERSION} \

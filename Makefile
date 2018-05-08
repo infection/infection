@@ -139,13 +139,11 @@ validate:
 auto-review: vendor
 	vendor/bin/phpunit --group=auto-review
 
-build/bin/infection.phar: bin src vendor scoper.inc.php box.phar box.json
+build/bin/infection.phar: bin src vendor box.phar box.json
 	php box.phar compile
 
 box.json: box.json.dist
 	cat box.json.dist | sed -E 's/\"key\": \".+\",//g' | sed -E 's/\"algorithm\": \".+\",//g' > box.json
-
-
 
 box.phar:
 	wget https://github.com/humbug/box/releases/download/3.0.0-alpha.5/box.phar
