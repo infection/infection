@@ -67,7 +67,6 @@ script:
   - if [[ $PHPDBG != 1 ]]; then xdebug-enable; fi
   - if [[ $PHPDBG != 1 ]]; then $PHPUNIT_BIN; else phpdbg -qrr $PHPUNIT_BIN; fi
   - ./tests/e2e_tests
-  - ./tests/final_private_test
   - if [[ $NO_DEBUGGER == 1 ]]; then xdebug-disable; fi
   - if [[ $PHPDBG != 1 ]]; then
       bin/infection $INFECTION_FLAGS;
