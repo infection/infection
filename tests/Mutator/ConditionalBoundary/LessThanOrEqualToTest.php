@@ -11,7 +11,10 @@ namespace Infection\Tests\Mutator\ConditionalBoundary;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class LessThanOrEqualToTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class LessThanOrEqualToTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

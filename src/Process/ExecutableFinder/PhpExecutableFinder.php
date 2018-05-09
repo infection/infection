@@ -12,6 +12,9 @@ namespace Infection\Process\ExecutableFinder;
 use Composer\XdebugHandler\XdebugHandler;
 use Symfony\Component\Process\PhpExecutableFinder as BasePhpExecutableFinder;
 
+/**
+ * @internal
+ */
 final class PhpExecutableFinder extends BasePhpExecutableFinder
 {
     public function findArguments()

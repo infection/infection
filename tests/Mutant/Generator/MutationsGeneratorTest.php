@@ -25,7 +25,10 @@ use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use Pimple\Container;
 
-class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+/**
+ * @internal
+ */
+final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     public function test_it_collects_plus_mutation()
     {

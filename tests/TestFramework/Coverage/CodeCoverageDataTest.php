@@ -16,7 +16,10 @@ use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkTypes;
 use Mockery;
 
-class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+/**
+ * @internal
+ */
+final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     private $coverageDir = __DIR__ . '/../../Fixtures/Files/phpunit/coverage-xml';
 

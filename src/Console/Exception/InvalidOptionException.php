@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Infection\Console\Exception;
 
+/**
+ * @internal
+ */
 final class InvalidOptionException extends InfectionException
 {
     public static function withMessage(string $message)

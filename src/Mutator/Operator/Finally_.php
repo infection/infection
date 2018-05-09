@@ -13,6 +13,9 @@ use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
+/**
+ * @internal
+ */
 final class Finally_ extends Mutator
 {
     public function mutate(Node $node)

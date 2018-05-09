@@ -12,7 +12,10 @@ namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 use Infection\TestFramework\PhpUnit\Coverage\PhpUnitTestFileDataProvider;
 use PHPUnit\Framework\TestCase;
 
-class PhpUnitTestFileDataProviderTest extends TestCase
+/**
+ * @internal
+ */
+final class PhpUnitTestFileDataProviderTest extends TestCase
 {
     /**
      * @var PhpUnitTestFileDataProvider

@@ -13,6 +13,9 @@ use Infection\Finder\Exception\FinderException;
 use Infection\Process\ExecutableFinder\PhpExecutableFinder;
 use Symfony\Component\Process\ExecutableFinder;
 
+/**
+ * @internal
+ */
 final class ComposerExecutableFinder extends AbstractExecutableFinder
 {
     public function find(): string

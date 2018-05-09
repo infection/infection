@@ -16,7 +16,10 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Symfony\Component\Process\Process;
 
-class MutantProcessTest extends MockeryTestCase
+/**
+ * @internal
+ */
+final class MutantProcessTest extends MockeryTestCase
 {
     public function test_it_handles_not_covered_mutant()
     {

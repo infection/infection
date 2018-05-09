@@ -13,6 +13,9 @@ use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Process\Process;
 
+/**
+ * @internal
+ */
 final class MutantProcess implements MutantProcessInterface
 {
     const CODE_KILLED = 0;

@@ -12,6 +12,9 @@ namespace Infection\Logger;
 use Infection\Mutant\MetricsCalculator;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @internal
+ */
 abstract class FileLogger implements MutationTestingResultsLogger
 {
     /**

@@ -13,7 +13,10 @@ use Infection\Finder\Exception\LocatorException;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use function Infection\Tests\normalizePath as p;
 
-class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
+/**
+ * @internal
+ */
+final class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
 {
     private $baseDir = __DIR__ . '/../../Fixtures/ConfigLocator/';
 

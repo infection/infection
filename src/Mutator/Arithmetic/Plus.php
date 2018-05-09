@@ -13,6 +13,9 @@ use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 
+/**
+ * @internal
+ */
 final class Plus extends Mutator
 {
     /**

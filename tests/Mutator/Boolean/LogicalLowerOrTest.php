@@ -11,7 +11,10 @@ namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class LogicalLowerOrTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class LogicalLowerOrTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

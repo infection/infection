@@ -11,7 +11,10 @@ namespace Infection\Tests\Mutator\Regex;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class PregQuoteTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class PregQuoteTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

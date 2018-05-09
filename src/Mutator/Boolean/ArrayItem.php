@@ -12,6 +12,9 @@ namespace Infection\Mutator\Boolean;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
+/**
+ * @internal
+ */
 final class ArrayItem extends Mutator
 {
     /**

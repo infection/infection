@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
+/**
+ * @internal
+ */
 final class MutatorConfig
 {
     /**

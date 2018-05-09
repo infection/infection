@@ -15,7 +15,10 @@ use Infection\Process\MutantProcessInterface;
 use Mockery;
 use Symfony\Component\Process\Process;
 
-class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+/**
+ * @internal
+ */
+final class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     public function test_it_shows_zero_values_by_default()
     {

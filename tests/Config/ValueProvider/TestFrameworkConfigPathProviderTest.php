@@ -16,7 +16,10 @@ use Mockery;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
+/**
+ * @internal
+ */
+final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
 {
     public function test_it_calls_locator_in_the_current_dir()
     {

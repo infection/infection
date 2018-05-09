@@ -11,7 +11,10 @@ namespace Infection\Tests\Mutator\Number;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class OneZeroFloatTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class OneZeroFloatTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

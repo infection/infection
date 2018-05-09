@@ -12,7 +12,10 @@ namespace Infection\Tests\Mutator\Util;
 use Infection\Mutator\Util\MutatorConfig;
 use PHPUnit\Framework\TestCase;
 
-class MutatorConfigTest extends TestCase
+/**
+ * @internal
+ */
+final class MutatorConfigTest extends TestCase
 {
     /**
      * @dataProvider providesIgnoredValues

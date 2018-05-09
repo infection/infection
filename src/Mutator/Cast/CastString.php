@@ -11,6 +11,9 @@ namespace Infection\Mutator\Cast;
 
 use PhpParser\Node;
 
+/**
+ * @internal
+ */
 final class CastString extends AbstractCastMutator
 {
     protected function mutatesNode(Node $node): bool

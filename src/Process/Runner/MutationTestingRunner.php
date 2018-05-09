@@ -23,6 +23,9 @@ use Infection\Process\MutantProcessInterface;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 
+/**
+ * @internal
+ */
 final class MutationTestingRunner
 {
     /**

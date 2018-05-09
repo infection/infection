@@ -23,6 +23,9 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\VersionParser;
 
+/**
+ * @internal
+ */
 final class Factory
 {
     /**

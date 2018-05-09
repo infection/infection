@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace Infection\Tests;
 
 /**
+ * @internal
+ *
  * Normalizes path. Replaces backslashes with forward ones
  *
  * @param string $value

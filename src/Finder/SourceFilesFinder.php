@@ -12,6 +12,9 @@ namespace Infection\Finder;
 use Infection\Finder\Iterator\RealPathFilterIterator;
 use Symfony\Component\Finder\Finder;
 
+/**
+ * @internal
+ */
 final class SourceFilesFinder extends Finder
 {
     /**

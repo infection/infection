@@ -11,7 +11,10 @@ namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class Finally_Test extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class Finally_Test extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

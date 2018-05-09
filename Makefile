@@ -110,7 +110,7 @@ build-xdebug-72: vendor
 	docker build -t infection_php72 -f "$$PWD/devTools/Dockerfile-php72-xdebug" .
 
 #style checks/ static analysis
-.PHONY: analyze cs-fix cs-check phpstan validate update
+.PHONY: analyze cs-fix cs-check phpstan validate auto-review
 analyze: cs-check phpstan validate
 
 cs-fix: build/cache $(PHP-CS-FIXER)
@@ -125,6 +125,9 @@ phpstan: vendor $(PHPSTAN)
 
 validate:
 	composer validate --strict
+
+auto-review: vendor
+	vendor/bin/phpunit --group=auto-review
 
 build/bin/infection.phar: bin src vendor box.json.dist scoper.inc.php box.phar
 	php box.phar compile

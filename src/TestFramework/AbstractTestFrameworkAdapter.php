@@ -18,6 +18,9 @@ use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\Utils\VersionParser;
 use Symfony\Component\Process\Process;
 
+/**
+ * @internal
+ */
 abstract class AbstractTestFrameworkAdapter
 {
     /**

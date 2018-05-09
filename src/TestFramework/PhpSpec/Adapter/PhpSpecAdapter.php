@@ -11,6 +11,9 @@ namespace Infection\TestFramework\PhpSpec\Adapter;
 
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 
+/**
+ * @internal
+ */
 final class PhpSpecAdapter extends AbstractTestFrameworkAdapter
 {
     const ERROR_REGEXPS = [

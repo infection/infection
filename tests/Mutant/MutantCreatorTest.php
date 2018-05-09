@@ -16,7 +16,10 @@ use Infection\TestFramework\Coverage\CodeCoverageData;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PhpParser\PrettyPrinter\Standard;
 
-class MutantCreatorTest extends MockeryTestCase
+/**
+ * @internal
+ */
+final class MutantCreatorTest extends MockeryTestCase
 {
     const TEST_FILE_NAME = '/mutant.hash.infection.php';
 

@@ -11,6 +11,9 @@ namespace Infection\Mutator\Util;
 
 use Infection\Config\Exception\InvalidConfigException;
 
+/**
+ * @internal
+ */
 final class MutatorsGenerator
 {
     /**

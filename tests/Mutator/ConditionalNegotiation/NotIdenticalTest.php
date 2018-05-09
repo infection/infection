@@ -11,7 +11,10 @@ namespace Infection\Tests\Mutator\ConditionalNegotiation;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class NotIdenticalTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class NotIdenticalTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

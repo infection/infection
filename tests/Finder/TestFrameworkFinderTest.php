@@ -15,7 +15,10 @@ use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-class TestFrameworkFinderTest extends TestCase
+/**
+ * @internal
+ */
+final class TestFrameworkFinderTest extends TestCase
 {
     /**
      * @var Filesystem

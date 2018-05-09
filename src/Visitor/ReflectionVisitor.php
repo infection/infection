@@ -12,6 +12,9 @@ namespace Infection\Visitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
+/**
+ * @internal
+ */
 final class ReflectionVisitor extends NodeVisitorAbstract
 {
     const REFLECTION_CLASS_KEY = 'reflectionClass';

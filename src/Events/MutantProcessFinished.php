@@ -11,6 +11,9 @@ namespace Infection\Events;
 
 use Infection\Process\MutantProcessInterface;
 
+/**
+ * @internal
+ */
 final class MutantProcessFinished
 {
     /**

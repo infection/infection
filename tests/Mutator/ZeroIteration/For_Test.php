@@ -11,7 +11,10 @@ namespace Infection\Tests\Mutator\ZeroIteration;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class For_Test extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class For_Test extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

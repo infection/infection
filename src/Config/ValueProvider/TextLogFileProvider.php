@@ -15,6 +15,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 
+/**
+ * @internal
+ */
 final class TextLogFileProvider
 {
     const TEXT_LOG_FILE_NAME = 'infection-log.txt';

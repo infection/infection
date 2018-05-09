@@ -17,7 +17,10 @@ use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use Infection\Utils\VersionParser;
 use Mockery;
 
-class PhpSpecAdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+/**
+ * @internal
+ */
+final class PhpSpecAdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     public function test_it_has_a_name()
     {

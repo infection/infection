@@ -12,6 +12,9 @@ namespace Infection\Visitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
+/**
+ * @internal
+ */
 final class CloneVisitor extends NodeVisitorAbstract
 {
     public function enterNode(Node $origNode)

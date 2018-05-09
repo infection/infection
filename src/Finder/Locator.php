@@ -12,6 +12,9 @@ namespace Infection\Finder;
 use Infection\Finder\Exception\LocatorException;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @internal
+ */
 final class Locator
 {
     /**

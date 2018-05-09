@@ -21,7 +21,10 @@ use Infection\Process\MutantProcessInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MutationTestingConsoleLoggerSubscriberTest extends TestCase
+/**
+ * @internal
+ */
+final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 {
     /**
      * @var OutputInterface|\PHPUnit_Framework_MockObject_MockObject

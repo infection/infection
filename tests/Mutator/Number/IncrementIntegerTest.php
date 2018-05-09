@@ -11,7 +11,10 @@ namespace Infection\Tests\Mutator\Number;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class IncrementIntegerTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class IncrementIntegerTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

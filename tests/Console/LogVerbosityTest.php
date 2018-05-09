@@ -16,7 +16,10 @@ use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class LogVerbosityTest extends MockeryTestCase
+/**
+ * @internal
+ */
+final class LogVerbosityTest extends MockeryTestCase
 {
     public function test_it_works_if_verbosity_is_valid()
     {

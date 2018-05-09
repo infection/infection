@@ -13,6 +13,9 @@ use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @internal
+ */
 final class DotFormatter extends AbstractOutputFormatter
 {
     const DOTS_PER_ROW = 50;

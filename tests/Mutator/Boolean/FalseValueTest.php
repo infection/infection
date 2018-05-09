@@ -13,7 +13,10 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
 
-class FalseValueTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class FalseValueTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

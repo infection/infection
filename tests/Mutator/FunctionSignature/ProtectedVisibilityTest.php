@@ -12,7 +12,10 @@ namespace Infection\Tests\Mutator\FunctionSignature;
 use Infection\Mutator\FunctionSignature\ProtectedVisibility;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ProtectedVisibilityTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class ProtectedVisibilityTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

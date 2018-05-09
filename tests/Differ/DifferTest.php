@@ -13,7 +13,10 @@ use Infection\Differ\Differ;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 
-class DifferTest extends TestCase
+/**
+ * @internal
+ */
+final class DifferTest extends TestCase
 {
     public function test_show_diffs_with_max_lines()
     {

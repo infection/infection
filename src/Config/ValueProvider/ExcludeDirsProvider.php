@@ -17,6 +17,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @internal
+ */
 final class ExcludeDirsProvider
 {
     const EXCLUDED_ROOT_DIRS = ['vendor', 'tests', 'test'];

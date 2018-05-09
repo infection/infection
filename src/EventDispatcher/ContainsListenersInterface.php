@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Infection\EventDispatcher;
 
+/**
+ * @internal
+ */
 interface ContainsListenersInterface
 {
     /**

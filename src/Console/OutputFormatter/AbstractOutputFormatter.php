@@ -12,6 +12,8 @@ namespace Infection\Console\OutputFormatter;
 use Infection\Process\MutantProcessInterface;
 
 /**
+ * @internal
+ *
  * Abstract empty class to simplify particular implementations
  */
 abstract class AbstractOutputFormatter implements OutputFormatter

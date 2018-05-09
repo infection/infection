@@ -12,6 +12,9 @@ namespace Infection\Mutator\Arithmetic;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
+/**
+ * @internal
+ */
 final class MinusEqual extends Mutator
 {
     /**

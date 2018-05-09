@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Infection\Finder\Exception;
 
+/**
+ * @internal
+ */
 final class FinderException extends \RuntimeException
 {
     public static function composerNotFound(): self

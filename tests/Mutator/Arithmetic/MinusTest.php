@@ -12,7 +12,10 @@ namespace Infection\Tests\Mutator\Arithmetic;
 use Infection\Mutator\Arithmetic\Minus;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class MinusTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class MinusTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

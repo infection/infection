@@ -12,6 +12,9 @@ namespace Infection\Console\OutputFormatter;
 use Infection\Process\MutantProcessInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 
+/**
+ * @internal
+ */
 final class ProgressFormatter extends AbstractOutputFormatter
 {
     /**

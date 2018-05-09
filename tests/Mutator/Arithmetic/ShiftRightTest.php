@@ -11,7 +11,10 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ShiftRightTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class ShiftRightTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

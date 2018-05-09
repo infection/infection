@@ -12,6 +12,9 @@ namespace Infection\Mutator\ReturnValue;
 use Infection\Mutator\Util\AbstractValueToNullReturnValue;
 use PhpParser\Node;
 
+/**
+ * @internal
+ */
 final class NewObject extends AbstractValueToNullReturnValue
 {
     /**

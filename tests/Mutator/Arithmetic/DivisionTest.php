@@ -12,7 +12,10 @@ namespace Infection\Tests\Mutator\Arithmetic;
 use Infection\Mutator\Arithmetic\Division;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class DivisionTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class DivisionTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

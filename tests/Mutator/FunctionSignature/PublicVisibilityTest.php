@@ -12,7 +12,10 @@ namespace Infection\Tests\Mutator\FunctionSignature;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class PublicVisibilityTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class PublicVisibilityTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider blacklistedProvider

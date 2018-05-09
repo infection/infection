@@ -11,6 +11,9 @@ namespace Infection\Mutant;
 
 use Infection\MutationInterface;
 
+/**
+ * @internal
+ */
 final class Mutant implements MutantInterface
 {
     private $mutatedFilePath;

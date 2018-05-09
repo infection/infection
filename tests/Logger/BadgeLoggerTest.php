@@ -16,7 +16,10 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class BadgeLoggerTest extends MockeryTestCase
+/**
+ * @internal
+ */
+final class BadgeLoggerTest extends MockeryTestCase
 {
     /**
      * @var OutputInterface|Mockery\MockInterface

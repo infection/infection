@@ -11,7 +11,10 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-class ModEqualTest extends AbstractMutatorTestCase
+/**
+ * @internal
+ */
+final class ModEqualTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

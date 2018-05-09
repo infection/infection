@@ -13,6 +13,8 @@ use Infection\Mutant\MutantInterface;
 use Symfony\Component\Process\Process;
 
 /**
+ * @internal
+ *
  * @see MutantProcess
  */
 interface MutantProcessInterface

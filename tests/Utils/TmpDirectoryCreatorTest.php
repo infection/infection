@@ -13,7 +13,10 @@ use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-class TmpDirectoryCreatorTest extends TestCase
+/**
+ * @internal
+ */
+final class TmpDirectoryCreatorTest extends TestCase
 {
     /**
      * @var TmpDirectoryCreator

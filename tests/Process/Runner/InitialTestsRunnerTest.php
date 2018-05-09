@@ -19,7 +19,10 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Symfony\Component\Process\Process;
 
-class InitialTestsRunnerTest extends MockeryTestCase
+/**
+ * @internal
+ */
+final class InitialTestsRunnerTest extends MockeryTestCase
 {
     public function test_it_dispatches_events()
     {

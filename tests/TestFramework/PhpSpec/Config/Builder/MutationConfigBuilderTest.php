@@ -16,7 +16,10 @@ use Infection\Utils\TmpDirectoryCreator;
 use Mockery;
 use Symfony\Component\Filesystem\Filesystem;
 
-class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+/**
+ * @internal
+ */
+final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     private $tmpDir;
 

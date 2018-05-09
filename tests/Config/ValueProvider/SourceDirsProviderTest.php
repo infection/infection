@@ -14,7 +14,10 @@ use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\ValueProvider\SourceDirsProvider;
 use Mockery;
 
-class SourceDirsProviderTest extends AbstractBaseProviderTest
+/**
+ * @internal
+ */
+final class SourceDirsProviderTest extends AbstractBaseProviderTest
 {
     public function test_it_uses_guesser_and_default_value()
     {

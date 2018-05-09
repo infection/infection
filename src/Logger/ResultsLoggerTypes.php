@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+/**
+ * @internal
+ */
 final class ResultsLoggerTypes
 {
     const TEXT_FILE = 'text';
