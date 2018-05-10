@@ -46,7 +46,7 @@ final class PhpProcess extends Process
     {
         // Xdebug wasn't skipped, running as is
         if ('' == XdebugHandler::getSkippedVersion()) {
-            parent::start($callback, $env);
+            parent::start($callback, $env ?? []);
 
             return;
         }
@@ -62,7 +62,7 @@ final class PhpProcess extends Process
 
         self::restoreVanillaEnvironment();
 
-        parent::start($callback, $env);
+        parent::start($callback, $env ?? []);
 
         self::setupXdebugFreeEnvironment();
     }
