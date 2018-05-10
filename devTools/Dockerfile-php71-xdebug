@@ -2,3 +2,6 @@ FROM php:7.1-cli
 
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 RUN apt-get -y update && apt-get install -y expect
+RUN useradd --shell /bin/bash infection
+
+USER infection
