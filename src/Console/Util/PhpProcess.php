@@ -51,6 +51,15 @@ final class PhpProcess extends Process
             return;
         }
 
+        /*
+         * Vanilla processes are expected to run in a vanilla, or the most original, environment.
+         *
+         * For that, we need to remove or reset all environment variables we set to setup our custom
+         * xdebug-free environment, later setting them back so we won't have to think again about it
+         * for the bulk of other processes, which not require xdebug to function, and work better
+         * without it.
+         */
+
         self::restoreVanillaEnvironment();
 
         parent::start($callback, $env);
