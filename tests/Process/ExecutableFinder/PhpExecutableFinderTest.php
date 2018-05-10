@@ -12,7 +12,10 @@ namespace Infection\Tests\Process\ExecutableFinder;
 use Infection\Process\ExecutableFinder\PhpExecutableFinder;
 use PHPUnit\Framework\TestCase;
 
-class PhpExecutableFinderTest extends TestCase
+/**
+ * @internal
+ */
+final class PhpExecutableFinderTest extends TestCase
 {
     public function test_it_finds_needed_args()
     {
