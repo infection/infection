@@ -28,11 +28,8 @@ build/cache:
 	chmod a+x ./phpstan.phar
 
 #All tests, (infection itself, phpunit, e2e) for different php version/ environments (xdebug or phpdbg)
-.PHONY: test test-unit test-infection-phpdbg test-e2e-phpdbg test-infection-xdebug test-e2e-xdebug test-final-private
-test: test-unit test-infection-phpdbg test-e2e-phpdbg test-infection-xdebug test-e2e-xdebug test-final-private
-
-test-final-private:
-	./tests/final_private_test
+.PHONY: test test-unit test-infection-phpdbg test-e2e-phpdbg test-infection-xdebug test-e2e-xdebug
+test: test-unit test-infection-phpdbg test-e2e-phpdbg test-infection-xdebug test-e2e-xdebug
 
 .PHONY: test-unit test-unit-70 test-unit-71 test-unit-72
 #php unit tests
