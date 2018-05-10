@@ -30,6 +30,7 @@ build/cache:
 #All tests, (infection itself, phpunit, e2e) for different php version/ environments (xdebug or phpdbg)
 .PHONY: test test-unit test-infection-phpdbg test-e2e-phpdbg test-infection-xdebug test-e2e-xdebug
 test: test-unit test-infection-phpdbg test-e2e-phpdbg test-infection-xdebug test-e2e-xdebug
+	# All tests finished without errors
 
 .PHONY: test-unit test-unit-70 test-unit-71 test-unit-72
 #php unit tests
