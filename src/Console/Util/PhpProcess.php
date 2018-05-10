@@ -32,7 +32,7 @@ final class PhpProcess extends Process
      * - PHP_INI_SCAN_DIR should be made blank because our php.ini has all we need
      *   (a previous value can be found in XdebugHandler::getRestartSettings()["scanDir"])
      */
-    public static function setupEnvironment()
+    public static function setupXdebugFreeEnvironment()
     {
         if (!isset(self::$phprc)) {
             self::$phprc = getenv('PHPRC');
@@ -55,7 +55,7 @@ final class PhpProcess extends Process
 
         parent::start($callback, $env);
 
-        self::setupEnvironment();
+        self::setupXdebugFreeEnvironment();
     }
 
     private static function restoreVanillaEnvironment()

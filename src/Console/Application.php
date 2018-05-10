@@ -121,7 +121,7 @@ ASCII;
          * If we're skipping Xdebug, setup a default Xdebug-free environment for all subprocesses
          */
         if ('' != XdebugHandler::getSkippedVersion()) {
-            PhpProcess::setupEnvironment();
+            PhpProcess::setupXdebugFreeEnvironment();
         }
 
         return parent::run($input, $output);
