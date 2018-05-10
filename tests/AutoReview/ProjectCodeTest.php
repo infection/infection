@@ -255,6 +255,15 @@ final class ProjectCodeTest extends TestCase
             return;
         }
 
+        /*
+         * We should consider only properties belonging to our classes, but not to foreign classes
+         * we're exteding from. E.g. we can't change Symfony\Component\Process\Process to not have
+         * a public propery it has.
+         */
+        $properties = array_filter($properties, function (\ReflectionProperty $property) use ($className) {
+            return $property->class == $className;
+        });
+
         $this->assertCount(
             0,
             $properties,
