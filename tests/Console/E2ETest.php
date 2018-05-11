@@ -127,7 +127,7 @@ final class E2ETest extends TestCase
 
     private function runOnE2EFixture($path): string
     {
-        $this->assertTrue(is_dir($path));
+        $this->assertDirectoryExists($path);
         chdir($path);
 
         $this->installComposerDeps();
@@ -242,7 +242,7 @@ final class E2ETest extends TestCase
         $exitCode = $application->run($input, $output);
 
         // Leaving window open to negative tests (e.g. where Infection is expected to fail)
-        $this->assertEquals($expectedExitCode, $exitCode, "Unexpected exit code. Check with command's output for details.");
+        $this->assertSame($expectedExitCode, $exitCode, "Unexpected exit code. Check with command's output for details.");
 
         return $output->fetch();
     }

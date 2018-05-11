@@ -55,7 +55,6 @@ final class TimeoutProviderTest extends AbstractBaseProviderTest
 
     /**
      * @dataProvider validatorProvider
-     * @expectedException \RuntimeException
      */
     public function test_it_does_not_allow_invalid_values($inputValue)
     {
@@ -65,6 +64,8 @@ final class TimeoutProviderTest extends AbstractBaseProviderTest
         $dialog = $this->getQuestionHelper();
 
         $provider = new TimeoutProvider($consoleMock, $dialog);
+
+        $this->expectException(\RuntimeException::class);
 
         $timeout = $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("{$inputValue}\n")),

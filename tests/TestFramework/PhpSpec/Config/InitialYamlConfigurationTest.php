@@ -11,6 +11,7 @@ namespace Infection\Tests\TestFramework\PhpSpec\Config;
 
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\PhpSpec\Config\InitialYamlConfiguration;
+use Infection\TestFramework\PhpSpec\Config\NoCodeCoverageException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
 
@@ -40,32 +41,26 @@ final class InitialYamlConfigurationTest extends TestCase
         return new InitialYamlConfiguration($this->tempDir, $configArray ?: $this->defaultConfig, $skipCoverage);
     }
 
-    /**
-     * @expectedException \Infection\TestFramework\PhpSpec\Config\NoCodeCoverageException
-     */
     public function test_it_throws_exception_when_extensions_array_is_empty()
     {
         $configuration = $this->getConfigurationObject(['extensions' => []]);
+        $this->expectException(NoCodeCoverageException::class);
 
         $configuration->getYaml();
     }
 
-    /**
-     * @expectedException \Infection\TestFramework\PhpSpec\Config\NoCodeCoverageException
-     */
     public function test_it_throws_exception_when_extensions_array_is_not_present()
     {
         $configuration = $this->getConfigurationObject(['bootstrap' => '/path/to/adc']);
+        $this->expectException(NoCodeCoverageException::class);
 
         $configuration->getYaml();
     }
 
-    /**
-     * @expectedException \Infection\TestFramework\PhpSpec\Config\NoCodeCoverageException
-     */
     public function test_it_throws_exception_when_no_extensions_have_no_coverage_one()
     {
         $configuration = $this->getConfigurationObject(['extensions' => ['a' => []]]);
+        $this->expectException(NoCodeCoverageException::class);
 
         $configuration->getYaml();
     }

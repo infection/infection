@@ -37,11 +37,10 @@ final class VersionParserTest extends TestCase
         $this->assertSame($expectedVersion, $result);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function test_it_throws_exception_when_content_has_no_version_substring()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $this->versionParser->parse('abc');
     }
 

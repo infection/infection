@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
+use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
 use Infection\TestFramework\PhpUnit\Coverage\PhpUnitTestFileDataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -29,11 +30,10 @@ final class PhpUnitTestFileDataProviderTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \Infection\TestFramework\Coverage\TestFileNameNotFoundException
-     */
     public function test_it_throws_an_exception_if_class_is_not_found()
     {
+        $this->expectException(TestFileNameNotFoundException::class);
+
         $this->infoProvider->getTestFileInfo('abc');
     }
 

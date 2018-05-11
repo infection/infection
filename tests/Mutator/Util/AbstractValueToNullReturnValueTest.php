@@ -21,7 +21,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
 {
     protected $testSubject = null;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->testSubject = $this->getMockBuilder(AbstractValueToNullReturnValue::class)
             ->disableOriginalConstructor()

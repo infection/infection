@@ -22,7 +22,7 @@ return \PhpCsFixer\Config::create()
         '@Symfony:risky' => true,
         '@PHP70Migration' => true,
         '@PHP70Migration:risky' => true,
-
+        '@PHPUnit60Migration:risky' => true,
         'concat_space' => ['spacing' => 'one'],
         'header_comment' => [
             'commentType' => 'PHPDoc',
@@ -41,6 +41,12 @@ return \PhpCsFixer\Config::create()
         'ordered_imports' => true,
         'phpdoc_align' => false,
         'phpdoc_summary' => false,
+        'php_unit_set_up_tear_down_visibility' => true,
+        'php_unit_strict' => true,
+        'php_unit_test_annotation' => [
+            'style' => 'prefix',
+            'case' => 'snake',
+        ],
         'yoda_style' => false,
     ])
     ->setFinder($finder)
