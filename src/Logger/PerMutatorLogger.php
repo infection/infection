@@ -30,14 +30,16 @@ final class PerMutatorLogger extends FileLogger
         $logs[] = '# Effects per Mutator';
         $logs[] = "\n";
 
-        $logs[] = '| Mutator | Mutations | Killed | Escaped | Errors | MSI | Covered MSI |';
-        $logs[] = '| ------- | --------- | ------ | ------- |------- | --- | ----------- |';
+        $logs[] = '| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |';
+        $logs[] = '| ------- | --------- | ------ | ------- |------- | --------- | --- | ----------- |';
+
         foreach ($this->calculatorPerMutator as $mutator => $calculator) {
             $logs[] = '| ' . $mutator . ' | ' .
                 $calculator->getTotalMutantsCount() . ' | ' .
                 $calculator->getKilledCount() . ' | ' .
                 $calculator->getEscapedCount() . ' | ' .
                 $calculator->getErrorCount() . ' | ' .
+                $calculator->getTimedOutCount() . ' | ' .
                 $calculator->getMutationScoreIndicator() . '| ' .
                 $calculator->getCoveredCodeMutationScoreIndicator() . '|';
         }
