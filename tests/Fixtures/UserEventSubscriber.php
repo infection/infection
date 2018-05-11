@@ -11,6 +11,8 @@ use Infection\EventDispatcher\EventSubscriberInterface;
 
 class UserEventSubscriber implements EventSubscriberInterface
 {
+    public $count = 0;
+
     public function getSubscribedEvents()
     {
         return [
@@ -20,5 +22,6 @@ class UserEventSubscriber implements EventSubscriberInterface
 
     public function __invoke()
     {
+        ++$this->count;
     }
 }

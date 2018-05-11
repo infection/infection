@@ -12,7 +12,7 @@ namespace Infection\EventDispatcher;
 /**
  * @internal
  */
-class EventDispatcher implements EventDispatcherInterface, ContainsListenersInterface
+class EventDispatcher implements EventDispatcherInterface
 {
     /**
      * @var callable[][]
@@ -31,41 +31,24 @@ class EventDispatcher implements EventDispatcherInterface, ContainsListenersInte
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addListener($eventName, callable $listener)
+    public function addSubscriber(EventSubscriberInterface $eventSubscriber)
     {
-        $this->listeners[$eventName][] = $listener;
+        foreach ($eventSubscriber->getSubscribedEvents() as $eventName => $listener) {
+            $this->listeners[$eventName][] = $listener;
+        }
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $eventName
+     *
+     * @return callable[]
      */
-    public function getListeners($eventName)
+    private function getListeners($eventName)
     {
-        if (!$this->hasListeners($eventName)) {
+        if (!isset($this->listeners[$eventName])) {
             return [];
         }
 
         return $this->listeners[$eventName];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasListeners($eventName)
-    {
-        return isset($this->listeners[$eventName]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addSubscriber(EventSubscriberInterface $eventSubscriber)
-    {
-        foreach ($eventSubscriber->getSubscribedEvents() as $eventName => $listener) {
-            $this->addListener($eventName, $listener);
-        }
     }
 }
