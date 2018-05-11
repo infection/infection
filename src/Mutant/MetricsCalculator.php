@@ -79,7 +79,7 @@ class MetricsCalculator
      *
      * @return MetricsCalculator
      */
-    public static function createFromArray(array $mutantProcesses)
+    public static function createFromArray(array $mutantProcesses): self
     {
         $self = new self();
         foreach ($mutantProcesses as $process) {

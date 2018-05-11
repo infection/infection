@@ -27,8 +27,7 @@ final class PerMutatorLogger extends FileLogger
 
         $logs = [];
 
-        $logs[] = '# Effects per Mutator';
-        $logs[] = "\n";
+        $logs[] = "# Effects per Mutator\n";
 
         $logs[] = '| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |';
         $logs[] = '| ------- | --------- | ------ | ------- |------- | --------- | --- | ----------- |';
@@ -61,6 +60,7 @@ final class PerMutatorLogger extends FileLogger
         foreach ($processPerMutator as $mutator => $processes) {
             $this->calculatorPerMutator[$mutator] = MetricsCalculator::createFromArray($processes);
         }
+
         ksort($this->calculatorPerMutator);
     }
 }
