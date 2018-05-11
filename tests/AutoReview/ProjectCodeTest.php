@@ -15,7 +15,6 @@ use Infection\Config\InfectionConfig;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
-use Infection\EventDispatcher\EventDispatcher;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\Http\BadgeApiClient;
 use Infection\Mutant\MetricsCalculator;
@@ -71,7 +70,6 @@ final class ProjectCodeTest extends TestCase
         InfectionConfig::class,
         DiffColorizer::class,
         Differ::class,
-        EventDispatcher::class,
         TestFrameworkFinder::class,
         BadgeApiClient::class,
         MetricsCalculator::class,

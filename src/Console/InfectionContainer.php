@@ -14,6 +14,7 @@ use Infection\Config\InfectionConfig;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\EventDispatcher\EventDispatcher;
+use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Finder\Locator;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutator\Util\MutatorsGenerator;
@@ -123,7 +124,7 @@ final class InfectionContainer extends Container
             );
         };
 
-        $this['dispatcher'] = function (): EventDispatcher {
+        $this['dispatcher'] = function (): EventDispatcherInterface {
             return new EventDispatcher();
         };
 

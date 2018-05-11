@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutant\Generator;
 
 use Infection\Config\Exception\InvalidConfigException;
-use Infection\EventDispatcher\EventDispatcher;
+use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutator\Arithmetic\Decrement;
 use Infection\Mutator\Arithmetic\Plus;
@@ -167,8 +167,8 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
             $container[TrueValue::class],
         ];
 
-        $eventDispatcherMock = Mockery::mock(EventDispatcher::class);
-        $eventDispatcherMock->shouldReceive('dispatch');
+        $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcherMock->expects($this->any())->method('dispatch');
 
         return new MutationsGenerator(
             $srcDirs,

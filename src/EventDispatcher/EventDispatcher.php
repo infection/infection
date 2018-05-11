@@ -12,7 +12,7 @@ namespace Infection\EventDispatcher;
 /**
  * @internal
  */
-class EventDispatcher implements EventDispatcherInterface
+final class EventDispatcher implements EventDispatcherInterface
 {
     /**
      * @var callable[][]
