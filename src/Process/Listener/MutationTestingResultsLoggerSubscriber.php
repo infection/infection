@@ -16,6 +16,7 @@ use Infection\Events\MutationTestingFinished;
 use Infection\Http\BadgeApiClient;
 use Infection\Logger\BadgeLogger;
 use Infection\Logger\DebugFileLogger;
+use Infection\Logger\PerMutatorLogger;
 use Infection\Logger\ResultsLoggerTypes;
 use Infection\Logger\SummaryFileLogger;
 use Infection\Logger\TextFileLogger;
@@ -134,7 +135,6 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
                     $config,
                     $this->metricsCalculator,
                     $this->fs,
-
                     $isDebugMode
                 ))->log();
                 break;
@@ -144,6 +144,14 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
                     new BadgeApiClient($this->output),
                     $this->metricsCalculator,
                     $config
+                ))->log();
+                break;
+            case ResultsLoggerTypes::PER_MUTATOR:
+                (new PerMutatorLogger(
+                    $config,
+                    $this->metricsCalculator,
+                    $this->fs,
+                    $isDebugMode
                 ))->log();
                 break;
         }

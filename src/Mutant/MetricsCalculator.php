@@ -72,6 +72,23 @@ class MetricsCalculator
      */
     private $totalMutantsCount = 0;
 
+    /**
+     * Build a metric calculator with a sub-set of mutators
+     *
+     * @param MutantProcessInterface[] $mutantProcesses
+     *
+     * @return MetricsCalculator
+     */
+    public static function createFromArray(array $mutantProcesses)
+    {
+        $self = new self();
+        foreach ($mutantProcesses as $process) {
+            $self->collect($process);
+        }
+
+        return $self;
+    }
+
     public function collect(MutantProcessInterface $mutantProcess)
     {
         ++$this->totalMutantsCount;
@@ -217,6 +234,19 @@ class MetricsCalculator
     public function getNotCoveredMutantProcesses(): array
     {
         return $this->notCoveredMutantProcesses;
+    }
+
+    /**
+     * @return MutantProcessInterface[]
+     */
+    public function getAllMutantProcesses(): array
+    {
+        return array_merge(
+            $this->escapedMutantProcesses,
+            $this->killedMutantProcesses,
+            $this->timedOutProcesses,
+            $this->notCoveredMutantProcesses
+        );
     }
 
     public function getErrorCount(): int

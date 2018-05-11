@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\Process;
 
 use Infection\Mutant\MutantInterface;
+use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Process\Process;
 
@@ -100,5 +101,10 @@ final class MutantProcess implements MutantProcessInterface
         }
 
         return self::CODE_KILLED;
+    }
+
+    public function getMutator(): Mutator
+    {
+        return $this->getMutant()->getMutation()->getMutator();
     }
 }
