@@ -18,7 +18,7 @@ use PhpParser\Node;
 final class LogicalLowerOr extends Mutator
 {
     /**
-     * Replcaes "or" with "and"
+     * Replaces "or" with "and"
      *
      * @param Node $node
      *

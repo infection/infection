@@ -18,6 +18,13 @@ use PhpParser\Node;
  */
 final class Break_ extends Mutator
 {
+    /**
+     * Replaces "break;" with "continue;"
+     *
+     * @param Node $node
+     *
+     * @return Node\Stmt\Continue_
+     */
     public function mutate(Node $node)
     {
         return new Node\Stmt\Continue_();

@@ -18,7 +18,7 @@ use PhpParser\Node;
 final class AssignmentEqual extends Mutator
 {
     /**
-     * Replaces "==" with a "=".
+     * Replaces "==" with "="
      *
      * @param Node $node
      *

@@ -19,7 +19,7 @@ final class FloatNegation extends Mutator
 {
     /**
      * Replaces any float with negated float
-     * 33.4 => -33.4
+     * Replaces "-33.4" with "33.4"
      *
      * @param Node $node
      *

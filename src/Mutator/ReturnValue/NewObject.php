@@ -18,7 +18,7 @@ use PhpParser\Node;
 final class NewObject extends AbstractValueToNullReturnValue
 {
     /**
-     * Replace "return new Something(anything);" with "new Something(anything); return null;"
+     * Replaces "return new Something(anything);" with "new Something(anything); return null;"
      *
      * @param Node $node
      *

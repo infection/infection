@@ -18,6 +18,13 @@ use PhpParser\Node;
  */
 final class Finally_ extends Mutator
 {
+    /**
+     * Removes "finally{}" blocks
+     *
+     * @param Node $node
+     *
+     * @return Node\Stmt\Nop
+     */
     public function mutate(Node $node)
     {
         return new Node\Stmt\Nop();

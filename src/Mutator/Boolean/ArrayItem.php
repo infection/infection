@@ -18,7 +18,7 @@ use PhpParser\Node;
 final class ArrayItem extends Mutator
 {
     /**
-     * Replaces [$a->foo => $b->bar] with [$a->foo > $b->bar]
+     * Replaces "[$a->foo => $b->bar]" with "[$a->foo > $b->bar]"
      *
      * @param Node $node
      *

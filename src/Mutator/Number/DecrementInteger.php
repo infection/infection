@@ -18,7 +18,7 @@ use PhpParser\Node;
 final class DecrementInteger extends Mutator
 {
     /**
-     * Decrements an integer by 1.
+     * Decrements an integer by 1
      *
      * @param Node $node
      *
