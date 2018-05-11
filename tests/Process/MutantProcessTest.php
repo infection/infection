@@ -10,6 +10,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Process;
 
 use Infection\Mutant\MutantInterface;
+use Infection\MutationInterface;
+use Infection\Mutator\Util\MutatorConfig;
+use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Mockery;
@@ -92,5 +95,24 @@ final class MutantProcessTest extends MockeryTestCase
 
         $this->assertSame(MutantProcess::CODE_KILLED, $mutantProcess->getResultCode());
         $this->assertSame($mutant, $mutantProcess->getMutant());
+    }
+
+    public function test_it_knows_its_mutator()
+    {
+        $mutator = new For_(new MutatorConfig([]));
+
+        $mutation = $this->createMock(MutationInterface::class);
+        $mutation->expects($this->once())->method('getMutator')->willReturn($mutator);
+
+        $mutant = $this->createMock(MutantInterface::class);
+        $mutant->expects($this->once())->method('getMutation')->willReturn($mutation);
+
+        $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
+
+        $process = $this->createMock(Process::class);
+
+        $mutantProcess = new MutantProcess($process, $mutant, $adapter);
+
+        $this->assertSame($mutator, $mutantProcess->getMutator());
     }
 }
