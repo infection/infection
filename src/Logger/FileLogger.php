@@ -30,7 +30,7 @@ abstract class FileLogger implements MutationTestingResultsLogger
     /**
      * @var Filesystem
      */
-    protected $fs;
+    private $fs;
 
     /**
      * @var bool
