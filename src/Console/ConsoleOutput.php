@@ -83,8 +83,6 @@ final class ConsoleOutput
                 $metricsCalculator->getMutationScoreIndicator()
             )
         );
-
-        return;
     }
 
     public function logBadCoveredMsiErrorMessage(MetricsCalculator $metricsCalculator, float $minCoveredMsi)
@@ -101,7 +99,16 @@ final class ConsoleOutput
                 $metricsCalculator->getCoveredCodeMutationScoreIndicator()
             )
         );
+    }
 
-        return;
+    public function logMissedDebuggerOrCoverageOption()
+    {
+        $this->io->error([
+            'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:',
+            '- Enable xdebug and run infection again' . PHP_EOL .
+            '- Use phpdbg: phpdbg -qrr infection' . PHP_EOL .
+            '- Use --coverage option with path to the existing coverage report' . PHP_EOL .
+            '- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters',
+        ]);
     }
 }
