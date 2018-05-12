@@ -13,6 +13,7 @@ use Infection\Config\InfectionConfig;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Events\MutationTestingFinished;
+use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Listener\MutationTestingResultsLoggerSubscriber;
 use PHPUnit\Framework\TestCase;
@@ -182,7 +183,7 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_to_other_logging_types()
     {
-        $logTypes = ['per-mutator' => sys_get_temp_dir() . '/infection-log.md'];
+        $logTypes = [ResultsLoggerTypes::PER_MUTATOR => sys_get_temp_dir() . '/infection-log.md'];
 
         $this->infectionConfig->expects($this->once())
             ->method('getLogsTypes')

@@ -18,7 +18,7 @@ final class ResultsLoggerTypes
     const SUMMARY_FILE = 'summary';
     const DEBUG_FILE = 'debug';
     const BADGE = 'badge';
-    const PER_MUTATOR = 'per-mutator';
+    const PER_MUTATOR = 'perMutator';
 
     const ALL = [
         self::TEXT_FILE,
