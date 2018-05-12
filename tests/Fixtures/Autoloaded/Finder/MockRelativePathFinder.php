@@ -2,13 +2,11 @@
 
 namespace Infection\Tests\Fixtures\Autoloaded\Finder;
 
-
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Iterator\PathFilterIterator;
 
 class MockRelativePathFinder extends Finder
 {
-
     private $sourceDirectories;
 
     private $filters = [];
@@ -39,5 +37,4 @@ class MockRelativePathFinder extends Finder
 
         return $iterator;
     }
-
 }

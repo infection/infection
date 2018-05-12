@@ -7,7 +7,6 @@ use Symfony\Component\Finder\Finder;
 
 class MockRealPathFinder extends Finder
 {
-
     private $sourceDirectories;
 
     private $filters = [];
@@ -38,5 +37,4 @@ class MockRealPathFinder extends Finder
 
         return $iterator;
     }
-
 }
