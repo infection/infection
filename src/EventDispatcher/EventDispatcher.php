@@ -31,6 +31,9 @@ final class EventDispatcher implements EventDispatcherInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function addSubscriber(EventSubscriberInterface $eventSubscriber)
     {
         foreach ($eventSubscriber->getSubscribedEvents() as $eventName => $listener) {
@@ -43,12 +46,8 @@ final class EventDispatcher implements EventDispatcherInterface
      *
      * @return callable[]
      */
-    private function getListeners($eventName)
+    private function getListeners(string $eventName): array
     {
-        if (!isset($this->listeners[$eventName])) {
-            return [];
-        }
-
-        return $this->listeners[$eventName];
+        return $this->listeners[$eventName] ?? [];
     }
 }
