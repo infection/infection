@@ -107,9 +107,6 @@ final class SourceDirsProviderTest extends AbstractBaseProviderTest
         $this->assertSame(['.'], $sourceDirs);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function test_it_throws_exception_when_current_dir_is_selected_with_another_dir()
     {
         $consoleMock = Mockery::mock(ConsoleHelper::class);
@@ -121,6 +118,8 @@ final class SourceDirsProviderTest extends AbstractBaseProviderTest
         $sourceDirGuesser->method('guess')->willReturn(['src']);
 
         $provider = new SourceDirsProvider($consoleMock, $dialog, $sourceDirGuesser);
+
+        $this->expectException(\LogicException::class);
 
         $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("0,1\n")),

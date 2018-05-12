@@ -28,7 +28,7 @@ final class MutantCreatorTest extends MockeryTestCase
      */
     private $directory;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
         $this->directory = \sys_get_temp_dir() . '/infection/MutantCreator';
@@ -42,7 +42,7 @@ PHP
 );
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         parent::tearDown();
         unlink($this->directory . self::TEST_FILE_NAME);

@@ -49,7 +49,7 @@ final class TestFrameworkFinderTest extends TestCase
 
         $frameworkFinder = new TestFrameworkFinder('not-used', $filename);
 
-        $this->assertEquals($filename, $frameworkFinder->find(), 'Should return the custom path');
+        $this->assertSame($filename, $frameworkFinder->find(), 'Should return the custom path');
     }
 
     public function test_invalid_custom_path_throws_exception()

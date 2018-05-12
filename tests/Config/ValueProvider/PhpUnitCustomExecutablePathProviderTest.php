@@ -14,6 +14,7 @@ use Infection\Config\ValueProvider\PhpUnitCustomExecutablePathProvider;
 use Infection\Finder\Exception\FinderException;
 use Infection\Finder\TestFrameworkFinder;
 use Mockery;
+use Symfony\Component\Console\Exception\RuntimeException as SymfonyRuntimeException;
 use function Infection\Tests\normalizePath as p;
 
 /**
@@ -61,9 +62,6 @@ final class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProvider
         $this->assertSame($customExecutable, $path);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Console\Exception\RuntimeException
-     */
     public function test_validates_incorrect_dir()
     {
         if (!$this->hasSttyAvailable()) {
@@ -82,6 +80,8 @@ final class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProvider
             $consoleMock,
             $this->getQuestionHelper()
         );
+
+        $this->expectException(SymfonyRuntimeException::class);
 
         $provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("abc\n")),

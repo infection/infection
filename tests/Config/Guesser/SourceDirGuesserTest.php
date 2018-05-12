@@ -92,15 +92,14 @@ JSON;
         $this->assertSame(['sources', 'libs'], $guesser->guess());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage autoload section does not match the expected JSON schema
-     */
     public function test_it_throw_invalid_autoload_exception()
     {
         $guesser = new SourceDirGuesser(
             json_decode('{"autoload":{"psr-4": [{"NameSpace\\//": ["sources", "libs"]}]}}')
         );
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('autoload section does not match the expected JSON schema');
 
         $guesser->guess();
     }

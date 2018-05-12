@@ -198,7 +198,7 @@ JSON;
             '/path/to/config'
         );
 
-        $this->assertEquals($result, $testSubject->{$methodName}());
+        $this->assertSame($result, $testSubject->{$methodName}());
     }
 
     public function configDataProvider(): \Generator

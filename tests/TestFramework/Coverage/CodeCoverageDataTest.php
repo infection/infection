@@ -12,6 +12,7 @@ namespace Infection\Tests\TestFramework\Coverage;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkTypes;
 use Mockery;
@@ -171,14 +172,13 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertCount(6, $codeCoverageData->getAllTestsFor($mutation));
     }
 
-    /**
-     * @expectedException \Infection\TestFramework\Coverage\CoverageDoesNotExistException
-     */
     public function test_it_throws_an_exception_when_no_coverage_found()
     {
         $coverageXmlParserMock = Mockery::mock(CoverageXmlParser::class);
 
         $coverage = new CodeCoverageData('/abc', $coverageXmlParserMock, TestFrameworkTypes::PHPUNIT);
+
+        $this->expectException(CoverageDoesNotExistException::class);
 
         $coverage->hasTests('/abc/def.php');
     }

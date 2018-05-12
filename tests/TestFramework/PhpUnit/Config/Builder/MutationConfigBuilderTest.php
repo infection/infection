@@ -187,7 +187,7 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
 
         $configurationPath = $this->builder->build($this->mutant);
 
-        $this->assertEquals(1, $this->queryXpath(file_get_contents($configurationPath), '/phpunit/testsuite')->length);
+        $this->assertSame(1, $this->queryXpath(file_get_contents($configurationPath), '/phpunit/testsuite')->length);
     }
 
     public function test_it_removes_original_loggers()
