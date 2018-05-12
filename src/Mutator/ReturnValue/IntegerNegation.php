@@ -19,7 +19,7 @@ final class IntegerNegation extends Mutator
 {
     /**
      * Replaces any integer with negated integer value.
-     * -5 => 5
+     * Replaces "-5" with "5"
      *
      * @param Node $node
      *

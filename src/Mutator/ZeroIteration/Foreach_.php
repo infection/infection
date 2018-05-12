@@ -17,6 +17,13 @@ use PhpParser\Node;
  */
 final class Foreach_ extends Mutator
 {
+    /**
+     * Replaces "foreach($a as $b)" with "foreach(array() as $b)"
+     *
+     * @param Node $node
+     *
+     * @return Node\Stmt\Foreach_
+     */
     public function mutate(Node $node)
     {
         return new Node\Stmt\Foreach_(

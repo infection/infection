@@ -18,7 +18,7 @@ use PhpParser\Node;
 final class Yield_ extends Mutator
 {
     /**
-     * Replaces `yield $a => $b;` with `yield $a > $b;`
+     * Replaces "yield $a => $b;" with "yield $a > $b;"
      *
      * @param Node $node
      *

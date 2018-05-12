@@ -19,6 +19,7 @@ final class Spaceship extends Mutator
 {
     /**
      * Swaps the arguments in the Spaceship operator <=>
+     * Replaces "$a <=> $b" with "$b <=> $a"
      *
      * @param Node $node
      *

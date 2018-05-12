@@ -17,6 +17,13 @@ use PhpParser\Node;
  */
 final class Throw_ extends Mutator
 {
+    /**
+     * Replaces "throw new Exception();" with "new Exception();"
+     *
+     * @param Node $node
+     *
+     * @return Node\Stmt\Expression
+     */
     public function mutate(Node $node)
     {
         return new Node\Stmt\Expression($node->expr);
