@@ -119,4 +119,20 @@ final class ConsoleOutputTest extends TestCase
 
         $console->logBadCoveredMsiErrorMessage($metrics, 25.0);
     }
+
+    public function test_log_missed_debugger_or_coverage_option()
+    {
+        $io = $this->createMock(SymfonyStyle::class);
+        $io->expects($this->once())->method('error')
+            ->with([
+                'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:',
+                '- Enable xdebug and run infection again' . PHP_EOL .
+                '- Use phpdbg: phpdbg -qrr infection' . PHP_EOL .
+                '- Use --coverage option with path to the existing coverage report' . PHP_EOL .
+                '- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters',
+            ]);
+
+        $consoleOutput = new ConsoleOutput($io);
+        $consoleOutput->logMissedDebuggerOrCoverageOption();
+    }
 }
