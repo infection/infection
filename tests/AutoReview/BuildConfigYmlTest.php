@@ -33,8 +33,9 @@ final class BuildConfigYmlTest extends TestCase
         } catch (ParseException $e) {
             $this->fail(
                 sprintf(
-                    'Yaml file "%s" contains invalid yaml, and is used by our CI, please fix it.',
-                    realpath($filePath)
+                    'Yaml file "%s" contains invalid yaml, and is used by our CI, please fix it. Original error message: "%s"',
+                    realpath($filePath),
+                    $e->getMessage()
                 )
             );
         }
