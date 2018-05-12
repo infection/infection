@@ -20,4 +20,6 @@ interface EventDispatcherInterface
      * @param mixed $event
      */
     public function dispatch($event);
+
+    public function addSubscriber(EventSubscriberInterface $eventSubscriber);
 }

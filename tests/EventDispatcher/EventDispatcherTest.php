@@ -19,76 +19,18 @@ use PHPUnit\Framework\TestCase;
  */
 final class EventDispatcherTest extends TestCase
 {
-    /**
-     * @var EventDispatcher
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var string
-     */
-    private $eventName;
-
-    /**
-     * @var callable
-     */
-    private $listener;
-
-    /**
-     * @var int
-     */
-    private $listenerCallsCount = 0;
-
-    public function setUp()
+    public function test_event_dispatcher_dispatches_events_correctly()
     {
-        $this->eventName = UserWasCreated::class;
+        $userEvent = new UserEventSubscriber();
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($userEvent);
 
-        $this->listener = function () {
-            ++$this->listenerCallsCount;
-        };
+        //Sanity check
+        $this->assertSame(0, $userEvent->count);
 
-        $this->eventDispatcher = new EventDispatcher();
-    }
+        $dispatcher->dispatch(new UserWasCreated());
+        $dispatcher->dispatch(new UserWasCreated());
 
-    /**
-     * @test
-     */
-    public function it_adds_event_listeners()
-    {
-        $this->eventDispatcher->addListener($this->eventName, $this->listener);
-
-        $this->assertTrue($this->eventDispatcher->hasListeners($this->eventName));
-        $this->assertEquals($this->listener, $this->eventDispatcher->getListeners($this->eventName)[0]);
-    }
-
-    /**
-     * @test
-     */
-    public function it_return_empty_array_when_event_does_not_have_listeners()
-    {
-        $this->assertEquals([], $this->eventDispatcher->getListeners('test'));
-    }
-
-    /**
-     * @test
-     */
-    public function it_calls_all_listeners_during_dispatch()
-    {
-        $this->eventDispatcher->addListener($this->eventName, $this->listener);
-        $this->eventDispatcher->addListener($this->eventName, $this->listener);
-
-        $this->eventDispatcher->dispatch(new UserWasCreated());
-
-        $this->assertEquals(2, $this->listenerCallsCount);
-    }
-
-    /**
-     * @test
-     */
-    public function it_adds_event_listeners_from_subscriber()
-    {
-        $this->eventDispatcher->addSubscriber(new UserEventSubscriber());
-
-        $this->assertTrue($this->eventDispatcher->hasListeners($this->eventName));
+        $this->assertSame(2, $userEvent->count);
     }
 }

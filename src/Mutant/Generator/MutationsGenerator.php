@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutant\Generator;
 
-use Infection\EventDispatcher\EventDispatcher;
+use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
@@ -63,7 +63,7 @@ final class MutationsGenerator
     private $defaultMutators;
 
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     private $eventDispatcher;
 
@@ -78,7 +78,7 @@ final class MutationsGenerator
         CodeCoverageData $codeCoverageData,
         array $defaultMutators,
         array $whitelistedMutatorNames,
-        EventDispatcher $eventDispatcher,
+        EventDispatcherInterface $eventDispatcher,
         Parser $parser
     ) {
         $this->srcDirs = $srcDirs;

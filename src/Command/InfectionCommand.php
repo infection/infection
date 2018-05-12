@@ -19,7 +19,7 @@ use Infection\Console\LogVerbosity;
 use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
-use Infection\EventDispatcher\EventDispatcher;
+use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Finder\Exception\LocatorException;
 use Infection\Finder\Locator;
 use Infection\Mutant\Generator\MutationsGenerator;
@@ -60,7 +60,7 @@ final class InfectionCommand extends BaseCommand
     private $consoleOutput;
 
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     private $eventDispatcher;
 
