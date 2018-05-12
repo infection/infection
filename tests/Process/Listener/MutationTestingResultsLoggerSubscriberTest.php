@@ -179,4 +179,34 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
 
         $dispatcher->dispatch(new MutationTestingFinished());
     }
+
+    public function test_it_reacts_to_other_logging_types()
+    {
+        $logTypes = ['per-mutator' => sys_get_temp_dir() . '/infection-log.md'];
+
+        $this->infectionConfig->expects($this->once())
+            ->method('getLogsTypes')
+            ->willReturn($logTypes);
+
+        $this->output->expects($this->never())
+            ->method($this->anything());
+
+        $this->metricsCalculator->expects($this->once())
+            ->method('getAllMutantProcesses')
+            ->willReturn([]);
+
+        $this->filesystem->expects($this->once())
+            ->method('dumpFile');
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(
+            $this->output,
+            $this->infectionConfig,
+            $this->metricsCalculator,
+            $this->filesystem,
+            LogVerbosity::DEBUG
+        ));
+
+        $dispatcher->dispatch(new MutationTestingFinished());
+    }
 }
