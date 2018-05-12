@@ -162,7 +162,8 @@ final class ProjectCodeTest extends TestCase
         }
 
         $this->assertInternalType(
-            'string', $docBlock,
+            'string',
+            $docBlock,
             sprintf(
                 'The "%s" class is not an extension point, and should be marked as internal.',
                 $className
@@ -302,7 +303,8 @@ final class ProjectCodeTest extends TestCase
         $docBlock = $rc->getDocComment();
 
         $this->assertInternalType(
-            'string', $docBlock,
+            'string',
+            $docBlock,
             sprintf(
                 'Test class  "%s" must be marked internal.',
                 $className
