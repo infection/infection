@@ -1,6 +1,12 @@
 PHP_CS_FIXER_FUTURE_MODE=1
 PHPSTAN=./phpstan.phar
 PHP-CS-FIXER=./php-cs-fixer-v2.phar
+PHPUNIT=vendor/bin/phpunit
+
+DOCKER_RUN=docker run -t --rm -v "$$PWD":/opt/infection -w /opt/infection
+DOCKER_RUN_70=flock devTools/*php70*.json $(DOCKER_RUN) infection_php70
+DOCKER_RUN_71=flock devTools/*php71*.json $(DOCKER_RUN) infection_php71
+DOCKER_RUN_72=flock devTools/*php72*.json $(DOCKER_RUN) infection_php72
 
 .PHONY: all
 #Run all checks, default when running 'make'
@@ -22,52 +28,50 @@ build/cache:
 	chmod a+x ./phpstan.phar
 
 #All tests, (infection itself, phpunit, e2e) for different php version/ environments (xdebug or phpdbg)
-.PHONY: test test-unit test-infection-phpdbg test-e2e-phpdbg test-infection-xdebug test-e2e-xdebug test-final-private
-test: test-unit test-infection-phpdbg test-e2e-phpdbg test-infection-xdebug test-e2e-xdebug test-final-private
-
-test-final-private:
-	./tests/final_private_test
+.PHONY: test test-unit test-infection-phpdbg test-e2e-phpdbg test-infection-xdebug test-e2e-xdebug
+test: test-unit test-infection-phpdbg test-e2e-phpdbg test-infection-xdebug test-e2e-xdebug
+	# All tests finished without errors
 
 .PHONY: test-unit test-unit-70 test-unit-71 test-unit-72
 #php unit tests
 test-unit: test-unit-70 test-unit-71 test-unit-72
 
-test-unit-70: vendor
-	docker run -it --rm -v "$$PWD":/opt/infection -w /opt/infection php:7.0-cli php vendor/bin/phpunit
+test-unit-70: build-xdebug-70
+	$(DOCKER_RUN_70) $(PHPUNIT)
 
-test-unit-71: vendor
-	docker run -it --rm -v "$$PWD":/opt/infection -w /opt/infection php:7.1-cli php vendor/bin/phpunit
+test-unit-71: build-xdebug-71
+	$(DOCKER_RUN_71) $(PHPUNIT)
 
-test-unit-72: vendor
-	docker run -it --rm -v "$$PWD":/opt/infection -w /opt/infection php:7.2-cli php vendor/bin/phpunit
+test-unit-72: build-xdebug-72
+	$(DOCKER_RUN_72) $(PHPUNIT)
 
 
 .PHONY: test-infection-phpdbg test-infection-phpdbg-70 test-infection-phpdbg-71 test-infection-phpdbg-72
 #infection with phpdbg
 test-infection-phpdbg: test-infection-phpdbg-70 test-infection-phpdbg-71 test-infection-phpdbg-72
 
-test-infection-phpdbg-70: vendor
-	docker run -it --rm -v "$$PWD":/opt/infection -w /opt/infection php:7.0-cli phpdbg -qrr bin/infection --threads=4
+test-infection-phpdbg-70: build-xdebug-70
+	$(DOCKER_RUN_70) phpdbg -qrr bin/infection --threads=4
 
-test-infection-phpdbg-71: vendor
-	docker run -it --rm -v "$$PWD":/opt/infection -w /opt/infection php:7.1-cli phpdbg -qrr bin/infection --threads=4
+test-infection-phpdbg-71: build-xdebug-71
+	$(DOCKER_RUN_71) phpdbg -qrr bin/infection --threads=4
 
-test-infection-phpdbg-72: vendor
-	docker run -it --rm -v "$$PWD":/opt/infection -w /opt/infection php:7.2-cli phpdbg -qrr bin/infection --threads=4
+test-infection-phpdbg-72: build-xdebug-72
+	$(DOCKER_RUN_72) phpdbg -qrr bin/infection --threads=4
 
 
 .PHONY: test-e2e-phpdbg test-e2e-phpdbg-70 test-e2e-phpdbg-71 test-e2e-phpdbg-72
 #e2e tests with phpdbg
 test-e2e-phpdbg: test-e2e-phpdbg-70 test-e2e-phpdbg-71 test-e2e-phpdbg-72
 
-test-e2e-phpdbg-70: vendor
-	docker run -it --rm -e PHPDBG=1 -v "$$PWD":/opt/infection -w /opt/infection php:7.0-cli ./tests/e2e_tests
+test-e2e-phpdbg-70: build-xdebug-70
+	$(DOCKER_RUN_70) env PHPDBG=1 ./tests/e2e_tests
 
-test-e2e-phpdbg-71: vendor
-	docker run -it --rm -e PHPDBG=1 -v "$$PWD":/opt/infection -w /opt/infection php:7.1-cli ./tests/e2e_tests
+test-e2e-phpdbg-71: build-xdebug-71
+	$(DOCKER_RUN_71) env PHPDBG=1 ./tests/e2e_tests
 
-test-e2e-phpdbg-72: vendor
-	docker run -it --rm -e PHPDBG=1 -v "$$PWD":/opt/infection -w /opt/infection php:7.2-cli ./tests/e2e_tests
+test-e2e-phpdbg-72: build-xdebug-72
+	$(DOCKER_RUN_72) env PHPDBG=1 ./tests/e2e_tests
 
 
 .PHONY: test-infection-xdebug test-infection-xdebug-70 test-infection-xdebug-71 test-infection-xdebug-72
@@ -75,13 +79,13 @@ test-e2e-phpdbg-72: vendor
 test-infection-xdebug: test-infection-xdebug-70 test-infection-xdebug-71 test-infection-xdebug-72
 
 test-infection-xdebug-70: build-xdebug-70
-	docker run -it --rm -v "$$PWD":/opt/infection -w /opt/infection infection_php70 php bin/infection --threads=4
+	$(DOCKER_RUN_70) php bin/infection --threads=4
 
 test-infection-xdebug-71: build-xdebug-71
-	docker run -it --rm -v "$$PWD":/opt/infection -w /opt/infection infection_php71 php bin/infection --threads=4
+	$(DOCKER_RUN_71) php bin/infection --threads=4
 
 test-infection-xdebug-72: build-xdebug-72
-	docker run -it --rm -v "$$PWD":/opt/infection -w /opt/infection infection_php72 php bin/infection --threads=4
+	$(DOCKER_RUN_72) php bin/infection --threads=4
 
 
 .PHONY: test-e2e-xdebug test-e2e-xdebug-70 test-e2e-xdebug-71 test-e2e-xdebug-72
@@ -89,25 +93,31 @@ test-infection-xdebug-72: build-xdebug-72
 test-e2e-xdebug: test-e2e-xdebug-70 test-e2e-xdebug-71 test-e2e-xdebug-72
 
 test-e2e-xdebug-70: build-xdebug-70
-	docker run -it --rm -v "$$PWD":/opt/infection -w /opt/infection infection_php70 ./tests/e2e_tests
+	$(DOCKER_RUN_70) ./tests/e2e_tests
 
-test-e2e-xdebug-71: build-xdebug-71
-	docker run -it --rm -v "$$PWD":/opt/infection -w /opt/infection infection_php71 ./tests/e2e_tests
+test-e2e-xdebug-71: vendor
+	$(DOCKER_RUN_71) ./tests/e2e_tests
 
-test-e2e-xdebug-72: build-xdebug-72
-	docker run -it --rm -v "$$PWD":/opt/infection -w /opt/infection infection_php72 ./tests/e2e_tests
+test-e2e-xdebug-72: vendor
+	$(DOCKER_RUN_72) ./tests/e2e_tests
 
 
 .PHONY: build-xdebug-70 build-xdebug-71 build-xdebug-72
 #Building images with xdebug
-build-xdebug-70: vendor
-	docker build -t infection_php70 -f "$$PWD/devTools/Dockerfile-php70-xdebug" .
+build-xdebug-70: vendor devTools/Dockerfile-php70-xdebug.json
+devTools/Dockerfile-php70-xdebug.json: devTools/Dockerfile-php70-xdebug
+	docker build -t infection_php70 -f devTools/Dockerfile-php70-xdebug .
+	docker image inspect infection_php70 >> devTools/Dockerfile-php70-xdebug.json
 
-build-xdebug-71: vendor
-	docker build -t infection_php71 -f "$$PWD/devTools/Dockerfile-php71-xdebug" .
+build-xdebug-71: vendor devTools/Dockerfile-php71-xdebug.json
+devTools/Dockerfile-php71-xdebug.json: devTools/Dockerfile-php71-xdebug
+	docker build -t infection_php71 -f devTools/Dockerfile-php71-xdebug .
+	docker image inspect infection_php71 >> devTools/Dockerfile-php71-xdebug.json
 
-build-xdebug-72: vendor
-	docker build -t infection_php72 -f "$$PWD/devTools/Dockerfile-php72-xdebug" .
+build-xdebug-72: vendor devTools/Dockerfile-php72-xdebug.json
+devTools/Dockerfile-php72-xdebug.json: devTools/Dockerfile-php72-xdebug
+	docker build -t infection_php72 -f devTools/Dockerfile-php72-xdebug .
+	docker image inspect infection_php72 >> devTools/Dockerfile-php72-xdebug.json
 
 #style checks/ static analysis
 .PHONY: analyze cs-fix cs-check phpstan validate auto-review

@@ -8,5 +8,5 @@
     "logs": {
         "summary": "infection-log.txt"
     },
-    "tmpDir": "infection-cache"
+    "tmpDir": "/tmp/infection-cache"
 }
