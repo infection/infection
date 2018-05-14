@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\Process;
 
 use Infection\Mutant\MutantInterface;
+use Infection\Mutator\Util\Mutator;
 use Symfony\Component\Process\Process;
 
 /**
@@ -26,4 +27,6 @@ interface MutantProcessInterface
     public function markTimeout();
 
     public function getResultCode(): int;
+
+    public function getMutator(): Mutator;
 }

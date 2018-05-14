@@ -13,6 +13,7 @@ use Infection\Config\InfectionConfig;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Events\MutationTestingFinished;
+use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Listener\MutationTestingResultsLoggerSubscriber;
 use PHPUnit\Framework\TestCase;
@@ -175,6 +176,36 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->filesystem,
             LogVerbosity::NONE
+        ));
+
+        $dispatcher->dispatch(new MutationTestingFinished());
+    }
+
+    public function test_it_reacts_to_other_logging_types()
+    {
+        $logTypes = [ResultsLoggerTypes::PER_MUTATOR => sys_get_temp_dir() . '/infection-log.md'];
+
+        $this->infectionConfig->expects($this->once())
+            ->method('getLogsTypes')
+            ->willReturn($logTypes);
+
+        $this->output->expects($this->never())
+            ->method($this->anything());
+
+        $this->metricsCalculator->expects($this->once())
+            ->method('getAllMutantProcesses')
+            ->willReturn([]);
+
+        $this->filesystem->expects($this->once())
+            ->method('dumpFile');
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(
+            $this->output,
+            $this->infectionConfig,
+            $this->metricsCalculator,
+            $this->filesystem,
+            LogVerbosity::DEBUG
         ));
 
         $dispatcher->dispatch(new MutationTestingFinished());
