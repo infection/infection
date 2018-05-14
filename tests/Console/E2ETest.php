@@ -37,6 +37,10 @@ final class E2ETest extends TestCase
 
     protected function setUp()
     {
+        if (stripos(PHP_OS, 'WIN') === 0) {
+            $this->markTestSkipped('Currently unable to run e2e tests on windows.');
+        }
+
         // Without overcommit this test fails with `proc_open(): fork failed - Cannot allocate memory`
         if (strpos(PHP_OS, 'Linux') === 0 &&
             is_readable('/proc/sys/vm/overcommit_memory') &&
@@ -241,13 +245,15 @@ final class E2ETest extends TestCase
         $application->setAutoExit(false);
         $exitCode = $application->run($input, $output);
 
+        $outputText = $output->fetch();
+
         // Leaving window open to negative tests (e.g. where Infection is expected to fail)
         $this->assertSame(
             $expectedExitCode,
             $exitCode,
-            'Unexpected exit code. Command output was' . $output->fetch()
+            'Unexpected exit code. Command output was' . $outputText
         );
 
-        return $output->fetch();
+        return $outputText;
     }
 }
