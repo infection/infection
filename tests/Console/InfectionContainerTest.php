@@ -39,7 +39,7 @@ final class InfectionContainerTest extends TestCase
         //Sanity check
         $this->assertArrayNotHasKey('coverage.path', $container);
         $container->buildDynamicDependencies($input);
-        //Check thins are 'default' value, because we use empty json, because the file does not exist
+
         $this->assertSame(
             $tmpDir,
             $container['coverage.path']
