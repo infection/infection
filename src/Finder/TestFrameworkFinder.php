@@ -96,7 +96,12 @@ class TestFrameworkFinder extends AbstractExecutableFinder
             return $this->customPath;
         }
 
-        $candidates = [$this->testFrameworkName, $this->testFrameworkName . '.phar'];
+        $candidates = [
+            $this->testFrameworkName,
+            $this->testFrameworkName . '.phar',
+            $this->testFrameworkName . '.bat',
+        ];
+
         $finder = new ExecutableFinder();
 
         foreach ($candidates as $name) {
