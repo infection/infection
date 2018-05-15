@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-readonly INFECTION=../../../../bin/infection
+readonly INFECTION=../../../../${1}
 
 set -e pipefail
 

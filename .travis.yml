@@ -45,6 +45,12 @@ addons:
     - expect
 
 before_install:
+  - |
+    if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+      cp box.json.dist box.json
+      openssl aes-256-cbc -K $encrypted_4dbefe709cef_key -iv $encrypted_4dbefe709cef_iv -in .travis/secrets.tar.enc -out .travis/secrets.tar -d
+      tar xvf .travis/secrets.tar -C .travis
+    fi;
   - composer selfupdate
   - source .travis/xdebug.sh
   - xdebug-disable
@@ -53,7 +59,7 @@ install:
   - composer install
   - |
    if [ "${SYMFONY_VERSION}" != "" ]; then
-      composer config --unset platform.php
+      composer config --unset platform
       composer require \
         symfony/console:${SYMFONY_VERSION} \
         symfony/filesystem:${SYMFONY_VERSION} \
@@ -66,9 +72,16 @@ script:
   - make analyze --keep-going
   - if [[ $PHPDBG != 1 ]]; then xdebug-enable; fi
   - if [[ $PHPDBG != 1 ]]; then $PHPUNIT_BIN; else phpdbg -qrr $PHPUNIT_BIN; fi
-  - ./tests/e2e_tests
+  - |
+    if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" || "${SYMFONY_VERSION}" != "" ]]; then
+      ./tests/e2e_tests bin/infection;
+    else
+      make build/bin/infection.phar;
+      ./tests/e2e_tests build/bin/infection.phar;
+    fi
   - if [[ $NO_DEBUGGER == 1 ]]; then xdebug-disable; fi
-  - if [[ $PHPDBG != 1 ]]; then
+  - |
+    if [[ $PHPDBG != 1 ]]; then
       bin/infection $INFECTION_FLAGS;
     else
       phpdbg -qrr bin/infection $INFECTION_FLAGS;

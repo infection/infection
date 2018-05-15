@@ -25,7 +25,7 @@ do
     then
         output="$(bash run_tests.bash)"
     else
-        output="$(bash ../standard_script.bash)"
+        output="$(bash ../standard_script.bash ${1:-build/bin/infection.phar})"
     fi
 
     if [ $? != 0 ]
