@@ -82,7 +82,7 @@ script:
   - if [[ $NO_DEBUGGER == 1 ]]; then xdebug-disable; fi
   - |
     if [[ $PHPDBG != 1 ]]; then
-      bin/infection $INFECTION_FLAGS;
+      INFECTION_ALLOW_XDEBUG=1 bin/infection $INFECTION_FLAGS;
     else
       phpdbg -qrr bin/infection $INFECTION_FLAGS;
     fi
