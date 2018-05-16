@@ -151,7 +151,7 @@ abstract class AbstractTestFrameworkAdapter
         }
 
         /*
-         * In all other cases run it with a choosen PHP interpreter
+         * In all other cases run it with a chosen PHP interpreter
          */
         return sprintf(
             '%s %s %s %s',
