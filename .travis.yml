@@ -10,6 +10,7 @@ matrix:
     - php: 7.0
       env: PHPDBG=1
     - php: 7.1
+      env: EXECUTE_DEPLOYMENT=1
     - php: 7.1
       env: NO_DEBUGGER=1
     - php: 7.1
@@ -89,3 +90,16 @@ script:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
+deploy:
+    provider: releases
+    api_key:
+        secure: JtdvJBE2ARf6VWN5KlXAburz3FZMriiXBHEdeIocHePBAzgYW7tVMksJR5N3azrE3KjhftMEukXtA1k5VfAGdLCSm6nKGsZwolkd24ryG7PYNuAdFWfbau8QQXn6aLFesF2lkTq89+PqxAdVjwXNgFA7ble3vL66Ogabff6gov6QwT9vDrTqwLmWNGwbt9QB32IE9yVPjW/3lk4MAkMHtKDr2DElyeT2CRRuPuUCA+zNwoGG95wqLAD/RwjsqR3GjotzDKrldqog9jU2OQptUc3BgdKlYR1AzdknxJYnT7a5CRVdmSOEfD9IrDqlYEzn9pHav+Sk4KD2KNKsALQGk/w16BqncN2uyOexUTzXvnDd27G4ZYy+1OsXMdYMhF5ffwj7EqNLm8XfLPtHHV0/FUJY9kkrbf9+wQVjDQmMJLLIiBSt3vuY0ya5SVW8thtjlF2j67smamNe4hDhditBipto+9Y5vI4AYhcm4CQlqP8BVbw3/LgGAl/dJR5ohM7PFZH3EUE1AojBaEXfUymlICdFVZFJbB0D/AM8jSqNmWBQu9QX3MURhT5xLSwc+kir2izQaEo/GQz79AifqkUJgSCzpRUJntCN8A7yk1uxDZDONbINF3ReuF+nqu7GMksgKZLCGbOIaBl9of24K5BeTqxgcEykiHFFY7X9QdI3Dyo=
+    file:
+        - build/bin/infection.phar
+        - build/bin/infection.phar.pubkey
+    skip_cleanup: true
+    on:
+        tags: true
+        repo: infection/infection
+        condition: "$EXECUTE_DEPLOYMENT"
