@@ -123,7 +123,7 @@ abstract class AbstractTestFrameworkAdapter
     {
         $frameworkPath = realpath($frameworkPath);
 
-        if (\defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if ('\\' == DIRECTORY_SEPARATOR) {
             if (false !== strpos($frameworkPath, '.bat')) {
                 return $frameworkPath;
             }
