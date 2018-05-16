@@ -3,6 +3,9 @@ platform:
   - x64
 clone_folder: c:\projects\workspace
 
+artifacts:
+  - path: infection-log.txt
+
 environment:
   matrix:
   - dependencies: highest
@@ -68,7 +71,7 @@ install:
 test_script:
     - cd c:\projects\workspace
     - vendor\bin\phpunit --coverage-clover=clover.xml --coverage-xml=coverage/coverage-xml --log-junit=coverage/phpunit.junit.xml
-    - php bin/infection --threads=4 --log-verbosity=none --coverage=coverage
+    - php bin/infection --threads=4 --coverage=coverage
 
 after_test:
   - ps: |
