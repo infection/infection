@@ -136,6 +136,23 @@ abstract class AbstractTestFrameworkAdapter
             );
         }
 
+        /*
+         * Run an executable as it is if we're using a standard CLI and
+         * there's a standard interpreter available on PATH.
+         *
+         * This lets folks use, say, a bash wrapper over phpunit.
+         */
+        if ('cli' == PHP_SAPI && empty($phpExtraArgs) && is_executable($frameworkPath) && `command -v php`) {
+            return sprintf(
+                '%s %s',
+                'exec',
+                $frameworkPath
+            );
+        }
+
+        /*
+         * In all other cases run it with a chosen PHP interpreter
+         */
         return sprintf(
             '%s %s %s %s',
             'exec',
