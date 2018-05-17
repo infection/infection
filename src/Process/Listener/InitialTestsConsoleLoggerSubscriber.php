@@ -44,7 +44,7 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterf
         $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
 
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
         return [
             InitialTestSuiteStarted::class => [$this, 'onInitialTestSuiteStarted'],

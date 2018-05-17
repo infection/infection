@@ -77,7 +77,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInt
         $this->mutationCount = 0;
     }
 
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
         return [
             MutationTestingStarted::class => [$this, 'onMutationTestingStarted'],

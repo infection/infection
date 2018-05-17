@@ -37,7 +37,7 @@ final class MutationGeneratingConsoleLoggerSubscriber implements EventSubscriber
         $this->progressBar = $progressBar;
     }
 
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
         return [
             MutationGeneratingStarted::class => [$this, 'onMutationGeneratingStarted'],

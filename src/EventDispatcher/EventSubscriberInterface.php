@@ -14,8 +14,5 @@ namespace Infection\EventDispatcher;
  */
 interface EventSubscriberInterface
 {
-    /**
-     * @return array
-     */
-    public function getSubscribedEvents();
+    public function getSubscribedEvents(): array;
 }

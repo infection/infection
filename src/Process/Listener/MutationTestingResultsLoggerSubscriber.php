@@ -68,10 +68,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
         $this->logVerbosity = $logVerbosity;
     }
 
-    /**
-     * @return array
-     */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
         return [
             MutationTestingFinished::class => [$this, 'onMutationTestingFinished'],

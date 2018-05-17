@@ -37,7 +37,7 @@ final class MutantCreatingConsoleLoggerSubscriber implements EventSubscriberInte
         $this->output = $output;
     }
 
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
         return [
             MutantsCreatingStarted::class => [$this, 'onMutantsCreatingStarted'],

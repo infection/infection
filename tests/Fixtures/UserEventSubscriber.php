@@ -13,7 +13,7 @@ class UserEventSubscriber implements EventSubscriberInterface
 {
     public $count = 0;
 
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
         return [
             UserWasCreated::class => [$this, '__invoke'],
