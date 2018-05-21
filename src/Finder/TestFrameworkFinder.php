@@ -99,8 +99,16 @@ class TestFrameworkFinder extends AbstractExecutableFinder
         $candidates = [
             $this->testFrameworkName,
             $this->testFrameworkName . '.phar',
-            $this->testFrameworkName . '.bat',
         ];
+
+        /*
+         * There's a glitch where ExecutableFinder would find a non-executable
+         * file on Windows, even if there's a proper executable .bat by its side.
+         * Therefore we have to explicitly look for a .bat.
+         */
+        if ('\\' == DIRECTORY_SEPARATOR) {
+            array_unshift($candidates, $this->testFrameworkName . '.bat');
+        }
 
         $finder = new ExecutableFinder();
 
