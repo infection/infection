@@ -16,6 +16,7 @@ use Infection\Events\MutationTestingFinished;
 use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Listener\MutationTestingResultsLoggerSubscriber;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -26,22 +27,22 @@ use Symfony\Component\Filesystem\Filesystem;
 final class MutationTestingResultsLoggerSubscriberTest extends TestCase
 {
     /**
-     * @var OutputInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var OutputInterface|MockObject
      */
     private $output;
 
     /**
-     * @var InfectionConfig|\PHPUnit_Framework_MockObject_MockObject
+     * @var InfectionConfig|MockObject
      */
     private $infectionConfig;
 
     /**
-     * @var Filesystem|\PHPUnit_Framework_MockObject_MockObject
+     * @var Filesystem|MockObject
      */
     private $filesystem;
 
     /**
-     * @var MetricsCalculator|\PHPUnit_Framework_MockObject_MockObject
+     * @var MetricsCalculator|MockObject
      */
     private $metricsCalculator;
 
@@ -72,7 +73,9 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
             $this->output,
             $this->infectionConfig,
             $this->metricsCalculator,
-            $this->filesystem
+            $this->filesystem,
+            LogVerbosity::DEBUG,
+            true
         ));
 
         $dispatcher->dispatch(new MutationTestingFinished());
@@ -115,7 +118,8 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
             $this->infectionConfig,
             $this->metricsCalculator,
             $this->filesystem,
-            LogVerbosity::DEBUG
+            LogVerbosity::DEBUG,
+            true
         ));
 
         $dispatcher->dispatch(new MutationTestingFinished());
@@ -155,7 +159,9 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
             $this->output,
             $this->infectionConfig,
             $this->metricsCalculator,
-            $this->filesystem
+            $this->filesystem,
+            LogVerbosity::NORMAL,
+            false
         ));
 
         $dispatcher->dispatch(new MutationTestingFinished());
@@ -175,7 +181,8 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
             $this->infectionConfig,
             $this->metricsCalculator,
             $this->filesystem,
-            LogVerbosity::NONE
+            LogVerbosity::NONE,
+            true
         ));
 
         $dispatcher->dispatch(new MutationTestingFinished());
@@ -205,7 +212,8 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
             $this->infectionConfig,
             $this->metricsCalculator,
             $this->filesystem,
-            LogVerbosity::DEBUG
+            LogVerbosity::DEBUG,
+            true
         ));
 
         $dispatcher->dispatch(new MutationTestingFinished());

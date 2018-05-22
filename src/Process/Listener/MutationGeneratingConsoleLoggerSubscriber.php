@@ -31,10 +31,12 @@ final class MutationGeneratingConsoleLoggerSubscriber implements EventSubscriber
      */
     private $progressBar;
 
-    public function __construct(OutputInterface $output, ProgressBar $progressBar)
+    public function __construct(OutputInterface $output)
     {
         $this->output = $output;
-        $this->progressBar = $progressBar;
+
+        $this->progressBar = new ProgressBar($this->output);
+        $this->progressBar->setFormat('Processing source code files: %current%/%max%');
     }
 
     public function getSubscribedEvents(): array

@@ -54,18 +54,25 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
      */
     private $output;
 
+    /**
+     * @var bool
+     */
+    private $isDebugMode;
+
     public function __construct(
         OutputInterface $output,
         InfectionConfig $infectionConfig,
         MetricsCalculator $metricsCalculator,
         Filesystem $fs,
-        string $logVerbosity = LogVerbosity::NORMAL
+        string $logVerbosity,
+        bool $isDebugMode
     ) {
         $this->output = $output;
         $this->infectionConfig = $infectionConfig;
         $this->metricsCalculator = $metricsCalculator;
         $this->fs = $fs;
         $this->logVerbosity = $logVerbosity;
+        $this->isDebugMode = $isDebugMode;
     }
 
     public function getSubscribedEvents(): array
@@ -109,14 +116,16 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
 
     private function useLogger(string $logType, $config)
     {
-        $isDebugMode = $this->logVerbosity == LogVerbosity::DEBUG;
+        $isDebugVerbosity = $this->logVerbosity == LogVerbosity::DEBUG;
+
         switch ($logType) {
             case ResultsLoggerTypes::TEXT_FILE:
                 (new TextFileLogger(
                     $config,
                     $this->metricsCalculator,
                     $this->fs,
-                    $isDebugMode
+                    $isDebugVerbosity,
+                    $this->isDebugMode
                 ))->log();
                 break;
             case ResultsLoggerTypes::SUMMARY_FILE:
@@ -124,7 +133,8 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
                     $config,
                     $this->metricsCalculator,
                     $this->fs,
-                     $isDebugMode
+                     $isDebugVerbosity,
+                    $this->isDebugMode
                 ))->log();
                 break;
             case ResultsLoggerTypes::DEBUG_FILE:
@@ -132,7 +142,8 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
                     $config,
                     $this->metricsCalculator,
                     $this->fs,
-                    $isDebugMode
+                    $isDebugVerbosity,
+                    $this->isDebugMode
                 ))->log();
                 break;
             case ResultsLoggerTypes::BADGE:
@@ -148,7 +159,8 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
                     $config,
                     $this->metricsCalculator,
                     $this->fs,
-                    $isDebugMode
+                    $isDebugVerbosity,
+                    $this->isDebugMode
                 ))->log();
                 break;
         }

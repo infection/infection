@@ -70,6 +70,10 @@ final class MutantCreator
 
     private function createMutatedCode(MutationInterface $mutation, string $mutatedFilePath): string
     {
+        if (file_exists($mutatedFilePath)) {
+            return file_get_contents($mutatedFilePath);
+        }
+
         $traverser = new NodeTraverser();
 
         $traverser->addVisitor(new CloneVisitor());

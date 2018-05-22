@@ -21,7 +21,7 @@ final class TextFileLogger extends FileLogger
         $logs[] = $this->getLogParts($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped');
         $logs[] = $this->getLogParts($this->metricsCalculator->getTimedOutProcesses(), 'Timeout');
 
-        if ($this->isDebugMode) {
+        if ($this->isDebugVerbosity) {
             $logs[] = $this->getLogParts($this->metricsCalculator->getKilledMutantProcesses(), 'Killed');
             $logs[] = $this->getLogParts($this->metricsCalculator->getErrorProcesses(), 'Errors');
         }
@@ -42,11 +42,13 @@ final class TextFileLogger extends FileLogger
         $logParts = $this->getHeadlineParts($headlinePrefix);
 
         foreach ($processes as $index => $mutantProcess) {
-            $isShowFullFormat = $this->isDebugMode && $mutantProcess->getProcess()->isStarted();
+            $isShowFullFormat = $this->isDebugVerbosity && $mutantProcess->getProcess()->isStarted();
 
             $logParts[] = '';
             $logParts[] = $this->getMutatorFirstLine($index, $mutantProcess);
-            $logParts[] = $isShowFullFormat ? $mutantProcess->getProcess()->getCommandLine() : '';
+
+            $logParts[] = $this->isDebugMode ? $mutantProcess->getProcess()->getCommandLine() : '';
+
             $logParts[] = $mutantProcess->getMutant()->getDiff();
 
             if ($isShowFullFormat) {

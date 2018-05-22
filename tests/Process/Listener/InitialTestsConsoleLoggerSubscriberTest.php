@@ -14,7 +14,6 @@ use Infection\Events\InitialTestSuiteStarted;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Mockery;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -29,20 +28,12 @@ final class InitialTestsConsoleLoggerSubscriberTest extends Mockery\Adapter\Phpu
         $output->shouldReceive('writeln');
         $output->shouldReceive('getVerbosity')->andReturn(OutputInterface::VERBOSITY_QUIET);
 
-        $progressBar = new ProgressBar($output);
-
         $testFramework = Mockery::mock(AbstractTestFrameworkAdapter::class);
         $testFramework->shouldReceive('getName')->once();
         $testFramework->shouldReceive('getVersion')->once();
 
-        $subscriber = new InitialTestsConsoleLoggerSubscriber(
-            $output,
-            $progressBar,
-            $testFramework
-        );
-
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber($subscriber);
+        $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework));
 
         $dispatcher->dispatch(new InitialTestSuiteStarted());
     }
@@ -59,20 +50,12 @@ final class InitialTestsConsoleLoggerSubscriberTest extends Mockery\Adapter\Phpu
         ]]);
         $output->shouldReceive('getVerbosity')->andReturn(OutputInterface::VERBOSITY_QUIET);
 
-        $progressBar = new ProgressBar($output);
-
         $testFramework = Mockery::mock(AbstractTestFrameworkAdapter::class);
         $testFramework->shouldReceive('getName')->once()->andReturn('PHPUnit');
         $testFramework->shouldReceive('getVersion')->andThrow(\InvalidArgumentException::class);
 
-        $subscriber = new InitialTestsConsoleLoggerSubscriber(
-            $output,
-            $progressBar,
-            $testFramework
-        );
-
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber($subscriber);
+        $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework));
 
         $dispatcher->dispatch(new InitialTestSuiteStarted());
     }
