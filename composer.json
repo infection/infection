@@ -66,8 +66,8 @@
         "symfony/yaml": "^3.2 || ^4.0"
     },
     "require-dev": {
-        "mockery/mockery": "^1.0",
-        "phpunit/phpunit": "^6.1"
+        "mockery/mockery": "^1.1",
+        "phpunit/phpunit": "^6.5"
     },
     "bin": ["bin/infection"]
 }
