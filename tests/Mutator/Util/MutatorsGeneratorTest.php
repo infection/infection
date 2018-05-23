@@ -139,6 +139,62 @@ final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
         $this->assertTrue($mutators[Plus::getName()]->shouldMutate($plusNode));
     }
 
+    public function test_it_can_set_a_single_item_with_a_setting()
+    {
+        $reflectionMock = Mockery::mock(\ReflectionClass::class);
+        $reflectionMock->shouldReceive('getName')->times(2)->andReturn('A');
+        $falseNode = $this->getBoolNode('false', 'B', $reflectionMock);
+        $trueNode = $this->getBoolNode('true', 'B', $reflectionMock);
+
+        $mutatorGenerator = new MutatorsGenerator([
+            '@boolean' => ['ignore' => ['A::B']],
+        ]);
+        $mutators = $mutatorGenerator->generate();
+
+        $this->assertCount(count(MutatorProfile::BOOLEAN), $mutators);
+
+        $this->assertArrayNotHasKey(Plus::getName(), $mutators);
+
+        $this->assertFalse($mutators[TrueValue::getName()]->shouldMutate($trueNode));
+        $this->assertFalse($mutators[FalseValue::getName()]->shouldMutate($falseNode));
+    }
+
+    public function test_an_empty_setting_is_allowed()
+    {
+        $mutatorGenerator = new MutatorsGenerator([
+            '@boolean' => [],
+        ]);
+        $mutators = $mutatorGenerator->generate();
+
+        $this->assertCount(count(MutatorProfile::BOOLEAN), $mutators);
+
+        $this->assertArrayNotHasKey(Plus::getName(), $mutators);
+    }
+
+    /**
+     * This is default behaviour since we json decode our config file as an stdclass
+     */
+    public function test_it_works_when_supplied_with_an_std_class_as_setting()
+    {
+        $mutatorSettings = json_decode(<<<'JSON'
+{
+    "@default": true,
+    "Infection\\Mutator\\Boolean\\Yield_": false,
+    "Plus": false,
+    "Minus": {
+        "ignore": ["A::B"]
+    }
+
+}
+JSON
+        );
+
+        $mutatorGenerator = new MutatorsGenerator((array) $mutatorSettings);
+        $mutators = $mutatorGenerator->generate();
+
+        $this->assertCount(self::$countDefaultMutators - 2, $mutators);
+    }
+
     private function getPlusNode(string $functionName, \ReflectionClass $reflectionMock): Node
     {
         return new PlusNode(

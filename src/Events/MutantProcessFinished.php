@@ -26,9 +26,6 @@ final class MutantProcessFinished
         $this->mutantProcess = $mutantProcess;
     }
 
-    /**
-     * @return MutantProcessInterface
-     */
     public function getMutantProcess(): MutantProcessInterface
     {
         return $this->mutantProcess;

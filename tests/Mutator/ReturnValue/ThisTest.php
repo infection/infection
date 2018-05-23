@@ -27,7 +27,7 @@ final class ThisTest extends AbstractMutatorTestCase
 
     public function provideMutationCases(): \Generator
     {
-        yield 'It does not mutate with not nullable return typehint' => [
+        yield 'It does mutate with no typehint' => [
             $this->getFileContent('this_return-this.php'),
             <<<'PHP'
 <?php
@@ -42,6 +42,10 @@ class Test
     }
 }
 PHP
+        ];
+
+        yield 'It does not mutate non \'this\' return statements' => [
+            $this->getFileContent('this-return-types.php'),
         ];
     }
 

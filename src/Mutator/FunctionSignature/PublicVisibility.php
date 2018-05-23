@@ -130,7 +130,7 @@ final class PublicVisibility extends Mutator
                     return true;
                 }
             } catch (\ReflectionException $e) {
-                continue;
+                return false;
             } finally {
                 $parent = $parent->getParentClass();
             }

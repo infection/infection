@@ -4,10 +4,14 @@ namespace ProtectedSameAbstract;
 
 abstract class SameAbstract
 {
-    abstract protected function foo();
+    protected abstract function foo();
 }
-
 class Child extends SameAbstract
 {
-    protected function foo() {}
+    protected function foo()
+    {
+    }
+    public function bar()
+    {
+    }
 }

@@ -24,28 +24,44 @@ final class Foreach_Test extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): array
+    public function provideMutationCases(): \Generator
     {
-        return [
-            'It mutates to new array in foreach' => [
-                <<<'PHP'
+        yield 'It mutates to new array in foreach' => [
+            <<<'PHP'
 <?php
 
 $array = [1, 2];
-
 foreach ($array as $value) {
 }
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 $array = [1, 2];
 foreach (array() as $value) {
 }
 PHP
-                ,
-            ],
+            ,
+        ];
+        yield 'It does not change whether items were passed by reference' => [
+            <<<'PHP'
+<?php
+
+$array = [1, 2];
+foreach ($array as $key => &$value) {
+    echo $value;
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$array = [1, 2];
+foreach (array() as $key => &$value) {
+    echo $value;
+}
+PHP
         ];
     }
 }

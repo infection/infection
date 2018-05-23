@@ -10,5 +10,5 @@ class Test
             return $element;
         };
         return new \stdClass();
-}
+    }
 }

@@ -24,11 +24,10 @@ final class For_Test extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): array
+    public function provideMutationCases(): \Generator
     {
-        return [
-            'It mutates to false in for loop condition' => [
-                <<<'PHP'
+        yield 'It mutates to false in for loop condition' => [
+            <<<'PHP'
 <?php
 
 $array = [1, 2];
@@ -36,16 +35,40 @@ $array = [1, 2];
 for($i = 0; $i < count($array); $i++) {
 }
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 $array = [1, 2];
 for ($i = 0; false; $i++) {
 }
 PHP
-                ,
-            ],
+            ,
+        ];
+
+        yield 'It does not mutate the body of the for loop' => [
+            <<<'PHP'
+<?php
+
+$array = [1, 2];
+for($i = 0; $i < count($array); $i++) {
+    if ($i == 1) {
+        echo '$i is one';
+    }
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$array = [1, 2];
+for ($i = 0; false; $i++) {
+    if ($i == 1) {
+        echo '$i is one';
+    }
+}
+PHP
+            ,
         ];
     }
 }

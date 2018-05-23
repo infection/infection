@@ -11,4 +11,7 @@ class Child extends SameAbstract
     public function foo()
     {
     }
+    private function bar()
+    {
+    }
 }

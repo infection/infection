@@ -24,9 +24,6 @@ final class MutationTestingStarted
         $this->mutationCount = $mutationCount;
     }
 
-    /**
-     * @return int
-     */
     public function getMutationCount(): int
     {
         return $this->mutationCount;
