@@ -9,26 +9,62 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
+use Infection\Command\ConfigureCommand;
+use Infection\Command\InfectionCommand;
+use Infection\Command\SelfUpdateCommand;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\InfectionConfig;
+use Infection\Console\Application;
+use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;
+use Infection\Console\OutputFormatter\ProgressFormatter;
+use Infection\Console\Util\PhpProcess;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
+use Infection\Events\InitialTestCaseCompleted;
+use Infection\Events\InitialTestSuiteFinished;
+use Infection\Events\InitialTestSuiteStarted;
+use Infection\Events\MutableFileProcessed;
+use Infection\Events\MutantCreated;
+use Infection\Events\MutantProcessFinished;
+use Infection\Events\MutantsCreatingFinished;
+use Infection\Events\MutantsCreatingStarted;
+use Infection\Events\MutationGeneratingFinished;
+use Infection\Events\MutationGeneratingStarted;
+use Infection\Events\MutationTestingFinished;
+use Infection\Events\MutationTestingStarted;
+use Infection\Finder\ComposerExecutableFinder;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\Http\BadgeApiClient;
+use Infection\Logger\DebugFileLogger;
+use Infection\Logger\ResultsLoggerTypes;
+use Infection\Logger\SummaryFileLogger;
+use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
+use Infection\Mutant\Mutant;
 use Infection\Mutator\Util\Mutator;
 use Infection\Process\Builder\ProcessBuilder;
+use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
+use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
+use Infection\Process\Runner\MutationTestingRunner;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
+use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder as PhpSpecInitalConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder as PhpSpecMutationConfigBuilder;
+use Infection\TestFramework\PhpSpec\Config\NoCodeCoverageException;
+use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Utils\VersionParser;
+use Infection\Visitor\CloneVisitor;
+use Infection\Visitor\MutationsCollectorVisitor;
+use Infection\Visitor\ParentConnectorVisitor;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -84,6 +120,51 @@ final class ProjectCodeTest extends TestCase
         VersionParser::class,
     ];
 
+    /**
+     * @var string[]
+     */
+    private static $nonTestedConcreteClasses = [
+        ConfigureCommand::class,
+        InfectionCommand::class,
+        SelfUpdateCommand::class,
+        ConsoleHelper::class,
+        Application::class,
+        DotFormatter::class,
+        ProgressFormatter::class,
+        PhpProcess::class,
+        InitialTestCaseCompleted::class,
+        InitialTestSuiteFinished::class,
+        InitialTestSuiteStarted::class,
+        MutableFileProcessed::class,
+        MutantCreated::class,
+        MutantProcessFinished::class,
+        MutantsCreatingStarted::class,
+        MutantsCreatingFinished::class,
+        MutationGeneratingFinished::class,
+        MutationGeneratingStarted::class,
+        MutationTestingFinished::class,
+        MutationTestingStarted::class,
+        ComposerExecutableFinder::class,
+        BadgeApiClient::class,
+        DebugFileLogger::class,
+        ResultsLoggerTypes::class,
+        SummaryFileLogger::class,
+        TextFileLogger::class,
+        Mutant::class,
+        MutantCreatingConsoleLoggerSubscriber::class,
+        MutationGeneratingConsoleLoggerSubscriber::class,
+        MutationTestingRunner::class,
+        CoverageDoesNotExistException::class,
+        TestFileNameNotFoundException::class,
+        NoCodeCoverageException::class,
+        PhpSpecExtraOptions::class,
+        XmlConfigurationHelper::class,
+        TestFrameworkTypes::class,
+        CloneVisitor::class,
+        MutationsCollectorVisitor::class,
+        ParentConnectorVisitor::class,
+    ];
+
     public function test_infection_bin_is_executable()
     {
         if (stripos(PHP_OS, 'WIN') === 0) {
@@ -124,6 +205,51 @@ final class ProjectCodeTest extends TestCase
             sprintf(
                 'The "%s" class was picked up by the test files finder, but it is not a class, interface or trait. ' .
                 'Please check for typos in the class name. Or exclude the file if in the ProjectCodeTest if it is not a class.',
+                $className
+            )
+        );
+    }
+
+    /**
+     * @dataProvider provideConcreteSourceClasses
+     *
+     * @param string $className
+     */
+    public function test_all_concrete_classes_have_tests(string $className)
+    {
+        $testClass = preg_replace('/Infection/', 'Infection\\Tests', $className, 1) . 'Test';
+        if (in_array($className, self::$nonTestedConcreteClasses)) {
+            $this->assertFalse(class_exists($testClass),
+                sprintf(
+                    'Class "%s" has a corresponding unit test "%s", and can be removed from the non tested class list',
+                    $className,
+                    $testClass
+                )
+            );
+            $this->markTestSkipped(sprintf(
+                'Class "%s" does not have a correstponding unit test yet, you can improve this by adding one',
+                $className
+            ));
+        }
+        $this->assertTrue(class_exists($testClass),
+            sprintf(
+                'Class "%s" doest not have a corresponding unit test "%s", please add one',
+                $className,
+                $testClass
+            )
+        );
+    }
+
+    /**
+     * @dataProvider provideNonTestedConcreteClasses
+     *
+     * @param string $className
+     */
+    public function test_non_tested_concrete_class_list_is_valid(string $className)
+    {
+        $this->assertTrue(class_exists($className),
+            sprintf(
+                'Class "%s" no longer exists, please remove it from the list of non tested classes',
                 $className
             )
         );
@@ -320,7 +446,7 @@ final class ProjectCodeTest extends TestCase
         );
     }
 
-    public function providesSourceClasses()
+    public function providesSourceClasses(): array
     {
         return array_map(
             static function ($item) {
@@ -330,7 +456,17 @@ final class ProjectCodeTest extends TestCase
         );
     }
 
-    public function providesTestClassCases()
+    public function provideConcreteSourceClasses(): array
+    {
+        return array_map(
+            static function ($item) {
+                return [$item];
+            },
+            $this->getConcreteSrcClasses()
+        );
+    }
+
+    public function providesTestClassCases(): array
     {
         return array_map(
             static function ($item) {
@@ -340,7 +476,7 @@ final class ProjectCodeTest extends TestCase
         );
     }
 
-    public function provideNonFinalNonExtensionClasses()
+    public function provideNonFinalNonExtensionClasses(): array
     {
         return array_map(
             static function ($item) {
@@ -350,7 +486,17 @@ final class ProjectCodeTest extends TestCase
         );
     }
 
-    private function getSrcClasses()
+    public function provideNonTestedConcreteClasses(): array
+    {
+        return array_map(
+            static function ($item) {
+                return [$item];
+            },
+            self::$nonTestedConcreteClasses
+        );
+    }
+
+    private function getSrcClasses(): array
     {
         static $classes;
 
@@ -381,7 +527,18 @@ final class ProjectCodeTest extends TestCase
         return $classes;
     }
 
-    private function getTestClasses()
+    private function getConcreteSrcClasses(): array
+    {
+        return array_filter($this->getSrcClasses(),
+            function ($class) {
+                $rc = new \ReflectionClass($class);
+
+                return !$rc->isInterface() && !$rc->isAbstract() && !$rc->isTrait();
+            }
+        );
+    }
+
+    private function getTestClasses(): array
     {
         static $classes;
 
