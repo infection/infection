@@ -27,13 +27,9 @@ use Infection\Events\InitialTestSuiteFinished;
 use Infection\Events\InitialTestSuiteStarted;
 use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutantCreated;
-use Infection\Events\MutantProcessFinished;
 use Infection\Events\MutantsCreatingFinished;
-use Infection\Events\MutantsCreatingStarted;
 use Infection\Events\MutationGeneratingFinished;
-use Infection\Events\MutationGeneratingStarted;
 use Infection\Events\MutationTestingFinished;
-use Infection\Events\MutationTestingStarted;
 use Infection\Finder\ComposerExecutableFinder;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\Http\BadgeApiClient;
@@ -42,7 +38,6 @@ use Infection\Logger\ResultsLoggerTypes;
 use Infection\Logger\SummaryFileLogger;
 use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Mutant\Mutant;
 use Infection\Mutator\Util\Mutator;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
@@ -50,7 +45,6 @@ use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Coverage\CodeCoverageData;
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder as PhpSpecInitalConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder as PhpSpecMutationConfigBuilder;
@@ -137,24 +131,18 @@ final class ProjectCodeTest extends TestCase
         InitialTestSuiteStarted::class,
         MutableFileProcessed::class,
         MutantCreated::class,
-        MutantProcessFinished::class,
-        MutantsCreatingStarted::class,
         MutantsCreatingFinished::class,
         MutationGeneratingFinished::class,
-        MutationGeneratingStarted::class,
         MutationTestingFinished::class,
-        MutationTestingStarted::class,
         ComposerExecutableFinder::class,
         BadgeApiClient::class,
         DebugFileLogger::class,
         ResultsLoggerTypes::class,
         SummaryFileLogger::class,
         TextFileLogger::class,
-        Mutant::class,
         MutantCreatingConsoleLoggerSubscriber::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
         MutationTestingRunner::class,
-        CoverageDoesNotExistException::class,
         TestFileNameNotFoundException::class,
         NoCodeCoverageException::class,
         PhpSpecExtraOptions::class,
