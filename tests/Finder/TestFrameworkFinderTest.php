@@ -14,6 +14,7 @@ use Infection\Finder\TestFrameworkFinder;
 use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
+use function Infection\Tests\normalizePath;
 
 /**
  * @internal
@@ -64,6 +65,26 @@ final class TestFrameworkFinderTest extends TestCase
         $this->expectExceptionMessageRegExp('/custom path/');
 
         $frameworkFinder->find();
+    }
+
+    public function test_it_adds_vendor_folder_to_path_if_needed()
+    {
+        $pathName = getenv('PATH') ? 'PATH' : 'Path';
+        $path = getenv($pathName);
+
+        $frameworkFinder = new TestFrameworkFinder('phpunit');
+
+        $this->assertContains(normalizePath('vendor/bin/phpunit'), normalizePath($frameworkFinder->find()), 'Should return the custom path');
+        $pathAfterTest = getenv($pathName);
+
+        $this->assertNotSame($path, $pathAfterTest);
+        $this->assertContains('vendor', $pathAfterTest);
+
+        $this->assertGreaterThan(
+            strlen($path),
+            strlen($pathAfterTest),
+            'PATH with vendor added is shorter than without it added, make sure it isn\'t overwritten.'
+        );
     }
 
     protected function tearDown()

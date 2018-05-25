@@ -75,6 +75,14 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertTrue($codeCoverageData->hasTests($filePath));
     }
 
+    public function test_it_determines_file_is_not_covered()
+    {
+        $codeCoverageData = $this->getCodeCoverageData();
+        $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevelNotCovered.php';
+
+        $this->assertFalse($codeCoverageData->hasTests($filePath));
+    }
+
     public function test_it_determines_file_does_not_have_tests_on_line_for_unknown_file()
     {
         $codeCoverageData = $this->getCodeCoverageData();
@@ -176,10 +184,13 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     {
         $coverageXmlParserMock = Mockery::mock(CoverageXmlParser::class);
 
-        $coverage = new CodeCoverageData('/abc', $coverageXmlParserMock, TestFrameworkTypes::PHPUNIT);
+        $coverage = new CodeCoverageData('/abc/foo/bar', $coverageXmlParserMock, TestFrameworkTypes::PHPUNIT);
 
         $this->expectException(CoverageDoesNotExistException::class);
-
+        $this->expectExceptionMessage(
+            'Code Coverage does not exist. File /abc/foo/bar/index.xml is not found. ' .
+            'Check phpunit version Infection was run with and generated config files inside /abc/foo.'
+        );
         $coverage->hasTests('/abc/def.php');
     }
 

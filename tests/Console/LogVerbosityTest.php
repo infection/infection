@@ -61,6 +61,11 @@ final class LogVerbosityTest extends MockeryTestCase
             LogVerbosity::DEBUG_INTEGER,
             LogVerbosity::DEBUG,
         ];
+
+        yield 'It converts string version of debug integer to debug' => [
+            (string) LogVerbosity::DEBUG_INTEGER,
+            LogVerbosity::DEBUG,
+        ];
     }
 
     public function test_it_converts_to_normal_and_writes_notice_when_invalid_verbosity()
