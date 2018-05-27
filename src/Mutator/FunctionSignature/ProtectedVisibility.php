@@ -74,7 +74,7 @@ final class ProtectedVisibility extends Mutator
                     return true;
                 }
             } catch (\ReflectionException $e) {
-                continue;
+                return false;
             } finally {
                 $parent = $parent->getParentClass();
             }

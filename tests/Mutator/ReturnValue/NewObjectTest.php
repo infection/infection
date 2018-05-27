@@ -20,8 +20,11 @@ final class NewObjectTest extends AbstractMutatorTestCase
     /**
      * @dataProvider provideMutationCases
      */
-    public function test_mutator($input, $expected = null)
+    public function test_mutator($input, $expected = null, bool $allowed = true, $message = '')
     {
+        if (!$allowed) {
+            $this->markTestSkipped($message);
+        }
         $this->doTest($input, $expected);
     }
 
@@ -68,19 +71,10 @@ PHP
         yield 'It does not mutate when scalar return typehint does not allow null' => [
             $this->getFileContent('no-not-mutates-scalar-return-typehint-does-not-allow-null.php'),
         ];
-    }
 
-    public function test_it_mutates_when_function_contains_another_function_but_returns_new_instance_and_null_allowed()
-    {
-        if (\PHP_VERSION_ID < 70100) {
-            $this->markTestSkipped('Current PHP version does not support nullable return typehint.');
-        }
-
-        $code = $this->getFileContent('no-contains-another-func-and-null-allowed.php');
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<"CODE"
+        yield 'It mutates when function contains another function but returns new instance and null allowed' => [
+            $this->getFileContent('no-contains-another-func-and-null-allowed.php'),
+            <<<"CODE"
 <?php
 
 namespace NewObject_ContainsAnotherFunctionAndNullAllowed;
@@ -96,51 +90,22 @@ class Test
         return null;
     }
 }
-CODE;
+CODE
+            ,
+            \PHP_VERSION_ID >= 70100,
+            'Current PHP version does not support nullable return typehint.',
+        ];
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
+        yield 'It does not mutate when function contains another function but return null is not allowed' => [
+            $this->getFileContent('no-contains-another-func-and-null-is-not-allowed.php'),
+            null,
+            \PHP_VERSION_ID >= 70100,
+            'Current PHP version does not support nullable return typehint.',
+        ];
 
-    public function test_it_does_not_mutate_when_function_contains_another_function_but_return_null_is_not_allowed()
-    {
-        if (\PHP_VERSION_ID < 70100) {
-            $this->markTestSkipped('Current PHP version does not support nullable return typehint.');
-        }
-
-        $code = $this->getFileContent('no-contains-another-func-and-null-is-not-allowed.php');
-
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<"CODE"
-<?php
-
-namespace NewObject_ContainsAnotherFunctionAndNullIsNotAllowed;
-
-class Test
-{
-    function test() : \stdClass
-    {
-        \$a = function (\$element) : ?\stdClass {
-            return \$element;
-        };
-        return new \stdClass();
-    }
-}
-CODE;
-
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_it_mutates_when_return_typehint_fqcn_allows_null()
-    {
-        if (\PHP_VERSION_ID < 70100) {
-            $this->markTestSkipped('Current PHP version does not support nullable return typehint.');
-        }
-
-        $code = $this->getFileContent('no-mutates-return-typehint-fqcn-allows-null.php');
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<"CODE"
+        yield 'It mutates when return typehint fqcn allows null' => [
+            $this->getFileContent('no-mutates-return-typehint-fqcn-allows-null.php'),
+            <<<"CODE"
 <?php
 
 namespace NewObject_ReturnTypehintFqcnAllowsNull;
@@ -153,21 +118,15 @@ class Test
         return null;
     }
 }
-CODE;
+CODE
+            ,
+            \PHP_VERSION_ID >= 70100,
+            'Current PHP version does not support nullable return typehint.',
+        ];
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
-    }
-
-    public function test_mutates_when_scalar_return_typehint_allows_null()
-    {
-        if (\PHP_VERSION_ID < 70100) {
-            $this->markTestSkipped('Current PHP version does not support nullable return typehint.');
-        }
-
-        $code = $this->getFileContent('no-mutates-scalar-return-typehint-allows-null.php');
-        $mutatedCode = $this->mutate($code);
-
-        $expectedMutatedCode = <<<"CODE"
+        yield 'It mutates when scalar return typehint allows null' => [
+            $this->getFileContent('no-mutates-scalar-return-typehint-allows-null.php'),
+            <<<"CODE"
 <?php
 
 namespace NewObject_ScalarReturnTypehintsAllowsNull;
@@ -180,9 +139,15 @@ class Test
         return null;
     }
 }
-CODE;
+CODE
+            ,
+            \PHP_VERSION_ID >= 70100,
+            'Current PHP version does not support nullable return typehint.',
+        ];
 
-        $this->assertSame($expectedMutatedCode, $mutatedCode);
+        yield 'It does not mutate the return of an anonymous class' => [
+            $this->getFileContent('no-not-mutates-anonymous-class.php'),
+        ];
     }
 
     private function getFileContent(string $file): string

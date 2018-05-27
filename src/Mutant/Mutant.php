@@ -16,6 +16,9 @@ use Infection\MutationInterface;
  */
 final class Mutant implements MutantInterface
 {
+    /**
+     * @var string
+     */
     private $mutatedFilePath;
 
     /**

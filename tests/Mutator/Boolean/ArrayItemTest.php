@@ -33,6 +33,7 @@ final class ArrayItemTest extends AbstractMutatorTestCase
 [$a->foo => $b->bar];
 [$a->foo() => bar()];
 [foo() => $b->bar];
+[$foo => $b->bar];
 PHP
             ,
             <<<'PHP'
@@ -41,6 +42,7 @@ PHP
 [$a->foo > $b->bar];
 [$a->foo() > bar()];
 [foo() > $b->bar];
+[$foo > $b->bar];
 PHP
             ,
         ];

@@ -24,9 +24,6 @@ final class MutantsCreatingStarted
         $this->mutantCount = $mutantCount;
     }
 
-    /**
-     * @return int
-     */
     public function getMutantCount(): int
     {
         return $this->mutantCount;

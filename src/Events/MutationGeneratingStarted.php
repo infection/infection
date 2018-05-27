@@ -24,9 +24,6 @@ final class MutationGeneratingStarted
         $this->mutableFilesCount = $mutableFilesCount;
     }
 
-    /**
-     * @return int
-     */
     public function getMutableFilesCount(): int
     {
         return $this->mutableFilesCount;

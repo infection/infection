@@ -79,9 +79,9 @@ class TestFrameworkFinder extends AbstractExecutableFinder
                 $vendorPath = $candidate;
             }
         }
-
         if (null !== $vendorPath) {
-            putenv('PATH=' . $vendorPath . PATH_SEPARATOR . getenv('PATH'));
+            $pathName = getenv('PATH') ? 'PATH' : 'Path';
+            putenv($pathName . '=' . $vendorPath . PATH_SEPARATOR . getenv($pathName));
         }
     }
 

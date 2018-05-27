@@ -55,7 +55,7 @@ namespace ProtectedVisibilityFinal;
 
 class Test
 {
-    private final function foo(int $param, $test = 1) : bool
+    private final function &foo(int $param, $test = 1) : bool
     {
         echo 1;
         return false;
@@ -109,23 +109,6 @@ PHP
 
         yield 'It does not mutate if parent abstract has same protected method' => [
             $this->getFileContent('pv-same-method-abstract.php'),
-            <<<'PHP'
-<?php
-
-namespace ProtectedSameAbstract;
-
-abstract class SameAbstract
-{
-    protected abstract function foo();
-}
-class Child extends SameAbstract
-{
-    protected function foo()
-    {
-    }
-}
-PHP
-            ,
         ];
 
         yield 'It does not mutate if parent class has same protected method' => [
@@ -151,7 +134,7 @@ PHP
             ,
         ];
 
-        yield 'it does not mutate if grand parent class has same protected method' => [
+        yield 'It does not mutate if grand parent class has same protected method' => [
             $this->getFileContent('pv-same-method-grandparent.php'),
             <<<'PHP'
 <?php
