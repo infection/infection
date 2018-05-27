@@ -73,6 +73,7 @@ final class MutantCreator
         if (file_exists($mutatedFilePath)) {
             return file_get_contents($mutatedFilePath);
         }
+
         $traverser = new NodeTraverser();
 
         $traverser->addVisitor(new CloneVisitor());

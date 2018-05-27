@@ -35,18 +35,25 @@ abstract class FileLogger implements MutationTestingResultsLogger
     /**
      * @var bool
      */
+    protected $isDebugVerbosity;
+
+    /**
+     * @var bool
+     */
     protected $isDebugMode;
 
     public function __construct(
         string $logFilePath,
         MetricsCalculator $metricsCalculator,
         Filesystem $fs,
+        bool $isDebugVerbosity,
         bool $isDebugMode
     ) {
+        $this->logFilePath = $logFilePath;
         $this->metricsCalculator = $metricsCalculator;
         $this->fs = $fs;
+        $this->isDebugVerbosity = $isDebugVerbosity;
         $this->isDebugMode = $isDebugMode;
-        $this->logFilePath = $logFilePath;
     }
 
     public function log()

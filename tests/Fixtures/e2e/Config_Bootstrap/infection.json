@@ -8,5 +8,6 @@
     "logs": {
         "summary": "infection-log.txt"
     },
-    "bootstrap": "src/bootstrap.php"
+    "bootstrap": "src/bootstrap.php",
+    "tmpDir": "."
 }

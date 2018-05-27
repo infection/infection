@@ -8,5 +8,6 @@
     "logs": {
         "summary": "infection-log.txt"
     },
-    "bootstrap": "./custom-autoload.php"
+    "bootstrap": "./custom-autoload.php",
+    "tmpDir": "."
 }

@@ -31,13 +31,15 @@ final class MutantCreatingConsoleLoggerSubscriber implements EventSubscriberInte
      */
     private $progressBar;
 
-    public function __construct(OutputInterface $output, ProgressBar $progressBar)
+    public function __construct(OutputInterface $output)
     {
-        $this->progressBar = $progressBar;
         $this->output = $output;
+
+        $this->progressBar = new ProgressBar($this->output);
+        $this->progressBar->setFormat('Creating mutated files and processes: %current%/%max%');
     }
 
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
         return [
             MutantsCreatingStarted::class => [$this, 'onMutantsCreatingStarted'],

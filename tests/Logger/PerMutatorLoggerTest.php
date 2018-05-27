@@ -28,7 +28,8 @@ final class PerMutatorLoggerTest extends TestCase
     {
         $fs = $this->createMock(Filesystem::class);
         $fs->expects($this->once())
-            ->method('dumpFile')->with(
+            ->method('dumpFile')
+            ->with(
                 sys_get_temp_dir() . '/fake-file.md',
                 "# Effects per Mutator\n" .
                 "\n" .
@@ -37,10 +38,12 @@ final class PerMutatorLoggerTest extends TestCase
                 "| For_ | 15 | 10 | 0 | 0 | 0 | 67| 100|\n" .
                 '| PregQuote | 5 | 0 | 0 | 0 | 0 | 0| 0|'
             );
+
         $perMutatorLogger = new PerMutatorLogger(
             sys_get_temp_dir() . '/fake-file.md',
             $this->createMetricsCalculator(),
             $fs,
+            true,
             true
         );
 

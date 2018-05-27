@@ -25,6 +25,7 @@ use Infection\Finder\Locator;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Builder\ProcessBuilder;
+use Infection\Process\Listener\CleanUpAfterMutationTestingFinishedSubscriber;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
@@ -153,7 +154,7 @@ final class InfectionCommand extends BaseCommand
             ->addOption(
                 'log-verbosity',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'Log verbosity level. \'all\' - full logs format, \'default\' - short logs format, \'none\' - no logs.',
                 LogVerbosity::NORMAL
             )
@@ -169,6 +170,12 @@ final class InfectionCommand extends BaseCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Ignore MSI violations with zero mutations'
+            )
+            ->addOption(
+                'debug',
+                null,
+                InputOption::VALUE_NONE,
+                'Debug mode. Will not clean up Infection temporary folder.'
             )
         ;
     }
@@ -319,29 +326,10 @@ final class InfectionCommand extends BaseCommand
         MetricsCalculator $metricsCalculator,
         AbstractTestFrameworkAdapter $testFrameworkAdapter
     ): array {
-        $initialTestsProgressBar = new ProgressBar($this->output);
-        $initialTestsProgressBar->setFormat('verbose');
-
-        $mutationGeneratingProgressBar = new ProgressBar($this->output);
-        $mutationGeneratingProgressBar->setFormat('Processing source code files: %current%/%max%');
-
-        $mutantCreatingProgressBar = new ProgressBar($this->output);
-        $mutantCreatingProgressBar->setFormat('Creating mutated files and processes: %current%/%max%');
-
-        return [
-            new InitialTestsConsoleLoggerSubscriber(
-                $this->output,
-                $initialTestsProgressBar,
-                $testFrameworkAdapter
-            ),
-            new MutationGeneratingConsoleLoggerSubscriber(
-                $this->output,
-                $mutationGeneratingProgressBar
-            ),
-            new MutantCreatingConsoleLoggerSubscriber(
-                $this->output,
-                $mutantCreatingProgressBar
-            ),
+        $subscribers = [
+            new InitialTestsConsoleLoggerSubscriber($this->output, $testFrameworkAdapter),
+            new MutationGeneratingConsoleLoggerSubscriber($this->output),
+            new MutantCreatingConsoleLoggerSubscriber($this->output),
             new MutationTestingConsoleLoggerSubscriber(
                 $this->output,
                 $this->getOutputFormatter(),
@@ -354,9 +342,19 @@ final class InfectionCommand extends BaseCommand
                 $this->getContainer()->get('infection.config'),
                 $metricsCalculator,
                 $this->getContainer()->get('filesystem'),
-                $this->input->getOption('log-verbosity')
+                $this->input->getOption('log-verbosity'),
+                (bool) $this->input->getOption('debug')
             ),
         ];
+
+        if (!$this->input->getOption('debug')) {
+            $subscribers[] = new CleanUpAfterMutationTestingFinishedSubscriber(
+                $this->getContainer()->get('filesystem'),
+                $this->getContainer()->get('tmp.dir')
+            );
+        }
+
+        return $subscribers;
     }
 
     private function getCodeCoverageData(string $testFrameworkKey): CodeCoverageData

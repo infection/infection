@@ -44,12 +44,12 @@ final class RealPathFilterIteratorTest extends TestCase
 
     public function providesFinders()
     {
-        yield 'RealPathFileItterator' => [
+        yield 'RealPathFileIterator' => [
             MockRealPathFinder::class,
             1,
         ];
 
-        yield 'Symfony PathFileItterator' => [
+        yield 'Symfony PathFileIterator' => [
             MockRelativePathFinder::class,
             0,
         ];

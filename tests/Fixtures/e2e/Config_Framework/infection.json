@@ -8,5 +8,6 @@
     "logs": {
         "debug": "infection-log.txt"
     },
-    "testFramework" : "phpspec"
+    "testFramework" : "phpspec",
+    "tmpDir": "."
 }

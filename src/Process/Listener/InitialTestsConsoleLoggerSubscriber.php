@@ -37,14 +37,16 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterf
      */
     private $testFrameworkAdapter;
 
-    public function __construct(OutputInterface $output, ProgressBar $progressBar, AbstractTestFrameworkAdapter $testFrameworkAdapter)
+    public function __construct(OutputInterface $output, AbstractTestFrameworkAdapter $testFrameworkAdapter)
     {
         $this->output = $output;
-        $this->progressBar = $progressBar;
         $this->testFrameworkAdapter = $testFrameworkAdapter;
+
+        $this->progressBar = new ProgressBar($this->output);
+        $this->progressBar->setFormat('verbose');
     }
 
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
         return [
             InitialTestSuiteStarted::class => [$this, 'onInitialTestSuiteStarted'],
