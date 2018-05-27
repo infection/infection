@@ -51,7 +51,7 @@ install:
     - appveyor-retry appveyor DownloadFile https://getcomposer.org/composer.phar
     - cd c:\projects\workspace
     - IF %dependencies%==current appveyor-retry composer install
-    - IF %dependencies%==highest appveyor-retry composer update --no-suggest --prefer-dist --ignore-platform-reqs
+    - IF %dependencies%==highest appveyor-retry composer update --no-suggest --ignore-platform-reqs
     - composer show
     # Install XDebug for code coverage
     - ps: |

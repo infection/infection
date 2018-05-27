@@ -37,10 +37,6 @@ final class E2ETest extends TestCase
 
     protected function setUp()
     {
-        if (stripos(PHP_OS, 'WIN') === 0) {
-            $this->markTestSkipped('Currently unable to run e2e tests on windows.');
-        }
-
         // Without overcommit this test fails with `proc_open(): fork failed - Cannot allocate memory`
         if (strpos(PHP_OS, 'Linux') === 0 &&
             is_readable('/proc/sys/vm/overcommit_memory') &&
