@@ -2,7 +2,7 @@
 
 namespace ParamCoverage;
 
-class ArraySearcher
+class ArraySearcher extends AbstractSearcher
 {
     private $items;
 
