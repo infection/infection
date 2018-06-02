@@ -40,7 +40,7 @@ final class PhpUnitTestFileDataProvider implements TestFileDataProvider
         $nodes = $xPath->query(sprintf('//testsuite[@name="%s"]', $fullyQualifiedClassName));
 
         if (!$nodes->length) {
-            throw new TestFileNameNotFoundException(sprintf('For FQCN: %s', $fullyQualifiedClassName));
+            throw TestFileNameNotFoundException::notFoundFromFQN($fullyQualifiedClassName);
         }
 
         return [

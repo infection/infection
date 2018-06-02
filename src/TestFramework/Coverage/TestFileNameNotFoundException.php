@@ -14,4 +14,8 @@ namespace Infection\TestFramework\Coverage;
  */
 final class TestFileNameNotFoundException extends \Exception
 {
+    public static function notFoundFromFQN(string $fqn): self
+    {
+        return new self(sprintf('For FQCN: %s', $fqn));
+    }
 }
