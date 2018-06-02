@@ -12,12 +12,12 @@ namespace Infection\Tests\Mutator;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Tests\Fixtures\SimpleMutatorVisitor;
-use Infection\Visitor\CloneVisitor;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Lexer;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PHPUnit\Framework\TestCase;
@@ -80,7 +80,7 @@ abstract class AbstractMutatorTestCase extends TestCase
         $traverser->addVisitor(new ParentConnectorVisitor());
         $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
         $traverser->addVisitor(new ReflectionVisitor());
-        $traverser->addVisitor(new CloneVisitor());
+        $traverser->addVisitor(new CloningVisitor());
         $traverser->addVisitor(new SimpleMutatorVisitor($this->mutator));
 
         $mutatedNodes = $traverser->traverse($nodes);
