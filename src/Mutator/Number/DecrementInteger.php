@@ -18,6 +18,8 @@ use PhpParser\Node;
  */
 final class DecrementInteger extends Mutator
 {
+    private const COUNT_NAME = 'count';
+
     /**
      * Decrements an integer by 1
      *
@@ -56,6 +58,17 @@ final class DecrementInteger extends Mutator
             return false;
         }
 
-        return $parentNode->left instanceof Node\Expr\FuncCall && $parentNode->left->name->toString() === 'count';
+        $isLeftPartCount = $parentNode->left instanceof Node\Expr\FuncCall
+            && $this->getLowercaseMethodName($parentNode, 'left') === self::COUNT_NAME;
+
+        $isRightPartCount = $parentNode->right instanceof Node\Expr\FuncCall
+            && $this->getLowercaseMethodName($parentNode, 'right') === self::COUNT_NAME;
+
+        return $isLeftPartCount || $isRightPartCount;
+    }
+
+    private function getLowercaseMethodName(Node $node, string $part): string
+    {
+        return strtolower($node->{$part}->name->toString());
     }
 }
