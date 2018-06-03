@@ -99,6 +99,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
         $candidates = [
             $this->testFrameworkName,
             $this->testFrameworkName . '.phar',
+            $this->testFrameworkName . '.bat', // always looking for .bat for testing with .bat not on Windows
         ];
 
         /*

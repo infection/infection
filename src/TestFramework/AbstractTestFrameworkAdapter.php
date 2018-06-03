@@ -137,6 +137,13 @@ abstract class AbstractTestFrameworkAdapter
         }
 
         /*
+         * That's an empty options list by all means, we need to see it as such
+         */
+        if ($phpExtraArgs == ['']) {
+            $phpExtraArgs = [];
+        }
+
+        /*
          * Run an executable as it is if we're using a standard CLI and
          * there's a standard interpreter available on PATH.
          *
