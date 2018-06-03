@@ -11,5 +11,11 @@
         "psr-4": {
             "ParamCoverage\\Test\\": "tests/"
         }
+    },
+    "config": {
+        "platform": {
+            "php": "7.0.8"
+        },
+        "sort-packages": true
     }
 }
