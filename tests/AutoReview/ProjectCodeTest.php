@@ -16,20 +16,11 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\InfectionConfig;
 use Infection\Console\Application;
-use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\Util\PhpProcess;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
-use Infection\Events\InitialTestCaseCompleted;
-use Infection\Events\InitialTestSuiteFinished;
-use Infection\Events\InitialTestSuiteStarted;
-use Infection\Events\MutableFileProcessed;
-use Infection\Events\MutantCreated;
-use Infection\Events\MutantsCreatingFinished;
-use Infection\Events\MutationGeneratingFinished;
-use Infection\Events\MutationTestingFinished;
 use Infection\Finder\ComposerExecutableFinder;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\Http\BadgeApiClient;
@@ -45,18 +36,15 @@ use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Coverage\CodeCoverageData;
-use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder as PhpSpecInitalConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder as PhpSpecMutationConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\NoCodeCoverageException;
-use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Utils\VersionParser;
-use Infection\Visitor\CloneVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use PHPUnit\Framework\TestCase;
@@ -123,17 +111,8 @@ final class ProjectCodeTest extends TestCase
         SelfUpdateCommand::class,
         ConsoleHelper::class,
         Application::class,
-        DotFormatter::class,
         ProgressFormatter::class,
         PhpProcess::class,
-        InitialTestCaseCompleted::class,
-        InitialTestSuiteFinished::class,
-        InitialTestSuiteStarted::class,
-        MutableFileProcessed::class,
-        MutantCreated::class,
-        MutantsCreatingFinished::class,
-        MutationGeneratingFinished::class,
-        MutationTestingFinished::class,
         ComposerExecutableFinder::class,
         BadgeApiClient::class,
         DebugFileLogger::class,
@@ -143,12 +122,9 @@ final class ProjectCodeTest extends TestCase
         MutantCreatingConsoleLoggerSubscriber::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
         MutationTestingRunner::class,
-        TestFileNameNotFoundException::class,
         NoCodeCoverageException::class,
-        PhpSpecExtraOptions::class,
         XmlConfigurationHelper::class,
         TestFrameworkTypes::class,
-        CloneVisitor::class,
         MutationsCollectorVisitor::class,
         ParentConnectorVisitor::class,
     ];
