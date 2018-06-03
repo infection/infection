@@ -25,6 +25,11 @@
             "name": "Théo FIDRY",
             "email": "theo.fidry@gmail.com",
             "homepage": "https://twitter.com/tfidry"
+        },
+        {
+            "name": "Alexey Kopytko",
+            "email": "alexey@kopytko.com",
+            "homepage": "https://www.alexeykopytko.com"
         }
     ],
     "autoload": {
