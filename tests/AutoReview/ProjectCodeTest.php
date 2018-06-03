@@ -503,7 +503,7 @@ final class ProjectCodeTest extends TestCase
                 return sprintf(
                     '%s\\%s%s%s',
                     'Infection',
-                    strtr($file->getRelativePath(), DIRECTORY_SEPARATOR, '\\'),
+                    strtr($file->getRelativePath(), \DIRECTORY_SEPARATOR, '\\'),
                     $file->getRelativePath() ? '\\' : '',
                     $file->getBasename('.' . $file->getExtension())
                 );
@@ -548,7 +548,7 @@ final class ProjectCodeTest extends TestCase
             static function (SplFileInfo $file) {
                 return sprintf(
                     'Infection\\Tests\\%s%s%s',
-                    strtr($file->getRelativePath(), DIRECTORY_SEPARATOR, '\\'),
+                    strtr($file->getRelativePath(), \DIRECTORY_SEPARATOR, '\\'),
                     $file->getRelativePath() ? '\\' : '',
                     $file->getBasename('.' . $file->getExtension())
                 );

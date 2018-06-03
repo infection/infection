@@ -50,7 +50,7 @@ class ProcessBuilder
         bool $skipCoverage,
         array $phpExtraOptions = []
     ): Process {
-        $includeArgs = PHP_SAPI == 'phpdbg';
+        $includeArgs = \PHP_SAPI == 'phpdbg';
 
         // If we're expecting to receive a code coverage, test process must run in a vanilla environment
         $processType = $skipCoverage ? Process::class : PhpProcess::class;

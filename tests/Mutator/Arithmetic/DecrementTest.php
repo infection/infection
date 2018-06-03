@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Mutator\Arithmetic\Decrement;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 /**

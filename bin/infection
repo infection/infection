@@ -39,7 +39,7 @@ if (!isset($file)) {
 require $file;
 unset($file);
 
-if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
+if (\PHP_SAPI !== 'cli' && \PHP_SAPI !== 'phpdbg') {
     echo 'Warning: Infection may only be invoked from a command line', PHP_EOL;
 }
 

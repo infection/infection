@@ -71,8 +71,8 @@ ASCII;
 
         $this->io = new SymfonyStyle($input, $output);
 
-        if (PHP_SAPI === 'phpdbg') {
-            $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, PHP_SAPI));
+        if (\PHP_SAPI === 'phpdbg') {
+            $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, \PHP_SAPI));
         } elseif (\extension_loaded('xdebug')) {
             $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, 'xdebug'));
         }

@@ -93,8 +93,8 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
             $this->markTestSkipped('Stty is not available');
         }
 
-        $dir1 = $this->workspace . DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR;
-        $dir2 = $this->workspace . DIRECTORY_SEPARATOR . 'foo' . DIRECTORY_SEPARATOR;
+        $dir1 = $this->workspace . \DIRECTORY_SEPARATOR . 'test' . \DIRECTORY_SEPARATOR;
+        $dir2 = $this->workspace . \DIRECTORY_SEPARATOR . 'foo' . \DIRECTORY_SEPARATOR;
 
         \mkdir($dir1);
         \mkdir($dir2);

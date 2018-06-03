@@ -58,7 +58,7 @@ final class PhpUnitCustomExecutablePathProvider
             $question->setValidator($this->getValidator());
 
             return str_replace(
-                DIRECTORY_SEPARATOR,
+                \DIRECTORY_SEPARATOR,
                 '/',
                 $this->questionHelper->ask($input, $output, $question)
             );

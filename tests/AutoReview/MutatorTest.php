@@ -122,7 +122,7 @@ final class MutatorTest extends TestCase
                 return sprintf(
                     '%s\\%s%s%s',
                     'Infection\\Mutator',
-                    strtr($file->getRelativePath(), DIRECTORY_SEPARATOR, '\\'),
+                    strtr($file->getRelativePath(), \DIRECTORY_SEPARATOR, '\\'),
                     $file->getRelativePath() ? '\\' : '',
                     $file->getBasename('.' . $file->getExtension())
                 );
