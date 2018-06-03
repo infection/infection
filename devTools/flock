@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if [ -x "$(command -v flock)" ]; then
+  flock "$@"
+  exit $?
+fi
+
+# Executing the original command as it is
+shift
+"$@"
+
