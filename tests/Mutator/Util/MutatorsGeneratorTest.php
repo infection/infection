@@ -31,7 +31,7 @@ final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
     public static function setUpBeforeClass()
     {
         foreach (MutatorProfile::DEFAULT as $profileName) {
-            self::$countDefaultMutators += count(MutatorProfile::MUTATOR_PROFILE_LIST[$profileName]);
+            self::$countDefaultMutators += \count(MutatorProfile::MUTATOR_PROFILE_LIST[$profileName]);
         }
     }
 
@@ -50,7 +50,7 @@ final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
         ]);
         $mutators = $mutatorGenerator->generate();
 
-        $this->assertCount(count(MutatorProfile::BOOLEAN), $mutators);
+        $this->assertCount(\count(MutatorProfile::BOOLEAN), $mutators);
     }
 
     public function test_mutators_can_be_ignored()
@@ -72,7 +72,7 @@ final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
         ]);
         $mutators = $mutatorGenerator->generate();
 
-        $this->assertCount(self::$countDefaultMutators - count(MutatorProfile::BOOLEAN), $mutators);
+        $this->assertCount(self::$countDefaultMutators - \count(MutatorProfile::BOOLEAN), $mutators);
     }
 
     public function test_names_can_be_ignored()
@@ -151,7 +151,7 @@ final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
         ]);
         $mutators = $mutatorGenerator->generate();
 
-        $this->assertCount(count(MutatorProfile::BOOLEAN), $mutators);
+        $this->assertCount(\count(MutatorProfile::BOOLEAN), $mutators);
 
         $this->assertArrayNotHasKey(Plus::getName(), $mutators);
 
@@ -166,7 +166,7 @@ final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
         ]);
         $mutators = $mutatorGenerator->generate();
 
-        $this->assertCount(count(MutatorProfile::BOOLEAN), $mutators);
+        $this->assertCount(\count(MutatorProfile::BOOLEAN), $mutators);
 
         $this->assertArrayNotHasKey(Plus::getName(), $mutators);
     }

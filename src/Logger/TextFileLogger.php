@@ -65,7 +65,7 @@ final class TextFileLogger extends FileLogger
 
         return [
             $headline,
-            str_repeat('=', strlen($headline)),
+            str_repeat('=', \strlen($headline)),
             '',
         ];
     }

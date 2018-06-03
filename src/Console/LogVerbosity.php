@@ -44,7 +44,7 @@ final class LogVerbosity
     public static function convertVerbosityLevel(InputInterface $input, ConsoleOutput $io)
     {
         $verbosityLevel = $input->getOption('log-verbosity');
-        if (in_array($verbosityLevel, self::ALLOWED_OPTIONS)) {
+        if (\in_array($verbosityLevel, self::ALLOWED_OPTIONS)) {
             return;
         }
 

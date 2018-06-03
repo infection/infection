@@ -74,7 +74,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
         $originalBootstrap = $this->getOriginalBootstrapFilePath($parsedYaml);
         $autoloadPlaceholder = $originalBootstrap ? "require_once '{$originalBootstrap}';" : '';
-        $interceptorPath = dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
+        $interceptorPath = \dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
 
         $customAutoload = <<<AUTOLOAD
 <?php

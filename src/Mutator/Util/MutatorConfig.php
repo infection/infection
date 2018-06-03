@@ -26,11 +26,11 @@ final class MutatorConfig
 
     public function isIgnored(string $class, string $method): bool
     {
-        if (in_array($class, $this->ignoreConfig)) {
+        if (\in_array($class, $this->ignoreConfig)) {
             return true;
         }
 
-        if (in_array($class . '::' . $method, $this->ignoreConfig)) {
+        if (\in_array($class . '::' . $method, $this->ignoreConfig)) {
             return true;
         }
 

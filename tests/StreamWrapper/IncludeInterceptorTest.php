@@ -172,7 +172,7 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
          * cannot handle any of these
          */
 
-        $this->assertGreaterThan(0, count(glob(__DIR__ . '/*')));
+        $this->assertGreaterThan(0, \count(glob(__DIR__ . '/*')));
 
         $tempnam = tempnam('', basename(__FILE__, 'php'));
         unlink($tempnam);

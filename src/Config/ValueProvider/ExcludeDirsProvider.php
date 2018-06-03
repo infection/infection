@@ -67,13 +67,13 @@ final class ExcludeDirsProvider
 
         if ($sourceDirs == ['.']) {
             foreach (self::EXCLUDED_ROOT_DIRS as $dir) {
-                if (in_array($dir, $dirsInCurrentDir, true)) {
+                if (\in_array($dir, $dirsInCurrentDir, true)) {
                     $excludedDirs[] = $dir;
                 }
             }
 
             $autocompleteValues = $dirsInCurrentDir;
-        } elseif (count($sourceDirs) == 1) {
+        } elseif (\count($sourceDirs) == 1) {
             $globDirs = array_filter(glob($sourceDirs[0] . '/*'), 'is_dir');
 
             $autocompleteValues = array_map(

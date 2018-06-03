@@ -125,7 +125,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInt
         $this->output->writeln([
             '',
             $headline,
-            str_repeat('=', strlen($headline)),
+            str_repeat('=', \strlen($headline)),
             '',
         ]);
 

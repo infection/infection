@@ -101,12 +101,12 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
     {
         foreach ($logTypes as $key => $value) {
             if ($this->logVerbosity == LogVerbosity::NONE) {
-                if (!in_array($key, ResultsLoggerTypes::ALLOWED_WITHOUT_LOGGING, true)) {
+                if (!\in_array($key, ResultsLoggerTypes::ALLOWED_WITHOUT_LOGGING, true)) {
                     unset($logTypes[$key]);
                 }
                 continue;
             }
-            if (!in_array($key, ResultsLoggerTypes::ALL, true)) {
+            if (!\in_array($key, ResultsLoggerTypes::ALL, true)) {
                 unset($logTypes[$key]);
             }
         }

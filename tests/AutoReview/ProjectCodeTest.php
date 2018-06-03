@@ -182,7 +182,7 @@ final class ProjectCodeTest extends TestCase
     public function test_all_concrete_classes_have_tests(string $className)
     {
         $testClass = preg_replace('/Infection/', 'Infection\\Tests', $className, 1) . 'Test';
-        if (in_array($className, self::$nonTestedConcreteClasses)) {
+        if (\in_array($className, self::$nonTestedConcreteClasses)) {
             $this->assertFalse(class_exists($testClass),
                 sprintf(
                     'Class "%s" has a corresponding unit test "%s", and can be removed from the non tested class list',
@@ -229,7 +229,7 @@ final class ProjectCodeTest extends TestCase
         $rc = new \ReflectionClass($className);
         $docBlock = $rc->getDocComment();
 
-        if (in_array($className, self::$extensionPoints)) {
+        if (\in_array($className, self::$extensionPoints)) {
             if ($docBlock === false) {
                 $this->markTestSkipped(
                     sprintf(
@@ -278,7 +278,7 @@ final class ProjectCodeTest extends TestCase
     {
         $rc = new \ReflectionClass($className);
 
-        if (in_array($className, self::$nonFinalNonExtensionClasses)) {
+        if (\in_array($className, self::$nonFinalNonExtensionClasses)) {
             $this->addToAssertionCount(1);
 
             return;

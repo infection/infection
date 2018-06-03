@@ -37,7 +37,7 @@ abstract class AbstractValueToNullReturnValue extends Mutator
         }
 
         // scalar typehint
-        if (is_string($returnType)) {
+        if (\is_string($returnType)) {
             return false;
         }
 

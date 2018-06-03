@@ -51,7 +51,7 @@ abstract class AbstractMutatorTestCase extends TestCase
 
     protected function getMutator(): Mutator
     {
-        $class = get_class($this);
+        $class = \get_class($this);
         $mutator = substr(str_replace('\Tests', '', $class), 0, -4);
 
         return new $mutator(new MutatorConfig([]));
