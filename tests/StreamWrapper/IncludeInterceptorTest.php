@@ -48,13 +48,17 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
          * if any of our tests fail for any reason.
          *
          * Silenced a warning here: stream_wrapper_restore(): file:// was never changed, nothing to restore
-         * (this warning will never happed in normal circumstances)
+         * (this warning will never happen in normal circumstances)
          */
         @IncludeInterceptor::disable();
 
         array_map('unlink', self::$files);
     }
 
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
     public function test_it_throws_an_exception_if_not_configured()
     {
         $this->expectException(\RuntimeException::class);
