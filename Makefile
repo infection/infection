@@ -139,7 +139,7 @@ validate:
 auto-review: vendor
 	vendor/bin/phpunit --group=auto-review
 
-build/bin/infection.phar: bin src vendor box.phar box.json
+build/bin/infection.phar: $(shell find bin/ src/ -type f) box.phar box.json .git/HEAD
 	php box.phar compile
 
 box.json: box.json.dist
