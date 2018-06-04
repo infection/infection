@@ -2,6 +2,7 @@ PHP_CS_FIXER_FUTURE_MODE=1
 PHPSTAN=./phpstan.phar
 PHP-CS-FIXER=./php-cs-fixer-v2.phar
 PHPUNIT=vendor/bin/phpunit
+INFECTION=build/bin/infection.phar
 
 DOCKER_RUN=docker run -t --rm -v "$$PWD":/opt/infection -w /opt/infection
 DOCKER_RUN_70=flock devTools/*php70*.json $(DOCKER_RUN) infection_php70
@@ -64,14 +65,14 @@ test-infection-phpdbg-72: build-xdebug-72
 #e2e tests with phpdbg
 test-e2e-phpdbg: test-e2e-phpdbg-70 test-e2e-phpdbg-71 test-e2e-phpdbg-72
 
-test-e2e-phpdbg-70: build-xdebug-70 build/bin/infection.phar
-	$(DOCKER_RUN_70) env PHPDBG=1 ./tests/e2e_tests
+test-e2e-phpdbg-70: build-xdebug-70 $(INFECTION)
+	$(DOCKER_RUN_70) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
 
-test-e2e-phpdbg-71: build-xdebug-71 build/bin/infection.phar
-	$(DOCKER_RUN_71) env PHPDBG=1 ./tests/e2e_tests
+test-e2e-phpdbg-71: build-xdebug-71 $(INFECTION)
+	$(DOCKER_RUN_71) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
 
-test-e2e-phpdbg-72: build-xdebug-72 build/bin/infection.phar
-	$(DOCKER_RUN_72) env PHPDBG=1 ./tests/e2e_tests
+test-e2e-phpdbg-72: build-xdebug-72 $(INFECTION)
+	$(DOCKER_RUN_72) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
 
 
 .PHONY: test-infection-xdebug test-infection-xdebug-70 test-infection-xdebug-71 test-infection-xdebug-72
@@ -92,14 +93,14 @@ test-infection-xdebug-72: build-xdebug-72
 #e2e tests with xdebug
 test-e2e-xdebug: test-e2e-xdebug-70 test-e2e-xdebug-71 test-e2e-xdebug-72
 
-test-e2e-xdebug-70: build-xdebug-70 build/bin/infection.phar
-	$(DOCKER_RUN_70) ./tests/e2e_tests
+test-e2e-xdebug-70: build-xdebug-70 $(INFECTION)
+	$(DOCKER_RUN_70) ./tests/e2e_tests $(INFECTION)
 
-test-e2e-xdebug-71: build-xdebug-71 build/bin/infection.phar
-	$(DOCKER_RUN_71) ./tests/e2e_tests
+test-e2e-xdebug-71: build-xdebug-71 $(INFECTION)
+	$(DOCKER_RUN_71) ./tests/e2e_tests $(INFECTION)
 
-test-e2e-xdebug-72: build-xdebug-72 build/bin/infection.phar
-	$(DOCKER_RUN_72) ./tests/e2e_tests
+test-e2e-xdebug-72: build-xdebug-72 $(INFECTION)
+	$(DOCKER_RUN_72) ./tests/e2e_tests $(INFECTION)
 
 
 .PHONY: build-xdebug-70 build-xdebug-71 build-xdebug-72
