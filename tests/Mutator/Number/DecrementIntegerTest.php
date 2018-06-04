@@ -55,6 +55,140 @@ if ($foo < 1) {
 PHP
                 ,
             ],
+            'It does not decrement zero when it is being compared as identical with result of count()' => [
+                <<<'PHP'
+<?php
+
+if (count($a) === 0) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
+            'It does not decrement zero with yoda style when it is being compared as identical with result of count()' => [
+                <<<'PHP'
+<?php
+
+if (0 === count($a)) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
+            'It does not decrement zero with when it is being compared as identical with result of cOunT()' => [
+                <<<'PHP'
+<?php
+
+if (cOunT($a) === 0) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
+            'It does not decrement zero when it is being compared as not identical with result of count()' => [
+                <<<'PHP'
+<?php
+
+if (count($a) !== 0) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
+            'It does not decrement zero when it is compared as equal with result of count()' => [
+                <<<'PHP'
+<?php
+
+if (count($a) == 0) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
+            'It does not decrement zero when it is compared as not equal with result of count()' => [
+                <<<'PHP'
+<?php
+
+if (count($a) != 0) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
+            'It does not decrement zero when it is compared as more than count()' => [
+                <<<'PHP'
+<?php
+
+if (count($a) > 0) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
+            'It does not decrement zero when it is compared as more or equal than count()' => [
+                <<<'PHP'
+<?php
+
+if (count($a) >= 0) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
+            'It decrements zero when it is compared as less than count()' => [
+                <<<'PHP'
+<?php
+
+if (count($a) < 0) {
+    echo 'bar';
+}
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+if (count($a) < -1) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
+            'It decrements zero when it is compared any other, not count() function' => [
+                <<<'PHP'
+<?php
+
+if (abs($a) === 0) {
+    echo 'bar';
+}
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+if (abs($a) === -1) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
+            'It decrements zero when it is compared as less or equal than count()' => [
+                <<<'PHP'
+<?php
+
+if (count($a) <= 0) {
+    echo 'bar';
+}
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+if (count($a) <= -1) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
             'It decrements zero' => [
                 <<<'PHP'
 <?php
