@@ -21,7 +21,7 @@ final class PhpExecutableFinderTest extends TestCase
     {
         $finder = new PhpExecutableFinder();
 
-        if ('phpdbg' == PHP_SAPI) {
+        if ('phpdbg' == \PHP_SAPI) {
             $this->assertSame(['-qrr'], $finder->findArguments());
 
             return;

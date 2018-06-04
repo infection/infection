@@ -106,7 +106,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
          * file on Windows, even if there's a proper executable .bat by its side.
          * Therefore we have to explicitly look for a .bat.
          */
-        if ('\\' == DIRECTORY_SEPARATOR) {
+        if ('\\' == \DIRECTORY_SEPARATOR) {
             array_unshift($candidates, $this->testFrameworkName . '.bat');
         }
 

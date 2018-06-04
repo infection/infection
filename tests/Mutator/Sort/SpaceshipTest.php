@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Sort;
 
-use Infection\Mutator\Sort\Spaceship;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 /**

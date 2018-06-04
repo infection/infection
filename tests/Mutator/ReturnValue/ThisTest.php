@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ReturnValue;
 
-use Infection\Mutator\ReturnValue\This;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 /**

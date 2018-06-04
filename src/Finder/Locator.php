@@ -44,7 +44,7 @@ final class Locator
         }
 
         foreach ($this->paths as $path) {
-            $file = $path . DIRECTORY_SEPARATOR . $name;
+            $file = $path . \DIRECTORY_SEPARATOR . $name;
 
             if ($this->filesystem->exists($file)) {
                 return realpath($file);

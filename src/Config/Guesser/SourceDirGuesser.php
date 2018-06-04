@@ -83,7 +83,7 @@ class SourceDirGuesser implements Guesser
         }
 
         if (is_string($path)) {
-            $dirs[] = trim($path, DIRECTORY_SEPARATOR);
+            $dirs[] = trim($path, \DIRECTORY_SEPARATOR);
         }
     }
 }

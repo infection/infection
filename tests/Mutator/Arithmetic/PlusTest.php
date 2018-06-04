@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Mutator\Arithmetic\Plus;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;

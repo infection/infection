@@ -279,7 +279,7 @@ final class InfectionCommand extends BaseCommand
 
     private function applyMemoryLimitFromPhpUnitProcess(Process $process, MemoryUsageAware $adapter)
     {
-        if (PHP_SAPI == 'phpdbg') {
+        if (\PHP_SAPI == 'phpdbg') {
             // Under phpdbg we're using a system php.ini, can't add a memory limit there
             return;
         }
@@ -420,7 +420,7 @@ final class InfectionCommand extends BaseCommand
     private function hasDebuggerOrCoverageOption(): bool
     {
         return $this->skipCoverage
-            || PHP_SAPI === 'phpdbg'
+            || \PHP_SAPI === 'phpdbg'
             || \extension_loaded('xdebug')
             || XdebugHandler::getSkippedVersion()
             || $this->isXdebugIncludedInInitialTestPhpOptions();

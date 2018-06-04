@@ -50,7 +50,7 @@ class InfectionConfig
     public function getPhpUnitConfigDir(): string
     {
         if (isset($this->config->phpUnit->configDir)) {
-            return $this->configLocation . DIRECTORY_SEPARATOR . $this->config->phpUnit->configDir;
+            return $this->configLocation . \DIRECTORY_SEPARATOR . $this->config->phpUnit->configDir;
         }
 
         return $this->configLocation;
@@ -122,7 +122,7 @@ class InfectionConfig
                         function ($excludeDir) use ($srcDir) {
                             return ltrim(
                                 substr_replace($excludeDir, '', 0, strlen($srcDir)),
-                                DIRECTORY_SEPARATOR
+                                \DIRECTORY_SEPARATOR
                             );
                         },
                         $unpackedPaths
