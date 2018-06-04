@@ -3,6 +3,7 @@ PHPSTAN=./phpstan.phar
 PHP-CS-FIXER=./php-cs-fixer-v2.phar
 PHPUNIT=vendor/bin/phpunit
 INFECTION=build/bin/infection.phar
+BOX_URL="https://github.com/humbug/box/releases/download/3.0.0-alpha.5/box.phar"
 
 DOCKER_RUN=docker run -t --rm -v "$$PWD":/opt/infection -w /opt/infection
 DOCKER_RUN_70=flock devTools/*php70*.json $(DOCKER_RUN) infection_php70
@@ -147,5 +148,5 @@ box.json: box.json.dist
 	cat box.json.dist | sed -E 's/\"key\": \".+\",//g' | sed -E 's/\"algorithm\": \".+\",//g' > box.json
 
 box.phar:
-	wget https://github.com/humbug/box/releases/download/3.0.0-alpha.5/box.phar
+	wget $(BOX_URL)
 	chmod a+x box.phar
