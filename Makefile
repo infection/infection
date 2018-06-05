@@ -3,7 +3,11 @@ PHPSTAN=./phpstan.phar
 PHP-CS-FIXER=./php-cs-fixer-v2.phar
 PHPUNIT=vendor/bin/phpunit
 INFECTION=build/bin/infection.phar
+
+# URLs to download all tools
 BOX_URL="https://github.com/humbug/box/releases/download/3.0.0-alpha.5/box.phar"
+PHP-CS-FIXER_URL="https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar"
+PHPSTAN_URL="https://github.com/phpstan/phpstan/releases/download/0.9.1/phpstan.phar"
 
 DOCKER_RUN=docker run -t --rm -v "$$PWD":/opt/infection -w /opt/infection
 DOCKER_RUN_70=flock devTools/*php70*.json $(DOCKER_RUN) infection_php70
@@ -22,11 +26,11 @@ build/cache:
 	mkdir -p build/cache
 
 ./php-cs-fixer-v2.phar:
-	wget https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar
+	wget $(PHP-CS-FIXER_URL)
 	chmod a+x ./php-cs-fixer-v2.phar
 
 ./phpstan.phar:
-	wget https://github.com/phpstan/phpstan/releases/download/0.9.1/phpstan.phar
+	wget $(PHPSTAN_URL)
 	chmod a+x ./phpstan.phar
 
 #All tests, (infection itself, phpunit, e2e) for different php version/ environments (xdebug or phpdbg)
