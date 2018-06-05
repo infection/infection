@@ -31,6 +31,7 @@ use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\Util\Mutator;
 use Infection\Process\Builder\ProcessBuilder;
+use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -119,6 +120,7 @@ final class ProjectCodeTest extends TestCase
         ResultsLoggerTypes::class,
         SummaryFileLogger::class,
         TextFileLogger::class,
+        SubscriberBuilder::class,
         MutantCreatingConsoleLoggerSubscriber::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
         MutationTestingRunner::class,

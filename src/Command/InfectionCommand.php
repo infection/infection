@@ -9,31 +9,20 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use Composer\XdebugHandler\XdebugHandler;
 use Infection\Config\InfectionConfig;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Exception\InfectionException;
 use Infection\Console\Exception\InvalidOptionException;
 use Infection\Console\LogVerbosity;
-use Infection\Console\OutputFormatter\DotFormatter;
-use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Finder\Exception\LocatorException;
 use Infection\Finder\Locator;
 use Infection\Mutant\Generator\MutationsGenerator;
-use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Builder\ProcessBuilder;
-use Infection\Process\Listener\CleanUpAfterMutationTestingFinishedSubscriber;
-use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
-use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
-use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
-use Infection\Process\Listener\MutationTestingConsoleLoggerSubscriber;
-use Infection\Process\Listener\MutationTestingResultsLoggerSubscriber;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
@@ -41,7 +30,6 @@ use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -182,13 +170,13 @@ final class InfectionCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!$this->hasDebuggerOrCoverageOption()) {
+        $container = $this->getContainer();
+        if (!$container->get('coverage.checker')->hasDebuggerOrCoverageOption()) {
             $this->consoleOutput->logMissedDebuggerOrCoverageOption();
 
             return 1;
         }
 
-        $container = $this->getContainer();
         $config = $container->get('infection.config');
 
         $this->includeUserBootstrap($config);
@@ -198,8 +186,8 @@ final class InfectionCommand extends BaseCommand
 
         LogVerbosity::convertVerbosityLevel($input, $this->consoleOutput);
 
-        $metricsCalculator = new MetricsCalculator();
-        $this->registerSubscribers($metricsCalculator, $adapter);
+        $metricsCalculator = $container->get('metrics');
+        $container->get('subscriber.creator')->registerSubscribers($adapter, $output);
 
         $processBuilder = new ProcessBuilder($adapter, $config->getProcessTimeout());
         $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);
@@ -248,8 +236,20 @@ final class InfectionCommand extends BaseCommand
             $codeCoverageData,
             $testFrameworkOptions->getForMutantProcess()
         );
+        /** @var TestRunConstraintChecker $constraintChecker */
+        $constraintChecker = $container->get('test.run.constraint.checker');
 
-        return $this->hasRunPassedConstraints($metricsCalculator);
+        if (!$constraintChecker->hasTestRunPassedConstraints()) {
+            $this->consoleOutput->logBadMsiErrorMessage(
+                    $metricsCalculator,
+                    $constraintChecker->getMinRequiredValue(),
+                    $constraintChecker->getErrorType()
+                );
+
+            return 1;
+        }
+
+        return 0;
     }
 
     private function includeUserBootstrap(InfectionConfig $config)
@@ -262,19 +262,6 @@ final class InfectionCommand extends BaseCommand
 
             require_once $bootstrap;
         }
-    }
-
-    private function getOutputFormatter(): OutputFormatter
-    {
-        if ($this->input->getOption('formatter') === 'progress') {
-            return new ProgressFormatter(new ProgressBar($this->output));
-        }
-
-        if ($this->input->getOption('formatter') === 'dot') {
-            return new DotFormatter($this->output);
-        }
-
-        throw new \InvalidArgumentException('Incorrect formatter. Possible values: "dot", "progress"');
     }
 
     private function applyMemoryLimitFromPhpUnitProcess(Process $process, MemoryUsageAware $adapter)
@@ -311,50 +298,6 @@ final class InfectionCommand extends BaseCommand
         $memoryLimit *= 2;
 
         file_put_contents($tempConfigPath, PHP_EOL . sprintf('memory_limit = %dM', $memoryLimit), FILE_APPEND);
-    }
-
-    private function registerSubscribers(
-        MetricsCalculator $metricsCalculator,
-        AbstractTestFrameworkAdapter $testFrameworkAdapter
-    ) {
-        foreach ($this->getSubscribers($metricsCalculator, $testFrameworkAdapter) as $subscriber) {
-            $this->eventDispatcher->addSubscriber($subscriber);
-        }
-    }
-
-    private function getSubscribers(
-        MetricsCalculator $metricsCalculator,
-        AbstractTestFrameworkAdapter $testFrameworkAdapter
-    ): array {
-        $subscribers = [
-            new InitialTestsConsoleLoggerSubscriber($this->output, $testFrameworkAdapter),
-            new MutationGeneratingConsoleLoggerSubscriber($this->output),
-            new MutantCreatingConsoleLoggerSubscriber($this->output),
-            new MutationTestingConsoleLoggerSubscriber(
-                $this->output,
-                $this->getOutputFormatter(),
-                $metricsCalculator,
-                $this->getContainer()->get('diff.colorizer'),
-                $this->input->getOption('show-mutations')
-            ),
-            new MutationTestingResultsLoggerSubscriber(
-                $this->output,
-                $this->getContainer()->get('infection.config'),
-                $metricsCalculator,
-                $this->getContainer()->get('filesystem'),
-                $this->input->getOption('log-verbosity'),
-                (bool) $this->input->getOption('debug')
-            ),
-        ];
-
-        if (!$this->input->getOption('debug')) {
-            $subscribers[] = new CleanUpAfterMutationTestingFinishedSubscriber(
-                $this->getContainer()->get('filesystem'),
-                $this->getContainer()->get('tmp.dir')
-            );
-        }
-
-        return $subscribers;
     }
 
     private function getCodeCoverageData(string $testFrameworkKey): CodeCoverageData
@@ -412,18 +355,9 @@ final class InfectionCommand extends BaseCommand
             $this->runConfigurationCommand($locator);
         }
 
-        $this->consoleOutput = new ConsoleOutput($this->getApplication()->getIO());
+        $this->consoleOutput = $this->getApplication()->getConsoleOutput();
         $this->skipCoverage = \strlen(trim($input->getOption('coverage'))) > 0;
         $this->eventDispatcher = $this->getContainer()->get('dispatcher');
-    }
-
-    private function hasDebuggerOrCoverageOption(): bool
-    {
-        return $this->skipCoverage
-            || \PHP_SAPI === 'phpdbg'
-            || \extension_loaded('xdebug')
-            || XdebugHandler::getSkippedVersion()
-            || $this->isXdebugIncludedInInitialTestPhpOptions();
     }
 
     private function runConfigurationCommand(Locator $locator)
@@ -445,58 +379,5 @@ final class InfectionCommand extends BaseCommand
                 throw ConfigurationException::configurationAborted();
             }
         }
-    }
-
-    private function isXdebugIncludedInInitialTestPhpOptions(): bool
-    {
-        return (bool) preg_match(
-            '/(zend_extension\s*=.*xdebug.*)/mi',
-            $this->input->getOption('initial-tests-php-options')
-        );
-    }
-
-    /**
-     * Checks if the infection run passed the constraints like min msi & covered msi.
-     *
-     * @param MetricsCalculator $metricsCalculator
-     *
-     * @return int
-     */
-    private function hasRunPassedConstraints(MetricsCalculator $metricsCalculator): int
-    {
-        if ($this->input->getOption('ignore-msi-with-no-mutations') && $metricsCalculator->getTotalMutantsCount() === 0) {
-            return 0;
-        }
-
-        if ($this->hasBadMsi($metricsCalculator)) {
-            $this->consoleOutput->logBadMsiErrorMessage($metricsCalculator, (float) $this->input->getOption('min-msi'));
-
-            return 1;
-        }
-
-        if ($this->hasBadCoveredMsi($metricsCalculator)) {
-            $this->consoleOutput->logBadCoveredMsiErrorMessage(
-                $metricsCalculator,
-                (float) $this->input->getOption('min-covered-msi')
-            );
-
-            return 1;
-        }
-
-        return 0;
-    }
-
-    private function hasBadMsi(MetricsCalculator $metricsCalculator): bool
-    {
-        $minMsi = (float) $this->input->getOption('min-msi');
-
-        return $minMsi && ($metricsCalculator->getMutationScoreIndicator() < $minMsi);
-    }
-
-    private function hasBadCoveredMsi(MetricsCalculator $metricsCalculator): bool
-    {
-        $minCoveredMsi = (float) $this->input->getOption('min-covered-msi');
-
-        return $minCoveredMsi && ($metricsCalculator->getCoveredCodeMutationScoreIndicator() < $minCoveredMsi);
     }
 }

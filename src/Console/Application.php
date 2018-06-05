@@ -11,6 +11,7 @@ namespace Infection\Console;
 
 use Composer\XdebugHandler\XdebugHandler;
 use Infection\Command;
+use Infection\Console\ConsoleOutput as InfectionConsoleOutput;
 use Infection\Console\Util\PhpProcess;
 use PackageVersions\Versions;
 use Symfony\Component\Console\Application as BaseApplication;
@@ -28,7 +29,6 @@ final class Application extends BaseApplication
 {
     const NAME = 'Infection - PHP Mutation Testing Framework';
     const VERSION = '@package_version@';
-    const RUNNING_WITH_DEBUGGER_NOTE = 'You are running Infection with %s enabled.';
 
     const INFECTION_PREFIX = 'INFECTION';
 
@@ -47,9 +47,9 @@ ASCII;
     private $container;
 
     /**
-     * @var SymfonyStyle
+     * @var InfectionConsoleOutput
      */
-    private $io;
+    private $consoleOutput;
 
     public function __construct(InfectionContainer $container, string $name = self::NAME, string $version = self::VERSION)
     {
@@ -69,12 +69,12 @@ ASCII;
             $output = new ConsoleOutput();
         }
 
-        $this->io = new SymfonyStyle($input, $output);
+        $this->consoleOutput = new InfectionConsoleOutput(new SymfonyStyle($input, $output));
 
         if (\PHP_SAPI === 'phpdbg') {
-            $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, \PHP_SAPI));
+            $this->consoleOutput->logRunningWithDebugger(\PHP_SAPI);
         } elseif (\extension_loaded('xdebug')) {
-            $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, 'xdebug'));
+            $this->consoleOutput->logRunningWithDebugger('xdebug');
         }
 
         if (!$this->isAutoExitEnabled()) {
@@ -82,10 +82,7 @@ ASCII;
             // responsibility to disable xdebug if it isn't needed. As of writing
             // that's only the case during E2E testing. Show a warning nevertheless.
 
-            $this->io->warning([
-                'Infection cannot control exit codes and unable to relaunch itself.' . PHP_EOL .
-                'It is your responsibility to disable xdebug/phpdbg unless needed.',
-            ]);
+            $this->consoleOutput->logNotInControlOfExitCodes();
 
             return parent::run($input, $output);
         }
@@ -161,8 +158,8 @@ ASCII;
         return $this->container;
     }
 
-    public function getIO(): SymfonyStyle
+    public function getConsoleOutput(): InfectionConsoleOutput
     {
-        return $this->io;
+        return $this->consoleOutput;
     }
 }
