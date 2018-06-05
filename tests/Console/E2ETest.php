@@ -95,6 +95,11 @@ final class E2ETest extends TestCase
      */
     public function test_it_runs_an_e2e_test_with_success(string $fullPath)
     {
+        if ('\\' == \DIRECTORY_SEPARATOR && 'Config_Framework' == basename((string) $fullPath)) {
+            $this->markTestIncomplete("Ignoring this test on Windows because it's a know bug");
+            // Development tracked at https://github.com/infection/infection/issues/377
+        }
+
         $this->runOnE2EFixture($fullPath);
     }
 
