@@ -136,7 +136,7 @@ final class ConsoleOutputTest extends TestCase
         $consoleOutput->logRunningWithDebugger('foo');
     }
 
-    public function test_log_not_in_controll_of_exit_codes()
+    public function test_log_not_in_control_of_exit_codes()
     {
         $io = $this->createMock(SymfonyStyle::class);
         $io->expects($this->once())->method('warning')
