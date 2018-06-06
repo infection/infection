@@ -29,7 +29,7 @@ final class ParentConnectorVisitor extends NodeVisitorAbstract
     public function enterNode(Node $node)
     {
         if (!empty($this->stack)) {
-            $node->setAttribute(self::PARENT_KEY, $this->stack[count($this->stack) - 1]);
+            $node->setAttribute(self::PARENT_KEY, $this->stack[\count($this->stack) - 1]);
         }
 
         $this->stack[] = $node;

@@ -81,8 +81,8 @@ final class TestFrameworkFinderTest extends TestCase
         $this->assertContains('vendor', $pathAfterTest);
 
         $this->assertGreaterThan(
-            strlen($path),
-            strlen($pathAfterTest),
+            \strlen($path),
+            \strlen($pathAfterTest),
             'PATH with vendor added is shorter than without it added, make sure it isn\'t overwritten.'
         );
     }

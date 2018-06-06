@@ -67,7 +67,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
             $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->reflectionClass);
             $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
         } elseif ($isInsideFunction) {
-            $node->setAttribute(self::FUNCTION_SCOPE_KEY, $this->scopeStack[count($this->scopeStack) - 1]);
+            $node->setAttribute(self::FUNCTION_SCOPE_KEY, $this->scopeStack[\count($this->scopeStack) - 1]);
             $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->reflectionClass);
             $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
         }

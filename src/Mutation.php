@@ -98,7 +98,7 @@ final class Mutation implements MutationInterface
     public function getHash(): string
     {
         if (!isset($this->hash)) {
-            $mutatorClass = get_class($this->getMutator());
+            $mutatorClass = \get_class($this->getMutator());
             $attributes = $this->getAttributes();
             $attributeValues = [
                 $mutatorClass,

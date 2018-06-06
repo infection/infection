@@ -63,7 +63,7 @@ final class SourceDirsProvider
 
         $sourceFolders = $this->questionHelper->ask($input, $output, $question);
 
-        if (in_array('.', $sourceFolders, true) && count($sourceFolders) > 1) {
+        if (\in_array('.', $sourceFolders, true) && \count($sourceFolders) > 1) {
             throw new \LogicException('You cannot use current folder "." with other subfolders');
         }
 

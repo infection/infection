@@ -94,7 +94,7 @@ class MutationConfigBuilder extends ConfigBuilder
     {
         $originalFilePath = $mutant->getMutation()->getOriginalFilePath();
         $mutatedFilePath = $mutant->getMutatedFilePath();
-        $interceptorPath = dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
+        $interceptorPath = \dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
 
         $customAutoload = <<<AUTOLOAD
 <?php
@@ -189,7 +189,7 @@ AUTOLOAD;
         $uniqueTests = [];
 
         foreach ($coverageTests as $coverageTest) {
-            if (!in_array($coverageTest['testFilePath'], $usedFileNames, true)) {
+            if (!\in_array($coverageTest['testFilePath'], $usedFileNames, true)) {
                 $uniqueTests[] = $coverageTest;
                 $usedFileNames[] = $coverageTest['testFilePath'];
             }

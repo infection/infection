@@ -96,7 +96,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                 $this->fileAst,
                 $mutator,
                 $node->getAttributes(),
-                get_class($node),
+                \get_class($node),
                 $isOnFunctionSignature,
                 $isCoveredByTest
             );

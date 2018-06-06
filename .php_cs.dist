@@ -30,6 +30,9 @@ return \PhpCsFixer\Config::create()
             'location' => 'after_open',
             'separate' => 'bottom',
         ],
+        'native_function_invocation' => [
+            'include' => ['@compiler_optimized']
+        ],
         'no_useless_else'=> true,
         'ordered_class_elements' => [
             'order' => [

@@ -71,7 +71,7 @@ final class DebugFileLogger extends FileLogger
 
         return [
             $headline,
-            str_repeat('=', strlen($headline)),
+            str_repeat('=', \strlen($headline)),
             '',
         ];
     }

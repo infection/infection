@@ -92,7 +92,7 @@ class InfectionConfig
 
     private function getExcludes(): array
     {
-        if (isset($this->config->source->excludes) && is_array($this->config->source->excludes)) {
+        if (isset($this->config->source->excludes) && \is_array($this->config->source->excludes)) {
             return $this->config->source->excludes;
         }
 
@@ -121,7 +121,7 @@ class InfectionConfig
                     array_map(
                         function ($excludeDir) use ($srcDir) {
                             return ltrim(
-                                substr_replace($excludeDir, '', 0, strlen($srcDir)),
+                                substr_replace($excludeDir, '', 0, \strlen($srcDir)),
                                 \DIRECTORY_SEPARATOR
                             );
                         },

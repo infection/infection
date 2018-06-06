@@ -73,7 +73,7 @@ final class PublicVisibility extends Mutator
 
     private function isBlacklistedFunction(Node\Identifier $name): bool
     {
-        return in_array(
+        return \in_array(
             $name->name,
             [
                 '__construct',

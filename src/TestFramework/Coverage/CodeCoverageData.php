@@ -65,11 +65,11 @@ class CodeCoverageData
         $coveredLineTestMethods = array_filter(
             $coverageData[$filePath]['byLine'],
             function ($testMethods) {
-                return count($testMethods) > 0;
+                return \count($testMethods) > 0;
             }
         );
 
-        return count($coveredLineTestMethods) > 0;
+        return \count($coveredLineTestMethods) > 0;
     }
 
     public function hasTestsOnLine(string $filePath, int $line): bool
@@ -154,7 +154,7 @@ class CodeCoverageData
                 throw CoverageDoesNotExistException::with(
                     $coverageIndexFilePath,
                     $this->testFrameworkKey,
-                    dirname($coverageIndexFilePath, 2)
+                    \dirname($coverageIndexFilePath, 2)
                 );
             }
 

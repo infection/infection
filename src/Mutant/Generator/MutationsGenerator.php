@@ -86,7 +86,7 @@ final class MutationsGenerator
         $this->excludeDirsOrFiles = $excludeDirsOrFiles;
         $this->defaultMutators = $defaultMutators;
         $this->whitelistedMutatorNames = $whitelistedMutatorNames;
-        $this->whitelistedMutatorNamesCount = count($whitelistedMutatorNames);
+        $this->whitelistedMutatorNamesCount = \count($whitelistedMutatorNames);
         $this->eventDispatcher = $eventDispatcher;
         $this->parser = $parser;
     }

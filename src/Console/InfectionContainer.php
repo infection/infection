@@ -207,7 +207,7 @@ final class InfectionContainer extends Container
 
             $config = json_decode($json);
 
-            if (is_string($infectionConfigFile) && null === $config && JSON_ERROR_NONE !== json_last_error()) {
+            if (\is_string($infectionConfigFile) && null === $config && JSON_ERROR_NONE !== json_last_error()) {
                 throw InvalidConfigException::invalidJson(
                     $infectionConfigFile,
                     json_last_error_msg()
