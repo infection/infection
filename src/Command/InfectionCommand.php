@@ -187,7 +187,7 @@ final class InfectionCommand extends BaseCommand
         LogVerbosity::convertVerbosityLevel($input, $this->consoleOutput);
 
         $metricsCalculator = $container->get('metrics');
-        $container->get('subscriber.creator')->registerSubscribers($adapter, $output);
+        $container->get('subscriber.builder')->registerSubscribers($adapter, $output);
 
         $processBuilder = new ProcessBuilder($adapter, $config->getProcessTimeout());
         $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);

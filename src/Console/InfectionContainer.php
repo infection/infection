@@ -253,7 +253,7 @@ final class InfectionContainer extends Container
             );
         };
 
-        $this['subscriber.creator'] = function () use ($input): SubscriberBuilder {
+        $this['subscriber.builder'] = function () use ($input): SubscriberBuilder {
             return new SubscriberBuilder(
                 $input,
                 $this['metrics'],
