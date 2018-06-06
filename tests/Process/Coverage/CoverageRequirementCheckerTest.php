@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Coverage;
 
-use Infection\Process\Coverage\CoverageChecker;
+use Infection\Process\Coverage\CoverageRequirementChecker;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,14 +21,14 @@ use PHPUnit\Framework\TestCase;
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
-final class CoverageCheckerTest extends TestCase
+final class CoverageRequirementCheckerTest extends TestCase
 {
     public function test_it_has_debugger_or_coverage_option_on_phpdbg()
     {
         $this->requirePhpDbg();
         $this->requireNoXdebug();
 
-        $coverageChecker = new CoverageChecker(false, '');
+        $coverageChecker = new CoverageRequirementChecker(false, '');
 
         $this->assertTrue($coverageChecker->hasDebuggerOrCoverageOption());
     }
@@ -38,7 +38,7 @@ final class CoverageCheckerTest extends TestCase
         $this->requireNoPhpDbg();
         $this->requireXdebug();
 
-        $coverageChecker = new CoverageChecker(false, '');
+        $coverageChecker = new CoverageRequirementChecker(false, '');
 
         $this->assertTrue($coverageChecker->hasDebuggerOrCoverageOption());
     }
@@ -48,7 +48,7 @@ final class CoverageCheckerTest extends TestCase
         $this->requireNoPhpDbg();
         $this->requireNoXdebug();
 
-        $coverageChecker = new CoverageChecker(true, '');
+        $coverageChecker = new CoverageRequirementChecker(true, '');
 
         $this->assertTrue($coverageChecker->hasDebuggerOrCoverageOption());
     }
@@ -58,7 +58,7 @@ final class CoverageCheckerTest extends TestCase
         $this->requireNoPhpDbg();
         $this->requireNoXdebug();
 
-        $coverageChecker = new CoverageChecker(false, '-d zend_extension=xdebug.so');
+        $coverageChecker = new CoverageRequirementChecker(false, '-d zend_extension=xdebug.so');
 
         $this->assertTrue($coverageChecker->hasDebuggerOrCoverageOption());
     }
@@ -68,7 +68,7 @@ final class CoverageCheckerTest extends TestCase
         $this->requireNoPhpDbg();
         $this->requireNoXdebug();
 
-        $coverageChecker = new CoverageChecker(false, '--help');
+        $coverageChecker = new CoverageRequirementChecker(false, '--help');
 
         $this->assertFalse($coverageChecker->hasDebuggerOrCoverageOption());
     }

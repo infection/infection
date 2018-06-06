@@ -14,7 +14,7 @@ use Composer\XdebugHandler\XdebugHandler;
 /**
  * @internal
  */
-final class CoverageChecker
+final class CoverageRequirementChecker
 {
     /**
      * @var bool

@@ -20,7 +20,7 @@ use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutator\Util\MutatorsGenerator;
 use Infection\Process\Builder\SubscriberBuilder;
-use Infection\Process\Coverage\CoverageChecker;
+use Infection\Process\Coverage\CoverageRequirementChecker;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
@@ -237,8 +237,8 @@ final class InfectionContainer extends Container
                 : sprintf('%s/%s', getcwd(), $existingCoveragePath);
         };
 
-        $this['coverage.checker'] = function () use ($input): CoverageChecker {
-            return new CoverageChecker(
+        $this['coverage.checker'] = function () use ($input): CoverageRequirementChecker {
+            return new CoverageRequirementChecker(
                 \strlen(trim($input->getOption('coverage'))) > 0,
                 $input->getOption('initial-tests-php-options')
             );
