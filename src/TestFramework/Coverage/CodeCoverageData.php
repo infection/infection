@@ -110,22 +110,47 @@ class CodeCoverageData
             return [];
         }
 
-        $filePath = $mutation->getOriginalFilePath();
-        $line = $mutation->getAttributes()['startLine'];
-
         if ($mutation->isOnFunctionSignature()) {
+            return iterator_to_array($this->getTestsForMutationOnFunctionSignature($mutation), false);
+        }
+
+        return iterator_to_array($this->getTestsForMutation($mutation), false);
+    }
+
+    private function getTestsForMutationOnFunctionSignature(MutationInterface $mutation): \Generator
+    {
+        $filePath = $mutation->getOriginalFilePath();
+
+        foreach ($this->linesForMutation($mutation) as $line) {
             if ($this->hasExecutedMethodOnLine($filePath, $line)) {
-                return $this->getTestsForExecutedMethodOnLine($filePath, $line);
+                yield from $this->getTestsForExecutedMethodOnLine($filePath, $line);
             }
-
-            return [];
         }
+    }
 
-        if ($this->hasTestsOnLine($filePath, $line)) {
-            return $this->getCoverage()[$filePath]['byLine'][$line];
+    private function getTestsForMutation(MutationInterface $mutation): \Generator
+    {
+        $filePath = $mutation->getOriginalFilePath();
+
+        foreach ($this->linesForMutation($mutation) as $line) {
+            if ($this->hasTestsOnLine($filePath, $line)) {
+                yield from $this->getCoverage()[$filePath]['byLine'][$line];
+            }
         }
+    }
 
-        return [];
+    private function linesForMutation(MutationInterface $mutation): \Generator
+    {
+        /*
+         * If we only look for tests that cover only the very first line of our
+         * mutation, we may naturally miss other tests that may actually also
+         * cover this mutation, this all leading to false positives.
+         *
+         * Therefore we have to consider all lines of a mutation.
+         */
+        for ($line = $mutation->getAttributes()['startLine']; $line <= $mutation->getAttributes()['endLine']; ++$line) {
+            yield $line;
+        }
     }
 
     /**
