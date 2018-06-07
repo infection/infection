@@ -54,21 +54,12 @@ install:
     - IF %dependencies%==highest appveyor-retry composer update --no-suggest --ignore-platform-reqs
     - composer show
     # Install XDebug for code coverage
-    - ps: |
-        $client = New-Object System.Net.WebClient
-        $xdebugUrl = "https://xdebug.org/files/php_xdebug-$env:xdebug_ver-nts-x86_64.dll"
-        $phpDir = (Get-Item (Get-Command php).Source).Directory.FullName
-        $xdebugPath = Join-Path $phpDir ext\xdebug.dll
-        $client.DownloadFile($xdebugUrl, $xdebugPath)
-        $phpIniPath = Join-Path $phpDir php.ini
-        Add-Content $phpIniPath @"
-        zend_extension=$xdebugPath
-        "@
+    - ps: if ($env:PHP -eq "1" ) { .ci\appveyor_install_xdebug.ps1 }
 
 test_script:
     - cd c:\projects\workspace
     - vendor\bin\phpunit --coverage-clover=clover.xml --coverage-xml=coverage/coverage-xml --log-junit=coverage/phpunit.junit.xml
-    - php bin/infection --threads=4 --log-verbosity=none --coverage=coverage
+    - php bin\infection --threads=4 --log-verbosity=none --coverage=coverage
 
 after_test:
   - ps: |
