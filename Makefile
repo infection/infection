@@ -9,10 +9,12 @@ BOX_URL="https://github.com/humbug/box/releases/download/3.0.0-alpha.5/box.phar"
 PHP-CS-FIXER_URL="https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar"
 PHPSTAN_URL="https://github.com/phpstan/phpstan/releases/download/0.9.1/phpstan.phar"
 
+FLOCK=./devTools/flock
+
 DOCKER_RUN=docker run -t --rm -v "$$PWD":/opt/infection -w /opt/infection
-DOCKER_RUN_70=flock devTools/*php70*.json $(DOCKER_RUN) infection_php70
-DOCKER_RUN_71=flock devTools/*php71*.json $(DOCKER_RUN) infection_php71
-DOCKER_RUN_72=flock devTools/*php72*.json $(DOCKER_RUN) infection_php72
+DOCKER_RUN_70=$(FLOCK) devTools/*php70*.json $(DOCKER_RUN) infection_php70
+DOCKER_RUN_71=$(FLOCK) devTools/*php71*.json $(DOCKER_RUN) infection_php71
+DOCKER_RUN_72=$(FLOCK) devTools/*php72*.json $(DOCKER_RUN) infection_php72
 
 .PHONY: all
 #Run all checks, default when running 'make'
