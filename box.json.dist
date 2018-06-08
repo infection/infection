@@ -3,7 +3,7 @@
     "chmod": "0755",
 
     "algorithm": "OPENSSL",
-    "key": ".travis/infection-private.pem",
+    "key": ".ci/infection-private.pem",
 
     "git-version": "package_version",
 
