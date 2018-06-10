@@ -106,10 +106,18 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
     private function isCoveredByTest(bool $isOnFunctionSignature, Node $node): bool
     {
         if ($isOnFunctionSignature) {
+            // hasExecutedMethodOnLine checks for all lines of a given method,
+            // therefore it isn't making any sense to check any other line but first
             return $this->codeCoverageData->hasExecutedMethodOnLine($this->filePath, $node->getLine());
         }
 
-        return $this->codeCoverageData->hasTestsOnLine($this->filePath, $node->getLine());
+        for ($line = $node->getStartLine(); $line <= $node->getEndLine(); ++$line) {
+            if ($this->codeCoverageData->hasTestsOnLine($this->filePath, $line)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

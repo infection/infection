@@ -117,7 +117,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             $filePath,
             [],
             Mockery::mock(Mutator::class),
-            ['startLine' => 1],
+            ['startLine' => 1, 'endLine' => 1],
             'PHPParser\Node\Expr\BinaryOp\Plus',
             false,
             true
@@ -135,7 +135,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             $filePath,
             [],
             Mockery::mock(Mutator::class),
-            ['startLine' => 26],
+            ['startLine' => 26, 'endLine' => 26],
             'PHPParser\Node\Expr\BinaryOp\Plus',
             false,
             true
@@ -153,7 +153,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             $filePath,
             [],
             Mockery::mock(Mutator::class),
-            ['startLine' => 1],
+            ['startLine' => 1, 'endLine' => 1],
             'PHPParser\Node\Stmt\ClassMethod',
             true,
             true
@@ -171,7 +171,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             $filePath,
             [],
             Mockery::mock(Mutator::class),
-            ['startLine' => 24],
+            ['startLine' => 24, 'endLine' => 24],
             'PHPParser\Node\Stmt\ClassMethod',
             true,
             true
