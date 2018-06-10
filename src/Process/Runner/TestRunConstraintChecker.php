@@ -63,13 +63,13 @@ final class TestRunConstraintChecker
             return true;
         }
 
-        if ($this->hasBadMsi($this->metricsCalculator)) {
+        if ($this->hasBadMsi()) {
             $this->failureType = self::MSI_FAILURE;
 
             return false;
         }
 
-        if ($this->hasBadCoveredMsi($this->metricsCalculator)) {
+        if ($this->hasBadCoveredMsi()) {
             $this->failureType = self::COVERED_MSI_FAILURE;
 
             return false;
@@ -88,13 +88,13 @@ final class TestRunConstraintChecker
         return $this->failureType === self::MSI_FAILURE ? $this->minMsi : $this->minCoveredMsi;
     }
 
-    private function hasBadMsi(MetricsCalculator $metricsCalculator): bool
+    private function hasBadMsi(): bool
     {
-        return $this->minMsi && ($metricsCalculator->getMutationScoreIndicator() < $this->minMsi);
+        return $this->minMsi && ($this->metricsCalculator->getMutationScoreIndicator() < $this->minMsi);
     }
 
-    private function hasBadCoveredMsi(MetricsCalculator $metricsCalculator): bool
+    private function hasBadCoveredMsi(): bool
     {
-        return $this->minCoveredMsi && ($metricsCalculator->getCoveredCodeMutationScoreIndicator() < $this->minCoveredMsi);
+        return $this->minCoveredMsi && ($this->metricsCalculator->getCoveredCodeMutationScoreIndicator() < $this->minCoveredMsi);
     }
 }
