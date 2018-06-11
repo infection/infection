@@ -24,7 +24,7 @@ final class MutatorExceptionTest extends TestCase
         $mutator = new Plus(new MutatorConfig([]));
         $previous = new \Exception();
 
-        $exception = MutatorException::errorWhileMutating($mutator, $previous);
+        $exception = MutatorException::couldNotMutate($mutator, $previous);
 
         $this->assertSame($mutator, $exception->getMutator());
         $this->assertSame($previous, $exception->getPrevious());
@@ -37,7 +37,7 @@ final class MutatorExceptionTest extends TestCase
 
         $file = $this->createMock(\SplFileInfo::class);
         $file->expects($this->once())->method('getRealPath')->willReturn('foo/bar/baz');
-        $previous = MutatorException::errorWhileMutating($mutator,
+        $previous = MutatorException::couldNotMutate($mutator,
             $original);
 
         $exception = MutatorException::traverseErrorWithBetterMessage($file, $previous);

@@ -18,7 +18,7 @@ final class MutatorException extends \Exception
 {
     private $mutator;
 
-    public static function errorWhileMutating(Mutator $mutator, \Throwable $previous): self
+    public static function couldNotMutate(Mutator $mutator, \Throwable $previous): self
     {
         $exception = new self($previous->getMessage(), $previous->getCode(), $previous);
         $exception->mutator = $mutator;

@@ -151,7 +151,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
         );
 
         $this->expectException(ParserException::class);
-        $this->expectExceptionMessageRegExp('#Fixtures/Files/InvalidFile/InvalidFile\.php#');
+        $this->expectExceptionMessageRegExp('#Fixtures(/|\\\)Files(/|\\\)InvalidFile(/|\\\)InvalidFile\.php#');
         $generator->generate(false);
     }
 

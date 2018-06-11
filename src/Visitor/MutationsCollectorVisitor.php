@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\Visitor;
 
 use Infection\Mutation;
+use Infection\Mutator\Util\Exception\MutatorException;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use PhpParser\Node;
@@ -66,8 +67,12 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
     public function leaveNode(Node $node)
     {
         foreach ($this->mutators as $mutator) {
-            if (!$mutator->shouldMutate($node)) {
-                continue;
+            try {
+                if (!$mutator->shouldMutate($node)) {
+                    continue;
+                }
+            } catch (\Throwable $t) {
+                throw MutatorException::couldNotMutate($mutator, $t);
             }
 
             $isOnFunctionSignature = $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
