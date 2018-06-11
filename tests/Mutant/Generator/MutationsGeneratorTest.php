@@ -11,14 +11,17 @@ namespace Infection\Tests\Mutant\Generator;
 
 use Infection\Config\Exception\InvalidConfigException;
 use Infection\EventDispatcher\EventDispatcherInterface;
+use Infection\Mutant\Exception\ParserException;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutator\Arithmetic\Decrement;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
+use Infection\Mutator\Util\Exception\MutatorException;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Tests\Fixtures\Files\Mutation\OneFile\OneFile;
+use Infection\WrongMutator\ErrorMutator;
 use Mockery;
 use PhpParser\Lexer;
 use PhpParser\Parser;
@@ -138,11 +141,47 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
         $generator->generate(false);
     }
 
-    private function createMutationGenerator(CodeCoverageData $codeCoverageDataMock, array $whitelistedMutatorNames = [], MutatorConfig $mutatorConfig = null)
+    public function test_it_throws_correct_error_when_file_is_invalid()
     {
-        $srcDirs = [
-            \dirname(__DIR__, 2) . '/Fixtures/Files/Mutation/OneFile',
-        ];
+        $generator = $this->createMutationGenerator(
+            Mockery::mock(CodeCoverageData::class),
+            [Decrement::getName()],
+            null,
+            [\dirname(__DIR__, 2) . '/Fixtures/Files/InvalidFile']
+        );
+
+        $this->expectException(ParserException::class);
+        $this->expectExceptionMessageRegExp('#Fixtures/Files/InvalidFile/InvalidFile\.php#');
+        $generator->generate(false);
+    }
+
+    public function test_it_throws_correct_exception_when_mutator_is_invalid()
+    {
+        $generator = $this->createMutationGenerator(
+            Mockery::mock(CodeCoverageData::class),
+            [ErrorMutator::class]
+        );
+
+        $this->expectException(MutatorException::class);
+        $this->expectExceptionMessageRegExp(
+            '#Encountered an error with the "ErrorMutator" mutator in the ".+OneFile.php"' .
+            ' file. This is most likely a bug in infection, so please report this in our issue tracker.#'
+        );
+
+        $generator->generate(false);
+    }
+
+    private function createMutationGenerator(
+        CodeCoverageData $codeCoverageDataMock,
+        array $whitelistedMutatorNames = [],
+        MutatorConfig $mutatorConfig = null,
+        array $srcDirs = []
+    ) {
+        if ($srcDirs === []) {
+            $srcDirs = [
+                \dirname(__DIR__, 2) . '/Fixtures/Files/Mutation/OneFile',
+            ];
+        }
         $excludedDirsOrFiles = [];
 
         $container = new Container();

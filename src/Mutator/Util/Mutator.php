@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
+use Infection\Mutator\Util\Exception\MutatorException;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
@@ -30,8 +31,12 @@ abstract class Mutator
 
     final public function shouldMutate(Node $node): bool
     {
-        if (!$this->mutatesNode($node)) {
-            return false;
+        try {
+            if (!$this->mutatesNode($node)) {
+                return false;
+            }
+        } catch (\Throwable $t) {
+            throw MutatorException::errorWhileMutating($this, $t);
         }
 
         $reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY, false);
