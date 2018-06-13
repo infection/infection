@@ -58,7 +58,6 @@ class InfectionConfig
         }
 
         return $this->configLocation . \DIRECTORY_SEPARATOR . $this->config->phpUnit->configDir;
-
     }
 
     public function getPhpUnitCustomPath(): string
