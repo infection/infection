@@ -52,7 +52,6 @@ before_install:
       openssl aes-256-cbc -K $encrypted_4dbefe709cef_key -iv $encrypted_4dbefe709cef_iv -in .ci/secrets.tar.enc -out .ci/secrets.tar -d
       tar xvf .ci/secrets.tar -C .ci
     fi;
-  - composer selfupdate
   - source .ci/xdebug.sh
   - xdebug-disable
 
