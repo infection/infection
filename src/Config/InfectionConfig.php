@@ -49,7 +49,13 @@ class InfectionConfig
 
     public function getPhpUnitConfigDir(): string
     {
-        if (isset($this->config->phpUnit->configDir)) {
+        $issetPhpUnitConfigDir = isset($this->config->phpUnit->configDir);
+
+        if ($issetPhpUnitConfigDir && $this->filesystem->isAbsolutePath($this->config->phpUnit->configDir)) {
+            return $this->config->phpUnit->configDir;
+        }
+
+        if ($issetPhpUnitConfigDir) {
             return $this->configLocation . \DIRECTORY_SEPARATOR . $this->config->phpUnit->configDir;
         }
 

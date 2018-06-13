@@ -52,6 +52,17 @@ final class InfectionConfigTest extends TestCase
         $this->assertSame('/path/to/config', $config->getPhpUnitConfigDir());
     }
 
+    public function test_it_returns_phpunit_absolute_dir_from_config_with_absolute_path()
+    {
+        $absolutePath = '/app';
+        $json = sprintf('{"phpUnit": {"configDir": "%s"}}', $absolutePath);
+        $config = new InfectionConfig(json_decode($json), $this->filesystem, '/path/to/config');
+
+        $expected = $absolutePath;
+
+        $this->assertSame(p($expected), p($config->getPhpUnitConfigDir()));
+    }
+
     public function test_it_returns_phpunit_config_dir_from_config()
     {
         $phpUnitConfigDir = 'app';
