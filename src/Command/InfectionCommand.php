@@ -16,6 +16,8 @@ use Infection\Console\Exception\InfectionException;
 use Infection\Console\Exception\InvalidOptionException;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventDispatcherInterface;
+use Infection\Events\ApplicationExecutionFinished;
+use Infection\Events\ApplicationExecutionStarted;
 use Infection\Finder\Exception\LocatorException;
 use Infection\Finder\Locator;
 use Infection\Mutant\Generator\MutationsGenerator;
@@ -188,6 +190,8 @@ final class InfectionCommand extends BaseCommand
         $metricsCalculator = $container->get('metrics');
         $container->get('subscriber.builder')->registerSubscribers($adapter, $output);
 
+        $this->eventDispatcher->dispatch(new ApplicationExecutionStarted());
+
         $processBuilder = new ProcessBuilder($adapter, $config->getProcessTimeout());
         $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);
 
@@ -237,6 +241,8 @@ final class InfectionCommand extends BaseCommand
         );
         /** @var TestRunConstraintChecker $constraintChecker */
         $constraintChecker = $container->get('test.run.constraint.checker');
+
+        $this->eventDispatcher->dispatch(new ApplicationExecutionFinished());
 
         if (!$constraintChecker->hasTestRunPassedConstraints()) {
             $this->consoleOutput->logBadMsiErrorMessage(

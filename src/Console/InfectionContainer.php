@@ -19,6 +19,10 @@ use Infection\Finder\Locator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutator\Util\MutatorsGenerator;
+use Infection\Performance\Memory\MemoryFormatter;
+use Infection\Performance\Memory\MemoryUsageProvider;
+use Infection\Performance\Time\TimeFormatter;
+use Infection\Performance\Time\Timer;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Coverage\CoverageRequirementChecker;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
@@ -180,6 +184,22 @@ final class InfectionContainer extends Container
 
         $this['metrics'] = function (): MetricsCalculator {
             return new MetricsCalculator();
+        };
+
+        $this['timer'] = function (): Timer {
+            return new Timer();
+        };
+
+        $this['time.formatter'] = function (): TimeFormatter {
+            return new TimeFormatter();
+        };
+
+        $this['memory.usage.provider'] = function (): MemoryUsageProvider {
+            return new MemoryUsageProvider();
+        };
+
+        $this['memory.formatter'] = function (): MemoryFormatter {
+            return new MemoryFormatter();
         };
     }
 
