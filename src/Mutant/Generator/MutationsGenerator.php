@@ -16,7 +16,6 @@ use Infection\Events\MutationGeneratingStarted;
 use Infection\Finder\SourceFilesFinder;
 use Infection\Mutant\Exception\ParserException;
 use Infection\Mutation;
-use Infection\Mutator\Util\Exception\MutatorException;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorsGenerator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
@@ -147,16 +146,12 @@ final class MutationsGenerator
             $onlyCovered
         );
 
-        $traverser->addVisitor($mutationsCollectorVisitor);
         $traverser->addVisitor(new ParentConnectorVisitor());
         $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
         $traverser->addVisitor(new ReflectionVisitor());
+        $traverser->addVisitor($mutationsCollectorVisitor);
 
-        try {
-            $traverser->traverse($initialStatements);
-        } catch (MutatorException $e) {
-            throw MutatorException::traverseErrorWithBetterMessage($file, $e);
-        }
+        $traverser->traverse($initialStatements);
 
         return $mutationsCollectorVisitor->getMutations();
     }

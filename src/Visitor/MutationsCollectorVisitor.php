@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Infection\Visitor;
 
+use Infection\Exception\MutatorException;
 use Infection\Mutation;
-use Infection\Mutator\Util\Exception\MutatorException;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use PhpParser\Node;
@@ -72,7 +72,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                     continue;
                 }
             } catch (\Throwable $t) {
-                throw MutatorException::couldNotMutate($mutator, $t);
+                throw MutatorException::internalErrorWhileTraversing($this->filePath, $mutator, $t);
             }
 
             $isOnFunctionSignature = $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
