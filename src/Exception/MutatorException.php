@@ -20,6 +20,7 @@ final class MutatorException extends \Exception
      * @param string $filePath
      * @param Mutator $mutator
      * @param \Throwable $previous
+     *
      * @return MutatorException
      */
     public static function internalErrorWhileTraversing(string $filePath, Mutator $mutator, \Throwable $previous): self
