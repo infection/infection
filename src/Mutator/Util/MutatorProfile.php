@@ -112,6 +112,8 @@ final class MutatorProfile
 
     const REGEX = [
         Mutator\Regex\PregQuote::class,
+        Mutator\Regex\PregMatchSwapCaret::class,
+        Mutator\Regex\PregMatchSwapDollar::class
     ];
 
     const RETURN_VALUE = [
@@ -227,6 +229,8 @@ final class MutatorProfile
 
         //Regex
         'PregQuote' => Mutator\Regex\PregQuote::class,
+        'PregMatchSwapCaret' => Mutator\Regex\PregMatchSwapCaret::class,
+        'PregMatchSwapDollar' => Mutator\Regex\PregMatchSwapDollar::class,
 
         //Return Value
         'FloatNegation' => Mutator\ReturnValue\FloatNegation::class,
