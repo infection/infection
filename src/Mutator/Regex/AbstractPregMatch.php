@@ -35,7 +35,7 @@ abstract class AbstractPregMatch extends Mutator
     }
 
     /**
-     * todo in fture also work with 'concat' type of attribute  or passed in variable
+     * todo in fture also work with 'concat' type of attribute  or passed in variable or const
      *
      * @param Node $node
      *
@@ -46,8 +46,7 @@ abstract class AbstractPregMatch extends Mutator
         return $node instanceof FuncCall &&
             $node->name instanceof Node\Name &&
             strtolower((string) $node->name) == 'preg_match'
-            && !($node->args[0]->value instanceof Node\Expr\BinaryOp\Concat)
-            && !($node->args[0]->value instanceof Node\Expr\Variable);
+            && $node->args[0]->value instanceof Node\Scalar\String_;
     }
 
     protected function pullOutPattern(Node\Arg $argument): string
