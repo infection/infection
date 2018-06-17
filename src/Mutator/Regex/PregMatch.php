@@ -19,7 +19,7 @@ use PhpParser\Node\Expr\FuncCall;
 abstract class PregMatch extends Mutator
 {
     /**
-     * Replaces "preg_match"
+     * Replaces regex in "preg_match"
      *
      * @param Node $node
      *
@@ -33,18 +33,25 @@ abstract class PregMatch extends Mutator
         return new FuncCall($node->name, $arguments, $node->getAttributes());
     }
 
+    /**
+     * todo in fture also work with 'concat' type of attribute  or passed in variable
+     * @param Node $node
+     *
+     * @return bool
+     */
     protected function mutatesNode(Node $node): bool
     {
         return $node instanceof FuncCall &&
             $node->name instanceof Node\Name &&
-            strtolower((string) $node->name) == 'preg_match';
+            strtolower((string) $node->name) == 'preg_match'
+            && !($node->args[0]->value instanceof Node\Expr\BinaryOp\Concat)
+            && !($node->args[0]->value instanceof Node\Expr\Variable);
     }
 
     protected function pullOutPattern(Node\Arg $argument) : string
     {
-        /** @var Node\Scalar\String_ $stringNode */
+        /** @var  Node\Scalar\String_ $stringNode */
         $stringNode = $argument->value;
-
         return $stringNode->value;
     }
 
