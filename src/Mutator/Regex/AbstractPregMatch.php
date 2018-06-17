@@ -30,11 +30,13 @@ abstract class AbstractPregMatch extends Mutator
         $arguments = $node->args;
         $pattern = $this->pullOutPattern($arguments[0]);
         $arguments[0] = $this->setNewPattern($this->manipulatePattern($pattern), $arguments[0]);
+
         return new FuncCall($node->name, $arguments, $node->getAttributes());
     }
 
     /**
      * todo in fture also work with 'concat' type of attribute  or passed in variable
+     *
      * @param Node $node
      *
      * @return bool
@@ -48,10 +50,11 @@ abstract class AbstractPregMatch extends Mutator
             && !($node->args[0]->value instanceof Node\Expr\Variable);
     }
 
-    protected function pullOutPattern(Node\Arg $argument) : string
+    protected function pullOutPattern(Node\Arg $argument): string
     {
-        /** @var  Node\Scalar\String_ $stringNode */
+        /** @var Node\Scalar\String_ $stringNode */
         $stringNode = $argument->value;
+
         return $stringNode->value;
     }
 
