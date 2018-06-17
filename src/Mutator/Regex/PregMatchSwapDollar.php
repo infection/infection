@@ -22,7 +22,6 @@ final class PregMatchSwapDollar extends AbstractPregMatch
         $wasEndingSign = !empty($matches[3]);
         $flags = $matches[4];
 
-        return $delimiter .$regexBody . ($wasEndingSign ? '' : '$') . $delimiter . $flags;
+        return $delimiter . $regexBody . ($wasEndingSign ? '' : '$') . $delimiter . $flags;
     }
-
 }

@@ -24,6 +24,4 @@ final class PregMatchSwapCaret extends AbstractPregMatch
 
         return $delimiter . ($wasStartingSign ? '' : '^') . $regexBody . $delimiter . $flags;
     }
-
-
 }
