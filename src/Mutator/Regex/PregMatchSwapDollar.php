@@ -17,10 +17,10 @@ final class PregMatchSwapDollar extends AbstractPregMatch
     protected function manipulatePattern(string $pattern): string
     {
         preg_match('/^([\/#~+])([^$]*)([$]?)\1([gmixXsuUAJD]*)$/', $pattern, $matches);
-        $delimiter = $matches[1];
-        $regexBody = $matches[2];
+        $delimiter = $matches[1] ?? '';
+        $regexBody = $matches[2] ?? '';
         $wasEndingSign = !empty($matches[3]);
-        $flags = $matches[4];
+        $flags = $matches[4] ?? '';
 
         return $delimiter . $regexBody . ($wasEndingSign ? '' : '$') . $delimiter . $flags;
     }

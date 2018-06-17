@@ -17,10 +17,10 @@ final class PregMatchSwapCaret extends AbstractPregMatch
     protected function manipulatePattern(string $pattern): string
     {
         preg_match('/^([\/#~+])([\^]?)([^\^]*)\1([gmixXsuUAJD]*)$/', $pattern, $matches);
-        $delimiter = $matches[1];
+        $delimiter = $matches[1] ?? '';
         $wasStartingSign = !empty($matches[2]);
-        $regexBody = $matches[3];
-        $flags = $matches[4];
+        $regexBody = $matches[3] ?? '';
+        $flags = $matches[4] ?? '';
 
         return $delimiter . ($wasStartingSign ? '' : '^') . $regexBody . $delimiter . $flags;
     }
