@@ -16,7 +16,7 @@ use PhpParser\Node\Expr\FuncCall;
 /**
  * @internal
  */
-abstract class PregMatch extends Mutator
+abstract class AbstractPregMatch extends Mutator
 {
     /**
      * Replaces regex in "preg_match"
