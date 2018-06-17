@@ -113,7 +113,7 @@ final class MutatorProfile
     const REGEX = [
         Mutator\Regex\PregQuote::class,
         Mutator\Regex\PregMatchSwapCaret::class,
-        Mutator\Regex\PregMatchSwapDollar::class
+        Mutator\Regex\PregMatchSwapDollar::class,
     ];
 
     const RETURN_VALUE = [
