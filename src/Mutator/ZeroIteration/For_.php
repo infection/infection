@@ -26,7 +26,7 @@ final class For_ extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Stmt\For_(
+        yield new Node\Stmt\For_(
             [
                 'init' => $node->init,
                 'cond' => [new Node\Expr\ConstFetch(new Node\Name('false'))],

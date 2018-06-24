@@ -26,7 +26,7 @@ final class ModEqual extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\AssignOp\Mul($node->var, $node->expr, $node->getAttributes());
+        yield new Node\Expr\AssignOp\Mul($node->var, $node->expr, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool

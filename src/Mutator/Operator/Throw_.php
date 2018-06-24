@@ -26,7 +26,7 @@ final class Throw_ extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Stmt\Expression($node->expr);
+        yield new Node\Stmt\Expression($node->expr);
     }
 
     protected function mutatesNode(Node $node): bool

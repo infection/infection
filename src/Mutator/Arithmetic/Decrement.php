@@ -31,11 +31,11 @@ final class Decrement extends Mutator
     public function mutate(Node $node)
     {
         if ($node instanceof PreDec) {
-            return new PreInc($node->var, $node->getAttributes());
+            yield new PreInc($node->var, $node->getAttributes());
         }
 
         if ($node instanceof PostDec) {
-            return new PostInc($node->var, $node->getAttributes());
+            yield new PostInc($node->var, $node->getAttributes());
         }
     }
 

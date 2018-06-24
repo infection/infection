@@ -26,7 +26,7 @@ final class This extends AbstractValueToNullReturnValue
      */
     public function mutate(Node $node)
     {
-        return new Node\Stmt\Return_(
+        yield new Node\Stmt\Return_(
             new Node\Expr\ConstFetch(new Node\Name('null'))
         );
     }

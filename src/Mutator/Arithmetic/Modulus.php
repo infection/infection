@@ -26,7 +26,7 @@ final class Modulus extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\BinaryOp\Mul($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\Mul($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool

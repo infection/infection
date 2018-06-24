@@ -27,7 +27,7 @@ final class Finally_ extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Stmt\Nop();
+        yield new Node\Stmt\Nop();
     }
 
     protected function mutatesNode(Node $node): bool

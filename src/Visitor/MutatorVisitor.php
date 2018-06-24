@@ -37,14 +37,14 @@ final class MutatorVisitor extends NodeVisitorAbstract
             return null;
         }
 
-        $mutator = $this->mutation->getMutator();
         $mutatedAttributes = $this->mutation->getAttributes();
 
         $isEqualPosition = $attributes['startTokenPos'] === $mutatedAttributes['startTokenPos'] &&
             $attributes['endTokenPos'] === $mutatedAttributes['endTokenPos'];
 
         if ($isEqualPosition && $this->mutation->getMutatedNodeClass() === \get_class($node)) {
-            return $mutator->mutate($node);
+            var_dump(get_class($this->mutation->getMutatedNode()));
+            return $this->mutation->getMutatedNode();
             // TODO STOP TRAVERSING
             // TODO check all built-in visitors, in particular FirstFindingVisitor
             // TODO beforeTraverse - FirstFindingVisitor

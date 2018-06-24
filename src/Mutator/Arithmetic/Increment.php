@@ -31,11 +31,11 @@ final class Increment extends Mutator
     public function mutate(Node $node)
     {
         if ($node instanceof PreInc) {
-            return new PreDec($node->var, $node->getAttributes());
+            yield new PreDec($node->var, $node->getAttributes());
         }
 
         if ($node instanceof PostInc) {
-            return new Node\Expr\PostDec($node->var, $node->getAttributes());
+            yield new Node\Expr\PostDec($node->var, $node->getAttributes());
         }
     }
 
