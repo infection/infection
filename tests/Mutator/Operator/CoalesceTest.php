@@ -70,15 +70,31 @@ PHP
 PHP
         ];
 
+        yield 'Mutate coalesce with expression as second param' => [
+            <<<PHP
+<?php
+
+'value' ?? 'value' . 'withConcat';
+PHP
+            ,
+            <<<PHP
+<?php
+
+'value' . 'withConcat';
+PHP
+        ];
+
         yield 'Mutate coalesce with variable as second argument' => [
             <<<'PHP'
 <?php
+
 $foo = 5;
-'value' . 'withConcat' ?? $foo;
+'value' ?? $foo;
 PHP
             ,
             <<<'PHP'
 <?php
+
 $foo = 5;
 $foo;
 PHP
