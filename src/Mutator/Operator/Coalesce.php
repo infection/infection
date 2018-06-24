@@ -26,7 +26,7 @@ final class Coalesce extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\BinaryOp\Coalesce(new Node\Expr\Cast\Unset_($node->left), $node->right);
+        return $node->right;
     }
 
     protected function mutatesNode(Node $node): bool

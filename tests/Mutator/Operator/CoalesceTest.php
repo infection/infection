@@ -36,7 +36,7 @@ PHP
             <<<PHP
 <?php
 
-(unset) 'value' ?? 'otherValue';
+'otherValue';
 PHP
         ];
 
@@ -52,7 +52,7 @@ PHP
 <?php
 
 $foo = 'value';
-(unset) $foo ?? 'otherValue';
+'otherValue';
 PHP
         ];
 
@@ -66,7 +66,21 @@ PHP
             <<<PHP
 <?php
 
-(unset) ('value' . 'withConcat') ?? 'otherValue';
+'otherValue';
+PHP
+        ];
+
+        yield 'Mutate coalesce with variable as second argument' => [
+            <<<'PHP'
+<?php
+$foo = 5;
+'value' . 'withConcat' ?? $foo;
+PHP
+            ,
+            <<<'PHP'
+<?php
+$foo = 5;
+$foo;
 PHP
         ];
     }
