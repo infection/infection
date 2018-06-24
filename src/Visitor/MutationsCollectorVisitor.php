@@ -98,15 +98,19 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                 continue;
             }
 
-            $this->mutations[] = new Mutation(
-                $this->filePath,
-                $this->fileAst,
-                $mutator,
-                $node->getAttributes(),
-                \get_class($node),
-                $isOnFunctionSignature,
-                $isCoveredByTest
-            );
+            foreach($mutator->mutate($node) as $mutationByMutatorIndex => $mutatedNode) {
+                $this->mutations[] = new Mutation(
+                    $this->filePath,
+                    $this->fileAst,
+                    $mutator,
+                    $node->getAttributes(),
+                    \get_class($node),
+                    $isOnFunctionSignature,
+                    $isCoveredByTest,
+                    $mutatedNode,
+                    $mutationByMutatorIndex
+                );
+            }
         }
     }
 

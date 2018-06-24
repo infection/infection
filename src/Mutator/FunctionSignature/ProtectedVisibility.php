@@ -30,7 +30,7 @@ final class ProtectedVisibility extends Mutator
     public function mutate(Node $node)
     {
         /* @var ClassMethod $node */
-        return new ClassMethod(
+        yield new ClassMethod(
             $node->name,
             [
                 'flags' => ($node->flags & ~Class_::MODIFIER_PROTECTED) | Class_::MODIFIER_PRIVATE,

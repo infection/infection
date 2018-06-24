@@ -30,7 +30,7 @@ final class OneZeroFloat extends Mutator
             return new Node\Scalar\DNumber(1.0);
         }
 
-        return new Node\Scalar\DNumber(0.0);
+        yield new Node\Scalar\DNumber(0.0);
     }
 
     protected function mutatesNode(Node $node): bool

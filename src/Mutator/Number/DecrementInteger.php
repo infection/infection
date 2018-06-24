@@ -29,7 +29,7 @@ final class DecrementInteger extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Scalar\LNumber($node->value - 1);
+        yield new Node\Scalar\LNumber($node->value - 1);
     }
 
     protected function mutatesNode(Node $node): bool

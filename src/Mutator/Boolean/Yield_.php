@@ -29,7 +29,7 @@ final class Yield_ extends Mutator
         $node->value = new Node\Expr\BinaryOp\Greater($node->key, $node->value, $node->getAttributes());
         $node->key = null;
 
-        return $node;
+        yield $node;
     }
 
     protected function mutatesNode(Node $node): bool

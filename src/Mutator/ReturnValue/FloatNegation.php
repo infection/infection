@@ -31,7 +31,7 @@ final class FloatNegation extends Mutator
             ? -$node->expr->expr->value
             : $node->expr->value;
 
-        return new Node\Stmt\Return_(
+        yield new Node\Stmt\Return_(
             new Node\Scalar\DNumber(-1 * $floatValue, $node->getAttributes())
         );
     }

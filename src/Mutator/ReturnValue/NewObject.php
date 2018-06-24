@@ -26,7 +26,7 @@ final class NewObject extends AbstractValueToNullReturnValue
      */
     public function mutate(Node $node)
     {
-        return [
+        yield [
             new Node\Stmt\Expression($node->expr),
             new Node\Stmt\Return_(
                 new Node\Expr\ConstFetch(new Node\Name('null'))

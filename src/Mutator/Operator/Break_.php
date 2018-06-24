@@ -27,7 +27,7 @@ final class Break_ extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Stmt\Continue_();
+        yield new Node\Stmt\Continue_();
     }
 
     protected function mutatesNode(Node $node): bool

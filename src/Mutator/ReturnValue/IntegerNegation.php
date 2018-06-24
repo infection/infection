@@ -31,7 +31,7 @@ final class IntegerNegation extends Mutator
             ? -$node->expr->expr->value
             : $node->expr->value;
 
-        return new Node\Stmt\Return_(
+        yield new Node\Stmt\Return_(
             new Node\Scalar\LNumber(-1 * $integerValue, $node->getAttributes())
         );
     }

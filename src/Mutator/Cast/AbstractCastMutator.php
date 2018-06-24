@@ -26,6 +26,6 @@ abstract class AbstractCastMutator extends Mutator
      */
     public function mutate(Node $node)
     {
-        return $node->expr;
+        yield $node->expr;
     }
 }

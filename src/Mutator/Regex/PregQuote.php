@@ -26,7 +26,7 @@ final class PregQuote extends Mutator
      */
     public function mutate(Node $node)
     {
-        return $node->args[0];
+        yield $node->args[0];
     }
 
     protected function mutatesNode(Node $node): bool

@@ -26,7 +26,7 @@ final class PowEqual extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\AssignOp\Div($node->var, $node->expr, $node->getAttributes());
+        yield new Node\Expr\AssignOp\Div($node->var, $node->expr, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool

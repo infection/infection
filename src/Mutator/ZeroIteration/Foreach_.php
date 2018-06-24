@@ -26,7 +26,7 @@ final class Foreach_ extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Stmt\Foreach_(
+        yield new Node\Stmt\Foreach_(
             new Node\Expr\Array_(),
             $node->valueVar,
             [

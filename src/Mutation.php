@@ -57,6 +57,16 @@ final class Mutation implements MutationInterface
      */
     private $hash;
 
+    /**
+     * @var Node
+     */
+    private $mutatedNode;
+
+    /**
+     * @var int
+     */
+    private $mutationByMutatorIndex;
+
     public function __construct(
         string $originalFilePath,
         array $originalFileAst,
@@ -64,7 +74,9 @@ final class Mutation implements MutationInterface
         array $attributes,
         string $mutatedNodeClass,
         bool $isOnFunctionSignature,
-        bool $isCoveredByTest
+        bool $isCoveredByTest,
+        Node $mutatedNode,
+        int $mutationByMutatorIndex
     ) {
         $this->originalFilePath = $originalFilePath;
         $this->originalFileAst = $originalFileAst;
@@ -73,6 +85,8 @@ final class Mutation implements MutationInterface
         $this->mutatedNodeClass = $mutatedNodeClass;
         $this->isOnFunctionSignature = $isOnFunctionSignature;
         $this->isCoveredByTest = $isCoveredByTest;
+        $this->mutatedNode = $mutatedNode;
+        $this->mutationByMutatorIndex = $mutationByMutatorIndex;
     }
 
     public function getMutator(): Mutator
@@ -110,7 +124,10 @@ final class Mutation implements MutationInterface
                 $attributes['endFilePos'],
             ];
 
-            $hashKeys = array_merge([$this->getOriginalFilePath(), $mutatorClass], $attributeValues);
+            $hashKeys = array_merge(
+                [$this->getOriginalFilePath(), $mutatorClass, $this->mutationByMutatorIndex],
+                $attributeValues
+            );
 
             $this->hash = md5(implode('_', $hashKeys));
         }
@@ -131,5 +148,10 @@ final class Mutation implements MutationInterface
     public function isCoveredByTest(): bool
     {
         return $this->isCoveredByTest;
+    }
+
+    public function getMutatedNode(): Node
+    {
+        return $this->mutatedNode;
     }
 }

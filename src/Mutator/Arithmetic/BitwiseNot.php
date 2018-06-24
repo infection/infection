@@ -26,7 +26,7 @@ final class BitwiseNot extends Mutator
      */
     public function mutate(Node $node)
     {
-        return $node->expr;
+        yield $node->expr;
     }
 
     protected function mutatesNode(Node $node): bool

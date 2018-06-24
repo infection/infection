@@ -26,7 +26,7 @@ final class FalseValue extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\ConstFetch(new Node\Name('true'));
+        yield new Node\Expr\ConstFetch(new Node\Name('true'));
     }
 
     protected function mutatesNode(Node $node): bool
