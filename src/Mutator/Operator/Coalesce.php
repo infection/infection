@@ -18,7 +18,7 @@ use PhpParser\Node;
 final class Coalesce extends Mutator
 {
     /**
-     * Replaces "'someValue' ?? 'otherValue';" with "(unset) 'someValue' ?? 'otherValue'"
+     * Replaces "'someValue' ?? 'otherValue';" with "'otherValue'"
      *
      * @param Node $node
      *
