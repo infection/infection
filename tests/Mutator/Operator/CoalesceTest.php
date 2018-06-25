@@ -99,5 +99,21 @@ $foo = 5;
 $foo;
 PHP
         ];
+
+        yield 'Mutate coalesce with variable as second argument' => [
+            <<<'PHP'
+<?php
+
+if ('value' ?? 5) {
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+if (5) {
+}
+PHP
+        ];
     }
 }
