@@ -108,6 +108,7 @@ final class MutatorProfile
         Mutator\Operator\Break_::class,
         Mutator\Operator\Continue_::class,
         Mutator\Operator\Throw_::class,
+        Mutator\Operator\Coalesce::class,
     ];
 
     const REGEX = [
@@ -224,6 +225,7 @@ final class MutatorProfile
         'Continue_' => Mutator\Operator\Continue_::class,
         'Throw_' => Mutator\Operator\Throw_::class,
         'Finally_' => Mutator\Operator\Finally_::class,
+        'Coalesce' => Mutator\Operator\Coalesce::class,
 
         //Regex
         'PregQuote' => Mutator\Regex\PregQuote::class,
