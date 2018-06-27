@@ -1,4 +1,4 @@
-Total: 9
+Total: 8
 Killed mutants:
 ===============
 
@@ -31,9 +31,6 @@ Errors mutants:
 Escaped mutants:
 ================
 
-
-Mutator: NotIdenticalNotEqual
-Line 14
 
 Timed Out mutants:
 ==================
