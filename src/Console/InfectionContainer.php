@@ -20,7 +20,6 @@ use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutator\Util\MutatorsGenerator;
 use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Memory\MemoryUsageProvider;
 use Infection\Performance\Time\TimeFormatter;
 use Infection\Performance\Time\Timer;
 use Infection\Process\Builder\SubscriberBuilder;
@@ -192,10 +191,6 @@ final class InfectionContainer extends Container
 
         $this['time.formatter'] = function (): TimeFormatter {
             return new TimeFormatter();
-        };
-
-        $this['memory.usage.provider'] = function (): MemoryUsageProvider {
-            return new MemoryUsageProvider();
         };
 
         $this['memory.formatter'] = function (): MemoryFormatter {

@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Infection\Performance\Time;
 
+use Webmozart\Assert\Assert;
+
 /**
  * @internal
  */
@@ -21,18 +23,14 @@ final class Timer
 
     public function start()
     {
-        if (null !== $this->microTime) {
-            throw TimerIsAlreadyStartedException::create();
-        }
+        Assert::null($this->microTime, 'Timer can not be started again without stopping.');
 
         $this->microTime = microtime(true);
     }
 
     public function stop(): float
     {
-        if (null === $this->microTime) {
-            throw TimerNotStartedException::create();
-        }
+        Assert::notNull($this->microTime, 'Timer must be started before stopping.');
 
         $microTime = $this->microTime;
         $this->microTime = null;

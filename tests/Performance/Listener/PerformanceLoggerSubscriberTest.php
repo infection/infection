@@ -14,7 +14,6 @@ use Infection\Events\ApplicationExecutionFinished;
 use Infection\Events\ApplicationExecutionStarted;
 use Infection\Performance\Listener\PerformanceLoggerSubscriber;
 use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Memory\MemoryUsageProvider;
 use Infection\Performance\Time\TimeFormatter;
 use Infection\Performance\Time\Timer;
 use PHPUnit\Framework\TestCase;
@@ -47,7 +46,6 @@ final class PerformanceLoggerSubscriberTest extends TestCase
         $dispatcher->addSubscriber(new PerformanceLoggerSubscriber(
             new Timer(),
             new TimeFormatter(),
-            new MemoryUsageProvider(),
             new MemoryFormatter(),
             $this->output
         ));

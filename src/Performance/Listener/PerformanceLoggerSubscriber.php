@@ -13,7 +13,6 @@ use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\ApplicationExecutionFinished;
 use Infection\Events\ApplicationExecutionStarted;
 use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Memory\MemoryUsageProvider;
 use Infection\Performance\Time\TimeFormatter;
 use Infection\Performance\Time\Timer;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -34,11 +33,6 @@ final class PerformanceLoggerSubscriber implements EventSubscriberInterface
     private $output;
 
     /**
-     * @var MemoryUsageProvider
-     */
-    private $memoryUsageProvider;
-
-    /**
      * @var TimeFormatter
      */
     private $timeFormatter;
@@ -51,14 +45,12 @@ final class PerformanceLoggerSubscriber implements EventSubscriberInterface
     public function __construct(
         Timer $timer,
         TimeFormatter $timeFormatter,
-        MemoryUsageProvider $memoryUsageProvider,
         MemoryFormatter $memoryFormatter,
         OutputInterface $output
     ) {
         $this->timer = $timer;
         $this->timeFormatter = $timeFormatter;
         $this->output = $output;
-        $this->memoryUsageProvider = $memoryUsageProvider;
         $this->memoryFormatter = $memoryFormatter;
     }
 
@@ -84,7 +76,7 @@ final class PerformanceLoggerSubscriber implements EventSubscriberInterface
             sprintf(
                 'Time: %s. Memory: %s',
                 $this->timeFormatter->toHumanReadableString($time),
-                $this->memoryFormatter->toHumanReadableString($this->memoryUsageProvider->getPeakUsage())
+                $this->memoryFormatter->toHumanReadableString(memory_get_peak_usage(true))
             ),
         ]);
     }
