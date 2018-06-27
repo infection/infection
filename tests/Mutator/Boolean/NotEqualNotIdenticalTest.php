@@ -26,7 +26,7 @@ final class NotEqualNotIdenticalTest extends AbstractMutatorTestCase
 
     public function provideMutationCases(): \Generator
     {
-        yield 'It mutates not identical operator into not equal operator' => [
+        yield 'It mutates not equal operator into not identical operator' => [
             <<<'PHP'
 <?php
 

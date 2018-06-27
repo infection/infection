@@ -18,7 +18,7 @@ use PhpParser\Node;
 final class EqualIdentical extends Mutator
 {
     /**
-     * Replaces "===" with "=="
+     * Replaces "==" with "==="
      *
      * @param Node $node
      *

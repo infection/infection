@@ -18,7 +18,7 @@ use PhpParser\Node;
 final class NotEqualNotIdentical extends Mutator
 {
     /**
-     * Replaces "!==" with "!="
+     * Replaces "!=" with "!=="
      *
      * @param Node $node
      *

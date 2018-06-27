@@ -26,7 +26,7 @@ final class EqualIdenticalTest extends AbstractMutatorTestCase
 
     public function provideMutationCases(): \Generator
     {
-        yield 'It mutates identical operator into equal operator' => [
+        yield 'It mutates equal operator into identical operator' => [
             <<<'PHP'
 <?php
 
