@@ -25,9 +25,9 @@ final class DecrementInteger extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Scalar\LNumber
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         yield new Node\Scalar\LNumber($node->value - 1);
     }

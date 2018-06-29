@@ -22,12 +22,14 @@ final class OneZeroInteger extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Scalar\LNumber
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         if ($node->value === 0) {
             yield new Node\Scalar\LNumber(1);
+
+            return;
         }
 
         yield new Node\Scalar\LNumber(0);

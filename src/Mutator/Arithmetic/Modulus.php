@@ -22,9 +22,9 @@ final class Modulus extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Expr\BinaryOp\Mul
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         yield new Node\Expr\BinaryOp\Mul($node->left, $node->right, $node->getAttributes());
     }

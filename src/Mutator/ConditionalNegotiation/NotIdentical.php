@@ -22,9 +22,9 @@ final class NotIdentical extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Expr\BinaryOp\Identical
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         yield new Node\Expr\BinaryOp\Identical($node->left, $node->right, $node->getAttributes());
     }

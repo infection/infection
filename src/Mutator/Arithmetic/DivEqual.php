@@ -22,9 +22,9 @@ final class DivEqual extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Expr\AssignOp\Mul
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         yield new Node\Expr\AssignOp\Mul($node->var, $node->expr, $node->getAttributes());
     }

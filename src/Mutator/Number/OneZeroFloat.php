@@ -22,12 +22,14 @@ final class OneZeroFloat extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Scalar\DNumber
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         if ($node->value === 0.0) {
-            return new Node\Scalar\DNumber(1.0);
+            yield new Node\Scalar\DNumber(1.0);
+
+            return;
         }
 
         yield new Node\Scalar\DNumber(0.0);

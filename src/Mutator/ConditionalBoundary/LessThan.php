@@ -22,9 +22,9 @@ final class LessThan extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Expr\BinaryOp\SmallerOrEqual
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         yield new Node\Expr\BinaryOp\SmallerOrEqual($node->left, $node->right, $node->getAttributes());
     }

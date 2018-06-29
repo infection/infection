@@ -22,9 +22,9 @@ final class PowEqual extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Expr\AssignOp\Div
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         yield new Node\Expr\AssignOp\Div($node->var, $node->expr, $node->getAttributes());
     }

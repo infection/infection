@@ -22,9 +22,9 @@ final class Throw_ extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Stmt\Expression
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         yield new Node\Stmt\Expression($node->expr);
     }

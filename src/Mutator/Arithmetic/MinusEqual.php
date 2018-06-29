@@ -22,9 +22,9 @@ final class MinusEqual extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Expr\AssignOp\Plus
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         yield new Node\Expr\AssignOp\Plus($node->var, $node->expr, $node->getAttributes());
     }

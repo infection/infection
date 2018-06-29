@@ -22,9 +22,9 @@ final class ArrayItem extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Expr\BinaryOp\Greater
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         yield new Node\Expr\BinaryOp\Greater($node->key, $node->value, $node->getAttributes());
     }

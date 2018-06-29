@@ -22,11 +22,11 @@ final class IncrementInteger extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Scalar\LNumber
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
-        return new Node\Scalar\LNumber($node->value + 1);
+        yield new Node\Scalar\LNumber($node->value + 1);
     }
 
     protected function mutatesNode(Node $node): bool

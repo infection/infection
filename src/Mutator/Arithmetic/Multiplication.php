@@ -22,9 +22,9 @@ final class Multiplication extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Expr\BinaryOp\Div
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         yield new Node\Expr\BinaryOp\Div($node->left, $node->right, $node->getAttributes());
     }

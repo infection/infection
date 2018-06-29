@@ -23,9 +23,9 @@ final class IntegerNegation extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Stmt\Return_
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         $integerValue = $node->expr instanceof Node\Expr\UnaryMinus
             ? -$node->expr->expr->value

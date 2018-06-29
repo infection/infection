@@ -23,9 +23,9 @@ final class Finally_ extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Stmt\Nop
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         yield new Node\Stmt\Nop();
     }
