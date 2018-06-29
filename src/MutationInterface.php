@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Infection;
 
 use Infection\Mutator\Util\Mutator;
-use PhpParser\Node;
 
 /**
  * @internal
@@ -35,5 +34,5 @@ interface MutationInterface
 
     public function isCoveredByTest(): bool;
 
-    public function getMutatedNode(): Node;
+    public function getMutatedNode();
 }

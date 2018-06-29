@@ -25,9 +25,9 @@ final class ProtectedVisibility extends Mutator
      *
      * @param Node $node
      *
-     * @return ClassMethod
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         /* @var ClassMethod $node */
         yield new ClassMethod(

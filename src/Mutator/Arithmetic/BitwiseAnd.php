@@ -22,9 +22,9 @@ final class BitwiseAnd extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Expr\BinaryOp\BitwiseOr
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         yield new Node\Expr\BinaryOp\BitwiseOr($node->left, $node->right, $node->getAttributes());
     }

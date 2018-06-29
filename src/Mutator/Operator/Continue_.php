@@ -23,9 +23,9 @@ final class Continue_ extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Stmt\Break_
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         yield new Node\Stmt\Break_();
     }

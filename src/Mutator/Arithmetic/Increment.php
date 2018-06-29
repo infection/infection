@@ -11,7 +11,6 @@ namespace Infection\Mutator\Arithmetic;
 
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
-use PhpParser\Node\Expr\PostDec;
 use PhpParser\Node\Expr\PostInc;
 use PhpParser\Node\Expr\PreDec;
 use PhpParser\Node\Expr\PreInc;
@@ -26,9 +25,9 @@ final class Increment extends Mutator
      *
      * @param Node $node
      *
-     * @return PostDec|PreDec
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         if ($node instanceof PreInc) {
             yield new PreDec($node->var, $node->getAttributes());

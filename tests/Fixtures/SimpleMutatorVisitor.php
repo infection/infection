@@ -16,19 +16,21 @@ use PhpParser\NodeVisitorAbstract;
 class SimpleMutatorVisitor extends NodeVisitorAbstract
 {
     /**
-     * @var Mutator
+     * @var SimpleMutation
      */
-    private $mutator;
+    private $mutation;
 
-    public function __construct(Mutator $mutator)
+    public function __construct(SimpleMutation $mutation)
     {
-        $this->mutator = $mutator;
+        $this->mutation = $mutation;
     }
 
     public function leaveNode(Node $node)
     {
-        if ($this->mutator->shouldMutate($node)) {
-            return $this->mutator->mutate($node);
+        $mutator = $this->mutation->getMutator();
+
+        if ($mutator->shouldMutate($node)) {
+            return $this->mutation->getMutatedNode();
         }
     }
 }

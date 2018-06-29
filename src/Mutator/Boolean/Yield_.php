@@ -22,9 +22,9 @@ final class Yield_ extends Mutator
      *
      * @param Node $node
      *
-     * @return Node|Node\Expr\Yield_
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         $node->value = new Node\Expr\BinaryOp\Greater($node->key, $node->value, $node->getAttributes());
         $node->key = null;

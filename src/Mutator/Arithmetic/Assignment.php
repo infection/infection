@@ -22,9 +22,9 @@ final class Assignment extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Expr\Assign
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         yield new Node\Expr\Assign($node->var, $node->expr, $node->getAttributes());
     }

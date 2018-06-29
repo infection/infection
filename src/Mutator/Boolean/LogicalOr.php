@@ -22,9 +22,9 @@ final class LogicalOr extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Expr\BinaryOp\BooleanAnd
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         yield new Node\Expr\BinaryOp\BooleanAnd($node->left, $node->right, $node->getAttributes());
     }

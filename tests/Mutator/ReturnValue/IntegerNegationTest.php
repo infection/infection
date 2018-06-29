@@ -29,34 +29,58 @@ final class IntegerNegationTest extends AbstractMutatorTestCase
     public function provideMutationCases(): array
     {
         return [
-            'It mutates negative int return to positive' => [
+            'It mutates negative -1 int return to positive' => [
                 <<<'PHP'
 <?php
 
-return -1;
 return -2;
 PHP
                 ,
                 <<<'PHP'
 <?php
 
-return 1;
 return 2;
 PHP
                 ,
             ],
-            'It mutates positive int return to negative' => [
+            'It mutates negative -2 int return to positive' => [
+                <<<'PHP'
+<?php
+
+return -2;
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+return 2;
+PHP
+                ,
+            ],
+            'It mutates positive 1 int return to negative' => [
                 <<<'PHP'
 <?php
 
 return 1;
-return 2;
 PHP
                 ,
                 <<<'PHP'
 <?php
 
 return -1;
+PHP
+                ,
+            ],
+            'It mutates positive 2 int return to negative' => [
+                <<<'PHP'
+<?php
+
+return 2;
+PHP
+                ,
+                <<<'PHP'
+<?php
+
 return -2;
 PHP
                 ,

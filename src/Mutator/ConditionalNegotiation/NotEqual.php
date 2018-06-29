@@ -22,9 +22,9 @@ final class NotEqual extends Mutator
      *
      * @param Node $node
      *
-     * @return Node\Expr\BinaryOp\Equal
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
         yield new Node\Expr\BinaryOp\Equal($node->left, $node->right, $node->getAttributes());
     }
