@@ -14,16 +14,9 @@ use Infection\Mutator\Util\Mutator;
 /**
  * @internal
  */
-final class MutatorException extends \Exception
+final class InvalidMutatorException extends \Exception
 {
-    /**
-     * @param string $filePath
-     * @param Mutator $mutator
-     * @param \Throwable $previous
-     *
-     * @return MutatorException
-     */
-    public static function internalErrorWhileTraversing(string $filePath, Mutator $mutator, \Throwable $previous): self
+    public static function create(string $filePath, Mutator $mutator, \Throwable $previous): self
     {
         return new self(
             sprintf(

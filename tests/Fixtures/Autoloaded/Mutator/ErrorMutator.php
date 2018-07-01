@@ -15,9 +15,7 @@ class ErrorMutator extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        /*
-         * This is intended to cause an error.
-         */
+        //This is intended to cause an error.
         $name = (string) $node;
 
         return $name == 'foo';

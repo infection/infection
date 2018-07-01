@@ -11,7 +11,7 @@ namespace Infection\Tests\Mutant\Generator;
 
 use Infection\Config\Exception\InvalidConfigException;
 use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Exception\MutatorException;
+use Infection\Exception\InvalidMutatorException;
 use Infection\Mutant\Exception\ParserException;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutator\Arithmetic\Decrement;
@@ -162,7 +162,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
             [ErrorMutator::class]
         );
 
-        $this->expectException(MutatorException::class);
+        $this->expectException(InvalidMutatorException::class);
         $this->expectExceptionMessageRegExp(
             '#Encountered an error with the "ErrorMutator" mutator in the ".+OneFile.php"' .
             ' file. This is most likely a bug in infection, so please report this in our issue tracker.#'

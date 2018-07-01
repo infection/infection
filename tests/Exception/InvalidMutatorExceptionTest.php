@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Exception;
 
-use Infection\Exception\MutatorException;
+use Infection\Exception\InvalidMutatorException;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Util\MutatorConfig;
 use PHPUnit\Framework\TestCase;
@@ -17,14 +17,14 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  */
-final class MutatorExceptionTest extends TestCase
+final class InvalidMutatorExceptionTest extends TestCase
 {
     public function test_it_has_correct_user_facing_message()
     {
         $mutator = new Plus(new MutatorConfig([]));
         $original = new \Exception();
 
-        $exception = MutatorException::internalErrorWhileTraversing('foo/bar/baz', $mutator, $original);
+        $exception = InvalidMutatorException::create('foo/bar/baz', $mutator, $original);
 
         $this->assertSame(
             'Encountered an error with the "Plus" mutator in the "foo/bar/baz" file. ' .
