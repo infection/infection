@@ -77,6 +77,7 @@ final class SourceFilesFinderTest extends TestCase
         $this->assertSame(2, $files->count());
 
         $expectedFilenames = ['FirstFile.php', 'SecondFile.php'];
+
         foreach ([$firstFile, $secondFile] as $file) {
             $this->assertTrue(\in_array($file->getFilename(), $expectedFilenames, true));
         }
@@ -99,6 +100,7 @@ final class SourceFilesFinderTest extends TestCase
         $this->assertSame(2, $files->count());
 
         $expectedFilenames = ['FirstFile.php', 'SecondFile.php'];
+
         foreach ([$firstFile, $secondFile] as $file) {
             $this->assertTrue(\in_array($file->getFilename(), $expectedFilenames, true));
         }
@@ -123,6 +125,7 @@ final class SourceFilesFinderTest extends TestCase
 
         $this->assertInstanceOf(Finder::class, $files);
         $this->assertSame(1, $files->count());
+
         foreach ($files as $file) {
             $this->assertSame('File.php', $file->getFilename());
         }

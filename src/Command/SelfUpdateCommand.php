@@ -150,6 +150,7 @@ final class SelfUpdateCommand extends Command
     protected function update(Updater $updater)
     {
         $this->output->writeln('Updating...' . PHP_EOL);
+
         try {
             $result = $updater->update();
 
@@ -184,6 +185,7 @@ final class SelfUpdateCommand extends Command
     protected function rollback()
     {
         $updater = new Updater();
+
         try {
             if ($updater->rollback()) {
                 $this->output->writeln('<fg=green>Infection has been rolled back to prior version.</fg=green>');

@@ -99,6 +99,7 @@ JSON
             ,
             '.',
         ];
+
         yield [
             <<<'JSON'
 {

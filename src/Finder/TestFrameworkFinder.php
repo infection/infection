@@ -75,10 +75,12 @@ class TestFrameworkFinder extends AbstractExecutableFinder
             $vendorPath = trim($process->getOutput());
         } catch (\RuntimeException $e) {
             $candidate = getcwd() . '/vendor/bin';
+
             if (file_exists($candidate)) {
                 $vendorPath = $candidate;
             }
         }
+
         if (null !== $vendorPath) {
             $pathName = getenv('PATH') ? 'PATH' : 'Path';
             putenv($pathName . '=' . $vendorPath . PATH_SEPARATOR . getenv($pathName));

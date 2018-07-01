@@ -127,6 +127,7 @@ final class ParallelProcessRunnerTest extends MockeryTestCase
     private function runWithAllKindsOfProcesses($threadCount)
     {
         $processes = [];
+
         for ($i = 0; $i < 4; ++$i) {
             $processes[] = $this->buildUncoveredMutantProcess();
             $processes[] = $this->buildCoveredMutantProcess();

@@ -174,6 +174,7 @@ abstract class AbstractTestFrameworkAdapter
         if ($this->cachedPhpPath === null || $this->cachedIncludedArgs !== $includeArgs) {
             $this->cachedIncludedArgs = $includeArgs;
             $phpPath = (new PhpExecutableFinder())->find($includeArgs);
+
             if ($phpPath === false) {
                 throw FinderException::phpExecutableNotFound();
             }

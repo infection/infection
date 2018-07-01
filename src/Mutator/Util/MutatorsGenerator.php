@@ -50,11 +50,13 @@ final class MutatorsGenerator
         foreach ($this->mutatorSettings as $mutatorOrProfile => $setting) {
             if (array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
                 $this->registerFromProfile($mutatorOrProfile, $setting);
+
                 continue;
             }
 
             if (class_exists($mutatorOrProfile)) {
                 $this->registerFromClass($mutatorOrProfile, $setting);
+
                 continue;
             }
 
@@ -77,11 +79,13 @@ final class MutatorsGenerator
         foreach ($mutators as $mutatorOrProfile) {
             if (array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
                 $this->registerFromProfile($mutatorOrProfile, $setting);
+
                 continue;
             }
 
             if (class_exists($mutatorOrProfile)) {
                 $this->registerFromClass($mutatorOrProfile, $setting);
+
                 continue;
             }
 

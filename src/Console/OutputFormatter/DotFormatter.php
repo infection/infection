@@ -52,18 +52,23 @@ final class DotFormatter extends AbstractOutputFormatter
         switch ($mutantProcess->getResultCode()) {
             case MutantProcess::CODE_KILLED:
                 $this->output->write('<killed>.</killed>');
+
                 break;
             case MutantProcess::CODE_NOT_COVERED:
                 $this->output->write('<uncovered>S</uncovered>');
+
                 break;
             case MutantProcess::CODE_ESCAPED:
                 $this->output->write('<escaped>M</escaped>');
+
                 break;
             case MutantProcess::CODE_TIMED_OUT:
                 $this->output->write('<timeout>T</timeout>');
+
                 break;
             case MutantProcess::CODE_ERROR:
                 $this->output->write('<with-error>E</with-error>');
+
                 break;
         }
 

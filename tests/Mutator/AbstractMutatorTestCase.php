@@ -35,11 +35,13 @@ abstract class AbstractMutatorTestCase extends TestCase
     public function doTest(string $inputCode, string $expectedCode = null)
     {
         $inputCode = rtrim($inputCode, "\n");
+
         if ($inputCode === $expectedCode) {
             throw new \LogicException('Input code cant be the same as mutated code');
         }
 
         $realMutatedCode = $this->mutate($inputCode);
+
         if ($expectedCode !== null) {
             $expectedCode = rtrim($expectedCode, "\n");
             $this->assertSame($expectedCode, $realMutatedCode);

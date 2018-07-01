@@ -171,6 +171,7 @@ final class InfectionCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $container = $this->getContainer();
+
         if (!$container->get('coverage.checker')->hasDebuggerOrCoverageOption()) {
             $this->consoleOutput->logMissedDebuggerOrCoverageOption();
 
@@ -255,6 +256,7 @@ final class InfectionCommand extends BaseCommand
     private function includeUserBootstrap(InfectionConfig $config)
     {
         $bootstrap = $config->getBootstrap();
+
         if ($bootstrap) {
             if (!file_exists($bootstrap)) {
                 throw LocatorException::fileOrDirectoryDoesNotExist($bootstrap);

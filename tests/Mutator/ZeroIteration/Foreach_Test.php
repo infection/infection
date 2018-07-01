@@ -44,6 +44,7 @@ foreach (array() as $value) {
 PHP
             ,
         ];
+
         yield 'It does not change whether items were passed by reference' => [
             <<<'PHP'
 <?php

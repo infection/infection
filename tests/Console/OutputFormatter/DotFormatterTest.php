@@ -90,6 +90,7 @@ final class DotFormatterTest extends TestCase
     private function getMutantsOfType(int $mutantCode, int $count = 1): array
     {
         $mutants = [];
+
         for ($i = 0; $i < $count; ++$i) {
             $mutant = $this->createMock(MutantProcessInterface::class);
             $mutant->expects($this->once())->method('getResultCode')->willReturn($mutantCode);
