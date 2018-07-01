@@ -2,36 +2,6 @@ language: php
 
 sudo: false
 
-matrix:
-  include:
-    - php: 7.0
-    - php: 7.0
-      env: NO_DEBUGGER=1
-    - php: 7.0
-      env: PHPDBG=1
-    - php: 7.1
-      env: EXECUTE_DEPLOYMENT=1
-    - php: 7.1
-      env: NO_DEBUGGER=1
-    - php: 7.1
-      env: PHPDBG=1
-    - php: 7.1
-      env: SYMFONY_VERSION="^4.0"
-    - php: 7.1
-      env: SYMFONY_VERSION="^4.0" PHPDBG=1
-    - php: 7.2
-    - php: 7.2
-      env: NO_DEBUGGER=1
-    - php: 7.2
-      env: PHPDBG=1
-    - php: 7.2
-      env: SYMFONY_VERSION="^4.0"
-    - php: 7.2
-      env: SYMFONY_VERSION="^4.0" PHPDBG=1
-    - php: nightly
-  allow_failures:
-    - php: nightly
-
 env:
   global:
     - INFECTION_FLAGS='--threads=4 --min-msi=68 --min-covered-msi=77 --coverage=coverage --log-verbosity=none'
@@ -49,60 +19,147 @@ addons:
     - expect
 
 before_install:
+  - source .ci/xdebug.sh
+  - xdebug-disable
   - |
     if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
       cp box.json.dist box.json
       openssl aes-256-cbc -K $encrypted_4dbefe709cef_key -iv $encrypted_4dbefe709cef_iv -in .ci/secrets.tar.enc -out .ci/secrets.tar -d
       tar xvf .ci/secrets.tar -C .ci
-    fi;
-  - composer selfupdate
-  - source .ci/xdebug.sh
-  - xdebug-disable
-
-install:
-  - composer install
-  - |
-   if [ "${SYMFONY_VERSION}" != "" ]; then
-      composer config --unset platform
-      composer require \
-        symfony/console:${SYMFONY_VERSION} \
-        symfony/filesystem:${SYMFONY_VERSION} \
-        symfony/process:${SYMFONY_VERSION} \
-        symfony/finder:${SYMFONY_VERSION} \
-        symfony/yaml:${SYMFONY_VERSION}
-   fi
-
-script:
-  - make analyze --keep-going
-  - if [[ $PHPDBG != 1 ]]; then xdebug-enable; fi
-  - if [[ $PHPDBG != 1 ]]; then $PHPUNIT_BIN; else phpdbg -qrr $PHPUNIT_BIN; fi
-  - |
-    if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" || "${SYMFONY_VERSION}" != "" ]]; then
-      ./tests/e2e_tests bin/infection;
-    else
-      make build/bin/infection.phar;
-      ./tests/e2e_tests build/bin/infection.phar;
-    fi
-  - if [[ $NO_DEBUGGER == 1 ]]; then xdebug-disable; fi
-  - |
-    if [[ $PHPDBG != 1 ]]; then
-      bin/infection $INFECTION_FLAGS;
-    else
-      phpdbg -qrr bin/infection $INFECTION_FLAGS;
     fi
 
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+jobs:
+  include:
+    - stage: Static Code Analysis
+      php: 7.2
+      install:
+        - composer install
+      script:
+        - make analyze --keep-going
 
-deploy:
-    provider: releases
-    api_key:
-        secure: JtdvJBE2ARf6VWN5KlXAburz3FZMriiXBHEdeIocHePBAzgYW7tVMksJR5N3azrE3KjhftMEukXtA1k5VfAGdLCSm6nKGsZwolkd24ryG7PYNuAdFWfbau8QQXn6aLFesF2lkTq89+PqxAdVjwXNgFA7ble3vL66Ogabff6gov6QwT9vDrTqwLmWNGwbt9QB32IE9yVPjW/3lk4MAkMHtKDr2DElyeT2CRRuPuUCA+zNwoGG95wqLAD/RwjsqR3GjotzDKrldqog9jU2OQptUc3BgdKlYR1AzdknxJYnT7a5CRVdmSOEfD9IrDqlYEzn9pHav+Sk4KD2KNKsALQGk/w16BqncN2uyOexUTzXvnDd27G4ZYy+1OsXMdYMhF5ffwj7EqNLm8XfLPtHHV0/FUJY9kkrbf9+wQVjDQmMJLLIiBSt3vuY0ya5SVW8thtjlF2j67smamNe4hDhditBipto+9Y5vI4AYhcm4CQlqP8BVbw3/LgGAl/dJR5ohM7PFZH3EUE1AojBaEXfUymlICdFVZFJbB0D/AM8jSqNmWBQu9QX3MURhT5xLSwc+kir2izQaEo/GQz79AifqkUJgSCzpRUJntCN8A7yk1uxDZDONbINF3ReuF+nqu7GMksgKZLCGbOIaBl9of24K5BeTqxgcEykiHFFY7X9QdI3Dyo=
-    file:
-        - build/bin/infection.phar
-        - build/bin/infection.phar.pubkey
-    skip_cleanup: true
-    on:
-        tags: true
-        repo: infection/infection
-        condition: "$EXECUTE_DEPLOYMENT"
+    - &STANDARD_TEST_JOB
+      stage: Test
+      php: 7.0
+      install:
+        - composer install
+        - |
+          if [ "${SYMFONY_VERSION}" != "" ]; then
+            composer config --unset platform
+            composer require \
+            symfony/console:${SYMFONY_VERSION} \
+            symfony/filesystem:${SYMFONY_VERSION} \
+            symfony/process:${SYMFONY_VERSION} \
+            symfony/finder:${SYMFONY_VERSION} \
+            symfony/yaml:${SYMFONY_VERSION}
+          fi
+      script:
+        - if [[ $PHPDBG != 1 ]]; then xdebug-enable; fi
+        - if [[ $PHPDBG != 1 ]]; then $PHPUNIT_BIN; else phpdbg -qrr $PHPUNIT_BIN; fi
+        - |
+          if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" || "${SYMFONY_VERSION}" != "" ]]; then
+            ./tests/e2e_tests bin/infection;
+          else
+            make build/bin/infection.phar;
+            ./tests/e2e_tests build/bin/infection.phar;
+          fi
+        - if [[ $NO_DEBUGGER == 1 ]]; then xdebug-disable; fi
+        - |
+          if [[ $PHPDBG != 1 ]]; then
+            bin/infection $INFECTION_FLAGS;
+          else
+            phpdbg -qrr bin/infection $INFECTION_FLAGS;
+          fi
+
+      after_success:
+        - bash <(curl -s https://codecov.io/bash)
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.0
+      env: NO_DEBUGGER=1
+
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.0
+      env: PHPDBG=1
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.1
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.1
+      env: NO_DEBUGGER=1
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.1
+      env: PHPDBG=1
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.1
+      env: SYMFONY_VERSION="^4.0"
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.1
+      env: SYMFONY_VERSION="^4.0" PHPDBG=1
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.2
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.2
+      env: NO_DEBUGGER=1
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.2
+      env: PHPDBG=1
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.1
+      env: SYMFONY_VERSION="^4.0"
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.2
+      env: SYMFONY_VERSION="^4.0" PHPDBG=1
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: nightly
+      env: PHPDBG=1
+
+      script:
+        # We don't have xdebug on the nightly build, so we always run with phpdbg.
+        - make build/bin/infection.phar;
+        - ./tests/e2e_tests build/bin/infection.phar;
+        - phpdbg -qrr $PHPUNIT_BIN
+        - phpdbg -qrr bin/infection $INFECTION_FLAGS
+
+    - stage: Deploy
+      php: 7.2
+      install:
+        - composer install
+      deploy:
+        provider: releases
+        api_key:
+          secure: JtdvJBE2ARf6VWN5KlXAburz3FZMriiXBHEdeIocHePBAzgYW7tVMksJR5N3azrE3KjhftMEukXtA1k5VfAGdLCSm6nKGsZwolkd24ryG7PYNuAdFWfbau8QQXn6aLFesF2lkTq89+PqxAdVjwXNgFA7ble3vL66Ogabff6gov6QwT9vDrTqwLmWNGwbt9QB32IE9yVPjW/3lk4MAkMHtKDr2DElyeT2CRRuPuUCA+zNwoGG95wqLAD/RwjsqR3GjotzDKrldqog9jU2OQptUc3BgdKlYR1AzdknxJYnT7a5CRVdmSOEfD9IrDqlYEzn9pHav+Sk4KD2KNKsALQGk/w16BqncN2uyOexUTzXvnDd27G4ZYy+1OsXMdYMhF5ffwj7EqNLm8XfLPtHHV0/FUJY9kkrbf9+wQVjDQmMJLLIiBSt3vuY0ya5SVW8thtjlF2j67smamNe4hDhditBipto+9Y5vI4AYhcm4CQlqP8BVbw3/LgGAl/dJR5ohM7PFZH3EUE1AojBaEXfUymlICdFVZFJbB0D/AM8jSqNmWBQu9QX3MURhT5xLSwc+kir2izQaEo/GQz79AifqkUJgSCzpRUJntCN8A7yk1uxDZDONbINF3ReuF+nqu7GMksgKZLCGbOIaBl9of24K5BeTqxgcEykiHFFY7X9QdI3Dyo=
+        file:
+          - build/bin/infection.phar
+          - build/bin/infection.phar.pubkey
+        skip_cleanup: true
+        on:
+          tags: true
+          repo: infection/infection
+
+  allow_failures:
+    - php: nightly
+      env: PHPDBG=1
