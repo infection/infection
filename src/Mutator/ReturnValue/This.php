@@ -35,7 +35,7 @@ final class This extends AbstractValueToNullReturnValue
     {
         return $node instanceof Node\Stmt\Return_ &&
             $node->expr instanceof Node\Expr\Variable &&
-            $node->expr->name == 'this'
+            $node->expr->name === 'this'
             && $this->isNullReturnValueAllowed($node);
     }
 }

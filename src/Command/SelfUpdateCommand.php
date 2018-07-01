@@ -227,7 +227,7 @@ final class SelfUpdateCommand extends Command
         $stability = 'stable';
 
         if ($updater->getStrategy() instanceof GithubStrategy
-            && $updater->getStrategy()->getStability() == GithubStrategy::UNSTABLE
+            && $updater->getStrategy()->getStability() === GithubStrategy::UNSTABLE
         ) {
             $stability = 'pre-release';
         }
@@ -239,7 +239,7 @@ final class SelfUpdateCommand extends Command
                     $stability,
                     $updater->getNewVersion()
                 ));
-            } elseif (false == $updater->getNewVersion()) {
+            } elseif (false === $updater->getNewVersion()) {
                 $this->output->writeln(sprintf('There are no %s builds available.', $stability));
             } else {
                 $this->output->writeln(sprintf('You have the current %s build installed.', $stability));

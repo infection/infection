@@ -20,7 +20,7 @@ final class PhpExecutableFinder extends BasePhpExecutableFinder
     {
         $arguments = [];
 
-        if ('phpdbg' == \PHP_SAPI) {
+        if ('phpdbg' === \PHP_SAPI) {
             $arguments[] = '-qrr';
         }
 
