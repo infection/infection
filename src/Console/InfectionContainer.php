@@ -16,9 +16,13 @@ use Infection\Differ\Differ;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Finder\Locator;
+use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutator\Util\MutatorsGenerator;
+use Infection\Process\Builder\SubscriberBuilder;
+use Infection\Process\Coverage\CoverageRequirementChecker;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
+use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\CodeCoverageData;
@@ -173,6 +177,10 @@ final class InfectionContainer extends Container
 
             return (new MutatorsGenerator($mutatorConfig))->generate();
         };
+
+        $this['metrics'] = function (): MetricsCalculator {
+            return new MetricsCalculator();
+        };
     }
 
     private function getInfectionConfig(): InfectionConfig
@@ -227,6 +235,34 @@ final class InfectionContainer extends Container
             return $this['filesystem']->isAbsolutePath($existingCoveragePath)
                 ? $existingCoveragePath
                 : sprintf('%s/%s', getcwd(), $existingCoveragePath);
+        };
+
+        $this['coverage.checker'] = function () use ($input): CoverageRequirementChecker {
+            return new CoverageRequirementChecker(
+                \strlen(trim($input->getOption('coverage'))) > 0,
+                $input->getOption('initial-tests-php-options')
+            );
+        };
+
+        $this['test.run.constraint.checker'] = function () use ($input): TestRunConstraintChecker {
+            return new TestRunConstraintChecker(
+                $this['metrics'],
+                $input->getOption('ignore-msi-with-no-mutations'),
+                (float) $input->getOption('min-msi'),
+                (float) $input->getOption('min-covered-msi')
+            );
+        };
+
+        $this['subscriber.builder'] = function () use ($input): SubscriberBuilder {
+            return new SubscriberBuilder(
+                $input,
+                $this['metrics'],
+                $this['dispatcher'],
+                $this['diff.colorizer'],
+                $this['infection.config'],
+                $this['filesystem'],
+                $this['tmp.dir']
+            );
         };
     }
 }
