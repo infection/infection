@@ -20,6 +20,10 @@ use Symfony\Component\Process\Process;
 final class ConsoleOutput
 {
     const CI_FLAG_ERROR = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
+    const INFECTION_USAGE_SUGGESTION = '- Enable xdebug and run infection again' . PHP_EOL .
+        '- Use phpdbg: phpdbg -qrr infection' . PHP_EOL .
+        '- Use --coverage option with path to the existing coverage report' . PHP_EOL .
+        '- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters';
 
     /**
      * @var SymfonyStyle
@@ -105,10 +109,7 @@ final class ConsoleOutput
     {
         $this->io->error([
             'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:',
-            '- Enable xdebug and run infection again' . PHP_EOL .
-            '- Use phpdbg: phpdbg -qrr infection' . PHP_EOL .
-            '- Use --coverage option with path to the existing coverage report' . PHP_EOL .
-            '- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters',
+            self::INFECTION_USAGE_SUGGESTION,
         ]);
     }
 }
