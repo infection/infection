@@ -241,10 +241,10 @@ final class InfectionCommand extends BaseCommand
 
         if (!$constraintChecker->hasTestRunPassedConstraints()) {
             $this->consoleOutput->logBadMsiErrorMessage(
-                    $metricsCalculator,
-                    $constraintChecker->getMinRequiredValue(),
-                    $constraintChecker->getErrorType()
-                );
+                $metricsCalculator,
+                $constraintChecker->getMinRequiredValue(),
+                $constraintChecker->getErrorType()
+            );
 
             return 1;
         }
