@@ -27,8 +27,11 @@ final class CoverageDoesNotExistExceptionTest extends TestCase
 
         $this->assertInstanceOf(CoverageDoesNotExistException::class, $exception);
         $this->assertSame(
-            'Code Coverage does not exist. File file-index-path is not found. ' .
-            'Check phpunit version Infection was run with and generated config files inside tempdir.', $exception->getMessage()
+            'Code Coverage does not exist. File file-index-path is not found. Check phpunit version Infection was run with and generated config files inside tempdir. Make sure to either: 
+- Enable xdebug and run infection again
+- Use phpdbg: phpdbg -qrr infection
+- Use --coverage option with path to the existing coverage report
+- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters', $exception->getMessage()
         );
     }
 
