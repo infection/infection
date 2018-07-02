@@ -73,7 +73,7 @@ final class IncludeInterceptor
         self::disable();
         $including = (bool) ($options & self::STREAM_OPEN_FOR_INCLUDE);
         if ($including) {
-            if ($path == self::$intercept || realpath($path) == self::$intercept) {
+            if ($path === self::$intercept || realpath($path) === self::$intercept) {
                 $this->fp = fopen(self::$replacement, 'r');
                 self::enable();
 

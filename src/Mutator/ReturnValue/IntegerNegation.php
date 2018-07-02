@@ -52,7 +52,7 @@ final class IntegerNegation extends Mutator
             return false;
         }
 
-        if ($expr->value == 0) {
+        if ($expr->value === 0) {
             return false;
         }
 

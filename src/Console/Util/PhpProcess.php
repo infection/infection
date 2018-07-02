@@ -45,7 +45,7 @@ final class PhpProcess extends Process
     public function start(callable $callback = null, array $env = null)
     {
         // Xdebug wasn't skipped, running as is
-        if ('' == XdebugHandler::getSkippedVersion()) {
+        if ('' === XdebugHandler::getSkippedVersion()) {
             parent::start($callback, $env ?? []);
 
             return;

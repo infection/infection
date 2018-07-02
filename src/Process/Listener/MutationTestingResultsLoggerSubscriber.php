@@ -100,7 +100,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
     private function filterLogTypes(array $logTypes): array
     {
         foreach ($logTypes as $key => $value) {
-            if ($this->logVerbosity == LogVerbosity::NONE) {
+            if ($this->logVerbosity === LogVerbosity::NONE) {
                 if (!\in_array($key, ResultsLoggerTypes::ALLOWED_WITHOUT_LOGGING, true)) {
                     unset($logTypes[$key]);
                 }
@@ -116,7 +116,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
 
     private function useLogger(string $logType, $config)
     {
-        $isDebugVerbosity = $this->logVerbosity == LogVerbosity::DEBUG;
+        $isDebugVerbosity = $this->logVerbosity === LogVerbosity::DEBUG;
 
         switch ($logType) {
             case ResultsLoggerTypes::TEXT_FILE:

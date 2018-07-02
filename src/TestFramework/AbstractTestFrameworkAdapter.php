@@ -123,7 +123,7 @@ abstract class AbstractTestFrameworkAdapter
     {
         $frameworkPath = realpath($frameworkPath);
 
-        if ('\\' == \DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             if (false !== strpos($frameworkPath, '.bat')) {
                 return $frameworkPath;
             }
@@ -139,7 +139,7 @@ abstract class AbstractTestFrameworkAdapter
         /*
          * That's an empty options list by all means, we need to see it as such
          */
-        if ($phpExtraArgs == ['']) {
+        if ($phpExtraArgs === ['']) {
             $phpExtraArgs = [];
         }
 
@@ -149,7 +149,7 @@ abstract class AbstractTestFrameworkAdapter
          *
          * This lets folks use, say, a bash wrapper over phpunit.
          */
-        if ('cli' == \PHP_SAPI && empty($phpExtraArgs) && is_executable($frameworkPath) && `command -v php`) {
+        if ('cli' === \PHP_SAPI && empty($phpExtraArgs) && is_executable($frameworkPath) && `command -v php`) {
             return sprintf(
                 '%s %s',
                 'exec',

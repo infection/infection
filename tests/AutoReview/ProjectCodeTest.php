@@ -350,7 +350,7 @@ final class ProjectCodeTest extends TestCase
          * a public propery it has.
          */
         $properties = array_filter($properties, function (\ReflectionProperty $property) use ($className) {
-            return $property->class == $className;
+            return $property->class === $className;
         });
 
         $this->assertCount(
