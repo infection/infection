@@ -82,6 +82,7 @@ class MetricsCalculator
     public static function createFromArray(array $mutantProcesses): self
     {
         $self = new self();
+
         foreach ($mutantProcesses as $process) {
             $self->collect($process);
         }
@@ -97,22 +98,27 @@ class MetricsCalculator
             case MutantProcess::CODE_KILLED:
                 $this->killedCount++;
                 $this->killedMutantProcesses[] = $mutantProcess;
+
                 break;
             case MutantProcess::CODE_NOT_COVERED:
                 $this->notCoveredByTestsCount++;
                 $this->notCoveredMutantProcesses[] = $mutantProcess;
+
                 break;
             case MutantProcess::CODE_ESCAPED:
                 $this->escapedCount++;
                 $this->escapedMutantProcesses[] = $mutantProcess;
+
                 break;
             case MutantProcess::CODE_TIMED_OUT:
                 $this->timedOutCount++;
                 $this->timedOutProcesses[] = $mutantProcess;
+
                 break;
             case MutantProcess::CODE_ERROR:
                 $this->errorCount++;
                 $this->errorProcesses[] = $mutantProcess;
+
                 break;
         }
     }

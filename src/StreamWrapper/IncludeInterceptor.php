@@ -43,6 +43,7 @@ final class IncludeInterceptor
                 'File to intercept and replace does not exist: ' . $file
             );
         }
+
         if (!file_exists($with)) {
             throw new \InvalidArgumentException(
                 'File to replace intercepted file with does not exist: ' . $file
@@ -72,6 +73,7 @@ final class IncludeInterceptor
     {
         self::disable();
         $including = (bool) ($options & self::STREAM_OPEN_FOR_INCLUDE);
+
         if ($including) {
             if ($path === self::$intercept || realpath($path) === self::$intercept) {
                 $this->fp = fopen(self::$replacement, 'r');
@@ -80,6 +82,7 @@ final class IncludeInterceptor
                 return true;
             }
         }
+
         if (isset($this->context)) {
             $this->fp = fopen($path, $mode, (bool) $options, $this->context);
         } else {
@@ -100,6 +103,7 @@ final class IncludeInterceptor
     public function dir_opendir($path)
     {
         self::disable();
+
         if (isset($this->context)) {
             $this->fp = opendir($path, $this->context);
         } else {
@@ -141,6 +145,7 @@ final class IncludeInterceptor
     public function rename($path_from, $path_to)
     {
         self::disable();
+
         if (isset($this->context)) {
             $return = rename($path_from, $path_to, $this->context);
         } else {
@@ -154,6 +159,7 @@ final class IncludeInterceptor
     public function rmdir($path)
     {
         self::disable();
+
         if (isset($this->context)) {
             $return = rmdir($path, $this->context);
         } else {
@@ -192,6 +198,7 @@ final class IncludeInterceptor
     public function stream_metadata($path, $option, $value)
     {
         self::disable();
+
         switch ($option) {
             case STREAM_META_TOUCH:
                 if (empty($value)) {
@@ -199,17 +206,21 @@ final class IncludeInterceptor
                 } else {
                     $return = touch($path, $value[0], $value[1]);
                 }
+
                 break;
             case STREAM_META_OWNER_NAME:
             case STREAM_META_OWNER:
                 $return = chown($path, $value);
+
                 break;
             case STREAM_META_GROUP_NAME:
             case STREAM_META_GROUP:
                 $return = chgrp($path, $value);
+
                 break;
             case STREAM_META_ACCESS:
                 $return = chmod($path, $value);
+
                 break;
             default:
                 throw new \RuntimeException('Unknown stream_metadata option');
@@ -266,6 +277,7 @@ final class IncludeInterceptor
     public function unlink($path)
     {
         self::disable();
+
         if (isset($this->context)) {
             $return = unlink($path, $this->context);
         } else {

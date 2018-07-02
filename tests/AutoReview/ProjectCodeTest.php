@@ -182,6 +182,7 @@ final class ProjectCodeTest extends TestCase
     public function test_all_concrete_classes_have_tests(string $className)
     {
         $testClass = preg_replace('/Infection/', 'Infection\\Tests', $className, 1) . 'Test';
+
         if (\in_array($className, self::$nonTestedConcreteClasses)) {
             $this->assertFalse(class_exists($testClass),
                 sprintf(
