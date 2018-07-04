@@ -22,12 +22,12 @@ final class TimerTest extends TestCase
      */
     private $timer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->timer = new Timer();
     }
 
-    public function test_it_returns_return_seconds_on_stop()
+    public function test_it_returns_return_seconds_on_stop(): void
     {
         $this->timer->start();
         $timeInSeconds = $this->timer->stop();
@@ -36,7 +36,7 @@ final class TimerTest extends TestCase
         $this->assertGreaterThan(0, $timeInSeconds);
     }
 
-    public function test_it_throws_an_exception_when_started_twice_without_stopping()
+    public function test_it_throws_an_exception_when_started_twice_without_stopping(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
@@ -44,7 +44,7 @@ final class TimerTest extends TestCase
         $this->timer->start();
     }
 
-    public function test_it_throws_an_exception_when_stopped_without_starting()
+    public function test_it_throws_an_exception_when_stopped_without_starting(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 

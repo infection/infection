@@ -14,7 +14,7 @@ namespace Infection\Performance\Time;
  */
 final class TimeFormatter
 {
-    const TIME_HORIZONS = [
+    private const TIME_HORIZONS = [
         'h' => 3600,
         'm' => 60,
         's' => 1,

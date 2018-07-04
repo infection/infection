@@ -22,7 +22,7 @@ final class TimeFormatterTest extends TestCase
      */
     private $timeFormatter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->timeFormatter = new TimeFormatter();
     }
@@ -33,7 +33,7 @@ final class TimeFormatterTest extends TestCase
      * @param float $seconds
      * @param string $expectedString
      */
-    public function test_it_converts_seconds_to_seconds_string(float $seconds, string $expectedString)
+    public function test_it_converts_seconds_to_seconds_string(float $seconds, string $expectedString): void
     {
         $timeString = $this->timeFormatter->toHumanReadableString($seconds);
 
@@ -43,11 +43,17 @@ final class TimeFormatterTest extends TestCase
     public function secondsProvider()
     {
         yield [0, '0s'];
+
         yield [0.3, '0s'];
+
         yield [1, '1s'];
+
         yield [1.19, '1s'];
+
         yield [3, '3s'];
+
         yield [31, '31s'];
+
         yield [31.01, '31s'];
     }
 
@@ -57,7 +63,7 @@ final class TimeFormatterTest extends TestCase
      * @param float $seconds
      * @param string $expectedString
      */
-    public function test_it_converts_seconds_to_minutes_string(float $seconds, string $expectedString)
+    public function test_it_converts_seconds_to_minutes_string(float $seconds, string $expectedString): void
     {
         $timeString = $this->timeFormatter->toHumanReadableString($seconds);
 
@@ -67,9 +73,13 @@ final class TimeFormatterTest extends TestCase
     public function minutesProvider()
     {
         yield [60, '1m'];
+
         yield [60.1, '1m'];
+
         yield [61, '1m 1s'];
+
         yield [122, '2m 2s'];
+
         yield [122.9, '2m 2s'];
     }
 
@@ -79,7 +89,7 @@ final class TimeFormatterTest extends TestCase
      * @param float $seconds
      * @param string $expectedString
      */
-    public function test_it_converts_seconds_to_hours_string(float $seconds, string $expectedString)
+    public function test_it_converts_seconds_to_hours_string(float $seconds, string $expectedString): void
     {
         $timeString = $this->timeFormatter->toHumanReadableString($seconds);
 
@@ -89,9 +99,13 @@ final class TimeFormatterTest extends TestCase
     public function hoursProvider()
     {
         yield [3600, '1h'];
+
         yield [3600.99, '1h'];
+
         yield [3601, '1h 0m 1s'];
+
         yield [7302, '2h 1m 42s'];
+
         yield [7302.88, '2h 1m 42s'];
     }
 }

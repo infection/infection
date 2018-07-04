@@ -62,12 +62,12 @@ final class PerformanceLoggerSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onApplicationExecutionStarted()
+    public function onApplicationExecutionStarted(): void
     {
         $this->timer->start();
     }
 
-    public function onApplicationExecutionFinished()
+    public function onApplicationExecutionFinished(): void
     {
         $time = $this->timer->stop();
 

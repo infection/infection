@@ -242,7 +242,7 @@ final class InfectionCommand extends BaseCommand
         /** @var TestRunConstraintChecker $constraintChecker */
         $constraintChecker = $container->get('test.run.constraint.checker');
 
-        $this->eventDispatcher->dispatch(new ApplicationExecutionFinished());
+        $statusCode = 0;
 
         if (!$constraintChecker->hasTestRunPassedConstraints()) {
             $this->consoleOutput->logBadMsiErrorMessage(
@@ -251,10 +251,12 @@ final class InfectionCommand extends BaseCommand
                 $constraintChecker->getErrorType()
             );
 
-            return 1;
+            $statusCode = 1;
         }
 
-        return 0;
+        $this->eventDispatcher->dispatch(new ApplicationExecutionFinished());
+
+        return $statusCode;
     }
 
     private function includeUserBootstrap(InfectionConfig $config): void

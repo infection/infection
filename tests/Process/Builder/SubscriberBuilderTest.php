@@ -13,6 +13,9 @@ use Infection\Config\InfectionConfig;
 use Infection\Differ\DiffColorizer;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Mutant\MetricsCalculator;
+use Infection\Performance\Memory\MemoryFormatter;
+use Infection\Performance\Time\TimeFormatter;
+use Infection\Performance\Time\Timer;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\TestCase;
@@ -40,7 +43,7 @@ final class SubscriberBuilderTest extends TestCase
             ));
         $calculator = new MetricsCalculator();
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher->expects($this->exactly(5))->method('addSubscriber');
+        $dispatcher->expects($this->exactly(6))->method('addSubscriber');
         $diff = $this->createMock(DiffColorizer::class);
         $config = $this->createMock(InfectionConfig::class);
         $fs = $this->createMock(Filesystem::class);
@@ -54,7 +57,10 @@ final class SubscriberBuilderTest extends TestCase
             $diff,
             $config,
             $fs,
-            sys_get_temp_dir()
+            sys_get_temp_dir(),
+            new Timer(),
+            new TimeFormatter(),
+            new MemoryFormatter()
         );
         $subscriberBuilder->registerSubscribers($adapter, $output);
     }
@@ -74,7 +80,7 @@ final class SubscriberBuilderTest extends TestCase
             ));
         $calculator = new MetricsCalculator();
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher->expects($this->exactly(6))->method('addSubscriber');
+        $dispatcher->expects($this->exactly(7))->method('addSubscriber');
         $diff = $this->createMock(DiffColorizer::class);
         $config = $this->createMock(InfectionConfig::class);
         $fs = $this->createMock(Filesystem::class);
@@ -88,7 +94,10 @@ final class SubscriberBuilderTest extends TestCase
             $diff,
             $config,
             $fs,
-            sys_get_temp_dir()
+            sys_get_temp_dir(),
+            new Timer(),
+            new TimeFormatter(),
+            new MemoryFormatter()
         );
         $subscriberBuilder->registerSubscribers($adapter, $output);
     }
@@ -120,7 +129,10 @@ final class SubscriberBuilderTest extends TestCase
             $diff,
             $config,
             $fs,
-            sys_get_temp_dir()
+            sys_get_temp_dir(),
+            new Timer(),
+            new TimeFormatter(),
+            new MemoryFormatter()
         );
 
         $this->expectException(\InvalidArgumentException::class);

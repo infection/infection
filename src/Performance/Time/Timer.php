@@ -21,7 +21,7 @@ final class Timer
      */
     private $microTime;
 
-    public function start()
+    public function start(): void
     {
         Assert::null($this->microTime, 'Timer can not be started again without stopping.');
 

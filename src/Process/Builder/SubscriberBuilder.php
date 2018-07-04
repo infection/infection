@@ -16,6 +16,10 @@ use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Mutant\MetricsCalculator;
+use Infection\Performance\Listener\PerformanceLoggerSubscriber;
+use Infection\Performance\Memory\MemoryFormatter;
+use Infection\Performance\Time\TimeFormatter;
+use Infection\Performance\Time\Timer;
 use Infection\Process\Listener\CleanUpAfterMutationTestingFinishedSubscriber;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
@@ -68,6 +72,20 @@ final class SubscriberBuilder
      */
     private $tmpDir;
 
+    /**
+     * @var Timer
+     */
+    private $timer;
+
+    /**
+     * @var TimeFormatter
+     */
+    private $timeFormatter;
+    /**
+     * @var MemoryFormatter
+     */
+    private $memoryFormatter;
+
     public function __construct(
         InputInterface $input,
         MetricsCalculator $metricsCalculator,
@@ -75,7 +93,10 @@ final class SubscriberBuilder
         DiffColorizer $diffColorizer,
         InfectionConfig $infectionConfig,
         Filesystem $fs,
-        string $tmpDir
+        string $tmpDir,
+        Timer $timer,
+        TimeFormatter $timeFormatter,
+        MemoryFormatter $memoryFormatter
     ) {
         $this->input = $input;
         $this->metricsCalculator = $metricsCalculator;
@@ -84,6 +105,9 @@ final class SubscriberBuilder
         $this->infectionConfig = $infectionConfig;
         $this->fs = $fs;
         $this->tmpDir = $tmpDir;
+        $this->timer = $timer;
+        $this->timeFormatter = $timeFormatter;
+        $this->memoryFormatter = $memoryFormatter;
     }
 
     public function registerSubscribers(
@@ -117,6 +141,12 @@ final class SubscriberBuilder
                 $this->fs,
                 $this->input->getOption('log-verbosity'),
                 (bool) $this->input->getOption('debug')
+            ),
+            new PerformanceLoggerSubscriber(
+                $this->timer,
+                $this->timeFormatter,
+                $this->memoryFormatter,
+                $output
             ),
         ];
 

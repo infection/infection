@@ -29,12 +29,12 @@ final class PerformanceLoggerSubscriberTest extends TestCase
      */
     private $output;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->output = $this->createMock(OutputInterface::class);
     }
 
-    public function test_it_reacts_on_application_execution_events()
+    public function test_it_reacts_on_application_execution_events(): void
     {
         $this->output->expects($this->once())
             ->method('writeln')

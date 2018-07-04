@@ -14,7 +14,7 @@ namespace Infection\Performance\Memory;
  */
 final class MemoryFormatter
 {
-    const BYTES_IN_MEGABYTE = 1024 * 1024;
+    private const BYTES_IN_MEGABYTE = 1024 * 1024;
 
     public function toHumanReadableString(float $bytes): string
     {

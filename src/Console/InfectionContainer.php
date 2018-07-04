@@ -280,7 +280,10 @@ final class InfectionContainer extends Container
                 $this['diff.colorizer'],
                 $this['infection.config'],
                 $this['filesystem'],
-                $this['tmp.dir']
+                $this['tmp.dir'],
+                $this['timer'],
+                $this['time.formatter'],
+                $this['memory.formatter']
             );
         };
     }
