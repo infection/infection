@@ -52,6 +52,7 @@ final class BadgeLoggerTest extends MockeryTestCase
             'TRAVIS_REPO_SLUG',
             'TRAVIS_PULL_REQUEST',
             BadgeLogger::ENV_INFECTION_BADGE_API_KEY,
+            BadgeLogger::ENV_STRYKER_DASHBOARD_API_KEY,
         ];
 
         foreach ($names as $name) {
@@ -110,6 +111,36 @@ final class BadgeLoggerTest extends MockeryTestCase
         $this->badgeLogger->log();
     }
 
+    public function test_it_skips_logging_when_branch_not_found()
+    {
+        putenv('TRAVIS=true');
+        putenv('TRAVIS_PULL_REQUEST=false');
+        putenv('TRAVIS_REPO_SLUG=a/b');
+        putenv('TRAVIS_BRANCH');
+
+        $this->output
+            ->shouldReceive('writeln')
+            ->withArgs(['Dashboard report has not been sent: repository slug nor current branch were found; not a Travis build?']);
+        $this->badgeApiClient->shouldReceive('sendReport')->never();
+
+        $this->badgeLogger->log();
+    }
+
+    public function test_it_skips_logging_when_repo_slug_not_found()
+    {
+        putenv('TRAVIS=true');
+        putenv('TRAVIS_PULL_REQUEST=false');
+        putenv('TRAVIS_REPO_SLUG');
+        putenv('TRAVIS_BRANCH=foo');
+
+        $this->output
+            ->shouldReceive('writeln')
+            ->withArgs(['Dashboard report has not been sent: repository slug nor current branch were found; not a Travis build?']);
+        $this->badgeApiClient->shouldReceive('sendReport')->never();
+
+        $this->badgeLogger->log();
+    }
+
     public function test_it_skips_logging_when_it_is_branch_not_from_config()
     {
         putenv('TRAVIS=true');
@@ -118,20 +149,64 @@ final class BadgeLoggerTest extends MockeryTestCase
         putenv('TRAVIS_BRANCH=foo');
         $this->output
             ->shouldReceive('writeln')
-            ->withArgs(['Dashboard report has not been sent: Repository Slug=a/b, Branch=foo']);
+            ->withArgs(['Dashboard report has not been sent: expected branch "master", found "foo"']);
         $this->badgeApiClient->shouldReceive('sendReport')->never();
 
         $this->badgeLogger->log();
     }
 
-    public function test_it_sends_report_when_everything_is_ok()
+    public function test_it_sends_report_missing_our_api_key()
+    {
+        putenv('TRAVIS=true');
+        putenv('TRAVIS_PULL_REQUEST=false');
+        putenv('TRAVIS_REPO_SLUG=a/b');
+        putenv('TRAVIS_BRANCH=master');
+
+        putenv(BadgeLogger::ENV_INFECTION_BADGE_API_KEY);
+        putenv(BadgeLogger::ENV_STRYKER_DASHBOARD_API_KEY);
+
+        $this->output
+        ->shouldReceive('writeln')
+        ->withArgs(['Dashboard report has not been sent: neither INFECTION_BADGE_API_KEY nor STRYKER_DASHBOARD_API_KEY were found in the environment']);
+        $this->badgeApiClient->shouldReceive('sendReport')->never();
+
+        $this->badgeLogger->log();
+    }
+
+    public function test_it_sends_report_when_everything_is_ok_with_stryker_key()
+    {
+        putenv(BadgeLogger::ENV_STRYKER_DASHBOARD_API_KEY . '=abc');
+        putenv('TRAVIS=true');
+        putenv('TRAVIS_PULL_REQUEST=false');
+        putenv('TRAVIS_REPO_SLUG=a/b');
+        putenv('TRAVIS_BRANCH=master');
+
+        $this->output
+            ->shouldReceive('writeln')
+            ->withArgs(['Sending dashboard report...']);
+        $this->badgeApiClient
+            ->shouldReceive('sendReport')
+            ->once()
+            ->withArgs(['abc', 'github.com/a/b', 'master', 33.3]);
+        $this->metricsCalculator
+            ->shouldReceive('getMutationScoreIndicator')
+            ->andReturn(33.3);
+
+        $this->badgeLogger->log();
+    }
+
+    public function test_it_sends_report_when_everything_is_ok_with_our_key()
     {
         putenv(BadgeLogger::ENV_INFECTION_BADGE_API_KEY . '=abc');
         putenv('TRAVIS=true');
         putenv('TRAVIS_PULL_REQUEST=false');
         putenv('TRAVIS_REPO_SLUG=a/b');
         putenv('TRAVIS_BRANCH=master');
-        $this->output->shouldReceive('writeln')->never();
+
+        $this->output
+            ->shouldReceive('writeln')
+            ->withArgs(['Sending dashboard report...']);
+
         $this->badgeApiClient
             ->shouldReceive('sendReport')
             ->once()
