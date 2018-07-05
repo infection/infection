@@ -98,7 +98,7 @@ ASCII;
 
     private function logRunningWithDebugger(InputInterface $input)
     {
-        if (!$input->hasParameterOption(array('--quiet', '-q'), true)) {
+        if (!$input->hasParameterOption(['--quiet', '-q'], true)) {
             if (\PHP_SAPI === 'phpdbg') {
                 $this->consoleOutput->logRunningWithDebugger(\PHP_SAPI);
             } elseif (\extension_loaded('xdebug')) {
