@@ -71,7 +71,11 @@ ASCII;
 
         $this->consoleOutput = new InfectionConsoleOutput(new SymfonyStyle($input, $output));
 
-        $this->logRunningWithDebugger($input);
+        if ($input->hasParameterOption(['--quiet', '-q'], true)) {
+            $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
+        }
+
+        $this->logRunningWithDebugger();
 
         if (!$this->isAutoExitEnabled()) {
             // When we're not in control of exit codes, that means it's the caller
@@ -96,14 +100,12 @@ ASCII;
         return parent::run($input, $output);
     }
 
-    private function logRunningWithDebugger(InputInterface $input)
+    private function logRunningWithDebugger()
     {
-        if (!$input->hasParameterOption(['--quiet', '-q'], true)) {
-            if (\PHP_SAPI === 'phpdbg') {
-                $this->consoleOutput->logRunningWithDebugger(\PHP_SAPI);
-            } elseif (\extension_loaded('xdebug')) {
-                $this->consoleOutput->logRunningWithDebugger('xdebug');
-            }
+        if (\PHP_SAPI === 'phpdbg') {
+            $this->consoleOutput->logRunningWithDebugger(\PHP_SAPI);
+        } elseif (\extension_loaded('xdebug')) {
+            $this->consoleOutput->logRunningWithDebugger('xdebug');
         }
     }
 
