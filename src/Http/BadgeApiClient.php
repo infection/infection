@@ -18,6 +18,8 @@ class BadgeApiClient
 {
     const STRYKER_DASHBOARD_API_URL = 'https://dashboard.stryker-mutator.io/api/reports';
 
+    const CREATED_RESPONSE_CODE = 201;
+
     /**
      * @var OutputInterface
      */
@@ -52,11 +54,14 @@ class BadgeApiClient
         curl_setopt($ch, CURLOPT_HEADER, true);
 
         $response = curl_exec($ch);
+        $responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
 
-        if ($this->output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-            $this->output->writeln($response);
+        if (self::CREATED_RESPONSE_CODE !== $responseCode) {
+            $this->output->writeln(sprintf('Stryker dashboard returned an unexpected response code: %s', $responseCode));
         }
 
-        curl_close($ch);
+        $this->output->writeln('Dashboard response:', OutputInterface::VERBOSITY_VERBOSE);
+        $this->output->writeln($response, OutputInterface::VERBOSITY_VERBOSE);
     }
 }
