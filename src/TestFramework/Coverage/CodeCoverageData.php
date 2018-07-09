@@ -184,6 +184,8 @@ class CodeCoverageData
             }
 
             $coverageIndexFileContent = file_get_contents($coverageIndexFilePath);
+            \assert(\is_string($coverageIndexFileContent));
+
             $coverage = $this->parser->parse($coverageIndexFileContent);
 
             $coverage = $this->addTestExecutionInfo($coverage);

@@ -180,6 +180,8 @@ AUTOLOAD;
             $testSuite->appendChild($file);
         }
 
+        \assert($nodeToAppendTestSuite instanceof \DOMNode);
+
         $nodeToAppendTestSuite->appendChild($testSuite);
     }
 

@@ -59,7 +59,10 @@ final class TestFrameworkConfigPathProvider
                 return $this->askTestFrameworkConfigLocation($input, $output, $dirsInCurrentDir, $testFramework, '');
             }
 
-            $phpUnitPathGuesser = new PhpUnitPathGuesser(json_decode(file_get_contents('composer.json')));
+            $composerJsonText = file_get_contents('composer.json');
+            \assert(\is_string($composerJsonText));
+
+            $phpUnitPathGuesser = new PhpUnitPathGuesser(json_decode($composerJsonText));
             $defaultValue = $phpUnitPathGuesser->guess();
 
             if ($defaultValue) {

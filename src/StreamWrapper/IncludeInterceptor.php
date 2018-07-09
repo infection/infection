@@ -95,6 +95,8 @@ final class IncludeInterceptor
 
     public function dir_closedir()
     {
+        \assert(\is_resource($this->fp));
+
         closedir($this->fp);
 
         return true;
@@ -116,11 +118,14 @@ final class IncludeInterceptor
 
     public function dir_readdir()
     {
+        \assert(\is_resource($this->fp));
+
         return readdir($this->fp);
     }
 
     public function dir_rewinddir()
     {
+        \assert(\is_resource($this->fp));
         rewinddir($this->fp);
 
         return true;
@@ -177,21 +182,29 @@ final class IncludeInterceptor
 
     public function stream_close()
     {
+        \assert(\is_resource($this->fp));
+
         return fclose($this->fp);
     }
 
     public function stream_eof()
     {
+        \assert(\is_resource($this->fp));
+
         return feof($this->fp);
     }
 
     public function stream_flush()
     {
+        \assert(\is_resource($this->fp));
+
         return fflush($this->fp);
     }
 
     public function stream_lock($operation)
     {
+        \assert(\is_resource($this->fp));
+
         return flock($this->fp, $operation);
     }
 
@@ -232,16 +245,22 @@ final class IncludeInterceptor
 
     public function stream_read($count)
     {
+        \assert(\is_resource($this->fp));
+
         return fread($this->fp, $count);
     }
 
     public function stream_seek($offset, $whence = SEEK_SET)
     {
+        \assert(\is_resource($this->fp));
+
         return fseek($this->fp, $offset, $whence) === 0;
     }
 
     public function stream_set_option($option, $arg1, $arg2)
     {
+        \assert(\is_resource($this->fp));
+
         switch ($option) {
             case STREAM_OPTION_BLOCKING:
                 return stream_set_blocking($this->fp, (bool) $arg1);
@@ -256,21 +275,29 @@ final class IncludeInterceptor
 
     public function stream_stat()
     {
+        \assert(\is_resource($this->fp));
+
         return fstat($this->fp);
     }
 
     public function stream_tell()
     {
+        \assert(\is_resource($this->fp));
+
         return ftell($this->fp);
     }
 
     public function stream_truncate($new_size)
     {
+        \assert(\is_resource($this->fp));
+
         return ftruncate($this->fp, $new_size);
     }
 
     public function stream_write($data)
     {
+        \assert(\is_resource($this->fp));
+
         return fwrite($this->fp, $data);
     }
 

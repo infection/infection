@@ -62,7 +62,10 @@ class CoverageXmlParser
     private function processXmlFileCoverage(string $relativeCoverageFilePath, string $projectSource): array
     {
         $absolutePath = realpath($this->coverageDir . '/' . $relativeCoverageFilePath);
+        \assert(\is_string($absolutePath));
+
         $coverageFileXml = file_get_contents($absolutePath);
+        \assert(\is_string($coverageFileXml));
 
         $dom = new \DOMDocument();
         $dom->loadXML($this->removeNamespace($coverageFileXml));

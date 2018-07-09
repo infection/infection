@@ -122,6 +122,7 @@ abstract class AbstractTestFrameworkAdapter
     private function makeExecutable(string $frameworkPath, bool $includeArgs = true, array $phpExtraArgs = []): string
     {
         $frameworkPath = realpath($frameworkPath);
+        \assert(\is_string($frameworkPath));
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             if (false !== strpos($frameworkPath, '.bat')) {
