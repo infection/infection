@@ -189,12 +189,17 @@ function bar($input)
 PHP
         ];
 
-        yield 'It does not mutate when the function name is a variable' => [
+        yield 'It does not mutate when the function name can\'t be determined' => [
             <<<'PHP'
 <?php
 
-$b = 'preg_quote';
-$a = $b($foo->bar(), '/');
+$a = $method($foo->bar(), '/');
+$b = ('preg_quote')('/asdf/', '/');
+$c = $class->{'foo'}('/asdf/');
+$d = Foo::{'foo'}('/asdf/');
+$e = Foo::$bar('/asdf/');
+$f = ($foo->bar)('/asdf/');
+
 PHP
         ];
     }
