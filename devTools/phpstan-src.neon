@@ -2,4 +2,3 @@ parameters:
     ignoreErrors:
         - '#Access to an undefined property PhpParser\\Node(.*?)#'
         - '#Call to an undefined method PhpParser\\Node(.*?)#'
-        - ':Parameter #1 $key of function array_key_exists expects int|string, float|int given.:'

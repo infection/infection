@@ -231,6 +231,7 @@ class CodeCoverageData
 
         foreach ($coverage[$filePath]['byMethod'] as $method => $coverageInfo) {
             if ($line >= $coverageInfo['startLine'] && $line <= $coverageInfo['endLine']) {
+                /** @var int[] $allLines */
                 $allLines = range($coverageInfo['startLine'], $coverageInfo['endLine']);
 
                 foreach ($allLines as $lineInExecutedMethod) {

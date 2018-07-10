@@ -224,7 +224,7 @@ final class InfectionContainer extends Container
             }
 
             // getcwd() may return false in rare circumstances
-            \assert(!\is_bool($configLocation));
+            \assert(\is_string($configLocation));
 
             return new InfectionConfig($config, $this['filesystem'], $configLocation);
         };
