@@ -71,11 +71,11 @@ ASCII;
 
         $this->consoleOutput = new InfectionConsoleOutput(new SymfonyStyle($input, $output));
 
-        if (\PHP_SAPI === 'phpdbg') {
-            $this->consoleOutput->logRunningWithDebugger(\PHP_SAPI);
-        } elseif (\extension_loaded('xdebug')) {
-            $this->consoleOutput->logRunningWithDebugger('xdebug');
+        if ($input->hasParameterOption(['--quiet', '-q'], true)) {
+            $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
         }
+
+        $this->logRunningWithDebugger();
 
         if (!$this->isAutoExitEnabled()) {
             // When we're not in control of exit codes, that means it's the caller
@@ -98,6 +98,15 @@ ASCII;
         }
 
         return parent::run($input, $output);
+    }
+
+    private function logRunningWithDebugger()
+    {
+        if (\PHP_SAPI === 'phpdbg') {
+            $this->consoleOutput->logRunningWithDebugger(\PHP_SAPI);
+        } elseif (\extension_loaded('xdebug')) {
+            $this->consoleOutput->logRunningWithDebugger('xdebug');
+        }
     }
 
     public function doRun(InputInterface $input, OutputInterface $output)
