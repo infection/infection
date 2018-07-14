@@ -28,6 +28,7 @@ final class MutatorProfile
         '@regex' => self::REGEX,
         '@return_value' => self::RETURN_VALUE,
         '@sort' => self::SORT,
+        '@statement' => self::STATEMENT,
         '@zero_iteration' => self::ZERO_ITERATION,
         '@cast' => self::CAST,
 
@@ -127,6 +128,13 @@ final class MutatorProfile
         Mutator\Sort\Spaceship::class,
     ];
 
+    const STATEMENT = [
+        Mutator\Statement\Assign::class,
+        Mutator\Statement\MethodCallFalse::class,
+        Mutator\Statement\MethodCallNull::class,
+        Mutator\Statement\MethodCallTrue::class,
+    ];
+
     const ZERO_ITERATION = [
         Mutator\ZeroIteration\Foreach_::class,
         Mutator\ZeroIteration\For_::class,
@@ -153,6 +161,7 @@ final class MutatorProfile
         '@regex',
         '@return_value',
         '@sort',
+        '@statement',
         '@zero_iteration',
     ];
 
@@ -239,6 +248,12 @@ final class MutatorProfile
 
         //Sort
         'Spaceship' => Mutator\Sort\Spaceship::class,
+
+        //Statement
+        'Assign' => Mutator\Statement\Assign::class,
+        'MethodCallFalse' => Mutator\Statement\MethodCallFalse::class,
+        'MethodCallNull' => Mutator\Statement\MethodCallNull::class,
+        'MethodCallTrue' => Mutator\Statement\MethodCallTrue::class,
 
         //Zero Iteration
         'Foreach_' => Mutator\ZeroIteration\Foreach_::class,
