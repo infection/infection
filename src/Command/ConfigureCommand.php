@@ -68,7 +68,9 @@ final class ConfigureCommand extends BaseCommand
         $questionHelper = $this->getHelper('question');
 
         if (file_exists('composer.json')) {
-            $content = json_decode(file_get_contents('composer.json'));
+            $content = file_get_contents('composer.json');
+            \assert(\is_string($content));
+            $content = json_decode($content);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new \LogicException('composer.json does not contain valid JSON');

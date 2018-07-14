@@ -45,6 +45,9 @@ CONTENT;
 
     private function getInterceptorNamespacePrefix(): string
     {
-        return strstr(__NAMESPACE__, 'Infection', true);
+        $prefix = strstr(__NAMESPACE__, 'Infection', true);
+        \assert(\is_string($prefix));
+
+        return $prefix;
     }
 }

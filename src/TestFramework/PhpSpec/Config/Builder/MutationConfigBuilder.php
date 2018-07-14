@@ -48,7 +48,7 @@ class MutationConfigBuilder extends ConfigBuilder
             $mutant->getMutation()->getHash()
         );
 
-        $parsedYaml = Yaml::parse(file_get_contents($this->originalYamlConfigPath));
+        $parsedYaml = Yaml::parseFile($this->originalYamlConfigPath);
 
         file_put_contents($customAutoloadFilePath, $this->createCustomAutoloadWithInterceptor($mutant, $parsedYaml));
 

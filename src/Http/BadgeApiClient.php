@@ -45,6 +45,8 @@ class BadgeApiClient
 
         $ch = curl_init();
 
+        \assert(\is_resource($ch));
+
         curl_setopt($ch, CURLOPT_URL, self::STRYKER_DASHBOARD_API_URL);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
@@ -61,7 +63,9 @@ class BadgeApiClient
             $this->output->writeln(sprintf('Stryker dashboard returned an unexpected response code: %s', $responseCode));
         }
 
-        $this->output->writeln('Dashboard response:', OutputInterface::VERBOSITY_VERBOSE);
-        $this->output->writeln($response, OutputInterface::VERBOSITY_VERBOSE);
+        if (\is_string($response)) {
+            $this->output->writeln('Dashboard response:', OutputInterface::VERBOSITY_VERBOSE);
+            $this->output->writeln($response, OutputInterface::VERBOSITY_VERBOSE);
+        }
     }
 }

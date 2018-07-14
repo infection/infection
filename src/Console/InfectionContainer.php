@@ -213,6 +213,7 @@ final class InfectionContainer extends Container
                 $configLocation = getcwd();
             }
 
+            \assert(\is_string($json));
             $config = json_decode($json);
 
             if (\is_string($infectionConfigFile) && null === $config && JSON_ERROR_NONE !== json_last_error()) {
@@ -221,6 +222,9 @@ final class InfectionContainer extends Container
                     json_last_error_msg()
                 );
             }
+
+            // getcwd() may return false in rare circumstances
+            \assert(\is_string($configLocation));
 
             return new InfectionConfig($config, $this['filesystem'], $configLocation);
         };

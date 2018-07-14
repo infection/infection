@@ -86,6 +86,7 @@ final class Factory
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
             $phpUnitConfigContent = file_get_contents($phpUnitConfigPath);
+            \assert(\is_string($phpUnitConfigContent));
 
             return new PhpUnitAdapter(
                 new TestFrameworkFinder(TestFrameworkTypes::PHPUNIT, $this->infectionConfig->getPhpUnitCustomPath()),

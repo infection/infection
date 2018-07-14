@@ -107,7 +107,7 @@ final class MutationsGenerator
         $this->eventDispatcher->dispatch(new MutationGeneratingStarted($files->count()));
 
         foreach ($files as $file) {
-            if (!$onlyCovered || ($onlyCovered && $this->hasTests($file))) {
+            if (!$onlyCovered || $this->hasTests($file)) {
                 $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered, $mutators);
             }
 

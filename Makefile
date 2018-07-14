@@ -7,7 +7,7 @@ INFECTION=build/bin/infection.phar
 # URLs to download all tools
 BOX_URL="https://github.com/humbug/box/releases/download/3.0.0-alpha.5/box.phar"
 PHP-CS-FIXER_URL="https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar"
-PHPSTAN_URL="https://github.com/phpstan/phpstan/releases/download/0.9.1/phpstan.phar"
+PHPSTAN_URL="https://github.com/phpstan/phpstan/releases/download/0.10.1/phpstan.phar"
 
 FLOCK=./devTools/flock
 

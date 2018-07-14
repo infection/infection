@@ -184,6 +184,8 @@ class CodeCoverageData
             }
 
             $coverageIndexFileContent = file_get_contents($coverageIndexFilePath);
+            \assert(\is_string($coverageIndexFileContent));
+
             $coverage = $this->parser->parse($coverageIndexFileContent);
 
             $coverage = $this->addTestExecutionInfo($coverage);
@@ -229,6 +231,7 @@ class CodeCoverageData
 
         foreach ($coverage[$filePath]['byMethod'] as $method => $coverageInfo) {
             if ($line >= $coverageInfo['startLine'] && $line <= $coverageInfo['endLine']) {
+                /** @var int[] $allLines */
                 $allLines = range($coverageInfo['startLine'], $coverageInfo['endLine']);
 
                 foreach ($allLines as $lineInExecutedMethod) {

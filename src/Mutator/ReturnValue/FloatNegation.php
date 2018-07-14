@@ -45,7 +45,7 @@ final class FloatNegation extends Mutator
         $expr = $node->expr;
 
         if ($expr instanceof Node\Expr\UnaryMinus) {
-            $expr = $node->expr->expr;
+            $expr = $expr->expr;
         }
 
         if (!$expr instanceof Node\Scalar\DNumber) {

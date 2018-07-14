@@ -101,7 +101,8 @@ final class ParallelProcessRunner
     private function startProcess(): bool
     {
         $mutantProcess = array_shift($this->processesQueue);
-        /** @var MutantProcessInterface $mutantProcess */
+        \assert($mutantProcess instanceof MutantProcessInterface);
+
         $mutant = $mutantProcess->getMutant();
 
         if (!$mutant->isCoveredByTest()) {
