@@ -28,7 +28,7 @@ final class InvalidMutatorExceptionTest extends TestCase
 
         $this->assertSame(
             'Encountered an error with the "Plus" mutator in the "foo/bar/baz" file. ' .
-            'This is most likely a bug in infection, so please report this in our issue tracker.',
+            'This is most likely a bug in Infection, so please report this in our issue tracker.',
             $exception->getMessage()
         );
         $this->assertSame($original, $exception->getPrevious());

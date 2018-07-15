@@ -21,7 +21,7 @@ final class InvalidMutatorException extends \Exception
         return new self(
             sprintf(
                 'Encountered an error with the "%s" mutator in the "%s" file. ' .
-                'This is most likely a bug in infection, so please report this in our issue tracker.',
+                'This is most likely a bug in Infection, so please report this in our issue tracker.',
                 $mutator::getName(),
                 $filePath
             ),

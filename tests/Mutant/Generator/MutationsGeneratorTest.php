@@ -165,7 +165,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
         $this->expectException(InvalidMutatorException::class);
         $this->expectExceptionMessageRegExp(
             '#Encountered an error with the "ErrorMutator" mutator in the ".+OneFile.php"' .
-            ' file. This is most likely a bug in infection, so please report this in our issue tracker.#'
+            ' file. This is most likely a bug in Infection, so please report this in our issue tracker.#'
         );
 
         $generator->generate(false);
