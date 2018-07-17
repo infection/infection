@@ -14,6 +14,7 @@ use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
 use Infection\Finder\SourceFilesFinder;
+use Infection\Mutant\Exception\ParserException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorsGenerator;
@@ -128,8 +129,12 @@ final class MutationsGenerator
      */
     private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered, array $mutators): array
     {
-        /** @var Node[] $initialStatements */
-        $initialStatements = $this->parser->parse($file->getContents());
+        try {
+            /** @var Node[] $initialStatements */
+            $initialStatements = $this->parser->parse($file->getContents());
+        } catch (\Throwable $t) {
+            throw ParserException::fromInvalidFile($file, $t);
+        }
 
         $traverser = new NodeTraverser();
 
@@ -141,10 +146,10 @@ final class MutationsGenerator
             $onlyCovered
         );
 
-        $traverser->addVisitor($mutationsCollectorVisitor);
         $traverser->addVisitor(new ParentConnectorVisitor());
         $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
         $traverser->addVisitor(new ReflectionVisitor());
+        $traverser->addVisitor($mutationsCollectorVisitor);
 
         $traverser->traverse($initialStatements);
 
