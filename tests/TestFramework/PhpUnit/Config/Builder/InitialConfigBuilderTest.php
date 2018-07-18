@@ -22,7 +22,7 @@ use function Infection\Tests\normalizePath as p;
  */
 final class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
-    const HASH = 'a1b2c3';
+    public const HASH = 'a1b2c3';
 
     /**
      * @var string
@@ -49,7 +49,7 @@ final class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTest
      */
     private $workspace;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workspace = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
 
@@ -61,12 +61,12 @@ final class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTest
         $this->createConfigBuilder();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->fileSystem->remove($this->workspace);
     }
 
-    private function createConfigBuilder(string $phpUnitXmlConfigPath = null, bool $skipCoverage = false)
+    private function createConfigBuilder(string $phpUnitXmlConfigPath = null, bool $skipCoverage = false): void
     {
         $phpunitXmlPath = $phpUnitXmlConfigPath ?: __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit.xml';
 
@@ -85,7 +85,7 @@ final class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTest
         );
     }
 
-    public function test_it_replaces_relative_path_to_absolute_path()
+    public function test_it_replaces_relative_path_to_absolute_path(): void
     {
         $configurationPath = $this->builder->build();
 
@@ -98,7 +98,7 @@ final class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTest
         $this->assertSame($this->pathToProject . '/*Bundle', p($directories[0]->nodeValue));
     }
 
-    public function test_it_replaces_bootstrap_file()
+    public function test_it_replaces_bootstrap_file(): void
     {
         $configurationPath = $this->builder->build();
 
@@ -109,7 +109,7 @@ final class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTest
         $this->assertSame($this->pathToProject . '/app/autoload2.php', $value);
     }
 
-    public function test_it_removes_original_loggers()
+    public function test_it_removes_original_loggers(): void
     {
         $configurationPath = $this->builder->build();
 
@@ -120,7 +120,7 @@ final class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTest
         $this->assertSame(0, $nodeList->length);
     }
 
-    public function test_it_adds_needed_loggers()
+    public function test_it_adds_needed_loggers(): void
     {
         $configurationPath = $this->builder->build();
 
@@ -135,7 +135,7 @@ final class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTest
         $this->assertSame('junit', $logEntries[1]->getAttribute('type'));
     }
 
-    public function test_it_does_not_add_coverage_loggers_if_should_be_skipped()
+    public function test_it_does_not_add_coverage_loggers_if_should_be_skipped(): void
     {
         $this->createConfigBuilder(null, true);
         $configurationPath = $this->builder->build();
@@ -148,7 +148,7 @@ final class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTest
         $this->assertSame(0, $logEntries->length);
     }
 
-    public function test_it_creates_coverage_filter_whitelist_node_if_does_not_exist()
+    public function test_it_creates_coverage_filter_whitelist_node_if_does_not_exist(): void
     {
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit_without_coverage_whitelist.xml';
         $this->createConfigBuilder($phpunitXmlPath);
@@ -163,7 +163,7 @@ final class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTest
         $this->assertSame(2, $filterNodes->length);
     }
 
-    public function test_it_does_not_create_coverage_filter_whitelist_node_if_already_exist()
+    public function test_it_does_not_create_coverage_filter_whitelist_node_if_already_exist(): void
     {
         $configurationPath = $this->builder->build();
 
@@ -175,7 +175,7 @@ final class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTest
         $this->assertSame(1, $filterNodes->length);
     }
 
-    public function test_it_removes_printer_class()
+    public function test_it_removes_printer_class(): void
     {
         $configurationPath = $this->builder->build();
 

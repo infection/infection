@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class ArgumentsAndOptionsBuilderTest extends TestCase
 {
-    public function test_it_builds_correct_command()
+    public function test_it_builds_correct_command(): void
     {
         $configPath = '/config/path';
         $builder = new ArgumentsAndOptionsBuilder();

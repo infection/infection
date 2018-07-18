@@ -27,7 +27,7 @@ class ConsoleHelper
         $this->formatterHelper = $formatterHelper;
     }
 
-    public function writeSection(OutputInterface $output, $text, $style = 'bg=blue;fg=white')
+    public function writeSection(OutputInterface $output, $text, $style = 'bg=blue;fg=white'): void
     {
         $output->writeln([
             '',

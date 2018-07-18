@@ -14,13 +14,13 @@ namespace Infection\Logger;
  */
 final class ResultsLoggerTypes
 {
-    const TEXT_FILE = 'text';
-    const SUMMARY_FILE = 'summary';
-    const DEBUG_FILE = 'debug';
-    const BADGE = 'badge';
-    const PER_MUTATOR = 'perMutator';
+    public const TEXT_FILE = 'text';
+    public const SUMMARY_FILE = 'summary';
+    public const DEBUG_FILE = 'debug';
+    public const BADGE = 'badge';
+    public const PER_MUTATOR = 'perMutator';
 
-    const ALL = [
+    public const ALL = [
         self::TEXT_FILE,
         self::DEBUG_FILE,
         self::SUMMARY_FILE,
@@ -28,7 +28,7 @@ final class ResultsLoggerTypes
         self::PER_MUTATOR,
     ];
 
-    const ALLOWED_WITHOUT_LOGGING = [
+    public const ALLOWED_WITHOUT_LOGGING = [
         self::BADGE,
     ];
 }

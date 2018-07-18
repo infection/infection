@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class CoverageRequirementCheckerTest extends TestCase
 {
-    public function test_it_has_debugger_or_coverage_option_on_phpdbg()
+    public function test_it_has_debugger_or_coverage_option_on_phpdbg(): void
     {
         $this->requirePhpDbg();
         $this->requireNoXdebug();
@@ -33,7 +33,7 @@ final class CoverageRequirementCheckerTest extends TestCase
         $this->assertTrue($coverageChecker->hasDebuggerOrCoverageOption());
     }
 
-    public function test_it_has_debugger_or_coverage_option_with_xdebug()
+    public function test_it_has_debugger_or_coverage_option_with_xdebug(): void
     {
         $this->requireNoPhpDbg();
         $this->requireXdebug();
@@ -43,7 +43,7 @@ final class CoverageRequirementCheckerTest extends TestCase
         $this->assertTrue($coverageChecker->hasDebuggerOrCoverageOption());
     }
 
-    public function test_it_has_debug_or_coverage_option_when_provided_with_coverage()
+    public function test_it_has_debug_or_coverage_option_when_provided_with_coverage(): void
     {
         $this->requireNoPhpDbg();
         $this->requireNoXdebug();
@@ -53,7 +53,7 @@ final class CoverageRequirementCheckerTest extends TestCase
         $this->assertTrue($coverageChecker->hasDebuggerOrCoverageOption());
     }
 
-    public function test_it_has_debug_or_coverage_option_when_provided_with_correct_initial_php_settings()
+    public function test_it_has_debug_or_coverage_option_when_provided_with_correct_initial_php_settings(): void
     {
         $this->requireNoPhpDbg();
         $this->requireNoXdebug();
@@ -63,7 +63,7 @@ final class CoverageRequirementCheckerTest extends TestCase
         $this->assertTrue($coverageChecker->hasDebuggerOrCoverageOption());
     }
 
-    public function test_it_has_no_debug_or_coverage_option_when_provided_with_incorrect_initial_php_settings()
+    public function test_it_has_no_debug_or_coverage_option_when_provided_with_incorrect_initial_php_settings(): void
     {
         $this->requireNoPhpDbg();
         $this->requireNoXdebug();
@@ -73,28 +73,28 @@ final class CoverageRequirementCheckerTest extends TestCase
         $this->assertFalse($coverageChecker->hasDebuggerOrCoverageOption());
     }
 
-    private function requirePhpDbg()
+    private function requirePhpDbg(): void
     {
         if (\PHP_SAPI !== 'phpdbg') {
             $this->markTestSkipped('Test requires phpdbg to run.');
         }
     }
 
-    private function requireNoPhpDbg()
+    private function requireNoPhpDbg(): void
     {
         if (\PHP_SAPI === 'phpdbg') {
             $this->markTestSkipped('Test requires phpdbg to be disabled to run.');
         }
     }
 
-    private function requireXdebug()
+    private function requireXdebug(): void
     {
         if (!\extension_loaded('xdebug')) {
             $this->markTestSkipped('Test requires xdebug to run.');
         }
     }
 
-    private function requireNoXdebug()
+    private function requireNoXdebug(): void
     {
         if (\extension_loaded('xdebug')) {
             $this->markTestSkipped('Test requires xdebug to be disabled to run.');

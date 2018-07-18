@@ -24,7 +24,7 @@ use function Infection\Tests\normalizePath as p;
  */
 final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
-    const HASH = 'a1b2c3';
+    public const HASH = 'a1b2c3';
 
     private $tmpDir;
 
@@ -51,7 +51,7 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
      */
     private $workspace;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workspace = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
 
@@ -82,12 +82,12 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->fileSystem->remove($this->workspace);
     }
 
-    public function test_it_builds_path_to_mutation_config_file()
+    public function test_it_builds_path_to_mutation_config_file(): void
     {
         $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
 
@@ -97,7 +97,7 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         );
     }
 
-    public function test_it_sets_custom_autoloader()
+    public function test_it_sets_custom_autoloader(): void
     {
         $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
 
@@ -117,7 +117,7 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         $this->assertContains('app/autoload2.php', file_get_contents($expectedCustomAutoloadFilePath));
     }
 
-    public function test_it_sets_custom_autoloader_when_attribute_is_absent()
+    public function test_it_sets_custom_autoloader_when_attribute_is_absent(): void
     {
         $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpuit_without_bootstrap.xml';
@@ -144,7 +144,7 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         $this->assertContains('vendor/autoload.php', file_get_contents($expectedCustomAutoloadFilePath));
     }
 
-    public function test_it_sets_stop_on_failure_flag()
+    public function test_it_sets_stop_on_failure_flag(): void
     {
         $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
 
@@ -157,7 +157,7 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         $this->assertSame('true', $value);
     }
 
-    public function test_it_sets_colors_flag()
+    public function test_it_sets_colors_flag(): void
     {
         $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
 
@@ -170,7 +170,7 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         $this->assertSame('false', $value);
     }
 
-    public function test_it_handles_root_test_suite()
+    public function test_it_handles_root_test_suite(): void
     {
         $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
 
@@ -190,7 +190,7 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         $this->assertSame(1, $this->queryXpath(file_get_contents($configurationPath), '/phpunit/testsuite')->length);
     }
 
-    public function test_it_removes_original_loggers()
+    public function test_it_removes_original_loggers(): void
     {
         $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
 
@@ -202,7 +202,7 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         $this->assertSame(0, $nodeList->length);
     }
 
-    public function test_it_removes_printer_class()
+    public function test_it_removes_printer_class(): void
     {
         $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
 
@@ -218,7 +218,7 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
     /**
      * @dataProvider coverageTestsProvider
      */
-    public function test_it_sets_sorted_list_of_test_files(array $coverageTests, array $expectedFiles)
+    public function test_it_sets_sorted_list_of_test_files(array $coverageTests, array $expectedFiles): void
     {
         $this->mutant->shouldReceive('getCoverageTests')->andReturn($coverageTests);
 

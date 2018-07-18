@@ -22,7 +22,7 @@ final class LogicalNotTest extends AbstractMutatorTestCase
     /**
      * @dataProvider provideMutationCases
      */
-    public function test_mutator($input, $expected = null)
+    public function test_mutator($input, $expected = null): void
     {
         $this->doTest($input, $expected);
     }
@@ -55,14 +55,14 @@ PHP
         ];
     }
 
-    public function test_it_mutates_logical_not()
+    public function test_it_mutates_logical_not(): void
     {
         $expr = new BooleanNot(new ConstFetch(new Name('false')));
 
         $this->assertTrue($this->mutator->shouldMutate($expr));
     }
 
-    public function test_it_does_not_mutates_doubled_logical_not()
+    public function test_it_does_not_mutates_doubled_logical_not(): void
     {
         $expr = new BooleanNot(
             new BooleanNot(new ConstFetch(new Name('false')))

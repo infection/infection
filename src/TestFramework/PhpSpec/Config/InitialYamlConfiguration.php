@@ -49,7 +49,7 @@ final class InitialYamlConfiguration extends AbstractYamlConfiguration
         return Yaml::dump($this->parsedYaml);
     }
 
-    private function updateCodeCoveragePath(array &$parsedYaml)
+    private function updateCodeCoveragePath(array &$parsedYaml): void
     {
         foreach ($parsedYaml['extensions'] as $extensionName => &$options) {
             if (!$this->isCodeCoverageExtension($extensionName)) {
@@ -64,7 +64,7 @@ final class InitialYamlConfiguration extends AbstractYamlConfiguration
         unset($options);
     }
 
-    private function removeCoverageExtension(array &$parsedYaml)
+    private function removeCoverageExtension(array &$parsedYaml): void
     {
         foreach ($parsedYaml['extensions'] as $extensionName => &$options) {
             if (!$this->isCodeCoverageExtension($extensionName)) {

@@ -55,7 +55,7 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterf
         ];
     }
 
-    public function onInitialTestSuiteStarted(InitialTestSuiteStarted $event)
+    public function onInitialTestSuiteStarted(InitialTestSuiteStarted $event): void
     {
         try {
             $version = $this->testFrameworkAdapter->getVersion();
@@ -76,12 +76,12 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterf
         $this->progressBar->start();
     }
 
-    public function onInitialTestSuiteFinished(InitialTestSuiteFinished $event)
+    public function onInitialTestSuiteFinished(InitialTestSuiteFinished $event): void
     {
         $this->progressBar->finish();
     }
 
-    public function onInitialTestCaseCompleted(InitialTestCaseCompleted $event)
+    public function onInitialTestCaseCompleted(InitialTestCaseCompleted $event): void
     {
         $this->progressBar->advance();
     }

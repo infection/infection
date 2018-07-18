@@ -18,8 +18,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class BadgeLogger implements MutationTestingResultsLogger
 {
-    const ENV_INFECTION_BADGE_API_KEY = 'INFECTION_BADGE_API_KEY';
-    const ENV_STRYKER_DASHBOARD_API_KEY = 'STRYKER_DASHBOARD_API_KEY';
+    public const ENV_INFECTION_BADGE_API_KEY = 'INFECTION_BADGE_API_KEY';
+    public const ENV_STRYKER_DASHBOARD_API_KEY = 'STRYKER_DASHBOARD_API_KEY';
 
     /**
      * @var BadgeApiClient
@@ -49,7 +49,7 @@ final class BadgeLogger implements MutationTestingResultsLogger
         $this->config = $config;
     }
 
-    public function log()
+    public function log(): void
     {
         $travisBuild = getenv('TRAVIS');
 
@@ -123,7 +123,7 @@ final class BadgeLogger implements MutationTestingResultsLogger
         );
     }
 
-    private function showInfo(string $message)
+    private function showInfo(string $message): void
     {
         $this->output->writeln(sprintf('Dashboard report has not been sent: %s', $message));
     }

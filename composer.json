@@ -49,7 +49,7 @@
     },
     "config": {
         "platform": {
-            "php": "7.0.8"
+            "php": "7.1"
         },
         "sort-packages": true
     },
@@ -57,7 +57,7 @@
         "symfony/process": "3.4.2"
     },
     "require": {
-        "php": "^7.0",
+        "php": "^7.1",
         "ext-dom": "*",
         "composer/xdebug-handler": "^1.1",
         "nikic/php-parser": "^4.0",

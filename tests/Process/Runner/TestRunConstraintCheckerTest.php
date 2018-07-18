@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class TestRunConstraintCheckerTest extends TestCase
 {
-    public function test_runs_fail_with_zero_mutations_and_no_ignore_msi_with_zero_mutations_and_required_msi()
+    public function test_runs_fail_with_zero_mutations_and_no_ignore_msi_with_zero_mutations_and_required_msi(): void
     {
         $constraintChecker = new TestRunConstraintChecker(
             new MetricsCalculator(),
@@ -32,7 +32,7 @@ final class TestRunConstraintCheckerTest extends TestCase
         $this->assertSame(10.0, $constraintChecker->getMinRequiredValue());
     }
 
-    public function test_runs_fail_with_zero_mutations_and_no_ignore_msi_with_zero_mutations_and_required_covered_msi()
+    public function test_runs_fail_with_zero_mutations_and_no_ignore_msi_with_zero_mutations_and_required_covered_msi(): void
     {
         $constraintChecker = new TestRunConstraintChecker(
             new MetricsCalculator(),
@@ -46,7 +46,7 @@ final class TestRunConstraintCheckerTest extends TestCase
         $this->assertSame(10.0, $constraintChecker->getMinRequiredValue());
     }
 
-    public function test_runs_passes_with_zero_mutations_and_no_ignore_msi_with_zero_mutations_and_no_required_msi()
+    public function test_runs_passes_with_zero_mutations_and_no_ignore_msi_with_zero_mutations_and_no_required_msi(): void
     {
         $constraintChecker = new TestRunConstraintChecker(
             new MetricsCalculator(),
@@ -58,7 +58,7 @@ final class TestRunConstraintCheckerTest extends TestCase
         $this->assertTrue($constraintChecker->hasTestRunPassedConstraints());
     }
 
-    public function test_runs_passes_with_zero_mutations_and_ignore_msi_with_zero_mutations_and_required_msi()
+    public function test_runs_passes_with_zero_mutations_and_ignore_msi_with_zero_mutations_and_required_msi(): void
     {
         $constraintChecker = new TestRunConstraintChecker(
             new MetricsCalculator(),
@@ -70,7 +70,7 @@ final class TestRunConstraintCheckerTest extends TestCase
         $this->assertTrue($constraintChecker->hasTestRunPassedConstraints());
     }
 
-    public function test_runs_passes_with_zero_mutations_and_ignore_msi_with_zero_mutations_option_and_required_covered_msi()
+    public function test_runs_passes_with_zero_mutations_and_ignore_msi_with_zero_mutations_option_and_required_covered_msi(): void
     {
         $constraintChecker = new TestRunConstraintChecker(
             new MetricsCalculator(),
@@ -82,7 +82,7 @@ final class TestRunConstraintCheckerTest extends TestCase
         $this->assertTrue($constraintChecker->hasTestRunPassedConstraints());
     }
 
-    public function test_run_fails_with_mutation_ignore_msi_with_zero_mutations_option_and_not_enough_msi()
+    public function test_run_fails_with_mutation_ignore_msi_with_zero_mutations_option_and_not_enough_msi(): void
     {
         $metrics = $this->createMock(MetricsCalculator::class);
         $metrics->expects($this->once())->method('getTotalMutantsCount')->willReturn(100);
@@ -99,7 +99,7 @@ final class TestRunConstraintCheckerTest extends TestCase
         $this->assertSame(10.0, $constraintChecker->getMinRequiredValue());
     }
 
-    public function test_run_fails_with_mutation_ignore_msi_with_zero_mutations_option_and_not_enough_covered_msi()
+    public function test_run_fails_with_mutation_ignore_msi_with_zero_mutations_option_and_not_enough_covered_msi(): void
     {
         $metrics = $this->createMock(MetricsCalculator::class);
         $metrics->expects($this->once())->method('getTotalMutantsCount')->willReturn(100);
@@ -117,7 +117,7 @@ final class TestRunConstraintCheckerTest extends TestCase
         $this->assertSame(10.0, $constraintChecker->getMinRequiredValue());
     }
 
-    public function test_run_fails_with_no_mutation_ignore_msi_with_zero_mutations_option_and_not_enough_msi()
+    public function test_run_fails_with_no_mutation_ignore_msi_with_zero_mutations_option_and_not_enough_msi(): void
     {
         $metrics = $this->createMock(MetricsCalculator::class);
         $metrics->expects($this->once())->method('getMutationScoreIndicator')->willReturn(8.0);
@@ -133,7 +133,7 @@ final class TestRunConstraintCheckerTest extends TestCase
         $this->assertSame(10.0, $constraintChecker->getMinRequiredValue());
     }
 
-    public function test_run_fails_with_no_mutation_ignore_msi_with_zero_mutations_option_and_not_enough_covered_msi()
+    public function test_run_fails_with_no_mutation_ignore_msi_with_zero_mutations_option_and_not_enough_covered_msi(): void
     {
         $metrics = $this->createMock(MetricsCalculator::class);
         $metrics->expects($this->once())->method('getMutationScoreIndicator')->willReturn(100.0);
@@ -150,7 +150,7 @@ final class TestRunConstraintCheckerTest extends TestCase
         $this->assertSame(10.0, $constraintChecker->getMinRequiredValue());
     }
 
-    public function test_run_passes_on_exactly_min_msi()
+    public function test_run_passes_on_exactly_min_msi(): void
     {
         $metrics = $this->createMock(MetricsCalculator::class);
         $metrics->expects($this->once())->method('getMutationScoreIndicator')->willReturn(10.0);
@@ -165,7 +165,7 @@ final class TestRunConstraintCheckerTest extends TestCase
         $this->assertTrue($constraintChecker->hasTestRunPassedConstraints());
     }
 
-    public function test_run_passes_on_exactly_covered_min_msi()
+    public function test_run_passes_on_exactly_covered_min_msi(): void
     {
         $metrics = $this->createMock(MetricsCalculator::class);
         $metrics->expects($this->once())->method('getMutationScoreIndicator')->willReturn(20.0);

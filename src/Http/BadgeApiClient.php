@@ -16,9 +16,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class BadgeApiClient
 {
-    const STRYKER_DASHBOARD_API_URL = 'https://dashboard.stryker-mutator.io/api/reports';
+    private const STRYKER_DASHBOARD_API_URL = 'https://dashboard.stryker-mutator.io/api/reports';
 
-    const CREATED_RESPONSE_CODE = 201;
+    private const CREATED_RESPONSE_CODE = 201;
 
     /**
      * @var OutputInterface
@@ -35,7 +35,7 @@ class BadgeApiClient
         string $repositorySlug,
         string $branch,
         float $mutationScore
-    ) {
+    ): void {
         $json = json_encode([
             'apiKey' => $apiKey,
             'repositorySlug' => $repositorySlug,

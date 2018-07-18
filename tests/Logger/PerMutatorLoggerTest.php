@@ -24,7 +24,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class PerMutatorLoggerTest extends TestCase
 {
-    public function test_it_correctly_build_log_lines()
+    public function test_it_correctly_build_log_lines(): void
     {
         $fs = $this->createMock(Filesystem::class);
         $fs->expects($this->once())

@@ -34,7 +34,7 @@ final class InitialConfigBuilderTest extends TestCase
      */
     private $workspace;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workspace = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
         $this->fileSystem = new Filesystem();
@@ -42,12 +42,12 @@ final class InitialConfigBuilderTest extends TestCase
         $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->fileSystem->remove($this->workspace);
     }
 
-    public function test_it_builds_path_to_initial_config_file()
+    public function test_it_builds_path_to_initial_config_file(): void
     {
         $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/phpspec/phpspec.yml';
 

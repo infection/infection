@@ -24,7 +24,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     private $coverageDir = __DIR__ . '/../../Fixtures/Files/phpunit/coverage-xml';
 
-    public function test_it_determines_if_method_was_executed_from_coverage_report()
+    public function test_it_determines_if_method_was_executed_from_coverage_report(): void
     {
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
@@ -34,7 +34,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertTrue($codeCoverageData->hasExecutedMethodOnLine($filePath, 22), 'End line'); // end line
     }
 
-    public function test_it_determines_line_is_not_covered_by_executed_method()
+    public function test_it_determines_line_is_not_covered_by_executed_method(): void
     {
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
@@ -43,7 +43,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertFalse($codeCoverageData->hasExecutedMethodOnLine($filePath, 40), 'After');
     }
 
-    public function test_it_determines_line_is_not_covered_by_not_executed_method()
+    public function test_it_determines_line_is_not_covered_by_not_executed_method(): void
     {
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
@@ -51,7 +51,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertFalse($codeCoverageData->hasExecutedMethodOnLine($filePath, 4));
     }
 
-    public function test_it_determines_line_is_not_covered_for_unknown_path()
+    public function test_it_determines_line_is_not_covered_for_unknown_path(): void
     {
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = 'unknown/path';
@@ -59,7 +59,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertFalse($codeCoverageData->hasExecutedMethodOnLine($filePath, 4));
     }
 
-    public function test_it_determines_file_is_not_covered_for_unknown_path()
+    public function test_it_determines_file_is_not_covered_for_unknown_path(): void
     {
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = 'unknown/path';
@@ -67,7 +67,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertFalse($codeCoverageData->hasTests($filePath));
     }
 
-    public function test_it_determines_file_is_covered()
+    public function test_it_determines_file_is_covered(): void
     {
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
@@ -75,7 +75,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertTrue($codeCoverageData->hasTests($filePath));
     }
 
-    public function test_it_determines_file_is_not_covered()
+    public function test_it_determines_file_is_not_covered(): void
     {
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevelNotCovered.php';
@@ -83,7 +83,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertFalse($codeCoverageData->hasTests($filePath));
     }
 
-    public function test_it_determines_file_does_not_have_tests_on_line_for_unknown_file()
+    public function test_it_determines_file_does_not_have_tests_on_line_for_unknown_file(): void
     {
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = 'unknown/path';
@@ -91,7 +91,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertFalse($codeCoverageData->hasTestsOnLine($filePath, 3));
     }
 
-    public function test_it_determines_file_does_not_have_tests_for_line()
+    public function test_it_determines_file_does_not_have_tests_for_line(): void
     {
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
@@ -99,7 +99,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertFalse($codeCoverageData->hasTestsOnLine($filePath, 1));
     }
 
-    public function test_it_determines_file_has_tests_for_line()
+    public function test_it_determines_file_has_tests_for_line(): void
     {
         $codeCoverageData = $this->getCodeCoverageData();
 
@@ -108,7 +108,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertTrue($codeCoverageData->hasTestsOnLine($filePath, 30));
     }
 
-    public function test_it_returns_zero_tests_for_not_covered_function_body_mutator()
+    public function test_it_returns_zero_tests_for_not_covered_function_body_mutator(): void
     {
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
@@ -126,7 +126,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertCount(0, $codeCoverageData->getAllTestsFor($mutation));
     }
 
-    public function test_it_returns_tests_for_covered_function_body_mutator()
+    public function test_it_returns_tests_for_covered_function_body_mutator(): void
     {
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
@@ -144,7 +144,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertCount(2, $codeCoverageData->getAllTestsFor($mutation));
     }
 
-    public function test_it_returns_zero_tests_for_not_covered_function_signature_mutator()
+    public function test_it_returns_zero_tests_for_not_covered_function_signature_mutator(): void
     {
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
@@ -162,7 +162,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertCount(0, $codeCoverageData->getAllTestsFor($mutation));
     }
 
-    public function test_it_returns_tests_for_covered_function_signature_mutator()
+    public function test_it_returns_tests_for_covered_function_signature_mutator(): void
     {
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
@@ -180,7 +180,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertCount(6, $codeCoverageData->getAllTestsFor($mutation));
     }
 
-    public function test_it_throws_an_exception_when_no_coverage_found()
+    public function test_it_throws_an_exception_when_no_coverage_found(): void
     {
         $coverageXmlParserMock = Mockery::mock(CoverageXmlParser::class);
 

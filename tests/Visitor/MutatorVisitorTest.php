@@ -29,7 +29,7 @@ final class MutatorVisitorTest extends TestCase
     /**
      * @dataProvider providesMutationCases
      */
-    public function test_it_mutates_the_correct_node(array $inputAst, string $outputCode, MutationInterface $mutation)
+    public function test_it_mutates_the_correct_node(array $inputAst, string $outputCode, MutationInterface $mutation): void
     {
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new MutatorVisitor($mutation));

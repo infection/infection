@@ -16,9 +16,9 @@ use Infection\Mutant\MetricsCalculator;
  */
 final class TestRunConstraintChecker
 {
-    const MSI_FAILURE = 'min-msi';
+    public const MSI_FAILURE = 'min-msi';
 
-    const COVERED_MSI_FAILURE = 'min-covered-msi';
+    public const COVERED_MSI_FAILURE = 'min-covered-msi';
 
     /**
      * @var MetricsCalculator

@@ -25,7 +25,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class SubscriberBuilderTest extends TestCase
 {
-    public function test_it_registers_the_subscribers_when_debugging()
+    public function test_it_registers_the_subscribers_when_debugging(): void
     {
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->exactly(5))
@@ -59,7 +59,7 @@ final class SubscriberBuilderTest extends TestCase
         $subscriberBuilder->registerSubscribers($adapter, $output);
     }
 
-    public function test_it_registers_the_subscribers_when_not_debugging()
+    public function test_it_registers_the_subscribers_when_not_debugging(): void
     {
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->exactly(5))
@@ -93,7 +93,7 @@ final class SubscriberBuilderTest extends TestCase
         $subscriberBuilder->registerSubscribers($adapter, $output);
     }
 
-    public function test_it_throws_an_exception_when_output_formatter_is_invalid()
+    public function test_it_throws_an_exception_when_output_formatter_is_invalid(): void
     {
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->exactly(2))

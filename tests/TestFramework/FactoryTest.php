@@ -22,7 +22,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class FactoryTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
-    public function test_it_throws_an_exception_if_it_cant_find_the_testframework()
+    public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
     {
         $factory = new Factory(
             '',

@@ -30,9 +30,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class ConfigureCommand extends BaseCommand
 {
-    const NONINTERACTIVE_MODE_ERROR = 'Infection config generator requires an interactive mode.';
+    public const NONINTERACTIVE_MODE_ERROR = 'Infection config generator requires an interactive mode.';
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('configure')
             ->setDescription('Create Infection config')
@@ -132,7 +132,7 @@ final class ConfigureCommand extends BaseCommand
         string $phpUnitConfigPath = null,
         string $phpUnitCustomExecutablePath = null,
         string $textLogFilePath = null
-    ) {
+    ): void {
         $configObject = new \stdClass();
 
         $configObject->timeout = $timeout;

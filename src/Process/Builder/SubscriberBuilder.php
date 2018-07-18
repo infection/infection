@@ -89,7 +89,7 @@ final class SubscriberBuilder
     public function registerSubscribers(
         AbstractTestFrameworkAdapter $testFrameworkAdapter,
         OutputInterface $output
-    ) {
+    ): void {
         foreach ($this->getSubscribers($testFrameworkAdapter, $output) as $subscriber) {
             $this->eventDispatcher->addSubscriber($subscriber);
         }

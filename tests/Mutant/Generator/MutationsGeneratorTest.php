@@ -33,7 +33,7 @@ use Pimple\Container;
  */
 final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
-    public function test_it_collects_plus_mutation()
+    public function test_it_collects_plus_mutation(): void
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
         $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->once()->andReturn(true);
@@ -46,7 +46,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
         $this->assertInstanceOf(Plus::class, $mutations[1]->getMutator());
     }
 
-    public function test_it_collects_public_visibility_mutation()
+    public function test_it_collects_public_visibility_mutation(): void
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
         $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->once()->andReturn(true);
@@ -60,7 +60,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
         $this->assertInstanceOf(PublicVisibility::class, $mutations[2]->getMutator());
     }
 
-    public function test_it_can_skip_not_covered_on_file_level()
+    public function test_it_can_skip_not_covered_on_file_level(): void
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
         $codeCoverageDataMock->shouldReceive('hasTests')->once()->andReturn(false);
@@ -72,7 +72,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
         $this->assertCount(0, $mutations);
     }
 
-    public function test_it_can_skip_not_covered_on_file_line_level()
+    public function test_it_can_skip_not_covered_on_file_line_level(): void
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
         $codeCoverageDataMock->shouldReceive('hasTests')->once()->andReturn(true);
@@ -88,7 +88,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
         $this->assertInstanceOf(PublicVisibility::class, $mutations[1]->getMutator());
     }
 
-    public function test_it_can_skip_not_covered_on_file_line_for_visibility()
+    public function test_it_can_skip_not_covered_on_file_line_for_visibility(): void
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
         $codeCoverageDataMock->shouldReceive('hasTests')->once()->andReturn(true);
@@ -102,7 +102,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
         $this->assertCount(0, $mutations);
     }
 
-    public function test_it_can_skip_ignored_classes()
+    public function test_it_can_skip_ignored_classes(): void
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
         $codeCoverageDataMock->shouldReceive('hasTests')->once()->andReturn(true);
@@ -118,7 +118,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
         $this->assertCount(0, $mutations);
     }
 
-    public function test_it_executes_only_whitelisted_mutators()
+    public function test_it_executes_only_whitelisted_mutators(): void
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
 
@@ -129,7 +129,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
         $this->assertCount(0, $mutations);
     }
 
-    public function test_whitelist_is_case_sensitive()
+    public function test_whitelist_is_case_sensitive(): void
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
 
@@ -141,7 +141,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
         $generator->generate(false);
     }
 
-    public function test_it_throws_correct_error_when_file_is_invalid()
+    public function test_it_throws_correct_error_when_file_is_invalid(): void
     {
         $generator = $this->createMutationGenerator(
             Mockery::mock(CodeCoverageData::class),
@@ -155,7 +155,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
         $generator->generate(false);
     }
 
-    public function test_it_throws_correct_exception_when_mutator_is_invalid()
+    public function test_it_throws_correct_exception_when_mutator_is_invalid(): void
     {
         $generator = $this->createMutationGenerator(
             Mockery::mock(CodeCoverageData::class),

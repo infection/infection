@@ -129,7 +129,7 @@ final class ProjectCodeTest extends TestCase
         ParentConnectorVisitor::class,
     ];
 
-    public function test_infection_bin_is_executable()
+    public function test_infection_bin_is_executable(): void
     {
         if (stripos(PHP_OS, 'WIN') === 0) {
             $this->markTestSkipped('Unable to check if the file is executable on windows.');
@@ -145,7 +145,7 @@ final class ProjectCodeTest extends TestCase
      *
      * @param string $className
      */
-    public function test_src_class_provider_is_valid(string $className)
+    public function test_src_class_provider_is_valid(string $className): void
     {
         $this->assertTrue(
             class_exists($className) || interface_exists($className) || trait_exists($className),
@@ -162,7 +162,7 @@ final class ProjectCodeTest extends TestCase
      *
      * @param string $className
      */
-    public function test_test_class_provider_is_valid(string $className)
+    public function test_test_class_provider_is_valid(string $className): void
     {
         $this->assertTrue(
             class_exists($className) || interface_exists($className) || trait_exists($className),
@@ -179,7 +179,7 @@ final class ProjectCodeTest extends TestCase
      *
      * @param string $className
      */
-    public function test_all_concrete_classes_have_tests(string $className)
+    public function test_all_concrete_classes_have_tests(string $className): void
     {
         $testClass = preg_replace('/Infection/', 'Infection\\Tests', $className, 1) . 'Test';
 
@@ -210,7 +210,7 @@ final class ProjectCodeTest extends TestCase
      *
      * @param string $className
      */
-    public function test_non_tested_concrete_class_list_is_valid(string $className)
+    public function test_non_tested_concrete_class_list_is_valid(string $className): void
     {
         $this->assertTrue(class_exists($className),
             sprintf(
@@ -225,7 +225,7 @@ final class ProjectCodeTest extends TestCase
      *
      * @param string $className
      */
-    public function test_non_extension_points_are_internal(string $className)
+    public function test_non_extension_points_are_internal(string $className): void
     {
         $rc = new \ReflectionClass($className);
         $docBlock = $rc->getDocComment();
@@ -275,7 +275,7 @@ final class ProjectCodeTest extends TestCase
      *
      * @param string $className
      */
-    public function test_non_extension_points_are_trait_interface_abstract_or_final(string $className)
+    public function test_non_extension_points_are_trait_interface_abstract_or_final(string $className): void
     {
         $rc = new \ReflectionClass($className);
 
@@ -295,7 +295,7 @@ final class ProjectCodeTest extends TestCase
      *
      * @param string $className
      */
-    public function test_non_final_non_extension_list_is_valid(string $className)
+    public function test_non_final_non_extension_list_is_valid(string $className): void
     {
         $rc = new \ReflectionClass($className);
 
@@ -314,7 +314,7 @@ final class ProjectCodeTest extends TestCase
      *
      * @param string $className
      */
-    public function test_src_classes_do_not_expose_public_properties(string $className)
+    public function test_src_classes_do_not_expose_public_properties(string $className): void
     {
         $rc = new \ReflectionClass($className);
 
@@ -373,7 +373,7 @@ final class ProjectCodeTest extends TestCase
      *
      * @param string $className
      */
-    public function test_all_test_classes_are_trait_abstract_or_final(string $className)
+    public function test_all_test_classes_are_trait_abstract_or_final(string $className): void
     {
         $rc = new \ReflectionClass($className);
 
@@ -388,7 +388,7 @@ final class ProjectCodeTest extends TestCase
      *
      * @param string $className
      */
-    public function test_all_test_classes_are_marked_internal(string $className)
+    public function test_all_test_classes_are_marked_internal(string $className): void
     {
         $rc = new \ReflectionClass($className);
         $docBlock = $rc->getDocComment();

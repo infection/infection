@@ -21,7 +21,7 @@ final class FalseValueTest extends AbstractMutatorTestCase
     /**
      * @dataProvider provideMutationCases
      */
-    public function test_mutator($input, $expected = null)
+    public function test_mutator($input, $expected = null): void
     {
         $this->doTest($input, $expected);
     }
@@ -68,14 +68,14 @@ PHP
         ];
     }
 
-    public function test_mutates_false_value()
+    public function test_mutates_false_value(): void
     {
         $falseValue = new ConstFetch(new Name('false'));
 
         $this->assertTrue($this->mutator->shouldMutate($falseValue));
     }
 
-    public function test_does_not_mutate_true_value()
+    public function test_does_not_mutate_true_value(): void
     {
         $falseValue = new ConstFetch(new Name('true'));
 

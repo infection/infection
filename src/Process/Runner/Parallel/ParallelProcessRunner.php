@@ -52,7 +52,7 @@ final class ParallelProcessRunner
      * @throws RuntimeException
      * @throws LogicException
      */
-    public function run(array $processes, int $threadCount, int $poll = 1000)
+    public function run(array $processes, int $threadCount, int $poll = 1000): void
     {
         if (!$this->processesQueue = $processes) {
             // nothing to do here

@@ -17,9 +17,6 @@ environment:
   - dependencies: current
     php_ver_target: 7.1
     xdebug_ver: '2.6.0-7.1-vc14'
-  - dependencies: current
-    php_ver_target: 7.0
-    xdebug_ver: '2.6.0-7.0-vc14'
 
 cache: # cache is cleared when linked file is modified
     - '%LOCALAPPDATA%\Composer\files -> composer.lock'

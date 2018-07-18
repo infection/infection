@@ -14,12 +14,11 @@ namespace Infection\StreamWrapper;
  */
 final class IncludeInterceptor
 {
-    const STREAM_OPEN_FOR_INCLUDE = 0x00000080;
-
     /**
      * @var resource
      */
     public $context;
+    private const STREAM_OPEN_FOR_INCLUDE = 0x00000080;
 
     /**
      * @var bool|resource
@@ -36,7 +35,7 @@ final class IncludeInterceptor
      */
     private static $replacement;
 
-    public static function intercept($file, $with)
+    public static function intercept($file, $with): void
     {
         if (!file_exists($file)) {
             throw new \InvalidArgumentException(
@@ -53,7 +52,7 @@ final class IncludeInterceptor
         self::$replacement = $with;
     }
 
-    public static function enable()
+    public static function enable(): void
     {
         if (!isset(self::$intercept) || !isset(self::$replacement)) {
             throw new \RuntimeException(
@@ -64,7 +63,7 @@ final class IncludeInterceptor
         stream_wrapper_register('file', __CLASS__);
     }
 
-    public static function disable()
+    public static function disable(): void
     {
         stream_wrapper_restore('file');
     }

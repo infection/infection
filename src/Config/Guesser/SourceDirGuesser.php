@@ -71,12 +71,12 @@ class SourceDirGuesser implements Guesser
      * @param array|string $path
      * @param array        $dirs
      */
-    private function parsePath($path, array &$dirs)
+    private function parsePath($path, array &$dirs): void
     {
         if (\is_array($path)) {
             array_walk_recursive(
                 $path,
-                function ($el) use (&$dirs) {
+                function ($el) use (&$dirs): void {
                     $this->parsePath($el, $dirs);
                 }
             );

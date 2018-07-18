@@ -41,8 +41,6 @@ use Symfony\Component\Process\Process;
  */
 final class InfectionCommand extends BaseCommand
 {
-    const CI_FLAG_ERROR = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
-
     /**
      * @var ConsoleOutput
      */
@@ -58,7 +56,7 @@ final class InfectionCommand extends BaseCommand
      */
     private $skipCoverage;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('run')
             ->setDescription('Runs the mutation testing.')
@@ -253,7 +251,7 @@ final class InfectionCommand extends BaseCommand
         return 0;
     }
 
-    private function includeUserBootstrap(InfectionConfig $config)
+    private function includeUserBootstrap(InfectionConfig $config): void
     {
         $bootstrap = $config->getBootstrap();
 
@@ -266,7 +264,7 @@ final class InfectionCommand extends BaseCommand
         }
     }
 
-    private function applyMemoryLimitFromPhpUnitProcess(Process $process, MemoryUsageAware $adapter)
+    private function applyMemoryLimitFromPhpUnitProcess(Process $process, MemoryUsageAware $adapter): void
     {
         if (\PHP_SAPI === 'phpdbg') {
             // Under phpdbg we're using a system php.ini, can't add a memory limit there
@@ -345,7 +343,7 @@ final class InfectionCommand extends BaseCommand
      *
      * @throws InfectionException
      */
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         parent::initialize($input, $output);
 
@@ -362,7 +360,7 @@ final class InfectionCommand extends BaseCommand
         $this->eventDispatcher = $this->getContainer()->get('dispatcher');
     }
 
-    private function runConfigurationCommand(Locator $locator)
+    private function runConfigurationCommand(Locator $locator): void
     {
         try {
             $locator->locateAnyOf(InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES);

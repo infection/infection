@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class TestFileNameNotFoundExceptionTest extends TestCase
 {
-    public function test_from_fqn()
+    public function test_from_fqn(): void
     {
         $exception = TestFileNameNotFoundException::notFoundFromFQN('Foo\Bar');
 

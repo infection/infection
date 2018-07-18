@@ -64,7 +64,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
         $this->onlyCovered = $onlyCovered;
     }
 
-    public function leaveNode(Node $node)
+    public function leaveNode(Node $node): void
     {
         foreach ($this->mutators as $mutator) {
             try {

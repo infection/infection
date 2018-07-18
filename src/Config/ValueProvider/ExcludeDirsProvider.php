@@ -22,7 +22,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class ExcludeDirsProvider
 {
-    const EXCLUDED_ROOT_DIRS = ['vendor', 'tests', 'test'];
+    public const EXCLUDED_ROOT_DIRS = ['vendor', 'tests', 'test'];
 
     /**
      * @var ConsoleHelper

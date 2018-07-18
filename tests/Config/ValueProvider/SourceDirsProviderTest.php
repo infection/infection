@@ -19,7 +19,7 @@ use Mockery;
  */
 final class SourceDirsProviderTest extends AbstractBaseProviderTest
 {
-    public function test_it_uses_guesser_and_default_value()
+    public function test_it_uses_guesser_and_default_value(): void
     {
         if (stripos(PHP_OS, 'WIN') === 0) {
             $this->markTestSkipped('Stty is not available');
@@ -44,7 +44,7 @@ final class SourceDirsProviderTest extends AbstractBaseProviderTest
         $this->assertSame(['src'], $sourceDirs);
     }
 
-    public function test_it_uses_guesser_and_non_default_guessed_value()
+    public function test_it_uses_guesser_and_non_default_guessed_value(): void
     {
         $consoleMock = Mockery::mock(ConsoleHelper::class);
         $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
@@ -65,7 +65,7 @@ final class SourceDirsProviderTest extends AbstractBaseProviderTest
         $this->assertSame(['src/Namespace'], $sourceDirs);
     }
 
-    public function test_it_uses_guesser_and_multiple_guessed_dirs()
+    public function test_it_uses_guesser_and_multiple_guessed_dirs(): void
     {
         $consoleMock = Mockery::mock(ConsoleHelper::class);
         $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
@@ -86,7 +86,7 @@ final class SourceDirsProviderTest extends AbstractBaseProviderTest
         $this->assertSame(['foo', 'bar'], $sourceDirs);
     }
 
-    public function test_it_fills_choices_with_current_dir()
+    public function test_it_fills_choices_with_current_dir(): void
     {
         $consoleMock = Mockery::mock(ConsoleHelper::class);
         $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
@@ -107,7 +107,7 @@ final class SourceDirsProviderTest extends AbstractBaseProviderTest
         $this->assertSame(['.'], $sourceDirs);
     }
 
-    public function test_it_throws_exception_when_current_dir_is_selected_with_another_dir()
+    public function test_it_throws_exception_when_current_dir_is_selected_with_another_dir(): void
     {
         $consoleMock = Mockery::mock(ConsoleHelper::class);
         $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');

@@ -114,7 +114,7 @@ AUTOLOAD;
         return $this->tempDirectory . '/' . $fileName;
     }
 
-    private function setCustomBootstrapPath(string $customAutoloadFilePath, \DOMXPath $xPath)
+    private function setCustomBootstrapPath(string $customAutoloadFilePath, \DOMXPath $xPath): void
     {
         $nodeList = $xPath->query('/phpunit/@bootstrap');
 
@@ -126,14 +126,14 @@ AUTOLOAD;
         }
     }
 
-    private function setFilteredTestsToRun(array $coverageTests, \DOMDocument $dom, \DOMXPath $xPath)
+    private function setFilteredTestsToRun(array $coverageTests, \DOMDocument $dom, \DOMXPath $xPath): void
     {
         $this->removeExistingTestSuite($xPath);
 
         $this->addTestSuiteWithFilteredTestFiles($coverageTests, $dom, $xPath);
     }
 
-    private function removeExistingTestSuite(\DOMXPath $xPath)
+    private function removeExistingTestSuite(\DOMXPath $xPath): void
     {
         $nodes = $xPath->query('/phpunit/testsuites/testsuite');
 
@@ -149,7 +149,7 @@ AUTOLOAD;
         }
     }
 
-    private function addTestSuiteWithFilteredTestFiles(array $coverageTests, \DOMDocument $dom, \DOMXPath $xPath)
+    private function addTestSuiteWithFilteredTestFiles(array $coverageTests, \DOMDocument $dom, \DOMXPath $xPath): void
     {
         $testSuites = $xPath->query('/phpunit/testsuites');
         $nodeToAppendTestSuite = $testSuites->item(0);

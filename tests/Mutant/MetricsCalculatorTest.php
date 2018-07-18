@@ -20,7 +20,7 @@ use Symfony\Component\Process\Process;
  */
 final class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
-    public function test_it_shows_zero_values_by_default()
+    public function test_it_shows_zero_values_by_default(): void
     {
         $calculator = new MetricsCalculator();
 
@@ -41,7 +41,7 @@ final class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
         $this->assertSame(0.0, $calculator->getCoveredCodeMutationScoreIndicator());
     }
 
-    public function test_it_collects_all_values()
+    public function test_it_collects_all_values(): void
     {
         $process = Mockery::mock(Process::class);
         $process->shouldReceive('stop');

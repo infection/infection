@@ -14,7 +14,7 @@ namespace Infection\Config\Guesser;
  */
 final class PhpUnitPathGuesser implements Guesser
 {
-    const CURRENT_DIR_PATH = '.';
+    private const CURRENT_DIR_PATH = '.';
 
     private $composerJsonContent;
 

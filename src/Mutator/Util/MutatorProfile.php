@@ -16,7 +16,7 @@ use Infection\Mutator;
  */
 final class MutatorProfile
 {
-    const MUTATOR_PROFILE_LIST = [
+    public const MUTATOR_PROFILE_LIST = [
         //Per category
         '@arithmetic' => self::ARITHMETIC,
         '@boolean' => self::BOOLEAN,
@@ -35,7 +35,7 @@ final class MutatorProfile
         '@default' => self::DEFAULT,
     ];
 
-    const ARITHMETIC = [
+    public const ARITHMETIC = [
         Mutator\Arithmetic\Assignment::class,
         Mutator\Arithmetic\AssignmentEqual::class,
         Mutator\Arithmetic\BitwiseAnd::class,
@@ -60,7 +60,7 @@ final class MutatorProfile
         Mutator\Arithmetic\ShiftRight::class,
     ];
 
-    const BOOLEAN = [
+    public const BOOLEAN = [
         Mutator\Boolean\ArrayItem::class,
         Mutator\Boolean\FalseValue::class,
         Mutator\Boolean\IdenticalEqual::class,
@@ -74,14 +74,14 @@ final class MutatorProfile
         Mutator\Boolean\Yield_::class,
     ];
 
-    const CONDITIONAL_BOUNDARY = [
+    public const CONDITIONAL_BOUNDARY = [
         Mutator\ConditionalBoundary\GreaterThan::class,
         Mutator\ConditionalBoundary\GreaterThanOrEqualTo::class,
         Mutator\ConditionalBoundary\LessThan::class,
         Mutator\ConditionalBoundary\LessThanOrEqualTo::class,
     ];
 
-    const CONDITIONAL_NEGOTIATION = [
+    public const CONDITIONAL_NEGOTIATION = [
         Mutator\ConditionalNegotiation\Equal::class,
         Mutator\ConditionalNegotiation\GreaterThanNegotiation::class,
         Mutator\ConditionalNegotiation\GreaterThanOrEqualToNegotiation::class,
@@ -92,30 +92,30 @@ final class MutatorProfile
         Mutator\ConditionalNegotiation\NotIdentical::class,
     ];
 
-    const FUNCTION_SIGNATURE = [
+    public const FUNCTION_SIGNATURE = [
         Mutator\FunctionSignature\PublicVisibility::class,
         Mutator\FunctionSignature\ProtectedVisibility::class,
     ];
 
-    const NUMBER = [
+    public const NUMBER = [
         Mutator\Number\DecrementInteger::class,
         Mutator\Number\IncrementInteger::class,
         Mutator\Number\OneZeroInteger::class,
         Mutator\Number\OneZeroFloat::class,
     ];
 
-    const OPERATOR = [
+    public const OPERATOR = [
         Mutator\Operator\Break_::class,
         Mutator\Operator\Continue_::class,
         Mutator\Operator\Throw_::class,
         Mutator\Operator\Coalesce::class,
     ];
 
-    const REGEX = [
+    public const REGEX = [
         Mutator\Regex\PregQuote::class,
     ];
 
-    const RETURN_VALUE = [
+    public const RETURN_VALUE = [
         Mutator\ReturnValue\FloatNegation::class,
         Mutator\ReturnValue\FunctionCall::class,
         Mutator\ReturnValue\IntegerNegation::class,
@@ -123,16 +123,16 @@ final class MutatorProfile
         Mutator\ReturnValue\This::class,
     ];
 
-    const SORT = [
+    public const SORT = [
         Mutator\Sort\Spaceship::class,
     ];
 
-    const ZERO_ITERATION = [
+    public const ZERO_ITERATION = [
         Mutator\ZeroIteration\Foreach_::class,
         Mutator\ZeroIteration\For_::class,
     ];
 
-    const CAST = [
+    public const CAST = [
         Mutator\Cast\CastArray::class,
         Mutator\Cast\CastBool::class,
         Mutator\Cast\CastFloat::class,
@@ -141,7 +141,7 @@ final class MutatorProfile
         Mutator\Cast\CastString::class,
     ];
 
-    const DEFAULT = [
+    public const DEFAULT = [
         '@arithmetic',
         '@boolean',
         '@cast',
@@ -156,7 +156,7 @@ final class MutatorProfile
         '@zero_iteration',
     ];
 
-    const FULL_MUTATOR_LIST = [
+    public const FULL_MUTATOR_LIST = [
         //Arithmetic
         'Assignment' => Mutator\Arithmetic\Assignment::class,
         'AssignmentEqual' => Mutator\Arithmetic\AssignmentEqual::class,

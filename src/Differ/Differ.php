@@ -16,7 +16,7 @@ use SebastianBergmann\Diff\Differ as BaseDiffer;
  */
 class Differ
 {
-    const DIFF_MAX_LINES = 12;
+    public const DIFF_MAX_LINES = 12;
 
     /**
      * @var BaseDiffer

@@ -16,7 +16,7 @@ use Infection\Finder\Exception\LocatorException;
  */
 final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
 {
-    const DEFAULT_EXTENSIONS = [
+    private const DEFAULT_EXTENSIONS = [
         'xml',
         'yml',
         'xml.dist',

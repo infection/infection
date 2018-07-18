@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class MutantProcessFinishedTest extends TestCase
 {
-    public function test_it_passes_around_its_mutant_process_without_changing_it()
+    public function test_it_passes_around_its_mutant_process_without_changing_it(): void
     {
         $process = $this->createMock(MutantProcessInterface::class);
         $process->expects($this->never())->method($this->anything());

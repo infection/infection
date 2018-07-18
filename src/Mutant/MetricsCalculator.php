@@ -90,7 +90,7 @@ class MetricsCalculator
         return $self;
     }
 
-    public function collect(MutantProcessInterface $mutantProcess)
+    public function collect(MutantProcessInterface $mutantProcess): void
     {
         ++$this->totalMutantsCount;
 

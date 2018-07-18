@@ -23,7 +23,7 @@ use Mockery;
  */
 final class PhpUnitAdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
-    public function test_it_has_a_name()
+    public function test_it_has_a_name(): void
     {
         $adapter = $this->getAdapter();
 
@@ -33,7 +33,7 @@ final class PhpUnitAdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     /**
      * @dataProvider passProvider
      */
-    public function test_it_determines_whether_tests_pass_or_not($output, $expectedResult)
+    public function test_it_determines_whether_tests_pass_or_not($output, $expectedResult): void
     {
         $adapter = $this->getAdapter();
 
@@ -52,7 +52,7 @@ final class PhpUnitAdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         ];
     }
 
-    public function test_it_conforms_to_memory_usage_aware()
+    public function test_it_conforms_to_memory_usage_aware(): void
     {
         $adapter = $this->getAdapter();
         $this->assertInstanceOf(MemoryUsageAware::class, $adapter);
@@ -61,7 +61,7 @@ final class PhpUnitAdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     /**
      * @dataProvider memoryReportProvider
      */
-    public function test_it_determines_used_memory_amount($output, $expectedResult)
+    public function test_it_determines_used_memory_amount($output, $expectedResult): void
     {
         $adapter = $this->getAdapter();
 

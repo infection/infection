@@ -14,10 +14,10 @@ namespace Infection\TestFramework;
  */
 final class TestFrameworkTypes
 {
-    const PHPUNIT = 'phpunit';
-    const PHPSPEC = 'phpspec';
+    public const PHPUNIT = 'phpunit';
+    public const PHPSPEC = 'phpspec';
 
-    const TYPES = [
+    public const TYPES = [
         self::PHPUNIT,
         self::PHPSPEC,
     ];

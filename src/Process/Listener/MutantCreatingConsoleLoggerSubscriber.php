@@ -48,18 +48,18 @@ final class MutantCreatingConsoleLoggerSubscriber implements EventSubscriberInte
         ];
     }
 
-    public function onMutantsCreatingStarted(MutantsCreatingStarted $event)
+    public function onMutantsCreatingStarted(MutantsCreatingStarted $event): void
     {
         $this->output->writeln(['']);
         $this->progressBar->start($event->getMutantCount());
     }
 
-    public function onMutantCreated(MutantCreated $event)
+    public function onMutantCreated(MutantCreated $event): void
     {
         $this->progressBar->advance();
     }
 
-    public function onMutantsCreatingFinished(MutantsCreatingFinished $event)
+    public function onMutantsCreatingFinished(MutantsCreatingFinished $event): void
     {
         $this->progressBar->finish();
     }

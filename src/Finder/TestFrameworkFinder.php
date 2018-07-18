@@ -65,7 +65,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
         throw FinderException::testCustomPathDoesNotExist($this->testFrameworkName, $this->customPath);
     }
 
-    private function addVendorFolderToPath()
+    private function addVendorFolderToPath(): void
     {
         $vendorPath = null;
 

@@ -72,7 +72,7 @@ final class MutatorsGenerator
      *
      * @throws InvalidConfigException
      */
-    private function registerFromProfile(string $profile, $setting)
+    private function registerFromProfile(string $profile, $setting): void
     {
         $mutators = MutatorProfile::MUTATOR_PROFILE_LIST[$profile];
 
@@ -97,7 +97,7 @@ final class MutatorsGenerator
      * @param string $mutator
      * @param array|bool|\stdClass $setting
      */
-    private function registerFromClass(string $mutator, $setting)
+    private function registerFromClass(string $mutator, $setting): void
     {
         if ($setting === false) {
             $this->mutatorList[$mutator] = false;
@@ -116,7 +116,7 @@ final class MutatorsGenerator
      *
      * @throws InvalidConfigException
      */
-    private function registerFromName(string $mutator, $setting)
+    private function registerFromName(string $mutator, $setting): void
     {
         if (!array_key_exists($mutator, MutatorProfile::FULL_MUTATOR_LIST)) {
             throw InvalidConfigException::invalidMutator($mutator);

@@ -46,7 +46,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
      */
     private $diffColorizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->output = $this->createMock(OutputInterface::class);
         $this->outputFormatter = $this->createMock(OutputFormatter::class);
@@ -54,7 +54,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $this->diffColorizer = $this->createMock(DiffColorizer::class);
     }
 
-    public function test_it_reacts_on_mutation_testing_started()
+    public function test_it_reacts_on_mutation_testing_started(): void
     {
         $this->outputFormatter
             ->expects($this->once())
@@ -72,7 +72,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $dispatcher->dispatch(new MutationTestingStarted(1));
     }
 
-    public function test_it_reacts_on_mutation_process_finished()
+    public function test_it_reacts_on_mutation_process_finished(): void
     {
         $this->metricsCalculator
             ->expects($this->once())
@@ -94,7 +94,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $dispatcher->dispatch(new MutantProcessFinished($this->createMock(MutantProcessInterface::class)));
     }
 
-    public function test_it_reacts_on_mutation_testing_finished()
+    public function test_it_reacts_on_mutation_testing_finished(): void
     {
         $this->outputFormatter
             ->expects($this->once())
@@ -112,7 +112,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $dispatcher->dispatch(new MutationTestingFinished());
     }
 
-    public function test_it_reacts_on_mutation_testing_finished_and_show_mutations_on()
+    public function test_it_reacts_on_mutation_testing_finished_and_show_mutations_on(): void
     {
         $this->output->expects($this->once())
             ->method('getVerbosity');
