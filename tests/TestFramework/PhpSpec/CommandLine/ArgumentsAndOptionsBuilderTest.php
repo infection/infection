@@ -22,13 +22,17 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         $configPath = '/config/path';
         $builder = new ArgumentsAndOptionsBuilder();
 
-        $command = $builder->build($configPath, '--verbose');
-
-        $this->assertContains('run', $command);
-        $this->assertContains('--no-ansi', $command);
-        $this->assertContains('--format=tap', $command);
-        $this->assertContains('--stop-on-failure', $command);
-        $this->assertContains('--verbose', $command);
-        $this->assertContains(sprintf('--config=%s', $configPath), $command);
+        $this->assertSame(
+            [
+                'run',
+                '--config',
+                $configPath,
+                '--no-ansi',
+                '--format=tap',
+                '--stop-on-failure',
+                '--verbose',
+            ],
+            $builder->build($configPath, '--verbose')
+        );
     }
 }

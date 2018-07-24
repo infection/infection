@@ -22,10 +22,14 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         $configPath = '/config/path';
         $builder = new ArgumentsAndOptionsBuilder();
 
-        $command = $builder->build($configPath, '--verbose');
-
-        $this->assertContains('--stop-on-failure', $command);
-        $this->assertContains('--verbose', $command);
-        $this->assertContains(sprintf('--configuration %s', $configPath), $command);
+        $this->assertSame(
+            [
+                '--configuration',
+                $configPath,
+                '--stop-on-failure',
+                '--verbose',
+            ],
+            $builder->build($configPath, '--verbose')
+        );
     }
 }

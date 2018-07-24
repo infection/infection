@@ -22,28 +22,28 @@ final class ProcessBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     public function test_getProcessForInitialTestRun_has_no_timeout()
     {
         $fwAdapter = Mockery::mock(AbstractTestFrameworkAdapter::class);
-        $fwAdapter->shouldReceive('getExecutableCommandLine', ['buildInitialConfigFile'])->andReturn('getExecutableCommandLine');
+        $fwAdapter->shouldReceive('getCommandLine', ['buildInitialConfigFile'])->andReturn(['/usr/bin/php']);
         $fwAdapter->shouldReceive('buildInitialConfigFile')->andReturn('buildInitialConfigFile');
 
         $builder = new ProcessBuilder($fwAdapter, 100);
 
         $process = $builder->getProcessForInitialTestRun('', false);
 
-        $this->assertContains('getExecutableCommandLine', $process->getCommandLine());
+        $this->assertContains('/usr/bin/php', $process->getCommandLine());
         $this->assertNull($process->getTimeout());
     }
 
     public function test_getProcessForMutant_has_timeout()
     {
         $fwAdapter = Mockery::mock(AbstractTestFrameworkAdapter::class);
-        $fwAdapter->shouldReceive('getExecutableCommandLine', ['buildMutationConfigFile'])->andReturn('getExecutableCommandLine');
+        $fwAdapter->shouldReceive('getCommandLine', ['buildMutationConfigFile'])->andReturn(['/usr/bin/php']);
         $fwAdapter->shouldReceive('buildMutationConfigFile')->andReturn('buildMutationConfigFile');
 
         $builder = new ProcessBuilder($fwAdapter, 100);
 
         $process = $builder->getProcessForMutant(Mockery::mock(MutantInterface::class))->getProcess();
 
-        $this->assertContains('getExecutableCommandLine', $process->getCommandLine());
+        $this->assertContains('/usr/bin/php', $process->getCommandLine());
         $this->assertSame(100.0, $process->getTimeout());
     }
 }
