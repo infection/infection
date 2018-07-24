@@ -26,7 +26,7 @@ class XmlConfigurationHelper
         $this->pathReplacer = $pathReplacer;
     }
 
-    public function replaceWithAbsolutePaths(\DOMXPath $xPath)
+    public function replaceWithAbsolutePaths(\DOMXPath $xPath): void
     {
         $queries = [
             '/phpunit/@bootstrap',
@@ -42,7 +42,7 @@ class XmlConfigurationHelper
         }
     }
 
-    public function removeExistingLoggers(\DOMDocument $dom, \DOMXPath $xPath)
+    public function removeExistingLoggers(\DOMDocument $dom, \DOMXPath $xPath): void
     {
         $nodes = $xPath->query('/phpunit/logging');
 
@@ -51,7 +51,7 @@ class XmlConfigurationHelper
         }
     }
 
-    public function setStopOnFailure(\DOMXPath $xPath)
+    public function setStopOnFailure(\DOMXPath $xPath): void
     {
         $nodeList = $xPath->query('/phpunit/@stopOnFailure');
 
@@ -63,7 +63,7 @@ class XmlConfigurationHelper
         }
     }
 
-    public function deactivateColours(\DOMXPath $xPath)
+    public function deactivateColours(\DOMXPath $xPath): void
     {
         $nodeList = $xPath->query('/phpunit/@colors');
 
@@ -75,7 +75,7 @@ class XmlConfigurationHelper
         }
     }
 
-    public function removeExistingPrinters(\DOMDocument $dom, \DOMXPath $xPath)
+    public function removeExistingPrinters(\DOMDocument $dom, \DOMXPath $xPath): void
     {
         $nodeList = $xPath->query('/phpunit/@printerClass');
 

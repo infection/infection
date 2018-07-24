@@ -17,14 +17,14 @@ use PHPUnit\Framework\TestCase;
  */
 final class InvalidConfigExceptionTest extends TestCase
 {
-    public function test_extends_runtime_exception()
+    public function test_extends_runtime_exception(): void
     {
         $exception = new InvalidConfigException();
 
         $this->assertInstanceOf(\RuntimeException::class, $exception);
     }
 
-    public function test_invalid_json_creates_exception()
+    public function test_invalid_json_creates_exception(): void
     {
         $configFile = __DIR__ . '/../../../infection.json.dist';
         $errorMessage = 'That does not look right.';
@@ -45,7 +45,7 @@ final class InvalidConfigExceptionTest extends TestCase
         $this->assertSame($expected, $exception->getMessage());
     }
 
-    public function test_invalid_mutator_creates_exception()
+    public function test_invalid_mutator_creates_exception(): void
     {
         $wrongMutator = 'NonExistent Mutator';
 
@@ -61,7 +61,7 @@ final class InvalidConfigExceptionTest extends TestCase
         $this->assertSame($expected, $exception->getMessage());
     }
 
-    public function test_invalid_profile_creates_exception()
+    public function test_invalid_profile_creates_exception(): void
     {
         $configFile = '@hello';
         $errorMessage = 'Wrong Mutator';

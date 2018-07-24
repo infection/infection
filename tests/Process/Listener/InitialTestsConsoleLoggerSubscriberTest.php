@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class InitialTestsConsoleLoggerSubscriberTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
-    public function test_it_reacts_on_initial_test_suite_run()
+    public function test_it_reacts_on_initial_test_suite_run(): void
     {
         $output = Mockery::mock(OutputInterface::class);
         $output->shouldReceive('isDecorated');
@@ -38,7 +38,7 @@ final class InitialTestsConsoleLoggerSubscriberTest extends Mockery\Adapter\Phpu
         $dispatcher->dispatch(new InitialTestSuiteStarted());
     }
 
-    public function test_it_sets_test_framework_version_as_unknown_in_case_of_exception()
+    public function test_it_sets_test_framework_version_as_unknown_in_case_of_exception(): void
     {
         $output = Mockery::mock(OutputInterface::class);
         $output->shouldReceive('isDecorated');

@@ -17,16 +17,16 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class ParentConnectorVisitor extends NodeVisitorAbstract
 {
-    const PARENT_KEY = 'parent';
+    public const PARENT_KEY = 'parent';
 
     private $stack;
 
-    public function beforeTraverse(array $nodes)
+    public function beforeTraverse(array $nodes): void
     {
         $this->stack = [];
     }
 
-    public function enterNode(Node $node)
+    public function enterNode(Node $node): void
     {
         if (!empty($this->stack)) {
             $node->setAttribute(self::PARENT_KEY, $this->stack[\count($this->stack) - 1]);
@@ -35,7 +35,7 @@ final class ParentConnectorVisitor extends NodeVisitorAbstract
         $this->stack[] = $node;
     }
 
-    public function leaveNode(Node $node)
+    public function leaveNode(Node $node): void
     {
         array_pop($this->stack);
     }

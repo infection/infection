@@ -18,7 +18,7 @@ use PhpParser\Node;
  */
 final class DecrementInteger extends Mutator
 {
-    const COUNT_NAME = 'count';
+    private const COUNT_NAME = 'count';
 
     /**
      * Decrements an integer by 1

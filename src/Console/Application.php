@@ -27,12 +27,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 final class Application extends BaseApplication
 {
-    const NAME = 'Infection - PHP Mutation Testing Framework';
-    const VERSION = '@package_version@';
+    private const NAME = 'Infection - PHP Mutation Testing Framework';
+    private const VERSION = '@package_version@';
 
-    const INFECTION_PREFIX = 'INFECTION';
+    private const INFECTION_PREFIX = 'INFECTION';
 
-    const LOGO = <<<'ASCII'
+    private const LOGO = <<<'ASCII'
     ____      ____          __  _
    /  _/___  / __/__  _____/ /_(_)___  ____ 
    / // __ \/ /_/ _ \/ ___/ __/ / __ \/ __ \
@@ -100,7 +100,7 @@ ASCII;
         return parent::run($input, $output);
     }
 
-    private function logRunningWithDebugger()
+    private function logRunningWithDebugger(): void
     {
         if (\PHP_SAPI === 'phpdbg') {
             $this->consoleOutput->logRunningWithDebugger(\PHP_SAPI);
@@ -143,7 +143,7 @@ ASCII;
         return $commands;
     }
 
-    protected function configureIO(InputInterface $input, OutputInterface $output)
+    protected function configureIO(InputInterface $input, OutputInterface $output): void
     {
         parent::configureIO($input, $output);
 

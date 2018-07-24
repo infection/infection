@@ -18,7 +18,7 @@ use Mockery;
  */
 final class CachedTestFileDataProviderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
-    public function test_the_second_call_returns_cached_result()
+    public function test_the_second_call_returns_cached_result(): void
     {
         $class = 'Test\Class';
         $providerMock = Mockery::mock(TestFileDataProvider::class);

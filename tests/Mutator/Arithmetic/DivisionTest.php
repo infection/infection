@@ -19,7 +19,7 @@ final class DivisionTest extends AbstractMutatorTestCase
     /**
      * @dataProvider provideMutationCases
      */
-    public function test_mutator($input, $expected = null)
+    public function test_mutator($input, $expected = null): void
     {
         $this->doTest($input, $expected);
     }
@@ -53,7 +53,7 @@ PHP
         ];
     }
 
-    public function test_replaces_division_with_multiplication()
+    public function test_replaces_division_with_multiplication(): void
     {
         $code = '<?php 1 / 2;';
         $mutatedCode = $this->mutate($code);

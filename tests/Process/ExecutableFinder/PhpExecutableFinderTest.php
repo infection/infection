@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class PhpExecutableFinderTest extends TestCase
 {
-    public function test_it_finds_needed_args()
+    public function test_it_finds_needed_args(): void
     {
         $finder = new PhpExecutableFinder();
 

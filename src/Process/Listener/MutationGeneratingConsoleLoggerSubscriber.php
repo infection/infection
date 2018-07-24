@@ -48,18 +48,18 @@ final class MutationGeneratingConsoleLoggerSubscriber implements EventSubscriber
         ];
     }
 
-    public function onMutationGeneratingStarted(MutationGeneratingStarted $event)
+    public function onMutationGeneratingStarted(MutationGeneratingStarted $event): void
     {
         $this->output->writeln(['', '', 'Generate mutants...', '']);
         $this->progressBar->start($event->getMutableFilesCount());
     }
 
-    public function onMutableFileProcessed(MutableFileProcessed $event)
+    public function onMutableFileProcessed(MutableFileProcessed $event): void
     {
         $this->progressBar->advance();
     }
 
-    public function onMutationGeneratingFinished(MutationGeneratingFinished $event)
+    public function onMutationGeneratingFinished(MutationGeneratingFinished $event): void
     {
         $this->progressBar->finish();
     }

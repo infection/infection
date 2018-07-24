@@ -19,7 +19,7 @@ final class NewObjectTest extends AbstractMutatorTestCase
     /**
      * @dataProvider provideMutationCases
      */
-    public function test_mutator($input, $expected = null, bool $allowed = true, $message = '')
+    public function test_mutator($input, $expected = null, bool $allowed = true, $message = ''): void
     {
         if (!$allowed) {
             $this->markTestSkipped($message);
@@ -91,15 +91,11 @@ class Test
 }
 CODE
             ,
-            \PHP_VERSION_ID >= 70100,
-            'Current PHP version does not support nullable return typehint.',
         ];
 
         yield 'It does not mutate when function contains another function but return null is not allowed' => [
             $this->getFileContent('no-contains-another-func-and-null-is-not-allowed.php'),
             null,
-            \PHP_VERSION_ID >= 70100,
-            'Current PHP version does not support nullable return typehint.',
         ];
 
         yield 'It mutates when return typehint fqcn allows null' => [
@@ -119,8 +115,6 @@ class Test
 }
 CODE
             ,
-            \PHP_VERSION_ID >= 70100,
-            'Current PHP version does not support nullable return typehint.',
         ];
 
         yield 'It mutates when scalar return typehint allows null' => [
@@ -140,8 +134,6 @@ class Test
 }
 CODE
             ,
-            \PHP_VERSION_ID >= 70100,
-            'Current PHP version does not support nullable return typehint.',
         ];
 
         yield 'It does not mutate the return of an anonymous class' => [

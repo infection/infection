@@ -22,14 +22,14 @@ use Mockery;
  */
 final class PhpSpecAdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
-    public function test_it_has_a_name()
+    public function test_it_has_a_name(): void
     {
         $adapter = $this->getAdapter();
 
         $this->assertSame('PhpSpec', $adapter->getName());
     }
 
-    public function test_it_determines_when_tests_do_not_pass()
+    public function test_it_determines_when_tests_do_not_pass(): void
     {
         $output = <<<OUTPUT
 TAP version 13
@@ -48,7 +48,7 @@ OUTPUT;
         $this->assertFalse($adapter->testsPass($output));
     }
 
-    public function test_it_determines_when_tests_pass()
+    public function test_it_determines_when_tests_pass(): void
     {
         $output = <<<OUTPUT
 TAP version 13
@@ -65,7 +65,7 @@ OUTPUT;
         $this->assertTrue($adapter->testsPass($output));
     }
 
-    public function test_it_catches_fatal_errors()
+    public function test_it_catches_fatal_errors(): void
     {
         $output = <<<OUTPUT
 TAP version 13
@@ -83,7 +83,7 @@ OUTPUT;
         $this->assertFalse($adapter->testsPass($output));
     }
 
-    public function test_it_catches_fatal_errors_from_start()
+    public function test_it_catches_fatal_errors_from_start(): void
     {
         $output = <<<OUTPUT
 TAP version 13

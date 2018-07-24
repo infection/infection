@@ -18,7 +18,7 @@ use Symfony\Component\Finder\Finder;
  */
 final class SourceFilesFinderTest extends TestCase
 {
-    public function test_it_lists_all_php_files_without_a_filter()
+    public function test_it_lists_all_php_files_without_a_filter(): void
     {
         $sourceFilesFinder = new SourceFilesFinder(['tests/Fixtures/Files/Finder'], []);
 
@@ -28,7 +28,7 @@ final class SourceFilesFinderTest extends TestCase
         $this->assertSame(2, $files->count());
     }
 
-    public function test_it_can_filter_one_file_by_a_relative_path()
+    public function test_it_can_filter_one_file_by_a_relative_path(): void
     {
         $sourceFilesFinder = new SourceFilesFinder(['tests/Fixtures/Files/Finder'], []);
 
@@ -44,7 +44,7 @@ final class SourceFilesFinderTest extends TestCase
         $this->assertSame('FirstFile.php', $firstFile->getFilename());
     }
 
-    public function test_it_can_filter_one_file_by_filename()
+    public function test_it_can_filter_one_file_by_filename(): void
     {
         $sourceFilesFinder = new SourceFilesFinder(['tests/Fixtures/Files/Finder'], []);
 
@@ -60,7 +60,7 @@ final class SourceFilesFinderTest extends TestCase
         $this->assertSame('FirstFile.php', $firstFile->getFilename());
     }
 
-    public function test_it_can_filter_a_list_of_files_by_relative_paths()
+    public function test_it_can_filter_a_list_of_files_by_relative_paths(): void
     {
         $sourceFilesFinder = new SourceFilesFinder(['tests/Fixtures/Files/Finder'], []);
 
@@ -83,7 +83,7 @@ final class SourceFilesFinderTest extends TestCase
         }
     }
 
-    public function test_it_can_filter_a_list_of_files_by_filename()
+    public function test_it_can_filter_a_list_of_files_by_filename(): void
     {
         $sourceFilesFinder = new SourceFilesFinder(['tests/Fixtures/Files/Finder'], []);
 
@@ -106,7 +106,7 @@ final class SourceFilesFinderTest extends TestCase
         }
     }
 
-    public function test_it_can_filter_to_an_empty_result()
+    public function test_it_can_filter_to_an_empty_result(): void
     {
         $sourceFilesFinder = new SourceFilesFinder(['tests/Fixtures/Files/Finder'], []);
 
@@ -117,7 +117,7 @@ final class SourceFilesFinderTest extends TestCase
         $this->assertSame(0, $files->count());
     }
 
-    public function test_it_can_exclude_a_directory()
+    public function test_it_can_exclude_a_directory(): void
     {
         $sourceFilesFinder = new SourceFilesFinder(['tests/Fixtures/Files/ExcludeFinder'], ['Folder2']);
 

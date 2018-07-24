@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class CloneVisitorTest extends TestCase
 {
-    public function test_it_does_not_save_the_old_nodes_without_the_clone_visitor()
+    public function test_it_does_not_save_the_old_nodes_without_the_clone_visitor(): void
     {
         $traverser = new NodeTraverser();
         $traverser->addVisitor($this->getChangingVisitor());
@@ -31,7 +31,7 @@ final class CloneVisitorTest extends TestCase
         $this->assertSame($oldNodes, $newNodes);
     }
 
-    public function test_it_saves_the_old_nodes_with_the_clone_visitor()
+    public function test_it_saves_the_old_nodes_with_the_clone_visitor(): void
     {
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new CloneVisitor());

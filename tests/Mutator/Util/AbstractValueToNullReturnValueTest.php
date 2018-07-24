@@ -21,7 +21,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
 {
     protected $testSubject = null;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->testSubject = $this->getMockBuilder(AbstractValueToNullReturnValue::class)
             ->disableOriginalConstructor()
@@ -62,12 +62,12 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         return $reflectionMethod->invoke($this->testSubject, $mockNode);
     }
 
-    public function test_attribute_not_found()
+    public function test_attribute_not_found(): void
     {
         $this->assertTrue($this->invokeMethod($this->mockNode(null)));
     }
 
-    public function test_return_type_is_node_identifier()
+    public function test_return_type_is_node_identifier(): void
     {
         /** @var Node\Identifier $mockNode */
         $mockNode = $this->createMock(Node\Identifier::class);
@@ -83,7 +83,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         );
     }
 
-    public function test_return_type_is_scalar_typehint()
+    public function test_return_type_is_scalar_typehint(): void
     {
         $this->assertFalse(
             $this->invokeMethod(
@@ -94,7 +94,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         );
     }
 
-    public function test_return_type_is_nullable()
+    public function test_return_type_is_nullable(): void
     {
         $this->assertTrue(
             $this->invokeMethod(
@@ -107,7 +107,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         );
     }
 
-    public function test_return_type_is_node_name()
+    public function test_return_type_is_node_name(): void
     {
         $this->assertTrue(
             $this->invokeMethod(
@@ -120,7 +120,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         );
     }
 
-    public function test_return_type_is_not_node_name()
+    public function test_return_type_is_not_node_name(): void
     {
         $this->assertFalse(
             $this->invokeMethod(

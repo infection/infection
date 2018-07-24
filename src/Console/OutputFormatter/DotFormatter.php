@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class DotFormatter extends AbstractOutputFormatter
 {
-    const DOTS_PER_ROW = 50;
+    private const DOTS_PER_ROW = 50;
 
     /**
      * @var OutputInterface
@@ -30,7 +30,7 @@ final class DotFormatter extends AbstractOutputFormatter
         $this->output = $output;
     }
 
-    public function start(int $mutationCount)
+    public function start(int $mutationCount): void
     {
         parent::start($mutationCount);
 
@@ -45,7 +45,7 @@ final class DotFormatter extends AbstractOutputFormatter
         ]);
     }
 
-    public function advance(MutantProcessInterface $mutantProcess, int $mutationCount)
+    public function advance(MutantProcessInterface $mutantProcess, int $mutationCount): void
     {
         parent::advance($mutantProcess, $mutationCount);
 

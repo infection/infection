@@ -19,7 +19,7 @@ use Symfony\Component\Console\Input\InputInterface;
  */
 final class InfectionContainerTest extends TestCase
 {
-    public function test_it_is_a_usable_container()
+    public function test_it_is_a_usable_container(): void
     {
         $container = new InfectionContainer();
 
@@ -27,7 +27,7 @@ final class InfectionContainerTest extends TestCase
         $this->assertInstanceOf(Container::class, $container);
     }
 
-    public function test_it_can_build_dynamic_dependencies()
+    public function test_it_can_build_dynamic_dependencies(): void
     {
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->once())->method('getOption')->with('coverage')->willReturn('');

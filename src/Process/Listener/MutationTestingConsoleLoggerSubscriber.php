@@ -24,7 +24,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
 {
-    const PAD_LENGTH = 8;
+    private const PAD_LENGTH = 8;
 
     /**
      * @var OutputInterface
@@ -84,14 +84,14 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInt
         ];
     }
 
-    public function onMutationTestingStarted(MutationTestingStarted $event)
+    public function onMutationTestingStarted(MutationTestingStarted $event): void
     {
         $this->mutationCount = $event->getMutationCount();
 
         $this->outputFormatter->start($this->mutationCount);
     }
 
-    public function onMutantProcessFinished(MutantProcessFinished $event)
+    public function onMutantProcessFinished(MutantProcessFinished $event): void
     {
         $this->mutantProcesses[] = $event->getMutantProcess();
         $this->metricsCalculator->collect($event->getMutantProcess());
@@ -99,7 +99,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInt
         $this->outputFormatter->advance($event->getMutantProcess(), $this->mutationCount);
     }
 
-    public function onMutationTestingFinished(MutationTestingFinished $event)
+    public function onMutationTestingFinished(MutationTestingFinished $event): void
     {
         $this->outputFormatter->finish();
 
@@ -118,7 +118,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInt
      * @param MutantProcessInterface[] $processes
      * @param string $headlinePrefix
      */
-    private function showMutations(array $processes, string $headlinePrefix)
+    private function showMutations(array $processes, string $headlinePrefix): void
     {
         $headline = sprintf('%s mutants:', $headlinePrefix);
 
@@ -147,7 +147,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInt
         }
     }
 
-    private function showMetrics()
+    private function showMetrics(): void
     {
         $this->output->writeln(['', '']);
         $this->output->writeln('<options=bold>' . $this->metricsCalculator->getTotalMutantsCount() . '</options=bold> mutations were generated:');

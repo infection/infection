@@ -82,7 +82,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
         ];
     }
 
-    public function onMutationTestingFinished(MutationTestingFinished $event)
+    public function onMutationTestingFinished(MutationTestingFinished $event): void
     {
         $logTypes = $this->infectionConfig->getLogsTypes();
 
@@ -116,7 +116,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
         return $logTypes;
     }
 
-    private function useLogger(string $logType, $config)
+    private function useLogger(string $logType, $config): void
     {
         $isDebugVerbosity = $this->logVerbosity === LogVerbosity::DEBUG;
 

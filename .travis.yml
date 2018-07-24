@@ -39,7 +39,7 @@ jobs:
 
     - &STANDARD_TEST_JOB
       stage: Test
-      php: 7.0
+      php: 7.1
       install:
         - composer install
         - |
@@ -56,7 +56,7 @@ jobs:
         - if [[ $PHPDBG != 1 ]]; then xdebug-enable; fi
         - if [[ $PHPDBG != 1 ]]; then $PHPUNIT_BIN; else phpdbg -qrr $PHPUNIT_BIN; fi
         - |
-          if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" || "${SYMFONY_VERSION}" != "" ]]; then
+          if [[ "${SYMFONY_VERSION}" != "" ]]; then
             ./tests/e2e_tests bin/infection;
           else
             make build/bin/infection.phar;
@@ -72,21 +72,6 @@ jobs:
 
       after_success:
         - bash <(curl -s https://codecov.io/bash)
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.0
-      env: NO_DEBUGGER=1
-
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.0
-      env: PHPDBG=1
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.1
 
     -
       <<: *STANDARD_TEST_JOB

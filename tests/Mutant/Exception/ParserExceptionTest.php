@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class ParserExceptionTest extends TestCase
 {
-    public function test_it_has_correct_error_message()
+    public function test_it_has_correct_error_message(): void
     {
         $file = $this->createMock(\SplFileInfo::class);
         $file->expects($this->once())

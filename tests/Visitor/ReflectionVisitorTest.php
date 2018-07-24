@@ -38,7 +38,7 @@ final class ReflectionVisitorTest extends TestCase
      */
     private $code;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->spyVisitor = $this->getInsideFunctionSpyVisitor();
 
@@ -55,7 +55,7 @@ final class ReflectionVisitorTest extends TestCase
     /**
      * @dataProvider isPartOfSignatureFlagProvider
      */
-    public function test_it_sets_is_part_of_signature_flag(string $nodeClass, bool $expectedResult)
+    public function test_it_sets_is_part_of_signature_flag(string $nodeClass, bool $expectedResult): void
     {
         $statements = $this->parser->parse($this->code);
 
@@ -72,7 +72,7 @@ final class ReflectionVisitorTest extends TestCase
         $this->assertSame($expectedResult, $spyVisitor->isPartOfSignature());
     }
 
-    public function test_it_detects_if_traversed_inside_class_method()
+    public function test_it_detects_if_traversed_inside_class_method(): void
     {
         $code = $this->getFileContent('rv-inside-class-method.php');
 
@@ -81,7 +81,7 @@ final class ReflectionVisitorTest extends TestCase
         $this->assertTrue($this->spyVisitor->isInsideFunction);
     }
 
-    public function test_it_detects_if_traversed_inside_function()
+    public function test_it_detects_if_traversed_inside_function(): void
     {
         $code = $this->getFileContent('rv-inside-function.php');
 
@@ -90,7 +90,7 @@ final class ReflectionVisitorTest extends TestCase
         $this->assertFalse($this->spyVisitor->isInsideFunction);
     }
 
-    public function test_it_detects_if_traversed_inside_closure()
+    public function test_it_detects_if_traversed_inside_closure(): void
     {
         $code = $this->getFileContent('rv-inside-closure.php');
 
@@ -99,7 +99,7 @@ final class ReflectionVisitorTest extends TestCase
         $this->assertTrue($this->spyVisitor->isInsideFunction);
     }
 
-    public function test_it_does_not_add_inside_function_flag_if_not_needed()
+    public function test_it_does_not_add_inside_function_flag_if_not_needed(): void
     {
         $code = $this->getFileContent('rv-without-function.php');
 
@@ -108,7 +108,7 @@ final class ReflectionVisitorTest extends TestCase
         $this->assertFalse($this->spyVisitor->isInsideFunction);
     }
 
-    public function test_it_correctly_works_with_anonymous_classes()
+    public function test_it_correctly_works_with_anonymous_classes(): void
     {
         $code = $this->getFileContent('rv-anonymous-class.php');
 
@@ -117,7 +117,7 @@ final class ReflectionVisitorTest extends TestCase
         $this->assertTrue($this->spyVisitor->isInsideFunction);
     }
 
-    public function test_it_sets_reflection_class_to_nodes()
+    public function test_it_sets_reflection_class_to_nodes(): void
     {
         $code = $this->getFileContent('rv-inside-class-method.php');
         $reflectionSpyVisitor = $this->getReflectionClassSpyVisitor();
@@ -154,7 +154,7 @@ final class ReflectionVisitorTest extends TestCase
                 $this->nodeClassUnderTest = $nodeClass;
             }
 
-            public function leaveNode(Node $node)
+            public function leaveNode(Node $node): void
             {
                 if ($node instanceof $this->nodeClassUnderTest) {
                     $this->isPartOfSignature = $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
@@ -209,7 +209,7 @@ final class ReflectionVisitorTest extends TestCase
         };
     }
 
-    private function parseAndTraverse(string $code, NodeVisitor $nodeVisitor = null)
+    private function parseAndTraverse(string $code, NodeVisitor $nodeVisitor = null): void
     {
         $nodes = $this->getNodes($code);
 

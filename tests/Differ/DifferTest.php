@@ -18,7 +18,7 @@ use SebastianBergmann\Diff\Differ as BaseDiffer;
  */
 final class DifferTest extends TestCase
 {
-    public function test_show_diffs_with_max_lines()
+    public function test_show_diffs_with_max_lines(): void
     {
         $source1 = <<<'CODE'
 public function diff($from, $to, LongestCommonSubsequence $lcs = null)

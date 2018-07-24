@@ -30,7 +30,7 @@ final class MutatorTest extends TestCase
      *
      * @param string $className
      */
-    public function test_mutator_class_provider_is_valid(string $className)
+    public function test_mutator_class_provider_is_valid(string $className): void
     {
         $this->assertTrue(
             class_exists($className) || interface_exists($className) || trait_exists($className),
@@ -47,7 +47,7 @@ final class MutatorTest extends TestCase
      *
      * @param string $className
      */
-    public function test_mutators_do_not_declare_public_methods(string $className)
+    public function test_mutators_do_not_declare_public_methods(string $className): void
     {
         $rc = new \ReflectionClass($className);
 
@@ -66,7 +66,7 @@ final class MutatorTest extends TestCase
      *
      * @param string $className
      */
-    public function test_mutators_have_tests(string $className)
+    public function test_mutators_have_tests(string $className): void
     {
         $testClassName = str_replace('Infection\\', 'Infection\Tests\\', $className) . 'Test';
 

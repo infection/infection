@@ -24,7 +24,7 @@ final class PathReplacerTest extends TestCase
      */
     private $projectPath;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->projectPath = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
     }
@@ -32,7 +32,7 @@ final class PathReplacerTest extends TestCase
     /**
      * @dataProvider pathProvider
      */
-    public function test_it_replaces_path_with_absolute_path(string $originalPath, string $expectedPath)
+    public function test_it_replaces_path_with_absolute_path(string $originalPath, string $expectedPath): void
     {
         $pathReplacer = new PathReplacer(new Filesystem());
 

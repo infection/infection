@@ -22,7 +22,7 @@ final class VersionParserTest extends TestCase
      */
     private $versionParser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->versionParser = new VersionParser();
     }
@@ -30,14 +30,14 @@ final class VersionParserTest extends TestCase
     /**
      * @dataProvider versionProvider
      */
-    public function test_it_parses_version_from_string(string $content, string $expectedVersion)
+    public function test_it_parses_version_from_string(string $content, string $expectedVersion): void
     {
         $result = $this->versionParser->parse($content);
 
         $this->assertSame($expectedVersion, $result);
     }
 
-    public function test_it_throws_exception_when_content_has_no_version_substring()
+    public function test_it_throws_exception_when_content_has_no_version_substring(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 

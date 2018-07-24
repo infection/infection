@@ -12,7 +12,6 @@ PHPSTAN_URL="https://github.com/phpstan/phpstan/releases/download/0.10.1/phpstan
 FLOCK=./devTools/flock
 
 DOCKER_RUN=docker run -t --rm -v "$$PWD":/opt/infection -w /opt/infection
-DOCKER_RUN_70=$(FLOCK) devTools/*php70*.json $(DOCKER_RUN) infection_php70
 DOCKER_RUN_71=$(FLOCK) devTools/*php71*.json $(DOCKER_RUN) infection_php71
 DOCKER_RUN_72=$(FLOCK) devTools/*php72*.json $(DOCKER_RUN) infection_php72
 
@@ -40,12 +39,9 @@ build/cache:
 test: test-unit test-infection-phpdbg test-e2e-phpdbg test-infection-xdebug test-e2e-xdebug
 	# All tests finished without errors
 
-.PHONY: test-unit test-unit-70 test-unit-71 test-unit-72
+.PHONY: test-unit test-unit-71 test-unit-72
 #php unit tests
-test-unit: test-unit-70 test-unit-71 test-unit-72
-
-test-unit-70: build-xdebug-70
-	$(DOCKER_RUN_70) $(PHPUNIT)
+test-unit: test-unit-71 test-unit-72
 
 test-unit-71: build-xdebug-71
 	$(DOCKER_RUN_71) $(PHPUNIT)
@@ -54,12 +50,9 @@ test-unit-72: build-xdebug-72
 	$(DOCKER_RUN_72) $(PHPUNIT)
 
 
-.PHONY: test-infection-phpdbg test-infection-phpdbg-70 test-infection-phpdbg-71 test-infection-phpdbg-72
+.PHONY: test-infection-phpdbg test-infection-phpdbg-71 test-infection-phpdbg-72
 #infection with phpdbg
-test-infection-phpdbg: test-infection-phpdbg-70 test-infection-phpdbg-71 test-infection-phpdbg-72
-
-test-infection-phpdbg-70: build-xdebug-70
-	$(DOCKER_RUN_70) phpdbg -qrr bin/infection --threads=4
+test-infection-phpdbg: test-infection-phpdbg-71 test-infection-phpdbg-72
 
 test-infection-phpdbg-71: build-xdebug-71
 	$(DOCKER_RUN_71) phpdbg -qrr bin/infection --threads=4
@@ -68,12 +61,9 @@ test-infection-phpdbg-72: build-xdebug-72
 	$(DOCKER_RUN_72) phpdbg -qrr bin/infection --threads=4
 
 
-.PHONY: test-e2e-phpdbg test-e2e-phpdbg-70 test-e2e-phpdbg-71 test-e2e-phpdbg-72
+.PHONY: test-e2e-phpdbg test-e2e-phpdbg-71 test-e2e-phpdbg-72
 #e2e tests with phpdbg
-test-e2e-phpdbg: test-e2e-phpdbg-70 test-e2e-phpdbg-71 test-e2e-phpdbg-72
-
-test-e2e-phpdbg-70: build-xdebug-70 $(INFECTION)
-	$(DOCKER_RUN_70) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
+test-e2e-phpdbg:test-e2e-phpdbg-71 test-e2e-phpdbg-72
 
 test-e2e-phpdbg-71: build-xdebug-71 $(INFECTION)
 	$(DOCKER_RUN_71) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
@@ -82,12 +72,9 @@ test-e2e-phpdbg-72: build-xdebug-72 $(INFECTION)
 	$(DOCKER_RUN_72) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
 
 
-.PHONY: test-infection-xdebug test-infection-xdebug-70 test-infection-xdebug-71 test-infection-xdebug-72
+.PHONY: test-infection-xdebug test-infection-xdebug-71 test-infection-xdebug-72
 #infection with xdebug
-test-infection-xdebug: test-infection-xdebug-70 test-infection-xdebug-71 test-infection-xdebug-72
-
-test-infection-xdebug-70: build-xdebug-70
-	$(DOCKER_RUN_70) php bin/infection --threads=4
+test-infection-xdebug: test-infection-xdebug-71 test-infection-xdebug-72
 
 test-infection-xdebug-71: build-xdebug-71
 	$(DOCKER_RUN_71) php bin/infection --threads=4
@@ -96,12 +83,9 @@ test-infection-xdebug-72: build-xdebug-72
 	$(DOCKER_RUN_72) php bin/infection --threads=4
 
 
-.PHONY: test-e2e-xdebug test-e2e-xdebug-70 test-e2e-xdebug-71 test-e2e-xdebug-72
+.PHONY: test-e2e-xdebug test-e2e-xdebug-71 test-e2e-xdebug-72
 #e2e tests with xdebug
-test-e2e-xdebug: test-e2e-xdebug-70 test-e2e-xdebug-71 test-e2e-xdebug-72
-
-test-e2e-xdebug-70: build-xdebug-70 $(INFECTION)
-	$(DOCKER_RUN_70) ./tests/e2e_tests $(INFECTION)
+test-e2e-xdebug: test-e2e-xdebug-71 test-e2e-xdebug-72
 
 test-e2e-xdebug-71: build-xdebug-71 $(INFECTION)
 	$(DOCKER_RUN_71) ./tests/e2e_tests $(INFECTION)
@@ -110,12 +94,8 @@ test-e2e-xdebug-72: build-xdebug-72 $(INFECTION)
 	$(DOCKER_RUN_72) ./tests/e2e_tests $(INFECTION)
 
 
-.PHONY: build-xdebug-70 build-xdebug-71 build-xdebug-72
+.PHONY: build-xdebug-71 build-xdebug-72
 #Building images with xdebug
-build-xdebug-70: vendor devTools/Dockerfile-php70-xdebug.json
-devTools/Dockerfile-php70-xdebug.json: devTools/Dockerfile-php70-xdebug
-	docker build -t infection_php70 -f devTools/Dockerfile-php70-xdebug .
-	docker image inspect infection_php70 >> devTools/Dockerfile-php70-xdebug.json
 
 build-xdebug-71: vendor devTools/Dockerfile-php71-xdebug.json
 devTools/Dockerfile-php71-xdebug.json: devTools/Dockerfile-php71-xdebug

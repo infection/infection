@@ -45,7 +45,7 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
      */
     private $metricsCalculator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->output = $this->createMock(OutputInterface::class);
         $this->infectionConfig = $this->createMock(InfectionConfig::class);
@@ -53,7 +53,7 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
         $this->filesystem = $this->createMock(Filesystem::class);
     }
 
-    public function test_it_do_nothing_when_file_log_path_is_not_defined()
+    public function test_it_do_nothing_when_file_log_path_is_not_defined(): void
     {
         $this->metricsCalculator->expects($this->never())
             ->method('getEscapedMutantProcesses');
@@ -80,7 +80,7 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
         $dispatcher->dispatch(new MutationTestingFinished());
     }
 
-    public function test_it_reacts_on_mutation_testing_finished()
+    public function test_it_reacts_on_mutation_testing_finished(): void
     {
         $logTypes = ['text' => sys_get_temp_dir() . '/infection-log.txt'];
 
@@ -124,7 +124,7 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
         $dispatcher->dispatch(new MutationTestingFinished());
     }
 
-    public function test_it_reacts_on_mutation_testing_finished_and_debug_mode_off()
+    public function test_it_reacts_on_mutation_testing_finished_and_debug_mode_off(): void
     {
         $logTypes = ['text' => sys_get_temp_dir() . '/infection-log.txt'];
 
@@ -166,7 +166,7 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
         $dispatcher->dispatch(new MutationTestingFinished());
     }
 
-    public function test_it_reacts_on_mutation_testing_finished_and_no_file_logging()
+    public function test_it_reacts_on_mutation_testing_finished_and_no_file_logging(): void
     {
         $logTypes = ['text' => sys_get_temp_dir() . '/infection-log.txt'];
 
@@ -187,7 +187,7 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
         $dispatcher->dispatch(new MutationTestingFinished());
     }
 
-    public function test_it_reacts_to_other_logging_types()
+    public function test_it_reacts_to_other_logging_types(): void
     {
         $logTypes = [ResultsLoggerTypes::PER_MUTATOR => sys_get_temp_dir() . '/infection-log.md'];
 

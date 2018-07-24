@@ -24,7 +24,7 @@ final class RealPathFilterIteratorTest extends TestCase
      * @param string $finder
      * @param int $expectedFilecount
      */
-    public function test_it_differs_from_relative_path(string $finder, int $expectedFilecount)
+    public function test_it_differs_from_relative_path(string $finder, int $expectedFilecount): void
     {
         $sourceFilesFinder = new $finder(['tests/Fixtures/Files/Finder']);
 

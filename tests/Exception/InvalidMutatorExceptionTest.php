@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class InvalidMutatorExceptionTest extends TestCase
 {
-    public function test_it_has_correct_user_facing_message()
+    public function test_it_has_correct_user_facing_message(): void
     {
         $mutator = new Plus(new MutatorConfig([]));
         $original = new \Exception();

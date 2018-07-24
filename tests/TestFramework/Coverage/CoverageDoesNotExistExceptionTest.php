@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class CoverageDoesNotExistExceptionTest extends TestCase
 {
-    public function test_with()
+    public function test_with(): void
     {
         $exception = CoverageDoesNotExistException::with(
             'file-index-path',
@@ -35,7 +35,7 @@ final class CoverageDoesNotExistExceptionTest extends TestCase
         );
     }
 
-    public function test_for_junit()
+    public function test_for_junit(): void
     {
         $exception = CoverageDoesNotExistException::forJunit('junit/file/path');
 
@@ -44,7 +44,7 @@ final class CoverageDoesNotExistExceptionTest extends TestCase
         $this->assertSame('Coverage report `junit` is not found in junit/file/path', $exception->getMessage());
     }
 
-    public function test_for_file_at_path()
+    public function test_for_file_at_path(): void
     {
         $exception = CoverageDoesNotExistException::forFileAtPath('file.php', '/path/to/file');
 

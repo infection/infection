@@ -20,17 +20,17 @@ abstract class AbstractOutputFormatter implements OutputFormatter
 {
     protected $callsCount = 0;
 
-    public function start(int $mutationCount)
+    public function start(int $mutationCount): void
     {
         $this->callsCount = 0;
     }
 
-    public function advance(MutantProcessInterface $mutantProcess, int $mutationCount)
+    public function advance(MutantProcessInterface $mutantProcess, int $mutationCount): void
     {
         ++$this->callsCount;
     }
 
-    public function finish()
+    public function finish(): void
     {
     }
 }

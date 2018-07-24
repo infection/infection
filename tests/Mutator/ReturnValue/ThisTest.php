@@ -19,7 +19,7 @@ final class ThisTest extends AbstractMutatorTestCase
     /**
      * @dataProvider provideMutationCases
      */
-    public function test_mutator($input, $expected = null)
+    public function test_mutator($input, $expected = null): void
     {
         $this->doTest($input, $expected);
     }

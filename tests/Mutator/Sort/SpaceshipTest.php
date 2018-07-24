@@ -16,7 +16,7 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
  */
 final class SpaceshipTest extends AbstractMutatorTestCase
 {
-    public function test_get_name()
+    public function test_get_name(): void
     {
         $this->assertSame('Spaceship', $this->getMutator()::getName());
     }
@@ -24,7 +24,7 @@ final class SpaceshipTest extends AbstractMutatorTestCase
     /**
      * @dataProvider provideMutationCases
      */
-    public function test_mutator($input, $expected = null)
+    public function test_mutator($input, $expected = null): void
     {
         $this->doTest($input, $expected);
     }

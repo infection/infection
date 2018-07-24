@@ -19,7 +19,7 @@ use Mockery;
  */
 final class ProcessBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
-    public function test_getProcessForInitialTestRun_has_no_timeout()
+    public function test_getProcessForInitialTestRun_has_no_timeout(): void
     {
         $fwAdapter = Mockery::mock(AbstractTestFrameworkAdapter::class);
         $fwAdapter->shouldReceive('getExecutableCommandLine', ['buildInitialConfigFile'])->andReturn('getExecutableCommandLine');
@@ -33,7 +33,7 @@ final class ProcessBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $this->assertNull($process->getTimeout());
     }
 
-    public function test_getProcessForMutant_has_timeout()
+    public function test_getProcessForMutant_has_timeout(): void
     {
         $fwAdapter = Mockery::mock(AbstractTestFrameworkAdapter::class);
         $fwAdapter->shouldReceive('getExecutableCommandLine', ['buildMutationConfigFile'])->andReturn('getExecutableCommandLine');

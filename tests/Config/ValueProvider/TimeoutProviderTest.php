@@ -19,7 +19,7 @@ use Mockery;
  */
 final class TimeoutProviderTest extends AbstractBaseProviderTest
 {
-    public function test_it_uses_default_value()
+    public function test_it_uses_default_value(): void
     {
         $consoleMock = Mockery::mock(ConsoleHelper::class);
         $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
@@ -36,7 +36,7 @@ final class TimeoutProviderTest extends AbstractBaseProviderTest
         $this->assertSame(InfectionConfig::PROCESS_TIMEOUT_SECONDS, $timeout);
     }
 
-    public function test_it_casts_any_value_to_integer()
+    public function test_it_casts_any_value_to_integer(): void
     {
         $consoleMock = Mockery::mock(ConsoleHelper::class);
         $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
@@ -56,7 +56,7 @@ final class TimeoutProviderTest extends AbstractBaseProviderTest
     /**
      * @dataProvider validatorProvider
      */
-    public function test_it_does_not_allow_invalid_values($inputValue)
+    public function test_it_does_not_allow_invalid_values($inputValue): void
     {
         $consoleMock = Mockery::mock(ConsoleHelper::class);
         $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');

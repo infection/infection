@@ -59,7 +59,7 @@ final class MutationTestingRunner
         $this->mutations = $mutations;
     }
 
-    public function run(int $threadCount, CodeCoverageData $codeCoverageData, string $testFrameworkExtraOptions)
+    public function run(int $threadCount, CodeCoverageData $codeCoverageData, string $testFrameworkExtraOptions): void
     {
         $mutantCount = \count($this->mutations);
 

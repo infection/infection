@@ -56,7 +56,7 @@ abstract class FileLogger implements MutationTestingResultsLogger
         $this->isDebugMode = $isDebugMode;
     }
 
-    public function log()
+    public function log(): void
     {
         $this->fs->dumpFile($this->logFilePath, implode($this->getLogLines(), "\n"));
     }

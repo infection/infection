@@ -188,7 +188,7 @@ final class InfectionContainer extends Container
         return $this['infection.config'];
     }
 
-    public function buildDynamicDependencies(InputInterface $input)
+    public function buildDynamicDependencies(InputInterface $input): void
     {
         $this['infection.config'] = function () use ($input): InfectionConfig {
             try {

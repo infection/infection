@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class MutationTest extends TestCase
 {
-    public function test_it_correctly_generates_hash()
+    public function test_it_correctly_generates_hash(): void
     {
         $mutator = new Plus(new MutatorConfig([]));
         $attributes = [
@@ -44,7 +44,7 @@ final class MutationTest extends TestCase
         $this->assertSame('e5e3a33955c4819395090c16e8df6f76', $mutation->getHash());
     }
 
-    public function test_it_correctly_sets_is_on_function_signature()
+    public function test_it_correctly_sets_is_on_function_signature(): void
     {
         $mutator = new Plus(new MutatorConfig([]));
         $attributes = [
@@ -69,7 +69,7 @@ final class MutationTest extends TestCase
         $this->assertFalse($mutation->isOnFunctionSignature());
     }
 
-    public function test_it_correctly_sets_original_file_ast()
+    public function test_it_correctly_sets_original_file_ast(): void
     {
         $mutator = new Plus(new MutatorConfig([]));
         $attributes = [
