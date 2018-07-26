@@ -26,6 +26,7 @@ final class MutatorProfile
         '@number' => self::NUMBER,
         '@operator' => self::OPERATOR,
         '@regex' => self::REGEX,
+        '@removal' => self::REMOVAL,
         '@return_value' => self::RETURN_VALUE,
         '@sort' => self::SORT,
         '@zero_iteration' => self::ZERO_ITERATION,
@@ -115,6 +116,11 @@ final class MutatorProfile
         Mutator\Regex\PregQuote::class,
     ];
 
+    public const REMOVAL = [
+        Mutator\Removal\FunctionRemoval::class,
+        Mutator\Removal\MethodRemoval::class,
+    ];
+
     public const RETURN_VALUE = [
         Mutator\ReturnValue\FloatNegation::class,
         Mutator\ReturnValue\FunctionCall::class,
@@ -151,6 +157,7 @@ final class MutatorProfile
         '@number',
         '@operator',
         '@regex',
+        '@removal',
         '@return_value',
         '@sort',
         '@zero_iteration',
@@ -229,6 +236,10 @@ final class MutatorProfile
 
         //Regex
         'PregQuote' => Mutator\Regex\PregQuote::class,
+
+        //Removal
+        'FunctionRemoval' => Mutator\Removal\FunctionRemoval::class,
+        'MethodRemoval' => Mutator\Removal\MethodRemoval::class,
 
         //Return Value
         'FloatNegation' => Mutator\ReturnValue\FloatNegation::class,
