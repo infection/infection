@@ -15,7 +15,7 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class FunctionRemoval extends Mutator
+final class FunctionCallRemoval extends Mutator
 {
     public function mutate(Node $node)
     {

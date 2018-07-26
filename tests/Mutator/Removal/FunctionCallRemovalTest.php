@@ -14,7 +14,7 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 /**
  * @internal
  */
-final class FunctionRemovalTest extends AbstractMutatorTestCase
+final class FunctionCallRemovalTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

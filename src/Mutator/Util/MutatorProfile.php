@@ -117,8 +117,8 @@ final class MutatorProfile
     ];
 
     public const REMOVAL = [
-        Mutator\Removal\FunctionRemoval::class,
-        Mutator\Removal\MethodRemoval::class,
+        Mutator\Removal\FunctionCallRemoval::class,
+        Mutator\Removal\MethodCallRemoval::class,
     ];
 
     public const RETURN_VALUE = [
@@ -238,8 +238,8 @@ final class MutatorProfile
         'PregQuote' => Mutator\Regex\PregQuote::class,
 
         //Removal
-        'FunctionRemoval' => Mutator\Removal\FunctionRemoval::class,
-        'MethodRemoval' => Mutator\Removal\MethodRemoval::class,
+        'FunctionCallRemoval' => Mutator\Removal\FunctionCallRemoval::class,
+        'MethodCallRemoval' => Mutator\Removal\MethodCallRemoval::class,
 
         //Return Value
         'FloatNegation' => Mutator\ReturnValue\FloatNegation::class,
