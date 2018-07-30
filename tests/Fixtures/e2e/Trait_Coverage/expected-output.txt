@@ -12,11 +12,11 @@ Line 7
 Mutator: TrueValue
 Line 12
 
-Mutator: Plus
-Line 15
-
 Mutator: PublicVisibility
 Line 12
+
+Mutator: Plus
+Line 15
 
 Errors mutants:
 ===============

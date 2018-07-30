@@ -24,10 +24,7 @@ use Infection\Differ\Differ;
 use Infection\Finder\ComposerExecutableFinder;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\Http\BadgeApiClient;
-use Infection\Logger\DebugFileLogger;
 use Infection\Logger\ResultsLoggerTypes;
-use Infection\Logger\SummaryFileLogger;
-use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\Util\Mutator;
 use Infection\Process\Builder\ProcessBuilder;
@@ -115,10 +112,7 @@ final class ProjectCodeTest extends TestCase
         PhpProcess::class,
         ComposerExecutableFinder::class,
         BadgeApiClient::class,
-        DebugFileLogger::class,
         ResultsLoggerTypes::class,
-        SummaryFileLogger::class,
-        TextFileLogger::class,
         MutantCreatingConsoleLoggerSubscriber::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
         MutationTestingRunner::class,

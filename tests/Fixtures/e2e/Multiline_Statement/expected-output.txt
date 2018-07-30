@@ -1,8 +1,8 @@
 Escaped mutants:
 ================
 
-Timeout mutants:
-================
+Timed Out mutants:
+==================
 
-Not covered mutants:
+Not Covered mutants:
 ====================

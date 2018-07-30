@@ -115,4 +115,44 @@ final class MutantProcessTest extends MockeryTestCase
 
         $this->assertSame($mutator, $mutantProcess->getMutator());
     }
+
+    public function test_it_knows_its_original_path(): void
+    {
+        $process = $this->createMOck(Process::class);
+        $process->expects($this->never())->method($this->anything());
+
+        $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $adapter->expects($this->never())->method($this->anything());
+
+        $mutation = $this->createMock(MutationInterface::class);
+        $mutation->expects($this->once())->method('getOriginalFilePath')->willReturn('foo/bar');
+        $mutant = $this->createMock(MutantInterface::class);
+        $mutant->expects($this->once())->method('getMutation')->willReturn($mutation);
+
+        $mutantProcess = new MutantProcess($process, $mutant, $adapter);
+
+        $path = $mutantProcess->getOriginalFilePath();
+
+        $this->assertSame('foo/bar', $path);
+    }
+
+    public function test_it_knows_its_original_starting_line(): void
+    {
+        $process = $this->createMOck(Process::class);
+        $process->expects($this->never())->method($this->anything());
+
+        $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $adapter->expects($this->never())->method($this->anything());
+
+        $mutation = $this->createMock(MutationInterface::class);
+        $mutation->expects($this->once())->method('getAttributes')->willReturn(['startLine' => '3']);
+        $mutant = $this->createMock(MutantInterface::class);
+        $mutant->expects($this->once())->method('getMutation')->willReturn($mutation);
+
+        $mutantProcess = new MutantProcess($process, $mutant, $adapter);
+
+        $line = $mutantProcess->getOriginalStartingLine();
+
+        $this->assertSame(3, $line);
+    }
 }
