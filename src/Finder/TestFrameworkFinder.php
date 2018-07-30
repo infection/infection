@@ -72,7 +72,8 @@ class TestFrameworkFinder extends AbstractExecutableFinder
         try {
             $process = new Process([
                 $this->findComposer(),
-                'config bin-dir',
+                'config',
+                'bin-dir',
             ]);
 
             $process->mustRun();
