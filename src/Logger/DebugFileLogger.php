@@ -54,12 +54,12 @@ final class DebugFileLogger extends FileLogger
     private function convertProcess(array $processes, string $headlinePrefix): string
     {
         $logParts = $this->getHeadlineParts($headlinePrefix);
+        $this->sortProcesses($processes);
 
-        foreach ($processes as $index => $mutantProcess) {
+        foreach ($processes as $mutantProcess) {
             $logParts[] = '';
-            $mutation = $mutantProcess->getMutant()->getMutation();
-            $logParts[] = 'Mutator: ' . $mutation->getMutator()::getName();
-            $logParts[] = 'Line ' . $mutation->getAttributes()['startLine'];
+            $logParts[] = 'Mutator: ' . $mutantProcess->getMutator()::getName();
+            $logParts[] = 'Line ' . $mutantProcess->getOriginalStartingLine();
         }
 
         return implode($logParts, "\n") . "\n";

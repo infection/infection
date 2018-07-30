@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\Process;
 
 use Infection\Mutant\MutantInterface;
+use Infection\MutationInterface;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Process\Process;
@@ -105,6 +106,21 @@ final class MutantProcess implements MutantProcessInterface
 
     public function getMutator(): Mutator
     {
-        return $this->getMutant()->getMutation()->getMutator();
+        return $this->getMutation()->getMutator();
+    }
+
+    public function getOriginalFilePath(): string
+    {
+        return $this->getMutation()->getOriginalFilePath();
+    }
+
+    public function getOriginalStartingLine(): int
+    {
+        return (int) $this->getMutation()->getAttributes()['startLine'];
+    }
+
+    private function getMutation(): MutationInterface
+    {
+        return $this->getMutant()->getMutation();
     }
 }
