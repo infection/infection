@@ -141,7 +141,7 @@ final class ConfigureCommand extends BaseCommand
         }
 
         if ($excludedDirs) {
-            $configObject->source->exclude = $excludedDirs;
+            $configObject->source->excludes = $excludedDirs;
         }
 
         if ($phpUnitConfigPath) {
