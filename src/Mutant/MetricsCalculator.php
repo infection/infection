@@ -134,7 +134,7 @@ class MetricsCalculator
         $defeatedTotal = $this->killedCount + $this->timedOutCount + $this->errorCount;
 
         if ($this->totalMutantsCount) {
-            $detectionRateAll = round(100 * ($defeatedTotal / $this->totalMutantsCount));
+            $detectionRateAll = floor(100 * ($defeatedTotal / $this->totalMutantsCount));
         }
 
         return $detectionRateAll;

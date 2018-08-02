@@ -59,7 +59,7 @@ final class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
         $killedMutantProcess->shouldReceive('getResultCode')->times(1)->andReturn(MutantProcess::CODE_KILLED);
 
         $errorMutantProcess = Mockery::mock(MutantProcessInterface::class);
-        $errorMutantProcess->shouldReceive('getResultCode')->times(1)->andReturn(MutantProcess::CODE_ERROR);
+        $errorMutantProcess->shouldReceive('getResultCode')->times(2)->andReturn(MutantProcess::CODE_ERROR);
 
         $calculator = new MetricsCalculator();
 
@@ -78,5 +78,8 @@ final class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
         $this->assertSame(60.0, $calculator->getMutationScoreIndicator());
         $this->assertSame(80.0, $calculator->getCoverageRate());
         $this->assertSame(75.0, $calculator->getCoveredCodeMutationScoreIndicator());
+
+        $calculator->collect($errorMutantProcess);
+        $this->assertSame(66.0, $calculator->getMutationScoreIndicator()); // (1+1+2)/6 = 66.66%
     }
 }
