@@ -3,13 +3,16 @@ Killed mutants:
 ===============
 
 
-Mutator: Plus
-Line 9
-
 Mutator: PublicVisibility
 Line 7
 
+Mutator: Plus
+Line 9
+
 Mutator: TrueValue
+Line 12
+
+Mutator: PublicVisibility
 Line 12
 
 Mutator: FalseValue
@@ -20,9 +23,6 @@ Line 14
 
 Mutator: TrueValue
 Line 15
-
-Mutator: PublicVisibility
-Line 12
 
 Errors mutants:
 ===============
