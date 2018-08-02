@@ -46,7 +46,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
                 $this->addVendorFolderToPath();
             }
 
-            $this->cachedPath = $this->findTestFramework();
+            $this->cachedPath = (string) realpath($this->findTestFramework());
         }
 
         return $this->cachedPath;
@@ -70,7 +70,12 @@ class TestFrameworkFinder extends AbstractExecutableFinder
         $vendorPath = null;
 
         try {
-            $process = new Process(sprintf('%s %s', $this->findComposer(), 'config bin-dir'));
+            $process = new Process([
+                $this->findComposer(),
+                'config',
+                'bin-dir',
+            ]);
+
             $process->mustRun();
             $vendorPath = trim($process->getOutput());
         } catch (\RuntimeException $e) {
