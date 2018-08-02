@@ -128,6 +128,9 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
 
     public function test_passthrough_file_methods_pass(): void
     {
+        if (\PHP_SAPI === 'phpdbg') {
+            $this->markTestSkipped('Running this test on PHPDBG has issues with FD_SETSIZE. Consider removing this if that issue has been fixed.');
+        }
         IncludeInterceptor::intercept(self::$files[1], self::$files[2]);
         IncludeInterceptor::enable();
 
