@@ -133,6 +133,8 @@ jobs:
       php: 7.2
       install:
         - composer install
+      script:
+        make build/bin/infection.phar;
       deploy:
         provider: releases
         api_key:
