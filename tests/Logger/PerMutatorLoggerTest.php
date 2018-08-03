@@ -35,7 +35,7 @@ final class PerMutatorLoggerTest extends TestCase
                 "\n" .
                 "| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |\n" .
                 "| ------- | --------- | ------ | ------- |------- | --------- | --- | ----------- |\n" .
-                "| For_ | 15 | 10 | 0 | 0 | 0 | 67| 100|\n" .
+                "| For_ | 15 | 10 | 0 | 0 | 0 | 66| 100|\n" .
                 '| PregQuote | 5 | 0 | 0 | 0 | 0 | 0| 0|'
             );
 
