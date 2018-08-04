@@ -12,6 +12,7 @@ namespace Infection\Tests\Mutator\Util;
 use Infection\Mutator\Util\AbstractValueToNullReturnValue;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Function_;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -19,7 +20,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class AbstractValueToNullReturnValueTest extends TestCase
 {
-    protected $testSubject = null;
+    protected $testSubject;
 
     protected function setUp(): void
     {
@@ -30,6 +31,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
 
     private function mockNode($returnValue): Node
     {
+        /** @var Node|MockObject $mockNode */
         $mockNode = $this->getMockBuilder(Node::class)
                          ->disableOriginalConstructor()
                          ->setMethods(['getAttribute'])
@@ -43,6 +45,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
 
     private function mockFunction($returnValue): Function_
     {
+        /** @var Function_|MockObject $mockFunction */
         $mockFunction = $this->getMockBuilder(Function_::class)
             ->disableOriginalConstructor()
             ->setMethods(['getReturnType'])
@@ -71,8 +74,6 @@ final class AbstractValueToNullReturnValueTest extends TestCase
     {
         /** @var Node\Identifier $mockNode */
         $mockNode = $this->createMock(Node\Identifier::class);
-
-        $mockNode->name = null;
 
         $this->assertTrue(
             $this->invokeMethod(

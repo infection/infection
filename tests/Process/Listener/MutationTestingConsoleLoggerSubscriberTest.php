@@ -18,6 +18,7 @@ use Infection\Events\MutationTestingStarted;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Listener\MutationTestingConsoleLoggerSubscriber;
 use Infection\Process\MutantProcessInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -27,22 +28,22 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 {
     /**
-     * @var OutputInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var OutputInterface|MockObject
      */
     private $output;
 
     /**
-     * @var OutputFormatter|\PHPUnit_Framework_MockObject_MockObject
+     * @var OutputFormatter|MockObject
      */
     private $outputFormatter;
 
     /**
-     * @var MetricsCalculator|\PHPUnit_Framework_MockObject_MockObject
+     * @var MetricsCalculator|MockObject
      */
     private $metricsCalculator;
 
     /**
-     * @var DiffColorizer|\PHPUnit_Framework_MockObject_MockObject
+     * @var DiffColorizer|MockObject
      */
     private $diffColorizer;
 

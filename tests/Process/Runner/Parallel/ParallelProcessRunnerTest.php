@@ -26,6 +26,7 @@ final class ParallelProcessRunnerTest extends MockeryTestCase
 {
     private function buildEventDispatcherWithEventCount($eventCount): EventDispatcherInterface
     {
+        /** @var EventDispatcherInterface|Mockery\MockInterface $eventDispatcher */
         $eventDispatcher = Mockery::mock(EventDispatcherInterface::class);
         $eventDispatcher->shouldReceive('dispatch')->times($eventCount)->with(Mockery::type(MutantProcessFinished::class));
 
@@ -44,6 +45,7 @@ final class ParallelProcessRunnerTest extends MockeryTestCase
         $mutant = Mockery::mock(MutantInterface::class);
         $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(false);
 
+        /** @var MutantProcessFinished|Mockery\MockInterface $mutantProcess */
         $mutantProcess = Mockery::mock(MutantProcessInterface::class);
         $mutantProcess->shouldReceive('getMutant')->once()->andReturn($mutant);
 
@@ -73,6 +75,7 @@ final class ParallelProcessRunnerTest extends MockeryTestCase
         $mutant = Mockery::mock(MutantInterface::class);
         $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(true);
 
+        /** @var MutantProcessFinished|Mockery\MockInterface $mutantProcess */
         $mutantProcess = Mockery::mock(MutantProcessInterface::class);
         $mutantProcess->shouldReceive('getProcess')->twice()->andReturn($process);
         $mutantProcess->shouldReceive('getMutant')->once()->andReturn($mutant);
@@ -103,6 +106,7 @@ final class ParallelProcessRunnerTest extends MockeryTestCase
         $mutant = Mockery::mock(MutantInterface::class);
         $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(true);
 
+        /** @var MutantProcessFinished|Mockery\MockInterface $mutantProcess */
         $mutantProcess = Mockery::mock(MutantProcessInterface::class);
         $mutantProcess->shouldReceive('getProcess')->twice()->andReturn($process);
         $mutantProcess->shouldReceive('getMutant')->once()->andReturn($mutant);

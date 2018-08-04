@@ -16,6 +16,7 @@ use Infection\Performance\Listener\PerformanceLoggerSubscriber;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\TimeFormatter;
 use Infection\Performance\Time\Timer;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -25,7 +26,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class PerformanceLoggerSubscriberTest extends TestCase
 {
     /**
-     * @var OutputInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var OutputInterface|MockObject
      */
     private $output;
 
