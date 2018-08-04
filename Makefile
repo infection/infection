@@ -119,7 +119,7 @@ cs-check: build/cache $(PHP-CS-FIXER)
 
 phpstan: vendor $(PHPSTAN)
 	$(PHPSTAN) analyse src --level=max -c ./devTools/phpstan-src.neon --no-interaction --no-progress
-	$(PHPSTAN) analyse tests --level=2 -c ./devTools/phpstan-tests.neon --no-interaction --no-progress
+	$(PHPSTAN) analyse tests --level=3 -c ./devTools/phpstan-tests.neon --no-interaction --no-progress
 
 validate:
 	composer validate --strict
