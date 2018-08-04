@@ -24,7 +24,7 @@ final class MethodCallRemoval extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        if (!($node instanceof Node\Stmt\Expression)) {
+        if (!$node instanceof Node\Stmt\Expression) {
             return false;
         }
 
