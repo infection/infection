@@ -22,7 +22,7 @@ final class PregMatchMatchesTest extends AbstractMutatorTestCase
      * @param string $input
      * @param string|null $output
      */
-    public function test_mutator(string $input, string $output = null)
+    public function test_mutator(string $input, string $output = null): void
     {
         $this->doTest($input, $output);
     }
@@ -51,6 +51,7 @@ $foo = 'preg_match';
 $foo('/a/', 'b', $bar);
 PHP
         ];
+
         yield 'It mutates if preg_match is incorrectly cased' => [
           <<<'PHP'
 <?php
@@ -64,6 +65,7 @@ PHP
 $foo = array();
 PHP
         ];
+
         yield 'It does not mutate if there are less than 3 arguments' => [
             <<<'PHP'
 <?php
@@ -105,6 +107,34 @@ PHP
 
         yield 'It does not mutate if the return type does not allow it' => [
             file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/RegexMatchMatches/ReturnNotAllowed.php'),
+        ];
+
+        yield 'It mutates correctly even with four arguments' => [
+            <<<'PHP'
+<?php
+
+preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE);
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$foo = array();
+PHP
+        ];
+
+        yield 'It mutates correctly even with five arguments' => [
+            <<<'PHP'
+<?php
+
+preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE, 3);
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$foo = array();
+PHP
         ];
     }
 }

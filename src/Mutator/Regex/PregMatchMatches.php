@@ -37,28 +37,27 @@ final class PregMatchMatches extends Mutator
             return false;
         }
 
-        if ($node->name instanceof Node\Expr\Variable ||
+        if (!$node->name instanceof Node\Name ||
             strtolower((string) $node->name) !== 'preg_match') {
             return false;
         }
 
-        return $this->isAllowedByReturnType($node) && \count($node->args) >= 3;
+        return \count($node->args) >= 3 && $this->isAllowedByReturnType($node);
     }
 
     private function isAllowedByReturnType(Node $node): bool
     {
-        if (($parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY)) instanceof Node\Stmt\Return_) {
-            $functionScope = $parent->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY);
-            $returnType = $functionScope->getReturnType();
-            if ($returnType instanceof Node\Identifier) {
-                $returnType = $returnType->name;
-            }
-            // no return value specified
-            if (null !== $returnType) {
-                return false;
-            }
+        if (!(($parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY)) instanceof Node\Stmt\Return_)) {
+            return true;
         }
 
-        return true;
+        $functionScope = $parent->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY);
+        $returnType = $functionScope->getReturnType();
+
+        if ($returnType instanceof Node\Identifier) {
+            $returnType = $returnType->name;
+        }
+
+        return null === $returnType;
     }
 }
