@@ -12,6 +12,7 @@ namespace Infection\Tests\TestFramework;
 use Infection\Config\InfectionConfig;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
+use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\VersionParser;
 use Mockery;
@@ -28,7 +29,7 @@ final class FactoryTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             '',
             '',
             Mockery::mock(TestFrameworkConfigLocatorInterface::class),
-            Mockery::mock(XmlConfigurationHelper::class),
+            new XmlConfigurationHelper(new PathReplacer(new Filesystem())),
             '',
             new InfectionConfig(new \stdClass(), new Filesystem(), ''),
             Mockery::mock(VersionParser::class)

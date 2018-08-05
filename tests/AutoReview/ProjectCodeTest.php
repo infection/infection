@@ -38,7 +38,6 @@ use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder as PhpS
 use Infection\TestFramework\PhpSpec\Config\NoCodeCoverageException;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
-use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Utils\VersionParser;
@@ -94,7 +93,6 @@ final class ProjectCodeTest extends TestCase
         PhpUnitInitalConfigBuilder::class,
         PhpSpecMutationConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
-        XmlConfigurationHelper::class,
         CoverageXmlParser::class,
         VersionParser::class,
     ];
@@ -106,7 +104,6 @@ final class ProjectCodeTest extends TestCase
         ConfigureCommand::class,
         InfectionCommand::class,
         SelfUpdateCommand::class,
-        ConsoleHelper::class,
         Application::class,
         ProgressFormatter::class,
         PhpProcess::class,
@@ -117,7 +114,6 @@ final class ProjectCodeTest extends TestCase
         MutationGeneratingConsoleLoggerSubscriber::class,
         MutationTestingRunner::class,
         NoCodeCoverageException::class,
-        XmlConfigurationHelper::class,
         TestFrameworkTypes::class,
         MutationsCollectorVisitor::class,
         ParentConnectorVisitor::class,

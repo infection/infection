@@ -74,6 +74,13 @@ JSON;
         $this->assertNull($guesser->guess());
     }
 
+    public function test_it_returns_null_when_does_not_have_psr_autoload(): void
+    {
+        $guesser = new SourceDirGuesser(json_decode('{"autoload": {"files": ["foo.php"] }}'));
+
+        $this->assertNull($guesser->guess());
+    }
+
     public function test_it_returns_only_src_if_contains_array_of_paths(): void
     {
         $guesser = new SourceDirGuesser(

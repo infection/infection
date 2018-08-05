@@ -14,7 +14,7 @@ use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 /**
  * @internal
  */
-class XmlConfigurationHelper
+final class XmlConfigurationHelper
 {
     /**
      * @var PathReplacer
@@ -35,18 +35,14 @@ class XmlConfigurationHelper
             '//file',
         ];
 
-        $nodes = $xPath->query(implode('|', $queries));
-
-        foreach ($nodes as $node) {
+        foreach ($xPath->query(implode('|', $queries)) as $node) {
             $this->pathReplacer->replaceInNode($node);
         }
     }
 
     public function removeExistingLoggers(\DOMDocument $dom, \DOMXPath $xPath): void
     {
-        $nodes = $xPath->query('/phpunit/logging');
-
-        foreach ($nodes as $node) {
+        foreach ($xPath->query('/phpunit/logging') as $node) {
             $dom->documentElement->removeChild($node);
         }
     }

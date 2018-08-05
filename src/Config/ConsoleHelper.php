@@ -36,7 +36,7 @@ class ConsoleHelper
         ]);
     }
 
-    public function getQuestion($question, $default = null, $sep = ':')
+    public function getQuestion($question, $default = null, $sep = ':'): string
     {
         return $default
             ? sprintf('<info>%s</info> [<comment>%s</comment>]%s ', $question, $default, $sep)
