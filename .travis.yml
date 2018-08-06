@@ -4,10 +4,10 @@ sudo: false
 
 env:
   global:
-    - INFECTION_FLAGS='--threads=4 --min-msi=62 --min-covered-msi=73 --coverage=coverage --log-verbosity=none'
+    - INFECTION_FLAGS='--threads=4 --min-msi=62 --min-covered-msi=72 --coverage=coverage --log-verbosity=none'
     - PHPUNIT_BIN='vendor/bin/phpunit --coverage-clover=clover.xml --coverage-xml=coverage/coverage-xml --log-junit=coverage/phpunit.junit.xml'
-    - secure: RT8az62c2YI2j7Xccamhw0eCFbPMphfK2c5aZ0cUyQCFeLuc7qJ5Q0y0DIapOf7YbpLBwVwf53LQtV8doyhZ2ltTRHM2NDmOxUrkxFpc50+I2FGlsrlPWPSDL69Dc6VxEy6+S1rvUUJu6KIs1lGCrUG3lOxt/avzctyY1g8KdqkhIfNADH6pwMzRxkhOacsKkdnT24RoFdN4M4uXyn16VclFOCeLaVdEHYCdD248L0MuhTZQF5u0jq0SdgNGOPnetRQXHjQLVSfmuB2bI5FUTxHVwvf4nU3aKYXONi+EzBauDZXdO/opgNydbmhVUZtRsTeSh1OANhAPTvW+qdFcMbc3K90q3UMdIp8pZS9krRzJyfXe7BodnvkOu0ej2S4x2eE2EZphK7L21nu016CDo1y434UCJX+DI3Pn7SZ7ood8nOi7yfOzNeVklW6+n6k6bSmS2ya/DcpS6y/OuH/awtLat0hzmXUCHVNV9YiES1KwtlkUSJqtaZwtj8iXuuBwOWWV4u71bivpKEbF2L7+1GYy56ftv57JHbh6m2tWCoeUQc9oAzDb0sHeBhj4YFVhAd598860Q4WhRG9BWJT8guySRI0iXOSxDrvgtgr5okG3WD2/CJtnsVukdgXMvcXiLbxMXKeF7LMRJfkNjrn++311ZAMaRWJSfGNEivZlooQ=
-
+    - secure: Wsy2cIgrnk4QGNXRlClN3j6WIYvaT55YkRhVnt8DhAfOGEypNl2a0fAB7o3hrSipCLDfMuyXV4Jldm7EfQOwCyOsF6zpBnzKDCySCX/H7fBT5HUNPx3Er5j2CSgSqJQNNP3fJuxe6FDlkKJfR5wH7VRbKwRICpNB/WvEAw28RYfqAqdgMRcMFFuUuKsqDwof9Ho6MBySxhP/BItv/v/+JyYLGn4VUtoGFs6HyKa7gZx/v2vMhnSpkA/ekLLkKoCKJSPzDRZGm1u1fDNX36ady4i9+23hnHRx5mjtFIgc3LtkEAyR5RhwEOI1ETEYinB9FX/CZmwGpCsnHrL5nZU85iILHyLzsrP8K0gfsefCshFLkm7Py2nBwtdYzMJSJy+eJ04HsWU9WkfCYs3hSGl8qzpEbboI3SV8drK9oXekbxEpJPEg/YcG3My16243Aevg3bsclp9JOFbGqagJvptJMydNjq70dqGDDbI5A5jAwAPK2nrUIgucuL5hnE5OcOD6g37duUHGzvwrU9ZBZQpeTxlxjFxBa6zLx/5qBDVQF3tmbfyDOMglgBhfN7+Ipi44p72K1DfWn4AdsQ8KtcIzXbnBC+tDpr8jjeaZ1BoFFNdM2jQfOuGlPnfnlm0vdk7V32W1uorQNiqfikYYOPh0MfuxEU2P9uBvWSMRPXALBx4=
+    - secure: RJJkBxuV6Obkyrraj4ImoK1lIhpZ6US/Pp96r7LO93FyDgANBzXkyPcOFPD0NrTMKKTp63M5SznUK5LOyi8ULVvLwJ/XqvNHz1f9lRQoc13Bs3MtXFvVrrrAPM8Lwa3YdvlR29WsYxTLB6eiFaYwwuCHW4OWmfQ+AOCielB8CA5XOeEX75E2geVYZ25qeEKKFlRKhm4N1h5DeuvGrQ2VG4sIX/bk0meE9z5kY/XtJCO6YfN+gj8T3yCzT4rb7xjaqdFfR+Iq8joxb9+5giIWjT7xkPS60ELQppIYSn/jW7puRPP2WrvbgiT6Tbzb4VBddew5VYe8/JkOBFi0gZpa6PR/LxH1+0hab+X1SUjzqy0BhPY6PEHadYcIp0kqjD2fLEHoNg7jjvTuk79RvRpcuvECj30nZfZHbMkixc539rkVn7BTt53488z6IQ+PCFFcH0CsPByXGSBJLgYca0jD/9h/uM4IZdXsC8yAd/MEIRCH+AwLxgPrb432CeoWdjz5V53VIMSXVqTp6fidpDGIeQR8bzA953ciZ2WxyMkNudKV1n4DcIOHCklZKPuCetQk5CAti9qJqGq2QDYlJYYvRLE7HCmDdeHt/kwaXYKDWx/BqRcHQ3Dnz02tA6hkj1aBN6NPrXSyeZOIf1uOdW6fhTlJvpiPTX6RiA26ftKHEck=
 cache:
   directories:
     - $HOME/.composer/cache
@@ -21,12 +21,6 @@ addons:
 before_install:
   - source .ci/xdebug.sh
   - xdebug-disable
-  - |
-    if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-      cp box.json.dist box.json
-      openssl aes-256-cbc -K $encrypted_4dbefe709cef_key -iv $encrypted_4dbefe709cef_iv -in .ci/secrets.tar.enc -out .ci/secrets.tar -d
-      tar xvf .ci/secrets.tar -C .ci
-    fi
 
 jobs:
   include:
@@ -135,13 +129,18 @@ jobs:
         - composer install
       script:
         make build/bin/infection.phar;
+      before_deploy:
+        - echo $DECRYPT_KEY | gpg --passphrase-fd 0 .ci/keys.asc.gpg
+        - gpg --batch --yes --import .ci/keys.asc
+        - echo $SIGN_KEY | gpg --passphrase-fd 0 -u C5095986493B4AA0 --armor --detach-sig build/bin/infection.phar
+
       deploy:
         provider: releases
         api_key:
           secure: JtdvJBE2ARf6VWN5KlXAburz3FZMriiXBHEdeIocHePBAzgYW7tVMksJR5N3azrE3KjhftMEukXtA1k5VfAGdLCSm6nKGsZwolkd24ryG7PYNuAdFWfbau8QQXn6aLFesF2lkTq89+PqxAdVjwXNgFA7ble3vL66Ogabff6gov6QwT9vDrTqwLmWNGwbt9QB32IE9yVPjW/3lk4MAkMHtKDr2DElyeT2CRRuPuUCA+zNwoGG95wqLAD/RwjsqR3GjotzDKrldqog9jU2OQptUc3BgdKlYR1AzdknxJYnT7a5CRVdmSOEfD9IrDqlYEzn9pHav+Sk4KD2KNKsALQGk/w16BqncN2uyOexUTzXvnDd27G4ZYy+1OsXMdYMhF5ffwj7EqNLm8XfLPtHHV0/FUJY9kkrbf9+wQVjDQmMJLLIiBSt3vuY0ya5SVW8thtjlF2j67smamNe4hDhditBipto+9Y5vI4AYhcm4CQlqP8BVbw3/LgGAl/dJR5ohM7PFZH3EUE1AojBaEXfUymlICdFVZFJbB0D/AM8jSqNmWBQu9QX3MURhT5xLSwc+kir2izQaEo/GQz79AifqkUJgSCzpRUJntCN8A7yk1uxDZDONbINF3ReuF+nqu7GMksgKZLCGbOIaBl9of24K5BeTqxgcEykiHFFY7X9QdI3Dyo=
         file:
           - build/bin/infection.phar
-          - build/bin/infection.phar.pubkey
+          - build/bin/infection.phar.asc
         skip_cleanup: true
         on:
           tags: true

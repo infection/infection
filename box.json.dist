@@ -2,9 +2,6 @@
     "output": "build/bin/infection.phar",
     "chmod": "0755",
 
-    "algorithm": "OPENSSL",
-    "key": ".ci/infection-private.pem",
-
     "git-version": "package_version",
 
     "compression": "GZ",

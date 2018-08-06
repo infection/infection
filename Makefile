@@ -127,11 +127,8 @@ validate:
 auto-review: vendor
 	vendor/bin/phpunit --group=auto-review
 
-build/bin/infection.phar: $(shell find bin/ src/ -type f) box.phar box.json .git/HEAD
+build/bin/infection.phar: $(shell find bin/ src/ -type f) box.phar box.json.dist .git/HEAD
 	php box.phar compile
-
-box.json: box.json.dist
-	cat box.json.dist | sed -E 's/\"key\": \".+\",//g' | sed -E 's/\"algorithm\": \".+\",//g' > box.json
 
 box.phar:
 	wget $(BOX_URL)
