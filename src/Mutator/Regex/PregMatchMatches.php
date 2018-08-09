@@ -10,8 +10,6 @@ declare(strict_types=1);
 namespace Infection\Mutator\Regex;
 
 use Infection\Mutator\Util\Mutator;
-use Infection\Visitor\ParentConnectorVisitor;
-use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
 /**
@@ -20,15 +18,15 @@ use PhpParser\Node;
 final class PregMatchMatches extends Mutator
 {
     /**
-     * Replaces "preg_match('/a/', 'b', $foo);" with "$foo = array();"
+     * Replaces "preg_match('/a/', 'b', $foo);" with "(int) $foo = array();"
      *
      * @param Node|Node\Expr\FuncCall $node
      *
-     * @return Node\Expr\Assign
+     * @return Node\Expr\Cast\Int_
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\Assign($node->args[2]->value, new Node\Expr\Array_());
+        return new Node\Expr\Cast\Int_(new Node\Expr\Assign($node->args[2]->value, new Node\Expr\Array_()));
     }
 
     protected function mutatesNode(Node $node): bool
@@ -42,22 +40,6 @@ final class PregMatchMatches extends Mutator
             return false;
         }
 
-        return \count($node->args) >= 3 && $this->isAllowedByReturnType($node);
-    }
-
-    private function isAllowedByReturnType(Node $node): bool
-    {
-        if (!(($parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY)) instanceof Node\Stmt\Return_)) {
-            return true;
-        }
-
-        $functionScope = $parent->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY);
-        $returnType = $functionScope->getReturnType();
-
-        if ($returnType instanceof Node\Identifier) {
-            $returnType = $returnType->name;
-        }
-
-        return null === $returnType;
+        return \count($node->args) >= 3;
     }
 }
