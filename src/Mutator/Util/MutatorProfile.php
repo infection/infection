@@ -114,6 +114,7 @@ final class MutatorProfile
 
     public const REGEX = [
         Mutator\Regex\PregQuote::class,
+        Mutator\Regex\PregMatchMatches::class,
     ];
 
     public const REMOVAL = [
@@ -236,6 +237,7 @@ final class MutatorProfile
 
         //Regex
         'PregQuote' => Mutator\Regex\PregQuote::class,
+        'PregMatchMatches' => Mutator\Regex\PregMatchMatches::class,
 
         //Removal
         'FunctionCallRemoval' => Mutator\Removal\FunctionCallRemoval::class,
