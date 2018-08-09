@@ -30,7 +30,7 @@ final class InfectionContainerTest extends TestCase
     public function test_it_can_build_dynamic_dependencies()
     {
         $input = $this->createMock(InputInterface::class);
-        $input->expects($this->once())->method('getOption')->with('coverage')->willReturn('');
+        $input->expects($this->once())->method('hasOption')->with('coverage')->willReturn(false);
 
         $container = new InfectionContainer();
         $tmpDir = sys_get_temp_dir();
