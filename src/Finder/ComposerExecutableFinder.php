@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace Infection\Finder;
 
 use Infection\Finder\Exception\FinderException;
-use Infection\Process\ExecutableFinder\PhpExecutableFinder;
 use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
  * @internal

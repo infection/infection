@@ -11,6 +11,7 @@ namespace Infection\Tests\Finder;
 
 use Infection\Finder\Exception\FinderException;
 use Infection\Finder\TestFrameworkFinder;
+use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
@@ -72,9 +73,14 @@ final class TestFrameworkFinderTest extends TestCase
         $pathName = getenv('PATH') ? 'PATH' : 'Path';
         $path = getenv($pathName);
 
-        $frameworkFinder = new TestFrameworkFinder('phpunit');
+        $frameworkFinder = new TestFrameworkFinder(TestFrameworkTypes::PHPUNIT);
 
-        $this->assertContains(normalizePath('vendor/bin/phpunit'), normalizePath($frameworkFinder->find()), 'Should return the custom path');
+        $this->assertContains(
+            normalizePath(realpath('vendor/bin/phpunit')),
+            normalizePath($frameworkFinder->find()),
+            'Should return the custom path'
+        );
+
         $pathAfterTest = getenv($pathName);
 
         $this->assertNotSame($path, $pathAfterTest);

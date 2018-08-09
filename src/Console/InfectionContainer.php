@@ -245,7 +245,11 @@ final class InfectionContainer extends Container
         };
 
         $this['coverage.path'] = function () use ($input): string {
-            $existingCoveragePath = trim($input->getOption('coverage'));
+            $existingCoveragePath = '';
+
+            if ($input->hasOption('coverage')) {
+                $existingCoveragePath = trim($input->getOption('coverage'));
+            }
 
             if ($existingCoveragePath === '') {
                 return $this['tmp.dir'];
