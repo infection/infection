@@ -33,7 +33,7 @@ final class TimerTest extends TestCase
         $timeInSeconds = $this->timer->stop();
 
         $this->assertInternalType('float', $timeInSeconds);
-        $this->assertGreaterThan(0, $timeInSeconds);
+        $this->assertGreaterThanOrEqual(0, $timeInSeconds);
     }
 
     public function test_it_throws_an_exception_when_started_twice_without_stopping(): void
