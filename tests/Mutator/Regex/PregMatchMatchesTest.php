@@ -39,7 +39,7 @@ PHP
             <<<'PHP'
 <?php
 
-$foo = array();
+(int) ($foo = array());
 PHP
         ];
 
@@ -62,7 +62,7 @@ PHP
             <<<'PHP'
 <?php
 
-$foo = array();
+(int) ($foo = array());
 PHP
         ];
 
@@ -84,29 +84,8 @@ PHP
             <<<'PHP'
 <?php
 
-$a->b = array();
+(int) ($a->b = array());
 PHP
-        ];
-
-        yield 'It mutates if the return type allows it' => [
-            file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/RegexMatchMatches/ReturnTypes.php'),
-            <<<'PHP'
-<?php
-
-namespace RegexMatchMatches;
-
-class ReturnTypes
-{
-    public function foo()
-    {
-        return $matches = array();
-    }
-}
-PHP
-        ];
-
-        yield 'It does not mutate if the return type does not allow it' => [
-            file_get_contents(__DIR__ . '/../../Fixtures/Autoloaded/RegexMatchMatches/ReturnNotAllowed.php'),
         ];
 
         yield 'It mutates correctly even with four arguments' => [
@@ -119,7 +98,7 @@ PHP
             <<<'PHP'
 <?php
 
-$foo = array();
+(int) ($foo = array());
 PHP
         ];
 
@@ -133,7 +112,7 @@ PHP
             <<<'PHP'
 <?php
 
-$foo = array();
+(int) ($foo = array());
 PHP
         ];
     }
