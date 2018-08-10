@@ -170,29 +170,29 @@ final class InfectionCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container = $this->getContainer();
+        $infectionContainer = $this->getContainer();
 
-        if (!$container->get('coverage.checker')->hasDebuggerOrCoverageOption()) {
+        if (!$infectionContainer->get('coverage.checker')->hasDebuggerOrCoverageOption()) {
             $this->consoleOutput->logMissedDebuggerOrCoverageOption();
 
             return 1;
         }
 
-        $config = $container->get('infection.config');
+        $infectionConfig = $infectionContainer->get('infection.config');
 
-        $this->includeUserBootstrap($config);
+        $this->includeUserBootstrap($infectionConfig);
 
-        $testFrameworkKey = $input->getOption('test-framework') ?: $config->getTestFramework();
-        $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $this->skipCoverage);
+        $testFrameworkKey = $input->getOption('test-framework') ?: $infectionConfig->getTestFramework();
+        $adapter = $infectionContainer->get('test.framework.factory')->create($testFrameworkKey, $this->skipCoverage);
 
         LogVerbosity::convertVerbosityLevel($input, $this->consoleOutput);
 
-        $metricsCalculator = $container->get('metrics');
-        $container->get('subscriber.builder')->registerSubscribers($adapter, $output);
+        $metricsCalculator = $infectionContainer->get('metrics');
+        $infectionContainer->get('subscriber.builder')->registerSubscribers($adapter, $output);
 
         $this->eventDispatcher->dispatch(new ApplicationExecutionStarted());
 
-        $processBuilder = new ProcessBuilder($adapter, $config->getProcessTimeout());
+        $processBuilder = new ProcessBuilder($adapter, $infectionConfig->getProcessTimeout());
         $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);
 
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
@@ -215,21 +215,21 @@ final class InfectionCommand extends BaseCommand
 
         $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
         $mutationsGenerator = new MutationsGenerator(
-            $container->get('src.dirs'),
-            $container->get('exclude.paths'),
+            $infectionContainer->get('src.dirs'),
+            $infectionContainer->get('exclude.paths'),
             $codeCoverageData,
-            $container->get('mutators'),
+            $infectionContainer->get('mutators'),
             $this->parseMutators($input->getOption('mutators')),
             $this->eventDispatcher,
-            $container->get('parser')
+            $infectionContainer->get('parser')
         );
 
         $mutations = $mutationsGenerator->generate($input->getOption('only-covered'), $input->getOption('filter'));
 
         $mutationTestingRunner = new MutationTestingRunner(
             $processBuilder,
-            $container->get('parallel.process.runner'),
-            $container->get('mutant.creator'),
+            $infectionContainer->get('parallel.process.runner'),
+            $infectionContainer->get('mutant.creator'),
             $this->eventDispatcher,
             $mutations
         );
@@ -240,7 +240,7 @@ final class InfectionCommand extends BaseCommand
             $testFrameworkOptions->getForMutantProcess()
         );
         /** @var TestRunConstraintChecker $constraintChecker */
-        $constraintChecker = $container->get('test.run.constraint.checker');
+        $constraintChecker = $infectionContainer->get('test.run.constraint.checker');
 
         $statusCode = 0;
 
@@ -259,9 +259,9 @@ final class InfectionCommand extends BaseCommand
         return $statusCode;
     }
 
-    private function includeUserBootstrap(InfectionConfig $config): void
+    private function includeUserBootstrap(InfectionConfig $infectionConfig): void
     {
-        $bootstrap = $config->getBootstrap();
+        $bootstrap = $infectionConfig->getBootstrap();
 
         if ($bootstrap) {
             if (!file_exists($bootstrap)) {
@@ -373,7 +373,7 @@ final class InfectionCommand extends BaseCommand
         try {
             $locator->locateAnyOf(InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES);
         } catch (\Exception $e) {
-            $configureCommand = $this->getApplication()->find('configure');
+            $infectionConfigureCommand = $this->getApplication()->find('configure');
 
             $args = [
                 '--test-framework' => $this->input->getOption('test-framework'),
@@ -381,7 +381,7 @@ final class InfectionCommand extends BaseCommand
 
             $newInput = new ArrayInput($args);
             $newInput->setInteractive($this->input->isInteractive());
-            $result = $configureCommand->run($newInput, $this->output);
+            $result = $infectionConfigureCommand->run($newInput, $this->output);
 
             if ($result !== 0) {
                 throw ConfigurationException::configurationAborted();
