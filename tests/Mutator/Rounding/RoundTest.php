@@ -73,5 +73,115 @@ $float = '2.5';
 round($float);
 PHP
         ];
+
+        yield 'It mutates variables on floor to round' => [
+            <<<'PHP'
+<?php
+
+$float = '2.5';
+ceil($float);
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$float = '2.5';
+round($float);
+PHP
+        ];
+
+        yield 'It does not mutate other functions' => [
+            <<<'PHP'
+<?php
+
+strtolower('lower');
+PHP
+        ];
+
+        yield 'It mutates \ceil to round' => [
+            <<<'PHP'
+<?php
+
+\ceil(9.9);
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+round(9.9);
+PHP
+        ];
+
+        yield 'It mutates \floor to round' => [
+            <<<'PHP'
+<?php
+
+\floor(9.9);
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+round(9.9);
+PHP
+        ];
+
+        yield 'It mutates when ceil is being assigned to a variable' => [
+            <<<'PHP'
+<?php
+
+$result = ceil(9.9);
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$result = round(9.9);
+PHP
+        ];
+
+        yield 'It mutates when floor is being assigned to a variable' => [
+            <<<'PHP'
+<?php
+
+$result = floor(9.9);
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$result = round(9.9);
+PHP
+        ];
+
+        yield 'It mutates when the function is incorrectly cased' => [
+            <<<'PHP'
+<?php
+
+$result = CeiL(9.9);
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$result = round(9.9);
+PHP
+        ];
+
+        yield 'It mutates when function is part of a control flow statement' => [
+            <<<'PHP'
+<?php
+
+while (ceil(9.9)) {
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+while (round(9.9)) {
+}
+PHP
+        ];
     }
 }
