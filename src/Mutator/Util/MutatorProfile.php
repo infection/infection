@@ -59,7 +59,7 @@ final class MutatorProfile
         Mutator\Arithmetic\PowEqual::class,
         Mutator\Arithmetic\ShiftLeft::class,
         Mutator\Arithmetic\ShiftRight::class,
-        Mutator\Rounding\ChangeRoundFunctionCall::class,
+        Mutator\Rounding\Round::class,
     ];
 
     public const BOOLEAN = [

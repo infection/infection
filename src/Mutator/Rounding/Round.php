@@ -20,21 +20,23 @@ final class Round extends Mutator
     /**
      * Replaces "floor();" and "ceil();" with "round();"
      *
-     * @param Node|Node\Name $node
+     * @param Node\Expr\FuncCall $node
      *
-     * @return Node\Expr\Cast\Int_
+     * @return Node\Expr\FuncCall
      */
     public function mutate(Node $node)
     {
-        $node->name->parts = ['round'];
-
-        return $node;
+        return new Node\Expr\FuncCall(
+            new Node\Name('round'),
+            $node->args,
+            $node->getAttributes()
+        );
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node->name instanceof Node\Name && (
-            strtolower((string) $node->name) === 'floor' || 
+        return $node instanceof Node\Expr\FuncCall && (
+            strtolower((string) $node->name) === 'floor' ||
             strtolower((string) $node->name) === 'ceil'
         );
     }

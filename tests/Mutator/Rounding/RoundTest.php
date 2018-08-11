@@ -61,16 +61,17 @@ PHP
         yield 'It mutates variables on ceil to round' => [
             <<<'PHP'
 <?php
+
 $float = '2.5';
 ceil($float);
 PHP
             ,
             <<<'PHP'
 <?php
+
 $float = '2.5';
 round($float);
 PHP
         ];
-
     }
 }
