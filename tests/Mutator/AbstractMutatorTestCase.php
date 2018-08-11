@@ -35,7 +35,7 @@ abstract class AbstractMutatorTestCase extends TestCase
      */
     protected $mutator;
 
-    public function doTest(string $inputCode, string $expectedCode = null): void
+    public function doTest(string $inputCode, $expectedCode = null): void
     {
         $expectedCodeSamples = (array) $expectedCode;
 
