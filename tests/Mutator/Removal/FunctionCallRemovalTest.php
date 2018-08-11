@@ -26,11 +26,26 @@ final class FunctionCallRemovalTest extends AbstractMutatorTestCase
 
     public function provideMutationCases(): \Generator
     {
-        yield 'It removes a function call' => [
+        yield 'It removes a function call without parameters' => [
             <<<'PHP'
 <?php
 
 foo();
+$a = 3;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = 3;
+PHP
+            ,
+        ];
+
+        yield 'It removes a function call with parameters' => [
+            <<<'PHP'
+<?php
+
 bar(3, 4);
 $a = 3;
 PHP

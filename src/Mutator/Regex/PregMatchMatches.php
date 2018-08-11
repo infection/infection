@@ -22,11 +22,11 @@ final class PregMatchMatches extends Mutator
      *
      * @param Node|Node\Expr\FuncCall $node
      *
-     * @return Node\Expr\Cast\Int_
+     * @return \Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
-        return new Node\Expr\Cast\Int_(new Node\Expr\Assign($node->args[2]->value, new Node\Expr\Array_()));
+        yield new Node\Expr\Cast\Int_(new Node\Expr\Assign($node->args[2]->value, new Node\Expr\Array_()));
     }
 
     protected function mutatesNode(Node $node): bool

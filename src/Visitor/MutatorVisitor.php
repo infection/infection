@@ -43,7 +43,6 @@ final class MutatorVisitor extends NodeVisitorAbstract
             $attributes['endTokenPos'] === $mutatedAttributes['endTokenPos'];
 
         if ($isEqualPosition && $this->mutation->getMutatedNodeClass() === \get_class($node)) {
-            var_dump(get_class($this->mutation->getMutatedNode()));
             return $this->mutation->getMutatedNode();
             // TODO STOP TRAVERSING
             // TODO check all built-in visitors, in particular FirstFindingVisitor
