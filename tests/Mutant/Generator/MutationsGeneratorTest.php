@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant\Generator;
 
-use Infection\Config\Exception\InvalidConfigException;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Exception\InvalidMutatorException;
 use Infection\Mutant\Exception\ParserException;
@@ -107,7 +106,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
         $codeCoverageDataMock->shouldReceive('hasTests')->once()->andReturn(true);
 
-        $generator = $this->createMutationGenerator($codeCoverageDataMock, [], new MutatorConfig([
+        $generator = $this->createMutationGenerator($codeCoverageDataMock, null, new MutatorConfig([
             'ignore' => [
                 OneFile::class,
             ],
@@ -122,30 +121,18 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
     {
         $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
 
-        $generator = $this->createMutationGenerator($codeCoverageDataMock, [Decrement::getName()]);
+        $generator = $this->createMutationGenerator($codeCoverageDataMock, Decrement::class);
 
         $mutations = $generator->generate(false);
 
         $this->assertCount(0, $mutations);
     }
 
-    public function test_whitelist_is_case_sensitive(): void
-    {
-        $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
-
-        $generator = $this->createMutationGenerator($codeCoverageDataMock, [strtolower(Decrement::getName())]);
-
-        $this->expectException(InvalidConfigException::class);
-        $this->expectExceptionMessage('not recognized');
-
-        $generator->generate(false);
-    }
-
     public function test_it_throws_correct_error_when_file_is_invalid(): void
     {
         $generator = $this->createMutationGenerator(
             Mockery::mock(CodeCoverageData::class),
-            [Decrement::getName()],
+            Decrement::class,
             null,
             [\dirname(__DIR__, 2) . '/Fixtures/Files/InvalidFile']
         );
@@ -159,7 +146,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
     {
         $generator = $this->createMutationGenerator(
             Mockery::mock(CodeCoverageData::class),
-            [ErrorMutator::class]
+            ErrorMutator::class
         );
 
         $this->expectException(InvalidMutatorException::class);
@@ -173,8 +160,8 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
 
     private function createMutationGenerator(
         CodeCoverageData $codeCoverageDataMock,
-        array $whitelistedMutatorNames = [],
-        MutatorConfig $mutatorConfig = null,
+        ?string $whitelistedMutatorNames = null,
+        ?MutatorConfig $mutatorConfig = null,
         array $srcDirs = []
     ) {
         if ($srcDirs === []) {
@@ -188,15 +175,15 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
 
         $mutatorConfig = $mutatorConfig ?? new MutatorConfig([]);
 
-        $container[Plus::class] = function (Container $c) use ($mutatorConfig) {
+        $container[Plus::class] = function () use ($mutatorConfig) {
             return new Plus($mutatorConfig);
         };
 
-        $container[PublicVisibility::class] = function (Container $c) use ($mutatorConfig) {
+        $container[PublicVisibility::class] = function () use ($mutatorConfig) {
             return new PublicVisibility($mutatorConfig);
         };
 
-        $container[TrueValue::class] = function (Container $c) use ($mutatorConfig) {
+        $container[TrueValue::class] = function () use ($mutatorConfig) {
             return new TrueValue($mutatorConfig);
         };
 
@@ -206,6 +193,8 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
             $container[TrueValue::class],
         ];
 
+        $mutators = $whitelistedMutatorNames ? [new $whitelistedMutatorNames($mutatorConfig)] : $defaultMutators;
+
         $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcherMock->expects($this->any())->method('dispatch');
 
@@ -213,8 +202,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
             $srcDirs,
             $excludedDirsOrFiles,
             $codeCoverageDataMock,
-            $defaultMutators,
-            $whitelistedMutatorNames,
+            $mutators,
             $eventDispatcherMock,
             $this->getParser()
         );

@@ -17,7 +17,6 @@ use Infection\Finder\SourceFilesFinder;
 use Infection\Mutant\Exception\ParserException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
-use Infection\Mutator\Util\MutatorsGenerator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
@@ -49,19 +48,9 @@ final class MutationsGenerator
     private $excludeDirsOrFiles;
 
     /**
-     * @var array
-     */
-    private $whitelistedMutatorNames;
-
-    /**
-     * @var int
-     */
-    private $whitelistedMutatorNamesCount;
-
-    /**
      * @var Mutator[]
      */
-    private $defaultMutators;
+    private $mutators;
 
     /**
      * @var EventDispatcherInterface
@@ -77,17 +66,14 @@ final class MutationsGenerator
         array $srcDirs,
         array $excludeDirsOrFiles,
         CodeCoverageData $codeCoverageData,
-        array $defaultMutators,
-        array $whitelistedMutatorNames,
+        array $mutators,
         EventDispatcherInterface $eventDispatcher,
         Parser $parser
     ) {
         $this->srcDirs = $srcDirs;
         $this->codeCoverageData = $codeCoverageData;
         $this->excludeDirsOrFiles = $excludeDirsOrFiles;
-        $this->defaultMutators = $defaultMutators;
-        $this->whitelistedMutatorNames = $whitelistedMutatorNames;
-        $this->whitelistedMutatorNamesCount = \count($whitelistedMutatorNames);
+        $this->mutators = $mutators;
         $this->eventDispatcher = $eventDispatcher;
         $this->parser = $parser;
     }
@@ -103,13 +89,12 @@ final class MutationsGenerator
         $sourceFilesFinder = new SourceFilesFinder($this->srcDirs, $this->excludeDirsOrFiles);
         $files = $sourceFilesFinder->getSourceFiles($filter);
         $allFilesMutations = [[]];
-        $mutators = $this->getMutators();
 
         $this->eventDispatcher->dispatch(new MutationGeneratingStarted($files->count()));
 
         foreach ($files as $file) {
             if (!$onlyCovered || $this->hasTests($file)) {
-                $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered, $mutators);
+                $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered, $this->mutators);
             }
 
             $this->eventDispatcher->dispatch(new MutableFileProcessed());
@@ -164,24 +149,5 @@ final class MutationsGenerator
         \assert(\is_string($filePath));
 
         return $this->codeCoverageData->hasTests($filePath);
-    }
-
-    /**
-     * @return array|Mutator[]
-     */
-    private function getMutators(): array
-    {
-        if ($this->whitelistedMutatorNamesCount > 0) {
-            $mutatorSettings = [];
-
-            foreach ($this->whitelistedMutatorNames as $mutatorName) {
-                $mutatorSettings[$mutatorName] = true;
-            }
-            $generator = new MutatorsGenerator($mutatorSettings);
-
-            return $generator->generate();
-        }
-
-        return $this->defaultMutators;
     }
 }

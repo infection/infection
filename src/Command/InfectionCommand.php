@@ -13,7 +13,6 @@ use Infection\Config\InfectionConfig;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Exception\InfectionException;
-use Infection\Console\Exception\InvalidOptionException;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\ApplicationExecutionFinished;
@@ -219,7 +218,6 @@ final class InfectionCommand extends BaseCommand
             $container->get('exclude.paths'),
             $codeCoverageData,
             $container->get('mutators'),
-            $this->parseMutators($input->getOption('mutators')),
             $this->eventDispatcher,
             $container->get('parser')
         );
@@ -319,21 +317,6 @@ final class InfectionCommand extends BaseCommand
             : null;
 
         return new CodeCoverageData($coverageDir, new CoverageXmlParser($coverageDir), $testFrameworkKey, $testFileDataProviderService);
-    }
-
-    private function parseMutators(string $mutators = null): array
-    {
-        if ($mutators === null) {
-            return [];
-        }
-
-        $trimmedMutators = trim($mutators);
-
-        if ($trimmedMutators === '') {
-            throw InvalidOptionException::withMessage('The "--mutators" option requires a value.');
-        }
-
-        return explode(',', $mutators);
     }
 
     private function getTestFrameworkExtraOptions(string $testFrameworkKey): TestFrameworkExtraOptions
