@@ -20,6 +20,7 @@ use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutator\Util\MutatorParser;
 use Infection\Mutator\Util\MutatorsGenerator;
+use Infection\Performance\Limiter\MemoryLimiter;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\TimeFormatter;
 use Infection\Performance\Time\Timer;
@@ -196,6 +197,10 @@ final class InfectionContainer extends Container
 
         $this['memory.formatter'] = function (): MemoryFormatter {
             return new MemoryFormatter();
+        };
+
+        $this['memory.limit.applier'] = function (): MemoryLimiter {
+            return new MemoryLimiter($this['filesystem'], \php_ini_loaded_file());
         };
     }
 
