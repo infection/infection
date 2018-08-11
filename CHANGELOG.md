@@ -1,5 +1,35 @@
 # Change Log
 
+# Change Log
+
+## [0.10.0](https://github.com/infection/infection/tree/HEAD)  (2018-08-11) 
+
+[Full Changelog](https://github.com/infection/infection/compare/0.9.3...0.10.0)
+
+**BC Breaks:**
+
+- Drop PHP 7.0 support [\#414](https://github.com/infection/infection/issues/414)
+
+**Added:**
+
+- Function and method removal mutators [\#418](https://github.com/infection/infection/pull/418) ([BackEndTea](https://github.com/BackEndTea))
+- PregMatchMatches mutator [\#383](https://github.com/infection/infection/pull/383) ([BackEndTea](https://github.com/BackEndTea))
+- Add infection to PHIVE \(PHAR Installation and Verification Environment\) [\#134](https://github.com/infection/infection/issues/134)
+- Show time and memory info to the console output [\#390](https://github.com/infection/infection/pull/390) ([borNfreee](https://github.com/borNfreee))
+- Add GPG signing for PHAR [\#436](https://github.com/infection/infection/pull/436) ([borNfreee](https://github.com/borNfreee))
+- Sort logs [\#424](https://github.com/infection/infection/pull/424) ([BackEndTea](https://github.com/BackEndTea))
+- Explicitly require the DOM extension [\#411](https://github.com/infection/infection/pull/411) ([BackEndTea](https://github.com/BackEndTea))
+
+**Fixed:**
+
+- 100% MSI reported even if a small number of uncovered mutations is found [\#426](https://github.com/infection/infection/issues/426)
+- Round MSI down to the smallest integer, instead of nearest [\#431](https://github.com/infection/infection/pull/431) ([sanmai](https://github.com/sanmai))
+- Space in directory path breaks Infection [\#413](https://github.com/infection/infection/issues/413)
+- BadgeLogger now reports exact errors [\#405](https://github.com/infection/infection/pull/405) ([sanmai](https://github.com/sanmai))
+- Quiet mode is as quiet as one can expect it to be [\#403](https://github.com/infection/infection/issues/403)
+- Fix exclude to excludes for generated config file [\#423](https://github.com/infection/infection/pull/423) ([BackEndTea](https://github.com/BackEndTea))
+- Brew installation isn't supported anymore or docs aren't updated [\#416](https://github.com/infection/infection/issues/416)
+
 ## [0.9.0](https://github.com/infection/infection/tree/HEAD) (2018-07-02) 
 
 [Full Changelog](https://github.com/infection/infection/compare/0.8.2...0.9.0)
