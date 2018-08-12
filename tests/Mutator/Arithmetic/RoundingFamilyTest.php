@@ -223,5 +223,27 @@ echo round($result = $this->average());
 PHP
             ],
         ];
+
+        yield 'It mutates round() to ceil() and floor() during arithmetic operations' => [
+            <<<'PHP'
+<?php
+
+return round($this->positive / $this->total);
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+return floor($this->positive / $this->total);
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+return ceil($this->positive / $this->total);
+PHP
+            ],
+        ];
     }
 }
