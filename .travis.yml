@@ -126,7 +126,7 @@ jobs:
     - stage: Deploy
       php: 7.2
       install:
-        - composer install
+        - composer install --no-dev
       script:
         make build/bin/infection.phar;
       before_deploy:
