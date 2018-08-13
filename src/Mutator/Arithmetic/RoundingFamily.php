@@ -27,7 +27,7 @@ final class RoundingFamily extends Mutator
      * Mutates from one rounding function to all others:
      *     1. floor() to ceil() and round()
      *     2. ceil() to floor() and round()
-     *     3. round() to ceil() and round()
+     *     3. round() to ceil() and floor()
      *
      * @param Node\Expr\FuncCall|Node $node
      *

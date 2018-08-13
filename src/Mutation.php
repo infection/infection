@@ -75,7 +75,7 @@ final class Mutation implements MutationInterface
         string $mutatedNodeClass,
         bool $isOnFunctionSignature,
         bool $isCoveredByTest,
-        $mutatedNode,
+        Node $mutatedNode,
         int $mutationByMutatorIndex
     ) {
         $this->originalFilePath = $originalFilePath;
@@ -150,7 +150,7 @@ final class Mutation implements MutationInterface
         return $this->isCoveredByTest;
     }
 
-    public function getMutatedNode()
+    public function getMutatedNode(): Node
     {
         return $this->mutatedNode;
     }
