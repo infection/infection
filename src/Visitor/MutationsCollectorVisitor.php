@@ -85,7 +85,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
 
             if ($isOnFunctionSignature
                 && ($methodNode = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY))
-                && $methodNode->isAbstract()
+                && (!$methodNode instanceof Node\Expr\Closure && $methodNode->isAbstract())
             ) {
                 continue;
             }
