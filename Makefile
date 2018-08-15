@@ -111,6 +111,10 @@ devTools/Dockerfile-php72-xdebug.json: devTools/Dockerfile-php72-xdebug
 .PHONY: analyze cs-fix cs-check phpstan validate auto-review
 analyze: cs-check phpstan validate
 
+# PHP-CS-Fixer is checked by PrettyCI
+.PHONY: analyze-ci
+analyze-ci: phpstan validate
+
 cs-fix: build/cache $(PHP-CS-FIXER)
 	$(PHP-CS-FIXER) fix -v --cache-file=build/cache/.php_cs.cache
 

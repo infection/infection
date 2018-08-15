@@ -29,7 +29,7 @@ jobs:
       install:
         - composer install
       script:
-        - make analyze --keep-going
+        - make analyze-ci --keep-going
 
     - &STANDARD_TEST_JOB
       stage: Test
