@@ -20,7 +20,7 @@ use Symfony\Component\Console\Question\Question;
  */
 final class TextLogFileProvider
 {
-    public const TEXT_LOG_FILE_NAME = 'infection-log.txt';
+    public const TEXT_LOG_FILE_NAME = 'infection.log';
 
     /**
      * @var ConsoleHelper

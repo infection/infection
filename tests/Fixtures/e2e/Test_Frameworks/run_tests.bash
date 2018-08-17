@@ -11,7 +11,7 @@ else
     php $INFECTION
 fi
 
-diff expected-output.txt infection-log.txt
+diff expected-output.txt infection.log
 
 
 
@@ -22,4 +22,4 @@ else
     php $INFECTION --test-framework=phpspec
 fi
 
-diff expected-output.txt infection-log.txt
+diff expected-output.txt infection.log

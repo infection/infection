@@ -138,11 +138,11 @@ final class E2ETest extends TestCase
         $this->assertRegExp('/\d+ mutants were killed/', $output);
 
         if (isset($_SERVER['GOLDEN'])) {
-            copy('infection-log.txt', 'expected-output.txt');
+            copy('infection.log', 'expected-output.txt');
             $this->markTestSkipped('Saved golden output');
         }
 
-        $this->assertFileEquals('expected-output.txt', 'infection-log.txt', sprintf('%s/expected-output.txt is not same as infection-log.txt (if that is OK, run GOLDEN=1 vendor/bin/phpunit)', getcwd()));
+        $this->assertFileEquals('expected-output.txt', 'infection.log', sprintf('%s/expected-output.txt is not same as infection.log (if that is OK, run GOLDEN=1 vendor/bin/phpunit)', getcwd()));
 
         return $output;
     }
