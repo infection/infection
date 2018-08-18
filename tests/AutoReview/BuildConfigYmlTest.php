@@ -25,9 +25,10 @@ final class BuildConfigYmlTest extends TestCase
     /**
      * @dataProvider providesYamlFilesForTesting
      */
-    public function test_valid_yaml_has_key($filePath)
+    public function test_valid_yaml_has_key($filePath): void
     {
         $this->assertFileExists($filePath);
+
         try {
             Yaml::parse(file_get_contents($filePath));
         } catch (ParseException $e) {

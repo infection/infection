@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class EventDispatcherTest extends TestCase
 {
-    public function test_event_dispatcher_dispatches_events_correctly()
+    public function test_event_dispatcher_dispatches_events_correctly(): void
     {
         $userEvent = new UserEventSubscriber();
         $dispatcher = new EventDispatcher();

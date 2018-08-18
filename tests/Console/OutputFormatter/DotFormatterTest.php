@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class DotFormatterTest extends TestCase
 {
-    public function test_start_logs_inital_starting_text()
+    public function test_start_logs_inital_starting_text(): void
     {
         $output = $this->createMock(OutputInterface::class);
         $output->expects($this->once())->method('writeln')->with([
@@ -37,7 +37,7 @@ final class DotFormatterTest extends TestCase
         $formatter->start(10);
     }
 
-    public function test_killed_logs_correctly_in_console()
+    public function test_killed_logs_correctly_in_console(): void
     {
         $outputKilled = $this->getStartOutputFormatter();
         $outputKilled->expects($this->once())->method('write')->with('<killed>.</killed>');
@@ -47,7 +47,7 @@ final class DotFormatterTest extends TestCase
         $dot->advance($this->getMutantsOfType(MutantProcess::CODE_KILLED)[0], 10);
     }
 
-    public function test_escaped_logs_correctly_in_console()
+    public function test_escaped_logs_correctly_in_console(): void
     {
         $outputEscaped = $this->getStartOutputFormatter();
         $outputEscaped->expects($this->once())->method('write')->with('<escaped>M</escaped>');
@@ -57,7 +57,7 @@ final class DotFormatterTest extends TestCase
         $dot->advance($this->getMutantsOfType(MutantProcess::CODE_ESCAPED)[0], 10);
     }
 
-    public function test_errored_logs_correctly_in_console()
+    public function test_errored_logs_correctly_in_console(): void
     {
         $outputErrored = $this->getStartOutputFormatter();
         $outputErrored->expects($this->once())->method('write')->with('<with-error>E</with-error>');
@@ -67,7 +67,7 @@ final class DotFormatterTest extends TestCase
         $dot->advance($this->getMutantsOfType(MutantProcess::CODE_ERROR)[0], 10);
     }
 
-    public function test_timed_out_logs_correctly_in_console()
+    public function test_timed_out_logs_correctly_in_console(): void
     {
         $outputTimedOut = $this->getStartOutputFormatter();
         $outputTimedOut->expects($this->once())->method('write')->with('<timeout>T</timeout>');
@@ -77,7 +77,7 @@ final class DotFormatterTest extends TestCase
         $dot->advance($this->getMutantsOfType(MutantProcess::CODE_TIMED_OUT)[0], 10);
     }
 
-    public function test_not_covered_correctly_in_console()
+    public function test_not_covered_correctly_in_console(): void
     {
         $outputNotcovered = $this->getStartOutputFormatter();
         $outputNotcovered->expects($this->once())->method('write')->with('<uncovered>S</uncovered>');
@@ -90,6 +90,7 @@ final class DotFormatterTest extends TestCase
     private function getMutantsOfType(int $mutantCode, int $count = 1): array
     {
         $mutants = [];
+
         for ($i = 0; $i < $count; ++$i) {
             $mutant = $this->createMock(MutantProcessInterface::class);
             $mutant->expects($this->once())->method('getResultCode')->willReturn($mutantCode);

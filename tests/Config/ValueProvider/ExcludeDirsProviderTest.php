@@ -29,7 +29,7 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
      */
     private $fileSystem;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workspace = \sys_get_temp_dir() . '/exclude' . \microtime(true) . \random_int(100, 999);
         \mkdir($this->workspace, 0777, true);
@@ -37,7 +37,7 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
         $this->fileSystem = new Filesystem();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->fileSystem->remove($this->workspace);
     }
@@ -45,7 +45,7 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
     /**
      * @dataProvider excludeDirsProvider
      */
-    public function test_it_contains_vendors_when_sources_contains_current_dir(string $excludedRootDir, array $dirsInCurrentFolder)
+    public function test_it_contains_vendors_when_sources_contains_current_dir(string $excludedRootDir, array $dirsInCurrentFolder): void
     {
         $consoleMock = Mockery::mock(ConsoleHelper::class);
         $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
@@ -64,7 +64,7 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
         $this->assertContains($excludedRootDir, $excludedDirs);
     }
 
-    public function test_it_validates_dirs()
+    public function test_it_validates_dirs(): void
     {
         if (!$this->hasSttyAvailable()) {
             $this->markTestSkipped('Stty is not available');
@@ -87,7 +87,7 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
         $this->assertCount(0, $excludeDirs);
     }
 
-    public function test_passes_when_correct_dir_typed()
+    public function test_passes_when_correct_dir_typed(): void
     {
         if (!$this->hasSttyAvailable()) {
             $this->markTestSkipped('Stty is not available');

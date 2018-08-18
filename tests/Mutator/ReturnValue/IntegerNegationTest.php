@@ -21,7 +21,7 @@ final class IntegerNegationTest extends AbstractMutatorTestCase
     /**
      * @dataProvider provideMutationCases
      */
-    public function test_mutator($input, $expected = null)
+    public function test_mutator($input, $expected = null): void
     {
         $this->doTest($input, $expected);
     }
@@ -80,7 +80,7 @@ PHP
         ];
     }
 
-    public function test_it_does_not_mutate_zero()
+    public function test_it_does_not_mutate_zero(): void
     {
         $node = new Return_(new LNumber(0));
         $this->assertFalse($this->getMutator()->shouldMutate($node));

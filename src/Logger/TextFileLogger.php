@@ -19,14 +19,14 @@ final class TextFileLogger extends FileLogger
     protected function getLogLines(): array
     {
         $logs[] = $this->getLogParts($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped');
-        $logs[] = $this->getLogParts($this->metricsCalculator->getTimedOutProcesses(), 'Timeout');
+        $logs[] = $this->getLogParts($this->metricsCalculator->getTimedOutProcesses(), 'Timed Out');
 
         if ($this->isDebugVerbosity) {
             $logs[] = $this->getLogParts($this->metricsCalculator->getKilledMutantProcesses(), 'Killed');
             $logs[] = $this->getLogParts($this->metricsCalculator->getErrorProcesses(), 'Errors');
         }
 
-        $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not covered');
+        $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not Covered');
 
         return $logs;
     }
@@ -40,6 +40,7 @@ final class TextFileLogger extends FileLogger
     private function getLogParts(array $processes, string $headlinePrefix): string
     {
         $logParts = $this->getHeadlineParts($headlinePrefix);
+        $this->sortProcesses($processes);
 
         foreach ($processes as $index => $mutantProcess) {
             $isShowFullFormat = $this->isDebugVerbosity && $mutantProcess->getProcess()->isStarted();
@@ -72,14 +73,12 @@ final class TextFileLogger extends FileLogger
 
     private function getMutatorFirstLine(int $index, MutantProcessInterface $mutantProcess): string
     {
-        $mutation = $mutantProcess->getMutant()->getMutation();
-
         return sprintf(
             '%d) %s:%d    [M] %s',
             $index + 1,
-            $mutation->getOriginalFilePath(),
-            (int) $mutation->getAttributes()['startLine'],
-            $mutation->getMutator()::getName()
+            $mutantProcess->getOriginalFilePath(),
+            $mutantProcess->getOriginalStartingLine(),
+            $mutantProcess->getMutator()::getName()
         );
     }
 }

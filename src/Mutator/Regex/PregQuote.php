@@ -33,6 +33,6 @@ final class PregQuote extends Mutator
     {
         return $node instanceof Node\Expr\FuncCall &&
             $node->name instanceof Node\Name &&
-            strtolower((string) $node->name) == 'preg_quote';
+            strtolower((string) $node->name) === 'preg_quote';
     }
 }

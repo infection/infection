@@ -21,14 +21,14 @@ use PhpParser\PrettyPrinter\Standard;
  */
 final class MutantCreatorTest extends MockeryTestCase
 {
-    const TEST_FILE_NAME = '/mutant.hash.infection.php';
+    private const TEST_FILE_NAME = '/mutant.hash.infection.php';
 
     /**
      * @var string
      */
     private $directory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->directory = \sys_get_temp_dir() . '/infection/MutantCreator';
@@ -42,14 +42,14 @@ PHP
 );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         unlink($this->directory . self::TEST_FILE_NAME);
         rmdir($this->directory);
     }
 
-    public function test_it_uses_avaialable_file_if_hash_is_the_same()
+    public function test_it_uses_avaialable_file_if_hash_is_the_same(): void
     {
         $standard = \Mockery::mock(Standard::class);
         $standard->shouldReceive('prettyPrintFile')->andReturn('The Print');

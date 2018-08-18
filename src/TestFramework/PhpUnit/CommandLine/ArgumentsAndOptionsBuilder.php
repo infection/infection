@@ -16,15 +16,13 @@ use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
  */
 final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
-    public function build(string $configPath, string $extraOptions): string
+    public function build(string $configPath, string $extraOptions): array
     {
-        $options = [];
-
-        $options[] = sprintf('--configuration %s', $configPath);
-        $options[] = '--stop-on-failure';
-
-        $options[] = $extraOptions;
-
-        return implode(' ', $options);
+        return [
+            '--configuration',
+            $configPath,
+            '--stop-on-failure',
+            $extraOptions,
+        ];
     }
 }

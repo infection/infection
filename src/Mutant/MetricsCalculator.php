@@ -82,6 +82,7 @@ class MetricsCalculator
     public static function createFromArray(array $mutantProcesses): self
     {
         $self = new self();
+
         foreach ($mutantProcesses as $process) {
             $self->collect($process);
         }
@@ -89,7 +90,7 @@ class MetricsCalculator
         return $self;
     }
 
-    public function collect(MutantProcessInterface $mutantProcess)
+    public function collect(MutantProcessInterface $mutantProcess): void
     {
         ++$this->totalMutantsCount;
 
@@ -97,22 +98,27 @@ class MetricsCalculator
             case MutantProcess::CODE_KILLED:
                 $this->killedCount++;
                 $this->killedMutantProcesses[] = $mutantProcess;
+
                 break;
             case MutantProcess::CODE_NOT_COVERED:
                 $this->notCoveredByTestsCount++;
                 $this->notCoveredMutantProcesses[] = $mutantProcess;
+
                 break;
             case MutantProcess::CODE_ESCAPED:
                 $this->escapedCount++;
                 $this->escapedMutantProcesses[] = $mutantProcess;
+
                 break;
             case MutantProcess::CODE_TIMED_OUT:
                 $this->timedOutCount++;
                 $this->timedOutProcesses[] = $mutantProcess;
+
                 break;
             case MutantProcess::CODE_ERROR:
                 $this->errorCount++;
                 $this->errorProcesses[] = $mutantProcess;
+
                 break;
         }
     }
@@ -128,7 +134,7 @@ class MetricsCalculator
         $defeatedTotal = $this->killedCount + $this->timedOutCount + $this->errorCount;
 
         if ($this->totalMutantsCount) {
-            $detectionRateAll = round(100 * ($defeatedTotal / $this->totalMutantsCount));
+            $detectionRateAll = floor(100 * $defeatedTotal / $this->totalMutantsCount);
         }
 
         return $detectionRateAll;
@@ -145,7 +151,7 @@ class MetricsCalculator
         $coveredByTestsTotal = $this->totalMutantsCount - $this->notCoveredByTestsCount;
 
         if ($this->totalMutantsCount) {
-            $coveredRate = round(100 * ($coveredByTestsTotal / $this->totalMutantsCount));
+            $coveredRate = floor(100 * $coveredByTestsTotal / $this->totalMutantsCount);
         }
 
         return $coveredRate;
@@ -158,7 +164,7 @@ class MetricsCalculator
         $defeatedTotal = $this->killedCount + $this->timedOutCount + $this->errorCount;
 
         if ($coveredByTestsTotal) {
-            $detectionRateTested = round(100 * ($defeatedTotal / $coveredByTestsTotal));
+            $detectionRateTested = floor(100 * $defeatedTotal / $coveredByTestsTotal);
         }
 
         return $detectionRateTested;

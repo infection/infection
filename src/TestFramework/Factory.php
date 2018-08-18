@@ -83,9 +83,10 @@ final class Factory
 
     public function create(string $adapterName, bool $skipCoverage): AbstractTestFrameworkAdapter
     {
-        if ($adapterName == TestFrameworkTypes::PHPUNIT) {
+        if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
             $phpUnitConfigContent = file_get_contents($phpUnitConfigPath);
+            \assert(\is_string($phpUnitConfigContent));
 
             return new PhpUnitAdapter(
                 new TestFrameworkFinder(TestFrameworkTypes::PHPUNIT, $this->infectionConfig->getPhpUnitCustomPath()),
@@ -103,7 +104,7 @@ final class Factory
             );
         }
 
-        if ($adapterName == TestFrameworkTypes::PHPSPEC) {
+        if ($adapterName === TestFrameworkTypes::PHPSPEC) {
             $phpSpecConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPSPEC);
 
             return new PhpSpecAdapter(

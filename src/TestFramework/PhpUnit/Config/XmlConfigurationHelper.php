@@ -14,7 +14,7 @@ use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 /**
  * @internal
  */
-class XmlConfigurationHelper
+final class XmlConfigurationHelper
 {
     /**
      * @var PathReplacer
@@ -26,7 +26,7 @@ class XmlConfigurationHelper
         $this->pathReplacer = $pathReplacer;
     }
 
-    public function replaceWithAbsolutePaths(\DOMXPath $xPath)
+    public function replaceWithAbsolutePaths(\DOMXPath $xPath): void
     {
         $queries = [
             '/phpunit/@bootstrap',
@@ -35,23 +35,19 @@ class XmlConfigurationHelper
             '//file',
         ];
 
-        $nodes = $xPath->query(implode('|', $queries));
-
-        foreach ($nodes as $node) {
+        foreach ($xPath->query(implode('|', $queries)) as $node) {
             $this->pathReplacer->replaceInNode($node);
         }
     }
 
-    public function removeExistingLoggers(\DOMDocument $dom, \DOMXPath $xPath)
+    public function removeExistingLoggers(\DOMDocument $dom, \DOMXPath $xPath): void
     {
-        $nodes = $xPath->query('/phpunit/logging');
-
-        foreach ($nodes as $node) {
+        foreach ($xPath->query('/phpunit/logging') as $node) {
             $dom->documentElement->removeChild($node);
         }
     }
 
-    public function setStopOnFailure(\DOMXPath $xPath)
+    public function setStopOnFailure(\DOMXPath $xPath): void
     {
         $nodeList = $xPath->query('/phpunit/@stopOnFailure');
 
@@ -63,7 +59,7 @@ class XmlConfigurationHelper
         }
     }
 
-    public function deactivateColours(\DOMXPath $xPath)
+    public function deactivateColours(\DOMXPath $xPath): void
     {
         $nodeList = $xPath->query('/phpunit/@colors');
 
@@ -75,7 +71,7 @@ class XmlConfigurationHelper
         }
     }
 
-    public function removeExistingPrinters(\DOMDocument $dom, \DOMXPath $xPath)
+    public function removeExistingPrinters(\DOMDocument $dom, \DOMXPath $xPath): void
     {
         $nodeList = $xPath->query('/phpunit/@printerClass');
 

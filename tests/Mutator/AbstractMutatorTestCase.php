@@ -32,14 +32,16 @@ abstract class AbstractMutatorTestCase extends TestCase
      */
     protected $mutator;
 
-    public function doTest(string $inputCode, string $expectedCode = null)
+    public function doTest(string $inputCode, string $expectedCode = null): void
     {
         $inputCode = rtrim($inputCode, "\n");
+
         if ($inputCode === $expectedCode) {
             throw new \LogicException('Input code cant be the same as mutated code');
         }
 
         $realMutatedCode = $this->mutate($inputCode);
+
         if ($expectedCode !== null) {
             $expectedCode = rtrim($expectedCode, "\n");
             $this->assertSame($expectedCode, $realMutatedCode);
@@ -57,7 +59,7 @@ abstract class AbstractMutatorTestCase extends TestCase
         return new $mutator(new MutatorConfig([]));
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mutator = $this->getMutator();
     }
@@ -88,7 +90,7 @@ abstract class AbstractMutatorTestCase extends TestCase
         return $prettyPrinter->prettyPrintFile($mutatedNodes);
     }
 
-    private function assertSyntaxIsValid(string $realMutatedCode)
+    private function assertSyntaxIsValid(string $realMutatedCode): void
     {
         exec(sprintf('echo %s | php -l', escapeshellarg($realMutatedCode)), $output, $returnCode);
 

@@ -20,7 +20,7 @@ use Symfony\Component\Process\Process;
  */
 final class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
-    public function test_it_shows_zero_values_by_default()
+    public function test_it_shows_zero_values_by_default(): void
     {
         $calculator = new MetricsCalculator();
 
@@ -41,42 +41,40 @@ final class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
         $this->assertSame(0.0, $calculator->getCoveredCodeMutationScoreIndicator());
     }
 
-    public function test_it_collects_all_values()
+    private function addMutantProcess(MetricsCalculator $calculator, int $resultCode, int $count = 1): void
+    {
+        $mutantProcess = Mockery::mock(MutantProcessInterface::class);
+        $mutantProcess->shouldReceive('getResultCode')->times($count)->andReturn($resultCode);
+
+        while ($count--) {
+            $calculator->collect($mutantProcess);
+        }
+    }
+
+    public function test_it_collects_all_values(): void
     {
         $process = Mockery::mock(Process::class);
         $process->shouldReceive('stop');
 
-        $notCoveredMutantProcess = Mockery::mock(MutantProcessInterface::class);
-        $notCoveredMutantProcess->shouldReceive('getResultCode')->times(1)->andReturn(MutantProcess::CODE_NOT_COVERED);
-
-        $passMutantProcess = Mockery::mock(MutantProcessInterface::class);
-        $passMutantProcess->shouldReceive('getResultCode')->times(1)->andReturn(MutantProcess::CODE_ESCAPED);
-
-        $timedOutMutantProcess = Mockery::mock(MutantProcessInterface::class);
-        $timedOutMutantProcess->shouldReceive('getResultCode')->times(1)->andReturn(MutantProcess::CODE_TIMED_OUT);
-
-        $killedMutantProcess = Mockery::mock(MutantProcessInterface::class);
-        $killedMutantProcess->shouldReceive('getResultCode')->times(1)->andReturn(MutantProcess::CODE_KILLED);
-
-        $errorMutantProcess = Mockery::mock(MutantProcessInterface::class);
-        $errorMutantProcess->shouldReceive('getResultCode')->times(1)->andReturn(MutantProcess::CODE_ERROR);
-
         $calculator = new MetricsCalculator();
 
-        $calculator->collect($notCoveredMutantProcess);
-        $calculator->collect($passMutantProcess);
-        $calculator->collect($timedOutMutantProcess);
-        $calculator->collect($killedMutantProcess);
-        $calculator->collect($errorMutantProcess);
-
+        $this->addMutantProcess($calculator, MutantProcess::CODE_NOT_COVERED);
         $this->assertSame(1, $calculator->getNotCoveredByTestsCount());
-        $this->assertSame(1, $calculator->getEscapedCount());
-        $this->assertSame(1, $calculator->getTimedOutCount());
-        $this->assertSame(1, $calculator->getKilledCount());
-        $this->assertSame(1, $calculator->getErrorCount());
 
-        $this->assertSame(60.0, $calculator->getMutationScoreIndicator());
-        $this->assertSame(80.0, $calculator->getCoverageRate());
-        $this->assertSame(75.0, $calculator->getCoveredCodeMutationScoreIndicator());
+        $this->addMutantProcess($calculator, MutantProcess::CODE_ESCAPED, 2);
+        $this->assertSame(2, $calculator->getEscapedCount());
+
+        $this->addMutantProcess($calculator, MutantProcess::CODE_TIMED_OUT, 2);
+        $this->assertSame(2, $calculator->getTimedOutCount());
+
+        $this->addMutantProcess($calculator, MutantProcess::CODE_KILLED, 7);
+        $this->assertSame(7, $calculator->getKilledCount());
+
+        $this->addMutantProcess($calculator, MutantProcess::CODE_ERROR, 2);
+        $this->assertSame(2, $calculator->getErrorCount());
+
+        $this->assertSame(78.0, $calculator->getMutationScoreIndicator()); // 78.57
+        $this->assertSame(92.0, $calculator->getCoverageRate()); // 92.85
+        $this->assertSame(84.0, $calculator->getCoveredCodeMutationScoreIndicator()); // 84.61
     }
 }

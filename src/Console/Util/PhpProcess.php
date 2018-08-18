@@ -32,7 +32,7 @@ final class PhpProcess extends Process
      * - PHP_INI_SCAN_DIR should be made blank because our php.ini has all we need
      *   (a previous value can be found in XdebugHandler::getRestartSettings()["scanDir"])
      */
-    public static function setupXdebugFreeEnvironment()
+    public static function setupXdebugFreeEnvironment(): void
     {
         if (!isset(self::$phprc)) {
             self::$phprc = getenv('PHPRC');
@@ -42,10 +42,10 @@ final class PhpProcess extends Process
         self::putenv('PHP_INI_SCAN_DIR', '');
     }
 
-    public function start(callable $callback = null, array $env = null)
+    public function start(callable $callback = null, array $env = null): void
     {
         // Xdebug wasn't skipped, running as is
-        if ('' == XdebugHandler::getSkippedVersion()) {
+        if ('' === XdebugHandler::getSkippedVersion()) {
             parent::start($callback, $env ?? []);
 
             return;
@@ -67,7 +67,7 @@ final class PhpProcess extends Process
         self::setupXdebugFreeEnvironment();
     }
 
-    private static function restoreVanillaEnvironment()
+    private static function restoreVanillaEnvironment(): void
     {
         self::putenv('PHPRC', self::$phprc);
         self::putenv('PHP_INI_SCAN_DIR', XdebugHandler::getRestartSettings()['scanDir']);
@@ -77,7 +77,7 @@ final class PhpProcess extends Process
      * @param string $name
      * @param string|bool $value either string or false
      */
-    private static function putenv(string $name, $value)
+    private static function putenv(string $name, $value): void
     {
         // getenv returns false if there was no variable => we must delete it
         putenv(false === $value ? $name : $name . '=' . $value);

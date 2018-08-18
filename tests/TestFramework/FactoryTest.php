@@ -12,6 +12,7 @@ namespace Infection\Tests\TestFramework;
 use Infection\Config\InfectionConfig;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
+use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\VersionParser;
 use Mockery;
@@ -22,13 +23,13 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class FactoryTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
-    public function test_it_throws_an_exception_if_it_cant_find_the_testframework()
+    public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
     {
         $factory = new Factory(
             '',
             '',
             Mockery::mock(TestFrameworkConfigLocatorInterface::class),
-            Mockery::mock(XmlConfigurationHelper::class),
+            new XmlConfigurationHelper(new PathReplacer(new Filesystem())),
             '',
             new InfectionConfig(new \stdClass(), new Filesystem(), ''),
             Mockery::mock(VersionParser::class)

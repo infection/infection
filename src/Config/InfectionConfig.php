@@ -16,11 +16,11 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class InfectionConfig
 {
-    const PROCESS_TIMEOUT_SECONDS = 10;
-    const DEFAULT_SOURCE_DIRS = ['.'];
-    const DEFAULT_EXCLUDE_DIRS = ['vendor'];
-    const CONFIG_FILE_NAME = 'infection.json';
-    const POSSIBLE_CONFIG_FILE_NAMES = [
+    public const PROCESS_TIMEOUT_SECONDS = 10;
+    public const DEFAULT_SOURCE_DIRS = ['.'];
+    public const DEFAULT_EXCLUDE_DIRS = ['vendor'];
+    public const CONFIG_FILE_NAME = 'infection.json';
+    public const POSSIBLE_CONFIG_FILE_NAMES = [
         self::CONFIG_FILE_NAME,
         self::CONFIG_FILE_NAME . '.dist',
     ];
@@ -49,11 +49,15 @@ class InfectionConfig
 
     public function getPhpUnitConfigDir(): string
     {
-        if (isset($this->config->phpUnit->configDir)) {
-            return $this->configLocation . \DIRECTORY_SEPARATOR . $this->config->phpUnit->configDir;
+        if (!isset($this->config->phpUnit->configDir)) {
+            return $this->configLocation;
         }
 
-        return $this->configLocation;
+        if ($this->filesystem->isAbsolutePath($this->config->phpUnit->configDir)) {
+            return $this->config->phpUnit->configDir;
+        }
+
+        return $this->configLocation . \DIRECTORY_SEPARATOR . $this->config->phpUnit->configDir;
     }
 
     public function getPhpUnitCustomPath(): string

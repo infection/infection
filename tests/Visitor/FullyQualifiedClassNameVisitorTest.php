@@ -24,12 +24,12 @@ final class FullyQualifiedClassNameVisitorTest extends TestCase
 {
     private $spyVisitor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->spyVisitor = $this->getSpyVisitor();
     }
 
-    public function test_it_adds_fqcl_to_class_node()
+    public function test_it_adds_fqcl_to_class_node(): void
     {
         $code = $this->getFileContent('fqcn-empty-class.php');
 
@@ -42,7 +42,7 @@ final class FullyQualifiedClassNameVisitorTest extends TestCase
         );
     }
 
-    public function test_it_adds_fqcl_to_class_with_interface()
+    public function test_it_adds_fqcl_to_class_with_interface(): void
     {
         $code = $this->getFileContent('fqcn-class-interface.php');
 
@@ -55,7 +55,7 @@ final class FullyQualifiedClassNameVisitorTest extends TestCase
         );
     }
 
-    public function test_it_adds_fqcl_to_class_with_anonymous_class()
+    public function test_it_adds_fqcl_to_class_with_anonymous_class(): void
     {
         $code = $this->getFileContent('fqcn-anonymous-class.php');
 
@@ -81,7 +81,7 @@ final class FullyQualifiedClassNameVisitorTest extends TestCase
         return new class() extends NodeVisitorAbstract {
             public $processedNodes = [];
 
-            public function enterNode(Node $node)
+            public function enterNode(Node $node): void
             {
                 if (isset($node->fullyQualifiedClassName)) {
                     $this->processedNodes[] = $node;
@@ -90,7 +90,7 @@ final class FullyQualifiedClassNameVisitorTest extends TestCase
         };
     }
 
-    private function parseAndTraverse($code)
+    private function parseAndTraverse($code): void
     {
         $nodes = $this->getNodes($code);
 

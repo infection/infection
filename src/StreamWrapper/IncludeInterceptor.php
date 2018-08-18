@@ -14,12 +14,11 @@ namespace Infection\StreamWrapper;
  */
 final class IncludeInterceptor
 {
-    const STREAM_OPEN_FOR_INCLUDE = 0x00000080;
-
     /**
      * @var resource
      */
     public $context;
+    private const STREAM_OPEN_FOR_INCLUDE = 0x00000080;
 
     /**
      * @var bool|resource
@@ -36,13 +35,14 @@ final class IncludeInterceptor
      */
     private static $replacement;
 
-    public static function intercept($file, $with)
+    public static function intercept($file, $with): void
     {
         if (!file_exists($file)) {
             throw new \InvalidArgumentException(
                 'File to intercept and replace does not exist: ' . $file
             );
         }
+
         if (!file_exists($with)) {
             throw new \InvalidArgumentException(
                 'File to replace intercepted file with does not exist: ' . $file
@@ -52,7 +52,7 @@ final class IncludeInterceptor
         self::$replacement = $with;
     }
 
-    public static function enable()
+    public static function enable(): void
     {
         if (!isset(self::$intercept) || !isset(self::$replacement)) {
             throw new \RuntimeException(
@@ -63,7 +63,7 @@ final class IncludeInterceptor
         stream_wrapper_register('file', __CLASS__);
     }
 
-    public static function disable()
+    public static function disable(): void
     {
         stream_wrapper_restore('file');
     }
@@ -72,14 +72,16 @@ final class IncludeInterceptor
     {
         self::disable();
         $including = (bool) ($options & self::STREAM_OPEN_FOR_INCLUDE);
+
         if ($including) {
-            if ($path == self::$intercept || realpath($path) == self::$intercept) {
+            if ($path === self::$intercept || realpath($path) === self::$intercept) {
                 $this->fp = fopen(self::$replacement, 'r');
                 self::enable();
 
                 return true;
             }
         }
+
         if (isset($this->context)) {
             $this->fp = fopen($path, $mode, (bool) $options, $this->context);
         } else {
@@ -92,6 +94,8 @@ final class IncludeInterceptor
 
     public function dir_closedir()
     {
+        \assert(\is_resource($this->fp));
+
         closedir($this->fp);
 
         return true;
@@ -100,6 +104,7 @@ final class IncludeInterceptor
     public function dir_opendir($path)
     {
         self::disable();
+
         if (isset($this->context)) {
             $this->fp = opendir($path, $this->context);
         } else {
@@ -112,11 +117,14 @@ final class IncludeInterceptor
 
     public function dir_readdir()
     {
+        \assert(\is_resource($this->fp));
+
         return readdir($this->fp);
     }
 
     public function dir_rewinddir()
     {
+        \assert(\is_resource($this->fp));
         rewinddir($this->fp);
 
         return true;
@@ -141,6 +149,7 @@ final class IncludeInterceptor
     public function rename($path_from, $path_to)
     {
         self::disable();
+
         if (isset($this->context)) {
             $return = rename($path_from, $path_to, $this->context);
         } else {
@@ -154,6 +163,7 @@ final class IncludeInterceptor
     public function rmdir($path)
     {
         self::disable();
+
         if (isset($this->context)) {
             $return = rmdir($path, $this->context);
         } else {
@@ -171,27 +181,36 @@ final class IncludeInterceptor
 
     public function stream_close()
     {
+        \assert(\is_resource($this->fp));
+
         return fclose($this->fp);
     }
 
     public function stream_eof()
     {
+        \assert(\is_resource($this->fp));
+
         return feof($this->fp);
     }
 
     public function stream_flush()
     {
+        \assert(\is_resource($this->fp));
+
         return fflush($this->fp);
     }
 
     public function stream_lock($operation)
     {
+        \assert(\is_resource($this->fp));
+
         return flock($this->fp, $operation);
     }
 
     public function stream_metadata($path, $option, $value)
     {
         self::disable();
+
         switch ($option) {
             case STREAM_META_TOUCH:
                 if (empty($value)) {
@@ -199,17 +218,21 @@ final class IncludeInterceptor
                 } else {
                     $return = touch($path, $value[0], $value[1]);
                 }
+
                 break;
             case STREAM_META_OWNER_NAME:
             case STREAM_META_OWNER:
                 $return = chown($path, $value);
+
                 break;
             case STREAM_META_GROUP_NAME:
             case STREAM_META_GROUP:
                 $return = chgrp($path, $value);
+
                 break;
             case STREAM_META_ACCESS:
                 $return = chmod($path, $value);
+
                 break;
             default:
                 throw new \RuntimeException('Unknown stream_metadata option');
@@ -221,16 +244,22 @@ final class IncludeInterceptor
 
     public function stream_read($count)
     {
+        \assert(\is_resource($this->fp));
+
         return fread($this->fp, $count);
     }
 
     public function stream_seek($offset, $whence = SEEK_SET)
     {
+        \assert(\is_resource($this->fp));
+
         return fseek($this->fp, $offset, $whence) === 0;
     }
 
     public function stream_set_option($option, $arg1, $arg2)
     {
+        \assert(\is_resource($this->fp));
+
         switch ($option) {
             case STREAM_OPTION_BLOCKING:
                 return stream_set_blocking($this->fp, (bool) $arg1);
@@ -245,27 +274,36 @@ final class IncludeInterceptor
 
     public function stream_stat()
     {
+        \assert(\is_resource($this->fp));
+
         return fstat($this->fp);
     }
 
     public function stream_tell()
     {
+        \assert(\is_resource($this->fp));
+
         return ftell($this->fp);
     }
 
     public function stream_truncate($new_size)
     {
+        \assert(\is_resource($this->fp));
+
         return ftruncate($this->fp, $new_size);
     }
 
     public function stream_write($data)
     {
+        \assert(\is_resource($this->fp));
+
         return fwrite($this->fp, $data);
     }
 
     public function unlink($path)
     {
         self::disable();
+
         if (isset($this->context)) {
             $return = unlink($path, $this->context);
         } else {

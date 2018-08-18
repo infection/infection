@@ -20,7 +20,7 @@ final class PhpUnitPathGuesserTest extends TestCase
     /**
      * @dataProvider providesJsonComposerAndLocations
      */
-    public function test_it_guesses_correctly(string $composerJson, string $directory)
+    public function test_it_guesses_correctly(string $composerJson, string $directory): void
     {
         $guesser = new PhpUnitPathGuesser(json_decode($composerJson));
 
@@ -99,6 +99,7 @@ JSON
             ,
             '.',
         ];
+
         yield [
             <<<'JSON'
 {

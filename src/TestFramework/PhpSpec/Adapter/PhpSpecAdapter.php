@@ -16,7 +16,7 @@ use Infection\TestFramework\AbstractTestFrameworkAdapter;
  */
 final class PhpSpecAdapter extends AbstractTestFrameworkAdapter
 {
-    const ERROR_REGEXPS = [
+    private const ERROR_REGEXPS = [
         '/Fatal error\:/',
         '/Fatal error happened/i',
     ];

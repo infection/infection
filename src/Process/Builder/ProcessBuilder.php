@@ -50,14 +50,14 @@ class ProcessBuilder
         bool $skipCoverage,
         array $phpExtraOptions = []
     ): Process {
-        $includeArgs = \PHP_SAPI == 'phpdbg';
+        $includeArgs = \PHP_SAPI === 'phpdbg';
 
         // If we're expecting to receive a code coverage, test process must run in a vanilla environment
         $processType = $skipCoverage ? Process::class : PhpProcess::class;
 
         /** @var PhpProcess|Process $process */
         $process = new $processType(
-            $this->testFrameworkAdapter->getExecutableCommandLine(
+            $this->testFrameworkAdapter->getCommandLine(
                 $this->testFrameworkAdapter->buildInitialConfigFile(),
                 $testFrameworkExtraOptions,
                 $includeArgs,
@@ -74,7 +74,7 @@ class ProcessBuilder
     public function getProcessForMutant(MutantInterface $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
     {
         $process = new Process(
-            $this->testFrameworkAdapter->getExecutableCommandLine(
+            $this->testFrameworkAdapter->getCommandLine(
                 $this->testFrameworkAdapter->buildMutationConfigFile($mutant),
                 $testFrameworkExtraOptions
             )

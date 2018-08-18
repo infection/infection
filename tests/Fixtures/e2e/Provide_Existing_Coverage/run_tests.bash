@@ -11,7 +11,7 @@ else
     php $INFECTION
 fi
 
-diff expected-output_phpunit.txt infection-log.txt
+diff expected-output_phpunit.txt infection.log
 
 if [ -f "infection-cache/infection/phpunit.junit.xml" ]
 then
@@ -32,7 +32,7 @@ else
     php $INFECTION --test-framework=phpspec
 fi
 
-diff expected-output_phpspec.txt infection-log.txt
+diff expected-output_phpspec.txt infection.log
 
 if [ -d "infection-cache/infection/phpspec-coverage-xml" ]
 then

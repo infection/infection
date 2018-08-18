@@ -29,4 +29,8 @@ interface MutantProcessInterface
     public function getResultCode(): int;
 
     public function getMutator(): Mutator;
+
+    public function getOriginalFilePath(): string;
+
+    public function getOriginalStartingLine(): int;
 }

@@ -27,21 +27,21 @@ final class ProgressFormatter extends AbstractOutputFormatter
         $this->progressBar = $progressBar;
     }
 
-    public function start(int $mutationCount)
+    public function start(int $mutationCount): void
     {
         parent::start($mutationCount);
 
         $this->progressBar->start($mutationCount);
     }
 
-    public function advance(MutantProcessInterface $mutantProcess, int $mutationCount)
+    public function advance(MutantProcessInterface $mutantProcess, int $mutationCount): void
     {
         parent::advance($mutantProcess, $mutationCount);
 
         $this->progressBar->advance();
     }
 
-    public function finish()
+    public function finish(): void
     {
         parent::finish();
 

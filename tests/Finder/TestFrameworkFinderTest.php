@@ -11,6 +11,7 @@ namespace Infection\Tests\Finder;
 
 use Infection\Finder\Exception\FinderException;
 use Infection\Finder\TestFrameworkFinder;
+use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
@@ -36,7 +37,7 @@ final class TestFrameworkFinderTest extends TestCase
      */
     private $tmpDir;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workspace = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
 
@@ -44,7 +45,7 @@ final class TestFrameworkFinderTest extends TestCase
         $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
     }
 
-    public function test_it_can_load_a_custom_path()
+    public function test_it_can_load_a_custom_path(): void
     {
         $filename = $this->fileSystem->tempnam($this->tmpDir, 'test');
 
@@ -53,7 +54,7 @@ final class TestFrameworkFinderTest extends TestCase
         $this->assertSame($filename, $frameworkFinder->find(), 'Should return the custom path');
     }
 
-    public function test_invalid_custom_path_throws_exception()
+    public function test_invalid_custom_path_throws_exception(): void
     {
         $filename = $this->fileSystem->tempnam($this->tmpDir, 'test');
         // Remove it so that the file doesn't exist
@@ -67,14 +68,19 @@ final class TestFrameworkFinderTest extends TestCase
         $frameworkFinder->find();
     }
 
-    public function test_it_adds_vendor_folder_to_path_if_needed()
+    public function test_it_adds_vendor_folder_to_path_if_needed(): void
     {
         $pathName = getenv('PATH') ? 'PATH' : 'Path';
         $path = getenv($pathName);
 
-        $frameworkFinder = new TestFrameworkFinder('phpunit');
+        $frameworkFinder = new TestFrameworkFinder(TestFrameworkTypes::PHPUNIT);
 
-        $this->assertContains(normalizePath('vendor/bin/phpunit'), normalizePath($frameworkFinder->find()), 'Should return the custom path');
+        $this->assertContains(
+            normalizePath(realpath('vendor/bin/phpunit')),
+            normalizePath($frameworkFinder->find()),
+            'Should return the custom path'
+        );
+
         $pathAfterTest = getenv($pathName);
 
         $this->assertNotSame($path, $pathAfterTest);
@@ -87,7 +93,7 @@ final class TestFrameworkFinderTest extends TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->fileSystem->remove($this->workspace);
     }

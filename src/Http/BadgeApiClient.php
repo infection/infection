@@ -16,7 +16,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class BadgeApiClient
 {
-    const STRYKER_DASHBOARD_API_URL = 'https://dashboard.stryker-mutator.io/api/reports';
+    private const STRYKER_DASHBOARD_API_URL = 'https://dashboard.stryker-mutator.io/api/reports';
+
+    private const CREATED_RESPONSE_CODE = 201;
 
     /**
      * @var OutputInterface
@@ -33,7 +35,7 @@ class BadgeApiClient
         string $repositorySlug,
         string $branch,
         float $mutationScore
-    ) {
+    ): void {
         $json = json_encode([
             'apiKey' => $apiKey,
             'repositorySlug' => $repositorySlug,
@@ -42,6 +44,8 @@ class BadgeApiClient
         ]);
 
         $ch = curl_init();
+
+        \assert(\is_resource($ch));
 
         curl_setopt($ch, CURLOPT_URL, self::STRYKER_DASHBOARD_API_URL);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -52,11 +56,16 @@ class BadgeApiClient
         curl_setopt($ch, CURLOPT_HEADER, true);
 
         $response = curl_exec($ch);
+        $responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
 
-        if ($this->output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-            $this->output->writeln($response);
+        if (self::CREATED_RESPONSE_CODE !== $responseCode) {
+            $this->output->writeln(sprintf('Stryker dashboard returned an unexpected response code: %s', $responseCode));
         }
 
-        curl_close($ch);
+        if (\is_string($response)) {
+            $this->output->writeln('Dashboard response:', OutputInterface::VERBOSITY_VERBOSE);
+            $this->output->writeln($response, OutputInterface::VERBOSITY_VERBOSE);
+        }
     }
 }

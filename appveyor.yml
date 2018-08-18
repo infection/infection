@@ -17,44 +17,39 @@ environment:
   - dependencies: current
     php_ver_target: 7.1
     xdebug_ver: '2.6.0-7.1-vc14'
-  - dependencies: current
-    php_ver_target: 7.0
-    xdebug_ver: '2.6.0-7.0-vc14'
 
 cache: # cache is cleared when linked file is modified
     - '%LOCALAPPDATA%\Composer\files -> composer.lock'
     - composer.phar
     - C:\ProgramData\chocolatey\bin -> appveyor.yml
     - C:\ProgramData\chocolatey\lib -> appveyor.yml
-    - c:\tools\php -> appveyor.yml
+    - C:\tools\php -> appveyor.yml
 
 init:
     - SET PATH=C:\Program Files\OpenSSL;c:\tools\php;%PATH%
-    - SET PHP=1
     - SET ANSICON=121x90 (121x90)
     - SET COMPOSER_NO_INTERACTION=1
 
 install:
-    - IF EXIST c:\tools\php (SET PHP=0)
     # Enable Windows update service
     - ps: Set-Service wuauserv -StartupType Manual
     # Install PHP
     - ps: appveyor-retry cinst --params '""/InstallDir:C:\tools\php""' --ignore-checksums -y php --version ((choco search php --exact --all-versions -r | select-string -pattern $env:php_ver_target | sort { [version]($_ -split '\|' | select -last 1) } -Descending | Select-Object -first 1) -replace '[php|]','')
     - cd c:\tools\php
-    - IF %PHP%==1 copy php.ini-production php.ini /Y
-    - IF %PHP%==1 echo date.timezone="UTC" >> php.ini
-    - IF %PHP%==1 echo extension_dir=ext >> php.ini
-    - IF %PHP%==1 echo extension=php_openssl.dll >> php.ini
-    - IF %PHP%==1 echo extension=php_mbstring.dll >> php.ini
-    - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
+    - copy php.ini-production php.ini /Y
+    - echo date.timezone="UTC" >> php.ini
+    - echo extension_dir=ext >> php.ini
+    - echo extension=php_openssl.dll >> php.ini
+    - echo extension=php_mbstring.dll >> php.ini
     # Install composer and update per matrix
-    - appveyor-retry appveyor DownloadFile https://getcomposer.org/composer.phar
+    - copy C:\projects\workspace\.ci\composer.bat c:\tools\php\composer.bat
+    - appveyor-retry appveyor DownloadFile https://getcomposer.org/composer.phar -OutFile C:\tools\php\composer.phar
     - cd c:\projects\workspace
     - IF %dependencies%==current appveyor-retry composer install
     - IF %dependencies%==highest appveyor-retry composer update --no-suggest --ignore-platform-reqs
     - composer show
     # Install XDebug for code coverage
-    - ps: if ($env:PHP -eq "1" ) { .ci\appveyor_install_xdebug.ps1 }
+    - ps: .ci\appveyor_install_xdebug.ps1
 
 test_script:
     - cd c:\projects\workspace
@@ -66,3 +61,6 @@ after_test:
       $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
       Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
       bash codecov.sh
+
+matrix:
+  fast_finish: true

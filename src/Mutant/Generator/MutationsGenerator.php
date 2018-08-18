@@ -14,6 +14,7 @@ use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
 use Infection\Finder\SourceFilesFinder;
+use Infection\Mutant\Exception\ParserException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorsGenerator;
@@ -107,7 +108,7 @@ final class MutationsGenerator
         $this->eventDispatcher->dispatch(new MutationGeneratingStarted($files->count()));
 
         foreach ($files as $file) {
-            if (!$onlyCovered || ($onlyCovered && $this->hasTests($file))) {
+            if (!$onlyCovered || $this->hasTests($file)) {
                 $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered, $mutators);
             }
 
@@ -128,23 +129,29 @@ final class MutationsGenerator
      */
     private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered, array $mutators): array
     {
-        /** @var Node[] $initialStatements */
-        $initialStatements = $this->parser->parse($file->getContents());
+        try {
+            /** @var Node[] $initialStatements */
+            $initialStatements = $this->parser->parse($file->getContents());
+        } catch (\Throwable $t) {
+            throw ParserException::fromInvalidFile($file, $t);
+        }
 
         $traverser = new NodeTraverser();
+        $filePath = $file->getRealPath();
+        \assert(\is_string($filePath));
 
         $mutationsCollectorVisitor = new MutationsCollectorVisitor(
             $mutators,
-            $file->getRealPath(),
+            $filePath,
             $initialStatements,
             $this->codeCoverageData,
             $onlyCovered
         );
 
-        $traverser->addVisitor($mutationsCollectorVisitor);
         $traverser->addVisitor(new ParentConnectorVisitor());
         $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
         $traverser->addVisitor(new ReflectionVisitor());
+        $traverser->addVisitor($mutationsCollectorVisitor);
 
         $traverser->traverse($initialStatements);
 
@@ -153,7 +160,10 @@ final class MutationsGenerator
 
     private function hasTests(SplFileInfo $file): bool
     {
-        return $this->codeCoverageData->hasTests($file->getRealPath());
+        $filePath = $file->getRealPath();
+        \assert(\is_string($filePath));
+
+        return $this->codeCoverageData->hasTests($filePath);
     }
 
     /**

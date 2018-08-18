@@ -14,7 +14,7 @@ namespace Infection\Config\Guesser;
  */
 final class PhpUnitPathGuesser implements Guesser
 {
-    const CURRENT_DIR_PATH = '.';
+    private const CURRENT_DIR_PATH = '.';
 
     private $composerJsonContent;
 
@@ -46,7 +46,7 @@ final class PhpUnitPathGuesser implements Guesser
     {
         foreach ($parsedPaths as $namespace => $parsedPath) {
             // for old Symfony prjects (<=2.7) phpunit.xml is located in ./app folder
-            if (strpos($namespace, 'SymfonyStandard') !== false && trim($parsedPath, '/') == 'app') {
+            if (strpos($namespace, 'SymfonyStandard') !== false && trim($parsedPath, '/') === 'app') {
                 return 'app';
             }
         }

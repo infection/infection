@@ -25,7 +25,7 @@ final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
 {
     private $namespace;
 
-    public function enterNode(Node $node)
+    public function enterNode(Node $node): void
     {
         if ($node instanceof Stmt\Namespace_) {
             $this->namespace = $node->name;

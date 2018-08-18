@@ -82,7 +82,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
         ];
     }
 
-    public function onMutationTestingFinished(MutationTestingFinished $event)
+    public function onMutationTestingFinished(MutationTestingFinished $event): void
     {
         $logTypes = $this->infectionConfig->getLogsTypes();
 
@@ -100,12 +100,14 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
     private function filterLogTypes(array $logTypes): array
     {
         foreach ($logTypes as $key => $value) {
-            if ($this->logVerbosity == LogVerbosity::NONE) {
+            if ($this->logVerbosity === LogVerbosity::NONE) {
                 if (!\in_array($key, ResultsLoggerTypes::ALLOWED_WITHOUT_LOGGING, true)) {
                     unset($logTypes[$key]);
                 }
+
                 continue;
             }
+
             if (!\in_array($key, ResultsLoggerTypes::ALL, true)) {
                 unset($logTypes[$key]);
             }
@@ -114,9 +116,9 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
         return $logTypes;
     }
 
-    private function useLogger(string $logType, $config)
+    private function useLogger(string $logType, $config): void
     {
-        $isDebugVerbosity = $this->logVerbosity == LogVerbosity::DEBUG;
+        $isDebugVerbosity = $this->logVerbosity === LogVerbosity::DEBUG;
 
         switch ($logType) {
             case ResultsLoggerTypes::TEXT_FILE:
@@ -127,6 +129,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
                     $isDebugVerbosity,
                     $this->isDebugMode
                 ))->log();
+
                 break;
             case ResultsLoggerTypes::SUMMARY_FILE:
                 (new SummaryFileLogger(
@@ -136,6 +139,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
                      $isDebugVerbosity,
                     $this->isDebugMode
                 ))->log();
+
                 break;
             case ResultsLoggerTypes::DEBUG_FILE:
                 (new DebugFileLogger(
@@ -145,6 +149,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
                     $isDebugVerbosity,
                     $this->isDebugMode
                 ))->log();
+
                 break;
             case ResultsLoggerTypes::BADGE:
                 (new BadgeLogger(
@@ -153,6 +158,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
                     $this->metricsCalculator,
                     $config
                 ))->log();
+
                 break;
             case ResultsLoggerTypes::PER_MUTATOR:
                 (new PerMutatorLogger(
@@ -162,6 +168,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
                     $isDebugVerbosity,
                     $this->isDebugMode
                 ))->log();
+
                 break;
         }
     }

@@ -19,7 +19,7 @@ final class TmpDirectoryCreator
     /**
      * @private
      */
-    const BASE_DIR_NAME = 'infection';
+    private const BASE_DIR_NAME = 'infection';
 
     /**
      * @var Filesystem

@@ -27,7 +27,7 @@ class ConsoleHelper
         $this->formatterHelper = $formatterHelper;
     }
 
-    public function writeSection(OutputInterface $output, $text, $style = 'bg=blue;fg=white')
+    public function writeSection(OutputInterface $output, $text, $style = 'bg=blue;fg=white'): void
     {
         $output->writeln([
             '',
@@ -36,7 +36,7 @@ class ConsoleHelper
         ]);
     }
 
-    public function getQuestion($question, $default = null, $sep = ':')
+    public function getQuestion($question, $default = null, $sep = ':'): string
     {
         return $default
             ? sprintf('<info>%s</info> [<comment>%s</comment>]%s ', $question, $default, $sep)

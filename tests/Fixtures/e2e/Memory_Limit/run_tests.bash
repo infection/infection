@@ -20,7 +20,7 @@ run () {
         php $PHPARGS $INFECTION
     fi
 
-    diff -u -w expected-output.txt infection-log.txt
+    diff -u -w expected-output.txt infection.log
 }
 
 

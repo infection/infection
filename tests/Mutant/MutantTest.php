@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class MutantTest extends TestCase
 {
-    public function test_it_passes_along_its_input_without_changing_it()
+    public function test_it_passes_along_its_input_without_changing_it(): void
     {
         $filepath = 'path/to/file';
         $mutation = $this->createMock(MutationInterface::class);

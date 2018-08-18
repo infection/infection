@@ -1,5 +1,5 @@
 vendor/
-infection-log.txt
+infection.log
 infection-cache/
 composer.lock
 error.log

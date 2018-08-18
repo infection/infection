@@ -20,7 +20,7 @@ final class InitialTestSuiteFinishedTest extends TestCase
     /**
      * This class is only used to fire events, and the only functionality it needs is being instantiated
      */
-    public function test_it_can_be_initialzed()
+    public function test_it_can_be_initialzed(): void
     {
         $class = new InitialTestSuiteFinished();
         $this->assertInstanceOf(InitialTestSuiteFinished::class, $class);

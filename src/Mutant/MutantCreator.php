@@ -70,8 +70,11 @@ final class MutantCreator
 
     private function createMutatedCode(MutationInterface $mutation, string $mutatedFilePath): string
     {
-        if (file_exists($mutatedFilePath)) {
-            return file_get_contents($mutatedFilePath);
+        if (is_readable($mutatedFilePath)) {
+            $mutatedCode = file_get_contents($mutatedFilePath);
+            \assert(\is_string($mutatedCode));
+
+            return $mutatedCode;
         }
 
         $traverser = new NodeTraverser();

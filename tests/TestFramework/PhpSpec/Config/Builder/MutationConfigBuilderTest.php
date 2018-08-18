@@ -33,7 +33,7 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
      */
     private $workspace;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workspace = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
 
@@ -41,12 +41,12 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->fileSystem->remove($this->workspace);
     }
 
-    public function test_it_builds_path_to_mutation_config_file()
+    public function test_it_builds_path_to_mutation_config_file(): void
     {
         $projectDir = '/project/dir';
         $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/phpspec/phpspec.yml';
@@ -66,7 +66,7 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         $this->assertSame($this->tmpDir . '/phpspecConfiguration.a1b2c3.infection.yml', $builder->build($mutant));
     }
 
-    public function test_it_adds_original_bootstrap_file_to_custom_autoload()
+    public function test_it_adds_original_bootstrap_file_to_custom_autoload(): void
     {
         $projectDir = '/project/dir';
         $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/phpspec/phpspec.with.bootstrap.yml';

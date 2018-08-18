@@ -6,7 +6,7 @@
         ]
     },
     "logs": {
-        "summary": "infection-log.txt"
+        "summary": "infection.log"
     },
     "bootstrap": "src/bootstrap.php",
     "tmpDir": "."

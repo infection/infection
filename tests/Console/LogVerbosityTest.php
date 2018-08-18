@@ -21,7 +21,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 final class LogVerbosityTest extends MockeryTestCase
 {
-    public function test_it_works_if_verbosity_is_valid()
+    public function test_it_works_if_verbosity_is_valid(): void
     {
         $input = $this->setInputExpectationsWhenItDoesNotChange(LogVerbosity::NORMAL);
 
@@ -34,7 +34,7 @@ final class LogVerbosityTest extends MockeryTestCase
      * @param int $input
      * @param string $output
      */
-    public function test_it_converts_int_version_to_string_version_of_verbosity(int $input, string $output)
+    public function test_it_converts_int_version_to_string_version_of_verbosity(int $input, string $output): void
     {
         $input = $this->setInputExpectationsWhenItDoesChange($input, $output);
         $io = Mockery::mock(SymfonyStyle::class);
@@ -68,7 +68,7 @@ final class LogVerbosityTest extends MockeryTestCase
         ];
     }
 
-    public function test_it_converts_to_normal_and_writes_notice_when_invalid_verbosity()
+    public function test_it_converts_to_normal_and_writes_notice_when_invalid_verbosity(): void
     {
         $input = $this->setInputExpectationsWhenItDoesChange('asdf', LogVerbosity::NORMAL);
         $io = Mockery::mock(SymfonyStyle::class);

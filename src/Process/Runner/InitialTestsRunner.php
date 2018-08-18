@@ -53,7 +53,7 @@ final class InitialTestsRunner
 
         $this->eventDispatcher->dispatch(new InitialTestSuiteStarted());
 
-        $process->run(function ($type) use ($process) {
+        $process->run(function ($type) use ($process): void {
             if ($process::ERR === $type) {
                 $process->stop();
             }

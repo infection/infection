@@ -16,7 +16,7 @@ use Infection\Finder\Exception\LocatorException;
  */
 final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
 {
-    const DEFAULT_EXTENSIONS = [
+    private const DEFAULT_EXTENSIONS = [
         'xml',
         'yml',
         'xml.dist',
@@ -44,7 +44,10 @@ final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInte
             $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
 
             if (file_exists($conf)) {
-                return realpath($conf);
+                $realpath = realpath($conf);
+                \assert(\is_string($realpath));
+
+                return $realpath;
             }
 
             $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);

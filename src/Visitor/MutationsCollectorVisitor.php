@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Visitor;
 
+use Infection\Exception\InvalidMutatorException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
@@ -63,11 +64,15 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
         $this->onlyCovered = $onlyCovered;
     }
 
-    public function leaveNode(Node $node)
+    public function leaveNode(Node $node): void
     {
         foreach ($this->mutators as $mutator) {
-            if (!$mutator->shouldMutate($node)) {
-                continue;
+            try {
+                if (!$mutator->shouldMutate($node)) {
+                    continue;
+                }
+            } catch (\Throwable $t) {
+                throw InvalidMutatorException::create($this->filePath, $mutator, $t);
             }
 
             $isOnFunctionSignature = $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);

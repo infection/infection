@@ -20,14 +20,14 @@ final class PhpSpecExtraOptionsTest extends TestCase
     /**
      * @dataProvider mutantProcessProvider
      */
-    public function test_it_does_not_change_extra_options_mutant_process(string $sourceExtraOptions)
+    public function test_it_does_not_change_extra_options_mutant_process(string $sourceExtraOptions): void
     {
         $phpUnitOptions = new PhpSpecExtraOptions($sourceExtraOptions);
 
         $this->assertSame($sourceExtraOptions, $phpUnitOptions->getForMutantProcess());
     }
 
-    public function test_it_returns_empty_string_when_source_options_are_null()
+    public function test_it_returns_empty_string_when_source_options_are_null(): void
     {
         $phpUnitOptions = new PhpSpecExtraOptions(null);
 

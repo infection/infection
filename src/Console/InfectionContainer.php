@@ -16,9 +16,16 @@ use Infection\Differ\Differ;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Finder\Locator;
+use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutator\Util\MutatorsGenerator;
+use Infection\Performance\Memory\MemoryFormatter;
+use Infection\Performance\Time\TimeFormatter;
+use Infection\Performance\Time\Timer;
+use Infection\Process\Builder\SubscriberBuilder;
+use Infection\Process\Coverage\CoverageRequirementChecker;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
+use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\CodeCoverageData;
@@ -173,6 +180,22 @@ final class InfectionContainer extends Container
 
             return (new MutatorsGenerator($mutatorConfig))->generate();
         };
+
+        $this['metrics'] = function (): MetricsCalculator {
+            return new MetricsCalculator();
+        };
+
+        $this['timer'] = function (): Timer {
+            return new Timer();
+        };
+
+        $this['time.formatter'] = function (): TimeFormatter {
+            return new TimeFormatter();
+        };
+
+        $this['memory.formatter'] = function (): MemoryFormatter {
+            return new MemoryFormatter();
+        };
     }
 
     private function getInfectionConfig(): InfectionConfig
@@ -180,7 +203,7 @@ final class InfectionContainer extends Container
         return $this['infection.config'];
     }
 
-    public function buildDynamicDependencies(InputInterface $input)
+    public function buildDynamicDependencies(InputInterface $input): void
     {
         $this['infection.config'] = function () use ($input): InfectionConfig {
             try {
@@ -205,6 +228,7 @@ final class InfectionContainer extends Container
                 $configLocation = getcwd();
             }
 
+            \assert(\is_string($json));
             $config = json_decode($json);
 
             if (\is_string($infectionConfigFile) && null === $config && JSON_ERROR_NONE !== json_last_error()) {
@@ -214,11 +238,18 @@ final class InfectionContainer extends Container
                 );
             }
 
+            // getcwd() may return false in rare circumstances
+            \assert(\is_string($configLocation));
+
             return new InfectionConfig($config, $this['filesystem'], $configLocation);
         };
 
         $this['coverage.path'] = function () use ($input): string {
-            $existingCoveragePath = trim($input->getOption('coverage'));
+            $existingCoveragePath = '';
+
+            if ($input->hasOption('coverage')) {
+                $existingCoveragePath = trim($input->getOption('coverage'));
+            }
 
             if ($existingCoveragePath === '') {
                 return $this['tmp.dir'];
@@ -227,6 +258,37 @@ final class InfectionContainer extends Container
             return $this['filesystem']->isAbsolutePath($existingCoveragePath)
                 ? $existingCoveragePath
                 : sprintf('%s/%s', getcwd(), $existingCoveragePath);
+        };
+
+        $this['coverage.checker'] = function () use ($input): CoverageRequirementChecker {
+            return new CoverageRequirementChecker(
+                \strlen(trim($input->getOption('coverage'))) > 0,
+                $input->getOption('initial-tests-php-options')
+            );
+        };
+
+        $this['test.run.constraint.checker'] = function () use ($input): TestRunConstraintChecker {
+            return new TestRunConstraintChecker(
+                $this['metrics'],
+                $input->getOption('ignore-msi-with-no-mutations'),
+                (float) $input->getOption('min-msi'),
+                (float) $input->getOption('min-covered-msi')
+            );
+        };
+
+        $this['subscriber.builder'] = function () use ($input): SubscriberBuilder {
+            return new SubscriberBuilder(
+                $input,
+                $this['metrics'],
+                $this['dispatcher'],
+                $this['diff.colorizer'],
+                $this['infection.config'],
+                $this['filesystem'],
+                $this['tmp.dir'],
+                $this['timer'],
+                $this['time.formatter'],
+                $this['memory.formatter']
+            );
         };
     }
 }

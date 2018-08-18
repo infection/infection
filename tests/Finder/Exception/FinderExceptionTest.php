@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class FinderExceptionTest extends TestCase
 {
-    public function test_composer_not_found_exception()
+    public function test_composer_not_found_exception(): void
     {
         $exception = FinderException::composerNotFound();
 
@@ -28,7 +28,7 @@ final class FinderExceptionTest extends TestCase
         );
     }
 
-    public function test_php_executable_not_found()
+    public function test_php_executable_not_found(): void
     {
         $exception = FinderException::phpExecutableNotFound();
 
@@ -39,7 +39,7 @@ final class FinderExceptionTest extends TestCase
         );
     }
 
-    public function test_test_framework_not_found()
+    public function test_test_framework_not_found(): void
     {
         $exception = FinderException::testFrameworkNotFound('framework');
 
@@ -54,7 +54,7 @@ final class FinderExceptionTest extends TestCase
         );
     }
 
-    public function test_test_custom_path_does_not_exsist()
+    public function test_test_custom_path_does_not_exsist(): void
     {
         $exception = FinderException::testCustomPathDoesNotExist('framework', 'foo/bar/abc');
 

@@ -11,6 +11,7 @@ namespace Infection\Console;
 
 use Infection\Mutant\Exception\MsiCalculationException;
 use Infection\Mutant\MetricsCalculator;
+use Infection\Process\Runner\TestRunConstraintChecker;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Process;
 
@@ -19,7 +20,13 @@ use Symfony\Component\Process\Process;
  */
 final class ConsoleOutput
 {
-    const CI_FLAG_ERROR = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
+    public const INFECTION_USAGE_SUGGESTION = '- Enable xdebug and run infection again' . PHP_EOL .
+        '- Use phpdbg: phpdbg -qrr infection' . PHP_EOL .
+        '- Use --coverage option with path to the existing coverage report' . PHP_EOL .
+        '- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters';
+    private const CI_FLAG_ERROR = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
+
+    private const RUNNING_WITH_DEBUGGER_NOTE = 'You are running Infection with %s enabled.';
 
     /**
      * @var SymfonyStyle
@@ -31,17 +38,17 @@ final class ConsoleOutput
         $this->io = $io;
     }
 
-    public function logVerbosityDeprecationNotice(string $valueToUse)
+    public function logVerbosityDeprecationNotice(string $valueToUse): void
     {
         $this->io->note('Numeric versions of log-verbosity have been deprecated, please use, ' . $valueToUse . ' to keep the same result');
     }
 
-    public function logUnkownVerbosityOption(string $default)
+    public function logUnkownVerbosityOption(string $default): void
     {
         $this->io->note('Running infection with an unknown log-verbosity option, falling back to ' . $default . ' option');
     }
 
-    public function logInitialTestsDoNotPass(Process $initialTestSuitProcess, string $testFrameworkKey)
+    public function logInitialTestsDoNotPass(Process $initialTestSuitProcess, string $testFrameworkKey): void
     {
         $lines = [
             'Project tests must be in a passing state before running Infection.',
@@ -69,7 +76,7 @@ final class ConsoleOutput
         $this->io->error($lines);
     }
 
-    public function logBadMsiErrorMessage(MetricsCalculator $metricsCalculator, float $minMsi)
+    public function logBadMsiErrorMessage(MetricsCalculator $metricsCalculator, float $minMsi, string $type): void
     {
         if (!$minMsi) {
             throw MsiCalculationException::create('min-msi');
@@ -78,37 +85,34 @@ final class ConsoleOutput
         $this->io->error(
             sprintf(
                 self::CI_FLAG_ERROR,
-                'MSI',
+                ($type === TestRunConstraintChecker::MSI_FAILURE ? 'MSI' : 'Covered Code MSI'),
                 $minMsi,
-                $metricsCalculator->getMutationScoreIndicator()
+                ($type === TestRunConstraintChecker::MSI_FAILURE ?
+                    $metricsCalculator->getMutationScoreIndicator() :
+                    $metricsCalculator->getCoveredCodeMutationScoreIndicator()
+                )
             )
         );
     }
 
-    public function logBadCoveredMsiErrorMessage(MetricsCalculator $metricsCalculator, float $minCoveredMsi)
-    {
-        if (!$minCoveredMsi) {
-            throw MsiCalculationException::create('min-covered-msi');
-        }
-
-        $this->io->error(
-            sprintf(
-                self::CI_FLAG_ERROR,
-                'Covered Code MSI',
-                $minCoveredMsi,
-                $metricsCalculator->getCoveredCodeMutationScoreIndicator()
-            )
-        );
-    }
-
-    public function logMissedDebuggerOrCoverageOption()
+    public function logMissedDebuggerOrCoverageOption(): void
     {
         $this->io->error([
             'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:',
-            '- Enable xdebug and run infection again' . PHP_EOL .
-            '- Use phpdbg: phpdbg -qrr infection' . PHP_EOL .
-            '- Use --coverage option with path to the existing coverage report' . PHP_EOL .
-            '- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters',
+            self::INFECTION_USAGE_SUGGESTION,
+        ]);
+    }
+
+    public function logRunningWithDebugger(string $debugger): void
+    {
+        $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, $debugger));
+    }
+
+    public function logNotInControlOfExitCodes(): void
+    {
+        $this->io->warning([
+            'Infection cannot control exit codes and unable to relaunch itself.' . PHP_EOL .
+            'It is your responsibility to disable xdebug/phpdbg unless needed.',
         ]);
     }
 }

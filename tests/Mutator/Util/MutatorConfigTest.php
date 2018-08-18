@@ -24,7 +24,7 @@ final class MutatorConfigTest extends TestCase
      * @param string $class
      * @param string $method
      */
-    public function test_is_ignored_returns_true_if_there_is_a_match(array $ignored, string $class, string $method)
+    public function test_is_ignored_returns_true_if_there_is_a_match(array $ignored, string $class, string $method): void
     {
         $config = new MutatorConfig(['ignore' => $ignored]);
 
@@ -71,7 +71,7 @@ final class MutatorConfigTest extends TestCase
      * @param string $class
      * @param string $method
      */
-    public function test_is_ignored_returns_false_if_there_is_no_match(array $ignored, string $class, string $method)
+    public function test_is_ignored_returns_false_if_there_is_no_match(array $ignored, string $class, string $method): void
     {
         $config = new MutatorConfig(['ignore' => $ignored]);
 

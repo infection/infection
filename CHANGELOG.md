@@ -1,5 +1,87 @@
 # Change Log
 
+## [0.10.0](https://github.com/infection/infection/tree/HEAD)  (2018-08-11) 
+
+[Full Changelog](https://github.com/infection/infection/compare/0.9.3...0.10.0)
+
+**BC Breaks:**
+
+- Drop PHP 7.0 support [\#414](https://github.com/infection/infection/issues/414)
+
+**Added:**
+
+- Function and method removal mutators [\#418](https://github.com/infection/infection/pull/418) ([BackEndTea](https://github.com/BackEndTea))
+- PregMatchMatches mutator [\#383](https://github.com/infection/infection/pull/383) ([BackEndTea](https://github.com/BackEndTea))
+- Add infection to PHIVE \(PHAR Installation and Verification Environment\) [\#134](https://github.com/infection/infection/issues/134)
+- Show time and memory info to the console output [\#390](https://github.com/infection/infection/pull/390) ([borNfreee](https://github.com/borNfreee))
+- Add GPG signing for PHAR [\#436](https://github.com/infection/infection/pull/436) ([borNfreee](https://github.com/borNfreee))
+- Sort logs [\#424](https://github.com/infection/infection/pull/424) ([BackEndTea](https://github.com/BackEndTea))
+- Explicitly require the DOM extension [\#411](https://github.com/infection/infection/pull/411) ([BackEndTea](https://github.com/BackEndTea))
+
+**Fixed:**
+
+- 100% MSI reported even if a small number of uncovered mutations is found [\#426](https://github.com/infection/infection/issues/426)
+- Round MSI down to the smallest integer, instead of nearest [\#431](https://github.com/infection/infection/pull/431) ([sanmai](https://github.com/sanmai))
+- Space in directory path breaks Infection [\#413](https://github.com/infection/infection/issues/413)
+- BadgeLogger now reports exact errors [\#405](https://github.com/infection/infection/pull/405) ([sanmai](https://github.com/sanmai))
+- Quiet mode is as quiet as one can expect it to be [\#403](https://github.com/infection/infection/issues/403)
+- Fix exclude to excludes for generated config file [\#423](https://github.com/infection/infection/pull/423) ([BackEndTea](https://github.com/BackEndTea))
+- Brew installation isn't supported anymore or docs aren't updated [\#416](https://github.com/infection/infection/issues/416)
+
+## [0.9.0](https://github.com/infection/infection/tree/HEAD) (2018-07-02) 
+
+[Full Changelog](https://github.com/infection/infection/compare/0.8.2...0.9.0)
+
+**BC Breaks:**
+
+- Use textual version of log verbosity [\265]()https://github.com/infection/infection/pull/265)
+
+**Added:**
+
+- Feature: Profiles [\#220](https://github.com/infection/infection/pull/220)
+- Mutation badge [\#207](https://github.com/infection/infection/pull/207)
+- Feature:disable certain mutators [\#177](https://github.com/infection/infection/pull/177)
+- Add reflection classes to mutators. Do no mutate public method visibility if parent has the same one [\#67](https://github.com/infection/infection/pull/67)
+- [Mutator] IdenticalEqual and NotIdenticalNotEqual mutators [\#298](https://github.com/infection/infection/pull/298)
+- [Mutator] Remove type cast operators [\#297](https://github.com/infection/infection/pull/297)
+- [Mutator] Add mutator that removes finally {} block [\#261](https://github.com/infection/infection/pull/261)
+- [Mutator] Yield Mutator [\#242](https://github.com/infection/infection/pull/242)
+- [Mutator] ArrayItem Mutator [\#240](https://github.com/infection/infection/pull/240)
+- [Mutator] Add a For Loop mutator & test [\#230](https://github.com/infection/infection/pull/230)
+- [Mutator] Add Assignment Equal Mutator [\#229](https://github.com/infection/infection/pull/229)
+- [Mutator] Add Assignment Mutator [\#228](https://github.com/infection/infection/pull/228)
+- [Mutator] Add the first regex mutator [\#333](https://github.com/infection/infection/pull/333) ([BackEndTea](https://github.com/BackEndTea))
+- Use PHP-Parser 4 to preserve mutated code formatting [\#55](https://github.com/infection/infection/issues/55)
+- \[epic\] Scope and deploy signed PHAR [\#338](https://github.com/infection/infection/issues/338)
+- Add a per mutator logging option [\#346](https://github.com/infection/infection/pull/346) ([BackEndTea](https://github.com/BackEndTea))
+- Update travis config to deploy PHAR and pubkey on releases [\#353](https://github.com/infection/infection/pull/353) ([borNfreee](https://github.com/borNfreee))
+
+
+**Changed:**
+
+- Xdebug/ phpdbg check should be later in the infection process [\#325](https://github.com/infection/infection/issues/325)
+- Stop mutation of abstract methods default parameters [\#361](https://github.com/infection/infection/pull/361) ([BackEndTea](https://github.com/BackEndTea))
+- Add a test to check whether classes are unit tested [\#360](https://github.com/infection/infection/pull/360) ([BackEndTea](https://github.com/BackEndTea))
+- Clean up after Mutation testing has been finished [\#357](https://github.com/infection/infection/pull/357) ([sidz](https://github.com/sidz))
+- Simplify the EventDispatcher [\#348](https://github.com/infection/infection/pull/348) ([BackEndTea](https://github.com/BackEndTea))
+
+
+**Fixed:**
+
+- infection ignores phpunit.xml bootstrap file [\#320](https://github.com/infection/infection/issues/320)
+- False positive when calculation is in multiple lines [\#366](https://github.com/infection/infection/issues/366)
+- Allow Absolute Path to phpunit.xml\(.dist\) [\#387](https://github.com/infection/infection/pull/387) ([adeptofvoltron](https://github.com/adeptofvoltron))
+- Account for statements spanning multiple lines [\#375](https://github.com/infection/infection/pull/375) ([sanmai](https://github.com/sanmai))
+- Look for .bat on all platforms [\#374](https://github.com/infection/infection/pull/374) ([sanmai](https://github.com/sanmai))
+- False positive: count\(-1\) \(decrement integer mutator\) [\#364](https://github.com/infection/infection/issues/364)
+- Infection works incorrectly on Windows [\#351](https://github.com/infection/infection/issues/351)
+- Weird behaviour in Docker container [\#332](https://github.com/infection/infection/issues/332)
+- Initial test suite may fail to deliver coverage, e.g. under Docker [\#306](https://github.com/infection/infection/issues/306)
+- Infection infects /tmp [\#356](https://github.com/infection/infection/issues/356)
+- Infection does not correctly detect whether phpunit is php-executable [\#300](https://github.com/infection/infection/issues/300)
+- Infection can't report on effectiveness of mutators [\#271](https://github.com/infection/infection/issues/271)
+- Do not decrement integer 0 when it is being compared with the result of count\(\) [\#365](https://github.com/infection/infection/pull/365) ([borNfreee](https://github.com/borNfreee))
+
 ## [0.8.0](https://github.com/infection/infection/tree/0.8.0) (2018-02-27) 
 
 [Full Changelog](https://github.com/infection/infection/compare/0.7.1...0.8.0)

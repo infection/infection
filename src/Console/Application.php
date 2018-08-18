@@ -11,6 +11,7 @@ namespace Infection\Console;
 
 use Composer\XdebugHandler\XdebugHandler;
 use Infection\Command;
+use Infection\Console\ConsoleOutput as InfectionConsoleOutput;
 use Infection\Console\Util\PhpProcess;
 use PackageVersions\Versions;
 use Symfony\Component\Console\Application as BaseApplication;
@@ -26,13 +27,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 final class Application extends BaseApplication
 {
-    const NAME = 'Infection - PHP Mutation Testing Framework';
-    const VERSION = '@package_version@';
-    const RUNNING_WITH_DEBUGGER_NOTE = 'You are running Infection with %s enabled.';
+    private const NAME = 'Infection - PHP Mutation Testing Framework';
+    private const VERSION = '@package_version@';
 
-    const INFECTION_PREFIX = 'INFECTION';
+    private const INFECTION_PREFIX = 'INFECTION';
 
-    const LOGO = <<<'ASCII'
+    private const LOGO = <<<'ASCII'
     ____      ____          __  _
    /  _/___  / __/__  _____/ /_(_)___  ____ 
    / // __ \/ /_/ _ \/ ___/ __/ / __ \/ __ \
@@ -47,9 +47,9 @@ ASCII;
     private $container;
 
     /**
-     * @var SymfonyStyle
+     * @var InfectionConsoleOutput
      */
-    private $io;
+    private $consoleOutput;
 
     public function __construct(InfectionContainer $container, string $name = self::NAME, string $version = self::VERSION)
     {
@@ -69,23 +69,20 @@ ASCII;
             $output = new ConsoleOutput();
         }
 
-        $this->io = new SymfonyStyle($input, $output);
+        $this->consoleOutput = new InfectionConsoleOutput(new SymfonyStyle($input, $output));
 
-        if (\PHP_SAPI === 'phpdbg') {
-            $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, \PHP_SAPI));
-        } elseif (\extension_loaded('xdebug')) {
-            $this->io->writeln(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, 'xdebug'));
+        if ($input->hasParameterOption(['--quiet', '-q'], true)) {
+            $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
         }
+
+        $this->logRunningWithDebugger();
 
         if (!$this->isAutoExitEnabled()) {
             // When we're not in control of exit codes, that means it's the caller
             // responsibility to disable xdebug if it isn't needed. As of writing
             // that's only the case during E2E testing. Show a warning nevertheless.
 
-            $this->io->warning([
-                'Infection cannot control exit codes and unable to relaunch itself.' . PHP_EOL .
-                'It is your responsibility to disable xdebug/phpdbg unless needed.',
-            ]);
+            $this->consoleOutput->logNotInControlOfExitCodes();
 
             return parent::run($input, $output);
         }
@@ -96,11 +93,20 @@ ASCII;
         /*
          * If we're skipping Xdebug, setup a default Xdebug-free environment for all subprocesses
          */
-        if ('' != XdebugHandler::getSkippedVersion()) {
+        if ('' !== XdebugHandler::getSkippedVersion()) {
             PhpProcess::setupXdebugFreeEnvironment();
         }
 
         return parent::run($input, $output);
+    }
+
+    private function logRunningWithDebugger(): void
+    {
+        if (\PHP_SAPI === 'phpdbg') {
+            $this->consoleOutput->logRunningWithDebugger(\PHP_SAPI);
+        } elseif (\extension_loaded('xdebug')) {
+            $this->consoleOutput->logRunningWithDebugger('xdebug');
+        }
     }
 
     public function doRun(InputInterface $input, OutputInterface $output)
@@ -137,7 +143,7 @@ ASCII;
         return $commands;
     }
 
-    protected function configureIO(InputInterface $input, OutputInterface $output)
+    protected function configureIO(InputInterface $input, OutputInterface $output): void
     {
         parent::configureIO($input, $output);
 
@@ -161,8 +167,8 @@ ASCII;
         return $this->container;
     }
 
-    public function getIO(): SymfonyStyle
+    public function getConsoleOutput(): InfectionConsoleOutput
     {
-        return $this->io;
+        return $this->consoleOutput;
     }
 }

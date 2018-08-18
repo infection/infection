@@ -41,7 +41,7 @@ final class InitialYamlConfigurationTest extends TestCase
         return new InitialYamlConfiguration($this->tempDir, $configArray ?: $this->defaultConfig, $skipCoverage);
     }
 
-    public function test_it_throws_exception_when_extensions_array_is_empty()
+    public function test_it_throws_exception_when_extensions_array_is_empty(): void
     {
         $configuration = $this->getConfigurationObject(['extensions' => []]);
         $this->expectException(NoCodeCoverageException::class);
@@ -49,7 +49,7 @@ final class InitialYamlConfigurationTest extends TestCase
         $configuration->getYaml();
     }
 
-    public function test_it_throws_exception_when_extensions_array_is_not_present()
+    public function test_it_throws_exception_when_extensions_array_is_not_present(): void
     {
         $configuration = $this->getConfigurationObject(['bootstrap' => '/path/to/adc']);
         $this->expectException(NoCodeCoverageException::class);
@@ -57,7 +57,7 @@ final class InitialYamlConfigurationTest extends TestCase
         $configuration->getYaml();
     }
 
-    public function test_it_throws_exception_when_no_extensions_have_no_coverage_one()
+    public function test_it_throws_exception_when_no_extensions_have_no_coverage_one(): void
     {
         $configuration = $this->getConfigurationObject(['extensions' => ['a' => []]]);
         $this->expectException(NoCodeCoverageException::class);
@@ -65,7 +65,7 @@ final class InitialYamlConfigurationTest extends TestCase
         $configuration->getYaml();
     }
 
-    public function test_it_updates_code_coverage_file()
+    public function test_it_updates_code_coverage_file(): void
     {
         $configuration = $this->getConfigurationObject();
 
@@ -75,7 +75,7 @@ final class InitialYamlConfigurationTest extends TestCase
         $this->assertSame($expectedPath, $parsedYaml['extensions']['PhpSpecCodeCoverageExtension']['output']['xml']);
     }
 
-    public function test_it_removes_all_coverage_extensions_if_coverage_should_be_skipped()
+    public function test_it_removes_all_coverage_extensions_if_coverage_should_be_skipped(): void
     {
         $configuration = $this->getConfigurationObject(
             ['extensions' => ['CodeCoverage1' => [], 'CodeCoverage2' => []]],
@@ -87,7 +87,7 @@ final class InitialYamlConfigurationTest extends TestCase
         $this->assertCount(0, $parsedYaml['extensions']);
     }
 
-    public function test_it_preserves_options_form_coverage_extension()
+    public function test_it_preserves_options_form_coverage_extension(): void
     {
         $configuration = $this->getConfigurationObject();
 

@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class InvalidOptionExceptionTest extends TestCase
 {
-    public function test_with_message()
+    public function test_with_message(): void
     {
         $message = 'Error Message';
 

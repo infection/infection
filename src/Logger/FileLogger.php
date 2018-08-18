@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use Infection\Mutant\MetricsCalculator;
+use Infection\Process\MutantProcessInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -56,10 +57,24 @@ abstract class FileLogger implements MutationTestingResultsLogger
         $this->isDebugMode = $isDebugMode;
     }
 
-    public function log()
+    public function log(): void
     {
         $this->fs->dumpFile($this->logFilePath, implode($this->getLogLines(), "\n"));
     }
 
     abstract protected function getLogLines(): array;
+
+    /**
+     * @param MutantProcessInterface[] $processes
+     */
+    final protected function sortProcesses(array &$processes): void
+    {
+        usort($processes, function (MutantProcessInterface $a, MutantProcessInterface $b): int {
+            if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
+                return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
+            }
+
+            return $a->getOriginalFilePath() <=> $b->getOriginalFilePath();
+        });
+    }
 }

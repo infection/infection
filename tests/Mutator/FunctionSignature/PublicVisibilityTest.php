@@ -19,7 +19,7 @@ final class PublicVisibilityTest extends AbstractMutatorTestCase
     /**
      * @dataProvider blacklistedProvider
      */
-    public function test_it_does_not_modify_blacklisted_functions(string $functionName, string $args = '', string $modifier = '')
+    public function test_it_does_not_modify_blacklisted_functions(string $functionName, string $args = '', string $modifier = ''): void
     {
         $code = $this->getFileContent("pv-{$functionName}.php");
 
@@ -58,7 +58,7 @@ PHP;
     /**
      * @dataProvider provideMutationCases
      */
-    public function test_mutator($input, $expected = null)
+    public function test_mutator($input, $expected = null): void
     {
         $this->doTest($input, $expected);
     }

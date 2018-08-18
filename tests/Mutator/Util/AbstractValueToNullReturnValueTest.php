@@ -12,6 +12,7 @@ namespace Infection\Tests\Mutator\Util;
 use Infection\Mutator\Util\AbstractValueToNullReturnValue;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Function_;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -19,9 +20,9 @@ use PHPUnit\Framework\TestCase;
  */
 final class AbstractValueToNullReturnValueTest extends TestCase
 {
-    protected $testSubject = null;
+    protected $testSubject;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->testSubject = $this->getMockBuilder(AbstractValueToNullReturnValue::class)
             ->disableOriginalConstructor()
@@ -30,6 +31,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
 
     private function mockNode($returnValue): Node
     {
+        /** @var Node|MockObject $mockNode */
         $mockNode = $this->getMockBuilder(Node::class)
                          ->disableOriginalConstructor()
                          ->setMethods(['getAttribute'])
@@ -43,6 +45,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
 
     private function mockFunction($returnValue): Function_
     {
+        /** @var Function_|MockObject $mockFunction */
         $mockFunction = $this->getMockBuilder(Function_::class)
             ->disableOriginalConstructor()
             ->setMethods(['getReturnType'])
@@ -62,17 +65,15 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         return $reflectionMethod->invoke($this->testSubject, $mockNode);
     }
 
-    public function test_attribute_not_found()
+    public function test_attribute_not_found(): void
     {
         $this->assertTrue($this->invokeMethod($this->mockNode(null)));
     }
 
-    public function test_return_type_is_node_identifier()
+    public function test_return_type_is_node_identifier(): void
     {
         /** @var Node\Identifier $mockNode */
         $mockNode = $this->createMock(Node\Identifier::class);
-
-        $mockNode->name = null;
 
         $this->assertTrue(
             $this->invokeMethod(
@@ -83,7 +84,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         );
     }
 
-    public function test_return_type_is_scalar_typehint()
+    public function test_return_type_is_scalar_typehint(): void
     {
         $this->assertFalse(
             $this->invokeMethod(
@@ -94,7 +95,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         );
     }
 
-    public function test_return_type_is_nullable()
+    public function test_return_type_is_nullable(): void
     {
         $this->assertTrue(
             $this->invokeMethod(
@@ -107,7 +108,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         );
     }
 
-    public function test_return_type_is_node_name()
+    public function test_return_type_is_node_name(): void
     {
         $this->assertTrue(
             $this->invokeMethod(
@@ -120,7 +121,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         );
     }
 
-    public function test_return_type_is_not_node_name()
+    public function test_return_type_is_not_node_name(): void
     {
         $this->assertFalse(
             $this->invokeMethod(

@@ -16,7 +16,7 @@ use Infection\Mutant\Exception\MsiCalculationException;
  */
 final class MsiCalculationExceptionTest extends \PHPUnit\Framework\TestCase
 {
-    public function test_it_is_instance_of_logic_exception()
+    public function test_it_is_instance_of_logic_exception(): void
     {
         $exception = MsiCalculationException::create('');
 
@@ -26,7 +26,7 @@ final class MsiCalculationExceptionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function test_it_has_correct_error_message()
+    public function test_it_has_correct_error_message(): void
     {
         $exception = MsiCalculationException::create('min-msi');
         $this->assertSame(

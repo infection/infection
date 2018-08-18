@@ -24,7 +24,7 @@ use Symfony\Component\Process\Process;
  */
 final class MutantProcessTest extends MockeryTestCase
 {
-    public function test_it_handles_not_covered_mutant()
+    public function test_it_handles_not_covered_mutant(): void
     {
         $process = Mockery::mock(Process::class);
         $mutant = Mockery::mock(MutantInterface::class);
@@ -36,7 +36,7 @@ final class MutantProcessTest extends MockeryTestCase
         $this->assertSame(MutantProcess::CODE_NOT_COVERED, $mutantProcess->getResultCode());
     }
 
-    public function test_it_handles_timeout()
+    public function test_it_handles_timeout(): void
     {
         $process = Mockery::mock(Process::class);
         $mutant = Mockery::mock(MutantInterface::class);
@@ -49,7 +49,7 @@ final class MutantProcessTest extends MockeryTestCase
         $this->assertSame(MutantProcess::CODE_TIMED_OUT, $mutantProcess->getResultCode());
     }
 
-    public function test_it_handles_error()
+    public function test_it_handles_error(): void
     {
         $process = Mockery::mock(Process::class);
         $process->shouldReceive('getExitCode')->once()->andReturn(126);
@@ -62,7 +62,7 @@ final class MutantProcessTest extends MockeryTestCase
         $this->assertSame(MutantProcess::CODE_ERROR, $mutantProcess->getResultCode());
     }
 
-    public function test_it_handles_escaped_mutant()
+    public function test_it_handles_escaped_mutant(): void
     {
         $process = Mockery::mock(Process::class);
         $process->shouldReceive('getExitCode')->once()->andReturn(0);
@@ -79,7 +79,7 @@ final class MutantProcessTest extends MockeryTestCase
         $this->assertSame(MutantProcess::CODE_ESCAPED, $mutantProcess->getResultCode());
     }
 
-    public function test_it_handles_killed_mutant()
+    public function test_it_handles_killed_mutant(): void
     {
         $process = Mockery::mock(Process::class);
         $process->shouldReceive('getExitCode')->once()->andReturn(0);
@@ -97,7 +97,7 @@ final class MutantProcessTest extends MockeryTestCase
         $this->assertSame($mutant, $mutantProcess->getMutant());
     }
 
-    public function test_it_knows_its_mutator()
+    public function test_it_knows_its_mutator(): void
     {
         $mutator = new For_(new MutatorConfig([]));
 
@@ -114,5 +114,45 @@ final class MutantProcessTest extends MockeryTestCase
         $mutantProcess = new MutantProcess($process, $mutant, $adapter);
 
         $this->assertSame($mutator, $mutantProcess->getMutator());
+    }
+
+    public function test_it_knows_its_original_path(): void
+    {
+        $process = $this->createMOck(Process::class);
+        $process->expects($this->never())->method($this->anything());
+
+        $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $adapter->expects($this->never())->method($this->anything());
+
+        $mutation = $this->createMock(MutationInterface::class);
+        $mutation->expects($this->once())->method('getOriginalFilePath')->willReturn('foo/bar');
+        $mutant = $this->createMock(MutantInterface::class);
+        $mutant->expects($this->once())->method('getMutation')->willReturn($mutation);
+
+        $mutantProcess = new MutantProcess($process, $mutant, $adapter);
+
+        $path = $mutantProcess->getOriginalFilePath();
+
+        $this->assertSame('foo/bar', $path);
+    }
+
+    public function test_it_knows_its_original_starting_line(): void
+    {
+        $process = $this->createMOck(Process::class);
+        $process->expects($this->never())->method($this->anything());
+
+        $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $adapter->expects($this->never())->method($this->anything());
+
+        $mutation = $this->createMock(MutationInterface::class);
+        $mutation->expects($this->once())->method('getAttributes')->willReturn(['startLine' => '3']);
+        $mutant = $this->createMock(MutantInterface::class);
+        $mutant->expects($this->once())->method('getMutation')->willReturn($mutation);
+
+        $mutantProcess = new MutantProcess($process, $mutant, $adapter);
+
+        $line = $mutantProcess->getOriginalStartingLine();
+
+        $this->assertSame(3, $line);
     }
 }

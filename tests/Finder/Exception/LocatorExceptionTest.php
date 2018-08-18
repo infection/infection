@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class LocatorExceptionTest extends TestCase
 {
-    public function test_file_or_directory_does_not_exist()
+    public function test_file_or_directory_does_not_exist(): void
     {
         $exception = LocatorException::fileOrDirectoryDoesNotExist('file');
 
@@ -28,7 +28,7 @@ final class LocatorExceptionTest extends TestCase
         );
     }
 
-    public function test_files_or_directories_do_not_exist()
+    public function test_files_or_directories_do_not_exist(): void
     {
         $exception = LocatorException::filesOrDirectoriesDoNotExist('file', ['foo/', 'bar/']);
 
@@ -39,7 +39,7 @@ final class LocatorExceptionTest extends TestCase
         );
     }
 
-    public function test_multiple_files_do_not_exist()
+    public function test_multiple_files_do_not_exist(): void
     {
         $exception = LocatorException::multipleFilesDoNotExist('foo/bar/', ['file1', 'file2']);
 
@@ -50,7 +50,7 @@ final class LocatorExceptionTest extends TestCase
         );
     }
 
-    public function test_files_not_found()
+    public function test_files_not_found(): void
     {
         $exception = LocatorException::filesNotFound();
 
