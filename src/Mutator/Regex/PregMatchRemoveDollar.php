@@ -14,7 +14,7 @@ namespace Infection\Mutator\Regex;
  */
 final class PregMatchRemoveDollar extends AbstractPregMatch
 {
-    const ANALYSE_REGEX = '/^([\/#~+])([^$]*)([$]?)\1([gmixXsuUAJD]*)$/';
+    public const ANALYSE_REGEX = '/^([\/#~+])([^$]*)([$]?)\1([gmixXsuUAJD]*)$/';
 
     protected function manipulatePattern(string $pattern): string
     {
