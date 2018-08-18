@@ -35,7 +35,7 @@ abstract class AbstractPregMatch extends Mutator
     }
 
     /**
-     * todo in fture also work with 'concat' type of attribute  or passed in variable or const
+     * todo in future also work with 'concat' type of attribute  or passed in variable or const
      *
      * @param Node $node
      *
@@ -46,10 +46,11 @@ abstract class AbstractPregMatch extends Mutator
         return $node instanceof FuncCall &&
             $node->name instanceof Node\Name &&
             strtolower((string) $node->name) == 'preg_match'
-            && $node->args[0]->value instanceof Node\Scalar\String_;
+            && $node->args[0]->value instanceof Node\Scalar\String_
+            && $this->isProperRegexToMutate($this->pullOutPattern($node->args[0]));
     }
 
-    protected function pullOutPattern(Node\Arg $argument): string
+    private function pullOutPattern(Node\Arg $argument): string
     {
         /** @var Node\Scalar\String_ $stringNode */
         $stringNode = $argument->value;
@@ -59,7 +60,9 @@ abstract class AbstractPregMatch extends Mutator
 
     abstract protected function manipulatePattern(string $pattern): string;
 
-    protected function setNewPattern(string $pattern, Node\Arg $argument): Node\Arg
+    abstract protected function isProperRegexToMutate(string $pattern): bool;
+
+    private function setNewPattern(string $pattern, Node\Arg $argument): Node\Arg
     {
         /** @var Node\Scalar\String_ $stringNode */
         $stringNode = $argument->value;

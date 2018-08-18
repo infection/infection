@@ -14,7 +14,7 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 /**
  * @internal
  */
-final class PregMatchSwapCaretTest extends AbstractMutatorTestCase
+final class PregMatchRemoveCaretTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases
@@ -26,20 +26,6 @@ final class PregMatchSwapCaretTest extends AbstractMutatorTestCase
 
     public function provideMutationCases(): \Generator
     {
-        yield 'It mutates correctly adding caret when provided with a string' => [
-            <<<'PHP'
-<?php
-
-preg_match('#some-regexp#ig', 'irrelevant');
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-preg_match('#^some-regexp#ig', 'irrelevant');
-PHP
-        ];
-
         yield 'It mutates correctly removing caret when provided with a string' => [
             <<<'PHP'
 <?php
