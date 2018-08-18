@@ -26,8 +26,6 @@ final class PregMatchRemoveCaret extends AbstractPregMatch
         return $delimiter . $regexBody . $delimiter . $flags;
     }
 
-
-
     protected function isProperRegexToMutate(string $pattern): bool
     {
         preg_match(self::ANALYSE_REGEX, $pattern, $matches);
