@@ -47,9 +47,9 @@ abstract class AbstractMutatorTestCase extends TestCase
 
         $mutants = $this->mutate($inputCode);
 
-        if ($expectedCode === null) {
-            $this->assertCount(0, $mutants);
-        } else {
+        $this->assertSame(\count($mutants), \count($expectedCodeSamples));
+
+        if ($expectedCode !== null) {
             foreach ($mutants as $realMutatedCode) {
                 $expectedCodeSample = array_shift($expectedCodeSamples);
 

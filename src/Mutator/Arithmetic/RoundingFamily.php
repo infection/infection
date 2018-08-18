@@ -55,7 +55,8 @@ final class RoundingFamily extends Mutator
         }
 
         if (!$node->name instanceof Node\Name ||
-            !\in_array($this->getNormalizedFunctionName($node->name), self::MUTATORS_MAP, true)) {
+            !\in_array($this->getNormalizedFunctionName($node->name), self::MUTATORS_MAP, true)
+        ) {
             return false;
         }
 
