@@ -45,7 +45,7 @@ abstract class AbstractPregMatch extends Mutator
     {
         return $node instanceof FuncCall &&
             $node->name instanceof Node\Name &&
-            strtolower((string) $node->name) == 'preg_match'
+            strtolower((string) $node->name) === 'preg_match'
             && $node->args[0]->value instanceof Node\Scalar\String_
             && $this->isProperRegexToMutate($this->pullOutPattern($node->args[0]));
     }
