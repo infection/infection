@@ -22,7 +22,7 @@ final class PlusTest extends AbstractMutatorTestCase
     /**
      * @dataProvider provideMutationCases
      */
-    public function test_mutator($input, $expected = null)
+    public function test_mutator($input, $expected = null): void
     {
         $this->doTest($input, $expected);
     }
@@ -91,14 +91,14 @@ PHP
         ];
     }
 
-    public function test_it_should_mutate_plus_expression()
+    public function test_it_should_mutate_plus_expression(): void
     {
         $plusExpression = new Node\Expr\BinaryOp\Plus(new LNumber(1), new LNumber(2));
 
         $this->assertTrue($this->mutator->shouldMutate($plusExpression));
     }
 
-    public function test_it_should_not_mutate_plus_with_arrays()
+    public function test_it_should_not_mutate_plus_with_arrays(): void
     {
         $plusExpression = new Node\Expr\BinaryOp\Plus(
             new Array_([new LNumber(1)]),

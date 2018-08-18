@@ -46,7 +46,7 @@ final class PerMutatorLogger extends FileLogger
         return $logs;
     }
 
-    private function setUpPerCalculatorMutator()
+    private function setUpPerCalculatorMutator(): void
     {
         $processes = $this->metricsCalculator->getAllMutantProcesses();
 

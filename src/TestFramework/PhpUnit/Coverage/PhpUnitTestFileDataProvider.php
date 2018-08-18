@@ -24,7 +24,7 @@ final class PhpUnitTestFileDataProvider implements TestFileDataProvider
     private $jUnitFilePath;
 
     /**
-     * @var \DOMXPath
+     * @var \DOMXPath|null
      */
     private $xPath;
 
@@ -57,7 +57,7 @@ final class PhpUnitTestFileDataProvider implements TestFileDataProvider
             }
 
             $dom = new \DOMDocument();
-            $dom->loadXML(file_get_contents($this->jUnitFilePath));
+            $dom->load($this->jUnitFilePath);
 
             $this->xPath = new \DOMXPath($dom);
         }

@@ -21,7 +21,7 @@ use Symfony\Component\Process\Process;
  */
 final class ConsoleOutputTest extends TestCase
 {
-    public function test_log_verbosity_deprecation_notice()
+    public function test_log_verbosity_deprecation_notice(): void
     {
         $option = 'all';
         $io = $this->createMock(SymfonyStyle::class);
@@ -34,7 +34,7 @@ final class ConsoleOutputTest extends TestCase
         $consoleOutput->logVerbosityDeprecationNotice($option);
     }
 
-    public function test_log_unknown_verbosity_option()
+    public function test_log_unknown_verbosity_option(): void
     {
         $option = 'default';
         $io = $this->createMock(SymfonyStyle::class);
@@ -47,7 +47,7 @@ final class ConsoleOutputTest extends TestCase
         $consoleOutput->logUnkownVerbosityOption($option);
     }
 
-    public function test_log_initial_tests_do_not_pass()
+    public function test_log_initial_tests_do_not_pass(): void
     {
         $testFrameworkKey = 'phpunit';
         $process = $this->createMock(Process::class);
@@ -72,7 +72,7 @@ final class ConsoleOutputTest extends TestCase
         $console->logInitialTestsDoNotPass($process, $testFrameworkKey);
     }
 
-    public function test_log_bad_msi_error_message()
+    public function test_log_bad_msi_error_message(): void
     {
         $metrics = $this->createMock(MetricsCalculator::class);
         $metrics->expects($this->once())->method('getMutationScoreIndicator')->willReturn('75.0');
@@ -83,30 +83,20 @@ final class ConsoleOutputTest extends TestCase
 
         $console = new ConsoleOutput($io);
 
-        $console->logBadMsiErrorMessage($metrics, 25.0);
+        $console->logBadMsiErrorMessage($metrics, 25.0, 'min-msi');
     }
 
-    public function test_log_bad_msi_error_message_throws_error_on_faulty_msi()
+    public function test_log_bad_msi_error_message_throws_error_on_faulty_msi(): void
     {
         $io = $this->createMock(SymfonyStyle::class);
         $consoleOutput = new ConsoleOutput($io);
 
         $this->expectException(MsiCalculationException::class);
 
-        $consoleOutput->logBadMsiErrorMessage(new MetricsCalculator(), 0.0);
+        $consoleOutput->logBadMsiErrorMessage(new MetricsCalculator(), 0.0, 'min-msi');
     }
 
-    public function test_log_bad_covered_msi_error_message_throws_error_on_faulty_msi()
-    {
-        $io = $this->createMock(SymfonyStyle::class);
-        $consoleOutput = new ConsoleOutput($io);
-
-        $this->expectException(MsiCalculationException::class);
-
-        $consoleOutput->logBadCoveredMsiErrorMessage(new MetricsCalculator(), 0.0);
-    }
-
-    public function test_log_bad_covered_msi_error_message()
+    public function test_log_bad_covered_msi_error_message(): void
     {
         $metrics = $this->createMock(MetricsCalculator::class);
         $metrics->expects($this->once())->method('getCoveredCodeMutationScoreIndicator')->willReturn('75.0');
@@ -117,10 +107,10 @@ final class ConsoleOutputTest extends TestCase
 
         $console = new ConsoleOutput($io);
 
-        $console->logBadCoveredMsiErrorMessage($metrics, 25.0);
+        $console->logBadMsiErrorMessage($metrics, 25.0, 'min-covered-msi');
     }
 
-    public function test_log_missed_debugger_or_coverage_option()
+    public function test_log_missed_debugger_or_coverage_option(): void
     {
         $io = $this->createMock(SymfonyStyle::class);
         $io->expects($this->once())->method('error')
@@ -134,5 +124,28 @@ final class ConsoleOutputTest extends TestCase
 
         $consoleOutput = new ConsoleOutput($io);
         $consoleOutput->logMissedDebuggerOrCoverageOption();
+    }
+
+    public function test_log_running_with_debugger(): void
+    {
+        $io = $this->createMock(SymfonyStyle::class);
+        $io->expects($this->once())->method('writeln')
+            ->with('You are running Infection with foo enabled.');
+
+        $consoleOutput = new ConsoleOutput($io);
+        $consoleOutput->logRunningWithDebugger('foo');
+    }
+
+    public function test_log_not_in_control_of_exit_codes(): void
+    {
+        $io = $this->createMock(SymfonyStyle::class);
+        $io->expects($this->once())->method('warning')
+            ->with([
+                'Infection cannot control exit codes and unable to relaunch itself.' . PHP_EOL .
+                'It is your responsibility to disable xdebug/phpdbg unless needed.',
+            ]);
+
+        $consoleOutput = new ConsoleOutput($io);
+        $consoleOutput->logNotInControlOfExitCodes();
     }
 }

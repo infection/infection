@@ -95,7 +95,7 @@ class InitialConfigBuilder implements ConfigBuilder
         return $this->tmpDir . '/phpunitConfiguration.initial.infection.xml';
     }
 
-    private function addJUnitLogger(\DOMDocument $dom, \DOMXPath $xPath)
+    private function addJUnitLogger(\DOMDocument $dom, \DOMXPath $xPath): void
     {
         $logging = $this->getOrCreateNode($dom, $xPath, 'logging');
 
@@ -106,7 +106,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $logging->appendChild($junitLog);
     }
 
-    private function addCodeCoverageLogger(\DOMDocument $dom, \DOMXPath $xPath)
+    private function addCodeCoverageLogger(\DOMDocument $dom, \DOMXPath $xPath): void
     {
         $logging = $this->getOrCreateNode($dom, $xPath, 'logging');
 
@@ -117,7 +117,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $logging->appendChild($coverageXmlLog);
     }
 
-    private function addCoverageFilterWhitelistIfDoesNotExist(\DOMDocument $dom, \DOMXPath $xPath)
+    private function addCoverageFilterWhitelistIfDoesNotExist(\DOMDocument $dom, \DOMXPath $xPath): void
     {
         $filterNode = $this->getNode($dom, $xPath, 'filter');
 

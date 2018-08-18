@@ -35,7 +35,7 @@ final class PathReplacer
     /**
      * @param \DOMNode|\DOMElement $domElement
      */
-    public function replaceInNode(\DOMNode $domElement)
+    public function replaceInNode(\DOMNode $domElement): void
     {
         if (!$this->filesystem->isAbsolutePath($domElement->nodeValue)) {
             $newPath = sprintf(

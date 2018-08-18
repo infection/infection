@@ -24,7 +24,7 @@ use Symfony\Component\Process\Process;
  */
 final class InitialTestsRunnerTest extends MockeryTestCase
 {
-    public function test_it_dispatches_events()
+    public function test_it_dispatches_events(): void
     {
         $process = Mockery::mock(Process::class);
         $process->shouldReceive('run');

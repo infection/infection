@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class CoverageDoesNotExistExceptionTest extends TestCase
 {
-    public function test_with()
+    public function test_with(): void
     {
         $exception = CoverageDoesNotExistException::with(
             'file-index-path',
@@ -27,12 +27,15 @@ final class CoverageDoesNotExistExceptionTest extends TestCase
 
         $this->assertInstanceOf(CoverageDoesNotExistException::class, $exception);
         $this->assertSame(
-            'Code Coverage does not exist. File file-index-path is not found. ' .
-            'Check phpunit version Infection was run with and generated config files inside tempdir.', $exception->getMessage()
+            'Code Coverage does not exist. File file-index-path is not found. Check phpunit version Infection was run with and generated config files inside tempdir. Make sure to either: ' . PHP_EOL .
+            '- Enable xdebug and run infection again' . PHP_EOL .
+            '- Use phpdbg: phpdbg -qrr infection' . PHP_EOL .
+            '- Use --coverage option with path to the existing coverage report' . PHP_EOL .
+            '- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters', $exception->getMessage()
         );
     }
 
-    public function test_for_junit()
+    public function test_for_junit(): void
     {
         $exception = CoverageDoesNotExistException::forJunit('junit/file/path');
 
@@ -41,7 +44,7 @@ final class CoverageDoesNotExistExceptionTest extends TestCase
         $this->assertSame('Coverage report `junit` is not found in junit/file/path', $exception->getMessage());
     }
 
-    public function test_for_file_at_path()
+    public function test_for_file_at_path(): void
     {
         $exception = CoverageDoesNotExistException::forFileAtPath('file.php', '/path/to/file');
 

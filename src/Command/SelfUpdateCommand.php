@@ -22,8 +22,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class SelfUpdateCommand extends Command
 {
-    const PACKAGE_NAME = 'infection/infection';
-    const FILE_NAME = 'infection.phar';
+    private const PACKAGE_NAME = 'infection/infection';
+    private const FILE_NAME = 'infection.phar';
 
     /**
      * @var OutputInterface
@@ -35,7 +35,7 @@ final class SelfUpdateCommand extends Command
      */
     private $version;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('self-update')
             ->setDescription('Update infection.phar to most recent stable or pre-release build.')
@@ -137,19 +137,20 @@ final class SelfUpdateCommand extends Command
         return $updater;
     }
 
-    protected function updateToStableBuild()
+    protected function updateToStableBuild(): void
     {
         $this->update($this->getStableUpdater());
     }
 
-    protected function updateToPreReleaseBuild()
+    protected function updateToPreReleaseBuild(): void
     {
         $this->update($this->getPreReleaseUpdater());
     }
 
-    protected function update(Updater $updater)
+    protected function update(Updater $updater): void
     {
         $this->output->writeln('Updating...' . PHP_EOL);
+
         try {
             $result = $updater->update();
 
@@ -181,9 +182,10 @@ final class SelfUpdateCommand extends Command
         $this->output->writeln('You can also select update stability using --pre (alpha/beta/rc) or --stable.');
     }
 
-    protected function rollback()
+    protected function rollback(): void
     {
         $updater = new Updater();
+
         try {
             if ($updater->rollback()) {
                 $this->output->writeln('<fg=green>Infection has been rolled back to prior version.</fg=green>');
@@ -195,7 +197,7 @@ final class SelfUpdateCommand extends Command
         }
     }
 
-    protected function printAvailableUpdates()
+    protected function printAvailableUpdates(): void
     {
         $this->printCurrentLocalVersion();
         $this->printCurrentStableVersion();
@@ -204,7 +206,7 @@ final class SelfUpdateCommand extends Command
         $this->output->writeln('You can select update stability using --pre or --stable when self-updating.');
     }
 
-    protected function printCurrentLocalVersion()
+    protected function printCurrentLocalVersion(): void
     {
         $this->output->writeln(sprintf(
             'Your current local build version is: <options=bold>%s</options=bold>',
@@ -212,22 +214,22 @@ final class SelfUpdateCommand extends Command
         ));
     }
 
-    protected function printCurrentStableVersion()
+    protected function printCurrentStableVersion(): void
     {
         $this->printVersion($this->getStableUpdater());
     }
 
-    protected function printCurrentPreReleaseVersion()
+    protected function printCurrentPreReleaseVersion(): void
     {
         $this->printVersion($this->getPreReleaseUpdater());
     }
 
-    protected function printVersion(Updater $updater)
+    protected function printVersion(Updater $updater): void
     {
         $stability = 'stable';
 
         if ($updater->getStrategy() instanceof GithubStrategy
-            && $updater->getStrategy()->getStability() == GithubStrategy::UNSTABLE
+            && $updater->getStrategy()->getStability() === GithubStrategy::UNSTABLE
         ) {
             $stability = 'pre-release';
         }
@@ -239,7 +241,7 @@ final class SelfUpdateCommand extends Command
                     $stability,
                     $updater->getNewVersion()
                 ));
-            } elseif (false == $updater->getNewVersion()) {
+            } elseif (false === $updater->getNewVersion()) {
                 $this->output->writeln(sprintf('There are no %s builds available.', $stability));
             } else {
                 $this->output->writeln(sprintf('You have the current %s build installed.', $stability));

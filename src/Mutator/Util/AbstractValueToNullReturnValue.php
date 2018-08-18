@@ -19,14 +19,15 @@ abstract class AbstractValueToNullReturnValue extends Mutator
 {
     protected function isNullReturnValueAllowed(Node $node): bool
     {
-        /** @var \PhpParser\Node\Stmt\Function_ $functionScope */
-        $functionScope = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY);
+        /** @var \PhpParser\Node\Stmt\Function_|null $functionScope */
+        $functionScope = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY, null);
 
-        if (!$functionScope) {
+        if (null === $functionScope) {
             return true;
         }
 
         $returnType = $functionScope->getReturnType();
+
         if ($returnType instanceof Node\Identifier) {
             $returnType = $returnType->name;
         }

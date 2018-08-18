@@ -41,7 +41,7 @@ final class CleanUpAfterMutationTestingFinishedSubscriber implements EventSubscr
         ];
     }
 
-    public function onMutationTestingFinished(MutationTestingFinished $event)
+    public function onMutationTestingFinished(MutationTestingFinished $event): void
     {
         $this->filesystem->remove($this->tmpDir);
     }

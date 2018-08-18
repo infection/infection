@@ -45,7 +45,7 @@ final class MutationYamlConfigurationTest extends TestCase
         );
     }
 
-    public function test_it_removes_code_coverage_extension()
+    public function test_it_removes_code_coverage_extension(): void
     {
         $configuration = $this->getConfigurationObject();
 
@@ -55,7 +55,7 @@ final class MutationYamlConfigurationTest extends TestCase
         $this->assertArrayNotHasKey('PhpSpecCodeCoverageExtension', $parsedYaml['extensions']);
     }
 
-    public function test_it_returns_same_extensions_when_no_coverage_extension_found()
+    public function test_it_returns_same_extensions_when_no_coverage_extension_found(): void
     {
         $originalParsedYaml = ['bootstrap' => '/path/to/adc', 'extensions' => []];
         $configuration = $this->getConfigurationObject($originalParsedYaml);
@@ -65,7 +65,7 @@ final class MutationYamlConfigurationTest extends TestCase
         $this->assertCount(0, $parsedYaml['extensions']);
     }
 
-    public function test_it_sets_custom_autoloader_path()
+    public function test_it_sets_custom_autoloader_path(): void
     {
         $configuration = $this->getConfigurationObject();
 

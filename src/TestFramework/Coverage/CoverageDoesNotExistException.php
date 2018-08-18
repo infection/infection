@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\InfectionException;
 
 /**
@@ -20,10 +21,12 @@ final class CoverageDoesNotExistException extends InfectionException
     {
         return new self(
             sprintf(
-                'Code Coverage does not exist. File %s is not found. Check %s version Infection was run with and generated config files inside %s.',
+                'Code Coverage does not exist. File %s is not found. Check %s version Infection was run with and generated config files inside %s. Make sure to either: %s%s',
                 $coverageIndexFilePath,
                 $testFrameworkKey,
-                $tempDir
+                $tempDir,
+                PHP_EOL,
+                ConsoleOutput::INFECTION_USAGE_SUGGESTION
             )
         );
     }

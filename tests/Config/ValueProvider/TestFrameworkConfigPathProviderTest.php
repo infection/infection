@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
 {
-    public function test_it_calls_locator_in_the_current_dir()
+    public function test_it_calls_locator_in_the_current_dir(): void
     {
         $locatorMock = $this->createMock(TestFrameworkConfigLocatorInterface::class);
         $locatorMock->expects($this->once())->method('locate');
@@ -42,7 +42,7 @@ final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
         $this->assertNull($result);
     }
 
-    public function test_it_asks_question_if_no_config_is_found_in_current_dir()
+    public function test_it_asks_question_if_no_config_is_found_in_current_dir(): void
     {
         $locatorMock = Mockery::mock(TestFrameworkConfigLocatorInterface::class);
 
@@ -68,7 +68,7 @@ final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
         $this->assertDirectoryExists($path);
     }
 
-    public function test_it_automatically_guesses_path()
+    public function test_it_automatically_guesses_path(): void
     {
         $locatorMock = Mockery::mock(TestFrameworkConfigLocatorInterface::class);
 
@@ -90,7 +90,7 @@ final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
         $this->assertSame('.', $path);
     }
 
-    public function test_validates_incorrect_dir()
+    public function test_validates_incorrect_dir(): void
     {
         if (!$this->hasSttyAvailable()) {
             $this->markTestSkipped('Stty is not available');

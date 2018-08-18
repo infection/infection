@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class SourceDirGuesserTest extends TestCase
 {
-    public function test_it_parser_psr4()
+    public function test_it_parser_psr4(): void
     {
         $composerJson = <<<'JSON'
 {
@@ -34,7 +34,7 @@ JSON;
         $this->assertSame(['abc', 'namespace'], $guesser->guess());
     }
 
-    public function test_it_returns_only_src_if_several_are_in_psr_config()
+    public function test_it_returns_only_src_if_several_are_in_psr_config(): void
     {
         $composerJson = <<<'JSON'
 {
@@ -51,7 +51,7 @@ JSON;
         $this->assertSame(['src'], $guesser->guess());
     }
 
-    public function test_it_parser_psr0()
+    public function test_it_parser_psr0(): void
     {
         $composerJson = <<<'JSON'
 {
@@ -67,14 +67,21 @@ JSON;
         $this->assertSame(['src'], $guesser->guess());
     }
 
-    public function test_it_returns_null_when_does_not_have_autoload()
+    public function test_it_returns_null_when_does_not_have_autoload(): void
     {
         $guesser = new SourceDirGuesser(json_decode('{}'));
 
         $this->assertNull($guesser->guess());
     }
 
-    public function test_it_returns_only_src_if_contains_array_of_paths()
+    public function test_it_returns_null_when_does_not_have_psr_autoload(): void
+    {
+        $guesser = new SourceDirGuesser(json_decode('{"autoload": {"files": ["foo.php"] }}'));
+
+        $this->assertNull($guesser->guess());
+    }
+
+    public function test_it_returns_only_src_if_contains_array_of_paths(): void
     {
         $guesser = new SourceDirGuesser(
             json_decode('{"autoload":{"psr-0": {"": ["src", "libs"]}}}')
@@ -83,7 +90,7 @@ JSON;
         $this->assertSame(['src'], $guesser->guess());
     }
 
-    public function test_it_returns_list_if_contains_array_of_paths_without_src()
+    public function test_it_returns_list_if_contains_array_of_paths_without_src(): void
     {
         $guesser = new SourceDirGuesser(
             json_decode('{"autoload":{"psr-4": {"NameSpace\\//": ["sources", "libs"]}}}')
@@ -92,7 +99,7 @@ JSON;
         $this->assertSame(['sources', 'libs'], $guesser->guess());
     }
 
-    public function test_it_throw_invalid_autoload_exception()
+    public function test_it_throw_invalid_autoload_exception(): void
     {
         $guesser = new SourceDirGuesser(
             json_decode('{"autoload":{"psr-4": [{"NameSpace\\//": ["sources", "libs"]}]}}')

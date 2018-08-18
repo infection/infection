@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\Process;
 
 use Infection\Mutant\MutantInterface;
+use Infection\MutationInterface;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Process\Process;
@@ -19,17 +20,17 @@ use Symfony\Component\Process\Process;
  */
 final class MutantProcess implements MutantProcessInterface
 {
-    const CODE_KILLED = 0;
-    const CODE_ESCAPED = 1;
-    const CODE_ERROR = 2;
-    const CODE_TIMED_OUT = 3;
-    const CODE_NOT_COVERED = 4;
+    public const CODE_KILLED = 0;
+    public const CODE_ESCAPED = 1;
+    public const CODE_ERROR = 2;
+    public const CODE_TIMED_OUT = 3;
+    public const CODE_NOT_COVERED = 4;
 
-    const PROCESS_OK = 0;
-    const PROCESS_GENERAL_ERROR = 1;
-    const PROCESS_MISUSE_SHELL_BUILTINS = 2;
+    private const PROCESS_OK = 0;
+    private const PROCESS_GENERAL_ERROR = 1;
+    private const PROCESS_MISUSE_SHELL_BUILTINS = 2;
 
-    const NOT_FATAL_ERROR_CODES = [
+    private const NOT_FATAL_ERROR_CODES = [
         self::PROCESS_OK,
         self::PROCESS_GENERAL_ERROR,
         self::PROCESS_MISUSE_SHELL_BUILTINS,
@@ -77,7 +78,7 @@ final class MutantProcess implements MutantProcessInterface
         return $this->mutant;
     }
 
-    public function markTimeout()
+    public function markTimeout(): void
     {
         $this->isTimedOut = true;
     }
@@ -105,6 +106,21 @@ final class MutantProcess implements MutantProcessInterface
 
     public function getMutator(): Mutator
     {
-        return $this->getMutant()->getMutation()->getMutator();
+        return $this->getMutation()->getMutator();
+    }
+
+    public function getOriginalFilePath(): string
+    {
+        return $this->getMutation()->getOriginalFilePath();
+    }
+
+    public function getOriginalStartingLine(): int
+    {
+        return (int) $this->getMutation()->getAttributes()['startLine'];
+    }
+
+    private function getMutation(): MutationInterface
+    {
+        return $this->getMutant()->getMutation();
     }
 }

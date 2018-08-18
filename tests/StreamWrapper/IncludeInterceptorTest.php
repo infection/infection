@@ -32,7 +32,7 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
 {
     private static $files = [];
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         foreach (range(1, 3) as $number) {
             $tempnam = tempnam('', basename(__FILE__, 'php'));
@@ -41,7 +41,7 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         /*
          * We need to always disable so not to interfere with other tests
@@ -59,25 +59,25 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
-    public function test_it_throws_an_exception_if_not_configured()
+    public function test_it_throws_an_exception_if_not_configured(): void
     {
         $this->expectException(\RuntimeException::class);
         IncludeInterceptor::enable();
     }
 
-    public function test_it_throws_an_exception_if_target_not_exists()
+    public function test_it_throws_an_exception_if_target_not_exists(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         IncludeInterceptor::intercept('', '');
     }
 
-    public function test_it_throws_an_exception_if_destination_not_exists()
+    public function test_it_throws_an_exception_if_destination_not_exists(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         IncludeInterceptor::intercept(self::$files[1], '');
     }
 
-    public function test_it_not_intercepts_when_not_included()
+    public function test_it_not_intercepts_when_not_included(): void
     {
         $before = file_get_contents(self::$files[1]);
         // Sanity check
@@ -93,7 +93,7 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($before, $after);
     }
 
-    public function test_it_intercepts_file_with_another()
+    public function test_it_intercepts_file_with_another(): void
     {
         $before = include self::$files[1];
         $this->assertSame(1, $before);
@@ -111,7 +111,7 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($after, $expected);
     }
 
-    public function test_it_does_not_intercept_file_where_should_not()
+    public function test_it_does_not_intercept_file_where_should_not(): void
     {
         $before = include self::$files[3];
         $this->assertSame(3, $before);
@@ -126,8 +126,11 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($before, $after);
     }
 
-    public function test_passthrough_file_methods_pass()
+    public function test_passthrough_file_methods_pass(): void
     {
+        if (\PHP_SAPI === 'phpdbg') {
+            $this->markTestSkipped('Running this test on PHPDBG has issues with FD_SETSIZE. Consider removing this if that issue has been fixed.');
+        }
         IncludeInterceptor::intercept(self::$files[1], self::$files[2]);
         IncludeInterceptor::enable();
 
@@ -166,7 +169,7 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
         IncludeInterceptor::disable();
     }
 
-    public function test_passthrough_dir_methods_pass()
+    public function test_passthrough_dir_methods_pass(): void
     {
         IncludeInterceptor::intercept(self::$files[1], self::$files[2]);
         IncludeInterceptor::enable();

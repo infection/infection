@@ -17,11 +17,11 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class ReflectionVisitor extends NodeVisitorAbstract
 {
-    const REFLECTION_CLASS_KEY = 'reflectionClass';
-    const IS_INSIDE_FUNCTION_KEY = 'isInsideFunction';
-    const IS_ON_FUNCTION_SIGNATURE = 'isOnFunctionSignature';
-    const FUNCTION_SCOPE_KEY = 'functionScope';
-    const FUNCTION_NAME = 'functionName';
+    public const REFLECTION_CLASS_KEY = 'reflectionClass';
+    public const IS_INSIDE_FUNCTION_KEY = 'isInsideFunction';
+    public const IS_ON_FUNCTION_SIGNATURE = 'isOnFunctionSignature';
+    public const FUNCTION_SCOPE_KEY = 'functionScope';
+    public const FUNCTION_NAME = 'functionName';
 
     private $scopeStack = [];
 
@@ -35,14 +35,14 @@ final class ReflectionVisitor extends NodeVisitorAbstract
      */
     private $methodName;
 
-    public function beforeTraverse(array $nodes)
+    public function beforeTraverse(array $nodes): void
     {
         $this->scopeStack = [];
         $this->reflectionClass = null;
         $this->methodName = null;
     }
 
-    public function enterNode(Node $node)
+    public function enterNode(Node $node): void
     {
         if ($node instanceof Node\Stmt\ClassLike && isset($node->fullyQualifiedClassName)) {
             $this->reflectionClass = new \ReflectionClass($node->fullyQualifiedClassName->toString());
@@ -73,7 +73,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         }
     }
 
-    public function leaveNode(Node $node)
+    public function leaveNode(Node $node): void
     {
         if ($this->isFunctionLikeNode($node)) {
             array_pop($this->scopeStack);

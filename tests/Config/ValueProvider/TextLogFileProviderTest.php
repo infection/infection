@@ -18,7 +18,7 @@ use Mockery;
  */
 final class TextLogFileProviderTest extends AbstractBaseProviderTest
 {
-    public function test_it_uses_default_value()
+    public function test_it_uses_default_value(): void
     {
         $consoleMock = Mockery::mock(ConsoleHelper::class);
         $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
@@ -36,7 +36,7 @@ final class TextLogFileProviderTest extends AbstractBaseProviderTest
         $this->assertSame(TextLogFileProvider::TEXT_LOG_FILE_NAME, $textLogFilePath);
     }
 
-    public function test_it_uses_typed_value()
+    public function test_it_uses_typed_value(): void
     {
         $inputValue = 'test-log.txt';
         $consoleMock = Mockery::mock(ConsoleHelper::class);

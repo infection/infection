@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class DotFormatter extends AbstractOutputFormatter
 {
-    const DOTS_PER_ROW = 50;
+    private const DOTS_PER_ROW = 50;
 
     /**
      * @var OutputInterface
@@ -30,7 +30,7 @@ final class DotFormatter extends AbstractOutputFormatter
         $this->output = $output;
     }
 
-    public function start(int $mutationCount)
+    public function start(int $mutationCount): void
     {
         parent::start($mutationCount);
 
@@ -45,25 +45,30 @@ final class DotFormatter extends AbstractOutputFormatter
         ]);
     }
 
-    public function advance(MutantProcessInterface $mutantProcess, int $mutationCount)
+    public function advance(MutantProcessInterface $mutantProcess, int $mutationCount): void
     {
         parent::advance($mutantProcess, $mutationCount);
 
         switch ($mutantProcess->getResultCode()) {
             case MutantProcess::CODE_KILLED:
                 $this->output->write('<killed>.</killed>');
+
                 break;
             case MutantProcess::CODE_NOT_COVERED:
                 $this->output->write('<uncovered>S</uncovered>');
+
                 break;
             case MutantProcess::CODE_ESCAPED:
                 $this->output->write('<escaped>M</escaped>');
+
                 break;
             case MutantProcess::CODE_TIMED_OUT:
                 $this->output->write('<timeout>T</timeout>');
+
                 break;
             case MutantProcess::CODE_ERROR:
                 $this->output->write('<with-error>E</with-error>');
+
                 break;
         }
 

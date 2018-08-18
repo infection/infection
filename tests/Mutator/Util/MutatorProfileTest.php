@@ -18,7 +18,7 @@ use Symfony\Component\Finder\Finder;
  */
 final class MutatorProfileTest extends TestCase
 {
-    public function test_all_mutators_have_the_correct_name_in_the_full_mutator_list()
+    public function test_all_mutators_have_the_correct_name_in_the_full_mutator_list(): void
     {
         foreach (MutatorProfile::FULL_MUTATOR_LIST as $name => $class) {
             $this->assertSame(
@@ -34,7 +34,7 @@ final class MutatorProfileTest extends TestCase
         }
     }
 
-    public function test_all_mutators_are_part_of_the_full_mutators_list()
+    public function test_all_mutators_are_part_of_the_full_mutators_list(): void
     {
         /** @var Finder $files */
         $files = Finder::create()

@@ -22,7 +22,7 @@ use function Infection\Tests\normalizePath as p;
  */
 final class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProviderTest
 {
-    public function test_it_returns_null_if_executable_is_found()
+    public function test_it_returns_null_if_executable_is_found(): void
     {
         $finderMock = Mockery::mock(TestFrameworkFinder::class);
         $finderMock->shouldReceive('find')->once();
@@ -38,7 +38,7 @@ final class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProvider
         $this->assertNull($result);
     }
 
-    public function test_it_asks_question_if_no_config_is_found_in_current_dir()
+    public function test_it_asks_question_if_no_config_is_found_in_current_dir(): void
     {
         $finderMock = Mockery::mock(TestFrameworkFinder::class);
         $finderMock->shouldReceive('find')->once()->andThrow(new FinderException());
@@ -62,7 +62,7 @@ final class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProvider
         $this->assertSame($customExecutable, $path);
     }
 
-    public function test_validates_incorrect_dir()
+    public function test_validates_incorrect_dir(): void
     {
         if (!$this->hasSttyAvailable()) {
             $this->markTestSkipped('Stty is not available');

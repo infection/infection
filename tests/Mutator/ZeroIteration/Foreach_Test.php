@@ -19,7 +19,7 @@ final class Foreach_Test extends AbstractMutatorTestCase
     /**
      * @dataProvider provideMutationCases
      */
-    public function test_mutator($input, $expected = null)
+    public function test_mutator($input, $expected = null): void
     {
         $this->doTest($input, $expected);
     }
@@ -44,6 +44,7 @@ foreach (array() as $value) {
 PHP
             ,
         ];
+
         yield 'It does not change whether items were passed by reference' => [
             <<<'PHP'
 <?php

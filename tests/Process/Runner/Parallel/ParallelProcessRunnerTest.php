@@ -26,13 +26,14 @@ final class ParallelProcessRunnerTest extends MockeryTestCase
 {
     private function buildEventDispatcherWithEventCount($eventCount): EventDispatcherInterface
     {
+        /** @var EventDispatcherInterface|Mockery\MockInterface $eventDispatcher */
         $eventDispatcher = Mockery::mock(EventDispatcherInterface::class);
         $eventDispatcher->shouldReceive('dispatch')->times($eventCount)->with(Mockery::type(MutantProcessFinished::class));
 
         return $eventDispatcher;
     }
 
-    public function test_it_does_nothing_when_nothing_to_do()
+    public function test_it_does_nothing_when_nothing_to_do(): void
     {
         $eventDispatcher = $this->buildEventDispatcherWithEventCount(0);
         $runner = new ParallelProcessRunner($eventDispatcher);
@@ -44,13 +45,14 @@ final class ParallelProcessRunnerTest extends MockeryTestCase
         $mutant = Mockery::mock(MutantInterface::class);
         $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(false);
 
+        /** @var MutantProcessFinished|Mockery\MockInterface $mutantProcess */
         $mutantProcess = Mockery::mock(MutantProcessInterface::class);
         $mutantProcess->shouldReceive('getMutant')->once()->andReturn($mutant);
 
         return $mutantProcess;
     }
 
-    public function test_it_does_not_start_processes_for_uncovered_mutants()
+    public function test_it_does_not_start_processes_for_uncovered_mutants(): void
     {
         $processes = [];
 
@@ -73,6 +75,7 @@ final class ParallelProcessRunnerTest extends MockeryTestCase
         $mutant = Mockery::mock(MutantInterface::class);
         $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(true);
 
+        /** @var MutantProcessFinished|Mockery\MockInterface $mutantProcess */
         $mutantProcess = Mockery::mock(MutantProcessInterface::class);
         $mutantProcess->shouldReceive('getProcess')->twice()->andReturn($process);
         $mutantProcess->shouldReceive('getMutant')->once()->andReturn($mutant);
@@ -80,7 +83,7 @@ final class ParallelProcessRunnerTest extends MockeryTestCase
         return $mutantProcess;
     }
 
-    public function test_it_starts_processes_for_covered_mutants()
+    public function test_it_starts_processes_for_covered_mutants(): void
     {
         $processes = [];
 
@@ -103,6 +106,7 @@ final class ParallelProcessRunnerTest extends MockeryTestCase
         $mutant = Mockery::mock(MutantInterface::class);
         $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(true);
 
+        /** @var MutantProcessFinished|Mockery\MockInterface $mutantProcess */
         $mutantProcess = Mockery::mock(MutantProcessInterface::class);
         $mutantProcess->shouldReceive('getProcess')->twice()->andReturn($process);
         $mutantProcess->shouldReceive('getMutant')->once()->andReturn($mutant);
@@ -111,7 +115,7 @@ final class ParallelProcessRunnerTest extends MockeryTestCase
         return $mutantProcess;
     }
 
-    public function test_it_checks_for_timeout()
+    public function test_it_checks_for_timeout(): void
     {
         $processes = [];
 
@@ -124,9 +128,10 @@ final class ParallelProcessRunnerTest extends MockeryTestCase
         $runner->run($processes, 4, 0);
     }
 
-    private function runWithAllKindsOfProcesses($threadCount)
+    private function runWithAllKindsOfProcesses($threadCount): void
     {
         $processes = [];
+
         for ($i = 0; $i < 4; ++$i) {
             $processes[] = $this->buildUncoveredMutantProcess();
             $processes[] = $this->buildCoveredMutantProcess();
@@ -138,27 +143,27 @@ final class ParallelProcessRunnerTest extends MockeryTestCase
         $runner->run($processes, $threadCount, 0);
     }
 
-    public function test_it_handles_all_kids_of_processes_with_infinite_threads()
+    public function test_it_handles_all_kids_of_processes_with_infinite_threads(): void
     {
         $this->runWithAllKindsOfProcesses(PHP_INT_MAX);
     }
 
-    public function test_it_handles_all_kids_of_processes()
+    public function test_it_handles_all_kids_of_processes(): void
     {
         $this->runWithAllKindsOfProcesses(4);
     }
 
-    public function test_it_handles_all_kids_of_processes_in_one_thread()
+    public function test_it_handles_all_kids_of_processes_in_one_thread(): void
     {
         $this->runWithAllKindsOfProcesses(1);
     }
 
-    public function test_it_still_runs_with_zero_threads()
+    public function test_it_still_runs_with_zero_threads(): void
     {
         $this->runWithAllKindsOfProcesses(0);
     }
 
-    public function test_it_still_runs_with_negative_thread_count()
+    public function test_it_still_runs_with_negative_thread_count(): void
     {
         $this->runWithAllKindsOfProcesses(-1);
     }

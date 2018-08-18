@@ -66,6 +66,7 @@ final class ProtectedVisibility extends Mutator
         $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
 
         $parent = $reflection->getParentClass();
+
         while ($parent) {
             try {
                 $method = $parent->getMethod($node->name->name);

@@ -25,8 +25,8 @@ use Symfony\Component\Process\Process;
  */
 final class E2ETest extends TestCase
 {
-    const EXPECT_ERROR = 1;
-    const EXPECT_SUCCESS = 0;
+    private const EXPECT_ERROR = 1;
+    private const EXPECT_SUCCESS = 0;
 
     private $cwd;
 
@@ -35,12 +35,12 @@ final class E2ETest extends TestCase
      */
     private $previousLoader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         // Without overcommit this test fails with `proc_open(): fork failed - Cannot allocate memory`
         if (strpos(PHP_OS, 'Linux') === 0 &&
             is_readable('/proc/sys/vm/overcommit_memory') &&
-            file_get_contents('/proc/sys/vm/overcommit_memory') == 2) {
+            (int) file_get_contents('/proc/sys/vm/overcommit_memory') === 2) {
             $this->markTestSkipped('This test needs copious amounts of virtual memory. It will fail unless it is allowed to overcommit memory.');
         }
 
@@ -59,7 +59,7 @@ final class E2ETest extends TestCase
      * @group e2e
      * @large
      */
-    public function test_it_runs_on_itself()
+    public function test_it_runs_on_itself(): void
     {
         if (ini_get('memory_limit') === '-1') {
             $this->markTestSkipped(implode("\n", [
@@ -80,7 +80,7 @@ final class E2ETest extends TestCase
     /**
      * @group e2e
      */
-    public function test_it_runs_configure_command_if_no_configuration()
+    public function test_it_runs_configure_command_if_no_configuration(): void
     {
         chdir('tests/Fixtures/e2e/Unconfigured/');
 
@@ -93,7 +93,7 @@ final class E2ETest extends TestCase
      * @dataProvider e2eTestSuiteDataProvider
      * @group e2e
      */
-    public function test_it_runs_an_e2e_test_with_success(string $fullPath)
+    public function test_it_runs_an_e2e_test_with_success(string $fullPath): void
     {
         $this->runOnE2EFixture($fullPath);
     }
@@ -116,7 +116,7 @@ final class E2ETest extends TestCase
         }
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if ($this->previousLoader) {
             $this->previousLoader->unregister();
@@ -138,16 +138,16 @@ final class E2ETest extends TestCase
         $this->assertRegExp('/\d+ mutants were killed/', $output);
 
         if (isset($_SERVER['GOLDEN'])) {
-            copy('infection-log.txt', 'expected-output.txt');
+            copy('infection.log', 'expected-output.txt');
             $this->markTestSkipped('Saved golden output');
         }
 
-        $this->assertFileEquals('expected-output.txt', 'infection-log.txt', sprintf('%s/expected-output.txt is not same as infection-log.txt (if that is OK, run GOLDEN=1 vendor/bin/phpunit)', getcwd()));
+        $this->assertFileEquals('expected-output.txt', 'infection.log', sprintf('%s/expected-output.txt is not same as infection.log (if that is OK, run GOLDEN=1 vendor/bin/phpunit)', getcwd()));
 
         return $output;
     }
 
-    private function installComposerDeps()
+    private function installComposerDeps(): void
     {
         if (!file_exists('composer.json')) {
             // Tests may have no deps to install

@@ -18,7 +18,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class BadgeLogger implements MutationTestingResultsLogger
 {
-    const ENV_INFECTION_BADGE_API_KEY = 'INFECTION_BADGE_API_KEY';
+    public const ENV_INFECTION_BADGE_API_KEY = 'INFECTION_BADGE_API_KEY';
+    public const ENV_STRYKER_DASHBOARD_API_KEY = 'STRYKER_DASHBOARD_API_KEY';
 
     /**
      * @var BadgeApiClient
@@ -48,7 +49,7 @@ final class BadgeLogger implements MutationTestingResultsLogger
         $this->config = $config;
     }
 
-    public function log()
+    public function log(): void
     {
         $travisBuild = getenv('TRAVIS');
 
@@ -66,29 +67,63 @@ final class BadgeLogger implements MutationTestingResultsLogger
             return;
         }
 
-        $apiKey = getenv(self::ENV_INFECTION_BADGE_API_KEY);
         $repositorySlug = getenv('TRAVIS_REPO_SLUG');
         $currentBranch = getenv('TRAVIS_BRANCH');
 
-        if ($apiKey && $repositorySlug && $currentBranch === $this->config->branch) {
-            $this->badgeApiClient->sendReport(
-                $apiKey,
-                'github.com/' . $repositorySlug,
-                $currentBranch,
-                $this->metricsCalculator->getMutationScoreIndicator()
-            );
-        } else {
+        if ($repositorySlug === false || $currentBranch === false) {
+            $this->showInfo('repository slug nor current branch were found; not a Travis build?');
+
+            return;
+        }
+
+        if ($currentBranch !== $this->config->branch) {
             $this->showInfo(
                 sprintf(
-                    'Repository Slug=%s, Branch=%s',
-                    $repositorySlug,
+                    'expected branch "%s", found "%s"',
+                    $this->config->branch,
                     $currentBranch
                 )
             );
+
+            return;
         }
+
+        $apiKey = getenv(self::ENV_INFECTION_BADGE_API_KEY);
+
+        /*
+         * Original Stryker Dashboard manual warrants a different API key:
+         * fall back to theirs if our isn't present
+         */
+        if ($apiKey === false) {
+            $apiKey = getenv(self::ENV_STRYKER_DASHBOARD_API_KEY);
+        }
+
+        if ($apiKey === false) {
+            $this->showInfo(
+                sprintf(
+                    'neither %s nor %s were found in the environment',
+                    self::ENV_INFECTION_BADGE_API_KEY,
+                    self::ENV_STRYKER_DASHBOARD_API_KEY
+                )
+            );
+
+            return;
+        }
+
+        /*
+         * All clear!
+         */
+        $this->output->writeln('Sending dashboard report...');
+
+        $this->badgeApiClient->sendReport(
+            $apiKey,
+            'github.com/' . $repositorySlug,
+            $currentBranch,
+            $this->metricsCalculator->getMutationScoreIndicator()
+        );
     }
 
-    private function showInfo(string $message)
+    private function showInfo(string $message): void
     {
         $this->output->writeln(sprintf('Dashboard report has not been sent: %s', $message));
     }

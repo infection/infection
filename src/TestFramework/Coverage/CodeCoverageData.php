@@ -17,9 +17,9 @@ use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
  */
 class CodeCoverageData
 {
-    const PHP_UNIT_COVERAGE_DIR = 'coverage-xml';
-    const PHP_SPEC_COVERAGE_DIR = 'phpspec-coverage-xml';
-    const COVERAGE_INDEX_FILE_NAME = 'index.xml';
+    public const PHP_UNIT_COVERAGE_DIR = 'coverage-xml';
+    public const PHP_SPEC_COVERAGE_DIR = 'phpspec-coverage-xml';
+    public const COVERAGE_INDEX_FILE_NAME = 'index.xml';
 
     /**
      * @var array
@@ -184,6 +184,8 @@ class CodeCoverageData
             }
 
             $coverageIndexFileContent = file_get_contents($coverageIndexFilePath);
+            \assert(\is_string($coverageIndexFileContent));
+
             $coverage = $this->parser->parse($coverageIndexFileContent);
 
             $coverage = $this->addTestExecutionInfo($coverage);
@@ -229,6 +231,7 @@ class CodeCoverageData
 
         foreach ($coverage[$filePath]['byMethod'] as $method => $coverageInfo) {
             if ($line >= $coverageInfo['startLine'] && $line <= $coverageInfo['endLine']) {
+                /** @var int[] $allLines */
                 $allLines = range($coverageInfo['startLine'], $coverageInfo['endLine']);
 
                 foreach ($allLines as $lineInExecutedMethod) {

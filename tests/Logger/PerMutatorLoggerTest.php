@@ -24,7 +24,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class PerMutatorLoggerTest extends TestCase
 {
-    public function test_it_correctly_build_log_lines()
+    public function test_it_correctly_build_log_lines(): void
     {
         $fs = $this->createMock(Filesystem::class);
         $fs->expects($this->once())
@@ -35,7 +35,7 @@ final class PerMutatorLoggerTest extends TestCase
                 "\n" .
                 "| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |\n" .
                 "| ------- | --------- | ------ | ------- |------- | --------- | --- | ----------- |\n" .
-                "| For_ | 15 | 10 | 0 | 0 | 0 | 67| 100|\n" .
+                "| For_ | 15 | 10 | 0 | 0 | 0 | 66| 100|\n" .
                 '| PregQuote | 5 | 0 | 0 | 0 | 0 | 0| 0|'
             );
 

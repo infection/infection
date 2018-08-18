@@ -62,7 +62,10 @@ class CoverageXmlParser
     private function processXmlFileCoverage(string $relativeCoverageFilePath, string $projectSource): array
     {
         $absolutePath = realpath($this->coverageDir . '/' . $relativeCoverageFilePath);
+        \assert(\is_string($absolutePath));
+
         $coverageFileXml = file_get_contents($absolutePath);
+        \assert(\is_string($coverageFileXml));
 
         $dom = new \DOMDocument();
         $dom->loadXML($this->removeNamespace($coverageFileXml));
@@ -156,7 +159,7 @@ class CoverageXmlParser
             $lineNumber = $lineCoverageNode->getAttribute('nr');
 
             foreach ($lineCoverageNode->childNodes as $coveredNode) {
-                if ($coveredNode->nodeName == 'covered') {
+                if ($coveredNode->nodeName === 'covered') {
                     $testMethod = $coveredNode->getAttribute('by');
 
                     $fileCoverage[$lineNumber][] = ['testMethod' => $testMethod];

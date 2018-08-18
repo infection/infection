@@ -46,7 +46,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
                 $this->addVendorFolderToPath();
             }
 
-            $this->cachedPath = $this->findTestFramework();
+            $this->cachedPath = (string) realpath($this->findTestFramework());
         }
 
         return $this->cachedPath;
@@ -65,20 +65,27 @@ class TestFrameworkFinder extends AbstractExecutableFinder
         throw FinderException::testCustomPathDoesNotExist($this->testFrameworkName, $this->customPath);
     }
 
-    private function addVendorFolderToPath()
+    private function addVendorFolderToPath(): void
     {
         $vendorPath = null;
 
         try {
-            $process = new Process(sprintf('%s %s', $this->findComposer(), 'config bin-dir'));
+            $process = new Process([
+                $this->findComposer(),
+                'config',
+                'bin-dir',
+            ]);
+
             $process->mustRun();
             $vendorPath = trim($process->getOutput());
         } catch (\RuntimeException $e) {
             $candidate = getcwd() . '/vendor/bin';
+
             if (file_exists($candidate)) {
                 $vendorPath = $candidate;
             }
         }
+
         if (null !== $vendorPath) {
             $pathName = getenv('PATH') ? 'PATH' : 'Path';
             putenv($pathName . '=' . $vendorPath . PATH_SEPARATOR . getenv($pathName));
@@ -106,7 +113,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
          * file on Windows, even if there's a proper executable .bat by its side.
          * Therefore we have to explicitly look for a .bat.
          */
-        if ('\\' == \DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             array_unshift($candidates, $this->testFrameworkName . '.bat');
         } else {
             // yet always looking for .bat for testing with .bat not on Windows

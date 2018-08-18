@@ -16,34 +16,35 @@ use Symfony\Component\Console\Input\InputInterface;
  */
 final class LogVerbosity
 {
-    const DEBUG = 'all';
-    const NORMAL = 'default';
-    const NONE = 'none';
+    public const DEBUG = 'all';
+    public const NORMAL = 'default';
+    public const NONE = 'none';
 
     /**
      * @deprecated
      */
-    const DEBUG_INTEGER = 1;
+    public const DEBUG_INTEGER = 1;
 
     /**
      * @deprecated
      */
-    const NORMAL_INTEGER = 2;
+    public const NORMAL_INTEGER = 2;
 
     /**
      * @deprecated
      */
-    const NONE_INTEGER = 3;
+    public const NONE_INTEGER = 3;
 
-    const ALLOWED_OPTIONS = [
+    public const ALLOWED_OPTIONS = [
         self::DEBUG_INTEGER => self::DEBUG,
         self::NORMAL_INTEGER => self::NORMAL,
         self::NONE_INTEGER => self::NONE,
     ];
 
-    public static function convertVerbosityLevel(InputInterface $input, ConsoleOutput $io)
+    public static function convertVerbosityLevel(InputInterface $input, ConsoleOutput $io): void
     {
         $verbosityLevel = $input->getOption('log-verbosity');
+
         if (\in_array($verbosityLevel, self::ALLOWED_OPTIONS)) {
             return;
         }

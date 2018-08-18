@@ -12,10 +12,10 @@ namespace Infection\TestFramework;
 use Infection\Finder\AbstractExecutableFinder;
 use Infection\Finder\Exception\FinderException;
 use Infection\Mutant\MutantInterface;
-use Infection\Process\ExecutableFinder\PhpExecutableFinder;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\Utils\VersionParser;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 /**
@@ -49,7 +49,7 @@ abstract class AbstractTestFrameworkAdapter
     private $versionParser;
 
     /**
-     * @var string
+     * @var string[]
      */
     private $cachedPhpPath;
 
@@ -77,71 +77,32 @@ abstract class AbstractTestFrameworkAdapter
     abstract public function getName(): string;
 
     /**
-     * Returns path to the test framework's executable
-     *
-     * Examples:
-     *     bin/phpspec [arguments] [--options]
-     *     bin/phpunit
-     *     vendor/phpunit/phpunit/phpunit
-     *     /usr/bin/php bin/phpunit
-     *     bin/phpunit.bat
+     * Returns array of arguments to pass them into the Symfony Process
      *
      * @param string $configPath
      * @param string $extraOptions
      * @param bool $includePhpArgs
-     * @param array $phpExtraOptions
+     * @param array $phpExtraArgs
      *
-     * @return string
+     * @return string[]
      */
-    public function getExecutableCommandLine(
+    public function getCommandLine(
         string $configPath,
         string $extraOptions,
         bool $includePhpArgs = true,
-        array $phpExtraOptions = []
-    ): string {
-        return sprintf(
-            '%s %s',
-            $this->makeExecutable(
-                $this->testFrameworkFinder->find(),
-                $includePhpArgs,
-                $phpExtraOptions
-            ),
-            $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions)
-        );
-    }
+        array $phpExtraArgs = []
+    ): array {
+        $frameworkPath = $this->testFrameworkFinder->find();
+        $frameworkArgs = $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions);
 
-    /**
-     * Prefix commands with exec outside Windows to ensure process timeouts are enforced and end PHP processes properly.
-     *
-     * @param string $frameworkPath
-     * @param bool $includeArgs
-     * @param array $phpExtraArgs
-     *
-     * @return string
-     */
-    private function makeExecutable(string $frameworkPath, bool $includeArgs = true, array $phpExtraArgs = []): string
-    {
-        $frameworkPath = realpath($frameworkPath);
-
-        if ('\\' == \DIRECTORY_SEPARATOR) {
-            if (false !== strpos($frameworkPath, '.bat')) {
-                return $frameworkPath;
-            }
-
-            return sprintf(
-                '%s %s %s',
-                $this->findPhp($includeArgs),
-                implode(' ', $phpExtraArgs),
-                $frameworkPath
-            );
+        if (false !== strpos($frameworkPath, '.bat')) {
+            return array_merge([$frameworkPath], $frameworkArgs);
         }
 
         /*
          * That's an empty options list by all means, we need to see it as such
          */
-        if ($phpExtraArgs == ['']) {
-            $phpExtraArgs = [];
-        }
+        $phpExtraArgs = array_filter($phpExtraArgs);
 
         /*
          * Run an executable as it is if we're using a standard CLI and
@@ -149,35 +110,41 @@ abstract class AbstractTestFrameworkAdapter
          *
          * This lets folks use, say, a bash wrapper over phpunit.
          */
-        if ('cli' == \PHP_SAPI && empty($phpExtraArgs) && is_executable($frameworkPath) && `command -v php`) {
-            return sprintf(
-                '%s %s',
-                'exec',
-                $frameworkPath
-            );
+        if ('cli' === \PHP_SAPI && empty($phpExtraArgs) && is_executable($frameworkPath) && `command -v php`) {
+            return array_merge([$frameworkPath], $frameworkArgs);
         }
 
         /*
          * In all other cases run it with a chosen PHP interpreter
          */
-        return sprintf(
-            '%s %s %s %s',
-            'exec',
-            $this->findPhp($includeArgs),
-            implode(' ', $phpExtraArgs),
-            $frameworkPath
+        $commandLineArgs = array_merge(
+            $this->findPhp($includePhpArgs),
+            $phpExtraArgs,
+            [$frameworkPath],
+            $frameworkArgs
         );
+
+        return array_filter($commandLineArgs);
     }
 
-    private function findPhp(bool $includeArgs = true): string
+    /**
+     * Need to return string for cases when user run phpdbg with -qrr argument.s
+     *
+     * @param bool $includeArgs
+     *
+     * @return string[]
+     */
+    private function findPhp(bool $includeArgs = true): array
     {
         if ($this->cachedPhpPath === null || $this->cachedIncludedArgs !== $includeArgs) {
             $this->cachedIncludedArgs = $includeArgs;
             $phpPath = (new PhpExecutableFinder())->find($includeArgs);
+
             if ($phpPath === false) {
                 throw FinderException::phpExecutableNotFound();
             }
-            $this->cachedPhpPath = $phpPath;
+
+            $this->cachedPhpPath = explode(' ', $phpPath);
         }
 
         return $this->cachedPhpPath;
@@ -195,13 +162,13 @@ abstract class AbstractTestFrameworkAdapter
 
     public function getVersion(): string
     {
-        $process = new Process(
-            sprintf(
-                '%s %s',
-                $this->makeExecutable($this->testFrameworkFinder->find()),
-                '--version'
-            )
-        );
+        $process = new Process(array_merge(
+            $this->findPhp(),
+            [
+                $this->testFrameworkFinder->find(),
+                '--version',
+            ]
+        ));
 
         $process->mustRun();
 

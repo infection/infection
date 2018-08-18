@@ -17,7 +17,7 @@ use Infection\TestFramework\MemoryUsageAware;
  */
 final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware
 {
-    const JUNIT_FILE_NAME = 'phpunit.junit.xml';
+    public const JUNIT_FILE_NAME = 'phpunit.junit.xml';
 
     public function testsPass(string $output): bool
     {

@@ -45,14 +45,14 @@ final class IntegerNegation extends Mutator
         $expr = $node->expr;
 
         if ($expr instanceof Node\Expr\UnaryMinus) {
-            $expr = $node->expr->expr;
+            $expr = $expr->expr;
         }
 
         if (!$expr instanceof Node\Scalar\LNumber) {
             return false;
         }
 
-        if ($expr->value == 0) {
+        if ($expr->value === 0) {
             return false;
         }
 

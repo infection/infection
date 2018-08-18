@@ -50,11 +50,13 @@ final class MutatorsGenerator
         foreach ($this->mutatorSettings as $mutatorOrProfile => $setting) {
             if (array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
                 $this->registerFromProfile($mutatorOrProfile, $setting);
+
                 continue;
             }
 
             if (class_exists($mutatorOrProfile)) {
                 $this->registerFromClass($mutatorOrProfile, $setting);
+
                 continue;
             }
 
@@ -70,18 +72,20 @@ final class MutatorsGenerator
      *
      * @throws InvalidConfigException
      */
-    private function registerFromProfile(string $profile, $setting)
+    private function registerFromProfile(string $profile, $setting): void
     {
         $mutators = MutatorProfile::MUTATOR_PROFILE_LIST[$profile];
 
         foreach ($mutators as $mutatorOrProfile) {
             if (array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
                 $this->registerFromProfile($mutatorOrProfile, $setting);
+
                 continue;
             }
 
             if (class_exists($mutatorOrProfile)) {
                 $this->registerFromClass($mutatorOrProfile, $setting);
+
                 continue;
             }
 
@@ -93,7 +97,7 @@ final class MutatorsGenerator
      * @param string $mutator
      * @param array|bool|\stdClass $setting
      */
-    private function registerFromClass(string $mutator, $setting)
+    private function registerFromClass(string $mutator, $setting): void
     {
         if ($setting === false) {
             $this->mutatorList[$mutator] = false;
@@ -112,7 +116,7 @@ final class MutatorsGenerator
      *
      * @throws InvalidConfigException
      */
-    private function registerFromName(string $mutator, $setting)
+    private function registerFromName(string $mutator, $setting): void
     {
         if (!array_key_exists($mutator, MutatorProfile::FULL_MUTATOR_LIST)) {
             throw InvalidConfigException::invalidMutator($mutator);
@@ -132,6 +136,7 @@ final class MutatorsGenerator
 
         foreach ($mutators as $mutator => $setting) {
             if ($setting !== false) {
+                \assert(\is_string($mutator));
                 $mutatorList[$mutator::getName()] = new $mutator(
                     new MutatorConfig($setting)
                 );

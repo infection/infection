@@ -26,7 +26,7 @@ final class CoverageXmlParserTest extends TestCase
 
     private $srcDir = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage-xml';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->parser = new CoverageXmlParser($this->tempDir);
     }
@@ -43,7 +43,7 @@ final class CoverageXmlParserTest extends TestCase
         );
     }
 
-    public function test_it_collects_data_recursively_for_all_files()
+    public function test_it_collects_data_recursively_for_all_files(): void
     {
         $coverage = $this->parser->parse($this->getXml());
 
@@ -51,7 +51,7 @@ final class CoverageXmlParserTest extends TestCase
         $this->assertCount(4, $coverage);
     }
 
-    public function test_it_has_correct_coverage_data_for_each_file()
+    public function test_it_has_correct_coverage_data_for_each_file(): void
     {
         $coverage = $this->parser->parse($this->getXml());
 
@@ -73,7 +73,7 @@ final class CoverageXmlParserTest extends TestCase
         );
     }
 
-    public function test_it_adds_by_method_coverage_data()
+    public function test_it_adds_by_method_coverage_data(): void
     {
         $firstLevelAbsolutePath = realpath($this->tempDir . '/FirstLevel/firstLevel.php');
         $expectedByMethodArray = [
@@ -98,7 +98,7 @@ final class CoverageXmlParserTest extends TestCase
         $this->assertSame($expectedByMethodArray, $coverage[$firstLevelAbsolutePath]['byMethod']);
     }
 
-    public function test_it_adds_by_method_coverage_data_for_traits()
+    public function test_it_adds_by_method_coverage_data_for_traits(): void
     {
         $pathToTrait = realpath($this->tempDir . '/FirstLevel/SecondLevel/secondLevelTrait.php');
 
