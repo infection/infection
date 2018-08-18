@@ -268,7 +268,9 @@ final class InfectionCommand extends BaseCommand
                 throw LocatorException::fileOrDirectoryDoesNotExist($bootstrap);
             }
 
-            require_once $bootstrap;
+            (function ($infectionBootstrapFile): void {
+                require_once $infectionBootstrapFile;
+            })($bootstrap);
         }
     }
 
