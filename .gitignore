@@ -1,6 +1,6 @@
 /.idea
 /vendor
-/infection-log.txt
+/infection.log
 /build/*
 !/build/.gitkeep
 /.php_cs.cache

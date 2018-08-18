@@ -83,7 +83,7 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_on_mutation_testing_finished(): void
     {
-        $logTypes = ['text' => sys_get_temp_dir() . '/infection-log.txt'];
+        $logTypes = ['text' => sys_get_temp_dir() . '/infection.log'];
 
         $this->infectionConfig->expects($this->once())
             ->method('getLogsTypes')
@@ -127,7 +127,7 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_on_mutation_testing_finished_and_debug_mode_off(): void
     {
-        $logTypes = ['text' => sys_get_temp_dir() . '/infection-log.txt'];
+        $logTypes = ['text' => sys_get_temp_dir() . '/infection.log'];
 
         $this->infectionConfig->expects($this->once())
             ->method('getLogsTypes')
@@ -169,7 +169,7 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_on_mutation_testing_finished_and_no_file_logging(): void
     {
-        $logTypes = ['text' => sys_get_temp_dir() . '/infection-log.txt'];
+        $logTypes = ['text' => sys_get_temp_dir() . '/infection.log'];
 
         $this->infectionConfig->expects($this->once())
             ->method('getLogsTypes')

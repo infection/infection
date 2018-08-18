@@ -6,7 +6,7 @@
         ]
     },
     "logs": {
-        "debug": "infection-log.txt"
+        "debug": "infection.log"
     },
     "testFramework" : "phpspec",
     "tmpDir": "."
