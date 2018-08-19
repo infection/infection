@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Performance\Limiter;
 
+use Composer\XdebugHandler\XdebugHandler;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\MemoryUsageAware;
 use Symfony\Component\Filesystem\Filesystem;
@@ -19,8 +20,14 @@ use Symfony\Component\Process\Process;
  */
 final class MemoryLimiter
 {
+    /**
+     * @var Filesystem
+     */
     private $fs;
 
+    /**
+     * @var string|false
+     */
     private $iniLocation;
 
     public function __construct(Filesystem $fs, $iniLocation)
@@ -32,7 +39,6 @@ final class MemoryLimiter
     public function applyMemoryLimitFromProcess(Process $process, AbstractTestFrameworkAdapter $adapter): void
     {
         if (!$adapter instanceof MemoryUsageAware || $this->hasMemoryLimitSet() || $this->isUsingSystemIni()) {
-            // If a memory limit is already set we won't alter it
             return;
         }
 
@@ -73,7 +79,7 @@ final class MemoryLimiter
     private function isUsingSystemIni(): bool
     {
         // Under phpdbg we're using a system php.ini, can't add a memory limit there
-        // If xdebug is enabled, that means we aren't using xdebug handler, and are also using the system php.ini
-        return \PHP_SAPI === 'phpdbg' || \extension_loaded('xdebug');
+        // If there is no skipped version of xdebug handler we are also using the system php ini
+        return \PHP_SAPI === 'phpdbg' || XdebugHandler::getSkippedVersion() === '';
     }
 }
