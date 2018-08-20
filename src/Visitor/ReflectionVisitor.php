@@ -123,9 +123,14 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
     private function isFunctionLikeNode(Node $node): bool
     {
-        $isClassMethod = $node instanceof Node\Stmt\ClassMethod;
-        $isClosure = $node instanceof Node\Expr\Closure;
+        if ($node instanceof Node\Stmt\ClassMethod) {
+            return true;
+        }
 
-        return $isClassMethod || $isClosure;
+        if ($node instanceof Node\Expr\Closure) {
+            return true;
+        }
+
+        return false;
     }
 }

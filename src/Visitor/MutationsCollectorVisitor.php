@@ -83,11 +83,13 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                 continue;
             }
 
-            if ($isOnFunctionSignature
-                && ($methodNode = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY))
-                && $methodNode->isAbstract()
-            ) {
-                continue;
+            if ($isOnFunctionSignature) {
+                $methodNode = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY);
+
+                /** @var Node\Stmt\ClassMethod|Node\Expr\Closure $methodNode */
+                if ($methodNode instanceof Node\Stmt\ClassMethod && $methodNode->isAbstract()) {
+                    continue;
+                }
             }
 
             $isCoveredByTest = $this->isCoveredByTest($isOnFunctionSignature, $node);
