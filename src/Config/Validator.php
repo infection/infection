@@ -29,17 +29,19 @@ final class Validator
         $logTypes = $config->getLogsTypes();
 
         foreach ($logTypes as $logType => $file) {
-            if ($logType !== ResultsLoggerTypes::BADGE) {
-                $dir = \dirname($file);
+            if ($logType === ResultsLoggerTypes::BADGE) {
+                continue;
+            }
 
-                if (is_dir($dir) && !is_writable($dir)) {
-                    throw new IOException(
-                        sprintf('Unable to write to the "%s" directory. Check "logs.%s" file path in infection.json.', $dir, $logType),
-                        0,
-                        null,
-                        $dir
-                    );
-                }
+            $dir = \dirname($file);
+
+            if (is_dir($dir) && !is_writable($dir)) {
+                throw new IOException(
+                    sprintf('Unable to write to the "%s" directory. Check "logs.%s" file path in infection.json.', $dir, $logType),
+                    0,
+                    null,
+                    $dir
+                );
             }
         }
     }
