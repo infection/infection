@@ -60,6 +60,10 @@ final class ValidatorTest extends TestCase
      */
     public function test_it_validates_log_file_paths(string $logType): void
     {
+        if (\DIRECTORY_SEPARATOR === '\\') {
+            $this->markTestSkipped('Can\' test file permission on Windows');
+        }
+
         $readOnlyDirPath = $this->tmpDir . '/invalid';
         $exceptionMessage = sprintf('Unable to write to the "%s" directory. Check "logs.%s" file path in infection.json.', $readOnlyDirPath, $logType);
 
