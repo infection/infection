@@ -14,7 +14,7 @@ use Infection\TestFramework\TestFrameworkExtraOptions;
 /**
  * @internal
  */
-final class PhpUnitExtraOptions extends TestFrameworkExtraOptions
+final class ExtraOptions extends TestFrameworkExtraOptions
 {
     protected function getInitialRunOnlyOptions(): array
     {

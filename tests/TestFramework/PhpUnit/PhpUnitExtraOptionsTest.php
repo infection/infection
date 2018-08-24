@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit;
 
-use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
+use Infection\TestFramework\PhpUnit\ExtraOptions;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -22,14 +22,14 @@ final class PhpUnitExtraOptionsTest extends TestCase
      */
     public function test_it_skips_filter_for_mutant_process(string $sourceExtraOptions, string $expectedExtraOptions): void
     {
-        $phpUnitOptions = new PhpUnitExtraOptions($sourceExtraOptions);
+        $phpUnitOptions = new ExtraOptions($sourceExtraOptions);
 
         $this->assertSame($expectedExtraOptions, $phpUnitOptions->getForMutantProcess());
     }
 
     public function test_it_returns_empty_string_when_source_options_are_null(): void
     {
-        $phpUnitOptions = new PhpUnitExtraOptions(null);
+        $phpUnitOptions = new ExtraOptions(null);
 
         $this->assertSame('', $phpUnitOptions->getForInitialProcess());
         $this->assertSame('', $phpUnitOptions->getForMutantProcess());

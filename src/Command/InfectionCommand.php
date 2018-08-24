@@ -29,7 +29,7 @@ use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\PhpSpec\ExtraOptions;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
-use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
+use Infection\TestFramework\PhpUnit\ExtraOptions;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -341,7 +341,7 @@ final class InfectionCommand extends BaseCommand
         $extraOptions = $this->input->getOption('test-framework-options');
 
         return TestFrameworkTypes::PHPUNIT === $testFrameworkKey
-            ? new PhpUnitExtraOptions($extraOptions)
+            ? new ExtraOptions($extraOptions)
             : new ExtraOptions($extraOptions);
     }
 
