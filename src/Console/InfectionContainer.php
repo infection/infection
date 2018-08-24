@@ -31,7 +31,7 @@ use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Factory;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
+use Infection\TestFramework\PhpUnit\Adapter;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\PhpUnit\Coverage\PhpUnitTestFileDataProvider;
@@ -90,7 +90,7 @@ final class InfectionContainer extends Container
         };
 
         $this['phpunit.junit.file.path'] = function () {
-            return sprintf('%s/%s', $this['coverage.path'], PhpUnitAdapter::JUNIT_FILE_NAME);
+            return sprintf('%s/%s', $this['coverage.path'], Adapter::JUNIT_FILE_NAME);
         };
 
         $this['locator'] = function (): Locator {

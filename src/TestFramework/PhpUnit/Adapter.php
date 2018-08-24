@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Adapter;
+namespace Infection\TestFramework\PhpUnit;
 
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\MemoryUsageAware;
@@ -15,7 +15,7 @@ use Infection\TestFramework\MemoryUsageAware;
 /**
  * @internal
  */
-final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware
+final class Adapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware
 {
     public const JUNIT_FILE_NAME = 'phpunit.junit.xml';
 

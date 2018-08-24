@@ -12,7 +12,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 use Infection\Finder\AbstractExecutableFinder;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\MemoryUsageAware;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
+use Infection\TestFramework\PhpUnit\Adapter;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\Utils\VersionParser;
@@ -79,7 +79,7 @@ final class PhpUnitAdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         ];
     }
 
-    private function getAdapter(): PhpUnitAdapter
+    private function getAdapter(): Adapter
     {
         $executableFined = Mockery::mock(AbstractExecutableFinder::class);
         $initialConfigBuilder = Mockery::mock(InitialConfigBuilder::class);
@@ -87,7 +87,7 @@ final class PhpUnitAdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $cliArgumentsBuilder = Mockery::mock(CommandLineArgumentsAndOptionsBuilder::class);
         $versionParser = Mockery::mock(VersionParser::class);
 
-        return new PhpUnitAdapter(
+        return new Adapter(
             $executableFined,
             $initialConfigBuilder,
             $mutationConfigBuilder,
