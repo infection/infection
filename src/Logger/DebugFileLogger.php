@@ -62,7 +62,7 @@ final class DebugFileLogger extends FileLogger
             $logParts[] = 'Line ' . $mutantProcess->getOriginalStartingLine();
         }
 
-        return implode($logParts, "\n") . "\n";
+        return implode("\n", $logParts) . "\n";
     }
 
     private function getHeadlineParts(string $headlinePrefix): array

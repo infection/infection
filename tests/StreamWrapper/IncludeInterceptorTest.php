@@ -26,7 +26,7 @@ use Infection\StreamWrapper\IncludeInterceptor;
  * url_stat
  *
  * Other methods are not essential for interception to work,
- * but still are required to be implemented by a full wrapper.
+ * but still are required to be implemented by a full wrapper
  */
 final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
 {
@@ -141,7 +141,7 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
 
         $tempnam = tempnam('', basename(__FILE__, 'php'));
 
-        $fp = fopen($tempnam, 'w+');
+        $fp = fopen($tempnam, 'w+b');
         flock($fp, LOCK_EX);
         fwrite($fp, 'test');
         fseek($fp, 0);

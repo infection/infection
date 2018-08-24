@@ -57,7 +57,7 @@ final class TextFileLogger extends FileLogger
             }
         }
 
-        return implode($logParts, "\n");
+        return implode("\n", $logParts);
     }
 
     private function getHeadlineParts(string $headlinePrefix): array

@@ -28,6 +28,22 @@ final class FunctionCallRemoval extends Mutator
             return false;
         }
 
-        return $node->expr instanceof Node\Expr\FuncCall;
+        if (!$node->expr instanceof Node\Expr\FuncCall) {
+            return false;
+        }
+
+        $name = $node->expr->name;
+
+        if (!$name instanceof Node\Name) {
+            return true;
+        }
+
+        $string = strtolower((string) $name);
+
+        if ($string === 'assert') {
+            return false;
+        }
+
+        return true;
     }
 }
