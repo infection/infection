@@ -11,7 +11,7 @@ namespace Infection\Tests\TestFramework\PhpSpec\Adapter;
 
 use Infection\Finder\AbstractExecutableFinder;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
-use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
+use Infection\TestFramework\PhpSpec\Adapter;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use Infection\Utils\VersionParser;
@@ -99,7 +99,7 @@ OUTPUT;
         $this->assertFalse($adapter->testsPass($output));
     }
 
-    private function getAdapter(): PhpSpecAdapter
+    private function getAdapter(): Adapter
     {
         $executableFined = Mockery::mock(AbstractExecutableFinder::class);
         $initialConfigBuilder = Mockery::mock(InitialConfigBuilder::class);
@@ -107,6 +107,6 @@ OUTPUT;
         $cliArgumentsBuilder = Mockery::mock(CommandLineArgumentsAndOptionsBuilder::class);
         $versionParser = Mockery::mock(VersionParser::class);
 
-        return new PhpSpecAdapter($executableFined, $initialConfigBuilder, $mutationConfigBuilder, $cliArgumentsBuilder, $versionParser);
+        return new Adapter($executableFined, $initialConfigBuilder, $mutationConfigBuilder, $cliArgumentsBuilder, $versionParser);
     }
 }
