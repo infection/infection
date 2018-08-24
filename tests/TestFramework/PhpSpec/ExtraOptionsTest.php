@@ -7,24 +7,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit;
+namespace Infection\Tests\TestFramework\PhpSpec;
 
-use Infection\TestFramework\PhpUnit\ExtraOptions;
+use Infection\TestFramework\PhpSpec\ExtraOptions;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-final class PhpUnitExtraOptionsTest extends TestCase
+final class ExtraOptionsTest extends TestCase
 {
     /**
      * @dataProvider mutantProcessProvider
      */
-    public function test_it_skips_filter_for_mutant_process(string $sourceExtraOptions, string $expectedExtraOptions): void
+    public function test_it_does_not_change_extra_options_mutant_process(string $sourceExtraOptions): void
     {
         $phpUnitOptions = new ExtraOptions($sourceExtraOptions);
 
-        $this->assertSame($expectedExtraOptions, $phpUnitOptions->getForMutantProcess());
+        $this->assertSame($sourceExtraOptions, $phpUnitOptions->getForMutantProcess());
     }
 
     public function test_it_returns_empty_string_when_source_options_are_null(): void
@@ -38,9 +38,9 @@ final class PhpUnitExtraOptionsTest extends TestCase
     public function mutantProcessProvider()
     {
         return [
-            ['--filter=someTest#2 --a --b=value', '--a --b=value'],
-            ['--a --filter=someTest#2 --b=value', '--a --b=value'],
-            ['--a --filter someTest#2 --b=value', '--a --b=value'],
+            ['--filter=someTest#2 --a --b=value'],
+            ['--a --filter=someTest#2 --b=value'],
+            ['--a --filter someTest#2 --b=value'],
         ];
     }
 }

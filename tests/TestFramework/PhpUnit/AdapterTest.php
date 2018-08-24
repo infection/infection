@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
+namespace Infection\Tests\TestFramework\PhpUnit;
 
 use Infection\Finder\AbstractExecutableFinder;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
@@ -21,7 +21,7 @@ use Mockery;
 /**
  * @internal
  */
-final class PhpUnitAdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+final class AdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 {
     public function test_it_has_a_name(): void
     {
