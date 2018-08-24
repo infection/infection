@@ -59,7 +59,7 @@ abstract class FileLogger implements MutationTestingResultsLogger
 
     public function log(): void
     {
-        $this->fs->dumpFile($this->logFilePath, implode($this->getLogLines(), "\n"));
+        $this->fs->dumpFile($this->logFilePath, implode("\n", $this->getLogLines()));
     }
 
     abstract protected function getLogLines(): array;

@@ -43,6 +43,28 @@ PHP
             ,
         ];
 
+        yield 'It removes dynamic function calls' => [
+            <<<'PHP'
+<?php
+
+$start = true;
+$foo();
+('foo')();
+$end = true;
+
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$start = true;
+
+
+$end = true;
+PHP
+            ,
+        ];
+
         yield 'It does not remove a function call that is assigned to something' => [
             <<<'PHP'
 <?php
@@ -81,6 +103,17 @@ PHP
 <?php
 
 $this->foo();
+$a = 3;
+PHP
+        ];
+
+        yield 'It does not remove an assert() call' => [
+            <<<'PHP'
+<?php
+
+assert(true === true);
+aSsert(true === true);
+\assert(true === true);
 $a = 3;
 PHP
         ];
