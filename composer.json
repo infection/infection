@@ -59,6 +59,7 @@
     "require": {
         "php": "^7.1",
         "ext-dom": "*",
+        "ext-json": "*",
         "composer/xdebug-handler": "^1.1",
         "nikic/php-parser": "^4.0",
         "ocramius/package-versions": "^1.2",

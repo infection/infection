@@ -69,15 +69,7 @@ final class ValidatorTest extends TestCase
         // make it readonly
         $this->fileSystem->mkdir($readOnlyDirPath, 0400);
 
-        $configObject = json_decode(
-            <<<"JSON"
-{
-    "logs": {
-        "{$logType}": "{$readOnlyDirPath}\/infection.log"
-    }
-}
-JSON
-        );
+        $configObject = json_decode(sprintf('{"logs": {"%s": "%s/infection.log"}}', $logType, $readOnlyDirPath));
 
         $config = new InfectionConfig($configObject, $this->fileSystem, '');
         $validator = new Validator();
