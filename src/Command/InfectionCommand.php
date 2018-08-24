@@ -27,7 +27,7 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\MemoryUsageAware;
-use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
+use Infection\TestFramework\PhpSpec\ExtraOptions;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use Infection\TestFramework\TestFrameworkExtraOptions;
@@ -342,7 +342,7 @@ final class InfectionCommand extends BaseCommand
 
         return TestFrameworkTypes::PHPUNIT === $testFrameworkKey
             ? new PhpUnitExtraOptions($extraOptions)
-            : new PhpSpecExtraOptions($extraOptions);
+            : new ExtraOptions($extraOptions);
     }
 
     /**
