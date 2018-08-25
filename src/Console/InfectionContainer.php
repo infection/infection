@@ -106,8 +106,6 @@ final class InfectionContainer extends Container
                 $this['tmp.dir'],
                 $this['project.dir'],
                 $this['testframework.config.locator'],
-                $this['xml.configuration.helper'],
-                $this['phpunit.junit.file.path'],
                 $this->getInfectionConfig(),
                 $this['version.parser']
             );

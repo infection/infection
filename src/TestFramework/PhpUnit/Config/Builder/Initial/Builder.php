@@ -19,10 +19,6 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 class Builder extends AbstractBuilder
 {
     /**
-     * @var string
-     */
-    private $originalXmlConfigContent;
-    /**
      * @var XmlConfigurationHelper
      */
     private $xmlConfigurationHelper;
@@ -44,11 +40,32 @@ class Builder extends AbstractBuilder
 //        array $srcDirs,
 //        bool $skipCoverage
 //    ) {
-//        $this->originalXmlConfigContent = $originalXmlConfigContent;
-//        $this->xmlConfigurationHelper = $xmlConfigurationHelper;
 //        $this->jUnitFilePath = $jUnitFilePath;
 //        $this->srcDirs = $srcDirs;
 //    }
+
+    protected function getXmlHelper(): XmlConfigurationHelper
+    {
+        if ($this->xmlConfigurationHelper === null) {
+            $this->setXmlHelper(new XmlConfigurationHelper());
+        }
+
+        return $this->xmlConfigurationHelper;
+    }
+
+    protected function getJUnitFilePath(): string
+    {
+
+    }
+
+
+
+    public function setXmlHelper(XmlConfigurationHelper $xmlHelper): self
+    {
+        $this->xmlConfigurationHelper = $xmlHelper;
+
+        return $this;
+    }
 
     public function build(): string
     {
@@ -57,16 +74,16 @@ class Builder extends AbstractBuilder
         $dom = new \DOMDocument();
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
-        $dom->loadXML($this->originalXmlConfigContent);
+        $dom->loadXML($this->readConfigFile());
 
         $xPath = new \DOMXPath($dom);
 
         $this->addCoverageFilterWhitelistIfDoesNotExist($dom, $xPath);
-        $this->xmlConfigurationHelper->replaceWithAbsolutePaths($xPath);
-        $this->xmlConfigurationHelper->setStopOnFailure($xPath);
-        $this->xmlConfigurationHelper->deactivateColours($xPath);
-        $this->xmlConfigurationHelper->removeExistingLoggers($dom, $xPath);
-        $this->xmlConfigurationHelper->removeExistingPrinters($dom, $xPath);
+        $this->getXmlHelper()->replaceWithAbsolutePaths($xPath);
+        $this->getXmlHelper()->setStopOnFailure($xPath);
+        $this->getXmlHelper()->deactivateColours($xPath);
+        $this->getXmlHelper()->removeExistingLoggers($dom, $xPath);
+        $this->getXmlHelper()->removeExistingPrinters($dom, $xPath);
 
         if (!$this->canSkipCoverage()) {
             $this->addCodeCoverageLogger($dom, $xPath);

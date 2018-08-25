@@ -12,7 +12,6 @@ namespace Infection\TestFramework;
 use Infection\Config\InfectionConfig;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\VersionParser;
 
 /**
@@ -26,11 +25,6 @@ final class Factory
     private $tmpDir;
 
     /**
-     * @var XmlConfigurationHelper
-     */
-    private $xmlConfigurationHelper;
-
-    /**
      * @var TestFrameworkConfigLocatorInterface
      */
     private $configLocator;
@@ -39,11 +33,6 @@ final class Factory
      * @var string
      */
     private $projectDir;
-
-    /**
-     * @var string
-     */
-    private $jUnitFilePath;
 
     /**
      * @var InfectionConfig
@@ -59,16 +48,12 @@ final class Factory
         string $tmpDir,
         string $projectDir,
         TestFrameworkConfigLocatorInterface $configLocator,
-        XmlConfigurationHelper $xmlConfigurationHelper,
-        string $jUnitFilePath,
         InfectionConfig $infectionConfig,
         VersionParser $versionParser
     ) {
         $this->tmpDir = $tmpDir;
         $this->configLocator = $configLocator;
-        $this->xmlConfigurationHelper = $xmlConfigurationHelper;
         $this->projectDir = $projectDir;
-        $this->jUnitFilePath = $jUnitFilePath;
         $this->infectionConfig = $infectionConfig;
         $this->versionParser = $versionParser;
     }
