@@ -12,14 +12,6 @@ namespace Infection\TestFramework;
 use Infection\Config\InfectionConfig;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
-use Infection\TestFramework\PhpSpec\CommandLine\ArgumentsAndOptionsBuilder as PhpSpecArgumentsAndOptionsBuilder;
-use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder as PhpSpecInitialConfigBuilder;
-use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder as PhpSpecMutationConfigBuilder;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
-use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
-use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
-use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\VersionParser;
 
@@ -81,46 +73,62 @@ final class Factory
         $this->versionParser = $versionParser;
     }
 
+    private function checkClassExists(string $className, string $classType): self
+    {
+        if (!class_exists($className)) {
+            throw new \LogicException('Framework ' . $classType . ' Should Be Named ' . $className);
+        }
+
+        return $this;
+    }
+
     public function create(string $adapterName, bool $skipCoverage): AbstractTestFrameworkAdapter
     {
-        if ($adapterName === TestFrameworkTypes::PHPUNIT) {
-            $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
-            $phpUnitConfigContent = file_get_contents($phpUnitConfigPath);
-            \assert(\is_string($phpUnitConfigContent));
-
-            return new PhpUnitAdapter(
-                new TestFrameworkFinder(TestFrameworkTypes::PHPUNIT, $this->infectionConfig->getPhpUnitCustomPath()),
-                new InitialConfigBuilder(
-                    $this->tmpDir,
-                    $phpUnitConfigContent,
-                    $this->xmlConfigurationHelper,
-                    $this->jUnitFilePath,
-                    $this->infectionConfig->getSourceDirs(),
-                    $skipCoverage
-                ),
-                new MutationConfigBuilder($this->tmpDir, $phpUnitConfigContent, $this->xmlConfigurationHelper, $this->projectDir),
-                new ArgumentsAndOptionsBuilder(),
-                $this->versionParser
+        if (!in_array($adapterName, TestFrameworkTypes::TYPES)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Invalid name of test framework. Available names are: %s',
+                    implode(', ', TestFrameworkTypes::TYPES)
+                )
             );
         }
 
-        if ($adapterName === TestFrameworkTypes::PHPSPEC) {
-            $phpSpecConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPSPEC);
+        $configPath = $this->configLocator->locate($adapterName);
+        $configContent = file_get_contents($configPath);
+        \assert(\is_string($configContent));
 
-            return new PhpSpecAdapter(
-                new TestFrameworkFinder(TestFrameworkTypes::PHPSPEC),
-                new PhpSpecInitialConfigBuilder($this->tmpDir, $phpSpecConfigPath, $skipCoverage),
-                new PhpSpecMutationConfigBuilder($this->tmpDir, $phpSpecConfigPath, $this->projectDir),
-                new PhpSpecArgumentsAndOptionsBuilder(),
-                $this->versionParser
-            );
-        }
+        $baseNamespace = __NAMESPACE__ . '\\' . $adapterName . '\\';
 
-        throw new \InvalidArgumentException(
-            sprintf(
-                'Invalid name of test framework. Available names are: %s',
-                implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC])
-            )
+        $adapterClass          = $baseNamespace . $adapterName . 'Adapter';
+        $initConfigClass       = $baseNamespace . '\\Config\\Builder\\InitialConfigBuilder';
+        $mutationConfigClass   = $baseNamespace . '\\Config\\Builder\\MutationConfigBuilder';
+        $argumentsBuilderClass = $baseNamespace . '\\' . $adapterName . 'ExtraOptions';
+
+        $this->checkClassExists($adapterClass, 'Adapter')
+            ->checkClassExists($initConfigClass, 'Initial Config Builder')
+            ->checkClassExists($mutationConfigClass, 'Mutation Config Builder')
+            ->checkClassExists($argumentsBuilderClass, 'Argument Builder Class');
+
+        $testAdapter = new $adapterClass(
+            new TestFrameworkFinder($adapterName, $this->infectionConfig->{'get' . $adapterName . 'CustomPath'}()),
+            new $initConfigClass(
+                $this->tmpDir,
+                $configContent,
+                $this->xmlConfigurationHelper,
+                $this->jUnitFilePath,
+                $this->infectionConfig->getSourceDirs(),
+                $skipCoverage
+            ),
+            new $mutationConfigClass(
+                $this->tmpDir,
+                $configContent,
+                $this->xmlConfigurationHelper,
+                $this->projectDir
+            ),
+            new $argumentsBuilderClass(),
+            $this->versionParser
         );
+
+        return $testAdapter;
     }
 }
