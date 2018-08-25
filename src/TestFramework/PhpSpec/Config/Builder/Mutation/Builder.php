@@ -7,17 +7,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpSpec\Config\Builder;
+namespace Infection\TestFramework\PhpSpec\Config\Builder\Mutation;
 
 use Infection\Mutant\MutantInterface;
-use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
+use Infection\TestFramework\Config\Builder\Mutation\AbstractBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\MutationYamlConfiguration;
 use Symfony\Component\Yaml\Yaml;
 
 /**
  * @internal
  */
-class MutationConfigBuilder extends ConfigBuilder
+class Builder extends ConfigBuilder
 {
     /**
      * @var string
@@ -32,13 +32,13 @@ class MutationConfigBuilder extends ConfigBuilder
      * @var string
      */
     private $projectDir;
-
-    public function __construct(string $tempDirectory, string $originalYamlConfigPath, string $projectDir)
-    {
-        $this->tempDirectory = $tempDirectory;
-        $this->originalYamlConfigPath = $originalYamlConfigPath;
-        $this->projectDir = $projectDir;
-    }
+//
+//    public function __construct(string $tempDirectory, string $originalYamlConfigPath, string $projectDir)
+//    {
+//        $this->tempDirectory = $tempDirectory;
+//        $this->originalYamlConfigPath = $originalYamlConfigPath;
+//        $this->projectDir = $projectDir;
+//    }
 
     public function build(MutantInterface $mutant): string
     {

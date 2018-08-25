@@ -7,21 +7,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Config\Builder;
+namespace Infection\TestFramework\PhpUnit\Config\Builder\Initial;
 
-use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
+use Infection\TestFramework\Config\Builder\Initial\AbstractBuilder;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 
 /**
  * @internal
  */
-class InitialConfigBuilder implements ConfigBuilder
+class Builder extends AbstractBuilder
 {
-    /**
-     * @var string
-     */
-    private $tmpDir;
     /**
      * @var string
      */
@@ -41,26 +37,18 @@ class InitialConfigBuilder implements ConfigBuilder
      */
     private $srcDirs = [];
 
-    /**
-     * @var bool
-     */
-    private $skipCoverage;
-
-    public function __construct(
-        string $tmpDir,
-        string $originalXmlConfigContent,
-        XmlConfigurationHelper $xmlConfigurationHelper,
-        string $jUnitFilePath,
-        array $srcDirs,
-        bool $skipCoverage
-    ) {
-        $this->tmpDir = $tmpDir;
-        $this->originalXmlConfigContent = $originalXmlConfigContent;
-        $this->xmlConfigurationHelper = $xmlConfigurationHelper;
-        $this->jUnitFilePath = $jUnitFilePath;
-        $this->srcDirs = $srcDirs;
-        $this->skipCoverage = $skipCoverage;
-    }
+//    public function __construct(
+//        string $originalXmlConfigContent,
+//        XmlConfigurationHelper $xmlConfigurationHelper,
+//        string $jUnitFilePath,
+//        array $srcDirs,
+//        bool $skipCoverage
+//    ) {
+//        $this->originalXmlConfigContent = $originalXmlConfigContent;
+//        $this->xmlConfigurationHelper = $xmlConfigurationHelper;
+//        $this->jUnitFilePath = $jUnitFilePath;
+//        $this->srcDirs = $srcDirs;
+//    }
 
     public function build(): string
     {
@@ -80,7 +68,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->xmlConfigurationHelper->removeExistingLoggers($dom, $xPath);
         $this->xmlConfigurationHelper->removeExistingPrinters($dom, $xPath);
 
-        if (!$this->skipCoverage) {
+        if (!$this->canSkipCoverage()) {
             $this->addCodeCoverageLogger($dom, $xPath);
             $this->addJUnitLogger($dom, $xPath);
         }
@@ -92,7 +80,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function buildPath(): string
     {
-        return $this->tmpDir . '/phpunitConfiguration.initial.infection.xml';
+        return $this->getTempDirectory() . '/phpunitConfiguration.initial.infection.xml';
     }
 
     private function addJUnitLogger(\DOMDocument $dom, \DOMXPath $xPath): void
@@ -112,7 +100,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
         $coverageXmlLog = $dom->createElement('log');
         $coverageXmlLog->setAttribute('type', 'coverage-xml');
-        $coverageXmlLog->setAttribute('target', $this->tmpDir . '/' . CodeCoverageData::PHP_UNIT_COVERAGE_DIR);
+        $coverageXmlLog->setAttribute('target', $this->getTempDirectory() . '/' . CodeCoverageData::PHP_UNIT_COVERAGE_DIR);
 
         $logging->appendChild($coverageXmlLog);
     }

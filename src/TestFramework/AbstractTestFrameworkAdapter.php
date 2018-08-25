@@ -12,8 +12,8 @@ namespace Infection\TestFramework;
 use Infection\Finder\AbstractExecutableFinder;
 use Infection\Finder\Exception\FinderException;
 use Infection\Mutant\MutantInterface;
-use Infection\TestFramework\Config\InitialConfigBuilder;
-use Infection\TestFramework\Config\MutationConfigBuilder;
+use Infection\TestFramework\Config\Builder\Initial\BuilderInterface as InitalInterface;
+use Infection\TestFramework\Config\Builder\Mutation\BuilderInterface as MutationInterface;
 use Infection\Utils\VersionParser;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
@@ -60,8 +60,8 @@ abstract class AbstractTestFrameworkAdapter
 
     public function __construct(
         AbstractExecutableFinder $testFrameworkFinder,
-        InitialConfigBuilder $initialConfigBuilder,
-        MutationConfigBuilder $mutationConfigBuilder,
+        InitalInterface $initialConfigBuilder,
+        MutationInterface $mutationConfigBuilder,
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
         VersionParser $versionParser
     ) {

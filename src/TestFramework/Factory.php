@@ -94,35 +94,36 @@ final class Factory
         }
 
         $configPath = $this->configLocator->locate($adapterName);
-        $configContent = file_get_contents($configPath);
-        \assert(\is_string($configContent));
 
         $baseNamespace = __NAMESPACE__ . '\\' . $adapterName . '\\';
 
-        $adapterClass          = $baseNamespace . $adapterName . 'Adapter';
-        $initConfigClass       = $baseNamespace . '\\Config\\Builder\\InitialConfigBuilder';
-        $mutationConfigClass   = $baseNamespace . '\\Config\\Builder\\MutationConfigBuilder';
-        $argumentsBuilderClass = $baseNamespace . '\\' . $adapterName . 'ExtraOptions';
+        $adapterClass          = $baseNamespace . 'Adapter';
+        $initConfigClass       = $baseNamespace . 'Config\\Builder\\Initial\\Builder';
+        $mutationConfigClass   = $baseNamespace . 'Config\\Builder\\Mutation\\Builder';
+        $argumentsBuilderClass = $baseNamespace . 'CommandLine\\ArgumentsAndOptionsBuilder';
 
         $this->checkClassExists($adapterClass, 'Adapter')
             ->checkClassExists($initConfigClass, 'Initial Config Builder')
             ->checkClassExists($mutationConfigClass, 'Mutation Config Builder')
             ->checkClassExists($argumentsBuilderClass, 'Argument Builder Class');
 
+        $customPath = '';
+        if (method_exists($this->infectionConfig, 'get' . $adapterName . 'CustomPath')) {
+            $customPath = $this->infectionConfig->{'get' . $adapterName . 'CustomPath'}();
+        }
+
         $testAdapter = new $adapterClass(
-            new TestFrameworkFinder($adapterName, $this->infectionConfig->{'get' . $adapterName . 'CustomPath'}()),
+            new TestFrameworkFinder($adapterName, $customPath),
             new $initConfigClass(
+                $this->infectionConfig,
                 $this->tmpDir,
-                $configContent,
-                $this->xmlConfigurationHelper,
-                $this->jUnitFilePath,
-                $this->infectionConfig->getSourceDirs(),
+                $configPath,
                 $skipCoverage
             ),
             new $mutationConfigClass(
+                $this->infectionConfig,
                 $this->tmpDir,
-                $configContent,
-                $this->xmlConfigurationHelper,
+                $configPath,
                 $this->projectDir
             ),
             new $argumentsBuilderClass(),

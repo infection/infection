@@ -7,12 +7,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
+namespace Infection\TestFramework\Config\Builder\Initial;
 
 /**
  * @internal
  */
-interface InitialConfigBuilder
+interface BuilderInterface
 {
     public function build(): string;
 }

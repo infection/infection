@@ -13,7 +13,7 @@ use Infection\Finder\AbstractExecutableFinder;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\PhpUnit\Adapter;
-use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
+use Infection\TestFramework\PhpUnit\Config\Builder\BuilderInterface;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\Utils\VersionParser;
 use Mockery;
@@ -82,7 +82,7 @@ final class AdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
     private function getAdapter(): Adapter
     {
         $executableFined = Mockery::mock(AbstractExecutableFinder::class);
-        $initialConfigBuilder = Mockery::mock(InitialConfigBuilder::class);
+        $initialConfigBuilder = Mockery::mock(BuilderInterface::class);
         $mutationConfigBuilder = Mockery::mock(MutationConfigBuilder::class);
         $cliArgumentsBuilder = Mockery::mock(CommandLineArgumentsAndOptionsBuilder::class);
         $versionParser = Mockery::mock(VersionParser::class);

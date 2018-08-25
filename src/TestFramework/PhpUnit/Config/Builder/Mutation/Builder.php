@@ -7,26 +7,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Config\Builder;
+namespace Infection\TestFramework\PhpUnit\Config\Builder\Mutation;
 
 use Infection\Mutant\MutantInterface;
-use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
+use Infection\TestFramework\Config\Builder\Mutation\AbstractBuilder;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 
 /**
  * @internal
  */
-class MutationConfigBuilder extends ConfigBuilder
+class Builder extends AbstractBuilder
 {
     /**
      * @var string
      */
     private $tempDirectory;
-
-    /**
-     * @var string
-     */
-    private $projectDir;
 
     /**
      * @var XmlConfigurationHelper
@@ -43,19 +38,18 @@ class MutationConfigBuilder extends ConfigBuilder
      */
     private $dom;
 
-    public function __construct(string $tempDirectory, string $originalXmlConfigContent, XmlConfigurationHelper $xmlConfigurationHelper, string $projectDir)
-    {
-        $this->tempDirectory = $tempDirectory;
-        $this->projectDir = $projectDir;
-
-        $this->xmlConfigurationHelper = $xmlConfigurationHelper;
-        $this->originalXmlConfigContent = $originalXmlConfigContent;
-
-        $this->dom = new \DOMDocument();
-        $this->dom->preserveWhiteSpace = false;
-        $this->dom->formatOutput = true;
-        $this->dom->loadXML($this->originalXmlConfigContent);
-    }
+//    public function __construct(string $tempDirectory, string $originalXmlConfigContent, XmlConfigurationHelper $xmlConfigurationHelper, string $projectDir)
+//    {
+//        $this->tempDirectory = $tempDirectory;
+//
+//        $this->xmlConfigurationHelper = $xmlConfigurationHelper;
+//        $this->originalXmlConfigContent = $originalXmlConfigContent;
+//
+//        $this->dom = new \DOMDocument();
+//        $this->dom->preserveWhiteSpace = false;
+//        $this->dom->formatOutput = true;
+//        $this->dom->loadXML($this->originalXmlConfigContent);
+//    }
 
     public function build(MutantInterface $mutant): string
     {
@@ -208,6 +202,6 @@ AUTOLOAD;
             return $nodeList[0]->nodeValue;
         }
 
-        return sprintf('%s/vendor/autoload.php', $this->projectDir);
+        return sprintf('%s/vendor/autoload.php', $this->getProjectsDirectory());
     }
 }

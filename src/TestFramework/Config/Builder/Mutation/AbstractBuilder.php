@@ -7,16 +7,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
+namespace Infection\TestFramework\Config\Builder\Mutation;
 
-use Infection\Mutant\MutantInterface;
+use Infection\Config\InfectionConfig;
+use Infection\TestFramework\Config\Builder\AbstractBuilder as Builder;
 
 /**
  * @internal
  */
-abstract class MutationConfigBuilder
+abstract class AbstractBuilder extends Builder implements BuilderInterface
 {
-    abstract public function build(MutantInterface $mutant): string;
+    /**
+     * @var string
+     */
+    private $projectDir;
+
+    public function __construct(
+        InfectionConfig $infectionConfig,
+        string $tempDirectory,
+        string $configPath,
+        string $projectDir
+    )
+    {
+        $this->projectDir = $projectDir;
+
+        parent::__construct($infectionConfig, $tempDirectory, $configPath);
+    }
+
+    protected function getProjectsDirectory(): string
+    {
+        return $this->projectDir;
+    }
 
     protected function getInterceptorFileContent(string $interceptorPath, string $originalFilePath, string $mutatedFilePath): string
     {

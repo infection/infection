@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
-use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
+use Infection\TestFramework\PhpUnit\Config\Builder\BuilderInterface;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\TmpDirectoryCreator;
@@ -40,7 +40,7 @@ final class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTest
     private $pathToProject;
 
     /**
-     * @var InitialConfigBuilder
+     * @var BuilderInterface
      */
     private $builder;
 
@@ -75,7 +75,7 @@ final class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTest
 
         $replacer = new PathReplacer($this->fileSystem, $this->pathToProject);
 
-        $this->builder = new InitialConfigBuilder(
+        $this->builder = new BuilderInterface(
             $this->tmpDir,
             file_get_contents($phpunitXmlPath),
             new XmlConfigurationHelper($replacer),

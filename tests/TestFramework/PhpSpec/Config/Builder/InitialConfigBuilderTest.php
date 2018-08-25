@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpSpec\Config\Builder;
 
+use Infection\Config\InfectionConfig;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder;
 use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
@@ -51,7 +52,12 @@ final class InitialConfigBuilderTest extends TestCase
     {
         $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/phpspec/phpspec.yml';
 
-        $builder = new InitialConfigBuilder($this->tmpDir, $originalYamlConfigPath, false);
+        $builder = new InitialConfigBuilder(
+            new InfectionConfig(new \stdClass(), new Filesystem(), ''),
+            $this->tmpDir,
+            $originalYamlConfigPath,
+            false
+        );
 
         $this->assertSame($this->tmpDir . '/phpspecConfiguration.initial.infection.yml', $builder->build());
     }
