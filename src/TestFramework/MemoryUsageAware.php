@@ -15,7 +15,7 @@ namespace Infection\TestFramework;
 interface MemoryUsageAware
 {
     /**
-     * Reports memory used by a test suite.
+     * Reports memory used by a test suite, or -1 if it cant detect the memory usage.
      *
      * @param string $output
      *

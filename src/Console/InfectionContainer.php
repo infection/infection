@@ -18,7 +18,9 @@ use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Finder\Locator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
+use Infection\Mutator\Util\MutatorParser;
 use Infection\Mutator\Util\MutatorsGenerator;
+use Infection\Performance\Limiter\MemoryLimiter;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\TimeFormatter;
 use Infection\Performance\Time\Timer;
@@ -175,7 +177,7 @@ final class InfectionContainer extends Container
             return new Standard();
         };
 
-        $this['mutators'] = function (): array {
+        $this['mutators.config'] = function (): array {
             $mutatorConfig = $this->getInfectionConfig()->getMutatorsConfiguration();
 
             return (new MutatorsGenerator($mutatorConfig))->generate();
@@ -195,6 +197,10 @@ final class InfectionContainer extends Container
 
         $this['memory.formatter'] = function (): MemoryFormatter {
             return new MemoryFormatter();
+        };
+
+        $this['memory.limit.applier'] = function (): MemoryLimiter {
+            return new MemoryLimiter($this['filesystem'], \php_ini_loaded_file());
         };
     }
 
@@ -289,6 +295,12 @@ final class InfectionContainer extends Container
                 $this['time.formatter'],
                 $this['memory.formatter']
             );
+        };
+
+        $this['mutators'] = function () use ($input): array {
+            $parser = new MutatorParser($input->getOption('mutators'), $this['mutators.config']);
+
+            return $parser->getMutators();
         };
     }
 }
