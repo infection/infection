@@ -160,7 +160,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
 
     private function createMutationGenerator(
         CodeCoverageData $codeCoverageDataMock,
-        ?string $whitelistedMutatorNames = null,
+        ?string $whitelistedMutatorName = null,
         ?MutatorConfig $mutatorConfig = null,
         array $srcDirs = []
     ) {
@@ -193,7 +193,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
             $container[TrueValue::class],
         ];
 
-        $mutators = $whitelistedMutatorNames ? [new $whitelistedMutatorNames($mutatorConfig)] : $defaultMutators;
+        $mutators = $whitelistedMutatorName ? [new $whitelistedMutatorName($mutatorConfig)] : $defaultMutators;
 
         $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcherMock->expects($this->any())->method('dispatch');
