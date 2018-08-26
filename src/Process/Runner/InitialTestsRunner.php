@@ -47,9 +47,14 @@ use Symfony\Component\Process\Process;
  */
 final class InitialTestsRunner
 {
+    private const ERROR_TIMEOUT = 10;
+
     private $processBuilder;
     private $eventDispatcher;
 
+    /**
+     * InitialTestsRunner constructor.
+     */
     public function __construct(
         InitialTestsRunProcessFactory $processFactory,
         EventDispatcher $eventDispatcher
@@ -66,16 +71,35 @@ final class InitialTestsRunner
         array $phpExtraOptions,
         bool $skipCoverage
     ): Process {
+        /** @var Process $process */
         $process = $this->processBuilder->createProcess(
             $testFrameworkExtraOptions,
             $phpExtraOptions,
             $skipCoverage
         );
 
+        //Tracking Process Error Exit
+        $expirationData = (object) [
+            'time' => null,
+        ];
+
         $this->eventDispatcher->dispatch(new InitialTestSuiteWasStarted());
 
-        $process->run(function (string $type) use ($process): void {
+        $process->run(function (string $type) use ($process, $expirationData): void {
             if ($process::ERR === $type) {
+                //If already started, do not start again and let parent one run - prevent infinite loop.
+                //->isRunning calls the callback again every time there is any updated output.
+                if ($expirationData->time !== null) {
+                    return;
+                }
+
+                //Give The Error Processing Time To Fully Output
+                $expirationData->time = time() + self::ERROR_TIMEOUT;
+
+                while ($process->isRunning() && time() < $expirationData->time) {
+                    usleep(100);
+                }
+
                 // Stop on the first error encountered
                 $process->stop();
             }
