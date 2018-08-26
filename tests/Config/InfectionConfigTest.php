@@ -256,5 +256,33 @@ JSON;
             'getBootstrap',
             'bootstrap.php',
         ];
+
+        yield 'It returns empty initial test php options' => [
+            (object) [],
+            'getInitialTestsPhpOptions',
+            ''
+        ];
+
+        yield 'It returns initial test php options' => [
+            (object) [
+                'initialTestsPhpOptions' => '-d xdebug.remote_autostart=1'
+            ],
+            'getInitialTestsPhpOptions',
+            '-d xdebug.remote_autostart=1'
+        ];
+
+        yield 'It returns empty framework options' => [
+            (object) [],
+            'getTestFrameworkOptions',
+            ''
+        ];
+
+        yield 'It returns framework options' => [
+            (object) [
+                'testFrameworkOptions' => '-vvv'
+            ],
+            'getTestFrameworkOptions',
+            '-vvv'
+        ];
     }
 }
