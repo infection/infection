@@ -196,7 +196,7 @@ final class InfectionCommand extends BaseCommand
         $initialTestSuitProcess = $initialTestsRunner->run(
             $testFrameworkOptions->getForInitialProcess(),
             $this->skipCoverage,
-            explode(' ', $input->getOption('initial-tests-php-options'))
+            explode(' ', $input->getOption('initial-tests-php-options') ?: $config->getInitialTestsPhpOptions())
         );
 
         if (!$initialTestSuitProcess->isSuccessful()) {
@@ -280,7 +280,8 @@ final class InfectionCommand extends BaseCommand
 
     private function getTestFrameworkExtraOptions(string $testFrameworkKey): TestFrameworkExtraOptions
     {
-        $extraOptions = $this->input->getOption('test-framework-options');
+        $extraOptions = $this->input->getOption('test-framework-options')
+            ?: $this->getContainer()->get('infection.config')->getTestFrameworkOptions();
 
         return TestFrameworkTypes::PHPUNIT === $testFrameworkKey
             ? new PhpUnitExtraOptions($extraOptions)
