@@ -13,7 +13,6 @@ proc configure {input} {
 
 configure "directories do you want to include"
 configure "Any directories to exclude from"
-configure "configuration located?"
 configure "timeout in seconds"
 configure "text log file?"
 
