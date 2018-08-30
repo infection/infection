@@ -11,6 +11,8 @@ namespace Infection\Logger;
 
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcessInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -43,7 +45,13 @@ abstract class FileLogger implements MutationTestingResultsLogger
      */
     protected $isDebugMode;
 
+    /**
+     * @var OutputInterface
+     */
+    private $output;
+
     public function __construct(
+        OutputInterface $output,
         string $logFilePath,
         MetricsCalculator $metricsCalculator,
         Filesystem $fs,
@@ -55,11 +63,16 @@ abstract class FileLogger implements MutationTestingResultsLogger
         $this->fs = $fs;
         $this->isDebugVerbosity = $isDebugVerbosity;
         $this->isDebugMode = $isDebugMode;
+        $this->output = $output;
     }
 
     public function log(): void
     {
-        $this->fs->dumpFile($this->logFilePath, implode("\n", $this->getLogLines()));
+        try {
+            $this->fs->dumpFile($this->logFilePath, implode("\n", $this->getLogLines()));
+        } catch (IOException $e) {
+            $this->output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+        }
     }
 
     abstract protected function getLogLines(): array;

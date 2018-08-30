@@ -17,6 +17,7 @@ use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessInterface;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -28,6 +29,7 @@ final class DebugFileLoggerTest extends TestCase
     {
         $logFilePath = sys_get_temp_dir() . '/foo.txt';
         $calculator = new MetricsCalculator();
+        $output = $this->createMock(OutputInterface::class);
         $fs = $this->createMock(Filesystem::class);
         $fs->expects($this->once())->method('dumpFile')->with(
             $logFilePath,
@@ -56,7 +58,7 @@ Not Covered mutants:
 TXT
         );
 
-        $debugFileLogger = new DebugFileLogger($logFilePath, $calculator, $fs, false, false);
+        $debugFileLogger = new DebugFileLogger($output, $logFilePath, $calculator, $fs, false, false);
         $debugFileLogger->log();
     }
 
@@ -64,6 +66,7 @@ TXT
     {
         $logFilePath = sys_get_temp_dir() . '/foo.txt';
         $calculator = $this->createFilledMetricsCalculator();
+        $output = $this->createMock(OutputInterface::class);
         $fs = $this->createMock(Filesystem::class);
         $fs->expects($this->once())->method('dumpFile')->with(
             $logFilePath,
@@ -128,7 +131,7 @@ Not Covered mutants:
 TXT
         );
 
-        $debugFileLogger = new DebugFileLogger($logFilePath, $calculator, $fs, false, false);
+        $debugFileLogger = new DebugFileLogger($output, $logFilePath, $calculator, $fs, false, false);
         $debugFileLogger->log();
     }
 

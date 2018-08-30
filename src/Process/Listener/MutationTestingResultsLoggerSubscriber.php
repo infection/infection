@@ -123,6 +123,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
         switch ($logType) {
             case ResultsLoggerTypes::TEXT_FILE:
                 (new TextFileLogger(
+                    $this->output,
                     $config,
                     $this->metricsCalculator,
                     $this->fs,
@@ -133,6 +134,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
                 break;
             case ResultsLoggerTypes::SUMMARY_FILE:
                 (new SummaryFileLogger(
+                    $this->output,
                     $config,
                     $this->metricsCalculator,
                     $this->fs,
@@ -143,6 +145,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
                 break;
             case ResultsLoggerTypes::DEBUG_FILE:
                 (new DebugFileLogger(
+                    $this->output,
                     $config,
                     $this->metricsCalculator,
                     $this->fs,
@@ -162,6 +165,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
                 break;
             case ResultsLoggerTypes::PER_MUTATOR:
                 (new PerMutatorLogger(
+                    $this->output,
                     $config,
                     $this->metricsCalculator,
                     $this->fs,
