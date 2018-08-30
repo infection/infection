@@ -15,6 +15,8 @@ class OneFile
 
     public function foo($value = true): int
     {
-        return 33 + 44;
+        return (function ($input = 33) {
+            return $input;
+        })() + 44;
     }
 }
