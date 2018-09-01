@@ -18,11 +18,11 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
 {
     public function build(string $configPath, string $extraOptions): array
     {
-        return [
+        return array_filter([
             '--configuration',
             $configPath,
             '--stop-on-failure',
             $extraOptions,
-        ];
+        ]);
     }
 }
