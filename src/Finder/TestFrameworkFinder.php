@@ -43,10 +43,14 @@ class TestFrameworkFinder extends AbstractExecutableFinder
     {
         if (!isset($this->cachedPath)) {
             if (!$this->shouldUseCustomPath()) {
-                $this->addVendorFolderToPath();
+                $this->addVendorBinToPath();
             }
 
             $this->cachedPath = (string) realpath($this->findTestFramework());
+
+            if ('.bat' === substr($this->cachedPath, -4)) {
+                $this->cachedPath = $this->findFromBatchFile($this->cachedPath);
+            }
         }
 
         return $this->cachedPath;
@@ -65,7 +69,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
         throw FinderException::testCustomPathDoesNotExist($this->testFrameworkName, $this->customPath);
     }
 
-    private function addVendorFolderToPath(): void
+    private function addVendorBinToPath(): void
     {
         $vendorPath = null;
 
@@ -135,5 +139,26 @@ class TestFrameworkFinder extends AbstractExecutableFinder
         }
 
         throw FinderException::testFrameworkNotFound($this->testFrameworkName);
+    }
+
+    private function findFromBatchFile(string $path): string
+    {
+        /* Check the proxy code (%~dp0 is the script path with a backslash),
+         * then trim it and remove any leading directory slash and any trailing
+         * components. This will extract the relative path from lines like:
+         *
+         *   SET BIN_TARGET=%~dp0/../path
+         *   php %~dp0/path %*
+         */
+        if (preg_match('/%~dp0(.+$)/mi', (string) file_get_contents($path), $match)) {
+            $target = ltrim(rtrim(trim($match[1]), '" %*'), '\\/');
+            $script = (string) realpath(\dirname($path) . '/' . $target);
+
+            if (file_exists($script)) {
+                $path = $script;
+            }
+        }
+
+        return $path;
     }
 }
