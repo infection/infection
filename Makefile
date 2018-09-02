@@ -137,3 +137,20 @@ build/bin/infection.phar: $(shell find bin/ src/ -type f) box.phar box.json.dist
 box.phar:
 	wget $(BOX_URL)
 	chmod a+x box.phar
+
+.PHONY: symfony-40 symfony-30
+symfony-40:
+	composer config --unset platform.php
+	composer require symfony/console:^4.0 \
+		symfony/filesystem:^4.0 \
+		symfony/process:^4.0 \
+		symfony/finder:^4.0 \
+		symfony/yaml:^4.0
+
+symfony-30:
+	composer config platform.php 7.1
+	composer require symfony/console:^3.0 \
+		symfony/filesystem:^3.0 \
+		symfony/process:^3.0 \
+		symfony/finder:^3.0 \
+		symfony/yaml:^3.0
