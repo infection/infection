@@ -58,12 +58,11 @@ PHP
             ,
         ];
 
-        yield 'It removes dynamic function calls' => [
+        yield 'It removes dynamic function calls with string' => [
             <<<'PHP'
 <?php
 
 $start = true;
-$foo();
 ('foo')();
 $end = true;
 
@@ -74,6 +73,25 @@ PHP
 
 $start = true;
 
+$end = true;
+PHP
+            ,
+        ];
+
+        yield 'It removes dynamic function call with variable' => [
+            <<<'PHP'
+<?php
+
+$start = true;
+$foo();
+$end = true;
+
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$start = true;
 
 $end = true;
 PHP
