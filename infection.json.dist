@@ -10,5 +10,6 @@
         "badge": {
             "branch": "master"
         }
-    }
+    },
+    "tmpDir": "build/cache/infection"
 }

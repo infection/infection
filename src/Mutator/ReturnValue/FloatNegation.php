@@ -23,9 +23,9 @@ final class FloatNegation extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return iterable
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node): iterable
     {
         $floatValue = $node->expr instanceof Node\Expr\UnaryMinus
             ? -$node->expr->expr->value

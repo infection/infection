@@ -22,9 +22,9 @@ final class PregQuote extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return iterable
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node): iterable
     {
         yield $node->args[0];
     }

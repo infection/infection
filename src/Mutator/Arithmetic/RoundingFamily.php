@@ -31,9 +31,9 @@ final class RoundingFamily extends Mutator
      *
      * @param Node\Expr\FuncCall|Node $node
      *
-     * @return \Generator
+     * @return iterable
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node): iterable
     {
         $currentFunctionName = $this->getNormalizedFunctionName($node->name);
 

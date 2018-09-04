@@ -26,9 +26,9 @@ final class Decrement extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return iterable
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node): iterable
     {
         if ($node instanceof PreDec) {
             yield new PreInc($node->var, $node->getAttributes());

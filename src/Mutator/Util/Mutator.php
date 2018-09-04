@@ -24,7 +24,7 @@ abstract class Mutator
         $this->config = $config;
     }
 
-    abstract public function mutate(Node $node): \Generator;
+    abstract public function mutate(Node $node): iterable;
 
     abstract protected function mutatesNode(Node $node): bool;
 

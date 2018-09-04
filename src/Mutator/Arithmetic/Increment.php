@@ -25,9 +25,9 @@ final class Increment extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return iterable
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node): iterable
     {
         if ($node instanceof PreInc) {
             yield new PreDec($node->var, $node->getAttributes());

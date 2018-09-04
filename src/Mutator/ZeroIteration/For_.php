@@ -22,9 +22,9 @@ final class For_ extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return iterable
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node): iterable
     {
         yield new Node\Stmt\For_(
             [

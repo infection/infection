@@ -22,9 +22,9 @@ final class Assignment extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return iterable
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node): iterable
     {
         yield new Node\Expr\Assign($node->var, $node->expr, $node->getAttributes());
     }

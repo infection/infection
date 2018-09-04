@@ -1,0 +1,1067 @@
+Escaped mutants:
+================
+
+
+1) /Users/maksrafalko/sites/infection/src/Process/Builder/ProcessBuilder.php:53    [M] IdenticalEqual
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.7de2222f011b75a13d255a1b1dc96133.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $includeArgs = \PHP_SAPI === 'phpdbg';
++        $includeArgs = \PHP_SAPI == 'phpdbg';
+
+
+2) /Users/maksrafalko/sites/infection/src/Process/Builder/ProcessBuilder.php:53    [M] Identical
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.df848b2ca52fe3e3caa7a504215dba44.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $includeArgs = \PHP_SAPI === 'phpdbg';
++        $includeArgs = \PHP_SAPI !== 'phpdbg';
+
+
+3) /Users/maksrafalko/sites/infection/src/Process/Builder/ProcessBuilder.php:69    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.6af4db11af31ba895a6f0a7d5ec21700.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        // ignore the default timeout of 60 seconds
+-        $process->inheritEnvironmentVariables();
++        
+
+
+4) /Users/maksrafalko/sites/infection/src/Process/Builder/ProcessBuilder.php:84    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.20f26a8492193658e1145a3ab0c9454c.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $process->inheritEnvironmentVariables();
++        
+
+
+5) /Users/maksrafalko/sites/infection/src/Process/Builder/SubscriberBuilder.php:143    [M] CastBool
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.c162d4368bed65bdb6b77fd8303ac874.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $subscribers = [new InitialTestsConsoleLoggerSubscriber($output, $testFrameworkAdapter), new MutationGeneratingConsoleLoggerSubscriber($output), new MutantCreatingConsoleLoggerSubscriber($output), new MutationTestingConsoleLoggerSubscriber($output, $this->getOutputFormatter($output), $this->metricsCalculator, $this->diffColorizer, $this->input->getOption('show-mutations')), new MutationTestingResultsLoggerSubscriber($output, $this->infectionConfig, $this->metricsCalculator, $this->fs, $this->input->getOption('log-verbosity'), (bool) $this->input->getOption('debug')), new PerformanceLoggerSubscriber($this->timer, $this->timeFormatter, $this->memoryFormatter, $output)];
++        $subscribers = [new InitialTestsConsoleLoggerSubscriber($output, $testFrameworkAdapter), new MutationGeneratingConsoleLoggerSubscriber($output), new MutantCreatingConsoleLoggerSubscriber($output), new MutationTestingConsoleLoggerSubscriber($output, $this->getOutputFormatter($output), $this->metricsCalculator, $this->diffColorizer, $this->input->getOption('show-mutations')), new MutationTestingResultsLoggerSubscriber($output, $this->infectionConfig, $this->metricsCalculator, $this->fs, $this->input->getOption('log-verbosity'), $this->input->getOption('debug')), new PerformanceLoggerSubscriber($this->timer, $this->timeFormatter, $this->memoryFormatter, $output)];
+
+
+6) /Users/maksrafalko/sites/infection/src/Process/Builder/SubscriberBuilder.php:165    [M] IdenticalEqual
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.cce605f6f11f9359a565988fc8f1f843.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($this->input->getOption('formatter') === 'progress') {
++        if ($this->input->getOption('formatter') == 'progress') {
+
+
+7) /Users/maksrafalko/sites/infection/src/Process/Builder/SubscriberBuilder.php:169    [M] IdenticalEqual
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.2bd3191327be0ef061d88c166297250b.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($this->input->getOption('formatter') === 'dot') {
++        if ($this->input->getOption('formatter') == 'dot') {
+
+
+8) /Users/maksrafalko/sites/infection/src/Process/Listener/InitialTestsConsoleLoggerSubscriber.php:46    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.05fa192bfe14211d4df1a8882247f635.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->progressBar->setFormat('verbose');
++        
+
+
+9) /Users/maksrafalko/sites/infection/src/Process/Listener/InitialTestsConsoleLoggerSubscriber.php:76    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.c3cb80c948ac61efabe2880a0e137929.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->progressBar->start();
++        
+
+
+10) /Users/maksrafalko/sites/infection/src/Process/Listener/InitialTestsConsoleLoggerSubscriber.php:79    [M] PublicVisibility
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.8b64ce11ebce2297833efdab502f1fcd.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-    public function onInitialTestSuiteFinished(InitialTestSuiteFinished $event) : void
++    protected function onInitialTestSuiteFinished(InitialTestSuiteFinished $event) : void
+
+
+11) /Users/maksrafalko/sites/infection/src/Process/Listener/InitialTestsConsoleLoggerSubscriber.php:81    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.f8459bff771e250a89b8c6beb4feec42.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->progressBar->finish();
++        
+
+
+12) /Users/maksrafalko/sites/infection/src/Process/Listener/InitialTestsConsoleLoggerSubscriber.php:84    [M] PublicVisibility
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.920aa9532610063efc4bde150190f4d9.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-    public function onInitialTestCaseCompleted(InitialTestCaseCompleted $event) : void
++    protected function onInitialTestCaseCompleted(InitialTestCaseCompleted $event) : void
+
+
+13) /Users/maksrafalko/sites/infection/src/Process/Listener/InitialTestsConsoleLoggerSubscriber.php:86    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.806912323902b1ff18923f13bbfebf53.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->progressBar->advance();
++        
+
+
+14) /Users/maksrafalko/sites/infection/src/Process/Listener/MutantCreatingConsoleLoggerSubscriber.php:39    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.f5db00e3ceab6be74936b15ba28d5af4.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->progressBar->setFormat('Creating mutated files and processes: %current%/%max%');
++        
+
+
+15) /Users/maksrafalko/sites/infection/src/Process/Listener/MutantCreatingConsoleLoggerSubscriber.php:51    [M] PublicVisibility
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.4bf6ef5a4c3f7bd412f38f7842e602d6.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-    public function onMutantsCreatingStarted(MutantsCreatingStarted $event) : void
++    protected function onMutantsCreatingStarted(MutantsCreatingStarted $event) : void
+
+
+16) /Users/maksrafalko/sites/infection/src/Process/Listener/MutantCreatingConsoleLoggerSubscriber.php:53    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.bcdb5926c5d75ca30fd9ff875867ad0b.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->output->writeln(['']);
++        
+
+
+17) /Users/maksrafalko/sites/infection/src/Process/Listener/MutantCreatingConsoleLoggerSubscriber.php:54    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.7cf9200050661466b40581b36eaaeffa.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->progressBar->start($event->getMutantCount());
++        
+
+
+18) /Users/maksrafalko/sites/infection/src/Process/Listener/MutantCreatingConsoleLoggerSubscriber.php:57    [M] PublicVisibility
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.c3dc8f8aa9d9bd2faabea23322254358.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-    public function onMutantCreated(MutantCreated $event) : void
++    protected function onMutantCreated(MutantCreated $event) : void
+
+
+19) /Users/maksrafalko/sites/infection/src/Process/Listener/MutantCreatingConsoleLoggerSubscriber.php:59    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.7e126071a3958f160d7d58ddec490854.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->progressBar->advance();
++        
+
+
+20) /Users/maksrafalko/sites/infection/src/Process/Listener/MutantCreatingConsoleLoggerSubscriber.php:62    [M] PublicVisibility
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.f34dde3996851c9c3114ddcfcbb58392.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-    public function onMutantsCreatingFinished(MutantsCreatingFinished $event) : void
++    protected function onMutantsCreatingFinished(MutantsCreatingFinished $event) : void
+
+
+21) /Users/maksrafalko/sites/infection/src/Process/Listener/MutantCreatingConsoleLoggerSubscriber.php:64    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.5c6aef32ef3b35c3dcc7895d040f2ad6.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->progressBar->finish();
++        
+
+
+22) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationGeneratingConsoleLoggerSubscriber.php:39    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.502960bdd0b47984e587487d27e85143.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->progressBar->setFormat('Processing source code files: %current%/%max%');
++        
+
+
+23) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationGeneratingConsoleLoggerSubscriber.php:51    [M] PublicVisibility
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.daafd795135ef5d5c725da2a08eff1f4.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-    public function onMutationGeneratingStarted(MutationGeneratingStarted $event) : void
++    protected function onMutationGeneratingStarted(MutationGeneratingStarted $event) : void
+
+
+24) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationGeneratingConsoleLoggerSubscriber.php:53    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.3e8c16287cfe421c105fdb278ef99a3a.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->output->writeln(['', '', 'Generate mutants...', '']);
++        
+
+
+25) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationGeneratingConsoleLoggerSubscriber.php:54    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.7deb4ce64b1bda1e0ecd0cddf65361a3.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->progressBar->start($event->getMutableFilesCount());
++        
+
+
+26) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationGeneratingConsoleLoggerSubscriber.php:57    [M] PublicVisibility
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.698d7afc07a8f66cb4321400bad24170.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-    public function onMutableFileProcessed(MutableFileProcessed $event) : void
++    protected function onMutableFileProcessed(MutableFileProcessed $event) : void
+
+
+27) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationGeneratingConsoleLoggerSubscriber.php:59    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.8e655fb61c61fff1a71700a1e13db837.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->progressBar->advance();
++        
+
+
+28) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationGeneratingConsoleLoggerSubscriber.php:62    [M] PublicVisibility
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.5be8d696a7b5d1a79e6faf3327f6391a.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-    public function onMutationGeneratingFinished(MutationGeneratingFinished $event) : void
++    protected function onMutationGeneratingFinished(MutationGeneratingFinished $event) : void
+
+
+29) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationGeneratingConsoleLoggerSubscriber.php:64    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.363bed440e18ab464ff0faa49f72c925.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->progressBar->finish();
++        
+
+
+30) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:107    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.d63302e1144a3c901b7c20ed91e475db.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-            $this->showMutations($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped');
++            
+
+
+31) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:109    [M] GreaterThanNegotiation
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.1fe1fa011b278a28f4461b87a0611a3a.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-            if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
++            if ($this->output->getVerbosity() <= OutputInterface::VERBOSITY_NORMAL) {
+
+
+32) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:109    [M] GreaterThan
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.b4b48146b4c45836c7afaa37dbb0a92b.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-            if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
++            if ($this->output->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL) {
+
+
+33) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:114    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.60a00eda1c28303e5faa1504d82d9fba.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->showMetrics();
++        
+
+
+34) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:125    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.c934c2a1750ae7e27615fe97f35ba94b.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->output->writeln(['', $headline, str_repeat('=', \strlen($headline)), '']);
++        
+
+
+35) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:132    [M] Foreach_
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.bb2d1bc542850ca0c839606f7c783584.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        foreach ($processes as $index => $mutantProcess) {
++        foreach (array() as $index => $mutantProcess) {
+
+
+36) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:152    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.d432ca8ae890d9f39c516d1dfa1a9dd7.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->output->writeln(['', '']);
++        
+
+
+37) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:153    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.9f046d20011af204691b4d05031da5f8.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->output->writeln('<options=bold>' . $this->metricsCalculator->getTotalMutantsCount() . '</options=bold> mutations were generated:');
++        
+
+
+38) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:154    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.7f309cb0eac2ebab7b9b58ebcbdc4c1a.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getKilledCount()) . '</options=bold> mutants were killed');
++        
+
+
+39) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:155    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.4b9a736aacf46748cefcb14ee56b3844.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getNotCoveredByTestsCount()) . '</options=bold> mutants were not covered by tests');
++        
+
+
+40) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:156    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.a3a01afe9f0f312162a3d937653cf358.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getEscapedCount()) . '</options=bold> covered mutants were not detected');
++        
+
+
+41) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:157    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.3c858aea7bb95325ee91f7c3fdb21c47.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getErrorCount()) . '</options=bold> errors were encountered');
++        
+
+
+42) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:158    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.14d819b4d733eb39edf86d648436025c.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getTimedOutCount()) . '</options=bold> time outs were encountered');
++        
+
+
+43) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:164    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.ef97bc1091ef807a3631257b94896b72.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->output->writeln(['', 'Metrics:']);
++        
+
+
+44) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:165    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.6a3e42f048f9da3ab99fd64f22c91e21.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->output->writeln($this->addIndentation("Mutation Score Indicator (MSI): <{$msiTag}>{$this->metricsCalculator->getMutationScoreIndicator()}%</{$msiTag}>"));
++        
+
+
+45) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:168    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.8cdc8e1984930bfbdf375e233a9a5eb9.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->output->writeln($this->addIndentation("Mutation Code Coverage: <{$mutationCoverageTag}>{$this->metricsCalculator->getCoverageRate()}%</{$mutationCoverageTag}>"));
++        
+
+
+46) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:171    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.c7c7b54fc94dbf17978fc2677fb15864.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->output->writeln($this->addIndentation("Covered Code MSI: <{$coveredMsiTag}>{$this->metricsCalculator->getCoveredCodeMutationScoreIndicator()}%</{$coveredMsiTag}>"));
++        
+
+
+47) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:175    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.28ae99d518661aa7dc96d0ae69f9f9e6.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->output->writeln(['', 'Please note that some mutants will inevitably be harmless (i.e. false positives).']);
++        
+
+
+48) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:185    [M] OneZeroInteger
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.a998e444709c24db4b33691881e0d162.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        return str_repeat(' ', self::PAD_LENGTH + 1) . $string;
++        return str_repeat(' ', self::PAD_LENGTH + 0) . $string;
+
+
+49) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:185    [M] Plus
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.b9c5e2d1b20104ec0758216bf7214979.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        return str_repeat(' ', self::PAD_LENGTH + 1) . $string;
++        return str_repeat(' ', self::PAD_LENGTH - 1) . $string;
+
+
+50) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:185    [M] IncrementInteger
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.7978e866692a3ee6e279b61221ff7f86.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        return str_repeat(' ', self::PAD_LENGTH + 1) . $string;
++        return str_repeat(' ', self::PAD_LENGTH + 2) . $string;
+
+
+51) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:190    [M] DecrementInteger
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.19a024ee72e430dc027a0959cb93088c.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($percentage >= 0 && $percentage < 50) {
++        if ($percentage >= -1 && $percentage < 50) {
+
+
+52) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:190    [M] OneZeroInteger
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.2f080cd57a27103da48e50efd258f195.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($percentage >= 0 && $percentage < 50) {
++        if ($percentage >= 1 && $percentage < 50) {
+
+
+53) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:190    [M] GreaterThanOrEqualTo
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.cd16500a34b5c9bd54f6c2c8f37b2f4c.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($percentage >= 0 && $percentage < 50) {
++        if ($percentage > 0 && $percentage < 50) {
+
+
+54) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:190    [M] GreaterThanOrEqualToNegotiation
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.3626967f86151ad1b981d7d5f812ad9e.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($percentage >= 0 && $percentage < 50) {
++        if ($percentage < 0 && $percentage < 50) {
+
+
+55) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:190    [M] DecrementInteger
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.9ef998004e61d3806876c87bb796f651.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($percentage >= 0 && $percentage < 50) {
++        if ($percentage >= 0 && $percentage < 49) {
+
+
+56) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:190    [M] IncrementInteger
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.28f0edbdde99dbcfcfdb1568ac7fd2af.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($percentage >= 0 && $percentage < 50) {
++        if ($percentage >= 0 && $percentage < 51) {
+
+
+57) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:190    [M] LessThan
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.c7f99251a146e39e914dc666412ffd15.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($percentage >= 0 && $percentage < 50) {
++        if ($percentage >= 0 && $percentage <= 50) {
+
+
+58) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:190    [M] LessThanNegotiation
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.84d037d531aa1d90f3c03ee83b340e2b.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($percentage >= 0 && $percentage < 50) {
++        if ($percentage >= 0 && $percentage >= 50) {
+
+
+59) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:190    [M] LogicalAnd
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.292eb8726daabe318f341af169882636.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($percentage >= 0 && $percentage < 50) {
++        if ($percentage >= 0 || $percentage < 50) {
+
+
+60) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:194    [M] DecrementInteger
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.218c7121a90538932df6f87023130faa.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($percentage >= 50 && $percentage < 90) {
++        if ($percentage >= 50 && $percentage < 89) {
+
+
+61) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:194    [M] LogicalAnd
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.ac29c3ee525e433683c9a929bcb3a7f6.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($percentage >= 50 && $percentage < 90) {
++        if ($percentage >= 50 || $percentage < 90) {
+
+
+62) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:194    [M] LessThan
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.40e29f214e9c3eb4c4044fbf167a1698.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($percentage >= 50 && $percentage < 90) {
++        if ($percentage >= 50 && $percentage <= 90) {
+
+
+63) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:194    [M] LessThanNegotiation
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.6d64ddedbe5efcbc2c1fb93c2fc8226a.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($percentage >= 50 && $percentage < 90) {
++        if ($percentage >= 50 && $percentage >= 90) {
+
+
+64) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:194    [M] IncrementInteger
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.0caec0d8c567d01965483a71511c1919.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($percentage >= 50 && $percentage < 90) {
++        if ($percentage >= 50 && $percentage < 91) {
+
+
+65) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:194    [M] GreaterThanOrEqualTo
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.6194b2840dd4dedca663ad3de54a5ea7.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($percentage >= 50 && $percentage < 90) {
++        if ($percentage > 50 && $percentage < 90) {
+
+
+66) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:194    [M] GreaterThanOrEqualToNegotiation
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.958c6eb89bbf0b211a9a7c64a519fda4.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($percentage >= 50 && $percentage < 90) {
++        if ($percentage < 50 && $percentage < 90) {
+
+
+67) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:194    [M] IncrementInteger
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.263f4481e5d6995424ddd35cf73e8d03.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($percentage >= 50 && $percentage < 90) {
++        if ($percentage >= 51 && $percentage < 90) {
+
+
+68) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:194    [M] DecrementInteger
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.0def90f0951ab113cf5adacef920edf0.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($percentage >= 50 && $percentage < 90) {
++        if ($percentage >= 49 && $percentage < 90) {
+
+
+69) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingResultsLoggerSubscriber.php:102    [M] Foreach_
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.e60835b9e2455d5e5c189ada09052e29.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        foreach ($logTypes as $key => $value) {
++        foreach (array() as $key => $value) {
+
+
+70) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingResultsLoggerSubscriber.php:103    [M] IdenticalEqual
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.63361ddeee9e4bce62f640711b18e564.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-            if ($this->logVerbosity === LogVerbosity::NONE) {
++            if ($this->logVerbosity == LogVerbosity::NONE) {
+
+
+71) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingResultsLoggerSubscriber.php:104    [M] TrueValue
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.65058d1f06b4a2ace43a7439eddf66ee.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-                if (!\in_array($key, ResultsLoggerTypes::ALLOWED_WITHOUT_LOGGING, true)) {
++                if (!\in_array($key, ResultsLoggerTypes::ALLOWED_WITHOUT_LOGGING, false)) {
+
+
+72) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingResultsLoggerSubscriber.php:104    [M] LogicalNot
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.f73c6ab6d15201becddfe32e88110a73.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-                if (!\in_array($key, ResultsLoggerTypes::ALLOWED_WITHOUT_LOGGING, true)) {
++                if (\in_array($key, ResultsLoggerTypes::ALLOWED_WITHOUT_LOGGING, true)) {
+
+
+73) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingResultsLoggerSubscriber.php:108    [M] Continue_
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.e856aeb2d9d5b78f30d69451191c76ee.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-                continue;
++                break;
+
+
+74) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingResultsLoggerSubscriber.php:111    [M] TrueValue
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.699a8b65fb969792d18d5324a4600d47.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-            if (!\in_array($key, ResultsLoggerTypes::ALL, true)) {
++            if (!\in_array($key, ResultsLoggerTypes::ALL, false)) {
+
+
+75) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingResultsLoggerSubscriber.php:121    [M] IdenticalEqual
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.8249593bbc283b4543171ae1758872d8.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $isDebugVerbosity = $this->logVerbosity === LogVerbosity::DEBUG;
++        $isDebugVerbosity = $this->logVerbosity == LogVerbosity::DEBUG;
+
+
+76) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingResultsLoggerSubscriber.php:136    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.0d68f37b53bc908581fc81e4b63ef1c4.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-                (new SummaryFileLogger($this->output, $config, $this->metricsCalculator, $this->fs, $isDebugVerbosity, $this->isDebugMode))->log();
++                
+
+
+77) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingResultsLoggerSubscriber.php:147    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.b7ada759b73eb1a9e8d7a37dc99620df.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-                (new DebugFileLogger($this->output, $config, $this->metricsCalculator, $this->fs, $isDebugVerbosity, $this->isDebugMode))->log();
++                
+
+
+78) /Users/maksrafalko/sites/infection/src/Process/MutantProcess.php:96    [M] TrueValue
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.3b079fafec3cef6dbe36730b7758f136.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if (!\in_array($this->getProcess()->getExitCode(), self::NOT_FATAL_ERROR_CODES, true)) {
++        if (!\in_array($this->getProcess()->getExitCode(), self::NOT_FATAL_ERROR_CODES, false)) {
+
+
+79) /Users/maksrafalko/sites/infection/src/Process/Runner/InitialTestsRunner.php:54    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.d1d40ba2c2437a02c09f5335190fb55b.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->eventDispatcher->dispatch(new InitialTestSuiteStarted());
++        
+
+
+80) /Users/maksrafalko/sites/infection/src/Process/Runner/InitialTestsRunner.php:56    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.7aa69e220412b4b40548eead5b5cdcfc.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $process->run(function ($type) use($process) : void {
+-            if ($process::ERR === $type) {
+-                $process->stop();
+-            }
+-            $this->eventDispatcher->dispatch(new InitialTestCaseCompleted());
+-        });
++        
+
+
+81) /Users/maksrafalko/sites/infection/src/Process/Runner/InitialTestsRunner.php:57    [M] IdenticalEqual
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.3d89a56d73d0b18b8a5520ffb02c9561.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-            if ($process::ERR === $type) {
++            if ($process::ERR == $type) {
+
+
+82) /Users/maksrafalko/sites/infection/src/Process/Runner/InitialTestsRunner.php:57    [M] Identical
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.2f2cac3fec8253cefb06443fdda7ba52.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-            if ($process::ERR === $type) {
++            if ($process::ERR !== $type) {
+
+
+83) /Users/maksrafalko/sites/infection/src/Process/Runner/InitialTestsRunner.php:61    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.2f085ac80c6a4eeac3e797bcedcb57f2.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-            $this->eventDispatcher->dispatch(new InitialTestCaseCompleted());
++            
+
+
+84) /Users/maksrafalko/sites/infection/src/Process/Runner/InitialTestsRunner.php:64    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.70eded0abcf383003c747dab4f9a5028.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->eventDispatcher->dispatch(new InitialTestSuiteFinished());
++        
+
+
+85) /Users/maksrafalko/sites/infection/src/Process/Runner/MutationTestingRunner.php:62    [M] PublicVisibility
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.8abb9b222d49dcca790d0a3a57007443.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-    public function run(int $threadCount, CodeCoverageData $codeCoverageData, string $testFrameworkExtraOptions) : void
++    protected function run(int $threadCount, CodeCoverageData $codeCoverageData, string $testFrameworkExtraOptions) : void
+
+
+86) /Users/maksrafalko/sites/infection/src/Process/Runner/MutationTestingRunner.php:66    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.6ed11fb52cb8ef51430dfbdbe61b310b.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->eventDispatcher->dispatch(new MutantsCreatingStarted($mutantCount));
++        
+
+
+87) /Users/maksrafalko/sites/infection/src/Process/Runner/MutationTestingRunner.php:74    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.cb7b0864230db935efa0013ee115d387.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-            $this->eventDispatcher->dispatch(new MutantCreated());
++            
+
+
+88) /Users/maksrafalko/sites/infection/src/Process/Runner/MutationTestingRunner.php:81    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.fd6bf58bec337331917566b2784d601e.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->eventDispatcher->dispatch(new MutantsCreatingFinished());
++        
+
+
+89) /Users/maksrafalko/sites/infection/src/Process/Runner/MutationTestingRunner.php:83    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.75319e73857d34cb5857cca51689cd95.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->eventDispatcher->dispatch(new MutationTestingStarted($mutantCount));
++        
+
+
+90) /Users/maksrafalko/sites/infection/src/Process/Runner/MutationTestingRunner.php:85    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.9017e3cb37c17d92fcba9b285823edb1.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->parallelProcessManager->run($processes, $threadCount);
++        
+
+
+91) /Users/maksrafalko/sites/infection/src/Process/Runner/MutationTestingRunner.php:87    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.c869994a366f65422cad1a469fa8cf44.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $this->eventDispatcher->dispatch(new MutationTestingFinished());
++        
+
+
+92) /Users/maksrafalko/sites/infection/src/Process/Runner/Parallel/ParallelProcessRunner.php:55    [M] DecrementInteger
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.29fd43778c4f39c855bcb3a43460bd99.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-    public function run(array $processes, int $threadCount, int $poll = 1000) : void
++    public function run(array $processes, int $threadCount, int $poll = 999) : void
+
+
+93) /Users/maksrafalko/sites/infection/src/Process/Runner/Parallel/ParallelProcessRunner.php:55    [M] IncrementInteger
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.937b99cbff91cf20f5d555f9f9205f25.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-    public function run(array $processes, int $threadCount, int $poll = 1000) : void
++    public function run(array $processes, int $threadCount, int $poll = 1001) : void
+
+
+94) /Users/maksrafalko/sites/infection/src/Process/Runner/Parallel/ParallelProcessRunner.php:63    [M] IncrementInteger
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.3267d034fbfa3c151d61303b6926aa80.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $maxParallel = min(max($threadCount, 1), \count($this->processesQueue));
++        $maxParallel = min(max($threadCount, 2), \count($this->processesQueue));
+
+
+95) /Users/maksrafalko/sites/infection/src/Process/Runner/Parallel/ParallelProcessRunner.php:68    [M] LessThan
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.4d55e25316b2398aeaa07c71f6804e38.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        } while ($this->processesQueue && \count($this->currentProcesses) < $maxParallel);
++        } while ($this->processesQueue && \count($this->currentProcesses) <= $maxParallel);
+
+
+96) /Users/maksrafalko/sites/infection/src/Process/Runner/Parallel/ParallelProcessRunner.php:71    [M] FunctionCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.a92e6638e94ba68933b5c241776fde4f.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-            usleep($poll);
++            
+
+
+97) /Users/maksrafalko/sites/infection/src/Process/Runner/Parallel/ParallelProcessRunner.php:92    [M] Break_
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.c49afa22acc3f5d40068534aaca7b2fa.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-                            break;
++                            continue;
+
+
+98) /Users/maksrafalko/sites/infection/src/Process/Runner/Parallel/ParallelProcessRunner.php:118    [M] TrueValue
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.d83db141562fbacde73e2d8f49167804.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        return true;
++        return false;
+
+
+99) /Users/maksrafalko/sites/infection/src/Process/Runner/TestRunConstraintChecker.php:62    [M] IdenticalEqual
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.6c768d0019e7c19159ea76be51079994.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        if ($this->ignoreMsiWithNoMutations && $this->metricsCalculator->getTotalMutantsCount() === 0) {
++        if ($this->ignoreMsiWithNoMutations && $this->metricsCalculator->getTotalMutantsCount() == 0) {
+
+
+100) /Users/maksrafalko/sites/infection/src/Process/Runner/TestRunConstraintChecker.php:88    [M] IdenticalEqual
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.b251e0f032b0828fffef2e1b4d538bd6.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        return $this->failureType === self::MSI_FAILURE ? $this->minMsi : $this->minCoveredMsi;
++        return $this->failureType == self::MSI_FAILURE ? $this->minMsi : $this->minCoveredMsi;
+
+Timed Out mutants:
+==================
+
+
+1) /Users/maksrafalko/sites/infection/src/Process/Runner/Parallel/ParallelProcessRunner.php:63    [M] OneZeroInteger
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.a80e276b9b36148e55efb1817544da58.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        $maxParallel = min(max($threadCount, 1), \count($this->processesQueue));
++        $maxParallel = min(max($threadCount, 0), \count($this->processesQueue));
+
+
+2) /Users/maksrafalko/sites/infection/src/Process/Runner/Parallel/ParallelProcessRunner.php:67    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.2e87c66f4b6be16507b71f93391cd8e4.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-            $this->startProcess();
++            
+
+
+3) /Users/maksrafalko/sites/infection/src/Process/Runner/Parallel/ParallelProcessRunner.php:68    [M] LessThanNegotiation
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.ba724727fc96eb7f432cb6ca8a7e1da8.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        } while ($this->processesQueue && \count($this->currentProcesses) < $maxParallel);
++        } while ($this->processesQueue && \count($this->currentProcesses) >= $maxParallel);
+
+
+4) /Users/maksrafalko/sites/infection/src/Process/Runner/Parallel/ParallelProcessRunner.php:74    [M] Foreach_
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.be5358064958b00d1f8c6c56e3bd6e09.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-            foreach ($this->currentProcesses as $index => $mutantProcess) {
++            foreach (array() as $index => $mutantProcess) {
+
+
+5) /Users/maksrafalko/sites/infection/src/Process/Runner/Parallel/ParallelProcessRunner.php:111    [M] FalseValue
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.7c4af0e3bdfd784fbaf22f6bbfb0ee05.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-            return false;
++            return true;
+
+Not Covered mutants:
+====================
+
+
+1) /Users/maksrafalko/sites/infection/src/Process/Coverage/CoverageRequirementChecker.php:38    [M] Identical
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.e402cfbd2b6ff24f04eda094763175e7.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        return $this->skipCoverage || \PHP_SAPI === 'phpdbg' || \extension_loaded('xdebug') || XdebugHandler::getSkippedVersion() || $this->isXdebugIncludedInInitialTestPhpOptions();
++        return $this->skipCoverage || \PHP_SAPI !== 'phpdbg' || \extension_loaded('xdebug') || XdebugHandler::getSkippedVersion() || $this->isXdebugIncludedInInitialTestPhpOptions();
+
+
+2) /Users/maksrafalko/sites/infection/src/Process/Coverage/CoverageRequirementChecker.php:38    [M] IdenticalEqual
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.6ea78f92c1426ee0562cefc1ad7ec490.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        return $this->skipCoverage || \PHP_SAPI === 'phpdbg' || \extension_loaded('xdebug') || XdebugHandler::getSkippedVersion() || $this->isXdebugIncludedInInitialTestPhpOptions();
++        return $this->skipCoverage || \PHP_SAPI == 'phpdbg' || \extension_loaded('xdebug') || XdebugHandler::getSkippedVersion() || $this->isXdebugIncludedInInitialTestPhpOptions();
+
+
+3) /Users/maksrafalko/sites/infection/src/Process/Coverage/CoverageRequirementChecker.php:46    [M] CastBool
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.a1fb2dc10881a3272782213f29e7e17f.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-        return (bool) preg_match('/(zend_extension\\s*=.*xdebug.*)/mi', $this->initialTestPhpOptions);
++        return preg_match('/(zend_extension\\s*=.*xdebug.*)/mi', $this->initialTestPhpOptions);
+
+
+4) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:110    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.f14e44c141495816edb3b2a3cc5d6390.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-                $this->showMutations($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not covered');
++                
+
+
+5) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:135    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.e3a4bed46d2f4213814fdcf1975928dd.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-            $this->output->writeln(['', sprintf('%d) %s:%d    [M] %s', $index + 1, $mutation->getOriginalFilePath(), (int) $mutation->getAttributes()['startLine'], $mutation->getMutator()::getName())]);
++            
+
+
+6) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:139    [M] IncrementInteger
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.1db368f5bce51e101c408515bf7af1f2.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-            $this->output->writeln(['', sprintf('%d) %s:%d    [M] %s', $index + 1, $mutation->getOriginalFilePath(), (int) $mutation->getAttributes()['startLine'], $mutation->getMutator()::getName())]);
++            $this->output->writeln(['', sprintf('%d) %s:%d    [M] %s', $index + 2, $mutation->getOriginalFilePath(), (int) $mutation->getAttributes()['startLine'], $mutation->getMutator()::getName())]);
+
+
+7) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:139    [M] OneZeroInteger
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.893f762c5a608ef05ab0b69ca3f2badd.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-            $this->output->writeln(['', sprintf('%d) %s:%d    [M] %s', $index + 1, $mutation->getOriginalFilePath(), (int) $mutation->getAttributes()['startLine'], $mutation->getMutator()::getName())]);
++            $this->output->writeln(['', sprintf('%d) %s:%d    [M] %s', $index + 0, $mutation->getOriginalFilePath(), (int) $mutation->getAttributes()['startLine'], $mutation->getMutator()::getName())]);
+
+
+8) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:139    [M] Plus
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.8ee0ba4e9c87883477027f3b8ba0064f.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-            $this->output->writeln(['', sprintf('%d) %s:%d    [M] %s', $index + 1, $mutation->getOriginalFilePath(), (int) $mutation->getAttributes()['startLine'], $mutation->getMutator()::getName())]);
++            $this->output->writeln(['', sprintf('%d) %s:%d    [M] %s', $index - 1, $mutation->getOriginalFilePath(), (int) $mutation->getAttributes()['startLine'], $mutation->getMutator()::getName())]);
+
+
+9) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:141    [M] CastInt
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.e767e62ab5ad5727a54c3d03b466e118.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-            $this->output->writeln(['', sprintf('%d) %s:%d    [M] %s', $index + 1, $mutation->getOriginalFilePath(), (int) $mutation->getAttributes()['startLine'], $mutation->getMutator()::getName())]);
++            $this->output->writeln(['', sprintf('%d) %s:%d    [M] %s', $index + 1, $mutation->getOriginalFilePath(), $mutation->getAttributes()['startLine'], $mutation->getMutator()::getName())]);
+
+
+10) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingConsoleLoggerSubscriber.php:146    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.8e12be7b35a6ed6ed8c0a902286b12e4.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-            $this->output->writeln($this->diffColorizer->colorize($mutantProcess->getMutant()->getDiff()));
++            
+
+
+11) /Users/maksrafalko/sites/infection/src/Process/Listener/MutationTestingResultsLoggerSubscriber.php:158    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.c05baf61209ff3913239682e7779d895.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-                (new BadgeLogger($this->output, new BadgeApiClient($this->output), $this->metricsCalculator, $config))->log();
++                
+
+
+12) /Users/maksrafalko/sites/infection/src/Process/Runner/InitialTestsRunner.php:58    [M] MethodCallRemoval
+'/Users/maksrafalko/sites/infection/vendor/phpunit/phpunit/phpunit' '--configuration' '/Users/maksrafalko/sites/infection/build/cache/infection/infection/phpunitConfiguration.1baeffa734a71e49814076351f5c6e58.infection.xml' '--stop-on-failure' ''
+--- Original
++++ New
+@@ @@
+-                $process->stop();
++                
