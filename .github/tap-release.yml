@@ -1,0 +1,20 @@
+asset: infection.phar
+tap: infection/homebrew-infection/Formula/infection.rb
+template: >
+  class Infection < Formula
+    desc     "$REPO_DESCRIPTION"
+    homepage "$REPO_WEBITE"
+    version  "$STABLE_VERSION"
+    url      "$STABLE_ASSET_URL"
+    sha256   "$STABLE_ASSET_SHA256"
+
+    depends_on "php71-xdebug" if Formula["php71"].linked_keg.exist?
+
+    def install
+      bin.install "infection.phar" => "infection"
+    end
+
+    test do
+        shell_output("#{bin}/infection --version").include?(version)
+    end
+  end
