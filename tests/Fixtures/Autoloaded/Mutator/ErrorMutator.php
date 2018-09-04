@@ -8,7 +8,7 @@ use PhpParser\Node;
 
 class ErrorMutator extends Mutator
 {
-    public function mutate(Node $node): iterable
+    public function mutate(Node $node): \Generator
     {
         yield $node;
     }

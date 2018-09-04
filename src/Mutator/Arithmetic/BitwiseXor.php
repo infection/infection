@@ -22,9 +22,9 @@ final class BitwiseXor extends Mutator
      *
      * @param Node $node
      *
-     * @return iterable
+     * @return \Generator
      */
-    public function mutate(Node $node): iterable
+    public function mutate(Node $node): \Generator
     {
         yield new Node\Expr\BinaryOp\BitwiseAnd($node->left, $node->right, $node->getAttributes());
     }

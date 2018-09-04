@@ -22,9 +22,9 @@ final class Foreach_ extends Mutator
      *
      * @param Node $node
      *
-     * @return iterable
+     * @return \Generator
      */
-    public function mutate(Node $node): iterable
+    public function mutate(Node $node): \Generator
     {
         yield new Node\Stmt\Foreach_(
             new Node\Expr\Array_(),

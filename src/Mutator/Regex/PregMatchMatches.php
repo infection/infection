@@ -22,9 +22,9 @@ final class PregMatchMatches extends Mutator
      *
      * @param Node|Node\Expr\FuncCall $node
      *
-     * @return iterable
+     * @return \Generator
      */
-    public function mutate(Node $node): iterable
+    public function mutate(Node $node): \Generator
     {
         yield new Node\Expr\Cast\Int_(new Node\Expr\Assign($node->args[2]->value, new Node\Expr\Array_()));
     }

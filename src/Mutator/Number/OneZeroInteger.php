@@ -22,9 +22,9 @@ final class OneZeroInteger extends Mutator
      *
      * @param Node $node
      *
-     * @return iterable
+     * @return \Generator
      */
-    public function mutate(Node $node): iterable
+    public function mutate(Node $node): \Generator
     {
         if ($node->value === 0) {
             yield new Node\Scalar\LNumber(1);

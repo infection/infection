@@ -28,9 +28,9 @@ final class PublicVisibility extends Mutator
      *
      * @param Node $node
      *
-     * @return iterable
+     * @return \Generator
      */
-    public function mutate(Node $node): iterable
+    public function mutate(Node $node): \Generator
     {
         /* @var ClassMethod $node */
         yield new ClassMethod(
