@@ -18,7 +18,7 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
 {
     public function build(string $configPath, string $extraOptions): array
     {
-        return [
+        return array_filter([
             'run',
             '--config',
             $configPath,
@@ -26,6 +26,6 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
             '--format=tap',
             '--stop-on-failure',
             $extraOptions,
-        ];
+        ]);
     }
 }
