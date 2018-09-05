@@ -12,7 +12,6 @@ namespace Infection\Console;
 use Composer\XdebugHandler\XdebugHandler;
 use Infection\Command;
 use Infection\Console\ConsoleOutput as InfectionConsoleOutput;
-use Infection\Console\Util\PhpProcess;
 use PackageVersions\Versions;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -34,11 +33,11 @@ final class Application extends BaseApplication
 
     private const LOGO = <<<'ASCII'
     ____      ____          __  _
-   /  _/___  / __/__  _____/ /_(_)___  ____ 
+   /  _/___  / __/__  _____/ /_(_)___  ____
    / // __ \/ /_/ _ \/ ___/ __/ / __ \/ __ \
  _/ // / / / __/  __/ /__/ /_/ / /_/ / / / /
 /___/_/ /_/_/  \___/\___/\__/_/\____/_/ /_/
- 
+
 ASCII;
 
     /**
@@ -87,15 +86,9 @@ ASCII;
             return parent::run($input, $output);
         }
 
-        $xdebug = new XdebugHandler(self::INFECTION_PREFIX, '--ansi');
-        $xdebug->check();
-
-        /*
-         * If we're skipping Xdebug, setup a default Xdebug-free environment for all subprocesses
-         */
-        if ('' !== XdebugHandler::getSkippedVersion()) {
-            PhpProcess::setupXdebugFreeEnvironment();
-        }
+        (new XdebugHandler(self::INFECTION_PREFIX, '--ansi'))
+            ->setPersistent()
+            ->check();
 
         return parent::run($input, $output);
     }
