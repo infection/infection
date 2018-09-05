@@ -107,7 +107,7 @@ TXT
     public function test_it_outputs_an_error_when_dir_is_not_writable(): void
     {
         if (\DIRECTORY_SEPARATOR === '\\') {
-            $this->markTestSkipped('Can\' test file permission on Windows');
+            $this->markTestSkipped('Can\'t test file permission on Windows');
         }
 
         $readOnlyDirPath = $this->tmpDir . '/invalid';
@@ -115,6 +115,10 @@ TXT
 
         // make it readonly
         $this->fileSystem->mkdir($readOnlyDirPath, 0400);
+
+        if (is_writable($readOnlyDirPath)) {
+            $this->markTestSkipped('Unable to change file permission to 0400');
+        }
 
         $calculator = $this->createMock(MetricsCalculator::class);
         $calculator->expects($this->once())->method('getTotalMutantsCount')->willReturn(6);
