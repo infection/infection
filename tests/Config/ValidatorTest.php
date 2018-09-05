@@ -61,7 +61,7 @@ final class ValidatorTest extends TestCase
     public function test_it_validates_log_file_paths(string $logType): void
     {
         if (\DIRECTORY_SEPARATOR === '\\') {
-            $this->markTestSkipped('Can\' test file permission on Windows');
+            $this->markTestSkipped('Can\'t test file permission on Windows');
         }
 
         $readOnlyDirPath = $this->tmpDir . '/invalid';
@@ -72,6 +72,10 @@ final class ValidatorTest extends TestCase
 
         // make it readonly
         $this->fileSystem->mkdir($readOnlyDirPath, 0400);
+
+        if (is_writable($readOnlyDirPath)) {
+            $this->markTestSkipped('Unable to change file permission to 0400');
+        }
 
         $configObject = json_decode(sprintf('{"logs": {"%s": "%s/infection.log"}}', $logType, $readOnlyDirPath));
 
