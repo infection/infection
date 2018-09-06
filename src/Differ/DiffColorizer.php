@@ -14,19 +14,19 @@ namespace Infection\Differ;
  */
 class DiffColorizer
 {
-    public function colorize(string $diff)
+    public function colorize(string $diff): string
     {
-        $lines = array();
-
-        foreach (explode("\n", $diff) as $line) {
+        $lines = array_map(function (string $line) {
             if (0 === strpos($line, '-')) {
-                $lines[] = sprintf('<diff-del>%s</diff-del>', $line);
-            } elseif (0 === strpos($line, '+')) {
-                $lines[] = sprintf('<diff-add>%s</diff-add>', $line);
-            } else {
-                $lines[] = $line;
+                return  sprintf('<diff-del>%s</diff-del>', $line);
             }
-        }
+
+            if (0 === strpos($line, '+')) {
+                return sprintf('<diff-add>%s</diff-add>', $line);
+            }
+
+            return $line;
+        }, explode("\n", $diff));
 
         return sprintf('<code>%s%s</code>', "\n", implode("\n", $lines));
     }

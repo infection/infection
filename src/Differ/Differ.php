@@ -43,7 +43,7 @@ class Differ
      *
      * @return string
      */
-    public function diff($from, $to)
+    public function diff($from, $to): string
     {
         $diff = $this->differ->diff($from, $to);
 
