@@ -1,0 +1,2 @@
+comment: Thank you for contributing to Infection. We noticed you didn't add any tests. Could you please add them to make sure everything works as expected?
+fileExtensions: ['.php']
