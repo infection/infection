@@ -38,9 +38,16 @@ final class PhpUnitExtraOptionsTest extends TestCase
     public function mutantProcessProvider()
     {
         return [
-            ['--filter=someTest#2 --a --b=value --testsuite=Foobar', '--a --b=value'],
-            ['--a --filter=someTest#2 --b=value --testsuite=Foobar', '--a --b=value'],
-            ['--a --filter someTest#2 --b=value --testsuite=Foobar', '--a --b=value'],
+            ['--filter=someTest#2 --a --b=value', '--a --b=value'],
+            ['--a --filter=someTest#2 --b=value', '--a --b=value'],
+            ['--a --filter someTest#2 --b=value', '--a --b=value'],
+            ['--a --filter="some Test#2" --b=value', '--a --b=value'],
+            ['--a --filter=\'some Test#2\' --b=value', '--a --b=value'],
+            ['--testsuite=someTest#2 --a --b=value', '--a --b=value'],
+            ['--a --testsuite=someTest#2 --b=value', '--a --b=value'],
+            ['--a --testsuite someTest#2 --b=value', '--a --b=value'],
+            ['--a --testsuite="some Test#2" --b=value', '--a --b=value'],
+            ['--a --testsuite=\'some Test#2\' --b=value', '--a --b=value'],
         ];
     }
 }
