@@ -36,7 +36,7 @@ abstract class TestFrameworkExtraOptions
         $extraOptions = $this->extraOptions;
 
         foreach ($this->getInitialRunOnlyOptions() as $initialRunOnlyOption) {
-            $extraOptions = preg_replace(sprintf('/%s[\=| ](?:\w+|\"[^\"]*\"|\'[^\']*\')/', $initialRunOnlyOption), '', $extraOptions);
+            $extraOptions = preg_replace(sprintf('/%s[\=| ](?:\"[^\"]*\"|\'[^\']*\'|[^\ ]*)/', $initialRunOnlyOption), '', $extraOptions);
         }
 
         return preg_replace('/\s+/', ' ', trim($extraOptions));
