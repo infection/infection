@@ -22,11 +22,11 @@ final class For_ extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return Node\Stmt\For_
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node)
     {
-        yield new Node\Stmt\For_(
+        return new Node\Stmt\For_(
             [
                 'init' => $node->init,
                 'cond' => [new Node\Expr\ConstFetch(new Node\Name('false'))],

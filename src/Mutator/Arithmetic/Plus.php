@@ -23,11 +23,11 @@ final class Plus extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return Node\Expr\BinaryOp\Minus
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node)
     {
-        yield new Node\Expr\BinaryOp\Minus($node->left, $node->right, $node->getAttributes());
+        return new Node\Expr\BinaryOp\Minus($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool

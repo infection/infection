@@ -22,11 +22,11 @@ final class FunctionCall extends AbstractValueToNullReturnValue
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return Node[]
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node)
     {
-        yield [
+        return [
             new Node\Stmt\Expression($node->expr),
             new Node\Stmt\Return_(
                 new Node\Expr\ConstFetch(new Node\Name('null'))

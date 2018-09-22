@@ -28,12 +28,12 @@ final class PublicVisibility extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return ClassMethod
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node)
     {
         /* @var ClassMethod $node */
-        yield new ClassMethod(
+        return new ClassMethod(
             $node->name,
             [
                 'flags' => ($node->flags & ~Class_::MODIFIER_PUBLIC) | Class_::MODIFIER_PROTECTED,

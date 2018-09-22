@@ -18,15 +18,15 @@ use PhpParser\Node;
 final class BitwiseNot extends Mutator
 {
     /**
-     * Removes "~"
+     * Replaces "~" with "" (removed)
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return mixed
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node)
     {
-        yield $node->expr;
+        return $node->expr;
     }
 
     protected function mutatesNode(Node $node): bool

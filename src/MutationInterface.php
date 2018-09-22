@@ -36,7 +36,7 @@ interface MutationInterface
     public function isCoveredByTest(): bool;
 
     /**
-     * @return Node|Node[]|int|null Node, array of Nodes, NodeTraverser::REMOVE_NODE, NodeTraverser::STOP_TRAVERSAL, null
+     * @return Node|Node[] Node, array of Nodes
      */
     public function getMutatedNode();
 }

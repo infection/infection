@@ -23,15 +23,15 @@ final class IntegerNegation extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return Node\Stmt\Return_
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node)
     {
         $integerValue = $node->expr instanceof Node\Expr\UnaryMinus
             ? -$node->expr->expr->value
             : $node->expr->value;
 
-        yield new Node\Stmt\Return_(
+        return new Node\Stmt\Return_(
             new Node\Scalar\LNumber(-1 * $integerValue, $node->getAttributes())
         );
     }

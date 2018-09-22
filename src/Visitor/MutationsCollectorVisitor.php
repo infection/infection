@@ -98,7 +98,11 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                 continue;
             }
 
-            foreach ($mutator->mutate($node) as $mutationByMutatorIndex => $mutatedNode) {
+            $mutatedResult = $mutator->mutate($node);
+
+            $mutatedNodes = $mutatedResult instanceof \Generator ? $mutatedResult : [$mutatedResult];
+
+            foreach ($mutatedNodes as $mutationByMutatorIndex => $mutatedNode) {
                 $this->mutations[] = new Mutation(
                     $this->filePath,
                     $this->fileAst,

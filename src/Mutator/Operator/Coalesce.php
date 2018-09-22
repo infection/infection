@@ -22,11 +22,11 @@ final class Coalesce extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return Node\Expr\BinaryOp\Coalesce
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node)
     {
-        yield $node->right;
+        return $node->right;
     }
 
     protected function mutatesNode(Node $node): bool

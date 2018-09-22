@@ -22,11 +22,11 @@ final class FunctionCallRemoval extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return Node\Stmt\Nop()
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node)
     {
-        yield new Node\Stmt\Nop();
+        return new Node\Stmt\Nop();
     }
 
     protected function mutatesNode(Node $node): bool

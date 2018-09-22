@@ -40,7 +40,11 @@ final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
             return;
         }
 
-        foreach($this->mutator->mutate($node) as $mutatedNode) {
+        $mutatedResult = $this->mutator->mutate($node);
+
+        $mutatedNodes = $mutatedResult instanceof \Generator ? $mutatedResult : [$mutatedResult];
+
+        foreach($mutatedNodes as $mutatedNode) {
             $this->mutations[] = new SimpleMutation(
                 $this->fileAst,
                 $this->mutator,

@@ -22,11 +22,11 @@ final class PregQuote extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return mixed
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node)
     {
-        yield $node->args[0];
+        return $node->args[0];
     }
 
     protected function mutatesNode(Node $node): bool

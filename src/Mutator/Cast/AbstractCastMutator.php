@@ -22,10 +22,10 @@ abstract class AbstractCastMutator extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return Node
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node)
     {
-        yield $node->expr;
+        return $node->expr;
     }
 }

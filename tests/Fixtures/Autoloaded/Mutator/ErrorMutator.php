@@ -8,9 +8,9 @@ use PhpParser\Node;
 
 class ErrorMutator extends Mutator
 {
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node)
     {
-        yield $node;
+        return $node;
     }
 
     protected function mutatesNode(Node $node): bool

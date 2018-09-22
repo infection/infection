@@ -23,15 +23,15 @@ final class FloatNegation extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return Node\Stmt\Return_
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node)
     {
         $floatValue = $node->expr instanceof Node\Expr\UnaryMinus
             ? -$node->expr->expr->value
             : $node->expr->value;
 
-        yield new Node\Stmt\Return_(
+        return new Node\Stmt\Return_(
             new Node\Scalar\DNumber(-1 * $floatValue, $node->getAttributes())
         );
     }

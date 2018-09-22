@@ -22,11 +22,11 @@ final class This extends AbstractValueToNullReturnValue
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return Node\Stmt\Return_
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node)
     {
-        yield new Node\Stmt\Return_(
+        return new Node\Stmt\Return_(
             new Node\Expr\ConstFetch(new Node\Name('null'))
         );
     }

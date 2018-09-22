@@ -23,11 +23,11 @@ final class Spaceship extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return Node\Expr\BinaryOp\Spaceship
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node)
     {
-        yield new Node\Expr\BinaryOp\Spaceship($node->right, $node->left);
+        return new Node\Expr\BinaryOp\Spaceship($node->right, $node->left);
     }
 
     protected function mutatesNode(Node $node): bool

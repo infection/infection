@@ -22,11 +22,11 @@ final class Identical extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return Node\Expr\BinaryOp\NotIdentical
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node)
     {
-        yield new Node\Expr\BinaryOp\NotIdentical($node->left, $node->right, $node->getAttributes());
+        return new Node\Expr\BinaryOp\NotIdentical($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool

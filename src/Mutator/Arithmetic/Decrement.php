@@ -26,16 +26,16 @@ final class Decrement extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return PreInc|PostInc
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node)
     {
         if ($node instanceof PreDec) {
-            yield new PreInc($node->var, $node->getAttributes());
+            return new PreInc($node->var, $node->getAttributes());
         }
 
         if ($node instanceof PostDec) {
-            yield new PostInc($node->var, $node->getAttributes());
+            return new PostInc($node->var, $node->getAttributes());
         }
     }
 

@@ -22,11 +22,11 @@ final class TrueValue extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return Node\Expr\ConstFetch
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node)
     {
-        yield new Node\Expr\ConstFetch(new Node\Name('false'));
+        return new Node\Expr\ConstFetch(new Node\Name('false'));
     }
 
     protected function mutatesNode(Node $node): bool

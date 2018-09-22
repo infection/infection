@@ -22,11 +22,11 @@ final class Foreach_ extends Mutator
      *
      * @param Node $node
      *
-     * @return \Generator
+     * @return Node\Stmt\Foreach_
      */
-    public function mutate(Node $node): \Generator
+    public function mutate(Node $node)
     {
-        yield new Node\Stmt\Foreach_(
+        return new Node\Stmt\Foreach_(
             new Node\Expr\Array_(),
             $node->valueVar,
             [

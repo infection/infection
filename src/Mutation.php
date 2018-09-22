@@ -58,7 +58,7 @@ final class Mutation implements MutationInterface
     private $hash;
 
     /**
-     * @var Node|Node[]|int|null
+     * @var Node|Node[]
      */
     private $mutatedNode;
 
