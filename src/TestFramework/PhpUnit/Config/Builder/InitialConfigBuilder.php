@@ -73,6 +73,8 @@ class InitialConfigBuilder implements ConfigBuilder
 
         $xPath = new \DOMXPath($dom);
 
+        $this->xmlConfigurationHelper->validate($dom, $xPath);
+
         $this->addCoverageFilterWhitelistIfDoesNotExist($dom, $xPath);
         $this->xmlConfigurationHelper->replaceWithAbsolutePaths($xPath);
         $this->xmlConfigurationHelper->setStopOnFailure($xPath);

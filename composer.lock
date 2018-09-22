@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "21bf5d2eee9ee7886728b8d230531cca",
+    "content-hash": "6dee8fc78cb77f37da4ec73ec45e4186",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -2501,7 +2501,8 @@
     "platform": {
         "php": "^7.1",
         "ext-dom": "*",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-libxml": "*"
     },
     "platform-dev": [],
     "platform-overrides": {
