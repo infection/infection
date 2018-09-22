@@ -23,7 +23,7 @@ final class InvalidPhpUnitXmlConfigExceptionTest extends TestCase
 
         $this->assertInstanceOf(InvalidPhpUnitXmlConfigException::class, $exception);
 
-        $this->assertSame('phpunit.xml does not contain a valid PHPUit configuration.', $exception->getMessage());
+        $this->assertSame('phpunit.xml does not contain a valid PHPUnit configuration.', $exception->getMessage());
     }
 
     public function test_for_xsd_schema(): void

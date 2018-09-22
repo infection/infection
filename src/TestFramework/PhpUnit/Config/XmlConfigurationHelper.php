@@ -93,11 +93,13 @@ final class XmlConfigurationHelper
 
         $schema = $xPath->query('/phpunit/@xsi:noNamespaceSchemaLocation');
 
-        libxml_use_internal_errors(true);
+        $original = libxml_use_internal_errors(true);
 
         if ($schema->length && !$dom->schemaValidate($schema[0]->nodeValue)) {
             throw InvalidPhpUnitXmlConfigException::byXsdSchema($this->getXmlErrorsString());
         }
+
+        libxml_use_internal_errors($original);
 
         return true;
     }

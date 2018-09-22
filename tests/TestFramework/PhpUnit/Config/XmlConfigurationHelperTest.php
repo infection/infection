@@ -236,7 +236,7 @@ XML
     public function test_it_validates_xml_by_root_node(): void
     {
         $this->expectException(InvalidPhpUnitXmlConfigException::class);
-        $this->expectExceptionMessage('phpunit.xml does not contain a valid PHPUit configuration.');
+        $this->expectExceptionMessage('phpunit.xml does not contain a valid PHPUnit configuration.');
 
         $dom = new \DOMDocument();
         $dom->preserveWhiteSpace = false;

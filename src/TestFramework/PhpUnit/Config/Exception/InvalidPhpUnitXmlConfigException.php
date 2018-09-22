@@ -16,7 +16,7 @@ final class InvalidPhpUnitXmlConfigException extends \RuntimeException
 {
     public static function byRootNode(): self
     {
-        return new self('phpunit.xml does not contain a valid PHPUit configuration.');
+        return new self('phpunit.xml does not contain a valid PHPUnit configuration.');
     }
 
     public static function byXsdSchema(string $libXmlErrorsString): self
