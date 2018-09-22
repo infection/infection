@@ -45,12 +45,6 @@ final class FunctionCallRemoval extends Mutator
             return true;
         }
 
-        $string = strtolower((string) $name);
-
-        if ($string === 'assert') {
-            return false;
-        }
-
-        return true;
+        return $name->toLowerString() !== 'assert';
     }
 }

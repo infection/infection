@@ -36,7 +36,7 @@ final class PregMatchMatches extends Mutator
         }
 
         if (!$node->name instanceof Node\Name ||
-            strtolower((string) $node->name) !== 'preg_match') {
+            $node->name->toLowerString() !== 'preg_match') {
             return false;
         }
 
