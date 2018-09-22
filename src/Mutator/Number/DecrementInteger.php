@@ -18,7 +18,7 @@ use PhpParser\Node;
  */
 final class DecrementInteger extends Mutator
 {
-    private const COUNT_NAME = 'count';
+    private const COUNT_NAME = ['count', 'sizeof'];
 
     /**
      * Decrements an integer by 1
@@ -38,37 +38,76 @@ final class DecrementInteger extends Mutator
             return false;
         }
 
-        return !$this->isZeroComparedWithCountResult($node);
+        return $this->isAllowedComparison($node);
     }
 
-    private function isZeroComparedWithCountResult(Node $node): bool
+    private function isAllowedComparison(Node\Scalar\LNumber $node): bool
     {
         if ($node->value !== 0) {
-            return false;
+            return true;
         }
 
         $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
 
-        if (!$parentNode instanceof Node\Expr\BinaryOp\Identical
-            && !$parentNode instanceof Node\Expr\BinaryOp\NotIdentical
-            && !$parentNode instanceof Node\Expr\BinaryOp\Equal
-            && !$parentNode instanceof Node\Expr\BinaryOp\NotEqual
-            && !$parentNode instanceof Node\Expr\BinaryOp\Greater
-            && !$parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual) {
-            return false;
+        if (!$this->isComparison($parentNode)) {
+            return true;
         }
 
-        $isLeftPartCount = $parentNode->left instanceof Node\Expr\FuncCall
-            && $this->getLowercaseMethodName($parentNode, 'left') === self::COUNT_NAME;
+        if ($parentNode->left instanceof Node\Expr\FuncCall
+            && \in_array(
+                $this->getLowercaseMethodName($parentNode, 'left'),
+                self::COUNT_NAME,
+                true)
+        ) {
+            return $this->isAllowedLeftSideCountComparison($parentNode);
+        }
 
-        $isRightPartCount = $parentNode->right instanceof Node\Expr\FuncCall
-            && $this->getLowercaseMethodName($parentNode, 'right') === self::COUNT_NAME;
+        if ($parentNode->right instanceof Node\Expr\FuncCall
+            && \in_array(
+                $this->getLowercaseMethodName($parentNode, 'right'),
+                self::COUNT_NAME,
+                true)
+        ) {
+            return $this->isAllowedRightSideCountComparison($parentNode);
+        }
 
-        return $isLeftPartCount || $isRightPartCount;
+        return true;
+    }
+
+    private function isAllowedLeftSideCountComparison(Node $node): bool
+    {
+        return $this->isSmallerThanComparison($node);
+    }
+
+    private function isAllowedRightSideCountComparison(Node $node): bool
+    {
+        return  $this->isGreaterThanComparison($node);
+    }
+
+    private function isComparison(Node $parentNode): bool
+    {
+        return $parentNode instanceof Node\Expr\BinaryOp\Identical
+            || $parentNode instanceof Node\Expr\BinaryOp\NotIdentical
+            || $parentNode instanceof Node\Expr\BinaryOp\Equal
+            || $parentNode instanceof Node\Expr\BinaryOp\NotEqual
+            || $this->isGreaterThanComparison($parentNode)
+            || $this->isSmallerThanComparison($parentNode);
+    }
+
+    private function isGreaterThanComparison(Node $parentNode): bool
+    {
+        return $parentNode instanceof Node\Expr\BinaryOp\Greater
+            || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual;
+    }
+
+    private function isSmallerThanComparison(Node $parentNode): bool
+    {
+        return $parentNode instanceof Node\Expr\BinaryOp\Smaller
+            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual;
     }
 
     private function getLowercaseMethodName(Node $node, string $part): string
     {
-        return strtolower($node->{$part}->name->toString());
+        return $node->{$part}->name->toLowerString();
     }
 }

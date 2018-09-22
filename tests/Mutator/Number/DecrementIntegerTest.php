@@ -85,6 +85,16 @@ if (cOunT($a) === 0) {
 PHP
                 ,
             ],
+            'It does not decrement zero with when it is being compared as identical with result of sizeOf()' => [
+                <<<'PHP'
+<?php
+
+if (sizeOf($a) === 0) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
             'It does not decrement zero when it is being compared as not identical with result of count()' => [
                 <<<'PHP'
 <?php
@@ -125,6 +135,54 @@ if (count($a) > 0) {
 PHP
                 ,
             ],
+            'It does not decrement zero when it is compared as less than count() on the right side' => [
+                <<<'PHP'
+<?php
+
+if (0 < count($a)) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
+            'It does not decrement zero when it is compared as less than or equal to count() on the right side' => [
+                <<<'PHP'
+<?php
+
+if (0 <= count($a)) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
+            'It does not decrement zero when it is compared as equal to count() on the right side' => [
+                <<<'PHP'
+<?php
+
+if (0 == count($a)) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
+            'It does decrement zero when it is compared as greater than count() on the right side' => [
+                <<<'PHP'
+<?php
+
+if (0 > count($a)) {
+    echo 'bar';
+}
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+if (-1 > count($a)) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
             'It does not decrement zero when it is compared as more or equal than count()' => [
                 <<<'PHP'
 <?php
@@ -148,6 +206,24 @@ PHP
 <?php
 
 if (count($a) < -1) {
+    echo 'bar';
+}
+PHP
+                ,
+            ],
+            'It does decrement when compared against a variable function' => [
+                <<<'PHP'
+<?php
+
+if ($foo < 0) {
+    echo 'bar';
+}
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+if ($foo < -1) {
     echo 'bar';
 }
 PHP
