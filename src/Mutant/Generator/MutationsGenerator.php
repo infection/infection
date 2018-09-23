@@ -18,6 +18,8 @@ use Infection\Mutant\Exception\ParserException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\Visitor\CodeCoverageClassIgnoreVisitor;
+use Infection\Visitor\CodeCoverageMethodIgnoreVisitor;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
@@ -133,9 +135,11 @@ final class MutationsGenerator
             $onlyCovered
         );
 
+        $traverser->addVisitor(new CodeCoverageClassIgnoreVisitor());
         $traverser->addVisitor(new ParentConnectorVisitor());
         $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
         $traverser->addVisitor(new ReflectionVisitor());
+        $traverser->addVisitor(new CodeCoverageMethodIgnoreVisitor());
         $traverser->addVisitor($mutationsCollectorVisitor);
 
         $traverser->traverse($initialStatements);
