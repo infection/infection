@@ -26,6 +26,7 @@ use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitorAbstract;
 use PhpParser\Parser;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -83,10 +84,11 @@ final class MutationsGenerator
     /**
      * @param bool $onlyCovered mutate only covered by tests lines of code
      * @param string $filter
+     * @param NodeVisitorAbstract[] $extraNodeVisitors
      *
      * @return Mutation[]
      */
-    public function generate(bool $onlyCovered, string $filter = ''): array
+    public function generate(bool $onlyCovered, string $filter = '', array $extraNodeVisitors = []): array
     {
         $sourceFilesFinder = new SourceFilesFinder($this->srcDirs, $this->excludeDirsOrFiles);
         $files = $sourceFilesFinder->getSourceFiles($filter);
@@ -96,7 +98,7 @@ final class MutationsGenerator
 
         foreach ($files as $file) {
             if (!$onlyCovered || $this->hasTests($file)) {
-                $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered, $this->mutators);
+                $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered, $extraNodeVisitors);
             }
 
             $this->eventDispatcher->dispatch(new MutableFileProcessed());
@@ -110,11 +112,11 @@ final class MutationsGenerator
     /**
      * @param SplFileInfo $file
      * @param bool $onlyCovered mutate only covered by tests lines of code
-     * @param array $mutators
+     * @param NodeVisitorAbstract[] $extraNodeVisitors extra visitors to influence to mutation collection process
      *
      * @return Mutation[]
      */
-    private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered, array $mutators): array
+    private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered, array $extraNodeVisitors): array
     {
         try {
             /** @var Node[] $initialStatements */
@@ -128,19 +130,33 @@ final class MutationsGenerator
         \assert(\is_string($filePath));
 
         $mutationsCollectorVisitor = new MutationsCollectorVisitor(
-            $mutators,
+            $this->mutators,
             $filePath,
             $initialStatements,
             $this->codeCoverageData,
             $onlyCovered
         );
 
-        $traverser->addVisitor(new CodeCoverageClassIgnoreVisitor());
-        $traverser->addVisitor(new ParentConnectorVisitor());
-        $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
-        $traverser->addVisitor(new ReflectionVisitor());
-        $traverser->addVisitor(new CodeCoverageMethodIgnoreVisitor());
-        $traverser->addVisitor($mutationsCollectorVisitor);
+        $orderedVisitors = [
+            40 => new ParentConnectorVisitor(),
+            30 => new FullyQualifiedClassNameVisitor(),
+            20 => new ReflectionVisitor(),
+            10 => $mutationsCollectorVisitor,
+        ];
+
+        $visitorsQueue = new \SplPriorityQueue();
+
+        foreach ($orderedVisitors as $priority => $visitor) {
+            $visitorsQueue->insert($visitor, $priority);
+        }
+
+        foreach ($extraNodeVisitors as $priority => $visitor) {
+            $visitorsQueue->insert($visitor, $priority);
+        }
+
+        foreach ($visitorsQueue as $visitor) {
+            $traverser->addVisitor($visitor);
+        }
 
         $traverser->traverse($initialStatements);
 

@@ -10,6 +10,6 @@ class IgnoreClassTest extends TestCase
     public function test_hello()
     {
         $ignoreClass = new IgnoreClass();
-        $this->assertSame('hello', $ignoreClass->hello());
+        $this->assertSame(3, $ignoreClass->getThree());
     }
 }

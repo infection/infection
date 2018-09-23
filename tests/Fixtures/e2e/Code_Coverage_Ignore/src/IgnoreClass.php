@@ -7,8 +7,8 @@ namespace Namespace_;
  */
 class IgnoreClass
 {
-    public function hello(): string
+    public function getThree(): int
     {
-        return 'hello';
+        return 1 + 2;
     }
 }

@@ -25,6 +25,7 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\HasExtraNodeVisitors;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
@@ -221,7 +222,11 @@ final class InfectionCommand extends BaseCommand
             $container->get('parser')
         );
 
-        $mutations = $mutationsGenerator->generate($input->getOption('only-covered'), $input->getOption('filter'));
+        $mutations = $mutationsGenerator->generate(
+            $input->getOption('only-covered'),
+            $input->getOption('filter'),
+            $adapter instanceof HasExtraNodeVisitors ? $adapter->getMutationsCollectionNodeVisitors() : []
+        );
 
         $mutationTestingRunner = new MutationTestingRunner(
             $processBuilder,
