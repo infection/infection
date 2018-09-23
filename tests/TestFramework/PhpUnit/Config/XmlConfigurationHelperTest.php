@@ -235,16 +235,15 @@ XML
 
     public function test_it_validates_xml_by_root_node(): void
     {
-        $this->expectException(InvalidPhpUnitXmlConfigException::class);
-        $this->expectExceptionMessage('phpunit.xml does not contain a valid PHPUnit configuration.');
-
         $dom = new \DOMDocument();
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
         $dom->loadXML('<invalid></invalid>');
         $xPath = new \DOMXPath($dom);
-
         $xmlHelper = new XmlConfigurationHelper($this->getPathReplacer());
+
+        $this->expectException(InvalidPhpUnitXmlConfigException::class);
+        $this->expectExceptionMessage('phpunit.xml does not contain a valid PHPUnit configuration.');
 
         $xmlHelper->validate($dom, $xPath);
     }
@@ -254,9 +253,6 @@ XML
      */
     public function test_it_validates_xml_by_xsd(string $xsdSchema): void
     {
-        $this->expectException(InvalidPhpUnitXmlConfigException::class);
-        $this->expectExceptionMessageRegExp('/Element \'invalid\'\: This element is not expected/');
-
         $dom = new \DOMDocument();
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
@@ -269,8 +265,10 @@ XML
 XML
         );
         $xPath = new \DOMXPath($dom);
-
         $xmlHelper = new XmlConfigurationHelper($this->getPathReplacer());
+
+        $this->expectException(InvalidPhpUnitXmlConfigException::class);
+        $this->expectExceptionMessageRegExp('/Element \'invalid\'\: This element is not expected/');
 
         $xmlHelper->validate($dom, $xPath);
     }
