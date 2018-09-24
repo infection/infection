@@ -35,7 +35,7 @@ final class Increment extends Mutator
         }
 
         if ($node instanceof PostInc) {
-            return new Node\Expr\PostDec($node->var, $node->getAttributes());
+            return new PostDec($node->var, $node->getAttributes());
         }
     }
 

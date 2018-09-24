@@ -182,7 +182,7 @@ final class ProjectCodeTest extends TestCase
                 )
             );
             $this->markTestSkipped(sprintf(
-                'Class "%s" does not have a correstponding unit test yet, you can improve this by adding one',
+                'Class "%s" does not have a corresponding unit test yet, you can improve this by adding one',
                 $className
             ));
         }

@@ -22,7 +22,7 @@ final class FunctionCall extends AbstractValueToNullReturnValue
      *
      * @param Node $node
      *
-     * @return array
+     * @return Node[]
      */
     public function mutate(Node $node)
     {

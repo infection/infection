@@ -12,6 +12,7 @@ namespace Infection\Tests;
 use Infection\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Util\MutatorConfig;
+use PhpParser\Node;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -38,10 +39,12 @@ final class MutationTest extends TestCase
             $attributes,
             'Interface_',
             false,
-            true
+            true,
+            new Node\Scalar\LNumber(1),
+            0
         );
 
-        $this->assertSame('e5e3a33955c4819395090c16e8df6f76', $mutation->getHash());
+        $this->assertSame('2930c05082a35248987760a81b9f9a08', $mutation->getHash());
     }
 
     public function test_it_correctly_sets_is_on_function_signature(): void
@@ -63,7 +66,9 @@ final class MutationTest extends TestCase
             $attributes,
             'Interface_',
             false,
-            true
+            true,
+            new Node\Scalar\LNumber(1),
+            0
         );
 
         $this->assertFalse($mutation->isOnFunctionSignature());
@@ -89,7 +94,9 @@ final class MutationTest extends TestCase
             $attributes,
             'Interface_',
             false,
-            true
+            true,
+            new Node\Scalar\LNumber(1),
+            0
         );
 
         $this->assertSame($fileAst, $mutation->getOriginalFileAst());

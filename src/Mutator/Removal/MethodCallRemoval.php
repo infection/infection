@@ -17,6 +17,13 @@ use PhpParser\Node;
  */
 final class MethodCallRemoval extends Mutator
 {
+    /**
+     * Replaces "$object->doSmth()" with ""
+     *
+     * @param Node $node
+     *
+     * @return Node\Stmt\Nop()
+     */
     public function mutate(Node $node)
     {
         return new Node\Stmt\Nop();

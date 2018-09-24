@@ -59,6 +59,7 @@ final class MutatorProfile
         Mutator\Arithmetic\PowEqual::class,
         Mutator\Arithmetic\ShiftLeft::class,
         Mutator\Arithmetic\ShiftRight::class,
+        Mutator\Arithmetic\RoundingFamily::class,
     ];
 
     public const BOOLEAN = [
@@ -188,6 +189,7 @@ final class MutatorProfile
         'PowEqual' => Mutator\Arithmetic\PowEqual::class,
         'ShiftLeft' => Mutator\Arithmetic\ShiftLeft::class,
         'ShiftRight' => Mutator\Arithmetic\ShiftRight::class,
+        'RoundingFamily' => Mutator\Arithmetic\RoundingFamily::class,
 
         //Boolean
         'ArrayItem' => Mutator\Boolean\ArrayItem::class,
