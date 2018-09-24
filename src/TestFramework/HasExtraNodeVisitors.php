@@ -1,10 +1,11 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: maksrafalko
- * Date: 9/24/18
- * Time: 12:07 AM
+ * Copyright © 2017-2018 Maks Rafalko
+ *
+ * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
+
+declare(strict_types=1);
 
 namespace Infection\TestFramework;
 

@@ -18,8 +18,6 @@ use Infection\Mutant\Exception\ParserException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
-use Infection\Visitor\CodeCoverageClassIgnoreVisitor;
-use Infection\Visitor\CodeCoverageMethodIgnoreVisitor;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;

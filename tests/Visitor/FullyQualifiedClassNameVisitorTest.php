@@ -10,17 +10,14 @@ declare(strict_types=1);
 namespace Infection\Tests\Visitor;
 
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
-use PhpParser\Lexer;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
-use PhpParser\ParserFactory;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-final class FullyQualifiedClassNameVisitorTest extends TestCase
+final class FullyQualifiedClassNameVisitorTest extends AbstractBaseVisitorTest
 {
     private $spyVisitor;
 
@@ -31,7 +28,7 @@ final class FullyQualifiedClassNameVisitorTest extends TestCase
 
     public function test_it_adds_fqcl_to_class_node(): void
     {
-        $code = $this->getFileContent('fqcn-empty-class.php');
+        $code = $this->getFileContent('Fqcn/fqcn-empty-class.php');
 
         $this->parseAndTraverse($code);
 
@@ -44,7 +41,7 @@ final class FullyQualifiedClassNameVisitorTest extends TestCase
 
     public function test_it_adds_fqcl_to_class_with_interface(): void
     {
-        $code = $this->getFileContent('fqcn-class-interface.php');
+        $code = $this->getFileContent('Fqcn/fqcn-class-interface.php');
 
         $this->parseAndTraverse($code);
 
@@ -57,7 +54,7 @@ final class FullyQualifiedClassNameVisitorTest extends TestCase
 
     public function test_it_adds_fqcl_to_class_with_anonymous_class(): void
     {
-        $code = $this->getFileContent('fqcn-anonymous-class.php');
+        $code = $this->getFileContent('Fqcn/fqcn-anonymous-class.php');
 
         $this->parseAndTraverse($code);
 
@@ -66,14 +63,6 @@ final class FullyQualifiedClassNameVisitorTest extends TestCase
             'FqcnClassAnonymous\Ci',
             $this->spyVisitor->processedNodes[0]->fullyQualifiedClassName->toString()
         );
-    }
-
-    private function getNodes(string $code): array
-    {
-        $lexer = new Lexer\Emulative();
-        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
-
-        return $parser->parse($code);
     }
 
     private function getSpyVisitor()
@@ -100,10 +89,5 @@ final class FullyQualifiedClassNameVisitorTest extends TestCase
         $traverser->addVisitor($this->spyVisitor);
 
         $traverser->traverse($nodes);
-    }
-
-    private function getFileContent(string $file): string
-    {
-        return file_get_contents(sprintf(__DIR__ . '/../Fixtures/Autoloaded/Fqcn/%s', $file));
     }
 }

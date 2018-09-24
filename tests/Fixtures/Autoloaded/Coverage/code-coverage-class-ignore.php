@@ -1,6 +1,6 @@
 <?php
 
-namespace CodeCoverageIgnore;
+namespace Infection\Tests\Fixtures\Coverage;
 
 /**
  * @codeCoverageIgnore

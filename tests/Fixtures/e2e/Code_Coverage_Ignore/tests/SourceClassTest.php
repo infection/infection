@@ -1,8 +1,8 @@
 <?php
 
-namespace Namespace_\Test;
+namespace CodeCoverageIgnore\Test;
 
-use Namespace_\IgnoreClass;
+use CodeCoverageIgnore\IgnoreClass;
 use PHPUnit\Framework\TestCase;
 
 class IgnoreClassTest extends TestCase

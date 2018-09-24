@@ -1,4 +1,9 @@
 <?php
+/**
+ * Copyright © 2017-2018 Maks Rafalko
+ *
+ * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+ */
 
 declare(strict_types=1);
 
@@ -10,7 +15,10 @@ use PhpParser\Node\Stmt;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 
-class CodeCoverageClassIgnoreVisitor extends NodeVisitorAbstract
+/**
+ * @internal
+ */
+final class CodeCoverageClassIgnoreVisitor extends NodeVisitorAbstract
 {
     private $namespace;
 
@@ -19,7 +27,12 @@ class CodeCoverageClassIgnoreVisitor extends NodeVisitorAbstract
         if ($node instanceof Stmt\Namespace_) {
             $this->namespace = $node->name;
         } elseif ($node instanceof Stmt\ClassLike) {
-            $fullyQualifiedClassName = $node->name ? Name::concat($this->namespace, $node->name->name) : null;
+            if (!$node->name) {
+                return null;
+            }
+
+            /** @var Name $fullyQualifiedClassName */
+            $fullyQualifiedClassName = Name::concat($this->namespace, $node->name->name);
 
             $reflectionClass = new \ReflectionClass($fullyQualifiedClassName->toString());
 

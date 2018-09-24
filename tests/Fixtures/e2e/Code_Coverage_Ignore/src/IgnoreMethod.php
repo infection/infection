@@ -1,6 +1,6 @@
 <?php
 
-namespace Namespace_;
+namespace CodeCoverageIgnore;
 
 class IgnoreMethod
 {

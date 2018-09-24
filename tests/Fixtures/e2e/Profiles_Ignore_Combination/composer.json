@@ -9,12 +9,12 @@
     },
     "autoload": {
         "psr-4": {
-            "TmpNamespace_\\": "src/"
+            "ProfileIgnoreCombination\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "TmpNamespace_\\Test\\": "tests/"
+            "ProfileIgnoreCombination\\Test\\": "tests/"
         }
     }
 }

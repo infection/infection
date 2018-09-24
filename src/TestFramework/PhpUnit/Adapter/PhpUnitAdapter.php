@@ -14,7 +14,6 @@ use Infection\TestFramework\HasExtraNodeVisitors;
 use Infection\TestFramework\MemoryUsageAware;
 use Infection\Visitor\CodeCoverageClassIgnoreVisitor;
 use Infection\Visitor\CodeCoverageMethodIgnoreVisitor;
-use PhpParser\NodeVisitorAbstract;
 
 /**
  * @internal
