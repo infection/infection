@@ -9,12 +9,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Namespace_\\": "src/"
+            "ConfigBoostrap\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Namespace_\\Test\\": "tests/"
+            "ConfigBoostrap\\Test\\": "tests/"
         }
     }
 }

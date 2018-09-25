@@ -1,6 +1,6 @@
 <?php
 
-namespace spec\Namespace_;
+namespace spec\TestFrameworks;
 
 use PhpSpec\ObjectBehavior;
 

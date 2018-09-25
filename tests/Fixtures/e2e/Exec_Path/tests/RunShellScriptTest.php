@@ -1,8 +1,8 @@
 <?php
 
-namespace Namespace_\Test;
+namespace ExecPath\Test;
 
-use Namespace_\RunShellScript;
+use ExecPath\RunShellScript;
 use PHPUnit\Framework\TestCase;
 
 class RunShellScriptTest extends TestCase

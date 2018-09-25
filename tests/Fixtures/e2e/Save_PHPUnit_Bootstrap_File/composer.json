@@ -9,12 +9,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Namespace_\\": "src/"
+            "SavePhpUnitBoostrapFile\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Namespace_\\Test\\": "tests/"
+            "SavePhpUnitBoostrapFile\\Test\\": "tests/"
         }
     }
 }

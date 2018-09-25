@@ -12,12 +12,12 @@
     "autoload": {
         "psr-4": {
             "spec\\": "spec/",
-            "Namespace_\\": "src/"
+            "ProvideExistingCoverage\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Namespace_\\Test\\": "tests/"
+            "ProvideExistingCoverage\\Test\\": "tests/"
         }
     }
 }
