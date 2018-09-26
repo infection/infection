@@ -19,29 +19,68 @@ final class NotEqualNotIdenticalTest extends AbstractMutatorTestCase
     /**
      * @dataProvider provideMutationCases
      */
-    public function test_mutator($input, $expected = null)
+    public function test_mutator($input, $expected = null): void
     {
         $this->doTest($input, $expected);
     }
 
     public function provideMutationCases(): \Generator
     {
-        yield 'It mutates not equal operator into not identical operator' => [
+        yield 'It mutates with two variables' => [
             <<<'PHP'
 <?php
 
 $a != $b;
-(int) $c != 2;
-$d != null;
-false != strpos();
 PHP
             ,
             <<<'PHP'
 <?php
 
 $a !== $b;
+PHP
+            ,
+        ];
+
+        yield 'It mutates with a cast' => [
+            <<<'PHP'
+<?php
+
+(int) $c != 2;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
 (int) $c !== 2;
+PHP
+            ,
+        ];
+
+        yield 'It mutates with a constant' => [
+            <<<'PHP'
+<?php
+
+$d != null;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
 $d !== null;
+PHP
+            ,
+        ];
+
+        yield 'It mutates with a function' => [
+            <<<'PHP'
+<?php
+
+false != strpos();
+PHP
+            ,
+            <<<'PHP'
+<?php
+
 false !== strpos();
 PHP
             ,
