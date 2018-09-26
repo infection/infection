@@ -8,5 +8,10 @@
     "logs": {
         "summary": "infection.log"
     },
-    "tmpDir": "."
+    "tmpDir": ".",
+    "mutators": {
+        "@default": true,
+        "IdenticalEqual": true,
+        "NotIdenticalNotEqual": true
+    }
 }

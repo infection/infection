@@ -1,4 +1,4 @@
-Total: 9
+Total: 8
 Killed mutants:
 ===============
 
@@ -16,9 +16,6 @@ Mutator: PublicVisibility
 Line 12
 
 Mutator: FalseValue
-Line 14
-
-Mutator: NotIdenticalNotEqual
 Line 14
 
 Mutator: NotIdentical

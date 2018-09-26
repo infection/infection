@@ -22,7 +22,9 @@ final class MutatorProfile
         '@boolean' => self::BOOLEAN,
         '@conditional_boundary' => self::CONDITIONAL_BOUNDARY,
         '@conditional_negotiation' => self::CONDITIONAL_NEGOTIATION,
+        '@equal' => self::EQUAL,
         '@function_signature' => self::FUNCTION_SIGNATURE,
+        '@identical' => self::IDENTICAL,
         '@number' => self::NUMBER,
         '@operator' => self::OPERATOR,
         '@regex' => self::REGEX,
@@ -65,13 +67,11 @@ final class MutatorProfile
     public const BOOLEAN = [
         Mutator\Boolean\ArrayItem::class,
         Mutator\Boolean\FalseValue::class,
-        Mutator\Boolean\IdenticalEqual::class,
         Mutator\Boolean\LogicalAnd::class,
         Mutator\Boolean\LogicalLowerAnd::class,
         Mutator\Boolean\LogicalLowerOr::class,
         Mutator\Boolean\LogicalNot::class,
         Mutator\Boolean\LogicalOr::class,
-        Mutator\Boolean\NotIdenticalNotEqual::class,
         Mutator\Boolean\TrueValue::class,
         Mutator\Boolean\Yield_::class,
     ];
@@ -94,9 +94,19 @@ final class MutatorProfile
         Mutator\ConditionalNegotiation\NotIdentical::class,
     ];
 
+    public const EQUAL = [
+        Mutator\Boolean\NotIdenticalNotEqual::class,
+        Mutator\Boolean\IdenticalEqual::class,
+    ];
+
     public const FUNCTION_SIGNATURE = [
         Mutator\FunctionSignature\PublicVisibility::class,
         Mutator\FunctionSignature\ProtectedVisibility::class,
+    ];
+
+    public const IDENTICAL = [
+        Mutator\Boolean\EqualIdentical::class,
+        Mutator\Boolean\NotEqualNotIdentical::class,
     ];
 
     public const NUMBER = [
@@ -193,6 +203,7 @@ final class MutatorProfile
 
         //Boolean
         'ArrayItem' => Mutator\Boolean\ArrayItem::class,
+        'EqualIdentical' => Mutator\Boolean\EqualIdentical::class,
         'FalseValue' => Mutator\Boolean\FalseValue::class,
         'IdenticalEqual' => Mutator\Boolean\IdenticalEqual::class,
         'LogicalAnd' => Mutator\Boolean\LogicalAnd::class,
@@ -200,6 +211,7 @@ final class MutatorProfile
         'LogicalLowerOr' => Mutator\Boolean\LogicalLowerOr::class,
         'LogicalNot' => Mutator\Boolean\LogicalNot::class,
         'LogicalOr' => Mutator\Boolean\LogicalOr::class,
+        'NotEqualNotIdentical' => Mutator\Boolean\NotEqualNotIdentical::class,
         'NotIdenticalNotEqual' => Mutator\Boolean\NotIdenticalNotEqual::class,
         'TrueValue' => Mutator\Boolean\TrueValue::class,
         'Yield_' => Mutator\Boolean\Yield_::class,
