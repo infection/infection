@@ -37,7 +37,7 @@ namespace Infection\Process;
 
 use Infection\Mutant\MutantInterface;
 use Infection\MutationInterface;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Process\Process;
 

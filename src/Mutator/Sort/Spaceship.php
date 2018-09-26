@@ -35,22 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Sort;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Spaceship extends Mutator
+final class Spaceship extends SingleMutator
 {
     /**
      * Swaps the arguments in the Spaceship operator <=>
      * Replaces "$a <=> $b" with "$b <=> $a"
      *
-     *
-     * @return Node\Expr\BinaryOp\Spaceship
+     * @param Node|Node\Expr\BinaryOp\Spaceship $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Expr\BinaryOp\Spaceship($node->right, $node->left);
     }

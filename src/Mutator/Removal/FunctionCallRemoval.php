@@ -35,21 +35,22 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class FunctionCallRemoval extends Mutator
+final class FunctionCallRemoval extends SingleMutator
 {
     /**
      * Replaces "doSmth()" with ""
      *
+     * @param Node|Node\Stmt\Expression $node
      *
-     * @return Node\Stmt\Nop()
+     * @return Node ()
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Stmt\Nop();
     }

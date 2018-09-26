@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 use PhpParser\Node\Expr\PostDec;
 use PhpParser\Node\Expr\PostInc;
@@ -45,16 +45,17 @@ use PhpParser\Node\Expr\PreInc;
 /**
  * @internal
  */
-final class Decrement extends Mutator
+final class Decrement extends SingleMutator
 {
     /**
      * Replaces "--" with "++"
      *
-     *
-     * @return PreInc|PostInc
+     * @param Node|PreDec|PostDec $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
+        $mutatedNode = null;
+
         if ($node instanceof PreDec) {
             return new PreInc($node->var, $node->getAttributes());
         }

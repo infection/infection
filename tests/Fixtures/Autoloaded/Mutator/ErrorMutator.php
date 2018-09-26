@@ -2,15 +2,15 @@
 
 namespace Infection\WrongMutator;
 
-
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator;
+use Infection\Mutator\Util\Replacer\NodeReplacement;
 use PhpParser\Node;
 
 class ErrorMutator extends Mutator
 {
-    public function mutate(Node $node)
+    public function mutate(Node $node): \Generator
     {
-        return $node;
+        yield [];
     }
 
     protected function mutatesNode(Node $node): bool

@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\Mutation;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;

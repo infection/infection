@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalNegotiation;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class GreaterThanOrEqualToNegotiation extends Mutator
+final class GreaterThanOrEqualToNegotiation extends SingleMutator
 {
     /**
      * Replaces ">=" with "<"
      *
-     *
-     * @return Node\Expr\BinaryOp\Smaller
+     * @param Node|Node\Expr\BinaryOp\GreaterOrEqual $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Expr\BinaryOp\Smaller($node->left, $node->right, $node->getAttributes());
     }

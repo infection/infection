@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class LogicalOr extends Mutator
+final class LogicalOr extends SingleMutator
 {
     /**
      * Replaces "||" with "&&"
      *
-     *
-     * @return Node\Expr\BinaryOp\BooleanAnd
+     * @param Node|Node\Expr\BinaryOp\BooleanOr $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Expr\BinaryOp\BooleanAnd($node->left, $node->right, $node->getAttributes());
     }

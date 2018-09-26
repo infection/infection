@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Exception;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator;
 
 /**
  * @internal

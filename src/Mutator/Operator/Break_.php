@@ -35,22 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Break_ extends Mutator
+final class Break_ extends SingleMutator
 {
     /**
      * Replaces "break;" with "continue;"
      *
-     *
-     * @return Node\Stmt\Continue_
+     * @param Node|Node\Stmt\Break_ $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Stmt\Continue_();
     }

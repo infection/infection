@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Cast;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-abstract class AbstractCastMutator extends Mutator
+abstract class AbstractCastMutator extends SingleMutator
 {
     /**
      * Replaces "(cast) $foo;" with "$foo;"
      *
-     *
-     * @return Node
+     * @param Node|Node\Expr\Cast $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return $node->expr;
     }

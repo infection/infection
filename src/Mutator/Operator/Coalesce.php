@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Coalesce extends Mutator
+final class Coalesce extends SingleMutator
 {
     /**
      * Replaces "'someValue' ?? 'otherValue';" with "'otherValue'"
      *
-     *
-     * @return Node\Expr\BinaryOp\Coalesce
+     * @param Node|Node\Expr\BinaryOp\Coalesce $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return $node->right;
     }

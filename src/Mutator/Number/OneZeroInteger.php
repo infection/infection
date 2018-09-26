@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class OneZeroInteger extends Mutator
+final class OneZeroInteger extends SingleMutator
 {
     /**
      * Replaces "0" with "1" or "1" with "0"
      *
-     *
-     * @return Node\Scalar\LNumber
+     * @param Node|Node\Scalar\LNumber $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         if ($node->value === 0) {
             return new Node\Scalar\LNumber(1);

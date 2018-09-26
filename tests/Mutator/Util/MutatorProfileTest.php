@@ -60,24 +60,6 @@ final class MutatorProfileTest extends TestCase
         }
     }
 
-    public function test_all_mutators_are_part_of_the_full_mutators_list(): void
-    {
-        foreach ($this->getMutatorFiles() as $file) {
-            $class = substr($file->getFilename(), 0, -4);
-
-            $this->assertArrayHasKey(
-                $class,
-                MutatorProfile::FULL_MUTATOR_LIST,
-                sprintf(
-                    'The mutator "%s" located in "%s" has not been added to the FULL_MUTATOR_LIST in the MutatorProfile class. ' .
-                    'Please add it to ensure it can be used.',
-                    $class,
-                    $file->getPath()
-                )
-            );
-        }
-    }
-
     public function test_all_mutators_are_part_of_at_least_one_profile(): void
     {
         $profileConstants = $this->getMutatorProfileConstants();
@@ -155,6 +137,13 @@ final class MutatorProfileTest extends TestCase
     {
         foreach ($profiles as $mutatorsInProfile) {
             $fqcn = sprintf('Infection\\Mutator\\%s', $relativeClassName);
+
+            $rc = new \ReflectionClass($fqcn);
+
+            //We don't need to check if the mutator is in the array if its abstract, an interface, or a trait
+            if ($rc->isAbstract() || $rc->isInterface() || $rc->isTrait()) {
+                return true;
+            }
 
             if (\in_array($fqcn, $mutatorsInProfile, true)) {
                 return true;

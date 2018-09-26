@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\FunctionSignature;
 
-use Infection\Mutator\Util\InterfaceParentTrait;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
+use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
@@ -45,19 +45,15 @@ use PhpParser\Node\Stmt\ClassMethod;
 /**
  * @internal
  */
-final class PublicVisibility extends Mutator
+final class PublicVisibility extends SingleMutator
 {
-    use InterfaceParentTrait;
-
     /**
      * Replaces "public function..." with "protected function ..."
      *
-     *
-     * @return ClassMethod
+     * @param Node|ClassMethod $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
-        /* @var ClassMethod $node */
         return new ClassMethod(
             $node->name,
             [
@@ -162,6 +158,21 @@ final class PublicVisibility extends Mutator
             } finally {
                 $parent = $parent->getParentClass();
             }
+        }
+
+        return false;
+    }
+
+    private function isBelongsToInterface(Node $node): bool
+    {
+        $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
+
+        if ($parentNode instanceof Node\Stmt\Interface_) {
+            return true;
+        }
+
+        if ($parentNode instanceof Node) {
+            return $this->isBelongsToInterface($parentNode);
         }
 
         return false;

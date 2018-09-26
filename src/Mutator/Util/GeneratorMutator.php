@@ -33,28 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Arithmetic;
+namespace Infection\Mutator\Util;
 
-use Infection\Mutator\Util\SingleMutator;
+use Generator;
+use Infection\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class BitwiseNot extends SingleMutator
+abstract class GeneratorMutator extends Mutator
 {
-    /**
-     * Replaces "~" with "" (removed)
-     *
-     * @param Node|Node\Expr\BitwiseNot $node
-     */
-    protected function getMutatedNode(Node $node): Node
+    final public function mutate(Node $node): Generator
     {
-        return $node->expr;
+        yield from $this->getMutatedNode($node);
     }
 
-    protected function mutatesNode(Node $node): bool
-    {
-        return $node instanceof Node\Expr\BitwiseNot;
-    }
+    abstract protected function getMutatedNode(Node $node): Generator;
 }

@@ -35,18 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Regex;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class PregQuote extends Mutator
+final class PregQuote extends SingleMutator
 {
     /**
      * Replaces "$a = preg_quote($b);" with "$a = $b;"
+     *
+     * @param Node|Node\Expr\FuncCall $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return $node->args[0];
     }

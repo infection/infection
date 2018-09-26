@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ZeroIteration;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Foreach_ extends Mutator
+final class Foreach_ extends SingleMutator
 {
     /**
      * Replaces "foreach($a as $b)" with "foreach(array() as $b)"
      *
-     *
-     * @return Node\Stmt\Foreach_
+     * @param Node|Node\Stmt\Foreach_ $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Stmt\Foreach_(
             new Node\Expr\Array_(),

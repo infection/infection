@@ -33,28 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Arithmetic;
+namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\Util\SingleMutator;
+use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class BitwiseNot extends SingleMutator
+trait ReturnNullValue
 {
-    /**
-     * Replaces "~" with "" (removed)
-     *
-     * @param Node|Node\Expr\BitwiseNot $node
-     */
-    protected function getMutatedNode(Node $node): Node
+    protected function isNullReturnValueAllowed(Node $node): bool
     {
-        return $node->expr;
-    }
+        /** @var \PhpParser\Node\Stmt\Function_|null $functionScope */
+        $functionScope = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY, null);
 
-    protected function mutatesNode(Node $node): bool
-    {
-        return $node instanceof Node\Expr\BitwiseNot;
+        if (null === $functionScope) {
+            return true;
+        }
+
+        $returnType = $functionScope->getReturnType();
+
+        if ($returnType instanceof Node\Identifier) {
+            $returnType = $returnType->name;
+        }
+
+        // no return value specified
+        if (null === $returnType) {
+            return true;
+        }
+
+        // scalar typehint
+        if (\is_string($returnType)) {
+            return false;
+        }
+
+        // nullable typehint, e.g. "?int" or "?CustomClass"
+        if ($returnType instanceof Node\NullableType) {
+            return true;
+        }
+
+        return !$returnType instanceof Node\Name;
     }
 }

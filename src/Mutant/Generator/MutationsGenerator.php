@@ -42,7 +42,7 @@ use Infection\Events\MutationGeneratingStarted;
 use Infection\Finder\SourceFilesFinder;
 use Infection\Mutant\Exception\ParserException;
 use Infection\Mutation;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Traverser\PriorityNodeTraverser;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;

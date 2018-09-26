@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class ArrayItem extends Mutator
+final class ArrayItem extends SingleMutator
 {
     /**
      * Replaces "[$a->foo => $b->bar]" with "[$a->foo > $b->bar]"
      *
-     *
-     * @return Node\Expr\BinaryOp\Greater
+     * @param Node|Node\Expr\ArrayItem  $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Expr\BinaryOp\Greater($node->key, $node->value, $node->getAttributes());
     }

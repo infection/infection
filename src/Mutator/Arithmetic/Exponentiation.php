@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Exponentiation extends Mutator
+final class Exponentiation extends SingleMutator
 {
     /**
      * Replaces "**" with "/"
      *
-     *
-     * @return Node\Expr\BinaryOp\Div
+     * @param Node|Node\Expr\BinaryOp\Pow $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Expr\BinaryOp\Div($node->left, $node->right, $node->getAttributes());
     }

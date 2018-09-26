@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class PlusEqual extends Mutator
+final class PlusEqual extends SingleMutator
 {
     /**
      * Replaces "+=" with "-="
      *
-     *
-     * @return Node\Expr\AssignOp\Minus
+     * @param Node|Node\Expr\AssignOp\Plus $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Expr\AssignOp\Minus($node->var, $node->expr, $node->getAttributes());
     }

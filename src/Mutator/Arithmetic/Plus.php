@@ -35,22 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 
 /**
  * @internal
  */
-final class Plus extends Mutator
+final class Plus extends SingleMutator
 {
     /**
      * Replaces "+" with "-"
      *
-     *
-     * @return Node\Expr\BinaryOp\Minus
+     * @param Node|Node\Expr\BinaryOp\Plus $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Expr\BinaryOp\Minus($node->left, $node->right, $node->getAttributes());
     }

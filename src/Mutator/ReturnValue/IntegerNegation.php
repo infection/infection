@@ -35,22 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class IntegerNegation extends Mutator
+final class IntegerNegation extends SingleMutator
 {
     /**
      * Replaces any integer with negated integer value.
      * Replaces "-5" with "5"
      *
-     *
-     * @return Node\Stmt\Return_
+     * @param Node|Node\Stmt\Return_ $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         $integerValue = $node->expr instanceof Node\Expr\UnaryMinus
             ? -$node->expr->expr->value

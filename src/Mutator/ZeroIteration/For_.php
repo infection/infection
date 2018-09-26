@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ZeroIteration;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class For_ extends Mutator
+final class For_ extends SingleMutator
 {
     /**
      * Replaces "for($i=0; $i<10; $i++)" with "for($i=0; false; $i++)"
      *
-     *
-     * @return Node\Stmt\For_
+     * @param Node|Node\Stmt\For_ $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Stmt\For_(
             [

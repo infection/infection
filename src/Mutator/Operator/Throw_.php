@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Throw_ extends Mutator
+final class Throw_ extends SingleMutator
 {
     /**
      * Replaces "throw new Exception();" with "new Exception();"
      *
-     *
-     * @return Node\Stmt\Expression
+     * @param Node|Node\Stmt\Throw_ $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Stmt\Expression($node->expr);
     }

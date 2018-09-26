@@ -35,21 +35,22 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\Util\AbstractValueToNullReturnValue;
+use Infection\Mutator\Util\ArrayMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class NewObject extends AbstractValueToNullReturnValue
+final class NewObject extends ArrayMutator
 {
+    use ReturnNullValue;
+
     /**
      * Replaces "return new Something(anything);" with "new Something(anything); return null;"
      *
-     *
-     * @return Node[]
+     * @param Node|Node\Stmt\Return_ $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): array
     {
         return [
             new Node\Stmt\Expression($node->expr),

@@ -35,18 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class LogicalNot extends Mutator
+final class LogicalNot extends SingleMutator
 {
     /**
      * Replaces "!something" with "something"
+     *
+     * @param Node|Node\Expr\BooleanNot $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return $node->expr;
     }

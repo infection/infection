@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Assignment extends Mutator
+final class Assignment extends SingleMutator
 {
     /**
      * Replaces "+=", "*=", ".=", and similar with a plain "="
      *
-     *
-     * @return Node\Expr\Assign
+     * @param Node|Node\Expr\AssignOp $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Expr\Assign($node->var, $node->expr, $node->getAttributes());
     }

@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\FunctionSignature;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
@@ -44,17 +44,15 @@ use PhpParser\Node\Stmt\ClassMethod;
 /**
  * @internal
  */
-final class ProtectedVisibility extends Mutator
+final class ProtectedVisibility extends SingleMutator
 {
     /**
      * Replaces "protected function..." with "private function ..."
      *
-     *
-     * @return ClassMethod
+     * @param Node|ClassMethod $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
-        /* @var ClassMethod $node */
         return new ClassMethod(
             $node->name,
             [

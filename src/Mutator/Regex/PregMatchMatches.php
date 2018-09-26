@@ -35,22 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Regex;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class PregMatchMatches extends Mutator
+final class PregMatchMatches extends SingleMutator
 {
     /**
      * Replaces "preg_match('/a/', 'b', $foo);" with "(int) $foo = array();"
      *
      * @param Node|Node\Expr\FuncCall $node
-     *
-     * @return Node\Expr\Cast\Int_
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Expr\Cast\Int_(new Node\Expr\Assign($node->args[2]->value, new Node\Expr\Array_()));
     }

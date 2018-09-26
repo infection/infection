@@ -37,7 +37,7 @@ namespace Infection\Visitor;
 
 use Infection\Exception\InvalidMutatorException;
 use Infection\Mutation;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
@@ -128,11 +128,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                 continue;
             }
 
-            $mutatedResult = $mutator->mutate($node);
-
-            $mutatedNodes = $mutatedResult instanceof \Generator ? $mutatedResult : [$mutatedResult];
-
-            foreach ($mutatedNodes as $mutationByMutatorIndex => $mutatedNode) {
+            foreach ($mutator->mutate($node) as $mutationByMutatorIndex => $mutatedNode) {
                 $this->mutations[] = new Mutation(
                     $this->filePath,
                     $this->fileAst,

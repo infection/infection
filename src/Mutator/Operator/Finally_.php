@@ -35,22 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Finally_ extends Mutator
+final class Finally_ extends SingleMutator
 {
     /**
      * Removes "finally{}" blocks
      *
-     *
-     * @return Node\Stmt\Nop
+     * @param Node|Node\Stmt\Finally_ $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Stmt\Nop();
     }

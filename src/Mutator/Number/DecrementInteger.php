@@ -35,24 +35,23 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class DecrementInteger extends Mutator
+final class DecrementInteger extends SingleMutator
 {
     private const COUNT_NAMES = ['count', 'sizeof'];
 
     /**
      * Decrements an integer by 1
      *
-     *
-     * @return Node\Scalar\LNumber
+     * @param Node|Node\Scalar\LNumber $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Scalar\LNumber($node->value - 1);
     }

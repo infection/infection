@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class EqualIdentical extends Mutator
+final class EqualIdentical extends SingleMutator
 {
     /**
      * Replaces "==" with "==="
      *
-     *
-     * @return Node\Expr\BinaryOp\Identical
+     * @param Node|Node\Expr\BinaryOp\Equal $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Expr\BinaryOp\Identical($node->left, $node->right, $node->getAttributes());
     }

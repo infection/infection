@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Yield_ extends Mutator
+final class Yield_ extends SingleMutator
 {
     /**
      * Replaces "yield $a => $b;" with "yield $a > $b;"
      *
-     *
-     * @return Node|Node\Expr\Yield_
+     * @param Node|Node\Expr\Yield_ $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         $node->value = new Node\Expr\BinaryOp\Greater($node->key, $node->value, $node->getAttributes());
         $node->key = null;

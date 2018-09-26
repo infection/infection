@@ -35,22 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class FloatNegation extends Mutator
+final class FloatNegation extends SingleMutator
 {
     /**
      * Replaces any float with negated float
      * Replaces "-33.4" with "33.4"
      *
-     *
-     * @return Node\Stmt\Return_
+     * @param Node|Node\Stmt\Return_ $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         $floatValue = $node->expr instanceof Node\Expr\UnaryMinus
             ? -$node->expr->expr->value

@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalNegotiation;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Identical extends Mutator
+final class Identical extends SingleMutator
 {
     /**
      * Replaces "===" with "!=="
      *
-     *
-     * @return Node\Expr\BinaryOp\NotIdentical
+     * @param Node|Node\Expr\BinaryOp\Identical $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Expr\BinaryOp\NotIdentical($node->left, $node->right, $node->getAttributes());
     }

@@ -35,20 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\GeneratorMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-abstract class AbstractUnwrapMutator extends Mutator
+abstract class AbstractUnwrapMutator extends GeneratorMutator
 {
     /**
      * Replaces "$a = function(arg1, arg2);" with "$a = arg1;"
      *
-     * @return Node\Param;
+     * @return \Generator;
      */
-    final public function mutate(Node $node)
+    final protected function getMutatedNode(Node $node): \Generator
     {
         foreach ($this->getParameterIndexes($node) as $index) {
             yield $node->args[$index];

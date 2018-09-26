@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class IncrementInteger extends Mutator
+final class IncrementInteger extends SingleMutator
 {
     /**
      * Increments an integer by 1
      *
-     *
-     * @return Node\Scalar\LNumber
+     * @param Node|Node\Scalar\LNumber $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Scalar\LNumber($node->value + 1);
     }

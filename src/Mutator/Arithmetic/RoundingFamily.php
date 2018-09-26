@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\GeneratorMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class RoundingFamily extends Mutator
+final class RoundingFamily extends GeneratorMutator
 {
     private const MUTATORS_MAP = [
         'floor',
@@ -56,16 +56,12 @@ final class RoundingFamily extends Mutator
      *     3. round() to ceil() and floor()
      *
      * @param Node\Expr\FuncCall|Node $node
-     *
-     * @return \Generator
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): \Generator
     {
         $currentFunctionName = $this->getNormalizedFunctionName($node->name);
 
-        $mutateToFunctions = array_diff(self::MUTATORS_MAP, [$currentFunctionName]);
-
-        foreach ($mutateToFunctions as $functionName) {
+        foreach (array_diff(self::MUTATORS_MAP, [$currentFunctionName]) as $functionName) {
             yield new Node\Expr\FuncCall(
                 new Node\Name($functionName),
                 [$node->args[0]],

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
+use Infection\Mutator;
 use Webmozart\Assert\Assert;
 
 /**

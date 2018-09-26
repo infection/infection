@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\Util\AbstractValueToNullReturnValue;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class This extends AbstractValueToNullReturnValue
+final class This extends SingleMutator
 {
+    use ReturnNullValue;
+
     /**
      * Replaces "return $this;" with "return null;"
-     *
-     *
-     * @return Node\Stmt\Return_
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Stmt\Return_(
             new Node\Expr\ConstFetch(new Node\Name('null'))

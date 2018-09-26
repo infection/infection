@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalBoundary;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class GreaterThanOrEqualTo extends Mutator
+final class GreaterThanOrEqualTo extends SingleMutator
 {
     /**
      * Replaces ">=" with ">"
      *
-     *
-     * @return Node\Expr\BinaryOp\Greater
+     * @param Node|Node\Expr\BinaryOp\GreaterOrEqual $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Expr\BinaryOp\Greater($node->left, $node->right, $node->getAttributes());
     }

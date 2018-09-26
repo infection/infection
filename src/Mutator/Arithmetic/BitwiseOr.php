@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class BitwiseOr extends Mutator
+final class BitwiseOr extends SingleMutator
 {
     /**
      * Replaces "|" with "&"
      *
-     *
-     * @return Node\Expr\BinaryOp\BitwiseAnd
+     * @param Node|Node\Expr\BinaryOp\BitwiseOr $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Expr\BinaryOp\BitwiseAnd($node->left, $node->right, $node->getAttributes());
     }

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**

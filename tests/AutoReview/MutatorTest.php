@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
+use Infection\Mutator\Util\MutatorProfile;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -67,7 +68,7 @@ final class MutatorTest extends TestCase
     }
 
     /**
-     * @dataProvider providesMutatorClasses
+     * @dataProvider provideConcreteMutatorClasses
      */
     public function test_mutators_do_not_declare_public_methods(string $className): void
     {
@@ -98,6 +99,25 @@ final class MutatorTest extends TestCase
                 $testClassName
             )
         );
+    }
+
+    /**
+     * @dataProvider provideConcreteMutatorClasses
+     */
+    public function test_all_mutators_are_part_of_the_full_mutators_list(string $class): void
+    {
+        $class = explode('\\', $class);
+        $class = array_pop($class);
+
+        $this->assertArrayHasKey(
+                $class,
+                MutatorProfile::FULL_MUTATOR_LIST,
+                sprintf(
+                    'The mutator "%s" located has not been added to the FULL_MUTATOR_LIST in the MutatorProfile class. ' .
+                    'Please add it to ensure it can be used.',
+                    $class
+                )
+            );
     }
 
     public function provideConcreteMutatorClasses()

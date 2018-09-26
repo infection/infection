@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Util;
 
 use Infection\Config\Exception\InvalidConfigException;
+use Infection\Mutator;
 
 /**
  * @internal

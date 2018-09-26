@@ -33,28 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Arithmetic;
+namespace Infection;
 
-use Infection\Mutator\Util\SingleMutator;
+use Infection\Mutator\Util\MutatorConfig;
+use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
-/**
- * @internal
- */
-final class BitwiseNot extends SingleMutator
+abstract class Mutator
 {
     /**
-     * Replaces "~" with "" (removed)
-     *
-     * @param Node|Node\Expr\BitwiseNot $node
+     * @var MutatorConfig
      */
-    protected function getMutatedNode(Node $node): Node
+    private $config;
+
+    public function __construct(MutatorConfig $config)
     {
-        return $node->expr;
+        $this->config = $config;
     }
 
-    protected function mutatesNode(Node $node): bool
+    abstract public function mutate(Node $node): \Generator;
+
+    final public function shouldMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\BitwiseNot;
+        if (!$this->mutatesNode($node)) {
+            return false;
+        }
+
+        $reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY, false);
+
+        if (!$reflectionClass) {
+            return true;
+        }
+
+        return !$this->config->isIgnored($reflectionClass->getName(), $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''));
     }
+
+    final public static function getName(): string
+    {
+        $parts = explode('\\', static::class);
+
+        return end($parts);
+    }
+
+    abstract protected function mutatesNode(Node $node): bool;
 }

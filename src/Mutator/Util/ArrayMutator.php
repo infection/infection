@@ -35,47 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
-use Infection\Visitor\ReflectionVisitor;
+use Infection\Mutator;
 use PhpParser\Node;
 
-abstract class Mutator
+/**
+ * @internal
+ */
+abstract class ArrayMutator extends Mutator
 {
-    /**
-     * @var MutatorConfig
-     */
-    private $config;
-
-    public function __construct(MutatorConfig $config)
+    final public function mutate(Node $node): \Generator
     {
-        $this->config = $config;
+        yield $this->getMutatedNode($node);
     }
 
-    /**
-     * @return Node|Node[]|\Generator
-     */
-    abstract public function mutate(Node $node);
-
-    final public function shouldMutate(Node $node): bool
-    {
-        if (!$this->mutatesNode($node)) {
-            return false;
-        }
-
-        $reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY, false);
-
-        if (!$reflectionClass) {
-            return true;
-        }
-
-        return !$this->config->isIgnored($reflectionClass->getName(), $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''));
-    }
-
-    final public static function getName(): string
-    {
-        $parts = explode('\\', static::class);
-
-        return end($parts);
-    }
-
-    abstract protected function mutatesNode(Node $node): bool;
+    abstract protected function getMutatedNode(Node $node): array;
 }

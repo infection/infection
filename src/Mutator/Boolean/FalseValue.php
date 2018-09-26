@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\SingleMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class FalseValue extends Mutator
+final class FalseValue extends SingleMutator
 {
     /**
      * Replaces "false" with "true"
      *
-     *
-     * @return Node\Expr\ConstFetch
+     * @param Node|Node\Expr\ConstFetch $node
      */
-    public function mutate(Node $node)
+    protected function getMutatedNode(Node $node): Node
     {
         return new Node\Expr\ConstFetch(new Node\Name('true'));
     }

@@ -35,44 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
-use Infection\Visitor\ReflectionVisitor;
+use Infection\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-abstract class AbstractValueToNullReturnValue extends Mutator
+abstract class SingleMutator extends Mutator
 {
-    protected function isNullReturnValueAllowed(Node $node): bool
+    final public function mutate(Node $node): \Generator
     {
-        /** @var \PhpParser\Node\Stmt\Function_|null $functionScope */
-        $functionScope = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY, null);
-
-        if (null === $functionScope) {
-            return true;
-        }
-
-        $returnType = $functionScope->getReturnType();
-
-        if ($returnType instanceof Node\Identifier) {
-            $returnType = $returnType->name;
-        }
-
-        // no return value specified
-        if (null === $returnType) {
-            return true;
-        }
-
-        // scalar typehint
-        if (\is_string($returnType)) {
-            return false;
-        }
-
-        // nullable typehint, e.g. "?int" or "?CustomClass"
-        if ($returnType instanceof Node\NullableType) {
-            return true;
-        }
-
-        return !$returnType instanceof Node\Name;
+        yield $this->getMutatedNode($node);
     }
+
+    abstract protected function getMutatedNode(Node $node): Node;
 }
