@@ -18,7 +18,7 @@ use PhpParser\Node;
  */
 final class DecrementInteger extends Mutator
 {
-    private const COUNT_NAME = ['count', 'sizeof'];
+    private const COUNT_NAMEs = ['count', 'sizeof'];
 
     /**
      * Decrements an integer by 1
@@ -55,8 +55,8 @@ final class DecrementInteger extends Mutator
 
         if ($parentNode->left instanceof Node\Expr\FuncCall
             && \in_array(
-                $this->getLowercaseMethodName($parentNode, 'left'),
-                self::COUNT_NAME,
+                $parentNode->left->name->toLowerString(),
+                self::COUNT_NAMEs,
                 true)
         ) {
             return $this->isAllowedLeftSideCountComparison($parentNode);
@@ -64,8 +64,8 @@ final class DecrementInteger extends Mutator
 
         if ($parentNode->right instanceof Node\Expr\FuncCall
             && \in_array(
-                $this->getLowercaseMethodName($parentNode, 'right'),
-                self::COUNT_NAME,
+                $parentNode->right->name->toLowerString(),
+                self::COUNT_NAMEs,
                 true)
         ) {
             return $this->isAllowedRightSideCountComparison($parentNode);
@@ -104,10 +104,5 @@ final class DecrementInteger extends Mutator
     {
         return $parentNode instanceof Node\Expr\BinaryOp\Smaller
             || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual;
-    }
-
-    private function getLowercaseMethodName(Node $node, string $part): string
-    {
-        return $node->{$part}->name->toLowerString();
     }
 }

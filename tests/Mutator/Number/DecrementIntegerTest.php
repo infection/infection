@@ -85,7 +85,7 @@ if (cOunT($a) === 0) {
 PHP
                 ,
             ],
-            'It does not decrement zero with when it is being compared as identical with result of sizeOf()' => [
+            'It does not decrement zero when it is being compared as identical with result of sizeOf()' => [
                 <<<'PHP'
 <?php
 
@@ -160,24 +160,6 @@ PHP
 <?php
 
 if (0 == count($a)) {
-    echo 'bar';
-}
-PHP
-                ,
-            ],
-            'It does decrement zero when it is compared as greater than count() on the right side' => [
-                <<<'PHP'
-<?php
-
-if (0 > count($a)) {
-    echo 'bar';
-}
-PHP
-                ,
-                <<<'PHP'
-<?php
-
-if (-1 > count($a)) {
     echo 'bar';
 }
 PHP
