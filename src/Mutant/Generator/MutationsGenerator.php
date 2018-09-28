@@ -18,12 +18,12 @@ use Infection\Mutant\Exception\ParserException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\Traverser\PriorityNodeTraverser;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\Parser;
 use Symfony\Component\Finder\SplFileInfo;
@@ -123,7 +123,7 @@ final class MutationsGenerator
             throw ParserException::fromInvalidFile($file, $t);
         }
 
-        $traverser = new NodeTraverser();
+        $traverser = new PriorityNodeTraverser();
         $filePath = $file->getRealPath();
         \assert(\is_string($filePath));
 
@@ -135,25 +135,13 @@ final class MutationsGenerator
             $onlyCovered
         );
 
-        $orderedVisitors = [
-            40 => new ParentConnectorVisitor(),
-            30 => new FullyQualifiedClassNameVisitor(),
-            20 => new ReflectionVisitor(),
-            10 => $mutationsCollectorVisitor,
-        ];
-
-        $visitorsQueue = new \SplPriorityQueue();
-
-        foreach ($orderedVisitors as $priority => $visitor) {
-            $visitorsQueue->insert($visitor, $priority);
-        }
+        $traverser->addVisitor(new ParentConnectorVisitor(), 40);
+        $traverser->addVisitor(new FullyQualifiedClassNameVisitor(), 30);
+        $traverser->addVisitor(new ReflectionVisitor(), 20);
+        $traverser->addVisitor($mutationsCollectorVisitor, 10);
 
         foreach ($extraNodeVisitors as $priority => $visitor) {
-            $visitorsQueue->insert($visitor, $priority);
-        }
-
-        foreach ($visitorsQueue as $visitor) {
-            $traverser->addVisitor($visitor);
+            $traverser->addVisitor($visitor, $priority);
         }
 
         $traverser->traverse($initialStatements);
