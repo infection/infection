@@ -24,19 +24,31 @@ final class PublicVisibility extends Mutator
     use InterfaceParentTrait;
 
     /**
-     * Replaces "public function..." with "protected function ..."
+     * Replaces "public function..." with "protected function ..." and "private function ..."
      *
      * @param Node $node
      *
-     * @return ClassMethod
+     * @return \Generator
      */
     public function mutate(Node $node)
     {
         /* @var ClassMethod $node */
-        return new ClassMethod(
+        yield new ClassMethod(
             $node->name,
             [
                 'flags' => ($node->flags & ~Class_::MODIFIER_PUBLIC) | Class_::MODIFIER_PROTECTED,
+                'byRef' => $node->returnsByRef(),
+                'params' => $node->getParams(),
+                'returnType' => $node->getReturnType(),
+                'stmts' => $node->getStmts(),
+            ],
+            $node->getAttributes()
+        );
+
+        yield new ClassMethod(
+            $node->name,
+            [
+                'flags' => ($node->flags & ~Class_::MODIFIER_PUBLIC) | Class_::MODIFIER_PRIVATE,
                 'byRef' => $node->returnsByRef(),
                 'params' => $node->getParams(),
                 'returnType' => $node->getReturnType(),

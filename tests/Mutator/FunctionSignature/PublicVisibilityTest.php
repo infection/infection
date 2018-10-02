@@ -52,8 +52,9 @@ final class PublicVisibilityTest extends AbstractMutatorTestCase
 
     public function provideMutationCases(): \Generator
     {
-        yield 'It mutates public to protected' => [
+        yield 'It mutates public to protected and private' => [
             $this->getFileContent('pv-one-class.php'),
+            [
                 <<<'PHP'
 <?php
 
@@ -69,10 +70,26 @@ class Test
 }
 PHP
                 ,
-            ];
+                <<<'PHP'
+<?php
+
+namespace PublicVisibilityOneClass;
+
+class Test
+{
+    private function &foo(int $param, $test = 1) : bool
+    {
+        echo 1;
+        return false;
+    }
+}
+PHP
+            ]
+        ];
 
         yield 'It does not mutate final flag' => [
             $this->getFileContent('pv-final.php'),
+            [
             <<<'PHP'
 <?php
 
@@ -87,12 +104,28 @@ class Test
     }
 }
 PHP
-            ,
+                ,
+                <<<'PHP'
+<?php
+
+namespace PublicVisibilityFinal;
+
+class Test
+{
+    private final function foo(int $param, $test = 1) : bool
+    {
+        echo 1;
+        return false;
+    }
+}
+PHP
+            ]
         ];
 
         yield 'It mutates non abstract public to protected in an abstract class' => [
             $this->getFileContent('pv-non-abstract-in-abstract-class.php'),
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 namespace PublicVisibilityNonAbstractInAbstractClass;
@@ -106,11 +139,27 @@ abstract class Test
     }
 }
 PHP
-            ,
+                ,
+                <<<'PHP'
+<?php
+
+namespace PublicVisibilityNonAbstractInAbstractClass;
+
+abstract class Test
+{
+    private function foo(int $param, $test = 1) : bool
+    {
+        echo 1;
+        return false;
+    }
+}
+PHP
+            ]
         ];
 
         yield 'It does not mutate static flag' => [
             $this->getFileContent('pv-static.php'),
+            [
         <<<'PHP'
 <?php
 
@@ -126,10 +175,27 @@ class Test
 }
 PHP
         ,
+                <<<'PHP'
+<?php
+
+namespace PublicVisibilityStatic;
+
+class Test
+{
+    private static function foo(int $param, $test = 1) : bool
+    {
+        echo 1;
+        return false;
+    }
+}
+PHP
+                ,
+            ]
         ];
 
         yield 'It replaces visibility if not set' => [
             $this->getFileContent('pv-not-set.php'),
+            [
             <<<'PHP'
 <?php
 
@@ -143,6 +209,20 @@ class Test
 }
 PHP
             ,
+                <<<'PHP'
+<?php
+
+namespace PublicVisibilityNotSet;
+
+class Test
+{
+    private function foo()
+    {
+    }
+}
+PHP
+                ,
+                ]
         ];
 
         yield 'It does not mutate an interface' => [
@@ -167,6 +247,7 @@ PHP
 
         yield 'It does not mutate if parent class has same public method' => [
             $this->getFileContent('pv-same-method-parent.php'),
+            [
             <<<'PHP'
 <?php
 
@@ -186,10 +267,31 @@ class Child extends SameParent
 }
 PHP
             ,
+                <<<'PHP'
+<?php
+
+namespace SameParent;
+
+class SameParent
+{
+    private function foo()
+    {
+    }
+}
+class Child extends SameParent
+{
+    public function foo()
+    {
+    }
+}
+PHP
+                ,
+                ]
         ];
 
         yield 'it does not mutate if grandparent class has same public method' => [
             $this->getFileContent('pv-same-method-grandparent.php'),
+            [
             <<<'PHP'
 <?php
 
@@ -212,10 +314,34 @@ class Child extends SameParent
 }
 PHP
             ,
+                <<<'PHP'
+<?php
+
+namespace SameGrandParent;
+
+class GrandParent
+{
+    private function foo()
+    {
+    }
+}
+class SameParent extends GrandParent
+{
+}
+class Child extends SameParent
+{
+    public function foo()
+    {
+    }
+}
+PHP
+                ,
+            ]
         ];
 
         yield 'it does mutate non-inherited methods' => [
             $this->getFileContent('pv-non-same-method-parent.php'),
+            [
             <<<'PHP'
 <?php
 
@@ -235,7 +361,28 @@ class Child extends NonSameAbstract
     }
 }
 PHP
-        ];
+                ,
+                <<<'PHP'
+<?php
+
+namespace NonSameAbstract;
+
+abstract class NonSameAbstract
+{
+    public abstract function foo();
+}
+class Child extends NonSameAbstract
+{
+    public function foo()
+    {
+    }
+    private function bar()
+    {
+    }
+}
+PHP
+                ]
+            ];
     }
 
     private function getFileContent(string $file): string
