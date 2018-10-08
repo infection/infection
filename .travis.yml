@@ -16,7 +16,7 @@ cache:
 addons:
   apt:
     packages:
-    - expect
+      - expect
 
 before_install:
   - source .ci/xdebug.sh

@@ -5,7 +5,7 @@ PHPUNIT=vendor/bin/phpunit
 INFECTION=build/bin/infection.phar
 
 # URLs to download all tools
-BOX_URL="https://github.com/humbug/box/releases/download/3.0.0-alpha.5/box.phar"
+BOX_URL="https://github.com/humbug/box/releases/download/3.1.0/box.phar"
 PHP-CS-FIXER_URL="https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar"
 PHPSTAN_URL="https://github.com/phpstan/phpstan/releases/download/0.10.3/phpstan.phar"
 
@@ -150,6 +150,7 @@ auto-review: vendor
 	vendor/bin/phpunit --group=auto-review
 
 build/bin/infection.phar: $(shell find bin/ src/ -type f) box.phar box.json.dist .git/HEAD
+	php box.phar validate
 	php box.phar compile
 
 box.phar:
