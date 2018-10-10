@@ -2,3 +2,4 @@ parameters:
     ignoreErrors:
         - '#Access to an undefined property PhpParser\\Node(.*?)#'
         - '#Call to an undefined method PhpParser\\Node(.*?)#'
+        - '#Access to undefined constant PhpParser\\NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN#'
