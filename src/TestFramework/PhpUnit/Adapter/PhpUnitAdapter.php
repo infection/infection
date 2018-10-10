@@ -57,7 +57,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
     {
         return [
             100 => new CodeCoverageClassIgnoreVisitor(),
-            0 => new CodeCoverageMethodIgnoreVisitor(),
+            15 => new CodeCoverageMethodIgnoreVisitor(),
         ];
     }
 

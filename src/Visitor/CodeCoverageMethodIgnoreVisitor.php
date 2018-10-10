@@ -36,17 +36,7 @@ final class CodeCoverageMethodIgnoreVisitor extends NodeVisitorAbstract
         }
 
         if (strpos($docComment, '@codeCoverageIgnore') !== false) {
-            /*
-             * This is a workaround to "disable" this Node from mutation.
-             *
-             * When PHP-Parser's NodeTraverser::DONT_TRAVERSE_CHILDREN is returned, subsequent Visitors still process
-             * current Node (enterNode(), leaveNode()), but without its children. This lead to class method to be
-             * mutated, while it shouldn't be.
-             */
-            $node->setAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
-            $node->setAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, false);
-
-            return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
 
         return null;
