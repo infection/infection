@@ -65,6 +65,11 @@ final class ProtectedVisibility extends Mutator
         /** @var \ReflectionClass $reflection */
         $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
 
+        if (!$reflection instanceof \ReflectionClass) {
+            // assuming the worst where interface has the same method
+            return true;
+        }
+
         $parent = $reflection->getParentClass();
 
         while ($parent) {

@@ -100,6 +100,11 @@ final class PublicVisibility extends Mutator
         /** @var \ReflectionClass $reflection */
         $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
 
+        if (!$reflection instanceof \ReflectionClass) {
+            // assuming the worst where interface has the same method
+            return true;
+        }
+
         foreach ($reflection->getInterfaces() as $reflectionInterface) {
             try {
                 $method = $reflectionInterface->getMethod($node->name->name);
@@ -120,6 +125,11 @@ final class PublicVisibility extends Mutator
     {
         /** @var \ReflectionClass $reflection */
         $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
+
+        if (!$reflection instanceof \ReflectionClass) {
+            // assuming the worst where interface has the same method
+            return true;
+        }
 
         $parent = $reflection->getParentClass();
 

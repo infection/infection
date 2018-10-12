@@ -236,6 +236,22 @@ class Child extends NonSameAbstract
 }
 PHP
         ];
+
+        yield 'it does not mutate an anonymous class because reflection is not avalable' => [
+            <<<'PHP'
+<?php
+
+function something()
+{
+    return new class() {
+        public function anything()
+        {
+            return null;
+        }
+    };
+}
+PHP
+        ];
     }
 
     private function getFileContent(string $file): string
