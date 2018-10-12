@@ -92,11 +92,11 @@ final class PublicVisibility extends Mutator
 
     private function hasSamePublicParentMethod(Node $node): bool
     {
-        /** @var \ReflectionClass $reflection */
+        /** @var \ReflectionClass|null $reflection */
         $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
 
         if (!$reflection instanceof \ReflectionClass) {
-            // assuming the worst where interface has the same method
+            // assuming the worst where an interface has the same method
             return true;
         }
 
