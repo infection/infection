@@ -181,6 +181,22 @@ class Child extends ProtectedNonSameAbstract
 }
 PHP
         ];
+
+        yield 'it does not mutate an anonymous class because reflection is not avalable' => [
+            <<<'PHP'
+<?php
+
+function something()
+{
+    return new class() {
+        protected function anything()
+        {
+            return null;
+        }
+    };
+}
+PHP
+        ];
     }
 
     private function getFileContent(string $file): string
