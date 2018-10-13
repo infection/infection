@@ -19,12 +19,11 @@ use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-final class ReflectionVisitorTest extends TestCase
+final class ReflectionVisitorTest extends AbstractBaseVisitorTest
 {
     private $spyVisitor;
 
@@ -49,7 +48,7 @@ final class ReflectionVisitorTest extends TestCase
         ]);
 
         $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
-        $this->code = $this->getFileContent('rv-part-of-signature-flag.php');
+        $this->code = $this->getFileContent('Reflection/rv-part-of-signature-flag.php');
     }
 
     /**
@@ -74,7 +73,7 @@ final class ReflectionVisitorTest extends TestCase
 
     public function test_it_detects_if_traversed_inside_class_method(): void
     {
-        $code = $this->getFileContent('rv-inside-class-method.php');
+        $code = $this->getFileContent('Reflection/rv-inside-class-method.php');
 
         $this->parseAndTraverse($code);
 
@@ -83,7 +82,7 @@ final class ReflectionVisitorTest extends TestCase
 
     public function test_it_detects_if_traversed_inside_function(): void
     {
-        $code = $this->getFileContent('rv-inside-function.php');
+        $code = $this->getFileContent('Reflection/rv-inside-function.php');
 
         $this->parseAndTraverse($code);
 
@@ -92,7 +91,7 @@ final class ReflectionVisitorTest extends TestCase
 
     public function test_it_detects_if_traversed_inside_closure(): void
     {
-        $code = $this->getFileContent('rv-inside-closure.php');
+        $code = $this->getFileContent('Reflection/rv-inside-closure.php');
 
         $this->parseAndTraverse($code);
 
@@ -101,7 +100,7 @@ final class ReflectionVisitorTest extends TestCase
 
     public function test_it_does_not_add_inside_function_flag_if_not_needed(): void
     {
-        $code = $this->getFileContent('rv-without-function.php');
+        $code = $this->getFileContent('Reflection/rv-without-function.php');
 
         $this->parseAndTraverse($code);
 
@@ -110,7 +109,7 @@ final class ReflectionVisitorTest extends TestCase
 
     public function test_it_correctly_works_with_anonymous_classes(): void
     {
-        $code = $this->getFileContent('rv-anonymous-class.php');
+        $code = $this->getFileContent('Reflection/rv-anonymous-class.php');
 
         $this->parseAndTraverse($code);
 
@@ -119,7 +118,7 @@ final class ReflectionVisitorTest extends TestCase
 
     public function test_it_sets_reflection_class_to_nodes(): void
     {
-        $code = $this->getFileContent('rv-inside-class-method.php');
+        $code = $this->getFileContent('Reflection/rv-inside-class-method.php');
         $reflectionSpyVisitor = $this->getReflectionClassSpyVisitor();
 
         $this->parseAndTraverse($code, $reflectionSpyVisitor);
@@ -168,14 +167,6 @@ final class ReflectionVisitorTest extends TestCase
         };
     }
 
-    private function getNodes(string $code): array
-    {
-        $lexer = new Lexer\Emulative();
-        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
-
-        return $parser->parse($code);
-    }
-
     private function getInsideFunctionSpyVisitor()
     {
         return new class() extends NodeVisitorAbstract {
@@ -221,10 +212,5 @@ final class ReflectionVisitorTest extends TestCase
         $traverser->addVisitor($nodeVisitor ?: $this->spyVisitor);
 
         $traverser->traverse($nodes);
-    }
-
-    private function getFileContent(string $file): string
-    {
-        return file_get_contents(sprintf(__DIR__ . '/../Fixtures/Autoloaded/Reflection/%s', $file));
     }
 }

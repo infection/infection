@@ -10,12 +10,15 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\HasExtraNodeVisitors;
 use Infection\TestFramework\MemoryUsageAware;
+use Infection\Visitor\CodeCoverageClassIgnoreVisitor;
+use Infection\Visitor\CodeCoverageMethodIgnoreVisitor;
 
 /**
  * @internal
  */
-final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware
+final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, HasExtraNodeVisitors
 {
     public const JUNIT_FILE_NAME = 'phpunit.junit.xml';
 
@@ -48,6 +51,14 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         }
 
         return -1;
+    }
+
+    public function getMutationsCollectionNodeVisitors(): array
+    {
+        return [
+            100 => new CodeCoverageClassIgnoreVisitor(),
+            15 => new CodeCoverageMethodIgnoreVisitor(),
+        ];
     }
 
     public function getName(): string

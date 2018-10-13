@@ -1,8 +1,8 @@
 <?php
 
-namespace TmpNamespace_\Test;
+namespace ProfileIgnoreCombination\Test;
 
-use TmpNamespace_\SourceClass;
+use ProfileIgnoreCombination\SourceClass;
 use PHPUnit\Framework\TestCase;
 
 class SourceClassTest extends TestCase

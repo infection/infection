@@ -10,12 +10,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Namespace_\\": "src/"
+            "MultilineStatement\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Namespace_\\Test\\": "tests/"
+            "MultilineStatement\\Test\\": "tests/"
         }
     }
 }

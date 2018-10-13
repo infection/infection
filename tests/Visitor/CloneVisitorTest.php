@@ -13,19 +13,26 @@ use Infection\Visitor\CloneVisitor;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
-use PhpParser\ParserFactory;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-final class CloneVisitorTest extends TestCase
+final class CloneVisitorTest extends AbstractBaseVisitorTest
 {
+    private const CODE = <<<'PHP'
+<?php
+
+function hello() 
+{
+    return 'hello';
+}
+PHP;
+
     public function test_it_does_not_save_the_old_nodes_without_the_clone_visitor(): void
     {
         $traverser = new NodeTraverser();
         $traverser->addVisitor($this->getChangingVisitor());
-        $oldNodes = $this->getNodes();
+        $oldNodes = $this->getNodes(self::CODE);
 
         $newNodes = $traverser->traverse($oldNodes);
         $this->assertSame($oldNodes, $newNodes);
@@ -36,25 +43,10 @@ final class CloneVisitorTest extends TestCase
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new CloneVisitor());
         $traverser->addVisitor($this->getChangingVisitor());
-        $oldNodes = $this->getNodes();
+        $oldNodes = $this->getNodes(self::CODE);
 
         $newNodes = $traverser->traverse($oldNodes);
         $this->assertNotSame($oldNodes, $newNodes);
-    }
-
-    private function getNodes(): array
-    {
-        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
-
-        return $parser->parse(<<<'PHP'
-<?php
-
-function hello() 
-{
-    return 'hello';
-}
-PHP
-        );
     }
 
     private function getChangingVisitor()

@@ -6,13 +6,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Namespace_\\": "src/"
+            "TestFrameworks\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "spec\\": "spec/",
-            "Namespace\\Test\\": "tests/"
+            "TestFrameworks\\Test\\": "tests/"
         }
     },
     "require-dev": {

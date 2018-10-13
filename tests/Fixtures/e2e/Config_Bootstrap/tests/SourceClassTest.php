@@ -1,8 +1,8 @@
 <?php
 
-namespace Namespace_\Test;
+namespace ConfigBoostrap\Test;
 
-use Namespace_\SourceClass;
+use ConfigBoostrap\SourceClass;
 use PHPUnit\Framework\TestCase;
 
 class SourceClassTest extends TestCase

@@ -1,9 +1,9 @@
 <?php
 
-namespace Namespace_\Test;
+namespace IdenticalMutatorExample\Test;
 
 use PHPUnit\Framework\TestCase;
-use Namespace_\StringEnvelope;
+use IdenticalMutatorExample\StringEnvelope;
 
 class StringEnvelopeTest extends TestCase
 {

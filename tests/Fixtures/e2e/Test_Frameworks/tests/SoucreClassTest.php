@@ -1,8 +1,8 @@
 <?php
 
-namespace Namespace_\Test;
+namespace TestFrameworks\Test;
 
-use Namespace_\SourceClass;
+use TestFrameworks\SourceClass;
 use PHPUnit\Framework\TestCase;
 
 class SourceClassTest extends TestCase

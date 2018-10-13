@@ -1,7 +1,7 @@
 suites:
   source_suite:
-    namespace: Namespace_
-    psr4_prefix: Namespace_
+    namespace: TestFrameworks
+    psr4_prefix: TestFrameworks
 
 extensions:
   LeanPHP\PhpSpec\CodeCoverage\CodeCoverageExtension: ~

@@ -21,6 +21,9 @@ cp  Example_Test/infection.json $dirname/infection.json
 cp  Example_Test/phpunit.xml $dirname/phpunit.xml
 cp  Example_Test/README.md $dirname/README.md
 
+cd $dirname
+find ./ -type f -exec sed -i -e "s/ExampleTest/$dirname/g" {} \;
+
 echo "Created the base for a new end-to-end test in directory $dirname"
 
 
