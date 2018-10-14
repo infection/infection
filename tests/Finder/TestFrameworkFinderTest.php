@@ -151,8 +151,8 @@ final class TestFrameworkFinderTest extends TestCase
         }
 
         $this->assertSame(
-            normalizePath($expected),
-            normalizePath($frameworkFinder->find()),
+            normalizePath(realpath($expected)),
+            normalizePath(realpath($frameworkFinder->find())),
             'should return the vendor bin link or .bat'
         );
     }
@@ -172,8 +172,8 @@ final class TestFrameworkFinderTest extends TestCase
         $frameworkFinder = new TestFrameworkFinder($mock::PACKAGE);
 
         $this->assertSame(
-            normalizePath($mock->getPackageScript()),
-            normalizePath($frameworkFinder->find()),
+            normalizePath(realpath($mock->getPackageScript())),
+            normalizePath(realpath($frameworkFinder->find())),
             'should return the package script from .bat'
         );
     }
