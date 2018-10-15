@@ -59,7 +59,7 @@ final class ReflectionVisitorTest extends AbstractBaseVisitorTest
         $statements = $this->parser->parse($this->code);
 
         $traverser = new NodeTraverser();
-        $spyVisitor = $this->getSpyVisitor($nodeClass);
+        $spyVisitor = $this->getPartOfSignatureSpyVisitor($nodeClass);
 
         $traverser->addVisitor(new ParentConnectorVisitor());
         $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
@@ -80,13 +80,33 @@ final class ReflectionVisitorTest extends AbstractBaseVisitorTest
         $this->assertTrue($this->spyVisitor->isInsideFunction);
     }
 
-    public function test_it_detects_if_traversed_inside_function(): void
+    public function test_it_does_not_travers_global_plain_function(): void
     {
         $code = $this->getFileContent('Reflection/rv-inside-function.php');
 
         $this->parseAndTraverse($code);
 
         $this->assertFalse($this->spyVisitor->isInsideFunction);
+    }
+
+    public function test_travers_plain_function_inside_a_class(): void
+    {
+        $code = $this->getFileContent('Reflection/rv-inside-plain-function-in-class.php');
+        $spyVisitor = $this->getSpyVisitor(Node\Expr\FuncCall::class);
+
+        $this->parseAndTraverse($code, $spyVisitor);
+
+        $this->assertTrue($spyVisitor->spyCalled);
+    }
+
+    public function test_travers_plain_function_inside_a_closure(): void
+    {
+        $code = $this->getFileContent('Reflection/rv-inside-plain-function-in-closure.php');
+        $spyVisitor = $this->getSpyVisitor(Node\Expr\FuncCall::class);
+
+        $this->parseAndTraverse($code, $spyVisitor);
+
+        $this->assertTrue($spyVisitor->spyCalled);
     }
 
     public function test_it_detects_if_traversed_inside_closure(): void
@@ -140,7 +160,7 @@ final class ReflectionVisitorTest extends AbstractBaseVisitorTest
         ];
     }
 
-    private function getSpyVisitor(string $nodeClass)
+    private function getPartOfSignatureSpyVisitor(string $nodeClass)
     {
         return new class($nodeClass) extends NodeVisitorAbstract {
             /** @var string */
@@ -163,6 +183,28 @@ final class ReflectionVisitorTest extends AbstractBaseVisitorTest
             public function isPartOfSignature()
             {
                 return $this->isPartOfSignature;
+            }
+        };
+    }
+
+    private function getSpyVisitor(string $nodeClass)
+    {
+        return new class($nodeClass) extends NodeVisitorAbstract {
+            /** @var string */
+            private $nodeClassUnderTest;
+
+            public $spyCalled = false;
+
+            public function __construct(string $nodeClass)
+            {
+                $this->nodeClassUnderTest = $nodeClass;
+            }
+
+            public function leaveNode(Node $node): void
+            {
+                if ($node instanceof $this->nodeClassUnderTest) {
+                    $this->spyCalled = true;
+                }
             }
         };
     }

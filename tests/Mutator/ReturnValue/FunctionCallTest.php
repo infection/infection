@@ -57,22 +57,6 @@ PHP
         ];
     }
 
-    public function test_it_does_not_mutate_a_function_outside_a_class(): void
-    {
-        $code = <<<"PHP"
-<?php
-
-function test()
-{
-    return 1;
-}
-PHP;
-
-        $mutations = $this->mutate($code);
-
-        $this->assertCount(0, $mutations);
-    }
-
     public function test_it_does_not_mutate_when_function_contains_another_function_but_return_null_is_not_allowed(): void
     {
         $code = $this->getFileContent('fc-contains-another-func-and-null-is-not-allowed.php');
