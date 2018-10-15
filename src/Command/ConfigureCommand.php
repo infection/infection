@@ -164,6 +164,15 @@ final class ConfigureCommand extends BaseCommand
             $configObject->logs->text = $textLogFilePath;
         }
 
+        /*
+         * Explicitly add the default profile to the list of mutators, as even if it is
+         * empty by default, it is not. If it would actually contain the default profile
+         * by default, it would make the profiles feature more obvious to configure.
+         */
+        $configObject->mutators = [
+            '@default' => true,
+        ];
+
         file_put_contents(InfectionConfig::CONFIG_FILE_NAME . '.dist', json_encode($configObject, JSON_PRETTY_PRINT));
     }
 }
