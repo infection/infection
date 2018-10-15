@@ -37,8 +37,7 @@ fi
 
 rm -f phpunit.bat.canary
 
-run "../../../../bin/infection --quiet"
-diff -w expected-output.txt infection-log.txt
+PATH=.:$PATH run "../../../../bin/infection --quiet" || true
 
 test -f phpunit.bat.canary && rm phpunit.bat.canary
 
