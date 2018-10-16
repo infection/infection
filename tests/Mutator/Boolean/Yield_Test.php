@@ -30,19 +30,17 @@ final class Yield_Test extends AbstractMutatorTestCase
             <<<'PHP'
 <?php
 
-function test()
-{
+$a = function () {
     (yield $a => $b);
-}
+};
 PHP
             ,
             <<<'PHP'
 <?php
 
-function test()
-{
+$a = function () {
     (yield $a > $b);
-}
+};
 PHP
             ,
         ];
@@ -51,10 +49,9 @@ PHP
             <<<'PHP'
 <?php
 
-function test()
-{
+$a = function () {
     (yield $b);
-}
+};
 PHP
             ,
         ];
