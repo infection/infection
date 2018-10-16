@@ -4,5 +4,7 @@ namespace InfectionReflectionFunction;
 
 function test()
 {
-    return 1;
+    return function ($a) {
+        return 1;
+    };
 }
