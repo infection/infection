@@ -169,23 +169,21 @@ PHP
             <<<'PHP'
 <?php
 
-function bar($input)
-{
+$bar = function ($input) {
     return array_map(function ($key, $value) {
         return strtolower(preg_quote($key . (ctype_alnum($value) ? '' : $value), '/'));
     }, $input);
-}
+};
 PHP
             ,
             <<<'PHP'
 <?php
 
-function bar($input)
-{
+$bar = function ($input) {
     return array_map(function ($key, $value) {
         return strtolower($key . (ctype_alnum($value) ? '' : $value));
     }, $input);
-}
+};
 PHP
         ];
 
