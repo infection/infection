@@ -33,6 +33,7 @@ final class MutatorProfile
         '@sort' => self::SORT,
         '@zero_iteration' => self::ZERO_ITERATION,
         '@cast' => self::CAST,
+        '@unwrap' => self::UNWRAP,
 
         //Special Profiles
         '@default' => self::DEFAULT,
@@ -159,6 +160,11 @@ final class MutatorProfile
         Mutator\Cast\CastString::class,
     ];
 
+    public const UNWRAP = [
+        Mutator\Unwrap\UnwrapArrayMap::class,
+        Mutator\Unwrap\UnwrapArrayFilter::class,
+    ];
+
     public const DEFAULT = [
         '@arithmetic',
         '@boolean',
@@ -278,5 +284,9 @@ final class MutatorProfile
         'CastInt' => Mutator\Cast\CastInt::class,
         'CastObject' => Mutator\Cast\CastObject::class,
         'CastString' => Mutator\Cast\CastString::class,
+
+        // Unwrap
+        'UnwrapArrayMap' => Mutator\Unwrap\UnwrapArrayMap::class,
+        'UnwrapArrayFilter' => Mutator\Unwrap\UnwrapArrayFilter::class,
     ];
 }
