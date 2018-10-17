@@ -54,95 +54,37 @@ final class PublicVisibilityTest extends AbstractMutatorTestCase
     {
         yield 'It mutates public to protected' => [
             $this->getFileContent('pv-one-class.php'),
-                <<<'PHP'
-<?php
-
-namespace PublicVisibilityOneClass;
-
-class Test
-{
-    protected function &foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-PHP
-                ,
-            ];
+            [
+                $this->getFileContent('pv-one-class-m0.php'),
+            ]
+        ];
 
         yield 'It does not mutate final flag' => [
             $this->getFileContent('pv-final.php'),
-            <<<'PHP'
-<?php
-
-namespace PublicVisibilityFinal;
-
-class Test
-{
-    protected final function foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-PHP
-            ,
+            [
+                $this->getFileContent('pv-final-m0.php'),
+            ]
         ];
 
         yield 'It mutates non abstract public to protected in an abstract class' => [
             $this->getFileContent('pv-non-abstract-in-abstract-class.php'),
-            <<<'PHP'
-<?php
-
-namespace PublicVisibilityNonAbstractInAbstractClass;
-
-abstract class Test
-{
-    protected function foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-PHP
-            ,
+            [
+                $this->getFileContent('pv-non-abstract-in-abstract-class-m0.php'),
+            ]
         ];
 
         yield 'It does not mutate static flag' => [
             $this->getFileContent('pv-static.php'),
-        <<<'PHP'
-<?php
-
-namespace PublicVisibilityStatic;
-
-class Test
-{
-    protected static function foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-PHP
-        ,
+            [
+                $this->getFileContent('pv-static-m0.php'),
+            ]
         ];
 
         yield 'It replaces visibility if not set' => [
             $this->getFileContent('pv-not-set.php'),
-            <<<'PHP'
-<?php
-
-namespace PublicVisibilityNotSet;
-
-class Test
-{
-    protected function foo()
-    {
-    }
-}
-PHP
-            ,
+            [
+                $this->getFileContent('pv-not-set-m0.php'),
+            ]
         ];
 
         yield 'It does not mutate an interface' => [
@@ -167,25 +109,9 @@ PHP
 
         yield 'It does not mutate if parent class has same public method' => [
             $this->getFileContent('pv-same-method-parent.php'),
-            <<<'PHP'
-<?php
-
-namespace SameParent;
-
-class SameParent
-{
-    protected function foo()
-    {
-    }
-}
-class Child extends SameParent
-{
-    public function foo()
-    {
-    }
-}
-PHP
-            ,
+            [
+                $this->getFileContent('pv-same-method-parent-m0.php'),
+            ],
         ];
 
         yield 'it does not mutate if grandparent class has same public method' => [
