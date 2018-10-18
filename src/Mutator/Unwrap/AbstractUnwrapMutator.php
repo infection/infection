@@ -26,17 +26,17 @@ abstract class AbstractUnwrapMutator extends Mutator
      *
      * @return Node\Param;
      */
-    public function mutate(Node $node)
+    final public function mutate(Node $node)
     {
         return $node->args[$this->getParameterIndex()];
     }
 
-    protected function mutatesNode(Node $node): bool
+    final protected function mutatesNode(Node $node): bool
     {
         if (!$node instanceof Node\Expr\FuncCall) {
             return false;
         }
 
-        return $node->name->toString() === $this->getFunctionName();
+        return $node->name->toLowerString() === strtolower($this->getFunctionName());
     }
 }
