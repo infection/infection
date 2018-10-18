@@ -106,7 +106,7 @@ if ($a === $a) {
 PHP
         ];
 
-        yield 'It mutates correctly when array_map is wrongly capitalized' => [
+        yield 'It mutates correctly when array_filter is wrongly capitalized' => [
             <<<'PHP'
 <?php
 
@@ -120,7 +120,7 @@ $a = ['A', 1, 'C'];
 PHP
         ];
 
-        yield 'It mutates correctly when array_map uses another function as input' => [
+        yield 'It mutates correctly when array_filter uses another function as input' => [
             <<<'PHP'
 <?php
 
