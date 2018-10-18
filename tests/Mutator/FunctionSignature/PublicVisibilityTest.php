@@ -23,20 +23,7 @@ final class PublicVisibilityTest extends AbstractMutatorTestCase
     {
         $code = $this->getFileContent("pv-{$functionName}.php");
 
-        $expectedMutatedCode = <<<"PHP"
-<?php
-
-namespace PublicVisibility{$functionName};
-
-class Test
-{
-    public {$modifier}function {$functionName}($args)
-    {
-    }
-}
-PHP;
-
-        $this->doTest($code, $expectedMutatedCode);
+        $this->doTest($code);
     }
 
     public function blacklistedProvider(): array
@@ -246,6 +233,22 @@ class Child extends NonSameAbstract
     protected function bar()
     {
     }
+}
+PHP
+        ];
+
+        yield 'it does not mutate an anonymous class because reflection is not avalable' => [
+            <<<'PHP'
+<?php
+
+function something()
+{
+    return new class() {
+        public function anything()
+        {
+            return null;
+        }
+    };
 }
 PHP
         ];

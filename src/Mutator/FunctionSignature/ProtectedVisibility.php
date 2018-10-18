@@ -62,8 +62,13 @@ final class ProtectedVisibility extends Mutator
 
     private function hasSameProtectedParentMethod(Node $node): bool
     {
-        /** @var \ReflectionClass $reflection */
+        /** @var \ReflectionClass|null $reflection */
         $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
+
+        if (!$reflection instanceof \ReflectionClass) {
+            // assuming the worst where a parent class has the same method
+            return true;
+        }
 
         $parent = $reflection->getParentClass();
 

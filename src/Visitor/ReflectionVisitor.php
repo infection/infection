@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\Visitor;
 
 use PhpParser\Node;
+use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 
 /**
@@ -42,7 +43,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         $this->methodName = null;
     }
 
-    public function enterNode(Node $node): void
+    public function enterNode(Node $node)
     {
         if ($node instanceof Node\Stmt\ClassLike && isset($node->fullyQualifiedClassName)) {
             $this->reflectionClass = new \ReflectionClass($node->fullyQualifiedClassName->toString());
@@ -56,6 +57,8 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
         if ($isInsideFunction) {
             $node->setAttribute(self::IS_INSIDE_FUNCTION_KEY, true);
+        } elseif ($node instanceof Node\Stmt\Function_) {
+            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
 
         if ($this->isPartOfFunctionSignature($node)) {
@@ -123,9 +126,14 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
     private function isFunctionLikeNode(Node $node): bool
     {
-        $isClassMethod = $node instanceof Node\Stmt\ClassMethod;
-        $isClosure = $node instanceof Node\Expr\Closure;
+        if ($node instanceof Node\Stmt\ClassMethod) {
+            return true;
+        }
 
-        return $isClassMethod || $isClosure;
+        if ($node instanceof Node\Expr\Closure) {
+            return true;
+        }
+
+        return false;
     }
 }

@@ -95,7 +95,7 @@ abstract class AbstractTestFrameworkAdapter
         $frameworkPath = $this->testFrameworkFinder->find();
         $frameworkArgs = $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions);
 
-        if (false !== strpos($frameworkPath, '.bat')) {
+        if ($this->isBatchFile($frameworkPath)) {
             return array_merge([$frameworkPath], $frameworkArgs);
         }
 
@@ -162,10 +162,13 @@ abstract class AbstractTestFrameworkAdapter
 
     public function getVersion(): string
     {
+        $frameworkPath = $this->testFrameworkFinder->find();
+        $phpIfNeeded = $this->isBatchFile($frameworkPath) ? [] : $this->findPhp();
+
         $process = new Process(array_merge(
-            $this->findPhp(),
+            $phpIfNeeded,
             [
-                $this->testFrameworkFinder->find(),
+                $frameworkPath,
                 '--version',
             ]
         ));
@@ -173,5 +176,10 @@ abstract class AbstractTestFrameworkAdapter
         $process->mustRun();
 
         return $this->versionParser->parse($process->getOutput());
+    }
+
+    private function isBatchFile(string $path): bool
+    {
+        return '.bat' === substr($path, -4);
     }
 }

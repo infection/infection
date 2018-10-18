@@ -26,22 +26,61 @@ final class ArrayItemTest extends AbstractMutatorTestCase
 
     public function provideMutationCases(): \Generator
     {
-        yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects' => [
+        yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects and left is property' => [
             <<<'PHP'
 <?php
 
 [$a->foo => $b->bar];
-[$a->foo() => bar()];
-[foo() => $b->bar];
-[$foo => $b->bar];
 PHP
             ,
             <<<'PHP'
 <?php
 
 [$a->foo > $b->bar];
-[$a->foo() > bar()];
+PHP
+            ,
+        ];
+
+        yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects and left is method call' => [
+            <<<'PHP'
+<?php
+
+[$a->foo() => $b->bar()];
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+[$a->foo() > $b->bar()];
+PHP
+            ,
+        ];
+
+        yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects and left is function call' => [
+            <<<'PHP'
+<?php
+
+[foo() => $b->bar];
+PHP
+            ,
+            <<<'PHP'
+<?php
+
 [foo() > $b->bar];
+PHP
+            ,
+        ];
+
+        yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects and right is property' => [
+            <<<'PHP'
+<?php
+
+[$foo => $b->bar];
+PHP
+            ,
+            <<<'PHP'
+<?php
+
 [$foo > $b->bar];
 PHP
             ,

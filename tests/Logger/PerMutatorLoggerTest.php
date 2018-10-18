@@ -17,6 +17,7 @@ use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessInterface;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -26,6 +27,7 @@ final class PerMutatorLoggerTest extends TestCase
 {
     public function test_it_correctly_build_log_lines(): void
     {
+        $output = $this->createMock(OutputInterface::class);
         $fs = $this->createMock(Filesystem::class);
         $fs->expects($this->once())
             ->method('dumpFile')
@@ -40,6 +42,7 @@ final class PerMutatorLoggerTest extends TestCase
             );
 
         $perMutatorLogger = new PerMutatorLogger(
+            $output,
             sys_get_temp_dir() . '/fake-file.md',
             $this->createMetricsCalculator(),
             $fs,

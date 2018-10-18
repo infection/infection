@@ -1,7 +1,7 @@
 suites:
   source_suite:
-    namespace: Namespace_
-    psr4_prefix: Namespace_
+    namespace: ProvideExistingCoverage
+    psr4_prefix: ProvideExistingCoverage
 
 extensions:
   LeanPHP\PhpSpec\CodeCoverage\CodeCoverageExtension: ~

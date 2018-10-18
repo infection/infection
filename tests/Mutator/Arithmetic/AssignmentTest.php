@@ -24,45 +24,174 @@ final class AssignmentTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): array
+    public function provideMutationCases(): \Generator
     {
-        return [
-            'It changes compound assignments to simple assignments' => [
-                <<<'PHP'
+        yield [
+            <<<'PHP'
 <?php
 
 $a += $b;
-$a -= $b;
-$a *= $b;
-$a **= $b;
-$a /= $b;
-$a %= $b;
-$a .= $b;
-$a &= $b;
-$a |= $b;
-$a ^= $b;
-$a <<= $b;
-$a >>= $b;
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 $a = $b;
-$a = $b;
-$a = $b;
-$a = $b;
-$a = $b;
-$a = $b;
-$a = $b;
-$a = $b;
-$a = $b;
-$a = $b;
-$a = $b;
+PHP
+        ];
+
+        yield [
+            <<<'PHP'
+<?php
+
+$a -= $b;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
 $a = $b;
 PHP
-                ,
-            ],
+        ];
+
+        yield [
+            <<<'PHP'
+<?php
+
+$a *= $b;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = $b;
+PHP
+        ];
+
+        yield [
+            <<<'PHP'
+<?php
+
+$a **= $b;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = $b;
+PHP
+        ];
+
+        yield [
+            <<<'PHP'
+<?php
+
+$a /= $b;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = $b;
+PHP
+        ];
+
+        yield [
+            <<<'PHP'
+<?php
+
+$a %= $b;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = $b;
+PHP
+        ];
+
+        yield [
+            <<<'PHP'
+<?php
+
+$a .= $b;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = $b;
+PHP
+        ];
+
+        yield [
+            <<<'PHP'
+<?php
+
+$a &= $b;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = $b;
+PHP
+        ];
+
+        yield [
+            <<<'PHP'
+<?php
+
+$a |= $b;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = $b;
+PHP
+        ];
+
+        yield [
+            <<<'PHP'
+<?php
+
+$a ^= $b;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = $b;
+PHP
+        ];
+
+        yield [
+            <<<'PHP'
+<?php
+
+$a <<= $b;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = $b;
+PHP
+        ];
+
+        yield [
+            <<<'PHP'
+<?php
+
+$a >>= $b;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = $b;
+PHP
         ];
     }
 }

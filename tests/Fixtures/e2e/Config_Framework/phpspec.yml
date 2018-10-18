@@ -1,7 +1,7 @@
 suites:
   source_suite:
-    namespace: Namespace_
-    psr4_prefix: Namespace_
+    namespace: ConfigFramework
+    psr4_prefix: ConfigFramework
 
 extensions:
   LeanPHP\PhpSpec\CodeCoverage\CodeCoverageExtension: ~

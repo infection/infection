@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config;
 
+use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 
 /**
@@ -78,5 +79,47 @@ final class XmlConfigurationHelper
         if ($nodeList->length) {
             $dom->documentElement->removeAttribute('printerClass');
         }
+    }
+
+    public function validate(\DOMDocument $dom, \DOMXPath $xPath): bool
+    {
+        if ($xPath->query('/phpunit')->length === 0) {
+            throw InvalidPhpUnitXmlConfigException::byRootNode();
+        }
+
+        if (!$xPath->query('namespace::xsi')->length) {
+            return true;
+        }
+
+        $schema = $xPath->query('/phpunit/@xsi:noNamespaceSchemaLocation');
+
+        $original = libxml_use_internal_errors(true);
+
+        if ($schema->length && !$dom->schemaValidate($schema[0]->nodeValue)) {
+            throw InvalidPhpUnitXmlConfigException::byXsdSchema($this->getXmlErrorsString());
+        }
+
+        libxml_use_internal_errors($original);
+
+        return true;
+    }
+
+    private function getXmlErrorsString(): string
+    {
+        $errorsString = '';
+        $errors = libxml_get_errors();
+
+        foreach ($errors as $key => $error) {
+            $level = $error->level === LIBXML_ERR_WARNING ? 'Warning' : $error->level === LIBXML_ERR_ERROR ? 'Error' : 'Fatal';
+            $errorsString .= sprintf('[%s] %s', $level, $error->message);
+
+            if ($error->file) {
+                $errorsString .= sprintf(' in %s (line %s, col %s)', $error->file, $error->line, $error->column);
+            }
+
+            $errorsString .= "\n";
+        }
+
+        return $errorsString;
     }
 }

@@ -32,4 +32,19 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             $builder->build($configPath, '--verbose')
         );
     }
+
+    public function test_it_removes_empty_extra_options(): void
+    {
+        $configPath = '/config/path';
+        $builder = new ArgumentsAndOptionsBuilder();
+
+        $this->assertSame(
+            [
+                '--configuration',
+                $configPath,
+                '--stop-on-failure',
+            ],
+            $builder->build($configPath, '')
+        );
+    }
 }

@@ -26,11 +26,26 @@ final class FunctionCallRemovalTest extends AbstractMutatorTestCase
 
     public function provideMutationCases(): \Generator
     {
-        yield 'It removes a function call' => [
+        yield 'It removes a function call without parameters' => [
             <<<'PHP'
 <?php
 
 foo();
+$a = 3;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = 3;
+PHP
+            ,
+        ];
+
+        yield 'It removes a function call with parameters' => [
+            <<<'PHP'
+<?php
+
 bar(3, 4);
 $a = 3;
 PHP
@@ -39,6 +54,46 @@ PHP
 <?php
 
 $a = 3;
+PHP
+            ,
+        ];
+
+        yield 'It removes dynamic function calls with string' => [
+            <<<'PHP'
+<?php
+
+$start = true;
+('foo')();
+$end = true;
+
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$start = true;
+
+$end = true;
+PHP
+            ,
+        ];
+
+        yield 'It removes dynamic function call with variable' => [
+            <<<'PHP'
+<?php
+
+$start = true;
+$foo();
+$end = true;
+
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$start = true;
+
+$end = true;
 PHP
             ,
         ];
@@ -81,6 +136,17 @@ PHP
 <?php
 
 $this->foo();
+$a = 3;
+PHP
+        ];
+
+        yield 'It does not remove an assert() call' => [
+            <<<'PHP'
+<?php
+
+assert(true === true);
+aSsert(true === true);
+\assert(true === true);
 $a = 3;
 PHP
         ];

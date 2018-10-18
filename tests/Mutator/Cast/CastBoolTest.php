@@ -26,18 +26,31 @@ final class CastBoolTest extends AbstractMutatorTestCase
 
     public function provideMutationCases(): \Generator
     {
-        yield 'It removes casting to bool' => [
+        yield 'It removes casting to bool with "bool"' => [
             <<<'PHP'
 <?php
 
 (bool) 1;
-(boolean) 1;
 PHP
             ,
             <<<'PHP'
 <?php
 
 1;
+PHP
+            ,
+        ];
+
+        yield 'It removes casting to bool with "boolean"' => [
+            <<<'PHP'
+<?php
+
+(boolean) 1;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
 1;
 PHP
             ,

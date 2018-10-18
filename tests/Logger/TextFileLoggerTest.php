@@ -18,6 +18,7 @@ use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessInterface;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
@@ -30,6 +31,7 @@ final class TextFileLoggerTest extends TestCase
     {
         $logFilePath = sys_get_temp_dir() . '/foo.txt';
         $calculator = new MetricsCalculator();
+        $output = $this->createMock(OutputInterface::class);
         $fs = $this->createMock(Filesystem::class);
         $fs->expects($this->once())->method('dumpFile')->with(
             $logFilePath,
@@ -46,7 +48,7 @@ Not Covered mutants:
 TXT
         );
 
-        $debugFileLogger = new TextFileLogger($logFilePath, $calculator, $fs, false, false);
+        $debugFileLogger = new TextFileLogger($output, $logFilePath, $calculator, $fs, false, false);
         $debugFileLogger->log();
     }
 
@@ -54,6 +56,7 @@ TXT
     {
         $logFilePath = sys_get_temp_dir() . '/foo.txt';
         $calculator = new MetricsCalculator();
+        $output = $this->createMock(OutputInterface::class);
         $fs = $this->createMock(Filesystem::class);
         $fs->expects($this->once())->method('dumpFile')->with(
             $logFilePath,
@@ -76,7 +79,7 @@ Not Covered mutants:
 TXT
         );
 
-        $debugFileLogger = new TextFileLogger($logFilePath, $calculator, $fs, true, false);
+        $debugFileLogger = new TextFileLogger($output, $logFilePath, $calculator, $fs, true, false);
         $debugFileLogger->log();
     }
 
@@ -84,6 +87,7 @@ TXT
     {
         $logFilePath = sys_get_temp_dir() . '/foo.txt';
         $calculator = $this->createFilledMetricsCalculator();
+        $output = $this->createMock(OutputInterface::class);
         $fs = $this->createMock(Filesystem::class);
         $fs->expects($this->atMost(10))->method('dumpFile')->with(
             $logFilePath,
@@ -148,7 +152,7 @@ Diff Diff
 TXT
         );
 
-        $debugFileLogger = new TextFileLogger($logFilePath, $calculator, $fs, false, true);
+        $debugFileLogger = new TextFileLogger($output, $logFilePath, $calculator, $fs, false, true);
         $debugFileLogger->log();
     }
 
@@ -156,6 +160,7 @@ TXT
     {
         $logFilePath = sys_get_temp_dir() . '/foo.txt';
         $calculator = $this->createFilledMetricsCalculator();
+        $output = $this->createMock(OutputInterface::class);
         $fs = $this->createMock(Filesystem::class);
         $fs->expects($this->atMost(10))->method('dumpFile')->with(
             $logFilePath,
@@ -248,7 +253,7 @@ Diff Diff
 TXT
         );
 
-        $debugFileLogger = new TextFileLogger($logFilePath, $calculator, $fs, true, false);
+        $debugFileLogger = new TextFileLogger($output, $logFilePath, $calculator, $fs, true, false);
         $debugFileLogger->log();
     }
 

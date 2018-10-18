@@ -26,11 +26,26 @@ final class MethodCallRemovalTest extends AbstractMutatorTestCase
 
     public function provideMutationCases(): \Generator
     {
-        yield 'It removes a method call' => [
+        yield 'It removes a method call without parameters' => [
             <<<'PHP'
 <?php
 
 $this->foo();
+$a = 3;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = 3;
+PHP
+            ,
+        ];
+
+        yield 'It removes a method call with parameters' => [
+            <<<'PHP'
+<?php
+
 $foo->bar(3, 4);
 $a = 3;
 PHP
@@ -43,11 +58,25 @@ PHP
             ,
         ];
 
-        yield 'It remove a static method call' => [
+        yield 'It remove a static method call without parameters' => [
             <<<'PHP'
 <?php
 
 self::foo();
+$a = 3;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = 3;
+PHP
+        ];
+
+        yield 'It remove a static method call with parameters' => [
+            <<<'PHP'
+<?php
+
 THatClass::bar(3, 4);
 $a = 3;
 PHP

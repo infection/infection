@@ -1,0 +1,4 @@
+helpr:
+    opened: 'has PR'
+    merged: 'PR merged'
+    rejected: 'PR rejected'

@@ -167,4 +167,14 @@ class InfectionConfig
     {
         return $this->config->testFramework ?? 'phpunit';
     }
+
+    public function getInitialTestsPhpOptions(): string
+    {
+        return $this->config->initialTestsPhpOptions ?? '';
+    }
+
+    public function getTestFrameworkOptions(): string
+    {
+        return $this->config->testFrameworkOptions ?? '';
+    }
 }

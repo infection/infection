@@ -31,13 +31,26 @@ final class CastIntTest extends AbstractMutatorTestCase
 <?php
 
 (int) 1.0;
-(integer) 1.0;
 PHP
             ,
             <<<'PHP'
 <?php
 
 1.0;
+PHP
+            ,
+        ];
+
+        yield 'It removes casting to integer' => [
+            <<<'PHP'
+<?php
+
+(integer) 1.0;
+PHP
+            ,
+            <<<'PHP'
+<?php
+
 1.0;
 PHP
             ,

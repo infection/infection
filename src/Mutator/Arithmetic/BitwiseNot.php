@@ -18,7 +18,7 @@ use PhpParser\Node;
 final class BitwiseNot extends Mutator
 {
     /**
-     * Removes "~"
+     * Replaces "~" with "" (removed)
      *
      * @param Node $node
      *

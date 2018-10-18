@@ -16,6 +16,7 @@ use Infection\Mutator\Util\MutatorConfig;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\Lexer;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Nop;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
@@ -78,10 +79,7 @@ class Test
     {
         return 'hello';
     }
-    protected function bye() : string
-    {
-        return 'bye';
-    }
+    
 }
 PHP
             ,
@@ -95,7 +93,9 @@ PHP
                 ],
                 ClassMethod::class,
                 true,
-                true
+                true,
+                new Nop(),
+                0
             ),
         ];
 
@@ -142,7 +142,9 @@ PHP
                 ],
                 ClassMethod::class,
                 true,
-                true
+                true,
+                new Nop(),
+                0
             ),
         ];
         $badLexer = new Lexer\Emulative([
@@ -196,7 +198,9 @@ PHP
                 ],
                 ClassMethod::class,
                 true,
-                true
+                true,
+                new Nop(),
+                0
             ),
         ];
     }

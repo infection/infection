@@ -1,6 +1,6 @@
 <?php
 
-namespace TmpNamespace_;
+namespace ProfileIgnoreCombination;
 
 class SourceClass
 {

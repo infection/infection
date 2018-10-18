@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
+use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use PHPUnit\Framework\TestCase;
@@ -230,6 +231,75 @@ XML
 XML
             , $dom->saveXML()
         );
+    }
+
+    public function test_it_validates_xml_by_root_node(): void
+    {
+        $dom = new \DOMDocument();
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML('<invalid></invalid>');
+        $xPath = new \DOMXPath($dom);
+        $xmlHelper = new XmlConfigurationHelper($this->getPathReplacer());
+
+        $this->expectException(InvalidPhpUnitXmlConfigException::class);
+        $this->expectExceptionMessage('phpunit.xml does not contain a valid PHPUnit configuration.');
+
+        $xmlHelper->validate($dom, $xPath);
+    }
+
+    /**
+     * @dataProvider schemaProvider
+     */
+    public function test_it_validates_xml_by_xsd(string $xsdSchema): void
+    {
+        $dom = new \DOMDocument();
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML(<<<"XML"
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xsi:noNamespaceSchemaLocation="$xsdSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <invalid></invalid>
+</phpunit>
+
+XML
+        );
+        $xPath = new \DOMXPath($dom);
+        $xmlHelper = new XmlConfigurationHelper($this->getPathReplacer());
+
+        $this->expectException(InvalidPhpUnitXmlConfigException::class);
+        $this->expectExceptionMessageRegExp('/Element \'invalid\'\: This element is not expected/');
+
+        $xmlHelper->validate($dom, $xPath);
+    }
+
+    public function schemaProvider(): \Generator
+    {
+        yield 'Remote XSD' => ['https://schema.phpunit.de/6.1/phpunit.xsd'];
+
+        yield 'Local XSD' => ['./vendor/phpunit/phpunit/phpunit.xsd'];
+    }
+
+    /**
+     * @dataProvider schemaProvider
+     */
+    public function test_it_passes_validation_by_xsd(string $xsdSchema): void
+    {
+        $dom = new \DOMDocument();
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML(<<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xsi:noNamespaceSchemaLocation="$xsdSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</phpunit>
+
+XML
+        );
+        $xPath = new \DOMXPath($dom);
+
+        $xmlHelper = new XmlConfigurationHelper($this->getPathReplacer());
+
+        $this->assertTrue(true, $xmlHelper->validate($dom, $xPath));
     }
 
     private function getDomDocument(): \DOMDocument

@@ -92,14 +92,19 @@ final class PublicVisibility extends Mutator
 
     private function hasSamePublicParentMethod(Node $node): bool
     {
-        return $this->hasSamePublicMethodInInterface($node) || $this->hasSamePublicMethodInParentClass($node);
-    }
-
-    private function hasSamePublicMethodInInterface(Node $node): bool
-    {
-        /** @var \ReflectionClass $reflection */
+        /** @var \ReflectionClass|null $reflection */
         $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
 
+        if (!$reflection instanceof \ReflectionClass) {
+            // assuming the worst where an interface has the same method
+            return true;
+        }
+
+        return $this->hasSamePublicMethodInInterface($node, $reflection) || $this->hasSamePublicMethodInParentClass($node, $reflection);
+    }
+
+    private function hasSamePublicMethodInInterface(Node $node, \ReflectionClass $reflection): bool
+    {
         foreach ($reflection->getInterfaces() as $reflectionInterface) {
             try {
                 $method = $reflectionInterface->getMethod($node->name->name);
@@ -116,11 +121,8 @@ final class PublicVisibility extends Mutator
         return false;
     }
 
-    private function hasSamePublicMethodInParentClass(Node $node): bool
+    private function hasSamePublicMethodInParentClass(Node $node, \ReflectionClass $reflection): bool
     {
-        /** @var \ReflectionClass $reflection */
-        $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
-
         $parent = $reflection->getParentClass();
 
         while ($parent) {

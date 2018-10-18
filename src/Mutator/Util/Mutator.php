@@ -24,6 +24,11 @@ abstract class Mutator
         $this->config = $config;
     }
 
+    /**
+     * @param Node $node
+     *
+     * @return Node|Node[]|\Generator
+     */
     abstract public function mutate(Node $node);
 
     abstract protected function mutatesNode(Node $node): bool;

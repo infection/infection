@@ -5,15 +5,16 @@ PHPUNIT=vendor/bin/phpunit
 INFECTION=build/bin/infection.phar
 
 # URLs to download all tools
-BOX_URL="https://github.com/humbug/box/releases/download/3.0.0-alpha.5/box.phar"
+BOX_URL="https://github.com/humbug/box/releases/download/3.1.0/box.phar"
 PHP-CS-FIXER_URL="https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar"
-PHPSTAN_URL="https://github.com/phpstan/phpstan/releases/download/0.10.2/phpstan.phar"
+PHPSTAN_URL="https://github.com/phpstan/phpstan/releases/download/0.10.3/phpstan.phar"
 
 FLOCK=./devTools/flock
 
 DOCKER_RUN=docker run -t --rm -v "$$PWD":/opt/infection -w /opt/infection
 DOCKER_RUN_71=$(FLOCK) devTools/*php71*.json $(DOCKER_RUN) infection_php71
 DOCKER_RUN_72=$(FLOCK) devTools/*php72*.json $(DOCKER_RUN) infection_php72
+DOCKER_RUN_73=$(FLOCK) devTools/*php73*.json $(DOCKER_RUN) infection_php73
 
 .PHONY: all
 #Run all checks, default when running 'make'
@@ -39,9 +40,9 @@ build/cache:
 test: test-unit test-infection-phpdbg test-e2e-phpdbg test-infection-xdebug test-e2e-xdebug
 	# All tests finished without errors
 
-.PHONY: test-unit test-unit-71 test-unit-72
+.PHONY: test-unit test-unit-71 test-unit-72 test-unit-73
 #php unit tests
-test-unit: test-unit-71 test-unit-72
+test-unit: test-unit-71 test-unit-72 test-unit-73
 
 test-unit-71: build-xdebug-71
 	$(DOCKER_RUN_71) $(PHPUNIT)
@@ -49,10 +50,12 @@ test-unit-71: build-xdebug-71
 test-unit-72: build-xdebug-72
 	$(DOCKER_RUN_72) $(PHPUNIT)
 
+test-unit-73: build-xdebug-73
+	$(DOCKER_RUN_73) $(PHPUNIT)
 
-.PHONY: test-infection-phpdbg test-infection-phpdbg-71 test-infection-phpdbg-72
+.PHONY: test-infection-phpdbg test-infection-phpdbg-71 test-infection-phpdbg-72 test-infection-phpdbg-73
 #infection with phpdbg
-test-infection-phpdbg: test-infection-phpdbg-71 test-infection-phpdbg-72
+test-infection-phpdbg: test-infection-phpdbg-71 test-infection-phpdbg-72 test-infection-phpdbg-73
 
 test-infection-phpdbg-71: build-xdebug-71
 	$(DOCKER_RUN_71) phpdbg -qrr bin/infection --threads=4
@@ -60,10 +63,13 @@ test-infection-phpdbg-71: build-xdebug-71
 test-infection-phpdbg-72: build-xdebug-72
 	$(DOCKER_RUN_72) phpdbg -qrr bin/infection --threads=4
 
+test-infection-phpdbg-73: build-xdebug-73
+	$(DOCKER_RUN_73) phpdbg -qrr bin/infection --threads=4
 
-.PHONY: test-e2e-phpdbg test-e2e-phpdbg-71 test-e2e-phpdbg-72
+
+.PHONY: test-e2e-phpdbg test-e2e-phpdbg-71 test-e2e-phpdbg-72 test-e2e-phpdbg-73
 #e2e tests with phpdbg
-test-e2e-phpdbg:test-e2e-phpdbg-71 test-e2e-phpdbg-72
+test-e2e-phpdbg:test-e2e-phpdbg-71 test-e2e-phpdbg-72 test-e2e-phpdbg-73
 
 test-e2e-phpdbg-71: build-xdebug-71 $(INFECTION)
 	$(DOCKER_RUN_71) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
@@ -71,10 +77,13 @@ test-e2e-phpdbg-71: build-xdebug-71 $(INFECTION)
 test-e2e-phpdbg-72: build-xdebug-72 $(INFECTION)
 	$(DOCKER_RUN_72) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
 
+test-e2e-phpdbg-73: build-xdebug-73 $(INFECTION)
+	$(DOCKER_RUN_73) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
 
-.PHONY: test-infection-xdebug test-infection-xdebug-71 test-infection-xdebug-72
+
+.PHONY: test-infection-xdebug test-infection-xdebug-71 test-infection-xdebug-72 test-infection-xdebug-73
 #infection with xdebug
-test-infection-xdebug: test-infection-xdebug-71 test-infection-xdebug-72
+test-infection-xdebug: test-infection-xdebug-71 test-infection-xdebug-72 test-infection-xdebug-73
 
 test-infection-xdebug-71: build-xdebug-71
 	$(DOCKER_RUN_71) php bin/infection --threads=4
@@ -82,10 +91,12 @@ test-infection-xdebug-71: build-xdebug-71
 test-infection-xdebug-72: build-xdebug-72
 	$(DOCKER_RUN_72) php bin/infection --threads=4
 
+test-infection-xdebug-73: build-xdebug-73
+	$(DOCKER_RUN_73) php bin/infection --threads=4
 
-.PHONY: test-e2e-xdebug test-e2e-xdebug-71 test-e2e-xdebug-72
+.PHONY: test-e2e-xdebug test-e2e-xdebug-71 test-e2e-xdebug-72 test-e2e-xdebug-73
 #e2e tests with xdebug
-test-e2e-xdebug: test-e2e-xdebug-71 test-e2e-xdebug-72
+test-e2e-xdebug: test-e2e-xdebug-71 test-e2e-xdebug-72 test-e2e-xdebug-73
 
 test-e2e-xdebug-71: build-xdebug-71 $(INFECTION)
 	$(DOCKER_RUN_71) ./tests/e2e_tests $(INFECTION)
@@ -93,8 +104,10 @@ test-e2e-xdebug-71: build-xdebug-71 $(INFECTION)
 test-e2e-xdebug-72: build-xdebug-72 $(INFECTION)
 	$(DOCKER_RUN_72) ./tests/e2e_tests $(INFECTION)
 
+test-e2e-xdebug-73: build-xdebug-73 $(INFECTION)
+	$(DOCKER_RUN_73) ./tests/e2e_tests $(INFECTION)
 
-.PHONY: build-xdebug-71 build-xdebug-72
+.PHONY: build-xdebug-71 build-xdebug-72 build-xdebug-73
 #Building images with xdebug
 
 build-xdebug-71: vendor devTools/Dockerfile-php71-xdebug.json
@@ -106,6 +119,11 @@ build-xdebug-72: vendor devTools/Dockerfile-php72-xdebug.json
 devTools/Dockerfile-php72-xdebug.json: devTools/Dockerfile-php72-xdebug
 	docker build -t infection_php72 -f devTools/Dockerfile-php72-xdebug .
 	docker image inspect infection_php72 >> devTools/Dockerfile-php72-xdebug.json
+
+build-xdebug-73: vendor devTools/Dockerfile-php73-xdebug.json
+devTools/Dockerfile-php73-xdebug.json: devTools/Dockerfile-php73-xdebug
+	docker build -t infection_php73 -f devTools/Dockerfile-php73-xdebug .
+	docker image inspect infection_php73 >> devTools/Dockerfile-php73-xdebug.json
 
 #style checks/ static analysis
 .PHONY: analyze cs-fix cs-check phpstan validate auto-review
@@ -132,6 +150,7 @@ auto-review: vendor
 	vendor/bin/phpunit --group=auto-review
 
 build/bin/infection.phar: $(shell find bin/ src/ -type f) box.phar box.json.dist .git/HEAD
+	php box.phar validate
 	php box.phar compile
 
 box.phar:

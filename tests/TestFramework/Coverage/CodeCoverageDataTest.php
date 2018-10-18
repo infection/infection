@@ -16,6 +16,7 @@ use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkTypes;
 use Mockery;
+use PhpParser\Node\Scalar\LNumber;
 
 /**
  * @internal
@@ -120,7 +121,9 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             ['startLine' => 1, 'endLine' => 1],
             'PHPParser\Node\Expr\BinaryOp\Plus',
             false,
-            true
+            true,
+            new LNumber(1),
+            0
         );
 
         $this->assertCount(0, $codeCoverageData->getAllTestsFor($mutation));
@@ -138,7 +141,9 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             ['startLine' => 26, 'endLine' => 26],
             'PHPParser\Node\Expr\BinaryOp\Plus',
             false,
-            true
+            true,
+            new LNumber(1),
+            0
         );
 
         $this->assertCount(2, $codeCoverageData->getAllTestsFor($mutation));
@@ -156,7 +161,9 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             ['startLine' => 1, 'endLine' => 1],
             'PHPParser\Node\Stmt\ClassMethod',
             true,
-            true
+            true,
+            new LNumber(1),
+            0
         );
 
         $this->assertCount(0, $codeCoverageData->getAllTestsFor($mutation));
@@ -174,7 +181,9 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             ['startLine' => 24, 'endLine' => 24],
             'PHPParser\Node\Stmt\ClassMethod',
             true,
-            true
+            true,
+            new LNumber(1),
+            0
         );
 
         $this->assertCount(6, $codeCoverageData->getAllTestsFor($mutation));
