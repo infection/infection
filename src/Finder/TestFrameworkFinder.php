@@ -126,7 +126,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
             }
         }
 
-        $path = $this->searchNonExecutables($candidates, [getcwd()]);
+        $path = $this->searchNonExecutables($candidates, [getcwd(), getcwd() . '/vendor/bin']);
 
         if (null !== $path) {
             return $path;
