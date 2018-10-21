@@ -113,6 +113,11 @@ jobs:
 
     -
       <<: *STANDARD_TEST_JOB
+      php: 7.3
+      env: PHPDBG=1
+
+    -
+      <<: *STANDARD_TEST_JOB
       php: nightly
       env: PHPDBG=1
 
