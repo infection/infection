@@ -69,7 +69,7 @@ final class ConsoleOutput
         $this->io->note('Numeric versions of log-verbosity have been deprecated, please use, ' . $valueToUse . ' to keep the same result');
     }
 
-    public function logUnkownVerbosityOption(string $default): void
+    public function logUnknownVerbosityOption(string $default): void
     {
         $this->io->note('Running infection with an unknown log-verbosity option, falling back to ' . $default . ' option');
     }
@@ -78,6 +78,7 @@ final class ConsoleOutput
     {
         $lines = [
             'Project tests must be in a passing state before running Infection.',
+            sprintf('Check the executed command to identify the problem: %s', $initialTestSuitProcess->getCommandLine()),
             sprintf(
                 '%s reported an exit code of %d.',
                 $testFrameworkKey,

@@ -91,4 +91,46 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
     {
         return 'PHPUnit';
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getInitialTestRunCommandLine(
+        string $configPath,
+        string $extraOptions,
+        bool $includePhpArgs,
+        array $phpExtraArgs
+    ): array {
+        try {
+            $version = $this->getVersion();
+        } catch (\InvalidArgumentException $e) {
+            $version = 'uknown';
+        }
+
+        $testsOrder = $this->getTestsOrder($version);
+
+        if ($testsOrder) {
+            $extraOptions .= ' ' . $testsOrder;
+        }
+
+        return parent::getInitialTestRunCommandLine(
+            $configPath,
+            $extraOptions,
+            $includePhpArgs,
+            $phpExtraArgs
+        );
+    }
+
+    private function getTestsOrder($version): string
+    {
+        if (version_compare($version, '7.3', '>=')) {
+            return '--order=random';
+        }
+
+        if (version_compare($version, '7.2', '>=')) {
+            return '--random-order';
+        }
+
+        return '';
+    }
 }

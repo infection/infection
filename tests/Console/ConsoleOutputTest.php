@@ -70,7 +70,7 @@ final class ConsoleOutputTest extends TestCase
             );
 
         $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logUnkownVerbosityOption($option);
+        $consoleOutput->logUnknownVerbosityOption($option);
     }
 
     public function test_log_initial_tests_do_not_pass(): void
@@ -80,11 +80,13 @@ final class ConsoleOutputTest extends TestCase
         $process->expects($this->once())->method('getExitCode')->willReturn(0);
         $process->expects($this->once())->method('getOutput')->willReturn('output string');
         $process->expects($this->once())->method('getErrorOutput')->willReturn('error string');
+        $process->expects($this->once())->method('getCommandLine')->willReturn('vendor/bin/phpunit --order=random');
 
         $io = $this->createMock(SymfonyStyle::class);
         $io->expects($this->once())->method('error')->with(
             [
                 'Project tests must be in a passing state before running Infection.',
+                'Check the executed command to identify the problem: vendor/bin/phpunit --order=random',
                 'phpunit reported an exit code of 0.',
                 'Refer to the phpunit\'s output below:',
                 'STDOUT:',
