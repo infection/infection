@@ -165,6 +165,16 @@ if (0 == count($a)) {
 PHP
                 ,
             ],
+
+            'It does not decrement zero when it is compared as greater than count() on the right side' => [
+                <<<'PHP'
+<?php
+
+if (0 > count($a)) {
+    echo 'bar';
+}	
+PHP
+            ],
             'It does not decrement zero when it is compared as more or equal than count()' => [
                 <<<'PHP'
 <?php
@@ -175,19 +185,11 @@ if (count($a) >= 0) {
 PHP
                 ,
             ],
-            'It decrements zero when it is compared as less than count()' => [
+            'It doest not decrement zero when it is compared as less than count()' => [
                 <<<'PHP'
 <?php
 
 if (count($a) < 0) {
-    echo 'bar';
-}
-PHP
-                ,
-                <<<'PHP'
-<?php
-
-if (count($a) < -1) {
     echo 'bar';
 }
 PHP
@@ -234,14 +236,6 @@ PHP
 <?php
 
 if (count($a) <= 0) {
-    echo 'bar';
-}
-PHP
-                ,
-                <<<'PHP'
-<?php
-
-if (count($a) <= -1) {
     echo 'bar';
 }
 PHP

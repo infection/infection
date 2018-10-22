@@ -18,7 +18,7 @@ use PhpParser\Node;
  */
 final class DecrementInteger extends Mutator
 {
-    private const COUNT_NAMEs = ['count', 'sizeof'];
+    private const COUNT_NAMES = ['count', 'sizeof'];
 
     /**
      * Decrements an integer by 1
@@ -56,32 +56,22 @@ final class DecrementInteger extends Mutator
         if ($parentNode->left instanceof Node\Expr\FuncCall
             && \in_array(
                 $parentNode->left->name->toLowerString(),
-                self::COUNT_NAMEs,
+                self::COUNT_NAMES,
                 true)
         ) {
-            return $this->isAllowedLeftSideCountComparison($parentNode);
+            return false;
         }
 
         if ($parentNode->right instanceof Node\Expr\FuncCall
             && \in_array(
                 $parentNode->right->name->toLowerString(),
-                self::COUNT_NAMEs,
+                self::COUNT_NAMES,
                 true)
         ) {
-            return $this->isAllowedRightSideCountComparison($parentNode);
+            return false;
         }
 
         return true;
-    }
-
-    private function isAllowedLeftSideCountComparison(Node $node): bool
-    {
-        return $this->isSmallerThanComparison($node);
-    }
-
-    private function isAllowedRightSideCountComparison(Node $node): bool
-    {
-        return  $this->isGreaterThanComparison($node);
     }
 
     private function isComparison(Node $parentNode): bool
@@ -90,19 +80,9 @@ final class DecrementInteger extends Mutator
             || $parentNode instanceof Node\Expr\BinaryOp\NotIdentical
             || $parentNode instanceof Node\Expr\BinaryOp\Equal
             || $parentNode instanceof Node\Expr\BinaryOp\NotEqual
-            || $this->isGreaterThanComparison($parentNode)
-            || $this->isSmallerThanComparison($parentNode);
-    }
-
-    private function isGreaterThanComparison(Node $parentNode): bool
-    {
-        return $parentNode instanceof Node\Expr\BinaryOp\Greater
-            || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual;
-    }
-
-    private function isSmallerThanComparison(Node $parentNode): bool
-    {
-        return $parentNode instanceof Node\Expr\BinaryOp\Smaller
+            || $parentNode instanceof Node\Expr\BinaryOp\Greater
+            || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual
+            || $parentNode instanceof Node\Expr\BinaryOp\Smaller
             || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual;
     }
 }
