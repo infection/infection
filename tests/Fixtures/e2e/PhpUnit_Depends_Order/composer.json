@@ -1,12 +1,4 @@
 {
-    "config": {
-        "platform": {
-            "php": "7.0"
-        }
-    },
-    "require-dev": {
-
-    },
     "autoload": {
         "psr-4": {
             "PhpUnit_Depends_Order\\": "src/"

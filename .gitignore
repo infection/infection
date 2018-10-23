@@ -10,3 +10,4 @@
 /*.phar
 /build/bin/infection.phar
 /build/bin/infection.phar.pubkey
+.phpunit.result.cache
