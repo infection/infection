@@ -52,7 +52,6 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             [
                 '--configuration',
                 $configPath,
-                '--stop-on-failure',
                 '--verbose',
             ],
             $builder->build($configPath, '--verbose')
@@ -68,7 +67,6 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             [
                 '--configuration',
                 $configPath,
-                '--stop-on-failure',
             ],
             $builder->build($configPath, '')
         );

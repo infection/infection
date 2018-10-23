@@ -92,45 +92,19 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         return 'PHPUnit';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getInitialTestRunCommandLine(
-        string $configPath,
-        string $extraOptions,
-        bool $includePhpArgs,
-        array $phpExtraArgs
-    ): array {
-        try {
-            $version = $this->getVersion();
-        } catch (\InvalidArgumentException $e) {
-            $version = 'uknown';
-        }
-
-        $testsOrder = $this->getTestsOrder($version);
-
-        if ($testsOrder) {
-            $extraOptions .= ' ' . $testsOrder;
-        }
-
-        return parent::getInitialTestRunCommandLine(
-            $configPath,
-            $extraOptions,
-            $includePhpArgs,
-            $phpExtraArgs
-        );
-    }
-
-    private function getTestsOrder($version): string
+    public function getInitialTestsFailRecommendations(string $commandLine): string
     {
-        if (version_compare($version, '7.3', '>=')) {
-            return '--order=random';
+        $recommendations = parent::getInitialTestsFailRecommendations($commandLine);
+
+        if (version_compare($this->getVersion(), '7.2', '>=')) {
+            $recommendations = sprintf(
+                "%s\n\n%s",
+                "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n" .
+                'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="random" resolveDependencies="true" ...',
+                parent::getInitialTestsFailRecommendations($commandLine)
+            );
         }
 
-        if (version_compare($version, '7.2', '>=')) {
-            return '--random-order';
-        }
-
-        return '';
+        return $recommendations;
     }
 }

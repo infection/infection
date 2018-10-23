@@ -79,6 +79,6 @@ final class InitialConfigBuilderTest extends TestCase
 
         $builder = new InitialConfigBuilder($this->tmpDir, $originalYamlConfigPath, false);
 
-        $this->assertSame($this->tmpDir . '/phpspecConfiguration.initial.infection.yml', $builder->build());
+        $this->assertSame($this->tmpDir . '/phpspecConfiguration.initial.infection.yml', $builder->build('2.0'));
     }
 }

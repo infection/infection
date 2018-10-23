@@ -88,7 +88,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->skipCoverage = $skipCoverage;
     }
 
-    public function build(): string
+    public function build(string $version): string
     {
         $path = $this->buildPath();
 
@@ -102,6 +102,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->xmlConfigurationHelper->validate($dom, $xPath);
 
         $this->addCoverageFilterWhitelistIfDoesNotExist($dom, $xPath);
+        $this->addRandomTestsOrderAttributes($version, $xPath);
         $this->xmlConfigurationHelper->replaceWithAbsolutePaths($xPath);
         $this->xmlConfigurationHelper->setStopOnFailure($xPath);
         $this->xmlConfigurationHelper->deactivateColours($xPath);
@@ -147,7 +148,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function addCoverageFilterWhitelistIfDoesNotExist(\DOMDocument $dom, \DOMXPath $xPath): void
     {
-        $filterNode = $this->getNode($dom, $xPath, 'filter');
+        $filterNode = $this->getNode($xPath, 'filter');
 
         if (!$filterNode) {
             $filterNode = $this->createNode($dom, 'filter');
@@ -169,7 +170,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function getOrCreateNode(\DOMDocument $dom, \DOMXPath $xPath, string $nodeName): \DOMElement
     {
-        $node = $this->getNode($dom, $xPath, $nodeName);
+        $node = $this->getNode($xPath, $nodeName);
 
         if (!$node) {
             $node = $this->createNode($dom, $nodeName);
@@ -178,7 +179,7 @@ class InitialConfigBuilder implements ConfigBuilder
         return $node;
     }
 
-    private function getNode(\DOMDocument $dom, \DOMXPath $xPath, string $nodeName)
+    private function getNode(\DOMXPath $xPath, string $nodeName)
     {
         $nodeList = $xPath->query(sprintf('/phpunit/%s', $nodeName));
 
@@ -195,5 +196,27 @@ class InitialConfigBuilder implements ConfigBuilder
         $dom->documentElement->appendChild($node);
 
         return $node;
+    }
+
+    private function addRandomTestsOrderAttributes(string $version, \DOMXPath $xPath): void
+    {
+        if (!version_compare($version, '7.2', '>=')) {
+            return;
+        }
+
+        $this->updateOrAddAttribute('executionOrder', 'random', $xPath);
+        $this->updateOrAddAttribute('resolveDependencies', 'true', $xPath);
+    }
+
+    private function updateOrAddAttribute(string $attribute, string $value, \DOMXPath $xPath): void
+    {
+        $nodeList = $xPath->query(sprintf('/phpunit/@%s', $attribute));
+
+        if ($nodeList->length) {
+            $nodeList[0]->nodeValue = $value;
+        } else {
+            $node = $xPath->query('/phpunit')[0];
+            $node->setAttribute($attribute, $value);
+        }
     }
 }

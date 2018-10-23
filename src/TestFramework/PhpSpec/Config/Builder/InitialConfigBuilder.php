@@ -65,7 +65,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->skipCoverage = $skipCoverage;
     }
 
-    public function build(): string
+    public function build(string $version): string
     {
         $path = $this->buildPath();
 

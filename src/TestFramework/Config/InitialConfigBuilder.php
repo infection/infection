@@ -40,5 +40,5 @@ namespace Infection\TestFramework\Config;
  */
 interface InitialConfigBuilder
 {
-    public function build(): string;
+    public function build(string $version): string;
 }

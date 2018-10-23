@@ -47,7 +47,6 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
         return array_filter([
             '--configuration',
             $configPath,
-            '--stop-on-failure',
             $extraOptions,
         ]);
     }
