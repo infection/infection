@@ -27,41 +27,15 @@ final class ProtectedVisibilityTest extends AbstractMutatorTestCase
     public function provideMutationCases(): \Generator
     {
         yield 'It mutates protected to private' => [
-            $this->getFileContent('pv-one-class.php'),
-            <<<'PHP'
-<?php
-
-namespace ProtectedVisibilityOneClass;
-
-class Test
-{
-    private function foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-PHP
-            ,
+            $this->getFileContent('pv-one-class.php'), [
+                $this->getFileContent('pv-one-class-m0.php'),
+            ],
         ];
 
         yield 'It does not mutate final flag' => [
-            $this->getFileContent('pv-final.php'),
-            <<<'PHP'
-<?php
-
-namespace ProtectedVisibilityFinal;
-
-class Test
-{
-    private final function &foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-PHP
-            ,
+            $this->getFileContent('pv-final.php'), [
+                $this->getFileContent('pv-final-m0.php'),
+            ],
         ];
 
         yield 'It does not mutate abstract protected to private' => [
@@ -69,41 +43,15 @@ PHP
         ];
 
         yield 'It does mutate not abstract protected to private in an abstract class' => [
-            $this->getFileContent('pv-abstract-class-protected-method.php'),
-            <<<'PHP'
-<?php
-
-namespace ProtectedVisibilityAbstractClassProtectedMethod;
-
-abstract class Test
-{
-    private function foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-PHP
-            ,
+            $this->getFileContent('pv-abstract-class-protected-method.php'), [
+                $this->getFileContent('pv-abstract-class-protected-method-m0.php'),
+            ],
         ];
 
         yield 'It does not mutate static flag' => [
-            $this->getFileContent('pv-static.php'),
-            <<<'PHP'
-<?php
-
-namespace ProtectedVisibilityStatic;
-
-class Test
-{
-    private static function foo(int $param, $test = 1) : bool
-    {
-        echo 1;
-        return false;
-    }
-}
-PHP
-            ,
+            $this->getFileContent('pv-static.php'), [
+                $this->getFileContent('pv-static-m0.php'),
+            ],
         ];
 
         yield 'It does not mutate if parent abstract has same protected method' => [
@@ -111,75 +59,21 @@ PHP
         ];
 
         yield 'It does not mutate if parent class has same protected method' => [
-            $this->getFileContent('pv-same-method-parent.php'),
-            <<<'PHP'
-<?php
-
-namespace ProtectedSameParent;
-
-class SameParent
-{
-    private function foo()
-    {
-    }
-}
-class Child extends SameParent
-{
-    protected function foo()
-    {
-    }
-}
-PHP
-            ,
+            $this->getFileContent('pv-same-method-parent.php'), [
+                $this->getFileContent('pv-same-method-parent-m0.php'),
+            ],
         ];
 
         yield 'It does not mutate if grand parent class has same protected method' => [
-            $this->getFileContent('pv-same-method-grandparent.php'),
-            <<<'PHP'
-<?php
-
-namespace ProtectedSameGrandParent;
-
-class SameGrandParent
-{
-    private function foo()
-    {
-    }
-}
-class SameParent extends SameGrandParent
-{
-}
-class Child extends SameParent
-{
-    protected function foo()
-    {
-    }
-}
-PHP
-            ,
+            $this->getFileContent('pv-same-method-grandparent.php'), [
+                $this->getFileContent('pv-same-method-grandparent-m0.php'),
+            ],
         ];
 
         yield 'it does mutate non-inherited methods' => [
-            $this->getFileContent('pv-non-same-method-parent.php'),
-            <<<'PHP'
-<?php
-
-namespace ProtectedNonSameAbstract;
-
-abstract class ProtectedNonSameAbstract
-{
-    protected abstract function foo();
-}
-class Child extends ProtectedNonSameAbstract
-{
-    protected function foo()
-    {
-    }
-    private function bar()
-    {
-    }
-}
-PHP
+            $this->getFileContent('pv-non-same-method-parent.php'), [
+                $this->getFileContent('pv-non-same-method-parent-m0.php'),
+            ],
         ];
 
         yield 'it does not mutate an anonymous class because reflection is not avalable' => [
