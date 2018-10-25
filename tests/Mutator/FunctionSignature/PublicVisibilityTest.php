@@ -56,35 +56,35 @@ final class PublicVisibilityTest extends AbstractMutatorTestCase
             $this->getFileContent('pv-one-class.php'),
             [
                 $this->getFileContent('pv-one-class-m0.php'),
-            ]
+            ],
         ];
 
         yield 'It does not mutate final flag' => [
             $this->getFileContent('pv-final.php'),
             [
                 $this->getFileContent('pv-final-m0.php'),
-            ]
+            ],
         ];
 
         yield 'It mutates non abstract public to protected in an abstract class' => [
             $this->getFileContent('pv-non-abstract-in-abstract-class.php'),
             [
                 $this->getFileContent('pv-non-abstract-in-abstract-class-m0.php'),
-            ]
+            ],
         ];
 
         yield 'It does not mutate static flag' => [
             $this->getFileContent('pv-static.php'),
             [
                 $this->getFileContent('pv-static-m0.php'),
-            ]
+            ],
         ];
 
         yield 'It replaces visibility if not set' => [
             $this->getFileContent('pv-not-set.php'),
             [
                 $this->getFileContent('pv-not-set-m0.php'),
-            ]
+            ],
         ];
 
         yield 'It does not mutate an interface' => [
