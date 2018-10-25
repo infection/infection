@@ -115,52 +115,15 @@ final class PublicVisibilityTest extends AbstractMutatorTestCase
         ];
 
         yield 'it does not mutate if grandparent class has same public method' => [
-            $this->getFileContent('pv-same-method-grandparent.php'),
-            <<<'PHP'
-<?php
-
-namespace SameGrandParent;
-
-class GrandParent
-{
-    protected function foo()
-    {
-    }
-}
-class SameParent extends GrandParent
-{
-}
-class Child extends SameParent
-{
-    public function foo()
-    {
-    }
-}
-PHP
-            ,
+            $this->getFileContent('pv-same-method-grandparent.php'), [
+                $this->getFileContent('pv-same-method-grandparent-m0.php'),
+            ],
         ];
 
         yield 'it does mutate non-inherited methods' => [
-            $this->getFileContent('pv-non-same-method-parent.php'),
-            <<<'PHP'
-<?php
-
-namespace NonSameAbstract;
-
-abstract class NonSameAbstract
-{
-    public abstract function foo();
-}
-class Child extends NonSameAbstract
-{
-    public function foo()
-    {
-    }
-    protected function bar()
-    {
-    }
-}
-PHP
+            $this->getFileContent('pv-non-same-method-parent.php'), [
+                $this->getFileContent('pv-non-same-method-parent-m0.php'),
+            ],
         ];
 
         yield 'it does not mutate an anonymous class because reflection is not avalable' => [
