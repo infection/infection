@@ -35,6 +35,6 @@ final class TrueValue extends Mutator
             return false;
         }
 
-        return strtolower($node->name->getFirst()) === 'true';
+        return $node->name->toLowerString() === 'true';
     }
 }
