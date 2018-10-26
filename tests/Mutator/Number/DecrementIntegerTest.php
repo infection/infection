@@ -172,7 +172,7 @@ PHP
 
 if (0 > count($a)) {
     echo 'bar';
-}	
+}
 PHP
             ],
             'It does not decrement zero when it is compared as more or equal than count()' => [
@@ -231,7 +231,7 @@ if (abs($a) === -1) {
 PHP
                 ,
             ],
-            'It decrements zero when it is compared as less or equal than count()' => [
+            'It doest not decrements zero when it is compared as less or equal than count()' => [
                 <<<'PHP'
 <?php
 
