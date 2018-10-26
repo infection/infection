@@ -54,6 +54,7 @@
         "sort-packages": true
     },
     "conflict": {
+        "symfony/console": "3.4.16,4.1.5",
         "symfony/process": "3.4.2"
     },
     "require": {
