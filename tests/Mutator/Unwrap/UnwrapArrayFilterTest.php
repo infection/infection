@@ -26,7 +26,7 @@ final class UnwrapArrayFilterTest extends AbstractMutatorTestCase
 
     public function provideMutationCases(): \Generator
     {
-        yield 'It mutates correctly when provided with a array' => [
+        yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
 <?php
 
