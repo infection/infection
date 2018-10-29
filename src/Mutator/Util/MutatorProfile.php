@@ -161,8 +161,9 @@ final class MutatorProfile
     ];
 
     public const UNWRAP = [
-        Mutator\Unwrap\UnwrapArrayMap::class,
         Mutator\Unwrap\UnwrapArrayFilter::class,
+        Mutator\Unwrap\UnwrapArrayMap::class,
+        Mutator\Unwrap\UnwrapArrayReverse::class,
     ];
 
     public const DEFAULT = [
@@ -286,7 +287,8 @@ final class MutatorProfile
         'CastString' => Mutator\Cast\CastString::class,
 
         // Unwrap
-        'UnwrapArrayMap' => Mutator\Unwrap\UnwrapArrayMap::class,
         'UnwrapArrayFilter' => Mutator\Unwrap\UnwrapArrayFilter::class,
+        'UnwrapArrayMap' => Mutator\Unwrap\UnwrapArrayMap::class,
+        'UnwrapArrayReverse' => Mutator\Unwrap\UnwrapArrayReverse::class,
     ];
 }
