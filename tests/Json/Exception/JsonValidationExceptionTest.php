@@ -33,27 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config\Exception;
+namespace Infection\Tests\Json\Exception;
+
+use Infection\Json\Exception\JsonValidationException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-final class InvalidConfigException extends \RuntimeException
+final class JsonValidationExceptionTest extends TestCase
 {
-    public static function invalidMutator(string $mutator): self
+    public function test_does_not_match_schema_with_errors(): void
     {
-        return new self(sprintf(
-           'The "%s" mutator/profile was not recognized.',
-           $mutator
-        ));
+        $path = '/tmp/config.json';
+        $errors = [
+            'mutators : Must contain a minimum of 1 properties',
+        ];
+
+        $exception = JsonValidationException::doesNotMatchSchema($path, $errors);
+
+        $this->assertInstanceOf(JsonValidationException::class, $exception);
+
+        $expected = '"' . $path . '" does not match the expected JSON schema:' . PHP_EOL . ' - ' . implode(PHP_EOL . ' - ', $errors);
+
+        $this->assertSame($expected, $exception->getMessage());
     }
 
-    public static function invalidProfile(string $profile, string $mutator): self
+    public function test_does_not_match_schema_without_errors(): void
     {
-        return new self(sprintf(
-            'The "%s" profile contains the "%s" mutator which was not recognized.',
-            $profile,
-            $mutator
-        ));
+        $path = '/tmp/config.json';
+
+        $exception = JsonValidationException::doesNotMatchSchema($path);
+
+        $this->assertInstanceOf(JsonValidationException::class, $exception);
+
+        $expected = '"' . $path . '" does not match the expected JSON schema.';
+
+        $this->assertSame($expected, $exception->getMessage());
     }
 }

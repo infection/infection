@@ -33,27 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config\Exception;
+namespace Infection\Json\Exception;
 
 /**
  * @internal
  */
-final class InvalidConfigException extends \RuntimeException
+final class ParseException extends \RuntimeException
 {
-    public static function invalidMutator(string $mutator): self
+    public static function invalidJson(string $path, string $errorMessage): self
     {
         return new self(sprintf(
-           'The "%s" mutator/profile was not recognized.',
-           $mutator
-        ));
-    }
-
-    public static function invalidProfile(string $profile, string $mutator): self
-    {
-        return new self(sprintf(
-            'The "%s" profile contains the "%s" mutator which was not recognized.',
-            $profile,
-            $mutator
+            'The "%s" file does not contain valid JSON: %s.',
+            $path,
+            $errorMessage
         ));
     }
 }

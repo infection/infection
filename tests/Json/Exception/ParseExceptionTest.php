@@ -33,27 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config\Exception;
+namespace Infection\Tests\Json\Exception;
+
+use Infection\Json\Exception\ParseException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-final class InvalidConfigException extends \RuntimeException
+final class ParseExceptionTest extends TestCase
 {
-    public static function invalidMutator(string $mutator): self
+    public function test_invalid_json(): void
     {
-        return new self(sprintf(
-           'The "%s" mutator/profile was not recognized.',
-           $mutator
-        ));
-    }
+        $path = '/tmp/config.json';
+        $errorMessage = 'Syntax error';
 
-    public static function invalidProfile(string $profile, string $mutator): self
-    {
-        return new self(sprintf(
-            'The "%s" profile contains the "%s" mutator which was not recognized.',
-            $profile,
-            $mutator
-        ));
+        $exception = ParseException::invalidJson($path, $errorMessage);
+
+        $this->assertInstanceOf(ParseException::class, $exception);
+
+        $expected = sprintf(
+            'The "%s" file does not contain valid JSON: %s.',
+            $path,
+            $errorMessage
+        );
+
+        $this->assertSame($expected, $exception->getMessage());
     }
 }

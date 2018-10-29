@@ -124,7 +124,7 @@ final class LocatorTest extends TestCase
         $this->expectException(LocatorException::class);
         $this->expectExceptionMessage('Files are not found');
 
-        $locator->locateAnyOf([]);
+        $locator->locateOneOf([]);
     }
 
     public function test_it_returns_first_possible_file(): void
@@ -132,14 +132,14 @@ final class LocatorTest extends TestCase
         $projectPath = realpath(__DIR__ . '/../Fixtures/Locator');
         $locator = new Locator([$projectPath], $this->filesystem);
 
-        $found = $locator->locateAnyOf(['file.txt', 'secondfile.txt']);
+        $found = $locator->locateOneOf(['file.txt', 'secondfile.txt']);
         $this->assertStringEndsWith(
             'tests/Fixtures/Locator/file.txt',
             p($found),
             'Found an incorrect file, orders may be broken.'
         );
 
-        $found = $locator->locateAnyOf(['secondfile.txt', 'file.txt']);
+        $found = $locator->locateOneOf(['secondfile.txt', 'file.txt']);
 
         $this->assertStringEndsWith(
             'tests/Fixtures/Locator/secondfile.txt',
@@ -153,7 +153,7 @@ final class LocatorTest extends TestCase
         $projectPath = realpath(__DIR__ . '/../Fixtures/Locator');
         $locator = new Locator([$projectPath], $this->filesystem);
 
-        $found = $locator->locateAnyOf(['fakefile.txt', 'secondfile.txt', 'thirdfile.txt']);
+        $found = $locator->locateOneOf(['fakefile.txt', 'secondfile.txt', 'thirdfile.txt']);
 
         $this->assertStringEndsWith(
             'tests/Fixtures/Locator/secondfile.txt',
@@ -170,6 +170,6 @@ final class LocatorTest extends TestCase
         $this->expectException(LocatorException::class);
         $this->expectExceptionMessage('Files are not found');
 
-        $locator->locateAnyOf(['thirdfile.txt', 'fourthfile.txt']);
+        $locator->locateOneOf(['thirdfile.txt', 'fourthfile.txt']);
     }
 }

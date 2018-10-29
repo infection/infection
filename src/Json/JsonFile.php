@@ -33,27 +33,74 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config\Exception;
+namespace Infection\Json;
+
+use Infection\Json\Exception\JsonValidationException;
+use Infection\Json\Exception\ParseException;
+use JsonSchema\Validator;
 
 /**
  * @internal
  */
-final class InvalidConfigException extends \RuntimeException
+final class JsonFile
 {
-    public static function invalidMutator(string $mutator): self
+    private const SCHEMA_FILE = __DIR__ . '/../../resources/schema.json';
+
+    /**
+     * @var string
+     */
+    private $path;
+
+    /**
+     * @var \stdClass
+     */
+    private $data;
+
+    public function __construct(string $path)
     {
-        return new self(sprintf(
-           'The "%s" mutator/profile was not recognized.',
-           $mutator
-        ));
+        $this->path = $path;
     }
 
-    public static function invalidProfile(string $profile, string $mutator): self
+    public function decode(): \stdClass
     {
-        return new self(sprintf(
-            'The "%s" profile contains the "%s" mutator which was not recognized.',
-            $profile,
-            $mutator
-        ));
+        $this->parse();
+        $this->validateSchema();
+
+        return $this->data;
+    }
+
+    private function parse(): void
+    {
+        $data = json_decode((string) file_get_contents($this->path));
+
+        if (null === $data && JSON_ERROR_NONE !== json_last_error()) {
+            throw ParseException::invalidJson($this->path, json_last_error_msg());
+        }
+
+        $this->data = (object) $data;
+    }
+
+    private function validateSchema(): void
+    {
+        $validator = new Validator();
+
+        $schemaFile = self::SCHEMA_FILE;
+
+        // Prepend with file:// only when not using a special schema already (e.g. in the phar)
+        if (false === strpos($schemaFile, '://')) {
+            $schemaFile = 'file://' . $schemaFile;
+        }
+
+        $validator->validate($this->data, (object) ['$ref' => $schemaFile]);
+
+        if (!$validator->isValid()) {
+            $errors = [];
+
+            foreach ($validator->getErrors() as $error) {
+                $errors[] = ($error['property'] ? $error['property'] . ' : ' : '') . $error['message'];
+            }
+
+            throw JsonValidationException::doesNotMatchSchema($this->path, $errors);
+        }
     }
 }

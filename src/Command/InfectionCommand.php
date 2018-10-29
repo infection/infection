@@ -349,7 +349,7 @@ final class InfectionCommand extends BaseCommand
     private function runConfigurationCommand(Locator $locator): void
     {
         try {
-            $locator->locateAnyOf(InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES);
+            $locator->locateOneOf(InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES);
         } catch (\Exception $e) {
             $configureCommand = $this->getApplication()->find('configure');
             $config = $this->getContainer()->get('infection.config');
