@@ -21,19 +21,9 @@ use Symfony\Component\Filesystem\Filesystem;
 abstract class FileLogger implements MutationTestingResultsLogger
 {
     /**
-     * @var string
-     */
-    private $logFilePath;
-
-    /**
      * @var MetricsCalculator
      */
     protected $metricsCalculator;
-
-    /**
-     * @var Filesystem
-     */
-    private $fs;
 
     /**
      * @var bool
@@ -44,6 +34,15 @@ abstract class FileLogger implements MutationTestingResultsLogger
      * @var bool
      */
     protected $isDebugMode;
+    /**
+     * @var string
+     */
+    private $logFilePath;
+
+    /**
+     * @var Filesystem
+     */
+    private $fs;
 
     /**
      * @var OutputInterface

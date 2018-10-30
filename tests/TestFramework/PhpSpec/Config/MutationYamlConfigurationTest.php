@@ -36,15 +36,6 @@ final class MutationYamlConfigurationTest extends TestCase
         'bootstrap' => '/path/to/adc',
     ];
 
-    protected function getConfigurationObject(array $configArray = [])
-    {
-        return new MutationYamlConfiguration(
-            $this->tempDir,
-            $configArray ?: $this->defaultConfig,
-            $this->customAutoloadFilePath
-        );
-    }
-
     public function test_it_removes_code_coverage_extension(): void
     {
         $configuration = $this->getConfigurationObject();
@@ -72,5 +63,14 @@ final class MutationYamlConfigurationTest extends TestCase
         $parsedYaml = Yaml::parse($configuration->getYaml());
 
         $this->assertSame($this->customAutoloadFilePath, $parsedYaml['bootstrap']);
+    }
+
+    protected function getConfigurationObject(array $configArray = [])
+    {
+        return new MutationYamlConfiguration(
+            $this->tempDir,
+            $configArray ?: $this->defaultConfig,
+            $this->customAutoloadFilePath
+        );
     }
 }

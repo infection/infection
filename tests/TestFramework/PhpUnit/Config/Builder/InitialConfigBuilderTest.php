@@ -66,25 +66,6 @@ final class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTest
         $this->fileSystem->remove($this->workspace);
     }
 
-    private function createConfigBuilder(string $phpUnitXmlConfigPath = null, bool $skipCoverage = false): void
-    {
-        $phpunitXmlPath = $phpUnitXmlConfigPath ?: __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit.xml';
-
-        $jUnitFilePath = '/path/to/junit.xml';
-        $srcDirs = ['src', 'app'];
-
-        $replacer = new PathReplacer($this->fileSystem, $this->pathToProject);
-
-        $this->builder = new InitialConfigBuilder(
-            $this->tmpDir,
-            file_get_contents($phpunitXmlPath),
-            new XmlConfigurationHelper($replacer),
-            $jUnitFilePath,
-            $srcDirs,
-            $skipCoverage
-        );
-    }
-
     public function test_it_replaces_relative_path_to_absolute_path(): void
     {
         $configurationPath = $this->builder->build();
@@ -193,5 +174,24 @@ final class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTest
         $xPath = new \DOMXPath($dom);
 
         return $xPath->query($query);
+    }
+
+    private function createConfigBuilder(string $phpUnitXmlConfigPath = null, bool $skipCoverage = false): void
+    {
+        $phpunitXmlPath = $phpUnitXmlConfigPath ?: __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit.xml';
+
+        $jUnitFilePath = '/path/to/junit.xml';
+        $srcDirs = ['src', 'app'];
+
+        $replacer = new PathReplacer($this->fileSystem, $this->pathToProject);
+
+        $this->builder = new InitialConfigBuilder(
+            $this->tmpDir,
+            file_get_contents($phpunitXmlPath),
+            new XmlConfigurationHelper($replacer),
+            $jUnitFilePath,
+            $srcDirs,
+            $skipCoverage
+        );
     }
 }

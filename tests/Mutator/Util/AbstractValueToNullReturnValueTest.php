@@ -29,42 +29,6 @@ final class AbstractValueToNullReturnValueTest extends TestCase
             ->getMockForAbstractClass();
     }
 
-    private function mockNode($returnValue): Node
-    {
-        /** @var Node|MockObject $mockNode */
-        $mockNode = $this->getMockBuilder(Node::class)
-                         ->disableOriginalConstructor()
-                         ->setMethods(['getAttribute'])
-                         ->getMockForAbstractClass();
-
-        $mockNode->method('getAttribute')
-                 ->willReturn($returnValue);
-
-        return $mockNode;
-    }
-
-    private function mockFunction($returnValue): Function_
-    {
-        /** @var Function_|MockObject $mockFunction */
-        $mockFunction = $this->getMockBuilder(Function_::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getReturnType'])
-            ->getMock();
-
-        $mockFunction->method('getReturnType')
-            ->willReturn($returnValue);
-
-        return $mockFunction;
-    }
-
-    private function invokeMethod(Node $mockNode)
-    {
-        $reflectionMethod = new \ReflectionMethod(AbstractValueToNullReturnValue::class, 'isNullReturnValueAllowed');
-        $reflectionMethod->setAccessible(true);
-
-        return $reflectionMethod->invoke($this->testSubject, $mockNode);
-    }
-
     public function test_attribute_not_found(): void
     {
         $this->assertTrue($this->invokeMethod($this->mockNode(null)));
@@ -132,5 +96,41 @@ final class AbstractValueToNullReturnValueTest extends TestCase
                 )
             )
         );
+    }
+
+    private function mockNode($returnValue): Node
+    {
+        /** @var Node|MockObject $mockNode */
+        $mockNode = $this->getMockBuilder(Node::class)
+                         ->disableOriginalConstructor()
+                         ->setMethods(['getAttribute'])
+                         ->getMockForAbstractClass();
+
+        $mockNode->method('getAttribute')
+                 ->willReturn($returnValue);
+
+        return $mockNode;
+    }
+
+    private function mockFunction($returnValue): Function_
+    {
+        /** @var Function_|MockObject $mockFunction */
+        $mockFunction = $this->getMockBuilder(Function_::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getReturnType'])
+            ->getMock();
+
+        $mockFunction->method('getReturnType')
+            ->willReturn($returnValue);
+
+        return $mockFunction;
+    }
+
+    private function invokeMethod(Node $mockNode)
+    {
+        $reflectionMethod = new \ReflectionMethod(AbstractValueToNullReturnValue::class, 'isNullReturnValueAllowed');
+        $reflectionMethod->setAccessible(true);
+
+        return $reflectionMethod->invoke($this->testSubject, $mockNode);
     }
 }

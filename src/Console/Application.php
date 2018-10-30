@@ -93,15 +93,6 @@ ASCII;
         return parent::run($input, $output);
     }
 
-    private function logRunningWithDebugger(): void
-    {
-        if (\PHP_SAPI === 'phpdbg') {
-            $this->consoleOutput->logRunningWithDebugger(\PHP_SAPI);
-        } elseif (\extension_loaded('xdebug')) {
-            $this->consoleOutput->logRunningWithDebugger('xdebug');
-        }
-    }
-
     public function doRun(InputInterface $input, OutputInterface $output)
     {
         $this->getContainer()->buildDynamicDependencies($input);
@@ -120,6 +111,16 @@ ASCII;
         }
 
         return parent::getLongVersion();
+    }
+
+    public function getContainer(): InfectionContainer
+    {
+        return $this->container;
+    }
+
+    public function getConsoleOutput(): InfectionConsoleOutput
+    {
+        return $this->consoleOutput;
     }
 
     protected function getDefaultCommands()
@@ -155,13 +156,12 @@ ASCII;
         $output->getFormatter()->setStyle('high', new OutputFormatterStyle('green', null, ['bold']));
     }
 
-    public function getContainer(): InfectionContainer
+    private function logRunningWithDebugger(): void
     {
-        return $this->container;
-    }
-
-    public function getConsoleOutput(): InfectionConsoleOutput
-    {
-        return $this->consoleOutput;
+        if (\PHP_SAPI === 'phpdbg') {
+            $this->consoleOutput->logRunningWithDebugger(\PHP_SAPI);
+        } elseif (\extension_loaded('xdebug')) {
+            $this->consoleOutput->logRunningWithDebugger('xdebug');
+        }
     }
 }

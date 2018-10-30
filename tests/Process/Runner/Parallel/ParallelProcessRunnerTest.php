@@ -24,32 +24,11 @@ use Symfony\Component\Process\Process;
  */
 final class ParallelProcessRunnerTest extends MockeryTestCase
 {
-    private function buildEventDispatcherWithEventCount($eventCount): EventDispatcherInterface
-    {
-        /** @var EventDispatcherInterface|Mockery\MockInterface $eventDispatcher */
-        $eventDispatcher = Mockery::mock(EventDispatcherInterface::class);
-        $eventDispatcher->shouldReceive('dispatch')->times($eventCount)->with(Mockery::type(MutantProcessFinished::class));
-
-        return $eventDispatcher;
-    }
-
     public function test_it_does_nothing_when_nothing_to_do(): void
     {
         $eventDispatcher = $this->buildEventDispatcherWithEventCount(0);
         $runner = new ParallelProcessRunner($eventDispatcher);
         $runner->run([], 4, 0);
-    }
-
-    private function buildUncoveredMutantProcess(): MutantProcessInterface
-    {
-        $mutant = Mockery::mock(MutantInterface::class);
-        $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(false);
-
-        /** @var MutantProcessFinished|Mockery\MockInterface $mutantProcess */
-        $mutantProcess = Mockery::mock(MutantProcessInterface::class);
-        $mutantProcess->shouldReceive('getMutant')->once()->andReturn($mutant);
-
-        return $mutantProcess;
     }
 
     public function test_it_does_not_start_processes_for_uncovered_mutants(): void
@@ -65,24 +44,6 @@ final class ParallelProcessRunnerTest extends MockeryTestCase
         $runner->run($processes, 4, 0);
     }
 
-    private function buildCoveredMutantProcess(): MutantProcessInterface
-    {
-        $process = Mockery::mock(Process::class);
-        $process->shouldReceive('start')->once();
-        $process->shouldReceive('checkTimeout')->once();
-        $process->shouldReceive('isRunning')->once()->andReturn(false);
-
-        $mutant = Mockery::mock(MutantInterface::class);
-        $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(true);
-
-        /** @var MutantProcessFinished|Mockery\MockInterface $mutantProcess */
-        $mutantProcess = Mockery::mock(MutantProcessInterface::class);
-        $mutantProcess->shouldReceive('getProcess')->twice()->andReturn($process);
-        $mutantProcess->shouldReceive('getMutant')->once()->andReturn($mutant);
-
-        return $mutantProcess;
-    }
-
     public function test_it_starts_processes_for_covered_mutants(): void
     {
         $processes = [];
@@ -96,25 +57,6 @@ final class ParallelProcessRunnerTest extends MockeryTestCase
         $runner->run($processes, 4, 0);
     }
 
-    private function buildCoveredMutantProcessWithTimeout(): MutantProcessInterface
-    {
-        $process = Mockery::mock(Process::class);
-        $process->shouldReceive('start')->once();
-        $process->shouldReceive('checkTimeout')->once()->andThrow(Mockery::mock(ProcessTimedOutException::class));
-        $process->shouldReceive('isRunning')->once()->andReturn(false);
-
-        $mutant = Mockery::mock(MutantInterface::class);
-        $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(true);
-
-        /** @var MutantProcessFinished|Mockery\MockInterface $mutantProcess */
-        $mutantProcess = Mockery::mock(MutantProcessInterface::class);
-        $mutantProcess->shouldReceive('getProcess')->twice()->andReturn($process);
-        $mutantProcess->shouldReceive('getMutant')->once()->andReturn($mutant);
-        $mutantProcess->shouldReceive('markTimeout')->once();
-
-        return $mutantProcess;
-    }
-
     public function test_it_checks_for_timeout(): void
     {
         $processes = [];
@@ -126,21 +68,6 @@ final class ParallelProcessRunnerTest extends MockeryTestCase
         $eventDispatcher = $this->buildEventDispatcherWithEventCount(10);
         $runner = new ParallelProcessRunner($eventDispatcher);
         $runner->run($processes, 4, 0);
-    }
-
-    private function runWithAllKindsOfProcesses($threadCount): void
-    {
-        $processes = [];
-
-        for ($i = 0; $i < 4; ++$i) {
-            $processes[] = $this->buildUncoveredMutantProcess();
-            $processes[] = $this->buildCoveredMutantProcess();
-            $processes[] = $this->buildCoveredMutantProcessWithTimeout();
-        }
-
-        $eventDispatcher = $this->buildEventDispatcherWithEventCount(12);
-        $runner = new ParallelProcessRunner($eventDispatcher);
-        $runner->run($processes, $threadCount, 0);
     }
 
     public function test_it_handles_all_kids_of_processes_with_infinite_threads(): void
@@ -166,5 +93,78 @@ final class ParallelProcessRunnerTest extends MockeryTestCase
     public function test_it_still_runs_with_negative_thread_count(): void
     {
         $this->runWithAllKindsOfProcesses(-1);
+    }
+
+    private function buildEventDispatcherWithEventCount($eventCount): EventDispatcherInterface
+    {
+        /** @var EventDispatcherInterface|Mockery\MockInterface $eventDispatcher */
+        $eventDispatcher = Mockery::mock(EventDispatcherInterface::class);
+        $eventDispatcher->shouldReceive('dispatch')->times($eventCount)->with(Mockery::type(MutantProcessFinished::class));
+
+        return $eventDispatcher;
+    }
+
+    private function buildUncoveredMutantProcess(): MutantProcessInterface
+    {
+        $mutant = Mockery::mock(MutantInterface::class);
+        $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(false);
+
+        /** @var MutantProcessFinished|Mockery\MockInterface $mutantProcess */
+        $mutantProcess = Mockery::mock(MutantProcessInterface::class);
+        $mutantProcess->shouldReceive('getMutant')->once()->andReturn($mutant);
+
+        return $mutantProcess;
+    }
+
+    private function buildCoveredMutantProcess(): MutantProcessInterface
+    {
+        $process = Mockery::mock(Process::class);
+        $process->shouldReceive('start')->once();
+        $process->shouldReceive('checkTimeout')->once();
+        $process->shouldReceive('isRunning')->once()->andReturn(false);
+
+        $mutant = Mockery::mock(MutantInterface::class);
+        $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(true);
+
+        /** @var MutantProcessFinished|Mockery\MockInterface $mutantProcess */
+        $mutantProcess = Mockery::mock(MutantProcessInterface::class);
+        $mutantProcess->shouldReceive('getProcess')->twice()->andReturn($process);
+        $mutantProcess->shouldReceive('getMutant')->once()->andReturn($mutant);
+
+        return $mutantProcess;
+    }
+
+    private function buildCoveredMutantProcessWithTimeout(): MutantProcessInterface
+    {
+        $process = Mockery::mock(Process::class);
+        $process->shouldReceive('start')->once();
+        $process->shouldReceive('checkTimeout')->once()->andThrow(Mockery::mock(ProcessTimedOutException::class));
+        $process->shouldReceive('isRunning')->once()->andReturn(false);
+
+        $mutant = Mockery::mock(MutantInterface::class);
+        $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(true);
+
+        /** @var MutantProcessFinished|Mockery\MockInterface $mutantProcess */
+        $mutantProcess = Mockery::mock(MutantProcessInterface::class);
+        $mutantProcess->shouldReceive('getProcess')->twice()->andReturn($process);
+        $mutantProcess->shouldReceive('getMutant')->once()->andReturn($mutant);
+        $mutantProcess->shouldReceive('markTimeout')->once();
+
+        return $mutantProcess;
+    }
+
+    private function runWithAllKindsOfProcesses($threadCount): void
+    {
+        $processes = [];
+
+        for ($i = 0; $i < 4; ++$i) {
+            $processes[] = $this->buildUncoveredMutantProcess();
+            $processes[] = $this->buildCoveredMutantProcess();
+            $processes[] = $this->buildCoveredMutantProcessWithTimeout();
+        }
+
+        $eventDispatcher = $this->buildEventDispatcherWithEventCount(12);
+        $runner = new ParallelProcessRunner($eventDispatcher);
+        $runner->run($processes, $threadCount, 0);
     }
 }

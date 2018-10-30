@@ -19,8 +19,6 @@ abstract class TestFrameworkExtraOptions
      */
     private $extraOptions;
 
-    abstract protected function getInitialRunOnlyOptions(): array;
-
     public function __construct(string $extraOptions = null)
     {
         $this->extraOptions = $extraOptions ?: '';
@@ -41,4 +39,6 @@ abstract class TestFrameworkExtraOptions
 
         return preg_replace('/\s+/', ' ', trim($extraOptions));
     }
+
+    abstract protected function getInitialRunOnlyOptions(): array;
 }

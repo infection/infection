@@ -209,11 +209,6 @@ final class InfectionContainer extends Container
         };
     }
 
-    private function getInfectionConfig(): InfectionConfig
-    {
-        return $this['infection.config'];
-    }
-
     public function buildDynamicDependencies(InputInterface $input): void
     {
         $this['infection.config'] = function () use ($input): InfectionConfig {
@@ -311,5 +306,10 @@ final class InfectionContainer extends Container
 
             return $parser->getMutators();
         };
+    }
+
+    private function getInfectionConfig(): InfectionConfig
+    {
+        return $this['infection.config'];
     }
 }

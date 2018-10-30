@@ -17,10 +17,6 @@ use PhpParser\Node;
  */
 abstract class AbstractUnwrapMutator extends Mutator
 {
-    abstract protected function getFunctionName(): string;
-
-    abstract protected function getParameterIndex(): int;
-
     /**
      * Replaces "$a = function(arg1, arg2);" with "$a = arg1;"
      *
@@ -30,6 +26,10 @@ abstract class AbstractUnwrapMutator extends Mutator
     {
         return $node->args[$this->getParameterIndex()];
     }
+
+    abstract protected function getFunctionName(): string;
+
+    abstract protected function getParameterIndex(): int;
 
     final protected function mutatesNode(Node $node): bool
     {

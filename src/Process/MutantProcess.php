@@ -63,11 +63,6 @@ final class MutantProcess implements MutantProcessInterface
         $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
 
-    private function isTimedOut(): bool
-    {
-        return $this->isTimedOut;
-    }
-
     public function getProcess(): Process
     {
         return $this->process;
@@ -117,6 +112,11 @@ final class MutantProcess implements MutantProcessInterface
     public function getOriginalStartingLine(): int
     {
         return (int) $this->getMutation()->getAttributes()['startLine'];
+    }
+
+    private function isTimedOut(): bool
+    {
+        return $this->isTimedOut;
     }
 
     private function getMutation(): MutationInterface

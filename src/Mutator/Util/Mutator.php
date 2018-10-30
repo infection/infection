@@ -31,8 +31,6 @@ abstract class Mutator
      */
     abstract public function mutate(Node $node);
 
-    abstract protected function mutatesNode(Node $node): bool;
-
     final public function shouldMutate(Node $node): bool
     {
         if (!$this->mutatesNode($node)) {
@@ -54,4 +52,6 @@ abstract class Mutator
 
         return end($parts);
     }
+
+    abstract protected function mutatesNode(Node $node): bool;
 }

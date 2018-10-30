@@ -18,6 +18,10 @@ use Symfony\Component\Yaml\Yaml;
 final class InitialYamlConfiguration extends AbstractYamlConfiguration
 {
     /**
+     * @var string
+     */
+    protected $originalYamlConfigPath;
+    /**
      * @var bool
      */
     private $skipCoverage;
@@ -28,11 +32,6 @@ final class InitialYamlConfiguration extends AbstractYamlConfiguration
 
         $this->skipCoverage = $skipCoverage;
     }
-
-    /**
-     * @var string
-     */
-    protected $originalYamlConfigPath;
 
     public function getYaml(): string
     {
