@@ -34,6 +34,7 @@ abstract class FileLogger implements MutationTestingResultsLogger
      * @var bool
      */
     protected $isDebugMode;
+
     /**
      * @var string
      */

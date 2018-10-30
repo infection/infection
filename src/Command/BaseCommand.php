@@ -31,6 +31,7 @@ abstract class BaseCommand extends Command
      * @var OutputInterface
      */
     protected $output;
+
     /**
      * @var Container
      */

@@ -21,6 +21,7 @@ final class InitialYamlConfiguration extends AbstractYamlConfiguration
      * @var string
      */
     protected $originalYamlConfigPath;
+
     /**
      * @var bool
      */
