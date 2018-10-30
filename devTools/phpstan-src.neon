@@ -2,3 +2,7 @@ parameters:
     ignoreErrors:
         - '#Access to an undefined property PhpParser\\Node(.*?)#'
         - '#Call to an undefined method PhpParser\\Node(.*?)#'
+        - '#expects .*, array<string>\|bool\|string\|null given#'
+        - '#cast array<string>\|bool\|string\|null to#'
+        - '#Offset array<string>\|bool\|string\|null does not#'
+        - '#Possibly invalid array key type array<string>\|bool\|string\|null#'
