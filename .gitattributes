@@ -5,4 +5,16 @@
 *.jpg binary
 
 #Files we do not want to distribute
-/tests export-ignore
+/.appveyor            export-ignore
+/.build               export-ignore
+/.ci                  export-ignore
+/.codecov.yml         export-ignore
+/.editorconfig        export-ignore
+/.gitattributes       export-ignore
+/.github              export-ignore
+/.gitignore           export-ignore
+/.php_cs.dist         export-ignore
+/.travis.yml          export-ignore
+/infection.json.dist  export-ignore
+/phpunit.xml.dist     export-ignore
+/tests                export-ignore
