@@ -35,38 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
-use Infection\Mutator\Util\Mutator;
-use PhpParser\Node;
-
 /**
  * @internal
  */
-abstract class AbstractUnwrapMutator extends Mutator
+final class UnwrapArrayReduce extends AbstractUnwrapMutator
 {
-    /**
-     * Replaces "$a = function(arg1, arg2);" with "$a = arg1;"
-     *
-     * @return Node\Param;
-     */
-    final public function mutate(Node $node)
+    protected function getFunctionName(): string
     {
-        return $node->args[$this->getParameterIndex()];
+        return 'array_reduce';
     }
 
-    abstract protected function getFunctionName(): string;
-
-    abstract protected function getParameterIndex(): int;
-
-    final protected function mutatesNode(Node $node): bool
+    protected function getParameterIndex(): int
     {
-        if (!$node instanceof Node\Expr\FuncCall) {
-            return false;
-        }
-
-        if (!array_key_exists($this->getParameterIndex(), $node->args)) {
-            return false;
-        }
-
-        return $node->name->toLowerString() === strtolower($this->getFunctionName());
+        return 2;
     }
 }
