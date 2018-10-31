@@ -192,6 +192,7 @@ final class MutatorProfile
         Mutator\Unwrap\UnwrapArrayFlip::class,
         Mutator\Unwrap\UnwrapArrayMap::class,
         Mutator\Unwrap\UnwrapArrayReduce::class,
+        Mutator\Unwrap\UnwrapArrayReplace::class,
         Mutator\Unwrap\UnwrapArrayReverse::class,
         Mutator\Unwrap\UnwrapStrRepeat::class,
     ];
@@ -321,6 +322,7 @@ final class MutatorProfile
         'UnwrapArrayFlip' => Mutator\Unwrap\UnwrapArrayFlip::class,
         'UnwrapArrayMap' => Mutator\Unwrap\UnwrapArrayMap::class,
         'UnwrapArrayReduce' => Mutator\Unwrap\UnwrapArrayReduce::class,
+        'UnwrapArrayReplace' => Mutator\Unwrap\UnwrapArrayReplace::class,
         'UnwrapArrayReverse' => Mutator\Unwrap\UnwrapArrayReverse::class,
         'UnwrapStrRepeat' => Mutator\Unwrap\UnwrapStrRepeat::class,
     ];
