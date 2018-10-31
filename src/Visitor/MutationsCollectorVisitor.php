@@ -118,6 +118,14 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
         }
     }
 
+    /**
+     * @return Mutation[]
+     */
+    public function getMutations(): array
+    {
+        return $this->mutations;
+    }
+
     private function isCoveredByTest(bool $isOnFunctionSignature, Node $node): bool
     {
         if ($isOnFunctionSignature) {
@@ -133,13 +141,5 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
         }
 
         return false;
-    }
-
-    /**
-     * @return Mutation[]
-     */
-    public function getMutations(): array
-    {
-        return $this->mutations;
     }
 }

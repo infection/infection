@@ -30,6 +30,17 @@ final class MemoryLimiterTest extends TestCase
         $fs->mkdir(self::TEST_DIR_LOCATION);
     }
 
+    public static function tearDownAfterClass(): void
+    {
+        $fs = new Filesystem();
+        $fs->remove(self::TEST_DIR_LOCATION);
+
+        $xdebug = new \ReflectionClass(XdebugHandler::class);
+        $skipped = $xdebug->getProperty('skipped');
+        $skipped->setAccessible(true);
+        $skipped->setValue(null);
+    }
+
     protected function setUp(): void
     {
         if (ini_get('memory_limit') !== '-1') {
@@ -52,17 +63,6 @@ final class MemoryLimiterTest extends TestCase
         if (XdebugHandler::getSkippedVersion() !== 'infection-fake') {
             throw new \LogicException('Xdebug handler is active during tests, which it should not be.');
         }
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        $fs = new Filesystem();
-        $fs->remove(self::TEST_DIR_LOCATION);
-
-        $xdebug = new \ReflectionClass(XdebugHandler::class);
-        $skipped = $xdebug->getProperty('skipped');
-        $skipped->setAccessible(true);
-        $skipped->setValue(null);
     }
 
     public function test_it_does_nothing_when_adapter_is_not_memory_limit_aware(): void

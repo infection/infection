@@ -23,11 +23,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 abstract class BaseCommand extends Command
 {
     /**
-     * @var Container
-     */
-    private $container;
-
-    /**
      * @var InputInterface
      */
     protected $input;
@@ -36,6 +31,11 @@ abstract class BaseCommand extends Command
      * @var OutputInterface
      */
     protected $output;
+
+    /**
+     * @var Container
+     */
+    private $container;
 
     public function getContainer(): Container
     {

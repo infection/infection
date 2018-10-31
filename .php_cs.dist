@@ -55,13 +55,7 @@ return \PhpCsFixer\Config::create()
             'include' => ['@compiler_optimized']
         ],
         'no_useless_else'=> true,
-        'ordered_class_elements' => [
-            'order' => [
-                'use_trait',
-                'constant_public',
-                'property_public',
-            ],
-        ],
+        'ordered_class_elements' => true,
         'ordered_imports' => true,
         'phpdoc_align' => false,
         'phpdoc_summary' => false,

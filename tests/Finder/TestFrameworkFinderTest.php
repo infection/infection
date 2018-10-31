@@ -66,6 +66,11 @@ final class TestFrameworkFinderTest extends TestCase
         }
     }
 
+    public static function tearDownAfterClass(): void
+    {
+        self::restorePathEnvironment();
+    }
+
     protected function setUp(): void
     {
         self::restorePathEnvironment();
@@ -73,6 +78,11 @@ final class TestFrameworkFinderTest extends TestCase
 
         $this->fileSystem = new Filesystem();
         $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->fileSystem->remove($this->workspace);
     }
 
     public function test_it_can_load_a_custom_path(): void
@@ -195,15 +205,5 @@ final class TestFrameworkFinderTest extends TestCase
                 putenv($name);
             }
         }
-    }
-
-    protected function tearDown(): void
-    {
-        $this->fileSystem->remove($this->workspace);
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        self::restorePathEnvironment();
     }
 }

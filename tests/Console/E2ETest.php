@@ -49,6 +49,15 @@ final class E2ETest extends TestCase
         $this->cwd = getcwd();
     }
 
+    protected function tearDown(): void
+    {
+        if ($this->previousLoader) {
+            $this->previousLoader->unregister();
+        }
+
+        chdir($this->cwd);
+    }
+
     /**
      * Longest test: runs under about 160-200 sec
      *
@@ -114,15 +123,6 @@ final class E2ETest extends TestCase
 
             yield basename((string) $dirName) => [$dirName];
         }
-    }
-
-    protected function tearDown(): void
-    {
-        if ($this->previousLoader) {
-            $this->previousLoader->unregister();
-        }
-
-        chdir($this->cwd);
     }
 
     private function runOnE2EFixture($path): string

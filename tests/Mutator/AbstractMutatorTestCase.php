@@ -35,6 +35,11 @@ abstract class AbstractMutatorTestCase extends TestCase
      */
     protected $mutator;
 
+    protected function setUp(): void
+    {
+        $this->mutator = $this->getMutator();
+    }
+
     public function doTest(string $inputCode, $expectedCode = null): void
     {
         $expectedCodeSamples = (array) $expectedCode;
@@ -69,11 +74,6 @@ abstract class AbstractMutatorTestCase extends TestCase
         $mutator = substr(str_replace('\Tests', '', $class), 0, -4);
 
         return new $mutator(new MutatorConfig([]));
-    }
-
-    protected function setUp(): void
-    {
-        $this->mutator = $this->getMutator();
     }
 
     protected function getNodes(string $code): array

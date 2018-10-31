@@ -36,11 +36,6 @@ final class InitialYamlConfigurationTest extends TestCase
         'bootstrap' => '/path/to/adc',
     ];
 
-    protected function getConfigurationObject(array $configArray = [], bool $skipCoverage = false)
-    {
-        return new InitialYamlConfiguration($this->tempDir, $configArray ?: $this->defaultConfig, $skipCoverage);
-    }
-
     public function test_it_throws_exception_when_extensions_array_is_empty(): void
     {
         $configuration = $this->getConfigurationObject(['extensions' => []]);
@@ -94,5 +89,10 @@ final class InitialYamlConfigurationTest extends TestCase
         $parsedYaml = Yaml::parse($configuration->getYaml());
 
         $this->assertSame(['.'], $parsedYaml['extensions']['PhpSpecCodeCoverageExtension']['whitelist']);
+    }
+
+    protected function getConfigurationObject(array $configArray = [], bool $skipCoverage = false)
+    {
+        return new InitialYamlConfiguration($this->tempDir, $configArray ?: $this->defaultConfig, $skipCoverage);
     }
 }

@@ -14,11 +14,12 @@ namespace Infection\StreamWrapper;
  */
 final class IncludeInterceptor
 {
+    private const STREAM_OPEN_FOR_INCLUDE = 0x00000080;
+
     /**
      * @var resource
      */
     public $context;
-    private const STREAM_OPEN_FOR_INCLUDE = 0x00000080;
 
     /**
      * @var bool|resource

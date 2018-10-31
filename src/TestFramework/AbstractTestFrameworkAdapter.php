@@ -127,29 +127,6 @@ abstract class AbstractTestFrameworkAdapter
         return array_filter($commandLineArgs);
     }
 
-    /**
-     * Need to return string for cases when user run phpdbg with -qrr argument.s
-     *
-     * @param bool $includeArgs
-     *
-     * @return string[]
-     */
-    private function findPhp(bool $includeArgs = true): array
-    {
-        if ($this->cachedPhpPath === null || $this->cachedIncludedArgs !== $includeArgs) {
-            $this->cachedIncludedArgs = $includeArgs;
-            $phpPath = (new PhpExecutableFinder())->find($includeArgs);
-
-            if ($phpPath === false) {
-                throw FinderException::phpExecutableNotFound();
-            }
-
-            $this->cachedPhpPath = explode(' ', $phpPath);
-        }
-
-        return $this->cachedPhpPath;
-    }
-
     public function buildInitialConfigFile(): string
     {
         return $this->initialConfigBuilder->build();
@@ -176,6 +153,29 @@ abstract class AbstractTestFrameworkAdapter
         $process->mustRun();
 
         return $this->versionParser->parse($process->getOutput());
+    }
+
+    /**
+     * Need to return string for cases when user run phpdbg with -qrr argument.s
+     *
+     * @param bool $includeArgs
+     *
+     * @return string[]
+     */
+    private function findPhp(bool $includeArgs = true): array
+    {
+        if ($this->cachedPhpPath === null || $this->cachedIncludedArgs !== $includeArgs) {
+            $this->cachedIncludedArgs = $includeArgs;
+            $phpPath = (new PhpExecutableFinder())->find($includeArgs);
+
+            if ($phpPath === false) {
+                throw FinderException::phpExecutableNotFound();
+            }
+
+            $this->cachedPhpPath = explode(' ', $phpPath);
+        }
+
+        return $this->cachedPhpPath;
     }
 
     private function isBatchFile(string $path): bool

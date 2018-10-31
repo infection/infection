@@ -41,16 +41,6 @@ final class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
         $this->assertSame(0.0, $calculator->getCoveredCodeMutationScoreIndicator());
     }
 
-    private function addMutantProcess(MetricsCalculator $calculator, int $resultCode, int $count = 1): void
-    {
-        $mutantProcess = Mockery::mock(MutantProcessInterface::class);
-        $mutantProcess->shouldReceive('getResultCode')->times($count)->andReturn($resultCode);
-
-        while ($count--) {
-            $calculator->collect($mutantProcess);
-        }
-    }
-
     public function test_it_collects_all_values(): void
     {
         $process = Mockery::mock(Process::class);
@@ -76,5 +66,15 @@ final class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
         $this->assertSame(78.0, $calculator->getMutationScoreIndicator()); // 78.57
         $this->assertSame(92.0, $calculator->getCoverageRate()); // 92.85
         $this->assertSame(84.0, $calculator->getCoveredCodeMutationScoreIndicator()); // 84.61
+    }
+
+    private function addMutantProcess(MetricsCalculator $calculator, int $resultCode, int $count = 1): void
+    {
+        $mutantProcess = Mockery::mock(MutantProcessInterface::class);
+        $mutantProcess->shouldReceive('getResultCode')->times($count)->andReturn($resultCode);
+
+        while ($count--) {
+            $calculator->collect($mutantProcess);
+        }
     }
 }

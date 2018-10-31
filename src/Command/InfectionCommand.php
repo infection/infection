@@ -261,6 +261,31 @@ final class InfectionCommand extends BaseCommand
         return $statusCode;
     }
 
+    /**
+     * Run configuration command if config does not exist
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     *
+     * @throws InfectionException
+     */
+    protected function initialize(InputInterface $input, OutputInterface $output): void
+    {
+        parent::initialize($input, $output);
+
+        $locator = $this->getContainer()->get('locator');
+
+        if ($customConfigPath = $input->getOption('configuration')) {
+            $locator->locate($customConfigPath);
+        } else {
+            $this->runConfigurationCommand($locator);
+        }
+
+        $this->consoleOutput = $this->getApplication()->getConsoleOutput();
+        $this->skipCoverage = \strlen(trim($input->getOption('coverage'))) > 0;
+        $this->eventDispatcher = $this->getContainer()->get('dispatcher');
+    }
+
     private function includeUserBootstrap(InfectionConfig $config): void
     {
         $bootstrap = $config->getBootstrap();
@@ -295,31 +320,6 @@ final class InfectionCommand extends BaseCommand
         return TestFrameworkTypes::PHPUNIT === $testFrameworkKey
             ? new PhpUnitExtraOptions($extraOptions)
             : new PhpSpecExtraOptions($extraOptions);
-    }
-
-    /**
-     * Run configuration command if config does not exist
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     *
-     * @throws InfectionException
-     */
-    protected function initialize(InputInterface $input, OutputInterface $output): void
-    {
-        parent::initialize($input, $output);
-
-        $locator = $this->getContainer()->get('locator');
-
-        if ($customConfigPath = $input->getOption('configuration')) {
-            $locator->locate($customConfigPath);
-        } else {
-            $this->runConfigurationCommand($locator);
-        }
-
-        $this->consoleOutput = $this->getApplication()->getConsoleOutput();
-        $this->skipCoverage = \strlen(trim($input->getOption('coverage'))) > 0;
-        $this->eventDispatcher = $this->getContainer()->get('dispatcher');
     }
 
     private function runConfigurationCommand(Locator $locator): void

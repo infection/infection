@@ -94,48 +94,9 @@ class InfectionConfig
         return $excludedPaths;
     }
 
-    private function getExcludes(): array
-    {
-        if (isset($this->config->source->excludes) && \is_array($this->config->source->excludes)) {
-            return $this->config->source->excludes;
-        }
-
-        return self::DEFAULT_EXCLUDE_DIRS;
-    }
-
     public function getLogsTypes(): array
     {
         return (array) ($this->config->logs ?? []);
-    }
-
-    private function getExcludedDirsByPattern(string $originalExcludedDir)
-    {
-        $excludedDirs = [];
-        $srcDirs = $this->getSourceDirs();
-
-        foreach ($srcDirs as $srcDir) {
-            $unpackedPaths = glob(
-                sprintf('%s/%s', $srcDir, $originalExcludedDir),
-                GLOB_ONLYDIR
-            );
-
-            if ($unpackedPaths) {
-                $excludedDirs = array_merge(
-                    $excludedDirs,
-                    array_map(
-                        function ($excludeDir) use ($srcDir) {
-                            return ltrim(
-                                substr_replace($excludeDir, '', 0, \strlen($srcDir)),
-                                \DIRECTORY_SEPARATOR
-                            );
-                        },
-                        $unpackedPaths
-                    )
-                );
-            }
-        }
-
-        return $excludedDirs;
     }
 
     public function getTmpDir(): string
@@ -176,5 +137,44 @@ class InfectionConfig
     public function getTestFrameworkOptions(): string
     {
         return $this->config->testFrameworkOptions ?? '';
+    }
+
+    private function getExcludes(): array
+    {
+        if (isset($this->config->source->excludes) && \is_array($this->config->source->excludes)) {
+            return $this->config->source->excludes;
+        }
+
+        return self::DEFAULT_EXCLUDE_DIRS;
+    }
+
+    private function getExcludedDirsByPattern(string $originalExcludedDir)
+    {
+        $excludedDirs = [];
+        $srcDirs = $this->getSourceDirs();
+
+        foreach ($srcDirs as $srcDir) {
+            $unpackedPaths = glob(
+                sprintf('%s/%s', $srcDir, $originalExcludedDir),
+                GLOB_ONLYDIR
+            );
+
+            if ($unpackedPaths) {
+                $excludedDirs = array_merge(
+                    $excludedDirs,
+                    array_map(
+                        function ($excludeDir) use ($srcDir) {
+                            return ltrim(
+                                substr_replace($excludeDir, '', 0, \strlen($srcDir)),
+                                \DIRECTORY_SEPARATOR
+                            );
+                        },
+                        $unpackedPaths
+                    )
+                );
+            }
+        }
+
+        return $excludedDirs;
     }
 }
