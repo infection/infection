@@ -1,11 +1,8 @@
 <?php
 
-$year = date('Y');
-$header = <<<TXT
-Copyright © 2017-$year Maks Rafalko
+$header = trim('This code is licensed under the BSD 3-Clause License.'.substr(file_get_contents('LICENSE'), strlen('BSD 3-Clause License')));
 
-License: https://opensource.org/licenses/BSD-3-Clause New BSD License
-TXT;
+
 $finder = \PhpCsFixer\Finder::create()
     ->in('src')
     ->in('tests')
