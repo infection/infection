@@ -102,7 +102,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->xmlConfigurationHelper->validate($dom, $xPath);
 
         $this->addCoverageFilterWhitelistIfDoesNotExist($dom, $xPath);
-        $this->addRandomTestsOrderAttributes($version, $xPath);
+        $this->addRandomTestsOrderAttributesIfNotSet($version, $xPath);
         $this->xmlConfigurationHelper->replaceWithAbsolutePaths($xPath);
         $this->xmlConfigurationHelper->setStopOnFailure($xPath);
         $this->xmlConfigurationHelper->deactivateColours($xPath);
@@ -198,25 +198,28 @@ class InitialConfigBuilder implements ConfigBuilder
         return $node;
     }
 
-    private function addRandomTestsOrderAttributes(string $version, \DOMXPath $xPath): void
+    private function addRandomTestsOrderAttributesIfNotSet(string $version, \DOMXPath $xPath): void
     {
         if (!version_compare($version, '7.2', '>=')) {
             return;
         }
 
-        $this->updateOrAddAttribute('executionOrder', 'random', $xPath);
-        $this->updateOrAddAttribute('resolveDependencies', 'true', $xPath);
+        if ($this->addAttributeIfNotSet('executionOrder', 'random', $xPath)) {
+            $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
+        }
     }
 
-    private function updateOrAddAttribute(string $attribute, string $value, \DOMXPath $xPath): void
+    private function addAttributeIfNotSet(string $attribute, string $value, \DOMXPath $xPath): bool
     {
         $nodeList = $xPath->query(sprintf('/phpunit/@%s', $attribute));
 
-        if ($nodeList->length) {
-            $nodeList[0]->nodeValue = $value;
-        } else {
+        if (!$nodeList->length) {
             $node = $xPath->query('/phpunit')[0];
             $node->setAttribute($attribute, $value);
+
+            return true;
         }
+
+        return false;
     }
 }

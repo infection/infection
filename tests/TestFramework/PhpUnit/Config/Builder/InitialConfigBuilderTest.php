@@ -207,6 +207,23 @@ final class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTest
         $this->assertSame($expectedNodeCount, $filterNodes->length);
     }
 
+    public function test_it_does_not_update_order_if_it_is_already_set(): void
+    {
+        $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit_with_order_set.xml';
+        $this->createConfigBuilder($phpunitXmlPath);
+
+        $configurationPath = $this->builder->build('7.2');
+
+        $xml = file_get_contents($configurationPath);
+
+        /** @var \DOMNodeList $filterNodes */
+        $filterNodes = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'executionOrder'));
+        $this->assertSame('reverse', $filterNodes[0]->value);
+
+        $filterNodes = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'resolveDependencies'));
+        $this->assertSame(0, $filterNodes->length);
+    }
+
     public function executionOrderProvider(): \Generator
     {
         yield 'PHPUnit 7.1.99 runs without random test order' => ['7.1.99', 'executionOrder', 0];
