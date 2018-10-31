@@ -49,9 +49,6 @@ class Differ
      */
     private $differ;
 
-    /**
-     * Differ constructor.
-     */
     public function __construct(BaseDiffer $differ)
     {
         $this->differ = $differ;
