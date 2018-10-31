@@ -45,10 +45,6 @@ final class PregQuote extends Mutator
 {
     /**
      * Replaces "$a = preg_quote($b);" with "$a = $b;"
-     *
-     * @param Node $node
-     *
-     * @return mixed
      */
     public function mutate(Node $node)
     {

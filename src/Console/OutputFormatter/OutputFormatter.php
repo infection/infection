@@ -41,16 +41,11 @@ interface OutputFormatter
 {
     /**
      * Triggered when mutation testing is being started
-     *
-     * @param int $mutationCount
      */
     public function start(int $mutationCount);
 
     /**
      * Triggered each time mutation process is finished for one Mutant
-     *
-     * @param MutantProcessInterface $mutantProcess
-     * @param int $mutationCount
      */
     public function advance(MutantProcessInterface $mutantProcess, int $mutationCount);
 

@@ -138,8 +138,6 @@ abstract class AbstractMutatorTestCase extends TestCase
     }
 
     /**
-     * @param string $code
-     *
      * @return SimpleMutation[]
      */
     private function getMutationsFromCode(string $code, Parser $parser): array

@@ -46,7 +46,6 @@ final class ArrayItem extends Mutator
     /**
      * Replaces "[$a->foo => $b->bar]" with "[$a->foo > $b->bar]"
      *
-     * @param Node $node
      *
      * @return Node\Expr\BinaryOp\Greater
      */

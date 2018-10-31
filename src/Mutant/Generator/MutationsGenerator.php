@@ -107,7 +107,6 @@ final class MutationsGenerator
 
     /**
      * @param bool $onlyCovered mutate only covered by tests lines of code
-     * @param string $filter
      * @param NodeVisitorAbstract[] $extraNodeVisitors
      *
      * @return Mutation[]
@@ -134,7 +133,6 @@ final class MutationsGenerator
     }
 
     /**
-     * @param SplFileInfo $file
      * @param bool $onlyCovered mutate only covered by tests lines of code
      * @param NodeVisitorAbstract[] $extraNodeVisitors extra visitors to influence to mutation collection process
      *

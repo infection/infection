@@ -46,7 +46,6 @@ abstract class AbstractCastMutator extends Mutator
     /**
      * Replaces "(cast) $foo;" with "$foo;"
      *
-     * @param Node $node
      *
      * @return Node
      */

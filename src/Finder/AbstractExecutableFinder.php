@@ -43,9 +43,6 @@ abstract class AbstractExecutableFinder
     abstract public function find(): string;
 
     /**
-     * @param array $probableNames
-     * @param array $extraDirectories
-     *
      * @return string|null
      */
     protected function searchNonExecutables(array $probableNames, array $extraDirectories = [])

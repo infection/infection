@@ -46,7 +46,6 @@ final class AssignmentEqual extends Mutator
     /**
      * Replaces "==" with "="
      *
-     * @param Node $node
      *
      * @return Node\Expr\Assign
      */

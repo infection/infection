@@ -125,8 +125,6 @@ AUTOLOAD;
     }
 
     /**
-     * @param array $parsedYaml
-     *
      * @return string|null
      */
     private function getOriginalBootstrapFilePath(array $parsedYaml)

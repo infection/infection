@@ -158,8 +158,6 @@ final class ProjectCodeTest extends TestCase
 
     /**
      * @dataProvider providesSourceClasses
-     *
-     * @param string $className
      */
     public function test_src_class_provider_is_valid(string $className): void
     {
@@ -175,8 +173,6 @@ final class ProjectCodeTest extends TestCase
 
     /**
      * @dataProvider providesTestClassCases
-     *
-     * @param string $className
      */
     public function test_test_class_provider_is_valid(string $className): void
     {
@@ -192,8 +188,6 @@ final class ProjectCodeTest extends TestCase
 
     /**
      * @dataProvider provideConcreteSourceClasses
-     *
-     * @param string $className
      */
     public function test_all_concrete_classes_have_tests(string $className): void
     {
@@ -223,8 +217,6 @@ final class ProjectCodeTest extends TestCase
 
     /**
      * @dataProvider provideNonTestedConcreteClasses
-     *
-     * @param string $className
      */
     public function test_non_tested_concrete_class_list_is_valid(string $className): void
     {
@@ -238,8 +230,6 @@ final class ProjectCodeTest extends TestCase
 
     /**
      * @dataProvider providesSourceClasses
-     *
-     * @param string $className
      */
     public function test_non_extension_points_are_internal(string $className): void
     {
@@ -288,8 +278,6 @@ final class ProjectCodeTest extends TestCase
 
     /**
      * @dataProvider providesSourceClasses
-     *
-     * @param string $className
      */
     public function test_non_extension_points_are_trait_interface_abstract_or_final(string $className): void
     {
@@ -308,8 +296,6 @@ final class ProjectCodeTest extends TestCase
 
     /**
      * @dataProvider provideNonFinalNonExtensionClasses
-     *
-     * @param string $className
      */
     public function test_non_final_non_extension_list_is_valid(string $className): void
     {
@@ -327,8 +313,6 @@ final class ProjectCodeTest extends TestCase
 
     /**
      * @dataProvider providesSourceClasses
-     *
-     * @param string $className
      */
     public function test_src_classes_do_not_expose_public_properties(string $className): void
     {
@@ -386,8 +370,6 @@ final class ProjectCodeTest extends TestCase
 
     /**
      * @dataProvider providesTestClassCases
-     *
-     * @param string $className
      */
     public function test_all_test_classes_are_trait_abstract_or_final(string $className): void
     {
@@ -401,8 +383,6 @@ final class ProjectCodeTest extends TestCase
 
     /**
      * @dataProvider providesTestClassCases
-     *
-     * @param string $className
      */
     public function test_all_test_classes_are_marked_internal(string $className): void
     {

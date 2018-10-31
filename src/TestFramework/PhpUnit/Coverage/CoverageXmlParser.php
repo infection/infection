@@ -52,11 +52,6 @@ class CoverageXmlParser
         $this->coverageDir = $coverageDir;
     }
 
-    /**
-     * @param string $coverageXmlContent
-     *
-     * @return array
-     */
     public function parse(string $coverageXmlContent): array
     {
         $dom = new \DOMDocument();
@@ -79,12 +74,6 @@ class CoverageXmlParser
         return array_merge(...$coverage);
     }
 
-    /**
-     * @param string $relativeCoverageFilePath
-     * @param string $projectSource
-     *
-     * @return array
-     */
     private function processXmlFileCoverage(string $relativeCoverageFilePath, string $projectSource): array
     {
         $absolutePath = realpath($this->coverageDir . '/' . $relativeCoverageFilePath);
@@ -131,10 +120,6 @@ class CoverageXmlParser
 
     /**
      * Remove namespace to work with xPath without a headache
-     *
-     * @param string $xml
-     *
-     * @return string
      */
     private function removeNamespace(string $xml): string
     {
@@ -142,12 +127,6 @@ class CoverageXmlParser
     }
 
     /**
-     * @param \DOMXPath $xPath
-     * @param string $relativeCoverageFilePath
-     * @param string $projectSource
-     *
-     * @return string
-     *
      * @throws \Exception
      */
     private function getSourceFilePath(\DOMXPath $xPath, string $relativeCoverageFilePath, string $projectSource): string

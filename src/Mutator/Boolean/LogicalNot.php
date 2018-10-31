@@ -45,10 +45,6 @@ final class LogicalNot extends Mutator
 {
     /**
      * Replaces "!something" with "something"
-     *
-     * @param Node $node
-     *
-     * @return mixed
      */
     public function mutate(Node $node)
     {

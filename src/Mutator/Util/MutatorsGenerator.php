@@ -93,7 +93,6 @@ final class MutatorsGenerator
     }
 
     /**
-     * @param string $profile
      * @param array|bool $setting
      *
      * @throws InvalidConfigException
@@ -120,7 +119,6 @@ final class MutatorsGenerator
     }
 
     /**
-     * @param string $mutator
      * @param array|bool|\stdClass $setting
      */
     private function registerFromClass(string $mutator, $setting): void
@@ -137,7 +135,6 @@ final class MutatorsGenerator
     }
 
     /**
-     * @param string $mutator
      * @param array|bool $setting
      *
      * @throws InvalidConfigException
@@ -152,8 +149,6 @@ final class MutatorsGenerator
     }
 
     /**
-     * @param array $mutators
-     *
      * @return Mutator[]
      */
     private function createFromList(array $mutators): array

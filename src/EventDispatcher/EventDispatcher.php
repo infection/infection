@@ -68,8 +68,6 @@ final class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @param string $eventName
-     *
      * @return callable[]
      */
     private function getListeners(string $eventName): array

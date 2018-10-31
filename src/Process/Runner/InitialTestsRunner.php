@@ -59,9 +59,6 @@ final class InitialTestsRunner
 
     /**
      * InitialTestsRunner constructor.
-     *
-     * @param ProcessBuilder $processBuilder
-     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(ProcessBuilder $processBuilder, EventDispatcherInterface $eventDispatcher)
     {

@@ -47,7 +47,6 @@ final class FloatNegation extends Mutator
      * Replaces any float with negated float
      * Replaces "-33.4" with "33.4"
      *
-     * @param Node $node
      *
      * @return Node\Stmt\Return_
      */

@@ -47,7 +47,6 @@ final class Plus extends Mutator
     /**
      * Replaces "+" with "-"
      *
-     * @param Node $node
      *
      * @return Node\Expr\BinaryOp\Minus
      */

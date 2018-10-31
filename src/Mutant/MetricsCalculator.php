@@ -151,8 +151,6 @@ class MetricsCalculator
 
     /**
      * Mutation Score Indicator (MSI)
-     *
-     * @return float
      */
     public function getMutationScoreIndicator(): float
     {
@@ -168,8 +166,6 @@ class MetricsCalculator
 
     /**
      * Mutation coverage percentage
-     *
-     * @return float
      */
     public function getCoverageRate(): float
     {
@@ -196,41 +192,26 @@ class MetricsCalculator
         return $detectionRateTested;
     }
 
-    /**
-     * @return int
-     */
     public function getKilledCount(): int
     {
         return $this->killedCount;
     }
 
-    /**
-     * @return int
-     */
     public function getEscapedCount(): int
     {
         return $this->escapedCount;
     }
 
-    /**
-     * @return int
-     */
     public function getTimedOutCount(): int
     {
         return $this->timedOutCount;
     }
 
-    /**
-     * @return int
-     */
     public function getNotCoveredByTestsCount(): int
     {
         return $this->notCoveredByTestsCount;
     }
 
-    /**
-     * @return int
-     */
     public function getTotalMutantsCount(): int
     {
         return $this->totalMutantsCount;

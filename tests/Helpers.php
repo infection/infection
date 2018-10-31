@@ -39,10 +39,6 @@ namespace Infection\Tests;
  * @internal
  *
  * Normalizes path. Replaces backslashes with forward ones
- *
- * @param string $value
- *
- * @return string
  */
 function normalizePath(string $value): string
 {

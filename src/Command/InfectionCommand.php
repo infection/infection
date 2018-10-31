@@ -290,8 +290,6 @@ final class InfectionCommand extends BaseCommand
     /**
      * Run configuration command if config does not exist
      *
-     * @param InputInterface $input
-     * @param OutputInterface $output
      *
      * @throws InfectionException
      */

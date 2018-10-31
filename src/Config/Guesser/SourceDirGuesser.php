@@ -95,7 +95,6 @@ class SourceDirGuesser implements Guesser
 
     /**
      * @param array|string $path
-     * @param array        $dirs
      */
     private function parsePath($path, array &$dirs): void
     {

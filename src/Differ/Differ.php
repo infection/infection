@@ -51,8 +51,6 @@ class Differ
 
     /**
      * Differ constructor.
-     *
-     * @param BaseDiffer $differ
      */
     public function __construct(BaseDiffer $differ)
     {
@@ -66,8 +64,6 @@ class Differ
      *
      * @param array|string $from
      * @param array|string $to
-     *
-     * @return string
      */
     public function diff($from, $to): string
     {

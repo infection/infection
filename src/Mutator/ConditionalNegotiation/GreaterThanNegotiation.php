@@ -46,7 +46,6 @@ final class GreaterThanNegotiation extends Mutator
     /**
      * Replaces ">" with "<="
      *
-     * @param Node $node
      *
      * @return Node\Expr\BinaryOp\SmallerOrEqual
      */

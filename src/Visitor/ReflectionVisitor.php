@@ -126,10 +126,6 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
     /**
      * Recursively determine whether the node is inside the function
-     *
-     * @param Node $node
-     *
-     * @return bool
      */
     private function isInsideFunction(Node $node): bool
     {

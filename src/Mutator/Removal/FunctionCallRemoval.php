@@ -46,7 +46,6 @@ final class FunctionCallRemoval extends Mutator
     /**
      * Replaces "doSmth()" with ""
      *
-     * @param Node $node
      *
      * @return Node\Stmt\Nop()
      */

@@ -46,7 +46,6 @@ final class OneZeroInteger extends Mutator
     /**
      * Replaces "0" with "1" or "1" with "0"
      *
-     * @param Node $node
      *
      * @return Node\Scalar\LNumber
      */

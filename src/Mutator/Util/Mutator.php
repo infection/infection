@@ -51,8 +51,6 @@ abstract class Mutator
     }
 
     /**
-     * @param Node $node
-     *
      * @return Node|Node[]|\Generator
      */
     abstract public function mutate(Node $node);

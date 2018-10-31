@@ -105,10 +105,6 @@ abstract class AbstractTestFrameworkAdapter
     /**
      * Returns array of arguments to pass them into the Symfony Process
      *
-     * @param string $configPath
-     * @param string $extraOptions
-     * @param bool $includePhpArgs
-     * @param array $phpExtraArgs
      *
      * @return string[]
      */
@@ -184,7 +180,6 @@ abstract class AbstractTestFrameworkAdapter
     /**
      * Need to return string for cases when user run phpdbg with -qrr argument.s
      *
-     * @param bool $includeArgs
      *
      * @return string[]
      */

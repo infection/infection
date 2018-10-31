@@ -46,7 +46,6 @@ final class MinusEqual extends Mutator
     /**
      * Replaces "-=" with "+="
      *
-     * @param Node $node
      *
      * @return Node\Expr\AssignOp\Plus
      */

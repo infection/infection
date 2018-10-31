@@ -47,7 +47,6 @@ final class IntegerNegation extends Mutator
      * Replaces any integer with negated integer value.
      * Replaces "-5" with "5"
      *
-     * @param Node $node
      *
      * @return Node\Stmt\Return_
      */
