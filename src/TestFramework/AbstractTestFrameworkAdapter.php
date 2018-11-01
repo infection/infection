@@ -125,9 +125,6 @@ abstract class AbstractTestFrameworkAdapter
     /**
      * Returns array of arguments to pass them into the Mutant Symfony Process
      *
-     * @param string $configPath
-     * @param string $extraOptions
-     *
      * @return string[]
      */
     public function getMutantCommandLine(string $configPath, string $extraOptions): array
@@ -136,11 +133,6 @@ abstract class AbstractTestFrameworkAdapter
     }
 
     /**
-     * @param string $configPath
-     * @param string $extraOptions
-     * @param bool $includePhpArgs
-     * @param array $phpExtraArgs
-     *
      * @return string[]
      */
     public function getCommandLine(
