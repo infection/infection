@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
+use PhpParser\Node;
+
 /**
  * @internal
  */
@@ -45,8 +47,8 @@ final class UnwrapArrayReduce extends AbstractUnwrapMutator
         return 'array_reduce';
     }
 
-    protected function getParameterIndex(): int
+    protected function getParameterIndex(Node $node): \Generator
     {
-        return 2;
+        yield 2;
     }
 }

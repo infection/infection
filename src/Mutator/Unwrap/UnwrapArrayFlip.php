@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
+use PhpParser\Node;
+
 /**
  * @internal
  */
@@ -45,8 +47,8 @@ final class UnwrapArrayFlip extends AbstractUnwrapMutator
         return 'array_flip';
     }
 
-    protected function getParameterIndex(): int
+    protected function getParameterIndex(Node $node): \Generator
     {
-        return 0;
+        yield 0;
     }
 }
