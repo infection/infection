@@ -55,9 +55,6 @@ final class MemoryFormatterTest extends TestCase
 
     /**
      * @dataProvider bytesProvider
-     *
-     * @param float $bytes
-     * @param string $expectedString
      */
     public function test_it_converts_bytes_to_string(float $bytes, string $expectedString): void
     {

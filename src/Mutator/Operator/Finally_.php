@@ -47,7 +47,6 @@ final class Finally_ extends Mutator
     /**
      * Removes "finally{}" blocks
      *
-     * @param Node $node
      *
      * @return Node\Stmt\Nop
      */

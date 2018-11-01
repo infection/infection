@@ -59,9 +59,6 @@ final class TextFileLogger extends FileLogger
 
     /**
      * @param MutantProcessInterface[] $processes
-     * @param string $headlinePrefix
-     *
-     * @return string
      */
     private function getLogParts(array $processes, string $headlinePrefix): string
     {

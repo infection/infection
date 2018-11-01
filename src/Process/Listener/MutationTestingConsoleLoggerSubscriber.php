@@ -142,7 +142,6 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInt
 
     /**
      * @param MutantProcessInterface[] $processes
-     * @param string $headlinePrefix
      */
     private function showMutations(array $processes, string $headlinePrefix): void
     {

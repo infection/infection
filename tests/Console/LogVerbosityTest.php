@@ -56,9 +56,6 @@ final class LogVerbosityTest extends MockeryTestCase
 
     /**
      * @dataProvider provideConvertedLogVerbosity
-     *
-     * @param int $input
-     * @param string $output
      */
     public function test_it_converts_int_version_to_string_version_of_verbosity(int $input, string $output): void
     {
@@ -123,7 +120,6 @@ final class LogVerbosityTest extends MockeryTestCase
 
     /**
      * @param string|int $input
-     * @param string $output
      *
      * @return InputInterface|Mockery\MockInterface
      */

@@ -45,10 +45,6 @@ final class MutatorConfigTest extends TestCase
 {
     /**
      * @dataProvider providesIgnoredValues
-     *
-     * @param array $ignored
-     * @param string $class
-     * @param string $method
      */
     public function test_is_ignored_returns_true_if_there_is_a_match(array $ignored, string $class, string $method): void
     {
@@ -92,10 +88,6 @@ final class MutatorConfigTest extends TestCase
 
     /**
      * @dataProvider providesNotIgnoredValues
-     *
-     * @param array $ignored
-     * @param string $class
-     * @param string $method
      */
     public function test_is_ignored_returns_false_if_there_is_no_match(array $ignored, string $class, string $method): void
     {

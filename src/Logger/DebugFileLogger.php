@@ -73,9 +73,6 @@ final class DebugFileLogger extends FileLogger
 
     /**
      * @param MutantProcessInterface[] $processes
-     * @param string $headlinePrefix
-     *
-     * @return string
      */
     private function convertProcess(array $processes, string $headlinePrefix): string
     {

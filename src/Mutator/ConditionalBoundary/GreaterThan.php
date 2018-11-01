@@ -46,7 +46,6 @@ final class GreaterThan extends Mutator
     /**
      * Replaces ">" with ">="
      *
-     * @param Node $node
      *
      * @return Node\Expr\BinaryOp\GreaterOrEqual
      */

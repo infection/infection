@@ -46,7 +46,6 @@ final class IncrementInteger extends Mutator
     /**
      * Increments an integer by 1
      *
-     * @param Node $node
      *
      * @return Node\Scalar\LNumber
      */

@@ -55,9 +55,6 @@ final class TimeFormatterTest extends TestCase
 
     /**
      * @dataProvider secondsProvider
-     *
-     * @param float $seconds
-     * @param string $expectedString
      */
     public function test_it_converts_seconds_to_seconds_string(float $seconds, string $expectedString): void
     {
@@ -85,9 +82,6 @@ final class TimeFormatterTest extends TestCase
 
     /**
      * @dataProvider minutesProvider
-     *
-     * @param float $seconds
-     * @param string $expectedString
      */
     public function test_it_converts_seconds_to_minutes_string(float $seconds, string $expectedString): void
     {
@@ -111,9 +105,6 @@ final class TimeFormatterTest extends TestCase
 
     /**
      * @dataProvider minutesProvider
-     *
-     * @param float $seconds
-     * @param string $expectedString
      */
     public function test_it_converts_seconds_to_hours_string(float $seconds, string $expectedString): void
     {

@@ -46,7 +46,6 @@ final class Coalesce extends Mutator
     /**
      * Replaces "'someValue' ?? 'otherValue';" with "'otherValue'"
      *
-     * @param Node $node
      *
      * @return Node\Expr\BinaryOp\Coalesce
      */

@@ -52,7 +52,6 @@ final class PublicVisibility extends Mutator
     /**
      * Replaces "public function..." with "protected function ..."
      *
-     * @param Node $node
      *
      * @return ClassMethod
      */

@@ -53,8 +53,6 @@ final class MutatorTest extends TestCase
 {
     /**
      * @dataProvider providesMutatorClasses
-     *
-     * @param string $className
      */
     public function test_mutator_class_provider_is_valid(string $className): void
     {
@@ -70,8 +68,6 @@ final class MutatorTest extends TestCase
 
     /**
      * @dataProvider providesMutatorClasses
-     *
-     * @param string $className
      */
     public function test_mutators_do_not_declare_public_methods(string $className): void
     {
@@ -89,8 +85,6 @@ final class MutatorTest extends TestCase
 
     /**
      * @dataProvider provideConcreteMutatorClasses
-     *
-     * @param string $className
      */
     public function test_mutators_have_tests(string $className): void
     {

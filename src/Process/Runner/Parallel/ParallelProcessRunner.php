@@ -72,8 +72,6 @@ final class ParallelProcessRunner
 
     /**
      * @param MutantProcessInterface[] $processes
-     * @param int $threadCount
-     * @param int $poll
      *
      * @throws RuntimeException
      * @throws LogicException

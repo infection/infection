@@ -46,7 +46,6 @@ final class This extends AbstractValueToNullReturnValue
     /**
      * Replaces "return $this;" with "return null;"
      *
-     * @param Node $node
      *
      * @return Node\Stmt\Return_
      */

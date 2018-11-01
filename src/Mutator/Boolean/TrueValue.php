@@ -46,7 +46,6 @@ final class TrueValue extends Mutator
     /**
      * Replaces "true" with "false"
      *
-     * @param Node $node
      *
      * @return Node\Expr\ConstFetch
      */

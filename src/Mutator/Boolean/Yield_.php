@@ -46,7 +46,6 @@ final class Yield_ extends Mutator
     /**
      * Replaces "yield $a => $b;" with "yield $a > $b;"
      *
-     * @param Node $node
      *
      * @return Node|Node\Expr\Yield_
      */

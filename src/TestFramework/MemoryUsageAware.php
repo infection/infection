@@ -42,10 +42,6 @@ interface MemoryUsageAware
 {
     /**
      * Reports memory used by a test suite, or -1 if it cant detect the memory usage.
-     *
-     * @param string $output
-     *
-     * @return float
      */
     public function getMemoryUsed(string $output): float;
 }

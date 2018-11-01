@@ -49,7 +49,6 @@ final class DecrementInteger extends Mutator
     /**
      * Decrements an integer by 1
      *
-     * @param Node $node
      *
      * @return Node\Scalar\LNumber
      */

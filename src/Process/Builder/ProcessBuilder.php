@@ -64,12 +64,6 @@ class ProcessBuilder
 
     /**
      * Creates process with enabled debugger as test framework is going to use in the code coverage.
-     *
-     * @param string $testFrameworkExtraOptions
-     * @param bool $skipCoverage
-     * @param array $phpExtraOptions
-     *
-     * @return Process
      */
     public function getProcessForInitialTestRun(
         string $testFrameworkExtraOptions,

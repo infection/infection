@@ -46,7 +46,6 @@ final class NewObject extends AbstractValueToNullReturnValue
     /**
      * Replaces "return new Something(anything);" with "new Something(anything); return null;"
      *
-     * @param Node $node
      *
      * @return Node[]
      */

@@ -44,9 +44,6 @@ final class PregMatchMatchesTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider providesMutatorCases
-     *
-     * @param string $input
-     * @param string|null $output
      */
     public function test_mutator(string $input, string $output = null): void
     {
