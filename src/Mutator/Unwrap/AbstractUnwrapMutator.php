@@ -50,12 +50,14 @@ abstract class AbstractUnwrapMutator extends Mutator
      */
     final public function mutate(Node $node)
     {
-        return $node->args[$this->getParameterIndex()];
+        foreach ($this->getParameterIndex($node) as $index) {
+            yield $node->args[$index];
+        }
     }
 
     abstract protected function getFunctionName(): string;
 
-    abstract protected function getParameterIndex(): int;
+    abstract protected function getParameterIndex(Node $node): \Generator;
 
     final protected function mutatesNode(Node $node): bool
     {
@@ -63,8 +65,10 @@ abstract class AbstractUnwrapMutator extends Mutator
             return false;
         }
 
-        if (!array_key_exists($this->getParameterIndex(), $node->args)) {
-            return false;
+        foreach ($this->getParameterIndex($node) as $index) {
+            if (!array_key_exists($index, $node->args)) {
+                return false;
+            }
         }
 
         return $node->name->toLowerString() === strtolower($this->getFunctionName());

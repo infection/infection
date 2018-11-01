@@ -35,35 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
-use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class UnwrapArrayReplace extends Mutator
+final class UnwrapArrayReplace extends AbstractUnwrapMutator
 {
-    /**
-     * Replaces "$a = array_replace($array1, $array1);" with
-     *
-     * - "$a = $array1;
-     * - "$a = $array2;
-     *
-     * @return Node\Param;
-     */
-    public function mutate(Node $node)
+    protected function getFunctionName(): string
     {
-        foreach ($node->args as $arg) {
-            yield $arg;
-        }
+        return 'array_replace';
     }
 
-    protected function mutatesNode(Node $node): bool
+    protected function getParameterIndex(Node $node): \Generator
     {
-        if (!$node instanceof Node\Expr\FuncCall) {
-            return false;
-        }
-
-        return $node->name->toLowerString() === 'array_replace';
+        yield from array_keys($node->args);
     }
 }
