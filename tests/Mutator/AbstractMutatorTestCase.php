@@ -78,7 +78,11 @@ abstract class AbstractMutatorTestCase extends TestCase
 
         $mutants = $this->mutate($inputCode);
 
-        $this->assertSame(\count($mutants), \count($expectedCodeSamples));
+        $this->assertSame(\count($mutants), \count($expectedCodeSamples), sprintf(
+            'Failed asserting that the number of code samples (%d) equals the number of mutants (%d) created by the mutator.',
+            \count($expectedCodeSamples),
+            \count($mutants)
+        ));
 
         if ($expectedCode !== null) {
             foreach ($mutants as $realMutatedCode) {
