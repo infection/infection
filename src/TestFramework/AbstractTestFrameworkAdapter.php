@@ -84,6 +84,11 @@ abstract class AbstractTestFrameworkAdapter
      */
     private $cachedIncludedArgs;
 
+    /**
+     * @var string|null
+     */
+    private $cachedVersion;
+
     public function __construct(
         AbstractExecutableFinder $testFrameworkFinder,
         InitialConfigBuilder $initialConfigBuilder,
@@ -103,9 +108,31 @@ abstract class AbstractTestFrameworkAdapter
     abstract public function getName(): string;
 
     /**
-     * Returns array of arguments to pass them into the Symfony Process
+     * Returns array of arguments to pass them into the Initial Run Symfony Process
      *
      *
+     * @return string[]
+     */
+    public function getInitialTestRunCommandLine(
+        string $configPath,
+        string $extraOptions,
+        bool $includePhpArgs,
+        array $phpExtraArgs
+    ): array {
+        return $this->getCommandLine($configPath, $extraOptions, $includePhpArgs, $phpExtraArgs);
+    }
+
+    /**
+     * Returns array of arguments to pass them into the Mutant Symfony Process
+     *
+     * @return string[]
+     */
+    public function getMutantCommandLine(string $configPath, string $extraOptions): array
+    {
+        return $this->getCommandLine($configPath, $extraOptions);
+    }
+
+    /**
      * @return string[]
      */
     public function getCommandLine(
@@ -151,7 +178,7 @@ abstract class AbstractTestFrameworkAdapter
 
     public function buildInitialConfigFile(): string
     {
-        return $this->initialConfigBuilder->build();
+        return $this->initialConfigBuilder->build($this->getVersion());
     }
 
     public function buildMutationConfigFile(MutantInterface $mutant): string
@@ -161,6 +188,10 @@ abstract class AbstractTestFrameworkAdapter
 
     public function getVersion(): string
     {
+        if ($this->cachedVersion !== null) {
+            return $this->cachedVersion;
+        }
+
         $frameworkPath = $this->testFrameworkFinder->find();
         $phpIfNeeded = $this->isBatchFile($frameworkPath) ? [] : $this->findPhp();
 
@@ -174,7 +205,22 @@ abstract class AbstractTestFrameworkAdapter
 
         $process->mustRun();
 
-        return $this->versionParser->parse($process->getOutput());
+        $version = null;
+
+        try {
+            $version = $this->versionParser->parse($process->getOutput());
+        } catch (\InvalidArgumentException $e) {
+            $version = 'unknown';
+        } finally {
+            $this->cachedVersion = $version;
+        }
+
+        return $this->cachedVersion;
+    }
+
+    public function getInitialTestsFailRecommendations(string $commandLine): string
+    {
+        return sprintf('Check the executed command to identify the problem: %s', $commandLine);
     }
 
     /**

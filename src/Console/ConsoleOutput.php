@@ -38,6 +38,7 @@ namespace Infection\Console;
 use Infection\Mutant\Exception\MsiCalculationException;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Runner\TestRunConstraintChecker;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Process;
 
@@ -69,15 +70,18 @@ final class ConsoleOutput
         $this->io->note('Numeric versions of log-verbosity have been deprecated, please use, ' . $valueToUse . ' to keep the same result');
     }
 
-    public function logUnkownVerbosityOption(string $default): void
+    public function logUnknownVerbosityOption(string $default): void
     {
         $this->io->note('Running infection with an unknown log-verbosity option, falling back to ' . $default . ' option');
     }
 
-    public function logInitialTestsDoNotPass(Process $initialTestSuitProcess, string $testFrameworkKey): void
+    public function logInitialTestsDoNotPass(Process $initialTestSuitProcess, AbstractTestFrameworkAdapter $testFrameworkAdapter): void
     {
+        $testFrameworkKey = $testFrameworkAdapter->getName();
+
         $lines = [
             'Project tests must be in a passing state before running Infection.',
+            $testFrameworkAdapter->getInitialTestsFailRecommendations($initialTestSuitProcess->getCommandLine()),
             sprintf(
                 '%s reported an exit code of %d.',
                 $testFrameworkKey,

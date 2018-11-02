@@ -38,6 +38,7 @@ namespace Infection\Tests\Console;
 use Infection\Console\ConsoleOutput;
 use Infection\Mutant\Exception\MsiCalculationException;
 use Infection\Mutant\MetricsCalculator;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Process;
@@ -70,21 +71,26 @@ final class ConsoleOutputTest extends TestCase
             );
 
         $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logUnkownVerbosityOption($option);
+        $consoleOutput->logUnknownVerbosityOption($option);
     }
 
     public function test_log_initial_tests_do_not_pass(): void
     {
-        $testFrameworkKey = 'phpunit';
         $process = $this->createMock(Process::class);
         $process->expects($this->once())->method('getExitCode')->willReturn(0);
         $process->expects($this->once())->method('getOutput')->willReturn('output string');
         $process->expects($this->once())->method('getErrorOutput')->willReturn('error string');
+        $process->expects($this->once())->method('getCommandLine')->willReturn('vendor/bin/phpunit --order=random');
+
+        $testFrameworkAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $testFrameworkAdapter->expects($this->once())->method('getName')->willReturn('phpunit');
+        $testFrameworkAdapter->expects($this->once())->method('getInitialTestsFailRecommendations')->willReturn('-');
 
         $io = $this->createMock(SymfonyStyle::class);
         $io->expects($this->once())->method('error')->with(
             [
                 'Project tests must be in a passing state before running Infection.',
+                '-',
                 'phpunit reported an exit code of 0.',
                 'Refer to the phpunit\'s output below:',
                 'STDOUT:',
@@ -95,7 +101,7 @@ final class ConsoleOutputTest extends TestCase
         );
 
         $console = new ConsoleOutput($io);
-        $console->logInitialTestsDoNotPass($process, $testFrameworkKey);
+        $console->logInitialTestsDoNotPass($process, $testFrameworkAdapter);
     }
 
     public function test_log_bad_msi_error_message(): void

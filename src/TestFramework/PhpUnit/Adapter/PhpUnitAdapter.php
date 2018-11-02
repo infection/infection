@@ -91,4 +91,21 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
     {
         return 'PHPUnit';
     }
+
+    public function getInitialTestsFailRecommendations(string $commandLine): string
+    {
+        $recommendations = parent::getInitialTestsFailRecommendations($commandLine);
+
+        if (version_compare($this->getVersion(), '7.2', '>=')) {
+            $recommendations = sprintf(
+                "%s\n\n%s\n\n%s",
+                "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n" .
+                'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="random" resolveDependencies="true" ...',
+                'If you don\'t want to let Infection run tests in a random order, set the `executionOrder` to some value, for example <phpunit executionOrder="default"',
+                parent::getInitialTestsFailRecommendations($commandLine)
+            );
+        }
+
+        return $recommendations;
+    }
 }
