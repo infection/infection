@@ -192,6 +192,7 @@ final class MutatorProfile
         Mutator\Unwrap\UnwrapArrayMap::class,
         Mutator\Unwrap\UnwrapArrayReduce::class,
         Mutator\Unwrap\UnwrapArrayReverse::class,
+        Mutator\Unwrap\UnwrapStrRepeat::class,
     ];
 
     public const DEFAULT = [
