@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "7a4d3bb344d2a8b1dab2f9446e3e608a",
+    "content-hash": "6a2d6f87f34b1f2d77b2e87d25de9a65",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -104,7 +104,7 @@
                 "Xdebug",
                 "performance"
             ],
-            "time": "2018-08-31T19:07:57+00:00"
+            "time": "2018-08-31T19:20:00+00:00"
         },
         {
             "name": "nikic/php-parser",
