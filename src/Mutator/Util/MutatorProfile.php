@@ -148,6 +148,7 @@ final class MutatorProfile
         Mutator\Operator\Continue_::class,
         Mutator\Operator\Throw_::class,
         Mutator\Operator\Coalesce::class,
+        Mutator\Operator\Finally_::class,
     ];
 
     public const REGEX = [
