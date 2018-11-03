@@ -86,9 +86,9 @@ final class MutatorProfile
         Mutator\Arithmetic\Plus::class,
         Mutator\Arithmetic\PlusEqual::class,
         Mutator\Arithmetic\PowEqual::class,
+        Mutator\Arithmetic\RoundingFamily::class,
         Mutator\Arithmetic\ShiftLeft::class,
         Mutator\Arithmetic\ShiftRight::class,
-        Mutator\Arithmetic\RoundingFamily::class,
     ];
 
     public const BOOLEAN = [
@@ -122,13 +122,13 @@ final class MutatorProfile
     ];
 
     public const EQUAL = [
-        Mutator\Boolean\NotIdenticalNotEqual::class,
         Mutator\Boolean\IdenticalEqual::class,
+        Mutator\Boolean\NotIdenticalNotEqual::class,
     ];
 
     public const FUNCTION_SIGNATURE = [
-        Mutator\FunctionSignature\PublicVisibility::class,
         Mutator\FunctionSignature\ProtectedVisibility::class,
+        Mutator\FunctionSignature\PublicVisibility::class,
     ];
 
     public const IDENTICAL = [
@@ -139,21 +139,21 @@ final class MutatorProfile
     public const NUMBER = [
         Mutator\Number\DecrementInteger::class,
         Mutator\Number\IncrementInteger::class,
-        Mutator\Number\OneZeroInteger::class,
         Mutator\Number\OneZeroFloat::class,
+        Mutator\Number\OneZeroInteger::class,
     ];
 
     public const OPERATOR = [
         Mutator\Operator\Break_::class,
-        Mutator\Operator\Continue_::class,
-        Mutator\Operator\Throw_::class,
         Mutator\Operator\Coalesce::class,
+        Mutator\Operator\Continue_::class,
         Mutator\Operator\Finally_::class,
+        Mutator\Operator\Throw_::class,
     ];
 
     public const REGEX = [
-        Mutator\Regex\PregQuote::class,
         Mutator\Regex\PregMatchMatches::class,
+        Mutator\Regex\PregQuote::class,
     ];
 
     public const REMOVAL = [
@@ -174,8 +174,8 @@ final class MutatorProfile
     ];
 
     public const ZERO_ITERATION = [
-        Mutator\ZeroIteration\Foreach_::class,
         Mutator\ZeroIteration\For_::class,
+        Mutator\ZeroIteration\Foreach_::class,
     ];
 
     public const CAST = [
