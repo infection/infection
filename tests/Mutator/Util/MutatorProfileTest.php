@@ -62,15 +62,7 @@ final class MutatorProfileTest extends TestCase
 
     public function test_all_mutators_are_part_of_the_full_mutators_list(): void
     {
-        /** @var Finder $files */
-        $files = Finder::create()
-            ->name('*.php')
-            ->in('src/Mutator')
-            ->exclude('Util')
-            ->notName('/Abstract.*/')
-            ->files();
-
-        foreach ($files as $file) {
+        foreach ($this->getMutatorFiles() as $file) {
             $class = substr($file->getFilename(), 0, -4);
 
             $this->assertArrayHasKey(
@@ -84,5 +76,61 @@ final class MutatorProfileTest extends TestCase
                 )
             );
         }
+    }
+
+    public function test_all_mutators_are_part_of_at_least_one_profile(): void
+    {
+        $reflectionClass = new \ReflectionClass(MutatorProfile::class);
+        $excludedConstants = ['MUTATOR_PROFILE_LIST', 'DEFAULT', 'FULL_MUTATOR_LIST'];
+
+        $profileConstants = array_filter(
+            $reflectionClass->getConstants(),
+            function (string $constantName) use ($excludedConstants): bool {
+                return !\in_array($constantName, $excludedConstants, true);
+            },
+            ARRAY_FILTER_USE_KEY
+        );
+
+        foreach ($this->getMutatorFiles() as $file) {
+            $className = substr($file->getFilename(), 0, -4);
+            $relativeClassName = str_replace(
+                '/',
+                '\\',
+                substr($file->getRelativePathname(), 0, -4)
+            );
+
+            $this->assertTrue(
+                $this->isMutatorInAtLeastOneProfile($relativeClassName, $profileConstants),
+                sprintf(
+                    'The mutator "%s" located in "%s" has not been added to any profile in the MutatorProfile class. ' .
+                    'Please add it to ensure it can be used.',
+                    $className,
+                    $file->getPath()
+                )
+            );
+        }
+    }
+
+    private function getMutatorFiles(): Finder
+    {
+        return Finder::create()
+            ->name('*.php')
+            ->in('src/Mutator')
+            ->exclude('Util')
+            ->notName('/Abstract.*/')
+            ->files();
+    }
+
+    private function isMutatorInAtLeastOneProfile(string $relativeClassName, array $profiles): bool
+    {
+        foreach ($profiles as $mutatorsInProfile) {
+            $fqcn = sprintf('Infection\\Mutator\\%s', $relativeClassName);
+
+            if (\in_array($fqcn, $mutatorsInProfile, true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
