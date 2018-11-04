@@ -80,16 +80,7 @@ final class MutatorProfileTest extends TestCase
 
     public function test_all_mutators_are_part_of_at_least_one_profile(): void
     {
-        $reflectionClass = new \ReflectionClass(MutatorProfile::class);
-        $excludedConstants = ['MUTATOR_PROFILE_LIST', 'DEFAULT', 'FULL_MUTATOR_LIST'];
-
-        $profileConstants = array_filter(
-            $reflectionClass->getConstants(),
-            function (string $constantName) use ($excludedConstants): bool {
-                return !\in_array($constantName, $excludedConstants, true);
-            },
-            ARRAY_FILTER_USE_KEY
-        );
+        $profileConstants = $this->getMutatorProfileConstants();
 
         foreach ($this->getMutatorFiles() as $file) {
             $className = substr($file->getFilename(), 0, -4);
@@ -111,6 +102,31 @@ final class MutatorProfileTest extends TestCase
         }
     }
 
+    /**
+     * @dataProvider providerMutatorProfile
+     */
+    public function test_all_mutator_profiles_are_sorted(string $name, array $mutators): void
+    {
+        $sorted = $mutators;
+
+        sort($sorted);
+
+        $this->assertSame($sorted, $mutators, sprintf(
+            'Failed asserting that mutators listed in profile "%s" are sorted by name, please sort them.',
+            $name
+        ));
+    }
+
+    public function providerMutatorProfile(): \Generator
+    {
+        foreach ($this->getMutatorProfileConstants() as $name => $mutators) {
+            yield $name => [
+                $name,
+                $mutators,
+            ];
+        }
+    }
+
     private function getMutatorFiles(): Finder
     {
         return Finder::create()
@@ -119,6 +135,20 @@ final class MutatorProfileTest extends TestCase
             ->exclude('Util')
             ->notName('/Abstract.*/')
             ->files();
+    }
+
+    private function getMutatorProfileConstants(): array
+    {
+        $reflectionClass = new \ReflectionClass(MutatorProfile::class);
+        $excludedConstants = ['MUTATOR_PROFILE_LIST', 'DEFAULT', 'FULL_MUTATOR_LIST'];
+
+        return array_filter(
+            $reflectionClass->getConstants(),
+            function (string $constantName) use ($excludedConstants): bool {
+                return !\in_array($constantName, $excludedConstants, true);
+            },
+            ARRAY_FILTER_USE_KEY
+        );
     }
 
     private function isMutatorInAtLeastOneProfile(string $relativeClassName, array $profiles): bool
