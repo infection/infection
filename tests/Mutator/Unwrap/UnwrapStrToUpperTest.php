@@ -52,17 +52,17 @@ final class UnwrapStrToUpperTest extends AbstractMutatorTestCase
 
     public function provideMutationCases(): \Generator
     {
-        yield 'It mutates correctly when provided with an array' => [
+        yield 'It mutates correctly when provided with an string' => [
             <<<'PHP'
 <?php
 
-$a = strtoupper(['A', 1, 'C']);
+$a = strtoupper('infection');
 PHP
             ,
             <<<'PHP'
 <?php
 
-$a = ['A', 1, 'C'];
+$a = 'infection';
 PHP
         ];
 
@@ -80,17 +80,17 @@ $a = \Class_With_Const::Const;
 PHP
         ];
 
-        yield 'It mutates correctly when a backslash is in front of array_flip' => [
+        yield 'It mutates correctly when a backslash is in front of strtoupper' => [
             <<<'PHP'
 <?php
 
-$a = \strtoupper(['A', 1, 'C']);
+$a = \strtoupper('infection');
 PHP
             ,
             <<<'PHP'
 <?php
 
-$a = ['A', 1, 'C'];
+$a = 'infection';
 PHP
         ];
 
@@ -102,11 +102,11 @@ $a = array_map('strtoupper', ['A', 'B', 'C']);
 PHP
         ];
 
-        yield 'It does not mutate functions named array_flip' => [
+        yield 'It does not mutate functions named strtoupper' => [
             <<<'PHP'
 <?php
 
-function array_flip($text)
+function strtoupper($text)
 {
 }
 PHP
@@ -116,7 +116,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = ['A', 1, 'C'];
+$a = 'infection';
 if (strtoupper($a) === $a) {
     return true;
 }
@@ -125,28 +125,28 @@ PHP
             <<<'PHP'
 <?php
 
-$a = ['A', 1, 'C'];
+$a = 'infection';
 if ($a === $a) {
     return true;
 }
 PHP
         ];
 
-        yield 'It mutates correctly when array_flip is wrongly capitalized' => [
+        yield 'It mutates correctly when strtoupper is wrongly capitalized' => [
             <<<'PHP'
 <?php
 
-$a = StrToUpper(['A', 1, 'C']);
+$a = StrToUpper('infection');
 PHP
             ,
             <<<'PHP'
 <?php
 
-$a = ['A', 1, 'C'];
+$a = 'infection';
 PHP
         ];
 
-        yield 'It mutates correctly when array_flip uses another function as input' => [
+        yield 'It mutates correctly when strtoupper uses another function as input' => [
             <<<'PHP'
 <?php
 
@@ -164,13 +164,13 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_map('strtoupper', strtoupper(['A', 1, 'C']));
+$a = array_map('strtoupper', strtoupper('infection'));
 PHP
             ,
             <<<'PHP'
 <?php
 
-$a = array_map('strtoupper', ['A', 1, 'C']);
+$a = array_map('strtoupper', 'infection');
 PHP
         ];
     }
