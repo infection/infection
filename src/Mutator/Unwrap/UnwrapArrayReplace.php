@@ -47,7 +47,7 @@ final class UnwrapArrayReplace extends AbstractUnwrapMutator
         return 'array_replace';
     }
 
-    protected function getParameterIndex(Node $node): \Generator
+    protected function getParameterIndexes(Node $node): \Generator
     {
         yield from array_keys($node->args);
     }

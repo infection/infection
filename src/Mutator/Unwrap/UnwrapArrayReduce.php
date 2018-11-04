@@ -47,7 +47,7 @@ final class UnwrapArrayReduce extends AbstractUnwrapMutator
         return 'array_reduce';
     }
 
-    protected function getParameterIndex(Node $node): \Generator
+    protected function getParameterIndexes(Node $node): \Generator
     {
         yield 2;
     }
