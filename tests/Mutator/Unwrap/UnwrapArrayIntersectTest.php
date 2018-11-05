@@ -280,5 +280,16 @@ function array_intersect($array, $array1, $array2)
 }
 PHP
         ];
+
+        yield 'It does not break when provided with a variable function name' => [
+            <<<'PHP'
+<?php
+
+$a = 'array_intersect';
+
+$b = $a([1,2,3], [3,4,5]);
+PHP
+            ,
+        ];
     }
 }

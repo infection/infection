@@ -47,7 +47,7 @@ final class UnwrapArrayFilter extends AbstractUnwrapMutator
         return 'array_filter';
     }
 
-    protected function getParameterIndex(Node $node): \Generator
+    protected function getParameterIndexes(Node $node): \Generator
     {
         yield 0;
     }

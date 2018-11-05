@@ -173,5 +173,16 @@ PHP
 $a = array_map('strtolower', ['A', 1, 'C']);
 PHP
         ];
+
+        yield 'It does not break when provided with a variable function name' => [
+            <<<'PHP'
+<?php
+
+$a = 'array_flip';
+
+$b = $a([1,2,3]);
+PHP
+            ,
+        ];
     }
 }

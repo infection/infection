@@ -47,7 +47,7 @@ final class UnwrapArrayFlip extends AbstractUnwrapMutator
         return 'array_flip';
     }
 
-    protected function getParameterIndex(Node $node): \Generator
+    protected function getParameterIndexes(Node $node): \Generator
     {
         yield 0;
     }

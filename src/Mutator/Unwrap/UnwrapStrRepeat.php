@@ -47,7 +47,7 @@ final class UnwrapStrRepeat extends AbstractUnwrapMutator
         return 'str_repeat';
     }
 
-    protected function getParameterIndex(Node $node): \Generator
+    protected function getParameterIndexes(Node $node): \Generator
     {
         yield 0;
     }
