@@ -109,11 +109,15 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                 continue;
             }
 
-            if ($isOnFunctionSignature) {
-                $methodNode = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY);
-
+            if ($isOnFunctionSignature
+                && $methodNode = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY)
+            ) {
                 /** @var Node\Stmt\ClassMethod|Node\Expr\Closure $methodNode */
                 if ($methodNode instanceof Node\Stmt\ClassMethod && $methodNode->isAbstract()) {
+                    continue;
+                }
+
+                if ($methodNode instanceof Node\Stmt\ClassMethod && $methodNode->getAttribute(ParentConnectorVisitor::PARENT_KEY) instanceof Node\Stmt\Interface_) {
                     continue;
                 }
             }
