@@ -180,5 +180,16 @@ function str_repeat($input, $multiplier)
 }
 PHP
         ];
+
+        yield 'It does not break when provided with a variable function name' => [
+            <<<'PHP'
+<?php
+
+$a = 'str_repeat';
+
+$b = $a('foo', 3);
+PHP
+            ,
+        ];
     }
 }

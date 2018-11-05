@@ -61,7 +61,7 @@ abstract class AbstractUnwrapMutator extends Mutator
 
     final protected function mutatesNode(Node $node): bool
     {
-        if (!$node instanceof Node\Expr\FuncCall) {
+        if (!$node instanceof Node\Expr\FuncCall || !$node->name instanceof Node\Name) {
             return false;
         }
 
