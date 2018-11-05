@@ -177,5 +177,16 @@ function strtolower($string)
 }
 PHP
         ];
+
+        yield 'It does not break when provided with a variable function name' => [
+            <<<'PHP'
+<?php
+
+$a = 'strtolower';
+
+$b = $a('FooBar');
+PHP
+            ,
+        ];
     }
 }

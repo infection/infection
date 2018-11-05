@@ -225,5 +225,16 @@ function array_reduce($array, $callback, $initial = null)
 }
 PHP
         ];
+
+        yield 'It does not break when provided with a variable function name' => [
+            <<<'PHP'
+<?php
+
+$a = 'array_reduce';
+
+$b = $a('strtolower', [3,4,5]);
+PHP
+            ,
+        ];
     }
 }

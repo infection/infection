@@ -175,5 +175,16 @@ PHP
 $a = array_filter(['A', 'B', 'C'], 'is_int');
 PHP
         ];
+
+        yield 'It does not break when provided with a variable function name' => [
+            <<<'PHP'
+<?php
+
+$a = 'array_map';
+
+$b = $a('strtolower', [3,4,5]);
+PHP
+            ,
+        ];
     }
 }
