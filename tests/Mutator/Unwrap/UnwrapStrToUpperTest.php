@@ -48,6 +48,7 @@ final class UnwrapStrToUpperTest extends AbstractMutatorTestCase
     {
         $this->doTest($input, $expected);
     }
+
     public function provideMutationCases(): \Generator
     {
         yield 'It mutates correctly when provided with an string' => [
