@@ -47,7 +47,7 @@ final class UnwrapStrToUpper extends AbstractUnwrapMutator
         return 'strtoupper';
     }
 
-    protected function getParameterIndex(Node $node): \Generator
+    protected function getParameterIndexes(Node $node): \Generator
     {
         yield 0;
     }
