@@ -173,5 +173,15 @@ PHP
 $a = array_map('strtoupper', 'infection');
 PHP
         ];
+
+        yield 'It does not break when provided with a variable function name' => [
+            <<<'PHP'
+<?php
+
+ $a = 'strtoupper';
+ $b = $a('infection');
+PHP
+            ,
+        ];
     }
 }
