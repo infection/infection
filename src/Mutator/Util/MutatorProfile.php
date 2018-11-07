@@ -198,6 +198,7 @@ final class MutatorProfile
         Mutator\Unwrap\UnwrapArrayReplace::class,
         Mutator\Unwrap\UnwrapArrayReplaceRecursive::class,
         Mutator\Unwrap\UnwrapArrayReverse::class,
+        Mutator\Unwrap\UnwrapArrayValues::class,
         Mutator\Unwrap\UnwrapStrRepeat::class,
         Mutator\Unwrap\UnwrapStrToLower::class,
     ];
@@ -333,6 +334,7 @@ final class MutatorProfile
         'UnwrapArrayReplace' => Mutator\Unwrap\UnwrapArrayReplace::class,
         'UnwrapArrayReplaceRecursive' => Mutator\Unwrap\UnwrapArrayReplaceRecursive::class,
         'UnwrapArrayReverse' => Mutator\Unwrap\UnwrapArrayReverse::class,
+        'UnwrapArrayValues' => Mutator\Unwrap\UnwrapArrayValues::class,
         'UnwrapStrRepeat' => Mutator\Unwrap\UnwrapStrRepeat::class,
         'UnwrapStrToLower' => Mutator\Unwrap\UnwrapStrToLower::class,
     ];
