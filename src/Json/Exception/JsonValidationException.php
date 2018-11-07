@@ -33,27 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config\Exception;
+namespace Infection\Json\Exception;
+
+use JsonSchema\Exception\ValidationException;
 
 /**
  * @internal
  */
-final class InvalidConfigException extends \RuntimeException
+final class JsonValidationException extends ValidationException
 {
-    public static function invalidMutator(string $mutator): self
+    public static function doesNotMatchSchema(string $path, array $errors = []): self
     {
-        return new self(sprintf(
-           'The "%s" mutator/profile was not recognized.',
-           $mutator
-        ));
-    }
+        $message = \count($errors)
+            ? '"' . $path . '" does not match the expected JSON schema:' . PHP_EOL . ' - ' . implode(PHP_EOL . ' - ', $errors)
+            : '"' . $path . '" does not match the expected JSON schema.';
 
-    public static function invalidProfile(string $profile, string $mutator): self
-    {
-        return new self(sprintf(
-            'The "%s" profile contains the "%s" mutator which was not recognized.',
-            $profile,
-            $mutator
-        ));
+        return new self($message);
     }
 }

@@ -33,65 +33,80 @@
 
 declare(strict_types=1);
 
-namespace Infection\Finder;
+namespace Infection\Config;
 
+use Infection\Config\Validator as ConfigValidator;
 use Infection\Finder\Exception\LocatorException;
+use Infection\Finder\LocatorInterface;
+use Infection\Json\JsonFile;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
  */
-final class Locator implements LocatorInterface
+final class ConfigCreatorFacade
 {
     /**
-     * @var string[]
+     * @var ConfigValidator
      */
-    private $paths;
+    private $configValidator;
+
+    /**
+     * @var LocatorInterface
+     */
+    private $locator;
 
     /**
      * @var Filesystem
      */
     private $filesystem;
 
-    public function __construct(array $paths, Filesystem $filesystem)
+    public function __construct(LocatorInterface $locator, Filesystem $filesystem)
     {
-        $this->paths = $paths;
+        $this->locator = $locator;
         $this->filesystem = $filesystem;
+
+        $this->configValidator = new Validator();
     }
 
-    public function locate(string $name): string
+    public function createConfig(?string $customConfigPath): InfectionConfig
     {
-        if ($this->filesystem->isAbsolutePath($name)) {
-            if ($this->filesystem->exists($name)) {
-                return (string) realpath($name);
-            }
-
-            throw LocatorException::fileOrDirectoryDoesNotExist($name);
-        }
-
-        foreach ($this->paths as $path) {
-            $file = $path . \DIRECTORY_SEPARATOR . $name;
-
-            if ($this->filesystem->exists($file)) {
-                return (string) realpath($file);
-            }
-        }
-
-        throw LocatorException::filesOrDirectoriesDoNotExist($name, $this->paths);
-    }
-
-    public function locateOneOf(array $fileNames): string
-    {
-        if (!$fileNames) {
-            throw LocatorException::filesNotFound();
-        }
-
         try {
-            return $this->locate($fileNames[0]);
-        } catch (\Exception $e) {
-            array_shift($fileNames);
+            $infectionConfigFile = $this->locateConfigFile($customConfigPath);
 
-            return $this->locateOneOf($fileNames);
+            $content = (new JsonFile($infectionConfigFile))->decode();
+
+            $configLocation = \pathinfo($infectionConfigFile, PATHINFO_DIRNAME);
+        } catch (LocatorException $e) {
+            // Generate an empty class to trigger `configure` command.
+            $content = new \stdClass();
+
+            $configLocation = getcwd();
         }
+
+        // getcwd() may return false in rare circumstances
+        \assert(\is_string($configLocation));
+
+        $infectionConfig = new InfectionConfig($content, $this->filesystem, $configLocation);
+
+        $this->configValidator->validate($infectionConfig);
+
+        return $infectionConfig;
+    }
+
+    private function locateConfigFile(?string $customConfigPath): string
+    {
+        $configPaths = [];
+
+        if ($customConfigPath) {
+            $configPaths[] = $customConfigPath;
+        }
+
+        $configPaths = array_merge(
+            $configPaths,
+            InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES
+        );
+
+        return $this->locator->locateOneOf($configPaths);
     }
 }

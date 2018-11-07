@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Infection\Config\Exception\InvalidConfigException;
+use Infection\Config\ConfigCreatorFacade;
 use Infection\Config\InfectionConfig;
-use Infection\Config\Validator;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\EventDispatcher\EventDispatcher;
@@ -226,10 +225,6 @@ final class InfectionContainer extends Container
             return new MemoryFormatter();
         };
 
-        $this['infection.config.validator'] = function (): Validator {
-            return new Validator();
-        };
-
         $this['memory.limit.applier'] = function (): MemoryLimiter {
             return new MemoryLimiter($this['filesystem'], \php_ini_loaded_file());
         };
@@ -238,46 +233,9 @@ final class InfectionContainer extends Container
     public function buildDynamicDependencies(InputInterface $input): void
     {
         $this['infection.config'] = function () use ($input): InfectionConfig {
-            try {
-                $configPaths = [];
-                $customConfigPath = $input->getOption('configuration');
+            $facade = new ConfigCreatorFacade($this['locator'], $this['filesystem']);
 
-                if ($customConfigPath) {
-                    $configPaths[] = $customConfigPath;
-                }
-
-                $configPaths = array_merge(
-                    $configPaths,
-                    InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES
-                );
-
-                $infectionConfigFile = $this['locator']->locateAnyOf($configPaths);
-                $configLocation = \pathinfo($infectionConfigFile, PATHINFO_DIRNAME);
-                $json = file_get_contents($infectionConfigFile);
-            } catch (\Exception $e) {
-                $infectionConfigFile = null;
-                $json = '{}';
-                $configLocation = getcwd();
-            }
-
-            \assert(\is_string($json));
-            $config = json_decode($json);
-
-            if (\is_string($infectionConfigFile) && null === $config && JSON_ERROR_NONE !== json_last_error()) {
-                throw InvalidConfigException::invalidJson(
-                    $infectionConfigFile,
-                    json_last_error_msg()
-                );
-            }
-
-            // getcwd() may return false in rare circumstances
-            \assert(\is_string($configLocation));
-
-            $infectionConfig = new InfectionConfig($config, $this['filesystem'], $configLocation);
-
-            $this['infection.config.validator']->validate($infectionConfig);
-
-            return $infectionConfig;
+            return $facade->createConfig($input->getOption('configuration'));
         };
 
         $this['coverage.path'] = function () use ($input): string {

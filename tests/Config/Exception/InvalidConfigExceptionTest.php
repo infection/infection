@@ -50,27 +50,6 @@ final class InvalidConfigExceptionTest extends TestCase
         $this->assertInstanceOf(\RuntimeException::class, $exception);
     }
 
-    public function test_invalid_json_creates_exception(): void
-    {
-        $configFile = __DIR__ . '/../../../infection.json.dist';
-        $errorMessage = 'That does not look right.';
-
-        $exception = InvalidConfigException::invalidJson(
-            $configFile,
-            $errorMessage
-        );
-
-        $this->assertInstanceOf(InvalidConfigException::class, $exception);
-
-        $expected = sprintf(
-            'The configuration file "%s" does not contain valid JSON: %s.',
-            $configFile,
-            $errorMessage
-        );
-
-        $this->assertSame($expected, $exception->getMessage());
-    }
-
     public function test_invalid_mutator_creates_exception(): void
     {
         $wrongMutator = 'NonExistent Mutator';

@@ -33,27 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config\Exception;
+namespace Infection\Finder;
 
 /**
  * @internal
  */
-final class InvalidConfigException extends \RuntimeException
+interface LocatorInterface
 {
-    public static function invalidMutator(string $mutator): self
-    {
-        return new self(sprintf(
-           'The "%s" mutator/profile was not recognized.',
-           $mutator
-        ));
-    }
+    /**
+     * Determine the realpath of the file by the file path.
+     */
+    public function locate(string $name): string;
 
-    public static function invalidProfile(string $profile, string $mutator): self
-    {
-        return new self(sprintf(
-            'The "%s" profile contains the "%s" mutator which was not recognized.',
-            $profile,
-            $mutator
-        ));
-    }
+    /**
+     * Determine one realpath for the bunch of file paths.
+     *
+     * @param string[] $fileNames
+     */
+    public function locateOneOf(array $fileNames): string;
 }
