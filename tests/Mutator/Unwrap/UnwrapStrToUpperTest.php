@@ -94,11 +94,11 @@ $a = 'infection';
 PHP
         ];
 
-        yield 'It does not mutate other array_ calls' => [
+        yield 'It does not mutate other strto calls' => [
             <<<'PHP'
 <?php
 
-$a = array_map('strtoupper', 'infection');
+$a = strtolower('INFECTION');
 PHP
         ];
 
