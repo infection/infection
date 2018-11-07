@@ -188,6 +188,7 @@ final class MutatorProfile
     ];
 
     public const UNWRAP = [
+        Mutator\Unwrap\UnwrapArrayCombine::class,
         Mutator\Unwrap\UnwrapArrayFilter::class,
         Mutator\Unwrap\UnwrapArrayFlip::class,
         Mutator\Unwrap\UnwrapArrayIntersect::class,
@@ -322,6 +323,7 @@ final class MutatorProfile
         'CastString' => Mutator\Cast\CastString::class,
 
         // Unwrap
+        'UnwrapArrayCombine' => Mutator\Unwrap\UnwrapArrayCombine::class,
         'UnwrapArrayFilter' => Mutator\Unwrap\UnwrapArrayFilter::class,
         'UnwrapArrayFlip' => Mutator\Unwrap\UnwrapArrayFlip::class,
         'UnwrapArrayIntersect' => Mutator\Unwrap\UnwrapArrayIntersect::class,
