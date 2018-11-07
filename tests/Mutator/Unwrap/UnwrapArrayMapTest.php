@@ -176,6 +176,35 @@ $a = array_filter(['A', 'B', 'C'], 'is_int');
 PHP
         ];
 
+        yield 'It mutates correctly when provided with more than two parameters' => [
+            <<<'PHP'
+<?php
+
+$a = array_map('strtolower', ['A', 'B', 'C'], \Class_With_Const::Const, $foo->bar());
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+$a = ['A', 'B', 'C'];
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = \Class_With_Const::Const;
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = $foo->bar();
+PHP
+                ,
+            ],
+        ];
+
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
 <?php

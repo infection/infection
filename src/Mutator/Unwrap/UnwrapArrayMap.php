@@ -49,6 +49,6 @@ final class UnwrapArrayMap extends AbstractUnwrapMutator
 
     protected function getParameterIndexes(Node $node): \Generator
     {
-        yield 1;
+        yield from range(1, \count($node->args) - 1);
     }
 }
