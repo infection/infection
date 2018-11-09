@@ -41,6 +41,7 @@ install:
     - echo extension_dir=ext >> php.ini
     - echo extension=php_openssl.dll >> php.ini
     - echo extension=php_mbstring.dll >> php.ini
+    - echo memory_limit=512M >> php.ini
     # Install composer and update per matrix
     - copy C:\projects\workspace\.ci\composer.bat c:\tools\php\composer.bat
     - appveyor-retry appveyor DownloadFile https://getcomposer.org/composer.phar -OutFile C:\tools\php\composer.phar
