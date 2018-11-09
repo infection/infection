@@ -200,6 +200,7 @@ final class MutatorProfile
         Mutator\Unwrap\UnwrapArrayReverse::class,
         Mutator\Unwrap\UnwrapStrRepeat::class,
         Mutator\Unwrap\UnwrapStrToLower::class,
+        Mutator\Unwrap\UnwrapStrToUpper::class,
     ];
 
     public const DEFAULT = [
@@ -335,5 +336,6 @@ final class MutatorProfile
         'UnwrapArrayReverse' => Mutator\Unwrap\UnwrapArrayReverse::class,
         'UnwrapStrRepeat' => Mutator\Unwrap\UnwrapStrRepeat::class,
         'UnwrapStrToLower' => Mutator\Unwrap\UnwrapStrToLower::class,
+        'UnwrapStrToUpper' => Mutator\Unwrap\UnwrapStrToUpper::class,
     ];
 }
