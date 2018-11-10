@@ -1,0 +1,291 @@
+<?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017-2018, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+declare(strict_types=1);
+
+namespace Infection\Tests\Mutator\ArgumentRemoval;
+
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
+
+/**
+ * @internal
+ */
+final class ArgumentRemovalArrayReplaceTest extends AbstractMutatorTestCase
+{
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator($input, $expected = null): void
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): \Generator
+    {
+        yield 'It does not mutate when there are is only one parameter' => [
+            <<<'PHP'
+<?php
+
+$a = array_replace(['A', 1, 'C']);
+PHP
+        ];
+
+        yield 'It does not mutate other array_ calls' => [
+            <<<'PHP'
+<?php
+
+$a = array_map('strtolower', ['A', 'B', 'C']);
+PHP
+        ];
+
+        yield 'It does not mutate functions named array_replace' => [
+            <<<'PHP'
+<?php
+
+function array_replace($array, $array1, $array2)
+{
+}
+PHP
+        ];
+
+        yield 'It does not mutate when provided with a variable function name' => [
+            <<<'PHP'
+<?php
+
+$a = 'array_replace';
+
+$b = $a([1,2,3], [3,4,5]);
+PHP
+            ,
+        ];
+
+        yield 'It mutates correctly when there are two parameters' => [
+            <<<'PHP'
+<?php
+
+$a = array_replace(['A', 1, 'C'], ['D']);
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+$a = array_replace(['D']);
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = array_replace(['A', 1, 'C']);
+PHP
+                ,
+            ],
+        ];
+
+        yield 'It mutates correctly when there are more than two parameters' => [
+            <<<'PHP'
+<?php
+
+$a = array_replace(['A', 1, 'C'], ['D'], [1, 2, 3]);
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+$a = array_replace(['D'], [1, 2, 3]);
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = array_replace(['A', 1, 'C'], [1, 2, 3]);
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = array_replace(['A', 1, 'C'], ['D']);
+PHP
+                ,
+            ],
+        ];
+
+        yield 'It mutates correctly when there is a backslash in front of array_replace' => [
+            <<<'PHP'
+<?php
+
+$a = \array_replace(['A', 1, 'C'], ['D']);
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+$a = \array_replace(['D']);
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = \array_replace(['A', 1, 'C']);
+PHP
+                ,
+            ],
+        ];
+
+        yield 'It mutates correctly when array_replace uses constants as input' => [
+            <<<'PHP'
+<?php
+
+$a = array_replace(Foo::BAR, Bar::BAZ);
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+$a = array_replace(Bar::BAZ);
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = array_replace(Foo::BAR);
+PHP
+                ,
+            ],
+        ];
+
+        yield 'It mutates correctly when array_replace uses functions as input' => [
+            <<<'PHP'
+<?php
+
+$a = array_replace($foo->bar(), $bar->baz());
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+$a = array_replace($bar->baz());
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = array_replace($foo->bar());
+PHP
+                ,
+            ],
+        ];
+
+        yield 'It mutates correctly within if statements' => [
+            <<<'PHP'
+<?php
+
+$a = ['A', 1, 'C'];
+if (array_replace($a, ['D']) === $a) {
+    return true;
+}
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+$a = ['A', 1, 'C'];
+if (array_replace(['D']) === $a) {
+    return true;
+}
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['A', 1, 'C'];
+if (array_replace($a) === $a) {
+    return true;
+}
+PHP
+                ,
+            ],
+        ];
+
+        yield 'It mutates correctly when array_replace is wrongly capitalized' => [
+            <<<'PHP'
+<?php
+
+$a = aRrAy_RePlAcE(['A', 1, 'C'], ['D']);
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+$a = aRrAy_RePlAcE(['D']);
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = aRrAy_RePlAcE(['A', 1, 'C']);
+PHP
+                ,
+            ],
+        ];
+
+        yield 'It mutates correctly when provided with a more complex situation' => [
+            <<<'PHP'
+<?php
+
+$a = array_map('strtolower', array_replace(['A', 1, 'C'], ['D']));
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+$a = array_map('strtolower', array_replace(['D']));
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = array_map('strtolower', array_replace(['A', 1, 'C']));
+PHP
+                ,
+            ],
+        ];
+    }
+}

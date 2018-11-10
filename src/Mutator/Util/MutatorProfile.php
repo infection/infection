@@ -44,6 +44,7 @@ final class MutatorProfile
 {
     public const MUTATOR_PROFILE_LIST = [
         //Per category
+        '@argument_removal' => self::ARGUMENT_REMOVAL,
         '@arithmetic' => self::ARITHMETIC,
         '@boolean' => self::BOOLEAN,
         '@conditional_boundary' => self::CONDITIONAL_BOUNDARY,
@@ -63,6 +64,10 @@ final class MutatorProfile
 
         //Special Profiles
         '@default' => self::DEFAULT,
+    ];
+
+    public const ARGUMENT_REMOVAL = [
+        Mutator\ArgumentRemoval\ArgumentRemovalArrayReplace::class,
     ];
 
     public const ARITHMETIC = [
@@ -229,6 +234,9 @@ final class MutatorProfile
     ];
 
     public const FULL_MUTATOR_LIST = [
+        // ArgumentRemoval
+        'ArgumentRemovalArrayReplace' => Mutator\ArgumentRemoval\ArgumentRemovalArrayReplace::class,
+
         //Arithmetic
         'Assignment' => Mutator\Arithmetic\Assignment::class,
         'AssignmentEqual' => Mutator\Arithmetic\AssignmentEqual::class,
