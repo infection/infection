@@ -10,7 +10,7 @@
 
 **Added:**
 
-- Add json-schema validation for `infection.json.dist` config file [\#451](https://github.com/infection/infection/issues/451)
+- Add json-schema validation for `infection.json.dist` config file [\#451](https://github.com/infection/infection/issues/451) ([sidz](https://github.com/sidz))
 - Run project's tests in a random order for InitialTestRun process [\#519](https://github.com/infection/infection/pull/519) ([borNfreee](https://github.com/borNfreee))
 - Validate phpunit.xml [\#487](https://github.com/infection/infection/pull/487) ([borNfreee](https://github.com/borNfreee))
 - @codeCoverageIgnore annotations support [\#491](https://github.com/infection/infection/pull/491) ([borNfreee](https://github.com/borNfreee))
