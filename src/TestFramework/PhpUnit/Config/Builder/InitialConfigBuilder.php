@@ -48,6 +48,7 @@ class InitialConfigBuilder implements ConfigBuilder
      * @var string
      */
     private $tmpDir;
+
     /**
      * @var string
      */

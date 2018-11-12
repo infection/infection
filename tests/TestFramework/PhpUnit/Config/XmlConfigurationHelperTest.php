@@ -51,7 +51,7 @@ final class XmlConfigurationHelperTest extends TestCase
         $dom = $this->getDomDocument();
         $xPath = new \DOMXPath($dom);
 
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer());
+        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
 
         $xmlconfig->replaceWithAbsolutePaths($xPath);
 
@@ -84,7 +84,7 @@ XML
         $dom = $this->getDomDocument();
         $xPath = new \DOMXPath($dom);
 
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer());
+        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
 
         $xmlconfig->removeExistingLoggers($dom, $xPath);
 
@@ -114,7 +114,7 @@ XML
         $dom = $this->getDomDocument();
         $xPath = new \DOMXPath($dom);
 
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer());
+        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
 
         $xmlconfig->setStopOnFailure($xPath);
 
@@ -156,7 +156,7 @@ XML
         );
         $xPath = new \DOMXPath($dom);
 
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer());
+        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
 
         $xmlconfig->setStopOnFailure($xPath);
 
@@ -175,7 +175,7 @@ XML
         $dom = $this->getDomDocument();
         $xPath = new \DOMXPath($dom);
 
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer());
+        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
 
         $xmlconfig->deactivateColours($xPath);
 
@@ -217,7 +217,7 @@ XML
         );
         $xPath = new \DOMXPath($dom);
 
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer());
+        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
 
         $xmlconfig->deactivateColours($xPath);
 
@@ -245,7 +245,7 @@ XML
         );
         $xPath = new \DOMXPath($dom);
 
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer());
+        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
 
         $xmlconfig->removeExistingPrinters($dom, $xPath);
 
@@ -266,7 +266,7 @@ XML
         $dom->formatOutput = true;
         $dom->loadXML('<invalid></invalid>');
         $xPath = new \DOMXPath($dom);
-        $xmlHelper = new XmlConfigurationHelper($this->getPathReplacer());
+        $xmlHelper = new XmlConfigurationHelper($this->getPathReplacer(), '');
 
         $this->expectException(InvalidPhpUnitXmlConfigException::class);
         $this->expectExceptionMessage('phpunit.xml does not contain a valid PHPUnit configuration.');
@@ -291,7 +291,7 @@ XML
 XML
         );
         $xPath = new \DOMXPath($dom);
-        $xmlHelper = new XmlConfigurationHelper($this->getPathReplacer());
+        $xmlHelper = new XmlConfigurationHelper($this->getPathReplacer(), '');
 
         $this->expectException(InvalidPhpUnitXmlConfigException::class);
         $this->expectExceptionMessageRegExp('/Element \'invalid\'\: This element is not expected/');
@@ -323,7 +323,7 @@ XML
         );
         $xPath = new \DOMXPath($dom);
 
-        $xmlHelper = new XmlConfigurationHelper($this->getPathReplacer());
+        $xmlHelper = new XmlConfigurationHelper($this->getPathReplacer(), '');
 
         $this->assertTrue(true, $xmlHelper->validate($dom, $xPath));
     }
