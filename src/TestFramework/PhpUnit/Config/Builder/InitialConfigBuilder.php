@@ -1,8 +1,34 @@
 <?php
 /**
- * Copyright © 2017-2018 Maks Rafalko
+ * This code is licensed under the BSD 3-Clause License.
  *
- * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+ * Copyright (c) 2017-2018, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 declare(strict_types=1);
@@ -62,7 +88,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->skipCoverage = $skipCoverage;
     }
 
-    public function build(): string
+    public function build(string $version): string
     {
         $path = $this->buildPath();
 
@@ -76,6 +102,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->xmlConfigurationHelper->validate($dom, $xPath);
 
         $this->addCoverageFilterWhitelistIfDoesNotExist($dom, $xPath);
+        $this->addRandomTestsOrderAttributesIfNotSet($version, $xPath);
         $this->xmlConfigurationHelper->replaceWithAbsolutePaths($xPath);
         $this->xmlConfigurationHelper->setStopOnFailure($xPath);
         $this->xmlConfigurationHelper->deactivateColours($xPath);
@@ -121,7 +148,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function addCoverageFilterWhitelistIfDoesNotExist(\DOMDocument $dom, \DOMXPath $xPath): void
     {
-        $filterNode = $this->getNode($dom, $xPath, 'filter');
+        $filterNode = $this->getNode($xPath, 'filter');
 
         if (!$filterNode) {
             $filterNode = $this->createNode($dom, 'filter');
@@ -143,7 +170,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function getOrCreateNode(\DOMDocument $dom, \DOMXPath $xPath, string $nodeName): \DOMElement
     {
-        $node = $this->getNode($dom, $xPath, $nodeName);
+        $node = $this->getNode($xPath, $nodeName);
 
         if (!$node) {
             $node = $this->createNode($dom, $nodeName);
@@ -152,7 +179,7 @@ class InitialConfigBuilder implements ConfigBuilder
         return $node;
     }
 
-    private function getNode(\DOMDocument $dom, \DOMXPath $xPath, string $nodeName)
+    private function getNode(\DOMXPath $xPath, string $nodeName)
     {
         $nodeList = $xPath->query(sprintf('/phpunit/%s', $nodeName));
 
@@ -169,5 +196,30 @@ class InitialConfigBuilder implements ConfigBuilder
         $dom->documentElement->appendChild($node);
 
         return $node;
+    }
+
+    private function addRandomTestsOrderAttributesIfNotSet(string $version, \DOMXPath $xPath): void
+    {
+        if (!version_compare($version, '7.2', '>=')) {
+            return;
+        }
+
+        if ($this->addAttributeIfNotSet('executionOrder', 'random', $xPath)) {
+            $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
+        }
+    }
+
+    private function addAttributeIfNotSet(string $attribute, string $value, \DOMXPath $xPath): bool
+    {
+        $nodeList = $xPath->query(sprintf('/phpunit/@%s', $attribute));
+
+        if (!$nodeList->length) {
+            $node = $xPath->query('/phpunit')[0];
+            $node->setAttribute($attribute, $value);
+
+            return true;
+        }
+
+        return false;
     }
 }

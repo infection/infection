@@ -54,6 +54,7 @@
         "sort-packages": true
     },
     "conflict": {
+        "symfony/console": "=3.4.16 || =4.1.5",
         "symfony/process": "3.4.2"
     },
     "require": {
@@ -62,6 +63,7 @@
         "ext-json": "*",
         "ext-libxml": "*",
         "composer/xdebug-handler": "^1.3",
+        "justinrainbow/json-schema": "^5.2",
         "nikic/php-parser": "^4.1",
         "ocramius/package-versions": "^1.2",
         "padraic/phar-updater": "^1.0.4",

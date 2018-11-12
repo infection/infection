@@ -1,0 +1,104 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "timeout",
+        "source"
+    ],
+    "properties": {
+        "timeout": {
+            "type": "integer",
+            "description": "The allowed timeout in seconds configured for Infection."
+        },
+        "source": {
+            "type": "object",
+            "required": [
+                "directories"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "directories": {
+                    "type": "array",
+                    "minItems": 1,
+                    "description": "Contains all folders with source code you want to mutate.",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "excludes": {
+                    "type": "array",
+                    "minItems": 1,
+                    "description": "Contains all folders or files you want to exclude withing your source folders.",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "logs": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": false,
+            "properties": {
+                "text": {
+                    "type": "string",
+                    "description": "Human readable text log file."
+                },
+                "summary": {
+                    "type": "string",
+                    "definition": "Summary log file, which display the amount of mutants per category, (Killed, Errored, Escaped, Timed Out & Not Covered)."
+                },
+                "debug": {
+                    "type": "string",
+                    "description": "Debug log file, which displays what mutations were found on what line, per category."
+                },
+                "perMutator": {
+                    "type": "string",
+                    "description": "Markdown file which will give a break-down of the effectiveness of each mutator."
+                },
+                "badge": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "branch": {
+                            "type": "string",
+                            "description": "Mutation score badge for your github project."
+                        }
+                    }
+                }
+            }
+        },
+        "tmpDir": {
+            "type": "string",
+            "description": "Folder where Infection creates its configs, caches and other stuff."
+        },
+        "phpUnit": {
+            "type": "object",
+            "description": "PHPUnit additional settings.",
+            "additionalProperties": false,
+            "properties": {
+                "configDir": {
+                    "type": "string",
+                    "description": "Path to directory containing PHPUnit configuration file."
+                },
+                "customPath": {
+                    "type": "string",
+                    "description": "Custom path to PHPUnit executable."
+                }
+            }
+        },
+        "mutators": {
+            "type": "object",
+            "description": "Contains the settings for different mutations and profiles"
+        },
+        "testFramework": {
+            "type": "string",
+            "description": "Sets the framework to use for testing. Defaults to phpunit."
+        },
+        "bootstrap": {
+            "type": "string",
+            "description": "Use to specify a file to include as part of the startup to pre-configure the infection environment. Useful for adding custom autoloaders not included in composer."
+        }
+    }
+}

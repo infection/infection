@@ -1,8 +1,34 @@
 <?php
 /**
- * Copyright © 2017-2018 Maks Rafalko
+ * This code is licensed under the BSD 3-Clause License.
  *
- * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+ * Copyright (c) 2017-2018, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 declare(strict_types=1);
@@ -60,9 +86,9 @@ final class MutatorProfile
         Mutator\Arithmetic\Plus::class,
         Mutator\Arithmetic\PlusEqual::class,
         Mutator\Arithmetic\PowEqual::class,
+        Mutator\Arithmetic\RoundingFamily::class,
         Mutator\Arithmetic\ShiftLeft::class,
         Mutator\Arithmetic\ShiftRight::class,
-        Mutator\Arithmetic\RoundingFamily::class,
     ];
 
     public const BOOLEAN = [
@@ -96,13 +122,13 @@ final class MutatorProfile
     ];
 
     public const EQUAL = [
-        Mutator\Boolean\NotIdenticalNotEqual::class,
         Mutator\Boolean\IdenticalEqual::class,
+        Mutator\Boolean\NotIdenticalNotEqual::class,
     ];
 
     public const FUNCTION_SIGNATURE = [
-        Mutator\FunctionSignature\PublicVisibility::class,
         Mutator\FunctionSignature\ProtectedVisibility::class,
+        Mutator\FunctionSignature\PublicVisibility::class,
     ];
 
     public const IDENTICAL = [
@@ -113,20 +139,21 @@ final class MutatorProfile
     public const NUMBER = [
         Mutator\Number\DecrementInteger::class,
         Mutator\Number\IncrementInteger::class,
-        Mutator\Number\OneZeroInteger::class,
         Mutator\Number\OneZeroFloat::class,
+        Mutator\Number\OneZeroInteger::class,
     ];
 
     public const OPERATOR = [
         Mutator\Operator\Break_::class,
-        Mutator\Operator\Continue_::class,
-        Mutator\Operator\Throw_::class,
         Mutator\Operator\Coalesce::class,
+        Mutator\Operator\Continue_::class,
+        Mutator\Operator\Finally_::class,
+        Mutator\Operator\Throw_::class,
     ];
 
     public const REGEX = [
-        Mutator\Regex\PregQuote::class,
         Mutator\Regex\PregMatchMatches::class,
+        Mutator\Regex\PregQuote::class,
     ];
 
     public const REMOVAL = [
@@ -147,8 +174,8 @@ final class MutatorProfile
     ];
 
     public const ZERO_ITERATION = [
-        Mutator\ZeroIteration\Foreach_::class,
         Mutator\ZeroIteration\For_::class,
+        Mutator\ZeroIteration\Foreach_::class,
     ];
 
     public const CAST = [
@@ -161,8 +188,24 @@ final class MutatorProfile
     ];
 
     public const UNWRAP = [
-        Mutator\Unwrap\UnwrapArrayMap::class,
+        Mutator\Unwrap\UnwrapArrayChunk::class,
+        Mutator\Unwrap\UnwrapArrayCombine::class,
+        Mutator\Unwrap\UnwrapArrayDiff::class,
         Mutator\Unwrap\UnwrapArrayFilter::class,
+        Mutator\Unwrap\UnwrapArrayFlip::class,
+        Mutator\Unwrap\UnwrapArrayIntersect::class,
+        Mutator\Unwrap\UnwrapArrayKeys::class,
+        Mutator\Unwrap\UnwrapArrayMap::class,
+        Mutator\Unwrap\UnwrapArrayMerge::class,
+        Mutator\Unwrap\UnwrapArrayReduce::class,
+        Mutator\Unwrap\UnwrapArrayReplace::class,
+        Mutator\Unwrap\UnwrapArrayReplaceRecursive::class,
+        Mutator\Unwrap\UnwrapArrayReverse::class,
+        Mutator\Unwrap\UnwrapArrayUnique::class,
+        Mutator\Unwrap\UnwrapArrayValues::class,
+        Mutator\Unwrap\UnwrapStrRepeat::class,
+        Mutator\Unwrap\UnwrapStrToLower::class,
+        Mutator\Unwrap\UnwrapStrToUpper::class,
     ];
 
     public const DEFAULT = [
@@ -286,7 +329,23 @@ final class MutatorProfile
         'CastString' => Mutator\Cast\CastString::class,
 
         // Unwrap
-        'UnwrapArrayMap' => Mutator\Unwrap\UnwrapArrayMap::class,
+        'UnwrapArrayChunk' => Mutator\Unwrap\UnwrapArrayChunk::class,
+        'UnwrapArrayCombine' => Mutator\Unwrap\UnwrapArrayCombine::class,
+        'UnwrapArrayDiff' => Mutator\Unwrap\UnwrapArrayDiff::class,
         'UnwrapArrayFilter' => Mutator\Unwrap\UnwrapArrayFilter::class,
+        'UnwrapArrayFlip' => Mutator\Unwrap\UnwrapArrayFlip::class,
+        'UnwrapArrayIntersect' => Mutator\Unwrap\UnwrapArrayIntersect::class,
+        'UnwrapArrayKeys' => Mutator\Unwrap\UnwrapArrayKeys::class,
+        'UnwrapArrayMap' => Mutator\Unwrap\UnwrapArrayMap::class,
+        'UnwrapArrayMerge' => Mutator\Unwrap\UnwrapArrayMerge::class,
+        'UnwrapArrayReduce' => Mutator\Unwrap\UnwrapArrayReduce::class,
+        'UnwrapArrayReplace' => Mutator\Unwrap\UnwrapArrayReplace::class,
+        'UnwrapArrayReplaceRecursive' => Mutator\Unwrap\UnwrapArrayReplaceRecursive::class,
+        'UnwrapArrayReverse' => Mutator\Unwrap\UnwrapArrayReverse::class,
+        'UnwrapArrayUnique' => Mutator\Unwrap\UnwrapArrayUnique::class,
+        'UnwrapArrayValues' => Mutator\Unwrap\UnwrapArrayValues::class,
+        'UnwrapStrRepeat' => Mutator\Unwrap\UnwrapStrRepeat::class,
+        'UnwrapStrToLower' => Mutator\Unwrap\UnwrapStrToLower::class,
+        'UnwrapStrToUpper' => Mutator\Unwrap\UnwrapStrToUpper::class,
     ];
 }

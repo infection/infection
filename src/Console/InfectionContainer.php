@@ -1,17 +1,42 @@
 <?php
 /**
- * Copyright © 2017-2018 Maks Rafalko
+ * This code is licensed under the BSD 3-Clause License.
  *
- * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+ * Copyright (c) 2017-2018, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Infection\Config\Exception\InvalidConfigException;
+use Infection\Config\ConfigCreatorFacade;
 use Infection\Config\InfectionConfig;
-use Infection\Config\Validator;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\EventDispatcher\EventDispatcher;
@@ -200,63 +225,17 @@ final class InfectionContainer extends Container
             return new MemoryFormatter();
         };
 
-        $this['infection.config.validator'] = function (): Validator {
-            return new Validator();
-        };
-
         $this['memory.limit.applier'] = function (): MemoryLimiter {
             return new MemoryLimiter($this['filesystem'], \php_ini_loaded_file());
         };
     }
 
-    private function getInfectionConfig(): InfectionConfig
-    {
-        return $this['infection.config'];
-    }
-
     public function buildDynamicDependencies(InputInterface $input): void
     {
         $this['infection.config'] = function () use ($input): InfectionConfig {
-            try {
-                $configPaths = [];
-                $customConfigPath = $input->getOption('configuration');
+            $facade = new ConfigCreatorFacade($this['locator'], $this['filesystem']);
 
-                if ($customConfigPath) {
-                    $configPaths[] = $customConfigPath;
-                }
-
-                $configPaths = array_merge(
-                    $configPaths,
-                    InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES
-                );
-
-                $infectionConfigFile = $this['locator']->locateAnyOf($configPaths);
-                $configLocation = \pathinfo($infectionConfigFile, PATHINFO_DIRNAME);
-                $json = file_get_contents($infectionConfigFile);
-            } catch (\Exception $e) {
-                $infectionConfigFile = null;
-                $json = '{}';
-                $configLocation = getcwd();
-            }
-
-            \assert(\is_string($json));
-            $config = json_decode($json);
-
-            if (\is_string($infectionConfigFile) && null === $config && JSON_ERROR_NONE !== json_last_error()) {
-                throw InvalidConfigException::invalidJson(
-                    $infectionConfigFile,
-                    json_last_error_msg()
-                );
-            }
-
-            // getcwd() may return false in rare circumstances
-            \assert(\is_string($configLocation));
-
-            $infectionConfig = new InfectionConfig($config, $this['filesystem'], $configLocation);
-
-            $this['infection.config.validator']->validate($infectionConfig);
-
-            return $infectionConfig;
+            return $facade->createConfig($input->getOption('configuration'));
         };
 
         $this['coverage.path'] = function () use ($input): string {
@@ -311,5 +290,10 @@ final class InfectionContainer extends Container
 
             return $parser->getMutators();
         };
+    }
+
+    private function getInfectionConfig(): InfectionConfig
+    {
+        return $this['infection.config'];
     }
 }

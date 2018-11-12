@@ -1,11 +1,8 @@
 <?php
 
-$year = date('Y');
-$header = <<<TXT
-Copyright © 2017-$year Maks Rafalko
+$header = trim('This code is licensed under the BSD 3-Clause License.'.substr(file_get_contents('LICENSE'), strlen('BSD 3-Clause License')));
 
-License: https://opensource.org/licenses/BSD-3-Clause New BSD License
-TXT;
+
 $finder = \PhpCsFixer\Finder::create()
     ->in('src')
     ->in('tests')
@@ -54,14 +51,9 @@ return \PhpCsFixer\Config::create()
         'native_function_invocation' => [
             'include' => ['@compiler_optimized']
         ],
+        'no_superfluous_phpdoc_tags' => true,
         'no_useless_else'=> true,
-        'ordered_class_elements' => [
-            'order' => [
-                'use_trait',
-                'constant_public',
-                'property_public',
-            ],
-        ],
+        'ordered_class_elements' => true,
         'ordered_imports' => true,
         'phpdoc_align' => false,
         'phpdoc_summary' => false,

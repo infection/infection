@@ -1,0 +1,15 @@
+{
+    "autoload": {
+        "psr-4": {
+            "PhpUnit_Depends_Order\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PhpUnit_Depends_Order\\Test\\": "tests/"
+        }
+    },
+    "require": {
+        "phpunit/phpunit": "7.3"
+    }
+}
