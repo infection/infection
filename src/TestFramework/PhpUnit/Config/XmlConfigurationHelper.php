@@ -48,9 +48,15 @@ final class XmlConfigurationHelper
      */
     private $pathReplacer;
 
-    public function __construct(PathReplacer $pathReplacer)
+    /**
+     * @var string
+     */
+    private $phpUnitConfigDir;
+
+    public function __construct(PathReplacer $pathReplacer, string $phpUnitConfigDir)
     {
         $this->pathReplacer = $pathReplacer;
+        $this->phpUnitConfigDir = $phpUnitConfigDir;
     }
 
     public function replaceWithAbsolutePaths(\DOMXPath $xPath): void
@@ -120,8 +126,9 @@ final class XmlConfigurationHelper
         $schema = $xPath->query('/phpunit/@xsi:noNamespaceSchemaLocation');
 
         $original = libxml_use_internal_errors(true);
+        $schemaPath = $this->buildSchemaPath($schema[0]->nodeValue);
 
-        if ($schema->length && !$dom->schemaValidate($schema[0]->nodeValue)) {
+        if ($schema->length && !$dom->schemaValidate($schemaPath)) {
             throw InvalidPhpUnitXmlConfigException::byXsdSchema($this->getXmlErrorsString());
         }
 
@@ -147,5 +154,14 @@ final class XmlConfigurationHelper
         }
 
         return $errorsString;
+    }
+
+    private function buildSchemaPath(string $nodeValue): string
+    {
+        if ($this->phpUnitConfigDir === '' || filter_var($nodeValue, FILTER_VALIDATE_URL)) {
+            return $nodeValue;
+        }
+
+        return sprintf('%s/%s', $this->phpUnitConfigDir, $nodeValue);
     }
 }

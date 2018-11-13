@@ -55,7 +55,7 @@ final class FactoryTest extends Mockery\Adapter\Phpunit\MockeryTestCase
             '',
             '',
             Mockery::mock(TestFrameworkConfigLocatorInterface::class),
-            new XmlConfigurationHelper(new PathReplacer(new Filesystem())),
+            new XmlConfigurationHelper(new PathReplacer(new Filesystem()), ''),
             '',
             new InfectionConfig(new \stdClass(), new Filesystem(), ''),
             Mockery::mock(VersionParser::class)

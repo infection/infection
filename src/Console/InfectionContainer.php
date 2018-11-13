@@ -142,7 +142,7 @@ final class InfectionContainer extends Container
         };
 
         $this['xml.configuration.helper'] = function (): XmlConfigurationHelper {
-            return new XmlConfigurationHelper($this['path.replacer']);
+            return new XmlConfigurationHelper($this['path.replacer'], $this['phpunit.config.dir']);
         };
 
         $this['mutant.creator'] = function (): MutantCreator {

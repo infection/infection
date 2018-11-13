@@ -98,7 +98,7 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         $this->mutant->shouldReceive('getMutatedFilePath')->andReturn('/mutated/file/path');
         $this->mutant->shouldReceive('getMutatedFileCode')->andReturn('<?php');
 
-        $this->xmlConfigurationHelper = new XmlConfigurationHelper(new PathReplacer($this->fileSystem, $this->pathToProject));
+        $this->xmlConfigurationHelper = new XmlConfigurationHelper(new PathReplacer($this->fileSystem, $this->pathToProject), '');
 
         $this->builder = new MutationConfigBuilder(
             $this->tmpDir,
@@ -202,7 +202,7 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
 
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit_root_test_suite.xml';
         $replacer = new PathReplacer($this->fileSystem, $this->pathToProject);
-        $xmlConfigurationHelper = new XmlConfigurationHelper($replacer);
+        $xmlConfigurationHelper = new XmlConfigurationHelper($replacer, '');
 
         $this->builder = new MutationConfigBuilder(
             $this->tmpDir,

@@ -260,7 +260,7 @@ final class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTest
         $this->builder = new InitialConfigBuilder(
             $this->tmpDir,
             file_get_contents($phpunitXmlPath),
-            new XmlConfigurationHelper($replacer),
+            new XmlConfigurationHelper($replacer, ''),
             $jUnitFilePath,
             $srcDirs,
             $skipCoverage
