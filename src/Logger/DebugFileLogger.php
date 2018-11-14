@@ -82,7 +82,8 @@ final class DebugFileLogger extends FileLogger
         foreach ($processes as $mutantProcess) {
             $logParts[] = '';
             $logParts[] = 'Mutator: ' . $mutantProcess->getMutator()::getName();
-            $logParts[] = 'Line ' . $mutantProcess->getOriginalStartingLine();
+            $logParts[] = 'File: ' . $mutantProcess->getOriginalFilePath();
+            $logParts[] = 'Line: ' . $mutantProcess->getOriginalStartingLine();
         }
 
         return implode("\n", $logParts) . "\n";
