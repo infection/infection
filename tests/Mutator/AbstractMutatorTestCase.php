@@ -164,7 +164,24 @@ abstract class AbstractMutatorTestCase extends TestCase
 
     private function assertSyntaxIsValid(string $realMutatedCode): void
     {
-        exec(sprintf('echo %s | php -l', escapeshellarg($realMutatedCode)), $output, $returnCode);
+        $descriptorSpec = [
+           0 => ['pipe', 'r'],
+           1 => ['pipe', 'w'],
+        ];
+
+        $process = proc_open('php -l', $descriptorSpec, $pipes);
+
+        if (!\is_resource($process)) {
+            $this->fail('Unable to open process for linting.');
+
+            return;
+        }
+
+        fwrite($pipes[0], $realMutatedCode);
+        fclose($pipes[0]);
+        fclose($pipes[1]);
+
+        $returnCode = proc_close($process);
 
         $this->assertSame(
             0,
