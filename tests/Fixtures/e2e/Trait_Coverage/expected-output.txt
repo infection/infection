@@ -4,19 +4,24 @@ Killed mutants:
 
 
 Mutator: PublicVisibility
-Line 10
+File: /var/www/html/infection/tests/Fixtures/e2e/Trait_Coverage/src/SourceClass.php
+Line: 10
 
 Mutator: PublicVisibility
-Line 7
+File: /var/www/html/infection/tests/Fixtures/e2e/Trait_Coverage/src/SourceTrait.php
+Line: 7
 
 Mutator: TrueValue
-Line 12
+File: /var/www/html/infection/tests/Fixtures/e2e/Trait_Coverage/src/SourceTrait.php
+Line: 12
 
 Mutator: PublicVisibility
-Line 12
+File: /var/www/html/infection/tests/Fixtures/e2e/Trait_Coverage/src/SourceTrait.php
+Line: 12
 
 Mutator: Plus
-Line 15
+File: /var/www/html/infection/tests/Fixtures/e2e/Trait_Coverage/src/SourceTrait.php
+Line: 15
 
 Errors mutants:
 ===============
@@ -35,7 +40,9 @@ Not Covered mutants:
 
 
 Mutator: DecrementInteger
-Line 18
+File: /var/www/html/infection/tests/Fixtures/e2e/Trait_Coverage/src/SourceTrait.php
+Line: 18
 
 Mutator: OneZeroInteger
-Line 18
+File: /var/www/html/infection/tests/Fixtures/e2e/Trait_Coverage/src/SourceTrait.php
+Line: 18

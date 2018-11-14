@@ -4,10 +4,12 @@ Killed mutants:
 
 
 Mutator: FalseValue
-Line 15
+File: /var/www/html/infection/tests/Fixtures/e2e/Parameters_Coverage/src/ArraySearcher.php
+Line: 15
 
 Mutator: Identical
-Line 17
+File: /var/www/html/infection/tests/Fixtures/e2e/Parameters_Coverage/src/ArraySearcher.php
+Line: 17
 
 Errors mutants:
 ===============
@@ -18,7 +20,8 @@ Escaped mutants:
 
 
 Mutator: FalseValue
-Line 17
+File: /var/www/html/infection/tests/Fixtures/e2e/Parameters_Coverage/src/ArraySearcher.php
+Line: 17
 
 Timed Out mutants:
 ==================
@@ -29,4 +32,5 @@ Not Covered mutants:
 
 
 Mutator: Throw_
-Line 18
+File: /var/www/html/infection/tests/Fixtures/e2e/Parameters_Coverage/src/ArraySearcher.php
+Line: 18

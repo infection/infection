@@ -103,34 +103,44 @@ Killed mutants:
 
 
 Mutator: TrueValue
-Line 16
+File: bar/bar
+Line: 16
 
 Mutator: TrueValue
-Line 17
+File: bar/bar
+Line: 17
 
 Mutator: TrueValue
-Line 18
+File: bar/bar
+Line: 18
 
 Mutator: TrueValue
-Line 19
+File: bar/bar
+Line: 19
 
 Mutator: TrueValue
-Line 20
+File: bar/bar
+Line: 20
 
 Mutator: For_
-Line 6
+File: foo/bar
+Line: 6
 
 Mutator: For_
-Line 7
+File: foo/bar
+Line: 7
 
 Mutator: For_
-Line 8
+File: foo/bar
+Line: 8
 
 Mutator: For_
-Line 9
+File: foo/bar
+Line: 9
 
 Mutator: For_
-Line 10
+File: foo/bar
+Line: 10
 
 Errors mutants:
 ===============
@@ -141,10 +151,12 @@ Escaped mutants:
 
 
 Mutator: For_
-Line 9
+File: foo/bar
+Line: 9
 
 Mutator: For_
-Line 10
+File: foo/bar
+Line: 10
 
 Timed Out mutants:
 ==================
