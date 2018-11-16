@@ -187,7 +187,7 @@ ASCII;
         if (\PHP_SAPI === 'phpdbg') {
             $this->consoleOutput->logRunningWithDebugger(\PHP_SAPI);
         } elseif (\extension_loaded('xdebug')) {
-            $this->consoleOutput->logRunningWithDebugger('xdebug');
+            $this->consoleOutput->logRunningWithDebugger('Xdebug');
         }
     }
 }
