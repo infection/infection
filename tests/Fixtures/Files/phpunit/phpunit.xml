@@ -15,6 +15,7 @@
          processIsolation="false"
          syntaxCheck="false"
          printerClass="Fake\Printer\Class"
+         defaultTestSuite="unit"
 >
     <testsuites>
         <testsuite name="Application Test Suite">

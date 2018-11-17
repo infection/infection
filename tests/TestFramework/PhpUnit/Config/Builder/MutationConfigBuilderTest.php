@@ -262,6 +262,19 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         $this->assertSame($expectedFiles, $files);
     }
 
+    public function test_it_removes_default_test_suite(): void
+    {
+        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+
+        $configurationPath = $this->builder->build($this->mutant);
+
+        $xml = file_get_contents($configurationPath);
+
+        $value = $this->queryXpath($xml, '/phpunit/@defaultTestSuite');
+
+        $this->assertCount(0, $value);
+    }
+
     public function coverageTestsProvider(): array
     {
         return [

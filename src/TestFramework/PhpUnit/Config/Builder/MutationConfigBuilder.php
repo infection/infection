@@ -60,11 +60,6 @@ class MutationConfigBuilder extends ConfigBuilder
     private $xmlConfigurationHelper;
 
     /**
-     * @var string
-     */
-    private $originalXmlConfigContent;
-
-    /**
      * @var \DOMDocument
      */
     private $dom;
@@ -75,12 +70,11 @@ class MutationConfigBuilder extends ConfigBuilder
         $this->projectDir = $projectDir;
 
         $this->xmlConfigurationHelper = $xmlConfigurationHelper;
-        $this->originalXmlConfigContent = $originalXmlConfigContent;
 
         $this->dom = new \DOMDocument();
         $this->dom->preserveWhiteSpace = false;
         $this->dom->formatOutput = true;
-        $this->dom->loadXML($this->originalXmlConfigContent);
+        $this->dom->loadXML($originalXmlConfigContent);
     }
 
     public function build(MutantInterface $mutant): string
@@ -95,6 +89,7 @@ class MutationConfigBuilder extends ConfigBuilder
         $this->xmlConfigurationHelper->deactivateColours($xPath);
         $this->xmlConfigurationHelper->removeExistingLoggers($dom, $xPath);
         $this->xmlConfigurationHelper->removeExistingPrinters($dom, $xPath);
+        $this->xmlConfigurationHelper->removeDefaultTestSuite($dom, $xPath);
 
         $customAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',
