@@ -41,24 +41,24 @@ use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\VersionParser;
-use Mockery;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
  */
-final class FactoryTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+final class FactoryTest extends TestCase
 {
     public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
     {
         $factory = new Factory(
             '',
             '',
-            Mockery::mock(TestFrameworkConfigLocatorInterface::class),
+            $this->createMock(TestFrameworkConfigLocatorInterface::class),
             new XmlConfigurationHelper(new PathReplacer(new Filesystem()), ''),
             '',
             new InfectionConfig(new \stdClass(), new Filesystem(), ''),
-            Mockery::mock(VersionParser::class)
+            $this->createMock(VersionParser::class)
         );
 
         $this->expectException(\InvalidArgumentException::class);

@@ -39,13 +39,13 @@ use Infection\Mutant\MutantInterface;
 use Infection\MutationInterface;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use Infection\Utils\TmpDirectoryCreator;
-use Mockery;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
  */
-final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+final class MutationConfigBuilderTest extends TestCase
 {
     private $tmpDir;
 
@@ -77,13 +77,17 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         $projectDir = '/project/dir';
         $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/phpspec/phpspec.yml';
 
-        $mutation = Mockery::mock(MutationInterface::class);
-        $mutation->shouldReceive('getHash')->andReturn('a1b2c3');
-        $mutation->shouldReceive('getOriginalFilePath')->andReturn('/original/file/path');
+        $mutation = $this->createMock(MutationInterface::class);
+        $mutation->method('getHash')
+            ->willReturn('a1b2c3');
+        $mutation->method('getOriginalFilePath')
+            ->willReturn('/original/file/path');
 
-        $mutant = Mockery::mock(MutantInterface::class);
-        $mutant->shouldReceive('getMutation')->andReturn($mutation);
-        $mutant->shouldReceive('getMutatedFilePath')->andReturn('/mutated/file/path');
+        $mutant = $this->createMock(MutantInterface::class);
+        $mutant->method('getMutation')
+            ->willReturn($mutation);
+        $mutant->method('getMutatedFilePath')
+            ->willReturn('/mutated/file/path');
 
         // TODO for PhpSpec pass file content as well
         // TODO test phpspec after that
@@ -97,13 +101,17 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         $projectDir = '/project/dir';
         $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/phpspec/phpspec.with.bootstrap.yml';
 
-        $mutation = Mockery::mock(MutationInterface::class);
-        $mutation->shouldReceive('getHash')->andReturn('a1b2c3');
-        $mutation->shouldReceive('getOriginalFilePath')->andReturn('/original/file/path');
+        $mutation = $this->createMock(MutationInterface::class);
+        $mutation->method('getHash')
+            ->willReturn('a1b2c3');
+        $mutation->method('getOriginalFilePath')
+            ->willReturn('/original/file/path');
 
-        $mutant = Mockery::mock(MutantInterface::class);
-        $mutant->shouldReceive('getMutation')->andReturn($mutation);
-        $mutant->shouldReceive('getMutatedFilePath')->andReturn('/mutated/file/path');
+        $mutant = $this->createMock(MutantInterface::class);
+        $mutant->method('getMutation')
+            ->willReturn($mutation);
+        $mutant->method('getMutatedFilePath')
+            ->willReturn('/mutated/file/path');
 
         $builder = new MutationConfigBuilder($this->tmpDir, $originalYamlConfigPath, $projectDir);
 

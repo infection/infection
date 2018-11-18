@@ -41,13 +41,13 @@ use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkTypes;
-use Mockery;
 use PhpParser\Node\Scalar\LNumber;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+final class CodeCoverageDataTest extends TestCase
 {
     private $coverageDir = __DIR__ . '/../../Fixtures/Files/phpunit/coverage-xml';
 
@@ -143,7 +143,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $mutation = new Mutation(
             $filePath,
             [],
-            Mockery::mock(Mutator::class),
+            $this->createMock(Mutator::class),
             ['startLine' => 1, 'endLine' => 1],
             'PHPParser\Node\Expr\BinaryOp\Plus',
             false,
@@ -163,7 +163,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $mutation = new Mutation(
             $filePath,
             [],
-            Mockery::mock(Mutator::class),
+            $this->createMock(Mutator::class),
             ['startLine' => 26, 'endLine' => 26],
             'PHPParser\Node\Expr\BinaryOp\Plus',
             false,
@@ -183,7 +183,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $mutation = new Mutation(
             $filePath,
             [],
-            Mockery::mock(Mutator::class),
+            $this->createMock(Mutator::class),
             ['startLine' => 1, 'endLine' => 1],
             'PHPParser\Node\Stmt\ClassMethod',
             true,
@@ -203,7 +203,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
         $mutation = new Mutation(
             $filePath,
             [],
-            Mockery::mock(Mutator::class),
+            $this->createMock(Mutator::class),
             ['startLine' => 24, 'endLine' => 24],
             'PHPParser\Node\Stmt\ClassMethod',
             true,
@@ -217,7 +217,7 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
     public function test_it_throws_an_exception_when_no_coverage_found(): void
     {
-        $coverageXmlParserMock = Mockery::mock(CoverageXmlParser::class);
+        $coverageXmlParserMock = $this->createMock(CoverageXmlParser::class);
 
         $coverage = new CodeCoverageData('/abc/foo/bar', $coverageXmlParserMock, TestFrameworkTypes::PHPUNIT);
 
@@ -278,8 +278,10 @@ final class CodeCoverageDataTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
     private function getCodeCoverageData(): CodeCoverageData
     {
-        $coverageXmlParserMock = Mockery::mock(CoverageXmlParser::class);
-        $coverageXmlParserMock->shouldReceive('parse')->once()->andReturn($this->getParsedCodeCoverageData());
+        $coverageXmlParserMock = $this->createMock(CoverageXmlParser::class);
+        $coverageXmlParserMock->expects($this->once())
+            ->method('parse')
+            ->willReturn($this->getParsedCodeCoverageData());
 
         return new CodeCoverageData($this->coverageDir, $coverageXmlParserMock, TestFrameworkTypes::PHPUNIT);
     }

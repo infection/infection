@@ -39,14 +39,14 @@ use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\TmpDirectoryCreator;
-use Mockery;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use function Infection\Tests\normalizePath as p;
 
 /**
  * @internal
  */
-final class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+final class InitialConfigBuilderTest extends TestCase
 {
     public const HASH = 'a1b2c3';
 
@@ -239,7 +239,7 @@ final class InitialConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTest
         yield 'PHPUnit 7.3.1 runs dependency resolver' => ['7.3.1', 'resolveDependencies', 1];
     }
 
-    protected function queryXpath(string $xml, string $query)
+    private function queryXpath(string $xml, string $query)
     {
         $dom = new \DOMDocument();
         $dom->loadXML($xml);

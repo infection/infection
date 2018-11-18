@@ -37,23 +37,28 @@ namespace Infection\Tests\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TextLogFileProvider;
-use Mockery;
 
 /**
  * @internal
  */
 final class TextLogFileProviderTest extends AbstractBaseProviderTest
 {
+    /**
+     * @var TextLogFileProvider
+     */
+    private $provider;
+
+    protected function setUp(): void
+    {
+        $this->provider = new TextLogFileProvider(
+            $this->createMock(ConsoleHelper::class),
+            $this->getQuestionHelper()
+        );
+    }
+
     public function test_it_uses_default_value(): void
     {
-        $consoleMock = Mockery::mock(ConsoleHelper::class);
-        $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
-
-        $dialog = $this->getQuestionHelper();
-
-        $provider = new TextLogFileProvider($consoleMock, $dialog);
-
-        $textLogFilePath = $provider->get(
+        $textLogFilePath = $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
             $this->createOutputInterface(),
             []
@@ -65,14 +70,8 @@ final class TextLogFileProviderTest extends AbstractBaseProviderTest
     public function test_it_uses_typed_value(): void
     {
         $inputValue = 'test-log.txt';
-        $consoleMock = Mockery::mock(ConsoleHelper::class);
-        $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
 
-        $dialog = $this->getQuestionHelper();
-
-        $provider = new TextLogFileProvider($consoleMock, $dialog);
-
-        $textLogFilePath = $provider->get(
+        $textLogFilePath = $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("{$inputValue}\n")),
             $this->createOutputInterface(),
             []

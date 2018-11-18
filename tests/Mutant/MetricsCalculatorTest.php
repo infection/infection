@@ -38,13 +38,13 @@ namespace Infection\Tests\Mutant;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessInterface;
-use Mockery;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
  */
-final class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+final class MetricsCalculatorTest extends TestCase
 {
     public function test_it_shows_zero_values_by_default(): void
     {
@@ -69,8 +69,8 @@ final class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
 
     public function test_it_collects_all_values(): void
     {
-        $process = Mockery::mock(Process::class);
-        $process->shouldReceive('stop');
+        $process = $this->createMock(Process::class);
+        $process->method('stop');
 
         $calculator = new MetricsCalculator();
 
@@ -96,8 +96,10 @@ final class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
 
     private function addMutantProcess(MetricsCalculator $calculator, int $resultCode, int $count = 1): void
     {
-        $mutantProcess = Mockery::mock(MutantProcessInterface::class);
-        $mutantProcess->shouldReceive('getResultCode')->times($count)->andReturn($resultCode);
+        $mutantProcess = $this->createMock(MutantProcessInterface::class);
+        $mutantProcess->expects($this->exactly($count))
+            ->method('getResultCode')
+            ->willReturn($resultCode);
 
         while ($count--) {
             $calculator->collect($mutantProcess);

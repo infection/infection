@@ -37,7 +37,6 @@ namespace Infection\Tests\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
-use Mockery;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -55,12 +54,23 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
      */
     private $fileSystem;
 
+    /**
+     * @var ExcludeDirsProvider
+     */
+    private $provider;
+
     protected function setUp(): void
     {
         $this->workspace = \sys_get_temp_dir() . '/exclude' . \microtime(true) . \random_int(100, 999);
         \mkdir($this->workspace, 0777, true);
 
         $this->fileSystem = new Filesystem();
+
+        $this->provider = new ExcludeDirsProvider(
+            $this->createMock(ConsoleHelper::class),
+            $this->getQuestionHelper(),
+            $this->fileSystem
+        );
     }
 
     protected function tearDown(): void
@@ -73,14 +83,7 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
      */
     public function test_it_contains_vendors_when_sources_contains_current_dir(string $excludedRootDir, array $dirsInCurrentFolder): void
     {
-        $consoleMock = Mockery::mock(ConsoleHelper::class);
-        $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
-
-        $dialog = $this->getQuestionHelper();
-
-        $provider = new ExcludeDirsProvider($consoleMock, $dialog, $this->fileSystem);
-
-        $excludedDirs = $provider->get(
+        $excludedDirs = $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
             $this->createOutputInterface(),
             $dirsInCurrentFolder,
@@ -96,14 +99,7 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
             $this->markTestSkipped('Stty is not available');
         }
 
-        $consoleMock = Mockery::mock(ConsoleHelper::class);
-        $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
-
-        $dialog = $this->getQuestionHelper();
-
-        $provider = new ExcludeDirsProvider($consoleMock, $dialog, $this->fileSystem);
-
-        $excludeDirs = $provider->get(
+        $excludeDirs = $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("abc\n")),
             $this->createOutputInterface(),
             ['src'],
@@ -125,14 +121,7 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
         \mkdir($dir1);
         \mkdir($dir2);
 
-        $consoleMock = Mockery::mock(ConsoleHelper::class);
-        $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
-
-        $dialog = $this->getQuestionHelper();
-
-        $provider = new ExcludeDirsProvider($consoleMock, $dialog, $this->fileSystem);
-
-        $excludeDirs = $provider->get(
+        $excludeDirs = $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("foo\n")),
             $this->createOutputInterface(),
             ['src'],

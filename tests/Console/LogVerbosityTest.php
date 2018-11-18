@@ -37,21 +37,21 @@ namespace Infection\Tests\Console;
 
 use Infection\Console\ConsoleOutput;
 use Infection\Console\LogVerbosity;
-use Mockery;
-use Mockery\Adapter\Phpunit\MockeryTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * @internal
  */
-final class LogVerbosityTest extends MockeryTestCase
+final class LogVerbosityTest extends TestCase
 {
     public function test_it_works_if_verbosity_is_valid(): void
     {
         $input = $this->setInputExpectationsWhenItDoesNotChange(LogVerbosity::NORMAL);
 
-        LogVerbosity::convertVerbosityLevel($input, new ConsoleOutput(Mockery::mock(SymfonyStyle::class)));
+        LogVerbosity::convertVerbosityLevel($input, new ConsoleOutput($this->createMock(SymfonyStyle::class)));
     }
 
     /**
@@ -60,10 +60,10 @@ final class LogVerbosityTest extends MockeryTestCase
     public function test_it_converts_int_version_to_string_version_of_verbosity(int $input, string $output): void
     {
         $input = $this->setInputExpectationsWhenItDoesChange($input, $output);
-        $io = Mockery::mock(SymfonyStyle::class);
-        $io->shouldReceive('note')
-            ->withArgs(['Numeric versions of log-verbosity have been deprecated, please use, ' . $output . ' to keep the same result'])
-            ->once();
+        $io = $this->createMock(SymfonyStyle::class);
+        $io->expects($this->once())
+            ->method('note')
+            ->with('Numeric versions of log-verbosity have been deprecated, please use, ' . $output . ' to keep the same result');
 
         LogVerbosity::convertVerbosityLevel($input, new ConsoleOutput($io));
     }
@@ -94,10 +94,10 @@ final class LogVerbosityTest extends MockeryTestCase
     public function test_it_converts_to_normal_and_writes_notice_when_invalid_verbosity(): void
     {
         $input = $this->setInputExpectationsWhenItDoesChange('asdf', LogVerbosity::NORMAL);
-        $io = Mockery::mock(SymfonyStyle::class);
-        $io->shouldReceive('note')
-            ->withArgs(['Running infection with an unknown log-verbosity option, falling back to default option'])
-            ->once();
+        $io = $this->createMock(SymfonyStyle::class);
+        $io->expects($this->once())
+            ->method('note')
+            ->with('Running infection with an unknown log-verbosity option, falling back to default option');
 
         LogVerbosity::convertVerbosityLevel($input, new ConsoleOutput($io));
     }
@@ -105,15 +105,15 @@ final class LogVerbosityTest extends MockeryTestCase
     /**
      * @param string|int $inputVerbosity
      *
-     * @return InputInterface|Mockery\MockInterface
+     * @return InputInterface|MockObject
      */
     private function setInputExpectationsWhenItDoesNotChange($inputVerbosity)
     {
-        $input = Mockery::mock(InputInterface::class);
-        $input->shouldReceive('getOption')
-            ->withArgs(['log-verbosity'])
-            ->once()
-            ->andReturn($inputVerbosity);
+        $input = $this->createMock(InputInterface::class);
+        $input->expects($this->once())
+            ->method('getOption')
+            ->with('log-verbosity')
+            ->willReturn($inputVerbosity);
 
         return $input;
     }
@@ -121,14 +121,14 @@ final class LogVerbosityTest extends MockeryTestCase
     /**
      * @param string|int $input
      *
-     * @return InputInterface|Mockery\MockInterface
+     * @return InputInterface|MockObject
      */
     private function setInputExpectationsWhenItDoesChange($input, string $output)
     {
         $input = $this->setInputExpectationsWhenItDoesNotChange($input);
-        $input->shouldReceive('setOption')
-            ->withArgs(['log-verbosity', $output])
-            ->once();
+        $input->expects($this->once())
+            ->method('setOption')
+            ->with('log-verbosity', $output);
 
         return $input;
     }

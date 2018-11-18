@@ -38,18 +38,20 @@ namespace Infection\Tests\Process\Builder;
 use Infection\Mutant\MutantInterface;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Mockery;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-final class ProcessBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+final class ProcessBuilderTest extends TestCase
 {
     public function test_getProcessForInitialTestRun_has_no_timeout(): void
     {
-        $fwAdapter = Mockery::mock(AbstractTestFrameworkAdapter::class);
-        $fwAdapter->shouldReceive('getInitialTestRunCommandLine', ['buildInitialConfigFile'])->andReturn(['/usr/bin/php']);
-        $fwAdapter->shouldReceive('buildInitialConfigFile')->andReturn('buildInitialConfigFile');
+        $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $fwAdapter->method('getInitialTestRunCommandLine')
+            ->willReturn(['/usr/bin/php']);
+        $fwAdapter->method('buildInitialConfigFile')
+            ->willReturn('buildInitialConfigFile');
 
         $builder = new ProcessBuilder($fwAdapter, 100);
 
@@ -61,13 +63,15 @@ final class ProcessBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
 
     public function test_getProcessForMutant_has_timeout(): void
     {
-        $fwAdapter = Mockery::mock(AbstractTestFrameworkAdapter::class);
-        $fwAdapter->shouldReceive('getMutantCommandLine', ['buildMutationConfigFile'])->andReturn(['/usr/bin/php']);
-        $fwAdapter->shouldReceive('buildMutationConfigFile')->andReturn('buildMutationConfigFile');
+        $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $fwAdapter->method('getMutantCommandLine')
+            ->willReturn(['/usr/bin/php']);
+        $fwAdapter->method('buildMutationConfigFile')
+            ->willReturn('buildMutationConfigFile');
 
         $builder = new ProcessBuilder($fwAdapter, 100);
 
-        $process = $builder->getProcessForMutant(Mockery::mock(MutantInterface::class))->getProcess();
+        $process = $builder->getProcessForMutant($this->createMock(MutantInterface::class))->getProcess();
 
         $this->assertContains('/usr/bin/php', $process->getCommandLine());
         $this->assertSame(100.0, $process->getTimeout());

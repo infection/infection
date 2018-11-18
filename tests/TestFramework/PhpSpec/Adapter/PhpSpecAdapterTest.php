@@ -41,12 +41,12 @@ use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use Infection\Utils\VersionParser;
-use Mockery;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-final class PhpSpecAdapterTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+final class PhpSpecAdapterTest extends TestCase
 {
     public function test_it_has_a_name(): void
     {
@@ -127,12 +127,12 @@ OUTPUT;
 
     private function getAdapter(): PhpSpecAdapter
     {
-        $executableFined = Mockery::mock(AbstractExecutableFinder::class);
-        $initialConfigBuilder = Mockery::mock(InitialConfigBuilder::class);
-        $mutationConfigBuilder = Mockery::mock(MutationConfigBuilder::class);
-        $cliArgumentsBuilder = Mockery::mock(CommandLineArgumentsAndOptionsBuilder::class);
-        $versionParser = Mockery::mock(VersionParser::class);
-
-        return new PhpSpecAdapter($executableFined, $initialConfigBuilder, $mutationConfigBuilder, $cliArgumentsBuilder, $versionParser);
+        return new PhpSpecAdapter(
+            $this->createMock(AbstractExecutableFinder::class),
+            $this->createMock(InitialConfigBuilder::class),
+            $this->createMock(MutationConfigBuilder::class),
+            $this->createMock(CommandLineArgumentsAndOptionsBuilder::class),
+            $this->createMock(VersionParser::class)
+        );
     }
 }

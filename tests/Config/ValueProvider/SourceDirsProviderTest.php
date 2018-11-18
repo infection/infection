@@ -38,30 +38,45 @@ namespace Infection\Tests\Config\ValueProvider;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\ValueProvider\SourceDirsProvider;
-use Mockery;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @internal
  */
 final class SourceDirsProviderTest extends AbstractBaseProviderTest
 {
+    /**
+     * @var SourceDirsProvider
+     */
+    private $provider;
+
+    /**
+     * @var MockObject|SourceDirGuesser
+     */
+    private $sourceDirGuesser;
+
+    protected function setUp(): void
+    {
+        $this->sourceDirGuesser = $this->createMock(SourceDirGuesser::class);
+
+        $this->provider = new SourceDirsProvider(
+            $this->createMock(ConsoleHelper::class),
+            $this->getQuestionHelper(),
+            $this->sourceDirGuesser
+        );
+    }
+
     public function test_it_uses_guesser_and_default_value(): void
     {
         if (stripos(PHP_OS, 'WIN') === 0) {
             $this->markTestSkipped('Stty is not available');
         }
 
-        $consoleMock = Mockery::mock(ConsoleHelper::class);
-        $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
+        $this->sourceDirGuesser
+            ->method('guess')
+            ->willReturn(['src']);
 
-        $dialog = $this->getQuestionHelper();
-
-        $sourceDirGuesser = $this->createMock(SourceDirGuesser::class);
-        $sourceDirGuesser->method('guess')->willReturn(['src']);
-
-        $provider = new SourceDirsProvider($consoleMock, $dialog, $sourceDirGuesser);
-
-        $sourceDirs = $provider->get(
+        $sourceDirs = $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
             $this->createOutputInterface(),
             ['src']
@@ -72,17 +87,11 @@ final class SourceDirsProviderTest extends AbstractBaseProviderTest
 
     public function test_it_uses_guesser_and_non_default_guessed_value(): void
     {
-        $consoleMock = Mockery::mock(ConsoleHelper::class);
-        $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
+        $this->sourceDirGuesser
+            ->method('guess')
+            ->willReturn(['src/Namespace']);
 
-        $dialog = $this->getQuestionHelper();
-
-        $sourceDirGuesser = $this->createMock(SourceDirGuesser::class);
-        $sourceDirGuesser->method('guess')->willReturn(['src/Namespace']);
-
-        $provider = new SourceDirsProvider($consoleMock, $dialog, $sourceDirGuesser);
-
-        $sourceDirs = $provider->get(
+        $sourceDirs = $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
             $this->createOutputInterface(),
             ['src']
@@ -93,17 +102,11 @@ final class SourceDirsProviderTest extends AbstractBaseProviderTest
 
     public function test_it_uses_guesser_and_multiple_guessed_dirs(): void
     {
-        $consoleMock = Mockery::mock(ConsoleHelper::class);
-        $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
+        $this->sourceDirGuesser
+            ->method('guess')
+            ->willReturn(['foo', 'bar']);
 
-        $dialog = $this->getQuestionHelper();
-
-        $sourceDirGuesser = $this->createMock(SourceDirGuesser::class);
-        $sourceDirGuesser->method('guess')->willReturn(['foo', 'bar']);
-
-        $provider = new SourceDirsProvider($consoleMock, $dialog, $sourceDirGuesser);
-
-        $sourceDirs = $provider->get(
+        $sourceDirs = $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
             $this->createOutputInterface(),
             ['src']
@@ -114,17 +117,11 @@ final class SourceDirsProviderTest extends AbstractBaseProviderTest
 
     public function test_it_fills_choices_with_current_dir(): void
     {
-        $consoleMock = Mockery::mock(ConsoleHelper::class);
-        $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
+        $this->sourceDirGuesser
+            ->method('guess')
+            ->willReturn(['src']);
 
-        $dialog = $this->getQuestionHelper();
-
-        $sourceDirGuesser = $this->createMock(SourceDirGuesser::class);
-        $sourceDirGuesser->method('guess')->willReturn(['src']);
-
-        $provider = new SourceDirsProvider($consoleMock, $dialog, $sourceDirGuesser);
-
-        $sourceDirs = $provider->get(
+        $sourceDirs = $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("0\n")),
             $this->createOutputInterface(),
             ['src']
@@ -135,19 +132,13 @@ final class SourceDirsProviderTest extends AbstractBaseProviderTest
 
     public function test_it_throws_exception_when_current_dir_is_selected_with_another_dir(): void
     {
-        $consoleMock = Mockery::mock(ConsoleHelper::class);
-        $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
-
-        $dialog = $this->getQuestionHelper();
-
-        $sourceDirGuesser = $this->createMock(SourceDirGuesser::class);
-        $sourceDirGuesser->method('guess')->willReturn(['src']);
-
-        $provider = new SourceDirsProvider($consoleMock, $dialog, $sourceDirGuesser);
+        $this->sourceDirGuesser
+            ->method('guess')
+            ->willReturn(['src']);
 
         $this->expectException(\LogicException::class);
 
-        $provider->get(
+        $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("0,1\n")),
             $this->createOutputInterface(),
             ['src']

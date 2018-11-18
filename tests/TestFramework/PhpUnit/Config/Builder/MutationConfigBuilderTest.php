@@ -41,14 +41,14 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\TmpDirectoryCreator;
-use Mockery;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use function Infection\Tests\normalizePath as p;
 
 /**
  * @internal
  */
-final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+final class MutationConfigBuilderTest extends TestCase
 {
     public const HASH = 'a1b2c3';
 
@@ -89,14 +89,21 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         $projectDir = '/project/dir';
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit.xml';
 
-        $this->mutation = Mockery::mock(MutationInterface::class);
-        $this->mutation->shouldReceive('getHash')->andReturn(self::HASH);
-        $this->mutation->shouldReceive('getOriginalFilePath')->andReturn('/original/file/path');
+        $this->mutation = $this->createMock(MutationInterface::class);
+        $this->mutation
+            ->method('getHash')
+            ->willReturn(self::HASH);
+        $this->mutation
+            ->method('getOriginalFilePath')
+            ->willReturn('/original/file/path');
 
-        $this->mutant = Mockery::mock(MutantInterface::class);
-        $this->mutant->shouldReceive('getMutation')->andReturn($this->mutation);
-        $this->mutant->shouldReceive('getMutatedFilePath')->andReturn('/mutated/file/path');
-        $this->mutant->shouldReceive('getMutatedFileCode')->andReturn('<?php');
+        $this->mutant = $this->createMock(MutantInterface::class);
+        $this->mutant
+            ->method('getMutation')
+            ->willReturn($this->mutation);
+        $this->mutant
+            ->method('getMutatedFilePath')
+            ->willReturn('/mutated/file/path');
 
         $this->xmlConfigurationHelper = new XmlConfigurationHelper(new PathReplacer($this->fileSystem, $this->pathToProject), '');
 
@@ -115,7 +122,9 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
 
     public function test_it_builds_path_to_mutation_config_file(): void
     {
-        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn([]);
 
         $this->assertSame(
             $this->tmpDir . '/phpunitConfiguration.a1b2c3.infection.xml',
@@ -125,7 +134,9 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
 
     public function test_it_sets_custom_autoloader(): void
     {
-        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn([]);
 
         $configurationPath = $this->builder->build($this->mutant);
 
@@ -145,7 +156,10 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
 
     public function test_it_sets_custom_autoloader_when_attribute_is_absent(): void
     {
-        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn([]);
+
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpuit_without_bootstrap.xml';
         $this->builder = new MutationConfigBuilder(
             $this->tmpDir,
@@ -172,7 +186,9 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
 
     public function test_it_sets_stop_on_failure_flag(): void
     {
-        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn([]);
 
         $configurationPath = $this->builder->build($this->mutant);
 
@@ -185,7 +201,9 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
 
     public function test_it_sets_colors_flag(): void
     {
-        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn([]);
 
         $configurationPath = $this->builder->build($this->mutant);
 
@@ -198,7 +216,9 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
 
     public function test_it_handles_root_test_suite(): void
     {
-        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn([]);
 
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit_root_test_suite.xml';
         $replacer = new PathReplacer($this->fileSystem, $this->pathToProject);
@@ -218,7 +238,9 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
 
     public function test_it_removes_original_loggers(): void
     {
-        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn([]);
 
         $configurationPath = $this->builder->build($this->mutant);
 
@@ -230,7 +252,9 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
 
     public function test_it_removes_printer_class(): void
     {
-        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn([]);
 
         $configurationPath = $this->builder->build($this->mutant);
 
@@ -246,7 +270,9 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
      */
     public function test_it_sets_sorted_list_of_test_files(array $coverageTests, array $expectedFiles): void
     {
-        $this->mutant->shouldReceive('getCoverageTests')->andReturn($coverageTests);
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn($coverageTests);
 
         $configurationPath = $this->builder->build($this->mutant);
 
@@ -264,7 +290,9 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
 
     public function test_it_removes_default_test_suite(): void
     {
-        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn([]);
 
         $configurationPath = $this->builder->build($this->mutant);
 
@@ -333,7 +361,7 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         ];
     }
 
-    protected function queryXpath(string $xml, string $query)
+    private function queryXpath(string $xml, string $query)
     {
         $dom = new \DOMDocument();
         $dom->loadXML($xml);

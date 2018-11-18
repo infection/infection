@@ -48,39 +48,47 @@ use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Tests\Fixtures\Files\Mutation\OneFile\OneFile;
 use Infection\WrongMutator\ErrorMutator;
-use Mockery;
 use PhpParser\Lexer;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
+use PHPUnit\Framework\TestCase;
 use Pimple\Container;
 
 /**
  * @internal
  */
-final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+final class MutationsGeneratorTest extends TestCase
 {
     public function test_it_collects_plus_mutation(): void
     {
-        $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
-        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->twice()->andReturn(true);
-        $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->times(3)->andReturn(false);
+        $codeCoverageDataMock = $this->createMock(CodeCoverageData::class);
 
-        $generator = $this->createMutationGenerator($codeCoverageDataMock);
+        $codeCoverageDataMock->expects($this->exactly(2))
+            ->method('hasTestsOnLine')
+            ->willReturn(true);
 
-        $mutations = $generator->generate(false);
+        $codeCoverageDataMock->expects($this->exactly(3))
+            ->method('hasExecutedMethodOnLine')
+            ->willReturn(false);
+
+        $mutations = $this->createMutationGenerator($codeCoverageDataMock)->generate(false);
 
         $this->assertInstanceOf(Plus::class, $mutations[3]->getMutator());
     }
 
     public function test_it_collects_public_visibility_mutation(): void
     {
-        $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
-        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->twice()->andReturn(true);
-        $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->times(3)->andReturn(true);
+        $codeCoverageDataMock = $this->createMock(CodeCoverageData::class);
 
-        $generator = $this->createMutationGenerator($codeCoverageDataMock);
+        $codeCoverageDataMock->expects($this->exactly(2))
+            ->method('hasTestsOnLine')
+            ->willReturn(true);
 
-        $mutations = $generator->generate(false);
+        $codeCoverageDataMock->expects($this->exactly(3))
+            ->method('hasExecutedMethodOnLine')
+            ->willReturn(true);
+
+        $mutations = $this->createMutationGenerator($codeCoverageDataMock)->generate(false);
 
         $this->assertInstanceOf(Plus::class, $mutations[3]->getMutator());
         $this->assertInstanceOf(PublicVisibility::class, $mutations[4]->getMutator());
@@ -88,26 +96,34 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
 
     public function test_it_can_skip_not_covered_on_file_level(): void
     {
-        $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
-        $codeCoverageDataMock->shouldReceive('hasTests')->once()->andReturn(false);
+        $codeCoverageDataMock = $this->createMock(CodeCoverageData::class);
 
-        $generator = $this->createMutationGenerator($codeCoverageDataMock);
+        $codeCoverageDataMock->expects($this->once())
+            ->method('hasTests')
+            ->willReturn(false);
 
-        $mutations = $generator->generate(true);
+        $mutations = $this->createMutationGenerator($codeCoverageDataMock)->generate(true);
 
         $this->assertCount(0, $mutations);
     }
 
     public function test_it_can_skip_not_covered_on_file_line_level(): void
     {
-        $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
-        $codeCoverageDataMock->shouldReceive('hasTests')->once()->andReturn(true);
-        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->times(4)->andReturn(false);
-        $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->times(3)->andReturn(true);
+        $codeCoverageDataMock = $this->createMock(CodeCoverageData::class);
 
-        $generator = $this->createMutationGenerator($codeCoverageDataMock);
+        $codeCoverageDataMock->expects($this->once())
+            ->method('hasTests')
+            ->willReturn(true);
 
-        $mutations = $generator->generate(true);
+        $codeCoverageDataMock->expects($this->exactly(4))
+            ->method('hasTestsOnLine')
+            ->willReturn(false);
+
+        $codeCoverageDataMock->expects($this->exactly(3))
+            ->method('hasExecutedMethodOnLine')
+            ->willReturn(true);
+
+        $mutations = $this->createMutationGenerator($codeCoverageDataMock)->generate(true);
 
         $this->assertCount(3, $mutations);
         $this->assertInstanceOf(TrueValue::class, $mutations[0]->getMutator());
@@ -116,22 +132,32 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
 
     public function test_it_can_skip_not_covered_on_file_line_for_visibility(): void
     {
-        $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
-        $codeCoverageDataMock->shouldReceive('hasTests')->once()->andReturn(true);
-        $codeCoverageDataMock->shouldReceive('hasTestsOnLine')->times(4)->andReturn(false);
-        $codeCoverageDataMock->shouldReceive('hasExecutedMethodOnLine')->times(3)->andReturn(false);
+        $codeCoverageDataMock = $this->createMock(CodeCoverageData::class);
 
-        $generator = $this->createMutationGenerator($codeCoverageDataMock);
+        $codeCoverageDataMock->expects($this->once())
+            ->method('hasTests')
+            ->willReturn(true);
 
-        $mutations = $generator->generate(true);
+        $codeCoverageDataMock->expects($this->exactly(4))
+            ->method('hasTestsOnLine')
+            ->willReturn(false);
+
+        $codeCoverageDataMock->expects($this->exactly(3))
+            ->method('hasExecutedMethodOnLine')
+            ->willReturn(false);
+
+        $mutations = $this->createMutationGenerator($codeCoverageDataMock)->generate(true);
 
         $this->assertCount(0, $mutations);
     }
 
     public function test_it_can_skip_ignored_classes(): void
     {
-        $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
-        $codeCoverageDataMock->shouldReceive('hasTests')->once()->andReturn(true);
+        $codeCoverageDataMock = $this->createMock(CodeCoverageData::class);
+
+        $codeCoverageDataMock->expects($this->once())
+            ->method('hasTests')
+            ->willReturn(true);
 
         $generator = $this->createMutationGenerator($codeCoverageDataMock, null, new MutatorConfig([
             'ignore' => [
@@ -146,9 +172,10 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
 
     public function test_it_executes_only_whitelisted_mutators(): void
     {
-        $codeCoverageDataMock = Mockery::mock(CodeCoverageData::class);
-
-        $generator = $this->createMutationGenerator($codeCoverageDataMock, Decrement::class);
+        $generator = $this->createMutationGenerator(
+            $this->createMock(CodeCoverageData::class),
+            Decrement::class
+        );
 
         $mutations = $generator->generate(false);
 
@@ -158,7 +185,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
     public function test_it_throws_correct_error_when_file_is_invalid(): void
     {
         $generator = $this->createMutationGenerator(
-            Mockery::mock(CodeCoverageData::class),
+            $this->createMock(CodeCoverageData::class),
             Decrement::class,
             null,
             [\dirname(__DIR__, 2) . '/Fixtures/Files/InvalidFile']
@@ -172,7 +199,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
     public function test_it_throws_correct_exception_when_mutator_is_invalid(): void
     {
         $generator = $this->createMutationGenerator(
-            Mockery::mock(CodeCoverageData::class),
+            $this->createMock(CodeCoverageData::class),
             ErrorMutator::class
         );
 
@@ -190,7 +217,7 @@ final class MutationsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCa
         ?string $whitelistedMutatorName = null,
         ?MutatorConfig $mutatorConfig = null,
         array $srcDirs = []
-    ) {
+    ): MutationsGenerator {
         if ($srcDirs === []) {
             $srcDirs = [
                 \dirname(__DIR__, 2) . '/Fixtures/Files/Mutation/OneFile',
