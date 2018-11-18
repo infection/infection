@@ -19,7 +19,7 @@ addons:
       - expect
 
 before_install:
-  - source .ci/xdebug.sh
+  - source .ci/travis-functions.sh
   - xdebug-disable
 
 jobs:
@@ -58,10 +58,13 @@ jobs:
           fi
         - if [[ $NO_DEBUGGER == 1 ]]; then xdebug-disable; fi
         - |
+          INFECTION_PR_FLAGS=$(get-infection-pr-flags);
+          echo "INFECTION_PR_FLAGS=$INFECTION_PR_FLAGS";
+
           if [[ $PHPDBG != 1 ]]; then
-            bin/infection $INFECTION_FLAGS;
+            bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
           else
-            phpdbg -qrr bin/infection $INFECTION_FLAGS;
+            phpdbg -qrr bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
           fi
 
       after_success:
@@ -126,7 +129,9 @@ jobs:
         - make build/bin/infection.phar;
         - ./tests/e2e_tests build/bin/infection.phar;
         - phpdbg -qrr $PHPUNIT_BIN
-        - phpdbg -qrr bin/infection $INFECTION_FLAGS
+        - |
+          INFECTION_PR_FLAGS=$(get-infection-pr-flags);
+          phpdbg -qrr bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
 
     - stage: Deploy
       php: 7.2

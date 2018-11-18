@@ -47,7 +47,6 @@ final class Plus extends Mutator
     /**
      * Replaces "+" with "-"
      *
-     *
      * @return Node\Expr\BinaryOp\Minus
      */
     public function mutate(Node $node)
