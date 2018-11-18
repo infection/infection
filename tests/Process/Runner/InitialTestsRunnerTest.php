@@ -64,12 +64,14 @@ final class InitialTestsRunnerTest extends TestCase
 
         $process->expects($this->once())
             ->method('run')
-            ->will($this->returnCallback(function ($type) use ($process): void {
+            ->will($this->returnCallback(function ($type) use ($process) {
                 if (Process::ERR === $type) {
                     $process->stop();
                 }
 
                 $this->eventDispatcher->dispatch(new InitialTestCaseCompleted());
+
+                return 1;
             }));
 
         $processBuilder = $this->createMock(ProcessBuilder::class);
