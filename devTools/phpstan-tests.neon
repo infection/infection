@@ -1,5 +1,3 @@
 parameters:
     excludes_analyse:
         - %currentWorkingDirectory%/tests/Fixtures/*
-    ignoreErrors:
-        - '#Call to an undefined method Mockery#'

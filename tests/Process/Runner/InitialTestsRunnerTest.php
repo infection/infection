@@ -59,9 +59,8 @@ final class InitialTestsRunnerTest extends TestCase
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
+        /** @var MockObject|Process $process */
         $process = $this->createMock(Process::class);
-        $process->expects($this->never())
-            ->method('stop');
 
         $process->expects($this->once())
             ->method('run')

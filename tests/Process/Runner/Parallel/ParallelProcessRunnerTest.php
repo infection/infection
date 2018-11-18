@@ -164,6 +164,7 @@ final class ParallelProcessRunnerTest extends TestCase
             ->method('isCoveredByTest')
             ->willReturn(true);
 
+        /** @var MockObject|MutantProcessInterface $mutantProcess */
         $mutantProcess = $this->createMock(MutantProcessInterface::class);
         $mutantProcess->expects($this->exactly(2))
             ->method('getProcess')
@@ -192,6 +193,7 @@ final class ParallelProcessRunnerTest extends TestCase
             ->method('isCoveredByTest')
             ->willReturn(true);
 
+        /** @var MockObject|MutantProcessInterface $mutantProcess */
         $mutantProcess = $this->createMock(MutantProcessInterface::class);
         $mutantProcess->expects($this->exactly(2))
             ->method('getProcess')
