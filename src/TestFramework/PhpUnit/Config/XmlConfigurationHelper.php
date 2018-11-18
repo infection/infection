@@ -137,6 +137,13 @@ final class XmlConfigurationHelper
         return true;
     }
 
+    public function removeDefaultTestSuite(\DOMDocument $dom, \DOMXPath $xPath): void
+    {
+        if ($xPath->query('/phpunit/@defaultTestSuite')->length) {
+            $dom->documentElement->removeAttribute('defaultTestSuite');
+        }
+    }
+
     private function getXmlErrorsString(): string
     {
         $errorsString = '';

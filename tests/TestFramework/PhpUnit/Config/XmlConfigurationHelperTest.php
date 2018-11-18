@@ -328,6 +328,33 @@ XML
         $this->assertTrue(true, $xmlHelper->validate($dom, $xPath));
     }
 
+    public function test_it_removes_default_test_suite(): void
+    {
+        $dom = new \DOMDocument();
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML(<<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="false" defaultTestSuite="unit">
+</phpunit>
+
+XML
+        );
+
+        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
+
+        $xmlconfig->removeDefaultTestSuite($dom, new \DOMXPath($dom));
+
+        $this->assertSame(<<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="false">
+</phpunit>
+
+XML
+            , $dom->saveXML()
+        );
+    }
+
     private function getDomDocument(): \DOMDocument
     {
         $dom = new \DOMDocument();
