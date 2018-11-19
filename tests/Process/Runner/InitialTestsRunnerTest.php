@@ -50,28 +50,17 @@ use Symfony\Component\Process\Process;
  */
 final class InitialTestsRunnerTest extends TestCase
 {
-    /**
-     * @var MockObject|EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
     public function test_it_dispatches_events(): void
     {
-        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-
         /** @var MockObject|Process $process */
         $process = $this->createMock(Process::class);
 
         $process->expects($this->once())
             ->method('run')
-            ->will($this->returnCallback(function ($type) use ($process) {
-                if (Process::ERR === $type) {
-                    $process->stop();
-                }
+            ->with($this->callback(function ($processCallback): bool {
+                $processCallback(Process::OUT);
 
-                $this->eventDispatcher->dispatch(new InitialTestCaseCompleted());
-
-                return 1;
+                return true;
             }));
 
         $processBuilder = $this->createMock(ProcessBuilder::class);
@@ -79,7 +68,9 @@ final class InitialTestsRunnerTest extends TestCase
             ->with('', false, [])
             ->willReturn($process);
 
-        $this->eventDispatcher->expects($this->exactly(3))
+        /** @var MockObject|EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->expects($this->exactly(3))
             ->method('dispatch')
             ->withConsecutive(
                 $this->isInstanceOf(InitialTestSuiteStarted::class),
@@ -87,7 +78,7 @@ final class InitialTestsRunnerTest extends TestCase
                 $this->isInstanceOf(InitialTestSuiteFinished::class)
             );
 
-        $testRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
+        $testRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
 
         $testRunner->run('', false);
     }
