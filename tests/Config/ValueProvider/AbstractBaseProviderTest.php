@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Config\ValueProvider;
 
-use Mockery;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
@@ -43,16 +43,16 @@ use Symfony\Component\Console\Output\StreamOutput;
 /**
  * @internal
  */
-abstract class AbstractBaseProviderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+abstract class AbstractBaseProviderTest extends TestCase
 {
     protected static $stty;
 
-    protected function getQuestionHelper()
+    protected function getQuestionHelper(): QuestionHelper
     {
         return new QuestionHelper();
     }
 
-    protected function getInputStream($input)
+    protected function getInputStream(string $input)
     {
         $stream = fopen('php://memory', 'r+b', false);
         fwrite($stream, $input);
@@ -61,7 +61,7 @@ abstract class AbstractBaseProviderTest extends Mockery\Adapter\Phpunit\MockeryT
         return $stream;
     }
 
-    protected function createOutputInterface()
+    protected function createOutputInterface(): StreamOutput
     {
         return new StreamOutput(fopen('php://memory', 'r+b', false));
     }
@@ -69,20 +69,18 @@ abstract class AbstractBaseProviderTest extends Mockery\Adapter\Phpunit\MockeryT
     protected function createStreamableInputInterfaceMock($stream = null, $interactive = true)
     {
         $mock = $this->createMock(StreamableInputInterface::class);
-        $mock->expects($this->any())
-            ->method('isInteractive')
+        $mock->method('isInteractive')
             ->will($this->returnValue($interactive));
 
         if ($stream) {
-            $mock->expects($this->any())
-                ->method('getStream')
+            $mock->method('getStream')
                 ->willReturn($stream);
         }
 
         return $mock;
     }
 
-    protected function hasSttyAvailable()
+    protected function hasSttyAvailable(): bool
     {
         if (null !== self::$stty) {
             return self::$stty;

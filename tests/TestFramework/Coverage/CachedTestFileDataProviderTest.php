@@ -37,21 +37,21 @@ namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
-use Mockery;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-final class CachedTestFileDataProviderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+final class CachedTestFileDataProviderTest extends TestCase
 {
     public function test_the_second_call_returns_cached_result(): void
     {
         $class = 'Test\Class';
-        $providerMock = Mockery::mock(TestFileDataProvider::class);
-        $providerMock->shouldReceive('getTestFileInfo')
+        $providerMock = $this->createMock(TestFileDataProvider::class);
+        $providerMock->expects($this->once())
+            ->method('getTestFileInfo')
             ->with($class)
-            ->once()
-            ->andReturn(['data']);
+            ->willReturn(['data']);
 
         $infoProvider = new CachedTestFileDataProvider($providerMock);
 

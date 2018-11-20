@@ -41,30 +41,42 @@ use Infection\Events\InitialTestSuiteFinished;
 use Infection\Events\InitialTestSuiteStarted;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Runner\InitialTestsRunner;
-use Mockery;
-use Mockery\Adapter\Phpunit\MockeryTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
  */
-final class InitialTestsRunnerTest extends MockeryTestCase
+final class InitialTestsRunnerTest extends TestCase
 {
     public function test_it_dispatches_events(): void
     {
-        $process = Mockery::mock(Process::class);
-        $process->shouldReceive('run');
+        /** @var MockObject|Process $process */
+        $process = $this->createMock(Process::class);
 
-        $processBuilder = Mockery::mock(ProcessBuilder::class);
-        $processBuilder
-            ->shouldReceive('getProcessForInitialTestRun')
-            ->withArgs(['', false, []])
-            ->andReturn($process);
+        $process->expects($this->once())
+            ->method('run')
+            ->with($this->callback(function ($processCallback): bool {
+                $processCallback(Process::OUT);
 
-        $eventDispatcher = Mockery::mock(EventDispatcherInterface::class);
-        $eventDispatcher->shouldReceive('dispatch')->with(Mockery::type(InitialTestSuiteStarted::class));
-        $eventDispatcher->shouldReceive('dispatch')->with(Mockery::type(InitialTestCaseCompleted::class));
-        $eventDispatcher->shouldReceive('dispatch')->with(Mockery::type(InitialTestSuiteFinished::class));
+                return true;
+            }));
+
+        $processBuilder = $this->createMock(ProcessBuilder::class);
+        $processBuilder->method('getProcessForInitialTestRun')
+            ->with('', false, [])
+            ->willReturn($process);
+
+        /** @var MockObject|EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->expects($this->exactly(3))
+            ->method('dispatch')
+            ->withConsecutive(
+                $this->isInstanceOf(InitialTestSuiteStarted::class),
+                $this->isInstanceOf(InitialTestCaseCompleted::class),
+                $this->isInstanceOf(InitialTestSuiteFinished::class)
+            );
 
         $testRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
 

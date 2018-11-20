@@ -40,15 +40,15 @@ use Infection\Events\MutantProcessFinished;
 use Infection\Mutant\MutantInterface;
 use Infection\Process\MutantProcessInterface;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
-use Mockery;
-use Mockery\Adapter\Phpunit\MockeryTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
  */
-final class ParallelProcessRunnerTest extends MockeryTestCase
+final class ParallelProcessRunnerTest extends TestCase
 {
     public function test_it_does_nothing_when_nothing_to_do(): void
     {
@@ -123,58 +123,86 @@ final class ParallelProcessRunnerTest extends MockeryTestCase
 
     private function buildEventDispatcherWithEventCount($eventCount): EventDispatcherInterface
     {
-        /** @var EventDispatcherInterface|Mockery\MockInterface $eventDispatcher */
-        $eventDispatcher = Mockery::mock(EventDispatcherInterface::class);
-        $eventDispatcher->shouldReceive('dispatch')->times($eventCount)->with(Mockery::type(MutantProcessFinished::class));
+        /** @var MockObject|EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->expects($this->exactly($eventCount))
+            ->method('dispatch')
+            ->with(new MutantProcessFinished($this->createMock(MutantProcessInterface::class)));
 
         return $eventDispatcher;
     }
 
     private function buildUncoveredMutantProcess(): MutantProcessInterface
     {
-        $mutant = Mockery::mock(MutantInterface::class);
-        $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(false);
+        $mutant = $this->createMock(MutantInterface::class);
+        $mutant->expects($this->once())
+            ->method('isCoveredByTest')
+            ->willReturn(false);
 
-        /** @var MutantProcessFinished|Mockery\MockInterface $mutantProcess */
-        $mutantProcess = Mockery::mock(MutantProcessInterface::class);
-        $mutantProcess->shouldReceive('getMutant')->once()->andReturn($mutant);
+        /** @var MockObject|MutantProcessInterface $mutantProcess */
+        $mutantProcess = $this->createMock(MutantProcessInterface::class);
+        $mutantProcess->expects($this->once())
+            ->method('getMutant')
+            ->willReturn($mutant);
 
         return $mutantProcess;
     }
 
     private function buildCoveredMutantProcess(): MutantProcessInterface
     {
-        $process = Mockery::mock(Process::class);
-        $process->shouldReceive('start')->once();
-        $process->shouldReceive('checkTimeout')->once();
-        $process->shouldReceive('isRunning')->once()->andReturn(false);
+        $process = $this->createMock(Process::class);
+        $process->expects($this->once())
+            ->method('start');
+        $process->expects($this->once())
+            ->method('checkTimeout');
+        $process->expects($this->once())
+            ->method('isRunning')
+            ->willReturn(false);
 
-        $mutant = Mockery::mock(MutantInterface::class);
-        $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(true);
+        $mutant = $this->createMock(MutantInterface::class);
+        $mutant->expects($this->once())
+            ->method('isCoveredByTest')
+            ->willReturn(true);
 
-        /** @var MutantProcessFinished|Mockery\MockInterface $mutantProcess */
-        $mutantProcess = Mockery::mock(MutantProcessInterface::class);
-        $mutantProcess->shouldReceive('getProcess')->twice()->andReturn($process);
-        $mutantProcess->shouldReceive('getMutant')->once()->andReturn($mutant);
+        /** @var MockObject|MutantProcessInterface $mutantProcess */
+        $mutantProcess = $this->createMock(MutantProcessInterface::class);
+        $mutantProcess->expects($this->exactly(2))
+            ->method('getProcess')
+            ->willReturn($process);
+        $mutantProcess->expects($this->once())
+            ->method('getMutant')
+            ->willReturn($mutant);
 
         return $mutantProcess;
     }
 
     private function buildCoveredMutantProcessWithTimeout(): MutantProcessInterface
     {
-        $process = Mockery::mock(Process::class);
-        $process->shouldReceive('start')->once();
-        $process->shouldReceive('checkTimeout')->once()->andThrow(Mockery::mock(ProcessTimedOutException::class));
-        $process->shouldReceive('isRunning')->once()->andReturn(false);
+        $process = $this->createMock(Process::class);
+        $process->expects($this->once())
+            ->method('start');
+        $process->expects($this->once())
+            ->method('checkTimeout')
+            ->will($this->throwException(new ProcessTimedOutException($process, 1)));
+        $process->expects($this->once())
+            ->method('isRunning')
+            ->willReturn(false);
 
-        $mutant = Mockery::mock(MutantInterface::class);
-        $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(true);
+        $mutant = $this->createMock(MutantInterface::class);
+        $mutant->expects($this->once())
+            ->method('isCoveredByTest')
+            ->willReturn(true);
 
-        /** @var MutantProcessFinished|Mockery\MockInterface $mutantProcess */
-        $mutantProcess = Mockery::mock(MutantProcessInterface::class);
-        $mutantProcess->shouldReceive('getProcess')->twice()->andReturn($process);
-        $mutantProcess->shouldReceive('getMutant')->once()->andReturn($mutant);
-        $mutantProcess->shouldReceive('markTimeout')->once();
+        /** @var MockObject|MutantProcessInterface $mutantProcess */
+        $mutantProcess = $this->createMock(MutantProcessInterface::class);
+        $mutantProcess->expects($this->exactly(2))
+            ->method('getProcess')
+            ->willReturn($process);
+        $mutantProcess->expects($this->once())
+            ->method('getMutant')
+            ->willReturn($mutant);
+        $mutantProcess->expects($this->once())
+            ->method('markTimeout');
 
         return $mutantProcess;
     }

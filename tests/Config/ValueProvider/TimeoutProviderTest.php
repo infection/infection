@@ -38,23 +38,28 @@ namespace Infection\Tests\Config\ValueProvider;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\InfectionConfig;
 use Infection\Config\ValueProvider\TimeoutProvider;
-use Mockery;
 
 /**
  * @internal
  */
 final class TimeoutProviderTest extends AbstractBaseProviderTest
 {
+    /**
+     * @var TimeoutProvider
+     */
+    private $provider;
+
+    protected function setUp(): void
+    {
+        $this->provider = new TimeoutProvider(
+            $this->createMock(ConsoleHelper::class),
+            $this->getQuestionHelper()
+        );
+    }
+
     public function test_it_uses_default_value(): void
     {
-        $consoleMock = Mockery::mock(ConsoleHelper::class);
-        $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
-
-        $dialog = $this->getQuestionHelper();
-
-        $provider = new TimeoutProvider($consoleMock, $dialog);
-
-        $timeout = $provider->get(
+        $timeout = $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
             $this->createOutputInterface()
         );
@@ -64,14 +69,7 @@ final class TimeoutProviderTest extends AbstractBaseProviderTest
 
     public function test_it_casts_any_value_to_integer(): void
     {
-        $consoleMock = Mockery::mock(ConsoleHelper::class);
-        $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
-
-        $dialog = $this->getQuestionHelper();
-
-        $provider = new TimeoutProvider($consoleMock, $dialog);
-
-        $timeout = $provider->get(
+        $timeout = $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("13\n")),
             $this->createOutputInterface()
         );
@@ -84,16 +82,9 @@ final class TimeoutProviderTest extends AbstractBaseProviderTest
      */
     public function test_it_does_not_allow_invalid_values($inputValue): void
     {
-        $consoleMock = Mockery::mock(ConsoleHelper::class);
-        $consoleMock->shouldReceive('getQuestion')->once()->andReturn('?');
-
-        $dialog = $this->getQuestionHelper();
-
-        $provider = new TimeoutProvider($consoleMock, $dialog);
-
         $this->expectException(\RuntimeException::class);
 
-        $timeout = $provider->get(
+        $timeout = $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("{$inputValue}\n")),
             $this->createOutputInterface()
         );

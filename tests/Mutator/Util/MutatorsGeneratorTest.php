@@ -43,15 +43,16 @@ use Infection\Mutator\Util\MutatorProfile;
 use Infection\Mutator\Util\MutatorsGenerator;
 use Infection\Tests\Fixtures\StubMutator;
 use Infection\Visitor\ReflectionVisitor;
-use Mockery;
 use PhpParser\Node;
 use PhpParser\Node\Expr\BinaryOp\Plus as PlusNode;
 use PhpParser\Node\Scalar\DNumber;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+final class MutatorsGeneratorTest extends TestCase
 {
     private static $countDefaultMutators = 0;
 
@@ -64,8 +65,7 @@ final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
 
     public function test_no_setting_returns_the_default_mutators(): void
     {
-        $mutatorGenerator = new MutatorsGenerator([]);
-        $mutators = $mutatorGenerator->generate();
+        $mutators = (new MutatorsGenerator([]))->generate();
 
         $this->assertCount(self::$countDefaultMutators, $mutators);
     }
@@ -125,9 +125,12 @@ final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
 
     public function test_it_keeps_settings(): void
     {
-        /** @var \Mockery\MockInterface|\ReflectionClass $reflectionMock */
-        $reflectionMock = Mockery::mock(\ReflectionClass::class);
-        $reflectionMock->shouldReceive('getName')->once()->andReturn('A');
+        /** @var MockObject|\ReflectionClass $reflectionMock */
+        $reflectionMock = $this->createMock(\ReflectionClass::class);
+        $reflectionMock->expects($this->once())
+            ->method('getName')
+            ->willReturn('A');
+
         $plusNode = $this->getPlusNode('B', $reflectionMock);
 
         $mutatorGenerator = new MutatorsGenerator([
@@ -145,9 +148,12 @@ final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
 
     public function test_it_keeps_settings_when_applied_to_profiles(): void
     {
-        /** @var \Mockery\MockInterface|\ReflectionClass $reflectionMock */
-        $reflectionMock = Mockery::mock(\ReflectionClass::class);
-        $reflectionMock->shouldReceive('getName')->times(3)->andReturn('A');
+        /** @var MockObject|\ReflectionClass $reflectionMock */
+        $reflectionMock = $this->createMock(\ReflectionClass::class);
+        $reflectionMock->expects($this->exactly(3))
+            ->method('getName')
+            ->willReturn('A');
+
         $plusNode = $this->getPlusNode('B', $reflectionMock);
         $falseNode = $this->getBoolNode('false', 'B', $reflectionMock);
         $trueNode = $this->getBoolNode('true', 'B', $reflectionMock);
@@ -193,8 +199,12 @@ final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
 
     public function test_it_can_set_a_single_item_with_a_setting(): void
     {
-        $reflectionMock = Mockery::mock(\ReflectionClass::class);
-        $reflectionMock->shouldReceive('getName')->times(2)->andReturn('A');
+        /** @var MockObject|\ReflectionClass $reflectionMock */
+        $reflectionMock = $this->createMock(\ReflectionClass::class);
+        $reflectionMock->expects($this->exactly(2))
+            ->method('getName')
+            ->willReturn('A');
+
         $falseNode = $this->getBoolNode('false', 'B', $reflectionMock);
         $trueNode = $this->getBoolNode('true', 'B', $reflectionMock);
 

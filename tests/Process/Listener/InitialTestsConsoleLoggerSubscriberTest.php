@@ -39,24 +39,23 @@ use Infection\EventDispatcher\EventDispatcher;
 use Infection\Events\InitialTestSuiteStarted;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Mockery;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class InitialTestsConsoleLoggerSubscriberTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
 {
     public function test_it_reacts_on_initial_test_suite_run(): void
     {
-        $output = Mockery::mock(OutputInterface::class);
-        $output->shouldReceive('isDecorated');
-        $output->shouldReceive('writeln');
-        $output->shouldReceive('getVerbosity')->andReturn(OutputInterface::VERBOSITY_QUIET);
+        $output = $this->createMock(OutputInterface::class);
+        $output->method('getVerbosity')
+            ->willReturn(OutputInterface::VERBOSITY_QUIET);
 
-        $testFramework = Mockery::mock(AbstractTestFrameworkAdapter::class);
-        $testFramework->shouldReceive('getName')->once();
-        $testFramework->shouldReceive('getVersion')->once();
+        $testFramework = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $testFramework->expects($this->once())
+            ->method('getVersion');
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework));
@@ -66,19 +65,24 @@ final class InitialTestsConsoleLoggerSubscriberTest extends Mockery\Adapter\Phpu
 
     public function test_it_sets_test_framework_version_as_unknown_in_case_of_exception(): void
     {
-        $output = Mockery::mock(OutputInterface::class);
-        $output->shouldReceive('isDecorated');
-        $output->shouldReceive('writeln')->once()->withArgs([[
+        $output = $this->createMock(OutputInterface::class);
+        $output->expects($this->once())
+            ->method('writeln')
+            ->with([
             'Running initial test suite...',
             '',
             'PHPUnit version: unknown',
             '',
-        ]]);
-        $output->shouldReceive('getVerbosity')->andReturn(OutputInterface::VERBOSITY_QUIET);
+        ]);
+        $output->method('getVerbosity')
+            ->willReturn(OutputInterface::VERBOSITY_QUIET);
 
-        $testFramework = Mockery::mock(AbstractTestFrameworkAdapter::class);
-        $testFramework->shouldReceive('getName')->once()->andReturn('PHPUnit');
-        $testFramework->shouldReceive('getVersion')->andThrow(\InvalidArgumentException::class);
+        $testFramework = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $testFramework->expects($this->once())
+            ->method('getName')
+            ->willReturn('PHPUnit');
+        $testFramework->method('getVersion')
+            ->will($this->throwException(new \InvalidArgumentException()));
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework));

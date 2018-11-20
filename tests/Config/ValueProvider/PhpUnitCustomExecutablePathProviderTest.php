@@ -39,7 +39,7 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\PhpUnitCustomExecutablePathProvider;
 use Infection\Finder\Exception\FinderException;
 use Infection\Finder\TestFrameworkFinder;
-use Mockery;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Exception\RuntimeException as SymfonyRuntimeException;
 use function Infection\Tests\normalizePath as p;
 
@@ -48,39 +48,48 @@ use function Infection\Tests\normalizePath as p;
  */
 final class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProviderTest
 {
-    public function test_it_returns_null_if_executable_is_found(): void
-    {
-        $finderMock = Mockery::mock(TestFrameworkFinder::class);
-        $finderMock->shouldReceive('find')->once();
+    /**
+     * @var MockObject|TestFrameworkFinder
+     */
+    private $finderMock;
 
-        $provider = new PhpUnitCustomExecutablePathProvider(
-            $finderMock,
+    /**
+     * @var PhpUnitCustomExecutablePathProvider
+     */
+    private $provider;
+
+    protected function setUp(): void
+    {
+        $this->finderMock = $this->createMock(TestFrameworkFinder::class);
+
+        $this->provider = new PhpUnitCustomExecutablePathProvider(
+            $this->finderMock,
             $this->createMock(ConsoleHelper::class),
             $this->getQuestionHelper()
         );
+    }
 
-        $result = $provider->get($this->createStreamableInputInterfaceMock(), $this->createOutputInterface());
+    public function test_it_returns_null_if_executable_is_found(): void
+    {
+        $this->finderMock
+            ->expects($this->once())
+            ->method('find');
 
-        $this->assertNull($result);
+        $this->assertNull(
+            $this->provider->get($this->createStreamableInputInterfaceMock(), $this->createOutputInterface())
+        );
     }
 
     public function test_it_asks_question_if_no_config_is_found_in_current_dir(): void
     {
-        $finderMock = Mockery::mock(TestFrameworkFinder::class);
-        $finderMock->shouldReceive('find')->once()->andThrow(new FinderException());
-
-        $consoleMock = $this->createMock(ConsoleHelper::class);
-        $consoleMock->expects($this->once())->method('getQuestion')->willReturn('foobar');
-
-        $provider = new PhpUnitCustomExecutablePathProvider(
-            $finderMock,
-            $consoleMock,
-            $this->getQuestionHelper()
-        );
+        $this->finderMock
+            ->expects($this->once())
+            ->method('find')
+            ->will($this->throwException(new FinderException()));
 
         $customExecutable = p(realpath(__DIR__ . '/../../Fixtures/Files/phpunit/phpunit.phar'));
 
-        $path = $provider->get(
+        $path = $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("{$customExecutable}\n")),
             $this->createOutputInterface()
         );
@@ -94,22 +103,14 @@ final class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProvider
             $this->markTestSkipped('Stty is not available');
         }
 
-        $finderMock = Mockery::mock(TestFrameworkFinder::class);
-
-        $finderMock->shouldReceive('find')->once()->andThrow(new FinderException());
-
-        $consoleMock = $this->createMock(ConsoleHelper::class);
-        $consoleMock->expects($this->once())->method('getQuestion')->willReturn('foobar');
-
-        $provider = new PhpUnitCustomExecutablePathProvider(
-            $finderMock,
-            $consoleMock,
-            $this->getQuestionHelper()
-        );
+        $this->finderMock
+            ->expects($this->once())
+            ->method('find')
+            ->will($this->throwException(new FinderException()));
 
         $this->expectException(SymfonyRuntimeException::class);
 
-        $provider->get(
+        $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("abc\n")),
             $this->createOutputInterface()
         );

@@ -38,7 +38,7 @@ namespace Infection\Tests\Config\ValueProvider;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Mockery;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -47,18 +47,39 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
 {
-    public function test_it_calls_locator_in_the_current_dir(): void
-    {
-        $locatorMock = $this->createMock(TestFrameworkConfigLocatorInterface::class);
-        $locatorMock->expects($this->once())->method('locate');
+    /**
+     * @var TestFrameworkConfigPathProvider
+     */
+    private $provider;
 
-        $provider = new TestFrameworkConfigPathProvider(
-            $locatorMock,
-            $this->createMock(ConsoleHelper::class),
+    /**
+     * @var MockObject|TestFrameworkConfigLocatorInterface
+     */
+    private $locatorMock;
+
+    /**
+     * @var MockObject|ConsoleHelper
+     */
+    private $consoleMock;
+
+    protected function setUp(): void
+    {
+        $this->locatorMock = $this->createMock(TestFrameworkConfigLocatorInterface::class);
+        $this->consoleMock = $this->createMock(ConsoleHelper::class);
+        $this->provider = new TestFrameworkConfigPathProvider(
+            $this->locatorMock,
+            $this->consoleMock,
             $this->getQuestionHelper()
         );
+    }
 
-        $result = $provider->get(
+    public function test_it_calls_locator_in_the_current_dir(): void
+    {
+        $this->locatorMock
+            ->expects($this->once())
+            ->method('locate');
+
+        $result = $this->provider->get(
             $this->createStreamableInputInterfaceMock(),
             $this->createOutputInterface(),
             [],
@@ -70,20 +91,25 @@ final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
 
     public function test_it_asks_question_if_no_config_is_found_in_current_dir(): void
     {
-        $locatorMock = Mockery::mock(TestFrameworkConfigLocatorInterface::class);
+        $this->consoleMock
+            ->expects($this->once())
+            ->method('getQuestion')
+            ->willReturn('foobar');
 
-        $locatorMock->shouldReceive('locate')->once()->andThrow(new \Exception());
-        $locatorMock->shouldReceive('locate')->once()->andThrow(new \Exception());
-        $locatorMock->shouldReceive('locate')->once()->andReturn(true);
-
-        $consoleMock = $this->createMock(ConsoleHelper::class);
-        $consoleMock->expects($this->once())->method('getQuestion')->willReturn('foobar');
-
-        $provider = new TestFrameworkConfigPathProvider($locatorMock, $consoleMock, $this->getQuestionHelper());
+        $this->locatorMock
+            ->expects($this->exactly(3))
+            ->method('locate')
+            ->will(
+                $this->onConsecutiveCalls(
+                    $this->throwException(new \Exception()),
+                    $this->throwException(new \Exception()),
+                    true
+                )
+            );
 
         $inputPhpUnitPath = realpath(__DIR__ . '/../../Fixtures/Files/phpunit');
 
-        $path = $provider->get(
+        $path = $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("{$inputPhpUnitPath}\n")),
             $this->createOutputInterface(),
             [],
@@ -96,19 +122,23 @@ final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
 
     public function test_it_automatically_guesses_path(): void
     {
-        $locatorMock = Mockery::mock(TestFrameworkConfigLocatorInterface::class);
+        $this->locatorMock
+            ->expects($this->exactly(2))
+            ->method('locate')
+            ->will(
+                $this->onConsecutiveCalls(
+                    $this->throwException(new \Exception()),
+                    true
+                )
+            );
 
-        $locatorMock->shouldReceive('locate')->once()->andThrow(new \Exception());
-        $locatorMock->shouldReceive('locate')->once()->andReturn(true);
+        $this->consoleMock
+            ->expects($this->never())
+            ->method('getQuestion');
 
-        $consoleMock = Mockery::mock(ConsoleHelper::class);
-        $consoleMock->shouldReceive('getQuestion')->never();
-
-        $provider = new TestFrameworkConfigPathProvider($locatorMock, $consoleMock, $this->getQuestionHelper());
-
-        $path = $provider->get(
-            Mockery::mock(InputInterface::class),
-            Mockery::mock(OutputInterface::class),
+        $path = $this->provider->get(
+            $this->createMock(InputInterface::class),
+            $this->createMock(OutputInterface::class),
             [],
             'phpunit'
         );
@@ -122,18 +152,18 @@ final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
             $this->markTestSkipped('Stty is not available');
         }
 
-        $locatorMock = Mockery::mock(TestFrameworkConfigLocatorInterface::class);
+        $this->locatorMock
+            ->expects($this->exactly(3))
+            ->method('locate')
+            ->will(
+                $this->onConsecutiveCalls(
+                    $this->throwException(new \Exception()),
+                    $this->throwException(new \Exception()),
+                    true
+                )
+            );
 
-        $locatorMock->shouldReceive('locate')->once()->andThrow(new \Exception());
-        $locatorMock->shouldReceive('locate')->once()->andThrow(new \Exception());
-        $locatorMock->shouldReceive('locate')->once()->andReturn(true);
-
-        $consoleMock = $this->createMock(ConsoleHelper::class);
-        $consoleMock->expects($this->once())->method('getQuestion')->willReturn('foobar');
-
-        $provider = new TestFrameworkConfigPathProvider($locatorMock, $consoleMock, $this->getQuestionHelper());
-
-        $path = $provider->get(
+        $path = $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("abc\n")),
             $this->createOutputInterface(),
             [],

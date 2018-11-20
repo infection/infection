@@ -39,13 +39,13 @@ use Infection\Differ\Differ;
 use Infection\Mutant\MutantCreator;
 use Infection\MutationInterface;
 use Infection\TestFramework\Coverage\CodeCoverageData;
-use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PhpParser\PrettyPrinter\Standard;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-final class MutantCreatorTest extends MockeryTestCase
+final class MutantCreatorTest extends TestCase
 {
     private const TEST_FILE_NAME = '/mutant.hash.infection.php';
 
@@ -56,7 +56,6 @@ final class MutantCreatorTest extends MockeryTestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
         $this->directory = \sys_get_temp_dir() . '/infection/MutantCreator';
         mkdir($this->directory, 0777, true);
         touch($this->directory . self::TEST_FILE_NAME);
@@ -77,25 +76,26 @@ PHP
 
     public function test_it_uses_avaialable_file_if_hash_is_the_same(): void
     {
-        $standard = \Mockery::mock(Standard::class);
-        $standard->shouldReceive('prettyPrintFile')->andReturn('The Print');
+        $standard = $this->createMock(Standard::class);
+        $standard->method('prettyPrintFile')
+            ->willReturn('The Print');
 
-        $differ = \Mockery::mock(Differ::class);
-        $differ->shouldReceive('diff')
-            ->withArgs(['The Print', '<?php return \'This is a diff\';'])
-            ->andReturn('This is the Diff');
+        $differ = $this->createMock(Differ::class);
+        $differ->method('diff')
+            ->with('The Print', '<?php return \'This is a diff\';')
+            ->willReturn('This is the Diff');
 
-        $mutation = \Mockery::mock(MutationInterface::class);
-        $mutation->shouldReceive('getHash')->andReturn('hash');
-        $mutation->shouldReceive('getOriginalFilePath')->andReturn('original/path');
-        $mutation->shouldReceive('getOriginalFileAst')->andReturn(['ast']);
-        $mutation->shouldReceive('getAttributes')->andReturn(['startLine' => 1]);
-        $mutation->shouldReceive('isOnFunctionSignature')->andReturn(true);
-        $mutation->shouldReceive('isCoveredByTest')->once()->andReturn(true);
+        $mutation = $this->createMock(MutationInterface::class);
+        $mutation->method('getHash')->willReturn('hash');
+        $mutation->method('getOriginalFilePath')->willReturn('original/path');
+        $mutation->method('getOriginalFileAst')->willReturn(['ast']);
+        $mutation->method('getAttributes')->willReturn(['startLine' => 1]);
+        $mutation->method('isOnFunctionSignature')->willReturn(true);
+        $mutation->expects($this->once())->method('isCoveredByTest')->willReturn(true);
 
-        $coverage = \Mockery::mock(CodeCoverageData::class);
-        $coverage->shouldReceive('hasExecutedMethodOnLine')->andReturn(true);
-        $coverage->shouldReceive('getAllTestsFor')->andReturn(['test', 'list']);
+        $coverage = $this->createMock(CodeCoverageData::class);
+        $coverage->method('hasExecutedMethodOnLine')->willReturn(true);
+        $coverage->method('getAllTestsFor')->willReturn(['test', 'list']);
 
         $creator = new MutantCreator($this->directory, $differ, $standard);
         $mutant = $creator->create($mutation, $coverage);

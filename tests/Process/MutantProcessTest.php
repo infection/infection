@@ -41,86 +41,130 @@ use Infection\Mutator\Util\MutatorConfig;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Mockery;
-use Mockery\Adapter\Phpunit\MockeryTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
  */
-final class MutantProcessTest extends MockeryTestCase
+final class MutantProcessTest extends TestCase
 {
+    /**
+     * @var MutantProcess
+     */
+    private $mutantProcess;
+
+    /**
+     * @var MockObject|Process
+     */
+    private $process;
+
+    /**
+     * @var MockObject|MutantInterface
+     */
+    private $mutant;
+
+    /**
+     * @var MockObject|AbstractTestFrameworkAdapter
+     */
+    private $adapter;
+
+    protected function setUp(): void
+    {
+        $this->process = $this->createMock(Process::class);
+        $this->mutant = $this->createMock(MutantInterface::class);
+        $this->adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
+
+        $this->mutantProcess = new MutantProcess($this->process, $this->mutant, $this->adapter);
+    }
+
     public function test_it_handles_not_covered_mutant(): void
     {
-        $process = Mockery::mock(Process::class);
-        $mutant = Mockery::mock(MutantInterface::class);
-        $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(false);
-        $testFrameworkAdapter = Mockery::mock(AbstractTestFrameworkAdapter::class);
+        $this->mutant
+            ->expects($this->once())
+            ->method('isCoveredByTest')
+            ->willReturn(false);
 
-        $mutantProcess = new MutantProcess($process, $mutant, $testFrameworkAdapter);
-
-        $this->assertSame(MutantProcess::CODE_NOT_COVERED, $mutantProcess->getResultCode());
+        $this->assertSame(MutantProcess::CODE_NOT_COVERED, $this->mutantProcess->getResultCode());
     }
 
     public function test_it_handles_timeout(): void
     {
-        $process = Mockery::mock(Process::class);
-        $mutant = Mockery::mock(MutantInterface::class);
-        $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(true);
-        $testFrameworkAdapter = Mockery::mock(AbstractTestFrameworkAdapter::class);
+        $this->mutant
+            ->expects($this->once())
+            ->method('isCoveredByTest')
+            ->willReturn(true);
 
-        $mutantProcess = new MutantProcess($process, $mutant, $testFrameworkAdapter);
-        $mutantProcess->markTimeout();
+        $this->mutantProcess->markTimeout();
 
-        $this->assertSame(MutantProcess::CODE_TIMED_OUT, $mutantProcess->getResultCode());
+        $this->assertSame(MutantProcess::CODE_TIMED_OUT, $this->mutantProcess->getResultCode());
     }
 
     public function test_it_handles_error(): void
     {
-        $process = Mockery::mock(Process::class);
-        $process->shouldReceive('getExitCode')->once()->andReturn(126);
-        $mutant = Mockery::mock(MutantInterface::class);
-        $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(true);
-        $testFrameworkAdapter = Mockery::mock(AbstractTestFrameworkAdapter::class);
+        $this->mutant
+            ->expects($this->once())
+            ->method('isCoveredByTest')
+            ->willReturn(true);
 
-        $mutantProcess = new MutantProcess($process, $mutant, $testFrameworkAdapter);
+        $this->process
+            ->expects($this->once())
+            ->method('getExitCode')
+            ->willReturn(126);
 
-        $this->assertSame(MutantProcess::CODE_ERROR, $mutantProcess->getResultCode());
+        $this->assertSame(MutantProcess::CODE_ERROR, $this->mutantProcess->getResultCode());
     }
 
     public function test_it_handles_escaped_mutant(): void
     {
-        $process = Mockery::mock(Process::class);
-        $process->shouldReceive('getExitCode')->once()->andReturn(0);
-        $process->shouldReceive('getOutput')->once()->andReturn('...');
+        $this->mutant
+            ->expects($this->once())
+            ->method('isCoveredByTest')
+            ->willReturn(true);
 
-        $mutant = Mockery::mock(MutantInterface::class);
-        $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(true);
+        $this->process
+            ->expects($this->once())
+            ->method('getExitCode')
+            ->willReturn(0);
 
-        $testFrameworkAdapter = Mockery::mock(AbstractTestFrameworkAdapter::class);
-        $testFrameworkAdapter->shouldReceive('testsPass')->once()->andReturn(true);
+        $this->process
+            ->expects($this->once())
+            ->method('getOutput')
+            ->willReturn('...');
 
-        $mutantProcess = new MutantProcess($process, $mutant, $testFrameworkAdapter);
+        $this->adapter
+            ->expects($this->once())
+            ->method('testsPass')
+            ->willReturn(true);
 
-        $this->assertSame(MutantProcess::CODE_ESCAPED, $mutantProcess->getResultCode());
+        $this->assertSame(MutantProcess::CODE_ESCAPED, $this->mutantProcess->getResultCode());
     }
 
     public function test_it_handles_killed_mutant(): void
     {
-        $process = Mockery::mock(Process::class);
-        $process->shouldReceive('getExitCode')->once()->andReturn(0);
-        $process->shouldReceive('getOutput')->once()->andReturn('...');
+        $this->mutant
+            ->expects($this->once())
+            ->method('isCoveredByTest')
+            ->willReturn(true);
 
-        $mutant = Mockery::mock(MutantInterface::class);
-        $mutant->shouldReceive('isCoveredByTest')->once()->andReturn(true);
+        $this->process
+            ->expects($this->once())
+            ->method('getExitCode')
+            ->willReturn(0);
 
-        $testFrameworkAdapter = Mockery::mock(AbstractTestFrameworkAdapter::class);
-        $testFrameworkAdapter->shouldReceive('testsPass')->once()->andReturn(false);
+        $this->process
+            ->expects($this->once())
+            ->method('getOutput')
+            ->willReturn('...');
 
-        $mutantProcess = new MutantProcess($process, $mutant, $testFrameworkAdapter);
+        $this->adapter
+            ->expects($this->once())
+            ->method('testsPass')
+            ->willReturn(false);
 
-        $this->assertSame(MutantProcess::CODE_KILLED, $mutantProcess->getResultCode());
-        $this->assertSame($mutant, $mutantProcess->getMutant());
+        $this->assertSame(MutantProcess::CODE_KILLED, $this->mutantProcess->getResultCode());
+        $this->assertSame($this->mutant, $this->mutantProcess->getMutant());
     }
 
     public function test_it_knows_its_mutator(): void
@@ -128,57 +172,61 @@ final class MutantProcessTest extends MockeryTestCase
         $mutator = new For_(new MutatorConfig([]));
 
         $mutation = $this->createMock(MutationInterface::class);
-        $mutation->expects($this->once())->method('getMutator')->willReturn($mutator);
+        $mutation->expects($this->once())
+            ->method('getMutator')
+            ->willReturn($mutator);
 
-        $mutant = $this->createMock(MutantInterface::class);
-        $mutant->expects($this->once())->method('getMutation')->willReturn($mutation);
+        $this->mutant
+            ->expects($this->once())
+            ->method('getMutation')
+            ->willReturn($mutation);
 
-        $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
-
-        $process = $this->createMock(Process::class);
-
-        $mutantProcess = new MutantProcess($process, $mutant, $adapter);
-
-        $this->assertSame($mutator, $mutantProcess->getMutator());
+        $this->assertSame($mutator, $this->mutantProcess->getMutator());
     }
 
     public function test_it_knows_its_original_path(): void
     {
-        $process = $this->createMOck(Process::class);
-        $process->expects($this->never())->method($this->anything());
+        $this->process
+            ->expects($this->never())
+            ->method($this->anything());
 
-        $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
-        $adapter->expects($this->never())->method($this->anything());
+        $this->adapter
+            ->expects($this->never())
+            ->method($this->anything());
 
         $mutation = $this->createMock(MutationInterface::class);
-        $mutation->expects($this->once())->method('getOriginalFilePath')->willReturn('foo/bar');
-        $mutant = $this->createMock(MutantInterface::class);
-        $mutant->expects($this->once())->method('getMutation')->willReturn($mutation);
+        $mutation->expects($this->once())
+            ->method('getOriginalFilePath')
+            ->willReturn('foo/bar');
 
-        $mutantProcess = new MutantProcess($process, $mutant, $adapter);
+        $this->mutant
+            ->expects($this->once())
+            ->method('getMutation')
+            ->willReturn($mutation);
 
-        $path = $mutantProcess->getOriginalFilePath();
-
-        $this->assertSame('foo/bar', $path);
+        $this->assertSame('foo/bar', $this->mutantProcess->getOriginalFilePath());
     }
 
     public function test_it_knows_its_original_starting_line(): void
     {
-        $process = $this->createMOck(Process::class);
-        $process->expects($this->never())->method($this->anything());
+        $this->process
+            ->expects($this->never())
+            ->method($this->anything());
 
-        $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
-        $adapter->expects($this->never())->method($this->anything());
+        $this->adapter
+            ->expects($this->never())
+            ->method($this->anything());
 
         $mutation = $this->createMock(MutationInterface::class);
-        $mutation->expects($this->once())->method('getAttributes')->willReturn(['startLine' => '3']);
-        $mutant = $this->createMock(MutantInterface::class);
-        $mutant->expects($this->once())->method('getMutation')->willReturn($mutation);
+        $mutation->expects($this->once())
+            ->method('getAttributes')
+            ->willReturn(['startLine' => '3']);
 
-        $mutantProcess = new MutantProcess($process, $mutant, $adapter);
+        $this->mutant
+            ->expects($this->once())
+            ->method('getMutation')
+            ->willReturn($mutation);
 
-        $line = $mutantProcess->getOriginalStartingLine();
-
-        $this->assertSame(3, $line);
+        $this->assertSame(3, $this->mutantProcess->getOriginalStartingLine());
     }
 }
