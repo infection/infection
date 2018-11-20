@@ -19,3 +19,17 @@ function xdebug-enable() {
         phpenv config-add /tmp/xdebug.ini
     fi
 }
+
+function get-infection-pr-flags() {
+    if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
+        INFECTION_PR_FLAGS="";
+    else
+        git remote set-branches --add origin $TRAVIS_BRANCH;
+        git fetch;
+
+        CHANGED_FILES=$(git diff origin/$TRAVIS_BRANCH --diff-filter=AM --name-only | grep src/ | paste -sd "," -);
+        INFECTION_PR_FLAGS="--filter=${CHANGED_FILES} --ignore-msi-with-no-mutations --only-covered --min-msi=90";
+    fi
+
+    echo $INFECTION_PR_FLAGS;
+}
