@@ -301,7 +301,7 @@ XML
 
     public function schemaProvider(): \Generator
     {
-        yield 'Remote XSD' => ['https://schema.phpunit.de/6.1/phpunit.xsd'];
+        yield 'Remote XSD' => ['https://raw.githubusercontent.com/sebastianbergmann/phpunit/7.4/phpunit.xsd'];
 
         yield 'Local XSD' => ['./vendor/phpunit/phpunit/phpunit.xsd'];
     }
