@@ -362,10 +362,9 @@ final class InfectionCommand extends BaseCommand
             $locator->locateOneOf(InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES);
         } catch (\Exception $e) {
             $configureCommand = $this->getApplication()->find('configure');
-            $config = $this->getContainer()->get('infection.config');
 
             $args = [
-                '--test-framework' => $this->input->getOption('test-framework') ?: $config->getTestFramework(),
+                '--test-framework' => $this->input->getOption('test-framework') ?: TestFrameworkTypes::PHPUNIT,
             ];
 
             $newInput = new ArrayInput($args);
