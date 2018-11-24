@@ -73,6 +73,12 @@ final class MutatorConfigTest extends TestCase
             'method',
         ];
 
+        yield 'It ignores all classes in the namespace' => [
+            ['Foo\Test\*'],
+            'Foo\Test\Baz',
+            'method',
+        ];
+
         yield 'It ignores a pattern of a class with method' => [
             ['Foo\*::method'],
             'Foo\Bar\Test',
