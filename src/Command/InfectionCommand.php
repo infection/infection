@@ -104,7 +104,7 @@ final class InfectionCommand extends BaseCommand
                 'j',
                 InputOption::VALUE_REQUIRED,
                 'Threads count',
-                1
+                '1'
             )
             ->addOption(
                 'only-covered',
