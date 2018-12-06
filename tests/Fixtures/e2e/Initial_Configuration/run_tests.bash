@@ -7,7 +7,7 @@ if test ! -f "$(which expect)"; then
 fi
 
 cd $(dirname $0)
-rm -f infection.json.dist
+rm -f infection.json.dist infection.log
 
 set -e
 
@@ -21,5 +21,5 @@ export INFECTION
 
 ./do_configure.expect
 
-test -f infection.json.dist
+test -f infection.log
 diff -u expected.log infection.log
