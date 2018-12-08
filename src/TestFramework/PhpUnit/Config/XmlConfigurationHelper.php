@@ -89,6 +89,18 @@ final class XmlConfigurationHelper
         }
     }
 
+    public function deactivateResultCaching(\DOMXPath $xPath): void
+    {
+        $nodeList = $xPath->query('/phpunit/@cacheResult');
+
+        if ($nodeList->length) {
+            $nodeList[0]->nodeValue = 'false';
+        } else {
+            $node = $xPath->query('/phpunit')[0];
+            $node->setAttribute('cacheResult', 'false');
+        }
+    }
+
     public function setStopOnFailure(\DOMXPath $xPath): void
     {
         $nodeList = $xPath->query('/phpunit/@stopOnFailure');
