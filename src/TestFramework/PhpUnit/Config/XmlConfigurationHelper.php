@@ -75,11 +75,11 @@ final class XmlConfigurationHelper
 
     public function removeCacheResultFile(\DOMDocument $dom, \DOMXPath $xPath): void
     {
-        $nodeList = $xPath->query('/phpunit/@cacheResultFile');
-
-        if ($nodeList->length) {
-            $dom->documentElement->removeAttribute('cacheResultFile');
-        }
+        $this->removeAttribute(
+            $dom,
+            $xPath,
+            'cacheResultFile'
+        );
     }
 
     public function removeExistingLoggers(\DOMDocument $dom, \DOMXPath $xPath): void
@@ -91,35 +91,29 @@ final class XmlConfigurationHelper
 
     public function setStopOnFailure(\DOMXPath $xPath): void
     {
-        $nodeList = $xPath->query('/phpunit/@stopOnFailure');
-
-        if ($nodeList->length) {
-            $nodeList[0]->nodeValue = 'true';
-        } else {
-            $node = $xPath->query('/phpunit')[0];
-            $node->setAttribute('stopOnFailure', 'true');
-        }
+        $this->setAttributeValue(
+            $xPath,
+            'stopOnFailure',
+            'true'
+        );
     }
 
     public function deactivateColours(\DOMXPath $xPath): void
     {
-        $nodeList = $xPath->query('/phpunit/@colors');
-
-        if ($nodeList->length) {
-            $nodeList[0]->nodeValue = 'false';
-        } else {
-            $node = $xPath->query('/phpunit')[0];
-            $node->setAttribute('colors', 'false');
-        }
+        $this->setAttributeValue(
+            $xPath,
+            'colors',
+            'false'
+        );
     }
 
     public function removeExistingPrinters(\DOMDocument $dom, \DOMXPath $xPath): void
     {
-        $nodeList = $xPath->query('/phpunit/@printerClass');
-
-        if ($nodeList->length) {
-            $dom->documentElement->removeAttribute('printerClass');
-        }
+        $this->removeAttribute(
+            $dom,
+            $xPath,
+            'printerClass'
+        );
     }
 
     public function validate(\DOMDocument $dom, \DOMXPath $xPath): bool
@@ -148,9 +142,11 @@ final class XmlConfigurationHelper
 
     public function removeDefaultTestSuite(\DOMDocument $dom, \DOMXPath $xPath): void
     {
-        if ($xPath->query('/phpunit/@defaultTestSuite')->length) {
-            $dom->documentElement->removeAttribute('defaultTestSuite');
-        }
+        $this->removeAttribute(
+            $dom,
+            $xPath,
+            'defaultTestSuite'
+        );
     }
 
     private function getXmlErrorsString(): string
@@ -179,5 +175,32 @@ final class XmlConfigurationHelper
         }
 
         return sprintf('%s/%s', $this->phpUnitConfigDir, $nodeValue);
+    }
+
+    private function removeAttribute(\DOMDocument $dom, \DOMXPath $xPath, string $name): void
+    {
+        $nodeList = $xPath->query(sprintf(
+            '/phpunit/@%s',
+            $name
+        ));
+
+        if ($nodeList->length) {
+            $dom->documentElement->removeAttribute($name);
+        }
+    }
+
+    private function setAttributeValue(\DOMXPath $xPath, string $name, string $value): void
+    {
+        $nodeList = $xPath->query(sprintf(
+            '/phpunit/@%s',
+            $name
+        ));
+
+        if ($nodeList->length) {
+            $nodeList[0]->nodeValue = $value;
+        } else {
+            $node = $xPath->query('/phpunit')[0];
+            $node->setAttribute($name, $value);
+        }
     }
 }
