@@ -55,7 +55,7 @@ final class XmlConfigurationHelperTest extends TestCase
 
         $xmlconfig->replaceWithAbsolutePaths($xPath);
 
-        $this->assertSame(<<<XML
+        $this->assertXmlStringEqualsXmlString(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="/app/autoload2.php" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class">
   <testsuites>
@@ -88,7 +88,7 @@ XML
 
         $xmlconfig->removeExistingLoggers($dom, $xPath);
 
-        $this->assertSame(<<<XML
+        $this->assertXmlStringEqualsXmlString(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class">
   <testsuites>
@@ -118,7 +118,7 @@ XML
 
         $xmlconfig->setStopOnFailure($xPath);
 
-        $this->assertSame(<<<XML
+        $this->assertXmlStringEqualsXmlString(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="true">
   <testsuites>
@@ -160,7 +160,7 @@ XML
 
         $xmlconfig->setStopOnFailure($xPath);
 
-        $this->assertSame(<<<XML
+        $this->assertXmlStringEqualsXmlString(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="true">
 </phpunit>
@@ -179,7 +179,7 @@ XML
 
         $xmlconfig->deactivateColours($xPath);
 
-        $this->assertSame(<<<XML
+        $this->assertXmlStringEqualsXmlString(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class">
   <testsuites>
@@ -221,7 +221,7 @@ XML
 
         $xmlconfig->deactivateColours($xPath);
 
-        $this->assertSame(<<<XML
+        $this->assertXmlStringEqualsXmlString(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="false" colors="false">
 </phpunit>
@@ -249,7 +249,7 @@ XML
 
         $xmlconfig->removeCacheResultFile($dom, $xPath);
 
-        $this->assertSame(<<<XML
+        $this->assertXmlStringEqualsXmlString(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="false">
 </phpunit>
@@ -277,7 +277,7 @@ XML
 
         $xmlconfig->removeExistingPrinters($dom, $xPath);
 
-        $this->assertSame(<<<XML
+        $this->assertXmlStringEqualsXmlString(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" stopOnFailure="false">
 </phpunit>
@@ -373,7 +373,7 @@ XML
 
         $xmlconfig->removeDefaultTestSuite($dom, new \DOMXPath($dom));
 
-        $this->assertSame(<<<XML
+        $this->assertXmlStringEqualsXmlString(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="false">
 </phpunit>
