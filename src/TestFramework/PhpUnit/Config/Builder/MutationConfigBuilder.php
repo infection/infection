@@ -87,6 +87,7 @@ class MutationConfigBuilder extends ConfigBuilder
         $this->xmlConfigurationHelper->replaceWithAbsolutePaths($xPath);
         $this->xmlConfigurationHelper->setStopOnFailure($xPath);
         $this->xmlConfigurationHelper->deactivateColours($xPath);
+        $this->xmlConfigurationHelper->removeCacheResultFile($dom, $xPath);
         $this->xmlConfigurationHelper->removeExistingLoggers($dom, $xPath);
         $this->xmlConfigurationHelper->removeExistingPrinters($dom, $xPath);
         $this->xmlConfigurationHelper->removeDefaultTestSuite($dom, $xPath);
