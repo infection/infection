@@ -55,25 +55,35 @@ final class XmlConfigurationHelperTest extends TestCase
 
         $xmlconfig->replaceWithAbsolutePaths($xPath);
 
-        $this->assertSame(<<<XML
+        $this->assertXmlStringEqualsXmlString(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="/app/autoload2.php" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class">
-  <testsuites>
-    <testsuite name="Application Test Suite">
-      <directory>/*Bundle</directory>
-      <exclude>/*Bundle/Fixtures</exclude>
-    </testsuite>
-  </testsuites>
-  <filter>
-    <whitelist>
-      <directory>/src/</directory>
-    </whitelist>
-  </filter>
-  <logging>
-    <log type="coverage-html" target="/path/to/tmp"/>
-  </logging>
+<phpunit
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    bootstrap="/app/autoload2.php"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    printerClass="Fake\Printer\Class"
+    processIsolation="false"
+    syntaxCheck="false"
+>
+    <testsuites>
+        <testsuite name="Application Test Suite">
+            <directory>/*Bundle</directory>
+            <exclude>/*Bundle/Fixtures</exclude>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory>/src/</directory>
+        </whitelist>
+    </filter>
+    <logging>
+        <log type="coverage-html" target="/path/to/tmp"/>
+    </logging>
 </phpunit>
-
 XML
             , $dom->saveXML()
         );
@@ -88,22 +98,32 @@ XML
 
         $xmlconfig->removeExistingLoggers($dom, $xPath);
 
-        $this->assertSame(<<<XML
+        $this->assertXmlStringEqualsXmlString(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class">
-  <testsuites>
-    <testsuite name="Application Test Suite">
-      <directory>./*Bundle</directory>
-      <exclude>./*Bundle/Fixtures</exclude>
-    </testsuite>
-  </testsuites>
-  <filter>
-    <whitelist>
-      <directory>src/</directory>
-    </whitelist>
-  </filter>
+<phpunit
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    bootstrap="app/autoload2.php"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    printerClass="Fake\Printer\Class"
+    processIsolation="false"
+    syntaxCheck="false"
+>
+    <testsuites>
+        <testsuite name="Application Test Suite">
+            <directory>./*Bundle</directory>
+            <exclude>./*Bundle/Fixtures</exclude>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory>src/</directory>
+        </whitelist>
+    </filter>
 </phpunit>
-
 XML
             , $dom->saveXML()
         );
@@ -118,25 +138,36 @@ XML
 
         $xmlconfig->setStopOnFailure($xPath);
 
-        $this->assertSame(<<<XML
+        $this->assertXmlStringEqualsXmlString(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="true">
-  <testsuites>
-    <testsuite name="Application Test Suite">
-      <directory>./*Bundle</directory>
-      <exclude>./*Bundle/Fixtures</exclude>
-    </testsuite>
-  </testsuites>
-  <filter>
-    <whitelist>
-      <directory>src/</directory>
-    </whitelist>
-  </filter>
-  <logging>
-    <log type="coverage-html" target="/path/to/tmp"/>
-  </logging>
+<phpunit
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    bootstrap="app/autoload2.php"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    printerClass="Fake\Printer\Class"
+    processIsolation="false"
+    stopOnFailure="true"
+    syntaxCheck="false"
+>
+    <testsuites>
+        <testsuite name="Application Test Suite">
+            <directory>./*Bundle</directory>
+            <exclude>./*Bundle/Fixtures</exclude>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory>src/</directory>
+        </whitelist>
+    </filter>
+    <logging>
+        <log type="coverage-html" target="/path/to/tmp"/>
+    </logging>
 </phpunit>
-
 XML
             , $dom->saveXML()
         );
@@ -149,9 +180,20 @@ XML
         $dom->formatOutput = true;
         $dom->loadXML(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="false">
+<phpunit
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    bootstrap="app/autoload2.php"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    printerClass="Fake\Printer\Class"
+    processIsolation="false"
+    stopOnFailure="false"
+    syntaxCheck="false"
+>
 </phpunit>
-
 XML
         );
         $xPath = new \DOMXPath($dom);
@@ -160,11 +202,22 @@ XML
 
         $xmlconfig->setStopOnFailure($xPath);
 
-        $this->assertSame(<<<XML
+        $this->assertXmlStringEqualsXmlString(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="true">
+<phpunit
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    bootstrap="app/autoload2.php"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    printerClass="Fake\Printer\Class"
+    processIsolation="false"
+    stopOnFailure="true"
+    syntaxCheck="false"
+>
 </phpunit>
-
 XML
             , $dom->saveXML()
         );
@@ -179,25 +232,35 @@ XML
 
         $xmlconfig->deactivateColours($xPath);
 
-        $this->assertSame(<<<XML
+        $this->assertXmlStringEqualsXmlString(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class">
-  <testsuites>
-    <testsuite name="Application Test Suite">
-      <directory>./*Bundle</directory>
-      <exclude>./*Bundle/Fixtures</exclude>
-    </testsuite>
-  </testsuites>
-  <filter>
-    <whitelist>
-      <directory>src/</directory>
-    </whitelist>
-  </filter>
-  <logging>
-    <log type="coverage-html" target="/path/to/tmp"/>
-  </logging>
+<phpunit
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    bootstrap="app/autoload2.php"
+    colors="false"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    printerClass="Fake\Printer\Class"
+    processIsolation="false"
+    syntaxCheck="false"
+>
+    <testsuites>
+        <testsuite name="Application Test Suite">
+            <directory>./*Bundle</directory>
+            <exclude>./*Bundle/Fixtures</exclude>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory>src/</directory>
+        </whitelist>
+    </filter>
+    <logging>
+        <log type="coverage-html" target="/path/to/tmp"/>
+    </logging>
 </phpunit>
-
 XML
             , $dom->saveXML()
         );
@@ -210,9 +273,19 @@ XML
         $dom->formatOutput = true;
         $dom->loadXML(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="false">
+<phpunit
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    bootstrap="app/autoload2.php"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    printerClass="Fake\Printer\Class"
+    processIsolation="false"
+    stopOnFailure="false"
+    syntaxCheck="false"
+>
 </phpunit>
-
 XML
         );
         $xPath = new \DOMXPath($dom);
@@ -221,11 +294,22 @@ XML
 
         $xmlconfig->deactivateColours($xPath);
 
-        $this->assertSame(<<<XML
+        $this->assertXmlStringEqualsXmlString(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="false" colors="false">
+<phpunit
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    bootstrap="app/autoload2.php"
+    colors="false"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    printerClass="Fake\Printer\Class"
+    processIsolation="false"
+    stopOnFailure="false"
+    syntaxCheck="false"
+>
 </phpunit>
-
 XML
             , $dom->saveXML()
         );
@@ -238,9 +322,20 @@ XML
         $dom->formatOutput = true;
         $dom->loadXML(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" cacheResultFile="phpunit.cache" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="false">
+<phpunit
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    bootstrap="app/autoload2.php"
+    cacheResultFile="phpunit.cache"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    printerClass="Fake\Printer\Class"
+    processIsolation="false"
+    stopOnFailure="false"
+    syntaxCheck="false"
+>
 </phpunit>
-
 XML
         );
         $xPath = new \DOMXPath($dom);
@@ -249,11 +344,21 @@ XML
 
         $xmlconfig->removeCacheResultFile($dom, $xPath);
 
-        $this->assertSame(<<<XML
+        $this->assertXmlStringEqualsXmlString(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="false">
+<phpunit
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    bootstrap="app/autoload2.php"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    printerClass="Fake\Printer\Class"
+    processIsolation="false"
+    stopOnFailure="false"
+    syntaxCheck="false"
+>
 </phpunit>
-
 XML
             , $dom->saveXML()
         );
@@ -266,9 +371,19 @@ XML
         $dom->formatOutput = true;
         $dom->loadXML(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="false">
+<phpunit
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    bootstrap="app/autoload2.php"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    printerClass="Fake\Printer\Class"
+    processIsolation="false"
+    stopOnFailure="false"
+    syntaxCheck="false"
+>
 </phpunit>
-
 XML
         );
         $xPath = new \DOMXPath($dom);
@@ -277,11 +392,20 @@ XML
 
         $xmlconfig->removeExistingPrinters($dom, $xPath);
 
-        $this->assertSame(<<<XML
+        $this->assertXmlStringEqualsXmlString(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" stopOnFailure="false">
+<phpunit
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    bootstrap="app/autoload2.php"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    processIsolation="false"
+    stopOnFailure="false"
+    syntaxCheck="false"
+>
 </phpunit>
-
 XML
             , $dom->saveXML()
         );
@@ -312,10 +436,12 @@ XML
         $dom->formatOutput = true;
         $dom->loadXML(<<<"XML"
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xsi:noNamespaceSchemaLocation="$xsdSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<phpunit
+    xsi:noNamespaceSchemaLocation="$xsdSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
     <invalid></invalid>
 </phpunit>
-
 XML
         );
         $xPath = new \DOMXPath($dom);
@@ -344,9 +470,11 @@ XML
         $dom->formatOutput = true;
         $dom->loadXML(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xsi:noNamespaceSchemaLocation="$xsdSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<phpunit
+    xsi:noNamespaceSchemaLocation="$xsdSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
 </phpunit>
-
 XML
         );
         $xPath = new \DOMXPath($dom);
@@ -363,9 +491,13 @@ XML
         $dom->formatOutput = true;
         $dom->loadXML(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="false" defaultTestSuite="unit">
+<phpunit
+    defaultTestSuite="unit"
+    printerClass="Fake\Printer\Class"
+    stopOnFailure="false"
+    syntaxCheck="false"
+>
 </phpunit>
-
 XML
         );
 
@@ -373,11 +505,14 @@ XML
 
         $xmlconfig->removeDefaultTestSuite($dom, new \DOMXPath($dom));
 
-        $this->assertSame(<<<XML
+        $this->assertXmlStringEqualsXmlString(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="false">
+<phpunit
+    printerClass="Fake\Printer\Class"
+    stopOnFailure="false"
+    syntaxCheck="false"
+>
 </phpunit>
-
 XML
             , $dom->saveXML()
         );
@@ -402,7 +537,18 @@ XML
     {
         return <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class">
+<phpunit
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    bootstrap="app/autoload2.php"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    printerClass="Fake\Printer\Class"
+    processIsolation="false"
+    syntaxCheck="false"
+>
     <testsuites>
         <testsuite name="Application Test Suite">
             <directory>./*Bundle</directory>
@@ -420,7 +566,6 @@ XML
         <log type="coverage-html" target="/path/to/tmp"/>
     </logging>
 </phpunit>
-
 XML;
     }
 }
