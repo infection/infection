@@ -278,6 +278,26 @@ function something()
 }
 PHP
         ];
+
+        yield 'It does mutate when the parents method is protected' => [
+            $this->getFileContent('pv-protected-parent.php'),
+            <<<'PHP'
+<?php
+
+namespace ProtectedParent;
+
+abstract class SameAbstract
+{
+    protected abstract function foo();
+}
+class Child extends SameAbstract
+{
+    protected function foo()
+    {
+    }
+}
+PHP
+        ];
     }
 
     private function getFileContent(string $file): string
