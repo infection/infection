@@ -231,27 +231,104 @@ XML
         );
     }
 
-    public function test_it_removes_cache_result_file(): void
+    public function test_it_sets_cache_result_to_false_when_it_exists(): void
     {
         $dom = new \DOMDocument();
+
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
+
         $dom->loadXML(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" cacheResultFile="phpunit.cache" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="false">
+<phpunit
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    bootstrap="app/autoload2.php"
+    cacheResult="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    printerClass="Fake\Printer\Class"
+    processIsolation="false"
+    stopOnFailure="false"
+    syntaxCheck="false"
+>
 </phpunit>
 
 XML
         );
-        $xPath = new \DOMXPath($dom);
 
         $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
 
-        $xmlconfig->removeCacheResultFile($dom, $xPath);
+        $xmlconfig->deactivateResultCaching(new \DOMXPath($dom));
 
-        $this->assertSame(<<<XML
+        $this->assertXmlStringEqualsXmlString(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="false">
+<phpunit
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    bootstrap="app/autoload2.php"
+    cacheResult="false"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    printerClass="Fake\Printer\Class"
+    processIsolation="false"
+    stopOnFailure="false"
+    syntaxCheck="false"
+>
+</phpunit>
+
+XML
+            , $dom->saveXML()
+        );
+    }
+
+    public function test_it_sets_cache_result_to_false_when_it_does_not_exist(): void
+    {
+        $dom = new \DOMDocument();
+
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+
+        $dom->loadXML(<<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    bootstrap="app/autoload2.php"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    printerClass="Fake\Printer\Class"
+    processIsolation="false"
+    stopOnFailure="false"
+    syntaxCheck="false"
+>
+</phpunit>
+
+XML
+        );
+
+        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
+
+        $xmlconfig->deactivateResultCaching(new \DOMXPath($dom));
+
+        $this->assertXmlStringEqualsXmlString(<<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    bootstrap="app/autoload2.php"
+    cacheResult="false"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    printerClass="Fake\Printer\Class"
+    processIsolation="false"
+    stopOnFailure="false"
+    syntaxCheck="false"
+>
 </phpunit>
 
 XML
