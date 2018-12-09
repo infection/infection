@@ -73,15 +73,6 @@ final class XmlConfigurationHelper
         }
     }
 
-    public function removeCacheResultFile(\DOMDocument $dom, \DOMXPath $xPath): void
-    {
-        $nodeList = $xPath->query('/phpunit/@cacheResultFile');
-
-        if ($nodeList->length) {
-            $dom->documentElement->removeAttribute('cacheResultFile');
-        }
-    }
-
     public function removeExistingLoggers(\DOMDocument $dom, \DOMXPath $xPath): void
     {
         foreach ($xPath->query('/phpunit/logging') as $node) {

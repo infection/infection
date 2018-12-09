@@ -231,34 +231,6 @@ XML
         );
     }
 
-    public function test_it_removes_cache_result_file(): void
-    {
-        $dom = new \DOMDocument();
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $dom->loadXML(<<<XML
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" cacheResultFile="phpunit.cache" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="false">
-</phpunit>
-
-XML
-        );
-        $xPath = new \DOMXPath($dom);
-
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
-
-        $xmlconfig->removeCacheResultFile($dom, $xPath);
-
-        $this->assertSame(<<<XML
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="app/autoload2.php" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" printerClass="Fake\Printer\Class" stopOnFailure="false">
-</phpunit>
-
-XML
-            , $dom->saveXML()
-        );
-    }
-
     public function test_it_sets_cache_result_to_false_when_it_exists(): void
     {
         $dom = new \DOMDocument();

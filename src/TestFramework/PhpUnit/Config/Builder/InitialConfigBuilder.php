@@ -108,7 +108,6 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->xmlConfigurationHelper->setStopOnFailure($xPath);
         $this->xmlConfigurationHelper->deactivateColours($xPath);
         $this->xmlConfigurationHelper->deactivateResultCaching($xPath);
-        $this->xmlConfigurationHelper->removeCacheResultFile($dom, $xPath);
         $this->xmlConfigurationHelper->removeExistingLoggers($dom, $xPath);
         $this->xmlConfigurationHelper->removeExistingPrinters($dom, $xPath);
 
