@@ -303,6 +303,39 @@ if ($foo < -9) {
 PHP
                 ,
             ],
+            'It decrements an assignment' => [
+                <<<'PHP'
+<?php
+
+$foo = 10;
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$foo = 9;
+PHP
+            ],
+            'It decrements an assignment of 0' => [
+                <<<'PHP'
+<?php
+
+$foo = 0;
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$foo = -1;
+PHP
+            ],
+            'It does not decrement an assignment of 1' => [
+                <<<'PHP'
+<?php
+
+$foo = 1;
+PHP
+            ],
         ];
     }
 }
