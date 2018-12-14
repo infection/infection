@@ -190,6 +190,7 @@ final class MutatorProfile
     public const UNWRAP = [
         Mutator\Unwrap\UnwrapArrayChangeKeyCase::class,
         Mutator\Unwrap\UnwrapArrayChunk::class,
+        Mutator\Unwrap\UnwrapArrayColumn::class,
         Mutator\Unwrap\UnwrapArrayCombine::class,
         Mutator\Unwrap\UnwrapArrayDiff::class,
         Mutator\Unwrap\UnwrapArrayDiffAssoc::class,
@@ -338,6 +339,7 @@ final class MutatorProfile
         // Unwrap
         'UnwrapArrayChangeKeyCase' => Mutator\Unwrap\UnwrapArrayChangeKeyCase::class,
         'UnwrapArrayChunk' => Mutator\Unwrap\UnwrapArrayChunk::class,
+        'UnwrapArrayColumn' => Mutator\Unwrap\UnwrapArrayColumn::class,
         'UnwrapArrayCombine' => Mutator\Unwrap\UnwrapArrayCombine::class,
         'UnwrapArrayDiff' => Mutator\Unwrap\UnwrapArrayDiff::class,
         'UnwrapArrayDiffAssoc' => Mutator\Unwrap\UnwrapArrayDiffAssoc::class,
