@@ -216,7 +216,7 @@ final class E2ETest extends TestCase
          */
 
         /*
-         * E2E tests are expected to follow PSR-4.
+         * E2E tests are expected to follow PSR-0 or PSR-4.
          *
          * We exploit this to autoload only classes belonging to the test,
          * but not to vendored deps (so we don't need them here, but to run
@@ -241,6 +241,19 @@ final class E2ETest extends TestCase
             }
 
             $loader->setPsr4($namespace, $paths);
+        }
+
+        $mapPsr0 = require 'vendor/composer/autoload_namespaces.php';
+
+        foreach ($mapPsr0 as $namespace => $paths) {
+            foreach ($paths as $path) {
+                if (strpos($path, $vendorDir) !== false) {
+                    // Skip known dependency from autoloading
+                    continue 2;
+                }
+            }
+
+            $loader->set($namespace, $paths);
         }
 
         $loader->register($prepend = false); // Note: not prepending, but appending to our autoloader
