@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Finder;
 
 use Infection\Finder\Exception\FinderException;
+use Infection\TestFramework\TestFrameworkTypes;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -144,15 +145,22 @@ class TestFrameworkFinder extends AbstractExecutableFinder
             $this->testFrameworkName . '.phar',
         ];
 
+        if ($this->testFrameworkName === TestFrameworkTypes::PHPUNIT) {
+            $candidates[] = 'simple-phpunit.bat';
+            $candidates[] = 'simple-phpunit';
+            $candidates[] = 'simple-phpunit.phar';
+        }
+
         $finder = new ExecutableFinder();
 
+        $cwd = getcwd();
         foreach ($candidates as $name) {
-            if ($path = $finder->find($name, null, [getcwd()])) {
+            if ($path = $finder->find($name, null, [$cwd, $cwd . '/bin'])) {
                 return $path;
             }
         }
 
-        $path = $this->searchNonExecutables($candidates, [getcwd()]);
+        $path = $this->searchNonExecutables($candidates, [$cwd, $cwd . '/bin']);
 
         if (null !== $path) {
             return $path;
