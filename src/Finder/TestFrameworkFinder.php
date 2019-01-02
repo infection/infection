@@ -154,6 +154,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
         $finder = new ExecutableFinder();
 
         $cwd = getcwd();
+
         foreach ($candidates as $name) {
             if ($path = $finder->find($name, null, [$cwd, $cwd . '/bin'])) {
                 return $path;
