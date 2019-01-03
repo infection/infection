@@ -154,14 +154,15 @@ class TestFrameworkFinder extends AbstractExecutableFinder
         $finder = new ExecutableFinder();
 
         $cwd = getcwd();
+        $extraDirs = [$cwd, $cwd . '/bin'];
 
         foreach ($candidates as $name) {
-            if ($path = $finder->find($name, null, [$cwd, $cwd . '/bin'])) {
+            if ($path = $finder->find($name, null, $extraDirs)) {
                 return $path;
             }
         }
 
-        $path = $this->searchNonExecutables($candidates, [$cwd, $cwd . '/bin']);
+        $path = $this->searchNonExecutables($candidates, $extraDirs);
 
         if (null !== $path) {
             return $path;

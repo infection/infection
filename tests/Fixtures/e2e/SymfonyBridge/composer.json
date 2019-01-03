@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "symfony/phpunit-bridge": "^4.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "SymfonyBridge\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SymfonyBridge\\Test\\": "tests/"
+        }
+    }
+}

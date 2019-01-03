@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "symfony-flex-demo/flex": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "SymfonyFlex\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SymfonyFlex\\Test\\": "tests/"
+        }
+    }
+}
