@@ -1,6 +1,6 @@
 # Title
 
-https://github.com/infection/infection/issues/588
+* https://github.com/infection/infection/issues/588
 
 ## Summary
 symfony/phpunit-bridge isn't supported

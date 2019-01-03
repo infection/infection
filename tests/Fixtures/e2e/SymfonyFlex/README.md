@@ -1,9 +1,15 @@
 # Title
 
-* Link to github ticket if relevant
+* https://github.com/infection/infection/issues/493
 
 ## Summary
-Short summary of the ticket
+Symfony flex should correctly detect phpunit executable
 
 ## Full Ticket
-Full github ticket
+Symfony flex has a phpunit executable located under bin/phpunit.
+Infection does not detect this yet, and will not be able to find
+the executable.
+
+This is a common enough use case that we should either detect this
+during runtime, or help the user with a guesser during the initial
+set up.
