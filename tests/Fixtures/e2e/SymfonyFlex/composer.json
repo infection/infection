@@ -1,6 +1,7 @@
 {
     "require-dev": {
-        "symfony/flex": "^1.1"
+        "symfony/flex": "^1.1",
+        "symfony/phpunit-bridge": "^4.2"
     },
     "autoload": {
         "psr-4": {
