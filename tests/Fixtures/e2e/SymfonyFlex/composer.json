@@ -1,6 +1,6 @@
 {
     "require-dev": {
-        "symfony-flex-demo/flex": "dev-master"
+        "symfony/flex": "^1.1"
     },
     "autoload": {
         "psr-4": {
