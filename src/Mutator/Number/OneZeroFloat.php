@@ -58,7 +58,7 @@ final class OneZeroFloat extends Mutator
         return new Node\Scalar\DNumber(0.0);
     }
 
-    protected function mutatesNode(Node $node): bool
+    protected function mutatesNode(Node $node, array $mutatorSettings): bool
     {
         return $node instanceof Node\Scalar\DNumber && ($node->value === 0.0 || $node->value === 1.0);
     }

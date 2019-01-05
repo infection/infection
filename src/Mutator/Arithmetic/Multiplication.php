@@ -54,7 +54,7 @@ final class Multiplication extends Mutator
         return new Node\Expr\BinaryOp\Div($node->left, $node->right, $node->getAttributes());
     }
 
-    protected function mutatesNode(Node $node): bool
+    protected function mutatesNode(Node $node, array $mutatorSettings): bool
     {
         return $node instanceof Node\Expr\BinaryOp\Mul;
     }

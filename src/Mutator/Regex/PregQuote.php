@@ -51,7 +51,7 @@ final class PregQuote extends Mutator
         return $node->args[0];
     }
 
-    protected function mutatesNode(Node $node): bool
+    protected function mutatesNode(Node $node, array $mutatorSettings): bool
     {
         return $node instanceof Node\Expr\FuncCall &&
             $node->name instanceof Node\Name &&

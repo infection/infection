@@ -54,7 +54,7 @@ final class BitwiseAnd extends Mutator
         return new Node\Expr\BinaryOp\BitwiseOr($node->left, $node->right, $node->getAttributes());
     }
 
-    protected function mutatesNode(Node $node): bool
+    protected function mutatesNode(Node $node, array $mutatorSettings): bool
     {
         return $node instanceof Node\Expr\BinaryOp\BitwiseAnd;
     }

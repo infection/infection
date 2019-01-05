@@ -64,7 +64,7 @@ final class Increment extends Mutator
         }
     }
 
-    protected function mutatesNode(Node $node): bool
+    protected function mutatesNode(Node $node, array $mutatorSettings): bool
     {
         return $node instanceof PreInc || $node instanceof PostInc;
     }

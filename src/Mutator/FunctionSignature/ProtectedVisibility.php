@@ -68,7 +68,7 @@ final class ProtectedVisibility extends Mutator
         );
     }
 
-    protected function mutatesNode(Node $node): bool
+    protected function mutatesNode(Node $node, array $mutatorSettings): bool
     {
         if (!$node instanceof ClassMethod) {
             return false;

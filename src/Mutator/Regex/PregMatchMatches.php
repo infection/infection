@@ -55,7 +55,7 @@ final class PregMatchMatches extends Mutator
         return new Node\Expr\Cast\Int_(new Node\Expr\Assign($node->args[2]->value, new Node\Expr\Array_()));
     }
 
-    protected function mutatesNode(Node $node): bool
+    protected function mutatesNode(Node $node, array $mutatorSettings): bool
     {
         if (!$node instanceof Node\Expr\FuncCall) {
             return false;

@@ -12,7 +12,7 @@ class StubMutator extends Mutator
     {
     }
 
-    public function mutatesNode(Node $node): bool
+    public function mutatesNode(Node $node, array $mutatorSettings): bool
     {
         return false;
     }

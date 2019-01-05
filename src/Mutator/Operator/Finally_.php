@@ -55,7 +55,7 @@ final class Finally_ extends Mutator
         return new Node\Stmt\Nop();
     }
 
-    protected function mutatesNode(Node $node): bool
+    protected function mutatesNode(Node $node, array $mutatorSettings): bool
     {
         if (!$node instanceof Node\Stmt\Finally_) {
             return false;

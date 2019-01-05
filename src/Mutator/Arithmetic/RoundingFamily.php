@@ -74,7 +74,7 @@ final class RoundingFamily extends Mutator
         }
     }
 
-    protected function mutatesNode(Node $node): bool
+    protected function mutatesNode(Node $node, array $mutatorSettings): bool
     {
         if (!$node instanceof Node\Expr\FuncCall) {
             return false;

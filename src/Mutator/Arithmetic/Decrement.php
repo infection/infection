@@ -64,7 +64,7 @@ final class Decrement extends Mutator
         }
     }
 
-    protected function mutatesNode(Node $node): bool
+    protected function mutatesNode(Node $node, array $mutatorSettings): bool
     {
         return $node instanceof PreDec || $node instanceof PostDec;
     }

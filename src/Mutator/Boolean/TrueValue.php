@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Boolean;
 
 use Infection\Mutator\Util\Mutator;
+use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**
@@ -43,6 +44,11 @@ use PhpParser\Node;
  */
 final class TrueValue extends Mutator
 {
+    private const DEFAULT_SETTINGS = [
+        'in_array' => false,
+        'array_search' => false,
+    ];
+
     /**
      * Replaces "true" with "false"
      *
@@ -54,12 +60,29 @@ final class TrueValue extends Mutator
         return new Node\Expr\ConstFetch(new Node\Name('false'));
     }
 
-    protected function mutatesNode(Node $node): bool
+    protected function mutatesNode(Node $node, array $mutatorSettings): bool
     {
         if (!($node instanceof Node\Expr\ConstFetch)) {
             return false;
         }
 
-        return $node->name->toLowerString() === 'true';
+        if ($node->name->toLowerString() !== 'true') {
+            return false;
+        }
+
+        $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
+        $grandParentNode = $parentNode !== null ? $parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY) : null;
+
+        if ($grandParentNode instanceof Node\Expr\FuncCall) {
+            $resultSettings = array_merge(self::DEFAULT_SETTINGS, $mutatorSettings);
+
+            $functionName = $grandParentNode->name->toLowerString();
+
+            if (array_key_exists($functionName, $resultSettings) && $resultSettings[$functionName] === false) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

@@ -55,7 +55,7 @@ final class Break_ extends Mutator
         return new Node\Stmt\Continue_();
     }
 
-    protected function mutatesNode(Node $node): bool
+    protected function mutatesNode(Node $node, array $mutatorSettings): bool
     {
         if (!$node instanceof Node\Stmt\Break_) {
             return false;

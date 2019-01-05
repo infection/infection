@@ -59,7 +59,7 @@ final class NewObject extends AbstractValueToNullReturnValue
         ];
     }
 
-    protected function mutatesNode(Node $node): bool
+    protected function mutatesNode(Node $node, array $mutatorSettings): bool
     {
         if (!$node instanceof Node\Stmt\Return_) {
             return false;

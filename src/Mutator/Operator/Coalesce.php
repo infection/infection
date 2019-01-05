@@ -54,7 +54,7 @@ final class Coalesce extends Mutator
         return $node->right;
     }
 
-    protected function mutatesNode(Node $node): bool
+    protected function mutatesNode(Node $node, array $mutatorSettings): bool
     {
         return $node instanceof Node\Expr\BinaryOp\Coalesce;
     }

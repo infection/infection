@@ -42,7 +42,7 @@ use PhpParser\Node;
  */
 final class CastInt extends AbstractCastMutator
 {
-    protected function mutatesNode(Node $node): bool
+    protected function mutatesNode(Node $node, array $mutatorSettings): bool
     {
         return $node instanceof Node\Expr\Cast\Int_;
     }

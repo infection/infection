@@ -13,7 +13,7 @@ class ErrorMutator extends Mutator
         return $node;
     }
 
-    protected function mutatesNode(Node $node): bool
+    protected function mutatesNode(Node $node, array $mutatorSettings): bool
     {
         //This is intended to cause an error.
         $name = (string) $node;

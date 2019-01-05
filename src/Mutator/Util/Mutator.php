@@ -57,7 +57,7 @@ abstract class Mutator
 
     final public function shouldMutate(Node $node): bool
     {
-        if (!$this->mutatesNode($node)) {
+        if (!$this->mutatesNode($node, $this->config->getMutatorSettings())) {
             return false;
         }
 
@@ -77,5 +77,5 @@ abstract class Mutator
         return end($parts);
     }
 
-    abstract protected function mutatesNode(Node $node): bool;
+    abstract protected function mutatesNode(Node $node, array $mutatorSettings): bool;
 }

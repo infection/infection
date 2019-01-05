@@ -54,7 +54,7 @@ final class Throw_ extends Mutator
         return new Node\Stmt\Expression($node->expr);
     }
 
-    protected function mutatesNode(Node $node): bool
+    protected function mutatesNode(Node $node, array $mutatorSettings): bool
     {
         return $node instanceof Node\Stmt\Throw_;
     }

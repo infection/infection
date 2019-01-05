@@ -113,4 +113,153 @@ final class JsonFileTest extends TestCase
 
         (new JsonFile($jsonPath))->decode();
     }
+
+    /**
+     * @dataProvider validTrueValueProvider
+     */
+    public function test_it_validates_true_value_mutator(string $jsonString): void
+    {
+        $jsonPath = $this->tmpDir . '/file.json';
+
+        $this->filesystem->dumpFile($jsonPath, $jsonString);
+
+        $content = (new JsonFile($jsonPath))->decode();
+
+        self::assertObjectHasAttribute('mutators', $content);
+    }
+
+    public function validTrueValueProvider(): \Generator
+    {
+        yield 'Boolean value' => [
+            <<<JSON
+{
+    "timeout": 25,
+    "source": {"directories": ["src"]},
+	"mutators": {
+      "TrueValue": true
+    }
+}
+JSON
+        ];
+
+        yield 'Object value' => [
+            <<<JSON
+{
+    "timeout": 25,
+    "source": {"directories": ["src"]},
+	"mutators": {
+      "TrueValue": {
+        "ignore": [
+            "IgnoreClass"
+        ],
+      	"settings": {
+        	"in_array": false,
+            "array_search": true
+        }
+      }
+    }
+}
+JSON
+        ];
+    }
+
+    /**
+     * @dataProvider invalidTrueValueProvider
+     */
+    public function test_it_throws_exception_for_invalid_true_value_mutator(string $jsonString, string $expectedMessageRegex): void
+    {
+        $jsonPath = $this->tmpDir . '/file.json';
+
+        $this->filesystem->dumpFile($jsonPath, $jsonString);
+
+        self::expectException(ValidationException::class);
+        self::expectExceptionMessageRegExp($expectedMessageRegex);
+
+        (new JsonFile($jsonPath))->decode();
+    }
+
+    public function invalidTrueValueProvider(): \Generator
+    {
+        yield 'Extra property for TrueValue mutator' => [
+            <<<'JSON'
+{
+    "timeout": 25,
+    "source": {"directories": ["src"]},
+	"mutators": {
+      "TrueValue": {
+        "EXTRA_KEY": true,
+        "ignore": [
+            "IgnoreClass"
+        ],
+      	"settings": {
+        	"in_array": false,
+            "array_search": true
+        }
+      }
+    }
+}
+JSON
+            ,
+            '/mutators\.TrueValue : The property EXTRA_KEY is not defined and the definition does not allow additional properties/',
+        ];
+
+        yield 'Extra property for TrueValue mutator, settings object' => [
+            <<<'JSON'
+{
+    "timeout": 25,
+    "source": {"directories": ["src"]},
+	"mutators": {
+      "TrueValue": {
+        "ignore": [
+            "IgnoreClass"
+        ],
+      	"settings": {
+      	    "EXTRA_KEY": true,
+        	"in_array": false,
+            "array_search": true
+        }
+      }
+    }
+}
+JSON
+            ,
+            '/mutators\.TrueValue\.settings : The property EXTRA_KEY is not defined and the definition does not allow additional properties/',
+        ];
+
+        yield 'Invalid type for "in_array" setting' => [
+            <<<'JSON'
+{
+    "timeout": 25,
+    "source": {"directories": ["src"]},
+	"mutators": {
+      "TrueValue": {
+        "ignore": [
+            "IgnoreClass"
+        ],
+      	"settings": {
+        	"in_array": 123,
+            "array_search": true
+        }
+      }
+    }
+}
+JSON
+            ,
+            '/mutators\.TrueValue\.settings\.in_array : Integer value found, but a boolean is required/',
+        ];
+
+        yield 'Invalid type TrueValue' => [
+            <<<'JSON'
+{
+    "timeout": 25,
+    "source": {"directories": ["src"]},
+	"mutators": {
+      "TrueValue": 123
+    }
+}
+JSON
+            ,
+            '/mutators\.TrueValue : Failed to match at least one schema/',
+        ];
+    }
 }
