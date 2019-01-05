@@ -61,7 +61,7 @@ final class IntegerNegation extends Mutator
         );
     }
 
-    protected function mutatesNode(Node $node, array $mutatorSettings): bool
+    protected function mutatesNode(Node $node): bool
     {
         if (!$node instanceof Node\Stmt\Return_) {
             return false;

@@ -45,8 +45,8 @@ use PhpParser\Node;
 final class TrueValue extends Mutator
 {
     private const DEFAULT_SETTINGS = [
-        'in_array' => false,
         'array_search' => false,
+        'in_array' => false,
     ];
 
     /**
@@ -60,7 +60,7 @@ final class TrueValue extends Mutator
         return new Node\Expr\ConstFetch(new Node\Name('false'));
     }
 
-    protected function mutatesNode(Node $node, array $mutatorSettings): bool
+    protected function mutatesNode(Node $node): bool
     {
         if (!($node instanceof Node\Expr\ConstFetch)) {
             return false;
@@ -73,16 +73,14 @@ final class TrueValue extends Mutator
         $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
         $grandParentNode = $parentNode !== null ? $parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY) : null;
 
-        if ($grandParentNode instanceof Node\Expr\FuncCall) {
-            $resultSettings = array_merge(self::DEFAULT_SETTINGS, $mutatorSettings);
-
-            $functionName = $grandParentNode->name->toLowerString();
-
-            if (array_key_exists($functionName, $resultSettings) && $resultSettings[$functionName] === false) {
-                return false;
-            }
+        if (!$grandParentNode instanceof Node\Expr\FuncCall || !$grandParentNode->name instanceof Node\Name) {
+            return true;
         }
 
-        return true;
+        $resultSettings = array_merge(self::DEFAULT_SETTINGS, $this->config->getMutatorSettings());
+
+        $functionName = $grandParentNode->name->toLowerString();
+
+        return array_key_exists($functionName, $resultSettings) && $resultSettings[$functionName] !== false;
     }
 }

@@ -54,7 +54,7 @@ final class LogicalLowerAnd extends Mutator
         return new Node\Expr\BinaryOp\LogicalOr($node->left, $node->right, $node->getAttributes());
     }
 
-    protected function mutatesNode(Node $node, array $mutatorSettings): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\LogicalAnd;
     }

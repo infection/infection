@@ -51,7 +51,7 @@ final class LogicalNot extends Mutator
         return $node->expr;
     }
 
-    protected function mutatesNode(Node $node, array $mutatorSettings): bool
+    protected function mutatesNode(Node $node): bool
     {
         if (!($node instanceof Node\Expr\BooleanNot)) {
             return false;

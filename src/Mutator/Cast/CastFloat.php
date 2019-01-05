@@ -42,7 +42,7 @@ use PhpParser\Node;
  */
 final class CastFloat extends AbstractCastMutator
 {
-    protected function mutatesNode(Node $node, array $mutatorSettings): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Expr\Cast\Double;
     }

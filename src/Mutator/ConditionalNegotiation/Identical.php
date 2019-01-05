@@ -54,7 +54,7 @@ final class Identical extends Mutator
         return new Node\Expr\BinaryOp\NotIdentical($node->left, $node->right, $node->getAttributes());
     }
 
-    protected function mutatesNode(Node $node, array $mutatorSettings): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\Identical;
     }

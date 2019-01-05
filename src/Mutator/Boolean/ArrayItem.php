@@ -54,7 +54,7 @@ final class ArrayItem extends Mutator
         return new Node\Expr\BinaryOp\Greater($node->key, $node->value, $node->getAttributes());
     }
 
-    protected function mutatesNode(Node $node, array $mutatorSettings): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Expr\ArrayItem && $node->key && ($this->isNodeWithSideEffects($node->value) || $this->isNodeWithSideEffects($node->key));
     }

@@ -135,8 +135,8 @@ final class JsonFileTest extends TestCase
 {
     "timeout": 25,
     "source": {"directories": ["src"]},
-	"mutators": {
-      "TrueValue": true
+    "mutators": {
+        "TrueValue": true
     }
 }
 JSON
@@ -146,17 +146,19 @@ JSON
             <<<JSON
 {
     "timeout": 25,
-    "source": {"directories": ["src"]},
-	"mutators": {
-      "TrueValue": {
-        "ignore": [
-            "IgnoreClass"
-        ],
-      	"settings": {
-        	"in_array": false,
-            "array_search": true
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "TrueValue": {
+            "ignore": [
+                "IgnoreClass"
+            ],
+            "settings": {
+                "in_array": false,
+                "array_search": true
+            }
         }
-      }
     }
 }
 JSON
@@ -185,17 +187,17 @@ JSON
 {
     "timeout": 25,
     "source": {"directories": ["src"]},
-	"mutators": {
-      "TrueValue": {
-        "EXTRA_KEY": true,
-        "ignore": [
-            "IgnoreClass"
-        ],
-      	"settings": {
-        	"in_array": false,
-            "array_search": true
+    "mutators": {
+        "TrueValue": {
+            "EXTRA_KEY": true,
+            "ignore": [
+                "IgnoreClass"
+            ],
+            "settings": {
+                "in_array": false,
+                "array_search": true
+            }
         }
-      }
     }
 }
 JSON
@@ -208,17 +210,17 @@ JSON
 {
     "timeout": 25,
     "source": {"directories": ["src"]},
-	"mutators": {
-      "TrueValue": {
-        "ignore": [
-            "IgnoreClass"
-        ],
-      	"settings": {
-      	    "EXTRA_KEY": true,
-        	"in_array": false,
-            "array_search": true
+    "mutators": {
+        "TrueValue": {
+            "ignore": [
+                "IgnoreClass"
+            ],
+            "settings": {
+                "EXTRA_KEY": true,
+                "in_array": false,
+                "array_search": true
+            }
         }
-      }
     }
 }
 JSON
@@ -231,16 +233,16 @@ JSON
 {
     "timeout": 25,
     "source": {"directories": ["src"]},
-	"mutators": {
-      "TrueValue": {
-        "ignore": [
-            "IgnoreClass"
-        ],
-      	"settings": {
-        	"in_array": 123,
-            "array_search": true
+    "mutators": {
+        "TrueValue": {
+            "ignore": [
+                "IgnoreClass"
+            ],
+            "settings": {
+                "in_array": 123,
+                "array_search": true
+            }
         }
-      }
     }
 }
 JSON
@@ -253,8 +255,8 @@ JSON
 {
     "timeout": 25,
     "source": {"directories": ["src"]},
-	"mutators": {
-      "TrueValue": 123
+    "mutators": {
+        "TrueValue": 123
     }
 }
 JSON

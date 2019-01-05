@@ -47,7 +47,7 @@ final class TrueValueTest extends AbstractMutatorTestCase
     /**
      * @dataProvider provideMutationCases
      */
-    public function test_mutator($input, $expected = null, $settings = []): void
+    public function test_mutator($input, $expected = null, array $settings = []): void
     {
         $this->doTest($input, $expected, $settings);
     }
@@ -65,6 +65,38 @@ PHP
 <?php
 
 return false;
+PHP
+                ,
+            ];
+
+        yield 'It mutates inside function call when function is a variable' => [
+                <<<'PHP'
+<?php
+
+$a = 'foo';
+$a(true);
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = 'foo';
+$a(false);
+PHP
+                ,
+            ];
+
+        yield 'It mutates inside function call when function is a string' => [
+                <<<'PHP'
+<?php
+
+('function_name')(true);
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+('function_name')(false);
 PHP
                 ,
             ];
@@ -190,17 +222,17 @@ PHP
             ,
         ];
 
-        yield 'It mutates when used in "\array_search" function and explicitly enabled in settings' => [
+        yield 'It mutates when used in "array_search" function and explicitly enabled in settings' => [
             <<<'PHP'
 <?php
 
-\array_search($a, $b, true);
+array_search($a, $b, true);
 PHP
             ,
             <<<'PHP'
 <?php
 
-\array_search($a, $b, false);
+array_search($a, $b, false);
 PHP
             ,
             [
@@ -213,6 +245,19 @@ PHP
 <?php
 
 \array_search($a, $b, true);
+PHP
+            ,
+            [],
+            [
+                'settings' => ['array_search' => false],
+            ],
+        ];
+
+        yield 'It does not mutate when used in "\array_search" function and explicitly disabled and function is wrongly capitalized' => [
+            <<<'PHP'
+<?php
+
+\aRrAy_SeArCh($a, $b, true);
 PHP
             ,
             [],

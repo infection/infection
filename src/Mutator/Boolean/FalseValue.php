@@ -54,7 +54,7 @@ final class FalseValue extends Mutator
         return new Node\Expr\ConstFetch(new Node\Name('true'));
     }
 
-    protected function mutatesNode(Node $node, array $mutatorSettings): bool
+    protected function mutatesNode(Node $node): bool
     {
         if (!($node instanceof Node\Expr\ConstFetch)) {
             return false;

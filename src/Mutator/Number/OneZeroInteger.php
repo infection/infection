@@ -58,7 +58,7 @@ final class OneZeroInteger extends Mutator
         return new Node\Scalar\LNumber(0);
     }
 
-    protected function mutatesNode(Node $node, array $mutatorSettings): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Scalar\LNumber && ($node->value === 0 || $node->value === 1);
     }

@@ -59,7 +59,7 @@ abstract class AbstractUnwrapMutator extends Mutator
 
     abstract protected function getParameterIndexes(Node $node): \Generator;
 
-    final protected function mutatesNode(Node $node, array $mutatorSettings): bool
+    final protected function mutatesNode(Node $node): bool
     {
         if (!$node instanceof Node\Expr\FuncCall || !$node->name instanceof Node\Name) {
             return false;

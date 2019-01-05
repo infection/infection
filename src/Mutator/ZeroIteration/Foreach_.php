@@ -63,7 +63,7 @@ final class Foreach_ extends Mutator
         );
     }
 
-    protected function mutatesNode(Node $node, array $mutatorSettings): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Stmt\Foreach_;
     }

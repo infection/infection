@@ -43,7 +43,7 @@ abstract class Mutator
     /**
      * @var MutatorConfig
      */
-    private $config;
+    protected $config;
 
     public function __construct(MutatorConfig $config)
     {
@@ -57,7 +57,7 @@ abstract class Mutator
 
     final public function shouldMutate(Node $node): bool
     {
-        if (!$this->mutatesNode($node, $this->config->getMutatorSettings())) {
+        if (!$this->mutatesNode($node)) {
             return false;
         }
 
@@ -77,5 +77,5 @@ abstract class Mutator
         return end($parts);
     }
 
-    abstract protected function mutatesNode(Node $node, array $mutatorSettings): bool;
+    abstract protected function mutatesNode(Node $node): bool;
 }

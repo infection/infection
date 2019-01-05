@@ -54,7 +54,7 @@ final class Assignment extends Mutator
         return new Node\Expr\Assign($node->var, $node->expr, $node->getAttributes());
     }
 
-    protected function mutatesNode(Node $node, array $mutatorSettings): bool
+    protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Expr\AssignOp;
     }
