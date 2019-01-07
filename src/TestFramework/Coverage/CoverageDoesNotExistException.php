@@ -43,11 +43,17 @@ use Infection\Console\Exception\InfectionException;
  */
 final class CoverageDoesNotExistException extends InfectionException
 {
-    public static function with(string $coverageIndexFilePath, string $testFrameworkKey, string $tempDir): self
+    public static function with(string $coverageIndexFilePath, string $testFrameworkKey, string $tempDir, string $processInfo = ''): self
     {
+        $message = 'Code Coverage does not exist. File %s is not found. Check %s version Infection was run with and generated config files inside %s.';
+
+        if ($processInfo) {
+            $message .= $processInfo . PHP_EOL;
+        }
+
         return new self(
             sprintf(
-                'Code Coverage does not exist. File %s is not found. Check %s version Infection was run with and generated config files inside %s. Make sure to either: %s%s',
+                $message . ' Make sure to either: %s%s',
                 $coverageIndexFilePath,
                 $testFrameworkKey,
                 $tempDir,
