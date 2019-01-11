@@ -51,6 +51,7 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\HasExtraNodeVisitors;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
@@ -61,6 +62,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Process;
 
 /**
  * @internal
@@ -236,6 +238,8 @@ final class InfectionCommand extends BaseCommand
             return 1;
         }
 
+        $this->assertCodeCoverageExists($initialTestSuitProcess, $testFrameworkKey);
+
         $container->get('memory.limit.applier')->applyMemoryLimitFromProcess($initialTestSuitProcess, $adapter);
 
         $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
@@ -365,6 +369,30 @@ final class InfectionCommand extends BaseCommand
             if ($result !== 0) {
                 throw ConfigurationException::configurationAborted();
             }
+        }
+    }
+
+    private function assertCodeCoverageExists(Process $initialTestsProcess, string $testFrameworkKey): void
+    {
+        $coverageDir = $this->getContainer()->get(sprintf('coverage.dir.%s', $testFrameworkKey));
+
+        $coverageIndexFilePath = $coverageDir . '/' . CodeCoverageData::COVERAGE_INDEX_FILE_NAME;
+
+        $processInfo = sprintf(
+            '%sCommand line: %s%sProcess Output: %s',
+            PHP_EOL,
+            $initialTestsProcess->getCommandLine(),
+            PHP_EOL,
+            $initialTestsProcess->getOutput()
+        );
+
+        if (!file_exists($coverageIndexFilePath)) {
+            throw CoverageDoesNotExistException::with(
+                $coverageIndexFilePath,
+                $testFrameworkKey,
+                \dirname($coverageIndexFilePath, 2),
+                $processInfo
+            );
         }
     }
 }
