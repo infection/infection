@@ -77,7 +77,7 @@ final class TrueValue extends Mutator
             return true;
         }
 
-        $resultSettings = array_merge(self::DEFAULT_SETTINGS, $this->config->getMutatorSettings());
+        $resultSettings = array_merge(self::DEFAULT_SETTINGS, $this->getSettings());
 
         $functionName = $grandParentNode->name->toLowerString();
 

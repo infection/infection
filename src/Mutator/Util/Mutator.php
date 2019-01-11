@@ -43,7 +43,7 @@ abstract class Mutator
     /**
      * @var MutatorConfig
      */
-    protected $config;
+    private $config;
 
     public function __construct(MutatorConfig $config)
     {
@@ -75,6 +75,11 @@ abstract class Mutator
         $parts = explode('\\', static::class);
 
         return end($parts);
+    }
+
+    final protected function getSettings(): array
+    {
+        return $this->config->getMutatorSettings();
     }
 
     abstract protected function mutatesNode(Node $node): bool;
