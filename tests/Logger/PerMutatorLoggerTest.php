@@ -59,11 +59,11 @@ final class PerMutatorLoggerTest extends TestCase
             ->method('dumpFile')
             ->with(
                 sys_get_temp_dir() . '/fake-file.md',
-                "# Effects per Mutator\n" .
-                "\n" .
-                "| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |\n" .
-                "| ------- | --------- | ------ | ------- |------- | --------- | --- | ----------- |\n" .
-                "| For_ | 15 | 10 | 0 | 0 | 0 | 66| 100|\n" .
+                "# Effects per Mutator" . PHP_EOL .
+                PHP_EOL .
+                "| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |" . PHP_EOL .
+                "| ------- | --------- | ------ | ------- |------- | --------- | --- | ----------- |" . PHP_EOL .
+                "| For_ | 15 | 10 | 0 | 0 | 0 | 66| 100|" . PHP_EOL .
                 '| PregQuote | 5 | 0 | 0 | 0 | 0 | 0| 0|'
             );
 

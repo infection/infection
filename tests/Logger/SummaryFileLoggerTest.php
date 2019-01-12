@@ -88,14 +88,12 @@ final class SummaryFileLoggerTest extends TestCase
         $fs = $this->createMock(Filesystem::class);
         $fs->expects($this->once())->method('dumpFile')->with(
             $logFilePath,
-            <<<'TXT'
-Total: 0
-Killed: 0
-Errored: 0
-Escaped: 0
-Timed Out: 0
-Not Covered: 0
-TXT
+            'Total: 0' . PHP_EOL .
+            'Killed: 0' . PHP_EOL .
+            'Errored: 0' . PHP_EOL .
+            'Escaped: 0' . PHP_EOL .
+            'Timed Out: 0' . PHP_EOL .
+            'Not Covered: 0'
         );
 
         $debugFileLogger = new SummaryFileLogger($output, $logFilePath, $calculator, $fs, false, false);
@@ -116,14 +114,12 @@ TXT
         $fs = $this->createMock(Filesystem::class);
         $fs->expects($this->once())->method('dumpFile')->with(
             $logFilePath,
-            <<<'TXT'
-Total: 6
-Killed: 8
-Errored: 7
-Escaped: 30216
-Timed Out: 2
-Not Covered: 0
-TXT
+            'Total: 6' . PHP_EOL .
+            'Killed: 8' . PHP_EOL .
+            'Errored: 7' . PHP_EOL .
+            'Escaped: 30216' . PHP_EOL .
+            'Timed Out: 2' . PHP_EOL .
+            'Not Covered: 0'
         );
 
         $debugFileLogger = new SummaryFileLogger($output, $logFilePath, $calculator, $fs, false, false);
