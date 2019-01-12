@@ -56,10 +56,7 @@ final class DebugFileLoggerTest extends TestCase
         $logFilePath = sys_get_temp_dir() . '/foo.txt';
         $calculator = new MetricsCalculator();
         $output = $this->createMock(OutputInterface::class);
-        $fs = $this->createMock(Filesystem::class);
-        $fs->expects($this->once())->method('dumpFile')->with(
-            $logFilePath,
-            <<<'TXT'
+        $content = <<<'TXT'
 Total: 0
 Killed mutants:
 ===============
@@ -81,7 +78,13 @@ Not Covered mutants:
 ====================
 
 
-TXT
+TXT;
+        $content = str_replace("\n", PHP_EOL, $content);
+
+        $fs = $this->createMock(Filesystem::class);
+        $fs->expects($this->once())->method('dumpFile')->with(
+            $logFilePath,
+            $content
         );
 
         $debugFileLogger = new DebugFileLogger($output, $logFilePath, $calculator, $fs, false, false);
@@ -151,7 +154,6 @@ TXT
             . PHP_EOL
             . 'Not Covered mutants:' . PHP_EOL
             . '====================' . PHP_EOL
-            . PHP_EOL
             . PHP_EOL
         );
 
