@@ -53,7 +53,7 @@ final class PerMutatorLogger extends FileLogger
 
         $logs = [];
 
-        $logs[] = "# Effects per Mutator\n";
+        $logs[] = "# Effects per Mutator" . PHP_EOL;
 
         $logs[] = '| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |';
         $logs[] = '| ------- | --------- | ------ | ------- |------- | --------- | --- | ----------- |';
