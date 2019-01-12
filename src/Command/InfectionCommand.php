@@ -219,7 +219,7 @@ final class InfectionCommand extends BaseCommand
         $processBuilder = new ProcessBuilder($adapter, $config->getProcessTimeout());
         $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);
 
-        $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher, $this->consoleOutput);
+        $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
         $initialTestSuitProcess = $initialTestsRunner->run(
             $testFrameworkOptions->getForInitialProcess(),
             $this->skipCoverage,
