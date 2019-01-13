@@ -71,6 +71,7 @@ final class DebugFileLogger extends FileLogger
         $logs[] = 'Debug Messages:';
         $logs[] = '===============';
         $logs[] = '';
+
         foreach ($this->metricsCalculator->getDebugInfo() as $line) {
             $logs[] = '';
             $logs[] = $line;

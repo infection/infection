@@ -81,10 +81,11 @@ final class InitialTestsRunner
         $this->eventDispatcher->dispatch(new InitialTestSuiteStarted());
 
         $cmd = $process->getCommandLine();
+
         if (!empty($cmd)) {
             $this->metrics->addDebugInfo(
                 sprintf(
-                    "[%s()] Command:%s%s%s",
+                    '[%s()] Command:%s%s%s',
                     __METHOD__,
                     PHP_EOL,
                     $cmd,
