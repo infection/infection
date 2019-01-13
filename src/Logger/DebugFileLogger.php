@@ -67,14 +67,17 @@ final class DebugFileLogger extends FileLogger
             $this->metricsCalculator->getNotCoveredMutantProcesses(),
             'Not Covered'
         );
-        $logs[] = '';
-        $logs[] = 'Debug Messages:';
-        $logs[] = '===============';
-        $logs[] = '';
 
-        foreach ($this->metricsCalculator->getDebugInfo() as $line) {
+        if (!empty($this->metricsCalculator->getDebugInfo())) {
             $logs[] = '';
-            $logs[] = $line;
+            $logs[] = 'Debug Messages:';
+            $logs[] = '===============';
+            $logs[] = '';
+
+            foreach ($this->metricsCalculator->getDebugInfo() as $line) {
+                $logs[] = '';
+                $logs[] = $line;
+            }
         }
 
         return $logs;
