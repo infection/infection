@@ -39,6 +39,7 @@ use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\InitialTestCaseCompleted;
 use Infection\Events\InitialTestSuiteFinished;
 use Infection\Events\InitialTestSuiteStarted;
+use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Builder\ProcessBuilder;
 use Symfony\Component\Process\Process;
 
@@ -57,10 +58,16 @@ final class InitialTestsRunner
      */
     private $eventDispatcher;
 
-    public function __construct(ProcessBuilder $processBuilder, EventDispatcherInterface $eventDispatcher)
+    /**
+     * @var MetricsCalculator
+     */
+    private $metrics;
+
+    public function __construct(ProcessBuilder $processBuilder, EventDispatcherInterface $eventDispatcher, MetricsCalculator $metrics)
     {
         $this->processBuilder = $processBuilder;
         $this->eventDispatcher = $eventDispatcher;
+        $this->metrics = $metrics;
     }
 
     public function run(string $testFrameworkExtraOptions, bool $skipCoverage, array $phpExtraOptions = []): Process
@@ -72,6 +79,19 @@ final class InitialTestsRunner
         );
 
         $this->eventDispatcher->dispatch(new InitialTestSuiteStarted());
+
+        $cmd = $process->getCommandLine();
+        if (!empty($cmd)) {
+            $this->metrics->addDebugInfo(
+                sprintf(
+                    "[%s()] Command:%s%s%s",
+                    __METHOD__,
+                    PHP_EOL,
+                    $cmd,
+                    PHP_EOL
+                )
+            );
+        }
 
         $process->run(function ($type) use ($process): void {
             if ($process::ERR === $type) {

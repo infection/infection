@@ -35,10 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
+use Infection\Console\ConsoleOutputInterface;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\InitialTestCaseCompleted;
 use Infection\Events\InitialTestSuiteFinished;
 use Infection\Events\InitialTestSuiteStarted;
+use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Runner\InitialTestsRunner;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -78,7 +80,10 @@ final class InitialTestsRunnerTest extends TestCase
                 $this->isInstanceOf(InitialTestSuiteFinished::class)
             );
 
-        $testRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
+        $metrics = $this->getMockBuilder(MetricsCalculator::class)->getMock();
+        $metrics->method('getDebugInfo')->willReturn(['test']);
+
+        $testRunner = new InitialTestsRunner($processBuilder, $eventDispatcher, $metrics);
 
         $testRunner->run('', false);
     }

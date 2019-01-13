@@ -99,6 +99,11 @@ class MetricsCalculator
     private $totalMutantsCount = 0;
 
     /**
+     * @var string[]
+     */
+    private $debugMessage = [];
+
+    /**
      * Build a metric calculator with a sub-set of mutators
      *
      * @param MutantProcessInterface[] $mutantProcesses
@@ -273,5 +278,18 @@ class MetricsCalculator
     public function getErrorProcesses(): array
     {
         return $this->errorProcesses;
+    }
+
+    public function addDebugInfo(string $msg): void
+    {
+        $this->debugMessage[] = $msg;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getDebugInfo(): array
+    {
+        return $this->debugMessage;
     }
 }

@@ -65,6 +65,8 @@ final class MetricsCalculatorTest extends TestCase
         $this->assertSame(0.0, $calculator->getMutationScoreIndicator());
         $this->assertSame(0.0, $calculator->getCoverageRate());
         $this->assertSame(0.0, $calculator->getCoveredCodeMutationScoreIndicator());
+
+        $this->assertSame([], $calculator->getDebugInfo());
     }
 
     public function test_it_collects_all_values(): void
