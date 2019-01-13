@@ -116,10 +116,9 @@ abstract class AbstractTestFrameworkAdapter
     public function getInitialTestRunCommandLine(
         string $configPath,
         string $extraOptions,
-        bool $includePhpArgs,
         array $phpExtraArgs
     ): array {
-        return $this->getCommandLine($configPath, $extraOptions, $includePhpArgs, $phpExtraArgs);
+        return $this->getCommandLine($configPath, $extraOptions, $phpExtraArgs);
     }
 
     /**
@@ -138,7 +137,6 @@ abstract class AbstractTestFrameworkAdapter
     public function getCommandLine(
         string $configPath,
         string $extraOptions,
-        bool $includePhpArgs = true,
         array $phpExtraArgs = []
     ): array {
         $frameworkPath = $this->testFrameworkFinder->find();
@@ -167,7 +165,7 @@ abstract class AbstractTestFrameworkAdapter
          * In all other cases run it with a chosen PHP interpreter
          */
         $commandLineArgs = array_merge(
-            $this->findPhp($includePhpArgs),
+            $this->findPhp(),
             $phpExtraArgs,
             [$frameworkPath],
             $frameworkArgs
@@ -229,17 +227,20 @@ abstract class AbstractTestFrameworkAdapter
      *
      * @return string[]
      */
-    private function findPhp(bool $includeArgs = true): array
+    private function findPhp(): array
     {
-        if ($this->cachedPhpPath === null || $this->cachedIncludedArgs !== $includeArgs) {
-            $this->cachedIncludedArgs = $includeArgs;
-            $phpPath = (new PhpExecutableFinder())->find($includeArgs);
+        if ($this->cachedPhpPath === null) {
+            $phpPath = (new PhpExecutableFinder())->find(false);
 
             if ($phpPath === false) {
                 throw FinderException::phpExecutableNotFound();
             }
 
-            $this->cachedPhpPath = explode(' ', $phpPath);
+            $this->cachedPhpPath[] = $phpPath;
+
+            if (\PHP_SAPI === 'phpdbg') {
+                $this->cachedPhpPath[] = '-qrr';
+            }
         }
 
         return $this->cachedPhpPath;
