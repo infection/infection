@@ -172,7 +172,14 @@ final class E2ETest extends TestCase
             $this->markTestSkipped('Saved golden output');
         }
 
-        $this->assertFileEquals('expected-output.txt', 'infection.log', sprintf('%s/expected-output.txt is not same as infection.log (if that is OK, run GOLDEN=1 vendor/bin/phpunit)', getcwd()));
+        $this->assertStringStartsWith(
+            file_get_contents('expected-output.txt'),
+            file_get_contents('infection.log'),
+            sprintf(
+                '%s/expected-output.txt is not same as infection.log (if that is OK, run GOLDEN=1 vendor/bin/phpunit)',
+                getcwd()
+            )
+        );
 
         return $output;
     }
