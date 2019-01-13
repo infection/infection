@@ -87,24 +87,31 @@ TXT;
         $logFilePath = sys_get_temp_dir() . '/foo.txt';
         $calculator = new MetricsCalculator();
         $output = $this->createMock(OutputInterface::class);
+        $content = <<<'TXT'
+Escaped mutants:
+================
+
+Timed Out mutants:
+==================
+
+Killed mutants:
+===============
+
+Errors mutants:
+===============
+
+Not Covered mutants:
+====================
+
+TXT;
+        $content = str_replace("\n", PHP_EOL, $content);
+
         $fs = $this->createMock(Filesystem::class);
         $fs->expects($this->once())->method('dumpFile')->with(
             $logFilePath,
-            'Escaped mutants:' . PHP_EOL .
-            '================' . PHP_EOL .
-            PHP_EOL .
-            'Timed Out mutants:' . PHP_EOL .
-            '==================' . PHP_EOL .
-            PHP_EOL .
-            'Killed mutants:' . PHP_EOL .
-            '===============' . PHP_EOL .
-            PHP_EOL .
-            'Errors mutants:' . PHP_EOL .
-            '===============' . PHP_EOL .
-            PHP_EOL .
-            'Not Covered mutants:' . PHP_EOL .
-            '====================' . PHP_EOL
+            $content
         );
+
 
         $debugFileLogger = new TextFileLogger($output, $logFilePath, $calculator, $fs, true, false);
         $debugFileLogger->log();

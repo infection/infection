@@ -96,65 +96,71 @@ TXT;
         $logFilePath = sys_get_temp_dir() . '/foo.txt';
         $calculator = $this->createFilledMetricsCalculator();
         $output = $this->createMock(OutputInterface::class);
+        $content = <<<'TXT'
+Total: 12
+Killed mutants:
+===============
+
+
+Mutator: TrueValue
+Line 16
+
+Mutator: TrueValue
+Line 17
+
+Mutator: TrueValue
+Line 18
+
+Mutator: TrueValue
+Line 19
+
+Mutator: TrueValue
+Line 20
+
+Mutator: For_
+Line 6
+
+Mutator: For_
+Line 7
+
+Mutator: For_
+Line 8
+
+Mutator: For_
+Line 9
+
+Mutator: For_
+Line 10
+
+Errors mutants:
+===============
+
+
+Escaped mutants:
+================
+
+
+Mutator: For_
+Line 9
+
+Mutator: For_
+Line 10
+
+Timed Out mutants:
+==================
+
+
+Not Covered mutants:
+====================
+
+
+TXT;
+        $content = str_replace("\n", PHP_EOL, $content);
+
         $fs = $this->createMock(Filesystem::class);
         $fs->expects($this->once())->method('dumpFile')->with(
             $logFilePath,
-            'Total: 12' . PHP_EOL
-            . 'Killed mutants:' . PHP_EOL
-            . '===============' . PHP_EOL
-            . '' . PHP_EOL
-            . '' . PHP_EOL
-            . 'Mutator: TrueValue' . PHP_EOL
-            . 'Line 16' . PHP_EOL
-            . '' . PHP_EOL
-            . 'Mutator: TrueValue' . PHP_EOL
-            . 'Line 17' . PHP_EOL
-            . '' . PHP_EOL
-            . 'Mutator: TrueValue' . PHP_EOL
-            . 'Line 18' . PHP_EOL
-            . '' . PHP_EOL
-            . 'Mutator: TrueValue' . PHP_EOL
-            . 'Line 19' . PHP_EOL
-            . '' . PHP_EOL
-            . 'Mutator: TrueValue' . PHP_EOL
-            . 'Line 20' . PHP_EOL
-            . PHP_EOL
-            . 'Mutator: For_' . PHP_EOL
-            . 'Line 6' . PHP_EOL
-            . PHP_EOL
-            . 'Mutator: For_' . PHP_EOL
-            . 'Line 7' . PHP_EOL
-            . PHP_EOL
-            . 'Mutator: For_' . PHP_EOL
-            . 'Line 8' . PHP_EOL
-            . PHP_EOL
-            . 'Mutator: For_' . PHP_EOL
-            . 'Line 9' . PHP_EOL
-            . PHP_EOL
-            . 'Mutator: For_' . PHP_EOL
-            . 'Line 10' . PHP_EOL
-            . PHP_EOL
-            . 'Errors mutants:' . PHP_EOL
-            . '===============' . PHP_EOL
-            . PHP_EOL
-            . PHP_EOL
-            . 'Escaped mutants:' . PHP_EOL
-            . '================' . PHP_EOL
-            . PHP_EOL
-            . PHP_EOL
-            . 'Mutator: For_' . PHP_EOL
-            . 'Line 9' . PHP_EOL
-            . PHP_EOL
-            . 'Mutator: For_' . PHP_EOL
-            . 'Line 10' . PHP_EOL
-            . PHP_EOL
-            . 'Timed Out mutants:' . PHP_EOL
-            . '==================' . PHP_EOL
-            . PHP_EOL
-            . PHP_EOL
-            . 'Not Covered mutants:' . PHP_EOL
-            . '====================' . PHP_EOL
-            . PHP_EOL
+            $content
         );
 
         $debugFileLogger = new DebugFileLogger($output, $logFilePath, $calculator, $fs, false, false);
