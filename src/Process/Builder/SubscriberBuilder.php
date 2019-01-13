@@ -166,7 +166,8 @@ final class SubscriberBuilder
                 $this->metricsCalculator,
                 $this->fs,
                 $this->input->getOption('log-verbosity'),
-                (bool) $this->input->getOption('debug')
+                (bool) $this->input->getOption('debug'),
+                (bool) $this->input->getOption('only-covered')
             ),
             new PerformanceLoggerSubscriber(
                 $this->timer,

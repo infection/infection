@@ -63,10 +63,13 @@ final class DebugFileLogger extends FileLogger
             $this->metricsCalculator->getTimedOutProcesses(),
             'Timed Out'
         );
-        $logs[] = $this->convertProcess(
-            $this->metricsCalculator->getNotCoveredMutantProcesses(),
-            'Not Covered'
-        );
+
+        if (!$this->isOnlyCoveredMode) {
+            $logs[] = $this->convertProcess(
+                $this->metricsCalculator->getNotCoveredMutantProcesses(),
+                'Not Covered'
+            );
+        }
 
         return $logs;
     }
