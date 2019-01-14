@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2018, Maks Rafalko
+ * Copyright (c) 2017-2019, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -206,10 +206,13 @@ final class MutatorProfile
         Mutator\Unwrap\UnwrapArrayKeys::class,
         Mutator\Unwrap\UnwrapArrayMap::class,
         Mutator\Unwrap\UnwrapArrayMerge::class,
+        Mutator\Unwrap\UnwrapArrayMergeRecursive::class,
         Mutator\Unwrap\UnwrapArrayReduce::class,
         Mutator\Unwrap\UnwrapArrayReplace::class,
         Mutator\Unwrap\UnwrapArrayReplaceRecursive::class,
         Mutator\Unwrap\UnwrapArrayReverse::class,
+        Mutator\Unwrap\UnwrapArraySlice::class,
+        Mutator\Unwrap\UnwrapArraySplice::class,
         Mutator\Unwrap\UnwrapArrayUnique::class,
         Mutator\Unwrap\UnwrapArrayValues::class,
         Mutator\Unwrap\UnwrapStrRepeat::class,
@@ -356,10 +359,13 @@ final class MutatorProfile
         'UnwrapArrayKeys' => Mutator\Unwrap\UnwrapArrayKeys::class,
         'UnwrapArrayMap' => Mutator\Unwrap\UnwrapArrayMap::class,
         'UnwrapArrayMerge' => Mutator\Unwrap\UnwrapArrayMerge::class,
+        'UnwrapArrayMergeRecursive' => Mutator\Unwrap\UnwrapArrayMergeRecursive::class,
         'UnwrapArrayReduce' => Mutator\Unwrap\UnwrapArrayReduce::class,
         'UnwrapArrayReplace' => Mutator\Unwrap\UnwrapArrayReplace::class,
         'UnwrapArrayReplaceRecursive' => Mutator\Unwrap\UnwrapArrayReplaceRecursive::class,
         'UnwrapArrayReverse' => Mutator\Unwrap\UnwrapArrayReverse::class,
+        'UnwrapArraySlice' => Mutator\Unwrap\UnwrapArraySlice::class,
+        'UnwrapArraySplice' => Mutator\Unwrap\UnwrapArraySplice::class,
         'UnwrapArrayUnique' => Mutator\Unwrap\UnwrapArrayUnique::class,
         'UnwrapArrayValues' => Mutator\Unwrap\UnwrapArrayValues::class,
         'UnwrapStrRepeat' => Mutator\Unwrap\UnwrapStrRepeat::class,

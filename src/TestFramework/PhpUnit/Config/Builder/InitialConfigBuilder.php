@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2018, Maks Rafalko
+ * Copyright (c) 2017-2019, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -107,7 +107,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->xmlConfigurationHelper->replaceWithAbsolutePaths($xPath);
         $this->xmlConfigurationHelper->setStopOnFailure($xPath);
         $this->xmlConfigurationHelper->deactivateColours($xPath);
-        $this->xmlConfigurationHelper->removeCacheResultFile($dom, $xPath);
+        $this->xmlConfigurationHelper->deactivateResultCaching($xPath);
         $this->xmlConfigurationHelper->removeExistingLoggers($dom, $xPath);
         $this->xmlConfigurationHelper->removeExistingPrinters($dom, $xPath);
 

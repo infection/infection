@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2018, Maks Rafalko
+ * Copyright (c) 2017-2019, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -134,16 +134,22 @@ class TestFrameworkFinder extends AbstractExecutableFinder
             return $this->customPath;
         }
 
+        $candidates = [];
+
+        if ($this->testFrameworkName === TestFrameworkTypes::PHPUNIT) {
+            $candidates[] = 'simple-phpunit.bat';
+            $candidates[] = 'simple-phpunit';
+            $candidates[] = 'simple-phpunit.phar';
+        }
+
         /*
          * There's a glitch where ExecutableFinder would find a non-executable
          * file on Windows, even if there's a proper executable .bat by its side.
          * Therefore we have to explicitly look for a .bat first.
          */
-        $candidates = [
-            $this->testFrameworkName . '.bat',
-            $this->testFrameworkName,
-            $this->testFrameworkName . '.phar',
-        ];
+        $candidates[] = $this->testFrameworkName . '.bat';
+        $candidates[] = $this->testFrameworkName;
+        $candidates[] = $this->testFrameworkName . '.phar';
 
         if ($this->testFrameworkName === TestFrameworkTypes::PHPUNIT) {
             $candidates[] = 'simple-phpunit.bat';

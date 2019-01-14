@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2018, Maks Rafalko
+ * Copyright (c) 2017-2019, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -73,19 +73,22 @@ final class XmlConfigurationHelper
         }
     }
 
-    public function removeCacheResultFile(\DOMDocument $dom, \DOMXPath $xPath): void
-    {
-        $this->removeAttribute(
-            $dom,
-            $xPath,
-            'cacheResultFile'
-        );
-    }
-
     public function removeExistingLoggers(\DOMDocument $dom, \DOMXPath $xPath): void
     {
         foreach ($xPath->query('/phpunit/logging') as $node) {
             $dom->documentElement->removeChild($node);
+        }
+    }
+
+    public function deactivateResultCaching(\DOMXPath $xPath): void
+    {
+        $nodeList = $xPath->query('/phpunit/@cacheResult');
+
+        if ($nodeList->length) {
+            $nodeList[0]->nodeValue = 'false';
+        } else {
+            $node = $xPath->query('/phpunit')[0];
+            $node->setAttribute('cacheResult', 'false');
         }
     }
 
