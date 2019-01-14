@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Path;
 
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
+use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
-use function Infection\Tests\normalizePath as p;
 
 /**
  * @internal

@@ -37,9 +37,9 @@ namespace Infection\Tests\Finder;
 
 use Infection\Finder\Exception\LocatorException;
 use Infection\Finder\Locator;
+use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
-use function Infection\Tests\normalizePath as p;
 
 /**
  * @internal

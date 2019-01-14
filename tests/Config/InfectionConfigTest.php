@@ -37,9 +37,9 @@ namespace Infection\Tests\Config;
 
 use Infection\Config\InfectionConfig;
 use Infection\Tests\Fixtures\StubMutator;
+use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
-use function Infection\Tests\normalizePath as p;
 
 /**
  * @internal
