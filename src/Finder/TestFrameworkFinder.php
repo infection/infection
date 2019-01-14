@@ -151,12 +151,6 @@ class TestFrameworkFinder extends AbstractExecutableFinder
         $candidates[] = $this->testFrameworkName;
         $candidates[] = $this->testFrameworkName . '.phar';
 
-        if ($this->testFrameworkName === TestFrameworkTypes::PHPUNIT) {
-            $candidates[] = 'simple-phpunit.bat';
-            $candidates[] = 'simple-phpunit';
-            $candidates[] = 'simple-phpunit.phar';
-        }
-
         $finder = new ExecutableFinder();
 
         $cwd = getcwd();
