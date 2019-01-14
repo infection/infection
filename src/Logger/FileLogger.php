@@ -95,7 +95,7 @@ abstract class FileLogger implements MutationTestingResultsLogger
     public function log(): void
     {
         try {
-            $this->fs->dumpFile($this->logFilePath, implode("\n", $this->getLogLines()));
+            $this->fs->dumpFile($this->logFilePath, implode(PHP_EOL, $this->getLogLines()));
         } catch (IOException $e) {
             $this->output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
         }

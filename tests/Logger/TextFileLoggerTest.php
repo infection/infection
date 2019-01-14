@@ -58,10 +58,8 @@ final class TextFileLoggerTest extends TestCase
         $logFilePath = sys_get_temp_dir() . '/foo.txt';
         $calculator = new MetricsCalculator();
         $output = $this->createMock(OutputInterface::class);
-        $fs = $this->createMock(Filesystem::class);
-        $fs->expects($this->once())->method('dumpFile')->with(
-            $logFilePath,
-            <<<'TXT'
+
+        $content = <<<'TXT'
 Escaped mutants:
 ================
 
@@ -71,7 +69,13 @@ Timed Out mutants:
 Not Covered mutants:
 ====================
 
-TXT
+TXT;
+        $content = str_replace("\n", PHP_EOL, $content);
+
+        $fs = $this->createMock(Filesystem::class);
+        $fs->expects($this->once())->method('dumpFile')->with(
+            $logFilePath,
+            $content
         );
 
         $debugFileLogger = new TextFileLogger($output, $logFilePath, $calculator, $fs, false, false);
@@ -83,10 +87,7 @@ TXT
         $logFilePath = sys_get_temp_dir() . '/foo.txt';
         $calculator = new MetricsCalculator();
         $output = $this->createMock(OutputInterface::class);
-        $fs = $this->createMock(Filesystem::class);
-        $fs->expects($this->once())->method('dumpFile')->with(
-            $logFilePath,
-            <<<'TXT'
+        $content = <<<'TXT'
 Escaped mutants:
 ================
 
@@ -102,7 +103,13 @@ Errors mutants:
 Not Covered mutants:
 ====================
 
-TXT
+TXT;
+        $content = str_replace("\n", PHP_EOL, $content);
+
+        $fs = $this->createMock(Filesystem::class);
+        $fs->expects($this->once())->method('dumpFile')->with(
+            $logFilePath,
+            $content
         );
 
         $debugFileLogger = new TextFileLogger($output, $logFilePath, $calculator, $fs, true, false);
@@ -114,10 +121,7 @@ TXT
         $logFilePath = sys_get_temp_dir() . '/foo.txt';
         $calculator = $this->createFilledMetricsCalculator();
         $output = $this->createMock(OutputInterface::class);
-        $fs = $this->createMock(Filesystem::class);
-        $fs->expects($this->atMost(10))->method('dumpFile')->with(
-            $logFilePath,
-            <<<'TXT'
+        $content = <<<'TXT'
 Escaped mutants:
 ================
 
@@ -175,7 +179,12 @@ Diff Diff
 2) foo/bar:10    [M] For_
 bin/foo/bar -c conf
 Diff Diff
-TXT
+TXT;
+        $content = str_replace("\n", PHP_EOL, $content);
+        $fs = $this->createMock(Filesystem::class);
+        $fs->expects($this->atMost(10))->method('dumpFile')->with(
+            $logFilePath,
+            $content
         );
 
         $debugFileLogger = new TextFileLogger($output, $logFilePath, $calculator, $fs, false, true);
@@ -188,9 +197,7 @@ TXT
         $calculator = $this->createFilledMetricsCalculator();
         $output = $this->createMock(OutputInterface::class);
         $fs = $this->createMock(Filesystem::class);
-        $fs->expects($this->atMost(10))->method('dumpFile')->with(
-            $logFilePath,
-            <<<'TXT'
+        $content = <<<'TXT'
 Escaped mutants:
 ================
 
@@ -276,7 +283,12 @@ Diff Diff
 
 Diff Diff
 
-TXT
+TXT;
+
+        $content = str_replace("\n", PHP_EOL, $content);
+        $fs->expects($this->atMost(10))->method('dumpFile')->with(
+            $logFilePath,
+            $content
         );
 
         $debugFileLogger = new TextFileLogger($output, $logFilePath, $calculator, $fs, true, false);

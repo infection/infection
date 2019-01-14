@@ -80,7 +80,7 @@ final class TextFileLogger extends FileLogger
             }
         }
 
-        return implode("\n", $logParts);
+        return implode(PHP_EOL, $logParts);
     }
 
     private function getHeadlineParts(string $headlinePrefix): array
