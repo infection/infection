@@ -112,7 +112,6 @@ TXT;
             $content
         );
 
-
         $debugFileLogger = new TextFileLogger($output, $logFilePath, $calculator, $fs, true, false);
         $debugFileLogger->log();
     }
