@@ -38,10 +38,10 @@ namespace Infection\Tests\Finder;
 use Infection\Finder\Exception\FinderException;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\TestFramework\TestFrameworkTypes;
+use function Infection\Tests\normalizePath;
 use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
-use function Infection\Tests\normalizePath;
 
 /**
  * @internal

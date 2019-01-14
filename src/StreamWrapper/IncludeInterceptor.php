@@ -102,7 +102,7 @@ final class IncludeInterceptor
 
         if ($including) {
             if ($path === self::$intercept || realpath($path) === self::$intercept) {
-                $this->fp = fopen(self::$replacement, 'rb');
+                $this->fp = fopen(self::$replacement, 'r');
                 self::enable();
 
                 return true;

@@ -38,10 +38,10 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use function Infection\Tests\normalizePath as p;
 use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
-use function Infection\Tests\normalizePath as p;
 
 /**
  * @internal

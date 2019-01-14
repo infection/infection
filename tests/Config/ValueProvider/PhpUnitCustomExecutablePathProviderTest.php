@@ -39,9 +39,9 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\PhpUnitCustomExecutablePathProvider;
 use Infection\Finder\Exception\FinderException;
 use Infection\Finder\TestFrameworkFinder;
+use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Exception\RuntimeException as SymfonyRuntimeException;
-use function Infection\Tests\normalizePath as p;
 
 /**
  * @internal
