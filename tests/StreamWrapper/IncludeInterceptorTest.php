@@ -167,7 +167,7 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
 
         $tempnam = tempnam('', basename(__FILE__, 'php'));
 
-        $fp = fopen($tempnam, 'w+b');
+        $fp = fopen($tempnam, 'w+');
         flock($fp, LOCK_EX);
         fwrite($fp, 'test');
         fseek($fp, 0);
