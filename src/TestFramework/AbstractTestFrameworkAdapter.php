@@ -75,16 +75,6 @@ abstract class AbstractTestFrameworkAdapter
     private $versionParser;
 
     /**
-     * @var string[]
-     */
-    private $cachedPhpPath;
-
-    /**
-     * @var bool
-     */
-    private $cachedIncludedArgs;
-
-    /**
      * @var string|null
      */
     private $cachedVersion;
@@ -229,21 +219,19 @@ abstract class AbstractTestFrameworkAdapter
      */
     private function findPhp(): array
     {
-        if ($this->cachedPhpPath === null) {
-            $phpPath = (new PhpExecutableFinder())->find(false);
+        $phpExec = (new PhpExecutableFinder())->find(false);
 
-            if ($phpPath === false) {
-                throw FinderException::phpExecutableNotFound();
-            }
-
-            $this->cachedPhpPath[] = $phpPath;
-
-            if (\PHP_SAPI === 'phpdbg') {
-                $this->cachedPhpPath[] = '-qrr';
-            }
+        if ($phpExec === false) {
+            throw FinderException::phpExecutableNotFound();
         }
 
-        return $this->cachedPhpPath;
+        $phpCmd[] = $phpExec;
+
+        if (\PHP_SAPI === 'phpdbg') {
+            $phpCmd[] = '-qrr';
+        }
+
+        return $phpCmd;
     }
 
     private function isBatchFile(string $path): bool
