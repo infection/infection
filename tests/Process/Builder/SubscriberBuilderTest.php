@@ -57,7 +57,7 @@ final class SubscriberBuilderTest extends TestCase
     public function test_it_registers_the_subscribers_when_debugging(): void
     {
         $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(5))
+        $input->expects($this->exactly(6))
             ->method('getOption')
             ->will($this->returnValueMap(
                 [
@@ -94,7 +94,7 @@ final class SubscriberBuilderTest extends TestCase
     public function test_it_registers_the_subscribers_when_not_debugging(): void
     {
         $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(5))
+        $input->expects($this->exactly(6))
             ->method('getOption')
             ->will($this->returnValueMap(
                 [

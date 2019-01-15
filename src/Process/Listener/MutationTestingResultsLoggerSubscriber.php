@@ -85,13 +85,19 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
      */
     private $isDebugMode;
 
+    /**
+     * @var bool
+     */
+    private $isOnlyCoveredMode;
+
     public function __construct(
         OutputInterface $output,
         InfectionConfig $infectionConfig,
         MetricsCalculator $metricsCalculator,
         Filesystem $fs,
         string $logVerbosity,
-        bool $isDebugMode
+        bool $isDebugMode,
+        bool $isOnlyCoveredMode = false
     ) {
         $this->output = $output;
         $this->infectionConfig = $infectionConfig;
@@ -99,6 +105,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
         $this->fs = $fs;
         $this->logVerbosity = $logVerbosity;
         $this->isDebugMode = $isDebugMode;
+        $this->isOnlyCoveredMode = $isOnlyCoveredMode;
     }
 
     public function getSubscribedEvents(): array
@@ -154,7 +161,8 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
                     $this->metricsCalculator,
                     $this->fs,
                     $isDebugVerbosity,
-                    $this->isDebugMode
+                    $this->isDebugMode,
+                    $this->isOnlyCoveredMode
                 ))->log();
 
                 break;
@@ -176,7 +184,8 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
                     $this->metricsCalculator,
                     $this->fs,
                     $isDebugVerbosity,
-                    $this->isDebugMode
+                    $this->isDebugMode,
+                    $this->isOnlyCoveredMode
                 ))->log();
 
                 break;
