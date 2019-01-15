@@ -38,6 +38,8 @@ namespace Infection\Logger;
 use Infection\Process\MutantProcessInterface;
 
 /**
+ * This file is used for tests only.
+ *
  * @internal
  */
 final class DebugFileLogger extends FileLogger
