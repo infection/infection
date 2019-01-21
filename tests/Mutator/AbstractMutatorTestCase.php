@@ -66,7 +66,7 @@ abstract class AbstractMutatorTestCase extends TestCase
         $this->mutator = $this->getMutator();
     }
 
-    public function doTest(string $inputCode, $expectedCode = null): void
+    public function doTest(string $inputCode, $expectedCode = null, array $settings = []): void
     {
         $expectedCodeSamples = (array) $expectedCode;
 
@@ -76,7 +76,7 @@ abstract class AbstractMutatorTestCase extends TestCase
             throw new \LogicException('Input code cant be the same as mutated code');
         }
 
-        $mutants = $this->mutate($inputCode);
+        $mutants = $this->mutate($inputCode, $settings);
 
         $this->assertSame(\count($mutants), \count($expectedCodeSamples), sprintf(
             'Failed asserting that the number of code samples (%d) equals the number of mutants (%d) created by the mutator.',
@@ -98,12 +98,12 @@ abstract class AbstractMutatorTestCase extends TestCase
         }
     }
 
-    protected function getMutator(): Mutator
+    protected function getMutator(array $settings = []): Mutator
     {
         $class = \get_class($this);
         $mutator = substr(str_replace('\Tests', '', $class), 0, -4);
 
-        return new $mutator(new MutatorConfig([]));
+        return new $mutator(new MutatorConfig($settings));
     }
 
     protected function getNodes(string $code): array
@@ -114,12 +114,12 @@ abstract class AbstractMutatorTestCase extends TestCase
         return $parser->parse($code);
     }
 
-    protected function mutate(string $code): array
+    protected function mutate(string $code, array $settings = []): array
     {
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, new Lexer\Emulative());
         $prettyPrinter = new Standard();
 
-        $mutations = $this->getMutationsFromCode($code, $parser);
+        $mutations = $this->getMutationsFromCode($code, $parser, $settings);
 
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new CloneVisitor());
@@ -144,13 +144,13 @@ abstract class AbstractMutatorTestCase extends TestCase
     /**
      * @return SimpleMutation[]
      */
-    private function getMutationsFromCode(string $code, Parser $parser): array
+    private function getMutationsFromCode(string $code, Parser $parser, array $settings): array
     {
         $initialStatements = $parser->parse($code);
 
         $traverser = new NodeTraverser();
 
-        $mutationsCollectorVisitor = new SimpleMutationsCollectorVisitor($this->getMutator(), $initialStatements);
+        $mutationsCollectorVisitor = new SimpleMutationsCollectorVisitor($this->getMutator($settings), $initialStatements);
 
         $traverser->addVisitor($mutationsCollectorVisitor);
         $traverser->addVisitor(new ParentConnectorVisitor());

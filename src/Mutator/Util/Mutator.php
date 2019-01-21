@@ -77,5 +77,10 @@ abstract class Mutator
         return end($parts);
     }
 
+    final protected function getSettings(): array
+    {
+        return $this->config->getMutatorSettings();
+    }
+
     abstract protected function mutatesNode(Node $node): bool;
 }

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Boolean;
 
 use Infection\Mutator\Util\Mutator;
+use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**
@@ -43,6 +44,11 @@ use PhpParser\Node;
  */
 final class TrueValue extends Mutator
 {
+    private const DEFAULT_SETTINGS = [
+        'array_search' => false,
+        'in_array' => false,
+    ];
+
     /**
      * Replaces "true" with "false"
      *
@@ -60,6 +66,21 @@ final class TrueValue extends Mutator
             return false;
         }
 
-        return $node->name->toLowerString() === 'true';
+        if ($node->name->toLowerString() !== 'true') {
+            return false;
+        }
+
+        $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
+        $grandParentNode = $parentNode !== null ? $parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY) : null;
+
+        if (!$grandParentNode instanceof Node\Expr\FuncCall || !$grandParentNode->name instanceof Node\Name) {
+            return true;
+        }
+
+        $resultSettings = array_merge(self::DEFAULT_SETTINGS, $this->getSettings());
+
+        $functionName = $grandParentNode->name->toLowerString();
+
+        return array_key_exists($functionName, $resultSettings) && $resultSettings[$functionName] !== false;
     }
 }
