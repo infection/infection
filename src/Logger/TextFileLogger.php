@@ -52,7 +52,9 @@ final class TextFileLogger extends FileLogger
             $logs[] = $this->getLogParts($this->metricsCalculator->getErrorProcesses(), 'Errors');
         }
 
-        $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not Covered');
+        if (!$this->isOnlyCoveredMode) {
+            $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not Covered');
+        }
 
         return $logs;
     }
@@ -80,7 +82,7 @@ final class TextFileLogger extends FileLogger
             }
         }
 
-        return implode("\n", $logParts);
+        return implode(PHP_EOL, $logParts);
     }
 
     private function getHeadlineParts(string $headlinePrefix): array

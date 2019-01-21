@@ -54,7 +54,7 @@ abstract class AbstractBaseProviderTest extends TestCase
 
     protected function getInputStream(string $input)
     {
-        $stream = fopen('php://memory', 'r+b', false);
+        $stream = fopen('php://memory', 'r+', false);
         fwrite($stream, $input);
         rewind($stream);
 
@@ -63,7 +63,7 @@ abstract class AbstractBaseProviderTest extends TestCase
 
     protected function createOutputInterface(): StreamOutput
     {
-        return new StreamOutput(fopen('php://memory', 'r+b', false));
+        return new StreamOutput(fopen('php://memory', 'r+', false));
     }
 
     protected function createStreamableInputInterfaceMock($stream = null, $interactive = true)

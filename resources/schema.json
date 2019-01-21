@@ -90,7 +90,33 @@
         },
         "mutators": {
             "type": "object",
-            "description": "Contains the settings for different mutations and profiles"
+            "description": "Contains the settings for different mutations and profiles",
+            "properties": {
+                "TrueValue": {
+                    "type": {
+                        "anyOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                    "ignore": {"type": "array", "items": {"type": "string"}},
+                                    "settings": {
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "properties": {
+                                            "in_array": {"type": "boolean"},
+                                            "array_search": {"type": "boolean"}
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
         },
         "testFramework": {
             "type": "string",
@@ -99,6 +125,14 @@
         "bootstrap": {
             "type": "string",
             "description": "Use to specify a file to include as part of the startup to pre-configure the infection environment. Useful for adding custom autoloaders not included in composer."
+        },
+        "initialTestsPhpOptions": {
+            "type": "string",
+            "description": "Specify an additional php options for the initial test (IE: Enabling X-Debug). --initial-tests-php-options will override this option."
+        },
+        "testFrameworkOptions": {
+            "type": "string",
+            "description": "Specify an additional options to pass to the test framework (IE: Enabling Verbose Mode). --test-framework-options will override this option."
         }
     }
 }

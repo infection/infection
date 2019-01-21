@@ -47,15 +47,14 @@ final class TrueValueTest extends AbstractMutatorTestCase
     /**
      * @dataProvider provideMutationCases
      */
-    public function test_mutator($input, $expected = null): void
+    public function test_mutator($input, $expected = null, array $settings = []): void
     {
-        $this->doTest($input, $expected);
+        $this->doTest($input, $expected, $settings);
     }
 
-    public function provideMutationCases(): array
+    public function provideMutationCases(): \Generator
     {
-        return [
-            'It mutates true to false' => [
+        yield 'It mutates true to false' => [
                 <<<'PHP'
 <?php
 
@@ -68,16 +67,50 @@ PHP
 return false;
 PHP
                 ,
-            ],
-            'It does not mutate the string true to false' => [
+            ];
+
+        yield 'It mutates inside function call when function is a variable' => [
+                <<<'PHP'
+<?php
+
+$a = 'foo';
+$a(true);
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = 'foo';
+$a(false);
+PHP
+                ,
+            ];
+
+        yield 'It mutates inside function call when function is a string' => [
+                <<<'PHP'
+<?php
+
+('function_name')(true);
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+('function_name')(false);
+PHP
+                ,
+            ];
+
+        yield 'It does not mutate the string true to false' => [
                 <<<'PHP'
 <?php
 
 return 'true';
 PHP
                 ,
-            ],
-            'It mutates all caps true to false' => [
+            ];
+
+        yield 'It mutates all caps true to false' => [
                 <<<'PHP'
 <?php
 
@@ -90,6 +123,146 @@ PHP
 return false;
 PHP
                 ,
+            ];
+
+        yield 'It does not mutate when used in "in_array" function by default' => [
+                <<<'PHP'
+<?php
+
+in_array($a, $b, true);
+PHP
+                ,
+            ];
+
+        yield 'It does not mutate when used in "\in_array" function by default' => [
+                <<<'PHP'
+<?php
+
+\in_array($a, $b, true);
+PHP
+                ,
+            ];
+
+        yield 'It mutates when used in a method named "in_array"' => [
+                <<<'PHP'
+<?php
+
+$a->in_array($b, $c, true);
+PHP
+                ,
+            <<<'PHP'
+<?php
+
+$a->in_array($b, $c, false);
+PHP
+                ,
+            ];
+
+        yield 'It mutates when used in "\in_array" function and explicitly enabled in settings' => [
+                <<<'PHP'
+<?php
+
+\in_array($a, $b, true);
+PHP
+                ,
+            <<<'PHP'
+<?php
+
+\in_array($a, $b, false);
+PHP
+                ,
+                [
+                    'settings' => ['in_array' => true],
+                ],
+            ];
+
+        yield 'It does not mutate when used in "\in_array" function and explicitly disabled' => [
+                <<<'PHP'
+<?php
+
+\in_array($a, $b, true);
+PHP
+                ,
+                [],
+                [
+                    'settings' => ['in_array' => false],
+                ],
+            ];
+
+        yield 'It does not mutate when used in "array_search" function by default' => [
+            <<<'PHP'
+<?php
+
+array_search($a, $b, true);
+PHP
+            ,
+        ];
+
+        yield 'It does not mutate when used in "\array_search" function by default' => [
+            <<<'PHP'
+<?php
+
+\array_search($a, $b, true);
+PHP
+            ,
+        ];
+
+        yield 'It mutates when used in a method named "array_search"' => [
+            <<<'PHP'
+<?php
+
+$a->array_search($b, $c, true);
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a->array_search($b, $c, false);
+PHP
+            ,
+        ];
+
+        yield 'It mutates when used in "array_search" function and explicitly enabled in settings' => [
+            <<<'PHP'
+<?php
+
+array_search($a, $b, true);
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+array_search($a, $b, false);
+PHP
+            ,
+            [
+                'settings' => ['array_search' => true],
+            ],
+        ];
+
+        yield 'It does not mutate when used in "\array_search" function and explicitly disabled' => [
+            <<<'PHP'
+<?php
+
+\array_search($a, $b, true);
+PHP
+            ,
+            [],
+            [
+                'settings' => ['array_search' => false],
+            ],
+        ];
+
+        yield 'It does not mutate when used in "\array_search" function and explicitly disabled and function is wrongly capitalized' => [
+            <<<'PHP'
+<?php
+
+\aRrAy_SeArCh($a, $b, true);
+PHP
+            ,
+            [],
+            [
+                'settings' => ['array_search' => false],
             ],
         ];
     }

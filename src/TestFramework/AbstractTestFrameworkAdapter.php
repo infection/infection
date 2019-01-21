@@ -75,19 +75,14 @@ abstract class AbstractTestFrameworkAdapter
     private $versionParser;
 
     /**
-     * @var string[]
-     */
-    private $cachedPhpPath;
-
-    /**
-     * @var bool
-     */
-    private $cachedIncludedArgs;
-
-    /**
      * @var string|null
      */
     private $cachedVersion;
+
+    /**
+     * @var array|null
+     */
+    private $cachedPhpCmdLine;
 
     public function __construct(
         AbstractExecutableFinder $testFrameworkFinder,
@@ -116,10 +111,9 @@ abstract class AbstractTestFrameworkAdapter
     public function getInitialTestRunCommandLine(
         string $configPath,
         string $extraOptions,
-        bool $includePhpArgs,
         array $phpExtraArgs
     ): array {
-        return $this->getCommandLine($configPath, $extraOptions, $includePhpArgs, $phpExtraArgs);
+        return $this->getCommandLine($configPath, $extraOptions, $phpExtraArgs);
     }
 
     /**
@@ -138,7 +132,6 @@ abstract class AbstractTestFrameworkAdapter
     public function getCommandLine(
         string $configPath,
         string $extraOptions,
-        bool $includePhpArgs = true,
         array $phpExtraArgs = []
     ): array {
         $frameworkPath = $this->testFrameworkFinder->find();
@@ -167,7 +160,7 @@ abstract class AbstractTestFrameworkAdapter
          * In all other cases run it with a chosen PHP interpreter
          */
         $commandLineArgs = array_merge(
-            $this->findPhp($includePhpArgs),
+            $this->findPhp(),
             $phpExtraArgs,
             [$frameworkPath],
             $frameworkArgs
@@ -229,20 +222,25 @@ abstract class AbstractTestFrameworkAdapter
      *
      * @return string[]
      */
-    private function findPhp(bool $includeArgs = true): array
+    private function findPhp(): array
     {
-        if ($this->cachedPhpPath === null || $this->cachedIncludedArgs !== $includeArgs) {
-            $this->cachedIncludedArgs = $includeArgs;
-            $phpPath = (new PhpExecutableFinder())->find($includeArgs);
+        if ($this->cachedPhpCmdLine === null) {
+            $phpExec = (new PhpExecutableFinder())->find(false);
 
-            if ($phpPath === false) {
+            if ($phpExec === false) {
                 throw FinderException::phpExecutableNotFound();
             }
 
-            $this->cachedPhpPath = explode(' ', $phpPath);
+            $phpCmd[] = $phpExec;
+
+            if (\PHP_SAPI === 'phpdbg') {
+                $phpCmd[] = '-qrr';
+            }
+
+            $this->cachedPhpCmdLine = $phpCmd;
         }
 
-        return $this->cachedPhpPath;
+        return $this->cachedPhpCmdLine;
     }
 
     private function isBatchFile(string $path): bool
