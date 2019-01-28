@@ -41,11 +41,15 @@ use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\EventDispatcher\EventDispatcherInterface;
+use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Performance\Listener\PerformanceLoggerSubscriber;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\TimeFormatter;
 use Infection\Performance\Time\Timer;
+use Infection\Process\Listener\CiInitialTestsConsoleLoggerSubscriber;
+use Infection\Process\Listener\CiMutantCreatingConsoleLoggerSubscriber;
+use Infection\Process\Listener\CiMutationGeneratingConsoleLoggerSubscriber;
 use Infection\Process\Listener\CleanUpAfterMutationTestingFinishedSubscriber;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
@@ -150,9 +154,9 @@ final class SubscriberBuilder
         OutputInterface $output
     ): array {
         $subscribers = [
-            new InitialTestsConsoleLoggerSubscriber($output, $testFrameworkAdapter),
-            new MutationGeneratingConsoleLoggerSubscriber($output),
-            new MutantCreatingConsoleLoggerSubscriber($output),
+            $this->getInitialTestsConsoleLoggerSubscriber($testFrameworkAdapter, $output),
+            $this->getMutantGeneratingConsoleLoggerSubscriber($output),
+            $this->getMutantCreatingConsoleLoggerSubscriber($output),
             new MutationTestingConsoleLoggerSubscriber(
                 $output,
                 $this->getOutputFormatter($output),
@@ -198,5 +202,32 @@ final class SubscriberBuilder
         }
 
         throw new \InvalidArgumentException('Incorrect formatter. Possible values: "dot", "progress"');
+    }
+
+    private function getMutantCreatingConsoleLoggerSubscriber(OutputInterface $output): EventSubscriberInterface
+    {
+        if ((bool) $this->input->getOption('ci-friendly')) {
+            return new CiMutantCreatingConsoleLoggerSubscriber($output);
+        }
+
+        return new MutantCreatingConsoleLoggerSubscriber($output);
+    }
+
+    private function getMutantGeneratingConsoleLoggerSubscriber(OutputInterface $output): EventSubscriberInterface
+    {
+        if ((bool) $this->input->getOption('ci-friendly')) {
+            return new CiMutationGeneratingConsoleLoggerSubscriber($output);
+        }
+
+        return new MutationGeneratingConsoleLoggerSubscriber($output);
+    }
+
+    private function getInitialTestsConsoleLoggerSubscriber(AbstractTestFrameworkAdapter $testFrameworkAdapter, OutputInterface $output): EventSubscriberInterface
+    {
+        if ((bool) $this->input->getOption('ci-friendly')) {
+            return new CiInitialTestsConsoleLoggerSubscriber($output, $testFrameworkAdapter);
+        }
+
+        return new InitialTestsConsoleLoggerSubscriber($output, $testFrameworkAdapter);
     }
 }
