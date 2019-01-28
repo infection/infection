@@ -121,6 +121,12 @@ final class InfectionCommand extends BaseCommand
                 'Show mutations to the console'
             )
             ->addOption(
+                'ci-friendly',
+                null,
+                InputOption::VALUE_NONE,
+                'Makes the output CI friendly'
+            )
+            ->addOption(
                 'configuration',
                 'c',
                 InputOption::VALUE_REQUIRED,
