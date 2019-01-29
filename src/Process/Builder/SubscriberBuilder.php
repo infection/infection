@@ -206,7 +206,7 @@ final class SubscriberBuilder
 
     private function getMutantCreatingConsoleLoggerSubscriber(OutputInterface $output): EventSubscriberInterface
     {
-        if ((bool) $this->input->getOption('ci-friendly')) {
+        if ($this->shouldSkipProgressBars()) {
             return new CiMutantCreatingConsoleLoggerSubscriber($output);
         }
 
@@ -215,7 +215,7 @@ final class SubscriberBuilder
 
     private function getMutantGeneratingConsoleLoggerSubscriber(OutputInterface $output): EventSubscriberInterface
     {
-        if ((bool) $this->input->getOption('ci-friendly')) {
+        if ($this->shouldSkipProgressBars()) {
             return new CiMutationGeneratingConsoleLoggerSubscriber($output);
         }
 
@@ -224,10 +224,17 @@ final class SubscriberBuilder
 
     private function getInitialTestsConsoleLoggerSubscriber(AbstractTestFrameworkAdapter $testFrameworkAdapter, OutputInterface $output): EventSubscriberInterface
     {
-        if ((bool) $this->input->getOption('ci-friendly')) {
+        if ($this->shouldSkipProgressBars()) {
             return new CiInitialTestsConsoleLoggerSubscriber($output, $testFrameworkAdapter);
         }
 
         return new InitialTestsConsoleLoggerSubscriber($output, $testFrameworkAdapter);
+    }
+
+    private function shouldSkipProgressBars(): bool
+    {
+        $isCi = getenv('CI') === 'true' || getenv('CONTINUOUS_INTEGRATION') === 'true';
+
+        return $isCi || $this->input->getOption('no-progress');
     }
 }
