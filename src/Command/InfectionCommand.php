@@ -121,10 +121,10 @@ final class InfectionCommand extends BaseCommand
                 'Show mutations to the console'
             )
             ->addOption(
-                'ci-friendly',
+                'no-progress',
                 null,
                 InputOption::VALUE_NONE,
-                'Makes the output CI friendly'
+                'Do not output progress bars'
             )
             ->addOption(
                 'configuration',
