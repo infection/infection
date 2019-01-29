@@ -233,8 +233,8 @@ final class SubscriberBuilder
 
     private function shouldSkipProgressBars(): bool
     {
-        $isCi = getenv('CI') === 'true' || getenv('CONTINUOUS_INTEGRATION') === 'true';
-
-        return $isCi || $this->input->getOption('no-progress');
+        return $this->input->getOption('no-progress')
+            || getenv('CI') === 'true'
+            || getenv('CONTINUOUS_INTEGRATION') === 'true';
     }
 }
