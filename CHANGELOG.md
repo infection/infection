@@ -1,5 +1,41 @@
 # Change Log
 
+## [0.12.0](https://github.com/infection/infection/tree/0.12.0) (2019-01-24) 
+
+[Full Changelog](https://github.com/infection/infection/compare/0.11.0...0.12.0)
+
+**BC Breaks:**
+
+- Disabling mutating "true" -\> "false" in TrueValue mutator for in\_array/array\_search [\#599](https://github.com/infection/infection/pull/599)
+
+**Added:**
+
+- Allow settings for Mutators [\#206](https://github.com/infection/infection/issues/206)
+- Enhancement: Implement UnwrapArrayUdiffAssoc mutator [\#614](https://github.com/infection/infection/pull/614) 
+- Enhancement: Implement UnwrapArraySplice mutator [\#605](https://github.com/infection/infection/pull/605) 
+- Enhancement: Implement UnwrapArraySlice mutator [\#598](https://github.com/infection/infection/pull/598) 
+- Enhancement: Implement UnwrapArrayMergeRecursive mutator [\#594](https://github.com/infection/infection/pull/594) 
+- Enhancement: Implement UnwrapArrayIntersectUkey mutator [\#593](https://github.com/infection/infection/pull/593) 
+- Enhancement: Implement UnwrapArrayIntersectUassoc mutator [\#591](https://github.com/infection/infection/pull/591) 
+- Enhancement: Implement UnwrapArrayColumn mutator [\#590](https://github.com/infection/infection/pull/590) 
+- Enhancement: Implement UnwrapArrayIntersectKey mutator [\#584](https://github.com/infection/infection/pull/584)
+- Enhancement: Implement UnwrapArrayDiffUkey mutator [\#583](https://github.com/infection/infection/pull/583)
+
+**Fixed:**
+
+- Schema does not include initialTestsPhpOptions [\#606](https://github.com/infection/infection/issues/606)
+- Space in PHP interpreter path breaks Infection [\#600](https://github.com/infection/infection/issues/600)
+- Starting infection via phing differs from commandline [\#592](https://github.com/infection/infection/issues/592)
+- symfony/phpunit-bridge isn't supported [\#588](https://github.com/infection/infection/issues/588)
+- Symfony flex should correctly detect phpunit executable [\#493](https://github.com/infection/infection/issues/493)
+
+**Changed:**
+
+- Running command with `--only-covered` should add in log only covered code. [\#581](https://github.com/infection/infection/issues/581)
+- Add a test to check Infection works with PSR-0 compliant autoloader [\#579](https://github.com/infection/infection/pull/579)
+- Update gitattributes file [\#532](https://github.com/infection/infection/pull/532)
+
+
 ## [0.11.0](https://github.com/infection/infection/tree/0.11.0) (2018-11-11) 
 
 [Full Changelog](https://github.com/infection/infection/compare/0.10.6...0.11.0)

@@ -85,17 +85,20 @@ final class SummaryFileLoggerTest extends TestCase
         $logFilePath = $this->tmpDir . '/foo.txt';
         $calculator = new MetricsCalculator();
         $output = $this->createMock(OutputInterface::class);
-        $fs = $this->createMock(Filesystem::class);
-        $fs->expects($this->once())->method('dumpFile')->with(
-            $logFilePath,
-            <<<'TXT'
+        $content = <<<'TXT'
 Total: 0
 Killed: 0
 Errored: 0
 Escaped: 0
 Timed Out: 0
 Not Covered: 0
-TXT
+TXT;
+        $content = str_replace("\n", PHP_EOL, $content);
+
+        $fs = $this->createMock(Filesystem::class);
+        $fs->expects($this->once())->method('dumpFile')->with(
+            $logFilePath,
+            $content
         );
 
         $debugFileLogger = new SummaryFileLogger($output, $logFilePath, $calculator, $fs, false, false);
@@ -113,17 +116,20 @@ TXT
         $calculator->expects($this->once())->method('getTimedOutCount')->willReturn(2);
         $calculator->expects($this->once())->method('getNotCoveredByTestsCount')->willReturn(0);
         $output = $this->createMock(OutputInterface::class);
-        $fs = $this->createMock(Filesystem::class);
-        $fs->expects($this->once())->method('dumpFile')->with(
-            $logFilePath,
-            <<<'TXT'
+        $content = <<<'TXT'
 Total: 6
 Killed: 8
 Errored: 7
 Escaped: 30216
 Timed Out: 2
 Not Covered: 0
-TXT
+TXT;
+        $content = str_replace("\n", PHP_EOL, $content);
+
+        $fs = $this->createMock(Filesystem::class);
+        $fs->expects($this->once())->method('dumpFile')->with(
+            $logFilePath,
+            $content
         );
 
         $debugFileLogger = new SummaryFileLogger($output, $logFilePath, $calculator, $fs, false, false);

@@ -33,54 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Mutator\Unwrap;
 
-use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
-abstract class Mutator
+/**
+ * @internal
+ */
+final class UnwrapArraySplice extends AbstractUnwrapMutator
 {
-    /**
-     * @var MutatorConfig
-     */
-    private $config;
-
-    public function __construct(MutatorConfig $config)
+    protected function getFunctionName(): string
     {
-        $this->config = $config;
+        return 'array_splice';
     }
 
-    /**
-     * @return Node|Node[]|\Generator
-     */
-    abstract public function mutate(Node $node);
-
-    final public function shouldMutate(Node $node): bool
+    protected function getParameterIndexes(Node $node): \Generator
     {
-        if (!$this->mutatesNode($node)) {
-            return false;
-        }
-
-        $reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY, false);
-
-        if (!$reflectionClass) {
-            return true;
-        }
-
-        return !$this->config->isIgnored($reflectionClass->getName(), $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''));
+        yield 0;
     }
-
-    final public static function getName(): string
-    {
-        $parts = explode('\\', static::class);
-
-        return end($parts);
-    }
-
-    final protected function getSettings(): array
-    {
-        return $this->config->getMutatorSettings();
-    }
-
-    abstract protected function mutatesNode(Node $node): bool;
 }

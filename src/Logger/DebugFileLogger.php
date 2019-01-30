@@ -38,6 +38,8 @@ namespace Infection\Logger;
 use Infection\Process\MutantProcessInterface;
 
 /**
+ * This file is used for tests only.
+ *
  * @internal
  */
 final class DebugFileLogger extends FileLogger
@@ -63,10 +65,13 @@ final class DebugFileLogger extends FileLogger
             $this->metricsCalculator->getTimedOutProcesses(),
             'Timed Out'
         );
-        $logs[] = $this->convertProcess(
-            $this->metricsCalculator->getNotCoveredMutantProcesses(),
-            'Not Covered'
-        );
+
+        if (!$this->isOnlyCoveredMode) {
+            $logs[] = $this->convertProcess(
+                $this->metricsCalculator->getNotCoveredMutantProcesses(),
+                'Not Covered'
+            );
+        }
 
         return $logs;
     }
@@ -85,7 +90,7 @@ final class DebugFileLogger extends FileLogger
             $logParts[] = 'Line ' . $mutantProcess->getOriginalStartingLine();
         }
 
-        return implode("\n", $logParts) . "\n";
+        return implode(PHP_EOL, $logParts) . PHP_EOL;
     }
 
     private function getHeadlineParts(string $headlinePrefix): array

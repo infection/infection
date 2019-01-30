@@ -45,9 +45,15 @@ final class MutatorConfig
      */
     private $ignoreConfig;
 
+    /**
+     * @var array
+     */
+    private $mutatorSettings;
+
     public function __construct(array $config)
     {
         $this->ignoreConfig = $config['ignore'] ?? [];
+        $this->mutatorSettings = $config['settings'] ?? [];
     }
 
     public function isIgnored(string $class, string $method): bool
@@ -67,5 +73,10 @@ final class MutatorConfig
         }
 
         return false;
+    }
+
+    public function getMutatorSettings(): array
+    {
+        return $this->mutatorSettings;
     }
 }

@@ -53,18 +53,23 @@ final class PerMutatorLoggerTest extends TestCase
 {
     public function test_it_correctly_build_log_lines(): void
     {
+        $content = <<<'TXT'
+# Effects per Mutator
+
+| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |
+| ------- | --------- | ------ | ------- |------- | --------- | --- | ----------- |
+| For_ | 15 | 10 | 0 | 0 | 0 | 66| 100|
+| PregQuote | 5 | 0 | 0 | 0 | 0 | 0| 0|
+TXT;
+        $content = str_replace("\n", PHP_EOL, $content);
+
         $output = $this->createMock(OutputInterface::class);
         $fs = $this->createMock(Filesystem::class);
         $fs->expects($this->once())
             ->method('dumpFile')
             ->with(
                 sys_get_temp_dir() . '/fake-file.md',
-                "# Effects per Mutator\n" .
-                "\n" .
-                "| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |\n" .
-                "| ------- | --------- | ------ | ------- |------- | --------- | --- | ----------- |\n" .
-                "| For_ | 15 | 10 | 0 | 0 | 0 | 66| 100|\n" .
-                '| PregQuote | 5 | 0 | 0 | 0 | 0 | 0| 0|'
+                $content
             );
 
         $perMutatorLogger = new PerMutatorLogger(
