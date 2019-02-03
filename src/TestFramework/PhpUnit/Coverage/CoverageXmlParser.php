@@ -84,7 +84,8 @@ class CoverageXmlParser
         Assert::notSame(
             '0',
             $lineCoverage->item(0)->getAttribute('executed'),
-            '0 Lines of code were executed during tests. Please check your filters.'
+            '0 Lines of code were executed during tests. This could be due to "@covers" annotations, '.
+            'or your PHPUnit filters not being set up correctly.'
         );
     }
 
