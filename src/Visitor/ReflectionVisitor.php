@@ -50,12 +50,15 @@ final class ReflectionVisitor extends NodeVisitorAbstract
     public const FUNCTION_SCOPE_KEY = 'functionScope';
     public const FUNCTION_NAME = 'functionName';
 
+    /**
+     * @var Node\Expr\Closure[]|Node\Stmt\ClassMethod[]|Node[]
+     */
     private $functionScopeStack = [];
 
     /**
-     * @var \ReflectionClass|null
+     * @var \ReflectionClass[]|null[]
      */
-    private $reflectionClass;
+    private $classScopeStack = [];
 
     /**
      * @var string|null
@@ -65,14 +68,24 @@ final class ReflectionVisitor extends NodeVisitorAbstract
     public function beforeTraverse(array $nodes): void
     {
         $this->functionScopeStack = [];
-        $this->reflectionClass = null;
+        $this->classScopeStack = [];
         $this->methodName = null;
     }
 
     public function enterNode(Node $node)
     {
-        if ($node instanceof Node\Stmt\ClassLike && isset($node->fullyQualifiedClassName)) {
-            $this->reflectionClass = new \ReflectionClass($node->fullyQualifiedClassName->toString());
+        if ($node instanceof Node\Stmt\ClassLike){
+            if(isset($node->fullyQualifiedClassName)) {
+                $this->classScopeStack[] = new \ReflectionClass($node->fullyQualifiedClassName->toString());
+            } else {
+                // Anonymous class
+                $this->classScopeStack[] = null;
+            }
+        }
+
+        // No need to traverse outside of classes
+        if (count($this->classScopeStack) === 0 ) {
+            return null;
         }
 
         if ($node instanceof Node\Stmt\ClassMethod) {
@@ -93,11 +106,11 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
         if ($this->isFunctionLikeNode($node)) {
             $this->functionScopeStack[] = $node;
-            $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->reflectionClass);
+            $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->classScopeStack[\count($this->classScopeStack) - 1]);
             $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
         } elseif ($isInsideFunction) {
             $node->setAttribute(self::FUNCTION_SCOPE_KEY, $this->functionScopeStack[\count($this->functionScopeStack) - 1]);
-            $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->reflectionClass);
+            $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->classScopeStack[\count($this->classScopeStack) - 1]);
             $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
         }
     }
@@ -106,6 +119,10 @@ final class ReflectionVisitor extends NodeVisitorAbstract
     {
         if ($this->isFunctionLikeNode($node)) {
             array_pop($this->functionScopeStack);
+        }
+
+        if ($node instanceof  Node\Stmt\ClassLike) {
+            array_pop($this->classScopeStack);
         }
     }
 
