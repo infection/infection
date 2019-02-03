@@ -74,8 +74,8 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node)
     {
-        if ($node instanceof Node\Stmt\ClassLike){
-            if(isset($node->fullyQualifiedClassName)) {
+        if ($node instanceof Node\Stmt\ClassLike) {
+            if (isset($node->fullyQualifiedClassName)) {
                 $this->classScopeStack[] = new \ReflectionClass($node->fullyQualifiedClassName->toString());
             } else {
                 // Anonymous class
@@ -84,7 +84,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         }
 
         // No need to traverse outside of classes
-        if (count($this->classScopeStack) === 0 ) {
+        if (\count($this->classScopeStack) === 0) {
             return null;
         }
 

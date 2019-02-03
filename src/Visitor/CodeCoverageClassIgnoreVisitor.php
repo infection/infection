@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Visitor;
 
 use PhpParser\Node;
-use PhpParser\Node\Name;
 use PhpParser\Node\Stmt;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
@@ -61,6 +60,5 @@ final class CodeCoverageClassIgnoreVisitor extends NodeVisitorAbstract
         if (strpos($docComment->getText(), '@codeCoverageIgnore') !== false) {
             return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
-
     }
 }
