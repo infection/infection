@@ -50,7 +50,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
     public const FUNCTION_SCOPE_KEY = 'functionScope';
     public const FUNCTION_NAME = 'functionName';
 
-    private $scopeStack = [];
+    private $functionScopeStack = [];
 
     /**
      * @var \ReflectionClass|null
@@ -64,7 +64,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
     public function beforeTraverse(array $nodes): void
     {
-        $this->scopeStack = [];
+        $this->functionScopeStack = [];
         $this->reflectionClass = null;
         $this->methodName = null;
     }
@@ -92,11 +92,11 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         }
 
         if ($this->isFunctionLikeNode($node)) {
-            $this->scopeStack[] = $node;
+            $this->functionScopeStack[] = $node;
             $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->reflectionClass);
             $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
         } elseif ($isInsideFunction) {
-            $node->setAttribute(self::FUNCTION_SCOPE_KEY, $this->scopeStack[\count($this->scopeStack) - 1]);
+            $node->setAttribute(self::FUNCTION_SCOPE_KEY, $this->functionScopeStack[\count($this->functionScopeStack) - 1]);
             $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->reflectionClass);
             $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
         }
@@ -105,7 +105,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
     public function leaveNode(Node $node): void
     {
         if ($this->isFunctionLikeNode($node)) {
-            array_pop($this->scopeStack);
+            array_pop($this->functionScopeStack);
         }
     }
 
