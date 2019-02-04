@@ -83,6 +83,7 @@ final class E2ETest extends TestCase
     {
         if ($this->previousLoader) {
             $this->previousLoader->unregister();
+            unset($this->previousLoader);
         }
 
         chdir($this->cwd);
