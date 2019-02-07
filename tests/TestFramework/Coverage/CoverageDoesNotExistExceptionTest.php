@@ -78,4 +78,13 @@ final class CoverageDoesNotExistExceptionTest extends TestCase
 
         $this->assertSame('Source file file.php was not found at /path/to/file', $exception->getMessage());
     }
+
+    public function test_for_correctly_escaped_output_of_subprocesses(): void
+    {
+        $exception = CoverageDoesNotExistException::with('foo.xml', 'bar', '/baz', 'string with a single % and placeholders %s %d %i.');
+
+        $this->assertInstanceOf(CoverageDoesNotExistException::class, $exception);
+
+        $this->assertStringStartsWith('Code Coverage does not exist. File foo.xml is not found. Check bar version Infection was run with and generated config files inside /baz.string with a single % and placeholders %s %d %i.', $exception->getMessage());
+    }
 }
