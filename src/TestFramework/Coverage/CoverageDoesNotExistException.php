@@ -48,6 +48,7 @@ final class CoverageDoesNotExistException extends InfectionException
         $message = 'Code Coverage does not exist. File %s is not found. Check %s version Infection was run with and generated config files inside %s.';
 
         if ($processInfo) {
+            $processInfo = str_replace('%', '%%', $processInfo);
             $message .= $processInfo . PHP_EOL;
         }
 
