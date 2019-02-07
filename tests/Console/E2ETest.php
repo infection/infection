@@ -98,7 +98,7 @@ final class E2ETest extends TestCase
      * @group e2e
      * @large
      */
-    public function test_it_runs_on_itself(): void
+    public function t1est_it_runs_on_itself(): void
     {
         if (ini_get('memory_limit') === '-1') {
             $this->markTestSkipped(implode("\n", [
@@ -119,7 +119,7 @@ final class E2ETest extends TestCase
     /**
      * @group e2e
      */
-    public function test_it_runs_configure_command_if_no_configuration(): void
+    public function t1est_it_runs_configure_command_if_no_configuration(): void
     {
         chdir('tests/Fixtures/e2e/Unconfigured/');
 
