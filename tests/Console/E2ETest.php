@@ -134,7 +134,6 @@ final class E2ETest extends TestCase
      */
     public function test_it_runs_an_e2e_test_with_success(string $fullPath): void
     {
-        var_dump($fullPath);
         $this->runOnE2EFixture($fullPath);
     }
 
@@ -145,9 +144,6 @@ final class E2ETest extends TestCase
             ->in(__DIR__ . '/../Fixtures/e2e/')
             ->directories();
 
-        $a = iterator_to_array($directories->getIterator());
-        $t = end($a);
-
         foreach ($directories as $dirName) {
             if (file_exists($dirName . '/run_tests.bash')) {
                 // skipping non-standard tests
@@ -155,7 +151,7 @@ final class E2ETest extends TestCase
                 continue;
             }
 
-            yield basename((string) $t) => [$t];
+            yield basename((string) $dirName) => [$dirName];
         }
     }
 

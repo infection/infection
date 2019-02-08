@@ -181,6 +181,8 @@ abstract class AbstractTestFrameworkAdapter
 
     public function getVersion(): string
     {
+        return 'unknown';
+
         if ($this->cachedVersion !== null) {
             return $this->cachedVersion;
         }
