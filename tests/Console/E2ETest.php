@@ -100,6 +100,10 @@ final class E2ETest extends TestCase
      */
     public function test_it_runs_on_itself(): void
     {
+        if (\PHP_SAPI === 'phpdbg') {
+            $this->markTestSkipped('Running this test on PHPDBG causes failures on Travis, see https://github.com/infection/infection/pull/622.');
+        }
+
         if (ini_get('memory_limit') === '-1') {
             $this->markTestSkipped(implode("\n", [
                 'Refusing to run Infection on itself with no memory limit set: it is dangerous.',
