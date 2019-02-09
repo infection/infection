@@ -119,8 +119,12 @@ final class E2ETest extends TestCase
     /**
      * @group e2e
      */
-    public function t1est_it_runs_configure_command_if_no_configuration(): void
+    public function test_it_runs_configure_command_if_no_configuration(): void
     {
+        if (\PHP_SAPI === 'phpdbg') {
+            $this->markTestSkipped('Running this test on PHPDBG causes failures on Travis, see https://github.com/infection/infection/pull/622.');
+        }
+
         chdir('tests/Fixtures/e2e/Unconfigured/');
 
         $output = $this->runInfection(self::EXPECT_ERROR);
