@@ -200,7 +200,7 @@ abstract class AbstractTestFrameworkAdapter
 
         $process->mustRun();
 
-        $version = null;
+        $version = 'unknown';
 
         try {
             $version = $this->versionParser->parse($process->getOutput());
