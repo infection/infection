@@ -121,6 +121,12 @@ final class InfectionCommand extends BaseCommand
                 'Show mutations to the console'
             )
             ->addOption(
+                'no-progress',
+                null,
+                InputOption::VALUE_NONE,
+                'Do not output progress bars'
+            )
+            ->addOption(
                 'configuration',
                 'c',
                 InputOption::VALUE_REQUIRED,
