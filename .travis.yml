@@ -108,6 +108,11 @@ jobs:
       <<: *STANDARD_TEST_JOB
       php: 7.3
       env: PHPDBG=1
+    
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.4snapshot
+      env: PHPDBG=1
 
     -
       <<: *STANDARD_TEST_JOB
@@ -148,4 +153,6 @@ jobs:
 
   allow_failures:
     - php: nightly
+      env: PHPDBG=1
+    - php: 7.4snapshot
       env: PHPDBG=1
