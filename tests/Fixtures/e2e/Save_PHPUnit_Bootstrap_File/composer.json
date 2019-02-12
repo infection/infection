@@ -1,11 +1,11 @@
 {
     "config": {
         "platform": {
-            "php": "7.0"
+            "php": "7.1"
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "^6.5"
+        "phpunit/phpunit": "^7.5"
     },
     "autoload": {
         "psr-4": {
