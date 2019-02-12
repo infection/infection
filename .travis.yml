@@ -17,7 +17,9 @@ addons:
       - expect
 
 before_install:
+  - ulimit -a && free -h
   - ulimit -n 65535
+  - ulimit -a
   - source .ci/travis-functions.sh
   - xdebug-disable
 
