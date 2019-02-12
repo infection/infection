@@ -1,7 +1,5 @@
 language: php
 
-sudo: false
-
 env:
   global:
     - INFECTION_FLAGS='--threads=4 --min-msi=67 --min-covered-msi=75 --coverage=coverage --log-verbosity=none'
@@ -19,6 +17,7 @@ addons:
       - expect
 
 before_install:
+  - ulimit -n 65535
   - source .ci/travis-functions.sh
   - xdebug-disable
 
