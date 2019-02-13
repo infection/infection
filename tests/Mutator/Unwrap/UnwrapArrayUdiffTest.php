@@ -132,7 +132,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_udiff($foo->bar(), $foo->baz());
+$a = array_udiff($foo->bar(), $foo->baz(), $callback);
 PHP
             ,
             <<<'PHP'
