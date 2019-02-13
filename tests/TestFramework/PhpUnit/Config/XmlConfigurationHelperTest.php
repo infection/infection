@@ -535,7 +535,7 @@ XML
 
         $xmlHelper = new XmlConfigurationHelper($this->getPathReplacer(), '');
 
-        $this->assertTrue(true, $xmlHelper->validate($dom, $xPath));
+        $this->assertTrue($xmlHelper->validate($dom, $xPath));
     }
 
     public function test_it_removes_default_test_suite(): void
