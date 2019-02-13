@@ -73,6 +73,15 @@ final class CodeCoverageMethodIgnoreVisitorTest extends AbstractBaseVisitorTest
         $this->assertTrue($this->spyVisitor->isNodeVisited(), 'Node\Stmt\Return_ node has not been visited');
     }
 
+    public function test_it_travers_nodes_when_coverage_is_not_ignored_but_has_a_comment(): void
+    {
+        $code = $this->getFileContent('Coverage/code-coverage-method-not-ignored-with-comment.php');
+
+        $this->parseAndTraverse($code);
+
+        $this->assertTrue($this->spyVisitor->isNodeVisited(), 'Node\Stmt\Return_ node has not been visited');
+    }
+
     private function parseAndTraverse(string $code): void
     {
         $nodes = $this->getNodes($code);
