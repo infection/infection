@@ -132,7 +132,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_udiff_uassoc($foo->bar(), $foo->baz());
+$a = array_udiff_uassoc($foo->bar(), $foo->baz(), $value_compare_func, $key_compare_func);
 PHP
             ,
             <<<'PHP'

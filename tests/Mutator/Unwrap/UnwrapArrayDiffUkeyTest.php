@@ -132,7 +132,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_diff_ukey($foo->bar(), $foo->baz());
+$a = array_diff_ukey($foo->bar(), $foo->baz(), $callback);
 PHP
             ,
             <<<'PHP'
