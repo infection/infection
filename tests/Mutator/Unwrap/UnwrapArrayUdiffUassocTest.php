@@ -56,7 +56,7 @@ final class UnwrapArrayUdiffUassocTest extends AbstractMutatorTestCase
             <<<'PHP'
 <?php
 
-$a = array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func, $key_compare_func);
+$a = array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc);
 PHP
             ,
             <<<'PHP'
@@ -70,7 +70,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_udiff_uassoc(\Class_With_Const::Const, ['baz' => 'bar'], $value_compare_func, $key_compare_func);
+$a = array_udiff_uassoc(\Class_With_Const::Const, ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc);
 PHP
             ,
             <<<'PHP'
@@ -84,7 +84,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = \array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func, $key_compare_func);
+$a = \array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc);
 PHP
             ,
             <<<'PHP'
@@ -99,7 +99,7 @@ PHP
 <?php
 
 $a = ['foo' => 'bar'];
-if (array_udiff_uassoc($a, ['baz' => 'bar'], $value_compare_func, $key_compare_func) === $a) {
+if (array_udiff_uassoc($a, ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc) === $a) {
     return true;
 }
 PHP
@@ -118,7 +118,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = aRrAy_UdIfF_UaSsOc(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func, $key_compare_func);
+$a = aRrAy_UdIfF_UaSsOc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc);
 PHP
             ,
             <<<'PHP'
@@ -132,7 +132,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_udiff_uassoc($foo->bar(), $foo->baz(), $value_compare_func, $key_compare_func);
+$a = array_udiff_uassoc($foo->bar(), $foo->baz(), $valueCompareFunc, $keyCompareFunc);
 PHP
             ,
             <<<'PHP'
@@ -146,7 +146,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_map('strtolower', array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func, $key_compare_func));
+$a = array_map('strtolower', array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc));
 PHP
             ,
             <<<'PHP'
@@ -160,7 +160,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $value_compare_func, $key_compare_func);
+$a = array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $valueCompareFunc, $keyCompareFunc);
 PHP
             ,
             <<<'PHP'
@@ -194,7 +194,7 @@ PHP
 
 $a = 'array_udiff_uassoc';
 
-$b = $a(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func, $key_compare_func);
+$b = $a(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc);
 PHP
         ];
     }

@@ -106,7 +106,7 @@ PHP
             <<<'PHP'
 <?php
 
-function array_splice($array, $offset, $length = null, $preserve_keys = null)
+function array_splice($array, $offset, $length = null, $preserveKeys = null)
 {
 }
 PHP

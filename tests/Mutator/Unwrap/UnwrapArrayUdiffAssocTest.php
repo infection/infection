@@ -56,7 +56,7 @@ final class UnwrapArrayUdiffAssocTest extends AbstractMutatorTestCase
             <<<'PHP'
 <?php
 
-$a = array_udiff_assoc(['foo' => 'bar'], ['baz' => 'bar'], $callback);
+$a = array_udiff_assoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
 PHP
             ,
             <<<'PHP'
@@ -70,7 +70,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_udiff_assoc(\Class_With_Const::Const, ['baz' => 'bar'], $callback);
+$a = array_udiff_assoc(\Class_With_Const::Const, ['baz' => 'bar'], $valueCompareFunc);
 PHP
             ,
             <<<'PHP'
@@ -84,7 +84,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = \array_udiff_assoc(['foo' => 'bar'], ['baz' => 'bar'], $callback);
+$a = \array_udiff_assoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
 PHP
             ,
             <<<'PHP'
@@ -99,7 +99,7 @@ PHP
 <?php
 
 $a = ['foo' => 'bar'];
-if (array_udiff_assoc($a, ['baz' => 'bar'], $callback) === $a) {
+if (array_udiff_assoc($a, ['baz' => 'bar'], $valueCompareFunc) === $a) {
     return true;
 }
 PHP
@@ -118,7 +118,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = aRrAy_UdIfF_aSsOc(['foo' => 'bar'], ['baz' => 'bar'], $callback);
+$a = aRrAy_UdIfF_aSsOc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
 PHP
             ,
             <<<'PHP'
@@ -132,7 +132,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_udiff_assoc($foo->bar(), $foo->baz(), $callback);
+$a = array_udiff_assoc($foo->bar(), $foo->baz(), $valueCompareFunc);
 PHP
             ,
             <<<'PHP'
@@ -146,7 +146,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_map('strtolower', array_udiff_assoc(['foo' => 'bar'], ['baz' => 'bar'], $callback));
+$a = array_map('strtolower', array_udiff_assoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc));
 PHP
             ,
             <<<'PHP'
@@ -160,7 +160,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_udiff_assoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $callback);
+$a = array_udiff_assoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $valueCompareFunc);
 PHP
             ,
             <<<'PHP'
@@ -194,7 +194,7 @@ PHP
 
 $a = 'array_udiff_assoc';
 
-$b = $a(['foo' => 'bar'], ['baz' => 'bar'], $callback);
+$b = $a(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
 PHP
         ];
     }

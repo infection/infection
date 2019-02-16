@@ -56,7 +56,7 @@ final class UnwrapArrayUintersectAssocTest extends AbstractMutatorTestCase
             <<<'PHP'
 <?php
 
-$a = array_uintersect_assoc(['foo' => 'bar'], ['baz' => 'bar'], $callback);
+$a = array_uintersect_assoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
 PHP
             ,
             [
@@ -78,7 +78,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_uintersect_assoc(\Class_With_Const::Const, ['baz' => 'bar'], $callback);
+$a = array_uintersect_assoc(\Class_With_Const::Const, ['baz' => 'bar'], $valueCompareFunc);
 PHP
             ,
             [
@@ -101,7 +101,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = \array_uintersect_assoc(['foo' => 'bar'], ['baz' => 'bar'], $callback);
+$a = \array_uintersect_assoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
 PHP
             ,
             [
@@ -125,7 +125,7 @@ PHP
 <?php
 
 $a = ['foo' => 'bar'];
-if (array_uintersect_assoc($a, ['baz' => 'bar'], $callback) === $a) {
+if (array_uintersect_assoc($a, ['baz' => 'bar'], $valueCompareFunc) === $a) {
     return true;
 }
 PHP
@@ -156,7 +156,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = aRrAy_UiNtErSeCt_AsSoC(['foo' => 'bar'], ['baz' => 'bar'], $callback);
+$a = aRrAy_UiNtErSeCt_AsSoC(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
 PHP
             ,
             [
@@ -179,7 +179,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_uintersect_assoc($foo->bar(), $foo->baz(), $callback);
+$a = array_uintersect_assoc($foo->bar(), $foo->baz(), $valueCompareFunc);
 PHP
             ,
             [
@@ -202,7 +202,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_map('strtolower', array_uintersect_assoc(['foo' => 'bar'], ['baz' => 'bar'], $callback));
+$a = array_map('strtolower', array_uintersect_assoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc));
 PHP
             ,
             [
@@ -225,7 +225,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_uintersect_assoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $callback);
+$a = array_uintersect_assoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $valueCompareFunc);
 PHP
             ,
             [
@@ -274,7 +274,7 @@ PHP
 
 $a = 'array_uintersect_assoc';
 
-$b = $a(['foo' => 'bar'], ['baz' => 'bar'], $callback);
+$b = $a(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
 PHP
         ];
     }
