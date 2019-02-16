@@ -59,11 +59,20 @@ final class UnwrapArrayDiffAssocTest extends AbstractMutatorTestCase
 $a = array_diff_assoc(['foo' => 'bar'], ['baz' => 'bar']);
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['baz' => 'bar'];
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
@@ -73,11 +82,20 @@ PHP
 $a = array_diff_assoc(\Class_With_Const::Const, ['baz' => 'bar']);
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = \Class_With_Const::Const;
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['baz' => 'bar'];
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_diff_assoc' => [
@@ -87,11 +105,20 @@ PHP
 $a = \array_diff_assoc(['foo' => 'bar'], ['baz' => 'bar']);
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['baz' => 'bar'];
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly within if statements' => [
@@ -104,13 +131,28 @@ if (array_diff_assoc($a, ['baz' => 'bar']) === $a) {
 }
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
 if ($a === $a) {
     return true;
 }
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['foo' => 'bar'];
+if (['baz' => 'bar'] === $a) {
+    return true;
+}
+PHP
+                ,
+            ],
+
+            <<<'PHP'
 PHP
         ];
 
@@ -121,11 +163,20 @@ PHP
 $a = aRraY_dIfF_aSsOc(['foo' => 'bar'], ['baz' => 'bar']);
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['baz' => 'bar'];
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly when array_diff_assoc uses functions as input' => [
@@ -135,11 +186,20 @@ PHP
 $a = array_diff_assoc($foo->bar(), $foo->baz());
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = $foo->bar();
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = $foo->baz();
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
@@ -149,11 +209,20 @@ PHP
 $a = array_map('strtolower', array_diff_assoc(['foo' => 'bar'], ['baz' => 'bar']));
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = array_map('strtolower', ['foo' => 'bar']);
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = array_map('strtolower', ['baz' => 'bar']);
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly when more than two parameters are present' => [
@@ -163,11 +232,26 @@ PHP
 $a = array_diff_assoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar']);
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['baz' => 'bar'];
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['qux' => 'bar'];
+PHP
+                ,
+            ],
         ];
 
         yield 'It does not mutate other array_ calls' => [

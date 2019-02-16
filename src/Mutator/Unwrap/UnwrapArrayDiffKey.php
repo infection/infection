@@ -49,6 +49,6 @@ final class UnwrapArrayDiffKey extends AbstractUnwrapMutator
 
     protected function getParameterIndexes(Node $node): \Generator
     {
-        yield 0;
+        yield from array_keys($node->args);
     }
 }

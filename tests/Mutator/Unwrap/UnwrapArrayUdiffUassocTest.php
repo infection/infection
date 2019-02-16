@@ -59,11 +59,20 @@ final class UnwrapArrayUdiffUassocTest extends AbstractMutatorTestCase
 $a = array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func, $key_compare_func);
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['baz' => 'bar'];
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
@@ -73,11 +82,20 @@ PHP
 $a = array_udiff_uassoc(\Class_With_Const::Const, ['baz' => 'bar'], $value_compare_func, $key_compare_func);
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = \Class_With_Const::Const;
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['baz' => 'bar'];
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_udiff_uassoc' => [
@@ -87,11 +105,20 @@ PHP
 $a = \array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func, $key_compare_func);
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['baz' => 'bar'];
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly within if statements' => [
@@ -104,7 +131,8 @@ if (array_udiff_uassoc($a, ['baz' => 'bar'], $value_compare_func, $key_compare_f
 }
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
@@ -112,6 +140,17 @@ if ($a === $a) {
     return true;
 }
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['foo' => 'bar'];
+if (['baz' => 'bar'] === $a) {
+    return true;
+}
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly when array_udiff_uassoc is wrongly capitalized' => [
@@ -121,11 +160,20 @@ PHP
 $a = aRrAy_UdIfF_UaSsOc(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func, $key_compare_func);
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['baz' => 'bar'];
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly when array_udiff_uassoc uses functions as input' => [
@@ -135,11 +183,20 @@ PHP
 $a = array_udiff_uassoc($foo->bar(), $foo->baz(), $value_compare_func, $key_compare_func);
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = $foo->bar();
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = $foo->baz();
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
@@ -149,11 +206,20 @@ PHP
 $a = array_map('strtolower', array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func, $key_compare_func));
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = array_map('strtolower', ['foo' => 'bar']);
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = array_map('strtolower', ['baz' => 'bar']);
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly when more than two parameters are present' => [
@@ -163,11 +229,26 @@ PHP
 $a = array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $value_compare_func, $key_compare_func);
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['baz' => 'bar'];
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['qux' => 'bar'];
+PHP
+                ,
+            ],
         ];
 
         yield 'It does not mutate other array_ calls' => [

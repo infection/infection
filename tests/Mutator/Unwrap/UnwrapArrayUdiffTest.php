@@ -59,11 +59,20 @@ final class UnwrapArrayUdiffTest extends AbstractMutatorTestCase
 $a = array_udiff(['foo' => 'bar'], ['baz' => 'bar'], $callback);
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['baz' => 'bar'];
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
@@ -73,11 +82,20 @@ PHP
 $a = array_udiff(\Class_With_Const::Const, ['baz' => 'bar'], $callback);
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = \Class_With_Const::Const;
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['baz' => 'bar'];
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_udiff' => [
@@ -87,11 +105,20 @@ PHP
 $a = \array_udiff(['foo' => 'bar'], ['baz' => 'bar'], $callback);
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['baz' => 'bar'];
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly within if statements' => [
@@ -104,7 +131,8 @@ if (array_udiff($a, ['baz' => 'bar'], $callback) === $a) {
 }
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
@@ -112,6 +140,17 @@ if ($a === $a) {
     return true;
 }
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['foo' => 'bar'];
+if (['baz' => 'bar'] === $a) {
+    return true;
+}
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly when array_udiff is wrongly capitalized' => [
@@ -121,11 +160,20 @@ PHP
 $a = aRrAy_UdIfF(['foo' => 'bar'], ['baz' => 'bar'], $callback);
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['baz' => 'bar'];
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly when array_udiff uses functions as input' => [
@@ -135,11 +183,20 @@ PHP
 $a = array_udiff($foo->bar(), $foo->baz(), $callback);
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = $foo->bar();
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = $foo->baz();
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
@@ -149,11 +206,20 @@ PHP
 $a = array_map('strtolower', array_udiff(['foo' => 'bar'], ['baz' => 'bar'], $callback));
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = array_map('strtolower', ['foo' => 'bar']);
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = array_map('strtolower', ['baz' => 'bar']);
+PHP
+                ,
+            ],
         ];
 
         yield 'It mutates correctly when more than two parameters are present' => [
@@ -163,11 +229,26 @@ PHP
 $a = array_udiff(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $callback);
 PHP
             ,
-            <<<'PHP'
+            [
+                <<<'PHP'
 <?php
 
 $a = ['foo' => 'bar'];
 PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['baz' => 'bar'];
+PHP
+                ,
+                <<<'PHP'
+<?php
+
+$a = ['qux' => 'bar'];
+PHP
+                ,
+            ],
         ];
 
         yield 'It does not mutate other array_ calls' => [

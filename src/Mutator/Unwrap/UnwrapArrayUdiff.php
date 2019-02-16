@@ -49,6 +49,10 @@ final class UnwrapArrayUdiff extends AbstractUnwrapMutator
 
     protected function getParameterIndexes(Node $node): \Generator
     {
-        yield 0;
+        yield from \array_slice(
+            array_keys($node->args),
+            0,
+            \count($node->args) - 1
+        );
     }
 }
