@@ -174,11 +174,11 @@ $a = array_map('strtolower', ['A', 1, 'C']);
 PHP
         ];
 
-        yield 'It mutates correctly when the $preserve_keys parameter is present' => [
+        yield 'It mutates correctly when the $preserveKeys parameter is present' => [
             <<<'PHP'
 <?php
 
-$a = array_reverse(['A', 1, 'C'], $preserve_keys);
+$a = array_reverse(['A', 1, 'C'], $preserveKeys);
 PHP
             ,
             <<<'PHP'

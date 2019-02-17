@@ -174,11 +174,11 @@ $a = array_map('strtolower', ['foo', 'bar', 'bar']);
 PHP
         ];
 
-        yield 'It mutates correctly when the $sort_flags parameter is present' => [
+        yield 'It mutates correctly when the $sortFlags parameter is present' => [
             <<<'PHP'
 <?php
 
-$a = array_unique(['foo', 'bar', 'bar'], $sort_flags);
+$a = array_unique(['foo', 'bar', 'bar'], $sortFlags);
 PHP
             ,
             <<<'PHP'

@@ -56,7 +56,7 @@ final class UnwrapArrayIntersectUkeyTest extends AbstractMutatorTestCase
             <<<'PHP'
 <?php
 
-$a = array_intersect_ukey(['foo' => 'bar'], ['baz' => 'bar'], $callback);
+$a = array_intersect_ukey(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
 PHP
             ,
             [
@@ -78,7 +78,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_intersect_ukey(\Class_With_Const::Const, ['baz' => 'bar'], $callback);
+$a = array_intersect_ukey(\Class_With_Const::Const, ['baz' => 'bar'], $keyCompareFunc);
 PHP
             ,
             [
@@ -101,7 +101,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = \array_intersect_ukey(['foo' => 'bar'], ['baz' => 'bar'], $callback);
+$a = \array_intersect_ukey(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
 PHP
             ,
             [
@@ -125,7 +125,7 @@ PHP
 <?php
 
 $a = ['foo' => 'bar'];
-if (array_intersect_ukey($a, ['baz' => 'bar'], $callback) === $a) {
+if (array_intersect_ukey($a, ['baz' => 'bar'], $keyCompareFunc) === $a) {
     return true;
 }
 PHP
@@ -156,7 +156,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = aRrAy_InTeRsEcT_uKeY(['foo' => 'bar'], ['baz' => 'bar'], $callback);
+$a = aRrAy_InTeRsEcT_uKeY(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
 PHP
             ,
             [
@@ -179,7 +179,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_intersect_ukey($foo->bar(), $foo->baz(), $callback);
+$a = array_intersect_ukey($foo->bar(), $foo->baz(), $keyCompareFunc);
 PHP
             ,
             [
@@ -202,7 +202,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_map('strtolower', array_intersect_ukey(['foo' => 'bar'], ['baz' => 'bar'], $callback));
+$a = array_map('strtolower', array_intersect_ukey(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc));
 PHP
             ,
             [
@@ -225,7 +225,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_intersect_ukey(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $callback);
+$a = array_intersect_ukey(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $keyCompareFunc);
 PHP
             ,
             [
@@ -262,7 +262,7 @@ PHP
             <<<'PHP'
 <?php
 
-function array_intersect_ukey($array, $array1, $key_compare_func)
+function array_intersect_ukey($array, $array1, $keyCompareFunc)
 {
 }
 PHP
@@ -274,7 +274,7 @@ PHP
 
 $a = 'array_intersect_ukey';
 
-$b = $a(['foo' => 'bar'], ['baz' => 'bar'], $callback);
+$b = $a(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
 PHP
         ];
     }

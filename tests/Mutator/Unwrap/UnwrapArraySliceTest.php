@@ -106,7 +106,7 @@ PHP
             <<<'PHP'
 <?php
 
-function array_slice($array, $offset, $length = null, $preserve_keys = null)
+function array_slice($array, $offset, $length = null, $preserveKeys = null)
 {
 }
 PHP
@@ -188,7 +188,7 @@ $a = ['foo', 'bar', 'baz'];
 PHP
         ];
 
-        yield 'It mutates correctly when the $preserve_keys parameter is present' => [
+        yield 'It mutates correctly when the $preserveKeys parameter is present' => [
             <<<'PHP'
 <?php
 

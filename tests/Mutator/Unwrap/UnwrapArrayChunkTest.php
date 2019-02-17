@@ -106,7 +106,7 @@ PHP
             <<<'PHP'
 <?php
 
-function array_chunk($array, $size, $preserve_keys)
+function array_chunk($array, $size, $preserveKeys)
 {
 }
 PHP
@@ -174,11 +174,11 @@ $a = array_map('strtolower', ['A', 1, 'C']);
 PHP
         ];
 
-        yield 'It mutates correctly when the $preserve_keys parameter is present' => [
+        yield 'It mutates correctly when the $preserveKeys parameter is present' => [
             <<<'PHP'
 <?php
 
-$a = array_chunk(['A', 1, 'C'], 2, $preserve_keys);
+$a = array_chunk(['A', 1, 'C'], 2, $preserveKeys);
 PHP
             ,
             <<<'PHP'

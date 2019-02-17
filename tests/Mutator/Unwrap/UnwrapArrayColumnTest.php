@@ -106,7 +106,7 @@ PHP
             <<<'PHP'
 <?php
 
-function array_column($array, $column_key, $index_key = null)
+function array_column($array, $columnKey, $indexKey = null)
 {
 }
 PHP
@@ -174,11 +174,11 @@ $a = array_map('strtolower', [['foo' => 'bar']]);
 PHP
         ];
 
-        yield 'It mutates correctly when the $index_key parameter is present' => [
+        yield 'It mutates correctly when the $indexKey parameter is present' => [
             <<<'PHP'
 <?php
 
-$a = array_column([['foo' => 'bar']], 'foo', $index_key);
+$a = array_column([['foo' => 'bar']], 'foo', $indexKey);
 PHP
             ,
             <<<'PHP'

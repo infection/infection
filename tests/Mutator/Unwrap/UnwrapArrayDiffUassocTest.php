@@ -56,7 +56,7 @@ final class UnwrapArrayDiffUassocTest extends AbstractMutatorTestCase
             <<<'PHP'
 <?php
 
-$a = array_diff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $callback);
+$a = array_diff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
 PHP
             ,
             <<<'PHP'
@@ -70,7 +70,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_diff_uassoc(\Class_With_Const::Const, ['baz' => 'bar'], $callback);
+$a = array_diff_uassoc(\Class_With_Const::Const, ['baz' => 'bar'], $keyCompareFunc);
 PHP
             ,
             <<<'PHP'
@@ -84,7 +84,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = \array_diff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $callback);
+$a = \array_diff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
 PHP
             ,
             <<<'PHP'
@@ -99,7 +99,7 @@ PHP
 <?php
 
 $a = ['foo' => 'bar'];
-if (array_diff_uassoc($a, ['baz' => 'bar'], $callback) === $a) {
+if (array_diff_uassoc($a, ['baz' => 'bar'], $keyCompareFunc) === $a) {
     return true;
 }
 PHP
@@ -118,7 +118,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = aRraY_dIfF_uAsSoC(['foo' => 'bar'], ['baz' => 'bar'], $callback);
+$a = aRraY_dIfF_uAsSoC(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
 PHP
             ,
             <<<'PHP'
@@ -132,7 +132,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_diff_uassoc($foo->bar(), $foo->baz(), $callback);
+$a = array_diff_uassoc($foo->bar(), $foo->baz(), $keyCompareFunc);
 PHP
             ,
             <<<'PHP'
@@ -146,7 +146,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_map('strtolower', array_diff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $callback));
+$a = array_map('strtolower', array_diff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc));
 PHP
             ,
             <<<'PHP'
@@ -160,7 +160,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = array_diff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $callback);
+$a = array_diff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $keyCompareFunc);
 PHP
             ,
             <<<'PHP'
@@ -194,7 +194,7 @@ PHP
 
 $a = 'array_diff_uassoc';
 
-$b = $a(['foo' => 'bar'], ['baz' => 'bar'], $callback);
+$b = $a(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
 PHP
         ];
     }
