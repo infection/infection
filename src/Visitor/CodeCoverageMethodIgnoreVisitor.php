@@ -50,18 +50,13 @@ final class CodeCoverageMethodIgnoreVisitor extends NodeVisitorAbstract
             return null;
         }
 
-        /** @var \ReflectionClass $reflection */
-        $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
+        $docComment = $node->getDocComment();
 
-        $method = $reflection->getMethod($node->name->toString());
-
-        $docComment = $method->getDocComment();
-
-        if ($docComment === false) {
+        if ($docComment === null) {
             return null;
         }
 
-        if (strpos($docComment, '@codeCoverageIgnore') !== false) {
+        if (strpos($docComment->getText(), '@codeCoverageIgnore') !== false) {
             return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
 

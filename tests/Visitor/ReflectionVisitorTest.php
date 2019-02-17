@@ -173,6 +173,19 @@ final class ReflectionVisitorTest extends AbstractBaseVisitorTest
         $this->assertSame(\InfectionReflectionClassMethod\Foo::class, $reflectionSpyVisitor->reflectionClass->getName());
     }
 
+    public function test_it_sets_reflection_class_to_nodes_in_anonymous_class(): void
+    {
+        $code = $this->getFileContent('Reflection/rv-anonymous-class-inside-class.php');
+        $reflectionSpyVisitor = $this->getReflectionClassesSpyVisitor();
+
+        $this->parseAndTraverse($code, $reflectionSpyVisitor);
+
+        $this->assertNull($reflectionSpyVisitor->fooReflectionClass);
+
+        $this->assertInstanceOf(\ReflectionClass::class, $reflectionSpyVisitor->createAnonymousClassReflectionClass);
+        $this->assertSame(\InfectionReflectionAnonymousClass\Bug::class, $reflectionSpyVisitor->createAnonymousClassReflectionClass->getName());
+    }
+
     public function isPartOfSignatureFlagProvider(): array
     {
         return [
@@ -263,6 +276,34 @@ final class ReflectionVisitorTest extends AbstractBaseVisitorTest
                     $this->reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
 
                     return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+                }
+            }
+        };
+    }
+
+    private function getReflectionClassesSpyVisitor()
+    {
+        return new class() extends NodeVisitorAbstract {
+            public $fooReflectionClass;
+            public $createAnonymousClassReflectionClass;
+
+            public function enterNode(Node $node)
+            {
+                $name = $node->getAttribute(ReflectionVisitor::FUNCTION_NAME);
+
+                if ($name === 'foo') {
+                    $this->fooReflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
+
+                    return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+                }
+            }
+
+            public function leaveNode(Node $node): void
+            {
+                $name = $node->getAttribute(ReflectionVisitor::FUNCTION_NAME);
+
+                if ($name === 'createAnonymousClass') {
+                    $this->createAnonymousClassReflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
                 }
             }
         };

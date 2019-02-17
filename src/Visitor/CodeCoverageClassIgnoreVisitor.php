@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Visitor;
 
 use PhpParser\Node;
-use PhpParser\Node\Name;
 use PhpParser\Node\Stmt;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
@@ -46,31 +45,20 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class CodeCoverageClassIgnoreVisitor extends NodeVisitorAbstract
 {
-    private $namespace;
-
     public function enterNode(Node $node)
     {
-        if ($node instanceof Stmt\Namespace_) {
-            $this->namespace = $node->name;
-        } elseif ($node instanceof Stmt\ClassLike) {
-            if (!$node->name) {
-                return null;
-            }
+        if (!$node instanceof Stmt\ClassLike) {
+            return null;
+        }
 
-            /** @var Name $fullyQualifiedClassName */
-            $fullyQualifiedClassName = Name::concat($this->namespace, $node->name->name);
+        $docComment = $node->getDocComment();
 
-            $reflectionClass = new \ReflectionClass($fullyQualifiedClassName->toString());
+        if ($docComment === null) {
+            return null;
+        }
 
-            $docComment = $reflectionClass->getDocComment();
-
-            if ($docComment === false) {
-                return null;
-            }
-
-            if (strpos($docComment, '@codeCoverageIgnore') !== false) {
-                return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
-            }
+        if (strpos($docComment->getText(), '@codeCoverageIgnore') !== false) {
+            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
     }
 }
