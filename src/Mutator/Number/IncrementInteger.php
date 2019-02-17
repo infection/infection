@@ -35,13 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
-use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class IncrementInteger extends Mutator
+final class IncrementInteger extends AbstractNumberMutator
 {
     /**
      * Increments an integer by 1
@@ -56,6 +55,8 @@ final class IncrementInteger extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Scalar\LNumber && $node->value !== 0;
+        return $node instanceof Node\Scalar\LNumber
+            && $node->value !== 0
+            && !$this->isPartOfSizeComparison($node);
     }
 }

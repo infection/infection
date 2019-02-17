@@ -89,7 +89,7 @@ PHP
 PHP
                 ,
             ],
-            'It does not mutate float one to zer0' => [
+            'It does not mutate float one to zero' => [
                 <<<'PHP'
 <?php
 
@@ -102,6 +102,15 @@ PHP
 <?php
 
 'a' . '0';
+PHP
+            ],
+            'It does not mutate in a comparison' => [
+                <<<'PHP'
+<?php
+
+if ($a < 0) {
+    echo "small";
+}
 PHP
             ],
         ];

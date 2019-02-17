@@ -35,14 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
-use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class DecrementInteger extends Mutator
+final class DecrementInteger extends AbstractNumberMutator
 {
     private const COUNT_NAMES = ['count', 'sizeof'];
 
@@ -60,6 +59,10 @@ final class DecrementInteger extends Mutator
     protected function mutatesNode(Node $node): bool
     {
         if (!$node instanceof Node\Scalar\LNumber || $node->value === 1) {
+            return false;
+        }
+
+        if ($this->isPartOfSizeComparison($node)) {
             return false;
         }
 

@@ -114,6 +114,15 @@ PHP
 PHP
                 ,
             ],
+            'It does not mutate in a comparison' => [
+                <<<'PHP'
+<?php
+
+if ($a < 0.0) {
+    echo "small";
+}
+PHP
+            ],
         ];
     }
 }

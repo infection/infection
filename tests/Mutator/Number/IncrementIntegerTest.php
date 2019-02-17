@@ -57,7 +57,7 @@ final class IncrementIntegerTest extends AbstractMutatorTestCase
                 <<<'PHP'
 <?php
 
-if ($foo < 10) {
+if ($foo === 10) {
     echo 'bar';
 }
 PHP
@@ -65,7 +65,7 @@ PHP
                 <<<'PHP'
 <?php
 
-if ($foo < 11) {
+if ($foo === 11) {
     echo 'bar';
 }
 PHP
@@ -85,7 +85,7 @@ PHP
                 <<<'PHP'
 <?php
 
-if ($foo < 1) {
+if ($foo === 1) {
     echo 'bar';
 }
 PHP
@@ -93,7 +93,7 @@ PHP
                 <<<'PHP'
 <?php
 
-if ($foo < 2) {
+if ($foo === 2) {
     echo 'bar';
 }
 PHP
@@ -103,7 +103,7 @@ PHP
                 <<<'PHP'
 <?php
 
-if ($foo < 1.0) {
+if ($foo === 1.0) {
     echo 'bar';
 }
 PHP
@@ -112,7 +112,7 @@ PHP
                 <<<'PHP'
 <?php
 
-if ($foo < -10) {
+if ($foo === -10) {
     echo 'bar';
 }
 PHP
@@ -120,7 +120,7 @@ PHP
                 <<<'PHP'
 <?php
 
-if ($foo < -11) {
+if ($foo === -11) {
     echo 'bar';
 }
 PHP

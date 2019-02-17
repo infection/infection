@@ -53,19 +53,11 @@ final class DecrementIntegerTest extends AbstractMutatorTestCase
     public function provideMutationCases(): array
     {
         return [
-            'It decrements an integer' => [
+            'It does not decrement an integer in a comparison' => [
                 <<<'PHP'
 <?php
 
 if ($foo < 10) {
-    echo 'bar';
-}
-PHP
-                ,
-                <<<'PHP'
-<?php
-
-if ($foo < 9) {
     echo 'bar';
 }
 PHP
@@ -75,9 +67,7 @@ PHP
                 <<<'PHP'
 <?php
 
-if ($foo < 1) {
-    echo 'bar';
-}
+$a = 1;
 PHP
                 ,
             ],
@@ -225,7 +215,7 @@ PHP
                 <<<'PHP'
 <?php
 
-if ($foo < 0) {
+if ($foo === 0) {
     echo 'bar';
 }
 PHP
@@ -233,7 +223,7 @@ PHP
                 <<<'PHP'
 <?php
 
-if ($foo < -1) {
+if ($foo === -1) {
     echo 'bar';
 }
 PHP
@@ -271,17 +261,13 @@ PHP
                 <<<'PHP'
 <?php
 
-if ($foo < 0) {
-    echo 'bar';
-}
+$a = 0;
 PHP
                 ,
                 <<<'PHP'
 <?php
 
-if ($foo < -1) {
-    echo 'bar';
-}
+$a = -1;
 PHP
                 ,
             ],
@@ -289,7 +275,7 @@ PHP
                 <<<'PHP'
 <?php
 
-if ($foo < -10) {
+if ($foo === -10) {
     echo 'bar';
 }
 PHP
@@ -297,7 +283,7 @@ PHP
                 <<<'PHP'
 <?php
 
-if ($foo < -9) {
+if ($foo === -9) {
     echo 'bar';
 }
 PHP
