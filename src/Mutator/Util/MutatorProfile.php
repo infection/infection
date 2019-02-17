@@ -222,6 +222,7 @@ final class MutatorProfile
         Mutator\Unwrap\UnwrapStrRepeat::class,
         Mutator\Unwrap\UnwrapStrToLower::class,
         Mutator\Unwrap\UnwrapStrToUpper::class,
+        Mutator\Unwrap\UnwrapTrim::class,
         Mutator\Unwrap\UnwrapUcFirst::class,
     ];
 
@@ -380,6 +381,7 @@ final class MutatorProfile
         'UnwrapStrRepeat' => Mutator\Unwrap\UnwrapStrRepeat::class,
         'UnwrapStrToLower' => Mutator\Unwrap\UnwrapStrToLower::class,
         'UnwrapStrToUpper' => Mutator\Unwrap\UnwrapStrToUpper::class,
+        'UnwrapTrim' => Mutator\Unwrap\UnwrapTrim::class,
         'UnwrapUcFirst' => Mutator\Unwrap\UnwrapUcFirst::class,
     ];
 }
