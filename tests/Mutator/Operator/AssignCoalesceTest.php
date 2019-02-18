@@ -93,5 +93,14 @@ PHP
 $a['value'] = $var;
 PHP
         ];
+
+        yield 'Does not mutate coalesce binary operator' => [
+            <<<'PHP'
+<?php
+
+$a['value'] = $foo ?? $bar;
+PHP
+            ,
+        ];
     }
 }
