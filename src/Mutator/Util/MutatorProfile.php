@@ -144,6 +144,7 @@ final class MutatorProfile
     ];
 
     public const OPERATOR = [
+        Mutator\Operator\AssignCoalesce::class,
         Mutator\Operator\Break_::class,
         Mutator\Operator\Coalesce::class,
         Mutator\Operator\Continue_::class,
@@ -313,6 +314,7 @@ final class MutatorProfile
         'OneZeroFloat' => Mutator\Number\OneZeroFloat::class,
 
         //Operator
+        'AssignCoalesce' => Mutator\Operator\AssignCoalesce::class,
         'Break_' => Mutator\Operator\Break_::class,
         'Continue_' => Mutator\Operator\Continue_::class,
         'Throw_' => Mutator\Operator\Throw_::class,
