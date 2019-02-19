@@ -188,5 +188,19 @@ $b = $a('FooBar');
 PHP
             ,
         ];
+
+        yield 'It does not break when ucwords uses a delimiter parameter' => [
+            <<<'PHP'
+<?php
+
+$a = ucwords('good|afternoon|world', '|');
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = 'good|afternoon|world';
+PHP
+        ];
     }
 }
