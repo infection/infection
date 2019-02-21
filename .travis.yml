@@ -107,7 +107,26 @@ jobs:
     -
       <<: *STANDARD_TEST_JOB
       php: 7.3
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.3
+      env: NO_DEBUGGER=1
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.3
       env: PHPDBG=1
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.3
+      env: DEPS="LOW"
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.3
+      env: DEPS="LOW" PHPDBG=1
     
     -
       <<: *STANDARD_TEST_JOB
