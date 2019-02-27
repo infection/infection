@@ -1,4 +1,4 @@
-#How-to
+# How-to
 
 Every sub-folder should contain an e2e test case for `infection`. For each of these folders `standard_script.bash` is ran.
 This runs infection, and checks the difference between `expected-output.txt` and `infection.log`.
