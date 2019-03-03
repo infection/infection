@@ -162,6 +162,10 @@
         "testFrameworkOptions": {
             "type": "string",
             "description": "Specify an additional options to pass to the test framework (IE: Enabling Verbose Mode). --test-framework-options will override this option."
+        },
+        "plugins": {
+            "type": "array",
+            "description": "Specify Plugins to load on run command"
         }
     }
 }

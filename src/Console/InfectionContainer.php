@@ -232,6 +232,10 @@ final class InfectionContainer extends Container
 
     public function buildDynamicDependencies(InputInterface $input): void
     {
+        $this['console.input'] = function () use ($input) {
+            return $input;
+        };
+
         $this['infection.config'] = function () use ($input): InfectionConfig {
             $facade = new ConfigCreatorFacade($this['locator'], $this['filesystem']);
 

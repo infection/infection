@@ -73,6 +73,11 @@ class InfectionConfig
         $this->configLocation = $configLocation;
     }
 
+    public function getPlugins(): array
+    {
+        return (array) ($this->config->plugins ?? []);
+    }
+
     public function getPhpUnitConfigDir(): string
     {
         if (!isset($this->config->phpUnit->configDir)) {

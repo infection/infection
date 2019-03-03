@@ -43,9 +43,11 @@ use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\ApplicationExecutionFinished;
 use Infection\Events\ApplicationExecutionStarted;
+use Infection\Events\LoadPluginsFinished;
 use Infection\Finder\Exception\LocatorException;
 use Infection\Finder\Locator;
 use Infection\Mutant\Generator\MutationsGenerator;
+use Infection\Plugin\PluginInterface;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -83,6 +85,9 @@ final class InfectionCommand extends BaseCommand
      * @var bool
      */
     private $skipCoverage;
+
+    /** @var array */
+    private $loadedPlugins = [];
 
     protected function configure(): void
     {
@@ -196,7 +201,13 @@ final class InfectionCommand extends BaseCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Debug mode. Will not clean up Infection temporary folder.'
-            )
+            )->addOption(
+                'plugins',
+                null,
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'Plugins to load.',
+                [false]
+            );
         ;
     }
 
@@ -318,6 +329,29 @@ final class InfectionCommand extends BaseCommand
         $this->consoleOutput = $this->getApplication()->getConsoleOutput();
         $this->skipCoverage = \strlen(trim($input->getOption('coverage'))) > 0;
         $this->eventDispatcher = $this->getContainer()->get('dispatcher');
+
+        $this->loadPlugins(
+            $input->getOption('plugins') !== [false] ? $input->getOption('plugins') : $this->getContainer()->get('infection.config')->getPlugins()
+        );
+    }
+
+    private function loadPlugins(array $plugins): void
+    {
+        foreach ($plugins as $className) {
+            if (!class_exists($className)) {
+                throw new \RuntimeException('Plugin Not Found: ' . $className);
+            } else if (!is_subclass_of($className, PluginInterface::class)) {
+                throw new \LogicException('Invalid Plugin: ' . $className);
+            }
+
+            /** @var \Infection\Plugin\PluginInterface $plugin */
+            $plugin = new $className($this->getContainer());
+            $plugin->initialize();
+
+            $this->loadedPlugins[] = $plugin;
+        }
+
+        $this->eventDispatcher->dispatch(new LoadPluginsFinished());
     }
 
     private function includeUserBootstrap(InfectionConfig $config): void

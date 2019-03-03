@@ -2,7 +2,15 @@
 <?php
 
 set_error_handler(function($errno, $errstr) {
-    var_dump($errno, $errstr);
+    $backtrace = [];
+    foreach(debug_backtrace() as $trace) {
+        $backtrace[] = [
+            'file' => $trace['file'] ?? '',
+            'line' => $trace['line'] ?? ''
+        ];
+    }
+
+    var_dump($errno, $errstr, $backtrace);
 }, E_ALL);
 
 require __DIR__ . '/infection';
