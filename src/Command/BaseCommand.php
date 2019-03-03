@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use Infection\Console\Application;
+use Infection\Events\LoadPluginsFinished;
+use Infection\Plugin\PluginInterface;
 use Pimple\Psr11\Container;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -63,6 +65,9 @@ abstract class BaseCommand extends Command
      */
     private $container;
 
+    /** @var array */
+    private $loadedPlugins = [];
+
     public function getContainer(): Container
     {
         if ($this->container === null) {
@@ -78,5 +83,32 @@ abstract class BaseCommand extends Command
 
         $this->input = $input;
         $this->output = $output;
+
+        $plugins = $input->getOption('plugins');
+        if ([false] === $plugins && $this->getContainer()->has('infection.config')) {
+            $plugins = $this->getContainer()->get('infection.config')->getPlugins();
+        }
+
+        $this->loadPlugins($plugins);
+        $this->getContainer()->get('test.framework.types');
+    }
+
+    private function loadPlugins(array $plugins): void
+    {
+        foreach ($plugins as $className) {
+            if (!class_exists($className)) {
+                throw new \RuntimeException('Plugin Not Found: ' . $className);
+            } else if (!is_subclass_of($className, PluginInterface::class)) {
+                throw new \LogicException('Invalid Plugin: ' . $className);
+            }
+
+            /** @var \Infection\Plugin\PluginInterface $plugin */
+            $plugin = new $className($this->getContainer());
+            $plugin->initialize();
+
+            $this->loadedPlugins[] = $plugin;
+        }
+
+        $this->getContainer()->get('dispatcher')->dispatch(new LoadPluginsFinished());
     }
 }

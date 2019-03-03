@@ -33,67 +33,41 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\Events;
 
-use Infection\EventDispatcher\EventDispatcher;
-use Infection\Events\LoadFrameworkTypes;
-use Infection\Utils\Interfaces\HasDispatcherInterface;
-use Infection\Utils\Traits\HasDispatcher;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
 
-/**
- * @internal
- */
-final class TestFrameworkTypes implements HasDispatcherInterface
+final class LoadTestFramework
 {
-    use HasDispatcher;
+    private $adapter = null;
+    private $adapterName = '';
+    private $options = [];
 
-    public const PHPUNIT = 'phpunit';
-    public const PHPSPEC = 'phpspec';
-
-    public const BASE_TYPES = [
-        self::PHPUNIT,
-        self::PHPSPEC,
-    ];
-
-    /**
-     * @var self
-     */
-    private static $instance = null;
-
-    /**
-     * @var array
-     */
-    private $types = [];
-
-    public function __construct(EventDispatcher $eventDispatcher)
+    public function __construct(string $adapterName, array $options)
     {
-        $this->setDispatcher($eventDispatcher);
-        $this->loadTypes();
-
-        static::$instance = $this;
+        $this->adapterName = $adapterName;
+        $this->options     = $options;
     }
 
-    private function loadTypes(): self
+    public function getOption(string $optionName, $defaultValue = null)
     {
-        $event = new LoadFrameworkTypes();
+        return $this->options[$optionName] ?? $defaultValue;
+    }
 
-        $event->addType(static::PHPSPEC, null)
-            ->addType(static::PHPUNIT, null);
+    public function getAdapterName(): string
+    {
+        return $this->adapterName;
+    }
 
-        $this->getDispatcher()->dispatch($event);
-
-        $this->types = $event->getTypes();
+    public function setAdapter(AbstractTestFrameworkAdapter $adapter): self
+    {
+        $this->adapter = $adapter;
 
         return $this;
     }
 
-    public function getLoadedTypes(): array
+    public function getAdapter(): ?AbstractTestFrameworkAdapter
     {
-        return $this->types;
-    }
-
-    public static function getTypes(): array
-    {
-        return static::$instance->getLoadedTypes();
+        return $this->adapter;
     }
 }

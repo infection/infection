@@ -33,67 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\Events;
 
-use Infection\EventDispatcher\EventDispatcher;
-use Infection\Events\LoadFrameworkTypes;
-use Infection\Utils\Interfaces\HasDispatcherInterface;
-use Infection\Utils\Traits\HasDispatcher;
-
-/**
- * @internal
- */
-final class TestFrameworkTypes implements HasDispatcherInterface
+final class LoadFrameworkTypes
 {
-    use HasDispatcher;
-
-    public const PHPUNIT = 'phpunit';
-    public const PHPSPEC = 'phpspec';
-
-    public const BASE_TYPES = [
-        self::PHPUNIT,
-        self::PHPSPEC,
-    ];
-
-    /**
-     * @var self
-     */
-    private static $instance = null;
-
-    /**
-     * @var array
-     */
     private $types = [];
 
-    public function __construct(EventDispatcher $eventDispatcher)
+    public function addType(string $type): self
     {
-        $this->setDispatcher($eventDispatcher);
-        $this->loadTypes();
-
-        static::$instance = $this;
-    }
-
-    private function loadTypes(): self
-    {
-        $event = new LoadFrameworkTypes();
-
-        $event->addType(static::PHPSPEC, null)
-            ->addType(static::PHPUNIT, null);
-
-        $this->getDispatcher()->dispatch($event);
-
-        $this->types = $event->getTypes();
+        $this->types[] = $type;
 
         return $this;
     }
 
-    public function getLoadedTypes(): array
+    public function getTypes(): array
     {
         return $this->types;
-    }
-
-    public static function getTypes(): array
-    {
-        return static::$instance->getLoadedTypes();
     }
 }

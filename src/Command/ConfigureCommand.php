@@ -66,7 +66,7 @@ final class ConfigureCommand extends BaseCommand
                 'test-framework',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Name of the Test framework to use (' . implode(', ', TestFrameworkTypes::TYPES) . ')',
+                'Name of the Test framework to use (' . implode(', ', TestFrameworkTypes::BASE_TYPES) . ')',
                 TestFrameworkTypes::PHPUNIT
             );
     }

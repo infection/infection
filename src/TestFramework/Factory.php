@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use Infection\Config\InfectionConfig;
+use Infection\EventDispatcher\EventDispatcher;
+use Infection\Events\LoadTestFramework;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
@@ -89,6 +91,9 @@ final class Factory
      */
     private $versionParser;
 
+    /** @var EventDispatcher */
+    private $eventDispatcher;
+
     public function __construct(
         string $tmpDir,
         string $projectDir,
@@ -96,7 +101,8 @@ final class Factory
         XmlConfigurationHelper $xmlConfigurationHelper,
         string $jUnitFilePath,
         InfectionConfig $infectionConfig,
-        VersionParser $versionParser
+        VersionParser $versionParser,
+        EventDispatcher $eventDispatcher
     ) {
         $this->tmpDir = $tmpDir;
         $this->configLocator = $configLocator;
@@ -105,6 +111,7 @@ final class Factory
         $this->jUnitFilePath = $jUnitFilePath;
         $this->infectionConfig = $infectionConfig;
         $this->versionParser = $versionParser;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function create(string $adapterName, bool $skipCoverage): AbstractTestFrameworkAdapter
@@ -142,10 +149,29 @@ final class Factory
             );
         }
 
+        $event = new LoadTestFramework(
+            $adapterName,
+            [
+                'skipCoverage'           => $skipCoverage,
+                'tmpDir'                 => $this->tmpDir,
+                'configLocator'          => $this->configLocator,
+                'xmlConfigurationHelper' => $this->xmlConfigurationHelper,
+                'projectDir'             => $this->projectDir,
+                'jUnitFilePath'          => $this->jUnitFilePath,
+                'infectionConfig'        => $this->infectionConfig,
+                'versionParser'          => $this->versionParser
+            ]
+        );
+
+        $this->eventDispatcher->dispatch($event);
+        if ($event->getAdapter()) {
+            return $event->getAdapter();
+        }
+
         throw new \InvalidArgumentException(
             sprintf(
                 'Invalid name of test framework. Available names are: %s',
-                implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC])
+                implode(', ', TestFrameworkTypes::getTypes())
             )
         );
     }

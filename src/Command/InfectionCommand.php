@@ -39,6 +39,7 @@ use Infection\Config\InfectionConfig;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Exception\InfectionException;
+use Infection\Console\InfectionContainer;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\ApplicationExecutionFinished;
@@ -85,9 +86,6 @@ final class InfectionCommand extends BaseCommand
      * @var bool
      */
     private $skipCoverage;
-
-    /** @var array */
-    private $loadedPlugins = [];
 
     protected function configure(): void
     {
@@ -329,29 +327,6 @@ final class InfectionCommand extends BaseCommand
         $this->consoleOutput = $this->getApplication()->getConsoleOutput();
         $this->skipCoverage = \strlen(trim($input->getOption('coverage'))) > 0;
         $this->eventDispatcher = $this->getContainer()->get('dispatcher');
-
-        $this->loadPlugins(
-            $input->getOption('plugins') !== [false] ? $input->getOption('plugins') : $this->getContainer()->get('infection.config')->getPlugins()
-        );
-    }
-
-    private function loadPlugins(array $plugins): void
-    {
-        foreach ($plugins as $className) {
-            if (!class_exists($className)) {
-                throw new \RuntimeException('Plugin Not Found: ' . $className);
-            } else if (!is_subclass_of($className, PluginInterface::class)) {
-                throw new \LogicException('Invalid Plugin: ' . $className);
-            }
-
-            /** @var \Infection\Plugin\PluginInterface $plugin */
-            $plugin = new $className($this->getContainer());
-            $plugin->initialize();
-
-            $this->loadedPlugins[] = $plugin;
-        }
-
-        $this->eventDispatcher->dispatch(new LoadPluginsFinished());
     }
 
     private function includeUserBootstrap(InfectionConfig $config): void

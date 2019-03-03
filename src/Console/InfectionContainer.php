@@ -63,6 +63,7 @@ use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\PhpUnit\Coverage\PhpUnitTestFileDataProvider;
+use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Utils\TmpDirectoryCreator;
 use Infection\Utils\VersionParser;
 use PhpParser\Lexer;
@@ -137,7 +138,8 @@ final class InfectionContainer extends Container
                 $this['xml.configuration.helper'],
                 $this['phpunit.junit.file.path'],
                 $this->getInfectionConfig(),
-                $this['version.parser']
+                $this['version.parser'],
+                $this['dispatcher']
             );
         };
 
@@ -227,6 +229,10 @@ final class InfectionContainer extends Container
 
         $this['memory.limit.applier'] = function (): MemoryLimiter {
             return new MemoryLimiter($this['filesystem'], \php_ini_loaded_file());
+        };
+
+        $this['test.framework.types'] = function(): TestFrameworkTypes {
+            return new TestFrameworkTypes($this['dispatcher']);
         };
     }
 
