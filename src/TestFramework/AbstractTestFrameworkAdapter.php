@@ -121,7 +121,7 @@ abstract class AbstractTestFrameworkAdapter
      *
      * @return string[]
      */
-    public function getMutantCommandLine(string $configPath, string $extraOptions, Mutant $mutant = null): array
+    public function getMutantCommandLine(string $configPath, string $extraOptions, MutantInterface $mutant = null): array
     {
         return $this->getCommandLine($configPath, $extraOptions);
     }
@@ -133,7 +133,7 @@ abstract class AbstractTestFrameworkAdapter
         string $configPath,
         string $extraOptions,
         array $phpExtraArgs = [],
-        Mutant $mutant = null
+        MutantInterface $mutant = null
     ): array {
         $frameworkPath = $this->testFrameworkFinder->find();
         $frameworkArgs = $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions, $mutant);

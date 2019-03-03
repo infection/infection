@@ -25,7 +25,7 @@ class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilde
         $this->tmpDir = $tmpDir;
     }
 
-    public function build(string $configPath, string $extraOptions, Mutant $mutant = null): string
+    public function build(string $configPath, string $extraOptions, Mutant $mutant = null): array
     {
         $options = [
             'run',
@@ -37,11 +37,11 @@ class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilde
             $options[] = '--ext "Infection\TestFramework\Codeception\CustomAutoloadFilePath"';
             $options[] = '--fail-fast';
         } else {
-            $options[] = '--coverage-phpunit ' . CodeCoverageData::CODECEPTION_COVERAGE_DIR;
+            $options[] = '--coverage-phpunit=' . CodeCoverageData::CODECEPTION_COVERAGE_DIR;
         }
 
         $options[] = $extraOptions;
 
-        return implode(' ', $options);
+        return array_filter($options);
     }
 }

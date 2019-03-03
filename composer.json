@@ -90,5 +90,8 @@
     ],
     "support": {
         "issues": "https://github.com/infection/infection/issues"
+    },
+    "suggest": {
+        "codeception/codeception": "^2.4.0"
     }
 }

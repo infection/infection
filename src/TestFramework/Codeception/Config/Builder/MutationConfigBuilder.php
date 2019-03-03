@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Codeception\Config\Builder;
 
 use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\Codeception\Config\YamlConfigurationHelper;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 
@@ -25,7 +26,7 @@ class MutationConfigBuilder extends ConfigBuilder
         $this->configurationHelper = new YamlConfigurationHelper($tempDir, $projectDir, $originalConfig);
     }
 
-    public function build(Mutant $mutant): string
+    public function build(MutantInterface $mutant): string
     {
         $_SERVER['INFECTION_CODECEPTION_CUSTOM_AUTOLOAD_FILE_PATH'] = $customAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',

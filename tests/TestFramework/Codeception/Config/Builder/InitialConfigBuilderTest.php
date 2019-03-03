@@ -12,7 +12,6 @@ use Infection\Filesystem\Filesystem;
 use Infection\TestFramework\Codeception\Config\Builder\InitialConfigBuilder;
 use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 
 class InitialConfigBuilderTest extends TestCase

@@ -24,7 +24,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->configurationHelper = new YamlConfigurationHelper($tempDir, $projectDir, $originalConfig, $srcDirs);
     }
 
-    public function build(): string
+    public function build(string $version): string
     {
         $pathToInitialConfigFile = $this->configurationHelper->getTempDir() . DIRECTORY_SEPARATOR . 'codeception.initial.infection.yml';
 
