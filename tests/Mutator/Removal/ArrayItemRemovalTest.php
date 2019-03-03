@@ -33,9 +33,9 @@
 
 namespace Infection\Tests\Mutator\Removal;
 
+use Generator;
 use Infection\Config\Exception\InvalidConfigException;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
-use Generator;
 
 /**
  * @internal
@@ -44,10 +44,6 @@ final class ArrayItemRemovalTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases
-     * @param string          $input
-     * @param string[]|string $expected
-     * @param array           $settings
-     * @throws \Exception
      */
     public function test_mutator(string $input, $expected = null, array $settings = []): void
     {
@@ -98,10 +94,6 @@ final class ArrayItemRemovalTest extends AbstractMutatorTestCase
     }
 
     /**
-     * @param string $setting
-     * @param mixed  $value
-     * @param string $valueInError
-     * @throws \Exception
      * @dataProvider provideInvalidConfigurationCases
      */
     public function test_settings_validation(string $setting, $value, string $valueInError): void

@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
+use Generator;
 use Infection\Config\Exception\InvalidConfigException;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use PhpParser\Node;
-use Generator;
 
 /**
  * @internal
@@ -66,12 +66,13 @@ final class ArrayItemRemoval extends Mutator
 
     public function mutate(Node $arrayNode): Generator
     {
-        /** @var Node\Expr\Array_ $arrayNode */
-        foreach ($this->getItemsIndexes($arrayNode->items) as $indexToRemove) {
-            /** @var Node\Expr\Array_ $newArrayNode */
-            $newArrayNode = clone $arrayNode;
-            unset($newArrayNode->items[$indexToRemove]);
-            yield $newArrayNode;
+        if ($arrayNode instanceof Node\Expr\Array_) {
+            foreach ($this->getItemsIndexes($arrayNode->items) as $indexToRemove) {
+                $newArrayNode = clone $arrayNode;
+                unset($newArrayNode->items[$indexToRemove]);
+
+                yield $newArrayNode;
+            }
         }
     }
 
@@ -80,7 +81,9 @@ final class ArrayItemRemoval extends Mutator
         if (!$node instanceof Node\Expr\Array_) {
             return false;
         }
+
         $itemsCount = \count($node->items);
+
         return $itemsCount && ($this->remove !== 'all' || $itemsCount <= $this->limit);
     }
 
@@ -120,6 +123,7 @@ final class ArrayItemRemoval extends Mutator
     private function throwConfigException(string $property): void
     {
         $value = $this->getSettings()[$property];
+
         throw new InvalidConfigException(sprintf(
             'Invalid configuration of ArrayItemRemoval mutator. Setting `%s` is invalid (%s)',
             $property,
