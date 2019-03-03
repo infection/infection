@@ -158,6 +158,7 @@ final class MutatorProfile
     ];
 
     public const REMOVAL = [
+        Mutator\Removal\ArrayItemRemoval::class,
         Mutator\Removal\FunctionCallRemoval::class,
         Mutator\Removal\MethodCallRemoval::class,
     ];
@@ -327,6 +328,7 @@ final class MutatorProfile
         'PregMatchMatches' => Mutator\Regex\PregMatchMatches::class,
 
         //Removal
+        'ArrayItemRemoval' => Mutator\Removal\ArrayItemRemoval::class,
         'FunctionCallRemoval' => Mutator\Removal\FunctionCallRemoval::class,
         'MethodCallRemoval' => Mutator\Removal\MethodCallRemoval::class,
 
