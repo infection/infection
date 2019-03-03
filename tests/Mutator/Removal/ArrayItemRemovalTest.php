@@ -80,13 +80,25 @@ final class ArrayItemRemovalTest extends AbstractMutatorTestCase
             ['settings' => ['remove' => 'all']],
         ];
 
-        yield 'It skips arrays longer than specified limit when removing `all` items' => [
+        yield 'It obeys limit when mutating arrays in `all` mode' => [
             '<?php $a = [1, 2, 3];',
-            null,
+            [
+                "<?php\n\n\$a = [2, 3];",
+                "<?php\n\n\$a = [1, 3];",
+            ],
             ['settings' => ['remove' => 'all', 'limit' => 2]],
         ];
 
         yield 'It mutates arrays having required items count when removing `all` items' => [
+            '<?php $a = [1, 2];',
+            [
+                "<?php\n\n\$a = [2];",
+                "<?php\n\n\$a = [1];",
+            ],
+            ['settings' => ['remove' => 'all', 'limit' => 2]],
+        ];
+
+        yield 'It mutates correctly for limit value (1)' => [
             '<?php $a = [1];',
             [
                 "<?php\n\n\$a = [];",

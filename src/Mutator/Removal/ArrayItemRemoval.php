@@ -78,13 +78,7 @@ final class ArrayItemRemoval extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        if (!$node instanceof Node\Expr\Array_) {
-            return false;
-        }
-
-        $itemsCount = \count($node->items);
-
-        return $itemsCount && ($this->remove !== 'all' || $itemsCount <= $this->limit);
+        return $node instanceof Node\Expr\Array_ && \count($node->items);
     }
 
     private function getItemsIndexes(array $items): array
@@ -95,7 +89,7 @@ final class ArrayItemRemoval extends Mutator
             case 'last':
                 return [\count($items) - 1];
             default:
-                return \array_keys($items);
+                return \range(0, \min(\count($items), $this->limit) - 1);
         }
     }
 
