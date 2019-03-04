@@ -87,7 +87,7 @@ abstract class BaseCommand extends Command
         /** @var array $plugins */
         $plugins = $input->getOption('plugins');
 
-        if ([""] === $plugins && $this->getContainer()->has('infection.config')) {
+        if ([''] === $plugins && $this->getContainer()->has('infection.config')) {
             $plugins = $this->getContainer()->get('infection.config')->getPlugins();
         }
 
