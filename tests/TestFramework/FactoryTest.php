@@ -42,6 +42,7 @@ use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\VersionParser;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -58,7 +59,8 @@ final class FactoryTest extends TestCase
             new XmlConfigurationHelper(new PathReplacer(new Filesystem()), ''),
             '',
             new InfectionConfig(new \stdClass(), new Filesystem(), ''),
-            $this->createMock(VersionParser::class)
+            $this->createMock(VersionParser::class),
+            $this->createMock(EventDispatcher::class)
         );
 
         $this->expectException(\InvalidArgumentException::class);
