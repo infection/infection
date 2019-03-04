@@ -42,7 +42,7 @@ use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\VersionParser;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Infection\EventDispatcher;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
