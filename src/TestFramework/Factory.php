@@ -152,18 +152,19 @@ final class Factory
         $event = new LoadTestFramework(
             $adapterName,
             [
-                'skipCoverage'           => $skipCoverage,
-                'tmpDir'                 => $this->tmpDir,
-                'configLocator'          => $this->configLocator,
+                'skipCoverage' => $skipCoverage,
+                'tmpDir' => $this->tmpDir,
+                'configLocator' => $this->configLocator,
                 'xmlConfigurationHelper' => $this->xmlConfigurationHelper,
-                'projectDir'             => $this->projectDir,
-                'jUnitFilePath'          => $this->jUnitFilePath,
-                'infectionConfig'        => $this->infectionConfig,
-                'versionParser'          => $this->versionParser
+                'projectDir' => $this->projectDir,
+                'jUnitFilePath' => $this->jUnitFilePath,
+                'infectionConfig' => $this->infectionConfig,
+                'versionParser' => $this->versionParser,
             ]
         );
 
         $this->eventDispatcher->dispatch($event);
+
         if ($event->getAdapter()) {
             return $event->getAdapter();
         }

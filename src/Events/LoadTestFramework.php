@@ -46,7 +46,7 @@ final class LoadTestFramework
     public function __construct(string $adapterName, array $options)
     {
         $this->adapterName = $adapterName;
-        $this->options     = $options;
+        $this->options = $options;
     }
 
     public function getOption(string $optionName, $defaultValue = null)

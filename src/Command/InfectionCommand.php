@@ -39,16 +39,13 @@ use Infection\Config\InfectionConfig;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Exception\InfectionException;
-use Infection\Console\InfectionContainer;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\ApplicationExecutionFinished;
 use Infection\Events\ApplicationExecutionStarted;
-use Infection\Events\LoadPluginsFinished;
 use Infection\Finder\Exception\LocatorException;
 use Infection\Finder\Locator;
 use Infection\Mutant\Generator\MutationsGenerator;
-use Infection\Plugin\PluginInterface;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -206,7 +203,6 @@ final class InfectionCommand extends BaseCommand
                 'Plugins to load.',
                 [false]
             );
-        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

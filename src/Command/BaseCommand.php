@@ -85,6 +85,7 @@ abstract class BaseCommand extends Command
         $this->output = $output;
 
         $plugins = $input->getOption('plugins');
+
         if ([false] === $plugins && $this->getContainer()->has('infection.config')) {
             $plugins = $this->getContainer()->get('infection.config')->getPlugins();
         }
@@ -98,7 +99,7 @@ abstract class BaseCommand extends Command
         foreach ($plugins as $className) {
             if (!class_exists($className)) {
                 throw new \RuntimeException('Plugin Not Found: ' . $className);
-            } else if (!is_subclass_of($className, PluginInterface::class)) {
+            } elseif (!is_subclass_of($className, PluginInterface::class)) {
                 throw new \LogicException('Invalid Plugin: ' . $className);
             }
 

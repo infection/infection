@@ -231,7 +231,7 @@ final class InfectionContainer extends Container
             return new MemoryLimiter($this['filesystem'], \php_ini_loaded_file());
         };
 
-        $this['test.framework.types'] = function(): TestFrameworkTypes {
+        $this['test.framework.types'] = function (): TestFrameworkTypes {
             return new TestFrameworkTypes($this['dispatcher']);
         };
     }

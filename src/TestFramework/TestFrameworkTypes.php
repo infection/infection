@@ -73,6 +73,16 @@ final class TestFrameworkTypes implements HasDispatcherInterface
         static::$instance = $this;
     }
 
+    public function getLoadedTypes(): array
+    {
+        return $this->types;
+    }
+
+    public static function getTypes(): array
+    {
+        return static::$instance->getLoadedTypes();
+    }
+
     private function loadTypes(): self
     {
         $event = new LoadFrameworkTypes();
@@ -85,15 +95,5 @@ final class TestFrameworkTypes implements HasDispatcherInterface
         $this->types = $event->getTypes();
 
         return $this;
-    }
-
-    public function getLoadedTypes(): array
-    {
-        return $this->types;
-    }
-
-    public static function getTypes(): array
-    {
-        return static::$instance->getLoadedTypes();
     }
 }

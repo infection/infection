@@ -37,5 +37,4 @@ namespace Infection\Events;
 
 final class LoadPluginsFinished
 {
-
 }
