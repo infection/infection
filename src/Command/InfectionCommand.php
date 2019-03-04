@@ -201,7 +201,7 @@ final class InfectionCommand extends BaseCommand
                 null,
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
                 'Plugins to load.',
-                [false]
+                [""]
             );
     }
 

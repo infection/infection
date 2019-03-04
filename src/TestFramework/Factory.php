@@ -166,7 +166,10 @@ final class Factory
         $this->eventDispatcher->dispatch($event);
 
         if ($event->getAdapter()) {
-            return $event->getAdapter();
+            /** @var \Infection\TestFramework\AbstractTestFrameworkAdapter $adapter */
+            $adapter = $event->getAdapter();
+
+            return $adapter;
         }
 
         throw new \InvalidArgumentException(

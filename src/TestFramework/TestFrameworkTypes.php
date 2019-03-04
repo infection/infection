@@ -87,8 +87,8 @@ final class TestFrameworkTypes implements HasDispatcherInterface
     {
         $event = new LoadFrameworkTypes();
 
-        $event->addType(static::PHPSPEC, null)
-            ->addType(static::PHPUNIT, null);
+        $event->addType(static::PHPSPEC)
+            ->addType(static::PHPUNIT);
 
         $this->getDispatcher()->dispatch($event);
 
