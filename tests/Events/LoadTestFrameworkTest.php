@@ -33,20 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Plugin;
+namespace Infection\Tests\Events;
 
-use Infection\Utils\Interfaces\HasContainerInterface;
-use Pimple\Psr11\Container;
+use Infection\Events\LoadTestFramework;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use PHPUnit\Framework\TestCase;
 
 /**
- * Interface PluginInterface
- *
- * @package Infection\Plugin
  * @internal
  */
-interface PluginInterface extends HasContainerInterface
+final class LoadTestFrameworkTest extends TestCase
 {
-    public function __construct(Container $container);
+    public function test_it_can_be_initialzed(): void
+    {
+        $class = new LoadTestFramework('test', ['option' => 'value']);
 
-    public function initialize();
+        $this->assertEquals('test', $class->getAdapterName());
+        $this->assertEquals('value', $class->getOption('option'));
+        $this->assertEquals('default', $class->getOption('fake', 'default'));
+        $this->assertInstanceOf(LoadTestFramework::class, $class);
+    }
+
+    public function test_adapter(): void
+    {
+        $mockAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
+
+        $class = new LoadTestFramework('test', []);
+        $class->setAdapter($mockAdapter);
+        $this->assertSame($mockAdapter, $class->getAdapter());
+    }
 }

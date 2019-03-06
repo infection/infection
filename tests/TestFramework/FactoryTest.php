@@ -40,6 +40,7 @@ use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Utils\VersionParser;
 use PHPUnit\Framework\TestCase;
 use Infection\EventDispatcher\EventDispatcher;
@@ -52,6 +53,10 @@ final class FactoryTest extends TestCase
 {
     public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
     {
+        $eventDispatcher = new EventDispatcher();
+
+        (new TestFrameworkTypes($eventDispatcher));
+
         $factory = new Factory(
             '',
             '',
@@ -60,7 +65,7 @@ final class FactoryTest extends TestCase
             '',
             new InfectionConfig(new \stdClass(), new Filesystem(), ''),
             $this->createMock(VersionParser::class),
-            $this->createMock(EventDispatcher::class)
+            $eventDispatcher
         );
 
         $this->expectException(\InvalidArgumentException::class);

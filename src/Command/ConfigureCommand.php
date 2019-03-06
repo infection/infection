@@ -60,6 +60,8 @@ final class ConfigureCommand extends BaseCommand
 
     protected function configure(): void
     {
+        parent::configure();
+
         $this->setName('configure')
             ->setDescription('Create Infection config')
             ->addOption(

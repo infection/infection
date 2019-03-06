@@ -3,6 +3,7 @@
 cd tests/Fixtures/e2e
 
 failure="false"
+reinstall="${2:-false}"
 
 if [ -f error.log ]
 then
@@ -16,9 +17,11 @@ do
     cd "$dir"
     echo -e "\n$dir\n";
 
-    if [ -f composer.json ] || [ -f composer.lock ]
+    if [ reinstall != "false" ] || [ -f composer.json ] || [ -f composer.lock ]
     then
-        composer install > /dev/null 2>&1
+        echo "Installing Composer..."
+        composer install --no-interaction > /dev/null 2>&1
+        echo -e "Done\n"
     fi
 
     if [ -f "run_tests.bash" ]

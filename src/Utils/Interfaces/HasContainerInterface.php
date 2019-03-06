@@ -37,6 +37,9 @@ namespace Infection\Utils\Interfaces;
 
 use Pimple\Psr11\Container;
 
+/**
+ * @internal
+ */
 interface HasContainerInterface
 {
     public function getContainer(): Container;

@@ -38,6 +38,9 @@ namespace Infection\Utils\Traits;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Utils\Interfaces\HasDispatcherInterface;
 
+/**
+ * @internal
+ */
 trait HasDispatcher
 {
     private $dispatcher = null;

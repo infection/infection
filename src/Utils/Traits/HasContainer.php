@@ -38,6 +38,9 @@ namespace Infection\Utils\Traits;
 use Infection\Utils\Interfaces\HasContainerInterface;
 use Pimple\Psr11\Container;
 
+/**
+ * @internal
+ */
 trait HasContainer
 {
     private $container = null;

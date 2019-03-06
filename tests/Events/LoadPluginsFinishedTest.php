@@ -33,20 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Plugin;
+namespace Infection\Tests\Events;
 
-use Infection\Utils\Interfaces\HasContainerInterface;
-use Pimple\Psr11\Container;
+use Infection\Events\LoadPluginsFinished;
+use PHPUnit\Framework\TestCase;
 
 /**
- * Interface PluginInterface
- *
- * @package Infection\Plugin
  * @internal
  */
-interface PluginInterface extends HasContainerInterface
+final class LoadPluginsFinishedTest extends TestCase
 {
-    public function __construct(Container $container);
-
-    public function initialize();
+    /**
+     * This class is only used to fire events, and the only functionality it needs is being instantiated
+     */
+    public function test_it_can_be_initialzed(): void
+    {
+        $class = new LoadPluginsFinished();
+        $this->assertInstanceOf(LoadPluginsFinished::class, $class);
+    }
 }

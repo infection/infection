@@ -36,7 +36,10 @@ build/cache:
 	chmod a+x ./phpstan.phar
 
 #All tests, (infection itself, phpunit, e2e) for different php version/ environments (xdebug or phpdbg)
-.PHONY: test test-unit test-infection-phpdbg test-e2e-phpdbg test-infection-xdebug test-e2e-xdebug
+.PHONY: test test-unit test-infection-phpdbg test-e2e-phpdbg test-infection-xdebug test-e2e-xdebug test-e2e-force-update
+test-e2e-force-update:
+	./tests/e2e_tests build/bin/infection.phar true
+
 test: test-unit test-infection-phpdbg test-e2e-phpdbg test-infection-xdebug test-e2e-xdebug
 	# All tests finished without errors
 

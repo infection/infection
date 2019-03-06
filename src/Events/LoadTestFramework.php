@@ -37,6 +37,12 @@ namespace Infection\Events;
 
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 
+/**
+ * Class LoadTestFramework
+ *
+ * @package Infection\Events
+ * @internal
+ */
 final class LoadTestFramework
 {
     private $adapter = null;

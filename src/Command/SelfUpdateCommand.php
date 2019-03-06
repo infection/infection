@@ -63,6 +63,8 @@ final class SelfUpdateCommand extends Command
 
     protected function configure(): void
     {
+        parent::configure();
+
         $this->setName('self-update')
             ->setDescription('Update infection.phar to most recent stable or pre-release build.')
             ->addOption(

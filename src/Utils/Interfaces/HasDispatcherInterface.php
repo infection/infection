@@ -37,6 +37,9 @@ namespace Infection\Utils\Interfaces;
 
 use Infection\EventDispatcher\EventDispatcher;
 
+/**
+ * @internal
+ */
 interface HasDispatcherInterface
 {
     public function getDispatcher(): EventDispatcher;

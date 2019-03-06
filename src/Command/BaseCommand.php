@@ -41,6 +41,7 @@ use Infection\Plugin\PluginInterface;
 use Pimple\Psr11\Container;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -93,6 +94,19 @@ abstract class BaseCommand extends Command
 
         $this->loadPlugins($plugins);
         $this->getContainer()->get('test.framework.types');
+    }
+
+    protected function configure()
+    {
+        parent::configure();
+
+        $this->addOption(
+            'plugins',
+            null,
+            InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+            'Plugins to load.',
+            [""]
+        );
     }
 
     private function loadPlugins(array $plugins): void

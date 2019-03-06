@@ -86,6 +86,8 @@ final class InfectionCommand extends BaseCommand
 
     protected function configure(): void
     {
+        parent::configure();
+
         $this->setName('run')
             ->setDescription('Runs the mutation testing.')
             ->addOption(
@@ -196,12 +198,6 @@ final class InfectionCommand extends BaseCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Debug mode. Will not clean up Infection temporary folder.'
-            )->addOption(
-                'plugins',
-                null,
-                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
-                'Plugins to load.',
-                [""]
             );
     }
 
