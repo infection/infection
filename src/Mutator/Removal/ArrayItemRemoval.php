@@ -66,15 +66,17 @@ final class ArrayItemRemoval extends Mutator
         $this->limit = $settings['limit'];
     }
 
+    /**
+     * @param Node|Node\Expr\Array_  $arrayNode
+     * @return Node|Node[]|\Generator
+     */
     public function mutate(Node $arrayNode): Generator
     {
-        if ($arrayNode instanceof Node\Expr\Array_) {
-            foreach ($this->getItemsIndexes($arrayNode->items) as $indexToRemove) {
-                $newArrayNode = clone $arrayNode;
-                unset($newArrayNode->items[$indexToRemove]);
+        foreach ($this->getItemsIndexes($arrayNode->items) as $indexToRemove) {
+            $newArrayNode = clone $arrayNode;
+            unset($newArrayNode->items[$indexToRemove]);
 
-                yield $newArrayNode;
-            }
+            yield $newArrayNode;
         }
     }
 

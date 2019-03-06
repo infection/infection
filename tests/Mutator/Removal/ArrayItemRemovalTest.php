@@ -56,7 +56,6 @@ final class ArrayItemRemovalTest extends AbstractMutatorTestCase
     {
         yield 'It does not mutate empty arrays' => [
             '<?php $a = [];',
-            null,
         ];
 
         yield 'It removes only first item by default' => [
@@ -113,7 +112,11 @@ final class ArrayItemRemovalTest extends AbstractMutatorTestCase
     public function test_settings_validation(string $setting, $value, string $valueInError): void
     {
         $this->expectException(InvalidConfigException::class);
-        $this->expectExceptionMessage("Invalid configuration of ArrayItemRemoval mutator. Setting `$setting` is invalid ($valueInError)");
+        $this->expectExceptionMessage(sprintf(
+            'Invalid configuration of ArrayItemRemoval mutator. Setting `%s` is invalid (%s)',
+            $setting,
+            $valueInError
+        ));
         $this->doTest(
             '<?php $a = [1, 2, 3];',
             "<?php\n\n\$a = [2, 3];",
