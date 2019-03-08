@@ -74,7 +74,7 @@ final class MutatorsGenerator
         $this->mutatorList = [];
 
         foreach ($this->mutatorSettings as $mutatorOrProfile => $setting) {
-            if (array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
+            if (\array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
                 $this->registerFromProfile($mutatorOrProfile, $setting);
 
                 continue;
@@ -102,7 +102,7 @@ final class MutatorsGenerator
         $mutators = MutatorProfile::MUTATOR_PROFILE_LIST[$profile];
 
         foreach ($mutators as $mutatorOrProfile) {
-            if (array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
+            if (\array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
                 $this->registerFromProfile($mutatorOrProfile, $setting);
 
                 continue;
@@ -126,10 +126,10 @@ final class MutatorsGenerator
         if ($setting === false) {
             $this->mutatorList[$mutator] = false;
         } elseif ($setting === true) {
-            if (!array_key_exists($mutator, $this->mutatorList)) {
+            if (!\array_key_exists($mutator, $this->mutatorList)) {
                 $this->mutatorList[$mutator] = [];
             }
-        } elseif (!array_key_exists($mutator, $this->mutatorList) || !$this->mutatorList[$mutator]) {
+        } elseif (!\array_key_exists($mutator, $this->mutatorList) || !$this->mutatorList[$mutator]) {
             $this->mutatorList[$mutator] = (array) $setting;
         }
     }
@@ -141,7 +141,7 @@ final class MutatorsGenerator
      */
     private function registerFromName(string $mutator, $setting): void
     {
-        if (!array_key_exists($mutator, MutatorProfile::FULL_MUTATOR_LIST)) {
+        if (!\array_key_exists($mutator, MutatorProfile::FULL_MUTATOR_LIST)) {
             throw InvalidConfigException::invalidMutator($mutator);
         }
 

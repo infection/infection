@@ -59,7 +59,7 @@ final class MutatorVisitor extends NodeVisitorAbstract
     {
         $attributes = $node->getAttributes();
 
-        if (!array_key_exists('startTokenPos', $attributes)) {
+        if (!\array_key_exists('startTokenPos', $attributes)) {
             return null;
         }
 

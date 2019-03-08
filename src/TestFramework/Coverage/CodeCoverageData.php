@@ -117,7 +117,7 @@ class CodeCoverageData
     {
         $coverage = $this->getCoverage();
 
-        if (!array_key_exists($filePath, $coverage)) {
+        if (!\array_key_exists($filePath, $coverage)) {
             return false;
         }
 
@@ -261,7 +261,7 @@ class CodeCoverageData
                 $allLines = range($coverageInfo['startLine'], $coverageInfo['endLine']);
 
                 foreach ($allLines as $lineInExecutedMethod) {
-                    if (array_key_exists($lineInExecutedMethod, $this->getCoverage()[$filePath]['byLine'])) {
+                    if (\array_key_exists($lineInExecutedMethod, $this->getCoverage()[$filePath]['byLine'])) {
                         $tests[] = $this->getCoverage()[$filePath]['byLine'][$lineInExecutedMethod];
                     }
                 }

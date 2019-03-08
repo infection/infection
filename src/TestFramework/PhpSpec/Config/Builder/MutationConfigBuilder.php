@@ -129,7 +129,7 @@ AUTOLOAD;
      */
     private function getOriginalBootstrapFilePath(array $parsedYaml)
     {
-        if (!array_key_exists('bootstrap', $parsedYaml)) {
+        if (!\array_key_exists('bootstrap', $parsedYaml)) {
             return null;
         }
 
