@@ -47,6 +47,7 @@ use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Traverser\PriorityNodeTraverser;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
+use Infection\Visitor\NotMutableIgnoreVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
@@ -159,6 +160,7 @@ final class MutationsGenerator
             $onlyCovered
         );
 
+        $traverser->addVisitor(new NotMutableIgnoreVisitor(), 50);
         $traverser->addVisitor(new ParentConnectorVisitor(), 40);
         $traverser->addVisitor(new FullyQualifiedClassNameVisitor(), 30);
         $traverser->addVisitor(new ReflectionVisitor(), 20);
