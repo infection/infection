@@ -68,8 +68,6 @@ final class ArrayItemRemoval extends Mutator
 
     /**
      * @param Node|Node\Expr\Array_  $arrayNode
-     *
-     * @return Node|Node[]|\Generator
      */
     public function mutate(Node $arrayNode): Generator
     {
