@@ -65,4 +65,6 @@ interface MutationInterface
      * @return Node|Node[] Node, array of Nodes
      */
     public function getMutatedNode();
+
+    public function getLineRange(): array;
 }

@@ -121,7 +121,8 @@ PHP
                 true,
                 true,
                 new Nop(),
-                0
+                0,
+                range(29, 48)
             ),
         ];
 
@@ -170,7 +171,8 @@ PHP
                 true,
                 true,
                 new Nop(),
-                0
+                0,
+                range(29, 50)
             ),
         ];
         $badLexer = new Lexer\Emulative([
@@ -226,7 +228,8 @@ PHP
                 true,
                 true,
                 new Nop(),
-                0
+                0,
+                range(29, 48)
             ),
         ];
     }

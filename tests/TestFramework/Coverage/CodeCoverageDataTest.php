@@ -149,7 +149,8 @@ final class CodeCoverageDataTest extends TestCase
             false,
             true,
             new LNumber(1),
-            0
+            0,
+            [1]
         );
 
         $this->assertCount(0, $codeCoverageData->getAllTestsFor($mutation));
@@ -169,7 +170,8 @@ final class CodeCoverageDataTest extends TestCase
             false,
             true,
             new LNumber(1),
-            0
+            0,
+            [26]
         );
 
         $this->assertCount(2, $codeCoverageData->getAllTestsFor($mutation));
@@ -189,7 +191,8 @@ final class CodeCoverageDataTest extends TestCase
             true,
             true,
             new LNumber(1),
-            0
+            0,
+            [1]
         );
 
         $this->assertCount(0, $codeCoverageData->getAllTestsFor($mutation));
@@ -209,7 +212,8 @@ final class CodeCoverageDataTest extends TestCase
             true,
             true,
             new LNumber(1),
-            0
+            0,
+            [24]
         );
 
         $this->assertCount(6, $codeCoverageData->getAllTestsFor($mutation));
