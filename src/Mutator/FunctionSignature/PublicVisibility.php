@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\FunctionSignature;
 
-use Infection\Mutator\Util\InterfaceParentTrait;
 use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
@@ -47,8 +46,6 @@ use PhpParser\Node\Stmt\ClassMethod;
  */
 final class PublicVisibility extends Mutator
 {
-    use InterfaceParentTrait;
-
     /**
      * Replaces "public function..." with "protected function ..."
      *
@@ -81,15 +78,7 @@ final class PublicVisibility extends Mutator
             return false;
         }
 
-        if ($node->isAbstract()) {
-            return false;
-        }
-
         if ($node->isMagic()) {
-            return false;
-        }
-
-        if ($this->isBelongsToInterface($node)) {
             return false;
         }
 

@@ -42,6 +42,7 @@ use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;
 use Infection\Tests\Fixtures\SimpleMutatorVisitor;
 use Infection\Visitor\CloneVisitor;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
+use Infection\Visitor\NotMutableIgnoreVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Lexer;
@@ -152,6 +153,7 @@ abstract class AbstractMutatorTestCase extends TestCase
 
         $mutationsCollectorVisitor = new SimpleMutationsCollectorVisitor($this->getMutator($settings), $initialStatements);
 
+        $traverser->addVisitor(new NotMutableIgnoreVisitor());
         $traverser->addVisitor($mutationsCollectorVisitor);
         $traverser->addVisitor(new ParentConnectorVisitor());
         $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
