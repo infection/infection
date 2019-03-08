@@ -85,7 +85,7 @@ final class PublicVisibility extends Mutator
             return false;
         }
 
-        if ($this->isBlacklistedFunction($node->name)) {
+        if ($node->isMagic()) {
             return false;
         }
 
@@ -94,25 +94,6 @@ final class PublicVisibility extends Mutator
         }
 
         return !$this->hasSamePublicParentMethod($node);
-    }
-
-    private function isBlacklistedFunction(Node\Identifier $name): bool
-    {
-        return \in_array(
-            $name->name,
-            [
-                '__construct',
-                '__invoke',
-                '__call',
-                '__callStatic',
-                '__get',
-                '__set',
-                '__isset',
-                '__unset',
-                '__toString',
-                '__debugInfo',
-            ]
-        );
     }
 
     private function hasSamePublicParentMethod(Node $node): bool
