@@ -9,6 +9,16 @@ BOX_URL="https://github.com/humbug/box/releases/download/3.1.0/box.phar"
 PHP-CS-FIXER_URL="https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar"
 PHPSTAN_URL="https://github.com/phpstan/phpstan/releases/download/0.10.3/phpstan.phar"
 
+TEST_TRAVIS_OPTIONS ?= false
+ifeq ($(TEST_TRAVIS_OPTIONS),false)
+else
+	FILTER_OPTIONS := --filter=$(shell git whatchanged HEAD^! --name-only | grep \.php | tr '\n' ',')
+	INFECTION_TRAVIS_OPTIONS := --ignore-msi-with-no-mutations --only-covered --min-msi=90 --threads=4 --min-covered-msi=75 --log-verbosity=none $(FILTER_OPTIONS)
+endif
+
+INFECTION_EXTRA_OPTIONS ?= --threads=4
+INFECTION_OPTIONS ?= $(INFECTION_EXTRA_OPTIONS) $(INFECTION_TRAVIS_OPTIONS)
+
 FLOCK=./devTools/flock
 
 DOCKER_RUN=docker run -t --rm -v "$$PWD":/opt/infection -w /opt/infection
@@ -61,13 +71,13 @@ test-unit-73: build-xdebug-73
 test-infection-phpdbg: test-infection-phpdbg-71 test-infection-phpdbg-72 test-infection-phpdbg-73
 
 test-infection-phpdbg-71: build-xdebug-71
-	$(DOCKER_RUN_71) phpdbg -qrr bin/infection --threads=4
+	$(DOCKER_RUN_71) phpdbg $(PHP_OPTIONS) -qrr bin/infection $(INFECTION_OPTIONS)
 
 test-infection-phpdbg-72: build-xdebug-72
-	$(DOCKER_RUN_72) phpdbg -qrr bin/infection --threads=4
+	$(DOCKER_RUN_72) phpdbg $(PHP_OPTIONS) -qrr bin/infection $(INFECTION_OPTIONS)
 
 test-infection-phpdbg-73: build-xdebug-73
-	$(DOCKER_RUN_73) phpdbg -qrr bin/infection --threads=4
+	$(DOCKER_RUN_73) phpdbg $(PHP_OPTIONS) -qrr bin/infection $(INFECTION_OPTIONS)
 
 
 .PHONY: test-e2e-phpdbg test-e2e-phpdbg-71 test-e2e-phpdbg-72 test-e2e-phpdbg-73
@@ -89,13 +99,13 @@ test-e2e-phpdbg-73: build-xdebug-73 $(INFECTION)
 test-infection-xdebug: test-infection-xdebug-71 test-infection-xdebug-72 test-infection-xdebug-73
 
 test-infection-xdebug-71: build-xdebug-71
-	$(DOCKER_RUN_71) php bin/infection --threads=4
+	$(DOCKER_RUN_71) php $(PHP_OPTIONS) bin/infection $(INFECTION_OPTIONS)
 
 test-infection-xdebug-72: build-xdebug-72
-	$(DOCKER_RUN_72) php bin/infection --threads=4
+	$(DOCKER_RUN_72) php $(PHP_OPTIONS) bin/infection $(INFECTION_OPTIONS)
 
 test-infection-xdebug-73: build-xdebug-73
-	$(DOCKER_RUN_73) php bin/infection --threads=4
+	$(DOCKER_RUN_73) php $(PHP_OPTIONS) bin/infection $(INFECTION_OPTIONS)
 
 .PHONY: test-e2e-xdebug test-e2e-xdebug-71 test-e2e-xdebug-72 test-e2e-xdebug-73
 #e2e tests with xdebug

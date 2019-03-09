@@ -130,6 +130,14 @@ final class InfectionConfigTest extends TestCase
         $this->assertSame(['subfolder/excluded-folder'], $config->getSourceExcludePaths());
     }
 
+    public function test_it_checks_excludes_type(): void
+    {
+        $json = '{"source": {"excludes":true, "directories": ["source"]}}';
+        $config = new InfectionConfig(json_decode($json), $this->filesystem, '/path/to/config');
+
+        $this->assertSame(['vendor'], $config->getSourceExcludePaths());
+    }
+
     public function test_it_excludes_by_glob_patterns(): void
     {
         $srcDir = __DIR__ . '/../Fixtures/Files/phpunit/project-path';
@@ -138,6 +146,14 @@ final class InfectionConfigTest extends TestCase
         $config = new InfectionConfig(json_decode($json), $this->filesystem, '/path/to/config');
 
         $excludedDirs = $config->getSourceExcludePaths();
+
+        $this->assertSame(
+            [
+                'exclude/exclude_1',
+                'exclude/exclude_2',
+            ],
+            $excludedDirs
+        );
 
         $this->assertCount(2, $excludedDirs);
     }
