@@ -35,32 +35,35 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
+use Infection\Mutator\Util\Mutator;
+use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class OneZeroInteger extends AbstractNumberMutator
+abstract class AbstractNumberMutator extends Mutator
 {
-    /**
-     * Replaces "0" with "1" or "1" with "0"
-     *
-     *
-     * @return Node\Scalar\LNumber
-     */
-    public function mutate(Node $node)
+    protected function isPartOfSizeComparison(Node $node): bool
     {
-        if ($node->value === 0) {
-            return new Node\Scalar\LNumber(1);
+        $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
+
+        if ($parent === null) {
+            return false;
         }
 
-        return new Node\Scalar\LNumber(0);
+        return $this->isSizeComparison($parent);
     }
 
-    protected function mutatesNode(Node $node): bool
+    private function isSizeComparison(Node $parentNode): bool
     {
-        return $node instanceof Node\Scalar\LNumber
-            && ($node->value === 0 || $node->value === 1)
-            && !$this->isPartOfSizeComparison($node);
+        if ($parentNode instanceof Node\Expr\UnaryMinus) {
+            return $this->isSizeComparison($parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY));
+        }
+
+        return $parentNode instanceof Node\Expr\BinaryOp\Greater
+            || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual
+            || $parentNode instanceof Node\Expr\BinaryOp\Smaller
+            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual;
     }
 }

@@ -35,13 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
-use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class OneZeroFloat extends Mutator
+final class OneZeroFloat extends AbstractNumberMutator
 {
     /**
      * Replaces "0.0" with "1.0" or "1.0" with "0.0"
@@ -60,6 +59,9 @@ final class OneZeroFloat extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Scalar\DNumber && ($node->value === 0.0 || $node->value === 1.0);
+        return
+            $node instanceof Node\Scalar\DNumber
+            && ($node->value === 0.0 || $node->value === 1.0)
+            && !$this->isPartOfSizeComparison($node);
     }
 }
