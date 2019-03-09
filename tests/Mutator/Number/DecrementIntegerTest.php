@@ -322,6 +322,51 @@ PHP
 $foo = 1;
 PHP
             ],
+            'It does not decrement zero when it is being compared as identical with result of grapheme_strlen()' => [
+                <<<'PHP'
+<?php
+
+if (grapheme_strlen($a) === 0) {
+    echo 'bar';
+}
+PHP
+            ],
+            'It does not decrement zero when it is being compared as identical with result of iconv_strlen()' => [
+                <<<'PHP'
+<?php
+
+if (iconv_strlen($a) === 0) {
+    echo 'bar';
+}
+PHP
+            ],
+            'It does not decrement zero when it is being compared as identical with result of mb_strlen()' => [
+                <<<'PHP'
+<?php
+
+if (mb_strlen($a) === 0) {
+    echo 'bar';
+}
+PHP
+            ],
+            'It does not decrement zero when it is being compared as identical with result of sizeof()' => [
+                <<<'PHP'
+<?php
+
+if (sizeof($a) === 0) {
+    echo 'bar';
+}
+PHP
+            ],
+            'It does not decrement zero when it is being compared as identical with result of strlen()' => [
+                <<<'PHP'
+<?php
+
+if (strlen($a) === 0) {
+    echo 'bar';
+}
+PHP
+            ],
         ];
     }
 }

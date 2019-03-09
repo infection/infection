@@ -43,7 +43,14 @@ use PhpParser\Node;
  */
 final class DecrementInteger extends AbstractNumberMutator
 {
-    private const COUNT_NAMES = ['count', 'sizeof'];
+    private const COUNT_NAMES = [
+        'count',
+        'grapheme_strlen',
+        'iconv_strlen',
+        'mb_strlen',
+        'sizeof',
+        'strlen',
+    ];
 
     /**
      * Decrements an integer by 1
