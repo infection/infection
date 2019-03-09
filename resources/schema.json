@@ -115,6 +115,35 @@
                             }
                         ]
                     }
+                },
+                "ArrayItemRemoval": {
+                    "type": {
+                        "anyOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                    "settings": {
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "properties": {
+                                            "remove": {
+                                                "type": "string",
+                                                "enum": ["first", "last", "all"]
+                                            },
+                                            "limit": {
+                                                "type": "integer",
+                                                "minimum": 1
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
                 }
             }
         },
