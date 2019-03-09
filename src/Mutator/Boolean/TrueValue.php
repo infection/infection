@@ -81,6 +81,6 @@ final class TrueValue extends Mutator
 
         $functionName = $grandParentNode->name->toLowerString();
 
-        return array_key_exists($functionName, $resultSettings) && $resultSettings[$functionName] !== false;
+        return \array_key_exists($functionName, $resultSettings) && $resultSettings[$functionName] !== false;
     }
 }
