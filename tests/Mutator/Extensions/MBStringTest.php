@@ -1,0 +1,462 @@
+<?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017-2019, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+declare(strict_types=1);
+
+namespace Infection\Tests\Mutator\Extensions;
+
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
+
+/**
+ * @internal
+ */
+final class MBStringTest extends AbstractMutatorTestCase
+{
+    /**
+     * @dataProvider provideMutationCases
+     */
+    public function test_mutator(string $input, string $expected = null): void
+    {
+        $this->doTest($input, $expected);
+    }
+
+    public function provideMutationCases(): \Generator
+    {
+        yield 'It converts mb_strlen with leading slash' => [
+            "<?php \mb_strlen('test');",
+            "<?php\n\nstrlen('test');",
+        ];
+
+        yield 'It converts mb_strlen with leading slash in namespace' => [
+            "<?php namespace Test; \mb_strlen('test');",
+            "<?php\n\nnamespace Test;\n\nstrlen('test');",
+        ];
+
+        yield 'It does not convert standard functions like strpos' => [
+            "<?php strpos('test');",
+        ];
+
+        yield 'It converts mb_strlen with encoding to strlen' => [
+            "<?php mb_strlen('test', 'utf-8');",
+            "<?php\n\nstrlen('test');",
+        ];
+
+        // mb_chr-> chr
+
+        yield 'It converts mb_chr to chr' => [
+            '<?php mb_chr(74);',
+            "<?php\n\nchr(74);",
+        ];
+
+        yield 'It converts mb_chr with encoding to chr' => [
+            "<?php mb_chr(74, 'utf-8');",
+            "<?php\n\nchr(74);",
+        ];
+
+        // mb_ereg_match -> preg_match
+
+        yield 'It converts mb_ereg_match to preg_match' => [
+            "<?php mb_ereg_match('#t#', 'test');",
+            "<?php\n\npreg_match('#t#', 'test');",
+        ];
+
+        yield 'It converts mb_ereg_match with encoding argument to preg_match' => [
+            "<?php mb_ereg_match('#t#', 'trim', 'mb');",
+            "<?php\n\npreg_match('#t#', 'trim');",
+        ];
+
+        // mb_ereg_replace_callback -> preg_replace_callback
+
+        yield 'It converts mb_ereg_replace_callback to preg_replace_callback' => [
+            "<?php mb_ereg_replace_callback('#t#', 'trim', 'test');",
+            "<?php\n\npreg_replace_callback('#t#', 'trim', 'test');",
+        ];
+
+        yield 'It converts mb_ereg_replace_callback with options to preg_replace_callback' => [
+            "<?php mb_ereg_replace_callback('#t#', 'trim', 'test', 'msr');",
+            "<?php\n\npreg_replace_callback('#t#', 'trim', 'test');",
+        ];
+
+        // mb_ereg_replace -> ereg_replace
+
+        yield 'It converts mb_ereg_replace to ereg_replace' => [
+            "<?php mb_ereg_replace('#t#', 'T', 'test');",
+            "<?php\n\nereg_replace('#t#', 'T', 'test');",
+        ];
+
+        yield 'It converts mb_ereg_replace with options to ereg_replace' => [
+            "<?php mb_ereg_replace('#t#', 'T', 'test', 'mb');",
+            "<?php\n\nereg_replace('#t#', 'T', 'test');",
+        ];
+
+        // mb_ereg -> ereg
+
+        yield 'It converts mb_ereg to ereg' => [
+            "<?php mb_ereg('#t#', 'test');",
+            "<?php\n\nereg('#t#', 'test');",
+        ];
+
+        yield 'It converts mb_ereg with regs argument to ereg' => [
+            "<?php mb_ereg('#t#', 'test', \$regs);",
+            "<?php\n\nereg('#t#', 'test', \$regs);",
+        ];
+
+        // mb_eregi_replace -> eregi_replace
+
+        yield 'It converts mb_eregi_replace to eregi_replace' => [
+            "<?php mb_eregi_replace('#t#', 'T', 'test');",
+            "<?php\n\neregi_replace('#t#', 'T', 'test');",
+        ];
+
+        yield 'It converts mb_eregi_replace with options to eregi_replace' => [
+            "<?php mb_eregi_replace('#t#', 'T', 'test', 'msr');",
+            "<?php\n\neregi_replace('#t#', 'T', 'test');",
+        ];
+
+        // mb_eregi -> eregi
+
+        yield 'It converts mb_eregi to eregi' => [
+            "<?php mb_eregi('#t#', 'test');",
+            "<?php\n\neregi('#t#', 'test');",
+        ];
+
+        yield 'It converts mb_eregi with regs parameter to eregi' => [
+            "<?php mb_eregi('#t#', 'test', \$regs);",
+            "<?php\n\neregi('#t#', 'test', \$regs);",
+        ];
+
+        // mb_ord -> ord
+
+        yield 'It converts mb_ord to ord' => [
+            "<?php mb_ord('T');",
+            "<?php\n\nord('T');",
+        ];
+
+        yield 'It converts mb_ord with encoding to ord' => [
+            "<?php mb_ord('T', 'utf-8');",
+            "<?php\n\nord('T');",
+        ];
+
+        // mb_parse_str -> parse_str
+
+        yield 'It converts mb_parse_str to parse_str' => [
+            "<?php mb_parse_str('T');",
+            "<?php\n\nparse_str('T');",
+        ];
+
+        yield 'It converts mb_parse_str with params argument to parse_str' => [
+            "<?php mb_parse_str('T', \$params);",
+            "<?php\n\nparse_str('T', \$params);",
+        ];
+
+        // mb_send_mail -> mail
+
+        yield 'It converts mb_send_mail to mail' => [
+            "<?php mb_send_mail('to', 'subject', 'msg');",
+            "<?php\n\nmail('to', 'subject', 'msg');",
+        ];
+
+        yield 'It converts mb_send_mail with additional parameters to mail' => [
+            "<?php mb_send_mail('to', 'subject', 'msg', [], []);",
+            "<?php\n\nmail('to', 'subject', 'msg', [], []);",
+        ];
+
+        // mb_split -> split
+
+        yield 'It converts mb_split to split' => [
+            "<?php mb_split('to', 'subject');",
+            "<?php\n\nsplit('to', 'subject');",
+        ];
+
+        yield 'It converts mb_split with limit parameter to split' => [
+            "<?php mb_split('to', 'subject', 2);",
+            "<?php\n\nsplit('to', 'subject', 2);",
+        ];
+
+        // mb_strcut -> substr
+
+        yield 'It converts mb_strcut to substr' => [
+            "<?php mb_strcut('subject', 1);",
+            "<?php\n\nsubstr('subject', 1);",
+        ];
+
+        yield 'It converts mb_strcut with limit to substr' => [
+            "<?php mb_strcut('subject', 1, 20);",
+            "<?php\n\nsubstr('subject', 1, 20);",
+        ];
+
+        yield 'It converts mb_strcut with encoding to substr' => [
+            "<?php mb_strcut('subject', 1, 20, 'utf-8');",
+            "<?php\n\nsubstr('subject', 1, 20);",
+        ];
+
+        // mb_strpos -> strpos
+
+        yield 'It converts mb_strpos to strpos' => [
+            "<?php mb_strpos('subject', 'b');",
+            "<?php\n\nstrpos('subject', 'b');",
+        ];
+
+        yield 'It converts mb_strpos with offset to strpos' => [
+            "<?php mb_strpos('subject', 'b', 3);",
+            "<?php\n\nstrpos('subject', 'b', 3);",
+        ];
+
+        yield 'It converts mb_strpos with encoding to strpos' => [
+            "<?php mb_strpos('subject', 'b', 3, 'utf-8');",
+            "<?php\n\nstrpos('subject', 'b', 3);",
+        ];
+
+        // mb_stripos -> stripos
+
+        yield 'It converts mb_stripos to stripos' => [
+            "<?php mb_stripos('subject', 'b');",
+            "<?php\n\nstripos('subject', 'b');",
+        ];
+
+        yield 'It converts mb_stripos with offset to stripos' => [
+            "<?php mb_stripos('subject', 'b', 3);",
+            "<?php\n\nstripos('subject', 'b', 3);",
+        ];
+
+        yield 'It converts mb_stripos with encoding to stripos' => [
+            "<?php mb_stripos('subject', 'b', 3, 'utf-8');",
+            "<?php\n\nstripos('subject', 'b', 3);",
+        ];
+
+        // mb_stristr -> stristr
+
+        yield 'It converts mb_stristr to stristr' => [
+            "<?php mb_stristr('subject', 'b');",
+            "<?php\n\nstristr('subject', 'b');",
+        ];
+
+        yield 'It converts mb_stristr with part argument to stristr' => [
+            "<?php mb_stristr('subject', 'b', false);",
+            "<?php\n\nstristr('subject', 'b', false);",
+        ];
+
+        yield 'It converts mb_stristr with encoding to stristr' => [
+            "<?php mb_stristr('subject', 'b', false, 'utf-8');",
+            "<?php\n\nstristr('subject', 'b', false);",
+        ];
+
+        // mb_strripos -> strripos
+
+        yield 'It converts mb_strripos to strripos' => [
+            "<?php mb_strripos('subject', 'b');",
+            "<?php\n\nstrripos('subject', 'b');",
+        ];
+
+        yield 'It converts mb_strripos with offset argument to strripos' => [
+            "<?php mb_strripos('subject', 'b', 2);",
+            "<?php\n\nstrripos('subject', 'b', 2);",
+        ];
+
+        yield 'It converts mb_strripos with encoding to strripos' => [
+            "<?php mb_strripos('subject', 'b', 2, 'utf-8');",
+            "<?php\n\nstrripos('subject', 'b', 2);",
+        ];
+
+        // mb_strrpos -> strrpos
+
+        yield 'It converts mb_strrpos to strrpos' => [
+            "<?php mb_strrpos('subject', 'b');",
+            "<?php\n\nstrrpos('subject', 'b');",
+        ];
+
+        yield 'It converts mb_strrpos with offset argument to strrpos' => [
+            "<?php mb_strrpos('subject', 'b', 2);",
+            "<?php\n\nstrrpos('subject', 'b', 2);",
+        ];
+
+        yield 'It converts mb_strrpos with encoding to strrpos' => [
+            "<?php mb_strrpos('subject', 'b', 2, 'utf-8');",
+            "<?php\n\nstrrpos('subject', 'b', 2);",
+        ];
+
+        // mb_strstr -> strstr
+
+        yield 'It converts mb_strstr to strstr' => [
+            "<?php mb_strstr('subject', 'b');",
+            "<?php\n\nstrstr('subject', 'b');",
+        ];
+
+        yield 'It converts mb_strstr with part argument to strstr' => [
+            "<?php mb_strstr('subject', 'b', false);",
+            "<?php\n\nstrstr('subject', 'b', false);",
+        ];
+
+        yield 'It converts mb_strstr with encoding to strstr' => [
+            "<?php mb_strstr('subject', 'b', false, 'utf-8');",
+            "<?php\n\nstrstr('subject', 'b', false);",
+        ];
+
+        // mb_strtolower -> strtolower
+
+        yield 'It converts mb_strtolower to strtolower' => [
+            "<?php mb_strtolower('test');",
+            "<?php\n\nstrtolower('test');",
+        ];
+
+        yield 'It converts mb_strtolower with encoding to strtolower' => [
+            "<?php mb_strtolower('test', 'utf-8');",
+            "<?php\n\nstrtolower('test');",
+        ];
+
+        // mb_strtoupper -> strtoupper
+
+        yield 'It converts mb_strtoupper to strtoupper' => [
+            "<?php mb_strtoupper('test');",
+            "<?php\n\nstrtoupper('test');",
+        ];
+
+        yield 'It converts mb_strtoupper with encoding to strtoupper' => [
+            "<?php mb_strtoupper('test', 'utf-8');",
+            "<?php\n\nstrtoupper('test');",
+        ];
+
+        // mb_substr_count -> substr_count
+
+        yield 'It converts mb_substr_count to substr_count' => [
+            "<?php mb_substr_count('test', 't');",
+            "<?php\n\nsubstr_count('test', 't');",
+        ];
+
+        yield 'It converts mb_substr_count with encoding to substr_count' => [
+            "<?php mb_substr_count('test', 't', 'utf-8');",
+            "<?php\n\nsubstr_count('test', 't');",
+        ];
+
+        // mb_substr -> substr
+
+        yield 'It converts mb_substr to substr' => [
+            "<?php mb_substr('test', 2);",
+            "<?php\n\nsubstr('test', 2);",
+        ];
+
+        yield 'It converts mb_substr with length argument to substr' => [
+            "<?php mb_substr('test', 2, 10);",
+            "<?php\n\nsubstr('test', 2, 10);",
+        ];
+
+        yield 'It converts mb_substr with encoding argument to substr' => [
+            "<?php mb_substr('test', 2, 10, 'utf-8');",
+            "<?php\n\nsubstr('test', 2, 10);",
+        ];
+
+        // mb_strrchr -> strrchr
+
+        yield 'It converts mb_strrchr to strrchr' => [
+            "<?php mb_strrchr('subject', 'b');",
+            "<?php\n\nstrrchr('subject', 'b');",
+        ];
+
+        yield 'It converts mb_strrchr with part argument to strrchr' => [
+            "<?php mb_strrchr('subject', 'b', false);",
+            "<?php\n\nstrrchr('subject', 'b');",
+        ];
+
+        yield 'It converts mb_strrchr with encoding to strrchr' => [
+            "<?php mb_strrchr('subject', 'b', false, 'utf-8');",
+            "<?php\n\nstrrchr('subject', 'b');",
+        ];
+
+        // mb_strrichr -> strrchr
+
+        yield 'It converts mb_strrichr to strrchr' => [
+            "<?php mb_strrichr('subject', 'b');",
+            "<?php\n\nstrrchr('subject', 'b');",
+        ];
+
+        yield 'It converts mb_strrichr with part argument to strrchr' => [
+            "<?php mb_strrichr('subject', 'b', false);",
+            "<?php\n\nstrrchr('subject', 'b');",
+        ];
+
+        yield 'It converts mb_strrichr with encoding to strrchr' => [
+            "<?php mb_strrichr('subject', 'b', false, 'utf-8');",
+            "<?php\n\nstrrchr('subject', 'b');",
+        ];
+
+        // mb_convert_case
+
+        yield 'It converts mb_convert_case with MB_CASE_UPPER mode to strtoupper' => [
+            "<?php mb_convert_case('test', MB_CASE_UPPER);",
+            "<?php\n\nstrtoupper('test');",
+        ];
+
+        yield 'It converts mb_convert_case with MB_CASE_UPPER_SIMPLE mode to strtoupper' => [
+            "<?php mb_convert_case('test', MB_CASE_UPPER_SIMPLE);",
+            "<?php\n\nstrtoupper('test');",
+        ];
+
+        yield 'It converts mb_convert_case with MB_CASE_LOWER mode to strtolower' => [
+            "<?php mb_convert_case('test', E_ERROR);",
+            "<?php\n\nstrtolower('test');",
+        ];
+
+        yield 'It converts mb_convert_case with MB_CASE_LOWER_SIMPLE mode to strtolower' => [
+            "<?php mb_convert_case('test', MB_CASE_LOWER);",
+            "<?php\n\nstrtolower('test');",
+        ];
+
+        yield 'It converts mb_convert_case with MB_CASE_TITLE mode to ucwords' => [
+            "<?php mb_convert_case('test', MB_CASE_TITLE);",
+            "<?php\n\nucwords('test');",
+        ];
+
+        yield 'It converts mb_convert_case with MB_CASE_TITLE_SIMPLE mode to ucwords' => [
+            "<?php mb_convert_case('test', \MB_CASE_TITLE_SIMPLE);",
+            "<?php\n\nucwords('test');",
+        ];
+
+        yield 'It converts mb_convert_case with MB_CASE_FOLD mode to strtolower' => [
+            "<?php mb_convert_case('test', MB_CASE_FOLD);",
+            "<?php\n\nstrtolower('test');",
+        ];
+
+        yield 'It converts mb_convert_case with MB_CASE_FOLD_SIMPLE mode to strtolower' => [
+            "<?php mb_convert_case('test', MB_CASE_FOLD_SIMPLE);",
+            "<?php\n\nstrtolower('test');",
+        ];
+
+        yield 'It does not convert mb_convert_case with mode as variable' => [
+            "<?php mb_convert_case('test', \$mode);",
+        ];
+
+        yield 'It does not convert mb_convert_case with missing mode argument' => [
+            "<?php mb_convert_case('test');",
+        ];
+    }
+}

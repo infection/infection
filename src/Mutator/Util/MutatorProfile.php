@@ -60,6 +60,7 @@ final class MutatorProfile
         '@zero_iteration' => self::ZERO_ITERATION,
         '@cast' => self::CAST,
         '@unwrap' => self::UNWRAP,
+        '@extensions' => self::EXTENSIONS,
 
         //Special Profiles
         '@default' => self::DEFAULT,
@@ -232,6 +233,10 @@ final class MutatorProfile
         Mutator\Unwrap\UnwrapUcWords::class,
     ];
 
+    public const EXTENSIONS = [
+        Mutator\Extensions\MBString::class,
+    ];
+
     public const DEFAULT = [
         '@arithmetic',
         '@boolean',
@@ -246,6 +251,7 @@ final class MutatorProfile
         '@return_value',
         '@sort',
         '@zero_iteration',
+        '@extensions',
     ];
 
     public const FULL_MUTATOR_LIST = [
@@ -395,5 +401,8 @@ final class MutatorProfile
         'UnwrapTrim' => Mutator\Unwrap\UnwrapTrim::class,
         'UnwrapUcFirst' => Mutator\Unwrap\UnwrapUcFirst::class,
         'UnwrapUcWords' => Mutator\Unwrap\UnwrapUcWords::class,
+
+        // Extensions
+        'MBString' => Mutator\Extensions\MBString::class,
     ];
 }
