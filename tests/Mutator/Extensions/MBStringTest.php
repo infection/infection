@@ -45,9 +45,9 @@ final class MBStringTest extends AbstractMutatorTestCase
     /**
      * @dataProvider provideMutationCases
      */
-    public function test_mutator(string $input, string $expected = null): void
+    public function test_mutator(string $input, string $expected = null, array $settings = []): void
     {
-        $this->doTest($input, $expected);
+        $this->doTest($input, $expected, $settings);
     }
 
     public function provideMutationCases(): \Generator
@@ -69,6 +69,13 @@ final class MBStringTest extends AbstractMutatorTestCase
         yield 'It converts mb_strlen with encoding to strlen' => [
             "<?php mb_strlen('test', 'utf-8');",
             "<?php\n\nstrlen('test');",
+            ['settings' => ['mb_strlen' => true]],
+        ];
+
+        yield 'It does not convert mb_strlen when disabled' => [
+            "<?php mb_strlen('test');",
+            null,
+            ['settings' => ['mb_strlen' => false]],
         ];
 
         // mb_chr-> chr

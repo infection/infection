@@ -61,7 +61,10 @@ final class MBString extends Mutator
     public function __construct(MutatorConfig $config)
     {
         parent::__construct($config);
-        $this->setupConverters();
+
+        $settings = $this->getSettings();
+
+        $this->setupConverters($settings);
     }
 
     /**
@@ -77,9 +80,9 @@ final class MBString extends Mutator
         return isset($this->converters[$this->getFunctionName($node)]);
     }
 
-    private function setupConverters(): void
+    private function setupConverters(array $functionsMap): void
     {
-        $this->converters = [
+        $converters = [
             'mb_chr' => $this->mapNameSkipArg('chr', 1),
             'mb_ereg_match' => $this->mapNameSkipArg('preg_match', 2),
             'mb_ereg_replace_callback' => $this->mapNameSkipArg('preg_replace_callback', 3),
@@ -107,6 +110,12 @@ final class MBString extends Mutator
             'mb_substr' => $this->mapNameSkipArg('substr', 3),
             'mb_convert_case' => $this->mapConvertCase(),
         ];
+
+        $functionsToRemove = \array_filter($functionsMap, function ($isOn) {
+            return !$isOn;
+        });
+
+        $this->converters = \array_diff_key($converters, $functionsToRemove);
     }
 
     private function mapName(string $functionName): callable
