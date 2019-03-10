@@ -128,13 +128,7 @@ final class MBString extends Mutator
     private function mapNameSkipArg(string $functionName, int $skipArgs): callable
     {
         return function (Node\Expr\FuncCall $node) use ($functionName, $skipArgs): Generator {
-            $args = $node->args;
-
-            if ($skipArgs !== null) {
-                $args = \array_slice($args, 0, $skipArgs);
-            }
-
-            yield $this->createNode($node, $functionName, $args);
+            yield $this->createNode($node, $functionName, \array_slice($node->args, 0, $skipArgs));
         };
     }
 
@@ -164,8 +158,6 @@ final class MBString extends Mutator
         }
 
         $mode = $node->args[1]->value;
-
-        $modeValue = null;
 
         if ($mode instanceof Node\Expr\ConstFetch) {
             $modeName = $mode->name->toString();
