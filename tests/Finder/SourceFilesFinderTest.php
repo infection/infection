@@ -109,6 +109,32 @@ final class SourceFilesFinderTest extends TestCase
         }
     }
 
+    /**
+     * IE: --filter=1,,2,3,
+     */
+    public function test_extra_commas_in_filters(): void
+    {
+        $sourceFilesFinder = new SourceFilesFinder(['tests/Fixtures/Files/Finder'], []);
+
+        $filter = 'tests/Fixtures/Files/Finder/FirstFile.php,,tests/Fixtures/Files/Finder/SecondFile.php,';
+        $files = $sourceFilesFinder->getSourceFiles($filter);
+
+        $iterator = $files->getIterator();
+        $iterator->rewind();
+        $firstFile = $iterator->current();
+        $iterator->next();
+        $secondFile = $iterator->current();
+
+        $this->assertInstanceOf(Finder::class, $files);
+        $this->assertSame(2, $files->count());
+
+        $expectedFilenames = ['FirstFile.php', 'SecondFile.php'];
+
+        foreach ([$firstFile, $secondFile] as $file) {
+            $this->assertTrue(\in_array($file->getFilename(), $expectedFilenames, true));
+        }
+    }
+
     public function test_it_can_filter_a_list_of_files_by_filename(): void
     {
         $sourceFilesFinder = new SourceFilesFinder(['tests/Fixtures/Files/Finder'], []);
