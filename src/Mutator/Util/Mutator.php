@@ -67,7 +67,11 @@ abstract class Mutator
             return true;
         }
 
-        return !$this->config->isIgnored($reflectionClass->getName(), $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''));
+        return !$this->config->isIgnored(
+            $reflectionClass->getName(),
+            $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''),
+            $node->getLine()
+        );
     }
 
     final public static function getName(): string

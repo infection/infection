@@ -46,11 +46,11 @@ final class MutatorConfigTest extends TestCase
     /**
      * @dataProvider providesIgnoredValues
      */
-    public function test_is_ignored_returns_true_if_there_is_a_match(array $ignored, string $class, string $method): void
+    public function test_is_ignored_returns_true_if_there_is_a_match(array $ignored, string $class, string $method, int $lineNumber = null): void
     {
         $config = new MutatorConfig(['ignore' => $ignored]);
 
-        $this->assertTrue($config->isIgnored($class, $method));
+        $this->assertTrue($config->isIgnored($class, $method, $lineNumber));
     }
 
     public function providesIgnoredValues(): \Generator
@@ -89,6 +89,13 @@ final class MutatorConfigTest extends TestCase
             ['Foo\Bar\Test::m?th?d'],
             'Foo\Bar\Test',
             'method',
+        ];
+
+        yield 'It ignores a specific line number' => [
+            ['Foo\Bar\Test::method::63'],
+            'Foo\Bar\Test',
+            'method',
+            63
         ];
     }
 
