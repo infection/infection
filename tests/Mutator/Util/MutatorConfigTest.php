@@ -95,7 +95,7 @@ final class MutatorConfigTest extends TestCase
             ['Foo\Bar\Test::method::63'],
             'Foo\Bar\Test',
             'method',
-            63
+            63,
         ];
     }
 
