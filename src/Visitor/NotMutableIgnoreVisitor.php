@@ -33,32 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Visitor;
 
-use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitorAbstract;
 
 /**
- * Checks if given node belongs to Interface
- *
  * @internal
- *
- * @author Volodimir Melko <v.melko28@gmail.com>
  */
-trait InterfaceParentTrait
+final class NotMutableIgnoreVisitor extends NodeVisitorAbstract
 {
-    private function isBelongsToInterface(Node $node): bool
+    public function enterNode(Node $node)
     {
-        $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
-
-        if ($parentNode instanceof Node\Stmt\Interface_) {
-            return true;
+        if ($node instanceof Node\Stmt\Interface_) {
+            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
 
-        if ($parentNode instanceof Node) {
-            return $this->isBelongsToInterface($parentNode);
+        if ($node instanceof Node\Stmt\ClassMethod && $node->isAbstract()) {
+            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
-
-        return false;
     }
 }
