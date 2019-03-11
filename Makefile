@@ -13,7 +13,7 @@ TEST_TRAVIS_OPTIONS ?= false
 ifeq ($(TEST_TRAVIS_OPTIONS),false)
 else
 	FILTER_OPTIONS := --filter=$(shell git diff master --name-only | grep \.php | tr '\n' ',')
-	INFECTION_TRAVIS_OPTIONS := --ignore-msi-with-no-mutations --only-covered --min-msi=90 --threads=4 --min-covered-msi=75 --log-verbosity=none $(FILTER_OPTIONS)
+	INFECTION_TRAVIS_OPTIONS := --ignore-msi-with-no-mutations --only-covered --min-msi=90 --threads=4 --min-covered-msi=75 $(FILTER_OPTIONS)
 endif
 
 INFECTION_EXTRA_OPTIONS ?= --threads=4
