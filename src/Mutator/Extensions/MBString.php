@@ -84,12 +84,6 @@ final class MBString extends Mutator
     {
         $converters = [
             'mb_chr' => $this->mapNameSkipArg('chr', 1),
-            'mb_ereg_match' => $this->mapEreg($this->mapNameSkipArg('preg_match', 2), '^', '', [$this, 'warpEqOne']),
-            'mb_ereg_replace_callback' => $this->mapEreg($this->mapNameSkipArg('preg_replace_callback', 3)),
-            'mb_ereg_replace' => $this->mapEreg($this->mapNameSkipArg('preg_replace', 3)),
-            'mb_ereg' => $this->mapEreg($this->mapName('preg_match'), '', '', [$this, 'warpTernary']),
-            'mb_eregi_replace' => $this->mapEreg($this->mapNameSkipArg('preg_replace', 3), '', 'i'),
-            'mb_eregi' => $this->mapEreg($this->mapName('preg_match'), '', 'i', [$this, 'warpTernary']),
             'mb_ord' => $this->mapNameSkipArg('ord', 1),
             'mb_parse_str' => $this->mapName('parse_str'),
             'mb_send_mail' => $this->mapName('mail'),
@@ -130,50 +124,6 @@ final class MBString extends Mutator
         return function (Node\Expr\FuncCall $node) use ($functionName, $skipArgs): Generator {
             yield $this->createNode($node, $functionName, \array_slice($node->args, 0, $skipArgs));
         };
-    }
-
-    private function mapEreg(callable $baseConverter, string $prefix = '', string $modifiers = '', callable $warp = null): callable
-    {
-        return function (Node\Expr\FuncCall $node) use ($baseConverter, $prefix, $modifiers, $warp): Generator {
-            foreach ($baseConverter($node) as $newNode) {
-                /* @var Node\Expr\FuncCall $newNode */
-                $newNode->args[0] = new Node\Arg(
-                    new Node\Expr\BinaryOp\Concat(
-                        new Node\Expr\BinaryOp\Concat(
-                            new Node\Scalar\String_("/$prefix"),
-                            new Node\Expr\FuncCall(
-                                new Node\Name('\str_replace'),
-                                [
-                                    new Node\Arg(new Node\Scalar\String_('/')),
-                                    new Node\Arg(new Node\Scalar\String_('\/')),
-                                    new Node\Arg($newNode->args[0]->value),
-                                ]
-                            )
-                        ),
-                        new Node\Scalar\String_("/$modifiers")
-                    )
-                );
-
-                yield $warp ? $warp($newNode) : $newNode;
-            }
-        };
-    }
-
-    private function warpEqOne(Node\Expr\FuncCall $node): Node
-    {
-        return new Node\Expr\BinaryOp\Identical(
-            $node,
-            new Node\Scalar\LNumber(1)
-        );
-    }
-
-    private function warpTernary(Node\Expr\FuncCall $node): Node
-    {
-        return new Node\Expr\Ternary(
-            $node,
-            new Node\Scalar\LNumber(1),
-            new Node\Expr\ConstFetch(new Node\Name('false'))
-        );
     }
 
     private function mapConvertCase(): callable

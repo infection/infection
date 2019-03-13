@@ -162,24 +162,6 @@
                                             "mb_chr": {
                                                 "type": "boolean"
                                             },
-                                            "mb_ereg_match": {
-                                                "type": "boolean"
-                                            },
-                                            "mb_ereg_replace_callback": {
-                                                "type": "boolean"
-                                            },
-                                            "mb_ereg_replace": {
-                                                "type": "boolean"
-                                            },
-                                            "mb_ereg": {
-                                                "type": "boolean"
-                                            },
-                                            "mb_eregi_replace": {
-                                                "type": "boolean"
-                                            },
-                                            "mb_eregi": {
-                                                "type": "boolean"
-                                            },
                                             "mb_ord": {
                                                 "type": "boolean"
                                             },

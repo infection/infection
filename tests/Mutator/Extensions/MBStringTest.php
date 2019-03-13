@@ -81,18 +81,6 @@ final class MBStringTest extends AbstractMutatorTestCase
 
         yield from $this->provideMutationCasesForChr();
 
-        yield from $this->provideMutationCasesForEregMatch();
-
-        yield from $this->provideMutationCasesForEregReplaceCallback();
-
-        yield from $this->provideMutationCasesForEregReplace();
-
-        yield from $this->provideMutationCasesForEreg();
-
-        yield from $this->provideMutationCasesForEregiReplace();
-
-        yield from $this->provideMutationCasesForEregi();
-
         yield from $this->provideMutationCasesForOrd();
 
         yield from $this->provideMutationCasesForParseStr();
@@ -140,84 +128,6 @@ final class MBStringTest extends AbstractMutatorTestCase
         yield 'It converts mb_chr with encoding to chr' => [
             "<?php mb_chr(74, 'utf-8');",
             "<?php\n\nchr(74);",
-        ];
-    }
-
-    private function provideMutationCasesForEregMatch(): Generator
-    {
-        yield 'It converts mb_ereg_match to preg_match' => [
-            "<?php mb_ereg_match(M_2_PI, 'test');",
-            "<?php\n\npreg_match('/^' . \str_replace('/', '\\\\/', M_2_PI) . '/', 'test') === 1;",
-        ];
-
-        yield 'It converts mb_ereg_match with encoding argument to preg_match' => [
-            "<?php mb_ereg_match(M_2_PI, 'trim', 'mb');",
-            "<?php\n\npreg_match('/^' . \str_replace('/', '\\\\/', M_2_PI) . '/', 'trim') === 1;",
-        ];
-    }
-
-    private function provideMutationCasesForEregReplaceCallback(): Generator
-    {
-        yield 'It converts mb_ereg_replace_callback to preg_replace_callback' => [
-            "<?php mb_ereg_replace_callback('[A-Z/#]', 'trim', 'test');",
-            "<?php\n\npreg_replace_callback('/' . \str_replace('/', '\\\\/', '[A-Z/#]') . '/', 'trim', 'test');",
-        ];
-
-        yield 'It converts mb_ereg_replace_callback with options to preg_replace_callback' => [
-            "<?php mb_ereg_replace_callback('[A-Z/#]', 'trim', 'test', 'msr');",
-            "<?php\n\npreg_replace_callback('/' . \str_replace('/', '\\\\/', '[A-Z/#]') . '/', 'trim', 'test');",
-        ];
-    }
-
-    private function provideMutationCasesForEregReplace(): Generator
-    {
-        yield 'It converts mb_ereg_replace to ereg_replace' => [
-            "<?php mb_ereg_replace(\$pattern, 'T', 'test');",
-            "<?php\n\npreg_replace('/' . \str_replace('/', '\\\\/', \$pattern) . '/', 'T', 'test');",
-        ];
-
-        yield 'It converts mb_ereg_replace with options to ereg_replace' => [
-            "<?php mb_ereg_replace(\$pattern, 'T', 'test', 'mb');",
-            "<?php\n\npreg_replace('/' . \str_replace('/', '\\\\/', \$pattern) . '/', 'T', 'test');",
-        ];
-    }
-
-    private function provideMutationCasesForEreg(): Generator
-    {
-        yield 'It converts mb_ereg to ereg' => [
-            "<?php mb_ereg(getPattern(\$x, 1), 'test');",
-            "<?php\n\npreg_match('/' . \str_replace('/', '\\\\/', getPattern(\$x, 1)) . '/', 'test') ? 1 : false;",
-        ];
-
-        yield 'It converts mb_ereg with regs argument to ereg' => [
-            "<?php mb_ereg(getPattern(\$x, 1), 'test', \$regs);",
-            "<?php\n\npreg_match('/' . \str_replace('/', '\\\\/', getPattern(\$x, 1)) . '/', 'test', \$regs) ? 1 : false;",
-        ];
-    }
-
-    private function provideMutationCasesForEregiReplace(): Generator
-    {
-        yield 'It converts mb_eregi_replace to eregi_replace' => [
-            "<?php mb_eregi_replace(\$a . \$b, 'T', 'test');",
-            "<?php\n\npreg_replace('/' . \str_replace('/', '\\\\/', \$a . \$b) . '/i', 'T', 'test');",
-        ];
-
-        yield 'It converts mb_eregi_replace with options to eregi_replace' => [
-            "<?php mb_eregi_replace(\$a . \$b, 'T', 'test', 'msr');",
-            "<?php\n\npreg_replace('/' . \str_replace('/', '\\\\/', \$a . \$b) . '/i', 'T', 'test');",
-        ];
-    }
-
-    private function provideMutationCasesForEregi(): Generator
-    {
-        yield 'It converts mb_eregi to eregi' => [
-            "<?php mb_eregi(\DateTime::getLastErrors(), 'test');",
-            "<?php\n\npreg_match('/' . \str_replace('/', '\\\\/', \DateTime::getLastErrors()) . '/i', 'test') ? 1 : false;",
-        ];
-
-        yield 'It converts mb_eregi with regs parameter to eregi' => [
-            "<?php mb_eregi(\DateTime::getLastErrors(), 'test', \$regs);",
-            "<?php\n\npreg_match('/' . \str_replace('/', '\\\\/', \DateTime::getLastErrors()) . '/i', 'test', \$regs) ? 1 : false;",
         ];
     }
 
