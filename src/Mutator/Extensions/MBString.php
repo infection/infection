@@ -111,7 +111,7 @@ final class MBString extends Mutator
             'mb_convert_case' => $this->mapConvertCase(),
         ];
 
-        $functionsToRemove = \array_filter($functionsMap, function($isOn) {
+        $functionsToRemove = \array_filter($functionsMap, function ($isOn) {
             return !$isOn;
         });
 
@@ -120,21 +120,21 @@ final class MBString extends Mutator
 
     private function mapName(string $functionName): callable
     {
-        return function(Node\Expr\FuncCall $node) use ($functionName): Generator {
+        return function (Node\Expr\FuncCall $node) use ($functionName): Generator {
             yield $this->createNode($node, $functionName, $node->args);
         };
     }
 
     private function mapNameSkipArg(string $functionName, int $skipArgs): callable
     {
-        return function(Node\Expr\FuncCall $node) use ($functionName, $skipArgs): Generator {
+        return function (Node\Expr\FuncCall $node) use ($functionName, $skipArgs): Generator {
             yield $this->createNode($node, $functionName, \array_slice($node->args, 0, $skipArgs));
         };
     }
 
-    private function mapEreg(callable $baseConverter, string $prefix = '', string $suffix = '', callable $warp = null): callable
+    private function mapEreg(callable $baseConverter, string $prefix = '', string $modifiers = '', callable $warp = null): callable
     {
-        return function (Node\Expr\FuncCall $node) use ($baseConverter, $prefix, $suffix, $warp): Generator {
+        return function (Node\Expr\FuncCall $node) use ($baseConverter, $prefix, $modifiers, $warp): Generator {
             foreach ($baseConverter($node) as $newNode) {
                 /* @var Node\Expr\FuncCall $newNode */
                 $newNode->args[0] = new Node\Arg(
@@ -150,7 +150,7 @@ final class MBString extends Mutator
                                 ]
                             )
                         ),
-                        new Node\Scalar\String_("/$suffix")
+                        new Node\Scalar\String_("/$modifiers")
                     )
                 );
 
@@ -178,7 +178,7 @@ final class MBString extends Mutator
 
     private function mapConvertCase(): callable
     {
-        return function(Node\Expr\FuncCall $node): Generator {
+        return function (Node\Expr\FuncCall $node): Generator {
             $modeValue = $this->getConvertCaseModeValue($node);
 
             if ($modeValue === null) {
