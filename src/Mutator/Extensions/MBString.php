@@ -163,6 +163,8 @@ final class MBString extends Mutator
             if (isset(self::MB_CASES[$modeName])) {
                 return self::MB_CASES[$modeName];
             }
+        } elseif ($mode instanceof Node\Scalar\LNumber) {
+            return $mode->value;
         }
 
         return null;

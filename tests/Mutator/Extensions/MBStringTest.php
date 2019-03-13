@@ -414,8 +414,13 @@ final class MBStringTest extends AbstractMutatorTestCase
             "<?php\n\nstrtoupper('test');",
         ];
 
-        yield 'It converts mb_convert_case with MB_CASE_LOWER mode to strtolower' => [
+        yield 'It converts mb_convert_case with constant similar MB_CASE_LOWER mode to strtolower' => [
             "<?php mb_convert_case('test', E_ERROR);",
+            "<?php\n\nstrtolower('test');",
+        ];
+
+        yield 'It converts mb_convert_case with numeric MB_CASE_LOWER (1) mode to strtolower' => [
+            "<?php mb_convert_case('test', 1);",
             "<?php\n\nstrtolower('test');",
         ];
 
