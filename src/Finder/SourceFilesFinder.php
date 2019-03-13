@@ -80,7 +80,7 @@ final class SourceFilesFinder extends Finder
             return $this;
         }
 
-        $filters = explode(',', $filter);
+        $filters = array_filter(explode(',', $filter));
 
         foreach ($filters as $filter) {
             $this->filters[] = $filter;
