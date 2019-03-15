@@ -188,6 +188,8 @@ ASCII;
             $this->consoleOutput->logRunningWithDebugger(\PHP_SAPI);
         } elseif (\extension_loaded('xdebug')) {
             $this->consoleOutput->logRunningWithDebugger('Xdebug');
+        } elseif (\extension_loaded('pcov')) {
+            $this->consoleOutput->logRunningWithDebugger('PCOV');
         }
     }
 }
