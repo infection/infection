@@ -58,6 +58,6 @@ final class InvalidPhpUnitXmlConfigExceptionTest extends TestCase
 
         $this->assertInstanceOf(InvalidPhpUnitXmlConfigException::class, $exception);
 
-        $this->assertContains('phpunit.xml file does not pass XSD schema validation.', $exception->getMessage());
+        $this->assertStringContainsString('phpunit.xml file does not pass XSD schema validation.', $exception->getMessage());
     }
 }

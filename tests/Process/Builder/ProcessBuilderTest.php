@@ -57,7 +57,7 @@ final class ProcessBuilderTest extends TestCase
 
         $process = $builder->getProcessForInitialTestRun('', false);
 
-        $this->assertContains('/usr/bin/php', $process->getCommandLine());
+        $this->assertStringContainsString('/usr/bin/php', $process->getCommandLine());
         $this->assertNull($process->getTimeout());
     }
 
@@ -73,7 +73,7 @@ final class ProcessBuilderTest extends TestCase
 
         $process = $builder->getProcessForMutant($this->createMock(MutantInterface::class))->getProcess();
 
-        $this->assertContains('/usr/bin/php', $process->getCommandLine());
+        $this->assertStringContainsString('/usr/bin/php', $process->getCommandLine());
         $this->assertSame(100.0, $process->getTimeout());
     }
 }

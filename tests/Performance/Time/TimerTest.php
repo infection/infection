@@ -58,7 +58,7 @@ final class TimerTest extends TestCase
         $this->timer->start();
         $timeInSeconds = $this->timer->stop();
 
-        $this->assertInternalType('float', $timeInSeconds);
+        $this->assertIsFloat($timeInSeconds);
         $this->assertGreaterThanOrEqual(0, $timeInSeconds);
     }
 

@@ -126,7 +126,7 @@ $foo;
 PHP
         ];
 
-        yield 'Mutate coalesce with variable as second argument' => [
+        yield 'Mutate coalesce with constants in a conditional' => [
             <<<'PHP'
 <?php
 
