@@ -1,9 +1,8 @@
-# Title
+# Test Infection with PCOV and PHPUnit 8
 
-* Link to github ticket if relevant
+https://github.com/infection/infection/issues/665
 
 ## Summary
-Short summary of the ticket
 
-## Full Ticket
-Full github ticket
+...the issue boils down to Infection not being aware of PCOV as a coverage driver.
+
