@@ -87,8 +87,6 @@ final class MBStringTest extends AbstractMutatorTestCase
 
         yield from $this->provideMutationCasesForSendMail();
 
-        yield from $this->provideMutationCasesForSplit();
-
         yield from $this->provideMutationCasesForStrCut();
 
         yield from $this->provideMutationCasesForStrPos();
@@ -112,8 +110,6 @@ final class MBStringTest extends AbstractMutatorTestCase
         yield from $this->provideMutationCasesForSubStr();
 
         yield from $this->provideMutationCasesForStrRChr();
-
-        yield from $this->provideMutationCasesForStrRiChr();
 
         yield from $this->provideMutationCasesForConvertCase();
     }
@@ -167,19 +163,6 @@ final class MBStringTest extends AbstractMutatorTestCase
         yield 'It converts mb_send_mail with additional parameters to mail' => [
             "<?php mb_send_mail('to', 'subject', 'msg', [], []);",
             "<?php\n\nmail('to', 'subject', 'msg', [], []);",
-        ];
-    }
-
-    private function provideMutationCasesForSplit(): Generator
-    {
-        yield 'It converts mb_split to split' => [
-            "<?php mb_split('to', 'subject');",
-            "<?php\n\nsplit('to', 'subject');",
-        ];
-
-        yield 'It converts mb_split with limit parameter to split' => [
-            "<?php mb_split('to', 'subject', 2);",
-            "<?php\n\nsplit('to', 'subject', 2);",
         ];
     }
 
@@ -380,24 +363,6 @@ final class MBStringTest extends AbstractMutatorTestCase
 
         yield 'It converts mb_strrchr with encoding to strrchr' => [
             "<?php mb_strrchr('subject', 'b', false, 'utf-8');",
-            "<?php\n\nstrrchr('subject', 'b');",
-        ];
-    }
-
-    private function provideMutationCasesForStrRiChr(): Generator
-    {
-        yield 'It converts mb_strrichr to strrchr' => [
-            "<?php mb_strrichr('subject', 'b');",
-            "<?php\n\nstrrchr('subject', 'b');",
-        ];
-
-        yield 'It converts mb_strrichr with part argument to strrchr' => [
-            "<?php mb_strrichr('subject', 'b', false);",
-            "<?php\n\nstrrchr('subject', 'b');",
-        ];
-
-        yield 'It converts mb_strrichr with encoding to strrchr' => [
-            "<?php mb_strrichr('subject', 'b', false, 'utf-8');",
             "<?php\n\nstrrchr('subject', 'b');",
         ];
     }
