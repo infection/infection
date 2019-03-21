@@ -171,9 +171,6 @@
                                             "mb_send_mail": {
                                                 "type": "boolean"
                                             },
-                                            "mb_split": {
-                                                "type": "boolean"
-                                            },
                                             "mb_strcut": {
                                                 "type": "boolean"
                                             },
