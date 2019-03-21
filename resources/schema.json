@@ -189,9 +189,6 @@
                                             "mb_strrchr": {
                                                 "type": "boolean"
                                             },
-                                            "mb_strrichr": {
-                                                "type": "boolean"
-                                            },
                                             "mb_strripos": {
                                                 "type": "boolean"
                                             },
