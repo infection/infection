@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017, Maks Rafalko
+ * Copyright (c) 2017-2019, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,56 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
-use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
-abstract class BaseMutator implements Mutator
+/**
+ * @internal
+ */
+interface Mutator
 {
     /**
-     * @var MutatorConfig
+     * @return Node|Node[]|\Generator
      */
-    private $config;
+    public function mutate(Node $node);
 
-    public function __construct(MutatorConfig $config)
-    {
-        $this->config = $config;
-    }
+    public function shouldMutate(Node $node): bool;
 
-    /**
-     * @return Node|Node[]|\Generator|array
-     */
-    abstract public function mutate(Node $node);
-
-    final public function shouldMutate(Node $node): bool
-    {
-        if (!$this->mutatesNode($node)) {
-            return false;
-        }
-
-        $reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY, false);
-
-        if (!$reflectionClass) {
-            return true;
-        }
-
-        return !$this->config->isIgnored(
-            $reflectionClass->getName(),
-            $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''),
-            $node->getLine()
-        );
-    }
-
-    final public function getName(): string
-    {
-        $parts = explode('\\', static::class);
-
-        return (string) end($parts);
-    }
-
-    final protected function getSettings(): array
-    {
-        return $this->config->getMutatorSettings();
-    }
-
-    abstract protected function mutatesNode(Node $node): bool;
+    public function getName(): string;
 }
