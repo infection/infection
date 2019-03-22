@@ -7,7 +7,7 @@ class IgnoreMethod
     /**
      * @codeCoverageIgnore
      */
-    public function getThree(): string
+    public function getThree(): int
     {
         return 1 + 2;
     }
