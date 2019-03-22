@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use Infection\Mutator\Util\BaseMutator;
+use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
@@ -44,7 +44,7 @@ use PhpParser\Node;
 final class Mutation implements MutationInterface
 {
     /**
-     * @var BaseMutator
+     * @var Mutator
      */
     private $mutator;
 
@@ -101,7 +101,7 @@ final class Mutation implements MutationInterface
     public function __construct(
         string $originalFilePath,
         array $originalFileAst,
-        BaseMutator $mutator,
+        Mutator $mutator,
         array $attributes,
         string $mutatedNodeClass,
         bool $isOnFunctionSignature,
@@ -122,7 +122,7 @@ final class Mutation implements MutationInterface
         $this->lineRange = $lineRange;
     }
 
-    public function getMutator(): BaseMutator
+    public function getMutator(): Mutator
     {
         return $this->mutator;
     }

@@ -37,7 +37,7 @@ namespace Infection\Visitor;
 
 use Infection\Exception\InvalidMutatorException;
 use Infection\Mutation;
-use Infection\Mutator\Util\BaseMutator;
+use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
@@ -48,7 +48,7 @@ use PhpParser\NodeVisitorAbstract;
 final class MutationsCollectorVisitor extends NodeVisitorAbstract
 {
     /**
-     * @var BaseMutator[]
+     * @var Mutator[]
      */
     private $mutators;
 
