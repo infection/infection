@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Util;
 
-use Infection\Mutator\Boolean\FalseValue;
-use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\Util\MutatorParser;
 use PHPUnit\Framework\TestCase;
 
@@ -69,7 +67,7 @@ final class MutatorParserTest extends TestCase
         $mutatorList = $parser->getMutators();
 
         $this->assertCount(1, $mutatorList);
-        $this->assertInstanceOf(TrueValue::class, array_shift($mutatorList));
+        $this->assertSame('TrueValue', array_shift($mutatorList)->getName());
     }
 
     public function test_it_generates_multiple_mutators_from_the_input_string(): void
@@ -79,7 +77,7 @@ final class MutatorParserTest extends TestCase
         $mutatorList = $parser->getMutators();
 
         $this->assertCount(2, $mutatorList);
-        $this->assertInstanceOf(TrueValue::class, array_shift($mutatorList));
-        $this->assertInstanceOf(FalseValue::class, array_shift($mutatorList));
+        $this->assertSame('TrueValue', array_shift($mutatorList)->getName());
+        $this->assertSame('FalseValue', array_shift($mutatorList)->getName());
     }
 }

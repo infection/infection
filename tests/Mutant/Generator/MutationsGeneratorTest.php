@@ -73,7 +73,7 @@ final class MutationsGeneratorTest extends TestCase
 
         $mutations = $this->createMutationGenerator($codeCoverageDataMock)->generate(false);
 
-        $this->assertInstanceOf(Plus::class, $mutations[3]->getMutator());
+        $this->assertSame('Plus', $mutations[3]->getMutator()->getName());
     }
 
     public function test_it_collects_public_visibility_mutation(): void
@@ -90,8 +90,8 @@ final class MutationsGeneratorTest extends TestCase
 
         $mutations = $this->createMutationGenerator($codeCoverageDataMock)->generate(false);
 
-        $this->assertInstanceOf(Plus::class, $mutations[3]->getMutator());
-        $this->assertInstanceOf(PublicVisibility::class, $mutations[4]->getMutator());
+        $this->assertSame('Plus', $mutations[3]->getMutator()->getName());
+        $this->assertSame('PublicVisibility', $mutations[4]->getMutator()->getName());
     }
 
     public function test_it_can_skip_not_covered_on_file_level(): void
@@ -126,8 +126,8 @@ final class MutationsGeneratorTest extends TestCase
         $mutations = $this->createMutationGenerator($codeCoverageDataMock)->generate(true);
 
         $this->assertCount(3, $mutations);
-        $this->assertInstanceOf(TrueValue::class, $mutations[0]->getMutator());
-        $this->assertInstanceOf(PublicVisibility::class, $mutations[2]->getMutator());
+        $this->assertSame('TrueValue', $mutations[0]->getMutator()->getName());
+        $this->assertSame('PublicVisibility', $mutations[2]->getMutator()->getName());
     }
 
     public function test_it_can_skip_not_covered_on_file_line_for_visibility(): void

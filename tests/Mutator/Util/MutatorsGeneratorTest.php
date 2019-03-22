@@ -39,7 +39,6 @@ use Infection\Config\Exception\InvalidConfigException;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Util\MutatorProfile;
 use Infection\Mutator\Util\MutatorsGenerator;
-use Infection\Tests\Fixtures\StubMutator;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 use PhpParser\Node\Expr\BinaryOp\Plus as PlusNode;
@@ -139,7 +138,7 @@ final class MutatorsGeneratorTest extends TestCase
 
         $this->assertCount(self::$countDefaultMutators, $mutators);
 
-        $this->assertInstanceOf(Plus::class, $mutators['Plus']);
+        $this->assertSame('Plus', $mutators['Plus']->getName());
 
         $this->assertFalse($mutators['Plus']->shouldMutate($plusNode));
     }
@@ -164,7 +163,7 @@ final class MutatorsGeneratorTest extends TestCase
 
         $this->assertCount(self::$countDefaultMutators, $mutators);
 
-        $this->assertInstanceOf(Plus::class, $mutators['Plus']);
+        $this->assertSame('Plus', $mutators['Plus']->getName());
 
         $this->assertFalse($mutators['TrueValue']->shouldMutate($trueNode));
         $this->assertFalse($mutators['FalseValue']->shouldMutate($falseNode));
@@ -180,7 +179,7 @@ final class MutatorsGeneratorTest extends TestCase
         $mutators = $mutatorGenerator->generate();
 
         $this->assertArrayHasKey('StubMutator', $mutators);
-        $this->assertInstanceOf(StubMutator::class, $mutators['StubMutator']);
+        $this->assertSame('StubMutator', $mutators['StubMutator']->getName());
     }
 
     public function test_it_combines_custom_mutators_with_the_other_mutators(): void
