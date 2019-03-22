@@ -45,6 +45,7 @@ use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Traverser\PriorityNodeTraverser;
+use Infection\Visitor\FilePathVisitor;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\NotMutableIgnoreVisitor;
@@ -159,7 +160,7 @@ final class MutationsGenerator
             $this->codeCoverageData,
             $onlyCovered
         );
-
+        $traverser->addVisitor(new FilePathVisitor($filePath), 60);
         $traverser->addVisitor(new NotMutableIgnoreVisitor(), 50);
         $traverser->addVisitor(new ParentConnectorVisitor(), 40);
         $traverser->addVisitor(new FullyQualifiedClassNameVisitor(), 30);
