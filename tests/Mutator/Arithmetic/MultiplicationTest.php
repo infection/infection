@@ -50,10 +50,9 @@ final class MultiplicationTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): array
+    public function provideMutationCases(): \Generator
     {
-        return [
-            'It mutates normal multiplication' => [
+        yield 'It mutates normal multiplication' => [
                 <<<'PHP'
 <?php
 
@@ -65,17 +64,79 @@ PHP
 
 $a = 10 / 3;
 PHP
-                ,
-            ],
-            'It does not mutate multiplication equals' => [
+        ];
+
+        yield 'It does not mutate multiplication equals' => [
                 <<<'PHP'
 <?php
 
 $a = 1;
 $a *= 2;
 PHP
-                ,
-            ],
+        ];
+
+        yield 'It does not mutate when the left side is 1 to avoid an equivalent mutation' => [
+            <<<'PHP'
+<?php
+
+$a = 1 * $b;
+PHP
+        ];
+
+        yield 'It does not mutate when the right side is 1 to avoid an equivalent mutation' => [
+            <<<'PHP'
+<?php
+
+$a = $b * 1;
+PHP
+        ];
+
+        yield 'It does not mutate when the left side is -1 to avoid an equivalent mutation' => [
+            <<<'PHP'
+<?php
+
+$a = -1 * $b;
+PHP
+        ];
+
+        yield 'It does not mutate when the right side is -1 to avoid an equivalent mutation' => [
+            <<<'PHP'
+<?php
+
+$a = $b * -1;
+PHP
+        ];
+
+        yield 'It does not mutate when the left side is 1.0 to avoid an equivalent mutation' => [
+            <<<'PHP'
+<?php
+
+$a = 1.0 * $b;
+PHP
+        ];
+
+        yield 'It does not mutate when the right side is 1.0 to avoid an equivalent mutation' => [
+            <<<'PHP'
+<?php
+
+$a = $b * 1.0;
+PHP
+        ];
+
+        yield 'It does not mutate when the left side is -1.0 to avoid an equivalent mutation' => [
+            <<<'PHP'
+<?php
+
+$a = -1.0 * $b;
+PHP
+        ];
+
+        yield 'It does not mutate when the right side is -1.0 to avoid an equivalent mutation' => [
+            <<<'PHP'
+<?php
+
+$a = $b * -1.0;
+PHP
         ];
     }
 }
