@@ -56,7 +56,7 @@ final class MutatorConfig
         $this->mutatorSettings = $config['settings'] ?? [];
     }
 
-    public function isIgnored(string $class, string $method): bool
+    public function isIgnored(string $class, string $method, int $lineNumber = null): bool
     {
         if (\in_array($class, $this->ignoreConfig)) {
             return true;
@@ -67,7 +67,10 @@ final class MutatorConfig
         }
 
         foreach ($this->ignoreConfig as $ignorePattern) {
-            if (fnmatch($ignorePattern, $class, FNM_NOESCAPE) || fnmatch($ignorePattern, $class . '::' . $method, FNM_NOESCAPE)) {
+            if (fnmatch($ignorePattern, $class, FNM_NOESCAPE)
+                || fnmatch($ignorePattern, $class . '::' . $method, FNM_NOESCAPE)
+                || ($lineNumber !== null && fnmatch($ignorePattern, $class . '::' . $method . '::' . $lineNumber, FNM_NOESCAPE))
+            ) {
                 return true;
             }
         }
