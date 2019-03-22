@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class LogicalOr extends Mutator
+final class LogicalOr extends BaseMutator
 {
     /**
      * Replaces "||" with "&&"

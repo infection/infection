@@ -41,7 +41,7 @@ use PhpParser\Node;
 /**
  * @internal
  */
-abstract class AbstractValueToNullReturnValue extends Mutator
+abstract class AbstractValueToNullReturnValue extends BaseMutator
 {
     protected function isNullReturnValueAllowed(Node $node): bool
     {

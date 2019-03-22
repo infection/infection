@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class ArrayItem extends Mutator
+final class ArrayItem extends BaseMutator
 {
     /**
      * Replaces "[$a->foo => $b->bar]" with "[$a->foo > $b->bar]"

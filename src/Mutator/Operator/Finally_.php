@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Finally_ extends Mutator
+final class Finally_ extends BaseMutator
 {
     /**
      * Removes "finally{}" blocks

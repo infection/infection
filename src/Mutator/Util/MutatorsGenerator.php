@@ -62,7 +62,7 @@ final class MutatorsGenerator
      *
      * @throws InvalidConfigException
      *
-     * @return Mutator[]
+     * @return BaseMutator[]
      */
     public function generate(): array
     {
@@ -149,7 +149,7 @@ final class MutatorsGenerator
     }
 
     /**
-     * @return Mutator[]
+     * @return BaseMutator[]
      */
     private function createFromList(array $mutators): array
     {

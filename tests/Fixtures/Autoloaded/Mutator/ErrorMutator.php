@@ -3,10 +3,10 @@
 namespace Infection\WrongMutator;
 
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
-class ErrorMutator extends Mutator
+class ErrorMutator extends BaseMutator
 {
     public function mutate(Node $node)
     {

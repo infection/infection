@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Regex;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class PregMatchMatches extends Mutator
+final class PregMatchMatches extends BaseMutator
 {
     /**
      * Replaces "preg_match('/a/', 'b', $foo);" with "(int) $foo = array();"

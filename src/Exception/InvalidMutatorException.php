@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Exception;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 
 /**
  * @internal
  */
 final class InvalidMutatorException extends \Exception
 {
-    public static function create(string $filePath, Mutator $mutator, \Throwable $previous): self
+    public static function create(string $filePath, BaseMutator $mutator, \Throwable $previous): self
     {
         return new self(
             sprintf(

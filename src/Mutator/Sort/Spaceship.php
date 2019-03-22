@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Sort;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Spaceship extends Mutator
+final class Spaceship extends BaseMutator
 {
     /**
      * Swaps the arguments in the Spaceship operator <=>

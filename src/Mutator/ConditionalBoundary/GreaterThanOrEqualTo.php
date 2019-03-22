@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalBoundary;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class GreaterThanOrEqualTo extends Mutator
+final class GreaterThanOrEqualTo extends BaseMutator
 {
     /**
      * Replaces ">=" with ">"

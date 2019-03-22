@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -14,7 +14,7 @@ use PhpParser\NodeVisitorAbstract;
 final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
 {
     /**
-     * @var Mutator[]
+     * @var BaseMutator[]
      */
     private $mutator;
 
@@ -28,7 +28,7 @@ final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
      */
     private $fileAst;
 
-    public function __construct(Mutator $mutator, array $fileAst)
+    public function __construct(BaseMutator $mutator, array $fileAst)
     {
         $this->mutator = $mutator;
         $this->fileAst = $fileAst;

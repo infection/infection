@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-abstract class AbstractUnwrapMutator extends Mutator
+abstract class AbstractUnwrapMutator extends BaseMutator
 {
     /**
      * Replaces "$a = function(arg1, arg2);" with "$a = arg1;"

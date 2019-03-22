@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class DivEqual extends Mutator
+final class DivEqual extends BaseMutator
 {
     /**
      * Replaces "/=" with "*="

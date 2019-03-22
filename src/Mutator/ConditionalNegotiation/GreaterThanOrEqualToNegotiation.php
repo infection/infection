@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalNegotiation;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class GreaterThanOrEqualToNegotiation extends Mutator
+final class GreaterThanOrEqualToNegotiation extends BaseMutator
 {
     /**
      * Replaces ">=" with "<"

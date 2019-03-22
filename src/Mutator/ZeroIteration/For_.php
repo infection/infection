@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ZeroIteration;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class For_ extends Mutator
+final class For_ extends BaseMutator
 {
     /**
      * Replaces "for($i=0; $i<10; $i++)" with "for($i=0; false; $i++)"

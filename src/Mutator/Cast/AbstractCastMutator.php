@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Cast;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-abstract class AbstractCastMutator extends Mutator
+abstract class AbstractCastMutator extends BaseMutator
 {
     /**
      * Replaces "(cast) $foo;" with "$foo;"

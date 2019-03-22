@@ -48,7 +48,7 @@ final class MutatorParser
     private $inputMutators;
 
     /**
-     * @var array|Mutator[]
+     * @var array|BaseMutator[]
      */
     private $configMutators;
 
@@ -59,7 +59,7 @@ final class MutatorParser
     }
 
     /**
-     * @return array|Mutator[]
+     * @return array|BaseMutator[]
      */
     public function getMutators(): array
     {

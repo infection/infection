@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
@@ -45,7 +45,7 @@ use PhpParser\Node;
  */
 interface MutationInterface
 {
-    public function getMutator(): Mutator;
+    public function getMutator(): BaseMutator;
 
     public function getAttributes(): array;
 

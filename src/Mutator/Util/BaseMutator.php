@@ -38,7 +38,7 @@ namespace Infection\Mutator\Util;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
-abstract class Mutator
+abstract class BaseMutator
 {
     /**
      * @var MutatorConfig

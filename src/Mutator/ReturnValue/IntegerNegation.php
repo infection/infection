@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class IntegerNegation extends Mutator
+final class IntegerNegation extends BaseMutator
 {
     /**
      * Replaces any integer with negated integer value.

@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class TrueValue extends Mutator
+final class TrueValue extends BaseMutator
 {
     private const DEFAULT_SETTINGS = [
         'array_search' => false,

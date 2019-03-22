@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 use PhpParser\Node\Expr\PostDec;
 use PhpParser\Node\Expr\PostInc;
@@ -45,7 +45,7 @@ use PhpParser\Node\Expr\PreInc;
 /**
  * @internal
  */
-final class Decrement extends Mutator
+final class Decrement extends BaseMutator
 {
     /**
      * Replaces "--" with "++"

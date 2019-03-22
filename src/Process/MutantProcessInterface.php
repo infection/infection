@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process;
 
 use Infection\Mutant\MutantInterface;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use Symfony\Component\Process\Process;
 
 /**
@@ -54,7 +54,7 @@ interface MutantProcessInterface
 
     public function getResultCode(): int;
 
-    public function getMutator(): Mutator;
+    public function getMutator(): BaseMutator;
 
     public function getOriginalFilePath(): string;
 

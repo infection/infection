@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-abstract class AbstractNumberMutator extends Mutator
+abstract class AbstractNumberMutator extends BaseMutator
 {
     protected function isPartOfSizeComparison(Node $node): bool
     {

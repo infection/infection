@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class ShiftRight extends Mutator
+final class ShiftRight extends BaseMutator
 {
     /**
      * Replaces ">>" with "<<"

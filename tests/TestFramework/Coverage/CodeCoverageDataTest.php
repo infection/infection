@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\Mutation;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
@@ -148,7 +148,7 @@ final class CodeCoverageDataTest extends TestCase
         $mutation = new Mutation(
             $filePath,
             [],
-            $this->createMock(Mutator::class),
+            $this->createMock(BaseMutator::class),
             ['startLine' => 1, 'endLine' => 1],
             'PHPParser\Node\Expr\BinaryOp\Plus',
             false,
@@ -169,7 +169,7 @@ final class CodeCoverageDataTest extends TestCase
         $mutation = new Mutation(
             $filePath,
             [],
-            $this->createMock(Mutator::class),
+            $this->createMock(BaseMutator::class),
             ['startLine' => 26, 'endLine' => 26],
             'PHPParser\Node\Expr\BinaryOp\Plus',
             false,
@@ -194,7 +194,7 @@ final class CodeCoverageDataTest extends TestCase
         $mutation = new Mutation(
             $filePath,
             [],
-            $this->createMock(Mutator::class),
+            $this->createMock(BaseMutator::class),
             ['startLine' => 1, 'endLine' => 1],
             'PHPParser\Node\Stmt\ClassMethod',
             true,
@@ -215,7 +215,7 @@ final class CodeCoverageDataTest extends TestCase
         $mutation = new Mutation(
             $filePath,
             [],
-            $this->createMock(Mutator::class),
+            $this->createMock(BaseMutator::class),
             ['startLine' => 24, 'endLine' => 24],
             'PHPParser\Node\Stmt\ClassMethod',
             true,

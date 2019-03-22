@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Regex;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class PregQuote extends Mutator
+final class PregQuote extends BaseMutator
 {
     /**
      * Replaces "$a = preg_quote($b);" with "$a = $b;"

@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Throw_ extends Mutator
+final class Throw_ extends BaseMutator
 {
     /**
      * Replaces "throw new Exception();" with "new Exception();"

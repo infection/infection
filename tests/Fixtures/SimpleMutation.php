@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 class SimpleMutation
 {
     /**
-     * @var Mutator
+     * @var BaseMutator
      */
     private $mutator;
 
@@ -24,14 +24,14 @@ class SimpleMutation
      */
     private $mutatedNode;
 
-    public function __construct(array $originalFileAst, Mutator $mutator, $mutatedNode)
+    public function __construct(array $originalFileAst, BaseMutator $mutator, $mutatedNode)
     {
         $this->originalFileAst = $originalFileAst;
         $this->mutator = $mutator;
         $this->mutatedNode = $mutatedNode;
     }
 
-    public function getMutator(): Mutator
+    public function getMutator(): BaseMutator
     {
         return $this->mutator;
     }

@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Break_ extends Mutator
+final class Break_ extends BaseMutator
 {
     /**
      * Replaces "break;" with "continue;"

@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ZeroIteration;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Foreach_ extends Mutator
+final class Foreach_ extends BaseMutator
 {
     /**
      * Replaces "foreach($a as $b)" with "foreach(array() as $b)"

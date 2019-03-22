@@ -37,14 +37,14 @@ namespace Infection\Mutator\Removal;
 
 use Generator;
 use Infection\Config\Exception\InvalidConfigException;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use Infection\Mutator\Util\MutatorConfig;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class ArrayItemRemoval extends Mutator
+final class ArrayItemRemoval extends BaseMutator
 {
     private const DEFAULT_SETTINGS = [
         'remove' => 'first',

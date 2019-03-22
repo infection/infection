@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class AssignmentEqual extends Mutator
+final class AssignmentEqual extends BaseMutator
 {
     /**
      * Replaces "==" with "="

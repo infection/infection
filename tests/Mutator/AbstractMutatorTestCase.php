@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Tests\Fixtures\SimpleMutation;
 use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;
@@ -58,7 +58,7 @@ use PHPUnit\Framework\TestCase;
 abstract class AbstractMutatorTestCase extends TestCase
 {
     /**
-     * @var Mutator
+     * @var BaseMutator
      */
     protected $mutator;
 
@@ -99,7 +99,7 @@ abstract class AbstractMutatorTestCase extends TestCase
         }
     }
 
-    protected function getMutator(array $settings = []): Mutator
+    protected function getMutator(array $settings = []): BaseMutator
     {
         $class = \get_class($this);
         $mutator = substr(str_replace('\Tests', '', $class), 0, -4);

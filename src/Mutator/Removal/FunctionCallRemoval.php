@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class FunctionCallRemoval extends Mutator
+final class FunctionCallRemoval extends BaseMutator
 {
     /**
      * Replaces "doSmth()" with ""

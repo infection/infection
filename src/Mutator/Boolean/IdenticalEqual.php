@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class IdenticalEqual extends Mutator
+final class IdenticalEqual extends BaseMutator
 {
     /**
      * Replaces "===" with "=="

@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\BaseMutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Coalesce extends Mutator
+final class Coalesce extends BaseMutator
 {
     /**
      * Replaces "'someValue' ?? 'otherValue';" with "'otherValue'"
