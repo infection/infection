@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Util;
 
+use Infection\Mutator\Util\MutatorConfig;
 use Infection\Mutator\Util\MutatorProfile;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
@@ -47,14 +48,15 @@ final class MutatorProfileTest extends TestCase
     public function test_all_mutators_have_the_correct_name_in_the_full_mutator_list(): void
     {
         foreach (MutatorProfile::FULL_MUTATOR_LIST as $name => $class) {
+            $className = (new $class(new MutatorConfig([])))->getName();
             $this->assertSame(
                 $name,
-                $class::getName(),
+                $className,
                 sprintf(
                     'Invalid name "%s" provided for the class "%s", expected "%s" as key',
                     $name,
                     $class,
-                    $class::getName()
+                    $className
                 )
             );
         }

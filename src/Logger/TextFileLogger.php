@@ -103,7 +103,7 @@ final class TextFileLogger extends FileLogger
             $index + 1,
             $mutantProcess->getOriginalFilePath(),
             $mutantProcess->getOriginalStartingLine(),
-            $mutantProcess->getMutator()::getName()
+            $mutantProcess->getMutator()->getName()
         );
     }
 }

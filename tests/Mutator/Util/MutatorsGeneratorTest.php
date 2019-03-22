@@ -37,8 +37,6 @@ namespace Infection\Tests\Mutator\Util;
 
 use Infection\Config\Exception\InvalidConfigException;
 use Infection\Mutator\Arithmetic\Plus;
-use Infection\Mutator\Boolean\FalseValue;
-use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\Util\MutatorProfile;
 use Infection\Mutator\Util\MutatorsGenerator;
 use Infection\Tests\Fixtures\StubMutator;
@@ -106,7 +104,7 @@ final class MutatorsGeneratorTest extends TestCase
     {
         $mutatorGenerator = new MutatorsGenerator([
             '@default' => true,
-            Plus::getName() => false,
+            'Plus' => false,
         ]);
         $mutators = $mutatorGenerator->generate();
 
@@ -135,15 +133,15 @@ final class MutatorsGeneratorTest extends TestCase
 
         $mutatorGenerator = new MutatorsGenerator([
             '@default' => true,
-            Plus::getName() => ['ignore' => ['A::B']],
+            'Plus' => ['ignore' => ['A::B']],
         ]);
         $mutators = $mutatorGenerator->generate();
 
         $this->assertCount(self::$countDefaultMutators, $mutators);
 
-        $this->assertInstanceOf(Plus::class, $mutators[Plus::getName()]);
+        $this->assertInstanceOf(Plus::class, $mutators['Plus']);
 
-        $this->assertFalse($mutators[Plus::getName()]->shouldMutate($plusNode));
+        $this->assertFalse($mutators['Plus']->shouldMutate($plusNode));
     }
 
     public function test_it_keeps_settings_when_applied_to_profiles(): void
@@ -166,12 +164,12 @@ final class MutatorsGeneratorTest extends TestCase
 
         $this->assertCount(self::$countDefaultMutators, $mutators);
 
-        $this->assertInstanceOf(Plus::class, $mutators[Plus::getName()]);
+        $this->assertInstanceOf(Plus::class, $mutators['Plus']);
 
-        $this->assertFalse($mutators[TrueValue::getName()]->shouldMutate($trueNode));
-        $this->assertFalse($mutators[FalseValue::getName()]->shouldMutate($falseNode));
+        $this->assertFalse($mutators['TrueValue']->shouldMutate($trueNode));
+        $this->assertFalse($mutators['FalseValue']->shouldMutate($falseNode));
 
-        $this->assertTrue($mutators[Plus::getName()]->shouldMutate($plusNode));
+        $this->assertTrue($mutators['Plus']->shouldMutate($plusNode));
     }
 
     public function test_it_accepts_custom_mutators(): void
@@ -215,10 +213,10 @@ final class MutatorsGeneratorTest extends TestCase
 
         $this->assertCount(\count(MutatorProfile::BOOLEAN), $mutators);
 
-        $this->assertArrayNotHasKey(Plus::getName(), $mutators);
+        $this->assertArrayNotHasKey('Plus', $mutators);
 
-        $this->assertFalse($mutators[TrueValue::getName()]->shouldMutate($trueNode));
-        $this->assertFalse($mutators[FalseValue::getName()]->shouldMutate($falseNode));
+        $this->assertFalse($mutators['TrueValue']->shouldMutate($trueNode));
+        $this->assertFalse($mutators['FalseValue']->shouldMutate($falseNode));
     }
 
     public function test_an_empty_setting_is_allowed(): void
@@ -230,7 +228,7 @@ final class MutatorsGeneratorTest extends TestCase
 
         $this->assertCount(\count(MutatorProfile::BOOLEAN), $mutators);
 
-        $this->assertArrayNotHasKey(Plus::getName(), $mutators);
+        $this->assertArrayNotHasKey('Plus', $mutators);
     }
 
     /**

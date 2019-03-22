@@ -48,7 +48,7 @@ final class InvalidMutatorException extends \Exception
             sprintf(
                 'Encountered an error with the "%s" mutator in the "%s" file. ' .
                 'This is most likely a bug in Infection, so please report this in our issue tracker.',
-                $mutator::getName(),
+                $mutator->getName(),
                 $filePath
             ),
             0,
