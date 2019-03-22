@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Visitor;
 
-use Infection\Exception\InvalidMutatorException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
@@ -58,11 +57,6 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
     private $mutations = [];
 
     /**
-     * @var string
-     */
-    private $filePath;
-
-    /**
      * @var Node[]
      */
     private $fileAst;
@@ -78,13 +72,11 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
 
     public function __construct(
         array $mutators,
-        string $filePath,
         array $fileAst,
         CodeCoverageData $codeCoverageData,
         bool $onlyCovered
     ) {
         $this->mutators = $mutators;
-        $this->filePath = $filePath;
         $this->fileAst = $fileAst;
         $this->codeCoverageData = $codeCoverageData;
         $this->onlyCovered = $onlyCovered;
@@ -93,12 +85,8 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
     public function leaveNode(Node $node): ?Node
     {
         foreach ($this->mutators as $mutator) {
-            try {
-                if (!$mutator->shouldMutate($node)) {
-                    continue;
-                }
-            } catch (\Throwable $t) {
-                throw InvalidMutatorException::create($this->filePath, $mutator, $t);
+            if (!$mutator->shouldMutate($node)) {
+                continue;
             }
 
             $isOnFunctionSignature = $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
@@ -109,10 +97,11 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                 continue;
             }
 
+            $path = $node->getAttribute(FilePathVisitor::FILE_PATH);
             if ($isOnFunctionSignature) {
                 // hasExecutedMethodOnLine checks for all lines of a given method,
                 // therefore it isn't making any sense to check any other line but first
-                $isCoveredByTest = $this->codeCoverageData->hasExecutedMethodOnLine($this->filePath, $node->getLine());
+                $isCoveredByTest = $this->codeCoverageData->hasExecutedMethodOnLine($path, $node->getLine());
                 $linerange = $this->getNodeRange($node);
             } else {
                 $outerMostArrayNode = $this->getOuterMostArrayNode($node);
@@ -120,7 +109,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                 $linerange = $this->getNodeRange($outerMostArrayNode);
 
                 foreach ($linerange as $line) {
-                    if ($this->codeCoverageData->hasTestsOnLine($this->filePath, $line)) {
+                    if ($this->codeCoverageData->hasTestsOnLine($path, $line)) {
                         $isCoveredByTest = true;
 
                         break;
@@ -138,7 +127,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
 
             foreach ($mutatedNodes as $mutationByMutatorIndex => $mutatedNode) {
                 $this->mutations[] = new Mutation(
-                    $this->filePath,
+                    $node->getAttribute(FilePathVisitor::FILE_PATH),
                     $this->fileAst,
                     $mutator,
                     $node->getAttributes(),

@@ -45,6 +45,7 @@ use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\Mutator\Number\DecrementInteger;
 use Infection\Mutator\Util\MutatorConfig;
+use Infection\Mutator\Util\ThrowingMutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Tests\Fixtures\Files\Mutation\OneFile\OneFile;
 use Infection\WrongMutator\ErrorMutator;
@@ -230,19 +231,19 @@ final class MutationsGeneratorTest extends TestCase
         $mutatorConfig = $mutatorConfig ?? new MutatorConfig([]);
 
         $container[Plus::class] = static function () use ($mutatorConfig) {
-            return new Plus($mutatorConfig);
+            return new ThrowingMutator(new Plus($mutatorConfig));
         };
 
         $container[PublicVisibility::class] = static function () use ($mutatorConfig) {
-            return new PublicVisibility($mutatorConfig);
+            return new ThrowingMutator(new PublicVisibility($mutatorConfig));
         };
 
         $container[TrueValue::class] = static function () use ($mutatorConfig) {
-            return new TrueValue($mutatorConfig);
+            return new ThrowingMutator(new TrueValue($mutatorConfig));
         };
 
         $container[DecrementInteger::class] = static function (Container $c) use ($mutatorConfig) {
-            return new DecrementInteger($mutatorConfig);
+            return new ThrowingMutator(new DecrementInteger($mutatorConfig));
         };
 
         $defaultMutators = [
@@ -252,7 +253,7 @@ final class MutationsGeneratorTest extends TestCase
             $container[DecrementInteger::class],
         ];
 
-        $mutators = $whitelistedMutatorName ? [new $whitelistedMutatorName($mutatorConfig)] : $defaultMutators;
+        $mutators = $whitelistedMutatorName ? [new ThrowingMutator(new $whitelistedMutatorName($mutatorConfig))] : $defaultMutators;
 
         $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcherMock->expects($this->any())->method('dispatch');

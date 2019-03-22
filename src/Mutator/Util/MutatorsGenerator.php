@@ -158,7 +158,7 @@ final class MutatorsGenerator
         foreach ($mutators as $mutator => $setting) {
             if ($setting !== false) {
                 \assert(\is_string($mutator));
-                $mutatorInstance = new $mutator(new MutatorConfig($setting));
+                $mutatorInstance = new ThrowingMutator(new $mutator(new MutatorConfig($setting)));
                 $mutatorList[$mutatorInstance->getName()] = $mutatorInstance;
             }
         }

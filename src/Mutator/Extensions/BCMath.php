@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Extensions;
 
 use Generator;
+use Infection\Mutator\Util\BaseMutator;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use PhpParser\Node;
@@ -43,7 +44,7 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class BCMath extends Mutator
+final class BCMath extends BaseMutator
 {
     private $converters;
 

@@ -155,7 +155,6 @@ final class MutationsGenerator
 
         $mutationsCollectorVisitor = new MutationsCollectorVisitor(
             $this->mutators,
-            $filePath,
             $initialStatements,
             $this->codeCoverageData,
             $onlyCovered
