@@ -246,7 +246,7 @@ final class ProjectCodeTest extends TestCase
                     )
                 );
             }
-            $this->assertNotContains(
+            $this->assertStringNotContainsString(
                 '@internal',
                 $docBlock,
                 sprintf(
@@ -258,15 +258,14 @@ final class ProjectCodeTest extends TestCase
             return;
         }
 
-        $this->assertInternalType(
-            'string',
+        $this->assertIsString(
             $docBlock,
             sprintf(
                 'The "%s" class is not an extension point, and should be marked as internal.',
                 $className
             )
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             '@internal',
             $docBlock,
             sprintf(
@@ -389,15 +388,14 @@ final class ProjectCodeTest extends TestCase
         $rc = new \ReflectionClass($className);
         $docBlock = $rc->getDocComment();
 
-        $this->assertInternalType(
-            'string',
+        $this->assertIsString(
             $docBlock,
             sprintf(
                 'Test class  "%s" must be marked internal.',
                 $className
             )
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             '@internal',
             $rc->getDocComment(),
             sprintf(

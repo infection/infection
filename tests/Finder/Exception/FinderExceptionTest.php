@@ -48,7 +48,7 @@ final class FinderExceptionTest extends TestCase
         $exception = FinderException::composerNotFound();
 
         $this->assertInstanceOf(FinderException::class, $exception);
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Unable to locate a Composer executable on local system',
             $exception->getMessage()
         );
@@ -59,7 +59,7 @@ final class FinderExceptionTest extends TestCase
         $exception = FinderException::phpExecutableNotFound();
 
         $this->assertInstanceOf(FinderException::class, $exception);
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Unable to locate the PHP executable on the local system',
             $exception->getMessage()
         );
@@ -70,11 +70,11 @@ final class FinderExceptionTest extends TestCase
         $exception = FinderException::testFrameworkNotFound('framework');
 
         $this->assertInstanceOf(FinderException::class, $exception);
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Unable to locate a framework executable on local system.',
             $exception->getMessage()
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Ensure that framework is installed and available.',
             $exception->getMessage()
         );
@@ -85,7 +85,7 @@ final class FinderExceptionTest extends TestCase
         $exception = FinderException::testCustomPathDoesNotExist('framework', 'foo/bar/abc');
 
         $this->assertInstanceOf(FinderException::class, $exception);
-        $this->assertContains(
+        $this->assertStringContainsString(
             'The custom path to framework was set as "foo/bar/abc"',
             $exception->getMessage()
         );

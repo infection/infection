@@ -157,7 +157,7 @@ final class TestFrameworkFinderTest extends TestCase
 
         // Vendor bin should be the first item
         $pathList = explode(PATH_SEPARATOR, $pathAfterTest);
-        $this->assertContains('vendor', $pathList[0]);
+        $this->assertStringContainsString('vendor', $pathList[0]);
 
         $this->assertNotSame($path, $pathAfterTest);
 

@@ -57,7 +57,7 @@ final class LogVerbosityTest extends TestCase
     /**
      * @dataProvider provideConvertedLogVerbosity
      */
-    public function test_it_converts_int_version_to_string_version_of_verbosity(int $input, string $output): void
+    public function test_it_converts_int_version_to_string_version_of_verbosity($input, string $output): void
     {
         $input = $this->setInputExpectationsWhenItDoesChange($input, $output);
         $io = $this->createMock(SymfonyStyle::class);
