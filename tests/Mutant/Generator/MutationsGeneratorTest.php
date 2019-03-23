@@ -229,19 +229,19 @@ final class MutationsGeneratorTest extends TestCase
 
         $mutatorConfig = $mutatorConfig ?? new MutatorConfig([]);
 
-        $container[Plus::class] = function () use ($mutatorConfig) {
+        $container[Plus::class] = static function () use ($mutatorConfig) {
             return new Plus($mutatorConfig);
         };
 
-        $container[PublicVisibility::class] = function () use ($mutatorConfig) {
+        $container[PublicVisibility::class] = static function () use ($mutatorConfig) {
             return new PublicVisibility($mutatorConfig);
         };
 
-        $container[TrueValue::class] = function () use ($mutatorConfig) {
+        $container[TrueValue::class] = static function () use ($mutatorConfig) {
             return new TrueValue($mutatorConfig);
         };
 
-        $container[DecrementInteger::class] = function (Container $c) use ($mutatorConfig) {
+        $container[DecrementInteger::class] = static function (Container $c) use ($mutatorConfig) {
             return new DecrementInteger($mutatorConfig);
         };
 

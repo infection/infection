@@ -189,7 +189,7 @@ AUTOLOAD;
         // sort tests to run the fastest first
         usort(
             $uniqueCoverageTests,
-            function (array $a, array $b) {
+            static function (array $a, array $b) {
                 return $a['time'] <=> $b['time'];
             }
         );

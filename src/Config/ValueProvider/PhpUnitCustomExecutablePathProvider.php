@@ -95,7 +95,7 @@ final class PhpUnitCustomExecutablePathProvider
 
     private function getValidator(): \Closure
     {
-        return function ($answerPath) {
+        return static function ($answerPath) {
             $answerPath = $answerPath ? trim($answerPath) : $answerPath;
 
             if (!$answerPath || !file_exists($answerPath)) {

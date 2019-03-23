@@ -42,7 +42,7 @@ class DiffColorizer
 {
     public function colorize(string $diff): string
     {
-        $lines = array_map(function (string $line) {
+        $lines = array_map(static function (string $line) {
             if (0 === strpos($line, '-')) {
                 return  sprintf('<diff-del>%s</diff-del>', $line);
             }

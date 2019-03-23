@@ -57,7 +57,7 @@ final class InitialTestsRunnerTest extends TestCase
 
         $process->expects($this->once())
             ->method('run')
-            ->with($this->callback(function ($processCallback): bool {
+            ->with($this->callback(static function ($processCallback): bool {
                 $processCallback(Process::OUT);
 
                 return true;

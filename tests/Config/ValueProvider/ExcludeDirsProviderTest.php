@@ -134,7 +134,7 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
     public function excludeDirsProvider()
     {
         return array_map(
-            function (string $excludedRootDir) {
+            static function (string $excludedRootDir) {
                 return [$excludedRootDir, [$excludedRootDir, 'src']];
             },
             ExcludeDirsProvider::EXCLUDED_ROOT_DIRS

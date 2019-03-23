@@ -70,7 +70,7 @@ final class TimeoutProvider
         $questionText = $this->consoleHelper->getQuestion('Single test suite timeout in seconds', InfectionConfig::PROCESS_TIMEOUT_SECONDS);
 
         $timeoutQuestion = new Question($questionText, InfectionConfig::PROCESS_TIMEOUT_SECONDS);
-        $timeoutQuestion->setValidator(function ($answer) {
+        $timeoutQuestion->setValidator(static function ($answer) {
             if (!$answer || !is_numeric($answer) || (int) $answer <= 0) {
                 throw new \RuntimeException('Timeout should be an integer greater than 0');
             }

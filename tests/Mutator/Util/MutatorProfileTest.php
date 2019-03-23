@@ -144,7 +144,7 @@ final class MutatorProfileTest extends TestCase
 
         return array_filter(
             $reflectionClass->getConstants(),
-            function (string $constantName) use ($excludedConstants): bool {
+            static function (string $constantName) use ($excludedConstants): bool {
                 return !\in_array($constantName, $excludedConstants, true);
             },
             ARRAY_FILTER_USE_KEY
