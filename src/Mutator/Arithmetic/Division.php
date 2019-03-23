@@ -56,6 +56,31 @@ final class Division extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\Div;
+        if (!$node instanceof Node\Expr\BinaryOp\Div) {
+            return false;
+        }
+
+        if ($this->isNumericOne($node->left) || $this->isNumericOne($node->right)) {
+            return false;
+        }
+
+        if ($node->left instanceof Node\Expr\UnaryMinus && $this->isNumericOne($node->left->expr)) {
+            return false;
+        }
+
+        if ($node->right instanceof Node\Expr\UnaryMinus && $this->isNumericOne($node->right->expr)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function isNumericOne(Node $node): bool
+    {
+        if ($node instanceof Node\Scalar\LNumber && $node->value === 1) {
+            return true;
+        }
+
+        return $node instanceof Node\Scalar\DNumber && $node->value === 1.0;
     }
 }
