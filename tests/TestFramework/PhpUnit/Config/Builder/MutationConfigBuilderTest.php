@@ -151,7 +151,7 @@ final class MutationConfigBuilderTest extends TestCase
         );
 
         $this->assertSame($expectedCustomAutoloadFilePath, $resultAutoLoaderFilePath);
-        $this->assertContains('app/autoload2.php', file_get_contents($expectedCustomAutoloadFilePath));
+        $this->assertStringContainsString('app/autoload2.php', file_get_contents($expectedCustomAutoloadFilePath));
     }
 
     public function test_it_sets_custom_autoloader_when_attribute_is_absent(): void
@@ -181,7 +181,7 @@ final class MutationConfigBuilderTest extends TestCase
         );
 
         $this->assertSame($expectedCustomAutoloadFilePath, $resultAutoLoaderFilePath);
-        $this->assertContains('vendor/autoload.php', file_get_contents($expectedCustomAutoloadFilePath));
+        $this->assertStringContainsString('vendor/autoload.php', file_get_contents($expectedCustomAutoloadFilePath));
     }
 
     public function test_it_sets_stop_on_failure_flag(): void

@@ -107,7 +107,7 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
     {
         $before = file_get_contents(self::$files[1]);
         // Sanity check
-        $this->assertContains('1', $before);
+        $this->assertStringContainsString('1', $before);
 
         IncludeInterceptor::intercept(self::$files[1], self::$files[2]);
         IncludeInterceptor::enable();

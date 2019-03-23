@@ -116,7 +116,7 @@ final class MutationConfigBuilderTest extends TestCase
         $builder = new MutationConfigBuilder($this->tmpDir, $originalYamlConfigPath, $projectDir);
 
         $this->assertSame($this->tmpDir . '/phpspecConfiguration.a1b2c3.infection.yml', $builder->build($mutant));
-        $this->assertContains(
+        $this->assertStringContainsString(
             "require_once '/project/dir/bootstrap.php';",
             file_get_contents($this->tmpDir . '/interceptor.phpspec.autoload.a1b2c3.infection.php')
         );
