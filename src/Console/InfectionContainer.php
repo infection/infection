@@ -97,7 +97,7 @@ final class InfectionContainer extends Container
             return $this->getInfectionConfig()->getPhpUnitConfigDir();
         };
 
-        $this['filesystem'] = function (): Filesystem {
+        $this['filesystem'] = static function (): Filesystem {
             return new Filesystem();
         };
 
@@ -153,13 +153,13 @@ final class InfectionContainer extends Container
             );
         };
 
-        $this['differ'] = function (): Differ {
+        $this['differ'] = static function (): Differ {
             return new Differ(
                 new BaseDiffer()
             );
         };
 
-        $this['dispatcher'] = function (): EventDispatcherInterface {
+        $this['dispatcher'] = static function (): EventDispatcherInterface {
             return new EventDispatcher();
         };
 
@@ -173,7 +173,7 @@ final class InfectionContainer extends Container
             );
         };
 
-        $this['diff.colorizer'] = function (): DiffColorizer {
+        $this['diff.colorizer'] = static function (): DiffColorizer {
             return new DiffColorizer();
         };
 
@@ -183,11 +183,11 @@ final class InfectionContainer extends Container
             );
         };
 
-        $this['version.parser'] = function (): VersionParser {
+        $this['version.parser'] = static function (): VersionParser {
             return new VersionParser();
         };
 
-        $this['lexer'] = function (): Lexer {
+        $this['lexer'] = static function (): Lexer {
             return new Lexer\Emulative([
                 'usedAttributes' => [
                     'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
@@ -199,7 +199,7 @@ final class InfectionContainer extends Container
             return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $this['lexer']);
         };
 
-        $this['pretty.printer'] = function (): Standard {
+        $this['pretty.printer'] = static function (): Standard {
             return new Standard();
         };
 
@@ -209,19 +209,19 @@ final class InfectionContainer extends Container
             return (new MutatorsGenerator($mutatorConfig))->generate();
         };
 
-        $this['metrics'] = function (): MetricsCalculator {
+        $this['metrics'] = static function (): MetricsCalculator {
             return new MetricsCalculator();
         };
 
-        $this['timer'] = function (): Timer {
+        $this['timer'] = static function (): Timer {
             return new Timer();
         };
 
-        $this['time.formatter'] = function (): TimeFormatter {
+        $this['time.formatter'] = static function (): TimeFormatter {
             return new TimeFormatter();
         };
 
-        $this['memory.formatter'] = function (): MemoryFormatter {
+        $this['memory.formatter'] = static function (): MemoryFormatter {
             return new MemoryFormatter();
         };
 
@@ -254,7 +254,7 @@ final class InfectionContainer extends Container
                 : sprintf('%s/%s', getcwd(), $existingCoveragePath);
         };
 
-        $this['coverage.checker'] = function () use ($input): CoverageRequirementChecker {
+        $this['coverage.checker'] = static function () use ($input): CoverageRequirementChecker {
             return new CoverageRequirementChecker(
                 \strlen(trim($input->getOption('coverage'))) > 0,
                 $input->getOption('initial-tests-php-options')

@@ -65,7 +65,7 @@ final class PerformanceLoggerSubscriberTest extends TestCase
     {
         $this->output->expects($this->once())
             ->method('writeln')
-            ->with($this->callback(function ($parameter) {
+            ->with($this->callback(static function ($parameter) {
                 return \is_array($parameter) && '' === $parameter[0] && 0 === strpos($parameter[1], 'Time:');
             }));
 

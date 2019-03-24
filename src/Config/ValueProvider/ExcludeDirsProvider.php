@@ -103,7 +103,7 @@ final class ExcludeDirsProvider
             $globDirs = array_filter(glob($sourceDirs[0] . '/*'), 'is_dir');
 
             $autocompleteValues = array_map(
-                function (string $dir) use ($sourceDirs) {
+                static function (string $dir) use ($sourceDirs) {
                     return str_replace($sourceDirs[0] . '/', '', $dir);
                 },
                 $globDirs
@@ -125,7 +125,7 @@ final class ExcludeDirsProvider
 
     private function getValidator(Locator $locator)
     {
-        return function ($answer) use ($locator) {
+        return static function ($answer) use ($locator) {
             if (!$answer || strpos($answer, '*') !== false) {
                 return $answer;
             }

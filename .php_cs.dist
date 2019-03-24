@@ -63,6 +63,7 @@ return \PhpCsFixer\Config::create()
             'style' => 'prefix',
             'case' => 'snake',
         ],
+        'static_lambda' => true,
         'strict_comparison' => true,
         'yoda_style' => false,
     ])

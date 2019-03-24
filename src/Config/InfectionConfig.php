@@ -189,7 +189,7 @@ class InfectionConfig
                 $excludedDirs = array_merge(
                     $excludedDirs,
                     array_map(
-                        function ($excludeDir) use ($srcDir) {
+                        static function ($excludeDir) use ($srcDir) {
                             return ltrim(
                                 substr_replace($excludeDir, '', 0, \strlen($srcDir)),
                                 \DIRECTORY_SEPARATOR

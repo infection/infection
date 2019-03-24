@@ -115,7 +115,7 @@ abstract class FileLogger implements MutationTestingResultsLogger
      */
     final protected function sortProcesses(array &$processes): void
     {
-        usort($processes, function (MutantProcessInterface $a, MutantProcessInterface $b): int {
+        usort($processes, static function (MutantProcessInterface $a, MutantProcessInterface $b): int {
             if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
                 return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
             }
