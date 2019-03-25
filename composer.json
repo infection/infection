@@ -60,7 +60,8 @@
         "symfony/process": "3.4.2"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.5"
+        "phpunit/phpunit": "^7.5",
+        "ext-bcmath": "*"
     },
     "config": {
         "platform": {
