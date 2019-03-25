@@ -232,6 +232,10 @@ final class MutatorProfile
         Mutator\Unwrap\UnwrapUcWords::class,
     ];
 
+    public const EXTENSIONS = [
+        Mutator\Extensions\BCMath::class,
+    ];
+
     public const DEFAULT = [
         '@arithmetic',
         '@boolean',
@@ -395,5 +399,8 @@ final class MutatorProfile
         'UnwrapTrim' => Mutator\Unwrap\UnwrapTrim::class,
         'UnwrapUcFirst' => Mutator\Unwrap\UnwrapUcFirst::class,
         'UnwrapUcWords' => Mutator\Unwrap\UnwrapUcWords::class,
+
+        // Extensions
+        'BCMath' => Mutator\Extensions\BCMath::class,
     ];
 }
