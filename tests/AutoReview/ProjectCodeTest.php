@@ -349,7 +349,7 @@ final class ProjectCodeTest extends TestCase
          * we're exteding from. E.g. we can't change Symfony\Component\Process\Process to not have
          * a public propery it has.
          */
-        $properties = array_filter($properties, function (\ReflectionProperty $property) use ($className) {
+        $properties = array_filter($properties, static function (\ReflectionProperty $property) use ($className) {
             return $property->class === $className;
         });
 
@@ -489,7 +489,7 @@ final class ProjectCodeTest extends TestCase
     private function getConcreteSrcClasses(): array
     {
         return array_filter($this->getSrcClasses(),
-            function ($class) {
+            static function ($class) {
                 $rc = new \ReflectionClass($class);
 
                 return !$rc->isInterface() && !$rc->isAbstract() && !$rc->isTrait();

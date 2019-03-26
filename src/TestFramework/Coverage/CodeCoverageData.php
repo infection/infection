@@ -90,7 +90,7 @@ class CodeCoverageData
 
         $coveredLineTestMethods = array_filter(
             $coverageData[$filePath]['byLine'],
-            function ($testMethods) {
+            static function ($testMethods) {
                 return \count($testMethods) > 0;
             }
         );
