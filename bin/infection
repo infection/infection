@@ -6,12 +6,13 @@
  * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
  */
 $autoloaderInWorkingDirectory = getcwd() . '/vendor/autoload.php';
-$vendorDir = exec('composer config vendor-dir');
 
 if (is_file($autoloaderInWorkingDirectory)) {
     require_once $autoloaderInWorkingDirectory;
-} elseif ($vendorDir !== '' && is_file(getcwd() . '/' . $vendorDir . '/autoload.php')) {
-    require_once getcwd() . '/' . $vendorDir . '/autoload.php';
+} elseif ($vendorDir = exec('composer config vendor-dir')) {
+    if (is_file(getcwd() . '/' . $vendorDir . '/autoload.php')) {
+        require_once getcwd() . '/' . $vendorDir . '/autoload.php';
+    }
 }
 unset($autoloaderInWorkingDirectory);
 
