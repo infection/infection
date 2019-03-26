@@ -103,7 +103,7 @@ final class MBString extends Mutator
             'mb_convert_case' => $this->mapConvertCase(),
         ];
 
-        $functionsToRemove = \array_filter($functionsMap, function ($isOn) {
+        $functionsToRemove = \array_filter($functionsMap, static function ($isOn) {
             return !$isOn;
         });
 
