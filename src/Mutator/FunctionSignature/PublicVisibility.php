@@ -95,45 +95,10 @@ final class PublicVisibility extends Mutator
             return true;
         }
 
-        return $this->hasSamePublicMethodInInterface($node, $reflection) || $this->hasSamePublicMethodInParentClass($node, $reflection);
-    }
-
-    private function hasSamePublicMethodInInterface(Node $node, \ReflectionClass $reflection): bool
-    {
-        foreach ($reflection->getInterfaces() as $reflectionInterface) {
-            try {
-                $method = $reflectionInterface->getMethod($node->name->name);
-
-                if ($method->isPublic()) {
-                    // we can't mutate because interface requires the same public visibility
-                    return true;
-                }
-            } catch (\ReflectionException $e) {
-                continue;
-            }
+        try {
+            return $reflection->getMethod($node->name->name)->getPrototype()->isPublic();
+        } catch (\ReflectionException $e) {
+            return false;
         }
-
-        return false;
-    }
-
-    private function hasSamePublicMethodInParentClass(Node $node, \ReflectionClass $reflection): bool
-    {
-        $parent = $reflection->getParentClass();
-
-        while ($parent) {
-            try {
-                $method = $parent->getMethod($node->name->name);
-
-                if ($method->isPublic()) {
-                    return true;
-                }
-            } catch (\ReflectionException $e) {
-                return false;
-            } finally {
-                $parent = $parent->getParentClass();
-            }
-        }
-
-        return false;
     }
 }
