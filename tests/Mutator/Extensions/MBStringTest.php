@@ -43,6 +43,11 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
  */
 final class MBStringTest extends AbstractMutatorTestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        self::defineMissingMbCaseConstants();
+    }
+
     /**
      * @dataProvider provideMutationCases
      */
@@ -421,5 +426,20 @@ final class MBStringTest extends AbstractMutatorTestCase
         yield 'It does not convert mb_convert_case with missing mode argument' => [
             "<?php mb_convert_case('test');",
         ];
+    }
+
+    private static function defineMissingMbCaseConstants(): void
+    {
+        foreach ([
+            'MB_CASE_FOLD' => 3,
+            'MB_CASE_UPPER_SIMPLE' => 4,
+            'MB_CASE_LOWER_SIMPLE' => 5,
+            'MB_CASE_TITLE_SIMPLE' => 6,
+            'MB_CASE_FOLD_SIMPLE' => 7,
+        ] as $constantName => $constantValue) {
+            if (!\defined($constantName)) {
+                \define($constantName, $constantValue);
+            }
+        }
     }
 }

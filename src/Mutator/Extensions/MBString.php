@@ -45,17 +45,6 @@ use PhpParser\Node;
  */
 final class MBString extends Mutator
 {
-    private const MB_CASES = [
-        'MB_CASE_UPPER' => 0,
-        'MB_CASE_LOWER' => 1,
-        'MB_CASE_TITLE' => 2,
-        'MB_CASE_FOLD' => 3,
-        'MB_CASE_UPPER_SIMPLE' => 4,
-        'MB_CASE_LOWER_SIMPLE' => 5,
-        'MB_CASE_TITLE_SIMPLE' => 6,
-        'MB_CASE_FOLD_SIMPLE' => 7,
-    ];
-
     private $converters;
 
     public function __construct(MutatorConfig $config)
@@ -83,23 +72,23 @@ final class MBString extends Mutator
     private function setupConverters(array $functionsMap): void
     {
         $converters = [
-            'mb_chr' => $this->mapNameSkipArg('chr', 1),
-            'mb_ord' => $this->mapNameSkipArg('ord', 1),
-            'mb_parse_str' => $this->mapName('parse_str'),
-            'mb_send_mail' => $this->mapName('mail'),
-            'mb_strcut' => $this->mapNameSkipArg('substr', 3),
-            'mb_stripos' => $this->mapNameSkipArg('stripos', 3),
-            'mb_stristr' => $this->mapNameSkipArg('stristr', 3),
-            'mb_strlen' => $this->mapNameSkipArg('strlen', 1),
-            'mb_strpos' => $this->mapNameSkipArg('strpos', 3),
-            'mb_strrchr' => $this->mapNameSkipArg('strrchr', 2),
-            'mb_strripos' => $this->mapNameSkipArg('strripos', 3),
-            'mb_strrpos' => $this->mapNameSkipArg('strrpos', 3),
-            'mb_strstr' => $this->mapNameSkipArg('strstr', 3),
-            'mb_strtolower' => $this->mapNameSkipArg('strtolower', 1),
-            'mb_strtoupper' => $this->mapNameSkipArg('strtoupper', 1),
-            'mb_substr_count' => $this->mapNameSkipArg('substr_count', 2),
-            'mb_substr' => $this->mapNameSkipArg('substr', 3),
+            'mb_chr' => $this->mapFunctionAndRemoveExtraArgs('chr', 1),
+            'mb_ord' => $this->mapFunctionAndRemoveExtraArgs('ord', 1),
+            'mb_parse_str' => $this->mapFunction('parse_str'),
+            'mb_send_mail' => $this->mapFunction('mail'),
+            'mb_strcut' => $this->mapFunctionAndRemoveExtraArgs('substr', 3),
+            'mb_stripos' => $this->mapFunctionAndRemoveExtraArgs('stripos', 3),
+            'mb_stristr' => $this->mapFunctionAndRemoveExtraArgs('stristr', 3),
+            'mb_strlen' => $this->mapFunctionAndRemoveExtraArgs('strlen', 1),
+            'mb_strpos' => $this->mapFunctionAndRemoveExtraArgs('strpos', 3),
+            'mb_strrchr' => $this->mapFunctionAndRemoveExtraArgs('strrchr', 2),
+            'mb_strripos' => $this->mapFunctionAndRemoveExtraArgs('strripos', 3),
+            'mb_strrpos' => $this->mapFunctionAndRemoveExtraArgs('strrpos', 3),
+            'mb_strstr' => $this->mapFunctionAndRemoveExtraArgs('strstr', 3),
+            'mb_strtolower' => $this->mapFunctionAndRemoveExtraArgs('strtolower', 1),
+            'mb_strtoupper' => $this->mapFunctionAndRemoveExtraArgs('strtoupper', 1),
+            'mb_substr_count' => $this->mapFunctionAndRemoveExtraArgs('substr_count', 2),
+            'mb_substr' => $this->mapFunctionAndRemoveExtraArgs('substr', 3),
             'mb_convert_case' => $this->mapConvertCase(),
         ];
 
@@ -110,17 +99,17 @@ final class MBString extends Mutator
         $this->converters = \array_diff_key($converters, $functionsToRemove);
     }
 
-    private function mapName(string $functionName): callable
+    private function mapFunction(string $newFunctionName): callable
     {
-        return function (Node\Expr\FuncCall $node) use ($functionName): Generator {
-            yield $this->createNode($node, $functionName, $node->args);
+        return function (Node\Expr\FuncCall $node) use ($newFunctionName): Generator {
+            yield $this->mapFunctionCall($node, $newFunctionName, $node->args);
         };
     }
 
-    private function mapNameSkipArg(string $functionName, int $skipArgs): callable
+    private function mapFunctionAndRemoveExtraArgs(string $newFunctionName, int $argsAtMost): callable
     {
-        return function (Node\Expr\FuncCall $node) use ($functionName, $skipArgs): Generator {
-            yield $this->createNode($node, $functionName, \array_slice($node->args, 0, $skipArgs));
+        return function (Node\Expr\FuncCall $node) use ($newFunctionName, $argsAtMost): Generator {
+            yield $this->mapFunctionCall($node, $newFunctionName, \array_slice($node->args, 0, $argsAtMost));
         };
     }
 
@@ -139,7 +128,7 @@ final class MBString extends Mutator
                 return;
             }
 
-            yield $this->createNode($node, $functionName, [$node->args[0]]);
+            yield $this->mapFunctionCall($node, $functionName, [$node->args[0]]);
         };
     }
 
@@ -151,18 +140,12 @@ final class MBString extends Mutator
 
         $mode = $node->args[1]->value;
 
-        if ($mode instanceof Node\Expr\ConstFetch) {
-            $modeName = $mode->name->toString();
-
-            if (\defined($modeName)) {
-                return \constant($modeName);
-            }
-
-            if (isset(self::MB_CASES[$modeName])) {
-                return self::MB_CASES[$modeName];
-            }
-        } elseif ($mode instanceof Node\Scalar\LNumber) {
+        if ($mode instanceof Node\Scalar\LNumber) {
             return $mode->value;
+        }
+
+        if ($mode instanceof Node\Expr\ConstFetch) {
+            return \constant($mode->name->toString());
         }
 
         return null;
@@ -187,9 +170,13 @@ final class MBString extends Mutator
 
     private function isInMbCaseMode(int $mode, string ...$cases): bool
     {
-        $modes = \array_flip(self::MB_CASES);
+        foreach ($cases as $constant) {
+            if (\defined($constant) && \constant($constant) === $mode) {
+                return true;
+            }
+        }
 
-        return isset($modes[$mode]) && \in_array($modes[$mode], $cases);
+        return false;
     }
 
     private function getFunctionName(Node $node): ?string
@@ -198,13 +185,13 @@ final class MBString extends Mutator
             return null;
         }
 
-        return \strtolower($node->name->toString());
+        return $node->name->toLowerString();
     }
 
-    private function createNode(Node\Expr\FuncCall $node, string $functionName, array $args): Node\Expr\FuncCall
+    private function mapFunctionCall(Node\Expr\FuncCall $node, string $newFuncName, array $args): Node\Expr\FuncCall
     {
         return new Node\Expr\FuncCall(
-            new Node\Name($functionName, $node->name->getAttributes()),
+            new Node\Name($newFuncName, $node->name->getAttributes()),
             $args,
             $node->getAttributes()
         );
