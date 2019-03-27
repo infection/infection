@@ -9,7 +9,9 @@ $autoloaderInWorkingDirectory = getcwd() . '/vendor/autoload.php';
 
 if (is_file($autoloaderInWorkingDirectory)) {
     require_once $autoloaderInWorkingDirectory;
-} elseif ($vendorDir = exec('composer config vendor-dir')) {
+} else {
+    $vendorDir = exec('composer config vendor-dir');
+
     if (is_file(getcwd() . '/' . $vendorDir . '/autoload.php')) {
         require_once getcwd() . '/' . $vendorDir . '/autoload.php';
     }
