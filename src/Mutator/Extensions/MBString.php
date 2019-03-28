@@ -57,16 +57,22 @@ final class MBString extends Mutator
     }
 
     /**
+     * @param Node\Expr\FuncCall $node
+     *
      * @return Node|Node[]|Generator
      */
     public function mutate(Node $node)
     {
-        yield from $this->converters[$this->getFunctionName($node)]($node);
+        yield from $this->converters[$node->name->toLowerString()]($node);
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        return isset($this->converters[$this->getFunctionName($node)]);
+        if (!$node instanceof Node\Expr\FuncCall || !$node->name instanceof Node\Name) {
+            return false;
+        }
+
+        return isset($this->converters[$node->name->toLowerString()]);
     }
 
     private function setupConverters(array $functionsMap): void
@@ -177,15 +183,6 @@ final class MBString extends Mutator
         }
 
         return false;
-    }
-
-    private function getFunctionName(Node $node): ?string
-    {
-        if (!$node instanceof Node\Expr\FuncCall || !$node->name instanceof Node\Name) {
-            return null;
-        }
-
-        return $node->name->toLowerString();
     }
 
     private function mapFunctionCall(Node\Expr\FuncCall $node, string $newFuncName, array $args): Node\Expr\FuncCall
