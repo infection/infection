@@ -71,6 +71,10 @@ final class JsonFile
 
     private function parse(): void
     {
+        if (!is_file($this->path)) {
+            throw ParseException::invalidJson($this->path, 'file not found');
+        }
+
         $data = json_decode((string) file_get_contents($this->path));
 
         if (null === $data && JSON_ERROR_NONE !== json_last_error()) {
