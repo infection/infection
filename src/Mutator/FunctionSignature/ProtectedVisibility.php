@@ -95,22 +95,10 @@ final class ProtectedVisibility extends Mutator
             return true;
         }
 
-        $parent = $reflection->getParentClass();
-
-        while ($parent) {
-            try {
-                $method = $parent->getMethod($node->name->name);
-
-                if ($method->isProtected()) {
-                    return true;
-                }
-            } catch (\ReflectionException $e) {
-                return false;
-            } finally {
-                $parent = $parent->getParentClass();
-            }
+        try {
+            return $reflection->getMethod($node->name->name)->getPrototype()->isProtected();
+        } catch (\ReflectionException $e) {
+            return false;
         }
-
-        return false;
     }
 }
