@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^6.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Initial_Configuration\\": "Initial_Configuration/"
+        }
+    },
+    "autoload-dev": {
+        "psr-0": {
+            "Initial_Configuration": "tests/"
+        }
+    }
+}

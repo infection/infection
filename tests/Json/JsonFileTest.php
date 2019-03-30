@@ -101,6 +101,16 @@ final class JsonFileTest extends TestCase
         (new JsonFile($jsonPath))->decode();
     }
 
+    public function test_it_throws_parse_exception_when_file_is_not_found(): void
+    {
+        $jsonPath = $this->tmpDir . '/missing-invalid.json';
+        self::assertFileNotExists($jsonPath);
+
+        self::expectException(ParseException::class);
+
+        (new JsonFile($jsonPath))->decode();
+    }
+
     public function test_it_throws_schema_validation_exception(): void
     {
         $jsonString = '{"timeout": 25}';
