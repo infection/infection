@@ -126,6 +126,11 @@ final class MBStringTest extends AbstractMutatorTestCase
             "<?php\n\nchr(74);",
         ];
 
+        yield 'It converts correctly when mb_chr is wrongly capitalized' => [
+            '<?php mB_cHr(74);',
+            "<?php\n\nchr(74);",
+        ];
+
         yield 'It converts mb_chr with encoding to chr' => [
             "<?php mb_chr(74, 'utf-8');",
             "<?php\n\nchr(74);",
@@ -136,6 +141,11 @@ final class MBStringTest extends AbstractMutatorTestCase
     {
         yield 'It converts mb_ord to ord' => [
             "<?php mb_ord('T');",
+            "<?php\n\nord('T');",
+        ];
+
+        yield 'It converts correctly when mb_ord is wrongly capitalized' => [
+            "<?php MB_ord('T');",
             "<?php\n\nord('T');",
         ];
 
@@ -152,6 +162,11 @@ final class MBStringTest extends AbstractMutatorTestCase
             "<?php\n\nparse_str('T');",
         ];
 
+        yield 'It converts correctly when mb_parse_str is wrongly capitalize' => [
+            "<?php mb_pARse_Str('T');",
+            "<?php\n\nparse_str('T');",
+        ];
+
         yield 'It converts mb_parse_str with params argument to parse_str' => [
             "<?php mb_parse_str('T', \$params);",
             "<?php\n\nparse_str('T', \$params);",
@@ -165,6 +180,11 @@ final class MBStringTest extends AbstractMutatorTestCase
             "<?php\n\nmail('to', 'subject', 'msg');",
         ];
 
+        yield 'It converts correctly when mb_send_mail is wrongly capitalize' => [
+            "<?php mb_SEND_mail('to', 'subject', 'msg');",
+            "<?php\n\nmail('to', 'subject', 'msg');",
+        ];
+
         yield 'It converts mb_send_mail with additional parameters to mail' => [
             "<?php mb_send_mail('to', 'subject', 'msg', [], []);",
             "<?php\n\nmail('to', 'subject', 'msg', [], []);",
@@ -175,6 +195,11 @@ final class MBStringTest extends AbstractMutatorTestCase
     {
         yield 'It converts mb_strcut to substr' => [
             "<?php mb_strcut('subject', 1);",
+            "<?php\n\nsubstr('subject', 1);",
+        ];
+
+        yield 'It converts correctly when mb_strcut is wrongly capitalize' => [
+            "<?php MB_strcut('subject', 1);",
             "<?php\n\nsubstr('subject', 1);",
         ];
 
@@ -196,6 +221,11 @@ final class MBStringTest extends AbstractMutatorTestCase
             "<?php\n\nstrpos('subject', 'b');",
         ];
 
+        yield 'It converts correctly when mb_strpos is wrongly capitalize' => [
+            "<?php mb_StRpOs('subject', 'b');",
+            "<?php\n\nstrpos('subject', 'b');",
+        ];
+
         yield 'It converts mb_strpos with offset to strpos' => [
             "<?php mb_strpos('subject', 'b', 3);",
             "<?php\n\nstrpos('subject', 'b', 3);",
@@ -211,6 +241,11 @@ final class MBStringTest extends AbstractMutatorTestCase
     {
         yield 'It converts mb_stripos to stripos' => [
             "<?php mb_stripos('subject', 'b');",
+            "<?php\n\nstripos('subject', 'b');",
+        ];
+
+        yield 'It converts correctly when mb_stripos is wrongly capitalize' => [
+            "<?php mB_sTRIpos('subject', 'b');",
             "<?php\n\nstripos('subject', 'b');",
         ];
 
@@ -232,6 +267,11 @@ final class MBStringTest extends AbstractMutatorTestCase
             "<?php\n\nstristr('subject', 'b');",
         ];
 
+        yield 'It converts correctly when mb_stristr is wrongly capitalize' => [
+            "<?php mb_strISTR('subject', 'b');",
+            "<?php\n\nstristr('subject', 'b');",
+        ];
+
         yield 'It converts mb_stristr with part argument to stristr' => [
             "<?php mb_stristr('subject', 'b', false);",
             "<?php\n\nstristr('subject', 'b', false);",
@@ -247,6 +287,11 @@ final class MBStringTest extends AbstractMutatorTestCase
     {
         yield 'It converts mb_strripos to strripos' => [
             "<?php mb_strripos('subject', 'b');",
+            "<?php\n\nstrripos('subject', 'b');",
+        ];
+
+        yield 'It converts correctly when mb_strripos is wrongly capitalize' => [
+            "<?php MB_sTrRipos('subject', 'b');",
             "<?php\n\nstrripos('subject', 'b');",
         ];
 
@@ -268,6 +313,11 @@ final class MBStringTest extends AbstractMutatorTestCase
             "<?php\n\nstrrpos('subject', 'b');",
         ];
 
+        yield 'It converts correctly when mb_strrpos is wrongly capitalize' => [
+            "<?php mb_StRrPos('subject', 'b');",
+            "<?php\n\nstrrpos('subject', 'b');",
+        ];
+
         yield 'It converts mb_strrpos with offset argument to strrpos' => [
             "<?php mb_strrpos('subject', 'b', 2);",
             "<?php\n\nstrrpos('subject', 'b', 2);",
@@ -283,6 +333,11 @@ final class MBStringTest extends AbstractMutatorTestCase
     {
         yield 'It converts mb_strstr to strstr' => [
             "<?php mb_strstr('subject', 'b');",
+            "<?php\n\nstrstr('subject', 'b');",
+        ];
+
+        yield 'It converts correctly when mb_strstr is wrongly capitalize' => [
+            "<?php Mb_STRstr('subject', 'b');",
             "<?php\n\nstrstr('subject', 'b');",
         ];
 
@@ -304,6 +359,11 @@ final class MBStringTest extends AbstractMutatorTestCase
             "<?php\n\nstrtolower('test');",
         ];
 
+        yield 'It converts correctly when mb_strtolower is wrongly capitalize' => [
+            "<?php mB_StrTOloWer('test');",
+            "<?php\n\nstrtolower('test');",
+        ];
+
         yield 'It converts mb_strtolower with encoding to strtolower' => [
             "<?php mb_strtolower('test', 'utf-8');",
             "<?php\n\nstrtolower('test');",
@@ -314,6 +374,11 @@ final class MBStringTest extends AbstractMutatorTestCase
     {
         yield 'It converts mb_strtoupper to strtoupper' => [
             "<?php mb_strtoupper('test');",
+            "<?php\n\nstrtoupper('test');",
+        ];
+
+        yield 'It converts correctly when mb_strtoupper is wrongly capitalize' => [
+            "<?php Mb_StrToupPer('test');",
             "<?php\n\nstrtoupper('test');",
         ];
 
@@ -330,6 +395,11 @@ final class MBStringTest extends AbstractMutatorTestCase
             "<?php\n\nsubstr_count('test', 't');",
         ];
 
+        yield 'It converts correctly when mb_substr_count is wrongly capitalize' => [
+            "<?php MB_substr_COunt('test', 't');",
+            "<?php\n\nsubstr_count('test', 't');",
+        ];
+
         yield 'It converts mb_substr_count with encoding to substr_count' => [
             "<?php mb_substr_count('test', 't', 'utf-8');",
             "<?php\n\nsubstr_count('test', 't');",
@@ -340,6 +410,11 @@ final class MBStringTest extends AbstractMutatorTestCase
     {
         yield 'It converts mb_substr to substr' => [
             "<?php mb_substr('test', 2);",
+            "<?php\n\nsubstr('test', 2);",
+        ];
+
+        yield 'It converts correctly when mb_substr is wrongly capitalize' => [
+            "<?php mB_SuBsTr('test', 2);",
             "<?php\n\nsubstr('test', 2);",
         ];
 
@@ -361,6 +436,11 @@ final class MBStringTest extends AbstractMutatorTestCase
             "<?php\n\nstrrchr('subject', 'b');",
         ];
 
+        yield 'It converts correctly when mb_strrchr is wrongly capitalize' => [
+            "<?php MB_StRrcHr('subject', 'b');",
+            "<?php\n\nstrrchr('subject', 'b');",
+        ];
+
         yield 'It converts mb_strrchr with part argument to strrchr' => [
             "<?php mb_strrchr('subject', 'b', false);",
             "<?php\n\nstrrchr('subject', 'b');",
@@ -376,6 +456,11 @@ final class MBStringTest extends AbstractMutatorTestCase
     {
         yield 'It converts mb_convert_case with MB_CASE_UPPER mode to strtoupper' => [
             "<?php mb_convert_case('test', MB_CASE_UPPER);",
+            "<?php\n\nstrtoupper('test');",
+        ];
+
+        yield 'It converts correctly when mb_parse_str is wrongly capitalize' => [
+            "<?php Mb_CoNvErT_Case('test', MB_CASE_UPPER);",
             "<?php\n\nstrtoupper('test');",
         ];
 
