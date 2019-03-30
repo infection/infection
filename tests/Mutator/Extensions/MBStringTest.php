@@ -135,6 +135,10 @@ final class MBStringTest extends AbstractMutatorTestCase
             "<?php mb_chr(74, 'utf-8');",
             "<?php\n\nchr(74);",
         ];
+
+        yield 'It does not mutate mb_chr called via variable' => [
+            '<?php $a = "mb_chr"; $a(74);',
+        ];
     }
 
     private function provideMutationCasesForOrd(): Generator
@@ -152,6 +156,10 @@ final class MBStringTest extends AbstractMutatorTestCase
         yield 'It converts mb_ord with encoding to ord' => [
             "<?php mb_ord('T', 'utf-8');",
             "<?php\n\nord('T');",
+        ];
+
+        yield 'It does not mutate mb_ord called via variable' => [
+            '<?php $a = "mb_ord"; $a("T");',
         ];
     }
 
@@ -171,6 +179,10 @@ final class MBStringTest extends AbstractMutatorTestCase
             "<?php mb_parse_str('T', \$params);",
             "<?php\n\nparse_str('T', \$params);",
         ];
+
+        yield 'It does not mutate mb_parse_str called via variable' => [
+            '<?php $a = "mb_parse_str"; $a("T");',
+        ];
     }
 
     private function provideMutationCasesForSendMail(): Generator
@@ -188,6 +200,10 @@ final class MBStringTest extends AbstractMutatorTestCase
         yield 'It converts mb_send_mail with additional parameters to mail' => [
             "<?php mb_send_mail('to', 'subject', 'msg', [], []);",
             "<?php\n\nmail('to', 'subject', 'msg', [], []);",
+        ];
+
+        yield 'It does not mutate mb_send_mail called via variable' => [
+            '<?php $a = "mb_send_mail"; $a("to", "subject", "msg");',
         ];
     }
 
@@ -212,6 +228,10 @@ final class MBStringTest extends AbstractMutatorTestCase
             "<?php mb_strcut('subject', 1, 20, 'utf-8');",
             "<?php\n\nsubstr('subject', 1, 20);",
         ];
+
+        yield 'It does not mutate mb_strcut called via variable' => [
+            '<?php $a = "mb_strcut"; $a("subject", 1);',
+        ];
     }
 
     private function provideMutationCasesForStrPos(): Generator
@@ -234,6 +254,10 @@ final class MBStringTest extends AbstractMutatorTestCase
         yield 'It converts mb_strpos with encoding to strpos' => [
             "<?php mb_strpos('subject', 'b', 3, 'utf-8');",
             "<?php\n\nstrpos('subject', 'b', 3);",
+        ];
+
+        yield 'It does not mutate mb_strpos called via variable' => [
+            '<?php $a = "mb_strpos"; $a("subject", "b");',
         ];
     }
 
@@ -258,6 +282,10 @@ final class MBStringTest extends AbstractMutatorTestCase
             "<?php mb_stripos('subject', 'b', 3, 'utf-8');",
             "<?php\n\nstripos('subject', 'b', 3);",
         ];
+
+        yield 'It does not mutate mb_stripos called via variable' => [
+            '<?php $a = "mb_stripos"; $a("subject", "b");',
+        ];
     }
 
     private function provideMutationCasesForStrIStr(): Generator
@@ -280,6 +308,10 @@ final class MBStringTest extends AbstractMutatorTestCase
         yield 'It converts mb_stristr with encoding to stristr' => [
             "<?php mb_stristr('subject', 'b', false, 'utf-8');",
             "<?php\n\nstristr('subject', 'b', false);",
+        ];
+
+        yield 'It does not mutate mb_stristr called via variable' => [
+            '<?php $a = "mb_stristr"; $a("subject", "b");',
         ];
     }
 
@@ -304,6 +336,10 @@ final class MBStringTest extends AbstractMutatorTestCase
             "<?php mb_strripos('subject', 'b', 2, 'utf-8');",
             "<?php\n\nstrripos('subject', 'b', 2);",
         ];
+
+        yield 'It does not mutate mb_strripos called via variable' => [
+            '<?php $a = "mb_strripos"; $a("subject", "b");',
+        ];
     }
 
     private function provideMutationCasesForStrRPos(): Generator
@@ -326,6 +362,10 @@ final class MBStringTest extends AbstractMutatorTestCase
         yield 'It converts mb_strrpos with encoding to strrpos' => [
             "<?php mb_strrpos('subject', 'b', 2, 'utf-8');",
             "<?php\n\nstrrpos('subject', 'b', 2);",
+        ];
+
+        yield 'It does not mutate mb_strrpos called via variable' => [
+            '<?php $a = "mb_strrpos"; $a("subject", "b");',
         ];
     }
 
@@ -350,6 +390,10 @@ final class MBStringTest extends AbstractMutatorTestCase
             "<?php mb_strstr('subject', 'b', false, 'utf-8');",
             "<?php\n\nstrstr('subject', 'b', false);",
         ];
+
+        yield 'It does not mutate mb_strstr called via variable' => [
+            '<?php $a = "mb_strstr"; $a("subject", "b");',
+        ];
     }
 
     private function provideMutationCasesForStrToLower(): Generator
@@ -367,6 +411,10 @@ final class MBStringTest extends AbstractMutatorTestCase
         yield 'It converts mb_strtolower with encoding to strtolower' => [
             "<?php mb_strtolower('test', 'utf-8');",
             "<?php\n\nstrtolower('test');",
+        ];
+
+        yield 'It does not mutate mb_strtolower called via variable' => [
+            '<?php $a = "mb_strtolower"; $a("test");',
         ];
     }
 
@@ -386,6 +434,10 @@ final class MBStringTest extends AbstractMutatorTestCase
             "<?php mb_strtoupper('test', 'utf-8');",
             "<?php\n\nstrtoupper('test');",
         ];
+
+        yield 'It does not mutate mb_strtoupper called via variable' => [
+            '<?php $a = "mb_strtoupper"; $a("test");',
+        ];
     }
 
     private function provideMutationCasesForSubStrCount(): Generator
@@ -403,6 +455,10 @@ final class MBStringTest extends AbstractMutatorTestCase
         yield 'It converts mb_substr_count with encoding to substr_count' => [
             "<?php mb_substr_count('test', 't', 'utf-8');",
             "<?php\n\nsubstr_count('test', 't');",
+        ];
+
+        yield 'It does not mutate mb_substr_count called via variable' => [
+            '<?php $a = "mb_substr_count"; $a("test", "t");',
         ];
     }
 
@@ -427,6 +483,10 @@ final class MBStringTest extends AbstractMutatorTestCase
             "<?php mb_substr('test', 2, 10, 'utf-8');",
             "<?php\n\nsubstr('test', 2, 10);",
         ];
+
+        yield 'It does not mutate mb_substr called via variable' => [
+            '<?php $a = "mb_substr"; $a("test", 2, 10);',
+        ];
     }
 
     private function provideMutationCasesForStrRChr(): Generator
@@ -449,6 +509,10 @@ final class MBStringTest extends AbstractMutatorTestCase
         yield 'It converts mb_strrchr with encoding to strrchr' => [
             "<?php mb_strrchr('subject', 'b', false, 'utf-8');",
             "<?php\n\nstrrchr('subject', 'b');",
+        ];
+
+        yield 'It does not mutate mb_strrchr called via variable' => [
+            '<?php $a = "mb_strrchr"; $a("subject", "b");',
         ];
     }
 
@@ -510,6 +574,10 @@ final class MBStringTest extends AbstractMutatorTestCase
 
         yield 'It does not convert mb_convert_case with missing mode argument' => [
             "<?php mb_convert_case('test');",
+        ];
+
+        yield 'It does not mutate mb_convert_case called via variable' => [
+            '<?php $a = "mb_convert_case"; $a("test");',
         ];
     }
 
