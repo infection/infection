@@ -57,97 +57,98 @@ final class BCMath extends Mutator
     }
 
     /**
+     * @param Node|Node\Expr\FuncCall $node
+     *
      * @return Node|Node[]|Generator
      */
     public function mutate(Node $node)
     {
-        yield from $this->converters[$this->getFunctionName($node)]($node);
+        yield from $this->converters[$node->name->toLowerString()]($node);
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        $functionName = $this->getFunctionName($node);
-
-        return $functionName !== null && isset($this->converters[$functionName]) && \function_exists($functionName);
-    }
-
-    private function getFunctionName(Node $node): ?string
-    {
         if (!$node instanceof Node\Expr\FuncCall || !$node->name instanceof Node\Name) {
-            return null;
+            return false;
         }
 
-        return \strtolower($node->name->toString());
+        $functionName = $node->name->toLowerString();
+
+        return isset($this->converters[$functionName]) && \function_exists($functionName);
     }
 
     private function setupConverters(array $functionsMap): void
     {
         $converters = [
-            'bcadd' => $this->minArgsCastString(2,
-                $this->binaryOp(Node\Expr\BinaryOp\Plus::class)
-            ),
-            'bccomp' => $this->minArgsCastString(2,
-                $this->binaryOp(Node\Expr\BinaryOp\Spaceship::class)
-            ),
-            'bcdiv' => $this->minArgsCastString(2,
-                $this->binaryOp(Node\Expr\BinaryOp\Div::class)
-            ),
-            'bcmod' => $this->minArgsCastString(2,
-                $this->binaryOp(Node\Expr\BinaryOp\Mod::class)
-            ),
-            'bcmul' => $this->minArgsCastString(2,
-                $this->binaryOp(Node\Expr\BinaryOp\Mul::class)
-            ),
-            'bcpow' => $this->minArgsCastString(2,
-                $this->binaryOp(Node\Expr\BinaryOp\Pow::class)
-            ),
-            'bcsub' => $this->minArgsCastString(2,
-                $this->binaryOp(Node\Expr\BinaryOp\Minus::class)
-            ),
-            'bcsqrt' => $this->minArgsCastString(2,
-                $this->squareRoots()
-            ),
-            'bcpowmod' => $this->minArgsCastString(3,
-                $this->powerModulo()
+            'bcadd' => $this->mapCheckingMinArgs(2, $this->mapCastToString(
+                $this->mapBinaryOperator(Node\Expr\BinaryOp\Plus::class)
+            )),
+            'bcdiv' => $this->mapCheckingMinArgs(2, $this->mapCastToString(
+                $this->mapBinaryOperator(Node\Expr\BinaryOp\Div::class)
+            )),
+            'bcmod' => $this->mapCheckingMinArgs(2, $this->mapCastToString(
+                $this->mapBinaryOperator(Node\Expr\BinaryOp\Mod::class)
+            )),
+            'bcmul' => $this->mapCheckingMinArgs(2, $this->mapCastToString(
+                $this->mapBinaryOperator(Node\Expr\BinaryOp\Mul::class)
+            )),
+            'bcpow' => $this->mapCheckingMinArgs(2, $this->mapCastToString(
+                $this->mapBinaryOperator(Node\Expr\BinaryOp\Pow::class)
+            )),
+            'bcsub' => $this->mapCheckingMinArgs(2, $this->mapCastToString(
+                $this->mapBinaryOperator(Node\Expr\BinaryOp\Minus::class)
+            )),
+            'bcsqrt' => $this->mapCheckingMinArgs(1, $this->mapCastToString(
+                $this->mapSquareRoots()
+            )),
+            'bcpowmod' => $this->mapCheckingMinArgs(3, $this->mapCastToString(
+                $this->mapPowerModulo()
+            )),
+            'bccomp' => $this->mapCheckingMinArgs(2,
+                $this->mapBinaryOperator(Node\Expr\BinaryOp\Spaceship::class)
             ),
         ];
 
-        $functionsToRemove = \array_filter($functionsMap, function ($isOn) {
+        $functionsToRemove = \array_filter($functionsMap, static function ($isOn) {
             return !$isOn;
         });
 
         $this->converters = \array_diff_key($converters, $functionsToRemove);
     }
 
-    private function minArgsCastString(int $minimumArgsCount, callable $converter): callable
+    private function mapCheckingMinArgs(int $minimumArgsCount, callable $converter)
     {
         return static function (Node\Expr\FuncCall $node) use ($minimumArgsCount, $converter): Generator {
             if (\count($node->args) >= $minimumArgsCount) {
-                foreach ($converter($node) as $newNode) {
-                    yield new Node\Expr\Cast\String_($newNode);
-                }
+                yield from $converter($node);
             }
         };
     }
 
-    private function binaryOp(string $operator): callable
+    private function mapCastToString(callable $converter): callable
+    {
+        return static function (Node\Expr\FuncCall $node) use ($converter): Generator {
+            foreach ($converter($node) as $newNode) {
+                yield new Node\Expr\Cast\String_($newNode);
+            }
+        };
+    }
+
+    private function mapBinaryOperator(string $operator): callable
     {
         return static function (Node\Expr\FuncCall $node) use ($operator): Generator {
             yield new $operator($node->args[0]->value, $node->args[1]->value);
         };
     }
 
-    private function squareRoots(): callable
+    private function mapSquareRoots(): callable
     {
         return static function (Node\Expr\FuncCall $node): Generator {
-            yield new Node\Expr\FuncCall(
-                new Node\Name('\sqrt'),
-                [$node->args[0], $node->args[1]]
-            );
+            yield new Node\Expr\FuncCall(new Node\Name('\sqrt'), [$node->args[0]]);
         };
     }
 
-    private function powerModulo(): callable
+    private function mapPowerModulo(): callable
     {
         return static function (Node\Expr\FuncCall $node): Generator {
             yield new Node\Expr\BinaryOp\Mod(
