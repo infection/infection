@@ -60,6 +60,7 @@ final class MutatorProfile
         '@zero_iteration' => self::ZERO_ITERATION,
         '@cast' => self::CAST,
         '@unwrap' => self::UNWRAP,
+        '@extensions' => self::EXTENSIONS,
 
         //Special Profiles
         '@default' => self::DEFAULT,
@@ -202,6 +203,7 @@ final class MutatorProfile
         Mutator\Unwrap\UnwrapArrayFilter::class,
         Mutator\Unwrap\UnwrapArrayFlip::class,
         Mutator\Unwrap\UnwrapArrayIntersect::class,
+        Mutator\Unwrap\UnwrapArrayIntersectAssoc::class,
         Mutator\Unwrap\UnwrapArrayIntersectKey::class,
         Mutator\Unwrap\UnwrapArrayIntersectUassoc::class,
         Mutator\Unwrap\UnwrapArrayIntersectUkey::class,
@@ -209,6 +211,7 @@ final class MutatorProfile
         Mutator\Unwrap\UnwrapArrayMap::class,
         Mutator\Unwrap\UnwrapArrayMerge::class,
         Mutator\Unwrap\UnwrapArrayMergeRecursive::class,
+        Mutator\Unwrap\UnwrapArrayPad::class,
         Mutator\Unwrap\UnwrapArrayReduce::class,
         Mutator\Unwrap\UnwrapArrayReplace::class,
         Mutator\Unwrap\UnwrapArrayReplaceRecursive::class,
@@ -234,6 +237,7 @@ final class MutatorProfile
 
     public const EXTENSIONS = [
         Mutator\Extensions\BCMath::class,
+        Mutator\Extensions\MBString::class,
     ];
 
     public const DEFAULT = [
@@ -250,6 +254,7 @@ final class MutatorProfile
         '@return_value',
         '@sort',
         '@zero_iteration',
+        '@extensions',
     ];
 
     public const FULL_MUTATOR_LIST = [
@@ -371,6 +376,7 @@ final class MutatorProfile
         'UnwrapArrayFilter' => Mutator\Unwrap\UnwrapArrayFilter::class,
         'UnwrapArrayFlip' => Mutator\Unwrap\UnwrapArrayFlip::class,
         'UnwrapArrayIntersect' => Mutator\Unwrap\UnwrapArrayIntersect::class,
+        'UnwrapArrayIntersectAssoc' => Mutator\Unwrap\UnwrapArrayIntersectAssoc::class,
         'UnwrapArrayIntersectKey' => Mutator\Unwrap\UnwrapArrayIntersectKey::class,
         'UnwrapArrayIntersectUassoc' => Mutator\Unwrap\UnwrapArrayIntersectUassoc::class,
         'UnwrapArrayIntersectUkey' => Mutator\Unwrap\UnwrapArrayIntersectUkey::class,
@@ -378,6 +384,7 @@ final class MutatorProfile
         'UnwrapArrayMap' => Mutator\Unwrap\UnwrapArrayMap::class,
         'UnwrapArrayMerge' => Mutator\Unwrap\UnwrapArrayMerge::class,
         'UnwrapArrayMergeRecursive' => Mutator\Unwrap\UnwrapArrayMergeRecursive::class,
+        'UnwrapArrayPad' => Mutator\Unwrap\UnwrapArrayPad::class,
         'UnwrapArrayReduce' => Mutator\Unwrap\UnwrapArrayReduce::class,
         'UnwrapArrayReplace' => Mutator\Unwrap\UnwrapArrayReplace::class,
         'UnwrapArrayReplaceRecursive' => Mutator\Unwrap\UnwrapArrayReplaceRecursive::class,
@@ -402,5 +409,6 @@ final class MutatorProfile
 
         // Extensions
         'BCMath' => Mutator\Extensions\BCMath::class,
+        'MBString' => Mutator\Extensions\MBString::class,
     ];
 }
