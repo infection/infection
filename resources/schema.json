@@ -144,6 +144,81 @@
                             }
                         ]
                     }
+                },
+                "MBString": {
+                    "type": {
+                        "anyOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                    "settings": {
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "properties": {
+                                            "mb_chr": {
+                                                "type": "boolean"
+                                            },
+                                            "mb_ord": {
+                                                "type": "boolean"
+                                            },
+                                            "mb_parse_str": {
+                                                "type": "boolean"
+                                            },
+                                            "mb_send_mail": {
+                                                "type": "boolean"
+                                            },
+                                            "mb_strcut": {
+                                                "type": "boolean"
+                                            },
+                                            "mb_stripos": {
+                                                "type": "boolean"
+                                            },
+                                            "mb_stristr": {
+                                                "type": "boolean"
+                                            },
+                                            "mb_strlen": {
+                                                "type": "boolean"
+                                            },
+                                            "mb_strpos": {
+                                                "type": "boolean"
+                                            },
+                                            "mb_strrchr": {
+                                                "type": "boolean"
+                                            },
+                                            "mb_strripos": {
+                                                "type": "boolean"
+                                            },
+                                            "mb_strrpos": {
+                                                "type": "boolean"
+                                            },
+                                            "mb_strstr": {
+                                                "type": "boolean"
+                                            },
+                                            "mb_strtolower": {
+                                                "type": "boolean"
+                                            },
+                                            "mb_strtoupper": {
+                                                "type": "boolean"
+                                            },
+                                            "mb_substr_count": {
+                                                "type": "boolean"
+                                            },
+                                            "mb_substr": {
+                                                "type": "boolean"
+                                            },
+                                            "mb_convert_case": {
+                                                "type": "boolean"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
                 }
             }
         },
