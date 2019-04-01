@@ -72,9 +72,7 @@ final class BCMath extends Mutator
             return false;
         }
 
-        $functionName = $node->name->toLowerString();
-
-        return isset($this->converters[$functionName]) && \function_exists($functionName);
+        return isset($this->converters[$node->name->toLowerString()]);
     }
 
     private function setupConverters(array $functionsMap): void
@@ -109,7 +107,7 @@ final class BCMath extends Mutator
             ),
         ];
 
-        $functionsToRemove = \array_filter($functionsMap, static function ($isOn) {
+        $functionsToRemove = \array_filter($functionsMap, static function (bool $isOn): bool {
             return !$isOn;
         });
 
