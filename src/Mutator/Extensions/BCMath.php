@@ -78,32 +78,32 @@ final class BCMath extends Mutator
     private function setupConverters(array $functionsMap): void
     {
         $converters = [
-            'bcadd' => $this->mapCheckingMinArgs(2, $this->mapCastToString(
-                $this->mapBinaryOperator(Node\Expr\BinaryOp\Plus::class)
+            'bcadd' => $this->makeCheckingMinArgsMapper(2, $this->makeCastToStringMapper(
+                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Plus::class)
             )),
-            'bcdiv' => $this->mapCheckingMinArgs(2, $this->mapCastToString(
-                $this->mapBinaryOperator(Node\Expr\BinaryOp\Div::class)
+            'bcdiv' => $this->makeCheckingMinArgsMapper(2, $this->makeCastToStringMapper(
+                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Div::class)
             )),
-            'bcmod' => $this->mapCheckingMinArgs(2, $this->mapCastToString(
-                $this->mapBinaryOperator(Node\Expr\BinaryOp\Mod::class)
+            'bcmod' => $this->makeCheckingMinArgsMapper(2, $this->makeCastToStringMapper(
+                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Mod::class)
             )),
-            'bcmul' => $this->mapCheckingMinArgs(2, $this->mapCastToString(
-                $this->mapBinaryOperator(Node\Expr\BinaryOp\Mul::class)
+            'bcmul' => $this->makeCheckingMinArgsMapper(2, $this->makeCastToStringMapper(
+                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Mul::class)
             )),
-            'bcpow' => $this->mapCheckingMinArgs(2, $this->mapCastToString(
-                $this->mapBinaryOperator(Node\Expr\BinaryOp\Pow::class)
+            'bcpow' => $this->makeCheckingMinArgsMapper(2, $this->makeCastToStringMapper(
+                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Pow::class)
             )),
-            'bcsub' => $this->mapCheckingMinArgs(2, $this->mapCastToString(
-                $this->mapBinaryOperator(Node\Expr\BinaryOp\Minus::class)
+            'bcsub' => $this->makeCheckingMinArgsMapper(2, $this->makeCastToStringMapper(
+                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Minus::class)
             )),
-            'bcsqrt' => $this->mapCheckingMinArgs(1, $this->mapCastToString(
-                $this->mapSquareRoots()
+            'bcsqrt' => $this->makeCheckingMinArgsMapper(1, $this->makeCastToStringMapper(
+                $this->makeSquareRootsMapper()
             )),
-            'bcpowmod' => $this->mapCheckingMinArgs(3, $this->mapCastToString(
-                $this->mapPowerModulo()
+            'bcpowmod' => $this->makeCheckingMinArgsMapper(3, $this->makeCastToStringMapper(
+                $this->makePowerModuloMapper()
             )),
-            'bccomp' => $this->mapCheckingMinArgs(2,
-                $this->mapBinaryOperator(Node\Expr\BinaryOp\Spaceship::class)
+            'bccomp' => $this->makeCheckingMinArgsMapper(2,
+                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Spaceship::class)
             ),
         ];
 
@@ -114,7 +114,7 @@ final class BCMath extends Mutator
         $this->converters = \array_diff_key($converters, $functionsToRemove);
     }
 
-    private function mapCheckingMinArgs(int $minimumArgsCount, callable $converter)
+    private function makeCheckingMinArgsMapper(int $minimumArgsCount, callable $converter)
     {
         return static function (Node\Expr\FuncCall $node) use ($minimumArgsCount, $converter): Generator {
             if (\count($node->args) >= $minimumArgsCount) {
@@ -123,7 +123,7 @@ final class BCMath extends Mutator
         };
     }
 
-    private function mapCastToString(callable $converter): callable
+    private function makeCastToStringMapper(callable $converter): callable
     {
         return static function (Node\Expr\FuncCall $node) use ($converter): Generator {
             foreach ($converter($node) as $newNode) {
@@ -132,21 +132,21 @@ final class BCMath extends Mutator
         };
     }
 
-    private function mapBinaryOperator(string $operator): callable
+    private function makeBinaryOperatorMapper(string $operator): callable
     {
         return static function (Node\Expr\FuncCall $node) use ($operator): Generator {
             yield new $operator($node->args[0]->value, $node->args[1]->value);
         };
     }
 
-    private function mapSquareRoots(): callable
+    private function makeSquareRootsMapper(): callable
     {
         return static function (Node\Expr\FuncCall $node): Generator {
             yield new Node\Expr\FuncCall(new Node\Name('\sqrt'), [$node->args[0]]);
         };
     }
 
-    private function mapPowerModulo(): callable
+    private function makePowerModuloMapper(): callable
     {
         return static function (Node\Expr\FuncCall $node): Generator {
             yield new Node\Expr\BinaryOp\Mod(
