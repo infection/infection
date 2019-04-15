@@ -63,6 +63,7 @@ final class CoverageRequirementChecker
         return $this->skipCoverage
             || \PHP_SAPI === 'phpdbg'
             || \extension_loaded('xdebug')
+            || \extension_loaded('pcov')
             || XdebugHandler::getSkippedVersion()
             || $this->isXdebugIncludedInInitialTestPhpOptions();
     }
