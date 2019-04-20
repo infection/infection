@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Coverage;
 
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Webmozart\Assert\Assert;
+use Infection\TestFramework\PhpUnit\Coverage\Exception\NoLinesExecutedException;
 
 /**
  * @internal
@@ -79,13 +79,15 @@ class CoverageXmlParser
 
     private function assertHasCoverage(\DOMXPath $xPath): void
     {
-        $lineCoverage = $xPath->query('/phpunit/project/directory[@name="/"]/totals/lines');
+        $lineCoverage = $xPath->query('/phpunit/project/directory[@name="/"]/totals/lines')->item(0);
 
-        Assert::notSame(
-            '0',
-            $lineCoverage->item(0)->getAttribute('executed'),
-            '0 Lines of code were executed during tests. Please check your filters.'
-        );
+        if (
+            !$lineCoverage instanceof \DOMElement
+            || ($coverageCount = $lineCoverage->getAttribute('executed')) === '0'
+            || $coverageCount === ''
+        ) {
+            throw NoLinesExecutedException::noLinesExecuted();
+        }
     }
 
     private function processXmlFileCoverage(string $relativeCoverageFilePath, string $projectSource): array
