@@ -37,7 +37,6 @@ namespace Infection\Mutator\Extensions;
 
 use Generator;
 use Infection\Mutator\Util\BaseMutator;
-use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use PhpParser\Node;
 
