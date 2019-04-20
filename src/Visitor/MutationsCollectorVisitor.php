@@ -109,36 +109,23 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                 continue;
             }
 
-            if ($isOnFunctionSignature
-                && $methodNode = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY)
-            ) {
-                /** @var Node\Stmt\ClassMethod|Node\Expr\Closure $methodNode */
-                if ($methodNode instanceof Node\Stmt\ClassMethod && $methodNode->isAbstract()) {
-                    continue;
-                }
-
-                if ($methodNode instanceof Node\Stmt\ClassMethod && $methodNode->getAttribute(ParentConnectorVisitor::PARENT_KEY) instanceof Node\Stmt\Interface_) {
-                    continue;
-                }
-            }
-
             if ($isOnFunctionSignature) {
                 // hasExecutedMethodOnLine checks for all lines of a given method,
                 // therefore it isn't making any sense to check any other line but first
                 $isCoveredByTest = $this->codeCoverageData->hasExecutedMethodOnLine($this->filePath, $node->getLine());
-                $linerange = range($node->getStartLine(), $node->getEndLine());
+                $linerange = $this->getNodeRange($node);
             } else {
                 $outerMostArrayNode = $this->getOuterMostArrayNode($node);
                 $isCoveredByTest = false;
+                $linerange = $this->getNodeRange($outerMostArrayNode);
 
-                for ($line = $outerMostArrayNode->getStartLine(); $line <= $outerMostArrayNode->getEndLine(); ++$line) {
+                foreach ($linerange as $line) {
                     if ($this->codeCoverageData->hasTestsOnLine($this->filePath, $line)) {
                         $isCoveredByTest = true;
 
                         break;
                     }
                 }
-                $linerange = range($outerMostArrayNode->getStartLine(), $outerMostArrayNode->getEndLine());
             }
 
             if ($this->onlyCovered && !$isCoveredByTest) {
@@ -189,5 +176,13 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
         } while ($node = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY));
 
         return $outerMostArrayParent;
+    }
+
+    /**
+     * @return array|int[]
+     */
+    private function getNodeRange(Node $node): array
+    {
+        return range($node->getStartLine(), $node->getEndLine());
     }
 }
