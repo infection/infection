@@ -145,6 +145,54 @@
                         ]
                     }
                 },
+                "BCMath": {
+                    "type": {
+                        "anyOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                    "settings": {
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "properties": {
+                                            "bcadd": {
+                                                "type": "boolean"
+                                            },
+                                            "bccomp": {
+                                                "type": "boolean"
+                                            },
+                                            "bcdiv": {
+                                                "type": "boolean"
+                                            },
+                                            "bcmod": {
+                                                "type": "boolean"
+                                            },
+                                            "bcmul": {
+                                                "type": "boolean"
+                                            },
+                                            "bcpow": {
+                                                "type": "boolean"
+                                            },
+                                            "bcsub": {
+                                                "type": "boolean"
+                                            },
+                                            "bcsqrt": {
+                                                "type": "boolean"
+                                            },
+                                            "bcpowmod": {
+                                                "type": "boolean"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
                 "MBString": {
                     "type": {
                         "anyOf": [

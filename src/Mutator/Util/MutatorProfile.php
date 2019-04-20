@@ -236,6 +236,7 @@ final class MutatorProfile
     ];
 
     public const EXTENSIONS = [
+        Mutator\Extensions\BCMath::class,
         Mutator\Extensions\MBString::class,
     ];
 
@@ -407,6 +408,7 @@ final class MutatorProfile
         'UnwrapUcWords' => Mutator\Unwrap\UnwrapUcWords::class,
 
         // Extensions
+        'BCMath' => Mutator\Extensions\BCMath::class,
         'MBString' => Mutator\Extensions\MBString::class,
     ];
 }
