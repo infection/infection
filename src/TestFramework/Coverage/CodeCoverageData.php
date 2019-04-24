@@ -147,7 +147,7 @@ class CodeCoverageData
     {
         $filePath = $mutation->getOriginalFilePath();
 
-        foreach ($this->linesForMutation($mutation) as $line) {
+        foreach ($mutation->getLineRange() as $line) {
             if ($this->hasExecutedMethodOnLine($filePath, $line)) {
                 yield from $this->getTestsForExecutedMethodOnLine($filePath, $line);
             }
@@ -158,24 +158,10 @@ class CodeCoverageData
     {
         $filePath = $mutation->getOriginalFilePath();
 
-        foreach ($this->linesForMutation($mutation) as $line) {
+        foreach ($mutation->getLineRange() as $line) {
             if ($this->hasTestsOnLine($filePath, $line)) {
                 yield from $this->getCoverage()[$filePath]['byLine'][$line];
             }
-        }
-    }
-
-    private function linesForMutation(MutationInterface $mutation): \Generator
-    {
-        /*
-         * If we only look for tests that cover only the very first line of our
-         * mutation, we may naturally miss other tests that may actually also
-         * cover this mutation, this all leading to false positives.
-         *
-         * Therefore we have to consider all lines of a mutation.
-         */
-        for ($line = $mutation->getAttributes()['startLine']; $line <= $mutation->getAttributes()['endLine']; ++$line) {
-            yield $line;
         }
     }
 

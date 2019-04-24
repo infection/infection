@@ -93,6 +93,11 @@ final class Mutation implements MutationInterface
      */
     private $mutationByMutatorIndex;
 
+    /**
+     * @var array|int[]
+     */
+    private $lineRange;
+
     public function __construct(
         string $originalFilePath,
         array $originalFileAst,
@@ -102,7 +107,8 @@ final class Mutation implements MutationInterface
         bool $isOnFunctionSignature,
         bool $isCoveredByTest,
         $mutatedNode,
-        int $mutationByMutatorIndex
+        int $mutationByMutatorIndex,
+        array $lineRange
     ) {
         $this->originalFilePath = $originalFilePath;
         $this->originalFileAst = $originalFileAst;
@@ -113,6 +119,7 @@ final class Mutation implements MutationInterface
         $this->isCoveredByTest = $isCoveredByTest;
         $this->mutatedNode = $mutatedNode;
         $this->mutationByMutatorIndex = $mutationByMutatorIndex;
+        $this->lineRange = $lineRange;
     }
 
     public function getMutator(): Mutator
@@ -182,5 +189,10 @@ final class Mutation implements MutationInterface
     public function getMutatedNode()
     {
         return $this->mutatedNode;
+    }
+
+    public function getLineRange(): array
+    {
+        return $this->lineRange;
     }
 }

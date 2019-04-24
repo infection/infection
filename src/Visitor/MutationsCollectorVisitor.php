@@ -109,7 +109,24 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                 continue;
             }
 
-            $isCoveredByTest = $this->isCoveredByTest($isOnFunctionSignature, $node);
+            if ($isOnFunctionSignature) {
+                // hasExecutedMethodOnLine checks for all lines of a given method,
+                // therefore it isn't making any sense to check any other line but first
+                $isCoveredByTest = $this->codeCoverageData->hasExecutedMethodOnLine($this->filePath, $node->getLine());
+                $linerange = $this->getNodeRange($node);
+            } else {
+                $outerMostArrayNode = $this->getOuterMostArrayNode($node);
+                $isCoveredByTest = false;
+                $linerange = $this->getNodeRange($outerMostArrayNode);
+
+                foreach ($linerange as $line) {
+                    if ($this->codeCoverageData->hasTestsOnLine($this->filePath, $line)) {
+                        $isCoveredByTest = true;
+
+                        break;
+                    }
+                }
+            }
 
             if ($this->onlyCovered && !$isCoveredByTest) {
                 continue;
@@ -129,7 +146,8 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                     $isOnFunctionSignature,
                     $isCoveredByTest,
                     $mutatedNode,
-                    $mutationByMutatorIndex
+                    $mutationByMutatorIndex,
+                    $linerange
                 );
             }
         }
@@ -143,20 +161,28 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
         return $this->mutations;
     }
 
-    private function isCoveredByTest(bool $isOnFunctionSignature, Node $node): bool
+    /**
+     * If the node is part of an array, this will find the outermost array.
+     * Otherwise this will return the node itself
+     */
+    private function getOuterMostArrayNode(Node $node): Node
     {
-        if ($isOnFunctionSignature) {
-            // hasExecutedMethodOnLine checks for all lines of a given method,
-            // therefore it isn't making any sense to check any other line but first
-            return $this->codeCoverageData->hasExecutedMethodOnLine($this->filePath, $node->getLine());
-        }
+        $outerMostArrayParent = $node;
 
-        for ($line = $node->getStartLine(); $line <= $node->getEndLine(); ++$line) {
-            if ($this->codeCoverageData->hasTestsOnLine($this->filePath, $line)) {
-                return true;
+        do {
+            if ($node instanceof Node\Expr\Array_) {
+                $outerMostArrayParent = $node;
             }
-        }
+        } while ($node = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY));
 
-        return false;
+        return $outerMostArrayParent;
+    }
+
+    /**
+     * @return array|int[]
+     */
+    private function getNodeRange(Node $node): array
+    {
+        return range($node->getStartLine(), $node->getEndLine());
     }
 }
