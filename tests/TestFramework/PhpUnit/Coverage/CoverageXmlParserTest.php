@@ -151,20 +151,53 @@ final class CoverageXmlParserTest extends TestCase
 
     public function providesZeroLinesCoveredCases(): Generator
     {
-        yield 'Zero lines executed' => [
-            <<<'XML'
+        yield 'Zero lines executed' => [<<<'XML'
 <?xml version="1.0"?>
 <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
   <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
-@@ -160,10 +170,30 @@ public function test_it_errors_when_no_lines_were_executed(): void
+    <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
+    <driver name="xdebug" version="2.5.1"/>
+  </build>
+  <project source="/path/to/src">
+    <tests>
+      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
+      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
+    </tests>
+    <directory name="/">
+      <totals>
+        <lines total="913" comments="130" code="783" executable="348" executed="0" percent="0"/>
+      </totals>
+    </directory>
   </project>
   <!-- The rest of the file has been removed for this test-->
 </phpunit>
 XML
             ];
+
+        yield 'lines is not present' => [<<<'XML'
+<?xml version="1.0"?>
+<phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+  <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
+    <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
+    <driver name="xdebug" version="2.5.1"/>
+  </build>
+  <project source="/path/to/src">
+    <tests>
+      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
+      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
+    </tests>
+    <directory name="/">
+      <totals>
+      </totals>
+    </directory>
+  </project>
+  <!-- The rest of the file has been removed for this test-->
+</phpunit>
+XML
+        ];
     }
 
-    protected function getXml()
+    private function getXml()
     {
         $xml = file_get_contents(__DIR__ . '/../../../Fixtures/Files/phpunit/coverage-xml/index.xml');
 
