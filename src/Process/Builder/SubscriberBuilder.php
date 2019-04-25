@@ -228,7 +228,7 @@ final class SubscriberBuilder
             return new CiInitialTestsConsoleLoggerSubscriber($output, $testFrameworkAdapter);
         }
 
-        return new InitialTestsConsoleLoggerSubscriber($output, $testFrameworkAdapter);
+        return new InitialTestsConsoleLoggerSubscriber($output, $testFrameworkAdapter, $this->input->getOption('debug'));
     }
 
     private function shouldSkipProgressBars(): bool
