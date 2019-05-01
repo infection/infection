@@ -182,8 +182,7 @@ final class InfectionCommand extends BaseCommand
                 'initial-tests-php-options',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Extra php options for the initial test runner. Will be ignored if --coverage option presented.',
-                ''
+                'Extra php options for the initial test runner. Will be ignored if --coverage option presented.'
             )
             ->addOption(
                 'ignore-msi-with-no-mutations',
@@ -233,8 +232,8 @@ final class InfectionCommand extends BaseCommand
             $this->skipCoverage,
             explode(
                 ' ',
-                $input->hasOption('initial-tests-php-options') ? $input->getOption('initial-tests-php-options') :
-                    $config->getInitialTestsPhpOptions()
+                $input->getOption('initial-tests-php-options')
+                ?? $config->getInitialTestsPhpOptions()
             )
         );
 
@@ -348,8 +347,8 @@ final class InfectionCommand extends BaseCommand
 
     private function getTestFrameworkExtraOptions(string $testFrameworkKey): TestFrameworkExtraOptions
     {
-        $extraOptions = $this->input->hasOption('test-framework-options')
-            ? $this->input->getOption('test-framework-options') : $this->getContainer()->get('infection.config')->getTestFrameworkOptions();
+        $extraOptions = $this->input->getOption('test-framework-options')
+            ?? $this->getContainer()->get('infection.config')->getTestFrameworkOptions();
 
         return TestFrameworkTypes::PHPUNIT === $testFrameworkKey
             ? new PhpUnitExtraOptions($extraOptions)

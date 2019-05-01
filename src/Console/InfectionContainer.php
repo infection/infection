@@ -257,7 +257,7 @@ final class InfectionContainer extends Container
         $this['coverage.checker'] = static function () use ($input): CoverageRequirementChecker {
             return new CoverageRequirementChecker(
                 \strlen(trim($input->getOption('coverage'))) > 0,
-                $input->getOption('initial-tests-php-options')
+                (string) $input->getOption('initial-tests-php-options') ?? ''
             );
         };
 
