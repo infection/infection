@@ -76,7 +76,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
     {
         if ($node instanceof Node\Stmt\ClassLike) {
             if ($attribute = $node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)) {
-                $this->classScopeStack[] = new \ReflectionClass($attribute);
+                $this->classScopeStack[] = new \ReflectionClass($attribute->toString());
             } else {
                 // Anonymous class
                 $this->classScopeStack[] = null;

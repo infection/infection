@@ -45,6 +45,7 @@ final class OneZeroInteger extends AbstractNumberMutator
     /**
      * Replaces "0" with "1" or "1" with "0"
      *
+     * @param Node&Node\Scalar\LNumber $node
      *
      * @return Node\Scalar\LNumber
      */

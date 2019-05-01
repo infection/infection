@@ -1,7 +1,5 @@
 parameters:
     ignoreErrors:
-        - '#Access to an undefined property PhpParser\\Node(.*?)#'
-        - '#Call to an undefined method PhpParser\\Node(.*?)#'
         - '#expects .*, array<string>\|bool\|string\|null given#'
         - '#cast array<string>\|bool\|string\|null to#'
         - '#Return type \(void\) of method Infection\\Visitor\\.*::.*\(\) should be compatible with return type .* of method PhpParser\\Node.*::.*\(\)#'

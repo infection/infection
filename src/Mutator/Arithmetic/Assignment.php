@@ -46,6 +46,7 @@ final class Assignment extends Mutator
     /**
      * Replaces "+=", "*=", ".=", and similar with a plain "="
      *
+     * @param Node&Node\Expr\AssignOp $node
      *
      * @return Node\Expr\Assign
      */
