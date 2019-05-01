@@ -34,6 +34,16 @@ class ReturnTypes
         return $this;
     }
 
+    public function parentReturn(): parent
+    {
+        return $this;
+    }
+
+    public function nullableParentReturn(): ?parent
+    {
+        return $this;
+    }
+
     public function withNewerReturnType(): object
     {
         return $this;
