@@ -49,6 +49,7 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
 {
+    public const FQN_KEY = 'fullyQualifiedClassName';
     private $namespace;
 
     public function enterNode(Node $node): void
@@ -56,7 +57,7 @@ final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
         if ($node instanceof Stmt\Namespace_) {
             $this->namespace = $node->name;
         } elseif ($node instanceof Stmt\ClassLike) {
-            $node->fullyQualifiedClassName = $node->name ? Name::concat($this->namespace, $node->name->name) : null;
+            $node->setAttribute(self::FQN_KEY, $node->name ? Name::concat($this->namespace, $node->name->name) : null);
         }
     }
 }

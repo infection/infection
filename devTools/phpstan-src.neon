@@ -4,6 +4,8 @@ parameters:
         - '#Call to an undefined method PhpParser\\Node(.*?)#'
         - '#expects .*, array<string>\|bool\|string\|null given#'
         - '#cast array<string>\|bool\|string\|null to#'
-        - '#Offset array<string>\|bool\|string\|null does not#'
-        - '#Possibly invalid array key type array<string>\|bool\|string\|null#'
-        - '#Access to undefined constant PhpParser\\NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN#'
+        - '#Return type \(void\) of method Infection\\Visitor\\.*::.*\(\) should be compatible with return type .* of method PhpParser\\Node.*::.*\(\)#'
+        -
+            path: '%currentWorkingDirectory%/src/Process/Runner/Parallel/ParallelProcessRunner.php'
+            message: '#Left side of [\||\&]{2} is always true#'
+
