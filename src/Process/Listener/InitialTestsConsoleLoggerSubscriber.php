@@ -63,10 +63,16 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterf
      */
     private $testFrameworkAdapter;
 
-    public function __construct(OutputInterface $output, AbstractTestFrameworkAdapter $testFrameworkAdapter)
+    /**
+     * @var bool
+     */
+    private $debug;
+
+    public function __construct(OutputInterface $output, AbstractTestFrameworkAdapter $testFrameworkAdapter, bool $debug)
     {
         $this->output = $output;
         $this->testFrameworkAdapter = $testFrameworkAdapter;
+        $this->debug = $debug;
 
         $this->progressBar = new ProgressBar($this->output);
         $this->progressBar->setFormat('verbose');
@@ -105,6 +111,10 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterf
     public function onInitialTestSuiteFinished(InitialTestSuiteFinished $event): void
     {
         $this->progressBar->finish();
+
+        if ($this->debug) {
+            $this->output->writeln(PHP_EOL . $event->getOutputText());
+        }
     }
 
     public function onInitialTestCaseCompleted(InitialTestCaseCompleted $event): void
