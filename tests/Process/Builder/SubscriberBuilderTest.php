@@ -51,17 +51,21 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
+ *
+ * NOTE:
+ * InputInterfaces should be mocked here so that the 'getOption' method with paramater 'no-progress'
+ * should return true. Otherwise you will see different results based on wheter its running in CI or not.
  */
 final class SubscriberBuilderTest extends TestCase
 {
     public function test_it_registers_the_subscribers_when_debugging(): void
     {
         $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(10))
+        $input->expects($this->exactly(9))
             ->method('getOption')
             ->will($this->returnValueMap(
                 [
-                    ['ci-friendly', false],
+                    ['no-progress', true],
                     ['formatter', 'progress'],
                     ['show-mutations', true],
                     ['log-verbosity', 'all'],
@@ -95,11 +99,11 @@ final class SubscriberBuilderTest extends TestCase
     public function test_it_registers_the_subscribers_when_not_debugging(): void
     {
         $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(10))
+        $input->expects($this->exactly(9))
             ->method('getOption')
             ->will($this->returnValueMap(
                 [
-                    ['ci-friendly', false],
+                    ['no-progress', true],
                     ['formatter', 'progress'],
                     ['show-mutations', true],
                     ['log-verbosity', 'all'],
@@ -133,11 +137,11 @@ final class SubscriberBuilderTest extends TestCase
     public function test_it_throws_an_exception_when_output_formatter_is_invalid(): void
     {
         $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(6))
+        $input->expects($this->exactly(5))
             ->method('getOption')
             ->will($this->returnValueMap(
                 [
-                    ['ci-friendly', false],
+                    ['no-progress', true],
                     ['formatter', 'foo'],
                     ['show-mutations', true],
                     ['debug', true],
