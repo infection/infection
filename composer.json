@@ -78,7 +78,8 @@
             "Infection\\Tests\\": "tests/"
         },
         "classmap": [
-            "tests/Fixtures/Autoloaded"
+            "tests/Fixtures/Autoloaded",
+            "tests/Fixtures/CodeSamples"
         ],
         "files": [
             "tests/Helpers.php",
