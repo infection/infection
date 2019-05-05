@@ -50,6 +50,7 @@ use PhpParser\NodeVisitorAbstract;
 final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
 {
     public const FQN_KEY = 'fullyQualifiedClassName';
+
     private $namespace;
 
     public function enterNode(Node $node): void
