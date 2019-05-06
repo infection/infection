@@ -255,6 +255,7 @@ final class MutatorProfile
         '@sort',
         '@zero_iteration',
         '@extensions',
+        '@unwrap',
     ];
 
     public const FULL_MUTATOR_LIST = [
