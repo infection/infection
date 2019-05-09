@@ -61,7 +61,7 @@ final class FullyQualifiedClassNameVisitorTest extends AbstractBaseVisitorTest
         $this->assertCount(1, $this->spyVisitor->processedNodes);
         $this->assertSame(
             'FqcnEmptyClass\EmptyClass',
-            $this->spyVisitor->processedNodes[0]->fullyQualifiedClassName->toString()
+            $this->spyVisitor->processedNodes[0]->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)->toString()
         );
     }
 
@@ -74,7 +74,7 @@ final class FullyQualifiedClassNameVisitorTest extends AbstractBaseVisitorTest
         $this->assertCount(1, $this->spyVisitor->processedNodes);
         $this->assertSame(
             'FqcnClassInterface\Ci',
-            $this->spyVisitor->processedNodes[0]->fullyQualifiedClassName->toString()
+            $this->spyVisitor->processedNodes[0]->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)->toString()
         );
     }
 
@@ -87,7 +87,7 @@ final class FullyQualifiedClassNameVisitorTest extends AbstractBaseVisitorTest
         $this->assertCount(1, $this->spyVisitor->processedNodes);
         $this->assertSame(
             'FqcnClassAnonymous\Ci',
-            $this->spyVisitor->processedNodes[0]->fullyQualifiedClassName->toString()
+            $this->spyVisitor->processedNodes[0]->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)->toString()
         );
     }
 
@@ -98,7 +98,7 @@ final class FullyQualifiedClassNameVisitorTest extends AbstractBaseVisitorTest
 
             public function enterNode(Node $node): void
             {
-                if (isset($node->fullyQualifiedClassName)) {
+                if ($node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)) {
                     $this->processedNodes[] = $node;
                 }
             }
