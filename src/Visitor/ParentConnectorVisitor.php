@@ -47,22 +47,28 @@ final class ParentConnectorVisitor extends NodeVisitorAbstract
 
     private $stack;
 
-    public function beforeTraverse(array $nodes): void
+    public function beforeTraverse(array $nodes): ?array
     {
         $this->stack = [];
+
+        return null;
     }
 
-    public function enterNode(Node $node): void
+    public function enterNode(Node $node): ?Node
     {
         if (!empty($this->stack)) {
             $node->setAttribute(self::PARENT_KEY, $this->stack[\count($this->stack) - 1]);
         }
 
         $this->stack[] = $node;
+
+        return null;
     }
 
-    public function leaveNode(Node $node): void
+    public function leaveNode(Node $node): ?Node
     {
         array_pop($this->stack);
+
+        return null;
     }
 }

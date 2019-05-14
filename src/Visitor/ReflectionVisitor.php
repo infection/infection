@@ -65,11 +65,13 @@ final class ReflectionVisitor extends NodeVisitorAbstract
      */
     private $methodName;
 
-    public function beforeTraverse(array $nodes): void
+    public function beforeTraverse(array $nodes): ?array
     {
         $this->functionScopeStack = [];
         $this->classScopeStack = [];
         $this->methodName = null;
+
+        return null;
     }
 
     public function enterNode(Node $node)
@@ -115,7 +117,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         }
     }
 
-    public function leaveNode(Node $node): void
+    public function leaveNode(Node $node): ?Node
     {
         if ($this->isFunctionLikeNode($node)) {
             array_pop($this->functionScopeStack);
@@ -124,6 +126,8 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         if ($node instanceof  Node\Stmt\ClassLike) {
             array_pop($this->classScopeStack);
         }
+
+        return null;
     }
 
     private function isPartOfFunctionSignature(Node $node): bool

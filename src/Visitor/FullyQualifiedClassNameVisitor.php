@@ -53,12 +53,14 @@ final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
 
     private $namespace;
 
-    public function enterNode(Node $node): void
+    public function enterNode(Node $node): ?Node
     {
         if ($node instanceof Stmt\Namespace_) {
             $this->namespace = $node->name;
         } elseif ($node instanceof Stmt\ClassLike) {
             $node->setAttribute(self::FQN_KEY, $node->name ? Name::concat($this->namespace, $node->name->name) : null);
         }
+
+        return null;
     }
 }
