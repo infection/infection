@@ -44,13 +44,16 @@ use PhpParser\NodeVisitorAbstract;
  * @internal
  *
  * Adds FullyQualifiedClassName (FQCN) string to class node:
- *      $node->name                    // Plus
- *      $node->fullyQualifiedClassName // Infection\Mutator\Plus
+ *      $node->name                                                  // Plus
+ *      $node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY) // Infection\Mutator\Plus
  */
 final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
 {
     public const FQN_KEY = 'fullyQualifiedClassName';
 
+    /**
+     * @var Node\Name|null
+     */
     private $namespace;
 
     public function enterNode(Node $node): ?Node
