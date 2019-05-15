@@ -4,5 +4,5 @@ parameters:
         - '#cast array<string>\|bool\|string\|null to#'
         -
             path: '%currentWorkingDirectory%/src/Process/Runner/Parallel/ParallelProcessRunner.php'
-            message: '#Left side of [\||\&]{2} is always true#'
+            message: '#Left side of [\&]{2} is always true#'
 
