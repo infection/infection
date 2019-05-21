@@ -67,7 +67,7 @@ final class PhpProcess extends Process
         // As of 1.3.2 xdebug-handler won't update $_ENV if it is in use.
         // But Symfony's Process will happily import everything from $_ENV,
         // hence we need to reset it just as xdebug-handler does
-        $updateEnv = false !== strpos((string) ini_get('variables_order'), 'E');
+        $updateEnv = false !== stripos((string) ini_get('variables_order'), 'E');
 
         if ($updateEnv) {
             unset($_ENV['PHPRC']);
