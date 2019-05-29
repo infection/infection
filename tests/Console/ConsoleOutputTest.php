@@ -118,6 +118,21 @@ final class ConsoleOutputTest extends TestCase
         $console->logBadMsiErrorMessage($metrics, 25.0, 'min-msi');
     }
 
+    public function test_log_bad_msi_error_message_with_accuracy(): void
+    {
+        $metrics = $this->createMock(MetricsCalculator::class);
+        $metrics->expects($this->once())->method('getMutationScoreIndicator')->willReturn(75.00123987);
+        $io = $this->createMock(SymfonyStyle::class);
+        $io->expects($this->once())->method('error')->with(
+            'The minimum required MSI percentage should be 25.0043%, but actual is 75.0012%. Improve your tests!'
+        );
+
+        $console = new ConsoleOutput($io);
+        $console->setMsiDecimalAccuracy(4);
+
+        $console->logBadMsiErrorMessage($metrics, 25.00429942, 'min-msi');
+    }
+
     public function test_log_bad_msi_error_message_throws_error_on_faulty_msi(): void
     {
         $io = $this->createMock(SymfonyStyle::class);
@@ -138,6 +153,21 @@ final class ConsoleOutputTest extends TestCase
         );
 
         $console = new ConsoleOutput($io);
+
+        $console->logBadMsiErrorMessage($metrics, 25.0, 'min-covered-msi');
+    }
+
+    public function test_log_bad_covered_msi_error_message_with_accuracy(): void
+    {
+        $metrics = $this->createMock(MetricsCalculator::class);
+        $metrics->expects($this->once())->method('getCoveredCodeMutationScoreIndicator')->willReturn(75.00123987);
+        $io = $this->createMock(SymfonyStyle::class);
+        $io->expects($this->once())->method('error')->with(
+            'The minimum required Covered Code MSI percentage should be 25.00000%, but actual is 75.00124%. Improve your tests!'
+        );
+
+        $console = new ConsoleOutput($io);
+        $console->setCoverageDecimalAccuracy(5);
 
         $console->logBadMsiErrorMessage($metrics, 25.0, 'min-covered-msi');
     }

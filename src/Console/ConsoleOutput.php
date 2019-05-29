@@ -60,6 +60,16 @@ final class ConsoleOutput
      */
     private $io;
 
+    /**
+     * @var int
+     */
+    private $msiDecimalAccuracy = 0;
+
+    /**
+     * @var int
+     */
+    private $coverageDecimalAccuracy = 0;
+
     public function __construct(SymfonyStyle $io)
     {
         $this->io = $io;
@@ -112,17 +122,21 @@ final class ConsoleOutput
             throw MsiCalculationException::create('min-msi');
         }
 
-        $this->io->error(
+        $errorMessage = $type === TestRunConstraintChecker::MSI_FAILURE ?
             sprintf(
                 self::CI_FLAG_ERROR,
-                ($type === TestRunConstraintChecker::MSI_FAILURE ? 'MSI' : 'Covered Code MSI'),
-                $minMsi,
-                ($type === TestRunConstraintChecker::MSI_FAILURE ?
-                    $metricsCalculator->getMutationScoreIndicator() :
-                    $metricsCalculator->getCoveredCodeMutationScoreIndicator()
-                )
-            )
-        );
+                'MSI',
+                number_format($minMsi, $this->getMsiDecimalAccuracy()),
+                number_format($metricsCalculator->getMutationScoreIndicator(), $this->getMsiDecimalAccuracy())
+            ) :
+            sprintf(
+                self::CI_FLAG_ERROR,
+                'Covered Code MSI',
+                number_format($minMsi, $this->getCoverageDecimalAccuracy()),
+                number_format($metricsCalculator->getCoveredCodeMutationScoreIndicator(), $this->getCoverageDecimalAccuracy())
+            );
+
+        $this->io->error($errorMessage);
     }
 
     public function logMissedDebuggerOrCoverageOption(): void
@@ -144,5 +158,25 @@ final class ConsoleOutput
             'Infection cannot control exit codes and unable to relaunch itself.' . PHP_EOL .
             'It is your responsibility to disable xdebug/phpdbg unless needed.',
         ]);
+    }
+
+    public function getMsiDecimalAccuracy(): int
+    {
+        return $this->msiDecimalAccuracy;
+    }
+
+    public function setMsiDecimalAccuracy(int $msiDecimalAccuracy): void
+    {
+        $this->msiDecimalAccuracy = $msiDecimalAccuracy;
+    }
+
+    public function getCoverageDecimalAccuracy(): int
+    {
+        return $this->coverageDecimalAccuracy;
+    }
+
+    public function setCoverageDecimalAccuracy(int $coverageDecimalAccuracy): void
+    {
+        $this->coverageDecimalAccuracy = $coverageDecimalAccuracy;
     }
 }

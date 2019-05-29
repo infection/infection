@@ -100,6 +100,24 @@ ASCII;
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
         }
 
+        if ($input->hasOption('min-msi')) {
+            $minMsi = \trim($input->getOption('min-msi'));
+            $dotPos = \strpos($minMsi, '.');
+
+            if ($dotPos !== false) {
+                $this->consoleOutput->setMsiDecimalAccuracy(\strlen($minMsi) - $dotPos + 1);
+            }
+        }
+
+        if ($input->hasOption('min-covered-msi')) {
+            $minCoveredMsi = \trim($input->getOption('min-covered-msi'));
+            $dotPos = \strpos($minCoveredMsi, '.');
+
+            if ($dotPos !== false) {
+                $this->consoleOutput->setCoverageDecimalAccuracy(\strlen($minCoveredMsi) - $dotPos + 1);
+            }
+        }
+
         $this->logRunningWithDebugger();
 
         if (!$this->isAutoExitEnabled()) {
