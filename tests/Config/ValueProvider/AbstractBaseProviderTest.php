@@ -70,7 +70,7 @@ abstract class AbstractBaseProviderTest extends TestCase
     {
         $mock = $this->createMock(StreamableInputInterface::class);
         $mock->method('isInteractive')
-            ->will($this->returnValue($interactive));
+            ->willReturn($interactive);
 
         if ($stream) {
             $mock->method('getStream')
