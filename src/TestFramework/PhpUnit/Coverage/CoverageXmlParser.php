@@ -123,7 +123,7 @@ class CoverageXmlParser
      */
     private function removeNamespace(string $xml): string
     {
-        return preg_replace('/xmlns=\".*?\"/', '', $xml);
+        return (string) preg_replace('/xmlns=\".*?\"/', '', $xml);
     }
 
     /**

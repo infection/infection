@@ -47,7 +47,7 @@ final class UnwrapArraySlice extends AbstractUnwrapMutator
         return 'array_slice';
     }
 
-    protected function getParameterIndexes(Node $node): \Generator
+    protected function getParameterIndexes(Node\Expr\FuncCall $node): \Generator
     {
         yield 0;
     }

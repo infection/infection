@@ -46,6 +46,7 @@ final class NotIdenticalNotEqual extends Mutator
     /**
      * Replaces "!==" with "!="
      *
+     * @param Node&Node\Expr\BinaryOp\NotIdentical $node
      *
      * @return Node\Expr\BinaryOp\NotEqual
      */

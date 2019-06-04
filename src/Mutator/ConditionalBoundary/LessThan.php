@@ -46,6 +46,7 @@ final class LessThan extends Mutator
     /**
      * Replaces "<" with "<="
      *
+     * @param Node&Node\Expr\BinaryOp\Smaller $node
      *
      * @return Node\Expr\BinaryOp\SmallerOrEqual
      */

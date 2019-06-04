@@ -46,12 +46,18 @@ final class ArrayItem extends Mutator
     /**
      * Replaces "[$a->foo => $b->bar]" with "[$a->foo > $b->bar]"
      *
+     * @param Node&Node\Expr\ArrayItem $node
      *
      * @return Node\Expr\BinaryOp\Greater
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\BinaryOp\Greater($node->key, $node->value, $node->getAttributes());
+        /** @var Node\Expr $key */
+        $key = $node->key;
+        /** @var Node\Expr $value */
+        $value = $node->value;
+
+        return new Node\Expr\BinaryOp\Greater($key, $value, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool
@@ -59,7 +65,7 @@ final class ArrayItem extends Mutator
         return $node instanceof Node\Expr\ArrayItem && $node->key && ($this->isNodeWithSideEffects($node->value) || $this->isNodeWithSideEffects($node->key));
     }
 
-    private function isNodeWithSideEffects(Node $node)
+    private function isNodeWithSideEffects(Node $node): bool
     {
         return
             // __get() can have side-effects

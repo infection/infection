@@ -46,6 +46,7 @@ final class BitwiseOr extends Mutator
     /**
      * Replaces "|" with "&"
      *
+     * @param Node&Node\Expr\BinaryOp\BitwiseOr $node
      *
      * @return Node\Expr\BinaryOp\BitwiseAnd
      */

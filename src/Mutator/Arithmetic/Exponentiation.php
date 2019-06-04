@@ -46,6 +46,7 @@ final class Exponentiation extends Mutator
     /**
      * Replaces "**" with "/"
      *
+     * @param Node&Node\Expr\BinaryOp\Pow $node
      *
      * @return Node\Expr\BinaryOp\Div
      */

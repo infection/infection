@@ -50,6 +50,7 @@ final class Increment extends Mutator
     /**
      * Replaces "++" with "--"
      *
+     * @param Node&(PostInc|PreInc) $node
      *
      * @return PostDec|PreDec
      */

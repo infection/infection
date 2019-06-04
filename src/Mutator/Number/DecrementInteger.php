@@ -55,6 +55,7 @@ final class DecrementInteger extends AbstractNumberMutator
     /**
      * Decrements an integer by 1
      *
+     * @param Node&Node\Scalar\LNumber $node
      *
      * @return Node\Scalar\LNumber
      */

@@ -46,6 +46,7 @@ final class MulEqual extends Mutator
     /**
      * Replaces "*=" with "/="
      *
+     * @param Node&Node\Expr\AssignOp\Mul $node
      *
      * @return Node\Expr\AssignOp\Div
      */

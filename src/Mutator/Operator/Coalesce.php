@@ -46,8 +46,9 @@ final class Coalesce extends Mutator
     /**
      * Replaces "'someValue' ?? 'otherValue';" with "'otherValue'"
      *
+     * @param Node&Node\Expr\BinaryOp\Coalesce $node
      *
-     * @return Node\Expr\BinaryOp\Coalesce
+     * @return Node\Expr
      */
     public function mutate(Node $node)
     {
