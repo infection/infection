@@ -46,6 +46,7 @@ final class For_ extends Mutator
     /**
      * Replaces "for($i=0; $i<10; $i++)" with "for($i=0; false; $i++)"
      *
+     * @param Node&Node\Stmt\For_ $node
      *
      * @return Node\Stmt\For_
      */

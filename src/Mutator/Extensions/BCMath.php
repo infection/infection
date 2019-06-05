@@ -57,13 +57,16 @@ final class BCMath extends Mutator
     }
 
     /**
-     * @param Node|Node\Expr\FuncCall $node
+     * @param Node&Node\Expr\FuncCall $node
      *
      * @return Node|Node[]|Generator
      */
     public function mutate(Node $node)
     {
-        yield from $this->converters[$node->name->toLowerString()]($node);
+        /** @var Node\Name $name */
+        $name = $node->name;
+
+        yield from $this->converters[$name->toLowerString()]($node);
     }
 
     protected function mutatesNode(Node $node): bool

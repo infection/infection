@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Finder;
 
 use Infection\Finder\Iterator\RealPathFilterIterator;
+use Iterator;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -89,6 +90,9 @@ final class SourceFilesFinder extends Finder
         return $this;
     }
 
+    /**
+     * @return RealPathFilterIterator|(iterable<\Symfony\Component\Finder\SplFileInfo>&Iterator)
+     */
     public function getIterator()
     {
         $iterator = parent::getIterator();

@@ -46,6 +46,7 @@ final class PowEqual extends Mutator
     /**
      * Replaces "**=" with "/="
      *
+     * @param Node&Node\Expr\AssignOp\Pow $node
      *
      * @return Node\Expr\AssignOp\Div
      */

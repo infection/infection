@@ -49,6 +49,7 @@ final class ProtectedVisibility extends Mutator
     /**
      * Replaces "protected function..." with "private function ..."
      *
+     * @param Node&ClassMethod $node
      *
      * @return ClassMethod
      */
@@ -85,7 +86,7 @@ final class ProtectedVisibility extends Mutator
         return !$this->hasSameProtectedParentMethod($node);
     }
 
-    private function hasSameProtectedParentMethod(Node $node): bool
+    private function hasSameProtectedParentMethod(ClassMethod $node): bool
     {
         /** @var \ReflectionClass|null $reflection */
         $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);

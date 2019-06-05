@@ -46,6 +46,7 @@ final class LogicalOr extends Mutator
     /**
      * Replaces "||" with "&&"
      *
+     * @param Node&Node\Expr\BinaryOp\BooleanOr $node
      *
      * @return Node\Expr\BinaryOp\BooleanAnd
      */

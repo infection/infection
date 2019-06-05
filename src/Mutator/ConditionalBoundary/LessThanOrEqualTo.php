@@ -46,6 +46,7 @@ final class LessThanOrEqualTo extends Mutator
     /**
      * Replaces "<=" with "<"
      *
+     * @param Node&Node\Expr\BinaryOp\SmallerOrEqual $node
      *
      * @return Node\Expr\BinaryOp\Smaller
      */

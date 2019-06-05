@@ -51,7 +51,7 @@ abstract class Mutator
     }
 
     /**
-     * @return Node|Node[]|\Generator
+     * @return Node|Node[]|\Generator|array
      */
     abstract public function mutate(Node $node);
 
@@ -78,7 +78,7 @@ abstract class Mutator
     {
         $parts = explode('\\', static::class);
 
-        return end($parts);
+        return (string) end($parts);
     }
 
     final protected function getSettings(): array

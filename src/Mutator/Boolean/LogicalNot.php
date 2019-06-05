@@ -45,6 +45,8 @@ final class LogicalNot extends Mutator
 {
     /**
      * Replaces "!something" with "something"
+     *
+     * @param Node&Node\Expr\BooleanNot $node
      */
     public function mutate(Node $node)
     {

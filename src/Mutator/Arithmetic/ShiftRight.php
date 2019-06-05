@@ -46,6 +46,7 @@ final class ShiftRight extends Mutator
     /**
      * Replaces ">>" with "<<"
      *
+     * @param Node&Node\Expr\BinaryOp\ShiftRight $node
      *
      * @return Node\Expr\BinaryOp\ShiftLeft
      */

@@ -46,6 +46,7 @@ final class DivEqual extends Mutator
     /**
      * Replaces "/=" with "*="
      *
+     * @param Node&Node\Expr\AssignOp\Div $node
      *
      * @return Node\Expr\AssignOp\Mul
      */

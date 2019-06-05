@@ -46,8 +46,9 @@ final class Foreach_ extends Mutator
     /**
      * Replaces "foreach($a as $b)" with "foreach(array() as $b)"
      *
+     * @param Node&Node\Stmt\Foreach_ $node
      *
-     * @return Node\Stmt\Foreach_
+     * @return Node&Node\Stmt\Foreach_
      */
     public function mutate(Node $node)
     {

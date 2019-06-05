@@ -46,6 +46,7 @@ final class LogicalLowerOr extends Mutator
     /**
      * Replaces "or" with "and"
      *
+     * @param Node&Node\Expr\BinaryOp\LogicalOr $node
      *
      * @return Node\Expr\BinaryOp\LogicalAnd
      */

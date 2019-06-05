@@ -47,7 +47,7 @@ final class UnwrapArrayIntersect extends AbstractUnwrapMutator
         return 'array_intersect';
     }
 
-    protected function getParameterIndexes(Node $node): \Generator
+    protected function getParameterIndexes(Node\Expr\FuncCall $node): \Generator
     {
         yield from array_keys($node->args);
     }
