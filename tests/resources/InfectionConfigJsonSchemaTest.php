@@ -41,7 +41,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  */
-class InfectionConfigJsonSchemaTest extends TestCase
+final class InfectionConfigJsonSchemaTest extends TestCase
 {
     use JsonAssertions;
 
