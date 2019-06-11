@@ -89,9 +89,9 @@ final class MetricsCalculatorTest extends TestCase
         $this->addMutantProcess($calculator, MutantProcess::CODE_ERROR, 2);
         $this->assertSame(2, $calculator->getErrorCount());
 
-        $this->assertSame(78.0, $calculator->getMutationScoreIndicator()); // 78.57
-        $this->assertSame(92.0, $calculator->getCoverageRate()); // 92.85
-        $this->assertSame(84.0, $calculator->getCoveredCodeMutationScoreIndicator()); // 84.61
+        $this->assertSame(78.57142857142857, $calculator->getMutationScoreIndicator());
+        $this->assertSame(92.85714285714286, $calculator->getCoverageRate());
+        $this->assertSame(84.61538461538461, $calculator->getCoveredCodeMutationScoreIndicator());
     }
 
     private function addMutantProcess(MetricsCalculator $calculator, int $resultCode, int $count = 1): void
