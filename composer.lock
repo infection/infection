@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1bd627a0b3e7ec9b72766daacf768c1a",
+    "content-hash": "113b3aa6e4268a7c95c1fd7461a412cd",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -1219,6 +1219,91 @@
                 "instantiate"
             ],
             "time": "2019-03-17T17:37:11+00:00"
+        },
+        {
+            "name": "flow/jsonpath",
+            "version": "0.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/FlowCommunications/JSONPath.git",
+                "reference": "f0222818d5c938e4ab668ab2e2c079bd51a27112"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/FlowCommunications/JSONPath/zipball/f0222818d5c938e4ab668ab2e2c079bd51a27112",
+                "reference": "f0222818d5c938e4ab668ab2e2c079bd51a27112",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "peekmo/jsonpath": "dev-master",
+                "phpunit/phpunit": "^4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Flow\\JSONPath": "src/",
+                    "Flow\\JSONPath\\Test": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Stephen Frank",
+                    "email": "stephen@flowsa.com"
+                }
+            ],
+            "description": "JSONPath implementation for parsing, searching and flattening arrays",
+            "time": "2018-03-04T16:39:47+00:00"
+        },
+        {
+            "name": "helmich/phpunit-json-assert",
+            "version": "v2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/martin-helmich/phpunit-json-assert.git",
+                "reference": "8ec83fc433ac60b99b51615fdfb5e061b1371a5c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/martin-helmich/phpunit-json-assert/zipball/8ec83fc433ac60b99b51615fdfb5e061b1371a5c",
+                "reference": "8ec83fc433ac60b99b51615fdfb5e061b1371a5c",
+                "shasum": ""
+            },
+            "require": {
+                "flow/jsonpath": "^0.4.0",
+                "justinrainbow/json-schema": "^5.0",
+                "php": ">=7.0"
+            },
+            "conflict": {
+                "phpunit/phpunit": "<6.0 || >= 8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.0 | ^7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Helmich\\JsonAssert\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Martin Helmich",
+                    "email": "m.helmich@mittwald.de"
+                }
+            ],
+            "description": "PHPUnit assertions for JSON documents",
+            "time": "2019-03-22T17:40:25+00:00"
         },
         {
             "name": "myclabs/deep-copy",
