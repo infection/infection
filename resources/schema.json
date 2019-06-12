@@ -126,6 +126,7 @@
                                 "type": "object",
                                 "additionalProperties": false,
                                 "properties": {
+                                    "ignore": {"type": "array", "items": {"type": "string"}},
                                     "settings": {
                                         "type": "object",
                                         "additionalProperties": false,
@@ -155,6 +156,7 @@
                                 "type": "object",
                                 "additionalProperties": false,
                                 "properties": {
+                                    "ignore": {"type": "array", "items": {"type": "string"}},
                                     "settings": {
                                         "type": "object",
                                         "additionalProperties": false,
@@ -203,6 +205,7 @@
                                 "type": "object",
                                 "additionalProperties": false,
                                 "properties": {
+                                    "ignore": {"type": "array", "items": {"type": "string"}},
                                     "settings": {
                                         "type": "object",
                                         "additionalProperties": false,
