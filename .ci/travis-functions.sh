@@ -32,7 +32,7 @@ function get-infection-pr-flags() {
         if [ -z "$CHANGED_FILES" ]; then
             INFECTION_PR_FLAGS="";
         else
-            INFECTION_PR_FLAGS="--filter=${CHANGED_FILES} --ignore-msi-with-no-mutations --only-covered --min-msi=90";
+            INFECTION_PR_FLAGS="--filter=${CHANGED_FILES} --ignore-msi-with-no-mutations --only-covered --min-msi=90 --show-mutations";
         fi
     fi
 
