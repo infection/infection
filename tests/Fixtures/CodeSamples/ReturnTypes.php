@@ -2,7 +2,7 @@
 
 namespace Infection\CodeSamples;
 
-class ReturnTypes
+class ReturnTypes extends \ArrayObject
 {
     public function withReturnType(): int
     {

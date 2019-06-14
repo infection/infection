@@ -103,7 +103,7 @@ final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
                 $this->onConsecutiveCalls(
                     $this->throwException(new \Exception()),
                     $this->throwException(new \Exception()),
-                    true
+                    ''
                 )
             );
 
@@ -128,7 +128,7 @@ final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
             ->will(
                 $this->onConsecutiveCalls(
                     $this->throwException(new \Exception()),
-                    true
+                    ''
                 )
             );
 
@@ -159,7 +159,7 @@ final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
                 $this->onConsecutiveCalls(
                     $this->throwException(new \Exception()),
                     $this->throwException(new \Exception()),
-                    true
+                    ''
                 )
             );
 

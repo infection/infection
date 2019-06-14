@@ -74,7 +74,7 @@ PHP
         rmdir($this->directory);
     }
 
-    public function test_it_uses_avaialable_file_if_hash_is_the_same(): void
+    public function test_it_uses_available_file_if_hash_is_the_same(): void
     {
         $standard = $this->createMock(Standard::class);
         $standard->method('prettyPrintFile')
