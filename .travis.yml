@@ -107,7 +107,7 @@ jobs:
       <<: *STANDARD_TEST_JOB
       php: 7.3
       env: DEPS="LOW" PHPDBG=1
-    
+
     -
       <<: *STANDARD_TEST_JOB
       php: 7.4snapshot
