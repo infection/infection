@@ -69,11 +69,6 @@ analyze: cs-check analyze-ci
 analyze-ci:	## Runs static analyzers and various other checks
 analyze-ci: phpstan validate
 
-.PHONY: auto-review
-auto-review:	## TODO: find a suitable description
-auto-review: vendor
-	$(PHPUNIT) --group=auto-review
-
 .PHONY: validate
 validate:	## Checks that the composer.json file is valid
 validate:
