@@ -40,45 +40,45 @@ FLOCK=./devTools/flock
 #---------------------------------------------------------------------------
 
 .PHONY: compile
-compile:	 ## Bundles Infection into a PHAR
+compile:	## Bundles Infection into a PHAR
 compile: $(INFECTION)
 
 .PHONY: cs-fix
-cs-fix:	  	 ## Runs PHP-CS-Fixer
+cs-fix:	  	## Runs PHP-CS-Fixer
 cs-fix: $(PHP_CS_FIXER)
 	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE)
 
 .PHONY: cs-check
-cs-check:	 ## Runs PHP-CS-Fixer in dry mode
+cs-check:	## Runs PHP-CS-Fixer in dry mode
 cs-check: $(PHP_CS_FIXER)
 	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE) --dry-run --stop-on-violation
 
 .PHONY: phpstan
-phpstan:  	 ## Runs PHPStan
+phpstan:  	## Runs PHPStan
 phpstan: vendor $(PHPSTAN)
 	$(PHPSTAN) analyse src --level=max --configuration ./devTools/phpstan-src.neon --no-interaction --no-progress
 	$(PHPSTAN) analyse tests --level=4 --configuration ./devTools/phpstan-tests.neon --no-interaction --no-progress
 
 .PHONY: analyze
-analyze:	 ## Runs CS fixers, static analyzers and various other checks
+analyze:	## Runs CS fixers, static analyzers and various other checks
 analyze: cs-check analyze-ci
 
 .PHONY: analyze-ci
-analyze-ci:	 ## Runs static analyzers and various other checks
+analyze-ci:	## Runs static analyzers and various other checks
 analyze-ci: phpstan validate
 
 .PHONY: validate
-validate:	 ## Checks that the composer.json file is valid
+validate:	## Checks that the composer.json file is valid
 validate:
 	composer validate --strict
 
 .PHONY: test
-test:		 ## Runs all the tests
+test:		## Runs all the tests
 # TODO: add a test to ensure we are not missing targets here
-test: test-unit test-e2e-phpdbg test-e2e-xdebug test-infection-phpdbg test-infection-xdebug
+test: test-unit test-e2e test-infection
 
 .PHONY: test-unit
-test-unit:	 ## Runs the unit tests
+test-unit:	## Runs the unit tests
 test-unit: test-unit-72 test-unit-73
 
 .PHONY: test-unit-72
@@ -89,8 +89,11 @@ test-unit-72: $(DOCKER_RUN_72_IMAGE) $(PHPUNIT)
 test-unit-73: $(DOCKER_RUN_73_IMAGE) $(PHPUNIT)
 	$(DOCKER_RUN_73) $(PHPUNIT)
 
+.PHONY: test-e2e
+test-e2e: 	## Runs the end-to-end tests
+test-e2e: test-e2e-phpdbg test-e2e-xdebug
+
 .PHONY: test-e2e-phpdbg
-test-e2e-phpdbg: ## Runs the end-to-end tests for PHPDBG
 test-e2e-phpdbg: test-e2e-phpdbg-72 test-e2e-phpdbg-73
 
 .PHONY: test-e2e-phpdbg-72
@@ -102,7 +105,6 @@ test-e2e-phpdbg-73: $(DOCKER_RUN_73_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_73) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-e2e-xdebug
-test-e2e-xdebug: ## Runs the end-to-end tests for xdebug
 test-e2e-xdebug: test-e2e-xdebug-72 test-e2e-xdebug-73
 
 .PHONY: test-e2e-xdebug-72
@@ -113,8 +115,11 @@ test-e2e-xdebug-72: $(DOCKER_RUN_72_IMAGE) $(INFECTION)
 test-e2e-xdebug-73: $(DOCKER_RUN_73_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_73) ./tests/e2e_tests $(INFECTION)
 
+.PHONY: test-infection
+test-infection: ## Runs Infection against itself
+test-infection: test-infection-phpdbg test-infection-xdebug
+
 .PHONY: test-infection-phpdbg
-test-infection-phpdbg: ## Runs Infection with PHPDBG against itself
 test-infection-phpdbg: test-infection-phpdbg-72 test-infection-phpdbg-73
 
 .PHONY: test-infection-phpdbg-72
@@ -126,7 +131,6 @@ test-infection-phpdbg-73: $(DOCKER_RUN_73_IMAGE)
 	$(DOCKER_RUN_73) phpdbg -qrr bin/infection --threads=4
 
 .PHONY: test-infection-xdebug
-test-infection-xdebug: ## Runs Infection with xdebug against itself
 test-infection-xdebug: test-infection-xdebug-72 test-infection-xdebug-73
 
 .PHONY: test-infection-xdebug-72
