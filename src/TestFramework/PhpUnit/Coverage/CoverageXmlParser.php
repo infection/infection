@@ -66,9 +66,7 @@ class CoverageXmlParser
         foreach ($nodes as $node) {
             $relativeFilePath = $node->getAttribute('href');
 
-            $fileCoverage = $this->processXmlFileCoverage($relativeFilePath, $projectSource);
-
-            $coverage[] = $fileCoverage;
+            $coverage[] = $this->processXmlFileCoverage($relativeFilePath, $projectSource);
         }
 
         return array_merge(...$coverage);
