@@ -5,7 +5,7 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/infection/infection/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/infection/infection/?branch=master) 
 [![Infection MSI](https://badge.stryker-mutator.io/github.com/infection/infection/master)](https://infection.github.io)
 [![codecov](https://codecov.io/gh/infection/infection/branch/master/graph/badge.svg)](https://codecov.io/gh/infection/infection)
-[![Slack](https://img.shields.io/badge/slack-%23infection-green.svg?style=flat-square)](https://symfony.com/slack-invite)
+[![Slack channel: #infection on the Symfony slack](https://img.shields.io/badge/slack-%23infection-green.svg?style=flat-square)](https://symfony.com/slack-invite)
 
 
 Infection - Mutation Testing framework
