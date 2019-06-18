@@ -82,12 +82,10 @@ test-unit:	## Runs the unit tests
 test-unit: test-unit-72 test-unit-73
 
 .PHONY: test-unit-72
-test-unit-72:	## Runs the unit tests for PHP 7.2
 test-unit-72: $(DOCKER_RUN_72_IMAGE) $(PHPUNIT)
 	$(DOCKER_RUN_72) $(PHPUNIT)
 
 .PHONY: test-unit-73
-test-unit-73:	## Runs the unit tests for PHP 7.3
 test-unit-73: $(DOCKER_RUN_73_IMAGE) $(PHPUNIT)
 	$(DOCKER_RUN_73) $(PHPUNIT)
 
@@ -96,12 +94,10 @@ test-e2e-phpdbg:	## Runs the end-to-end tests for PHPDBG
 test-e2e-phpdbg: test-e2e-phpdbg-72 test-e2e-phpdbg-73
 
 .PHONY: test-e2e-phpdbg-72
-test-e2e-phpdbg-72:	## Runs the end-to-end tests for PHPDBG in PHP 7.2
 test-e2e-phpdbg-72: $(DOCKER_RUN_72_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_72) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-e2e-phpdbg-73
-test-e2e-phpdbg-73:	## Runs the end-to-end tests for PHPDBG in PHP 7.3
 test-e2e-phpdbg-73: $(DOCKER_RUN_73_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_73) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
 
@@ -110,12 +106,10 @@ test-e2e-xdebug:	## Runs the end-to-end tests for xdebug
 test-e2e-xdebug: test-e2e-xdebug-72 test-e2e-xdebug-73
 
 .PHONY: test-e2e-xdebug-72
-test-e2e-xdebug-72:	## Runs the end-to-end tests for xdebug in PHP 7.2
 test-e2e-xdebug-72: $(DOCKER_RUN_72_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_72) ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-e2e-xdebug-73
-test-e2e-xdebug-73:	## Runs the end-to-end tests for xdebug in PHP 7.3
 test-e2e-xdebug-73: $(DOCKER_RUN_73_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_73) ./tests/e2e_tests $(INFECTION)
 
@@ -124,14 +118,12 @@ test-infection-phpdbg:		## Runs Infection with PHPDBG against itself
 test-infection-phpdbg: test-infection-phpdbg-72 test-infection-phpdbg-73
 
 .PHONY: test-infection-phpdbg-72
-test-infection-phpdbg-72:	## Runs Infection with PHPDBG against itself in PHP 7.2
 test-infection-phpdbg-72: $(DOCKER_RUN_72_IMAGE)
 	# TODO: calculate the number of thread here instead of using the arbitrary number 4
 	# TODO: check other occurrences
 	$(DOCKER_RUN_72) phpdbg -qrr bin/infection --threads=4
 
 .PHONY: test-infection-phpdbg-73
-test-infection-phpdbg-73:	## Runs Infection with PHPDBG against itself in PHP 7.3
 test-infection-phpdbg-73: $(DOCKER_RUN_73_IMAGE)
 	$(DOCKER_RUN_73) phpdbg -qrr bin/infection --threads=4
 
@@ -140,12 +132,10 @@ test-infection-xdebug:		## Runs Infection with xdebug against itself
 test-infection-xdebug: test-infection-xdebug-72 test-infection-xdebug-73
 
 .PHONY: test-infection-xdebug-72
-test-infection-xdebug-72:	## Runs Infection with xdebug against itself in PHP 7.2
 test-infection-xdebug-72: $(DOCKER_RUN_72_IMAGE)
 	$(DOCKER_RUN_72) ./bin/infection --threads=4
 
 .PHONY: test-infection-xdebug-73
-test-infection-xdebug-73:	## Runs Infection with xdebug against itself in PHP 7.3
 test-infection-xdebug-73: $(DOCKER_RUN_73_IMAGE)
 	$(DOCKER_RUN_73) ./bin/infection --threads=4
 
