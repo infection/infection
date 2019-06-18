@@ -183,7 +183,6 @@ class CoverageXmlParser
             $methodsCoverage[$methodName] = [
                 'startLine' => (int) $methodsCoverageNode->getAttribute('start'),
                 'endLine' => (int) $methodsCoverageNode->getAttribute('end'),
-                'executable' => (int) $methodsCoverageNode->getAttribute('executable'),
                 'executed' => (int) $methodsCoverageNode->getAttribute('executed'),
                 'coverage' => (int) $methodsCoverageNode->getAttribute('coverage'),
             ];
