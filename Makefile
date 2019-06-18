@@ -46,13 +46,11 @@ compile: $(INFECTION)
 .PHONY: cs-fix
 cs-fix:	  	## Runs PHP-CS-Fixer
 cs-fix: $(PHP_CS_FIXER)
-	# TODO: disable verbose mode?
 	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE)
 
 .PHONY: cs-check
 cs-check:	## Runs PHP-CS-Fixer in dry mode
 cs-check: $(PHP_CS_FIXER)
-	# TODO: disable verbose mode?
 	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE) --dry-run --stop-on-violation
 
 .PHONY: phpstan
