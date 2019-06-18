@@ -119,8 +119,6 @@ test-infection-phpdbg: test-infection-phpdbg-72 test-infection-phpdbg-73
 
 .PHONY: test-infection-phpdbg-72
 test-infection-phpdbg-72: $(DOCKER_RUN_72_IMAGE)
-	# TODO: calculate the number of thread here instead of using the arbitrary number 4
-	# TODO: check other occurrences
 	$(DOCKER_RUN_72) phpdbg -qrr bin/infection --threads=4
 
 .PHONY: test-infection-phpdbg-73
