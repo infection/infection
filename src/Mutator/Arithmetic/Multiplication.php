@@ -46,6 +46,7 @@ final class Multiplication extends Mutator
     /**
      * Replaces "*" with "/"
      *
+     * @param Node&Node\Expr\BinaryOp\Mul $node
      *
      * @return Node\Expr\BinaryOp\Div
      */

@@ -47,17 +47,14 @@ final class IntegerNegation extends Mutator
      * Replaces any integer with negated integer value.
      * Replaces "-5" with "5"
      *
+     * @param Node&Node\Stmt\Return_ $node
      *
      * @return Node\Stmt\Return_
      */
     public function mutate(Node $node)
     {
-        $integerValue = $node->expr instanceof Node\Expr\UnaryMinus
-            ? -$node->expr->expr->value
-            : $node->expr->value;
-
         return new Node\Stmt\Return_(
-            new Node\Scalar\LNumber(-1 * $integerValue, $node->getAttributes())
+            new Node\Scalar\LNumber(-1 * $this->getIntegerValueOfNode($node), $node->getAttributes())
         );
     }
 
@@ -82,5 +79,23 @@ final class IntegerNegation extends Mutator
         }
 
         return true;
+    }
+
+    /**
+     * @param Node&Node\Stmt\Return_ $node
+     */
+    private function getIntegerValueOfNode(Node $node): int
+    {
+        /** @var Node\Expr\UnaryMinus|Node\Scalar\LNumber $expression */
+        $expression = $node->expr;
+
+        if ($expression instanceof Node\Expr\UnaryMinus) {
+            /** @var Node\Scalar\LNumber $innerExpression */
+            $innerExpression = $expression->expr;
+
+            return -$innerExpression->value;
+        }
+
+        return $expression->value;
     }
 }

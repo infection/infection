@@ -8,15 +8,9 @@ environment:
   - dependencies: highest
     php_ver_target: 7.2
     xdebug_ver: '2.6.0-7.2-vc15'
-  - dependencies: highest
-    php_ver_target: 7.1
-    xdebug_ver: '2.6.0-7.1-vc14'
   - dependencies: current
     php_ver_target: 7.2
     xdebug_ver: '2.6.0-7.2-vc15'
-  - dependencies: current
-    php_ver_target: 7.1
-    xdebug_ver: '2.6.0-7.1-vc14'
 
 cache: # cache is cleared when linked file is modified
     - '%LOCALAPPDATA%\Composer\files -> composer.lock'

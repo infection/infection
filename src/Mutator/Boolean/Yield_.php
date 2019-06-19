@@ -46,12 +46,17 @@ final class Yield_ extends Mutator
     /**
      * Replaces "yield $a => $b;" with "yield $a > $b;"
      *
+     * @param Node&Node\Expr\Yield_ $node
      *
      * @return Node|Node\Expr\Yield_
      */
     public function mutate(Node $node)
     {
-        $node->value = new Node\Expr\BinaryOp\Greater($node->key, $node->value, $node->getAttributes());
+        /** @var Node\Expr $key */
+        $key = $node->key;
+        /** @var Node\Expr $value */
+        $value = $node->value;
+        $node->value = new Node\Expr\BinaryOp\Greater($key, $value, $node->getAttributes());
         $node->key = null;
 
         return $node;

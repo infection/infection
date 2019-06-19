@@ -1,5 +1,47 @@
 # Change Log
 
+## [0.13.0](https://github.com/infection/infection/tree/0.13.0)
+
+[Full Changelog](https://github.com/infection/infection/compare/0.12.2...0.13.0) (2019-05-18)
+
+**Added:**
+
+- Log the InitialTestsRun command line when `--debug` is used [\#520](https://github.com/infection/infection/issues/520)
+- Preliminary support for PCOV [\#667](https://github.com/infection/infection/pull/667) 
+- Adding Line Numbers To Mutator Ignore List [\#663](https://github.com/infection/infection/pull/663)
+- Family bc\*-functions mutators \(bcmath support\) [\#658](https://github.com/infection/infection/issues/658)
+- Family mb\_\*-functions mutators [\#654](https://github.com/infection/infection/issues/654)
+- Add a new unwrap mutator: ucwords [\#644](https://github.com/infection/infection/issues/644)
+- New @unwrap mutator: lcfirst\(\) [\#642](https://github.com/infection/infection/issues/642)
+- Provide compact output for CI environments [\#613](https://github.com/infection/infection/issues/613)
+- add unwrap array\_pad mutator [\#680](https://github.com/infection/infection/pull/680)
+- add unwrap array\_intersect\_assoc mutator [\#679](https://github.com/infection/infection/pull/679)
+- \#597 Array item removal mutator [\#649](https://github.com/infection/infection/pull/649)
+- Enhancement: Implement UnwrapTrim mutator [\#638](https://github.com/infection/infection/pull/638)
+- Enhancement: Implement UnwrapArrayUintersect mutator [\#637](https://github.com/infection/infection/pull/637)
+- Enhancement: Implement UnwrapArrayUintersectUassoc mutator [\#633](https://github.com/infection/infection/pull/633)
+- Enhancement: Implement UnwrapArrayUintersectAssoc mutator [\#628](https://github.com/infection/infection/pull/628)
+- Enhancement: Implement UnwrapArrayUdiff mutator [\#624](https://github.com/infection/infection/pull/624)
+- Mutator: AssignCoalesce. Upgrade PHPParser to 4.2.1 [\#641](https://github.com/infection/infection/pull/641)
+- Mutator: UnwrapUcFirst \(unwrap the first argument of ucfirst\(\) function\) [\#635](https://github.com/infection/infection/pull/635)
+
+**Fixed:**
+
+- Multi line arrays are not properly handled by code coverage [\#652](https://github.com/infection/infection/issues/652)
+- Error when parsing method that creates anonymous class [\#616](https://github.com/infection/infection/issues/616)
+- Infection gets stuck in the first execution after configuration file is created [\#576](https://github.com/infection/infection/issues/576)
+- Wrong constructor ownership when returning an anonymous class [\#682](https://github.com/infection/infection/issues/682)
+- Do not mutate \* to / and vice versa if one of the operands is numeric ±1.0 [\#673](https://github.com/infection/infection/pull/673)
+
+
+**Changed:**
+
+- Stop traversal of interfaces and abstract methods [\#656](https://github.com/infection/infection/pull/656)
+- Add a few more count esque functions to not decrement against [\#640](https://github.com/infection/infection/pull/640)
+- Enhancement: Normalize composer.json [\#629](https://github.com/infection/infection/pull/629)
+- Upgrade PHPUnit from ^6.5 to ^7.5 and all dependencies, including root differ [\#627](https://github.com/infection/infection/pull/627)
+- Test against php 7.4 [\#625](https://github.com/infection/infection/pull/625)
+
 ## [0.12.0](https://github.com/infection/infection/tree/0.12.0) (2019-01-24) 
 
 [Full Changelog](https://github.com/infection/infection/compare/0.11.0...0.12.0)

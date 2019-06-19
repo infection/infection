@@ -65,8 +65,8 @@ final class PerMutatorLogger extends FileLogger
                 $calculator->getEscapedCount() . ' | ' .
                 $calculator->getErrorCount() . ' | ' .
                 $calculator->getTimedOutCount() . ' | ' .
-                $calculator->getMutationScoreIndicator() . '| ' .
-                $calculator->getCoveredCodeMutationScoreIndicator() . '|';
+                floor($calculator->getMutationScoreIndicator()) . '| ' .
+                floor($calculator->getCoveredCodeMutationScoreIndicator()) . '|';
         }
 
         return $logs;

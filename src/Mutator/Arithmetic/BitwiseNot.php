@@ -45,6 +45,8 @@ final class BitwiseNot extends Mutator
 {
     /**
      * Replaces "~" with "" (removed)
+     *
+     * @param Node&Node\Expr\BitwiseNot $node
      */
     public function mutate(Node $node)
     {

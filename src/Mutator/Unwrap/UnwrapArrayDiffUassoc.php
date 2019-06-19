@@ -47,7 +47,7 @@ final class UnwrapArrayDiffUassoc extends AbstractUnwrapMutator
         return 'array_diff_uassoc';
     }
 
-    protected function getParameterIndexes(Node $node): \Generator
+    protected function getParameterIndexes(Node\Expr\FuncCall $node): \Generator
     {
         yield 0;
     }

@@ -154,10 +154,10 @@ abstract class AbstractMutatorTestCase extends TestCase
         $mutationsCollectorVisitor = new SimpleMutationsCollectorVisitor($this->getMutator($settings), $initialStatements);
 
         $traverser->addVisitor(new NotMutableIgnoreVisitor());
-        $traverser->addVisitor($mutationsCollectorVisitor);
         $traverser->addVisitor(new ParentConnectorVisitor());
         $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
         $traverser->addVisitor(new ReflectionVisitor());
+        $traverser->addVisitor($mutationsCollectorVisitor);
 
         $traverser->traverse($initialStatements);
 

@@ -55,6 +55,7 @@ final class DecrementInteger extends AbstractNumberMutator
     /**
      * Decrements an integer by 1
      *
+     * @param Node&Node\Scalar\LNumber $node
      *
      * @return Node\Scalar\LNumber
      */
@@ -88,7 +89,7 @@ final class DecrementInteger extends AbstractNumberMutator
             return true;
         }
 
-        if ($parentNode->left instanceof Node\Expr\FuncCall
+        if ($parentNode->left instanceof Node\Expr\FuncCall && $parentNode->left->name instanceof Node\Name
             && \in_array(
                 $parentNode->left->name->toLowerString(),
                 self::COUNT_NAMES,
@@ -97,7 +98,7 @@ final class DecrementInteger extends AbstractNumberMutator
             return false;
         }
 
-        if ($parentNode->right instanceof Node\Expr\FuncCall
+        if ($parentNode->right instanceof Node\Expr\FuncCall && $parentNode->right->name instanceof Node\Name
             && \in_array(
                 $parentNode->right->name->toLowerString(),
                 self::COUNT_NAMES,

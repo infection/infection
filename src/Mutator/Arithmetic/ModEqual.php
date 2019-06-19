@@ -46,6 +46,7 @@ final class ModEqual extends Mutator
     /**
      * Replaces "%=" with "*="
      *
+     * @param Node&Node\Expr\AssignOp\Mod $node
      *
      * @return Node\Expr\AssignOp\Mul
      */

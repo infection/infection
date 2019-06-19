@@ -49,6 +49,7 @@ final class PublicVisibility extends Mutator
     /**
      * Replaces "public function..." with "protected function ..."
      *
+     * @param Node&ClassMethod $node
      *
      * @return ClassMethod
      */
@@ -85,7 +86,7 @@ final class PublicVisibility extends Mutator
         return !$this->hasSamePublicParentMethod($node);
     }
 
-    private function hasSamePublicParentMethod(Node $node): bool
+    private function hasSamePublicParentMethod(ClassMethod $node): bool
     {
         /** @var \ReflectionClass|null $reflection */
         $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
