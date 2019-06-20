@@ -208,6 +208,9 @@ class CodeCoverageData
         return $this->coverage;
     }
 
+    /**
+     * Pass $coverage by reference to avoid copying data and reduce memory usage
+     */
     private function addTestExecutionInfo(array &$coverage): void
     {
         if (!$this->testFileDataProvider) {
