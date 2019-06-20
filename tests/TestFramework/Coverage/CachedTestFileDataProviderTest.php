@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
+use Infection\TestFramework\Coverage\TestFileTimeData;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -51,7 +52,7 @@ final class CachedTestFileDataProviderTest extends TestCase
         $providerMock->expects($this->once())
             ->method('getTestFileInfo')
             ->with($class)
-            ->willReturn(['data']);
+            ->willReturn(TestFileTimeData::from('path/to/Test.php', 4.567));
 
         $infoProvider = new CachedTestFileDataProvider($providerMock);
 

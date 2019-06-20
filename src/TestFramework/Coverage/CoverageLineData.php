@@ -38,31 +38,40 @@ namespace Infection\TestFramework\Coverage;
 /**
  * @internal
  */
-final class CachedTestFileDataProvider implements TestFileDataProvider
+final class CoverageLineData
 {
     /**
-     * @var TestFileDataProvider
+     * @var string
      */
-    private $testFileDataProvider;
+    public $testMethod;
 
     /**
-     * @var array<string, TestFileTimeData>
+     * @var ?string
      */
-    private $testFileInfoCache = [];
+    public $testFilePath;
 
-    public function __construct(TestFileDataProvider $testFileDataProvider)
+    /**
+     * @var ?float
+     */
+    public $time;
+
+    public static function withTestMethod(string $testMethod): self
     {
-        $this->testFileDataProvider = $testFileDataProvider;
+        $self = new self();
+
+        $self->testMethod = $testMethod;
+
+        return $self;
     }
 
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
+    public static function with(string $testMethod, string $testFilePath, float $time): self
     {
-        if (\array_key_exists($fullyQualifiedClassName, $this->testFileInfoCache)) {
-            return $this->testFileInfoCache[$fullyQualifiedClassName];
-        }
+        $self = new self();
 
-        return $this->testFileInfoCache[$fullyQualifiedClassName] = $this->testFileDataProvider->getTestFileInfo(
-            $fullyQualifiedClassName
-        );
+        $self->testMethod = $testMethod;
+        $self->testFilePath = $testFilePath;
+        $self->time = $time;
+
+        return $self;
     }
 }

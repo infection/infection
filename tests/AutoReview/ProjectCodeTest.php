@@ -58,6 +58,10 @@ use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\Coverage\CoverageMethodData;
+use Infection\TestFramework\Coverage\TestFileTimeData;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder as PhpSpecInitalConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder as PhpSpecMutationConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\NoCodeCoverageException;
@@ -309,7 +313,7 @@ final class ProjectCodeTest extends TestCase
     }
 
     /**
-     * @dataProvider providesSourceClasses
+     * @dataProvider providesSourceClassesToCheckPublicProperties
      */
     public function test_src_classes_do_not_expose_public_properties(string $className): void
     {
@@ -410,6 +414,32 @@ final class ProjectCodeTest extends TestCase
                 return [$item];
             },
             $this->getSrcClasses()
+        );
+    }
+
+    public function providesSourceClassesToCheckPublicProperties()
+    {
+        $sourceClasses = array_filter(
+            $this->getSrcClasses(),
+            static function (string $className): bool {
+                return !\in_array(
+                    $className,
+                    [
+                        CoverageFileData::class,
+                        CoverageLineData::class,
+                        CoverageMethodData::class,
+                        TestFileTimeData::class,
+                    ],
+                true
+                );
+            }
+        );
+
+        return array_map(
+            static function ($item) {
+                return [$item];
+            },
+            $sourceClasses
         );
     }
 

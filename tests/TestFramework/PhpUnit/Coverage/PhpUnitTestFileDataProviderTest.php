@@ -68,8 +68,8 @@ final class PhpUnitTestFileDataProviderTest extends TestCase
     {
         $info = $this->infoProvider->getTestFileInfo('Infection\Tests\Config\InfectionConfigTest');
 
-        $this->assertSame('/project/tests/Config/InfectionConfigTest.php', $info['path']);
-        $this->assertSame(0.021983, $info['time']);
+        $this->assertSame('/project/tests/Config/InfectionConfigTest.php', $info->path);
+        $this->assertSame(0.021983, $info->time);
     }
 
     public function test_consecutive_calls_with_the_same_class_return_the_same_result(): void
@@ -77,7 +77,8 @@ final class PhpUnitTestFileDataProviderTest extends TestCase
         $info1 = $this->infoProvider->getTestFileInfo('Infection\Tests\Config\InfectionConfigTest');
         $info2 = $this->infoProvider->getTestFileInfo('Infection\Tests\Config\InfectionConfigTest');
 
-        $this->assertSame($info1, $info2);
+        $this->assertSame($info1->path, $info2->path);
+        $this->assertSame($info1->time, $info2->time);
     }
 
     public function test_it_throws_a_coverage_does_not_exists_exception_when_junit_file_does_not_exist(): void

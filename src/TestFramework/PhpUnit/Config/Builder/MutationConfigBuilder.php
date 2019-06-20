@@ -37,6 +37,7 @@ namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
 use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
+use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 
 /**
@@ -148,6 +149,9 @@ AUTOLOAD;
         }
     }
 
+    /**
+     * @param CoverageLineData[] $coverageTests
+     */
     private function setFilteredTestsToRun(array $coverageTests, \DOMDocument $dom, \DOMXPath $xPath): void
     {
         $this->removeExistingTestSuite($xPath);
@@ -171,6 +175,9 @@ AUTOLOAD;
         }
     }
 
+    /**
+     * @param CoverageLineData[] $coverageTests
+     */
     private function addTestSuiteWithFilteredTestFiles(array $coverageTests, \DOMDocument $dom, \DOMXPath $xPath): void
     {
         $testSuites = $xPath->query('/phpunit/testsuites');
@@ -184,17 +191,24 @@ AUTOLOAD;
         $testSuite = $dom->createElement('testsuite');
         $testSuite->setAttribute('name', 'Infection testsuite with filtered tests');
 
-        $uniqueCoverageTests = $this->unique($coverageTests);
+        $uniqueCoverageTests = $this->uniqueByTestFile($coverageTests);
 
         // sort tests to run the fastest first
         usort(
             $uniqueCoverageTests,
-            static function (array $a, array $b) {
-                return $a['time'] <=> $b['time'];
+            static function (CoverageLineData $a, CoverageLineData $b) {
+                return $a->time <=> $b->time;
             }
         );
 
-        $uniqueTestFilePaths = array_column($uniqueCoverageTests, 'testFilePath');
+        $uniqueTestFilePaths = array_map(
+            static function (CoverageLineData $coverageLineData): string {
+                \assert(\is_string($coverageLineData->testFilePath));
+
+                return $coverageLineData->testFilePath;
+            },
+            $uniqueCoverageTests
+        );
 
         foreach ($uniqueTestFilePaths as $testFilePath) {
             $file = $dom->createElement('file', $testFilePath);
@@ -207,15 +221,20 @@ AUTOLOAD;
         $nodeToAppendTestSuite->appendChild($testSuite);
     }
 
-    private function unique(array $coverageTests): array
+    /**
+     * @param CoverageLineData[] $coverageTests
+     *
+     * @return CoverageLineData[]
+     */
+    private function uniqueByTestFile(array $coverageTests): array
     {
         $usedFileNames = [];
         $uniqueTests = [];
 
         foreach ($coverageTests as $coverageTest) {
-            if (!\in_array($coverageTest['testFilePath'], $usedFileNames, true)) {
+            if (!\in_array($coverageTest->testFilePath, $usedFileNames, true)) {
                 $uniqueTests[] = $coverageTest;
-                $usedFileNames[] = $coverageTest['testFilePath'];
+                $usedFileNames[] = $coverageTest->testFilePath;
             }
         }
 

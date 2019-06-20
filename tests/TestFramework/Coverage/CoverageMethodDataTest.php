@@ -33,36 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage;
+
+use Infection\TestFramework\Coverage\CoverageMethodData;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-final class CachedTestFileDataProvider implements TestFileDataProvider
+final class CoverageMethodDataTest extends TestCase
 {
-    /**
-     * @var TestFileDataProvider
-     */
-    private $testFileDataProvider;
-
-    /**
-     * @var array<string, TestFileTimeData>
-     */
-    private $testFileInfoCache = [];
-
-    public function __construct(TestFileDataProvider $testFileDataProvider)
+    public function test_it_creates_self_with_named_constructor(): void
     {
-        $this->testFileDataProvider = $testFileDataProvider;
-    }
+        $coverageMethodData = CoverageMethodData::from(11, 22, 1, 100);
 
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
-    {
-        if (\array_key_exists($fullyQualifiedClassName, $this->testFileInfoCache)) {
-            return $this->testFileInfoCache[$fullyQualifiedClassName];
-        }
-
-        return $this->testFileInfoCache[$fullyQualifiedClassName] = $this->testFileDataProvider->getTestFileInfo(
-            $fullyQualifiedClassName
-        );
+        $this->assertSame(11, $coverageMethodData->startLine);
+        $this->assertSame(22, $coverageMethodData->endLine);
+        $this->assertSame(1, $coverageMethodData->executed);
+        $this->assertSame(100, $coverageMethodData->coverage);
     }
 }
