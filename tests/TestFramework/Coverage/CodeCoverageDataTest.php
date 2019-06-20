@@ -39,6 +39,7 @@ use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
+use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkTypes;
 use PhpParser\Node\Scalar\LNumber;
@@ -174,7 +175,11 @@ final class CodeCoverageDataTest extends TestCase
             [26]
         );
 
-        $this->assertCount(2, $codeCoverageData->getAllTestsFor($mutation));
+        $tests = $codeCoverageData->getAllTestsFor($mutation);
+
+        $this->assertCount(2, $tests);
+        $this->assertSame('path/to/testFile', $tests[0]['testFilePath']);
+        $this->assertSame(0.123, $tests[0]['time']);
     }
 
     public function test_it_returns_zero_tests_for_not_covered_function_signature_mutator(): void
@@ -287,6 +292,19 @@ final class CodeCoverageDataTest extends TestCase
             ->method('parse')
             ->willReturn($this->getParsedCodeCoverageData());
 
-        return new CodeCoverageData($this->coverageDir, $coverageXmlParserMock, TestFrameworkTypes::PHPUNIT);
+        $testFileDataProvider = $this->createMock(TestFileDataProvider::class);
+        $testFileDataProvider->expects($this->any())
+            ->method('getTestFileInfo')
+            ->willReturn([
+                'path' => 'path/to/testFile',
+                'time' => 0.123,
+            ]);
+
+        return new CodeCoverageData(
+            $this->coverageDir,
+            $coverageXmlParserMock,
+            TestFrameworkTypes::PHPUNIT,
+            $testFileDataProvider
+        );
     }
 }
