@@ -2,8 +2,8 @@
 
 namespace Test_Framework_Options_Config\Test;
 
-use Test_Framework_Options_Config\SourceClass;
 use PHPUnit\Framework\TestCase;
+use Test_Framework_Options_Config\SourceClass;
 
 class SourceClassTest extends TestCase
 {
@@ -12,10 +12,14 @@ class SourceClassTest extends TestCase
         if (
             !in_array('--strict-global-state', $GLOBALS['argv'], true)
         ) {
-            var_dump($GLOBALS['argv']);
-            echo 'Failure to pass framework option';
-            die(1);
+            $this->fail(
+                sprintf(
+                    'Failure to pass framework option (argv: %s)',
+                    implode(' ', $GLOBALS['argv'])
+                )
+            );
         }
+
         $sourceClass = new SourceClass();
         $this->assertSame('hello', $sourceClass->hello());
     }

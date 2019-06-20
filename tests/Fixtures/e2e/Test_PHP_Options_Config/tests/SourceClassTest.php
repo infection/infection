@@ -2,17 +2,22 @@
 
 namespace Test_PHP_Options_Config\Test;
 
-use Test_PHP_Options_Config\SourceClass;
 use PHPUnit\Framework\TestCase;
+use Test_PHP_Options_Config\SourceClass;
 
 class SourceClassTest extends TestCase
 {
     public function test_hello()
     {
         if (ini_get('short_open_tag') !== 'Test') {
-            echo 'Failure to pass php option';
-            die(1);
+            $this->fail(
+                sprintf(
+                    "Failure to pass php option (ini short_open_tag: '%s')",
+                    ini_get('short_open_tag')
+                )
+            );
         }
+
         $sourceClass = new SourceClass();
         $this->assertSame('hello', $sourceClass->hello());
     }
