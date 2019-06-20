@@ -37,7 +37,6 @@ namespace Infection\Tests\AutoReview;
 
 use Infection\Command\ConfigureCommand;
 use Infection\Command\InfectionCommand;
-use Infection\Command\SelfUpdateCommand;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\InfectionConfig;
@@ -129,7 +128,6 @@ final class ProjectCodeTest extends TestCase
     private static $nonTestedConcreteClasses = [
         ConfigureCommand::class,
         InfectionCommand::class,
-        SelfUpdateCommand::class,
         Application::class,
         ProgressFormatter::class,
         PhpProcess::class,
