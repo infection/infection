@@ -9,5 +9,5 @@
         "summary": "infection.log"
     },
     "tmpDir": ".",
-    "initialTestsPhpOptions": "-d short_open_tag=Test"
+    "initialTestsPhpOptions": "-d memory_limit=123M"
 }

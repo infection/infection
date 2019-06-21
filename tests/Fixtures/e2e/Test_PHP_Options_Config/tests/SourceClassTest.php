@@ -9,11 +9,11 @@ class SourceClassTest extends TestCase
 {
     public function test_hello()
     {
-        if (ini_get('short_open_tag') !== 'Test') {
+        if (ini_get('memory_limit') !== 'Test') {
             $this->fail(
                 sprintf(
-                    "Failure to pass php option (ini short_open_tag: '%s')",
-                    ini_get('short_open_tag')
+                    "Failure to pass php option (ini memory_limit: '%s')",
+                    ini_get('memory_limit')
                 )
             );
         }
