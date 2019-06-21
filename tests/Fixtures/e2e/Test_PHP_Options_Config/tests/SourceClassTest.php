@@ -9,7 +9,7 @@ class SourceClassTest extends TestCase
 {
     public function test_hello()
     {
-        if (ini_get('memory_limit') !== 'Test') {
+        if (ini_get('memory_limit') !== '123M') {
             $this->fail(
                 sprintf(
                     "Failure to pass php option (ini memory_limit: '%s')",
