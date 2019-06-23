@@ -46,6 +46,7 @@ final class BitwiseXor extends Mutator
     /**
      * Replaces "^" with "&"
      *
+     * @param Node&Node\Expr\BinaryOp\BitwiseXor $node
      *
      * @return Node\Expr\BinaryOp\BitwiseAnd
      */

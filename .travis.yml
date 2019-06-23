@@ -33,7 +33,7 @@ jobs:
 
     - &STANDARD_TEST_JOB
       stage: Test
-      php: 7.1
+      php: 7.2
       install:
         - if [ "$DEPS" == "LOW" ]; then composer update --prefer-lowest; else composer install; fi
       script:
@@ -62,26 +62,6 @@ jobs:
 
     -
       <<: *STANDARD_TEST_JOB
-      php: 7.1
-      env: NO_DEBUGGER=1
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.1
-      env: PHPDBG=1
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.1
-      env: DEPS="LOW"
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.1
-      env: DEPS="LOW" PHPDBG=1
-
-    -
-      <<: *STANDARD_TEST_JOB
       php: 7.2
 
     -
@@ -127,7 +107,7 @@ jobs:
       <<: *STANDARD_TEST_JOB
       php: 7.3
       env: DEPS="LOW" PHPDBG=1
-    
+
     -
       <<: *STANDARD_TEST_JOB
       php: 7.4snapshot

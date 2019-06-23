@@ -47,7 +47,7 @@ final class UnwrapArrayChangeKeyCase extends AbstractUnwrapMutator
         return 'array_change_key_case';
     }
 
-    protected function getParameterIndexes(Node $node): \Generator
+    protected function getParameterIndexes(Node\Expr\FuncCall $node): \Generator
     {
         yield 0;
     }

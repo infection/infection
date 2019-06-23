@@ -45,6 +45,7 @@ final class IncrementInteger extends AbstractNumberMutator
     /**
      * Increments an integer by 1
      *
+     * @param Node&Node\Scalar\LNumber $node
      *
      * @return Node\Scalar\LNumber
      */

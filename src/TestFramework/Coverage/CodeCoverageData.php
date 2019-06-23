@@ -200,7 +200,7 @@ class CodeCoverageData
 
             $coverage = $this->parser->parse($coverageIndexFileContent);
 
-            $coverage = $this->addTestExecutionInfo($coverage);
+            $this->addTestExecutionInfo($coverage);
 
             $this->coverage = $coverage;
         }
@@ -208,15 +208,16 @@ class CodeCoverageData
         return $this->coverage;
     }
 
-    private function addTestExecutionInfo(array $coverage): array
+    /**
+     * Pass $coverage by reference to avoid copying data and reduce memory usage
+     */
+    private function addTestExecutionInfo(array &$coverage): void
     {
         if (!$this->testFileDataProvider) {
-            return $coverage;
+            return;
         }
 
-        $newCoverage = $coverage;
-
-        foreach ($newCoverage as $sourceFilePath => &$fileCoverageData) {
+        foreach ($coverage as $sourceFilePath => &$fileCoverageData) {
             foreach ($fileCoverageData['byLine'] as $line => &$lineCoverageData) {
                 foreach ($lineCoverageData as &$test) {
                     $class = explode('::', $test['testMethod'])[0];
@@ -231,8 +232,6 @@ class CodeCoverageData
             unset($lineCoverageData);
         }
         unset($fileCoverageData);
-
-        return $newCoverage;
     }
 
     private function getTestsForExecutedMethodOnLine(string $filePath, int $line): array

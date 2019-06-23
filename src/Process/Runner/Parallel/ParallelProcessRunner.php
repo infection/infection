@@ -119,7 +119,7 @@ final class ParallelProcessRunner
                 }
             }
             // continue loop while there are processes being executed or waiting for execution
-        } while ($this->processesQueue || $this->currentProcesses);
+        } while ($this->currentProcesses);
     }
 
     private function startProcess(): bool

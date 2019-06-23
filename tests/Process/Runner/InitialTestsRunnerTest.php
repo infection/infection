@@ -62,6 +62,9 @@ final class InitialTestsRunnerTest extends TestCase
 
                 return true;
             }));
+        $process->expects($this->once())
+            ->method('getOutput')
+            ->willReturn('foo');
 
         $processBuilder = $this->createMock(ProcessBuilder::class);
         $processBuilder->method('getProcessForInitialTestRun')

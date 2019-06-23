@@ -46,13 +46,17 @@ final class FunctionCall extends AbstractValueToNullReturnValue
     /**
      * Replaces "return func();" with "func(); return null;"
      *
+     * @param Node&Node\Stmt\Return_ $node
      *
      * @return Node[]
      */
     public function mutate(Node $node)
     {
+        /** @var Node\Expr\New_ $expr */
+        $expr = $node->expr;
+
         return [
-            new Node\Stmt\Expression($node->expr),
+            new Node\Stmt\Expression($expr),
             new Node\Stmt\Return_(
                 new Node\Expr\ConstFetch(new Node\Name('null'))
             ),

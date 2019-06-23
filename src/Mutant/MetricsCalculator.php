@@ -158,7 +158,7 @@ class MetricsCalculator
         $defeatedTotal = $this->killedCount + $this->timedOutCount + $this->errorCount;
 
         if ($this->totalMutantsCount) {
-            $detectionRateAll = floor(100 * $defeatedTotal / $this->totalMutantsCount);
+            $detectionRateAll = 100 * $defeatedTotal / $this->totalMutantsCount;
         }
 
         return $detectionRateAll;
@@ -173,7 +173,7 @@ class MetricsCalculator
         $coveredByTestsTotal = $this->totalMutantsCount - $this->notCoveredByTestsCount;
 
         if ($this->totalMutantsCount) {
-            $coveredRate = floor(100 * $coveredByTestsTotal / $this->totalMutantsCount);
+            $coveredRate = 100 * $coveredByTestsTotal / $this->totalMutantsCount;
         }
 
         return $coveredRate;
@@ -186,7 +186,7 @@ class MetricsCalculator
         $defeatedTotal = $this->killedCount + $this->timedOutCount + $this->errorCount;
 
         if ($coveredByTestsTotal) {
-            $detectionRateTested = floor(100 * $defeatedTotal / $coveredByTestsTotal);
+            $detectionRateTested = 100 * $defeatedTotal / $coveredByTestsTotal;
         }
 
         return $detectionRateTested;

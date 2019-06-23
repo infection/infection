@@ -43,12 +43,12 @@ use PHPUnit\Framework\TestCase;
  */
 final class InitialTestSuiteFinishedTest extends TestCase
 {
-    /**
-     * This class is only used to fire events, and the only functionality it needs is being instantiated
-     */
-    public function test_it_can_be_initialzed(): void
+    public function test_it_passes_the_output_along(): void
     {
-        $class = new InitialTestSuiteFinished();
-        $this->assertInstanceOf(InitialTestSuiteFinished::class, $class);
+        $text = 'foo-bar-baz';
+
+        $class = new InitialTestSuiteFinished($text);
+
+        $this->assertSame($text, $class->getOutputText());
     }
 }

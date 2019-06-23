@@ -51,6 +51,10 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
+ *
+ * NOTE:
+ * InputInterfaces should be mocked here so that the 'getOption' method with paramater 'no-progress'
+ * should return true. Otherwise you will see different results based on wheter its running in CI or not.
  */
 final class SubscriberBuilderTest extends TestCase
 {
@@ -61,7 +65,7 @@ final class SubscriberBuilderTest extends TestCase
             ->method('getOption')
             ->will($this->returnValueMap(
                 [
-                    ['ci-friendly', false],
+                    ['no-progress', true],
                     ['formatter', 'progress'],
                     ['show-mutations', true],
                     ['log-verbosity', 'all'],
@@ -99,7 +103,7 @@ final class SubscriberBuilderTest extends TestCase
             ->method('getOption')
             ->will($this->returnValueMap(
                 [
-                    ['ci-friendly', false],
+                    ['no-progress', true],
                     ['formatter', 'progress'],
                     ['show-mutations', true],
                     ['log-verbosity', 'all'],
@@ -137,9 +141,10 @@ final class SubscriberBuilderTest extends TestCase
             ->method('getOption')
             ->will($this->returnValueMap(
                 [
-                    ['ci-friendly', false],
+                    ['no-progress', true],
                     ['formatter', 'foo'],
                     ['show-mutations', true],
+                    ['debug', true],
                 ]
             ));
         $calculator = new MetricsCalculator();

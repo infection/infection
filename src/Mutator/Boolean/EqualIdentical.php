@@ -46,6 +46,7 @@ final class EqualIdentical extends Mutator
     /**
      * Replaces "==" with "==="
      *
+     * @param Node&Node\Expr\BinaryOp\Equal $node
      *
      * @return Node\Expr\BinaryOp\Identical
      */
