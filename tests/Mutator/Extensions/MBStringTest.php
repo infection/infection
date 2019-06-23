@@ -523,7 +523,7 @@ final class MBStringTest extends AbstractMutatorTestCase
             "<?php\n\nstrtoupper('test');",
         ];
 
-        yield 'It converts correctly when mb_parse_str is wrongly capitalize' => [
+        yield 'It converts correctly when mb_convert_case is wrongly capitalize' => [
             "<?php Mb_CoNvErT_Case('test', MB_CASE_UPPER);",
             "<?php\n\nstrtoupper('test');",
         ];
