@@ -156,10 +156,6 @@ ASCII;
             new Command\InfectionCommand(),
         ]);
 
-        if (0 === strpos(__FILE__, 'phar:')) {
-            $commands[] = new Command\SelfUpdateCommand();
-        }
-
         return $commands;
     }
 
