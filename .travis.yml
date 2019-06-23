@@ -127,17 +127,6 @@ jobs:
           INFECTION_PR_FLAGS=$(get-infection-pr-flags);
           phpdbg -qrr bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
 
-    - stage: PHPUnit 8 future-proofing
-      php: 7.2
-      env: PHPUNIT_BIN='vendor/bin/phpunit'
-      install:
-        - composer config --unset platform.php
-        - composer require --dev phpunit/phpunit:^8 --no-update
-        - composer update
-      script:
-        - if [[ $PHPDBG != 1 ]]; then xdebug-enable; fi
-        - if [[ $PHPDBG != 1 ]]; then $PHPUNIT_BIN; else phpdbg -qrr $PHPUNIT_BIN; fi
-
     - stage: Deploy
       php: 7.2
       install:
