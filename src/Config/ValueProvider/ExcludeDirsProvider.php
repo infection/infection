@@ -120,7 +120,7 @@ final class ExcludeDirsProvider
             }
         }
 
-        return array_unique($excludedDirs);
+        return array_values(array_unique($excludedDirs));
     }
 
     private function getValidator(Locator $locator)
