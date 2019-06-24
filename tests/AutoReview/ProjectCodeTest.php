@@ -79,8 +79,6 @@ use Symfony\Component\Finder\SplFileInfo;
 /**
  * @internal
  *
- * @group auto-review
- *
  * @coversNothing
  *
  * This class is responsible for testing that our code base adheres to certain rules,

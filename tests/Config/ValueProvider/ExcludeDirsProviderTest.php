@@ -131,6 +131,30 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
         $this->assertContains('foo', $excludeDirs);
     }
 
+    public function test_returns_an_array_with_incremented_keys_started_from_zero(): void
+    {
+        if (!$this->hasSttyAvailable()) {
+            $this->markTestSkipped('Stty is not available');
+        }
+
+        $dirA = $this->workspace . \DIRECTORY_SEPARATOR . 'a' . \DIRECTORY_SEPARATOR;
+        $dirB = $this->workspace . \DIRECTORY_SEPARATOR . 'b' . \DIRECTORY_SEPARATOR;
+        $dirC = $this->workspace . \DIRECTORY_SEPARATOR . 'c' . \DIRECTORY_SEPARATOR;
+
+        \mkdir($dirA);
+        \mkdir($dirB);
+        \mkdir($dirC);
+
+        $excludeDirs = $this->provider->get(
+            $this->createStreamableInputInterfaceMock($this->getInputStream("$dirA\n$dirA\n$dirC\n")),
+            $this->createOutputInterface(),
+            [$dirA, $dirB, $dirC],
+            ['.']
+        );
+
+        $this->assertSame([0 => $dirA, 1 => $dirC], $excludeDirs);
+    }
+
     public function excludeDirsProvider()
     {
         return array_map(
