@@ -50,13 +50,9 @@ final class TestFileTimeData
      */
     public $time;
 
-    public static function from(string $path, float $time): self
+    public function __construct(string $path, float $time)
     {
-        $self = new self();
-
-        $self->path = $path;
-        $self->time = $time;
-
-        return $self;
+        $this->path = $path;
+        $this->time = $time;
     }
 }

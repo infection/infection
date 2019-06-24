@@ -50,13 +50,13 @@ final class CoverageFileData
      */
     public $byMethod = [];
 
-    public static function from(array $byLine, array $byMethod): self
+    /**
+     * @param array<int, array<int, CoverageLineData>> $byLine
+     * @param CoverageMethodData[] $byMethod
+     */
+    public function __construct(array $byLine = [], array $byMethod = [])
     {
-        $self = new self();
-
-        $self->byLine = $byLine;
-        $self->byMethod = $byMethod;
-
-        return $self;
+        $this->byLine = $byLine;
+        $this->byMethod = $byMethod;
     }
 }

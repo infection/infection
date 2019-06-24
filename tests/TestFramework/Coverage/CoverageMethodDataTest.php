@@ -45,7 +45,7 @@ final class CoverageMethodDataTest extends TestCase
 {
     public function test_it_creates_self_with_named_constructor(): void
     {
-        $coverageMethodData = CoverageMethodData::from(11, 22, 1, 100);
+        $coverageMethodData = new CoverageMethodData(11, 22, 1, 100);
 
         $this->assertSame(11, $coverageMethodData->startLine);
         $this->assertSame(22, $coverageMethodData->endLine);

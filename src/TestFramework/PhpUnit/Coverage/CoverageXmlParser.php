@@ -118,17 +118,15 @@ class CoverageXmlParser
         $linesNode = $xPath->query('/phpunit/file/totals/lines')[0];
         $percentage = (float) $linesNode->getAttribute('percent');
 
-        $coverageFileData = new CoverageFileData();
-
         if (!$percentage) {
-            return [$sourceFilePath => $coverageFileData];
+            return [$sourceFilePath => new CoverageFileData()];
         }
 
         /** @var \DOMNodeList $lineCoverageNodes */
         $lineCoverageNodes = $xPath->query('/phpunit/file/coverage/line');
 
         if (!$lineCoverageNodes->length) {
-            return [$sourceFilePath => $coverageFileData];
+            return [$sourceFilePath => new CoverageFileData()];
         }
 
         $methodsCoverageNodes = $xPath->query('/phpunit/file/class/method');
@@ -138,7 +136,7 @@ class CoverageXmlParser
         }
 
         return [
-            $sourceFilePath => CoverageFileData::from(
+            $sourceFilePath => new CoverageFileData(
                 $this->getCoveredLinesData($lineCoverageNodes),
                 $this->getMethodsCoverageData($methodsCoverageNodes)
             ),
@@ -215,7 +213,7 @@ class CoverageXmlParser
         foreach ($methodsCoverageNodes as $methodsCoverageNode) {
             $methodName = $methodsCoverageNode->getAttribute('name');
 
-            $methodsCoverage[$methodName] = CoverageMethodData::from(
+            $methodsCoverage[$methodName] = new CoverageMethodData(
                 (int) $methodsCoverageNode->getAttribute('start'),
                 (int) $methodsCoverageNode->getAttribute('end'),
                 (int) $methodsCoverageNode->getAttribute('executed'),

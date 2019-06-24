@@ -45,7 +45,7 @@ final class TestFileTimeDataTest extends TestCase
 {
     public function test_it_creates_self_object_with_named_constructor(): void
     {
-        $testFileTimeData = TestFileTimeData::from(
+        $testFileTimeData = new TestFileTimeData(
             '/path/to/Test.php',
             2.345
         );

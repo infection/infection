@@ -52,7 +52,7 @@ final class CachedTestFileDataProviderTest extends TestCase
         $providerMock->expects($this->once())
             ->method('getTestFileInfo')
             ->with($class)
-            ->willReturn(TestFileTimeData::from('path/to/Test.php', 4.567));
+            ->willReturn(new TestFileTimeData('path/to/Test.php', 4.567));
 
         $infoProvider = new CachedTestFileDataProvider($providerMock);
 

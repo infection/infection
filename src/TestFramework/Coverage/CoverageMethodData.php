@@ -60,15 +60,11 @@ final class CoverageMethodData
      */
     public $coverage;
 
-    public static function from(int $startLine, int $endLine, int $executed, int $coverage): self
+    public function __construct(int $startLine, int $endLine, int $executed, int $coverage)
     {
-        $self = new self();
-
-        $self->startLine = $startLine;
-        $self->endLine = $endLine;
-        $self->executed = $executed;
-        $self->coverage = $coverage;
-
-        return $self;
+        $this->startLine = $startLine;
+        $this->endLine = $endLine;
+        $this->executed = $executed;
+        $this->coverage = $coverage;
     }
 }

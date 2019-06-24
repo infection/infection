@@ -245,7 +245,7 @@ final class CodeCoverageDataTest extends TestCase
     private function getParsedCodeCoverageData(): array
     {
         return [
-            '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php' => CoverageFileData::from(
+            '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php' => new CoverageFileData(
                 [
                     26 => [
                         CoverageLineData::withTestMethod('Infection\\Tests\\Mutator\\Arithmetic\\PlusTest::test_it_should_mutate_plus_expression'),
@@ -263,19 +263,19 @@ final class CodeCoverageDataTest extends TestCase
                     ],
                 ],
                 [
-                    'mutate' => CoverageMethodData::from(
+                    'mutate' => new CoverageMethodData(
                         19,
                         22,
                         1,
                         0
                     ),
-                    'shouldMutate' => CoverageMethodData::from(
+                    'shouldMutate' => new CoverageMethodData(
                         24,
                         35,
                         4,
                         80
                     ),
-                    'notExecuted' => CoverageMethodData::from(
+                    'notExecuted' => new CoverageMethodData(
                         3,
                         5,
                         0,
@@ -297,7 +297,7 @@ final class CodeCoverageDataTest extends TestCase
         $testFileDataProvider->expects($this->any())
             ->method('getTestFileInfo')
             ->willReturn(
-                TestFileTimeData::from(
+                new TestFileTimeData(
                     'path/to/testFile',
                     0.123
                 )
