@@ -42,8 +42,6 @@ use Symfony\Component\Finder\SplFileInfo;
 /**
  * @internal
  *
- * @group auto-review
- *
  * @coversNothing
  *
  * This class is responsible for testing that all Mutator classes adhere to certain rules

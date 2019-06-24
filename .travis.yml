@@ -12,6 +12,9 @@ cache:
   directories:
     - $HOME/.composer/cache
     - build/cache
+  # Do not cache the downloaded tools yet; cf.
+  # https://github.com/infection/infection/pull/706#discussion_r294505032
+      #    - .tools
 
 addons:
   apt:
@@ -43,8 +46,8 @@ jobs:
           if [[ "$DEPS" == "LOW" ]]; then
             ./tests/e2e_tests bin/infection;
           else
-            make build/bin/infection.phar;
-            ./tests/e2e_tests build/bin/infection.phar;
+            make compile;
+            ./tests/e2e_tests build/infection.phar;
           fi
         - if [[ $NO_DEBUGGER == 1 ]]; then xdebug-disable; fi
         - |
@@ -120,8 +123,8 @@ jobs:
 
       script:
         # We don't have xdebug on the nightly build, so we always run with phpdbg.
-        - make build/bin/infection.phar;
-        - ./tests/e2e_tests build/bin/infection.phar;
+        - make compile;
+        - ./tests/e2e_tests build/infection.phar;
         - phpdbg -qrr $PHPUNIT_BIN
         - |
           INFECTION_PR_FLAGS=$(get-infection-pr-flags);
@@ -132,19 +135,19 @@ jobs:
       install:
         - composer install --no-dev
       script:
-        make build/bin/infection.phar;
+        make compile;
       before_deploy:
         - echo $DECRYPT_KEY | gpg --passphrase-fd 0 .ci/keys.asc.gpg
         - gpg --batch --yes --import .ci/keys.asc
-        - echo $SIGN_KEY | gpg --passphrase-fd 0 -u C5095986493B4AA0 --armor --detach-sig build/bin/infection.phar
+        - echo $SIGN_KEY | gpg --passphrase-fd 0 -u C5095986493B4AA0 --armor --detach-sig build/infection.phar
 
       deploy:
         provider: releases
         api_key:
           secure: JtdvJBE2ARf6VWN5KlXAburz3FZMriiXBHEdeIocHePBAzgYW7tVMksJR5N3azrE3KjhftMEukXtA1k5VfAGdLCSm6nKGsZwolkd24ryG7PYNuAdFWfbau8QQXn6aLFesF2lkTq89+PqxAdVjwXNgFA7ble3vL66Ogabff6gov6QwT9vDrTqwLmWNGwbt9QB32IE9yVPjW/3lk4MAkMHtKDr2DElyeT2CRRuPuUCA+zNwoGG95wqLAD/RwjsqR3GjotzDKrldqog9jU2OQptUc3BgdKlYR1AzdknxJYnT7a5CRVdmSOEfD9IrDqlYEzn9pHav+Sk4KD2KNKsALQGk/w16BqncN2uyOexUTzXvnDd27G4ZYy+1OsXMdYMhF5ffwj7EqNLm8XfLPtHHV0/FUJY9kkrbf9+wQVjDQmMJLLIiBSt3vuY0ya5SVW8thtjlF2j67smamNe4hDhditBipto+9Y5vI4AYhcm4CQlqP8BVbw3/LgGAl/dJR5ohM7PFZH3EUE1AojBaEXfUymlICdFVZFJbB0D/AM8jSqNmWBQu9QX3MURhT5xLSwc+kir2izQaEo/GQz79AifqkUJgSCzpRUJntCN8A7yk1uxDZDONbINF3ReuF+nqu7GMksgKZLCGbOIaBl9of24K5BeTqxgcEykiHFFY7X9QdI3Dyo=
         file:
-          - build/bin/infection.phar
-          - build/bin/infection.phar.asc
+          - build/infection.phar
+          - build/infection.phar.asc
         skip_cleanup: true
         on:
           tags: true

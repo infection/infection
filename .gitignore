@@ -1,8 +1,12 @@
 /.idea
+/.composer/
 /vendor
 /infection.log
 /build/*
 !/build/.gitkeep
+!/build/cache/.gitkeep
+/.tools/
+!/.tools/.gitkeep
 /.php_cs.cache
 /infection-cache
 /.ci/keys.asc
@@ -11,3 +15,4 @@
 /build/bin/infection.phar
 /build/bin/infection.phar.pubkey
 .phpunit.result.cache
+/devTools/Docker*.json
