@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Coverage;
 
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
+use Infection\TestFramework\PhpUnit\Coverage\Exception\NoLinesExecutedException;
 
 /**
  * @internal
@@ -58,6 +59,8 @@ class CoverageXmlParser
         $dom->loadXML($this->removeNamespace($coverageXmlContent));
         $xPath = new \DOMXPath($dom);
 
+        $this->assertHasCoverage($xPath);
+
         $coverage = [[]];
 
         $nodes = $xPath->query('//file');
@@ -70,6 +73,19 @@ class CoverageXmlParser
         }
 
         return array_merge(...$coverage);
+    }
+
+    private function assertHasCoverage(\DOMXPath $xPath): void
+    {
+        $lineCoverage = $xPath->query('/phpunit/project/directory[@name="/"]/totals/lines')->item(0);
+
+        if (
+            !$lineCoverage instanceof \DOMElement
+            || ($coverageCount = $lineCoverage->getAttribute('executed')) === '0'
+            || $coverageCount === ''
+        ) {
+            throw NoLinesExecutedException::noLinesExecuted();
+        }
     }
 
     private function processXmlFileCoverage(string $relativeCoverageFilePath, string $projectSource): array
