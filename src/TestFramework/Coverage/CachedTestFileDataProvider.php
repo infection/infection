@@ -46,7 +46,7 @@ final class CachedTestFileDataProvider implements TestFileDataProvider
     private $testFileDataProvider;
 
     /**
-     * @var array
+     * @var array<string, TestFileTimeData>
      */
     private $testFileInfoCache = [];
 
@@ -55,7 +55,7 @@ final class CachedTestFileDataProvider implements TestFileDataProvider
         $this->testFileDataProvider = $testFileDataProvider;
     }
 
-    public function getTestFileInfo(string $fullyQualifiedClassName): array
+    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
     {
         if (\array_key_exists($fullyQualifiedClassName, $this->testFileInfoCache)) {
             return $this->testFileInfoCache[$fullyQualifiedClassName];

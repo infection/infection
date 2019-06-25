@@ -38,6 +38,7 @@ namespace Infection\TestFramework\PhpUnit\Coverage;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
+use Infection\TestFramework\Coverage\TestFileTimeData;
 
 /**
  * @internal
@@ -59,7 +60,7 @@ final class PhpUnitTestFileDataProvider implements TestFileDataProvider
         $this->jUnitFilePath = $jUnitFilePath;
     }
 
-    public function getTestFileInfo(string $fullyQualifiedClassName): array
+    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
     {
         $xPath = $this->getXPath();
 
@@ -69,10 +70,10 @@ final class PhpUnitTestFileDataProvider implements TestFileDataProvider
             throw TestFileNameNotFoundException::notFoundFromFQN($fullyQualifiedClassName);
         }
 
-        return [
-            'path' => $nodes[0]->getAttribute('file'),
-            'time' => (float) $nodes[0]->getAttribute('time'),
-        ];
+        return new TestFileTimeData(
+            $nodes[0]->getAttribute('file'),
+            (float) $nodes[0]->getAttribute('time')
+        );
     }
 
     private function getXPath(): \DOMXPath

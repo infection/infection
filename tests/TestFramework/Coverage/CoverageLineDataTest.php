@@ -35,30 +35,27 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileTimeData;
+use Infection\TestFramework\Coverage\CoverageLineData;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-final class CachedTestFileDataProviderTest extends TestCase
+final class CoverageLineDataTest extends TestCase
 {
-    public function test_the_second_call_returns_cached_result(): void
+    public function test_it_creates_self_with_named_constructor_for_test_method(): void
     {
-        $class = 'Test\Class';
-        $providerMock = $this->createMock(TestFileDataProvider::class);
-        $providerMock->expects($this->once())
-            ->method('getTestFileInfo')
-            ->with($class)
-            ->willReturn(new TestFileTimeData('path/to/Test.php', 4.567));
+        $coverageLineData = CoverageLineData::withTestMethod('mutatesNode');
 
-        $infoProvider = new CachedTestFileDataProvider($providerMock);
+        $this->assertSame('mutatesNode', $coverageLineData->testMethod);
+    }
 
-        $info1 = $infoProvider->getTestFileInfo($class);
-        $info2 = $infoProvider->getTestFileInfo($class);
+    public function test_it_creates_self_with_named_constructor(): void
+    {
+        $coverageLineData = CoverageLineData::with('mutatesNode', 'path/to/Test.php', 0.123);
 
-        $this->assertSame($info1, $info2);
+        $this->assertSame('mutatesNode', $coverageLineData->testMethod);
+        $this->assertSame('path/to/Test.php', $coverageLineData->testFilePath);
+        $this->assertSame(0.123, $coverageLineData->time);
     }
 }

@@ -79,13 +79,13 @@ final class CoverageXmlParserTest extends TestCase
         $this->assertArrayHasKey($firstLevelAbsolutePath, $coverage);
         $this->assertArrayHasKey($secondLevelAbsolutePath, $coverage);
 
-        $this->assertCount(0, $coverage[$zeroLevelAbsolutePath]['byLine']);
-        $this->assertCount(4, $coverage[$firstLevelAbsolutePath]['byLine']);
-        $this->assertCount(1, $coverage[$secondLevelAbsolutePath]['byLine']);
+        $this->assertCount(0, $coverage[$zeroLevelAbsolutePath]->byLine);
+        $this->assertCount(4, $coverage[$firstLevelAbsolutePath]->byLine);
+        $this->assertCount(1, $coverage[$secondLevelAbsolutePath]->byLine);
 
         $this->assertSame(
-            ['testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays'],
-            $coverage[$firstLevelAbsolutePath]['byLine'][30][1]
+            'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
+            $coverage[$firstLevelAbsolutePath]->byLine[30][1]->testMethod
         );
     }
 
@@ -109,7 +109,9 @@ final class CoverageXmlParserTest extends TestCase
 
         $coverage = $this->parser->parse($this->getXml());
 
-        $this->assertSame($expectedByMethodArray, $coverage[$firstLevelAbsolutePath]['byMethod']);
+        $result = $this->convertObjectsToArray($coverage[$firstLevelAbsolutePath]->byMethod);
+
+        $this->assertSame($expectedByMethodArray, $result);
     }
 
     public function test_it_adds_by_method_coverage_data_for_traits(): void
@@ -133,7 +135,9 @@ final class CoverageXmlParserTest extends TestCase
 
         $coverage = $this->parser->parse($this->getXml());
 
-        $this->assertSame($expectedByMethodArray, $coverage[$pathToTrait]['byMethod']);
+        $result = $this->convertObjectsToArray($coverage[$pathToTrait]->byMethod);
+
+        $this->assertSame($expectedByMethodArray, $result);
     }
 
     /**
@@ -203,5 +207,21 @@ XML
             sprintf('$1%s$2', realpath($this->srcDir)),
             $xml
         );
+    }
+
+    private function convertObjectsToArray(array $coverageMethodsData): array
+    {
+        $result = [];
+
+        foreach ($coverageMethodsData as $method => $coverageMethodData) {
+            $result[$method] = [
+                'startLine' => $coverageMethodData->startLine,
+                'endLine' => $coverageMethodData->endLine,
+                'executed' => $coverageMethodData->executed,
+                'coverage' => $coverageMethodData->coverage,
+            ];
+        }
+
+        return $result;
     }
 }

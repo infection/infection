@@ -33,32 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
-
-use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileTimeData;
-use PHPUnit\Framework\TestCase;
+namespace Infection\TestFramework\Coverage;
 
 /**
  * @internal
  */
-final class CachedTestFileDataProviderTest extends TestCase
+final class CoverageMethodData
 {
-    public function test_the_second_call_returns_cached_result(): void
+    /**
+     * @var int
+     */
+    public $startLine;
+
+    /**
+     * @var int
+     */
+    public $endLine;
+
+    /**
+     * @var int
+     */
+    public $executed;
+
+    /**
+     * @var int
+     */
+    public $coverage;
+
+    public function __construct(int $startLine, int $endLine, int $executed, int $coverage)
     {
-        $class = 'Test\Class';
-        $providerMock = $this->createMock(TestFileDataProvider::class);
-        $providerMock->expects($this->once())
-            ->method('getTestFileInfo')
-            ->with($class)
-            ->willReturn(new TestFileTimeData('path/to/Test.php', 4.567));
-
-        $infoProvider = new CachedTestFileDataProvider($providerMock);
-
-        $info1 = $infoProvider->getTestFileInfo($class);
-        $info2 = $infoProvider->getTestFileInfo($class);
-
-        $this->assertSame($info1, $info2);
+        $this->startLine = $startLine;
+        $this->endLine = $endLine;
+        $this->executed = $executed;
+        $this->coverage = $coverage;
     }
 }

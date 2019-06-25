@@ -89,7 +89,7 @@ class CodeCoverageData
         }
 
         $coveredLineTestMethods = array_filter(
-            $coverageData[$filePath]['byLine'],
+            $coverageData[$filePath]->byLine,
             static function ($testMethods) {
                 return \count($testMethods) > 0;
             }
@@ -106,11 +106,11 @@ class CodeCoverageData
             return false;
         }
 
-        if (!isset($coverageData[$filePath]['byLine'][$line])) {
+        if (!isset($coverageData[$filePath]->byLine[$line])) {
             return false;
         }
 
-        return !empty($coverageData[$filePath]['byLine'][$line]);
+        return !empty($coverageData[$filePath]->byLine[$line]);
     }
 
     public function hasExecutedMethodOnLine(string $filePath, int $line): bool
@@ -121,15 +121,18 @@ class CodeCoverageData
             return false;
         }
 
-        foreach ($coverage[$filePath]['byMethod'] as $method => $coverageInfo) {
-            if ($line >= $coverageInfo['startLine'] && $line <= $coverageInfo['endLine']) {
-                return $coverageInfo['executed'] || $coverageInfo['coverage'];
+        foreach ($coverage[$filePath]->byMethod as $method => $coverageInfo) {
+            if ($line >= $coverageInfo->startLine && $line <= $coverageInfo->endLine) {
+                return $coverageInfo->executed || $coverageInfo->coverage;
             }
         }
 
         return false;
     }
 
+    /**
+     * @return CoverageLineData[]
+     */
     public function getAllTestsFor(MutationInterface $mutation): array
     {
         if (!$mutation->isCoveredByTest()) {
@@ -160,7 +163,7 @@ class CodeCoverageData
 
         foreach ($mutation->getLineRange() as $line) {
             if ($this->hasTestsOnLine($filePath, $line)) {
-                yield from $this->getCoverage()[$filePath]['byLine'][$line];
+                yield from $this->getCoverage()[$filePath]->byLine[$line];
             }
         }
     }
@@ -173,12 +176,17 @@ class CodeCoverageData
      *   ],
      *   'byLine' => [
      *       22 => [
-     *          'testMethod' => '\A\B\C::test_it_works',
-     *          'testFilePath' => '/path/to/A/B/C.php',
-     *          'time' => 0.34325,
-     *       ]
+     *           [
+     *               'testMethod' => '\A\B\C::test_it_works',
+     *               'testFilePath' => '/path/to/A/B/C.php',
+     *               'time' => 0.34325,
+     *           ],
+     *           ...
+     *        ]
      *    ]
      * ]
+     *
+     * @return CoverageFileData[]
      *
      * @throws CoverageDoesNotExistException
      */
@@ -209,45 +217,47 @@ class CodeCoverageData
     }
 
     /**
-     * Pass $coverage by reference to avoid copying data and reduce memory usage
+     * @param CoverageFileData[] $coverage
      */
-    private function addTestExecutionInfo(array &$coverage): void
+    private function addTestExecutionInfo(array $coverage): void
     {
         if (!$this->testFileDataProvider) {
             return;
         }
 
-        foreach ($coverage as $sourceFilePath => &$fileCoverageData) {
-            foreach ($fileCoverageData['byLine'] as $line => &$lineCoverageData) {
-                foreach ($lineCoverageData as &$test) {
-                    $class = explode('::', $test['testMethod'])[0];
+        foreach ($coverage as $sourceFilePath => $fileCoverageData) {
+            foreach ($fileCoverageData->byLine as $line => $linesCoverageData) {
+                foreach ($linesCoverageData as $test) {
+                    $class = explode('::', $test->testMethod)[0];
 
                     $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
 
-                    $test['testFilePath'] = $testFileData['path'];
-                    $test['time'] = $testFileData['time'];
+                    $test->testFilePath = $testFileData->path;
+                    $test->time = $testFileData->time;
                 }
-                unset($test);
             }
-            unset($lineCoverageData);
         }
-        unset($fileCoverageData);
     }
 
+    /**
+     * @return CoverageLineData[]
+     *
+     * @throws CoverageDoesNotExistException
+     */
     private function getTestsForExecutedMethodOnLine(string $filePath, int $line): array
     {
         $coverage = $this->getCoverage();
 
         $tests = [[]];
 
-        foreach ($coverage[$filePath]['byMethod'] as $method => $coverageInfo) {
-            if ($line >= $coverageInfo['startLine'] && $line <= $coverageInfo['endLine']) {
+        foreach ($coverage[$filePath]->byMethod as $method => $coverageMethodData) {
+            if ($line >= $coverageMethodData->startLine && $line <= $coverageMethodData->endLine) {
                 /** @var int[] $allLines */
-                $allLines = range($coverageInfo['startLine'], $coverageInfo['endLine']);
+                $allLines = range($coverageMethodData->startLine, $coverageMethodData->endLine);
 
                 foreach ($allLines as $lineInExecutedMethod) {
-                    if (\array_key_exists($lineInExecutedMethod, $this->getCoverage()[$filePath]['byLine'])) {
-                        $tests[] = $this->getCoverage()[$filePath]['byLine'][$lineInExecutedMethod];
+                    if (\array_key_exists($lineInExecutedMethod, $this->getCoverage()[$filePath]->byLine)) {
+                        $tests[] = $this->getCoverage()[$filePath]->byLine[$lineInExecutedMethod];
                     }
                 }
 

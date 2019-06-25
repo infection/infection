@@ -35,30 +35,34 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileTimeData;
+use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\Coverage\CoverageMethodData;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-final class CachedTestFileDataProviderTest extends TestCase
+final class CoverageFileDataTest extends TestCase
 {
-    public function test_the_second_call_returns_cached_result(): void
+    public function test_it_has_default_values(): void
     {
-        $class = 'Test\Class';
-        $providerMock = $this->createMock(TestFileDataProvider::class);
-        $providerMock->expects($this->once())
-            ->method('getTestFileInfo')
-            ->with($class)
-            ->willReturn(new TestFileTimeData('path/to/Test.php', 4.567));
+        $coverageFileData = new CoverageFileData();
 
-        $infoProvider = new CachedTestFileDataProvider($providerMock);
+        $this->assertSame([], $coverageFileData->byMethod);
+        $this->assertSame([], $coverageFileData->byLine);
+    }
 
-        $info1 = $infoProvider->getTestFileInfo($class);
-        $info2 = $infoProvider->getTestFileInfo($class);
+    public function test_it_creates_self_object_with_named_constructor(): void
+    {
+        $pathToTest = '/path/to/Test.php';
 
-        $this->assertSame($info1, $info2);
+        $coverageFileData = new CoverageFileData(
+            [1 => [CoverageLineData::withTestMethod($pathToTest)]],
+            ['method' => new CoverageMethodData(1, 3, 1, 100)]
+        );
+
+        $this->assertSame($pathToTest, $coverageFileData->byLine[1][0]->testMethod);
+        $this->assertSame(100, $coverageFileData->byMethod['method']->coverage);
     }
 }

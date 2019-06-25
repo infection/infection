@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutant;
 
 use Infection\MutationInterface;
+use Infection\TestFramework\Coverage\CoverageLineData;
 
 /**
  * @internal
@@ -63,7 +64,7 @@ final class Mutant implements MutantInterface
     private $isCoveredByTest;
 
     /**
-     * @var array
+     * @var CoverageLineData[]
      */
     private $coverageTests;
 
@@ -96,6 +97,9 @@ final class Mutant implements MutantInterface
         return $this->isCoveredByTest;
     }
 
+    /**
+     * @return CoverageLineData[]
+     */
     public function getCoverageTests(): array
     {
         return $this->coverageTests;

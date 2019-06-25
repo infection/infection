@@ -39,7 +39,11 @@ use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
+use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\Coverage\CoverageMethodData;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
+use Infection\TestFramework\Coverage\TestFileTimeData;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkTypes;
 use PhpParser\Node\Scalar\LNumber;
@@ -178,8 +182,8 @@ final class CodeCoverageDataTest extends TestCase
         $tests = $codeCoverageData->getAllTestsFor($mutation);
 
         $this->assertCount(2, $tests);
-        $this->assertSame('path/to/testFile', $tests[0]['testFilePath']);
-        $this->assertSame(0.123, $tests[0]['time']);
+        $this->assertSame('path/to/testFile', $tests[0]->testFilePath);
+        $this->assertSame(0.123, $tests[0]->time);
     }
 
     public function test_it_returns_zero_tests_for_not_covered_function_signature_mutator(): void
@@ -241,47 +245,44 @@ final class CodeCoverageDataTest extends TestCase
     private function getParsedCodeCoverageData(): array
     {
         return [
-            '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php' => [
-                'byLine' => [
+            '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php' => new CoverageFileData(
+                [
                     26 => [
-                            ['testMethod' => 'Infection\\Tests\\Mutator\\Arithmetic\\PlusTest::test_it_should_mutate_plus_expression'],
-                            ['testMethod' => 'Infection\\Tests\\Mutator\\Arithmetic\\PlusTest::test_it_should_not_mutate_plus_with_arrays'],
-                        ],
-                    30 => [
-                            ['testMethod' => 'Infection\\Tests\\Mutator\\Arithmetic\\PlusTest::test_it_should_mutate_plus_expression'],
-                            ['testMethod' => 'Infection\\Tests\\Mutator\\Arithmetic\\PlusTest::test_it_should_not_mutate_plus_with_arrays'],
-                        ],
-                    31 => [
-                            ['testMethod' => 'Infection\\Tests\\Mutator\\Arithmetic\\PlusTest::test_it_should_not_mutate_plus_with_arrays'],
-                        ],
-                    34 => [
-                            ['testMethod' => 'Infection\\Tests\\Mutator\\Arithmetic\\PlusTest::test_it_should_mutate_plus_expression'],
-                        ],
-                ],
-                'byMethod' => [
-                        'mutate' => [
-                            'startLine' => 19,
-                            'endLine' => 22,
-                            'executable' => 1,
-                            'executed' => 1,
-                            'coverage' => 0,
-                        ],
-                        'shouldMutate' => [
-                            'startLine' => 24,
-                            'endLine' => 35,
-                            'executable' => 5,
-                            'executed' => 4,
-                            'coverage' => 80,
-                        ],
-                        'notExecuted' => [
-                            'startLine' => 3,
-                            'endLine' => 5,
-                            'executable' => 5,
-                            'executed' => 0,
-                            'coverage' => 0, // not executed method can't be covered
-                        ],
+                        CoverageLineData::withTestMethod('Infection\\Tests\\Mutator\\Arithmetic\\PlusTest::test_it_should_mutate_plus_expression'),
+                        CoverageLineData::withTestMethod('Infection\\Tests\\Mutator\\Arithmetic\\PlusTest::test_it_should_not_mutate_plus_with_arrays'),
                     ],
-            ],
+                    30 => [
+                        CoverageLineData::withTestMethod('Infection\\Tests\\Mutator\\Arithmetic\\PlusTest::test_it_should_mutate_plus_expression'),
+                        CoverageLineData::withTestMethod('Infection\\Tests\\Mutator\\Arithmetic\\PlusTest::test_it_should_not_mutate_plus_with_arrays'),
+                    ],
+                    31 => [
+                        CoverageLineData::withTestMethod('Infection\\Tests\\Mutator\\Arithmetic\\PlusTest::test_it_should_not_mutate_plus_with_arrays'),
+                    ],
+                    34 => [
+                        CoverageLineData::withTestMethod('Infection\\Tests\\Mutator\\Arithmetic\\PlusTest::test_it_should_mutate_plus_expression'),
+                    ],
+                ],
+                [
+                    'mutate' => new CoverageMethodData(
+                        19,
+                        22,
+                        1,
+                        0
+                    ),
+                    'shouldMutate' => new CoverageMethodData(
+                        24,
+                        35,
+                        4,
+                        80
+                    ),
+                    'notExecuted' => new CoverageMethodData(
+                        3,
+                        5,
+                        0,
+                        0 // not executed method can't be covered
+                    ),
+                ]
+            ),
         ];
     }
 
@@ -295,10 +296,12 @@ final class CodeCoverageDataTest extends TestCase
         $testFileDataProvider = $this->createMock(TestFileDataProvider::class);
         $testFileDataProvider->expects($this->any())
             ->method('getTestFileInfo')
-            ->willReturn([
-                'path' => 'path/to/testFile',
-                'time' => 0.123,
-            ]);
+            ->willReturn(
+                new TestFileTimeData(
+                    'path/to/testFile',
+                    0.123
+                )
+            );
 
         return new CodeCoverageData(
             $this->coverageDir,

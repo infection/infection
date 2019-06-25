@@ -49,7 +49,7 @@ interface TestFileDataProvider
      *      return: '/path/to/NameSpace/Sub/TestClass.php'
      *
      *
-     * @return array file path and time
+     * @return TestFileTimeData file path and time
      */
-    public function getTestFileInfo(string $fullyQualifiedClassName): array;
+    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData;
 }

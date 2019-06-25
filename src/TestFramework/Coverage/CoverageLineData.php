@@ -33,32 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
-
-use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileTimeData;
-use PHPUnit\Framework\TestCase;
+namespace Infection\TestFramework\Coverage;
 
 /**
  * @internal
  */
-final class CachedTestFileDataProviderTest extends TestCase
+final class CoverageLineData
 {
-    public function test_the_second_call_returns_cached_result(): void
+    /**
+     * @var string
+     */
+    public $testMethod;
+
+    /**
+     * @var ?string
+     */
+    public $testFilePath;
+
+    /**
+     * @var ?float
+     */
+    public $time;
+
+    public static function withTestMethod(string $testMethod): self
     {
-        $class = 'Test\Class';
-        $providerMock = $this->createMock(TestFileDataProvider::class);
-        $providerMock->expects($this->once())
-            ->method('getTestFileInfo')
-            ->with($class)
-            ->willReturn(new TestFileTimeData('path/to/Test.php', 4.567));
+        $self = new self();
 
-        $infoProvider = new CachedTestFileDataProvider($providerMock);
+        $self->testMethod = $testMethod;
 
-        $info1 = $infoProvider->getTestFileInfo($class);
-        $info2 = $infoProvider->getTestFileInfo($class);
+        return $self;
+    }
 
-        $this->assertSame($info1, $info2);
+    public static function with(string $testMethod, string $testFilePath, float $time): self
+    {
+        $self = new self();
+
+        $self->testMethod = $testMethod;
+        $self->testFilePath = $testFilePath;
+        $self->time = $time;
+
+        return $self;
     }
 }
