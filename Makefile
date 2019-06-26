@@ -1,9 +1,6 @@
 .DEFAULT_GOAL := help
 
 .PHONY: help
-# TODO: add a check to ensure the result is always the expected one
-# TODO: add a check to ensure whenever a PHONY is declared, the following target has the same name; e.g. here .PHONY=help
-# so the next target should be `help:`. Otherwise this is most certainly a mistake.
 help:
 	@echo "\033[33mUsage:\033[0m\n  make TARGET\n\n\033[32m#\n# Commands\n#---------------------------------------------------------------------------\033[0m\n"
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//' | awk 'BEGIN {FS = ":"}; {printf "\033[33m%s:\033[0m%s\n", $$1, $$2}'
@@ -65,14 +62,8 @@ validate:
 	composer validate --strict
 
 .PHONY: test
-test:		 ## Runs all the tests
-# TODO: add a test to ensure we are not missing targets here
-test: test-autoreview test-unit test-e2e test-infection
-
-.PHONY: test-autoreview
-test-autoreview: ## Runs the AutoReview test suite
-test-autoreview:
-	$(PHPUNIT) --configuration=phpunit_autoreview.xml
+test:		## Runs all the tests
+test: test-unit test-e2e test-infection
 
 .PHONY: test-unit
 test-unit:	 ## Runs the unit tests

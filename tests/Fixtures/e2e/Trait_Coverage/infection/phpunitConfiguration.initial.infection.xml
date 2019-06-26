@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd" bootstrap="/opt/infection/tests/Fixtures/e2e/Trait_Coverage/vendor/autoload.php" colors="false" stopOnFailure="true" cacheResult="false">
+  <testsuites>
+    <testsuite name="Test Suite">
+      <directory>/opt/infection/tests/Fixtures/e2e/Trait_Coverage/tests/</directory>
+    </testsuite>
+  </testsuites>
+  <filter>
+    <whitelist>
+      <directory>/opt/infection/tests/Fixtures/e2e/Trait_Coverage/src/</directory>
+    </whitelist>
+  </filter>
+  <logging>
+    <log type="coverage-xml" target="/opt/infection/tests/Fixtures/e2e/Trait_Coverage/./infection/coverage-xml"/>
+    <log type="junit" target="/opt/infection/tests/Fixtures/e2e/Trait_Coverage/./infection/phpunit.junit.xml"/>
+  </logging>
+</phpunit>

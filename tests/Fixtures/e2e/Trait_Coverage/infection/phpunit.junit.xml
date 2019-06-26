@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Test Suite" tests="3" assertions="3" errors="0" failures="0" skipped="0" time="0.182602">
+    <testsuite name="Trait_Coverage\Test\SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/Trait_Coverage/tests/SourceClassTest.php" tests="3" assertions="3" errors="0" failures="0" skipped="0" time="0.182602">
+      <testcase name="test_hello" class="Trait_Coverage\Test\SourceClassTest" classname="Trait_Coverage.Test.SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/Trait_Coverage/tests/SourceClassTest.php" line="10" assertions="1" time="0.180758"/>
+      <testcase name="test_world" class="Trait_Coverage\Test\SourceClassTest" classname="Trait_Coverage.Test.SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/Trait_Coverage/tests/SourceClassTest.php" line="15" assertions="1" time="0.000737"/>
+      <testcase name="test_add" class="Trait_Coverage\Test\SourceClassTest" classname="Trait_Coverage.Test.SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/Trait_Coverage/tests/SourceClassTest.php" line="21" assertions="1" time="0.001107"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Test Suite" tests="6" assertions="6" errors="0" failures="0" skipped="0" time="0.108820">
+    <testsuite name="MultilineStatement\CalculatorTest" file="/opt/infection/tests/Fixtures/e2e/Multiline_Statement/tests/CalculatorTest.php" tests="6" assertions="6" errors="0" failures="0" skipped="0" time="0.108820">
+      <testcase name="testCalculateInMultipleLines" class="MultilineStatement\CalculatorTest" classname="MultilineStatement.CalculatorTest" file="/opt/infection/tests/Fixtures/e2e/Multiline_Statement/tests/CalculatorTest.php" line="18" assertions="1" time="0.102632"/>
+      <testcase name="testCalculateInMultipleLinesCustom" class="MultilineStatement\CalculatorTest" classname="MultilineStatement.CalculatorTest" file="/opt/infection/tests/Fixtures/e2e/Multiline_Statement/tests/CalculatorTest.php" line="25" assertions="1" time="0.000898"/>
+      <testcase name="testCalculateInSingleLine" class="MultilineStatement\CalculatorTest" classname="MultilineStatement.CalculatorTest" file="/opt/infection/tests/Fixtures/e2e/Multiline_Statement/tests/CalculatorTest.php" line="32" assertions="1" time="0.001073"/>
+      <testcase name="testCalculateInMultipleLinesFloat" class="MultilineStatement\CalculatorTest" classname="MultilineStatement.CalculatorTest" file="/opt/infection/tests/Fixtures/e2e/Multiline_Statement/tests/CalculatorTest.php" line="39" assertions="1" time="0.001372"/>
+      <testcase name="testCalculateInSingleLineFloat" class="MultilineStatement\CalculatorTest" classname="MultilineStatement.CalculatorTest" file="/opt/infection/tests/Fixtures/e2e/Multiline_Statement/tests/CalculatorTest.php" line="46" assertions="1" time="0.001142"/>
+      <testcase name="testCalculationsAreTheSame" class="MultilineStatement\CalculatorTest" classname="MultilineStatement.CalculatorTest" file="/opt/infection/tests/Fixtures/e2e/Multiline_Statement/tests/CalculatorTest.php" line="53" assertions="1" time="0.001703"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+  <build time="Wed Jun 26 9:50:41 GMT+0000 2019" phpunit="6.5.14" coverage="5.3.2">
+    <runtime name="PHPDBG" version="7.2.17" url="https://secure.php.net/"/>
+    <driver name="phpdbg" version="0.5.0"/>
+  </build>
+  <project source="/opt/infection/tests/Fixtures/e2e/Trait_Coverage/src">
+    <tests>
+      <test name="Trait_Coverage\Test\SourceClassTest::test_hello" size="unknown" result="0" status="PASSED"/>
+      <test name="Trait_Coverage\Test\SourceClassTest::test_world" size="unknown" result="0" status="PASSED"/>
+      <test name="Trait_Coverage\Test\SourceClassTest::test_add" size="unknown" result="0" status="PASSED"/>
+    </tests>
+    <directory name="/">
+      <totals>
+        <lines total="34" comments="0" code="34" executable="5" executed="4" percent="80.00"/>
+        <methods count="3" tested="2" percent="66.67"/>
+        <functions count="0" tested="0" percent="0"/>
+        <classes count="1" tested="1" percent="100.00"/>
+        <traits count="1" tested="0" percent="0.00"/>
+      </totals>
+      <file name="SourceClass.php" href="SourceClass.php.xml">
+        <totals>
+          <lines total="14" comments="0" code="14" executable="1" executed="1" percent="100.00"/>
+          <methods count="1" tested="1" percent="100.00"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="1" tested="1" percent="100.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="SourceTrait.php" href="SourceTrait.php.xml">
+        <totals>
+          <lines total="20" comments="0" code="20" executable="4" executed="3" percent="75.00"/>
+          <methods count="2" tested="1" percent="50.00"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="1" tested="0" percent="0.00"/>
+        </totals>
+      </file>
+    </directory>
+  </project>
+</phpunit>

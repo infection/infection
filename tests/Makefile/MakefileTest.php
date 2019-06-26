@@ -1,0 +1,278 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Infection\Tests\Makefile;
+
+use function array_filter;
+use function array_key_exists;
+use function array_map;
+use function array_pop;
+use function array_shift;
+use function chdir;
+use function current;
+use function file_get_contents;
+use function getcwd;
+use function implode;
+use PHPUnit\Framework\TestCase;
+use function shell_exec;
+use function sprintf;
+use function strpos;
+use function substr;
+use function substr_count;
+
+/**
+ * @coversNothing
+ *
+ * @group infra
+ */
+final class MakefileTest extends TestCase
+{
+    private const MAKEFILE_PATH = __DIR__.'/../../Makefile';
+
+    /**
+     * @var string
+     */
+    private static $originalCwd;
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function setUpBeforeClass(): void
+    {
+        self::$originalCwd = getcwd();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function tearDown(): void
+    {
+        chdir(self::$originalCwd);
+    }
+
+    public function test_the_default_goal_is_the_help_command(): void
+    {
+        $output = shell_exec(sprintf('make -f %s', self::MAKEFILE_PATH));
+
+        $expectedOutput = <<<'EOF'
+[33mUsage:[0m
+  make TARGET
+
+[32m#
+# Commands
+#---------------------------------------------------------------------------[0m
+
+[33mcompile:[0m	 Bundles Infection into a PHAR
+[33mcs-fix:[0m	  	 Runs PHP-CS-Fixer
+[33mcs-check:[0m	 Runs PHP-CS-Fixer in dry mode
+[33mphpstan:[0m  	 Runs PHPStan
+[33manalyze:[0m	 Runs CS fixers, static analyzers and various other checks
+[33manalyze-ci:[0m	 Runs static analyzers and various other checks
+[33mvalidate:[0m	 Checks that the composer.json file is valid
+[33mtest:[0m		 Runs all the tests
+[33mtest-unit:[0m	 Runs the unit tests
+[33mtest-e2e:[0m 	 Runs the end-to-end tests
+[33mtest-infection:[0m  Runs Infection against itself
+
+EOF;
+
+        $this->assertSame($expectedOutput, $output);
+    }
+
+    public function test_the_makefile_can_be_parsed(): void
+    {
+        (new Parser())->parse(file_get_contents(self::MAKEFILE_PATH));
+
+        $this->assertTrue(true);
+    }
+
+    public function test_phony_targets_are_correctly_declared(): void
+    {
+        $targets = (new Parser())->parse(file_get_contents(self::MAKEFILE_PATH));
+
+        $phony = null;
+        $targetComment = false;
+        $matchedPhony = true;
+
+        foreach ($targets as [$target, $dependencies]) {
+            if ('.PHONY' === $target) {
+                $this->assertCount(
+                    1,
+                    $dependencies,
+                    sprintf(
+                        'Expected one target to be declared as .PHONY. Found: "%s"',
+                        implode('", "', $dependencies)
+                    )
+                );
+
+                $previousPhony = $phony;
+                $phony = current($dependencies);
+
+                $this->assertTrue(
+                    $matchedPhony,
+                    sprintf(
+                        '"%s" has been declared as a .PHONY target but no such target could '
+                        .'be found',
+                        $previousPhony
+                    )
+                );
+
+                $targetComment = false;
+                $matchedPhony = false;
+
+                continue;
+            }
+
+            if ([] !== $dependencies && strpos($dependencies[0], '#') === 0) {
+                $this->assertStringStartsWith(
+                    '## ',
+                    $dependencies[0],
+                    'Expected the target comment to be a documented comment'
+                );
+
+                $this->assertSame(
+                    $phony,
+                    $target,
+                    'Expected the declared target to match the previous declared .PHONY'
+                );
+
+                $this->assertFalse(
+                    $targetComment,
+                    sprintf(
+                        'Did not expect to find twice the target comment line for "%s"',
+                        $target
+                    )
+                );
+
+                $this->assertFalse(
+                    $matchedPhony,
+                    sprintf(
+                        'Did not expect to find the target comment line before its target '
+                        .'definition for "%s"',
+                        $target
+                    )
+                );
+
+                $targetComment = true;
+
+                continue;
+            }
+
+            if (null !== $phony && false === $matchedPhony) {
+                $matchedPhony = true;
+
+                $this->assertSame(
+                    $phony,
+                    $target,
+                    'Expected the declared target to match the previous declared .PHONY'
+                );
+
+                continue;
+            }
+
+            $phony = null;
+            $targetComment = false;
+            $matchedPhony = false;
+        }
+    }
+
+    public function test_no_target_is_being_declared_twice(): void
+    {
+        $targets = (new Parser())->parse(file_get_contents(self::MAKEFILE_PATH));
+
+        $targetCounts = [];
+
+        foreach ($targets as [$target, $dependencies]) {
+            if ('.PHONY' === $target) {
+                continue;
+            }
+
+            if ([] !== $dependencies && strpos($dependencies[0], '## ') === 0) {
+                continue;
+            }
+
+            if (array_key_exists($target, $targetCounts)) {
+                $targetCounts[$target]++;
+            } else {
+                $targetCounts[$target] = 1;
+            }
+        }
+
+        foreach ($targetCounts as $target => $count) {
+            $this->assertSame(
+                1,
+                $count,
+                sprintf('Expected to find only one declaration for the target "%s"', $target)
+            );
+        }
+    }
+
+    public function test_all_test_targets_are_properly_declared(): void
+    {
+        $testTargets = array_filter(
+            (new Parser())->parse(file_get_contents(self::MAKEFILE_PATH)),
+            static function (array $targetSet): bool {
+                [$target, $dependencies] = $targetSet;
+
+                return strpos($target, 'test-') === 0
+                    && ([] === $dependencies
+                        || strpos($dependencies[0], '## ') !== 0
+                    )
+                ;
+            }
+        );
+
+        foreach ($testTargets as [$target, $dependencies]) {
+            $dashCount = substr_count($target, '-');
+
+            $subTestTargets = array_column(
+                array_filter(
+                    $testTargets,
+                    static function (array $targetSet) use ($target, $dashCount): bool {
+                        return strpos($targetSet[0], $target.'-') === 0
+                            && substr_count($targetSet[0], '-') === $dashCount + 1;
+                    }
+                ),
+                0
+            );
+
+            if ([] === $subTestTargets) {
+                continue;
+            }
+
+            $this->assertSame($subTestTargets, $dependencies);
+        }
+    }
+
+    public function test_the_test_target_runs_all_the_tests(): void
+    {
+        $testTargets = array_filter(
+            (new Parser())->parse(file_get_contents(self::MAKEFILE_PATH)),
+            static function (array $targetSet): bool {
+                [$target, $dependencies] = $targetSet;
+
+                return strpos($target, 'test') === 0
+                    && ([] === $dependencies
+                        || strpos($dependencies[0], '## ') !== 0
+                    )
+                ;
+            }
+        );
+
+        $testDependencies = array_shift($testTargets)[1];
+
+        $rootTestTargets = array_column(
+            array_filter(
+                $testTargets,
+                static function (array $targetSet): bool {
+                    return strpos($targetSet[0], 'test-') === 0
+                        && substr_count($targetSet[0], '-') === 1;
+                }
+            ),
+            0
+        );
+
+        $this->assertSame($rootTestTargets, $testDependencies);
+    }
+}

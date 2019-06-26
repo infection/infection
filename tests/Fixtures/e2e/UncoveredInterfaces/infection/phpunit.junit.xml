@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Test Suite" tests="2" assertions="3" errors="0" failures="0" skipped="0" time="0.100858">
+    <testsuite name="UncoveredInterfaces\Test\SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/UncoveredInterfaces/tests/SourceClassTest.php" tests="2" assertions="3" errors="0" failures="0" skipped="0" time="0.100858">
+      <testcase name="test_hello" class="UncoveredInterfaces\Test\SourceClassTest" classname="UncoveredInterfaces.Test.SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/UncoveredInterfaces/tests/SourceClassTest.php" line="10" assertions="1" time="0.097964"/>
+      <testcase name="test_code" class="UncoveredInterfaces\Test\SourceClassTest" classname="UncoveredInterfaces.Test.SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/UncoveredInterfaces/tests/SourceClassTest.php" line="16" assertions="2" time="0.002894"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

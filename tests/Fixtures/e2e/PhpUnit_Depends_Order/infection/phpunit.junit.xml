@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Test Suite" tests="4" assertions="6" errors="0" failures="0" skipped="0" time="0.155678">
+    <testsuite name="PhpUnit_Depends_Order\Test\SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/PhpUnit_Depends_Order/tests/SourceClassTest.php" tests="4" assertions="6" errors="0" failures="0" skipped="0" time="0.155678">
+      <testcase name="test_hello" class="PhpUnit_Depends_Order\Test\SourceClassTest" classname="PhpUnit_Depends_Order.Test.SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/PhpUnit_Depends_Order/tests/SourceClassTest.php" line="31" assertions="1" time="0.142635"/>
+      <testcase name="testEmpty" class="PhpUnit_Depends_Order\Test\SourceClassTest" classname="PhpUnit_Depends_Order.Test.SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/PhpUnit_Depends_Order/tests/SourceClassTest.php" line="39" assertions="1" time="0.007381"/>
+      <testcase name="testPush" class="PhpUnit_Depends_Order\Test\SourceClassTest" classname="PhpUnit_Depends_Order.Test.SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/PhpUnit_Depends_Order/tests/SourceClassTest.php" line="52" assertions="2" time="0.004794"/>
+      <testcase name="testPop" class="PhpUnit_Depends_Order\Test\SourceClassTest" classname="PhpUnit_Depends_Order.Test.SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/PhpUnit_Depends_Order/tests/SourceClassTest.php" line="66" assertions="2" time="0.000868"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

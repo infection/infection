@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+  <build time="Wed Jun 26 9:39:21 GMT+0000 2019" phpunit="6.5.14" coverage="5.3.2">
+    <runtime name="PHPDBG" version="7.2.17" url="https://secure.php.net/"/>
+    <driver name="phpdbg" version="0.5.0"/>
+  </build>
+  <project source="/opt/infection/tests/Fixtures/e2e/Parameters_Coverage/src">
+    <tests>
+      <test name="ParamCoverage\Test\ArraySearcherTest::testSearchDefaultsToNonStrictSearch" size="unknown" result="0" status="PASSED"/>
+    </tests>
+    <directory name="/">
+      <totals>
+        <lines total="30" comments="0" code="30" executable="4" executed="3" percent="75.00"/>
+        <methods count="2" tested="1" percent="50.00"/>
+        <functions count="0" tested="0" percent="0"/>
+        <classes count="1" tested="0" percent="0.00"/>
+        <traits count="0" tested="0" percent="0"/>
+      </totals>
+      <file name="AbstractSearcher.php" href="AbstractSearcher.php.xml">
+        <totals>
+          <lines total="8" comments="0" code="8" executable="0" executed="0" percent="0"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="ArraySearcher.php" href="ArraySearcher.php.xml">
+        <totals>
+          <lines total="22" comments="0" code="22" executable="4" executed="3" percent="75.00"/>
+          <methods count="2" tested="1" percent="50.00"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="1" tested="0" percent="0.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+    </directory>
+  </project>
+</phpunit>

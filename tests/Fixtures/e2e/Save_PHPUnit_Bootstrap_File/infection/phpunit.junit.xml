@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Test Suite" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.087387">
+    <testsuite name="SavePhpUnitBoostrapFile\Test\SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/Save_PHPUnit_Bootstrap_File/tests/SourceClassTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.087387">
+      <testcase name="test_hello" class="SavePhpUnitBoostrapFile\Test\SourceClassTest" classname="SavePhpUnitBoostrapFile.Test.SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/Save_PHPUnit_Bootstrap_File/tests/SourceClassTest.php" line="10" assertions="1" time="0.087387"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

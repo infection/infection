@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Test Suite" tests="2" assertions="4" errors="0" failures="0" skipped="0" time="0.330261">
+    <testsuite name="IdenticalMutatorExample\Test\StringEnvelopeTest" file="/opt/infection/tests/Fixtures/e2e/Identical_Mutator_Example/tests/StringEnvelopeTest.php" tests="2" assertions="4" errors="0" failures="0" skipped="0" time="0.330261">
+      <testcase name="testHasSubstring" class="IdenticalMutatorExample\Test\StringEnvelopeTest" classname="IdenticalMutatorExample.Test.StringEnvelopeTest" file="/opt/infection/tests/Fixtures/e2e/Identical_Mutator_Example/tests/StringEnvelopeTest.php" line="10" assertions="2" time="0.328093"/>
+      <testcase name="testHasNotSubstring" class="IdenticalMutatorExample\Test\StringEnvelopeTest" classname="IdenticalMutatorExample.Test.StringEnvelopeTest" file="/opt/infection/tests/Fixtures/e2e/Identical_Mutator_Example/tests/StringEnvelopeTest.php" line="19" assertions="2" time="0.002168"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

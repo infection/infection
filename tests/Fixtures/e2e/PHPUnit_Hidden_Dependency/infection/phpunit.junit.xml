@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Test Suite" tests="3" assertions="3" errors="0" failures="0" skipped="0" time="0.102896">
+    <testsuite name="PHPUnit_Hidden_Dependency\Test\SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/PHPUnit_Hidden_Dependency/tests/SourceClassTest.php" tests="3" assertions="3" errors="0" failures="0" skipped="0" time="0.102896">
+      <testcase name="test_hello" class="PHPUnit_Hidden_Dependency\Test\SourceClassTest" classname="PHPUnit_Hidden_Dependency.Test.SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/PHPUnit_Hidden_Dependency/tests/SourceClassTest.php" line="12" assertions="1" time="0.102028"/>
+      <testcase name="test_first" class="PHPUnit_Hidden_Dependency\Test\SourceClassTest" classname="PHPUnit_Hidden_Dependency.Test.SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/PHPUnit_Hidden_Dependency/tests/SourceClassTest.php" line="18" assertions="1" time="0.000422"/>
+      <testcase name="test_second" class="PHPUnit_Hidden_Dependency\Test\SourceClassTest" classname="PHPUnit_Hidden_Dependency.Test.SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/PHPUnit_Hidden_Dependency/tests/SourceClassTest.php" line="23" assertions="1" time="0.000446"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Test Suite" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.079297">
+    <testsuite name="TmpNamespace_\Test\SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/Custom_tmp_dir/tests/SourceClassTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.079297">
+      <testcase name="test_hello" class="TmpNamespace_\Test\SourceClassTest" classname="TmpNamespace_.Test.SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/Custom_tmp_dir/tests/SourceClassTest.php" line="10" assertions="1" time="0.079297"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

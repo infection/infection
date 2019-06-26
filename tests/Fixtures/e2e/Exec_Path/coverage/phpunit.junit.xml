@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Test Suite" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.239078">
+    <testsuite name="ExecPath\Test\RunShellScriptTest" file="/opt/infection/tests/Fixtures/e2e/Exec_Path/tests/RunShellScriptTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.239078">
+      <testcase name="test_hello" class="ExecPath\Test\RunShellScriptTest" classname="ExecPath.Test.RunShellScriptTest" file="/opt/infection/tests/Fixtures/e2e/Exec_Path/tests/RunShellScriptTest.php" line="10" assertions="1" time="0.239078"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

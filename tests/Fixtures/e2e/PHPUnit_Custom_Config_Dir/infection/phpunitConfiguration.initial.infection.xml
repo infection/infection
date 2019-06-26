@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../vendor/phpunit/phpunit/phpunit.xsd" bootstrap="/opt/infection/tests/Fixtures/e2e/PHPUnit_Custom_Config_Dir/build/../vendor/autoload.php" colors="false" stopOnFailure="true" cacheResult="false">
+  <testsuites>
+    <testsuite name="Test Suite">
+      <directory>/opt/infection/tests/Fixtures/e2e/PHPUnit_Custom_Config_Dir/build/../tests/</directory>
+    </testsuite>
+  </testsuites>
+  <filter>
+    <whitelist>
+      <directory>/opt/infection/tests/Fixtures/e2e/PHPUnit_Custom_Config_Dir/build/../src/</directory>
+    </whitelist>
+  </filter>
+  <logging>
+    <log type="coverage-xml" target="/opt/infection/tests/Fixtures/e2e/PHPUnit_Custom_Config_Dir/./infection/coverage-xml"/>
+    <log type="junit" target="/opt/infection/tests/Fixtures/e2e/PHPUnit_Custom_Config_Dir/./infection/phpunit.junit.xml"/>
+  </logging>
+</phpunit>
