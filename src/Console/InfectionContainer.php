@@ -83,30 +83,18 @@ final class InfectionContainer extends Container
     {
         parent::__construct($values);
 
-        $this['src.dirs'] = function (): array {
-            return $this->getInfectionConfig()->getSourceDirs();
-        };
-
-        $this['exclude.paths'] = function (): array {
-            return $this->getInfectionConfig()->getSourceExcludePaths();
-        };
-
         $this['project.dir'] = getcwd();
 
-        $this['phpunit.config.dir'] = function (): string {
-            return $this->getInfectionConfig()->getPhpUnitConfigDir();
-        };
-
-        $this['filesystem'] = static function (): Filesystem {
+        $this[Filesystem::class] = static function (): Filesystem {
             return new Filesystem();
         };
 
-        $this['tmp.dir.creator'] = function (): TmpDirectoryCreator {
-            return new TmpDirectoryCreator($this['filesystem']);
+        $this[TmpDirectoryCreator::class] = function (): TmpDirectoryCreator {
+            return new TmpDirectoryCreator($this[Filesystem::class]);
         };
 
         $this['tmp.dir'] = function (): string {
-            return $this['tmp.dir.creator']->createAndGet($this->getInfectionConfig()->getTmpDir());
+            return $this[TmpDirectoryCreator::class]->createAndGet($this->getInfectionConfig()->getTmpDir());
         };
 
         $this['coverage.dir.phpunit'] = function () {
@@ -121,73 +109,73 @@ final class InfectionContainer extends Container
             return sprintf('%s/%s', $this['coverage.path'], PhpUnitAdapter::JUNIT_FILE_NAME);
         };
 
-        $this['locator'] = function (): Locator {
-            return new Locator([$this['project.dir']], $this['filesystem']);
+        $this[Locator::class] = function (): Locator {
+            return new Locator([$this['project.dir']], $this[Filesystem::class]);
         };
 
-        $this['path.replacer'] = function (): PathReplacer {
-            return new PathReplacer($this['filesystem'], $this['phpunit.config.dir']);
+        $this[PathReplacer::class] = function (): PathReplacer {
+            return new PathReplacer($this[Filesystem::class], $this[InfectionConfig::class]->getPhpUnitConfigDir());
         };
 
-        $this['test.framework.factory'] = function (): Factory {
+        $this[Factory::class] = function (): Factory {
             return new Factory(
                 $this['tmp.dir'],
                 $this['project.dir'],
-                $this['testframework.config.locator'],
-                $this['xml.configuration.helper'],
+                $this[TestFrameworkConfigLocator::class],
+                $this[XmlConfigurationHelper::class],
                 $this['phpunit.junit.file.path'],
                 $this->getInfectionConfig(),
-                $this['version.parser']
+                $this[VersionParser::class]
             );
         };
 
-        $this['xml.configuration.helper'] = function (): XmlConfigurationHelper {
-            return new XmlConfigurationHelper($this['path.replacer'], $this['phpunit.config.dir']);
+        $this[XmlConfigurationHelper::class] = function (): XmlConfigurationHelper {
+            return new XmlConfigurationHelper($this[PathReplacer::class], $this[InfectionConfig::class]->getPhpUnitConfigDir());
         };
 
-        $this['mutant.creator'] = function (): MutantCreator {
+        $this[MutantCreator::class] = function (): MutantCreator {
             return new MutantCreator(
                 $this['tmp.dir'],
-                $this['differ'],
-                $this['pretty.printer']
+                $this[Differ::class],
+                $this[Standard::class]
             );
         };
 
-        $this['differ'] = static function (): Differ {
+        $this[Differ::class] = static function (): Differ {
             return new Differ(
                 new BaseDiffer()
             );
         };
 
-        $this['dispatcher'] = static function (): EventDispatcherInterface {
+        $this[EventDispatcherInterface::class] = static function (): EventDispatcherInterface {
             return new EventDispatcher();
         };
 
-        $this['parallel.process.runner'] = function (): ParallelProcessRunner {
-            return new ParallelProcessRunner($this['dispatcher']);
+        $this[ParallelProcessRunner::class] = function (): ParallelProcessRunner {
+            return new ParallelProcessRunner($this[EventDispatcherInterface::class]);
         };
 
-        $this['testframework.config.locator'] = function (): TestFrameworkConfigLocator {
+        $this[TestFrameworkConfigLocator::class] = function (): TestFrameworkConfigLocator {
             return new TestFrameworkConfigLocator(
-                $this['phpunit.config.dir'] /*[phpunit.dir, phpspec.dir, ...]*/
+                $this[InfectionConfig::class]->getPhpUnitConfigDir() /*[phpunit.dir, phpspec.dir, ...]*/
             );
         };
 
-        $this['diff.colorizer'] = static function (): DiffColorizer {
+        $this[DiffColorizer::class] = static function (): DiffColorizer {
             return new DiffColorizer();
         };
 
-        $this['test.file.data.provider.phpunit'] = function (): TestFileDataProvider {
+        $this[TestFileDataProvider::class] = function (): TestFileDataProvider {
             return new CachedTestFileDataProvider(
                 new PhpUnitTestFileDataProvider($this['phpunit.junit.file.path'])
             );
         };
 
-        $this['version.parser'] = static function (): VersionParser {
+        $this[VersionParser::class] = static function (): VersionParser {
             return new VersionParser();
         };
 
-        $this['lexer'] = static function (): Lexer {
+        $this[Lexer::class] = static function (): Lexer {
             return new Lexer\Emulative([
                 'usedAttributes' => [
                     'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
@@ -195,11 +183,11 @@ final class InfectionContainer extends Container
             ]);
         };
 
-        $this['parser'] = function (): Parser {
-            return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $this['lexer']);
+        $this[Parser::class] = function (): Parser {
+            return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $this[Lexer::class]);
         };
 
-        $this['pretty.printer'] = static function (): Standard {
+        $this[Standard::class] = static function (): Standard {
             return new Standard();
         };
 
@@ -209,31 +197,31 @@ final class InfectionContainer extends Container
             return (new MutatorsGenerator($mutatorConfig))->generate();
         };
 
-        $this['metrics'] = static function (): MetricsCalculator {
+        $this[MetricsCalculator::class] = static function (): MetricsCalculator {
             return new MetricsCalculator();
         };
 
-        $this['timer'] = static function (): Timer {
+        $this[Timer::class] = static function (): Timer {
             return new Timer();
         };
 
-        $this['time.formatter'] = static function (): TimeFormatter {
+        $this[TimeFormatter::class] = static function (): TimeFormatter {
             return new TimeFormatter();
         };
 
-        $this['memory.formatter'] = static function (): MemoryFormatter {
+        $this[MemoryFormatter::class] = static function (): MemoryFormatter {
             return new MemoryFormatter();
         };
 
-        $this['memory.limit.applier'] = function (): MemoryLimiter {
-            return new MemoryLimiter($this['filesystem'], \php_ini_loaded_file());
+        $this[MemoryLimiter::class] = function (): MemoryLimiter {
+            return new MemoryLimiter($this[Filesystem::class], \php_ini_loaded_file());
         };
     }
 
     public function buildDynamicDependencies(InputInterface $input): void
     {
-        $this['infection.config'] = function () use ($input): InfectionConfig {
-            $facade = new ConfigCreatorFacade($this['locator'], $this['filesystem']);
+        $this[InfectionConfig::class] = function () use ($input): InfectionConfig {
+            $facade = new ConfigCreatorFacade($this[Locator::class], $this[Filesystem::class]);
 
             return $facade->createConfig($input->getOption('configuration'));
         };
@@ -249,39 +237,39 @@ final class InfectionContainer extends Container
                 return $this['tmp.dir'];
             }
 
-            return $this['filesystem']->isAbsolutePath($existingCoveragePath)
+            return $this[Filesystem::class]->isAbsolutePath($existingCoveragePath)
                 ? $existingCoveragePath
                 : sprintf('%s/%s', getcwd(), $existingCoveragePath);
         };
 
-        $this['coverage.checker'] = static function () use ($input): CoverageRequirementChecker {
+        $this[CoverageRequirementChecker::class] = static function () use ($input): CoverageRequirementChecker {
             return new CoverageRequirementChecker(
                 \strlen(trim($input->getOption('coverage'))) > 0,
                 $input->getOption('initial-tests-php-options')
             );
         };
 
-        $this['test.run.constraint.checker'] = function () use ($input): TestRunConstraintChecker {
+        $this[TestRunConstraintChecker::class] = function () use ($input): TestRunConstraintChecker {
             return new TestRunConstraintChecker(
-                $this['metrics'],
+                $this[MetricsCalculator::class],
                 $input->getOption('ignore-msi-with-no-mutations'),
                 (float) $input->getOption('min-msi'),
                 (float) $input->getOption('min-covered-msi')
             );
         };
 
-        $this['subscriber.builder'] = function () use ($input): SubscriberBuilder {
+        $this[SubscriberBuilder::class] = function () use ($input): SubscriberBuilder {
             return new SubscriberBuilder(
                 $input,
-                $this['metrics'],
-                $this['dispatcher'],
-                $this['diff.colorizer'],
-                $this['infection.config'],
-                $this['filesystem'],
+                $this[MetricsCalculator::class],
+                $this[EventDispatcherInterface::class],
+                $this[DiffColorizer::class],
+                $this[InfectionConfig::class],
+                $this[Filesystem::class],
                 $this['tmp.dir'],
-                $this['timer'],
-                $this['time.formatter'],
-                $this['memory.formatter']
+                $this[Timer::class],
+                $this[TimeFormatter::class],
+                $this[MemoryFormatter::class]
             );
         };
 
@@ -294,6 +282,6 @@ final class InfectionContainer extends Container
 
     private function getInfectionConfig(): InfectionConfig
     {
-        return $this['infection.config'];
+        return $this[InfectionConfig::class];
     }
 }

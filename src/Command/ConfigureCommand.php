@@ -50,6 +50,7 @@ use Infection\TestFramework\TestFrameworkTypes;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
@@ -119,7 +120,7 @@ final class ConfigureCommand extends BaseCommand
         $excludeDirsProvider = new ExcludeDirsProvider(
             $consoleHelper,
             $questionHelper,
-            $this->getContainer()->get('filesystem')
+            $this->getContainer()->get(Filesystem::class)
         );
 
         $excludedDirs = $excludeDirsProvider->get($input, $output, $dirsInCurrentDir, $sourceDirs);

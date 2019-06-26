@@ -39,6 +39,7 @@ use Infection\Console\InfectionContainer;
 use PHPUnit\Framework\TestCase;
 use Pimple\Container;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
@@ -49,7 +50,8 @@ final class InfectionContainerTest extends TestCase
     {
         $container = new InfectionContainer();
 
-        $this->assertArrayHasKey('project.dir', $container);
+        $this->assertArrayHasKey(Filesystem::class, $container);
+
         $this->assertInstanceOf(Container::class, $container);
     }
 
