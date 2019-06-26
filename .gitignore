@@ -12,6 +12,7 @@
 /build/bin/infection.phar
 /build/bin/infection.phar.pubkey
 /devTools/Docker*.json
+/tests/Fixtures/e2e/SymfonyFlex/bin/.phpunit/
 /infection-cache
 /infection.json
 /infection.log
