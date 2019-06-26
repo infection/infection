@@ -33,6 +33,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+declare(strict_types=1);
+
 $autoloaderInWorkingDirectory = getcwd() . '/vendor/autoload.php';
 
 if (is_file($autoloaderInWorkingDirectory)) {

@@ -33,6 +33,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+declare(strict_types=1);
+
 set_error_handler(static function ($errno, $errstr): void {
     var_dump($errno, $errstr);
 }, E_ALL);
