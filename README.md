@@ -8,18 +8,27 @@
 [![Slack channel: #infection on the Symfony slack](https://img.shields.io/badge/slack-%23infection-green.svg?style=flat-square)](https://symfony.com/slack-invite)
 
 
-Infection - Mutation Testing framework
-=========
+# Infection - Mutation Testing framework
 
-Please read documentation here: http://infection.github.io
+Please read documentation here: [infection.github.io][doc]
 
-Twitter: http://twitter.com/infection_php
+Twitter: [@infection_php][twitter]
+
 
 ### Contributing
 
-Infection is an open source project that welcomes pull requests and issues from anyone.
-Before opening pull requests, please read our short [Contribution Guide](https://github.com/infection/infection/blob/master/.github/CONTRIBUTING.md).
+Infection is an open source project that welcomes pull requests and issues from anyone. Before 
+pening pull requests, please consider reading our short [Contribution Guide][contribution guide].
+
 
 ### Credits
 
-This project is highly inspired from Pádraic Brady ([@padraic](https://github.com/padraic))'s [Humbug library](https://github.com/humbug/humbug). Humbug has since then been discountinued in favour of this project.
+This project is highly inspired from Pádraic Brady ([@padraic][padraic])'s [Humbug library][humbug]. 
+Humbug has since then been discontinued in favour of this project.
+
+
+[doc]: http://infection.github.io
+[contribution guide]: .github/CONTRIBUTING.md
+[humbug]: https://github.com/humbug/humbug
+[padraic]: https://github.com/padraic
+[twitter]: http://twitter.com/infection_php

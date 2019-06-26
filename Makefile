@@ -43,15 +43,10 @@ FLOCK=./devTools/flock
 compile:	## Bundles Infection into a PHAR
 compile: $(INFECTION)
 
-.PHONY: cs-fix
-cs-fix:	  	## Runs PHP-CS-Fixer
-cs-fix: $(PHP_CS_FIXER)
+.PHONY: cs
+cs:	  	## Runs PHP-CS-Fixer
+cs: $(PHP_CS_FIXER)
 	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE)
-
-.PHONY: cs-check
-cs-check:	## Runs PHP-CS-Fixer in dry mode
-cs-check: $(PHP_CS_FIXER)
-	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE) --dry-run --stop-on-violation
 
 .PHONY: phpstan
 phpstan:  	## Runs PHPStan
@@ -60,12 +55,8 @@ phpstan: vendor $(PHPSTAN)
 	$(PHPSTAN) analyse tests --level=4 --configuration ./devTools/phpstan-tests.neon --no-interaction --no-progress
 
 .PHONY: analyze
-analyze:	## Runs CS fixers, static analyzers and various other checks
-analyze: cs-check analyze-ci
-
-.PHONY: analyze-ci
-analyze-ci:	## Runs static analyzers and various other checks
-analyze-ci: phpstan validate
+analyze:	## Runs Static analyzers and various other checks
+analyze: phpstan validate
 
 .PHONY: validate
 validate:	## Checks that the composer.json file is valid
