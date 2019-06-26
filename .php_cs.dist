@@ -1,18 +1,29 @@
-<?php
+<?php declare(strict_types=1);
 
-$header = trim('This code is licensed under the BSD 3-Clause License.'.substr(file_get_contents('LICENSE'), strlen('BSD 3-Clause License')));
+use PhpCsFixer\Config;
+use PhpCsFixer\Finder;
 
+$header = trim(
+    sprintf(
+        'This code is licensed under the BSD 3-Clause License.%s',
+        substr(
+            file_get_contents('LICENSE'),
+            strlen('BSD 3-Clause License')
+        )
+    )
+);
 
-$finder = \PhpCsFixer\Finder::create()
+$finder = Finder::create()
     ->in('src')
     ->in('tests')
-    ->exclude('Fixtures')
     ->in('bin')
+    ->exclude('Fixtures')
     ->name('*php')
     ->name('infection')
+    ->name('infection-debug')
 ;
 
-return \PhpCsFixer\Config::create()
+return Config::create()
     ->setRiskyAllowed(true)
     ->setRules([
         '@Symfony' => true,
@@ -46,7 +57,7 @@ return \PhpCsFixer\Config::create()
             'commentType' => 'PHPDoc',
             'header' => $header,
             'location' => 'after_open',
-            'separate' => 'bottom',
+            'separate' => 'both',
         ],
         'native_function_invocation' => [
             'include' => ['@compiler_optimized']

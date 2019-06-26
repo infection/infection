@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-set_error_handler(function($errno, $errstr) {
+set_error_handler(static function ($errno, $errstr): void {
     var_dump($errno, $errstr);
 }, E_ALL);
 
