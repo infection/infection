@@ -14,4 +14,4 @@
 /infection.json
 /infection.log
 /vendor
-/tests/Fixtures/e2e/Code_Coverage_Ignore/infection/
+/tests/Fixtures/e2e/*/infection/
