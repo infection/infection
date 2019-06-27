@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
@@ -100,7 +99,7 @@ return Config::create()
             'commentType' => 'PHPDoc',
             'header' => $header,
             'location' => 'after_open',
-            'separate' => 'both',
+            'separate' => 'bottom',
         ],
         'native_function_invocation' => [
             'include' => ['@compiler_optimized'],
