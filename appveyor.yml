@@ -23,6 +23,7 @@ init:
     - SET PATH=C:\Program Files\OpenSSL;c:\tools\php;%PATH%
     - SET ANSICON=121x90 (121x90)
     - SET COMPOSER_NO_INTERACTION=1
+    - SET COMPOSER_FLAGS='--no-interaction --no-progress --no-suggest --prefer-dist'
 
 install:
     # Enable Windows update service
@@ -40,8 +41,8 @@ install:
     - copy C:\projects\workspace\.ci\composer.bat c:\tools\php\composer.bat
     - appveyor-retry appveyor DownloadFile https://getcomposer.org/composer.phar -OutFile C:\tools\php\composer.phar
     - cd c:\projects\workspace
-    - IF %dependencies%==current appveyor-retry composer install
-    - IF %dependencies%==highest appveyor-retry composer update --no-suggest --ignore-platform-reqs
+    - IF %dependencies%==current appveyor-retry composer install $COMPOSER_FLAGS
+    - IF %dependencies%==highest appveyor-retry composer update --ignore-platform-reqs $COMPOSER_FLAGS
     - composer show
     # Install XDebug for code coverage
     - ps: .ci\appveyor_install_xdebug.ps1
