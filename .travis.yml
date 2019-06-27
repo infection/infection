@@ -12,9 +12,7 @@ cache:
   directories:
     - $HOME/.composer/cache
     - build/cache
-  # Do not cache the downloaded tools yet; cf.
-  # https://github.com/infection/infection/pull/706#discussion_r294505032
-      #    - .tools
+    - .tools
 
 addons:
   apt:
@@ -24,6 +22,7 @@ addons:
 before_install:
   - source .ci/travis-functions.sh
   - xdebug-disable
+  - touch -d "$(git log -1 --format=%cd Makefile)" Makefile
 
 jobs:
   include:
