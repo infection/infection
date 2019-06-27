@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites>
-  <testsuite name="Test Suite" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.097964">
-    <testsuite name="ParamCoverage\Test\ArraySearcherTest" file="/opt/infection/tests/Fixtures/e2e/Parameters_Coverage/tests/ArraySearcherTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.097964">
-      <testcase name="testSearchDefaultsToNonStrictSearch" class="ParamCoverage\Test\ArraySearcherTest" classname="ParamCoverage.Test.ArraySearcherTest" file="/opt/infection/tests/Fixtures/e2e/Parameters_Coverage/tests/ArraySearcherTest.php" line="10" assertions="1" time="0.097964"/>
-    </testsuite>
-  </testsuite>
-</testsuites>

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites>
-  <testsuite name="Test Suite" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.091590">
-    <testsuite name="SymfonyBridge\Test\SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/SymfonyBridge/tests/SourceClassTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.091590">
-      <testcase name="test_hello" class="SymfonyBridge\Test\SourceClassTest" classname="SymfonyBridge.Test.SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/SymfonyBridge/tests/SourceClassTest.php" line="10" assertions="1" time="0.091590"/>
-    </testsuite>
-  </testsuite>
-</testsuites>

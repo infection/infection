@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites>
-  <testsuite name="Test Suite" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.101454">
-    <testsuite name="PhpUnitCustomConfigDir\Test\SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/PHPUnit_Custom_Config_Dir/tests/SourceClassTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.101454">
-      <testcase name="test_hello" class="PhpUnitCustomConfigDir\Test\SourceClassTest" classname="PhpUnitCustomConfigDir.Test.SourceClassTest" file="/opt/infection/tests/Fixtures/e2e/PHPUnit_Custom_Config_Dir/tests/SourceClassTest.php" line="10" assertions="1" time="0.101454"/>
-    </testsuite>
-  </testsuite>
-</testsuites>
