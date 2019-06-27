@@ -1,8 +1,0 @@
-#!/bin/bash
-
-cd $(dirname "$0")
-PHP=$(command -v php)
-
-export PATH=
-
-${PHP} ../../../../bin/infection

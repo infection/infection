@@ -2,13 +2,18 @@
 
 set -e pipefail
 
-readonly INFECTION="./bootstrap"
+cd $(dirname "$0")
+
+readonly INFECTION="./../../../../bin/infection"
+readonly PHP=$(command -v php)
+
+export PATH=
 
 if [ "$PHPDBG" = "1" ]
 then
     $(which phpdbg) -qrr $INFECTION
 else
-    $(which php) $INFECTION
+    $PHP $INFECTION
 fi
 
 diff expected-output.txt infection.log
