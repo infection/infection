@@ -64,11 +64,9 @@ final class MakefileTest extends TestCase
 #---------------------------------------------------------------------------[0m
 
 [33mcompile:[0m	 Bundles Infection into a PHAR
-[33mcs-fix:[0m	  	 Runs PHP-CS-Fixer
-[33mcs-check:[0m	 Runs PHP-CS-Fixer in dry mode
+[33mcs:[0m	  	 Runs PHP-CS-Fixer
 [33mphpstan:[0m  	 Runs PHPStan
-[33manalyze:[0m	 Runs CS fixers, static analyzers and various other checks
-[33manalyze-ci:[0m	 Runs static analyzers and various other checks
+[33manalyze:[0m	 Runs Static analyzers and various other checks
 [33mvalidate:[0m	 Checks that the composer.json file is valid
 [33mtest:[0m		 Runs all the tests
 [33mtest-unit:[0m	 Runs the unit tests
