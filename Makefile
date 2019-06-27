@@ -47,6 +47,7 @@ compile: $(INFECTION)
 cs:	  	## Runs PHP-CS-Fixer
 cs: $(PHP_CS_FIXER)
 	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE)
+	sort -u .gitignore -o .gitignore
 
 .PHONY: phpstan
 phpstan:  	## Runs PHPStan
