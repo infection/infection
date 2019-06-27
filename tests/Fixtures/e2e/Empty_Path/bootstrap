@@ -1,6 +1,8 @@
-#!/usr/bin/env php
-<?php
+#!/bin/bash
 
-putenv('PATH=');
+cd $(dirname "$0")
+PHP=$(command -v php)
 
-require __DIR__ . '/../../../../bin/infection';
+export PATH=
+
+${PHP} ../../../../bin/infection
