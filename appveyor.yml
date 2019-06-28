@@ -23,7 +23,7 @@ init:
     - SET PATH=C:\Program Files\OpenSSL;c:\tools\php;%PATH%
     - SET ANSICON=121x90 (121x90)
     - SET COMPOSER_NO_INTERACTION=1
-    - SET COMPOSER_FLAGS='--no-interaction --no-progress --no-suggest --prefer-dist'
+    - SET COMPOSER_FLAGS=--no-interaction --no-progress --no-suggest --prefer-dist
 
 install:
     # Enable Windows update service
