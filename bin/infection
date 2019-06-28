@@ -33,7 +33,6 @@
  */
 
 // Disable strict types for now: https://github.com/infection/infection/pull/720#issuecomment-506546284
-declare(strict_types=0);
 
 $autoloaderInWorkingDirectory = getcwd() . '/vendor/autoload.php';
 
