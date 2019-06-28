@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -63,7 +63,7 @@ final class SubscriberBuilderTest extends TestCase
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->exactly(9))
             ->method('getOption')
-            ->will($this->returnValueMap(
+            ->willReturnMap(
                 [
                     ['no-progress', true],
                     ['formatter', 'progress'],
@@ -71,7 +71,7 @@ final class SubscriberBuilderTest extends TestCase
                     ['log-verbosity', 'all'],
                     ['debug', true],
                 ]
-            ));
+            );
         $calculator = new MetricsCalculator();
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->exactly(6))->method('addSubscriber');
@@ -101,7 +101,7 @@ final class SubscriberBuilderTest extends TestCase
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->exactly(9))
             ->method('getOption')
-            ->will($this->returnValueMap(
+            ->willReturnMap(
                 [
                     ['no-progress', true],
                     ['formatter', 'progress'],
@@ -109,7 +109,7 @@ final class SubscriberBuilderTest extends TestCase
                     ['log-verbosity', 'all'],
                     ['debug', false],
                 ]
-            ));
+            );
         $calculator = new MetricsCalculator();
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->exactly(7))->method('addSubscriber');
@@ -139,14 +139,14 @@ final class SubscriberBuilderTest extends TestCase
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->exactly(5))
             ->method('getOption')
-            ->will($this->returnValueMap(
+            ->willReturnMap(
                 [
                     ['no-progress', true],
                     ['formatter', 'foo'],
                     ['show-mutations', true],
                     ['debug', true],
                 ]
-            ));
+            );
         $calculator = new MetricsCalculator();
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->never())->method('addSubscriber');

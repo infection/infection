@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd" bootstrap="/Users/tfidry/Project/Humbug/infection/tests/Fixtures/e2e/Config_Bootstrap/vendor/autoload.php" colors="false" stopOnFailure="true" cacheResult="false">
+  <testsuites>
+    <testsuite name="Test Suite">
+      <directory>/Users/tfidry/Project/Humbug/infection/tests/Fixtures/e2e/Config_Bootstrap/tests/</directory>
+    </testsuite>
+  </testsuites>
+  <filter>
+    <whitelist>
+      <directory>/Users/tfidry/Project/Humbug/infection/tests/Fixtures/e2e/Config_Bootstrap/src/</directory>
+    </whitelist>
+  </filter>
+  <logging>
+    <log type="coverage-xml" target="/Users/tfidry/Project/Humbug/infection/tests/Fixtures/e2e/Config_Bootstrap/./infection/coverage-xml"/>
+    <log type="junit" target="/Users/tfidry/Project/Humbug/infection/tests/Fixtures/e2e/Config_Bootstrap/./infection/phpunit.junit.xml"/>
+  </logging>
+</phpunit>
