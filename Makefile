@@ -138,19 +138,17 @@ test-infection-xdebug-73: $(DOCKER_RUN_73_IMAGE)
 # Rules from files (non-phony targets)
 #---------------------------------------------------------------------------
 
-# TODO: some tools such as Box & PHP-CS-Fixer could be handled in a better way to ensure we are using the last version.
-
-$(BOX):
+$(BOX): Makefile
 	wget $(BOX_URL) --output-document=$(BOX)
 	chmod a+x $(BOX)
 	touch $@
 
-$(PHP_CS_FIXER):
+$(PHP_CS_FIXER): Makefile
 	wget $(PHP_CS_FIXER_URL) --output-document=$(PHP_CS_FIXER)
 	chmod a+x $(PHP_CS_FIXER)
 	touch $@
 
-$(PHPSTAN):
+$(PHPSTAN): Makefile
 	wget $(PHPSTAN_URL) --output-document=$(PHPSTAN)
 	chmod a+x $(PHPSTAN)
 	touch $@
