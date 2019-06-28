@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Makefile;
+namespace Infection\Tests\AutoReview\Makefile;
 
 use function array_filter;
 use function array_shift;
@@ -49,13 +49,13 @@ use function strpos;
 use function substr_count;
 
 /**
- * @coversNothing
+ * @internal
  *
- * @group infra
+ * @coversNothing
  */
 final class MakefileTest extends TestCase
 {
-    private const MAKEFILE_PATH = __DIR__ . '/../../Makefile';
+    private const MAKEFILE_PATH = __DIR__ . '/../../../Makefile';
 
     /**
      * @var string

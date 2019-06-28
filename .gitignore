@@ -13,7 +13,7 @@
 /infection-cache
 /infection.json
 /infection.log
-/vendor
-/tests/Fixtures/e2e/*/infection/
 /tests/Fixtures/e2e/*/coverage/
+/tests/Fixtures/e2e/*/infection/
 /tests/Fixtures/e2e/Configure/infection.json.dist
+/vendor/
