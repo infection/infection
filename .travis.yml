@@ -22,6 +22,8 @@ addons:
 before_install:
   - source .ci/travis-functions.sh
   - xdebug-disable
+  # Since the Makefile timestamp is used in the Makefile as a dependency, we must 
+  # ensure its timestamp is the correct one and not the one at the time of cloning
   - touch -d "$(git log -1 --date=iso --format=%cd Makefile)" Makefile
 
 jobs:
