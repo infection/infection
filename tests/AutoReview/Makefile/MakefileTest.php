@@ -53,7 +53,7 @@ use function substr_count;
  *
  * @coversNothing
  *
- * @group infra
+ * @group autoReview
  */
 final class MakefileTest extends TestCase
 {
