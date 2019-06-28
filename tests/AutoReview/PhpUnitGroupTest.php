@@ -35,9 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
+use Generator;
+use function implode;
+use Infection\Tests\AutoReview\PhpDoc\ClassParser;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Yaml;
+use function sprintf;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
@@ -46,36 +50,52 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @group autoReview
  */
-final class BuildConfigYmlTest extends TestCase
+final class PhpUnitGroupTest extends TestCase
 {
-    /**
-     * @dataProvider providesYamlFilesForTesting
-     */
-    public function test_valid_yaml_has_key($filePath): void
-    {
-        $this->assertFileExists($filePath);
+    private const AUTO_REVIEW_DIR = __DIR__ . '/../AutoReview';
 
-        try {
-            Yaml::parse(file_get_contents($filePath));
-        } catch (ParseException $e) {
-            $this->fail(
-                sprintf(
-                    'Yaml file "%s" contains invalid yaml, and is used by our CI, please fix it. Original error message: "%s"',
-                    realpath($filePath),
-                    $e->getMessage()
-                )
-            );
+    /**
+     * @dataProvider autoReviewFilesProvider
+     */
+    public function test_all_auto_review_tests_are_properly_tagged_in_the_auto_review_group(
+        string $filePath,
+        string $fileContent
+    ): void {
+        $tags = ClassParser::parseFilePhpDoc($fileContent);
+
+        $tagStrings = [];
+
+        foreach ($tags as $tag => $value) {
+            if ('@group' === $tag && 'autoReview' === $value) {
+                $this->assertTrue(true);
+
+                return;
+            }
+
+            $tagStrings[] = trim(sprintf('%s %s', $tag, $value));
         }
+
+        $this->fail(sprintf(
+            'Expected file "%s" to have the tag "@group autoReview". Tags found: [%s]',
+            $filePath,
+            implode('"", "', $tagStrings)
+        ));
     }
 
-    public function providesYamlFilesForTesting(): \Generator
+    public function autoReviewFilesProvider(): Generator
     {
-        $rootPath = __DIR__ . '/../../';
+        /** @var Finder&SplFileInfo[] $finder */
+        $finder = Finder::create()->files()->in(self::AUTO_REVIEW_DIR);
 
-        yield [$rootPath . '.travis.yml'];
-
-        yield [$rootPath . 'appveyor.yml'];
-
-        yield [$rootPath . 'codecov.yml'];
+        foreach ($finder as $fileInfo) {
+            yield [
+                // TODO: it might be worth to make the path canonical and relative to the project
+                // directory.
+                // Not done as the time of writing as implies importing webmozart/path-util for this
+                // single scenario which is not worth it
+                $fileInfo->getPathname(),
+                $fileInfo->getContents(),
+            ];
+        }
     }
 }

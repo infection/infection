@@ -44,6 +44,8 @@ use Symfony\Component\Finder\SplFileInfo;
  *
  * @coversNothing
  *
+ * @group autoReview
+ *
  * This class is responsible for testing that all Mutator classes adhere to certain rules
  * e.g. 'Mutators shouldn't declare any public methods`
  */
