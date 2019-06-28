@@ -50,7 +50,7 @@ final class ParserTest extends TestCase
      */
     public function test_it_can_parse_makefiles(string $content, array $expected): void
     {
-        $actual = (new Parser())->parse($content);
+        $actual = Parser::parse($content);
 
         $this->assertSame($expected, $actual);
     }

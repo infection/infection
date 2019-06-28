@@ -56,7 +56,7 @@ final class Parser
     /**
      * @return array<string[]&string[][]>
      */
-    public function parse(string $makeFileContents): array
+    public static function parse(string $makeFileContents): array
     {
         $targets = [];
 

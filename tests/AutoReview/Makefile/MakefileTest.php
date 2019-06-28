@@ -109,14 +109,14 @@ EOF;
 
     public function test_the_makefile_can_be_parsed(): void
     {
-        (new Parser())->parse(file_get_contents(self::MAKEFILE_PATH));
+        Parser::parse(file_get_contents(self::MAKEFILE_PATH));
 
         $this->assertTrue(true);
     }
 
     public function test_phony_targets_are_correctly_declared(): void
     {
-        $targets = (new Parser())->parse(file_get_contents(self::MAKEFILE_PATH));
+        $targets = Parser::parse(file_get_contents(self::MAKEFILE_PATH));
 
         $phony = null;
         $targetComment = false;
@@ -206,7 +206,7 @@ EOF;
 
     public function test_no_target_is_being_declared_twice(): void
     {
-        $targets = (new Parser())->parse(file_get_contents(self::MAKEFILE_PATH));
+        $targets = Parser::parse(file_get_contents(self::MAKEFILE_PATH));
 
         $targetCounts = [];
 
@@ -238,7 +238,7 @@ EOF;
     public function test_all_test_targets_are_properly_declared(): void
     {
         $testTargets = array_filter(
-            (new Parser())->parse(file_get_contents(self::MAKEFILE_PATH)),
+            Parser::parse(file_get_contents(self::MAKEFILE_PATH)),
             static function (array $targetSet): bool {
                 [$target, $dependencies] = $targetSet;
 
@@ -275,7 +275,7 @@ EOF;
     public function test_the_test_target_runs_all_the_tests(): void
     {
         $testTargets = array_filter(
-            (new Parser())->parse(file_get_contents(self::MAKEFILE_PATH)),
+            Parser::parse(file_get_contents(self::MAKEFILE_PATH)),
             static function (array $targetSet): bool {
                 [$target, $dependencies] = $targetSet;
 
