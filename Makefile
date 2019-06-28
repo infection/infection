@@ -67,7 +67,7 @@ validate:
 .PHONY: test
 test:		## Runs all the tests
 # TODO: add a test to ensure we are not missing targets here
-test: test-unit test- test-infection
+test: test-unit test-e2e test-infection
 
 .PHONY: test-unit
 test-unit:	## Runs the unit tests
