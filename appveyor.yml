@@ -41,8 +41,8 @@ install:
     - copy C:\projects\workspace\.ci\composer.bat c:\tools\php\composer.bat
     - appveyor-retry appveyor DownloadFile https://getcomposer.org/composer.phar -OutFile C:\tools\php\composer.phar
     - cd c:\projects\workspace
-    - IF %dependencies%==current appveyor-retry composer install $COMPOSER_FLAGS
-    - IF %dependencies%==highest appveyor-retry composer update --ignore-platform-reqs $COMPOSER_FLAGS
+    - IF %dependencies%==current appveyor-retry composer install %COMPOSER_FLAGS%
+    - IF %dependencies%==highest appveyor-retry composer update --ignore-platform-reqs %COMPOSER_FLAGS%
     - composer show
     # Install XDebug for code coverage
     - ps: .ci\appveyor_install_xdebug.ps1
