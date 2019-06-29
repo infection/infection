@@ -7,15 +7,21 @@
          verbose="true"
 >
     <testsuites>
-        <testsuite name="Application Test Suite">
-            <directory>./tests/</directory>
-            <exclude>./tests/Fixtures</exclude>
+        <testsuite name="Infection Test Suite">
+            <directory>tests</directory>
+
+            <exclude>tests/AutoReview</exclude>
+            <exclude>tests/Fixtures</exclude>
+        </testsuite>
+
+        <testsuite name="Auto-Review Test Suite">
+            <directory>tests/AutoReview</directory>
         </testsuite>
     </testsuites>
 
     <filter>
         <whitelist>
-            <directory>./src/</directory>
+            <directory>src</directory>
         </whitelist>
     </filter>
 
