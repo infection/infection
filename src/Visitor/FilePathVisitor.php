@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -55,8 +55,10 @@ final class FilePathVisitor extends NodeVisitorAbstract
         $this->path = $path;
     }
 
-    public function enterNode(Node $node): void
+    public function enterNode(Node $node): ?Node
     {
         $node->setAttribute(self::FILE_PATH, $this->path);
+
+        return null;
     }
 }

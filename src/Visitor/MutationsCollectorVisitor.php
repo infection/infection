@@ -98,6 +98,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
             }
 
             $path = $node->getAttribute(FilePathVisitor::FILE_PATH);
+
             if ($isOnFunctionSignature) {
                 // hasExecutedMethodOnLine checks for all lines of a given method,
                 // therefore it isn't making any sense to check any other line but first

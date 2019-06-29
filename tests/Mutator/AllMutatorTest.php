@@ -80,7 +80,7 @@ final class AllMutatorTest extends TestCase
         } catch (Throwable $t) {
             $this->fail(sprintf(
                'Ran into an error on the "%s" mutator, while parsing the file "%s". The original error was "%s"',
-               $mutator::getName(),
+               $mutator->getName(),
                $fileName,
                $t->getMessage()
             ));
