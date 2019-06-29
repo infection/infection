@@ -9,24 +9,15 @@
 >
 
     <testsuites>
-        <testsuite name="Infection Test Suite">
-            <directory>tests</directory>
-
-            <exclude>tests/AutoReview</exclude>
-            <exclude>tests/Fixtures</exclude>
+        <testsuite name="Auto-Review Test Suite">
+            <directory>tests/AutoReview</directory>
         </testsuite>
     </testsuites>
 
     <filter>
         <whitelist>
-            <directory>src</directory>
+            <directory>tests/AutoReview</directory>
         </whitelist>
     </filter>
-
-    <groups>
-        <exclude>
-            <group>large</group>
-        </exclude>
-    </groups>
 
 </phpunit>
