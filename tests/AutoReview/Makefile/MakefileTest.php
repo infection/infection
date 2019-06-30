@@ -42,6 +42,7 @@ use function current;
 use function file_get_contents;
 use function getcwd;
 use function implode;
+use const PHP_OS;
 use PHPUnit\Framework\TestCase;
 use function shell_exec;
 use function sprintf;
@@ -80,7 +81,11 @@ final class MakefileTest extends TestCase
 
     public function test_the_default_goal_is_the_help_command(): void
     {
-        $output = shell_exec(sprintf('timeout -k 5 make -f %s', self::MAKEFILE_PATH));
+        $output = shell_exec(sprintf(
+            '%s make -f %s 2>&1',
+            PHP_OS === 'Darwin' ? '' : 'timeout 2s',
+            self::MAKEFILE_PATH
+        ));
 
         $expectedOutput = <<<'EOF'
 [33mUsage:[0m
