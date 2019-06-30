@@ -80,7 +80,7 @@ final class MakefileTest extends TestCase
 
     public function test_the_default_goal_is_the_help_command(): void
     {
-        $output = shell_exec(sprintf('make -f %s', self::MAKEFILE_PATH));
+        $output = shell_exec(sprintf('timeout -k 5 make -f %s', self::MAKEFILE_PATH));
 
         $expectedOutput = <<<'EOF'
 [33mUsage:[0m
