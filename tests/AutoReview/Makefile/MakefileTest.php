@@ -36,12 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\Makefile;
 
 use function array_filter;
+use function array_pop;
 use function array_shift;
-use function chdir;
 use function current;
+use function explode;
 use function file_get_contents;
-use function getcwd;
 use function implode;
+use const PHP_EOL;
 use const PHP_OS;
 use PHPUnit\Framework\TestCase;
 use function shell_exec;
@@ -58,32 +59,11 @@ final class MakefileTest extends TestCase
 {
     private const MAKEFILE_PATH = __DIR__ . '/../../../Makefile';
 
-    /**
-     * @var string
-     */
-    private static $originalCwd;
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function setUpBeforeClass(): void
-    {
-        self::$originalCwd = getcwd();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        chdir(self::$originalCwd);
-    }
-
     public function test_the_default_goal_is_the_help_command(): void
     {
         $output = shell_exec(sprintf(
             '%s make -f %s 2>&1',
-            PHP_OS === 'Darwin' ? '' : 'timeout 2s',
+            null !== shell_exec('command -v timeout') ? 'timeout 2s' : '',
             self::MAKEFILE_PATH
         ));
 
@@ -107,6 +87,15 @@ final class MakefileTest extends TestCase
 [33mtest-infection:[0m   Runs Infection against itself
 
 EOF;
+
+        if (PHP_OS === 'Linux') {
+            $outputLines = explode(PHP_EOL, $output);
+
+            array_shift($outputLines);
+            array_pop($outputLines);
+
+            $output = implode(PHP_EOL, $outputLines);
+        }
 
         $this->assertSame($expectedOutput, $output);
     }
