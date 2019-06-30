@@ -40,37 +40,42 @@ FLOCK=./devTools/flock
 #---------------------------------------------------------------------------
 
 .PHONY: compile
-compile:	## Bundles Infection into a PHAR
+compile:	 ## Bundles Infection into a PHAR
 compile: $(INFECTION)
 
 .PHONY: cs
-cs:	  	## Runs PHP-CS-Fixer
+cs:	  	 ## Runs PHP-CS-Fixer
 cs: $(PHP_CS_FIXER)
 	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE)
 	sort -u .gitignore -o .gitignore
 
 .PHONY: phpstan
-phpstan:  	## Runs PHPStan
+phpstan:  	 ## Runs PHPStan
 phpstan: vendor $(PHPSTAN)
 	$(PHPSTAN) analyse src --level=max --configuration ./devTools/phpstan-src.neon --no-interaction --no-progress
 	$(PHPSTAN) analyse tests --level=4 --configuration ./devTools/phpstan-tests.neon --no-interaction --no-progress
 
 .PHONY: analyze
-analyze:	## Runs Static analyzers and various other checks
+analyze:	 ## Runs Static analyzers and various other checks
 analyze: phpstan validate
 
 .PHONY: validate
-validate:	## Checks that the composer.json file is valid
+validate:	 ## Checks that the composer.json file is valid
 validate:
 	composer validate --strict
 
 .PHONY: test
-test:		## Runs all the tests
+test:		 ## Runs all the tests
 # TODO: add a test to ensure we are not missing targets here
-test: test-unit test-e2e test-infection
+test: test-autoreview test-unit test-e2e test-infection
+
+.PHONY: test-autoreview
+test-autoreview: ## Runs the AutoReview test suite
+test-autoreview:
+	$(PHPUNIT) --configuration=phpunit_autoreview.xml
 
 .PHONY: test-unit
-test-unit:	## Runs the unit tests
+test-unit:	 ## Runs the unit tests
 test-unit: test-unit-72 test-unit-73
 
 .PHONY: test-unit-72
@@ -82,7 +87,7 @@ test-unit-73: $(DOCKER_RUN_73_IMAGE) $(PHPUNIT)
 	$(DOCKER_RUN_73) $(PHPUNIT)
 
 .PHONY: test-e2e
-test-e2e: 	## Runs the end-to-end tests
+test-e2e: 	 ## Runs the end-to-end tests
 test-e2e: test-e2e-phpdbg test-e2e-xdebug
 
 .PHONY: test-e2e-phpdbg
@@ -108,7 +113,7 @@ test-e2e-xdebug-73: $(DOCKER_RUN_73_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_73) ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-infection
-test-infection: ## Runs Infection against itself
+test-infection:  ## Runs Infection against itself
 test-infection: test-infection-phpdbg test-infection-xdebug
 
 .PHONY: test-infection-phpdbg
