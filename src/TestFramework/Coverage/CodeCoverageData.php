@@ -113,21 +113,6 @@ final class CodeCoverageData implements CodeCoverageDataInterface
         return iterator_to_array($this->getTestsForLineRange($filePath, $lineRange), false);
     }
 
-    private function hasTestsOnLine(string $filePath, int $line): bool
-    {
-        $coverageData = $this->getCoverage();
-
-        if (!isset($coverageData[$filePath])) {
-            return false;
-        }
-
-        if (!isset($coverageData[$filePath]->byLine[$line])) {
-            return false;
-        }
-
-        return !empty($coverageData[$filePath]->byLine[$line]);
-    }
-
     private function getTestsForFunctionSignature(string $filePath, array $lineRange): \Generator
     {
         foreach ($lineRange as $line) {
@@ -138,9 +123,7 @@ final class CodeCoverageData implements CodeCoverageDataInterface
     private function getTestsForLineRange(string $filePath, array $lineRange): \Generator
     {
         foreach ($lineRange as $line) {
-            if ($this->hasTestsOnLine($filePath, $line)) {
-                yield from $this->getCoverage()[$filePath]->byLine[$line];
-            }
+            yield from $this->getCoverage()[$filePath]->byLine[$line] ?? [];
         }
     }
 
