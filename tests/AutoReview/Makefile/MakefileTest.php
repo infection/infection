@@ -58,7 +58,7 @@ final class MakefileTest extends TestCase
     public function test_the_default_goal_is_the_help_command(): void
     {
         $output = shell_exec(sprintf(
-            '%s make -s -f %s 2>&1',
+            '%s make --silent --file %s 2>&1',
             null !== shell_exec('command -v timeout') ? 'timeout 2s' : '',
             self::MAKEFILE_PATH
         ));
