@@ -98,7 +98,22 @@ class CodeCoverageData
         return \count($coveredLineTestMethods) > 0;
     }
 
-    public function hasTestsOnLine(string $filePath, int $line): bool
+    /**
+     * @return CoverageLineData[]
+     */
+    public function getAllTestsForMutation(
+        string $filePath,
+        array $lineRange,
+        bool $isOnFunctionSignature
+    ): array {
+        if ($isOnFunctionSignature) {
+            return iterator_to_array($this->getTestsForFunctionSignature($filePath, $lineRange), false);
+        }
+
+        return iterator_to_array($this->getTestsForLineRange($filePath, $lineRange), false);
+    }
+
+    private function hasTestsOnLine(string $filePath, int $line): bool
     {
         $coverageData = $this->getCoverage();
 
@@ -113,7 +128,7 @@ class CodeCoverageData
         return !empty($coverageData[$filePath]->byLine[$line]);
     }
 
-    public function hasExecutedMethodOnLine(string $filePath, int $line): bool
+    private function hasExecutedMethodOnLine(string $filePath, int $line): bool
     {
         $coverage = $this->getCoverage();
 
@@ -128,21 +143,6 @@ class CodeCoverageData
         }
 
         return false;
-    }
-
-    /**
-     * @return CoverageLineData[]
-     */
-    public function getAllTestsForMutation(
-        string $filePath,
-        array $lineRange,
-        bool $isOnFunctionSignature
-    ): array {
-        if ($isOnFunctionSignature) {
-            return iterator_to_array($this->getTestsForFunctionSignature($filePath, $lineRange), false);
-        }
-
-        return iterator_to_array($this->getTestsForLineRange($filePath, $lineRange), false);
     }
 
     private function getTestsForFunctionSignature(string $filePath, array $lineRange): \Generator

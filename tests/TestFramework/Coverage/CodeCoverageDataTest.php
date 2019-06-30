@@ -53,39 +53,53 @@ final class CodeCoverageDataTest extends TestCase
 {
     private $coverageDir = __DIR__ . '/../../Fixtures/Files/phpunit/coverage-xml';
 
-    public function test_it_determines_if_method_was_executed_from_coverage_report(): void
+    public function test_it_correctly_sets_coverage_information_for_method_body(): void
     {
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        $this->assertTrue($codeCoverageData->hasExecutedMethodOnLine($filePath, 19), 'Start line'); // signature line
-        $this->assertTrue($codeCoverageData->hasExecutedMethodOnLine($filePath, 21), 'Body'); // inside body
-        $this->assertTrue($codeCoverageData->hasExecutedMethodOnLine($filePath, 22), 'End line'); // end line
+        $coverageOfLine = $codeCoverageData->getAllTestsForMutation($filePath, [34], false);
+        $this->assertCount(1, $coverageOfLine);
+        $this->assertSame(0.123, $coverageOfLine[0]->time);
+        $this->assertSame('path/to/testFile', $coverageOfLine[0]->testFilePath);
+        $this->assertSame(
+            'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
+            $coverageOfLine[0]->testMethod
+        );
     }
 
-    public function test_it_determines_line_is_not_covered_by_executed_method(): void
+    public function test_it_correctly_sets_coverage_information_for_method_signature(): void
     {
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        $this->assertFalse($codeCoverageData->hasExecutedMethodOnLine($filePath, 1), 'Before');
-        $this->assertFalse($codeCoverageData->hasExecutedMethodOnLine($filePath, 40), 'After');
+        $coverageOfLine = $codeCoverageData->getAllTestsForMutation($filePath, [24], true);
+
+        $this->assertCount(6, $codeCoverageData->getAllTestsForMutation($filePath, [24], true));
+        $this->assertSame(0.123, $coverageOfLine[0]->time);
+        $this->assertSame('path/to/testFile', $coverageOfLine[0]->testFilePath);
+        $this->assertSame(
+            'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
+            $coverageOfLine[0]->testMethod
+        );
     }
 
-    public function test_it_determines_line_is_not_covered_by_not_executed_method(): void
+    public function test_it_determines_method_was_not_executed_from_coverage_report(): void
     {
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        $this->assertFalse($codeCoverageData->hasExecutedMethodOnLine($filePath, 4));
+        $this->assertEmpty($codeCoverageData->getAllTestsForMutation($filePath, [19], true));
+        $this->assertEmpty($codeCoverageData->getAllTestsForMutation($filePath, [21], false));
     }
 
-    public function test_it_determines_line_is_not_covered_for_unknown_path(): void
+    public function test_it_determines_line_was_not_executed_from_coverage_report(): void
     {
         $codeCoverageData = $this->getCodeCoverageData();
-        $filePath = 'unknown/path';
+        $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        $this->assertFalse($codeCoverageData->hasExecutedMethodOnLine($filePath, 4));
+        $this->assertEmpty($codeCoverageData->getAllTestsForMutation($filePath, [27], false));
+        $this->assertEmpty($codeCoverageData->getAllTestsForMutation($filePath, [32], false));
     }
 
     public function test_it_determines_file_is_not_covered_for_unknown_path(): void
@@ -117,7 +131,8 @@ final class CodeCoverageDataTest extends TestCase
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = 'unknown/path';
 
-        $this->assertFalse($codeCoverageData->hasTestsOnLine($filePath, 3));
+        $this->assertEmpty($codeCoverageData->getAllTestsForMutation($filePath, [34], true));
+        $this->assertEmpty($codeCoverageData->getAllTestsForMutation($filePath, [34], false));
     }
 
     public function test_it_determines_file_does_not_have_tests_for_line(): void
@@ -125,16 +140,8 @@ final class CodeCoverageDataTest extends TestCase
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        $this->assertFalse($codeCoverageData->hasTestsOnLine($filePath, 1));
-    }
-
-    public function test_it_determines_file_has_tests_for_line(): void
-    {
-        $codeCoverageData = $this->getCodeCoverageData();
-
-        $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
-
-        $this->assertTrue($codeCoverageData->hasTestsOnLine($filePath, 30));
+        $this->assertEmpty($codeCoverageData->getAllTestsForMutation($filePath, [1], true));
+        $this->assertEmpty($codeCoverageData->getAllTestsForMutation($filePath, [1], false));
     }
 
     public function test_it_returns_zero_tests_for_not_covered_function_body_mutator(): void
