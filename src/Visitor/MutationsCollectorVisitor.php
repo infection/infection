@@ -38,7 +38,7 @@ namespace Infection\Visitor;
 use Infection\Exception\InvalidMutatorException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
-use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\Coverage\CodeCoverageDataInterface;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -68,7 +68,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
     private $fileAst;
 
     /**
-     * @var CodeCoverageData
+     * @var CodeCoverageDataInterface
      */
     private $codeCoverageData;
     /**
@@ -80,7 +80,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
         array $mutators,
         string $filePath,
         array $fileAst,
-        CodeCoverageData $codeCoverageData,
+        CodeCoverageDataInterface $codeCoverageData,
         bool $onlyCovered
     ) {
         $this->mutators = $mutators;

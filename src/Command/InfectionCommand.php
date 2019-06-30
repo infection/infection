@@ -52,6 +52,7 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\Coverage\CodeCoverageDataInterface;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\HasExtraNodeVisitors;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
@@ -332,7 +333,7 @@ final class InfectionCommand extends BaseCommand
         }
     }
 
-    private function getCodeCoverageData(string $testFrameworkKey): CodeCoverageData
+    private function getCodeCoverageData(string $testFrameworkKey): CodeCoverageDataInterface
     {
         $coverageDir = $this->getContainer()->get(sprintf('coverage.dir.%s', $testFrameworkKey));
         $testFileDataProviderServiceId = sprintf('test.file.data.provider.%s', $testFrameworkKey);

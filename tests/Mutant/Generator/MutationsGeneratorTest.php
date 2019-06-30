@@ -45,7 +45,7 @@ use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\Mutator\Number\DecrementInteger;
 use Infection\Mutator\Util\MutatorConfig;
-use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\Coverage\CodeCoverageDataInterface;
 use Infection\Tests\Fixtures\Files\Mutation\OneFile\OneFile;
 use Infection\WrongMutator\ErrorMutator;
 use PhpParser\Lexer;
@@ -61,7 +61,7 @@ final class MutationsGeneratorTest extends TestCase
 {
     public function test_it_collects_plus_mutation(): void
     {
-        $codeCoverageDataMock = $this->createMock(CodeCoverageData::class);
+        $codeCoverageDataMock = $this->createMock(CodeCoverageDataInterface::class);
 
         $mutations = $this->createMutationGenerator($codeCoverageDataMock)->generate(false);
 
@@ -70,7 +70,7 @@ final class MutationsGeneratorTest extends TestCase
 
     public function test_it_collects_public_visibility_mutation(): void
     {
-        $codeCoverageDataMock = $this->createMock(CodeCoverageData::class);
+        $codeCoverageDataMock = $this->createMock(CodeCoverageDataInterface::class);
 
         $mutations = $this->createMutationGenerator($codeCoverageDataMock)->generate(false);
 
@@ -80,7 +80,7 @@ final class MutationsGeneratorTest extends TestCase
 
     public function test_it_can_skip_not_covered_on_file_level(): void
     {
-        $codeCoverageDataMock = $this->createMock(CodeCoverageData::class);
+        $codeCoverageDataMock = $this->createMock(CodeCoverageDataInterface::class);
 
         $codeCoverageDataMock->expects($this->once())
             ->method('hasTests')
@@ -93,7 +93,7 @@ final class MutationsGeneratorTest extends TestCase
 
     public function test_it_can_skip_ignored_classes(): void
     {
-        $codeCoverageDataMock = $this->createMock(CodeCoverageData::class);
+        $codeCoverageDataMock = $this->createMock(CodeCoverageDataInterface::class);
 
         $codeCoverageDataMock->expects($this->once())
             ->method('hasTests')
@@ -113,7 +113,7 @@ final class MutationsGeneratorTest extends TestCase
     public function test_it_executes_only_whitelisted_mutators(): void
     {
         $generator = $this->createMutationGenerator(
-            $this->createMock(CodeCoverageData::class),
+            $this->createMock(CodeCoverageDataInterface::class),
             Decrement::class
         );
 
@@ -125,7 +125,7 @@ final class MutationsGeneratorTest extends TestCase
     public function test_it_throws_correct_error_when_file_is_invalid(): void
     {
         $generator = $this->createMutationGenerator(
-            $this->createMock(CodeCoverageData::class),
+            $this->createMock(CodeCoverageDataInterface::class),
             Decrement::class,
             null,
             [\dirname(__DIR__, 2) . '/Fixtures/Files/InvalidFile']
@@ -139,7 +139,7 @@ final class MutationsGeneratorTest extends TestCase
     public function test_it_throws_correct_exception_when_mutator_is_invalid(): void
     {
         $generator = $this->createMutationGenerator(
-            $this->createMock(CodeCoverageData::class),
+            $this->createMock(CodeCoverageDataInterface::class),
             ErrorMutator::class
         );
 
@@ -153,7 +153,7 @@ final class MutationsGeneratorTest extends TestCase
     }
 
     private function createMutationGenerator(
-        CodeCoverageData $codeCoverageDataMock,
+        CodeCoverageDataInterface $codeCoverageDataMock,
         ?string $whitelistedMutatorName = null,
         ?MutatorConfig $mutatorConfig = null,
         array $srcDirs = []
