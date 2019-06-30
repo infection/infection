@@ -116,7 +116,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                     $isOnFunctionSignature
                 );
 
-            if ($this->onlyCovered && \count($tests) !== 0) {
+            if ($this->onlyCovered && \count($tests) === 0) {
                 continue;
             }
 
