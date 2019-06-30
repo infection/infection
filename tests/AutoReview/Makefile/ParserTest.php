@@ -42,8 +42,6 @@ use PHPUnit\Framework\TestCase;
  * @internal
  *
  * @covers \Infection\Tests\AutoReview\Makefile\Parser
- *
- * @group autoReview
  */
 final class ParserTest extends TestCase
 {

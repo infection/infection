@@ -62,8 +62,13 @@ validate:
 	composer validate --strict
 
 .PHONY: test
-test:		## Runs all the tests
-test: test-unit test-e2e test-infection
+test:		 ## Runs all the tests
+test: test-autoreview test-unit test-e2e test-infection
+
+.PHONY: test-autoreview
+test-autoreview: ## Runs the AutoReview test suite
+test-autoreview:
+	$(PHPUNIT) --configuration=phpunit_autoreview.xml
 
 .PHONY: test-unit
 test-unit:	 ## Runs the unit tests

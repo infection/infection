@@ -81,8 +81,6 @@ use Symfony\Component\Finder\SplFileInfo;
  *
  * @coversNothing
  *
- * @group autoReview
- *
  * This class is responsible for testing that our code base adheres to certain rules,
  * e.g. 'All classes that aren't intended to be used by users should be marked internal'
  *
