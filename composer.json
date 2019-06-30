@@ -52,6 +52,7 @@
         "ocramius/package-versions": "^1.2",
         "pimple/pimple": "^3.2",
         "sebastian/diff": "^3.0.2",
+        "seld/jsonlint": "^1.7",
         "symfony/console": "^3.4.29 || ^4.0",
         "symfony/filesystem": "^3.4.29 || ^4.0",
         "symfony/finder": "^3.4.29 || ^4.0",
