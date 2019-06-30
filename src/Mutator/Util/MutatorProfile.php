@@ -165,6 +165,7 @@ final class MutatorProfile
     ];
 
     public const RETURN_VALUE = [
+        Mutator\ReturnValue\ArrayOneItem::class,
         Mutator\ReturnValue\FloatNegation::class,
         Mutator\ReturnValue\FunctionCall::class,
         Mutator\ReturnValue\IntegerNegation::class,
@@ -343,6 +344,7 @@ final class MutatorProfile
         'MethodCallRemoval' => Mutator\Removal\MethodCallRemoval::class,
 
         //Return Value
+        'ArrayOneItem' => Mutator\ReturnValue\ArrayOneItem::class,
         'FloatNegation' => Mutator\ReturnValue\FloatNegation::class,
         'FunctionCall' => Mutator\ReturnValue\FunctionCall::class,
         'IntegerNegation' => Mutator\ReturnValue\IntegerNegation::class,
