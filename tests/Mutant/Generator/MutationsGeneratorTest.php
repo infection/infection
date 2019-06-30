@@ -36,6 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutant\Generator;
 
 use Infection\EventDispatcher\EventDispatcherInterface;
+use Infection\Events\MutableFileProcessed;
+use Infection\Events\MutationGeneratingFinished;
+use Infection\Events\MutationGeneratingStarted;
 use Infection\Exception\InvalidMutatorException;
 use Infection\Mutant\Exception\ParserException;
 use Infection\Mutant\Generator\MutationsGenerator;
@@ -147,6 +150,29 @@ final class MutationsGeneratorTest extends TestCase
         $this->expectExceptionMessageRegExp(
             '#Encountered an error with the "ErrorMutator" mutator in the ".+OneFile.php"' .
             ' file. This is most likely a bug in Infection, so please report this in our issue tracker.#'
+        );
+
+        $generator->generate(false);
+    }
+
+    public function test_it_dispatches_the_correct_events(): void
+    {
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->expects($this->exactly(3))
+            ->method('dispatch')
+            ->withConsecutive(
+                [new MutationGeneratingStarted(1)],
+                [new MutableFileProcessed()],
+                [new MutationGeneratingFinished()]
+            );
+
+        $generator = new MutationsGenerator(
+            [\dirname(__DIR__, 2) . '/Fixtures/Files/Mutation/OneFile'],
+            [],
+            $this->createMock(CodeCoverageDataInterface::class),
+            [new Plus(new MutatorConfig([]))],
+            $eventDispatcher,
+            $this->getParser()
         );
 
         $generator->generate(false);
