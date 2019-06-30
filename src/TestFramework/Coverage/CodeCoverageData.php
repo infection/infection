@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Infection\MutationInterface;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use function Safe\file_get_contents;
 
@@ -134,35 +133,30 @@ class CodeCoverageData
     /**
      * @return CoverageLineData[]
      */
-    public function getAllTestsFor(MutationInterface $mutation): array
-    {
-        if (!$mutation->isCoveredByTest()) {
-            return [];
+    public function getAllTestsForMutation(
+        string $filePath,
+        array $lineRange,
+        bool $isOnFunctionSignature
+    ): array {
+        if ($isOnFunctionSignature) {
+            return iterator_to_array($this->getTestsForFunctionSignature($filePath, $lineRange), false);
         }
 
-        if ($mutation->isOnFunctionSignature()) {
-            return iterator_to_array($this->getTestsForMutationOnFunctionSignature($mutation), false);
-        }
-
-        return iterator_to_array($this->getTestsForMutation($mutation), false);
+        return iterator_to_array($this->getTestsForLineRange($filePath, $lineRange), false);
     }
 
-    private function getTestsForMutationOnFunctionSignature(MutationInterface $mutation): \Generator
+    private function getTestsForFunctionSignature(string $filePath, array $lineRange): \Generator
     {
-        $filePath = $mutation->getOriginalFilePath();
-
-        foreach ($mutation->getLineRange() as $line) {
+        foreach ($lineRange as $line) {
             if ($this->hasExecutedMethodOnLine($filePath, $line)) {
                 yield from $this->getTestsForExecutedMethodOnLine($filePath, $line);
             }
         }
     }
 
-    private function getTestsForMutation(MutationInterface $mutation): \Generator
+    private function getTestsForLineRange(string $filePath, array $lineRange): \Generator
     {
-        $filePath = $mutation->getOriginalFilePath();
-
-        foreach ($mutation->getLineRange() as $line) {
+        foreach ($lineRange as $line) {
             if ($this->hasTestsOnLine($filePath, $line)) {
                 yield from $this->getCoverage()[$filePath]->byLine[$line];
             }

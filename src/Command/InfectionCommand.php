@@ -272,7 +272,6 @@ final class InfectionCommand extends BaseCommand
 
         $mutationTestingRunner->run(
             (int) $this->input->getOption('threads'),
-            $codeCoverageData,
             $testFrameworkOptions->getForMutantProcess()
         );
         /** @var TestRunConstraintChecker $constraintChecker */

@@ -58,23 +58,11 @@ final class Mutant implements MutantInterface
      */
     private $diff;
 
-    /**
-     * @var bool
-     */
-    private $isCoveredByTest;
-
-    /**
-     * @var CoverageLineData[]
-     */
-    private $coverageTests;
-
-    public function __construct(string $mutatedFilePath, MutationInterface $mutation, string $diff, bool $isCoveredByTest, array $coverageTests)
+    public function __construct(string $mutatedFilePath, MutationInterface $mutation, string $diff)
     {
         $this->mutatedFilePath = $mutatedFilePath;
         $this->mutation = $mutation;
         $this->diff = $diff;
-        $this->isCoveredByTest = $isCoveredByTest;
-        $this->coverageTests = $coverageTests;
     }
 
     public function getMutatedFilePath(): string
@@ -94,7 +82,7 @@ final class Mutant implements MutantInterface
 
     public function isCoveredByTest(): bool
     {
-        return $this->isCoveredByTest;
+        return $this->mutation->isCoveredByTest();
     }
 
     /**
@@ -102,6 +90,6 @@ final class Mutant implements MutantInterface
      */
     public function getCoverageTests(): array
     {
-        return $this->coverageTests;
+        return $this->mutation->getAllTests();
     }
 }

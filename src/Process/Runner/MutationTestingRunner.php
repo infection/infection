@@ -47,7 +47,6 @@ use Infection\MutationInterface;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\MutantProcessInterface;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
-use Infection\TestFramework\Coverage\CodeCoverageData;
 
 /**
  * @internal
@@ -85,15 +84,15 @@ final class MutationTestingRunner
         $this->mutations = $mutations;
     }
 
-    public function run(int $threadCount, CodeCoverageData $codeCoverageData, string $testFrameworkExtraOptions): void
+    public function run(int $threadCount, string $testFrameworkExtraOptions): void
     {
         $mutantCount = \count($this->mutations);
 
         $this->eventDispatcher->dispatch(new MutantsCreatingStarted($mutantCount));
 
         $processes = array_map(
-            function (MutationInterface $mutation) use ($codeCoverageData, $testFrameworkExtraOptions): MutantProcessInterface {
-                $mutant = $this->mutantCreator->create($mutation, $codeCoverageData);
+            function (MutationInterface $mutation) use ($testFrameworkExtraOptions): MutantProcessInterface {
+                $mutant = $this->mutantCreator->create($mutation);
 
                 $process = $this->processBuilder->getProcessForMutant($mutant, $testFrameworkExtraOptions);
 

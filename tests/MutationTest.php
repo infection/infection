@@ -64,42 +64,12 @@ final class MutationTest extends TestCase
             $mutator,
             $attributes,
             'Interface_',
-            false,
-            true,
             new Node\Scalar\LNumber(1),
             0,
             [1, 2, 3]
         );
 
         $this->assertSame('2930c05082a35248987760a81b9f9a08', $mutation->getHash());
-    }
-
-    public function test_it_correctly_sets_is_on_function_signature(): void
-    {
-        $mutator = new Plus(new MutatorConfig([]));
-        $attributes = [
-            'startLine' => 3,
-            'endLine' => 5,
-            'startTokenPos' => 21,
-            'endTokenPos' => 31,
-            'startFilePos' => 43,
-            'endFilePos' => 53,
-        ];
-
-        $mutation = new Mutation(
-            '/abc.php',
-            [],
-            $mutator,
-            $attributes,
-            'Interface_',
-            false,
-            true,
-            new Node\Scalar\LNumber(1),
-            0,
-            [1, 2, 3]
-        );
-
-        $this->assertFalse($mutation->isOnFunctionSignature());
     }
 
     public function test_it_correctly_sets_original_file_ast(): void
@@ -121,42 +91,11 @@ final class MutationTest extends TestCase
             $mutator,
             $attributes,
             'Interface_',
-            false,
-            true,
             new Node\Scalar\LNumber(1),
             0,
             [1, 2, 3]
         );
 
         $this->assertSame($fileAst, $mutation->getOriginalFileAst());
-    }
-
-    public function test_it_correctly_sets_line_range(): void
-    {
-        $mutator = new Plus(new MutatorConfig([]));
-        $attributes = [
-            'startLine' => 3,
-            'endLine' => 5,
-            'startTokenPos' => 21,
-            'endTokenPos' => 31,
-            'startFilePos' => 43,
-            'endFilePos' => 53,
-        ];
-        $range = [21, 22, 23, 24];
-
-        $mutation = new Mutation(
-            '/abc.php',
-            ['file' => 'ast'],
-            $mutator,
-            $attributes,
-            'Interface_',
-            false,
-            true,
-            new Node\Scalar\LNumber(1),
-            0,
-            $range
-        );
-
-        $this->assertSame($range, $mutation->getLineRange());
     }
 }

@@ -37,7 +37,6 @@ namespace Infection\Mutant;
 
 use Infection\Differ\Differ;
 use Infection\MutationInterface;
-use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Visitor\CloneVisitor;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\NodeTraverser;
@@ -76,7 +75,7 @@ final class MutantCreator
         $this->prettyPrinter = $prettyPrinter;
     }
 
-    public function create(MutationInterface $mutation, CodeCoverageData $codeCoverageData): MutantInterface
+    public function create(MutationInterface $mutation): MutantInterface
     {
         $mutatedFilePath = sprintf('%s/mutant.%s.infection.php', $this->tempDir, $mutation->getHash());
 
@@ -89,9 +88,7 @@ final class MutantCreator
         return new Mutant(
             $mutatedFilePath,
             $mutation,
-            $diff,
-            $mutation->isCoveredByTest(),
-            $codeCoverageData->getAllTestsFor($mutation)
+            $diff
         );
     }
 

@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\Mutation;
-use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
@@ -46,7 +44,6 @@ use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileTimeData;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkTypes;
-use PhpParser\Node\Scalar\LNumber;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -145,20 +142,7 @@ final class CodeCoverageDataTest extends TestCase
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        $mutation = new Mutation(
-            $filePath,
-            [],
-            $this->createMock(Mutator::class),
-            ['startLine' => 1, 'endLine' => 1],
-            'PHPParser\Node\Expr\BinaryOp\Plus',
-            false,
-            true,
-            new LNumber(1),
-            0,
-            [1]
-        );
-
-        $this->assertCount(0, $codeCoverageData->getAllTestsFor($mutation));
+        $this->assertCount(0, $codeCoverageData->getAllTestsForMutation($filePath, [1], false));
     }
 
     public function test_it_returns_tests_for_covered_function_body_mutator(): void
@@ -166,20 +150,7 @@ final class CodeCoverageDataTest extends TestCase
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        $mutation = new Mutation(
-            $filePath,
-            [],
-            $this->createMock(Mutator::class),
-            ['startLine' => 26, 'endLine' => 26],
-            'PHPParser\Node\Expr\BinaryOp\Plus',
-            false,
-            true,
-            new LNumber(1),
-            0,
-            [26]
-        );
-
-        $tests = $codeCoverageData->getAllTestsFor($mutation);
+        $tests = $codeCoverageData->getAllTestsForMutation($filePath, [26], false);
 
         $this->assertCount(2, $tests);
         $this->assertSame('path/to/testFile', $tests[0]->testFilePath);
@@ -191,20 +162,7 @@ final class CodeCoverageDataTest extends TestCase
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        $mutation = new Mutation(
-            $filePath,
-            [],
-            $this->createMock(Mutator::class),
-            ['startLine' => 1, 'endLine' => 1],
-            'PHPParser\Node\Stmt\ClassMethod',
-            true,
-            true,
-            new LNumber(1),
-            0,
-            [1]
-        );
-
-        $this->assertCount(0, $codeCoverageData->getAllTestsFor($mutation));
+        $this->assertCount(0, $codeCoverageData->getAllTestsForMutation($filePath, [1], true));
     }
 
     public function test_it_returns_tests_for_covered_function_signature_mutator(): void
@@ -212,20 +170,7 @@ final class CodeCoverageDataTest extends TestCase
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        $mutation = new Mutation(
-            $filePath,
-            [],
-            $this->createMock(Mutator::class),
-            ['startLine' => 24, 'endLine' => 24],
-            'PHPParser\Node\Stmt\ClassMethod',
-            true,
-            true,
-            new LNumber(1),
-            0,
-            [24]
-        );
-
-        $this->assertCount(6, $codeCoverageData->getAllTestsFor($mutation));
+        $this->assertCount(6, $codeCoverageData->getAllTestsForMutation($filePath, [24], true));
     }
 
     public function test_it_throws_an_exception_when_no_coverage_found(): void

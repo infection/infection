@@ -57,7 +57,7 @@ interface MutationInterface
 
     public function getOriginalFileAst(): array;
 
-    public function isOnFunctionSignature(): bool;
+    public function getAllTests(): array;
 
     public function isCoveredByTest(): bool;
 
@@ -65,6 +65,4 @@ interface MutationInterface
      * @return Node|Node[] Node, array of Nodes
      */
     public function getMutatedNode();
-
-    public function getLineRange(): array;
 }

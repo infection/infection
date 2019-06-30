@@ -69,16 +69,6 @@ final class Mutation implements MutationInterface
     private $mutatedNodeClass;
 
     /**
-     * @var bool
-     */
-    private $isOnFunctionSignature;
-
-    /**
-     * @var bool
-     */
-    private $isCoveredByTest;
-
-    /**
      * @var string
      */
     private $hash;
@@ -94,9 +84,9 @@ final class Mutation implements MutationInterface
     private $mutationByMutatorIndex;
 
     /**
-     * @var array|int[]
+     * @var array
      */
-    private $lineRange;
+    private $tests;
 
     public function __construct(
         string $originalFilePath,
@@ -104,22 +94,18 @@ final class Mutation implements MutationInterface
         Mutator $mutator,
         array $attributes,
         string $mutatedNodeClass,
-        bool $isOnFunctionSignature,
-        bool $isCoveredByTest,
         $mutatedNode,
         int $mutationByMutatorIndex,
-        array $lineRange
+        array $tests
     ) {
         $this->originalFilePath = $originalFilePath;
         $this->originalFileAst = $originalFileAst;
         $this->mutator = $mutator;
         $this->attributes = $attributes;
         $this->mutatedNodeClass = $mutatedNodeClass;
-        $this->isOnFunctionSignature = $isOnFunctionSignature;
-        $this->isCoveredByTest = $isCoveredByTest;
         $this->mutatedNode = $mutatedNode;
         $this->mutationByMutatorIndex = $mutationByMutatorIndex;
-        $this->lineRange = $lineRange;
+        $this->tests = $tests;
     }
 
     public function getMutator(): Mutator
@@ -173,14 +159,14 @@ final class Mutation implements MutationInterface
         return $this->originalFileAst;
     }
 
-    public function isOnFunctionSignature(): bool
+    public function getAllTests(): array
     {
-        return $this->isOnFunctionSignature;
+        return $this->tests;
     }
 
     public function isCoveredByTest(): bool
     {
-        return $this->isCoveredByTest;
+        return \count($this->getAllTests()) !== 0;
     }
 
     /**
@@ -189,10 +175,5 @@ final class Mutation implements MutationInterface
     public function getMutatedNode()
     {
         return $this->mutatedNode;
-    }
-
-    public function getLineRange(): array
-    {
-        return $this->lineRange;
     }
 }
