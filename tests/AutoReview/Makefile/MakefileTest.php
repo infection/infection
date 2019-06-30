@@ -81,6 +81,7 @@ final class MakefileTest extends TestCase
 [33mtest-unit:[0m	  Runs the unit tests
 [33mtest-e2e:[0m 	  Runs the end-to-end tests
 [33mtest-infection:[0m   Runs Infection against itself
+
 EOF;
 
         $this->assertSame($expectedOutput, $output);
