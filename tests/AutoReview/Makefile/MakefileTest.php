@@ -90,15 +90,16 @@ final class MakefileTest extends TestCase
 # Commands
 #---------------------------------------------------------------------------[0m
 
-[33mcompile:[0m	 Bundles Infection into a PHAR
-[33mcs:[0m	  	 Runs PHP-CS-Fixer
-[33mphpstan:[0m  	 Runs PHPStan
-[33manalyze:[0m	 Runs Static analyzers and various other checks
-[33mvalidate:[0m	 Checks that the composer.json file is valid
-[33mtest:[0m		 Runs all the tests
-[33mtest-unit:[0m	 Runs the unit tests
-[33mtest-e2e:[0m 	 Runs the end-to-end tests
-[33mtest-infection:[0m  Runs Infection against itself
+[33mcompile:[0m	  Bundles Infection into a PHAR
+[33mcs:[0m	  	  Runs PHP-CS-Fixer
+[33mphpstan:[0m  	  Runs PHPStan
+[33manalyze:[0m	  Runs Static analyzers and various other checks
+[33mvalidate:[0m	  Checks that the composer.json file is valid
+[33mtest:[0m		  Runs all the tests
+[33mtest-autoreview:[0m  Runs the AutoReview test suite
+[33mtest-unit:[0m	  Runs the unit tests
+[33mtest-e2e:[0m 	  Runs the end-to-end tests
+[33mtest-infection:[0m   Runs Infection against itself
 
 EOF;
 
