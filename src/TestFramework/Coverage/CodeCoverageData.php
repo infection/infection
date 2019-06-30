@@ -128,29 +128,10 @@ final class CodeCoverageData implements CodeCoverageDataInterface
         return !empty($coverageData[$filePath]->byLine[$line]);
     }
 
-    private function hasExecutedMethodOnLine(string $filePath, int $line): bool
-    {
-        $coverage = $this->getCoverage();
-
-        if (!\array_key_exists($filePath, $coverage)) {
-            return false;
-        }
-
-        foreach ($coverage[$filePath]->byMethod as $method => $coverageInfo) {
-            if ($line >= $coverageInfo->startLine && $line <= $coverageInfo->endLine) {
-                return $coverageInfo->executed || $coverageInfo->coverage;
-            }
-        }
-
-        return false;
-    }
-
     private function getTestsForFunctionSignature(string $filePath, array $lineRange): \Generator
     {
         foreach ($lineRange as $line) {
-            if ($this->hasExecutedMethodOnLine($filePath, $line)) {
-                yield from $this->getTestsForExecutedMethodOnLine($filePath, $line);
-            }
+            yield from $this->getTestsForExecutedMethodOnLine($filePath, $line);
         }
     }
 
@@ -241,6 +222,10 @@ final class CodeCoverageData implements CodeCoverageDataInterface
     private function getTestsForExecutedMethodOnLine(string $filePath, int $line): array
     {
         $coverage = $this->getCoverage();
+
+        if (!\array_key_exists($filePath, $coverage)) {
+            return [];
+        }
 
         $tests = [[]];
 
