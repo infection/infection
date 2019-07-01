@@ -50,21 +50,9 @@ final class CoverageMethodData
      */
     public $endLine;
 
-    /**
-     * @var int
-     */
-    public $executed;
-
-    /**
-     * @var int
-     */
-    public $coverage;
-
-    public function __construct(int $startLine, int $endLine, int $executed, int $coverage)
+    public function __construct(int $startLine, int $endLine)
     {
         $this->startLine = $startLine;
         $this->endLine = $endLine;
-        $this->executed = $executed;
-        $this->coverage = $coverage;
     }
 }

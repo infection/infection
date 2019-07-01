@@ -214,9 +214,7 @@ class CoverageXmlParser
 
             $methodsCoverage[$methodName] = new CoverageMethodData(
                 (int) $methodsCoverageNode->getAttribute('start'),
-                (int) $methodsCoverageNode->getAttribute('end'),
-                (int) $methodsCoverageNode->getAttribute('executed'),
-                (int) $methodsCoverageNode->getAttribute('coverage')
+                (int) $methodsCoverageNode->getAttribute('end')
             );
         }
 

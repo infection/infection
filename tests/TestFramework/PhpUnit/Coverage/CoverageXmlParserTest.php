@@ -96,14 +96,10 @@ final class CoverageXmlParserTest extends TestCase
             'mutate' => [
                 'startLine' => 19,
                 'endLine' => 22,
-                'executed' => 0,
-                'coverage' => 0,
             ],
             'shouldMutate' => [
                 'startLine' => 24,
                 'endLine' => 35,
-                'executed' => 4,
-                'coverage' => 80,
             ],
         ];
 
@@ -122,14 +118,10 @@ final class CoverageXmlParserTest extends TestCase
             'mutate' => [
                 'startLine' => 19,
                 'endLine' => 22,
-                'executed' => 0,
-                'coverage' => 0,
             ],
             'shouldMutate' => [
                 'startLine' => 24,
                 'endLine' => 35,
-                'executed' => 4,
-                'coverage' => 80,
             ],
         ];
 
@@ -217,8 +209,6 @@ XML
             $result[$method] = [
                 'startLine' => $coverageMethodData->startLine,
                 'endLine' => $coverageMethodData->endLine,
-                'executed' => $coverageMethodData->executed,
-                'coverage' => $coverageMethodData->coverage,
             ];
         }
 

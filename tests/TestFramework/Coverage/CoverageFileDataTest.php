@@ -59,10 +59,10 @@ final class CoverageFileDataTest extends TestCase
 
         $coverageFileData = new CoverageFileData(
             [1 => [CoverageLineData::withTestMethod($pathToTest)]],
-            ['method' => new CoverageMethodData(1, 3, 1, 100)]
+            ['method' => new CoverageMethodData(1, 3)]
         );
 
         $this->assertSame($pathToTest, $coverageFileData->byLine[1][0]->testMethod);
-        $this->assertSame(100, $coverageFileData->byMethod['method']->coverage);
+        $this->assertSame(1, $coverageFileData->byMethod['method']->startLine);
     }
 }

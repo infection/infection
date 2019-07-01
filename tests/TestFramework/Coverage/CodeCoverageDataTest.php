@@ -217,21 +217,15 @@ final class CodeCoverageDataTest extends TestCase
                 [
                     'mutate' => new CoverageMethodData(
                         19,
-                        22,
-                        1,
-                        0
+                        22
                     ),
                     'shouldMutate' => new CoverageMethodData(
                         24,
-                        35,
-                        4,
-                        80
+                        35
                     ),
                     'notExecuted' => new CoverageMethodData(
                         3,
-                        5,
-                        0,
-                        0 // not executed method can't be covered
+                        5
                     ),
                 ]
             ),
