@@ -71,6 +71,7 @@ use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use Pimple\Container;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -255,9 +256,20 @@ final class InfectionContainer extends Container
         };
 
         $this['coverage.checker'] = static function () use ($input): CoverageRequirementChecker {
+            $initialTestsPhpOptions = $input->getOption('initial-tests-php-options') ?? '';
+
+            if (!\is_string($initialTestsPhpOptions)) {
+                throw new InvalidArgumentException(
+                    \sprintf(
+                        'Expected initial-tests-php-options to be string, %s given',
+                        \gettype($initialTestsPhpOptions)
+                    )
+                );
+            }
+
             return new CoverageRequirementChecker(
                 \strlen(trim($input->getOption('coverage'))) > 0,
-                $input->getOption('initial-tests-php-options')
+                $initialTestsPhpOptions
             );
         };
 
