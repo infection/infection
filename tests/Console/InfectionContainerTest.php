@@ -38,6 +38,7 @@ namespace Infection\Tests\Console;
 use Infection\Console\InfectionContainer;
 use PHPUnit\Framework\TestCase;
 use Pimple\Container;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 
 /**
@@ -70,5 +71,27 @@ final class InfectionContainerTest extends TestCase
             $tmpDir,
             $container['coverage.path']
         );
+    }
+
+    public function test_it_throws_on_invalid_type(): void
+    {
+        $input = $this->createMock(InputInterface::class);
+        $input
+            ->method('hasOption')
+            ->with('coverage')
+            ->willReturn(false)
+        ;
+        $input
+            ->method('getOption')
+            ->with('initial-tests-php-options')
+            ->willReturn([])
+        ;
+
+        $container = new InfectionContainer();
+        $container->buildDynamicDependencies($input);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected initial-tests-php-options to be string, array given');
+        $this->assertNotNull($container['coverage.checker']);
     }
 }
