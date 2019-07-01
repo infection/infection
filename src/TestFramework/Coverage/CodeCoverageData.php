@@ -99,6 +99,8 @@ final class CodeCoverageData implements CodeCoverageDataInterface
     }
 
     /**
+     * @param int[] $lineRange
+     *
      * @return CoverageLineData[]
      */
     public function getAllTestsForMutation(
@@ -113,6 +115,11 @@ final class CodeCoverageData implements CodeCoverageDataInterface
         return iterator_to_array($this->getTestsForLineRange($filePath, $lineRange), false);
     }
 
+    /**
+     * @param int[] $lineRange
+     *
+     * @return \Generator<CoverageLineData>
+     */
     private function getTestsForFunctionSignature(string $filePath, array $lineRange): \Generator
     {
         foreach ($lineRange as $line) {
@@ -120,6 +127,11 @@ final class CodeCoverageData implements CodeCoverageDataInterface
         }
     }
 
+    /**
+     * @param int[] $lineRange
+     *
+     * @return \Generator<CoverageLineData>
+     */
     private function getTestsForLineRange(string $filePath, array $lineRange): \Generator
     {
         foreach ($lineRange as $line) {
