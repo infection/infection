@@ -65,6 +65,7 @@ final class MutationsGeneratorTest extends TestCase
     public function test_it_collects_plus_mutation(): void
     {
         $codeCoverageDataMock = $this->createMock(CodeCoverageDataInterface::class);
+        $codeCoverageDataMock->method('getAllTestsForMutation');
 
         $mutations = $this->createMutationGenerator($codeCoverageDataMock)->generate(false);
 
@@ -74,6 +75,7 @@ final class MutationsGeneratorTest extends TestCase
     public function test_it_collects_public_visibility_mutation(): void
     {
         $codeCoverageDataMock = $this->createMock(CodeCoverageDataInterface::class);
+        $codeCoverageDataMock->method('getAllTestsForMutation');
 
         $mutations = $this->createMutationGenerator($codeCoverageDataMock)->generate(false);
 
@@ -84,6 +86,8 @@ final class MutationsGeneratorTest extends TestCase
     public function test_it_can_skip_not_covered_on_file_level(): void
     {
         $codeCoverageDataMock = $this->createMock(CodeCoverageDataInterface::class);
+
+        $codeCoverageDataMock->expects($this->never())->method('getAllTestsForMutation');
 
         $codeCoverageDataMock->expects($this->once())
             ->method('hasTests')
