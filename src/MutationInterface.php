@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection;
 
 use Infection\Mutator\Util\Mutator;
+use Infection\TestFramework\Coverage\CoverageLineData;
 use PhpParser\Node;
 
 /**
@@ -57,6 +58,9 @@ interface MutationInterface
 
     public function getOriginalFileAst(): array;
 
+    /**
+     * @return CoverageLineData[]
+     */
     public function getAllTests(): array;
 
     public function isCoveredByTest(): bool;

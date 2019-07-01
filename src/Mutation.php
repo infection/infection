@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection;
 
 use Infection\Mutator\Util\Mutator;
+use Infection\TestFramework\Coverage\CoverageLineData;
 use PhpParser\Node;
 
 /**
@@ -84,7 +85,7 @@ final class Mutation implements MutationInterface
     private $mutationByMutatorIndex;
 
     /**
-     * @var array
+     * @var CoverageLineData[]
      */
     private $tests;
 
@@ -159,6 +160,9 @@ final class Mutation implements MutationInterface
         return $this->originalFileAst;
     }
 
+    /**
+     * @return CoverageLineData[]
+     */
     public function getAllTests(): array
     {
         return $this->tests;
