@@ -105,12 +105,6 @@ final class ArrayOneItem extends Mutator
             $returnType = $returnType->name;
         }
 
-        // no return value specified
-        if (null === $returnType) {
-            return false;
-        }
-
-        // scalar typehint
         return \is_string($returnType) && $returnType === 'array';
     }
 }
