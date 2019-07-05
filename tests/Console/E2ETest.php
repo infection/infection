@@ -78,10 +78,6 @@ final class E2ETest extends TestCase
             $this->markTestSkipped('This test needs copious amounts of virtual memory. It will fail unless it is allowed to overcommit memory.');
         }
 
-        if (\version_compare(\PHPUnit\Runner\Version::id(), '8', '>=')) {
-            $this->markTestSkipped('Most E2E tests use an earlier version of PHPUnit, which is incompatible with PHPUnit 8 and later');
-        }
-
         // E2E tests usually require to chdir to their location
         // Hence we would need to go back to this dir
         $this->cwd = getcwd();
