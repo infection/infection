@@ -9,7 +9,7 @@ class CalculatorTest extends TestCase
     /** @var Calculator */
     private $calculator;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->calculator = new Calculator();

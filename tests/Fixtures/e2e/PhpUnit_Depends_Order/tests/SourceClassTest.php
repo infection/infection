@@ -19,7 +19,7 @@ class SourceClassTest extends TestCase
      * Expected result: random order of these tests should respect `@depends` annotation and do not
      * produce skipped tests, thanks to `resolveDependencies="true"`flag (or `--resolve-dependencies` option)
      */
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();
 
