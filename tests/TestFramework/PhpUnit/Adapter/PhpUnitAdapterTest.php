@@ -117,6 +117,7 @@ final class PhpUnitAdapterTest extends TestCase
         return [
             ['Memory: 8.00MB', 8.0],
             ['Memory: 68.00MB', 68.0],
+            ['Memory: 68.00 MB', 68.0],
             ['Time: 2.51 seconds', -1.0],
         ];
     }
