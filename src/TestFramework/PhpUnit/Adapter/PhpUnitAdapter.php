@@ -72,7 +72,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
 
     public function getMemoryUsed(string $output): float
     {
-        if (preg_match('/Memory: (\d+(?:\.\d+))MB/', $output, $match)) {
+        if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match)) {
             return (float) $match[1];
         }
 
