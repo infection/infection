@@ -40,6 +40,7 @@ use Infection\Command\ConfigureCommand;
 use Infection\Console\Application;
 use Infection\Console\InfectionContainer;
 use Infection\Finder\ComposerExecutableFinder;
+use Infection\Finder\Exception\FinderException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -211,6 +212,13 @@ final class E2ETest extends TestCase
 
                 ++self::$countFailingComposerInstall;
                 $this->markTestSkipped($e->getMessage());
+            } catch (FinderException $e) {
+                if (\DIRECTORY_SEPARATOR !== '\\') {
+                    throw $e;
+                }
+
+                // It is not our call to work around ComposerExecutableFinder's misbehavior on Windows
+                $this->markTestIncomplete($e->getMessage());
             }
         }
 
