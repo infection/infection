@@ -40,6 +40,7 @@ use Infection\Command\ConfigureCommand;
 use Infection\Console\Application;
 use Infection\Console\InfectionContainer;
 use Infection\Finder\ComposerExecutableFinder;
+use Infection\Finder\Exception\FinderException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -76,10 +77,6 @@ final class E2ETest extends TestCase
             is_readable('/proc/sys/vm/overcommit_memory') &&
             (int) file_get_contents('/proc/sys/vm/overcommit_memory') === 2) {
             $this->markTestSkipped('This test needs copious amounts of virtual memory. It will fail unless it is allowed to overcommit memory.');
-        }
-
-        if (\version_compare(\PHPUnit\Runner\Version::id(), '8', '>=')) {
-            $this->markTestSkipped('Most E2E tests use an earlier version of PHPUnit, which is incompatible with PHPUnit 8 and later');
         }
 
         // E2E tests usually require to chdir to their location
@@ -215,6 +212,13 @@ final class E2ETest extends TestCase
 
                 ++self::$countFailingComposerInstall;
                 $this->markTestSkipped($e->getMessage());
+            } catch (FinderException $e) {
+                if (\DIRECTORY_SEPARATOR !== '\\') {
+                    throw $e;
+                }
+
+                // It is not our call to work around ComposerExecutableFinder's misbehavior on Windows
+                $this->markTestIncomplete($e->getMessage());
             }
         }
 

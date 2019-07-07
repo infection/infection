@@ -1,6 +1,6 @@
 {
     "require-dev": {
-        "phpunit/phpunit": "^6.5"
+        "phpunit/phpunit": "^8"
     },
     "autoload": {
         "psr-4": {

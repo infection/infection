@@ -1,6 +1,6 @@
 {
     "require-dev": {
-        "phpunit/phpunit": "^6.5"
+        "phpunit/phpunit": "^8"
     },
     "autoload": {
         "psr-4": {
@@ -14,7 +14,7 @@
     },
     "config": {
         "platform": {
-            "php": "7.0.8"
+            "php": "7.2.9"
         },
         "sort-packages": true
     }
