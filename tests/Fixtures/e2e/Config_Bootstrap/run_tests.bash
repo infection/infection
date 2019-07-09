@@ -6,7 +6,7 @@ rm -rf infection-file.txt
 
 set -e pipefail
 
-if [ "$PHPDBG" = "1" ]
+if [ "$DRIVER" = "phpdbg" ]
 then
     phpdbg -qrr $INFECTION
 else

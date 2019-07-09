@@ -10,7 +10,7 @@ run () {
     local INFECTION=${1}
     local PHPARGS=${2}
 
-    if [ "$PHPDBG" = "1" ]
+    if [ "$DRIVER" = "phpdbg" ]
     then
         phpdbg $PHPARGS -qrr $INFECTION
     else
@@ -20,7 +20,7 @@ run () {
 
 cd $(dirname "$0")
 
-if [ "$PHPDBG" = "1" ]
+if [ "$DRIVER" = "phpdbg" ]
 then
     tputx bold
     echo "Will be using phpdbg"
@@ -31,7 +31,7 @@ tputx bold
 echo "Initial test run outside Infection must be successful"
 tputx sgr0
 
-if [ "$PHPDBG" = "1" ]
+if [ "$DRIVER" = "phpdbg" ]
 then
     PATH=$PATH:bin phpdbg -qrr vendor/bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage/phpunit.junit.xml
 else

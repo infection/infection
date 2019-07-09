@@ -24,7 +24,7 @@ addons:
 before_install:
   - source .ci/travis-functions.sh
   - xdebug-disable
-  # Since the Makefile timestamp is used in the Makefile as a dependency, we must 
+  # Since the Makefile timestamp is used in the Makefile as a dependency, we must
   # ensure its timestamp is the correct one and not the one at the time of cloning
   - touch -d "$(git log -1 --date=iso --format=%cd Makefile)" Makefile
 
@@ -41,11 +41,24 @@ jobs:
     - &STANDARD_TEST_JOB
       stage: Test
       php: 7.2
+      env: DRIVER="xdebug"
       install:
         - if [ "$DEPS" == "LOW" ]; then composer update --prefer-lowest $COMPOSER_FLAGS; else composer install $COMPOSER_FLAGS; fi
+      before_script:
+          - |
+              if [[ "$DRIVER" == "pcov" ]]; then
+                echo > $HOME/.phpenv/versions/$TRAVIS_PHP_VERSION/etc/conf.d/xdebug.ini
+                git clone --single-branch --branch=v1.0.6 --depth=1 https://github.com/krakjoe/pcov
+                cd pcov
+                phpize
+                ./configure
+                make clean install
+                echo "extension=pcov.so" > $HOME/.phpenv/versions/$TRAVIS_PHP_VERSION/etc/conf.d/pcov.ini
+                cd $TRAVIS_BUILD_DIR
+              fi
       script:
-        - if [[ $PHPDBG != 1 ]]; then xdebug-enable; fi
-        - if [[ $PHPDBG != 1 ]]; then $PHPUNIT_BIN; else phpdbg -qrr $PHPUNIT_BIN; fi
+        - if [[ "$DRIVER" == "xdebug" || "$DRIVER" == "none" ]]; then xdebug-enable; fi
+        - if [[ "$DRIVER" != "phpdbg" ]]; then $PHPUNIT_BIN; else phpdbg -qrr $PHPUNIT_BIN; fi
         - |
           if [[ "$DEPS" == "LOW" ]]; then
             ./tests/e2e_tests bin/infection;
@@ -53,12 +66,12 @@ jobs:
             make compile;
             ./tests/e2e_tests build/infection.phar;
           fi
-        - if [[ $NO_DEBUGGER == 1 ]]; then xdebug-disable; fi
+        - if [[ "$DRIVER" == "none" ]]; then xdebug-disable; fi
         - |
           INFECTION_PR_FLAGS=$(get-infection-pr-flags);
           echo "INFECTION_PR_FLAGS=$INFECTION_PR_FLAGS";
 
-          if [[ $PHPDBG != 1 ]]; then
+          if [[ "$DRIVER" != "phpdbg" ]]; then
             bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
           else
             phpdbg -qrr bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
@@ -70,60 +83,57 @@ jobs:
     -
       <<: *STANDARD_TEST_JOB
       php: 7.2
+      env: DRIVER="none"
 
     -
       <<: *STANDARD_TEST_JOB
       php: 7.2
-      env: NO_DEBUGGER=1
+      env: DRIVER="phpdbg"
 
     -
       <<: *STANDARD_TEST_JOB
       php: 7.2
-      env: PHPDBG=1
+      env: DEPS="LOW" DRIVER="xdebug"
 
     -
       <<: *STANDARD_TEST_JOB
       php: 7.2
-      env: DEPS="LOW"
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.2
-      env: DEPS="LOW" PHPDBG=1
+      env: DEPS="LOW" DRIVER="phpdbg"
 
     -
       <<: *STANDARD_TEST_JOB
       php: 7.3
+      env: DRIVER="xdebug"
 
     -
       <<: *STANDARD_TEST_JOB
       php: 7.3
-      env: NO_DEBUGGER=1
+      env: DRIVER="none"
 
     -
       <<: *STANDARD_TEST_JOB
       php: 7.3
-      env: PHPDBG=1
+      env: DRIVER="phpdbg"
 
     -
       <<: *STANDARD_TEST_JOB
       php: 7.3
-      env: DEPS="LOW"
+      env: DEPS="LOW" DRIVER="xdebug"
 
     -
       <<: *STANDARD_TEST_JOB
       php: 7.3
-      env: DEPS="LOW" PHPDBG=1
+      env: DEPS="LOW" DRIVER="phpdbg"
 
     -
       <<: *STANDARD_TEST_JOB
       php: 7.4snapshot
-      env: PHPDBG=1
+      env: DRIVER="phpdbg"
 
     -
       <<: *STANDARD_TEST_JOB
       php: nightly
-      env: PHPDBG=1
+      env: DRIVER="phpdbg"
 
       script:
         # We don't have xdebug on the nightly build, so we always run with phpdbg.
@@ -133,6 +143,10 @@ jobs:
         - |
           INFECTION_PR_FLAGS=$(get-infection-pr-flags);
           phpdbg -qrr bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
+
+    -
+      <<: *STANDARD_TEST_JOB
+      env: DRIVER="pcov"
 
     - stage: Deploy
       php: 7.2
@@ -159,6 +173,6 @@ jobs:
 
   allow_failures:
     - php: nightly
-      env: PHPDBG=1
+      env: DRIVER="phpdbg"
     - php: 7.4snapshot
-      env: PHPDBG=1
+      env: DRIVER="phpdbg"

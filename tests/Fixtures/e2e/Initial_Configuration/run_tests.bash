@@ -11,7 +11,7 @@ rm -v -f infection.json.dist infection.log
 
 set -e
 
-if [ "$PHPDBG" = "1" ]
+if [ "$DRIVER" = "phpdbg" ]
 then
     INFECTION="phpdbg -qrr ../../../../bin/infection"
 else

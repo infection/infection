@@ -197,7 +197,15 @@ final class E2ETest extends TestCase
             $this->assertNotEmpty(getenv('PATH') ?: getenv('Path'), 'E2E tests need a system composer installed, but it could not be found without a PATH set');
 
             try {
-                $process = new Process(sprintf('%s %s', (new ComposerExecutableFinder())->find(), 'install'));
+                $composerCommand = getenv('DEPS') === 'LOW' ? 'update --prefer-lowest' : 'install';
+
+                $process = new Process(
+                    sprintf(
+                        '%s %s',
+                        (new ComposerExecutableFinder())->find(),
+                        $composerCommand
+                    )
+                );
                 $process->setTimeout(300);
                 $process->mustRun();
             } catch (ProcessTimedOutException $e) {
