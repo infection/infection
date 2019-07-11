@@ -34,6 +34,11 @@
             "name": "Alexey Kopytko",
             "email": "alexey@kopytko.com",
             "homepage": "https://www.alexeykopytko.com"
+        },
+        {
+            "name": "Andreas Möller",
+            "email": "am@localheinz.com",
+            "homepage": "https://localheinz.com"
         }
     ],
     "require": {
