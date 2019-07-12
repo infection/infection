@@ -34,6 +34,11 @@
             "name": "Alexey Kopytko",
             "email": "alexey@kopytko.com",
             "homepage": "https://www.alexeykopytko.com"
+        },
+        {
+            "name": "Andreas Möller",
+            "email": "am@localheinz.com",
+            "homepage": "https://localheinz.com"
         }
     ],
     "require": {
@@ -59,8 +64,8 @@
         "symfony/process": "3.4.2"
     },
     "require-dev": {
-        "helmich/phpunit-json-assert": "^2.1 || ^3.0",
-        "phpunit/phpunit": "^8"
+        "helmich/phpunit-json-assert": "^3.0",
+        "phpunit/phpunit": "^8.2.4"
     },
     "config": {
         "platform": {
