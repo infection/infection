@@ -82,48 +82,26 @@ jobs:
 
     -
       <<: *STANDARD_TEST_JOB
-      php: 7.2
-      env: DRIVER="none"
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.2
-      env: DRIVER="phpdbg"
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.2
-      env: DEPS="LOW" DRIVER="xdebug"
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.2
-      env: DEPS="LOW" DRIVER="phpdbg"
-
-    -
-      <<: *STANDARD_TEST_JOB
       php: 7.3
       env: DRIVER="xdebug"
 
     -
       <<: *STANDARD_TEST_JOB
       php: 7.3
+      env: DRIVER="phpdbg"
+
+    - <<: *STANDARD_TEST_JOB
+      php: 7.3
+      env: DRIVER="pcov"
+
+    - <<: *STANDARD_TEST_JOB
+      php: 7.3
       env: DRIVER="none"
 
     -
       <<: *STANDARD_TEST_JOB
       php: 7.3
-      env: DRIVER="phpdbg"
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.3
       env: DEPS="LOW" DRIVER="xdebug"
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.3
-      env: DEPS="LOW" DRIVER="phpdbg"
 
     -
       <<: *STANDARD_TEST_JOB
@@ -143,10 +121,6 @@ jobs:
         - |
           INFECTION_PR_FLAGS=$(get-infection-pr-flags);
           phpdbg -qrr bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
-
-    -
-      <<: *STANDARD_TEST_JOB
-      env: DRIVER="pcov"
 
     - stage: Deploy
       php: 7.2
