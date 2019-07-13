@@ -60,6 +60,7 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\MethodLocationData;
+use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\TestFileTimeData;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder as PhpSpecInitalConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder as PhpSpecMutationConfigBuilder;
@@ -220,6 +221,7 @@ final class ProjectCodeProvider
                             CoverageFileData::class,
                             CoverageLineData::class,
                             MethodLocationData::class,
+                            NodeLineRangeData::class,
                             TestFileTimeData::class,
                         ],
                         true
