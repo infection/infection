@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageMethodData;
+use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileTimeData;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkTypes;
 use PHPUnit\Framework\TestCase;
@@ -49,7 +49,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  */
-final class CodeCoverageDataTest extends TestCase
+final class XMLLineCodeCoverageTest extends TestCase
 {
     private $coverageDir = __DIR__ . '/../../Fixtures/Files/phpunit/coverage-xml';
 
@@ -184,7 +184,7 @@ final class CodeCoverageDataTest extends TestCase
     {
         $coverageXmlParserMock = $this->createMock(CoverageXmlParser::class);
 
-        $coverage = new CodeCoverageData('/abc/foo/bar', $coverageXmlParserMock, TestFrameworkTypes::PHPUNIT);
+        $coverage = new XMLLineCodeCoverage('/abc/foo/bar', $coverageXmlParserMock, TestFrameworkTypes::PHPUNIT);
 
         $this->expectException(CoverageDoesNotExistException::class);
         $this->expectExceptionMessage(
@@ -215,15 +215,15 @@ final class CodeCoverageDataTest extends TestCase
                     ],
                 ],
                 [
-                    'mutate' => new CoverageMethodData(
+                    'mutate' => new MethodLocationData(
                         19,
                         22
                     ),
-                    'shouldMutate' => new CoverageMethodData(
+                    'shouldMutate' => new MethodLocationData(
                         24,
                         35
                     ),
-                    'notExecuted' => new CoverageMethodData(
+                    'notExecuted' => new MethodLocationData(
                         3,
                         5
                     ),
@@ -232,7 +232,7 @@ final class CodeCoverageDataTest extends TestCase
         ];
     }
 
-    private function getCodeCoverageData(): CodeCoverageData
+    private function getCodeCoverageData(): XMLLineCodeCoverage
     {
         $coverageXmlParserMock = $this->createMock(CoverageXmlParser::class);
         $coverageXmlParserMock->expects($this->once())
@@ -249,7 +249,7 @@ final class CodeCoverageDataTest extends TestCase
                 )
             );
 
-        return new CodeCoverageData(
+        return new XMLLineCodeCoverage(
             $this->coverageDir,
             $coverageXmlParserMock,
             TestFrameworkTypes::PHPUNIT,

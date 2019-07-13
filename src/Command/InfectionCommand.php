@@ -51,9 +51,9 @@ use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
-use Infection\TestFramework\Coverage\CodeCoverageData;
-use Infection\TestFramework\Coverage\CodeCoverageDataInterface;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
+use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\HasExtraNodeVisitors;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
@@ -333,7 +333,7 @@ final class InfectionCommand extends BaseCommand
         }
     }
 
-    private function getCodeCoverageData(string $testFrameworkKey): CodeCoverageDataInterface
+    private function getCodeCoverageData(string $testFrameworkKey): LineCodeCoverage
     {
         $coverageDir = $this->getContainer()->get(sprintf('coverage.dir.%s', $testFrameworkKey));
         $testFileDataProviderServiceId = sprintf('test.file.data.provider.%s', $testFrameworkKey);
@@ -341,7 +341,7 @@ final class InfectionCommand extends BaseCommand
             ? $this->getContainer()->get($testFileDataProviderServiceId)
             : null;
 
-        return new CodeCoverageData($coverageDir, new CoverageXmlParser($coverageDir), $testFrameworkKey, $testFileDataProviderService);
+        return new XMLLineCodeCoverage($coverageDir, new CoverageXmlParser($coverageDir), $testFrameworkKey, $testFileDataProviderService);
     }
 
     private function getTestFrameworkExtraOptions(string $testFrameworkKey): TestFrameworkExtraOptions
@@ -379,7 +379,7 @@ final class InfectionCommand extends BaseCommand
     {
         $coverageDir = $this->getContainer()->get(sprintf('coverage.dir.%s', $testFrameworkKey));
 
-        $coverageIndexFilePath = $coverageDir . '/' . CodeCoverageData::COVERAGE_INDEX_FILE_NAME;
+        $coverageIndexFilePath = $coverageDir . '/' . XMLLineCodeCoverage::COVERAGE_INDEX_FILE_NAME;
 
         $processInfo = sprintf(
             '%sCommand line: %s%sProcess Output: %s',

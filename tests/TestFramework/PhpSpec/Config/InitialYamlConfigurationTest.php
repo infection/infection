@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpSpec\Config;
 
-use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\PhpSpec\Config\InitialYamlConfiguration;
 use Infection\TestFramework\PhpSpec\Config\NoCodeCoverageException;
 use PHPUnit\Framework\TestCase;
@@ -91,7 +91,7 @@ final class InitialYamlConfigurationTest extends TestCase
         $configuration = $this->getConfigurationObject();
 
         $parsedYaml = Yaml::parse($configuration->getYaml());
-        $expectedPath = $this->tempDir . '/' . CodeCoverageData::PHP_SPEC_COVERAGE_DIR;
+        $expectedPath = $this->tempDir . '/' . XMLLineCodeCoverage::PHP_SPEC_COVERAGE_DIR;
 
         $this->assertSame($expectedPath, $parsedYaml['extensions']['PhpSpecCodeCoverageExtension']['output']['xml']);
     }

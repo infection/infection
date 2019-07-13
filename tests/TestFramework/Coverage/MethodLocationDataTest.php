@@ -33,17 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage;
+
+use Infection\TestFramework\Coverage\MethodLocationData;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-interface CodeCoverageDataInterface
+final class MethodLocationDataTest extends TestCase
 {
-    public function hasTests(string $filePath): bool;
+    public function test_it_creates_self_with_named_constructor(): void
+    {
+        $coverageMethodData = new MethodLocationData(11, 22);
 
-    /**
-     * @return CoverageLineData[]
-     */
-    public function getAllTestsForMutation(string $filePath, array $lineRange, bool $isOnFunctionSignature): array;
+        $this->assertSame(11, $coverageMethodData->startLine);
+        $this->assertSame(22, $coverageMethodData->endLine);
+    }
 }

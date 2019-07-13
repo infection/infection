@@ -33,21 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
-
-use Infection\TestFramework\Coverage\CoverageMethodData;
-use PHPUnit\Framework\TestCase;
+namespace Infection\TestFramework\Coverage;
 
 /**
  * @internal
  */
-final class CoverageMethodDataTest extends TestCase
+final class MethodLocationData
 {
-    public function test_it_creates_self_with_named_constructor(): void
-    {
-        $coverageMethodData = new CoverageMethodData(11, 22);
+    /**
+     * @var int
+     */
+    public $startLine;
 
-        $this->assertSame(11, $coverageMethodData->startLine);
-        $this->assertSame(22, $coverageMethodData->endLine);
+    /**
+     * @var int
+     */
+    public $endLine;
+
+    public function __construct(int $startLine, int $endLine)
+    {
+        $this->startLine = $startLine;
+        $this->endLine = $endLine;
     }
 }

@@ -38,7 +38,7 @@ namespace Infection\TestFramework\PhpUnit\Coverage;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageMethodData;
+use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\PhpUnit\Coverage\Exception\NoLinesExecutedException;
 use function Safe\file_get_contents;
 use function Safe\realpath;
@@ -203,7 +203,7 @@ class CoverageXmlParser
     }
 
     /**
-     * @return CoverageMethodData[]
+     * @return MethodLocationData[]
      */
     private function getMethodsCoverageData(\DOMNodeList $methodsCoverageNodes): array
     {
@@ -212,7 +212,7 @@ class CoverageXmlParser
         foreach ($methodsCoverageNodes as $methodsCoverageNode) {
             $methodName = $methodsCoverageNode->getAttribute('name');
 
-            $methodsCoverage[$methodName] = new CoverageMethodData(
+            $methodsCoverage[$methodName] = new MethodLocationData(
                 (int) $methodsCoverageNode->getAttribute('start'),
                 (int) $methodsCoverageNode->getAttribute('end')
             );

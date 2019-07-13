@@ -43,7 +43,7 @@ use Infection\Finder\SourceFilesFinder;
 use Infection\Mutant\Exception\ParserException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
-use Infection\TestFramework\Coverage\CodeCoverageDataInterface;
+use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Traverser\PriorityNodeTraverser;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
@@ -66,7 +66,7 @@ final class MutationsGenerator
     private $srcDirs;
 
     /**
-     * @var CodeCoverageDataInterface
+     * @var LineCodeCoverage
      */
     private $codeCoverageData;
 
@@ -93,7 +93,7 @@ final class MutationsGenerator
     public function __construct(
         array $srcDirs,
         array $excludeDirsOrFiles,
-        CodeCoverageDataInterface $codeCoverageData,
+        LineCodeCoverage $codeCoverageData,
         array $mutators,
         EventDispatcherInterface $eventDispatcher,
         Parser $parser

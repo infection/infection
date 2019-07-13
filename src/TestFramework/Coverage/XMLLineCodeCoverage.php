@@ -41,7 +41,7 @@ use function Safe\file_get_contents;
 /**
  * @internal
  */
-final class CodeCoverageData implements CodeCoverageDataInterface
+final class XMLLineCodeCoverage implements LineCodeCoverage
 {
     public const PHP_UNIT_COVERAGE_DIR = 'coverage-xml';
     public const PHP_SPEC_COVERAGE_DIR = 'phpspec-coverage-xml';

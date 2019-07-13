@@ -48,7 +48,7 @@ use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\Mutator\Number\DecrementInteger;
 use Infection\Mutator\Util\MutatorConfig;
-use Infection\TestFramework\Coverage\CodeCoverageDataInterface;
+use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Tests\Fixtures\Files\Mutation\OneFile\OneFile;
 use Infection\WrongMutator\ErrorMutator;
 use PhpParser\Lexer;
@@ -64,7 +64,7 @@ final class MutationsGeneratorTest extends TestCase
 {
     public function test_it_collects_plus_mutation(): void
     {
-        $codeCoverageDataMock = $this->createMock(CodeCoverageDataInterface::class);
+        $codeCoverageDataMock = $this->createMock(LineCodeCoverage::class);
         $codeCoverageDataMock->method('getAllTestsForMutation');
 
         $mutations = $this->createMutationGenerator($codeCoverageDataMock)->generate(false);
@@ -74,7 +74,7 @@ final class MutationsGeneratorTest extends TestCase
 
     public function test_it_collects_public_visibility_mutation(): void
     {
-        $codeCoverageDataMock = $this->createMock(CodeCoverageDataInterface::class);
+        $codeCoverageDataMock = $this->createMock(LineCodeCoverage::class);
         $codeCoverageDataMock->method('getAllTestsForMutation');
 
         $mutations = $this->createMutationGenerator($codeCoverageDataMock)->generate(false);
@@ -85,7 +85,7 @@ final class MutationsGeneratorTest extends TestCase
 
     public function test_it_can_skip_not_covered_on_file_level(): void
     {
-        $codeCoverageDataMock = $this->createMock(CodeCoverageDataInterface::class);
+        $codeCoverageDataMock = $this->createMock(LineCodeCoverage::class);
 
         $codeCoverageDataMock->expects($this->never())->method('getAllTestsForMutation');
 
@@ -100,7 +100,7 @@ final class MutationsGeneratorTest extends TestCase
 
     public function test_it_can_skip_ignored_classes(): void
     {
-        $codeCoverageDataMock = $this->createMock(CodeCoverageDataInterface::class);
+        $codeCoverageDataMock = $this->createMock(LineCodeCoverage::class);
 
         $codeCoverageDataMock->expects($this->once())
             ->method('hasTests')
@@ -120,7 +120,7 @@ final class MutationsGeneratorTest extends TestCase
     public function test_it_executes_only_whitelisted_mutators(): void
     {
         $generator = $this->createMutationGenerator(
-            $this->createMock(CodeCoverageDataInterface::class),
+            $this->createMock(LineCodeCoverage::class),
             Decrement::class
         );
 
@@ -132,7 +132,7 @@ final class MutationsGeneratorTest extends TestCase
     public function test_it_throws_correct_error_when_file_is_invalid(): void
     {
         $generator = $this->createMutationGenerator(
-            $this->createMock(CodeCoverageDataInterface::class),
+            $this->createMock(LineCodeCoverage::class),
             Decrement::class,
             null,
             [\dirname(__DIR__, 2) . '/Fixtures/Files/InvalidFile']
@@ -146,7 +146,7 @@ final class MutationsGeneratorTest extends TestCase
     public function test_it_throws_correct_exception_when_mutator_is_invalid(): void
     {
         $generator = $this->createMutationGenerator(
-            $this->createMock(CodeCoverageDataInterface::class),
+            $this->createMock(LineCodeCoverage::class),
             ErrorMutator::class
         );
 
@@ -173,7 +173,7 @@ final class MutationsGeneratorTest extends TestCase
         $generator = new MutationsGenerator(
             [\dirname(__DIR__, 2) . '/Fixtures/Files/Mutation/OneFile'],
             [],
-            $this->createMock(CodeCoverageDataInterface::class),
+            $this->createMock(LineCodeCoverage::class),
             [new Plus(new MutatorConfig([]))],
             $eventDispatcher,
             $this->getParser()
@@ -183,7 +183,7 @@ final class MutationsGeneratorTest extends TestCase
     }
 
     private function createMutationGenerator(
-        CodeCoverageDataInterface $codeCoverageDataMock,
+        LineCodeCoverage $codeCoverageDataMock,
         ?string $whitelistedMutatorName = null,
         ?MutatorConfig $mutatorConfig = null,
         array $srcDirs = []
