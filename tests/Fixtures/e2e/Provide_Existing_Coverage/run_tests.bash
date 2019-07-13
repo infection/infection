@@ -4,7 +4,7 @@ set -e pipefail
 
 readonly INFECTION="../../../../bin/infection --coverage=infection-coverage"
 
-if [ "$PHPDBG" = "1" ]
+if [ "$DRIVER" = "phpdbg" ]
 then
     phpdbg -qrr $INFECTION
 else
@@ -25,7 +25,7 @@ then
     exit 1;
 fi
 
-if [ "$PHPDBG" = "1" ]
+if [ "$DRIVER" = "phpdbg" ]
 then
     phpdbg -qrr $INFECTION --test-framework=phpspec
 else

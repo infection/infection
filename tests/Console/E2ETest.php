@@ -72,6 +72,10 @@ final class E2ETest extends TestCase
             $this->markTestSkipped('Running this test on PHPDBG causes failures on Travis, see https://github.com/infection/infection/pull/622.');
         }
 
+        if (getenv('DEPS') === 'LOW') {
+            $this->markTestSkipped('Running tests with different lowest versions of dependencies between Infection and underlying e2e tests causes failures, see https://github.com/infection/infection/pull/741.');
+        }
+
         // Without overcommit this test fails with `proc_open(): fork failed - Cannot allocate memory`
         if (strpos(PHP_OS, 'Linux') === 0 &&
             is_readable('/proc/sys/vm/overcommit_memory') &&

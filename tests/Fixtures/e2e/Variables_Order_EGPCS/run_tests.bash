@@ -4,7 +4,7 @@ readonly INFECTION=../../../../bin/infection
 
 set -e pipefail
 
-if [ "$PHPDBG" = "1" ]
+if [ "$DRIVER" = "phpdbg" ]
 then
     phpdbg -d variables_order=EGPCS -qrr $INFECTION
 else

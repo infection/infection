@@ -10,7 +10,7 @@ run () {
     local INFECTION=${1}
     local PHPARGS=${2}
 
-    if [ "$PHPDBG" = "1" ]
+    if [ "$DRIVER" = "phpdbg" ]
     then
         phpdbg $PHPARGS -qrr $INFECTION
     else
@@ -20,7 +20,7 @@ run () {
 
 cd $(dirname "$0")
 
-if [ "$PHPDBG" = "1" ]
+if [ "$DRIVER" = "phpdbg" ]
 then
     exit 0
 fi
@@ -42,11 +42,9 @@ then
     exit 0
 fi
 
-readonly INFECTION=../../../../${1}
-
 set -e pipefail
 
-php $INFECTION
+run "../../../../bin/infection"
 
 diff -w expected-output.txt infection.log
 

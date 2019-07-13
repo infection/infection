@@ -2,9 +2,15 @@
 
 set -e pipefail
 
+if [ "$DRIVER" = "pcov" ]
+then
+    # pcov does not work with phpspec, skipping...
+    exit 0
+fi
+
 readonly INFECTION=../../../../bin/infection
 
-if [ "$PHPDBG" = "1" ]
+if [ "$DRIVER" = "phpdbg" ]
 then
     phpdbg -qrr $INFECTION
 else
@@ -15,7 +21,7 @@ diff expected-output.txt infection.log
 
 
 
-if [ "$PHPDBG" = "1" ]
+if [ "$DRIVER" = "phpdbg" ]
 then
     phpdbg -qrr $INFECTION --test-framework=phpspec
 else
