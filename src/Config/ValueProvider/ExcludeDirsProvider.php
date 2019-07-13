@@ -37,6 +37,7 @@ namespace Infection\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
 use Infection\Finder\Locator;
+use function Safe\glob;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

@@ -47,6 +47,9 @@ use Infection\Config\ValueProvider\TimeoutProvider;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\TestFrameworkTypes;
+use function Safe\file_get_contents;
+use function Safe\glob;
+use function Safe\json_decode;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -94,13 +97,7 @@ final class ConfigureCommand extends BaseCommand
         $questionHelper = $this->getHelper('question');
 
         if (file_exists('composer.json')) {
-            $content = file_get_contents('composer.json');
-            \assert(\is_string($content));
-            $content = json_decode($content);
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new \LogicException('composer.json does not contain valid JSON');
-            }
+            $content = json_decode(file_get_contents('composer.json'));
 
             $sourceDirGuesser = new SourceDirGuesser($content);
         } else {

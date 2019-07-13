@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Finder;
 
 use Infection\Finder\Exception\LocatorException;
+use function Safe\realpath;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -63,7 +64,7 @@ final class Locator implements LocatorInterface
     {
         if ($this->filesystem->isAbsolutePath($name)) {
             if ($this->filesystem->exists($name)) {
-                return (string) realpath($name);
+                return realpath($name);
             }
 
             throw LocatorException::fileOrDirectoryDoesNotExist($name);
@@ -73,7 +74,7 @@ final class Locator implements LocatorInterface
             $file = $path . \DIRECTORY_SEPARATOR . $name;
 
             if ($this->filesystem->exists($file)) {
-                return (string) realpath($file);
+                return realpath($file);
             }
         }
 

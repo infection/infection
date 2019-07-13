@@ -42,6 +42,7 @@ use Infection\Visitor\CloneVisitor;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\PrettyPrinter\Standard;
+use function Safe\file_get_contents;
 
 /**
  * @internal
@@ -98,7 +99,6 @@ final class MutantCreator
     {
         if (is_readable($mutatedFilePath)) {
             $mutatedCode = file_get_contents($mutatedFilePath);
-            \assert(\is_string($mutatedCode));
 
             return $mutatedCode;
         }

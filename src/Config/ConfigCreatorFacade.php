@@ -39,6 +39,7 @@ use Infection\Config\Validator as ConfigValidator;
 use Infection\Finder\Exception\LocatorException;
 use Infection\Finder\LocatorInterface;
 use Infection\Json\JsonFile;
+use function Safe\getcwd;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -83,9 +84,6 @@ final class ConfigCreatorFacade
 
             $configLocation = getcwd();
         }
-
-        // getcwd() may return false in rare circumstances
-        \assert(\is_string($configLocation));
 
         $infectionConfig = new InfectionConfig($content, $this->filesystem, $configLocation);
 

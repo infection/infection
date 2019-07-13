@@ -57,6 +57,7 @@
         "symfony/finder": "^3.4 || ^4.0",
         "symfony/process": "^3.4 || ^4.0",
         "symfony/yaml": "^3.4 || ^4.0",
+        "thecodingmachine/safe": "^0.1.16",
         "webmozart/assert": "^1.3"
     },
     "conflict": {
