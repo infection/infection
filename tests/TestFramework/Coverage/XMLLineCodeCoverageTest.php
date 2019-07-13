@@ -39,6 +39,7 @@ use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\MethodLocationData;
+use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileTimeData;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
@@ -58,7 +59,11 @@ final class XMLLineCodeCoverageTest extends TestCase
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        $coverageOfLine = $codeCoverageData->getAllTestsForMutation($filePath, [34], false);
+        $coverageOfLine = $codeCoverageData->getAllTestsForMutation(
+            $filePath,
+            new NodeLineRangeData(34, 34),
+            false
+        );
         $this->assertCount(1, $coverageOfLine);
         $this->assertSame(0.123, $coverageOfLine[0]->time);
         $this->assertSame('path/to/testFile', $coverageOfLine[0]->testFilePath);
@@ -73,9 +78,17 @@ final class XMLLineCodeCoverageTest extends TestCase
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        $coverageOfLine = $codeCoverageData->getAllTestsForMutation($filePath, [24], true);
+        $coverageOfLine = $codeCoverageData->getAllTestsForMutation(
+            $filePath,
+            new NodeLineRangeData(24, 24),
+            true
+        );
 
-        $this->assertCount(6, $codeCoverageData->getAllTestsForMutation($filePath, [24], true));
+        $this->assertCount(6, $codeCoverageData->getAllTestsForMutation(
+            $filePath,
+            new NodeLineRangeData(24, 24),
+            true
+        ));
         $this->assertSame(0.123, $coverageOfLine[0]->time);
         $this->assertSame('path/to/testFile', $coverageOfLine[0]->testFilePath);
         $this->assertSame(
@@ -89,8 +102,16 @@ final class XMLLineCodeCoverageTest extends TestCase
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        $this->assertEmpty($codeCoverageData->getAllTestsForMutation($filePath, [19], true));
-        $this->assertEmpty($codeCoverageData->getAllTestsForMutation($filePath, [21], false));
+        $this->assertEmpty($codeCoverageData->getAllTestsForMutation(
+            $filePath,
+            new NodeLineRangeData(19, 19),
+            true
+        ));
+        $this->assertEmpty($codeCoverageData->getAllTestsForMutation(
+            $filePath,
+            new NodeLineRangeData(21, 21),
+            false
+        ));
     }
 
     public function test_it_determines_line_was_not_executed_from_coverage_report(): void
@@ -98,8 +119,14 @@ final class XMLLineCodeCoverageTest extends TestCase
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        $this->assertEmpty($codeCoverageData->getAllTestsForMutation($filePath, [27], false));
-        $this->assertEmpty($codeCoverageData->getAllTestsForMutation($filePath, [32], false));
+        $this->assertEmpty($codeCoverageData->getAllTestsForMutation(
+            $filePath,
+            new NodeLineRangeData(27, 27),
+            false
+        ));
+        $this->assertEmpty($codeCoverageData->getAllTestsForMutation(
+            $filePath, new NodeLineRangeData(32, 32), false
+        ));
     }
 
     public function test_it_determines_file_is_not_covered_for_unknown_path(): void
@@ -131,8 +158,16 @@ final class XMLLineCodeCoverageTest extends TestCase
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = 'unknown/path';
 
-        $this->assertEmpty($codeCoverageData->getAllTestsForMutation($filePath, [34], true));
-        $this->assertEmpty($codeCoverageData->getAllTestsForMutation($filePath, [34], false));
+        $this->assertEmpty($codeCoverageData->getAllTestsForMutation(
+            $filePath,
+            new NodeLineRangeData(34, 34),
+            true
+        ));
+        $this->assertEmpty($codeCoverageData->getAllTestsForMutation(
+            $filePath,
+            new NodeLineRangeData(34, 34),
+            false
+        ));
     }
 
     public function test_it_determines_file_does_not_have_tests_for_line(): void
@@ -140,8 +175,16 @@ final class XMLLineCodeCoverageTest extends TestCase
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        $this->assertEmpty($codeCoverageData->getAllTestsForMutation($filePath, [1], true));
-        $this->assertEmpty($codeCoverageData->getAllTestsForMutation($filePath, [1], false));
+        $this->assertEmpty($codeCoverageData->getAllTestsForMutation(
+            $filePath,
+            new NodeLineRangeData(1, 1),
+            true
+        ));
+        $this->assertEmpty($codeCoverageData->getAllTestsForMutation(
+            $filePath,
+            new NodeLineRangeData(1, 1),
+            false
+        ));
     }
 
     public function test_it_returns_zero_tests_for_not_covered_function_body_mutator(): void
@@ -149,7 +192,10 @@ final class XMLLineCodeCoverageTest extends TestCase
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        $this->assertCount(0, $codeCoverageData->getAllTestsForMutation($filePath, [1], false));
+        $this->assertCount(0, $codeCoverageData->getAllTestsForMutation($filePath,
+            new NodeLineRangeData(1, 1),
+            false
+        ));
     }
 
     public function test_it_returns_tests_for_covered_function_body_mutator(): void
@@ -157,7 +203,11 @@ final class XMLLineCodeCoverageTest extends TestCase
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        $tests = $codeCoverageData->getAllTestsForMutation($filePath, [26], false);
+        $tests = $codeCoverageData->getAllTestsForMutation(
+            $filePath,
+            new NodeLineRangeData(26, 26),
+            false
+        );
 
         $this->assertCount(2, $tests);
         $this->assertSame('path/to/testFile', $tests[0]->testFilePath);
@@ -169,7 +219,10 @@ final class XMLLineCodeCoverageTest extends TestCase
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        $this->assertCount(0, $codeCoverageData->getAllTestsForMutation($filePath, [1], true));
+        $this->assertCount(0, $codeCoverageData->getAllTestsForMutation(
+            $filePath,
+            new NodeLineRangeData(1, 1), true
+        ));
     }
 
     public function test_it_returns_tests_for_covered_function_signature_mutator(): void
@@ -177,7 +230,11 @@ final class XMLLineCodeCoverageTest extends TestCase
         $codeCoverageData = $this->getCodeCoverageData();
         $filePath = '/tests/Fixtures/Files/phpunit/coverage-xml/FirstLevel/firstLevel.php';
 
-        $this->assertCount(6, $codeCoverageData->getAllTestsForMutation($filePath, [24], true));
+        $this->assertCount(6, $codeCoverageData->getAllTestsForMutation(
+            $filePath,
+            new NodeLineRangeData(24, 24),
+            true
+        ));
     }
 
     public function test_it_throws_an_exception_when_no_coverage_found(): void

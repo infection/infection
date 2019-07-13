@@ -33,17 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage;
+
+use Infection\TestFramework\Coverage\NodeLineRangeData;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-interface LineCodeCoverage
+final class NodeLineRangeDataTest extends TestCase
 {
-    public function hasTests(string $filePath): bool;
+    public function test_it_errors_if_incorrect_range_is_created(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new NodeLineRangeData(20, 10);
+    }
 
-    /**
-     * @return CoverageLineData[]
-     */
-    public function getAllTestsForMutation(string $filePath, NodeLineRangeData $lineRange, bool $isOnFunctionSignature): array;
+    public function test_it_generates_a_range_for_a_one_line_node(): void
+    {
+        $range = new NodeLineRangeData(10, 10);
+
+        $this->assertSame([10], $range->range);
+    }
+
+    public function test_it_generates_a_range_for_a_multi_line_node(): void
+    {
+        $range = new NodeLineRangeData(10, 15);
+
+        $this->assertSame([10, 11, 12, 13, 14, 15], $range->range);
+    }
 }

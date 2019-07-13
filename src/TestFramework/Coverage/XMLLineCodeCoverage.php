@@ -99,13 +99,11 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
     }
 
     /**
-     * @param int[] $lineRange
-     *
      * @return CoverageLineData[]
      */
     public function getAllTestsForMutation(
         string $filePath,
-        array $lineRange,
+        NodeLineRangeData $lineRange,
         bool $isOnFunctionSignature
     ): array {
         if ($isOnFunctionSignature) {
@@ -116,25 +114,21 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
     }
 
     /**
-     * @param int[] $lineRange
-     *
      * @return \Generator<CoverageLineData>
      */
-    private function getTestsForFunctionSignature(string $filePath, array $lineRange): \Generator
+    private function getTestsForFunctionSignature(string $filePath, NodeLineRangeData $lineRange): \Generator
     {
-        foreach ($lineRange as $line) {
+        foreach ($lineRange->range as $line) {
             yield from $this->getTestsForExecutedMethodOnLine($filePath, $line);
         }
     }
 
     /**
-     * @param int[] $lineRange
-     *
      * @return \Generator<CoverageLineData>
      */
-    private function getTestsForLineRange(string $filePath, array $lineRange): \Generator
+    private function getTestsForLineRange(string $filePath, NodeLineRangeData $lineRange): \Generator
     {
-        foreach ($lineRange as $line) {
+        foreach ($lineRange->range as $line) {
             yield from $this->getCoverage()[$filePath]->byLine[$line] ?? [];
         }
     }

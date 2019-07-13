@@ -35,15 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use Webmozart\Assert\Assert;
+
 /**
+ * This class represents the lines a given node may take.
+ * For example, an array whose declaration takes multiple lines.
+ *
  * @internal
  */
-interface LineCodeCoverage
+final class NodeLineRangeData
 {
-    public function hasTests(string $filePath): bool;
-
     /**
-     * @return CoverageLineData[]
+     * @var array<int, int>
      */
-    public function getAllTestsForMutation(string $filePath, NodeLineRangeData $lineRange, bool $isOnFunctionSignature): array;
+    public $range;
+
+    public function __construct(int $start, int $end)
+    {
+        Assert::greaterThanEq($end, $start);
+        $this->range = range($start, $end);
+    }
 }

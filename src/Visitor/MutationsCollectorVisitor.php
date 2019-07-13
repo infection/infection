@@ -39,6 +39,7 @@ use Infection\Exception\InvalidMutatorException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\TestFramework\Coverage\NodeLineRangeData;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -166,15 +167,12 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
         return $outerMostArrayParent;
     }
 
-    /**
-     * @return array|int[]
-     */
-    private function getNodeRange(Node $node, bool $isOnFunctionSignature): array
+    private function getNodeRange(Node $node, bool $isOnFunctionSignature): NodeLineRangeData
     {
         if ($isOnFunctionSignature) {
             $node = $this->getOuterMostArrayNode($node);
         }
 
-        return range($node->getStartLine(), $node->getEndLine());
+        return new NodeLineRangeData($node->getStartLine(), $node->getEndLine());
     }
 }
