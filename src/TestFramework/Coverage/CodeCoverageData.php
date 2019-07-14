@@ -37,6 +37,7 @@ namespace Infection\TestFramework\Coverage;
 
 use Infection\MutationInterface;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use function Safe\file_get_contents;
 
 /**
  * @internal
@@ -204,7 +205,6 @@ class CodeCoverageData
             }
 
             $coverageIndexFileContent = file_get_contents($coverageIndexFilePath);
-            \assert(\is_string($coverageIndexFileContent));
 
             $coverage = $this->parser->parse($coverageIndexFileContent);
 

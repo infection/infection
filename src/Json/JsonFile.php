@@ -38,6 +38,7 @@ namespace Infection\Json;
 use Infection\Json\Exception\JsonValidationException;
 use Infection\Json\Exception\ParseException;
 use JsonSchema\Validator;
+use function Safe\file_get_contents;
 
 /**
  * @internal
@@ -75,7 +76,7 @@ final class JsonFile
             throw ParseException::invalidJson($this->path, 'file not found');
         }
 
-        $data = json_decode((string) file_get_contents($this->path));
+        $data = json_decode(file_get_contents($this->path));
 
         if (null === $data && JSON_ERROR_NONE !== json_last_error()) {
             throw ParseException::invalidJson($this->path, json_last_error_msg());

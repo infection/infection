@@ -40,6 +40,8 @@ use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageMethodData;
 use Infection\TestFramework\PhpUnit\Coverage\Exception\NoLinesExecutedException;
+use function Safe\file_get_contents;
+use function Safe\realpath;
 
 /**
  * @internal
@@ -104,10 +106,7 @@ class CoverageXmlParser
     private function processXmlFileCoverage(string $relativeCoverageFilePath, string $projectSource): array
     {
         $absolutePath = realpath($this->coverageDir . '/' . $relativeCoverageFilePath);
-        \assert(\is_string($absolutePath));
-
         $coverageFileXml = file_get_contents($absolutePath);
-        \assert(\is_string($coverageFileXml));
 
         $dom = new \DOMDocument();
         $dom->loadXML($this->removeNamespace($coverageFileXml));
