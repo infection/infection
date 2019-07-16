@@ -53,7 +53,7 @@ final class ConfigCreatorFacade
     private $configValidator;
 
     /**
-     * @var \Infection\Locator\Locator
+     * @var Locator
      */
     private $locator;
 

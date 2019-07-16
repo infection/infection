@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
+use Infection\Locator\Locator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -124,7 +125,7 @@ final class ExcludeDirsProvider
         return array_values(array_unique($excludedDirs));
     }
 
-    private function getValidator(RootsFileOrDirectoryLocator $locator)
+    private function getValidator(Locator $locator)
     {
         return static function ($answer) use ($locator) {
             if (!$answer || strpos($answer, '*') !== false) {

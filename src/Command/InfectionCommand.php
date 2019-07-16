@@ -44,6 +44,7 @@ use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\ApplicationExecutionFinished;
 use Infection\Events\ApplicationExecutionStarted;
 use Infection\Locator\FileNotFound;
+use Infection\Locator\Locator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Process\Builder\ProcessBuilder;
@@ -355,7 +356,7 @@ final class InfectionCommand extends BaseCommand
             : new PhpSpecExtraOptions($extraOptions);
     }
 
-    private function runConfigurationCommand(RootsFileOrDirectoryLocator $locator): void
+    private function runConfigurationCommand(Locator $locator): void
     {
         try {
             $locator->locateOneOf(InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES);
