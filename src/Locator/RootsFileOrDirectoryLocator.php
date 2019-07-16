@@ -33,21 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Finder;
+namespace Infection\Locator;
 
-use function array_values;
-use function current;
-use const DIRECTORY_SEPARATOR;
-use Infection\Finder\Exception\LocatorException;
-use function Safe\realpath;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
+use function current;
+use function Safe\realpath;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * @internal
  */
-final class FileOrDirectoryLocator implements Locator
+final class RootsFileOrDirectoryLocator implements Locator
 {
     private $roots;
     private $filesystem;
@@ -75,7 +73,7 @@ final class FileOrDirectoryLocator implements Locator
                 return realpath($fileFileName);
             }
 
-            throw LocatorException::fileOrDirectoryDoesNotExist($fileFileName, $this->roots);
+            throw FileNotFound::createForFile($fileFileName, $this->roots);
         }
 
         foreach ($this->roots as $path) {
@@ -86,7 +84,7 @@ final class FileOrDirectoryLocator implements Locator
             }
         }
 
-        throw LocatorException::fileOrDirectoryDoesNotExist($fileFileName, $this->roots);
+        throw FileNotFound::createForFile($fileFileName, $this->roots);
     }
 
     /**
@@ -97,7 +95,7 @@ final class FileOrDirectoryLocator implements Locator
         $file = $this->innerLocateOneOf($fileNames);
 
         if (null === $file) {
-            throw LocatorException::filesNotFound($fileNames, $this->roots);
+            throw FileNotFound::createForFiles($fileNames, $this->roots);
         }
 
         return $file;
@@ -114,7 +112,7 @@ final class FileOrDirectoryLocator implements Locator
 
         try {
             return $this->locate(current($fileNames));
-        } catch (LocatorException $exception) {
+        } catch (FileNotFound $exception) {
             array_shift($fileNames);
 
             return $this->innerLocateOneOf($fileNames);

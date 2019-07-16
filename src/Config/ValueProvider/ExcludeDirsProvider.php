@@ -36,13 +36,13 @@ declare(strict_types=1);
 namespace Infection\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
-use Infection\Finder\FileOrDirectoryLocator;
-use function Safe\glob;
+use Infection\Locator\RootsFileOrDirectoryLocator;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Filesystem\Filesystem;
+use function Safe\glob;
 
 /**
  * @internal
@@ -113,7 +113,7 @@ final class ExcludeDirsProvider
 
         $question = new Question($questionText, '');
         $question->setAutocompleterValues($autocompleteValues);
-        $question->setValidator($this->getValidator(new FileOrDirectoryLocator($sourceDirs, $this->filesystem)));
+        $question->setValidator($this->getValidator(new RootsFileOrDirectoryLocator($sourceDirs, $this->filesystem)));
 
         while ($dir = $this->questionHelper->ask($input, $output, $question)) {
             if ($dir) {
@@ -124,7 +124,7 @@ final class ExcludeDirsProvider
         return array_values(array_unique($excludedDirs));
     }
 
-    private function getValidator(FileOrDirectoryLocator $locator)
+    private function getValidator(RootsFileOrDirectoryLocator $locator)
     {
         return static function ($answer) use ($locator) {
             if (!$answer || strpos($answer, '*') !== false) {

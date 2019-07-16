@@ -41,7 +41,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Finder\FileOrDirectoryLocator;
+use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutator\Util\MutatorParser;
@@ -122,8 +122,8 @@ final class InfectionContainer extends Container
             return sprintf('%s/%s', $this['coverage.path'], PhpUnitAdapter::JUNIT_FILE_NAME);
         };
 
-        $this[FileOrDirectoryLocator::class] = function (): FileOrDirectoryLocator {
-            return new FileOrDirectoryLocator([$this['project.dir']], $this['filesystem']);
+        $this[RootsFileOrDirectoryLocator::class] = function (): RootsFileOrDirectoryLocator {
+            return new RootsFileOrDirectoryLocator([$this['project.dir']], $this['filesystem']);
         };
 
         $this['path.replacer'] = function (): PathReplacer {
@@ -234,7 +234,7 @@ final class InfectionContainer extends Container
     public function buildDynamicDependencies(InputInterface $input): void
     {
         $this['infection.config'] = function () use ($input): InfectionConfig {
-            $facade = new ConfigCreatorFacade($this[FileOrDirectoryLocator::class], $this['filesystem']);
+            $facade = new ConfigCreatorFacade($this[RootsFileOrDirectoryLocator::class], $this['filesystem']);
 
             return $facade->createConfig($input->getOption('configuration'));
         };

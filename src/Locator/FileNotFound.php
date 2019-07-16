@@ -33,21 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Finder\Exception;
+namespace Infection\Locator;
 
+use RuntimeException;
+use Webmozart\Assert\Assert;
 use function implode;
 use function Safe\sprintf;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class LocatorException extends \RuntimeException
+final class FileNotFound extends RuntimeException
 {
     /**
      * @param string[] $roots
      */
-    public static function fileOrDirectoryDoesNotExist(string $file, array $roots): self
+    public static function createForFile(string $file, array $roots): self
     {
         Assert::allString($roots);
 
@@ -78,16 +79,16 @@ final class LocatorException extends \RuntimeException
      * @param string[] $files
      * @param string[] $roots
      */
-    public static function filesNotFound(array $files, array $roots): self
+    public static function createForFiles(array $files, array $roots): self
     {
         Assert::allString($files);
         Assert::allString($roots);
 
         if ([] === $files) {
-            $message = 'Could not find any files (no file provided).';
+            $message = 'Could not locate any files (no file provided).';
         } else {
             $message = sprintf(
-                'Could not find the files "%s"%s',
+                'Could not locate the files "%s"%s',
                 implode('", "', $files),
                 [] === $roots
                     ? ''

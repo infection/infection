@@ -33,15 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Finder;
+namespace Infection\Tests\Locator;
 
 use Generator;
-use Infection\Finder\Exception\LocatorException;
-use Infection\Finder\FileOrDirectoryLocator;
-use function Infection\Tests\normalizePath as p;
-use function iterator_to_array;
+use Infection\Locator\FileNotFound;
+use Infection\Locator\RootsFileOrDirectoryLocator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
+use function Infection\Tests\normalizePath as p;
+use function iterator_to_array;
 use function Safe\realpath;
 use function Safe\sprintf;
 
@@ -71,7 +71,7 @@ final class FileOrDirectoryLocatorTest extends TestCase
      */
     public function test_it_can_locate_files(array $roots, string $file, string $expected): void
     {
-        $path = (new FileOrDirectoryLocator($roots, $this->filesystem))->locate($file);
+        $path = (new RootsFileOrDirectoryLocator($roots, $this->filesystem))->locate($file);
 
         $this->assertSame(p($expected), p($path));
     }
@@ -85,13 +85,13 @@ final class FileOrDirectoryLocatorTest extends TestCase
         string $expectedErrorMessage
     ): void
     {
-        $locator = new FileOrDirectoryLocator($roots, $this->filesystem);
+        $locator = new \Infection\Locator\RootsFileOrDirectoryLocator($roots, $this->filesystem);
 
         try {
             $locator->locate($file);
 
             $this->fail();
-        } catch (LocatorException $exception) {
+        } catch (FileNotFound $exception) {
             $this->assertSame($expectedErrorMessage, $exception->getMessage());
             $this->assertSame(0, $exception->getCode());
             $this->assertNull($exception->getPrevious());
@@ -107,7 +107,7 @@ final class FileOrDirectoryLocatorTest extends TestCase
         string $expected
     ): void
     {
-        $path = (new FileOrDirectoryLocator($roots, $this->filesystem))->locateOneOf($files);
+        $path = (new RootsFileOrDirectoryLocator($roots, $this->filesystem))->locateOneOf($files);
 
         $this->assertSame(p($expected), p($path));
     }
@@ -121,13 +121,13 @@ final class FileOrDirectoryLocatorTest extends TestCase
         string $expectedErrorMessage
     ): void
     {
-        $locator = new FileOrDirectoryLocator($roots, $this->filesystem);
+        $locator = new RootsFileOrDirectoryLocator($roots, $this->filesystem);
 
         try {
             $locator->locateOneOf($files);
 
             $this->fail();
-        } catch (LocatorException $exception) {
+        } catch (FileNotFound $exception) {
             $this->assertSame(
                 $expectedErrorMessage,
                 $exception->getMessage()
@@ -412,26 +412,26 @@ final class FileOrDirectoryLocatorTest extends TestCase
         yield [
             [],
             [],
-            'Could not find any files (no file provided).',
+            'Could not locate any files (no file provided).',
         ];
 
         yield [
             [],
             ['/unknown1', '/unknown2'],
-            'Could not find the files "/unknown1", "/unknown2"',
+            'Could not locate the files "/unknown1", "/unknown2"',
         ];
 
         yield [
             [$root1],
             ['/unknown1', '/unknown2'],
-            sprintf('Could not find the files "/unknown1", "/unknown2" in "%s"', $root1),
+            sprintf('Could not locate the files "/unknown1", "/unknown2" in "%s"', $root1),
         ];
 
         yield [
             [$root1, $root2],
             ['/unknown1', '/unknown2'],
             sprintf(
-                'Could not find the files "/unknown1", "/unknown2" in "%s", "%s"',
+                'Could not locate the files "/unknown1", "/unknown2" in "%s", "%s"',
                 $root1,
                 $root2
             ),

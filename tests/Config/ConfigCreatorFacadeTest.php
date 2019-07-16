@@ -37,8 +37,8 @@ namespace Infection\Tests\Config;
 
 use Infection\Config\ConfigCreatorFacade;
 use Infection\Config\InfectionConfig;
-use Infection\Finder\Exception\LocatorException;
-use Infection\Finder\Locator;
+use Infection\Locator\FileNotFound;
+use Infection\Locator\Locator;
 use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -55,7 +55,7 @@ final class ConfigCreatorFacadeTest extends TestCase
     private $creatorFacade;
 
     /**
-     * @var Locator|MockObject
+     * @var \Infection\Locator\Locator|MockObject
      */
     private $locator;
 
@@ -132,7 +132,7 @@ final class ConfigCreatorFacadeTest extends TestCase
     {
         $this->locator
             ->method('locateOneOf')
-            ->will($this->throwException(new LocatorException()));
+            ->will($this->throwException(new FileNotFound()));
 
         $infectionConfig = $this->creatorFacade->createConfig(null);
 

@@ -33,57 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Finder\Exception;
-
-use Infection\Finder\Exception\LocatorException;
-use PHPUnit\Framework\TestCase;
+namespace Infection\Locator;
 
 /**
  * @internal
  */
-final class LocatorExceptionTest extends TestCase
+interface Locator
 {
-    public function test_file_or_directory_does_not_exist(): void
-    {
-        $exception = LocatorException::fileOrDirectoryDoesNotExist('file');
+    /**
+     * Determine the realpath of the given file or directory located.
+     *
+     * @throws FileNotFound
+     */
+    public function locate(string $fileName): string;
 
-        $this->assertInstanceOf(LocatorException::class, $exception);
-        $this->assertSame(
-            'The file/directory "file" does not exist.',
-            $exception->getMessage()
-        );
-    }
-
-    public function test_files_or_directories_do_not_exist(): void
-    {
-        $exception = LocatorException::filesOrDirectoriesDoNotExist('file', ['foo/', 'bar/']);
-
-        $this->assertInstanceOf(LocatorException::class, $exception);
-        $this->assertSame(
-            'The file/folder "file" does not exist (in: foo/, bar/).',
-            $exception->getMessage()
-        );
-    }
-
-    public function test_multiple_files_do_not_exist(): void
-    {
-        $exception = LocatorException::multipleFilesDoNotExist('foo/bar/', ['file1', 'file2']);
-
-        $this->assertInstanceOf(LocatorException::class, $exception);
-        $this->assertSame(
-            'The path foo/bar/ does not contain any of the requested files: file1, file2',
-            $exception->getMessage()
-        );
-    }
-
-    public function test_files_not_found(): void
-    {
-        $exception = LocatorException::filesNotFound();
-
-        $this->assertInstanceOf(LocatorException::class, $exception);
-        $this->assertSame(
-            'Files are not found',
-            $exception->getMessage()
-        );
-    }
+    /**
+     * Determine the realpath of the first file or directory located.
+     *
+     * @param string[] $fileNames
+     *
+     * @throws FileNotFound
+     */
+    public function locateOneOf(array $fileNames): string;
 }

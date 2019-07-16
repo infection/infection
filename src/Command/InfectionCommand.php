@@ -43,8 +43,8 @@ use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\ApplicationExecutionFinished;
 use Infection\Events\ApplicationExecutionStarted;
-use Infection\Finder\Exception\LocatorException;
-use Infection\Finder\FileOrDirectoryLocator;
+use Infection\Locator\FileNotFound;
+use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Runner\InitialTestsRunner;
@@ -306,7 +306,7 @@ final class InfectionCommand extends BaseCommand
     {
         parent::initialize($input, $output);
 
-        $locator = $this->getContainer()->get(FileOrDirectoryLocator::class);
+        $locator = $this->getContainer()->get(RootsFileOrDirectoryLocator::class);
 
         if ($customConfigPath = $input->getOption('configuration')) {
             $locator->locate($customConfigPath);
@@ -325,7 +325,7 @@ final class InfectionCommand extends BaseCommand
 
         if ($bootstrap) {
             if (!file_exists($bootstrap)) {
-                throw LocatorException::fileOrDirectoryDoesNotExist($bootstrap);
+                throw FileNotFound::createForFile($bootstrap);
             }
 
             (function ($infectionBootstrapFile): void {
@@ -355,7 +355,7 @@ final class InfectionCommand extends BaseCommand
             : new PhpSpecExtraOptions($extraOptions);
     }
 
-    private function runConfigurationCommand(FileOrDirectoryLocator $locator): void
+    private function runConfigurationCommand(RootsFileOrDirectoryLocator $locator): void
     {
         try {
             $locator->locateOneOf(InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES);
