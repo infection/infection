@@ -38,12 +38,12 @@ namespace Infection\Tests\Locator;
 use Generator;
 use Infection\Locator\FileNotFound;
 use Infection\Locator\RootsFileOrDirectoryLocator;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
 use function Infection\Tests\normalizePath as p;
 use function iterator_to_array;
+use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use function Safe\sprintf;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
@@ -51,7 +51,7 @@ use function Safe\sprintf;
  */
 final class FileOrDirectoryLocatorTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__.'/../Fixtures/Locator';
+    private const FIXTURES_DIR = __DIR__ . '/../Fixtures/Locator';
 
     /**
      * @var Filesystem
@@ -83,8 +83,7 @@ final class FileOrDirectoryLocatorTest extends TestCase
         array $roots,
         string $file,
         string $expectedErrorMessage
-    ): void
-    {
+    ): void {
         $locator = new \Infection\Locator\RootsFileOrDirectoryLocator($roots, $this->filesystem);
 
         try {
@@ -105,8 +104,7 @@ final class FileOrDirectoryLocatorTest extends TestCase
         array $roots,
         array $files,
         string $expected
-    ): void
-    {
+    ): void {
         $path = (new RootsFileOrDirectoryLocator($roots, $this->filesystem))->locateOneOf($files);
 
         $this->assertSame(p($expected), p($path));
@@ -119,8 +117,7 @@ final class FileOrDirectoryLocatorTest extends TestCase
         array $roots,
         array $files,
         string $expectedErrorMessage
-    ): void
-    {
+    ): void {
         $locator = new RootsFileOrDirectoryLocator($roots, $this->filesystem);
 
         try {
@@ -147,8 +144,8 @@ final class FileOrDirectoryLocatorTest extends TestCase
             $title = 'one root';
             $case = 'locate root file';
 
-            $roots = [$root.'/dir'];
-            $expected = $root.'/dir/root';
+            $roots = [$root . '/dir'];
+            $expected = $root . '/dir/root';
 
             $paths = [
                 'root',
@@ -156,8 +153,8 @@ final class FileOrDirectoryLocatorTest extends TestCase
                 'root/',
                 'sub-dir/../root',
                 './sub-dir/../root',
-                $root.'/dir/root',
-                $root.'/dir/sub-dir/../root',
+                $root . '/dir/root',
+                $root . '/dir/sub-dir/../root',
             ];
 
             foreach ($paths as $index => $path) {
@@ -175,8 +172,8 @@ final class FileOrDirectoryLocatorTest extends TestCase
             $title = 'one root';
             $case = 'locate sub-dir root file';
 
-            $roots = [$root.'/dir'];
-            $expected = $root.'/dir/sub-dir/sub-dir-root';
+            $roots = [$root . '/dir'];
+            $expected = $root . '/dir/sub-dir/sub-dir-root';
 
             $paths = [
                 'sub-dir/sub-dir-root',
@@ -199,18 +196,18 @@ final class FileOrDirectoryLocatorTest extends TestCase
             $case = 'locate root file';
 
             $roots = [
-                $root.'/dir',
-                $root.'/sub-dir',
+                $root . '/dir',
+                $root . '/sub-dir',
             ];
-            $expected = $root.'/dir/root';
+            $expected = $root . '/dir/root';
 
             $paths = [
                 'root',
                 './root',
                 'sub-dir/../root',
                 './sub-dir/../root',
-                $root.'/dir/root',
-                $root.'/dir/sub-dir/../root',
+                $root . '/dir/root',
+                $root . '/dir/sub-dir/../root',
             ];
 
             foreach ($paths as $index => $path) {
@@ -229,10 +226,10 @@ final class FileOrDirectoryLocatorTest extends TestCase
             $case = 'locate sub-dir root file';
 
             $roots = [
-                $root.'/dir',
-                $root.'/sub-dir',
+                $root . '/dir',
+                $root . '/sub-dir',
             ];
-            $expected = $root.'/dir/sub-dir/sub-dir-root';
+            $expected = $root . '/dir/sub-dir/sub-dir-root';
 
             $paths = [
                 'sub-dir/sub-dir-root',
@@ -254,16 +251,16 @@ final class FileOrDirectoryLocatorTest extends TestCase
             $title = 'one root';
             $case = 'locate root directory';
 
-            $roots = [$root.'/dir'];
-            $expected = $root.'/dir';
+            $roots = [$root . '/dir'];
+            $expected = $root . '/dir';
 
             $paths = [
                 '.',
                 './',
                 './root/sub-dir/../../.',
                 './root/sub-dir/../../',
-                $root.'/dir',
-                $root.'/dir/',
+                $root . '/dir',
+                $root . '/dir/',
             ];
 
             foreach ($paths as $index => $path) {
@@ -281,8 +278,8 @@ final class FileOrDirectoryLocatorTest extends TestCase
             $title = 'one root';
             $case = 'locate symlinked file';
 
-            $roots = [$root.'/dir'];
-            $expected = $root.'/dir/sub-dir/sub-dir-root';
+            $roots = [$root . '/dir'];
+            $expected = $root . '/dir/sub-dir/sub-dir-root';
 
             $paths = [
                 'sub-dir-root-symlink',
@@ -335,7 +332,7 @@ final class FileOrDirectoryLocatorTest extends TestCase
             sprintf(
                 'Could not locate the file/directory "broken-symlink" in "%s".',
                 $fixturesDir
-            )
+            ),
         ];
     }
 
@@ -344,70 +341,70 @@ final class FileOrDirectoryLocatorTest extends TestCase
         $root = realpath(self::FIXTURES_DIR);
 
         yield [
-            [$root.'/dir'],
+            [$root . '/dir'],
             ['root'],
-            $root.'/dir/root'
+            $root . '/dir/root',
         ];
 
         yield [
             [
-                $root.'/dir',
-                $root.'/sub-dir',
+                $root . '/dir',
+                $root . '/sub-dir',
             ],
             ['root'],
-            $root.'/dir/root'
+            $root . '/dir/root',
         ];
 
         yield [
             [
-                $root.'/dir/sub-dir',
-                $root.'/dir',
+                $root . '/dir/sub-dir',
+                $root . '/dir',
             ],
             ['root'],
-            $root.'/dir/sub-dir/root'
+            $root . '/dir/sub-dir/root',
         ];
 
         yield [
-            [$root.'/dir/sub-dir'],
+            [$root . '/dir/sub-dir'],
             [
                 'root',
                 'sub-dir-root',
             ],
-            $root.'/dir/sub-dir/root'
+            $root . '/dir/sub-dir/root',
         ];
 
         yield [
-            [$root.'/dir/sub-dir'],
+            [$root . '/dir/sub-dir'],
             [
                 'sub-dir-root',
                 'root',
             ],
-            $root.'/dir/sub-dir/sub-dir-root'
+            $root . '/dir/sub-dir/sub-dir-root',
         ];
 
         yield [
-            [$root.'/dir/sub-dir'],
+            [$root . '/dir/sub-dir'],
             [
                 10 => 'sub-dir-root',
                 'root',
             ],
-            $root.'/dir/sub-dir/sub-dir-root'
+            $root . '/dir/sub-dir/sub-dir-root',
         ];
 
         yield [
-            [$root.'/dir'],
+            [$root . '/dir'],
             [
                 '/unknown',
                 'root',
             ],
-            $root.'/dir/root'
+            $root . '/dir/root',
         ];
     }
 
     public function multipleInvalidPathsProvider(): Generator
     {
         $root1 = realpath(self::FIXTURES_DIR);
-        $root2 = realpath(self::FIXTURES_DIR).'/dir';
+        $root2 = realpath(self::FIXTURES_DIR) . '/dir';
 
         yield [
             [],

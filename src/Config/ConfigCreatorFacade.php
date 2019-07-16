@@ -39,8 +39,8 @@ use Infection\Config\Validator as ConfigValidator;
 use Infection\Json\JsonFile;
 use Infection\Locator\FileNotFound;
 use Infection\Locator\Locator;
-use Symfony\Component\Filesystem\Filesystem;
 use function Safe\getcwd;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal

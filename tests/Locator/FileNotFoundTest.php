@@ -53,8 +53,7 @@ final class FileNotFoundTest extends TestCase
         string $file,
         array $roots,
         string $expectedErrorMessage
-    ): void
-    {
+    ): void {
         $exception = FileNotFound::createForFile($file, $roots);
 
         $this->assertSame($expectedErrorMessage, $exception->getMessage());
@@ -72,8 +71,7 @@ final class FileNotFoundTest extends TestCase
         array $files,
         array $roots,
         string $expectedErrorMessage
-    ): void
-    {
+    ): void {
         $exception = FileNotFound::createForFiles($files, $roots);
 
         $this->assertSame($expectedErrorMessage, $exception->getMessage());
@@ -98,25 +96,25 @@ final class FileNotFoundTest extends TestCase
         yield [
             'unknown',
             [],
-            'Could not locate the file/directory "unknown".'
+            'Could not locate the file/directory "unknown".',
         ];
 
         yield [
             '/unknown',
             [],
-            'Could not locate the file/directory "/unknown".'
+            'Could not locate the file/directory "/unknown".',
         ];
 
         yield [
             'unknown',
             ['root'],
-            'Could not locate the file/directory "unknown" in "root".'
+            'Could not locate the file/directory "unknown" in "root".',
         ];
 
         yield [
             'unknown',
             ['root1', 'root2'],
-            'Could not locate the file/directory "unknown" in "root1", "root2".'
+            'Could not locate the file/directory "unknown" in "root1", "root2".',
         ];
     }
 
@@ -125,55 +123,55 @@ final class FileNotFoundTest extends TestCase
         yield [
             [],
             [],
-            'Could not locate any files (no file provided).'
+            'Could not locate any files (no file provided).',
         ];
 
         yield [
             ['unknown'],
             [],
-            'Could not locate the files "unknown"'
+            'Could not locate the files "unknown"',
         ];
 
         yield [
             ['unknown1', 'unknown2'],
             [],
-            'Could not locate the files "unknown1", "unknown2"'
+            'Could not locate the files "unknown1", "unknown2"',
         ];
 
         yield [
             [],
             ['root'],
-            'Could not locate any files (no file provided).'
+            'Could not locate any files (no file provided).',
         ];
 
         yield [
             [],
             ['root1', 'root2'],
-            'Could not locate any files (no file provided).'
+            'Could not locate any files (no file provided).',
         ];
 
         yield [
             ['unknown'],
             ['root'],
-            'Could not locate the files "unknown" in "root"'
+            'Could not locate the files "unknown" in "root"',
         ];
 
         yield [
             ['unknown1', 'unknown2'],
             ['root'],
-            'Could not locate the files "unknown1", "unknown2" in "root"'
+            'Could not locate the files "unknown1", "unknown2" in "root"',
         ];
 
         yield [
             ['unknown'],
             ['root1', 'root2'],
-            'Could not locate the files "unknown" in "root1", "root2"'
+            'Could not locate the files "unknown" in "root1", "root2"',
         ];
 
         yield [
             ['unknown1', 'unknown2'],
             ['root1', 'root2'],
-            'Could not locate the files "unknown1", "unknown2" in "root1", "root2"'
+            'Could not locate the files "unknown1", "unknown2" in "root1", "root2"',
         ];
     }
 }

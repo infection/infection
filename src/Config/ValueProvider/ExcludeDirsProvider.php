@@ -38,12 +38,12 @@ namespace Infection\Config\ValueProvider;
 use Infection\Config\ConsoleHelper;
 use Infection\Locator\Locator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
+use function Safe\glob;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Filesystem\Filesystem;
-use function Safe\glob;
 
 /**
  * @internal

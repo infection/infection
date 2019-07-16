@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Locator;
 
+use function current;
+use const DIRECTORY_SEPARATOR;
+use function Safe\realpath;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
-use function current;
-use function Safe\realpath;
-use const DIRECTORY_SEPARATOR;
 
 /**
  * @internal

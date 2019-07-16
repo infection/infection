@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Locator;
 
-use RuntimeException;
-use Webmozart\Assert\Assert;
 use function implode;
+use RuntimeException;
 use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
