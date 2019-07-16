@@ -35,23 +35,34 @@ declare(strict_types=1);
 
 namespace Infection\Finder\Exception;
 
+use function implode;
+use function Safe\sprintf;
+use Webmozart\Assert\Assert;
+
 /**
  * @internal
  */
 final class LocatorException extends \RuntimeException
 {
-    public static function fileOrDirectoryDoesNotExist(string $name): self
+    /**
+     * @param string[] $roots
+     */
+    public static function fileOrDirectoryDoesNotExist(string $file, array $roots): self
     {
-        return new self(sprintf('The file/directory "%s" does not exist.', $name));
+        Assert::allString($roots);
+
+        return new self(sprintf(
+            'Could not locate the file/directory "%s"%s.',
+            $file,
+            [] === $roots
+                ? ''
+                : sprintf(' in "%s"', implode('", "', $roots))
+        ));
     }
 
-    public static function filesOrDirectoriesDoNotExist(string $name, array $paths): self
-    {
-        return new self(
-            sprintf('The file/folder "%s" does not exist (in: %s).', $name, implode(', ', $paths))
-        );
-    }
-
+    /**
+     * @deprecated
+     */
     public static function multipleFilesDoNotExist(string $path, array $files): self
     {
         return new self(
@@ -63,8 +74,27 @@ final class LocatorException extends \RuntimeException
         );
     }
 
-    public static function filesNotFound(): self
+    /**
+     * @param string[] $files
+     * @param string[] $roots
+     */
+    public static function filesNotFound(array $files, array $roots): self
     {
-        return new self('Files are not found');
+        Assert::allString($files);
+        Assert::allString($roots);
+
+        if ([] === $files) {
+            $message = 'Could not find any files (no file provided).';
+        } else {
+            $message = sprintf(
+                'Could not find the files "%s"%s',
+                implode('", "', $files),
+                [] === $roots
+                    ? ''
+                    : sprintf(' in "%s"', implode('", "', $roots))
+            );
+        }
+
+        return new self($message);
     }
 }

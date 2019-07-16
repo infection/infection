@@ -36,63 +36,25 @@ declare(strict_types=1);
 namespace Infection\Finder;
 
 use Infection\Finder\Exception\LocatorException;
-use function Safe\realpath;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
  */
-final class Locator implements LocatorInterface
+interface Locator
 {
     /**
-     * @var string[]
+     * Determine the realpath of the given file or directory located.
+     *
+     * @throws LocatorException
      */
-    private $paths;
+    public function locate(string $fileName): string;
 
     /**
-     * @var Filesystem
+     * Determine the realpath of the first file or directory located.
+     *
+     * @param string[] $fileNames
+     *
+     * @throws LocatorException
      */
-    private $filesystem;
-
-    public function __construct(array $paths, Filesystem $filesystem)
-    {
-        $this->paths = $paths;
-        $this->filesystem = $filesystem;
-    }
-
-    public function locate(string $name): string
-    {
-        if ($this->filesystem->isAbsolutePath($name)) {
-            if ($this->filesystem->exists($name)) {
-                return realpath($name);
-            }
-
-            throw LocatorException::fileOrDirectoryDoesNotExist($name);
-        }
-
-        foreach ($this->paths as $path) {
-            $file = $path . \DIRECTORY_SEPARATOR . $name;
-
-            if ($this->filesystem->exists($file)) {
-                return realpath($file);
-            }
-        }
-
-        throw LocatorException::filesOrDirectoriesDoNotExist($name, $this->paths);
-    }
-
-    public function locateOneOf(array $fileNames): string
-    {
-        if (!$fileNames) {
-            throw LocatorException::filesNotFound();
-        }
-
-        try {
-            return $this->locate($fileNames[0]);
-        } catch (\Exception $e) {
-            array_shift($fileNames);
-
-            return $this->locateOneOf($fileNames);
-        }
-    }
+    public function locateOneOf(array $fileNames): string;
 }

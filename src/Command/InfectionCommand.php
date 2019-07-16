@@ -44,7 +44,7 @@ use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\ApplicationExecutionFinished;
 use Infection\Events\ApplicationExecutionStarted;
 use Infection\Finder\Exception\LocatorException;
-use Infection\Finder\Locator;
+use Infection\Finder\FileOrDirectoryLocator;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Runner\InitialTestsRunner;
@@ -306,7 +306,7 @@ final class InfectionCommand extends BaseCommand
     {
         parent::initialize($input, $output);
 
-        $locator = $this->getContainer()->get('locator');
+        $locator = $this->getContainer()->get(FileOrDirectoryLocator::class);
 
         if ($customConfigPath = $input->getOption('configuration')) {
             $locator->locate($customConfigPath);
@@ -355,7 +355,7 @@ final class InfectionCommand extends BaseCommand
             : new PhpSpecExtraOptions($extraOptions);
     }
 
-    private function runConfigurationCommand(Locator $locator): void
+    private function runConfigurationCommand(FileOrDirectoryLocator $locator): void
     {
         try {
             $locator->locateOneOf(InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES);
