@@ -54,7 +54,7 @@ final class FileNotFoundTest extends TestCase
         array $roots,
         string $expectedErrorMessage
     ): void {
-        $exception = FileNotFound::createForFile($file, $roots);
+        $exception = FileNotFound::fromFileName($file, $roots);
 
         $this->assertSame($expectedErrorMessage, $exception->getMessage());
         $this->assertSame(0, $exception->getCode());
@@ -72,7 +72,7 @@ final class FileNotFoundTest extends TestCase
         array $roots,
         string $expectedErrorMessage
     ): void {
-        $exception = FileNotFound::createForFiles($files, $roots);
+        $exception = FileNotFound::fromFiles($files, $roots);
 
         $this->assertSame($expectedErrorMessage, $exception->getMessage());
         $this->assertSame(0, $exception->getCode());

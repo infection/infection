@@ -73,7 +73,7 @@ final class RootsFileOrDirectoryLocator implements Locator
                 return realpath($canonicalFileName);
             }
 
-            throw FileNotFound::createForFile($canonicalFileName, $this->roots);
+            throw FileNotFound::fromFileName($canonicalFileName, $this->roots);
         }
 
         foreach ($this->roots as $path) {
@@ -84,7 +84,7 @@ final class RootsFileOrDirectoryLocator implements Locator
             }
         }
 
-        throw FileNotFound::createForFile($canonicalFileName, $this->roots);
+        throw FileNotFound::fromFileName($canonicalFileName, $this->roots);
     }
 
     /**
@@ -95,7 +95,7 @@ final class RootsFileOrDirectoryLocator implements Locator
         $file = $this->innerLocateOneOf($fileNames);
 
         if (null === $file) {
-            throw FileNotFound::createForFiles($fileNames, $this->roots);
+            throw FileNotFound::fromFiles($fileNames, $this->roots);
         }
 
         return $file;

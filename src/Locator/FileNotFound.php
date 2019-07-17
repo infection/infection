@@ -48,7 +48,7 @@ final class FileNotFound extends RuntimeException
     /**
      * @param string[] $roots
      */
-    public static function createForFile(string $file, array $roots): self
+    public static function fromFileName(string $file, array $roots): self
     {
         Assert::allString($roots);
 
@@ -79,23 +79,21 @@ final class FileNotFound extends RuntimeException
      * @param string[] $files
      * @param string[] $roots
      */
-    public static function createForFiles(array $files, array $roots): self
+    public static function fromFiles(array $files, array $roots): self
     {
         Assert::allString($files);
         Assert::allString($roots);
 
-        if ([] === $files) {
-            $message = 'Could not locate any files (no file provided).';
-        } else {
-            $message = sprintf(
-                'Could not locate the files "%s"%s',
-                implode('", "', $files),
-                [] === $roots
-                    ? ''
-                    : sprintf(' in "%s"', implode('", "', $roots))
-            );
-        }
-
-        return new self($message);
+        return new self(
+            [] === $files
+                ? 'Could not locate any files (no file provided).'
+                : sprintf(
+                    'Could not locate the files "%s"%s',
+                    implode('", "', $files),
+                    [] === $roots
+                        ? ''
+                        : sprintf(' in "%s"', implode('", "', $roots))
+                )
+        );
     }
 }
