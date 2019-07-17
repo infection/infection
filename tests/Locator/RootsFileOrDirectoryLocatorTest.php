@@ -84,12 +84,12 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
         string $file,
         string $expectedErrorMessage
     ): void {
-        $locator = new \Infection\Locator\RootsFileOrDirectoryLocator($roots, $this->filesystem);
+        $locator = new RootsFileOrDirectoryLocator($roots, $this->filesystem);
 
         try {
             $locator->locate($file);
 
-            $this->fail();
+            $this->fail('Expected an exception to be thrown.');
         } catch (FileNotFound $exception) {
             $this->assertSame($expectedErrorMessage, $exception->getMessage());
             $this->assertSame(0, $exception->getCode());
@@ -123,7 +123,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
         try {
             $locator->locateOneOf($files);
 
-            $this->fail();
+            $this->fail('Expected an exception to be thrown.');
         } catch (FileNotFound $exception) {
             $this->assertSame(
                 $expectedErrorMessage,
