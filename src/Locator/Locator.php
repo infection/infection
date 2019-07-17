@@ -45,7 +45,7 @@ interface Locator
      *
      * @throws FileNotFound
      */
-    public function locate(string $fileName): string;
+    public function locate(string $name): string;
 
     /**
      * Determine the realpath of the first file or directory located.

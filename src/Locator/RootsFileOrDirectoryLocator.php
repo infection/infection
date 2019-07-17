@@ -64,27 +64,27 @@ final class RootsFileOrDirectoryLocator implements Locator
     /**
      * {@inheritdoc}
      */
-    public function locate(string $fileFileName): string
+    public function locate(string $fileName): string
     {
-        $fileFileName = Path::canonicalize($fileFileName);
+        $canonicalFileName = Path::canonicalize($fileName);
 
-        if ($this->filesystem->isAbsolutePath($fileFileName)) {
-            if ($this->filesystem->exists($fileFileName)) {
-                return realpath($fileFileName);
+        if ($this->filesystem->isAbsolutePath($canonicalFileName)) {
+            if ($this->filesystem->exists($canonicalFileName)) {
+                return realpath($canonicalFileName);
             }
 
-            throw FileNotFound::createForFile($fileFileName, $this->roots);
+            throw FileNotFound::createForFile($canonicalFileName, $this->roots);
         }
 
         foreach ($this->roots as $path) {
-            $file = $path . DIRECTORY_SEPARATOR . $fileFileName;
+            $file = $path . DIRECTORY_SEPARATOR . $canonicalFileName;
 
             if ($this->filesystem->exists($file)) {
                 return realpath($file);
             }
         }
 
-        throw FileNotFound::createForFile($fileFileName, $this->roots);
+        throw FileNotFound::createForFile($canonicalFileName, $this->roots);
     }
 
     /**
