@@ -94,7 +94,7 @@ final class RootsFileOrDirectoryLocator implements Locator
     {
         $file = $this->innerLocateOneOf($fileNames);
 
-        if (null === $file) {
+        if ($file === null) {
             throw FileNotFound::fromFiles($fileNames, $this->roots);
         }
 
@@ -106,7 +106,7 @@ final class RootsFileOrDirectoryLocator implements Locator
      */
     private function innerLocateOneOf(array $fileNames): ?string
     {
-        if ([] === $fileNames) {
+        if ($fileNames === []) {
             return null;
         }
 
