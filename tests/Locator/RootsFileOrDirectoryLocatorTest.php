@@ -274,30 +274,32 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
             }
         };
 
-        $generators[] = static function () use ($root): Generator {
-            $title = 'one root';
-            $case = 'locate symlinked file';
+        if (!\defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            $generators[] = static function () use ($root): Generator {
+                $title = 'one root';
+                $case = 'locate symlinked file';
 
-            $roots = [$root . '/dir'];
-            $expected = $root . '/dir/sub-dir/sub-dir-root';
+                $roots = [$root . '/dir'];
+                $expected = $root . '/dir/sub-dir/sub-dir-root';
 
-            $paths = [
-                'sub-dir-root-symlink',
-                './sub-dir-root-symlink',
-                'sub-dir-root-symlink/',
-                './sub-dir-root-symlink/',
-            ];
-
-            foreach ($paths as $index => $path) {
-                $name = sprintf('[%s][%s] #%s', $title, $case, $index);
-
-                yield $name => [
-                    $roots,
-                    $path,
-                    $expected,
+                $paths = [
+                    'sub-dir-root-symlink',
+                    './sub-dir-root-symlink',
+                    'sub-dir-root-symlink/',
+                    './sub-dir-root-symlink/',
                 ];
-            }
-        };
+
+                foreach ($paths as $index => $path) {
+                    $name = sprintf('[%s][%s] #%s', $title, $case, $index);
+
+                    yield $name => [
+                        $roots,
+                        $path,
+                        $expected,
+                    ];
+                }
+            };
+        }
 
         foreach ($generators as $generator) {
             yield from iterator_to_array($generator(), true);
