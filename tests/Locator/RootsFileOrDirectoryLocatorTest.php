@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Locator;
 
+use function defined;
 use Generator;
 use Infection\Locator\FileNotFound;
 use Infection\Locator\RootsFileOrDirectoryLocator;
@@ -326,14 +327,16 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
 
         $fixturesDir = realpath(self::FIXTURES_DIR);
 
-        yield [
-            [$fixturesDir],
-            'broken-symlink',
-            sprintf(
-                'Could not locate the file/directory "broken-symlink" in "%s".',
-                $fixturesDir
-            ),
-        ];
+        if (!defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            yield [
+                [$fixturesDir],
+                'broken-symlink',
+                sprintf(
+                    'Could not locate the file/directory "broken-symlink" in "%s".',
+                    $fixturesDir
+                ),
+            ];
+        }
     }
 
     public function multiplePathsProvider(): Generator
