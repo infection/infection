@@ -55,7 +55,7 @@ final class ConfigCreatorFacadeTest extends TestCase
     private $creatorFacade;
 
     /**
-     * @var Locator&MockObject
+     * @var Locator|MockObject
      */
     private $locator;
 

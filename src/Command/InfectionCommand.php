@@ -326,7 +326,7 @@ final class InfectionCommand extends BaseCommand
 
         if ($bootstrap) {
             if (!file_exists($bootstrap)) {
-                throw FileNotFound::fromFileName($bootstrap, __DIR__);
+                throw FileNotFound::fromFileName($bootstrap, [__DIR__]);
             }
 
             (function ($infectionBootstrapFile): void {
