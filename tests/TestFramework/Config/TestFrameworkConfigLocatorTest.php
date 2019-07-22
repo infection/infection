@@ -54,7 +54,7 @@ final class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage(
             sprintf(
-                'The path %s does not contain any of the requested files: phpunit.xml, phpunit.yml, phpunit.xml.dist, phpunit.yml.dist, phpunit.dist.xml, phpunit.dist.yml',
+                'The path "%s" does not contain any of the requested files: "phpunit.xml", "phpunit.yml", "phpunit.xml.dist", "phpunit.yml.dist", "phpunit.dist.xml", "phpunit.dist.yml"',
                 $dir
             )
         );
