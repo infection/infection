@@ -33,66 +33,89 @@
 
 declare(strict_types=1);
 
-namespace Infection\Finder;
+namespace Infection\Locator;
 
-use Infection\Finder\Exception\LocatorException;
+use function current;
+use const DIRECTORY_SEPARATOR;
 use function Safe\realpath;
 use Symfony\Component\Filesystem\Filesystem;
+use Webmozart\Assert\Assert;
+use Webmozart\PathUtil\Path;
 
 /**
  * @internal
  */
-final class Locator implements LocatorInterface
+final class RootsFileOrDirectoryLocator implements Locator
 {
-    /**
-     * @var string[]
-     */
-    private $paths;
-
-    /**
-     * @var Filesystem
-     */
+    private $roots;
     private $filesystem;
 
-    public function __construct(array $paths, Filesystem $filesystem)
+    /**
+     * @param  string[] $roots
+     */
+    public function __construct(array $roots, Filesystem $filesystem)
     {
-        $this->paths = $paths;
+        Assert::allString($roots);
+
+        $this->roots = $roots;
         $this->filesystem = $filesystem;
     }
 
-    public function locate(string $name): string
+    /**
+     * {@inheritdoc}
+     */
+    public function locate(string $fileName): string
     {
-        if ($this->filesystem->isAbsolutePath($name)) {
-            if ($this->filesystem->exists($name)) {
-                return realpath($name);
+        $canonicalFileName = Path::canonicalize($fileName);
+
+        if ($this->filesystem->isAbsolutePath($canonicalFileName)) {
+            if ($this->filesystem->exists($canonicalFileName)) {
+                return realpath($canonicalFileName);
             }
 
-            throw LocatorException::fileOrDirectoryDoesNotExist($name);
+            throw FileNotFound::fromFileName($canonicalFileName, $this->roots);
         }
 
-        foreach ($this->paths as $path) {
-            $file = $path . \DIRECTORY_SEPARATOR . $name;
+        foreach ($this->roots as $path) {
+            $file = $path . DIRECTORY_SEPARATOR . $canonicalFileName;
 
             if ($this->filesystem->exists($file)) {
                 return realpath($file);
             }
         }
 
-        throw LocatorException::filesOrDirectoriesDoNotExist($name, $this->paths);
+        throw FileNotFound::fromFileName($canonicalFileName, $this->roots);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function locateOneOf(array $fileNames): string
     {
-        if (!$fileNames) {
-            throw LocatorException::filesNotFound();
+        $file = $this->innerLocateOneOf($fileNames);
+
+        if ($file === null) {
+            throw FileNotFound::fromFiles($fileNames, $this->roots);
+        }
+
+        return $file;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    private function innerLocateOneOf(array $fileNames): ?string
+    {
+        if ($fileNames === []) {
+            return null;
         }
 
         try {
-            return $this->locate($fileNames[0]);
-        } catch (\Exception $e) {
+            return $this->locate(current($fileNames));
+        } catch (FileNotFound $exception) {
             array_shift($fileNames);
 
-            return $this->locateOneOf($fileNames);
+            return $this->innerLocateOneOf($fileNames);
         }
     }
 }

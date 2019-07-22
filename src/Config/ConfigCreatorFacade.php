@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Config;
 
 use Infection\Config\Validator as ConfigValidator;
-use Infection\Finder\Exception\LocatorException;
-use Infection\Finder\LocatorInterface;
 use Infection\Json\JsonFile;
+use Infection\Locator\FileNotFound;
+use Infection\Locator\Locator;
 use function Safe\getcwd;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -53,7 +53,7 @@ final class ConfigCreatorFacade
     private $configValidator;
 
     /**
-     * @var LocatorInterface
+     * @var Locator
      */
     private $locator;
 
@@ -62,7 +62,7 @@ final class ConfigCreatorFacade
      */
     private $filesystem;
 
-    public function __construct(LocatorInterface $locator, Filesystem $filesystem)
+    public function __construct(Locator $locator, Filesystem $filesystem)
     {
         $this->locator = $locator;
         $this->filesystem = $filesystem;
@@ -78,7 +78,7 @@ final class ConfigCreatorFacade
             $content = (new JsonFile($infectionConfigFile))->decode();
 
             $configLocation = \pathinfo($infectionConfigFile, PATHINFO_DIRNAME);
-        } catch (LocatorException $e) {
+        } catch (FileNotFound $e) {
             // Generate an empty class to trigger `configure` command.
             $content = new \stdClass();
 

@@ -58,7 +58,8 @@
         "symfony/process": "^3.4 || ^4.0",
         "symfony/yaml": "^3.4 || ^4.0",
         "thecodingmachine/safe": "^0.1.16",
-        "webmozart/assert": "^1.3"
+        "webmozart/assert": "^1.3",
+        "webmozart/path-util": "^2.3"
     },
     "conflict": {
         "symfony/console": "=3.4.16 || =4.1.5",

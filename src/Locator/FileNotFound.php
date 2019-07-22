@@ -33,38 +33,67 @@
 
 declare(strict_types=1);
 
-namespace Infection\Finder\Exception;
+namespace Infection\Locator;
+
+use function implode;
+use RuntimeException;
+use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class LocatorException extends \RuntimeException
+final class FileNotFound extends RuntimeException
 {
-    public static function fileOrDirectoryDoesNotExist(string $name): self
+    /**
+     * @param string[] $roots
+     */
+    public static function fromFileName(string $file, array $roots): self
     {
-        return new self(sprintf('The file/directory "%s" does not exist.', $name));
+        Assert::allString($roots);
+
+        return new self(sprintf(
+            'Could not locate the file/directory "%s"%s.',
+            $file,
+            [] === $roots
+                ? ''
+                : sprintf(' in "%s"', implode('", "', $roots))
+        ));
     }
 
-    public static function filesOrDirectoriesDoNotExist(string $name, array $paths): self
-    {
-        return new self(
-            sprintf('The file/folder "%s" does not exist (in: %s).', $name, implode(', ', $paths))
-        );
-    }
-
+    /**
+     * @deprecated
+     */
     public static function multipleFilesDoNotExist(string $path, array $files): self
     {
         return new self(
             sprintf(
-                'The path %s does not contain any of the requested files: %s',
+                'The path "%s" does not contain any of the requested files: "%s"',
                 $path,
-                implode(', ', $files)
+                implode('", "', $files)
             )
         );
     }
 
-    public static function filesNotFound(): self
+    /**
+     * @param string[] $files
+     * @param string[] $roots
+     */
+    public static function fromFiles(array $files, array $roots): self
     {
-        return new self('Files are not found');
+        Assert::allString($files);
+        Assert::allString($roots);
+
+        return new self(
+            [] === $files
+                ? 'Could not locate any files (no file provided).'
+                : sprintf(
+                    'Could not locate the files "%s"%s',
+                    implode('", "', $files),
+                    [] === $roots
+                        ? ''
+                        : sprintf(' in "%s"', implode('", "', $roots))
+                )
+        );
     }
 }
