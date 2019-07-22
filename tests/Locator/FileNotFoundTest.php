@@ -84,7 +84,7 @@ final class FileNotFoundTest extends TestCase
         $exception = FileNotFound::multipleFilesDoNotExist('foo/bar/', ['file1', 'file2']);
 
         $this->assertSame(
-            'The path foo/bar/ does not contain any of the requested files: file1, file2',
+            'The path "foo/bar/" does not contain any of the requested files: "file1", "file2"',
             $exception->getMessage()
         );
         $this->assertSame(0, $exception->getCode());

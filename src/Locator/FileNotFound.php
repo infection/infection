@@ -68,9 +68,9 @@ final class FileNotFound extends RuntimeException
     {
         return new self(
             sprintf(
-                'The path %s does not contain any of the requested files: %s',
+                'The path "%s" does not contain any of the requested files: "%s"',
                 $path,
-                implode(', ', $files)
+                implode('", "', $files)
             )
         );
     }
