@@ -210,6 +210,7 @@ final class InfectionCommand extends BaseCommand
             return 1;
         }
 
+        /** @var InfectionConfig $config */
         $config = $container->get('infection.config');
 
         $this->includeUserBootstrap($config);
@@ -250,8 +251,8 @@ final class InfectionCommand extends BaseCommand
 
         $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
         $mutationsGenerator = new MutationsGenerator(
-            $container->get('src.dirs'),
-            $container->get('exclude.paths'),
+            $config->getSourceDirs(),
+            $config->getSourceExcludePaths(),
             $codeCoverageData,
             $container->get('mutators'),
             $this->eventDispatcher,
