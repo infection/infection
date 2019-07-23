@@ -215,7 +215,7 @@ final class InfectionCommand extends BaseCommand
 
         $this->includeUserBootstrap($config);
 
-        $testFrameworkKey = $input->getOption('test-framework') ?: $config->getTestFramework();
+        $testFrameworkKey = trim((string) $input->getOption('test-framework') ?: $config->getTestFramework());
         $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $this->skipCoverage);
 
         LogVerbosity::convertVerbosityLevel($input, $this->consoleOutput);
@@ -229,14 +229,11 @@ final class InfectionCommand extends BaseCommand
         $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);
 
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
+        $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options') ?: $config->getInitialTestsPhpOptions());
         $initialTestSuitProcess = $initialTestsRunner->run(
             $testFrameworkOptions->getForInitialProcess(),
             $this->skipCoverage,
-            explode(
-                ' ',
-                $input->getOption('initial-tests-php-options')
-                ?? $config->getInitialTestsPhpOptions()
-            )
+            explode(' ', $initialTestsPhpOptions)
         );
 
         if (!$initialTestSuitProcess->isSuccessful()) {
