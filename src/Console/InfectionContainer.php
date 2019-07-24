@@ -90,15 +90,15 @@ final class InfectionContainer extends Container
             return new Filesystem();
         };
 
-        $this['tmp.dir.creator'] = static function (InfectionContainer $container): TmpDirectoryCreator {
+        $this['tmp.dir.creator'] = static function (self $container): TmpDirectoryCreator {
             return new TmpDirectoryCreator($container['filesystem']);
         };
 
-        $this['tmp.dir'] = static function (InfectionContainer $container): string {
+        $this['tmp.dir'] = static function (self $container): string {
             return $container['tmp.dir.creator']->createAndGet($container['infection.config']->getTmpDir());
         };
 
-        $this['coverage.dir.phpunit'] = static function (InfectionContainer $container) {
+        $this['coverage.dir.phpunit'] = static function (self $container) {
             return sprintf(
                 '%s/%s',
                 $container['coverage.path'],
@@ -106,7 +106,7 @@ final class InfectionContainer extends Container
             );
         };
 
-        $this['coverage.dir.phpspec'] = static function (InfectionContainer $container) {
+        $this['coverage.dir.phpspec'] = static function (self $container) {
             return sprintf(
                 '%s/%s',
                 $container['coverage.path'],
@@ -114,7 +114,7 @@ final class InfectionContainer extends Container
             );
         };
 
-        $this['phpunit.junit.file.path'] = static function (InfectionContainer $container) {
+        $this['phpunit.junit.file.path'] = static function (self $container) {
             return sprintf(
                 '%s/%s',
                 $container['coverage.path'],
@@ -122,21 +122,21 @@ final class InfectionContainer extends Container
             );
         };
 
-        $this[RootsFileOrDirectoryLocator::class] = static function (InfectionContainer $container): RootsFileOrDirectoryLocator {
+        $this[RootsFileOrDirectoryLocator::class] = static function (self $container): RootsFileOrDirectoryLocator {
             return new RootsFileOrDirectoryLocator(
-                [$container['project.dir']], 
+                [$container['project.dir']],
                 $container['filesystem']
             );
         };
 
-        $this['path.replacer'] = static function (InfectionContainer $container): PathReplacer {
+        $this['path.replacer'] = static function (self $container): PathReplacer {
             return new PathReplacer(
-                $container['filesystem'], 
+                $container['filesystem'],
                 $container['infection.config']->getPhpUnitConfigDir()
             );
         };
 
-        $this['test.framework.factory'] = static function (InfectionContainer $container): Factory {
+        $this['test.framework.factory'] = static function (self $container): Factory {
             return new Factory(
                 $container['tmp.dir'],
                 $container['project.dir'],
@@ -148,14 +148,14 @@ final class InfectionContainer extends Container
             );
         };
 
-        $this['xml.configuration.helper'] = static function (InfectionContainer $container): XmlConfigurationHelper {
+        $this['xml.configuration.helper'] = static function (self $container): XmlConfigurationHelper {
             return new XmlConfigurationHelper(
-                $container['path.replacer'], 
+                $container['path.replacer'],
                 $container['infection.config']->getPhpUnitConfigDir()
             );
         };
 
-        $this['mutant.creator'] = static function (InfectionContainer $container): MutantCreator {
+        $this['mutant.creator'] = static function (self $container): MutantCreator {
             return new MutantCreator(
                 $container['tmp.dir'],
                 $container['differ'],
@@ -173,11 +173,11 @@ final class InfectionContainer extends Container
             return new EventDispatcher();
         };
 
-        $this['parallel.process.runner'] = static function (InfectionContainer $container): ParallelProcessRunner {
+        $this['parallel.process.runner'] = static function (self $container): ParallelProcessRunner {
             return new ParallelProcessRunner($container['dispatcher']);
         };
 
-        $this['testframework.config.locator'] = static function (InfectionContainer $container): TestFrameworkConfigLocator {
+        $this['testframework.config.locator'] = static function (self $container): TestFrameworkConfigLocator {
             return new TestFrameworkConfigLocator(
                 $container['infection.config']->getPhpUnitConfigDir() /*[phpunit.dir, phpspec.dir, ...]*/
             );
@@ -187,7 +187,7 @@ final class InfectionContainer extends Container
             return new DiffColorizer();
         };
 
-        $this['test.file.data.provider.phpunit'] = static function (InfectionContainer $container): TestFileDataProvider {
+        $this['test.file.data.provider.phpunit'] = static function (self $container): TestFileDataProvider {
             return new CachedTestFileDataProvider(
                 new PhpUnitTestFileDataProvider($container['phpunit.junit.file.path'])
             );
@@ -205,7 +205,7 @@ final class InfectionContainer extends Container
             ]);
         };
 
-        $this['parser'] = static function (InfectionContainer $container): Parser {
+        $this['parser'] = static function (self $container): Parser {
             return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $container['lexer']);
         };
 
@@ -213,7 +213,7 @@ final class InfectionContainer extends Container
             return new Standard();
         };
 
-        $this['mutators.config'] = static function (InfectionContainer $container): array {
+        $this['mutators.config'] = static function (self $container): array {
             return (new MutatorsGenerator(
                 $container['infection.config']->getMutatorsConfiguration()
             ))->generate();
@@ -235,14 +235,14 @@ final class InfectionContainer extends Container
             return new MemoryFormatter();
         };
 
-        $this['memory.limit.applier'] = static function (InfectionContainer $container): MemoryLimiter {
+        $this['memory.limit.applier'] = static function (self $container): MemoryLimiter {
             return new MemoryLimiter($container['filesystem'], \php_ini_loaded_file());
         };
     }
 
     public function buildDynamicDependencies(InputInterface $input): void
     {
-        $this['infection.config'] = static function (InfectionContainer $container) use ($input): InfectionConfig {
+        $this['infection.config'] = static function (self $container) use ($input): InfectionConfig {
             $facade = new ConfigCreatorFacade(
                 $container[RootsFileOrDirectoryLocator::class],
                 $container['filesystem']
@@ -251,7 +251,7 @@ final class InfectionContainer extends Container
             return $facade->createConfig($input->getOption('configuration'));
         };
 
-        $this['coverage.path'] = static function (InfectionContainer $container) use ($input): string {
+        $this['coverage.path'] = static function (self $container) use ($input): string {
             $existingCoveragePath = '';
 
             if ($input->hasOption('coverage')) {
@@ -286,7 +286,7 @@ final class InfectionContainer extends Container
             );
         };
 
-        $this['test.run.constraint.checker'] = static function (InfectionContainer $container) use ($input): TestRunConstraintChecker {
+        $this['test.run.constraint.checker'] = static function (self $container) use ($input): TestRunConstraintChecker {
             return new TestRunConstraintChecker(
                 $container['metrics'],
                 $input->getOption('ignore-msi-with-no-mutations'),
@@ -295,7 +295,7 @@ final class InfectionContainer extends Container
             );
         };
 
-        $this['subscriber.builder'] = static function (InfectionContainer $container) use ($input): SubscriberBuilder {
+        $this['subscriber.builder'] = static function (self $container) use ($input): SubscriberBuilder {
             return new SubscriberBuilder(
                 $input,
                 $container['metrics'],
@@ -310,7 +310,7 @@ final class InfectionContainer extends Container
             );
         };
 
-        $this['mutators'] = static function (InfectionContainer $container) use ($input): array {
+        $this['mutators'] = static function (self $container) use ($input): array {
             $parser = new MutatorParser(
                 $input->getOption('mutators'),
                 $container['mutators.config']
