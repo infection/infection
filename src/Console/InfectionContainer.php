@@ -84,19 +84,7 @@ final class InfectionContainer extends Container
     {
         parent::__construct($values);
 
-        $this['src.dirs'] = function (): array {
-            return $this->getInfectionConfig()->getSourceDirs();
-        };
-
-        $this['exclude.paths'] = function (): array {
-            return $this->getInfectionConfig()->getSourceExcludePaths();
-        };
-
         $this['project.dir'] = getcwd();
-
-        $this['phpunit.config.dir'] = function (): string {
-            return $this->getInfectionConfig()->getPhpUnitConfigDir();
-        };
 
         $this['filesystem'] = static function (): Filesystem {
             return new Filesystem();
@@ -127,7 +115,7 @@ final class InfectionContainer extends Container
         };
 
         $this['path.replacer'] = function (): PathReplacer {
-            return new PathReplacer($this['filesystem'], $this['phpunit.config.dir']);
+            return new PathReplacer($this['filesystem'], $this['infection.config']->getPhpUnitConfigDir());
         };
 
         $this['test.framework.factory'] = function (): Factory {
@@ -143,7 +131,7 @@ final class InfectionContainer extends Container
         };
 
         $this['xml.configuration.helper'] = function (): XmlConfigurationHelper {
-            return new XmlConfigurationHelper($this['path.replacer'], $this['phpunit.config.dir']);
+            return new XmlConfigurationHelper($this['path.replacer'], $this['infection.config']->getPhpUnitConfigDir());
         };
 
         $this['mutant.creator'] = function (): MutantCreator {
@@ -170,7 +158,7 @@ final class InfectionContainer extends Container
 
         $this['testframework.config.locator'] = function (): TestFrameworkConfigLocator {
             return new TestFrameworkConfigLocator(
-                $this['phpunit.config.dir'] /*[phpunit.dir, phpspec.dir, ...]*/
+                $this['infection.config']->getPhpUnitConfigDir() /*[phpunit.dir, phpspec.dir, ...]*/
             );
         };
 

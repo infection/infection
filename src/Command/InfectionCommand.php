@@ -210,11 +210,12 @@ final class InfectionCommand extends BaseCommand
             return 1;
         }
 
+        /** @var InfectionConfig $config */
         $config = $container->get('infection.config');
 
         $this->includeUserBootstrap($config);
 
-        $testFrameworkKey = $input->getOption('test-framework') ?: $config->getTestFramework();
+        $testFrameworkKey = trim((string) $input->getOption('test-framework') ?: $config->getTestFramework());
         $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $this->skipCoverage);
 
         LogVerbosity::convertVerbosityLevel($input, $this->consoleOutput);
@@ -228,14 +229,11 @@ final class InfectionCommand extends BaseCommand
         $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);
 
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
+        $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options') ?: $config->getInitialTestsPhpOptions());
         $initialTestSuitProcess = $initialTestsRunner->run(
             $testFrameworkOptions->getForInitialProcess(),
             $this->skipCoverage,
-            explode(
-                ' ',
-                $input->getOption('initial-tests-php-options')
-                ?? $config->getInitialTestsPhpOptions()
-            )
+            explode(' ', $initialTestsPhpOptions)
         );
 
         if (!$initialTestSuitProcess->isSuccessful()) {
@@ -250,8 +248,8 @@ final class InfectionCommand extends BaseCommand
 
         $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
         $mutationsGenerator = new MutationsGenerator(
-            $container->get('src.dirs'),
-            $container->get('exclude.paths'),
+            $config->getSourceDirs(),
+            $config->getSourceExcludePaths(),
             $codeCoverageData,
             $container->get('mutators'),
             $this->eventDispatcher,
