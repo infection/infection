@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="./vendor/autoload.php"
+         colors="true"
+         stopOnFailure="true"
+         verbose="true"
+>
+
+    <testsuites>
+        <testsuite name="Infection Test Suite">
+            <directory>tests</directory>
+
+            <exclude>tests/AutoReview</exclude>
+            <exclude>tests/Fixtures</exclude>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory>src</directory>
+        </whitelist>
+    </filter>
+
+    <groups>
+        <exclude>
+            <group>large</group>
+        </exclude>
+    </groups>
+
+</phpunit>

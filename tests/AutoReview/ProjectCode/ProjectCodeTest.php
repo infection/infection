@@ -37,51 +37,11 @@ namespace Infection\Tests\AutoReview\ProjectCode;
 
 use function array_filter;
 use function array_map;
-use function in_array;
-use Infection\Command\ConfigureCommand;
-use Infection\Command\InfectionCommand;
-use Infection\Config\ConsoleHelper;
-use Infection\Config\Guesser\SourceDirGuesser;
-use Infection\Config\InfectionConfig;
-use Infection\Console\Application;
-use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Console\OutputFormatter\ProgressFormatter;
-use Infection\Console\Util\PhpProcess;
-use Infection\Differ\DiffColorizer;
-use Infection\Differ\Differ;
-use Infection\Finder\ComposerExecutableFinder;
-use Infection\Finder\TestFrameworkFinder;
-use Infection\Http\BadgeApiClient;
-use Infection\Logger\ResultsLoggerTypes;
-use Infection\Mutant\MetricsCalculator;
-use Infection\Mutator\Util\Mutator;
-use Infection\Process\Builder\ProcessBuilder;
-use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
-use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
-use Infection\Process\Runner\MutationTestingRunner;
 use Infection\StreamWrapper\IncludeInterceptor;
-use Infection\TestFramework\Coverage\CodeCoverageData;
-use Infection\TestFramework\Coverage\CoverageFileData;
-use Infection\TestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageMethodData;
-use Infection\TestFramework\Coverage\TestFileTimeData;
-use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder as PhpSpecInitalConfigBuilder;
-use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder as PhpSpecMutationConfigBuilder;
-use Infection\TestFramework\PhpSpec\Config\NoCodeCoverageException;
-use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
-use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
-use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
-use Infection\TestFramework\TestFrameworkTypes;
-use Infection\Utils\VersionParser;
-use Infection\Visitor\MutationsCollectorVisitor;
-use Infection\Visitor\ParentConnectorVisitor;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 use function Safe\preg_replace;
-use function trim;
 use function Safe\sprintf;
 
 /**
@@ -105,7 +65,7 @@ final class ProjectCodeTest extends TestCase
             $this->markTestSkipped('Cannot check if the file is executable on Windows.');
         }
 
-        $infectionFile = __DIR__.'/../../../bin/infection';
+        $infectionFile = __DIR__ . '/../../../bin/infection';
 
         $this->assertFileExists($infectionFile);
         $this->assertTrue(is_executable($infectionFile));
@@ -118,12 +78,12 @@ final class ProjectCodeTest extends TestCase
     {
         $testClassName = preg_replace('/Infection/', 'Infection\\Tests', $className, 1) . 'Test';
 
-        if (false === in_array($className, ProjectCodeProvider::NON_TESTED_CONCRETE_CLASSES, true)) {
+        if (false === \in_array($className, ProjectCodeProvider::NON_TESTED_CONCRETE_CLASSES, true)) {
             $this->assertTrue(
                 class_exists($testClassName, true),
                 sprintf(
                     'Could not find the test "%s" for the class "%s". Please either add it'
-                    .' or add it to %s::NON_TESTED_CONCRETE_CLASSES',
+                    . ' or add it to %s::NON_TESTED_CONCRETE_CLASSES',
                     $testClassName,
                     $className,
                     ProjectCodeProvider::class
@@ -137,7 +97,7 @@ final class ProjectCodeTest extends TestCase
             class_exists($testClassName, true),
             sprintf(
                 'The class "%s" has a test "%s". Please remove it from the list of non '
-                .'tested concrete classes in %s::NON_TESTED_CONCRETE_CLASSES',
+                . 'tested concrete classes in %s::NON_TESTED_CONCRETE_CLASSES',
                 $className,
                 $testClassName,
                 ProjectCodeProvider::class
@@ -160,12 +120,12 @@ final class ProjectCodeTest extends TestCase
 
         $docBlock = DocBlockParser::parse((string) $reflectionClass->getDocComment());
 
-        if (in_array($className, ProjectCodeProvider::EXTENSION_POINTS, true)) {
+        if (\in_array($className, ProjectCodeProvider::EXTENSION_POINTS, true)) {
             if ($docBlock === '') {
                 $this->markTestSkipped(
                     sprintf(
                         'The "%s" class is an extension point, but does not have a PHP '
-                        .'doc-block or an empty one. Consider adding one to improve usability.',
+                        . 'doc-block or an empty one. Consider adding one to improve usability.',
                         $className
                     )
                 );
@@ -176,7 +136,7 @@ final class ProjectCodeTest extends TestCase
                 $docBlock,
                 sprintf(
                     'The "%s" class is marked as an extension point in %s::EXTENSION_POINTS'
-                    .'; It should either not be tagged as "@internal" or not be listed there.',
+                    . '; It should either not be tagged as "@internal" or not be listed there.',
                     $className,
                     ProjectCodeProvider::class
                 )
@@ -190,7 +150,7 @@ final class ProjectCodeTest extends TestCase
             $docBlock,
             sprintf(
                 'The "%s" class is not an extension point: it should be marked as internal'
-                .' or listed as an extension point in %s::EXTENSION_POINTS.',
+                . ' or listed as an extension point in %s::EXTENSION_POINTS.',
                 $className,
                 ProjectCodeProvider::class
             )
@@ -204,7 +164,7 @@ final class ProjectCodeTest extends TestCase
     {
         $reflectionClass = new ReflectionClass($className);
 
-        if (in_array($className, ProjectCodeProvider::NON_FINAL_EXTENSION_CLASSES, true)) {
+        if (\in_array($className, ProjectCodeProvider::NON_FINAL_EXTENSION_CLASSES, true)) {
             $this->addToAssertionCount(1);
 
             return;
@@ -217,8 +177,8 @@ final class ProjectCodeTest extends TestCase
             || $reflectionClass->isFinal(),
             sprintf(
                 'Expected the class "%s" to be a trait, an interface, an abstract or final '
-                .'class. Either fix it or if it is an extension point, add it to '
-                .'%s::EXTENSION_POINTS.',
+                . 'class. Either fix it or if it is an extension point, add it to '
+                . '%s::EXTENSION_POINTS.',
                 $className,
                 ProjectCodeProvider::class
             )
@@ -266,7 +226,7 @@ final class ProjectCodeTest extends TestCase
         $propertyNames = array_map(
             static function (ReflectionProperty $reflectionProperty): string {
                 return sprintf(
-                    '%s#%s', 
+                    '%s#%s',
                     $reflectionProperty->getDeclaringClass()->getName(),
                     $reflectionProperty->getName()
                 );
@@ -284,7 +244,7 @@ final class ProjectCodeTest extends TestCase
             $propertyNames,
             sprintf(
                 'The class "%s" should not have any public properties declared. If it has '
-                .'properties that needs to be accessed, getters should be used instead.',
+                . 'properties that needs to be accessed, getters should be used instead.',
                 $className
             )
         );
