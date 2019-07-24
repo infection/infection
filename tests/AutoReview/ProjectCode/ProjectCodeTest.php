@@ -57,8 +57,6 @@ use function Safe\sprintf;
  */
 final class ProjectCodeTest extends TestCase
 {
-    use ProjectCodeDataProvider;
-
     public function test_infection_bin_is_executable(): void
     {
         if (stripos(PHP_OS, 'WIN') === 0) {
@@ -72,7 +70,7 @@ final class ProjectCodeTest extends TestCase
     }
 
     /**
-     * @dataProvider concreteSourceClassesProvider
+     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::concreteSourceClassesProvider
      */
     public function test_all_concrete_classes_have_tests(string $className): void
     {
@@ -112,7 +110,7 @@ final class ProjectCodeTest extends TestCase
     }
 
     /**
-     * @dataProvider sourceClassesProvider
+     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesProvider
      */
     public function test_non_extension_points_are_internal(string $className): void
     {
@@ -158,7 +156,7 @@ final class ProjectCodeTest extends TestCase
     }
 
     /**
-     * @dataProvider sourceClassesProvider
+     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesProvider
      */
     public function test_non_extension_points_are_traits_interfaces_abstracts_or_finals(string $className): void
     {
@@ -186,7 +184,7 @@ final class ProjectCodeTest extends TestCase
     }
 
     /**
-     * @dataProvider sourceClassesToCheckForPublicPropertiesProvider
+     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesToCheckForPublicPropertiesProvider
      */
     public function test_source_classes_do_not_expose_public_properties(string $className): void
     {
@@ -251,7 +249,7 @@ final class ProjectCodeTest extends TestCase
     }
 
     /**
-     * @dataProvider classesTestProvider
+     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::classesTestProvider
      */
     public function test_all_test_classes_are_trait_abstract_or_final(string $className): void
     {

@@ -69,6 +69,7 @@ use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUn
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkTypes;
+use function Infection\Tests\generator_to_phpunit_data_provider;
 use Infection\Utils\VersionParser;
 use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
@@ -170,6 +171,13 @@ final class ProjectCodeProvider
         yield from self::$sourceClasses;
     }
 
+    public static function sourceClassesProvider(): Generator
+    {
+        yield from generator_to_phpunit_data_provider(
+            self::provideSourceClasses()
+        );
+    }
+
     public static function provideConcreteSourceClasses(): Generator
     {
         $sourceClasses = iterator_to_array(self::provideSourceClasses(), true);
@@ -184,6 +192,13 @@ final class ProjectCodeProvider
                     && !$reflectionClass->isTrait()
                 ;
             }
+        );
+    }
+
+    public static function concreteSourceClassesProvider(): Generator
+    {
+        yield from generator_to_phpunit_data_provider(
+            self::provideConcreteSourceClasses()
         );
     }
 
@@ -207,6 +222,13 @@ final class ProjectCodeProvider
                     )
                 ;
             }
+        );
+    }
+
+    public static function sourceClassesToCheckForPublicPropertiesProvider(): Generator
+    {
+        yield from generator_to_phpunit_data_provider(
+            self::provideSourceClassesToCheckForPublicProperties()
         );
     }
 
@@ -243,5 +265,28 @@ final class ProjectCodeProvider
         self::$testClasses = $classes;
 
         yield from self::$testClasses;
+    }
+
+    // "testClassesProvider" would be more correct but PHPUnit will then detect this method as a
+    // test instead of a test provider.
+    public static function classesTestProvider(): Generator
+    {
+        yield from generator_to_phpunit_data_provider(
+            self::provideTestClasses()
+        );
+    }
+
+    public static function nonTestedConcreteClassesProvider(): Generator
+    {
+        yield from generator_to_phpunit_data_provider(
+            self::NON_TESTED_CONCRETE_CLASSES
+        );
+    }
+
+    public static function nonFinalExtensionClasses(): Generator
+    {
+        yield from generator_to_phpunit_data_provider(
+            self::NON_FINAL_EXTENSION_CLASSES
+        );
     }
 }

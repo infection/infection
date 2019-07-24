@@ -44,10 +44,8 @@ use function trait_exists;
  */
 final class ProjectCodeProviderTest extends TestCase
 {
-    use ProjectCodeDataProvider;
-
     /**
-     * @dataProvider sourceClassesProvider
+     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesProvider()
      */
     public function test_source_class_provider_is_valid(string $className): void
     {
@@ -67,7 +65,7 @@ final class ProjectCodeProviderTest extends TestCase
     }
 
     /**
-     * @dataProvider concreteSourceClassesProvider
+     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::concreteSourceClassesProvider
      */
     public function test_concrete_class_provider_is_valid(string $className): void
     {
@@ -81,7 +79,7 @@ final class ProjectCodeProviderTest extends TestCase
     }
 
     /**
-     * @dataProvider nonTestedConcreteClassesProvider
+     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::nonTestedConcreteClassesProvider
      */
     public function test_non_tested_concrete_class_provider_is_valid(string $className): void
     {
@@ -97,7 +95,7 @@ final class ProjectCodeProviderTest extends TestCase
     }
 
     /**
-     * @dataProvider sourceClassesToCheckForPublicPropertiesProvider
+     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesToCheckForPublicPropertiesProvider
      */
     public function test_source_classes_to_check_for_public_properties_provider_is_valid(string $className): void
     {
@@ -111,7 +109,7 @@ final class ProjectCodeProviderTest extends TestCase
     }
 
     /**
-     * @dataProvider classesTestProvider
+     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::classesTestProvider
      */
     public function test_test_classes_provider_is_valid(string $className): void
     {
@@ -131,7 +129,7 @@ final class ProjectCodeProviderTest extends TestCase
     }
 
     /**
-     * @dataProvider nonFinalExtensionClasses
+     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::nonFinalExtensionClasses
      */
     public function test_non_final_extension_classes_provider_is_valid(string $className): void
     {
