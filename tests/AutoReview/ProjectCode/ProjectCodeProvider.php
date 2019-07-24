@@ -133,6 +133,7 @@ final class ProjectCodeProvider
     ];
 
     private static $sourceClasses;
+    private static $testClasses;
 
     private function __construct()
     {
@@ -166,7 +167,7 @@ final class ProjectCodeProvider
 
         self::$sourceClasses = $classes;
 
-        yield from $classes;
+        yield from self::$sourceClasses;
     }
 
     public static function provideConcreteSourceClasses(): Generator
@@ -211,10 +212,8 @@ final class ProjectCodeProvider
 
     public static function provideTestClasses(): Generator
     {
-        static $classes;
-
-        if (null !== $classes) {
-            yield from $classes;
+        if (null !== self::$testClasses) {
+            yield from self::$testClasses;
         }
 
         $finder = Finder::create()
@@ -241,6 +240,8 @@ final class ProjectCodeProvider
 
         sort($classes, SORT_STRING);
 
-        yield from $classes;
+        self::$testClasses = $classes;
+
+        yield from self::$testClasses;
     }
 }
