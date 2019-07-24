@@ -203,7 +203,7 @@ final class E2ETest extends TestCase
             try {
                 $process = new Process([
                     (new ComposerExecutableFinder())->find(),
-                    'install'
+                    'install',
                 ]);
                 $process->setTimeout(300);
                 $process->mustRun();
