@@ -37,7 +37,7 @@ namespace Infection\Tests\Console;
 
 use Infection\Console\InfectionContainer;
 use PHPUnit\Framework\TestCase;
-use Pimple\Container;
+use stdClass;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 
@@ -46,12 +46,49 @@ use Symfony\Component\Console\Input\InputInterface;
  */
 final class InfectionContainerTest extends TestCase
 {
-    public function test_it_is_a_usable_container(): void
+    public function test_it_can_be_instantiated_without_any_services(): void
     {
         $container = new InfectionContainer();
 
-        $this->assertArrayHasKey('project.dir', $container);
-        $this->assertInstanceOf(Container::class, $container);
+        $this->assertSame([], $container->keys());
+    }
+
+    public function test_it_can_be_instantiated_with_services(): void
+    {
+        $syntheticService = (object) ['synthetic' => true];
+        $regularService = static function (): stdClass {
+            return (object) [
+                'regular' => true,
+            ];
+        };
+
+        $container = new InfectionContainer([
+            'synthetic service' => $syntheticService,
+            'regular service' => $regularService,
+        ]);
+
+        $this->assertSame(
+            [
+                'synthetic service',
+                'regular service',
+            ],
+            $container->keys()
+        );
+
+        $this->assertSame($syntheticService, $container['synthetic service']);
+        $this->assertSame(
+            (object) [
+                'regular' => true,
+            ],
+            $container['regular service']
+        );
+    }
+
+    public function test_it_can_be_instantiated_with_the_project_services(): void
+    {
+        $container = InfectionContainer::create();
+
+        $this->assertNotSame([], $container->keys());
     }
 
     public function test_it_can_build_dynamic_dependencies(): void

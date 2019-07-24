@@ -80,164 +80,137 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class InfectionContainer extends Container
 {
-    public function __construct(array $values = [])
+    public static function create(): self
     {
-        parent::__construct($values);
-
-        $this['project.dir'] = getcwd();
-
-        $this['filesystem'] = static function (): Filesystem {
-            return new Filesystem();
-        };
-
-        $this['tmp.dir.creator'] = static function (self $container): TmpDirectoryCreator {
-            return new TmpDirectoryCreator($container['filesystem']);
-        };
-
-        $this['tmp.dir'] = static function (self $container): string {
-            return $container['tmp.dir.creator']->createAndGet($container['infection.config']->getTmpDir());
-        };
-
-        $this['coverage.dir.phpunit'] = static function (self $container) {
-            return sprintf(
-                '%s/%s',
-                $container['coverage.path'],
-                CodeCoverageData::PHP_UNIT_COVERAGE_DIR
-            );
-        };
-
-        $this['coverage.dir.phpspec'] = static function (self $container) {
-            return sprintf(
-                '%s/%s',
-                $container['coverage.path'],
-                CodeCoverageData::PHP_SPEC_COVERAGE_DIR
-            );
-        };
-
-        $this['phpunit.junit.file.path'] = static function (self $container) {
-            return sprintf(
-                '%s/%s',
-                $container['coverage.path'],
-                PhpUnitAdapter::JUNIT_FILE_NAME
-            );
-        };
-
-        $this[RootsFileOrDirectoryLocator::class] = static function (self $container): RootsFileOrDirectoryLocator {
-            return new RootsFileOrDirectoryLocator(
-                [$container['project.dir']],
-                $container['filesystem']
-            );
-        };
-
-        $this['path.replacer'] = static function (self $container): PathReplacer {
-            return new PathReplacer(
-                $container['filesystem'],
-                $container['infection.config']->getPhpUnitConfigDir()
-            );
-        };
-
-        $this['test.framework.factory'] = static function (self $container): Factory {
-            return new Factory(
-                $container['tmp.dir'],
-                $container['project.dir'],
-                $container['testframework.config.locator'],
-                $container['xml.configuration.helper'],
-                $container['phpunit.junit.file.path'],
-                $container['infection.config'],
-                $container['version.parser']
-            );
-        };
-
-        $this['xml.configuration.helper'] = static function (self $container): XmlConfigurationHelper {
-            return new XmlConfigurationHelper(
-                $container['path.replacer'],
-                $container['infection.config']->getPhpUnitConfigDir()
-            );
-        };
-
-        $this['mutant.creator'] = static function (self $container): MutantCreator {
-            return new MutantCreator(
-                $container['tmp.dir'],
-                $container['differ'],
-                $container['pretty.printer']
-            );
-        };
-
-        $this['differ'] = static function (): Differ {
-            return new Differ(
-                new BaseDiffer()
-            );
-        };
-
-        $this['dispatcher'] = static function (): EventDispatcherInterface {
-            return new EventDispatcher();
-        };
-
-        $this['parallel.process.runner'] = static function (self $container): ParallelProcessRunner {
-            return new ParallelProcessRunner($container['dispatcher']);
-        };
-
-        $this['testframework.config.locator'] = static function (self $container): TestFrameworkConfigLocator {
-            return new TestFrameworkConfigLocator(
-                $container['infection.config']->getPhpUnitConfigDir() /*[phpunit.dir, phpspec.dir, ...]*/
-            );
-        };
-
-        $this['diff.colorizer'] = static function (): DiffColorizer {
-            return new DiffColorizer();
-        };
-
-        $this['test.file.data.provider.phpunit'] = static function (self $container): TestFileDataProvider {
-            return new CachedTestFileDataProvider(
-                new PhpUnitTestFileDataProvider($container['phpunit.junit.file.path'])
-            );
-        };
-
-        $this['version.parser'] = static function (): VersionParser {
-            return new VersionParser();
-        };
-
-        $this['lexer'] = static function (): Lexer {
-            return new Lexer\Emulative([
-                'usedAttributes' => [
-                    'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
-                ],
-            ]);
-        };
-
-        $this['parser'] = static function (self $container): Parser {
-            return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $container['lexer']);
-        };
-
-        $this['pretty.printer'] = static function (): Standard {
-            return new Standard();
-        };
-
-        $this['mutators.config'] = static function (self $container): array {
-            return (new MutatorsGenerator(
-                $container['infection.config']->getMutatorsConfiguration()
-            ))->generate();
-        };
-
-        $this['metrics'] = static function (): MetricsCalculator {
-            return new MetricsCalculator();
-        };
-
-        $this['timer'] = static function (): Timer {
-            return new Timer();
-        };
-
-        $this['time.formatter'] = static function (): TimeFormatter {
-            return new TimeFormatter();
-        };
-
-        $this['memory.formatter'] = static function (): MemoryFormatter {
-            return new MemoryFormatter();
-        };
-
-        $this['memory.limit.applier'] = static function (self $container): MemoryLimiter {
-            return new MemoryLimiter($container['filesystem'], \php_ini_loaded_file());
-        };
+        return new self([
+            'project.dir' => getcwd(),
+            'filesystem' => static function (): Filesystem {
+                return new Filesystem();
+            },
+            'tmp.dir.creator' => static function (self $container): TmpDirectoryCreator {
+                return new TmpDirectoryCreator($container['filesystem']);
+            },
+            'tmp.dir' => static function (self $container): string {
+                return $container['tmp.dir.creator']->createAndGet($container['infection.config']->getTmpDir());
+            },
+            'coverage.dir.phpunit' => static function (self $container) {
+                return sprintf(
+                    '%s/%s',
+                    $container['coverage.path'],
+                    CodeCoverageData::PHP_UNIT_COVERAGE_DIR
+                );
+            },
+            'coverage.dir.phpspec' => static function (self $container) {
+                return sprintf(
+                    '%s/%s',
+                    $container['coverage.path'],
+                    CodeCoverageData::PHP_SPEC_COVERAGE_DIR
+                );
+            },
+            'phpunit.junit.file.path' => static function (self $container) {
+                return sprintf(
+                    '%s/%s',
+                    $container['coverage.path'],
+                    PhpUnitAdapter::JUNIT_FILE_NAME
+                );
+            },
+            RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
+                return new RootsFileOrDirectoryLocator(
+                    [$container['project.dir']],
+                    $container['filesystem']
+                );
+            },
+            'path.replacer' => static function (self $container): PathReplacer {
+                return new PathReplacer(
+                    $container['filesystem'],
+                    $container['infection.config']->getPhpUnitConfigDir()
+                );
+            },
+            'test.framework.factory' => static function (self $container): Factory {
+                return new Factory(
+                    $container['tmp.dir'],
+                    $container['project.dir'],
+                    $container['testframework.config.locator'],
+                    $container['xml.configuration.helper'],
+                    $container['phpunit.junit.file.path'],
+                    $container['infection.config'],
+                    $container['version.parser']
+                );
+            },
+            'xml.configuration.helper' => static function (self $container): XmlConfigurationHelper {
+                return new XmlConfigurationHelper(
+                    $container['path.replacer'],
+                    $container['infection.config']->getPhpUnitConfigDir()
+                );
+            },
+            'mutant.creator' => static function (self $container): MutantCreator {
+                return new MutantCreator(
+                    $container['tmp.dir'],
+                    $container['differ'],
+                    $container['pretty.printer']
+                );
+            },
+            'differ' => static function (): Differ {
+                return new Differ(
+                    new BaseDiffer()
+                );
+            },
+            'dispatcher' => static function (): EventDispatcherInterface {
+                return new EventDispatcher();
+            },
+            'parallel.process.runner' => static function (self $container): ParallelProcessRunner {
+                return new ParallelProcessRunner($container['dispatcher']);
+            },
+            'testframework.config.locator' => static function (self $container): TestFrameworkConfigLocator {
+                return new TestFrameworkConfigLocator(
+                    $container['infection.config']->getPhpUnitConfigDir() /*[phpunit.dir, phpspec.dir, ...]*/
+                );
+            },
+            'diff.colorizer' => static function (): DiffColorizer {
+                return new DiffColorizer();
+            },
+            'test.file.data.provider.phpunit' => static function (self $container): TestFileDataProvider {
+                return new CachedTestFileDataProvider(
+                    new PhpUnitTestFileDataProvider($container['phpunit.junit.file.path'])
+                );
+            },
+            'version.parser' => static function (): VersionParser {
+                return new VersionParser();
+            },
+            'lexer' => static function (): Lexer {
+                return new Lexer\Emulative([
+                    'usedAttributes' => [
+                        'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
+                    ],
+                ]);
+            },
+            'parser' => static function (self $container): Parser {
+                return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $container['lexer']);
+            },
+            'pretty.printer' => static function (): Standard {
+                return new Standard();
+            },
+            'mutators.config' => static function (self $container): array {
+                return (new MutatorsGenerator(
+                    $container['infection.config']->getMutatorsConfiguration()
+                ))->generate();
+            },
+            'metrics' => static function (): MetricsCalculator {
+                return new MetricsCalculator();
+            },
+            'timer' => static function (): Timer {
+                return new Timer();
+            },
+            'time.formatter' => static function (): TimeFormatter {
+                return new TimeFormatter();
+            },
+            'memory.formatter' => static function (): MemoryFormatter {
+                return new MemoryFormatter();
+            },
+            'memory.limit.applier' => static function (self $container): MemoryLimiter {
+                return new MemoryLimiter($container['filesystem'], \php_ini_loaded_file());
+            },
+        ]);
     }
 
     public function buildDynamicDependencies(InputInterface $input): void

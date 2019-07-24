@@ -74,6 +74,7 @@ if (\PHP_SAPI !== 'cli' && \PHP_SAPI !== 'phpdbg') {
 }
 
 use Infection\Console\Application;
+use Infection\Console\InfectionContainer;
 
-$application = new Application(new \Infection\Console\InfectionContainer());
+$application = new Application(InfectionContainer::create());
 $application->run();
