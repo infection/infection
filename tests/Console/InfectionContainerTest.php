@@ -76,12 +76,7 @@ final class InfectionContainerTest extends TestCase
         );
 
         $this->assertSame($syntheticService, $container['synthetic service']);
-        $this->assertEquals(
-            (object) [
-                'regular' => true,
-            ],
-            $container['regular service']
-        );
+        $this->assertTrue($container['regular service']->regular);
     }
 
     public function test_it_can_be_instantiated_with_the_project_services(): void
