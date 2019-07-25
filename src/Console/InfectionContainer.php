@@ -228,7 +228,7 @@ final class InfectionContainer extends Container
             : ''
         ;
         /** @var string $initialTestsPhpOptions */
-        $initialTestsPhpOptions = trim($input->getOption('initial-tests-php-options') ?: '');
+        $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options') ?: '');
         /** @var bool $ignoreMsiWithNoMutations */
         $ignoreMsiWithNoMutations = $input->getOption('ignore-msi-with-no-mutations');
         $minMsi = (float) $input->getOption('min-msi');
