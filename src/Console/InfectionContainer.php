@@ -213,24 +213,46 @@ final class InfectionContainer extends Container
         ]);
     }
 
-    public function buildDynamicDependencies(InputInterface $input): void
+    public function withInput(InputInterface $input): self
     {
-        $this['infection.config'] = static function (self $container) use ($input): InfectionConfig {
+        /** @var string|null $configFile */
+        $configFile = $input->hasOption('configuration')
+            ? trim($input->getOption('configuration'))
+            : null
+        ;
+        /** @var string|null $coveragePath */
+        $existingCoveragePath = $input->hasOption('coverage')
+            ? trim($input->getOption('coverage'))
+            : ''
+        ;
+        /** @var string $initialTestsPhpOptions */
+        $initialTestsPhpOptions = trim($input->getOption('initial-tests-php-options') ?: '');
+        /** @var bool $ignoreMsiWithNoMutations */
+        $ignoreMsiWithNoMutations = $input->getOption('ignore-msi-with-no-mutations');
+        $minMsi = (float) $input->getOption('min-msi');
+        $minCoveredMsi = (float) $input->getOption('min-covered-msi');
+        $mutators = $input->hasOption('mutators')
+            ? trim($input->getOption('mutators'))
+            : null
+        ;
+
+        $showMutations = (bool) $input->getOption('show-mutations');
+        $logVerbosity = (string) $input->getOption('log-verbosity');
+        $debug = (bool) $input->getOption('debug');
+        $onlyCovered = (bool) $input->getOption('only-covered');
+        $formatter = (string) $input->getOption('formatter');
+        $noProgress = (bool) $input->getOption('no-progress');
+
+        $this['infection.config'] = static function (self $container) use ($configFile): InfectionConfig {
             $facade = new ConfigCreatorFacade(
                 $container[RootsFileOrDirectoryLocator::class],
                 $container['filesystem']
             );
 
-            return $facade->createConfig($input->getOption('configuration'));
+            return $facade->createConfig($configFile);
         };
 
-        $this['coverage.path'] = static function (self $container) use ($input): string {
-            $existingCoveragePath = '';
-
-            if ($input->hasOption('coverage')) {
-                $existingCoveragePath = trim($input->getOption('coverage'));
-            }
-
+        $this['coverage.path'] = static function (self $container) use ($existingCoveragePath): string {
             if ($existingCoveragePath === '') {
                 return $container['tmp.dir'];
             }
@@ -241,9 +263,7 @@ final class InfectionContainer extends Container
             ;
         };
 
-        $this['coverage.checker'] = static function () use ($input): CoverageRequirementChecker {
-            $initialTestsPhpOptions = $input->getOption('initial-tests-php-options') ?? '';
-
+        $this['coverage.checker'] = static function () use ($initialTestsPhpOptions, $existingCoveragePath): CoverageRequirementChecker {
             if (!\is_string($initialTestsPhpOptions)) {
                 throw new InvalidArgumentException(
                     \sprintf(
@@ -254,23 +274,39 @@ final class InfectionContainer extends Container
             }
 
             return new CoverageRequirementChecker(
-                \strlen(trim($input->getOption('coverage'))) > 0,
+                $existingCoveragePath !== '',
                 $initialTestsPhpOptions
             );
         };
 
-        $this['test.run.constraint.checker'] = static function (self $container) use ($input): TestRunConstraintChecker {
+        $this['test.run.constraint.checker'] = static function (self $container) use (
+            $ignoreMsiWithNoMutations,
+            $minMsi,
+            $minCoveredMsi
+        ): TestRunConstraintChecker {
             return new TestRunConstraintChecker(
                 $container['metrics'],
-                $input->getOption('ignore-msi-with-no-mutations'),
-                (float) $input->getOption('min-msi'),
-                (float) $input->getOption('min-covered-msi')
+                $ignoreMsiWithNoMutations,
+                $minMsi,
+                $minCoveredMsi
             );
         };
 
-        $this['subscriber.builder'] = static function (self $container) use ($input): SubscriberBuilder {
+        $this['subscriber.builder'] = static function (self $container) use (
+            $showMutations,
+            $logVerbosity,
+            $debug,
+            $onlyCovered,
+            $formatter,
+            $noProgress
+        ): SubscriberBuilder {
             return new SubscriberBuilder(
-                $input,
+                $showMutations,
+                $logVerbosity,
+                $debug,
+                $onlyCovered,
+                $formatter,
+                $noProgress,
                 $container['metrics'],
                 $container['dispatcher'],
                 $container['diff.colorizer'],
@@ -283,9 +319,9 @@ final class InfectionContainer extends Container
             );
         };
 
-        $this['mutators'] = static function (self $container) use ($input): array {
+        $this['mutators'] = static function (self $container) use ($mutators): array {
             $parser = new MutatorParser(
-                $input->getOption('mutators'),
+                $mutators,
                 $container['mutators.config']
             );
 

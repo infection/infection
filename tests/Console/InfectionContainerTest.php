@@ -94,7 +94,7 @@ final class InfectionContainerTest extends TestCase
 
         //Sanity check
         $this->assertArrayNotHasKey('coverage.path', $container);
-        $container->buildDynamicDependencies($input);
+        $container->withInput($input);
 
         $this->assertSame(
             $tmpDir,
@@ -117,7 +117,7 @@ final class InfectionContainerTest extends TestCase
         ;
 
         $container = new InfectionContainer();
-        $container->buildDynamicDependencies($input);
+        $container->withInput($input);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected initial-tests-php-options to be string, array given');

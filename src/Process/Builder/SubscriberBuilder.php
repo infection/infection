@@ -58,7 +58,6 @@ use Infection\Process\Listener\MutationTestingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationTestingResultsLoggerSubscriber;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -67,57 +66,29 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class SubscriberBuilder
 {
-    /**
-     * @var InputInterface
-     */
-    private $input;
-
-    /**
-     * @var MetricsCalculator
-     */
+    private $showMutations;
+    private $logVerbosity;
+    private $debug;
+    private $onlyCovered;
+    private $noProgress;
+    private $formatter;
     private $metricsCalculator;
-
-    /**
-     * @var EventDispatcherInterface
-     */
     private $eventDispatcher;
-
-    /**
-     * @var DiffColorizer
-     */
     private $diffColorizer;
-
-    /**
-     * @var InfectionConfig
-     */
     private $infectionConfig;
-
-    /**
-     * @var Filesystem
-     */
     private $fs;
-
-    /**
-     * @var string
-     */
     private $tmpDir;
-
-    /**
-     * @var Timer
-     */
     private $timer;
-
-    /**
-     * @var TimeFormatter
-     */
     private $timeFormatter;
-    /**
-     * @var MemoryFormatter
-     */
     private $memoryFormatter;
 
     public function __construct(
-        InputInterface $input,
+        bool $showMutations,
+        string $logVerbosity,
+        bool $debug,
+        bool $onlyCovered,
+        string $formatter,
+        bool $noProgress,
         MetricsCalculator $metricsCalculator,
         EventDispatcherInterface $eventDispatcher,
         DiffColorizer $diffColorizer,
@@ -128,7 +99,12 @@ final class SubscriberBuilder
         TimeFormatter $timeFormatter,
         MemoryFormatter $memoryFormatter
     ) {
-        $this->input = $input;
+        $this->showMutations = $showMutations;
+        $this->logVerbosity = $logVerbosity;
+        $this->debug = $debug;
+        $this->onlyCovered = $onlyCovered;
+        $this->formatter = $formatter;
+        $this->noProgress = $noProgress;
         $this->metricsCalculator = $metricsCalculator;
         $this->eventDispatcher = $eventDispatcher;
         $this->diffColorizer = $diffColorizer;
@@ -162,16 +138,16 @@ final class SubscriberBuilder
                 $this->getOutputFormatter($output),
                 $this->metricsCalculator,
                 $this->diffColorizer,
-                $this->input->getOption('show-mutations')
+                $this->showMutations
             ),
             new MutationTestingResultsLoggerSubscriber(
                 $output,
                 $this->infectionConfig,
                 $this->metricsCalculator,
                 $this->fs,
-                $this->input->getOption('log-verbosity'),
-                (bool) $this->input->getOption('debug'),
-                (bool) $this->input->getOption('only-covered')
+                $this->logVerbosity,
+                $this->debug,
+                $this->onlyCovered
             ),
             new PerformanceLoggerSubscriber(
                 $this->timer,
@@ -181,7 +157,7 @@ final class SubscriberBuilder
             ),
         ];
 
-        if (!$this->input->getOption('debug')) {
+        if (!$this->debug) {
             $subscribers[] = new CleanUpAfterMutationTestingFinishedSubscriber(
                 $this->fs,
                 $this->tmpDir
@@ -193,11 +169,11 @@ final class SubscriberBuilder
 
     private function getOutputFormatter(OutputInterface $output): OutputFormatter
     {
-        if ($this->input->getOption('formatter') === 'progress') {
+        if ($this->formatter === 'progress') {
             return new ProgressFormatter(new ProgressBar($output));
         }
 
-        if ($this->input->getOption('formatter') === 'dot') {
+        if ($this->formatter === 'dot') {
             return new DotFormatter($output);
         }
 
@@ -228,12 +204,12 @@ final class SubscriberBuilder
             return new CiInitialTestsConsoleLoggerSubscriber($output, $testFrameworkAdapter);
         }
 
-        return new InitialTestsConsoleLoggerSubscriber($output, $testFrameworkAdapter, $this->input->getOption('debug'));
+        return new InitialTestsConsoleLoggerSubscriber($output, $testFrameworkAdapter, $this->debug);
     }
 
     private function shouldSkipProgressBars(): bool
     {
-        return $this->input->getOption('no-progress')
+        return $this->noProgress
             || getenv('CI') === 'true'
             || getenv('CONTINUOUS_INTEGRATION') === 'true';
     }

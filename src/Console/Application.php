@@ -121,7 +121,7 @@ ASCII;
 
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        $this->getContainer()->buildDynamicDependencies($input);
+        $this->getContainer()->withInput($input);
 
         $output->writeln(self::LOGO);
 
