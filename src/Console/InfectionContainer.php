@@ -215,6 +215,8 @@ final class InfectionContainer extends Container
 
     public function withInput(InputInterface $input): self
     {
+        $clone = clone $this;
+
         /** @var string|null $configFile */
         $configFile = $input->hasOption('configuration')
             ? trim($input->getOption('configuration'))
@@ -243,7 +245,7 @@ final class InfectionContainer extends Container
         $formatter = (string) $input->getOption('formatter');
         $noProgress = (bool) $input->getOption('no-progress');
 
-        $this['infection.config'] = static function (self $container) use ($configFile): InfectionConfig {
+        $clone['infection.config'] = static function (self $container) use ($configFile): InfectionConfig {
             $facade = new ConfigCreatorFacade(
                 $container[RootsFileOrDirectoryLocator::class],
                 $container['filesystem']
@@ -252,7 +254,7 @@ final class InfectionContainer extends Container
             return $facade->createConfig($configFile);
         };
 
-        $this['coverage.path'] = static function (self $container) use ($existingCoveragePath): string {
+        $clone['coverage.path'] = static function (self $container) use ($existingCoveragePath): string {
             if ($existingCoveragePath === '') {
                 return $container['tmp.dir'];
             }
@@ -263,7 +265,7 @@ final class InfectionContainer extends Container
             ;
         };
 
-        $this['coverage.checker'] = static function () use ($initialTestsPhpOptions, $existingCoveragePath): CoverageRequirementChecker {
+        $clone['coverage.checker'] = static function () use ($initialTestsPhpOptions, $existingCoveragePath): CoverageRequirementChecker {
             if (!\is_string($initialTestsPhpOptions)) {
                 throw new InvalidArgumentException(
                     \sprintf(
@@ -279,7 +281,7 @@ final class InfectionContainer extends Container
             );
         };
 
-        $this['test.run.constraint.checker'] = static function (self $container) use (
+        $clone['test.run.constraint.checker'] = static function (self $container) use (
             $ignoreMsiWithNoMutations,
             $minMsi,
             $minCoveredMsi
@@ -292,7 +294,7 @@ final class InfectionContainer extends Container
             );
         };
 
-        $this['subscriber.builder'] = static function (self $container) use (
+        $clone['subscriber.builder'] = static function (self $container) use (
             $showMutations,
             $logVerbosity,
             $debug,
@@ -319,7 +321,7 @@ final class InfectionContainer extends Container
             );
         };
 
-        $this['mutators'] = static function (self $container) use ($mutators): array {
+        $clone['mutators'] = static function (self $container) use ($mutators): array {
             $parser = new MutatorParser(
                 $mutators,
                 $container['mutators.config']
@@ -327,5 +329,7 @@ final class InfectionContainer extends Container
 
             return $parser->getMutators();
         };
+
+        return $clone;
     }
 }
