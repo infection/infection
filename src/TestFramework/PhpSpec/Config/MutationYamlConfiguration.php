@@ -45,7 +45,7 @@ final class MutationYamlConfiguration extends AbstractYamlConfiguration
     /**
      * @var string
      */
-    protected $customAutoloadFilePath;
+    private $customAutoloadFilePath;
 
     public function __construct($tmpDir, array $parsedYaml, string $customAutoloadFilePath)
     {
