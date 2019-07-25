@@ -111,27 +111,4 @@ final class InfectionContainerTest extends TestCase
         $this->assertFalse($container->offsetExists('coverage.path'));
         $this->assertTrue($newContainer->offsetExists('coverage.path'));
     }
-
-//
-//    public function test_it_throws_on_invalid_type(): void
-//    {
-//        $input = $this->createMock(InputInterface::class);
-//        $input
-//            ->method('hasOption')
-//            ->with('coverage')
-//            ->willReturn(false)
-//        ;
-//        $input
-//            ->method('getOption')
-//            ->with('initial-tests-php-options')
-//            ->willReturn([])
-//        ;
-//
-//        $container = new InfectionContainer();
-//        $container->withInput($input);
-//
-//        $this->expectException(InvalidArgumentException::class);
-//        $this->expectExceptionMessage('Expected initial-tests-php-options to be string, array given');
-//        $this->assertNotNull($container['coverage.checker']);
-//    }
 }
