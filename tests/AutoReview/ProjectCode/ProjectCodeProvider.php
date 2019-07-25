@@ -133,7 +133,14 @@ final class ProjectCodeProvider
         OutputFormatter::class,
     ];
 
+    /**
+     * @var string[]|null
+     */
     private static $sourceClasses;
+
+    /**
+     * @var string[]|null
+     */
     private static $testClasses;
 
     private function __construct()
