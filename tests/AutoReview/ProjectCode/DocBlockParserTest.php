@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 /**
  * This code is licensed under the BSD 3-Clause License.
@@ -32,49 +31,87 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Disable strict types for now: https://github.com/infection/infection/pull/720#issuecomment-506546284
+declare(strict_types=1);
 
-$autoloaderInWorkingDirectory = getcwd() . '/vendor/autoload.php';
+namespace Infection\Tests\AutoReview\ProjectCode;
 
-if (is_file($autoloaderInWorkingDirectory)) {
-    require_once $autoloaderInWorkingDirectory;
-}
-unset($autoloaderInWorkingDirectory);
+use Generator;
+use PHPUnit\Framework\TestCase;
 
-$files = [
-    __DIR__ . '/../../../autoload.php',
-    __DIR__ . '/../vendor/autoload.php',
-    __DIR__ . '/vendor/autoload.php',
-];
+final class DocBlockParserTest extends TestCase
+{
+    /**
+     * @dataProvider docBlocksProvider
+     */
+    public function test_it_can_parse_PHP_doc_blocks(string $docBlock, string $expected): void
+    {
+        $actual = DocBlockParser::parse($docBlock);
 
-foreach ($files as $file) {
-    if (file_exists($file)) {
-        break;
+        $this->assertSame($expected, $actual);
     }
-    unset($file);
+
+    public function docBlocksProvider(): Generator
+    {
+        yield ['', ''];
+
+        yield [
+            <<<'PHP'
+/**
+ * This is a
+ * multi-line
+ * doc-block
+ */
+PHP
+            ,
+            <<<'TEXT'
+This is a
+multi-line
+doc-block
+TEXT
+        ];
+
+        yield [
+            <<<'PHP'
+/**
+ * Single line doc-block
+ */
+PHP
+            ,
+            'Single line doc-block',
+        ];
+
+        yield [
+            <<<'PHP'
+   /**
+ * This is a
+ * multi-line  
+   * doc-block
+ * with weird indentation
+    */
+PHP
+            ,
+            <<<'TEXT'
+This is a
+multi-line
+doc-block
+with weird indentation
+TEXT
+        ];
+
+        yield [
+            <<<'PHP'
+/** Inlined doc-block */
+PHP
+            ,
+            'Inlined doc-block',
+        ];
+
+        yield [
+            <<<'PHP'
+// Comment
+PHP
+            ,
+            'Comme', // Weird result: regular comments are not properly supported
+        ];
+    }
 }
-unset($files);
-
-if (!isset($file)) {
-    fwrite(
-        STDERR,
-        'You need to set up the project dependencies using Composer:' . PHP_EOL . PHP_EOL .
-        '    composer install' . PHP_EOL . PHP_EOL .
-        'You can learn all about Composer on https://getcomposer.org/.' . PHP_EOL
-    );
-
-    exit(1);
-}
-
-require $file;
-unset($file);
-
-if (\PHP_SAPI !== 'cli' && \PHP_SAPI !== 'phpdbg') {
-    echo 'Warning: Infection may only be invoked from a command line', PHP_EOL;
-}
-
-use Infection\Console\Application;
-use Infection\Console\InfectionContainer;
-
-$application = new Application(InfectionContainer::create());
-$application->run();

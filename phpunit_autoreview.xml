@@ -8,6 +8,10 @@
          verbose="true"
 >
 
+    <php>
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=0" />
+    </php>
+
     <testsuites>
         <testsuite name="Auto-Review Test Suite">
             <directory>tests/AutoReview</directory>
@@ -19,5 +23,10 @@
             <directory>tests/AutoReview</directory>
         </whitelist>
     </filter>
+
+    <listeners>
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
+        <listener class="Symfony\Bridge\PhpUnit\CoverageListener" />
+    </listeners>
 
 </phpunit>

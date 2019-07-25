@@ -33,57 +33,67 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Finder\Exception;
+namespace Infection\Locator;
 
-use Infection\Finder\Exception\LocatorException;
-use PHPUnit\Framework\TestCase;
+use function implode;
+use RuntimeException;
+use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class LocatorExceptionTest extends TestCase
+final class FileNotFound extends RuntimeException
 {
-    public function test_file_or_directory_does_not_exist(): void
+    /**
+     * @param string[] $roots
+     */
+    public static function fromFileName(string $file, array $roots): self
     {
-        $exception = LocatorException::fileOrDirectoryDoesNotExist('file');
+        Assert::allString($roots);
 
-        $this->assertInstanceOf(LocatorException::class, $exception);
-        $this->assertSame(
-            'The file/directory "file" does not exist.',
-            $exception->getMessage()
+        return new self(sprintf(
+            'Could not locate the file/directory "%s"%s.',
+            $file,
+            [] === $roots
+                ? ''
+                : sprintf(' in "%s"', implode('", "', $roots))
+        ));
+    }
+
+    /**
+     * @deprecated
+     */
+    public static function multipleFilesDoNotExist(string $path, array $files): self
+    {
+        return new self(
+            sprintf(
+                'The path "%s" does not contain any of the requested files: "%s"',
+                $path,
+                implode('", "', $files)
+            )
         );
     }
 
-    public function test_files_or_directories_do_not_exist(): void
+    /**
+     * @param string[] $files
+     * @param string[] $roots
+     */
+    public static function fromFiles(array $files, array $roots): self
     {
-        $exception = LocatorException::filesOrDirectoriesDoNotExist('file', ['foo/', 'bar/']);
+        Assert::allString($files);
+        Assert::allString($roots);
 
-        $this->assertInstanceOf(LocatorException::class, $exception);
-        $this->assertSame(
-            'The file/folder "file" does not exist (in: foo/, bar/).',
-            $exception->getMessage()
-        );
-    }
-
-    public function test_multiple_files_do_not_exist(): void
-    {
-        $exception = LocatorException::multipleFilesDoNotExist('foo/bar/', ['file1', 'file2']);
-
-        $this->assertInstanceOf(LocatorException::class, $exception);
-        $this->assertSame(
-            'The path foo/bar/ does not contain any of the requested files: file1, file2',
-            $exception->getMessage()
-        );
-    }
-
-    public function test_files_not_found(): void
-    {
-        $exception = LocatorException::filesNotFound();
-
-        $this->assertInstanceOf(LocatorException::class, $exception);
-        $this->assertSame(
-            'Files are not found',
-            $exception->getMessage()
+        return new self(
+            [] === $files
+                ? 'Could not locate any files (no file provided).'
+                : sprintf(
+                    'Could not locate the files "%s"%s',
+                    implode('", "', $files),
+                    [] === $roots
+                        ? ''
+                        : sprintf(' in "%s"', implode('", "', $roots))
+                )
         );
     }
 }

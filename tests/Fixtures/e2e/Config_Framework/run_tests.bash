@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 
-readonly INFECTION=../../../../${1}
-
 set -e pipefail
+
+readonly INFECTION="../../../../bin/infection"
+
+if [ "$DRIVER" = "pcov" ]
+then
+    # pcov does not work with phpspec, skipping...
+    exit 0
+fi
 
 if [ "$DRIVER" = "phpdbg" ]
 then

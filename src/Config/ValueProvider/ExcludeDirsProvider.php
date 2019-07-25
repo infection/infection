@@ -36,7 +36,9 @@ declare(strict_types=1);
 namespace Infection\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
-use Infection\Finder\Locator;
+use Infection\Locator\Locator;
+use Infection\Locator\RootsFileOrDirectoryLocator;
+use function Safe\glob;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -112,7 +114,7 @@ final class ExcludeDirsProvider
 
         $question = new Question($questionText, '');
         $question->setAutocompleterValues($autocompleteValues);
-        $question->setValidator($this->getValidator(new Locator($sourceDirs, $this->filesystem)));
+        $question->setValidator($this->getValidator(new RootsFileOrDirectoryLocator($sourceDirs, $this->filesystem)));
 
         while ($dir = $this->questionHelper->ask($input, $output, $question)) {
             if ($dir) {

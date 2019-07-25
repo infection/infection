@@ -8,6 +8,10 @@
          verbose="true"
 >
 
+    <php>
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=0" />
+    </php>
+
     <testsuites>
         <testsuite name="Infection Test Suite">
             <directory>tests</directory>
@@ -28,5 +32,10 @@
             <group>large</group>
         </exclude>
     </groups>
+
+    <listeners>
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
+        <listener class="Symfony\Bridge\PhpUnit\CoverageListener" />
+    </listeners>
 
 </phpunit>

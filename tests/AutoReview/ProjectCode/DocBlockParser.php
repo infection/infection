@@ -33,38 +33,56 @@
 
 declare(strict_types=1);
 
-namespace Infection\Finder\Exception;
+namespace Infection\Tests\AutoReview\ProjectCode;
 
-/**
- * @internal
- */
-final class LocatorException extends \RuntimeException
+use function array_filter;
+use function array_map;
+use function current;
+use function end;
+use function explode;
+use function implode;
+use function substr;
+use function trim;
+
+final class DocBlockParser
 {
-    public static function fileOrDirectoryDoesNotExist(string $name): self
+    public static function parse(string $docblock): string
     {
-        return new self(sprintf('The file/directory "%s" does not exist.', $name));
-    }
+        $docblock = trim($docblock);
 
-    public static function filesOrDirectoriesDoNotExist(string $name, array $paths): self
-    {
-        return new self(
-            sprintf('The file/folder "%s" does not exist (in: %s).', $name, implode(', ', $paths))
+        if ('' === $docblock) {
+            return '';
+        }
+
+        /** @var string[] $lines */
+        $lines = array_map(
+            'trim',
+            explode("\n", $docblock)
         );
-    }
 
-    public static function multipleFilesDoNotExist(string $path, array $files): self
-    {
-        return new self(
-            sprintf(
-                'The path %s does not contain any of the requested files: %s',
-                $path,
-                implode(', ', $files)
+        /** @var string $firstLine */
+        $firstLine = current($lines);
+
+        $lines[0] = substr($firstLine, 3);
+
+        $nbrOfLines = \count($lines);
+
+        for ($i = 1; $i < $nbrOfLines; ++$i) {
+            $lines[$i] = substr($lines[$i], 1);
+        }
+
+        end($lines);
+
+        /** @var string $lastLine */
+        $lastLine = current($lines);
+
+        $lines[$nbrOfLines - 1] = substr($lastLine, 0, -2);
+
+        return implode(
+            "\n",
+            array_filter(
+                array_map('trim', $lines)
             )
         );
-    }
-
-    public static function filesNotFound(): self
-    {
-        return new self('Files are not found');
     }
 }

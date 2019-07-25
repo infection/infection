@@ -33,22 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Finder;
+namespace Infection\Locator;
 
 /**
  * @internal
  */
-interface LocatorInterface
+interface Locator
 {
     /**
-     * Determine the realpath of the file by the file path.
+     * Determine the realpath of the given file or directory located.
+     *
+     * @throws FileNotFound
      */
-    public function locate(string $name): string;
+    public function locate(string $fileName): string;
 
     /**
-     * Determine one realpath for the bunch of file paths.
+     * Determine the realpath of the first file or directory located.
      *
      * @param string[] $fileNames
+     *
+     * @throws FileNotFound
      */
     public function locateOneOf(array $fileNames): string;
 }

@@ -43,8 +43,9 @@ use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\ApplicationExecutionFinished;
 use Infection\Events\ApplicationExecutionStarted;
-use Infection\Finder\Exception\LocatorException;
-use Infection\Finder\Locator;
+use Infection\Locator\FileNotFound;
+use Infection\Locator\Locator;
+use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\Runner\InitialTestsRunner;
@@ -209,11 +210,12 @@ final class InfectionCommand extends BaseCommand
             return 1;
         }
 
+        /** @var InfectionConfig $config */
         $config = $container->get('infection.config');
 
         $this->includeUserBootstrap($config);
 
-        $testFrameworkKey = $input->getOption('test-framework') ?: $config->getTestFramework();
+        $testFrameworkKey = trim((string) $input->getOption('test-framework') ?: $config->getTestFramework());
         $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $this->skipCoverage);
 
         LogVerbosity::convertVerbosityLevel($input, $this->consoleOutput);
@@ -227,14 +229,11 @@ final class InfectionCommand extends BaseCommand
         $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);
 
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
+        $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options') ?: $config->getInitialTestsPhpOptions());
         $initialTestSuitProcess = $initialTestsRunner->run(
             $testFrameworkOptions->getForInitialProcess(),
             $this->skipCoverage,
-            explode(
-                ' ',
-                $input->getOption('initial-tests-php-options')
-                ?? $config->getInitialTestsPhpOptions()
-            )
+            explode(' ', $initialTestsPhpOptions)
         );
 
         if (!$initialTestSuitProcess->isSuccessful()) {
@@ -249,8 +248,8 @@ final class InfectionCommand extends BaseCommand
 
         $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
         $mutationsGenerator = new MutationsGenerator(
-            $container->get('src.dirs'),
-            $container->get('exclude.paths'),
+            $config->getSourceDirs(),
+            $config->getSourceExcludePaths(),
             $codeCoverageData,
             $container->get('mutators'),
             $this->eventDispatcher,
@@ -306,7 +305,7 @@ final class InfectionCommand extends BaseCommand
     {
         parent::initialize($input, $output);
 
-        $locator = $this->getContainer()->get('locator');
+        $locator = $this->getContainer()->get(RootsFileOrDirectoryLocator::class);
 
         if ($customConfigPath = $input->getOption('configuration')) {
             $locator->locate($customConfigPath);
@@ -325,7 +324,7 @@ final class InfectionCommand extends BaseCommand
 
         if ($bootstrap) {
             if (!file_exists($bootstrap)) {
-                throw LocatorException::fileOrDirectoryDoesNotExist($bootstrap);
+                throw FileNotFound::fromFileName($bootstrap, [__DIR__]);
             }
 
             (function ($infectionBootstrapFile): void {

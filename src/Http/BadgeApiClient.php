@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Http;
 
+use function Safe\curl_init;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -70,8 +71,6 @@ class BadgeApiClient
         ]);
 
         $ch = curl_init();
-
-        \assert(\is_resource($ch));
 
         curl_setopt($ch, CURLOPT_URL, self::STRYKER_DASHBOARD_API_URL);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

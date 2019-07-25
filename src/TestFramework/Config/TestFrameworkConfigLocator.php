@@ -35,7 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Config;
 
-use Infection\Finder\Exception\LocatorException;
+use Infection\Locator\FileNotFound;
+use function Safe\realpath;
 
 /**
  * @internal
@@ -70,16 +71,13 @@ final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInte
             $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
 
             if (file_exists($conf)) {
-                $realpath = realpath($conf);
-                \assert(\is_string($realpath));
-
-                return $realpath;
+                return realpath($conf);
             }
 
             $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
         }
 
-        throw LocatorException::multipleFilesDoNotExist(
+        throw FileNotFound::multipleFilesDoNotExist(
             $dir,
             $triedFiles
         );
