@@ -309,7 +309,7 @@ final class InfectionCommand extends BaseCommand
     {
         parent::initialize($input, $output);
 
-        $this->container = $this->getApplication()->getContainer();
+        $this->container = $this->getApplication()->getContainer()->withInput($input);
 
         $locator = $this->container[RootsFileOrDirectoryLocator::class];
 

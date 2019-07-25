@@ -121,8 +121,6 @@ ASCII;
 
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        $this->container = $this->getContainer()->withInput($input);
-
         $output->writeln(self::LOGO);
 
         return parent::doRun($input, $output);

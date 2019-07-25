@@ -38,7 +38,6 @@ namespace Infection\Tests\Console;
 use Infection\Console\InfectionContainer;
 use PHPUnit\Framework\TestCase;
 use stdClass;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 
 final class InfectionContainerTest extends TestCase

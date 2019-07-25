@@ -219,12 +219,16 @@ final class InfectionContainer extends Container
 
         /** @var string|null $configFile */
         $configFile = $input->hasOption('configuration')
-            ? trim($input->getOption('configuration'))
+            ? trim((string) $input->getOption('configuration'))
             : null
         ;
-        /** @var string|null $coveragePath */
+
+        if ($configFile === '') {
+            $configFile = null;
+        }
+        /** @var string $existingCoveragePath */
         $existingCoveragePath = $input->hasOption('coverage')
-            ? trim($input->getOption('coverage'))
+            ? trim((string) $input->getOption('coverage'))
             : ''
         ;
         /** @var string $initialTestsPhpOptions */
@@ -234,12 +238,16 @@ final class InfectionContainer extends Container
         $minMsi = (float) $input->getOption('min-msi');
         $minCoveredMsi = (float) $input->getOption('min-covered-msi');
         $mutators = $input->hasOption('mutators')
-            ? trim($input->getOption('mutators'))
+            ? trim((string) $input->getOption('mutators'))
             : null
         ;
 
+        if ($mutators === '') {
+            $mutators = null;
+        }
+
         $showMutations = (bool) $input->getOption('show-mutations');
-        $logVerbosity = (string) $input->getOption('log-verbosity');
+        $logVerbosity = trim((string) $input->getOption('log-verbosity'));
         $debug = (bool) $input->getOption('debug');
         $onlyCovered = (bool) $input->getOption('only-covered');
         $formatter = (string) $input->getOption('formatter');
