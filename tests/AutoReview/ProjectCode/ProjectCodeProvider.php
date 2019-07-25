@@ -82,7 +82,8 @@ use Symfony\Component\Finder\SplFileInfo;
 final class ProjectCodeProvider
 {
     /**
-     * List of classes which should not have a matching test.
+     * This array contains all classes that don't have tests yet, due to legacy
+     * reasons. This list should never be added to, only removed from.
      */
     public const NON_TESTED_CONCRETE_CLASSES = [
         ConfigureCommand::class,
