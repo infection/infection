@@ -33,19 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpSpec\Config;
+namespace Infection\Tests\TestFramework\PhpSpec\Config;
+
+use Infection\TestFramework\PhpSpec\Config\NoCodeCoverageException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-final class NoCodeCoverageException extends \Exception
+final class NoCodeCoverageExceptionTest extends TestCase
 {
-    public static function fromTestFramework(string $framework): self
+    public function test_from_test_framework(): void
     {
-        return new self(sprintf(
-            'No code coverage Extension detected for %s. %sWithout code coverage, running Infection is not useful.',
-            $framework,
-            "\n"
-        ));
+        $exception = NoCodeCoverageException::fromTestFramework('Foo');
+
+        $this->assertSame(
+            "No code coverage Extension detected for Foo. \nWithout code coverage, running Infection is not useful.",
+            $exception->getMessage()
+        );
     }
 }

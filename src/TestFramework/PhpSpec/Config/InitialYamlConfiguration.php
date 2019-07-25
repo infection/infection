@@ -66,7 +66,7 @@ final class InitialYamlConfiguration extends AbstractYamlConfiguration
             $this->removeCoverageExtension($this->parsedYaml);
         } else {
             if (!$this->hasCodeCoverageExtension($this->parsedYaml)) {
-                throw new NoCodeCoverageException("No code coverage Extension detected for PhpSpec. \nWithout code coverage, running Infection is not useful.");
+                throw NoCodeCoverageException::fromTestFramework('PhpSpec');
             }
 
             $this->updateCodeCoveragePath($this->parsedYaml);
