@@ -343,7 +343,7 @@ final class InfectionCommand extends BaseCommand
     {
         $coverageDir = $this->container[sprintf('coverage.dir.%s', $testFrameworkKey)];
         $testFileDataProviderServiceId = sprintf('test.file.data.provider.%s', $testFrameworkKey);
-        $testFileDataProviderService = $this->container->offsetExists($testFileDataProviderServiceId)
+        $testFileDataProviderService = $this->container !== null && $this->container->offsetExists($testFileDataProviderServiceId)
             ? $this->container[$testFileDataProviderServiceId]
             : null;
 
