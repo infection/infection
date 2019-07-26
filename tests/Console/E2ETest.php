@@ -307,7 +307,7 @@ final class E2ETest extends TestCase
             $this->markTestSkipped("Infection from within PHPUnit won't run without xdebug or phpdbg");
         }
 
-        $container = new InfectionContainer();
+        $container = InfectionContainer::create();
         $input = new ArgvInput(array_merge([
             'bin/infection',
             'run',

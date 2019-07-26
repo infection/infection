@@ -118,7 +118,7 @@ final class ProjectCodeProviderTest extends TestCase
             || interface_exists($className, true)
             || trait_exists($className, true),
             sprintf(
-                'The "%s" class was picked up by the test files finder, but it not a class,'
+                'The "%s" class was picked up by the test files finder, but it is not a class,'
                 . ' interface or trait. Please check for typos in the class name. If the '
                 . ' problematic file is not a class file declaration, add it to the list of '
                 . 'excluded files in %s::provideTestClasses().',
@@ -138,7 +138,7 @@ final class ProjectCodeProviderTest extends TestCase
             || interface_exists($className, true)
             || trait_exists($className, true),
             sprintf(
-                'The "%s" class was picked up by the test files finder, but it not a class,'
+                'The "%s" class was picked up by the test files finder, but it is not a class,'
                 . ' interface or trait. Please check for typos in the class name. If the '
                 . ' class no longer exists, remove it from %s::NON_FINAL_EXTENSION_CLASSES.',
                 $className,
