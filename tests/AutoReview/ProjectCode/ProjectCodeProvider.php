@@ -64,7 +64,6 @@ use Infection\TestFramework\Coverage\CoverageMethodData;
 use Infection\TestFramework\Coverage\TestFileTimeData;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder as PhpSpecInitalConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder as PhpSpecMutationConfigBuilder;
-use Infection\TestFramework\PhpSpec\Config\NoCodeCoverageException;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
@@ -97,7 +96,6 @@ final class ProjectCodeProvider
         MutantCreatingConsoleLoggerSubscriber::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
         MutationTestingRunner::class,
-        NoCodeCoverageException::class,
         TestFrameworkTypes::class,
         MutationsCollectorVisitor::class,
         ParentConnectorVisitor::class,
