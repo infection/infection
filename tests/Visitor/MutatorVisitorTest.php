@@ -118,8 +118,6 @@ PHP
                     'endTokenPos' => 48,
                 ],
                 ClassMethod::class,
-                true,
-                true,
                 new Nop(),
                 0,
                 range(29, 48)
@@ -168,8 +166,6 @@ PHP
                     'endTokenPos' => 50,
                 ],
                 ClassMethod::class,
-                true,
-                true,
                 new Nop(),
                 0,
                 range(29, 50)
@@ -225,8 +221,6 @@ PHP
                     'endTokenPos' => 48,
                 ],
                 ClassMethod::class,
-                true,
-                true,
                 new Nop(),
                 0,
                 range(29, 48)

@@ -56,8 +56,8 @@ use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
-use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
@@ -97,14 +97,14 @@ final class InfectionContainer extends Container
                 return sprintf(
                     '%s/%s',
                     $container['coverage.path'],
-                    CodeCoverageData::PHP_UNIT_COVERAGE_DIR
+                    XMLLineCodeCoverage::PHP_UNIT_COVERAGE_DIR
                 );
             },
             'coverage.dir.phpspec' => static function (self $container) {
                 return sprintf(
                     '%s/%s',
                     $container['coverage.path'],
-                    CodeCoverageData::PHP_SPEC_COVERAGE_DIR
+                    XMLLineCodeCoverage::PHP_SPEC_COVERAGE_DIR
                 );
             },
             'phpunit.junit.file.path' => static function (self $container) {

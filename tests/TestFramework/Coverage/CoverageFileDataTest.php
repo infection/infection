@@ -37,7 +37,7 @@ namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\CoverageMethodData;
+use Infection\TestFramework\Coverage\MethodLocationData;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -59,10 +59,10 @@ final class CoverageFileDataTest extends TestCase
 
         $coverageFileData = new CoverageFileData(
             [1 => [CoverageLineData::withTestMethod($pathToTest)]],
-            ['method' => new CoverageMethodData(1, 3, 1, 100)]
+            ['method' => new MethodLocationData(1, 3)]
         );
 
         $this->assertSame($pathToTest, $coverageFileData->byLine[1][0]->testMethod);
-        $this->assertSame(100, $coverageFileData->byMethod['method']->coverage);
+        $this->assertSame(1, $coverageFileData->byMethod['method']->startLine);
     }
 }

@@ -46,13 +46,13 @@ final class CoverageFileData
     public $byLine = [];
 
     /**
-     * @var CoverageMethodData[]
+     * @var MethodLocationData[]
      */
     public $byMethod = [];
 
     /**
      * @param array<int, array<int, CoverageLineData>> $byLine
-     * @param CoverageMethodData[] $byMethod
+     * @param MethodLocationData[] $byMethod
      */
     public function __construct(array $byLine = [], array $byMethod = [])
     {

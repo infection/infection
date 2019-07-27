@@ -38,33 +38,12 @@ namespace Infection\TestFramework\Coverage;
 /**
  * @internal
  */
-final class CoverageMethodData
+interface LineCodeCoverage
 {
-    /**
-     * @var int
-     */
-    public $startLine;
+    public function hasTests(string $filePath): bool;
 
     /**
-     * @var int
+     * @return CoverageLineData[]
      */
-    public $endLine;
-
-    /**
-     * @var int
-     */
-    public $executed;
-
-    /**
-     * @var int
-     */
-    public $coverage;
-
-    public function __construct(int $startLine, int $endLine, int $executed, int $coverage)
-    {
-        $this->startLine = $startLine;
-        $this->endLine = $endLine;
-        $this->executed = $executed;
-        $this->coverage = $coverage;
-    }
+    public function getAllTestsForMutation(string $filePath, NodeLineRangeData $lineRange, bool $isOnFunctionSignature): array;
 }

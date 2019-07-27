@@ -33,40 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection;
-
-use Infection\Mutator\Util\Mutator;
-use Infection\TestFramework\Coverage\CoverageLineData;
-use PhpParser\Node;
+namespace Infection\TestFramework\Coverage;
 
 /**
  * @internal
- *
- * @see Mutation
  */
-interface MutationInterface
+final class MethodLocationData
 {
-    public function getMutator(): Mutator;
-
-    public function getAttributes(): array;
-
-    public function getOriginalFilePath(): string;
-
-    public function getMutatedNodeClass(): string;
-
-    public function getHash(): string;
-
-    public function getOriginalFileAst(): array;
+    /**
+     * @var int
+     */
+    public $startLine;
 
     /**
-     * @return CoverageLineData[]
+     * @var int
      */
-    public function getAllTests(): array;
+    public $endLine;
 
-    public function isCoveredByTest(): bool;
-
-    /**
-     * @return Node|Node[] Node, array of Nodes
-     */
-    public function getMutatedNode();
+    public function __construct(int $startLine, int $endLine)
+    {
+        $this->startLine = $startLine;
+        $this->endLine = $endLine;
+    }
 }

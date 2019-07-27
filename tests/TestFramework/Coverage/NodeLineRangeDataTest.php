@@ -33,40 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\Mutator\Util\Mutator;
-use Infection\TestFramework\Coverage\CoverageLineData;
-use PhpParser\Node;
+use Generator;
+use Infection\TestFramework\Coverage\NodeLineRangeData;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
- *
- * @see Mutation
  */
-interface MutationInterface
+final class NodeLineRangeDataTest extends TestCase
 {
-    public function getMutator(): Mutator;
-
-    public function getAttributes(): array;
-
-    public function getOriginalFilePath(): string;
-
-    public function getMutatedNodeClass(): string;
-
-    public function getHash(): string;
-
-    public function getOriginalFileAst(): array;
+    public function test_it_can_not_have_an_incorrect_range(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new NodeLineRangeData(20, 10);
+    }
 
     /**
-     * @return CoverageLineData[]
+     * @dataProvider providesLineRanges
      */
-    public function getAllTests(): array;
+    public function test_it_generates_the_correct_range(int $start, int $end, array $expected): void
+    {
+        $range = new NodeLineRangeData($start, $end);
 
-    public function isCoveredByTest(): bool;
+        $this->assertSame($expected, $range->range);
+    }
 
-    /**
-     * @return Node|Node[] Node, array of Nodes
-     */
-    public function getMutatedNode();
+    public function providesLineRanges(): Generator
+    {
+        yield 'Single line range' => [10, 10, [10]];
+
+        yield 'Multi line range' => [10, 15, [10, 11, 12, 13, 14, 15]];
+    }
 }

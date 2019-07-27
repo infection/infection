@@ -33,40 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace Infection\TestFramework\Coverage;
 
-use Infection\Mutator\Util\Mutator;
-use Infection\TestFramework\Coverage\CoverageLineData;
-use PhpParser\Node;
+use Webmozart\Assert\Assert;
 
 /**
- * @internal
+ * This class represents the line range for a given node. Indeed some statements can count as one line but be
+ * declared over multiple lines, e.g.:
  *
- * @see Mutation
+ * ```
+ * $x = [
+ *  'a',
+ *  'b',
+ * ];
+ * ```
+ *
+ * @internal
  */
-interface MutationInterface
+final class NodeLineRangeData
 {
-    public function getMutator(): Mutator;
-
-    public function getAttributes(): array;
-
-    public function getOriginalFilePath(): string;
-
-    public function getMutatedNodeClass(): string;
-
-    public function getHash(): string;
-
-    public function getOriginalFileAst(): array;
-
     /**
-     * @return CoverageLineData[]
+     * @var array<int, int>
      */
-    public function getAllTests(): array;
+    public $range;
 
-    public function isCoveredByTest(): bool;
-
-    /**
-     * @return Node|Node[] Node, array of Nodes
-     */
-    public function getMutatedNode();
+    public function __construct(int $start, int $end)
+    {
+        Assert::greaterThanEq($end, $start);
+        $this->range = range($start, $end);
+    }
 }

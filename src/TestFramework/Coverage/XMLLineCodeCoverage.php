@@ -35,14 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Infection\MutationInterface;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use function Safe\file_get_contents;
 
 /**
  * @internal
  */
-class CodeCoverageData
+final class XMLLineCodeCoverage implements LineCodeCoverage
 {
     public const PHP_UNIT_COVERAGE_DIR = 'coverage-xml';
     public const PHP_SPEC_COVERAGE_DIR = 'phpspec-coverage-xml';
@@ -99,73 +98,38 @@ class CodeCoverageData
         return \count($coveredLineTestMethods) > 0;
     }
 
-    public function hasTestsOnLine(string $filePath, int $line): bool
-    {
-        $coverageData = $this->getCoverage();
-
-        if (!isset($coverageData[$filePath])) {
-            return false;
-        }
-
-        if (!isset($coverageData[$filePath]->byLine[$line])) {
-            return false;
-        }
-
-        return !empty($coverageData[$filePath]->byLine[$line]);
-    }
-
-    public function hasExecutedMethodOnLine(string $filePath, int $line): bool
-    {
-        $coverage = $this->getCoverage();
-
-        if (!\array_key_exists($filePath, $coverage)) {
-            return false;
-        }
-
-        foreach ($coverage[$filePath]->byMethod as $method => $coverageInfo) {
-            if ($line >= $coverageInfo->startLine && $line <= $coverageInfo->endLine) {
-                return $coverageInfo->executed || $coverageInfo->coverage;
-            }
-        }
-
-        return false;
-    }
-
     /**
      * @return CoverageLineData[]
      */
-    public function getAllTestsFor(MutationInterface $mutation): array
-    {
-        if (!$mutation->isCoveredByTest()) {
-            return [];
+    public function getAllTestsForMutation(
+        string $filePath,
+        NodeLineRangeData $lineRange,
+        bool $isOnFunctionSignature
+    ): array {
+        if ($isOnFunctionSignature) {
+            return iterator_to_array($this->getTestsForFunctionSignature($filePath, $lineRange), false);
         }
 
-        if ($mutation->isOnFunctionSignature()) {
-            return iterator_to_array($this->getTestsForMutationOnFunctionSignature($mutation), false);
-        }
-
-        return iterator_to_array($this->getTestsForMutation($mutation), false);
+        return iterator_to_array($this->getTestsForLineRange($filePath, $lineRange), false);
     }
 
-    private function getTestsForMutationOnFunctionSignature(MutationInterface $mutation): \Generator
+    /**
+     * @return \Generator<CoverageLineData>
+     */
+    private function getTestsForFunctionSignature(string $filePath, NodeLineRangeData $lineRange): \Generator
     {
-        $filePath = $mutation->getOriginalFilePath();
-
-        foreach ($mutation->getLineRange() as $line) {
-            if ($this->hasExecutedMethodOnLine($filePath, $line)) {
-                yield from $this->getTestsForExecutedMethodOnLine($filePath, $line);
-            }
+        foreach ($lineRange->range as $line) {
+            yield from $this->getTestsForExecutedMethodOnLine($filePath, $line);
         }
     }
 
-    private function getTestsForMutation(MutationInterface $mutation): \Generator
+    /**
+     * @return \Generator<CoverageLineData>
+     */
+    private function getTestsForLineRange(string $filePath, NodeLineRangeData $lineRange): \Generator
     {
-        $filePath = $mutation->getOriginalFilePath();
-
-        foreach ($mutation->getLineRange() as $line) {
-            if ($this->hasTestsOnLine($filePath, $line)) {
-                yield from $this->getCoverage()[$filePath]->byLine[$line];
-            }
+        foreach ($lineRange->range as $line) {
+            yield from $this->getCoverage()[$filePath]->byLine[$line] ?? [];
         }
     }
 
@@ -247,6 +211,10 @@ class CodeCoverageData
     private function getTestsForExecutedMethodOnLine(string $filePath, int $line): array
     {
         $coverage = $this->getCoverage();
+
+        if (!\array_key_exists($filePath, $coverage)) {
+            return [];
+        }
 
         $tests = [[]];
 

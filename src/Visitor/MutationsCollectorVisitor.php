@@ -38,7 +38,8 @@ namespace Infection\Visitor;
 use Infection\Exception\InvalidMutatorException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
-use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\TestFramework\Coverage\NodeLineRangeData;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -68,7 +69,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
     private $fileAst;
 
     /**
-     * @var CodeCoverageData
+     * @var LineCodeCoverage
      */
     private $codeCoverageData;
     /**
@@ -80,7 +81,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
         array $mutators,
         string $filePath,
         array $fileAst,
-        CodeCoverageData $codeCoverageData,
+        LineCodeCoverage $codeCoverageData,
         bool $onlyCovered
     ) {
         $this->mutators = $mutators;
@@ -109,26 +110,14 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                 continue;
             }
 
-            if ($isOnFunctionSignature) {
-                // hasExecutedMethodOnLine checks for all lines of a given method,
-                // therefore it isn't making any sense to check any other line but first
-                $isCoveredByTest = $this->codeCoverageData->hasExecutedMethodOnLine($this->filePath, $node->getLine());
-                $linerange = $this->getNodeRange($node);
-            } else {
-                $outerMostArrayNode = $this->getOuterMostArrayNode($node);
-                $isCoveredByTest = false;
-                $linerange = $this->getNodeRange($outerMostArrayNode);
+            $tests = $this->codeCoverageData
+                ->getAllTestsForMutation(
+                    $this->filePath,
+                    $this->getNodeRange($node, $isOnFunctionSignature),
+                    $isOnFunctionSignature
+                );
 
-                foreach ($linerange as $line) {
-                    if ($this->codeCoverageData->hasTestsOnLine($this->filePath, $line)) {
-                        $isCoveredByTest = true;
-
-                        break;
-                    }
-                }
-            }
-
-            if ($this->onlyCovered && !$isCoveredByTest) {
+            if ($this->onlyCovered && \count($tests) === 0) {
                 continue;
             }
 
@@ -143,11 +132,9 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                     $mutator,
                     $node->getAttributes(),
                     \get_class($node),
-                    $isOnFunctionSignature,
-                    $isCoveredByTest,
                     $mutatedNode,
                     $mutationByMutatorIndex,
-                    $linerange
+                    $tests
                 );
             }
         }
@@ -180,11 +167,12 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
         return $outerMostArrayParent;
     }
 
-    /**
-     * @return array|int[]
-     */
-    private function getNodeRange(Node $node): array
+    private function getNodeRange(Node $node, bool $isOnFunctionSignature): NodeLineRangeData
     {
-        return range($node->getStartLine(), $node->getEndLine());
+        if ($isOnFunctionSignature) {
+            $node = $this->getOuterMostArrayNode($node);
+        }
+
+        return new NodeLineRangeData($node->getStartLine(), $node->getEndLine());
     }
 }

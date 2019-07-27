@@ -38,7 +38,6 @@ namespace Infection\Tests\Mutant;
 use Infection\Differ\Differ;
 use Infection\Mutant\MutantCreator;
 use Infection\MutationInterface;
-use Infection\TestFramework\Coverage\CodeCoverageData;
 use PhpParser\PrettyPrinter\Standard;
 use PHPUnit\Framework\TestCase;
 
@@ -90,15 +89,12 @@ PHP
         $mutation->method('getOriginalFilePath')->willReturn('original/path');
         $mutation->method('getOriginalFileAst')->willReturn(['ast']);
         $mutation->method('getAttributes')->willReturn(['startLine' => 1]);
-        $mutation->method('isOnFunctionSignature')->willReturn(true);
+        $mutation->method('getAllTests')->willReturn(['test', 'list']);
+
         $mutation->expects($this->once())->method('isCoveredByTest')->willReturn(true);
 
-        $coverage = $this->createMock(CodeCoverageData::class);
-        $coverage->method('hasExecutedMethodOnLine')->willReturn(true);
-        $coverage->method('getAllTestsFor')->willReturn(['test', 'list']);
-
         $creator = new MutantCreator($this->directory, $differ, $standard);
-        $mutant = $creator->create($mutation, $coverage);
+        $mutant = $creator->create($mutation);
 
         $this->assertSame($this->directory . self::TEST_FILE_NAME, $mutant->getMutatedFilePath());
         $this->assertSame('This is the Diff', $mutant->getDiff());
