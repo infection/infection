@@ -38,9 +38,6 @@ namespace Infection\Tests\TestFramework\PhpUnit\Coverage\Exception;
 use Infection\TestFramework\PhpUnit\Coverage\Exception\NoLinesExecutedException;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class NoLinesExecutedExceptionTest extends TestCase
 {
     public function test_no_lines_executed(): void

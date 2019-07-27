@@ -40,8 +40,6 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * @internal
- *
  * @coversNothing
  *
  * This class is responsible for testing that all Mutator classes adhere to certain rules

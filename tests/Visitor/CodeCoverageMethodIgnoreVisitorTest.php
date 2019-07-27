@@ -43,9 +43,6 @@ use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 
-/**
- * @internal
- */
 final class CodeCoverageMethodIgnoreVisitorTest extends AbstractBaseVisitorTest
 {
     private $spyVisitor;

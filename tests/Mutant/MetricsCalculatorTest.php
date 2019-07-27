@@ -41,9 +41,6 @@ use Infection\Process\MutantProcessInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-/**
- * @internal
- */
 final class MetricsCalculatorTest extends TestCase
 {
     public function test_it_shows_zero_values_by_default(): void

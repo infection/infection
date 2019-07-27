@@ -43,9 +43,6 @@ use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @internal
- */
 final class InitialConfigBuilderTest extends TestCase
 {
     public const HASH = 'a1b2c3';

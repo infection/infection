@@ -38,9 +38,6 @@ namespace Infection\Tests\TestFramework\Coverage;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class CoverageLineDataTest extends TestCase
 {
     public function test_it_creates_self_with_named_constructor_for_test_method(): void

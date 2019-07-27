@@ -38,9 +38,6 @@ namespace Infection\Tests\Mutator\Util;
 use Infection\Mutator\Util\MutatorConfig;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class MutatorConfigTest extends TestCase
 {
     /**

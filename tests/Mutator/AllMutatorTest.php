@@ -52,9 +52,6 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
 
-/**
- * @internal
- */
 final class AllMutatorTest extends TestCase
 {
     /**

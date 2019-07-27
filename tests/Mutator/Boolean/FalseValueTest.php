@@ -39,9 +39,6 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
 
-/**
- * @internal
- */
 final class FalseValueTest extends AbstractMutatorTestCase
 {
     /**

@@ -38,9 +38,6 @@ namespace Infection\Tests\Json\Exception;
 use Infection\Json\Exception\JsonValidationException;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class JsonValidationExceptionTest extends TestCase
 {
     public function test_does_not_match_schema_with_errors(): void

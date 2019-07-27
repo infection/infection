@@ -45,9 +45,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
-/**
- * @internal
- */
 final class ParallelProcessRunnerTest extends TestCase
 {
     public function test_it_does_nothing_when_nothing_to_do(): void

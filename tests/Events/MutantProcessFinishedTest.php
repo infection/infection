@@ -39,9 +39,6 @@ use Infection\Events\MutantProcessFinished;
 use Infection\Process\MutantProcessInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class MutantProcessFinishedTest extends TestCase
 {
     public function test_it_passes_around_its_mutant_process_without_changing_it(): void

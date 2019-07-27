@@ -41,9 +41,6 @@ use PhpParser\Node\Stmt\Function_;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class AbstractValueToNullReturnValueTest extends TestCase
 {
     protected $testSubject;

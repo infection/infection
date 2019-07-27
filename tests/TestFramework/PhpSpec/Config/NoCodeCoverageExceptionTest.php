@@ -38,9 +38,6 @@ namespace Infection\Tests\TestFramework\PhpSpec\Config;
 use Infection\TestFramework\PhpSpec\Config\NoCodeCoverageException;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class NoCodeCoverageExceptionTest extends TestCase
 {
     public function test_from_test_framework(): void

@@ -40,9 +40,6 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 
-/**
- * @internal
- */
 abstract class AbstractBaseProviderTest extends TestCase
 {
     protected static $stty;

@@ -38,9 +38,6 @@ namespace Infection\Tests\TestFramework\PhpUnit;
 use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class PhpUnitExtraOptionsTest extends TestCase
 {
     /**

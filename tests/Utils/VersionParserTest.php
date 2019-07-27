@@ -38,9 +38,6 @@ namespace Infection\Tests\Utils;
 use Infection\Utils\VersionParser;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class VersionParserTest extends TestCase
 {
     /**

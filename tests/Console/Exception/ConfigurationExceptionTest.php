@@ -39,9 +39,6 @@ use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Exception\InfectionException;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class ConfigurationExceptionTest extends TestCase
 {
     public function test_configuration_aborted(): void

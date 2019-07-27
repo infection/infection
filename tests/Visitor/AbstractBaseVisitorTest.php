@@ -39,9 +39,6 @@ use PhpParser\Lexer;
 use PhpParser\ParserFactory;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 abstract class AbstractBaseVisitorTest extends TestCase
 {
     protected function getNodes(string $code): array

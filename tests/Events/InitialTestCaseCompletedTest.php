@@ -38,9 +38,6 @@ namespace Infection\Tests\Events;
 use Infection\Events\InitialTestCaseCompleted;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class InitialTestCaseCompletedTest extends TestCase
 {
     /**

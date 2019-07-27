@@ -46,9 +46,6 @@ use PhpParser\NodeVisitorAbstract;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 
-/**
- * @internal
- */
 final class ReflectionVisitorTest extends AbstractBaseVisitorTest
 {
     private $spyVisitor;

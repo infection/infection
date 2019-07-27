@@ -45,9 +45,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-/**
- * @internal
- */
 final class InitialTestsRunnerTest extends TestCase
 {
     public function test_it_dispatches_events(): void

@@ -41,9 +41,6 @@ use Infection\Mutator\Util\MutatorConfig;
 use PhpParser\Node;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class MutationTest extends TestCase
 {
     public function test_it_correctly_generates_hash(): void

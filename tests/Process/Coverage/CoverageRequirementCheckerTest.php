@@ -42,8 +42,6 @@ use PHPUnit\Framework\TestCase;
  * All these tests should be ran in separate processes, as otherwise they may rely
  * on the internal state of XdebugHandler.
  *
- * @internal
- *
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */

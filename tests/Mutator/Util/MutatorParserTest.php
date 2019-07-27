@@ -40,9 +40,6 @@ use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\Util\MutatorParser;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class MutatorParserTest extends TestCase
 {
     public function test_it_returns_default_mutators_when_no_input_mutators(): void

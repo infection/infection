@@ -38,9 +38,6 @@ namespace Infection\Tests\resources;
 use Helmich\JsonAssert\JsonAssertions;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class InfectionConfigJsonSchemaTest extends TestCase
 {
     use JsonAssertions;

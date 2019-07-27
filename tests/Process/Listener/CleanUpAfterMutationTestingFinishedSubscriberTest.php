@@ -40,9 +40,6 @@ use Infection\Process\Listener\CleanUpAfterMutationTestingFinishedSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @internal
- */
 final class CleanUpAfterMutationTestingFinishedSubscriberTest extends TestCase
 {
     public function test_it_execute_remove_on_mutation_testing_finished(): void

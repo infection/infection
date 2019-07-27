@@ -38,9 +38,6 @@ namespace Infection\Tests\Finder\Exception;
 use Infection\Finder\Exception\FinderException;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class FinderExceptionTest extends TestCase
 {
     public function test_composer_not_found_exception(): void

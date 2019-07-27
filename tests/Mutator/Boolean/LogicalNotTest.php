@@ -40,9 +40,6 @@ use PhpParser\Node\Expr\BooleanNot;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
 
-/**
- * @internal
- */
 final class LogicalNotTest extends AbstractMutatorTestCase
 {
     /**

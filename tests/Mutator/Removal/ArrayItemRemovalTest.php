@@ -39,9 +39,6 @@ use Generator;
 use Infection\Config\Exception\InvalidConfigException;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-/**
- * @internal
- */
 final class ArrayItemRemovalTest extends AbstractMutatorTestCase
 {
     /**

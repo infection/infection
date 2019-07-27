@@ -43,9 +43,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @internal
- */
 final class ValidatorTest extends TestCase
 {
     /**

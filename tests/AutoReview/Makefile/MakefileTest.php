@@ -47,8 +47,6 @@ use function strpos;
 use function substr_count;
 
 /**
- * @internal
- *
  * @coversNothing
  */
 final class MakefileTest extends TestCase

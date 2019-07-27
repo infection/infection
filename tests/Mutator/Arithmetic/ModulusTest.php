@@ -37,9 +37,6 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-/**
- * @internal
- */
 final class ModulusTest extends AbstractMutatorTestCase
 {
     /**

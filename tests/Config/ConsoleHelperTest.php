@@ -40,9 +40,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @internal
- */
 final class ConsoleHelperTest extends TestCase
 {
     public function test_it_writes_to_section(): void

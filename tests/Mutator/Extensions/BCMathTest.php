@@ -38,9 +38,6 @@ namespace Infection\Tests\Mutator\Extensions;
 use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-/**
- * @internal
- */
 final class BCMathTest extends AbstractMutatorTestCase
 {
     /**

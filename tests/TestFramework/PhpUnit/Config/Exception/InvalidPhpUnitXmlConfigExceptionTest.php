@@ -38,9 +38,6 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config\Exception;
 use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class InvalidPhpUnitXmlConfigExceptionTest extends TestCase
 {
     public function test_for_root_node(): void

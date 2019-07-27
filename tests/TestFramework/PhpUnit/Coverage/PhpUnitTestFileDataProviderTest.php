@@ -40,9 +40,6 @@ use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
 use Infection\TestFramework\PhpUnit\Coverage\PhpUnitTestFileDataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class PhpUnitTestFileDataProviderTest extends TestCase
 {
     /**
