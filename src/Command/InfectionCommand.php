@@ -66,6 +66,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -209,6 +210,8 @@ final class InfectionCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        Assert::notNull($this->container);
+
         if (!$this->container['coverage.checker']->hasDebuggerOrCoverageOption()) {
             $this->consoleOutput->logMissedDebuggerOrCoverageOption();
 
@@ -343,7 +346,7 @@ final class InfectionCommand extends BaseCommand
     {
         $coverageDir = $this->container[sprintf('coverage.dir.%s', $testFrameworkKey)];
         $testFileDataProviderServiceId = sprintf('test.file.data.provider.%s', $testFrameworkKey);
-        $testFileDataProviderService = $this->container !== null && $this->container->offsetExists($testFileDataProviderServiceId)
+        $testFileDataProviderService = $this->container->offsetExists($testFileDataProviderServiceId)
             ? $this->container[$testFileDataProviderServiceId]
             : null;
 
