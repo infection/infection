@@ -38,8 +38,15 @@ namespace Infection\TestFramework\Coverage;
 use Webmozart\Assert\Assert;
 
 /**
- * This class represents the lines a given node may take.
- * For example, an array whose declaration takes multiple lines.
+ * This class represents the line range for a given node. Indeed some statements can count as one line but be
+ * declared over multiple lines, e.g.:
+ *
+ * ```
+ * $x = [
+ *  'a',
+ *  'b',
+ * ];
+ * ```
  *
  * @internal
  */
