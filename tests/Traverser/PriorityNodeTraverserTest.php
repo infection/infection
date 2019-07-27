@@ -40,9 +40,6 @@ use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class PriorityNodeTraverserTest extends TestCase
 {
     public function test_it_sorts_visitors_by_priorites(): void

@@ -43,9 +43,6 @@ use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use Infection\Utils\VersionParser;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class PhpSpecAdapterTest extends TestCase
 {
     public function test_it_has_a_name(): void

@@ -37,9 +37,6 @@ namespace Infection\Tests\Mutator\ConditionalNegotiation;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-/**
- * @internal
- */
 final class IdenticalTest extends AbstractMutatorTestCase
 {
     /**

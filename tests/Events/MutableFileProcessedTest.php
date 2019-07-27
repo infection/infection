@@ -38,9 +38,6 @@ namespace Infection\Tests\Events;
 use Infection\Events\MutableFileProcessed;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class MutableFileProcessedTest extends TestCase
 {
     /**

@@ -37,9 +37,6 @@ namespace Infection\Tests\Mutator\FunctionSignature;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-/**
- * @internal
- */
 final class PublicVisibilityTest extends AbstractMutatorTestCase
 {
     /**

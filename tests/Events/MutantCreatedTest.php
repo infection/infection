@@ -38,9 +38,6 @@ namespace Infection\Tests\Events;
 use Infection\Events\MutantCreated;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class MutantCreatedTest extends TestCase
 {
     /**

@@ -38,9 +38,6 @@ namespace Infection\Tests\Performance\Time;
 use Infection\Performance\Time\TimeFormatter;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class TimeFormatterTest extends TestCase
 {
     /**

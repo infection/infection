@@ -40,9 +40,6 @@ use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\LNumber;
 
-/**
- * @internal
- */
 final class PlusTest extends AbstractMutatorTestCase
 {
     /**

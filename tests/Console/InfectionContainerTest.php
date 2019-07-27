@@ -41,9 +41,6 @@ use stdClass;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 
-/**
- * @internal
- */
 final class InfectionContainerTest extends TestCase
 {
     public function test_it_can_be_instantiated_without_any_services(): void

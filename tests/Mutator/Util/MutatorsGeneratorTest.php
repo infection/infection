@@ -49,9 +49,6 @@ use PhpParser\Node\Scalar\DNumber;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class MutatorsGeneratorTest extends TestCase
 {
     private static $countDefaultMutators = 0;

@@ -37,9 +37,6 @@ namespace Infection\Tests\Mutator\Regex;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-/**
- * @internal
- */
 final class PregQuoteTest extends AbstractMutatorTestCase
 {
     /**

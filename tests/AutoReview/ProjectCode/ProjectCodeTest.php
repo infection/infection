@@ -45,8 +45,6 @@ use function Safe\preg_replace;
 use function Safe\sprintf;
 
 /**
- * @internal
- *
  * @coversNothing
  *
  * This class is responsible for testing that our code base adheres to certain rules,

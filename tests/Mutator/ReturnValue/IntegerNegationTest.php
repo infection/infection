@@ -39,9 +39,6 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Stmt\Return_;
 
-/**
- * @internal
- */
 final class IntegerNegationTest extends AbstractMutatorTestCase
 {
     /**

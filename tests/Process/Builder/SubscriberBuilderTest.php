@@ -50,8 +50,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @internal
- *
  * NOTE:
  * InputInterfaces should be mocked here so that the 'getOption' method with paramater 'no-progress'
  * should return true. Otherwise you will see different results based on wheter its running in CI or not.

@@ -39,9 +39,6 @@ use Generator;
 use Infection\Locator\FileNotFound;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class FileNotFoundTest extends TestCase
 {
     /**

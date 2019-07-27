@@ -38,9 +38,6 @@ namespace Infection\Tests\Mutant\Exception;
 use Infection\Mutant\Exception\ParserException;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class ParserExceptionTest extends TestCase
 {
     public function test_it_has_correct_error_message(): void

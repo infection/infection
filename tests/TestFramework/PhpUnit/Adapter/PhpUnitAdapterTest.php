@@ -45,9 +45,6 @@ use Infection\Utils\VersionParser;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class PhpUnitAdapterTest extends TestCase
 {
     /**

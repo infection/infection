@@ -39,9 +39,6 @@ use Infection\Mutator\Util\MutatorProfile;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
 
-/**
- * @internal
- */
 final class MutatorProfileTest extends TestCase
 {
     public function test_all_mutators_have_the_correct_name_in_the_full_mutator_list(): void

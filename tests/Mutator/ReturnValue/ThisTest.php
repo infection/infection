@@ -37,9 +37,6 @@ namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-/**
- * @internal
- */
 final class ThisTest extends AbstractMutatorTestCase
 {
     /**

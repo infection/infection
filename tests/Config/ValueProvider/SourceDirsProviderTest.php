@@ -40,9 +40,6 @@ use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\ValueProvider\SourceDirsProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @internal
- */
 final class SourceDirsProviderTest extends AbstractBaseProviderTest
 {
     /**

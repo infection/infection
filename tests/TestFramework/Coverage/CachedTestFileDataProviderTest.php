@@ -40,9 +40,6 @@ use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileTimeData;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class CachedTestFileDataProviderTest extends TestCase
 {
     public function test_the_second_call_returns_cached_result(): void

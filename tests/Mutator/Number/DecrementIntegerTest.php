@@ -37,9 +37,6 @@ namespace Infection\Tests\Mutator\Number;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-/**
- * @internal
- */
 final class DecrementIntegerTest extends AbstractMutatorTestCase
 {
     /**

@@ -48,9 +48,6 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
-/**
- * @internal
- */
 final class E2ETest extends TestCase
 {
     private const MAX_FAILING_COMPOSER_INSTALL = 5;

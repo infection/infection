@@ -40,9 +40,6 @@ use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\PhpUnit\Coverage\Exception\NoLinesExecutedException;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class CoverageXmlParserTest extends TestCase
 {
     /**

@@ -38,8 +38,6 @@ namespace Infection\Tests\StreamWrapper;
 use Infection\StreamWrapper\IncludeInterceptor;
 
 /**
- * @internal
- *
  * Tests IncludeInterceptor for correct operation.
  *
  * We mainly interested in methods, essential to interception:

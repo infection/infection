@@ -46,9 +46,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @internal
- */
 final class DebugFileLoggerTest extends TestCase
 {
     public function test_it_logs_correctly_with_no_mutations(): void

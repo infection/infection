@@ -48,9 +48,6 @@ use function strpos;
 use function substr;
 use function trim;
 
-/**
- * @internal
- */
 final class Parser
 {
     /**

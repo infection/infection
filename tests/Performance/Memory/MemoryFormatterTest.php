@@ -38,9 +38,6 @@ namespace Infection\Tests\Performance\Memory;
 use Infection\Performance\Memory\MemoryFormatter;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class MemoryFormatterTest extends TestCase
 {
     /**

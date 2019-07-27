@@ -40,9 +40,6 @@ use Infection\Tests\Fixtures\UserEventSubscriber;
 use Infection\Tests\Fixtures\UserWasCreated;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class EventDispatcherTest extends TestCase
 {
     public function test_event_dispatcher_dispatches_events_correctly(): void

@@ -41,9 +41,6 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @internal
- */
 final class XmlConfigurationHelperTest extends TestCase
 {
     public function test_it_replaces_with_absolute_paths(): void

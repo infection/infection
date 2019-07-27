@@ -46,7 +46,6 @@ use function Safe\sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @internal
  * @group integration
  */
 final class RootsFileOrDirectoryLocatorTest extends TestCase

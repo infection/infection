@@ -38,9 +38,6 @@ namespace Infection\Tests\TestFramework\Coverage;
 use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class TestFileNameNotFoundExceptionTest extends TestCase
 {
     public function test_from_fqn(): void

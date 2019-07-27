@@ -43,9 +43,6 @@ use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @internal
- */
 final class TestFrameworkFinderTest extends TestCase
 {
     /**

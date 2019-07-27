@@ -40,9 +40,6 @@ use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @internal
- */
 final class PathReplacerTest extends TestCase
 {
     /**

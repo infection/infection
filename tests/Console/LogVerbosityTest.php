@@ -42,9 +42,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-/**
- * @internal
- */
 final class LogVerbosityTest extends TestCase
 {
     public function test_it_works_if_verbosity_is_valid(): void

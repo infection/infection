@@ -38,9 +38,6 @@ namespace Infection\Tests\Events;
 use Infection\Events\MutationGeneratingFinished;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class MutationGeneratingFinishedTest extends TestCase
 {
     /**

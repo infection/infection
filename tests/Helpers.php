@@ -38,8 +38,6 @@ namespace Infection\Tests;
 use Generator;
 
 /**
- * @internal
- *
  * Normalizes path. Replaces backslashes with forward ones
  */
 function normalizePath(string $value): string

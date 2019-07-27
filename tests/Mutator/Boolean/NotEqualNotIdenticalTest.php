@@ -37,9 +37,6 @@ namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-/**
- * @internal
- */
 final class NotEqualNotIdenticalTest extends AbstractMutatorTestCase
 {
     /**

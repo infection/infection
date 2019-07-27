@@ -40,9 +40,6 @@ use Infection\Process\Builder\ProcessBuilder;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class ProcessBuilderTest extends TestCase
 {
     public function test_getProcessForInitialTestRun_has_no_timeout(): void

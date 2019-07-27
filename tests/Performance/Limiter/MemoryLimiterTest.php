@@ -43,9 +43,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
-/**
- * @internal
- */
 final class MemoryLimiterTest extends TestCase
 {
     private const TEST_DIR_LOCATION = __DIR__ . '/../../Fixtures/tmp-memory-files';

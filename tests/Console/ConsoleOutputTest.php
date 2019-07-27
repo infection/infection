@@ -43,9 +43,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Process;
 
-/**
- * @internal
- */
 final class ConsoleOutputTest extends TestCase
 {
     public function test_log_verbosity_deprecation_notice(): void

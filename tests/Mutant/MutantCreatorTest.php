@@ -41,9 +41,6 @@ use Infection\MutationInterface;
 use PhpParser\PrettyPrinter\Standard;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class MutantCreatorTest extends TestCase
 {
     private const TEST_FILE_NAME = '/mutant.hash.infection.php';

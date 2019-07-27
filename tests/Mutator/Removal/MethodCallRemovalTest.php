@@ -37,9 +37,6 @@ namespace Infection\Tests\Mutator\Removal;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-/**
- * @internal
- */
 final class MethodCallRemovalTest extends AbstractMutatorTestCase
 {
     /**
