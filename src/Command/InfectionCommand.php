@@ -67,6 +67,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
+use function trim;
 
 /**
  * @internal
@@ -312,7 +313,7 @@ final class InfectionCommand extends BaseCommand
     {
         parent::initialize($input, $output);
 
-        $this->container = $this->getApplication()->getContainer()->withInput($input);
+        $this->initContainer($input);
 
         $locator = $this->container[RootsFileOrDirectoryLocator::class];
 
@@ -325,6 +326,60 @@ final class InfectionCommand extends BaseCommand
         $this->consoleOutput = $this->getApplication()->getConsoleOutput();
         $this->skipCoverage = \strlen(trim($input->getOption('coverage'))) > 0;
         $this->eventDispatcher = $this->container['dispatcher'];
+    }
+
+    private function initContainer(InputInterface $input): void
+    {
+        /** @var string|null $configFile */
+        $configFile = $input->hasOption('configuration')
+            ? trim((string) $input->getOption('configuration'))
+            : null
+        ;
+
+        if ($configFile === '') {
+            $configFile = null;
+        }
+        /** @var string $existingCoveragePath */
+        $existingCoveragePath = $input->hasOption('coverage')
+            ? trim((string) $input->getOption('coverage'))
+            : ''
+        ;
+        /** @var string $initialTestsPhpOptions */
+        $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options') ?: '');
+        /** @var bool $ignoreMsiWithNoMutations */
+        $ignoreMsiWithNoMutations = $input->getOption('ignore-msi-with-no-mutations');
+        $minMsi = (float) $input->getOption('min-msi');
+        $minCoveredMsi = (float) $input->getOption('min-covered-msi');
+        $mutators = $input->hasOption('mutators')
+            ? trim((string) $input->getOption('mutators'))
+            : null
+        ;
+
+        if ($mutators === '') {
+            $mutators = null;
+        }
+
+        $showMutations = (bool) $input->getOption('show-mutations');
+        $logVerbosity = trim((string) $input->getOption('log-verbosity'));
+        $debug = (bool) $input->getOption('debug');
+        $onlyCovered = (bool) $input->getOption('only-covered');
+        $formatter = (string) $input->getOption('formatter');
+        $noProgress = (bool) $input->getOption('no-progress');
+
+        $this->container = $this->getApplication()->getContainer()->withDynamicParameters(
+            $configFile,
+            $showMutations,
+            $logVerbosity,
+            $debug,
+            $onlyCovered,
+            $formatter,
+            $noProgress,
+            $existingCoveragePath,
+            $initialTestsPhpOptions,
+            $ignoreMsiWithNoMutations,
+            $minMsi,
+            $minCoveredMsi
+        );
     }
 
     private function includeUserBootstrap(InfectionConfig $config): void

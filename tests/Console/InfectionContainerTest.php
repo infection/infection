@@ -105,7 +105,7 @@ final class InfectionContainerTest extends TestCase
         // Sanity check
         $this->assertFalse($container->offsetExists('coverage.path'));
 
-        $newContainer = $container->withInput($input);
+        $newContainer = $container->withDynamicParameters($input);
 
         $this->assertFalse($container->offsetExists('coverage.path'));
         $this->assertTrue($newContainer->offsetExists('coverage.path'));

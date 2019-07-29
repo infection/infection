@@ -213,45 +213,22 @@ final class InfectionContainer extends Container
         ]);
     }
 
-    public function withInput(InputInterface $input): self
+    public function withDynamicParameters(
+        ?string $configFile,
+        bool $showMutations,
+        string $logVerbosity,
+        bool $debug,
+        bool $onlyCovered,
+        string $formatter,
+        bool $noProgress,
+        string $existingCoveragePath,
+        string $initialTestsPhpOptions,
+        bool $ignoreMsiWithNoMutations,
+        float $minMsi,
+        float $minCoveredMsi
+    ): self
     {
         $clone = clone $this;
-
-        /** @var string|null $configFile */
-        $configFile = $input->hasOption('configuration')
-            ? trim((string) $input->getOption('configuration'))
-            : null
-        ;
-
-        if ($configFile === '') {
-            $configFile = null;
-        }
-        /** @var string $existingCoveragePath */
-        $existingCoveragePath = $input->hasOption('coverage')
-            ? trim((string) $input->getOption('coverage'))
-            : ''
-        ;
-        /** @var string $initialTestsPhpOptions */
-        $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options') ?: '');
-        /** @var bool $ignoreMsiWithNoMutations */
-        $ignoreMsiWithNoMutations = $input->getOption('ignore-msi-with-no-mutations');
-        $minMsi = (float) $input->getOption('min-msi');
-        $minCoveredMsi = (float) $input->getOption('min-covered-msi');
-        $mutators = $input->hasOption('mutators')
-            ? trim((string) $input->getOption('mutators'))
-            : null
-        ;
-
-        if ($mutators === '') {
-            $mutators = null;
-        }
-
-        $showMutations = (bool) $input->getOption('show-mutations');
-        $logVerbosity = trim((string) $input->getOption('log-verbosity'));
-        $debug = (bool) $input->getOption('debug');
-        $onlyCovered = (bool) $input->getOption('only-covered');
-        $formatter = (string) $input->getOption('formatter');
-        $noProgress = (bool) $input->getOption('no-progress');
 
         $clone['infection.config'] = static function (self $container) use ($configFile): InfectionConfig {
             $facade = new ConfigCreatorFacade(
