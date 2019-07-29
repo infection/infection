@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use Infection\Console\Application;
-use Pimple\Psr11\Container;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -57,20 +56,6 @@ abstract class BaseCommand extends Command
      * @var OutputInterface
      */
     protected $output;
-
-    /**
-     * @var Container
-     */
-    private $container;
-
-    public function getContainer(): Container
-    {
-        if ($this->container === null) {
-            $this->container = new Container($this->getApplication()->getContainer());
-        }
-
-        return $this->container;
-    }
 
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {

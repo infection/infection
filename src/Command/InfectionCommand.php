@@ -39,6 +39,7 @@ use Infection\Config\InfectionConfig;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Exception\InfectionException;
+use Infection\Console\InfectionContainer;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\ApplicationExecutionFinished;
@@ -85,6 +86,11 @@ final class InfectionCommand extends BaseCommand
      * @var bool
      */
     private $skipCoverage;
+
+    /**
+     * @var InfectionContainer
+     */
+    private $container;
 
     protected function configure(): void
     {
@@ -203,26 +209,24 @@ final class InfectionCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container = $this->getContainer();
-
-        if (!$container->get('coverage.checker')->hasDebuggerOrCoverageOption()) {
+        if (!$this->container['coverage.checker']->hasDebuggerOrCoverageOption()) {
             $this->consoleOutput->logMissedDebuggerOrCoverageOption();
 
             return 1;
         }
 
         /** @var InfectionConfig $config */
-        $config = $container->get('infection.config');
+        $config = $this->container['infection.config'];
 
         $this->includeUserBootstrap($config);
 
         $testFrameworkKey = trim((string) $input->getOption('test-framework') ?: $config->getTestFramework());
-        $adapter = $container->get('test.framework.factory')->create($testFrameworkKey, $this->skipCoverage);
+        $adapter = $this->container['test.framework.factory']->create($testFrameworkKey, $this->skipCoverage);
 
         LogVerbosity::convertVerbosityLevel($input, $this->consoleOutput);
 
-        $metricsCalculator = $container->get('metrics');
-        $container->get('subscriber.builder')->registerSubscribers($adapter, $output);
+        $metricsCalculator = $this->container['metrics'];
+        $this->container['subscriber.builder']->registerSubscribers($adapter, $output);
 
         $this->eventDispatcher->dispatch(new ApplicationExecutionStarted());
 
@@ -245,16 +249,16 @@ final class InfectionCommand extends BaseCommand
 
         $this->assertCodeCoverageExists($initialTestSuitProcess, $testFrameworkKey);
 
-        $container->get('memory.limit.applier')->applyMemoryLimitFromProcess($initialTestSuitProcess, $adapter);
+        $this->container['memory.limit.applier']->applyMemoryLimitFromProcess($initialTestSuitProcess, $adapter);
 
         $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
         $mutationsGenerator = new MutationsGenerator(
             $config->getSourceDirs(),
             $config->getSourceExcludePaths(),
             $codeCoverageData,
-            $container->get('mutators'),
+            $this->container['mutators'],
             $this->eventDispatcher,
-            $container->get('parser')
+            $this->container['parser']
         );
 
         $mutations = $mutationsGenerator->generate(
@@ -265,8 +269,8 @@ final class InfectionCommand extends BaseCommand
 
         $mutationTestingRunner = new MutationTestingRunner(
             $processBuilder,
-            $container->get('parallel.process.runner'),
-            $container->get('mutant.creator'),
+            $this->container['parallel.process.runner'],
+            $this->container['mutant.creator'],
             $this->eventDispatcher,
             $mutations
         );
@@ -276,7 +280,7 @@ final class InfectionCommand extends BaseCommand
             $testFrameworkOptions->getForMutantProcess()
         );
         /** @var TestRunConstraintChecker $constraintChecker */
-        $constraintChecker = $container->get('test.run.constraint.checker');
+        $constraintChecker = $this->container['test.run.constraint.checker'];
 
         $statusCode = 0;
 
@@ -305,7 +309,9 @@ final class InfectionCommand extends BaseCommand
     {
         parent::initialize($input, $output);
 
-        $locator = $this->getContainer()->get(RootsFileOrDirectoryLocator::class);
+        $this->container = $this->getApplication()->getContainer();
+
+        $locator = $this->container[RootsFileOrDirectoryLocator::class];
 
         if ($customConfigPath = $input->getOption('configuration')) {
             $locator->locate($customConfigPath);
@@ -315,7 +321,7 @@ final class InfectionCommand extends BaseCommand
 
         $this->consoleOutput = $this->getApplication()->getConsoleOutput();
         $this->skipCoverage = \strlen(trim($input->getOption('coverage'))) > 0;
-        $this->eventDispatcher = $this->getContainer()->get('dispatcher');
+        $this->eventDispatcher = $this->container['dispatcher'];
     }
 
     private function includeUserBootstrap(InfectionConfig $config): void
@@ -335,10 +341,10 @@ final class InfectionCommand extends BaseCommand
 
     private function getCodeCoverageData(string $testFrameworkKey): LineCodeCoverage
     {
-        $coverageDir = $this->getContainer()->get(sprintf('coverage.dir.%s', $testFrameworkKey));
+        $coverageDir = $this->container[sprintf('coverage.dir.%s', $testFrameworkKey)];
         $testFileDataProviderServiceId = sprintf('test.file.data.provider.%s', $testFrameworkKey);
-        $testFileDataProviderService = $this->getContainer()->has($testFileDataProviderServiceId)
-            ? $this->getContainer()->get($testFileDataProviderServiceId)
+        $testFileDataProviderService = $this->container->offsetExists($testFileDataProviderServiceId)
+            ? $this->container[$testFileDataProviderServiceId]
             : null;
 
         return new XMLLineCodeCoverage($coverageDir, new CoverageXmlParser($coverageDir), $testFrameworkKey, $testFileDataProviderService);
@@ -347,7 +353,7 @@ final class InfectionCommand extends BaseCommand
     private function getTestFrameworkExtraOptions(string $testFrameworkKey): TestFrameworkExtraOptions
     {
         $extraOptions = $this->input->getOption('test-framework-options')
-            ?? $this->getContainer()->get('infection.config')->getTestFrameworkOptions();
+            ?? $this->container['infection.config']->getTestFrameworkOptions();
 
         return TestFrameworkTypes::PHPUNIT === $testFrameworkKey
             ? new PhpUnitExtraOptions($extraOptions)
@@ -377,7 +383,7 @@ final class InfectionCommand extends BaseCommand
 
     private function assertCodeCoverageExists(Process $initialTestsProcess, string $testFrameworkKey): void
     {
-        $coverageDir = $this->getContainer()->get(sprintf('coverage.dir.%s', $testFrameworkKey));
+        $coverageDir = $this->container[sprintf('coverage.dir.%s', $testFrameworkKey)];
 
         $coverageIndexFilePath = $coverageDir . '/' . XMLLineCodeCoverage::COVERAGE_INDEX_FILE_NAME;
 

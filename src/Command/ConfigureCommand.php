@@ -116,7 +116,7 @@ final class ConfigureCommand extends BaseCommand
         $excludeDirsProvider = new ExcludeDirsProvider(
             $consoleHelper,
             $questionHelper,
-            $this->getContainer()->get('filesystem')
+            $this->getApplication()->getContainer()['filesystem']
         );
 
         $excludedDirs = $excludeDirsProvider->get($input, $output, $dirsInCurrentDir, $sourceDirs);
