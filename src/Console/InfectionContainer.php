@@ -72,7 +72,6 @@ use PhpParser\PrettyPrinter\Standard;
 use Pimple\Container;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -226,8 +225,7 @@ final class InfectionContainer extends Container
         bool $ignoreMsiWithNoMutations,
         float $minMsi,
         float $minCoveredMsi
-    ): self
-    {
+    ): self {
         $clone = clone $this;
 
         $clone['infection.config'] = static function (self $container) use ($configFile): InfectionConfig {
