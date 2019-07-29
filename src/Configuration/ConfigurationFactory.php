@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
+use function array_filter;
 use function array_map;
 use function array_unique;
 use function array_values;
+use function trim;
 use const INF;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\BCMathSettings;
@@ -36,42 +38,51 @@ class ConfigurationFactory
     {
         return new Configuration(
             $rawConfig->timeout ?? null,
-            new Source(
-                $rawConfig->source->directories,
-                $rawConfig->source->excludes ?? []
-            ),
+            self::createSource($rawConfig->source),
             self::createLogs($rawConfig->logs ?? new stdClass()),
-            $rawConfig->tmpDir ?? null,
+            self::normalizeString( $rawConfig->tmpDir ?? null),
             self::createPhpUnit($rawConfig->phpUnit ?? new stdClass()),
             self::createMutators($rawConfig->mutators ?? new stdClass()),
             $rawConfig->testFramework ?? null,
-            $rawConfig->bootstrap ?? null,
-            $rawConfig->initialTestsPhpOptions ?? null,
-            $rawConfig->testFrameworkOptions ?? null
+            self::normalizeString($rawConfig->bootstrap ?? null),
+            self::normalizeString($rawConfig->initialTestsPhpOptions ?? null),
+            self::normalizeString($rawConfig->testFrameworkOptions ?? null)
+        );
+    }
+
+    private static function createSource(stdClass $source): Source
+    {
+        return new Source(
+            self::normalizeStringArray($source->directories),
+            self::normalizeStringArray($source->excludes ?? [])
         );
     }
 
     private static function createLogs(stdClass $logs): Logs
     {
         return new Logs(
-            $logs->text ?? null,
-            $logs->summary ?? null,
-            $logs->debug ?? null,
-            $logs->perMutator ?? null,
+            self::normalizeString($logs->text ?? null),
+            self::normalizeString($logs->summary ?? null),
+            self::normalizeString($logs->debug ?? null),
+            self::normalizeString($logs->perMutator ?? null),
             self::createBadge($logs->badge ?? null)
         );
     }
 
     private static function createBadge(?stdClass $badge): ?Badge
     {
-        return null === $badge ? null : new Badge($badge->branch);
+        $branch = self::normalizeString($badge->branch ?? null);
+        return $branch === null
+            ? null
+            : new Badge($branch)
+        ;
     }
 
     private static function createPhpUnit(stdClass $phpUnit): PhpUnit
     {
         return new PhpUnit(
-            $phpUnit->configDir ?? null,
-            $phpUnit->customPath ?? null
+            self::normalizeString($phpUnit->configDir ?? null),
+            self::normalizeString($phpUnit->customPath ?? null)
         );
     }
 
@@ -310,5 +321,38 @@ class ConfigurationFactory
         }
 
         return new MBString($enabled, $ignore, $settings);
+    }
+
+    /**
+     * @param string[]|null $values
+     *
+     * @return string[]|null
+     */
+    private static function normalizeStringArray(
+        ?array $values,
+        ?array $default = []
+    ): array
+    {
+        if (null === $values) {
+            return $default;
+        }
+
+        $normalizedValue = array_filter(array_map('trim', $values));
+
+        return $normalizedValue === [] ? $default : array_values($normalizedValue);
+    }
+
+    private static function normalizeString(
+        ?string $value,
+        ?string $default = null
+    ): ?string
+    {
+        if (null === $value) {
+            return $default;
+        }
+
+        $normalizedValue = trim($value);
+
+        return $normalizedValue === '' ? $default : $normalizedValue;
     }
 }

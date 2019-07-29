@@ -40,6 +40,7 @@ final class Configuration
         ?string $initialTestsPhpOptions,
         ?string $testFrameworkOptions
     ) {
+        Assert::nullOrGreaterThanEq($timeout, 1);
         Assert::nullOrOneOf($testFramework, self::TEST_FRAMEWORKS);
 
         $this->timeout = $timeout;

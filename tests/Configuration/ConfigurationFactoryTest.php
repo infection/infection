@@ -52,7 +52,7 @@ class ConfigurationFactoryTest extends TestCase
     public function provideRawConfig(): Generator
     {
         // The schema is given as a JSON here to be closer to how the user configure the schema
-        yield 'empty' => [
+        yield 'minimal' => [
             <<<'JSON'
 {
     "source": {
@@ -66,7 +66,72 @@ JSON
             ]),
         ];
 
-        yield 'with timeout' => [
+        yield '[source] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src", "lib"]
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(
+                    ['src', 'lib'],
+                    []
+                ),
+            ]),
+        ];
+
+        yield '[source] excludes nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"],
+        "excludes": ["fixtures", "tests"]
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(
+                    ['src'],
+                    ['fixtures', 'tests']
+                ),
+            ]),
+        ];
+
+        yield '[source] empty strings' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": [""],
+        "excludes": [""]
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source([], []),
+            ]),
+        ];
+
+        yield '[source] empty & untrimmed strings' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": [" src ", ""],
+        "excludes": [" fixtures ", ""]
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], ['fixtures']),
+            ]),
+        ];
+
+        yield '[timeout] nominal' => [
             <<<'JSON'
 {
     "timeout": 100,
@@ -82,7 +147,7 @@ JSON
             ]),
         ];
 
-        yield 'logs - text' => [
+        yield '[logs][text] nominal' => [
             <<<'JSON'
 {
     "source": {
@@ -106,7 +171,7 @@ JSON
             ]),
         ];
 
-        yield 'logs - summary' => [
+        yield '[logs][summary] nominal' => [
             <<<'JSON'
 {
     "source": {
@@ -130,7 +195,7 @@ JSON
             ]),
         ];
 
-        yield 'logs - debug' => [
+        yield '[logs][debug] nominal' => [
             <<<'JSON'
 {
     "source": {
@@ -154,7 +219,7 @@ JSON
             ]),
         ];
 
-        yield 'logs - perMutator' => [
+        yield '[logs][perMutator] nominal' => [
             <<<'JSON'
 {
     "source": {
@@ -178,7 +243,7 @@ JSON
             ]),
         ];
 
-        yield 'logs - badge' => [
+        yield '[logs][badge] nominal' => [
             <<<'JSON'
 {
     "source": {
@@ -204,7 +269,7 @@ JSON
             ]),
         ];
 
-        yield 'logs - all' => [
+        yield '[logs] nominal' => [
             <<<'JSON'
 {
     "source": {
@@ -234,7 +299,67 @@ JSON
             ]),
         ];
 
-        yield 'tmp dir' => [
+        yield '[logs] empty strings' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "text": "",
+        "summary": "",
+        "debug": "",
+        "perMutator": "",
+        "badge": {
+            "branch": ""
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                )
+            ]),
+        ];
+
+        yield '[logs] empty & untrimmed strings' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "text": " text.log ",
+        "summary": " summary.log ",
+        "debug": " debug.log ",
+        "perMutator": " perMutator.log ",
+        "badge": {
+            "branch": " master "
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'logs' => new Logs(
+                    'text.log',
+                    'summary.log',
+                    'debug.log',
+                    'perMutator.log',
+                    new Badge('master')
+                )
+            ]),
+        ];
+
+        yield '[tmpDir] nominal' => [
             <<<'JSON'
 {
     "source": {
@@ -247,6 +372,288 @@ JSON
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'tmpDir' => 'custom-tmp',
+            ]),
+        ];
+
+        yield '[tmpDir] empty string' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "tmpDir": ""
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'tmpDir' => null,
+            ]),
+        ];
+
+        yield '[tmpDir] untrimmed string' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "tmpDir": " custom-tmp "
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'tmpDir' => 'custom-tmp',
+            ]),
+        ];
+
+        yield '[phpUnit] no property' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "phpUnit": {}
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'phpunit' => new PhpUnit(null, null),
+            ]),
+        ];
+
+        yield '[phpUnit][configDir] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "phpUnit": {
+        "configDir": "phpunit.xml"
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'phpunit' => new PhpUnit('phpunit.xml', null),
+            ]),
+        ];
+
+        yield '[phpUnit][customPath] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "phpUnit": {
+        "customPath": "bin/phpunit"
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'phpunit' => new PhpUnit(null, 'bin/phpunit'),
+            ]),
+        ];
+
+        yield '[phpUnit] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "phpUnit": {
+        "configDir": "phpunit.xml",
+        "customPath": "bin/phpunit"
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'phpunit' => new PhpUnit('phpunit.xml', 'bin/phpunit'),
+            ]),
+        ];
+
+        yield '[phpUnit] empty & untrimmed strings' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "phpUnit": {
+        "configDir": "",
+        "customPath": " bin/phpunit "
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'phpunit' => new PhpUnit(null, 'bin/phpunit'),
+            ]),
+        ];
+
+        yield '[testFramework] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "testFramework": "phpunit"
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'testFramework' => 'phpunit',
+            ]),
+        ];
+
+        yield '[bootstrap] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "bootstrap": "src/bootstrap.php"
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'bootstrap' => 'src/bootstrap.php',
+            ]),
+        ];
+
+        yield '[bootstrap] empty string' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "bootstrap": ""
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'bootstrap' => null,
+            ]),
+        ];
+
+        yield '[bootstrap] untrimmed string' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "bootstrap": " src/bootstrap.php "
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'bootstrap' => 'src/bootstrap.php',
+            ]),
+        ];
+
+        yield '[initialTestsPhpOptions] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "initialTestsPhpOptions": "-d zend_extension=xdebug.so"
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'initialTestsPhpOptions' => '-d zend_extension=xdebug.so',
+            ]),
+        ];
+
+        yield '[initialTestsPhpOptions] empty string' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "initialTestsPhpOptions": ""
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'initialTestsPhpOptions' => null,
+            ]),
+        ];
+
+        yield '[initialTestsPhpOptions] untrimmed string' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "initialTestsPhpOptions": " -d zend_extension=xdebug.so "
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'initialTestsPhpOptions' => '-d zend_extension=xdebug.so',
+            ]),
+        ];
+
+        yield '[testFrameworkOptions] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "testFrameworkOptions": "--debug"
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'testFrameworkOptions' => '--debug',
+            ]),
+        ];
+
+        yield '[testFrameworkOptions] empty string' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "testFrameworkOptions": ""
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'testFrameworkOptions' => null,
+            ]),
+        ];
+
+        yield '[testFrameworkOptions] untrimmed string' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "testFrameworkOptions": "--debug"
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'testFrameworkOptions' => '--debug',
             ]),
         ];
     }
