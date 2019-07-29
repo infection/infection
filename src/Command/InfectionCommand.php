@@ -339,17 +339,8 @@ final class InfectionCommand extends BaseCommand
         if ($configFile === '') {
             $configFile = null;
         }
-        /** @var string $existingCoveragePath */
-        $existingCoveragePath = $input->hasOption('coverage')
-            ? trim((string) $input->getOption('coverage'))
-            : ''
-        ;
-        /** @var string $initialTestsPhpOptions */
-        $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options') ?: '');
-        /** @var bool $ignoreMsiWithNoMutations */
-        $ignoreMsiWithNoMutations = $input->getOption('ignore-msi-with-no-mutations');
-        $minMsi = (float) $input->getOption('min-msi');
-        $minCoveredMsi = (float) $input->getOption('min-covered-msi');
+
+        /** @var string|null $mutators */
         $mutators = $input->hasOption('mutators')
             ? trim((string) $input->getOption('mutators'))
             : null
@@ -359,27 +350,22 @@ final class InfectionCommand extends BaseCommand
             $mutators = null;
         }
 
-        $showMutations = (bool) $input->getOption('show-mutations');
-        $logVerbosity = trim((string) $input->getOption('log-verbosity'));
-        $debug = (bool) $input->getOption('debug');
-        $onlyCovered = (bool) $input->getOption('only-covered');
-        $formatter = (string) $input->getOption('formatter');
-        $noProgress = (bool) $input->getOption('no-progress');
-
         $this->container = $this->getApplication()->getContainer()->withDynamicParameters(
             $configFile,
             $mutators,
-            $showMutations,
-            $logVerbosity,
-            $debug,
-            $onlyCovered,
-            $formatter,
-            $noProgress,
-            $existingCoveragePath,
-            $initialTestsPhpOptions,
-            $ignoreMsiWithNoMutations,
-            $minMsi,
-            $minCoveredMsi
+            (bool) $input->getOption('show-mutations'),
+            trim((string) $input->getOption('log-verbosity')),
+            (bool) $input->getOption('debug'),
+            (bool) $input->getOption('only-covered'),
+            (string) $input->getOption('formatter'),
+            (bool) $input->getOption('no-progress'),
+            $input->hasOption('coverage')
+                ? trim((string) $input->getOption('coverage'))
+                : '',
+            trim((string) $input->getOption('initial-tests-php-options') ?: ''),
+            (bool) $input->getOption('ignore-msi-with-no-mutations'),
+            (float) $input->getOption('min-msi'),
+            (float) $input->getOption('min-covered-msi')
         );
     }
 
