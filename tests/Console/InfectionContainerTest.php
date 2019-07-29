@@ -38,7 +38,6 @@ namespace Infection\Tests\Console;
 use Infection\Console\InfectionContainer;
 use PHPUnit\Framework\TestCase;
 use stdClass;
-use Symfony\Component\Console\Input\InputInterface;
 
 final class InfectionContainerTest extends TestCase
 {
@@ -84,28 +83,26 @@ final class InfectionContainerTest extends TestCase
 
     public function test_it_can_build_dynamic_services(): void
     {
-        $input = $this->createMock(InputInterface::class);
-        $input
-            ->expects($this->exactly(3))
-            ->method('hasOption')
-            ->willReturnMap([
-                'configuration' => false,
-                'coverage' => false,
-                'mutators' => false,
-            ])
-        ;
-        $input
-            ->expects($this->exactly(10))
-            ->method('getOption')
-            ->willReturnMap([])
-        ;
-
         $container = new InfectionContainer();
 
         // Sanity check
         $this->assertFalse($container->offsetExists('coverage.path'));
 
-        $newContainer = $container->withDynamicParameters($input);
+        $newContainer = $container->withDynamicParameters(
+            null,
+            null,
+            false,
+            '',
+            false,
+            false,
+            '',
+            false,
+            '',
+            '',
+            false,
+            .0,
+            .0
+        );
 
         $this->assertFalse($container->offsetExists('coverage.path'));
         $this->assertTrue($newContainer->offsetExists('coverage.path'));
