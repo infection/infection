@@ -368,6 +368,7 @@ final class InfectionCommand extends BaseCommand
 
         $this->container = $this->getApplication()->getContainer()->withDynamicParameters(
             $configFile,
+            $mutators,
             $showMutations,
             $logVerbosity,
             $debug,

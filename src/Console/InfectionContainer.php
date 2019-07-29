@@ -214,6 +214,7 @@ final class InfectionContainer extends Container
 
     public function withDynamicParameters(
         ?string $configFile,
+        ?string $mutators,
         bool $showMutations,
         string $logVerbosity,
         bool $debug,
