@@ -11,7 +11,10 @@ use JsonSchema\Validator;
 use const PHP_EOL;
 use stdClass;
 
-final class SchemaValidator
+/**
+ * @final
+ */
+class SchemaValidator
 {
     private const SCHEMA_FILE = __DIR__ . '/../../../resources/schema.json';
 
@@ -29,7 +32,7 @@ final class SchemaValidator
             $schemaFile = 'file://' . $schemaFile;
         }
 
-        $contents = $rawConfig->getContents();
+        $contents = $rawConfig->getDecodedContents();
 
         $validator->validate($contents, (object) ['$ref' => $schemaFile]);
 

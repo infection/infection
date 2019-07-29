@@ -27,26 +27,27 @@ use const PHP_INT_MAX;
 use stdClass;
 use function strpos;
 
-final class ConfigurationFactory
+/**
+ * @final
+ */
+class ConfigurationFactory
 {
-    public function create(RawConfiguration $rawConfig): Configuration
+    public function create(stdClass $rawConfig): Configuration
     {
-        $contents = $rawConfig->getContents();
-
         return new Configuration(
-            $contents->timeout ?? 10,
+            $rawConfig->timeout ?? null,
             new Source(
-                $contents->directories,
-                $contents->excludes ?? []
+                $rawConfig->source->directories,
+                $rawConfig->source->excludes ?? []
             ),
-            self::createLogs($contents->logs),
-            $contents->tmpDir ?? null,
-            self::createPhpUnit($contents->phpUnit ?? null),
-            self::createMutators($contents),
-            $contents->testFramework ?? null,
-            $contents->bootstrap ?? null,
-            $contents->initialTestsPhpOptions ?? null,
-            $contents->testFrameworkOptions ?? null
+            self::createLogs($rawConfig->logs ?? new stdClass()),
+            $rawConfig->tmpDir ?? null,
+            self::createPhpUnit($rawConfig->phpUnit ?? new stdClass()),
+            self::createMutators($rawConfig->mutators ?? new stdClass()),
+            $rawConfig->testFramework ?? null,
+            $rawConfig->bootstrap ?? null,
+            $rawConfig->initialTestsPhpOptions ?? null,
+            $rawConfig->testFrameworkOptions ?? null
         );
     }
 
@@ -66,11 +67,9 @@ final class ConfigurationFactory
         return null === $badge ? null : new Badge($badge->branch);
     }
 
-    private static function createPhpUnit(?stdClass $phpUnit): PhpUnit
+    private static function createPhpUnit(stdClass $phpUnit): PhpUnit
     {
-        return null === $phpUnit
-            ? null
-            : new PhpUnit(
+        return new PhpUnit(
             $phpUnit->configDir ?? null,
             $phpUnit->customPath ?? null
         );

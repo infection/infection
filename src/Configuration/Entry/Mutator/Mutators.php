@@ -37,10 +37,10 @@ final class Mutators
      */
     public function __construct(
         array $profiles,
-        MutatorConfiguration $trueValue,
-        MutatorConfiguration $arrayItemRemoval,
-        MutatorConfiguration $bcMath,
-        MutatorConfiguration $mbString
+        ?MutatorConfiguration $trueValue,
+        ?MutatorConfiguration $arrayItemRemoval,
+        ?MutatorConfiguration $bcMath,
+        ?MutatorConfiguration $mbString
     ) {
         Assert::allOneOf(array_keys($profiles), self::PROFILES);
         Assert::allBoolean($profiles);
@@ -60,22 +60,22 @@ final class Mutators
         return $this->profiles;
     }
 
-    public function getTrueValue(): MutatorConfiguration
+    public function getTrueValue(): ?MutatorConfiguration
     {
         return $this->trueValue;
     }
 
-    public function getArrayItemRemoval(): MutatorConfiguration
+    public function getArrayItemRemoval(): ?MutatorConfiguration
     {
         return $this->arrayItemRemoval;
     }
 
-    public function getBcMath(): MutatorConfiguration
+    public function getBcMath(): ?MutatorConfiguration
     {
         return $this->bcMath;
     }
 
-    public function getMbString(): MutatorConfiguration
+    public function getMbString(): ?MutatorConfiguration
     {
         return $this->mbString;
     }

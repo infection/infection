@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
-use Infection\Finder\LocatorInterface;
+use Infection\Locator\Locator;
 
 final class ConfigurationLoader
 {
     private $locator;
     private $fileLoader;
 
-    public function __construct(LocatorInterface $locator, ConfigurationFileLoader $fileLoader)
+    public function __construct(Locator $locator, ConfigurationFileLoader $fileLoader)
     {
         $this->locator = $locator;
         $this->fileLoader = $fileLoader;

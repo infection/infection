@@ -17,7 +17,7 @@ final class Logs
         ?string $summaryLogFilePath,
         ?string $debugLogFilePath,
         ?string $perMutatorFilePath,
-        Badge $badge
+        ?Badge $badge
     ) {
         $this->textLogFilePath = $textLogFilePath;
         $this->summaryLogFilePath = $summaryLogFilePath;
@@ -46,7 +46,7 @@ final class Logs
         return $this->perMutatorFilePath;
     }
 
-    public function getBadge(): Badge
+    public function getBadge(): ?Badge
     {
         return $this->badge;
     }

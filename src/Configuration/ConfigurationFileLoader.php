@@ -7,7 +7,10 @@ namespace Infection\Configuration;
 use Infection\Configuration\RawConfiguration\RawConfiguration;
 use Infection\Configuration\Schema\SchemaValidator;
 
-final class ConfigurationFileLoader
+/**
+ * @final
+ */
+class ConfigurationFileLoader
 {
     private $schemaValidator;
     private $factory;

@@ -35,7 +35,7 @@ final class RawConfiguration
     /**
      * @throws InvalidFile
      */
-    public function getContents(): stdClass
+    public function getDecodedContents(): stdClass
     {
         $this->initDecodedContents();
 
@@ -47,6 +47,10 @@ final class RawConfiguration
      */
     private function initDecodedContents(): void
     {
+        if (null !== $this->decodedContents) {
+            return;
+        }
+
         if (!is_file($this->path)) {
             throw InvalidFile::createForFileNotFound($this);
         }

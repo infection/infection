@@ -29,7 +29,7 @@ final class Configuration
     private $testFrameworkOptions;
 
     public function __construct(
-        int $timeout,
+        ?int $timeout,
         Source $source,
         Logs $logs,
         ?string $tmpDir,
@@ -71,7 +71,7 @@ final class Configuration
         return $self;
     }
 
-    public function getTimeout(): int
+    public function getTimeout(): ?int
     {
         return $this->timeout;
     }
