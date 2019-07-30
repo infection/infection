@@ -168,18 +168,15 @@ class ConfigurationFactory
 
             $ignore = [];
 
-            $settings = $value
-                ? new ArrayItemRemovalSettings('all', INF)
-                : new ArrayItemRemovalSettings('all', 1)
-            ;
+            $settings = new ArrayItemRemovalSettings('all', null);
         } else {
             $enabled = true;
 
-            $ignore = array_values(array_unique(array_map('trim', $value->ignore)));
+            $ignore = self::normalizeStringArray($value->ignore ?? []);
 
             $settings = new ArrayItemRemovalSettings(
                 $value->settings->remove ?? 'all',
-                $value->settings->limit ?? INF
+                $value->settings->limit ?? null
             );
         }
 

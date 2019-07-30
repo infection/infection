@@ -17,10 +17,10 @@ final class ArrayItemRemovalSettings
     private $remove;
     private $limit;
 
-    public function __construct(string $remove, int $limit)
+    public function __construct(string $remove, ?int $limit)
     {
         Assert::oneOf($remove, self::REMOVE_VALUES);
-        Assert::greaterThanEq($limit, 1);
+        Assert::nullOrGreaterThanEq($limit, 1);
 
         $this->remove = $remove;
         $this->limit = $limit;
@@ -31,7 +31,7 @@ final class ArrayItemRemovalSettings
         return $this->remove;
     }
 
-    public function getLimit(): int
+    public function getLimit(): ?int
     {
         return $this->limit;
     }

@@ -9,6 +9,8 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\Mutator\ArrayItemRemoval;
+use Infection\Configuration\Entry\Mutator\ArrayItemRemovalSettings;
 use Infection\Configuration\Entry\Mutator\Mutators;
 use Infection\Configuration\Entry\Mutator\TrueValue;
 use Infection\Configuration\Entry\Mutator\TrueValueSettings;
@@ -895,6 +897,248 @@ JSON
 
                     ),
                     null,
+                    null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[mutators][ArrayItemRemoval] true' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "ArrayItemRemoval": true
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    null,
+                    new ArrayItemRemoval(
+                        true,
+                        [],
+                        new ArrayItemRemovalSettings(
+                            'all',
+                            null
+                        )
+
+                    ),
+                    null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[mutators][ArrayItemRemoval] false' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "ArrayItemRemoval": false
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    null,
+                    new ArrayItemRemoval(
+                        false,
+                        [],
+                        new ArrayItemRemovalSettings(
+                            'all',
+                            null
+                        )
+
+                    ),
+                    null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[mutators][ArrayItemRemoval] ignore' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "ArrayItemRemoval": {
+            "ignore": ["fileA", "fileB"]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    null,
+                    new ArrayItemRemoval(
+                        true,
+                        ['fileA', 'fileB'],
+                        new ArrayItemRemovalSettings(
+                            'all',
+                            null
+                        )
+
+                    ),
+                    null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[mutators][ArrayItemRemoval] empty & untrimmed ignore' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "ArrayItemRemoval": {
+            "ignore": [" file ", ""]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    null,
+                    new ArrayItemRemoval(
+                        true,
+                        ['file'],
+                        new ArrayItemRemovalSettings(
+                            'all',
+                            null
+                        )
+
+                    ),
+                    null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[mutators][ArrayItemRemoval] remove' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "ArrayItemRemoval": {
+            "settings": {
+                "remove": "first"
+            }
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    null,
+                    new ArrayItemRemoval(
+                        true,
+                        [],
+                        new ArrayItemRemovalSettings(
+                            'first',
+                            null
+                        )
+
+                    ),
+                    null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[mutators][ArrayItemRemoval] limit' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "ArrayItemRemoval": {
+            "settings": {
+                "limit": 10
+            }
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    null,
+                    new ArrayItemRemoval(
+                        true,
+                        [],
+                        new ArrayItemRemovalSettings(
+                            'all',
+                            10
+                        )
+
+                    ),
+                    null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[mutators][ArrayItemRemoval] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "ArrayItemRemoval": {
+            "ignore": ["file"],
+            "settings": {
+                "remove": "first",
+                "limit": 10
+            }
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    null,
+                    new ArrayItemRemoval(
+                        true,
+                        ['file'],
+                        new ArrayItemRemovalSettings(
+                            'first',
+                            10
+                        )
+
+                    ),
                     null,
                     null
                 ),
