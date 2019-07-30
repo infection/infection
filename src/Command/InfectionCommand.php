@@ -66,6 +66,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
+use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -209,6 +211,8 @@ final class InfectionCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        Assert::notNull($this->container);
+
         if (!$this->container['coverage.checker']->hasDebuggerOrCoverageOption()) {
             $this->consoleOutput->logMissedDebuggerOrCoverageOption();
 
@@ -309,7 +313,7 @@ final class InfectionCommand extends BaseCommand
     {
         parent::initialize($input, $output);
 
-        $this->container = $this->getApplication()->getContainer();
+        $this->initContainer($input);
 
         $locator = $this->container[RootsFileOrDirectoryLocator::class];
 
@@ -322,6 +326,47 @@ final class InfectionCommand extends BaseCommand
         $this->consoleOutput = $this->getApplication()->getConsoleOutput();
         $this->skipCoverage = \strlen(trim($input->getOption('coverage'))) > 0;
         $this->eventDispatcher = $this->container['dispatcher'];
+    }
+
+    private function initContainer(InputInterface $input): void
+    {
+        /** @var string|null $configFile */
+        $configFile = $input->hasOption('configuration')
+            ? trim((string) $input->getOption('configuration'))
+            : null
+        ;
+
+        if ($configFile === '') {
+            $configFile = null;
+        }
+
+        /** @var string|null $mutators */
+        $mutators = $input->hasOption('mutators')
+            ? trim((string) $input->getOption('mutators'))
+            : null
+        ;
+
+        if ($mutators === '') {
+            $mutators = null;
+        }
+
+        $this->container = $this->getApplication()->getContainer()->withDynamicParameters(
+            $configFile,
+            $mutators,
+            (bool) $input->getOption('show-mutations'),
+            trim((string) $input->getOption('log-verbosity')),
+            (bool) $input->getOption('debug'),
+            (bool) $input->getOption('only-covered'),
+            (string) $input->getOption('formatter'),
+            (bool) $input->getOption('no-progress'),
+            $input->hasOption('coverage')
+                ? trim((string) $input->getOption('coverage'))
+                : '',
+            trim((string) $input->getOption('initial-tests-php-options') ?: ''),
+            (bool) $input->getOption('ignore-msi-with-no-mutations'),
+            (float) $input->getOption('min-msi'),
+            (float) $input->getOption('min-covered-msi')
+        );
     }
 
     private function includeUserBootstrap(InfectionConfig $config): void
