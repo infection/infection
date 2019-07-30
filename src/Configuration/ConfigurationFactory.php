@@ -4,18 +4,12 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
-use function array_filter;
-use function array_map;
-use function array_unique;
-use function array_values;
-use function trim;
-use const INF;
 use Infection\Configuration\Entry\Badge;
-use Infection\Configuration\Entry\BCMathSettings;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mutator\ArrayItemRemoval;
 use Infection\Configuration\Entry\Mutator\ArrayItemRemovalSettings;
 use Infection\Configuration\Entry\Mutator\BCMath;
+use Infection\Configuration\Entry\Mutator\BCMathSettings;
 use Infection\Configuration\Entry\Mutator\MBString;
 use Infection\Configuration\Entry\Mutator\MBStringSettings;
 use Infection\Configuration\Entry\Mutator\Mutators;
@@ -23,11 +17,14 @@ use Infection\Configuration\Entry\Mutator\TrueValue;
 use Infection\Configuration\Entry\Mutator\TrueValueSettings;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
-use Infection\Configuration\RawConfiguration\RawConfiguration;
-use function is_bool;
-use const PHP_INT_MAX;
 use stdClass;
+use function array_filter;
+use function array_map;
+use function array_unique;
+use function array_values;
+use function is_bool;
 use function strpos;
+use function trim;
 
 /**
  * @final
@@ -220,7 +217,7 @@ class ConfigurationFactory
         } else {
             $enabled = true;
 
-            $ignore = array_values(array_unique(array_map('trim', $value->ignore)));
+            $ignore = self::normalizeStringArray($value->ignore ?? []);
 
             $settings = new BCMathSettings(
                 $value->settings->bcadd ?? true,

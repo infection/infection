@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Entry;
+namespace Infection\Configuration\Entry\Mutator;
 
 final class BCMathSettings
 {

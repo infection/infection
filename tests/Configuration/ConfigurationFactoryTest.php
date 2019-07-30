@@ -11,15 +11,17 @@ use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mutator\ArrayItemRemoval;
 use Infection\Configuration\Entry\Mutator\ArrayItemRemovalSettings;
+use Infection\Configuration\Entry\Mutator\BCMath;
+use Infection\Configuration\Entry\Mutator\BCMathSettings;
 use Infection\Configuration\Entry\Mutator\Mutators;
 use Infection\Configuration\Entry\Mutator\TrueValue;
 use Infection\Configuration\Entry\Mutator\TrueValueSettings;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
-use InvalidArgumentException;
 use JsonSchema\Validator;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+use function array_fill;
 use function array_map;
 use function array_merge;
 use function array_values;
@@ -1140,6 +1142,273 @@ JSON
 
                     ),
                     null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[mutators][BCMath] true' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "BCMath": true
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    null,
+                    null,
+                    new BCMath(
+                        true,
+                        [],
+                        new BCMathSettings(
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true
+                        )
+
+                    ),
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[mutators][BCMath] false' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "BCMath": false
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    null,
+                    null,
+                    new BCMath(
+                        false,
+                        [],
+                        new BCMathSettings(
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        )
+
+                    ),
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[mutators][BCMath] ignore' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "BCMath": {
+            "ignore": ["fileA", "fileB"]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    null,
+                    null,
+                    new BCMath(
+                        true,
+                        ['fileA', 'fileB'],
+                        new BCMathSettings(
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true
+                        )
+
+                    ),
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[mutators][BCMath] empty & untrimmed ignore' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "BCMath": {
+            "ignore": [" file ", ""]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    null,
+                    null,
+                    new BCMath(
+                        true,
+                        ['file'],
+                        new BCMathSettings(
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true
+                        )
+
+                    ),
+                    null
+                ),
+            ]),
+        ];
+
+        $orderedBcMathSettings = [
+            'bcadd',
+            'bccomp',
+            'bcdiv',
+            'bcmod',
+            'bcmul',
+            'bcpow',
+            'bcsub',
+            'bcsqrt',
+            'bcpowmod'
+        ];
+
+        foreach ($orderedBcMathSettings as $index => $bcMathSetting) {
+            yield '[mutators][BCMath] setting '.$bcMathSetting => (static function () use (
+                $index,
+                $bcMathSetting
+            ): array {
+                $settingsArguments = array_fill(0, 9, true);
+                $settingsArguments[$index] = false;
+
+                return [
+                    <<<JSON
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "BCMath": {
+            "settings": {
+                "$bcMathSetting": false
+            }
+        }
+    }
+}
+JSON
+                    ,
+                    self::createConfig([
+                        'source' => new Source(['src'], []),
+                        'mutators' => new Mutators(
+                            [],
+                            null,
+                            null,
+                            new BCMath(
+                                true,
+                                [],
+                                new BCMathSettings(...$settingsArguments)
+
+                            ),
+                            null
+                        ),
+                    ]),
+                ];
+            })();
+        }
+
+        yield '[mutators][BCMath] nominal' => [
+            <<<'JSON'
+{
+"source": {
+    "directories": ["src"]
+},
+"mutators": {
+    "BCMath": {
+        "ignore": ["file"],
+        "settings": {
+            "bcadd": false,
+            "bccomp": false,
+            "bcdiv": false,
+            "bcmod": false,
+            "bcmul": false,
+            "bcpow": false,
+            "bcsub": false,
+            "bcsqrt": false,
+            "bcpowmod": false
+        }
+    }
+}
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    null,
+                    null,
+                    new BCMath(
+                        true,
+                        ['file'],
+                        new BCMathSettings(
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        )
+
+                    ),
                     null
                 ),
             ]),

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Entry\Mutator;
 
-use Infection\Configuration\Entry\BCMathSettings;
 use Webmozart\Assert\Assert;
 
 final class BCMath implements MutatorConfiguration
