@@ -13,6 +13,8 @@ use Infection\Configuration\Entry\Mutator\ArrayItemRemoval;
 use Infection\Configuration\Entry\Mutator\ArrayItemRemovalSettings;
 use Infection\Configuration\Entry\Mutator\BCMath;
 use Infection\Configuration\Entry\Mutator\BCMathSettings;
+use Infection\Configuration\Entry\Mutator\MBString;
+use Infection\Configuration\Entry\Mutator\MBStringSettings;
 use Infection\Configuration\Entry\Mutator\Mutators;
 use Infection\Configuration\Entry\Mutator\TrueValue;
 use Infection\Configuration\Entry\Mutator\TrueValueSettings;
@@ -686,7 +688,6 @@ JSON
                             true,
                             true
                         )
-
                     ),
                     null,
                     null,
@@ -718,7 +719,6 @@ JSON
                             false,
                             false
                         )
-
                     ),
                     null,
                     null,
@@ -752,7 +752,6 @@ JSON
                             true,
                             true
                         )
-
                     ),
                     null,
                     null,
@@ -786,7 +785,6 @@ JSON
                             true,
                             true
                         )
-
                     ),
                     null,
                     null,
@@ -822,7 +820,6 @@ JSON
                             false,
                             true
                         )
-
                     ),
                     null,
                     null,
@@ -858,7 +855,6 @@ JSON
                             true,
                             false
                         )
-
                     ),
                     null,
                     null,
@@ -896,7 +892,6 @@ JSON
                             false,
                             false
                         )
-
                     ),
                     null,
                     null,
@@ -929,7 +924,6 @@ JSON
                             'all',
                             null
                         )
-
                     ),
                     null,
                     null
@@ -961,7 +955,6 @@ JSON
                             'all',
                             null
                         )
-
                     ),
                     null,
                     null
@@ -995,7 +988,6 @@ JSON
                             'all',
                             null
                         )
-
                     ),
                     null,
                     null
@@ -1029,7 +1021,6 @@ JSON
                             'all',
                             null
                         )
-
                     ),
                     null,
                     null
@@ -1065,7 +1056,6 @@ JSON
                             'first',
                             null
                         )
-
                     ),
                     null,
                     null
@@ -1101,7 +1091,6 @@ JSON
                             'all',
                             10
                         )
-
                     ),
                     null,
                     null
@@ -1139,7 +1128,6 @@ JSON
                             'first',
                             10
                         )
-
                     ),
                     null,
                     null
@@ -1179,7 +1167,6 @@ JSON
                             true,
                             true
                         )
-
                     ),
                     null
                 ),
@@ -1218,7 +1205,6 @@ JSON
                             false,
                             false
                         )
-
                     ),
                     null
                 ),
@@ -1259,7 +1245,6 @@ JSON
                             true,
                             true
                         )
-
                     ),
                     null
                 ),
@@ -1300,7 +1285,6 @@ JSON
                             true,
                             true
                         )
-
                     ),
                     null
                 ),
@@ -1353,7 +1337,6 @@ JSON
                                 true,
                                 [],
                                 new BCMathSettings(...$settingsArguments)
-
                             ),
                             null
                         ),
@@ -1407,9 +1390,332 @@ JSON
                             false,
                             false
                         )
-
                     ),
                     null
+                ),
+            ]),
+        ];
+
+        yield '[mutators][MBString] true' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "MBString": true
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    null,
+                    null,
+                    null,
+                    new MBString(
+                        true,
+                        [],
+                        new MBStringSettings(
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true
+                        )
+                    )
+                ),
+            ]),
+        ];
+
+        yield '[mutators][MBString] false' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "MBString": false
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    null,
+                    null,
+                    null,
+                    new MBString(
+                        false,
+                        [],
+                        new MBStringSettings(
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        )
+                    )
+                ),
+            ]),
+        ];
+
+        yield '[mutators][MBString] ignore' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "MBString": {
+            "ignore": ["fileA", "fileB"]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    null,
+                    null,
+                    null,
+                    new MBString(
+                        true,
+                        ['fileA', 'fileB'],
+                        new MBStringSettings(
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true
+                        )
+                    )
+                ),
+            ]),
+        ];
+
+        yield '[mutators][MBString] empty & untrimmed ignore' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "MBString": {
+            "ignore": [" file ", ""]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    null,
+                    null,
+                    null,
+                    new MBString(
+                        true,
+                        ['file'],
+                        new MBStringSettings(
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true
+                        )
+                    )
+                ),
+            ]),
+        ];
+
+        $orderedMBStringSettings = [
+            'mb_chr',
+            'mb_ord',
+            'mb_parse_str',
+            'mb_send_mail',
+            'mb_strcut',
+            'mb_stripos',
+            'mb_stristr',
+            'mb_strlen',
+            'mb_strpos',
+            'mb_strrchr',
+            'mb_strripos',
+            'mb_strrpos',
+            'mb_strstr',
+            'mb_strtolower',
+            'mb_strtoupper',
+            'mb_substr_count',
+            'mb_substr',
+            'mb_convert_case',
+        ];
+
+        foreach ($orderedMBStringSettings as $index => $mbStringSetting) {
+            yield '[mutators][MBString] setting '.$mbStringSetting => (static function () use (
+                $index,
+                $mbStringSetting
+            ): array {
+                $settingsArguments = array_fill(0, 18, true);
+                $settingsArguments[$index] = false;
+
+                return [
+                    <<<JSON
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "MBString": {
+            "settings": {
+                "$mbStringSetting": false
+            }
+        }
+    }
+}
+JSON
+                    ,
+                    self::createConfig([
+                        'source' => new Source(['src'], []),
+                        'mutators' => new Mutators(
+                            [],
+                            null,
+                            null,
+                            null,
+                            new MBString(
+                                true,
+                                [],
+                                new MBStringSettings(...$settingsArguments)
+                            )
+                        ),
+                    ]),
+                ];
+            })();
+        }
+
+        yield '[mutators][MBString] nominal' => [
+            <<<'JSON'
+{
+"source": {
+    "directories": ["src"]
+},
+"mutators": {
+    "MBString": {
+        "ignore": ["file"],
+        "settings": {
+            "mb_chr": false,
+            "mb_ord": false,
+            "mb_parse_str": false,
+            "mb_send_mail": false,
+            "mb_strcut": false,
+            "mb_stripos": false,
+            "mb_stristr": false,
+            "mb_strlen": false,
+            "mb_strpos": false,
+            "mb_strrchr": false,
+            "mb_strripos": false,
+            "mb_strrpos": false,
+            "mb_strstr": false,
+            "mb_strtolower": false,
+            "mb_strtoupper": false,
+            "mb_substr_count": false,
+            "mb_substr": false,
+            "mb_convert_case": false
+        }
+    }
+}
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    null,
+                    null,
+                    null,
+                    new MBString(
+                        true,
+                        ['file'],
+                        new MBStringSettings(
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        )
+                    )
                 ),
             ]),
         ];
