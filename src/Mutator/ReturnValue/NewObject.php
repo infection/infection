@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,13 +46,17 @@ final class NewObject extends AbstractValueToNullReturnValue
     /**
      * Replaces "return new Something(anything);" with "new Something(anything); return null;"
      *
+     * @param Node&Node\Stmt\Return_ $node
      *
      * @return Node[]
      */
     public function mutate(Node $node)
     {
+        /** @var Node\Expr\New_ $expr */
+        $expr = $node->expr;
+
         return [
-            new Node\Stmt\Expression($node->expr),
+            new Node\Stmt\Expression($expr),
             new Node\Stmt\Return_(
                 new Node\Expr\ConstFetch(new Node\Name('null'))
             ),

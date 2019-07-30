@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,15 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpSpec\Config;
 
-use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\PhpSpec\Config\InitialYamlConfiguration;
 use Infection\TestFramework\PhpSpec\Config\NoCodeCoverageException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
 
-/**
- * @internal
- */
 final class InitialYamlConfigurationTest extends TestCase
 {
     protected $tempDir = '/path/to/tmp';
@@ -91,7 +88,7 @@ final class InitialYamlConfigurationTest extends TestCase
         $configuration = $this->getConfigurationObject();
 
         $parsedYaml = Yaml::parse($configuration->getYaml());
-        $expectedPath = $this->tempDir . '/' . CodeCoverageData::PHP_SPEC_COVERAGE_DIR;
+        $expectedPath = $this->tempDir . '/' . XMLLineCodeCoverage::PHP_SPEC_COVERAGE_DIR;
 
         $this->assertSame($expectedPath, $parsedYaml['extensions']['PhpSpecCodeCoverageExtension']['output']['xml']);
     }

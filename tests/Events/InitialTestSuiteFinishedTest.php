@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,17 +38,14 @@ namespace Infection\Tests\Events;
 use Infection\Events\InitialTestSuiteFinished;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class InitialTestSuiteFinishedTest extends TestCase
 {
-    /**
-     * This class is only used to fire events, and the only functionality it needs is being instantiated
-     */
-    public function test_it_can_be_initialzed(): void
+    public function test_it_passes_the_output_along(): void
     {
-        $class = new InitialTestSuiteFinished();
-        $this->assertInstanceOf(InitialTestSuiteFinished::class, $class);
+        $text = 'foo-bar-baz';
+
+        $class = new InitialTestSuiteFinished($text);
+
+        $this->assertSame($text, $class->getOutputText());
     }
 }

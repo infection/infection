@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection;
 
 use Infection\Mutator\Util\Mutator;
+use Infection\TestFramework\Coverage\CoverageLineData;
 use PhpParser\Node;
 
 /**
@@ -69,16 +70,6 @@ final class Mutation implements MutationInterface
     private $mutatedNodeClass;
 
     /**
-     * @var bool
-     */
-    private $isOnFunctionSignature;
-
-    /**
-     * @var bool
-     */
-    private $isCoveredByTest;
-
-    /**
      * @var string
      */
     private $hash;
@@ -93,26 +84,29 @@ final class Mutation implements MutationInterface
      */
     private $mutationByMutatorIndex;
 
+    /**
+     * @var CoverageLineData[]
+     */
+    private $tests;
+
     public function __construct(
         string $originalFilePath,
         array $originalFileAst,
         Mutator $mutator,
         array $attributes,
         string $mutatedNodeClass,
-        bool $isOnFunctionSignature,
-        bool $isCoveredByTest,
         $mutatedNode,
-        int $mutationByMutatorIndex
+        int $mutationByMutatorIndex,
+        array $tests
     ) {
         $this->originalFilePath = $originalFilePath;
         $this->originalFileAst = $originalFileAst;
         $this->mutator = $mutator;
         $this->attributes = $attributes;
         $this->mutatedNodeClass = $mutatedNodeClass;
-        $this->isOnFunctionSignature = $isOnFunctionSignature;
-        $this->isCoveredByTest = $isCoveredByTest;
         $this->mutatedNode = $mutatedNode;
         $this->mutationByMutatorIndex = $mutationByMutatorIndex;
+        $this->tests = $tests;
     }
 
     public function getMutator(): Mutator
@@ -166,14 +160,17 @@ final class Mutation implements MutationInterface
         return $this->originalFileAst;
     }
 
-    public function isOnFunctionSignature(): bool
+    /**
+     * @return CoverageLineData[]
+     */
+    public function getAllTests(): array
     {
-        return $this->isOnFunctionSignature;
+        return $this->tests;
     }
 
     public function isCoveredByTest(): bool
     {
-        return $this->isCoveredByTest;
+        return \count($this->getAllTests()) !== 0;
     }
 
     /**

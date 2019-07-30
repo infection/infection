@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,9 +39,6 @@ use Infection\Events\MutantProcessFinished;
 use Infection\Process\MutantProcessInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class MutantProcessFinishedTest extends TestCase
 {
     public function test_it_passes_around_its_mutant_process_without_changing_it(): void

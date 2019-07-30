@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,7 +46,7 @@ final class CachedTestFileDataProvider implements TestFileDataProvider
     private $testFileDataProvider;
 
     /**
-     * @var array
+     * @var array<string, TestFileTimeData>
      */
     private $testFileInfoCache = [];
 
@@ -55,7 +55,7 @@ final class CachedTestFileDataProvider implements TestFileDataProvider
         $this->testFileDataProvider = $testFileDataProvider;
     }
 
-    public function getTestFileInfo(string $fullyQualifiedClassName): array
+    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
     {
         if (\array_key_exists($fullyQualifiedClassName, $this->testFileInfoCache)) {
             return $this->testFileInfoCache[$fullyQualifiedClassName];

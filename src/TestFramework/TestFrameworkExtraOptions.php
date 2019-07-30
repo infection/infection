@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -60,10 +60,11 @@ abstract class TestFrameworkExtraOptions
         $extraOptions = $this->extraOptions;
 
         foreach ($this->getInitialRunOnlyOptions() as $initialRunOnlyOption) {
+            /** @var string $extraOptions */
             $extraOptions = preg_replace(sprintf('/%s[\=| ](?:\"[^\"]*\"|\'[^\']*\'|[^\ ]*)/', $initialRunOnlyOption), '', $extraOptions);
         }
 
-        return preg_replace('/\s+/', ' ', trim($extraOptions));
+        return (string) preg_replace('/\s+/', ' ', trim($extraOptions));
     }
 
     abstract protected function getInitialRunOnlyOptions(): array;

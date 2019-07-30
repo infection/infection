@@ -6,7 +6,7 @@ run () {
     local INFECTION=${1}
     local PHPARGS=${2}
 
-    if [ "$PHPDBG" = "1" ]
+    if [ "$DRIVER" = "phpdbg" ]
     then
         phpdbg $PHPARGS -qrr $INFECTION
     else

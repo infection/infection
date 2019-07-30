@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,6 @@ use Infection\MutationInterface;
 use Infection\Process\Builder\ProcessBuilder;
 use Infection\Process\MutantProcessInterface;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
-use Infection\TestFramework\Coverage\CodeCoverageData;
 
 /**
  * @internal
@@ -85,15 +84,15 @@ final class MutationTestingRunner
         $this->mutations = $mutations;
     }
 
-    public function run(int $threadCount, CodeCoverageData $codeCoverageData, string $testFrameworkExtraOptions): void
+    public function run(int $threadCount, string $testFrameworkExtraOptions): void
     {
         $mutantCount = \count($this->mutations);
 
         $this->eventDispatcher->dispatch(new MutantsCreatingStarted($mutantCount));
 
         $processes = array_map(
-            function (MutationInterface $mutation) use ($codeCoverageData, $testFrameworkExtraOptions): MutantProcessInterface {
-                $mutant = $this->mutantCreator->create($mutation, $codeCoverageData);
+            function (MutationInterface $mutation) use ($testFrameworkExtraOptions): MutantProcessInterface {
+                $mutant = $this->mutantCreator->create($mutation);
 
                 $process = $this->processBuilder->getProcessForMutant($mutant, $testFrameworkExtraOptions);
 

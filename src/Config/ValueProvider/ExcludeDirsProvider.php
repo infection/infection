@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,9 @@ declare(strict_types=1);
 namespace Infection\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
-use Infection\Finder\Locator;
+use Infection\Locator\Locator;
+use Infection\Locator\RootsFileOrDirectoryLocator;
+use function Safe\glob;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -112,7 +114,7 @@ final class ExcludeDirsProvider
 
         $question = new Question($questionText, '');
         $question->setAutocompleterValues($autocompleteValues);
-        $question->setValidator($this->getValidator(new Locator($sourceDirs, $this->filesystem)));
+        $question->setValidator($this->getValidator(new RootsFileOrDirectoryLocator($sourceDirs, $this->filesystem)));
 
         while ($dir = $this->questionHelper->ask($input, $output, $question)) {
             if ($dir) {
@@ -120,7 +122,7 @@ final class ExcludeDirsProvider
             }
         }
 
-        return array_unique($excludedDirs);
+        return array_values(array_unique($excludedDirs));
     }
 
     private function getValidator(Locator $locator)

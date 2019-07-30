@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ interface TestFileDataProvider
      *      return: '/path/to/NameSpace/Sub/TestClass.php'
      *
      *
-     * @return array file path and time
+     * @return TestFileTimeData file path and time
      */
-    public function getTestFileInfo(string $fullyQualifiedClassName): array;
+    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData;
 }

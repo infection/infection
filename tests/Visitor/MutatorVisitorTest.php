@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,9 +48,6 @@ use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class MutatorVisitorTest extends TestCase
 {
     /**
@@ -118,10 +115,9 @@ PHP
                     'endTokenPos' => 48,
                 ],
                 ClassMethod::class,
-                true,
-                true,
                 new Nop(),
-                0
+                0,
+                range(29, 48)
             ),
         ];
 
@@ -167,10 +163,9 @@ PHP
                     'endTokenPos' => 50,
                 ],
                 ClassMethod::class,
-                true,
-                true,
                 new Nop(),
-                0
+                0,
+                range(29, 50)
             ),
         ];
         $badLexer = new Lexer\Emulative([
@@ -223,10 +218,9 @@ PHP
                     'endTokenPos' => 48,
                 ],
                 ClassMethod::class,
-                true,
-                true,
                 new Nop(),
-                0
+                0,
+                range(29, 48)
             ),
         ];
     }

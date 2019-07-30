@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -65,18 +65,20 @@ final class ReflectionVisitor extends NodeVisitorAbstract
      */
     private $methodName;
 
-    public function beforeTraverse(array $nodes): void
+    public function beforeTraverse(array $nodes): ?array
     {
         $this->functionScopeStack = [];
         $this->classScopeStack = [];
         $this->methodName = null;
+
+        return null;
     }
 
     public function enterNode(Node $node)
     {
         if ($node instanceof Node\Stmt\ClassLike) {
-            if (isset($node->fullyQualifiedClassName)) {
-                $this->classScopeStack[] = new \ReflectionClass($node->fullyQualifiedClassName->toString());
+            if ($attribute = $node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)) {
+                $this->classScopeStack[] = new \ReflectionClass($attribute->toString());
             } else {
                 // Anonymous class
                 $this->classScopeStack[] = null;
@@ -115,7 +117,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         }
     }
 
-    public function leaveNode(Node $node): void
+    public function leaveNode(Node $node): ?Node
     {
         if ($this->isFunctionLikeNode($node)) {
             array_pop($this->functionScopeStack);
@@ -124,6 +126,8 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         if ($node instanceof  Node\Stmt\ClassLike) {
             array_pop($this->classScopeStack);
         }
+
+        return null;
     }
 
     private function isPartOfFunctionSignature(Node $node): bool

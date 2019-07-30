@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,6 +37,8 @@ namespace Infection\Finder;
 
 use Infection\Finder\Exception\FinderException;
 use Infection\TestFramework\TestFrameworkTypes;
+use function Safe\file_get_contents;
+use function Safe\realpath;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -73,7 +75,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
                 $this->addVendorBinToPath();
             }
 
-            $this->cachedPath = (string) realpath($this->findTestFramework());
+            $this->cachedPath = realpath($this->findTestFramework());
 
             if ('.bat' === substr($this->cachedPath, -4)) {
                 $this->cachedPath = $this->findFromBatchFile($this->cachedPath);
@@ -180,9 +182,9 @@ class TestFrameworkFinder extends AbstractExecutableFinder
          *   SET BIN_TARGET=%~dp0/../path
          *   php %~dp0/path %*
          */
-        if (preg_match('/%~dp0(.+$)/mi', (string) file_get_contents($path), $match)) {
+        if (preg_match('/%~dp0(.+$)/mi', file_get_contents($path), $match)) {
             $target = ltrim(rtrim(trim($match[1]), '" %*'), '\\/');
-            $script = (string) realpath(\dirname($path) . '/' . $target);
+            $script = realpath(\dirname($path) . '/' . $target);
 
             if (file_exists($script)) {
                 $path = $script;

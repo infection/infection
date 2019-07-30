@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,17 +47,14 @@ final class FloatNegation extends Mutator
      * Replaces any float with negated float
      * Replaces "-33.4" with "33.4"
      *
+     * @param Node&Node\Stmt\Return_ $node
      *
      * @return Node\Stmt\Return_
      */
     public function mutate(Node $node)
     {
-        $floatValue = $node->expr instanceof Node\Expr\UnaryMinus
-            ? -$node->expr->expr->value
-            : $node->expr->value;
-
         return new Node\Stmt\Return_(
-            new Node\Scalar\DNumber(-1 * $floatValue, $node->getAttributes())
+            new Node\Scalar\DNumber(-1 * $this->getFloatValueOfNode($node), $node->getAttributes())
         );
     }
 
@@ -82,5 +79,23 @@ final class FloatNegation extends Mutator
         }
 
         return true;
+    }
+
+    /**
+     * @param Node&Node\Stmt\Return_ $node
+     */
+    private function getFloatValueOfNode(Node $node): float
+    {
+        /** @var Node\Expr\UnaryMinus|Node\Scalar\DNumber $expression */
+        $expression = $node->expr;
+
+        if ($expression instanceof Node\Expr\UnaryMinus) {
+            /** @var Node\Scalar\LNumber $innerExpression */
+            $innerExpression = $expression->expr;
+
+            return -$innerExpression->value;
+        }
+
+        return $expression->value;
     }
 }

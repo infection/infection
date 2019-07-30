@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -55,6 +55,7 @@ final class DecrementInteger extends AbstractNumberMutator
     /**
      * Decrements an integer by 1
      *
+     * @param Node&Node\Scalar\LNumber $node
      *
      * @return Node\Scalar\LNumber
      */
@@ -88,7 +89,7 @@ final class DecrementInteger extends AbstractNumberMutator
             return true;
         }
 
-        if ($parentNode->left instanceof Node\Expr\FuncCall
+        if ($parentNode->left instanceof Node\Expr\FuncCall && $parentNode->left->name instanceof Node\Name
             && \in_array(
                 $parentNode->left->name->toLowerString(),
                 self::COUNT_NAMES,
@@ -97,7 +98,7 @@ final class DecrementInteger extends AbstractNumberMutator
             return false;
         }
 
-        if ($parentNode->right instanceof Node\Expr\FuncCall
+        if ($parentNode->right instanceof Node\Expr\FuncCall && $parentNode->right->name instanceof Node\Name
             && \in_array(
                 $parentNode->right->name->toLowerString(),
                 self::COUNT_NAMES,

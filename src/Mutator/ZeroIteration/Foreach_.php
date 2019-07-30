@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,8 +46,9 @@ final class Foreach_ extends Mutator
     /**
      * Replaces "foreach($a as $b)" with "foreach(array() as $b)"
      *
+     * @param Node&Node\Stmt\Foreach_ $node
      *
-     * @return Node\Stmt\Foreach_
+     * @return Node&Node\Stmt\Foreach_
      */
     public function mutate(Node $node)
     {

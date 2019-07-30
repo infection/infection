@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -63,6 +63,7 @@ final class CoverageRequirementChecker
         return $this->skipCoverage
             || \PHP_SAPI === 'phpdbg'
             || \extension_loaded('xdebug')
+            || \extension_loaded('pcov')
             || XdebugHandler::getSkippedVersion()
             || $this->isXdebugIncludedInInitialTestPhpOptions();
     }

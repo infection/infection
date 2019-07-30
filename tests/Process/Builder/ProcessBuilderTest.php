@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,9 +40,6 @@ use Infection\Process\Builder\ProcessBuilder;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class ProcessBuilderTest extends TestCase
 {
     public function test_getProcessForInitialTestRun_has_no_timeout(): void

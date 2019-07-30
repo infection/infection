@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutant;
 
 use Infection\MutationInterface;
+use Infection\TestFramework\Coverage\CoverageLineData;
 
 /**
  * @internal
@@ -57,23 +58,11 @@ final class Mutant implements MutantInterface
      */
     private $diff;
 
-    /**
-     * @var bool
-     */
-    private $isCoveredByTest;
-
-    /**
-     * @var array
-     */
-    private $coverageTests;
-
-    public function __construct(string $mutatedFilePath, MutationInterface $mutation, string $diff, bool $isCoveredByTest, array $coverageTests)
+    public function __construct(string $mutatedFilePath, MutationInterface $mutation, string $diff)
     {
         $this->mutatedFilePath = $mutatedFilePath;
         $this->mutation = $mutation;
         $this->diff = $diff;
-        $this->isCoveredByTest = $isCoveredByTest;
-        $this->coverageTests = $coverageTests;
     }
 
     public function getMutatedFilePath(): string
@@ -93,11 +82,14 @@ final class Mutant implements MutantInterface
 
     public function isCoveredByTest(): bool
     {
-        return $this->isCoveredByTest;
+        return $this->mutation->isCoveredByTest();
     }
 
+    /**
+     * @return CoverageLineData[]
+     */
     public function getCoverageTests(): array
     {
-        return $this->coverageTests;
+        return $this->mutation->getAllTests();
     }
 }

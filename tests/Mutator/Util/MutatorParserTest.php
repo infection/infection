@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,9 +40,6 @@ use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\Util\MutatorParser;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class MutatorParserTest extends TestCase
 {
     public function test_it_returns_default_mutators_when_no_input_mutators(): void

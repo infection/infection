@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Variables_Order_EGPCS\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Variables_Order_EGPCS\\Test\\": "tests/"
+        }
+    }
+}

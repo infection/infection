@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,7 +46,7 @@ final class PregMatchMatches extends Mutator
     /**
      * Replaces "preg_match('/a/', 'b', $foo);" with "(int) $foo = array();"
      *
-     * @param Node|Node\Expr\FuncCall $node
+     * @param Node&Node\Expr\FuncCall $node
      *
      * @return Node\Expr\Cast\Int_
      */

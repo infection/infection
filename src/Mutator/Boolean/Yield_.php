@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,12 +46,17 @@ final class Yield_ extends Mutator
     /**
      * Replaces "yield $a => $b;" with "yield $a > $b;"
      *
+     * @param Node&Node\Expr\Yield_ $node
      *
      * @return Node|Node\Expr\Yield_
      */
     public function mutate(Node $node)
     {
-        $node->value = new Node\Expr\BinaryOp\Greater($node->key, $node->value, $node->getAttributes());
+        /** @var Node\Expr $key */
+        $key = $node->key;
+        /** @var Node\Expr $value */
+        $value = $node->value;
+        $node->value = new Node\Expr\BinaryOp\Greater($key, $value, $node->getAttributes());
         $node->key = null;
 
         return $node;

@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,9 +37,6 @@ namespace Infection\Tests\Mutant\Exception;
 
 use Infection\Mutant\Exception\MsiCalculationException;
 
-/**
- * @internal
- */
 final class MsiCalculationExceptionTest extends \PHPUnit\Framework\TestCase
 {
     public function test_it_is_instance_of_logic_exception(): void

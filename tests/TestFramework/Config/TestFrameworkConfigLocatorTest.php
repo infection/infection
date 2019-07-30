@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,13 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Config;
 
-use Infection\Finder\Exception\LocatorException;
+use Infection\Locator\FileNotFound;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use function Infection\Tests\normalizePath as p;
 
-/**
- * @internal
- */
 final class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
 {
     private $baseDir = __DIR__ . '/../../Fixtures/ConfigLocator/';
@@ -51,10 +48,10 @@ final class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
         $dir = $this->baseDir . 'NoFiles/';
         $locator = new TestFrameworkConfigLocator($dir);
 
-        $this->expectException(LocatorException::class);
+        $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage(
             sprintf(
-                'The path %s does not contain any of the requested files: phpunit.xml, phpunit.yml, phpunit.xml.dist, phpunit.yml.dist, phpunit.dist.xml, phpunit.dist.yml',
+                'The path "%s" does not contain any of the requested files: "phpunit.xml", "phpunit.yml", "phpunit.xml.dist", "phpunit.yml.dist", "phpunit.dist.xml", "phpunit.dist.yml"',
                 $dir
             )
         );
@@ -131,7 +128,7 @@ final class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
             'Did not find the correct phpunit.xml.dist file.'
         );
 
-        $this->expectException(LocatorException::class);
+        $this->expectException(FileNotFound::class);
         $locator->locate('phpunit' . $dir . 'NoFiles/');
     }
 }

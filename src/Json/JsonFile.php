@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,7 @@ namespace Infection\Json;
 use Infection\Json\Exception\JsonValidationException;
 use Infection\Json\Exception\ParseException;
 use JsonSchema\Validator;
+use function Safe\file_get_contents;
 
 /**
  * @internal
@@ -71,7 +72,11 @@ final class JsonFile
 
     private function parse(): void
     {
-        $data = json_decode((string) file_get_contents($this->path));
+        if (!is_file($this->path)) {
+            throw ParseException::invalidJson($this->path, 'file not found');
+        }
+
+        $data = json_decode(file_get_contents($this->path));
 
         if (null === $data && JSON_ERROR_NONE !== json_last_error()) {
             throw ParseException::invalidJson($this->path, json_last_error_msg());

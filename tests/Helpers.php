@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,12 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use Generator;
+
 /**
- * @internal
- *
  * Normalizes path. Replaces backslashes with forward ones
  */
 function normalizePath(string $value): string
 {
     return str_replace(\DIRECTORY_SEPARATOR, '/', $value);
+}
+
+function generator_to_phpunit_data_provider(iterable $source): Generator
+{
+    foreach ($source as $key => $value) {
+        yield $key => [$value];
+    }
 }

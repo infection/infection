@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
 use Infection\Mutant\MutantInterface;
 use Infection\MutationInterface;
+use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
@@ -45,9 +46,6 @@ use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @internal
- */
 final class MutationConfigBuilderTest extends TestCase
 {
     public const HASH = 'a1b2c3';
@@ -308,26 +306,26 @@ final class MutationConfigBuilderTest extends TestCase
         return [
             [
                 [
-                    [
-                        'testMethod' => 'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #5',
-                        'testFilePath' => '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
-                        'time' => 0.086178,
-                    ],
-                    [
-                        'testMethod' => 'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #6',
-                        'testFilePath' => '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
-                        'time' => 0.086178,
-                    ],
-                    [
-                        'testMethod' => 'SimpleHabits\\Domain\\Model\\Goal\\GoalStepTest::it_correctly_returns_id',
-                        'testFilePath' => '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
-                        'time' => 0.035935,
-                    ],
-                    [
-                        'testMethod' => 'SimpleHabits\\Domain\\Model\\Goal\\GoalStepTest::it_correctly_returns_recorded_at_date',
-                        'testFilePath' => '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
-                        'time' => 0.035935,
-                    ],
+                    CoverageLineData::with(
+                        'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #5',
+                        '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
+                        0.086178
+                    ),
+                    CoverageLineData::with(
+                        'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #6',
+                        '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
+                        0.086178
+                    ),
+                    CoverageLineData::with(
+                        'SimpleHabits\\Domain\\Model\\Goal\\GoalStepTest::it_correctly_returns_id',
+                        '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
+                        0.035935
+                    ),
+                    CoverageLineData::with(
+                        'SimpleHabits\\Domain\\Model\\Goal\\GoalStepTest::it_correctly_returns_recorded_at_date',
+                        '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
+                        0.035935
+                    ),
                 ],
                 [
                     '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
@@ -336,21 +334,21 @@ final class MutationConfigBuilderTest extends TestCase
             ],
             [
                 [
-                    [
-                        'testMethod' => 'Path\\To\\A::test_a',
-                        'testFilePath' => '/path/to/A.php',
-                        'time' => 0.186178,
-                    ],
-                    [
-                        'testMethod' => 'Path\\To\\B::test_b',
-                        'testFilePath' => '/path/to/B.php',
-                        'time' => 0.086178,
-                    ],
-                    [
-                        'testMethod' => 'Path\\To\\C::test_c',
-                        'testFilePath' => '/path/to/C.php',
-                        'time' => 0.016178,
-                    ],
+                    CoverageLineData::with(
+                        'Path\\To\\A::test_a',
+                        '/path/to/A.php',
+                        0.186178
+                    ),
+                    CoverageLineData::with(
+                        'Path\\To\\B::test_b',
+                        '/path/to/B.php',
+                        0.086178
+                    ),
+                    CoverageLineData::with(
+                        'Path\\To\\C::test_c',
+                        '/path/to/C.php',
+                        0.016178
+                    ),
                 ],
                 [
                     '/path/to/C.php',

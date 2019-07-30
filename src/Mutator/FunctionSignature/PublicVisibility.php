@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,6 +49,7 @@ final class PublicVisibility extends Mutator
     /**
      * Replaces "public function..." with "protected function ..."
      *
+     * @param Node&ClassMethod $node
      *
      * @return ClassMethod
      */
@@ -85,7 +86,7 @@ final class PublicVisibility extends Mutator
         return !$this->hasSamePublicParentMethod($node);
     }
 
-    private function hasSamePublicParentMethod(Node $node): bool
+    private function hasSamePublicParentMethod(ClassMethod $node): bool
     {
         /** @var \ReflectionClass|null $reflection */
         $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
@@ -95,45 +96,10 @@ final class PublicVisibility extends Mutator
             return true;
         }
 
-        return $this->hasSamePublicMethodInInterface($node, $reflection) || $this->hasSamePublicMethodInParentClass($node, $reflection);
-    }
-
-    private function hasSamePublicMethodInInterface(Node $node, \ReflectionClass $reflection): bool
-    {
-        foreach ($reflection->getInterfaces() as $reflectionInterface) {
-            try {
-                $method = $reflectionInterface->getMethod($node->name->name);
-
-                if ($method->isPublic()) {
-                    // we can't mutate because interface requires the same public visibility
-                    return true;
-                }
-            } catch (\ReflectionException $e) {
-                continue;
-            }
+        try {
+            return $reflection->getMethod($node->name->name)->getPrototype()->isPublic();
+        } catch (\ReflectionException $e) {
+            return false;
         }
-
-        return false;
-    }
-
-    private function hasSamePublicMethodInParentClass(Node $node, \ReflectionClass $reflection): bool
-    {
-        $parent = $reflection->getParentClass();
-
-        while ($parent) {
-            try {
-                $method = $parent->getMethod($node->name->name);
-
-                if ($method->isPublic()) {
-                    return true;
-                }
-            } catch (\ReflectionException $e) {
-                return false;
-            } finally {
-                $parent = $parent->getParentClass();
-            }
-        }
-
-        return false;
     }
 }

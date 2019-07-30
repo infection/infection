@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,8 @@ namespace Infection\Visitor;
 use Infection\Exception\InvalidMutatorException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
-use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\TestFramework\Coverage\NodeLineRangeData;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -68,7 +69,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
     private $fileAst;
 
     /**
-     * @var CodeCoverageData
+     * @var LineCodeCoverage
      */
     private $codeCoverageData;
     /**
@@ -80,7 +81,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
         array $mutators,
         string $filePath,
         array $fileAst,
-        CodeCoverageData $codeCoverageData,
+        LineCodeCoverage $codeCoverageData,
         bool $onlyCovered
     ) {
         $this->mutators = $mutators;
@@ -90,7 +91,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
         $this->onlyCovered = $onlyCovered;
     }
 
-    public function leaveNode(Node $node): void
+    public function leaveNode(Node $node): ?Node
     {
         foreach ($this->mutators as $mutator) {
             try {
@@ -109,9 +110,14 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                 continue;
             }
 
-            $isCoveredByTest = $this->isCoveredByTest($isOnFunctionSignature, $node);
+            $tests = $this->codeCoverageData
+                ->getAllTestsForMutation(
+                    $this->filePath,
+                    $this->getNodeRange($node, $isOnFunctionSignature),
+                    $isOnFunctionSignature
+                );
 
-            if ($this->onlyCovered && !$isCoveredByTest) {
+            if ($this->onlyCovered && \count($tests) === 0) {
                 continue;
             }
 
@@ -126,13 +132,14 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                     $mutator,
                     $node->getAttributes(),
                     \get_class($node),
-                    $isOnFunctionSignature,
-                    $isCoveredByTest,
                     $mutatedNode,
-                    $mutationByMutatorIndex
+                    $mutationByMutatorIndex,
+                    $tests
                 );
             }
         }
+
+        return null;
     }
 
     /**
@@ -143,20 +150,29 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
         return $this->mutations;
     }
 
-    private function isCoveredByTest(bool $isOnFunctionSignature, Node $node): bool
+    /**
+     * If the node is part of an array, this will find the outermost array.
+     * Otherwise this will return the node itself
+     */
+    private function getOuterMostArrayNode(Node $node): Node
+    {
+        $outerMostArrayParent = $node;
+
+        do {
+            if ($node instanceof Node\Expr\Array_) {
+                $outerMostArrayParent = $node;
+            }
+        } while ($node = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY));
+
+        return $outerMostArrayParent;
+    }
+
+    private function getNodeRange(Node $node, bool $isOnFunctionSignature): NodeLineRangeData
     {
         if ($isOnFunctionSignature) {
-            // hasExecutedMethodOnLine checks for all lines of a given method,
-            // therefore it isn't making any sense to check any other line but first
-            return $this->codeCoverageData->hasExecutedMethodOnLine($this->filePath, $node->getLine());
+            $node = $this->getOuterMostArrayNode($node);
         }
 
-        for ($line = $node->getStartLine(); $line <= $node->getEndLine(); ++$line) {
-            if ($this->codeCoverageData->hasTestsOnLine($this->filePath, $line)) {
-                return true;
-            }
-        }
-
-        return false;
+        return new NodeLineRangeData($node->getStartLine(), $node->getEndLine());
     }
 }

@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -60,6 +60,7 @@ final class MutatorProfile
         '@zero_iteration' => self::ZERO_ITERATION,
         '@cast' => self::CAST,
         '@unwrap' => self::UNWRAP,
+        '@extensions' => self::EXTENSIONS,
 
         //Special Profiles
         '@default' => self::DEFAULT,
@@ -164,6 +165,7 @@ final class MutatorProfile
     ];
 
     public const RETURN_VALUE = [
+        Mutator\ReturnValue\ArrayOneItem::class,
         Mutator\ReturnValue\FloatNegation::class,
         Mutator\ReturnValue\FunctionCall::class,
         Mutator\ReturnValue\IntegerNegation::class,
@@ -202,6 +204,7 @@ final class MutatorProfile
         Mutator\Unwrap\UnwrapArrayFilter::class,
         Mutator\Unwrap\UnwrapArrayFlip::class,
         Mutator\Unwrap\UnwrapArrayIntersect::class,
+        Mutator\Unwrap\UnwrapArrayIntersectAssoc::class,
         Mutator\Unwrap\UnwrapArrayIntersectKey::class,
         Mutator\Unwrap\UnwrapArrayIntersectUassoc::class,
         Mutator\Unwrap\UnwrapArrayIntersectUkey::class,
@@ -209,6 +212,7 @@ final class MutatorProfile
         Mutator\Unwrap\UnwrapArrayMap::class,
         Mutator\Unwrap\UnwrapArrayMerge::class,
         Mutator\Unwrap\UnwrapArrayMergeRecursive::class,
+        Mutator\Unwrap\UnwrapArrayPad::class,
         Mutator\Unwrap\UnwrapArrayReduce::class,
         Mutator\Unwrap\UnwrapArrayReplace::class,
         Mutator\Unwrap\UnwrapArrayReplaceRecursive::class,
@@ -232,6 +236,11 @@ final class MutatorProfile
         Mutator\Unwrap\UnwrapUcWords::class,
     ];
 
+    public const EXTENSIONS = [
+        Mutator\Extensions\BCMath::class,
+        Mutator\Extensions\MBString::class,
+    ];
+
     public const DEFAULT = [
         '@arithmetic',
         '@boolean',
@@ -246,6 +255,8 @@ final class MutatorProfile
         '@return_value',
         '@sort',
         '@zero_iteration',
+        '@extensions',
+        '@unwrap',
     ];
 
     public const FULL_MUTATOR_LIST = [
@@ -333,6 +344,7 @@ final class MutatorProfile
         'MethodCallRemoval' => Mutator\Removal\MethodCallRemoval::class,
 
         //Return Value
+        'ArrayOneItem' => Mutator\ReturnValue\ArrayOneItem::class,
         'FloatNegation' => Mutator\ReturnValue\FloatNegation::class,
         'FunctionCall' => Mutator\ReturnValue\FunctionCall::class,
         'IntegerNegation' => Mutator\ReturnValue\IntegerNegation::class,
@@ -367,6 +379,7 @@ final class MutatorProfile
         'UnwrapArrayFilter' => Mutator\Unwrap\UnwrapArrayFilter::class,
         'UnwrapArrayFlip' => Mutator\Unwrap\UnwrapArrayFlip::class,
         'UnwrapArrayIntersect' => Mutator\Unwrap\UnwrapArrayIntersect::class,
+        'UnwrapArrayIntersectAssoc' => Mutator\Unwrap\UnwrapArrayIntersectAssoc::class,
         'UnwrapArrayIntersectKey' => Mutator\Unwrap\UnwrapArrayIntersectKey::class,
         'UnwrapArrayIntersectUassoc' => Mutator\Unwrap\UnwrapArrayIntersectUassoc::class,
         'UnwrapArrayIntersectUkey' => Mutator\Unwrap\UnwrapArrayIntersectUkey::class,
@@ -374,6 +387,7 @@ final class MutatorProfile
         'UnwrapArrayMap' => Mutator\Unwrap\UnwrapArrayMap::class,
         'UnwrapArrayMerge' => Mutator\Unwrap\UnwrapArrayMerge::class,
         'UnwrapArrayMergeRecursive' => Mutator\Unwrap\UnwrapArrayMergeRecursive::class,
+        'UnwrapArrayPad' => Mutator\Unwrap\UnwrapArrayPad::class,
         'UnwrapArrayReduce' => Mutator\Unwrap\UnwrapArrayReduce::class,
         'UnwrapArrayReplace' => Mutator\Unwrap\UnwrapArrayReplace::class,
         'UnwrapArrayReplaceRecursive' => Mutator\Unwrap\UnwrapArrayReplaceRecursive::class,
@@ -395,5 +409,9 @@ final class MutatorProfile
         'UnwrapTrim' => Mutator\Unwrap\UnwrapTrim::class,
         'UnwrapUcFirst' => Mutator\Unwrap\UnwrapUcFirst::class,
         'UnwrapUcWords' => Mutator\Unwrap\UnwrapUcWords::class,
+
+        // Extensions
+        'BCMath' => Mutator\Extensions\BCMath::class,
+        'MBString' => Mutator\Extensions\MBString::class,
     ];
 }

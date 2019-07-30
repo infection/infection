@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -156,10 +156,6 @@ ASCII;
             new Command\InfectionCommand(),
         ]);
 
-        if (0 === strpos(__FILE__, 'phar:')) {
-            $commands[] = new Command\SelfUpdateCommand();
-        }
-
         return $commands;
     }
 
@@ -188,6 +184,8 @@ ASCII;
             $this->consoleOutput->logRunningWithDebugger(\PHP_SAPI);
         } elseif (\extension_loaded('xdebug')) {
             $this->consoleOutput->logRunningWithDebugger('Xdebug');
+        } elseif (\extension_loaded('pcov')) {
+            $this->consoleOutput->logRunningWithDebugger('PCOV');
         }
     }
 }

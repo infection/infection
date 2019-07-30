@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Config;
 
+use Infection\TestFramework\TestFrameworkTypes;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -152,7 +153,7 @@ class InfectionConfig
 
     public function getTestFramework(): string
     {
-        return $this->config->testFramework ?? 'phpunit';
+        return $this->config->testFramework ?? TestFrameworkTypes::PHPUNIT;
     }
 
     public function getInitialTestsPhpOptions(): string

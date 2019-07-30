@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,7 @@ final class UnwrapArrayDiffUkey extends AbstractUnwrapMutator
         return 'array_diff_ukey';
     }
 
-    protected function getParameterIndexes(Node $node): \Generator
+    protected function getParameterIndexes(Node\Expr\FuncCall $node): \Generator
     {
         yield 0;
     }

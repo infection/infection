@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [ "$PHPDBG" = "1" ]
+if [ "$DRIVER" = "phpdbg" ]
 then
     # Memory limit cannot be enforced from our custom php.ini
     # under PHPDBG, hence this test shows nothing under PHPDBG
@@ -13,7 +13,7 @@ run () {
     local INFECTION=${1}
     local PHPARGS=${2}
 
-    if [ "$PHPDBG" = "1" ]
+    if [ "$DRIVER" = "phpdbg" ]
     then
         phpdbg $PHPARGS -qrr $INFECTION
     else

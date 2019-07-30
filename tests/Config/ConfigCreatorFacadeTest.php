@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,16 +37,13 @@ namespace Infection\Tests\Config;
 
 use Infection\Config\ConfigCreatorFacade;
 use Infection\Config\InfectionConfig;
-use Infection\Finder\Exception\LocatorException;
-use Infection\Finder\LocatorInterface;
+use Infection\Locator\FileNotFound;
+use Infection\Locator\Locator;
 use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @internal
- */
 final class ConfigCreatorFacadeTest extends TestCase
 {
     /**
@@ -55,7 +52,7 @@ final class ConfigCreatorFacadeTest extends TestCase
     private $creatorFacade;
 
     /**
-     * @var LocatorInterface|MockObject
+     * @var Locator|MockObject
      */
     private $locator;
 
@@ -81,7 +78,7 @@ final class ConfigCreatorFacadeTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->locator = $this->createMock(LocatorInterface::class);
+        $this->locator = $this->createMock(Locator::class);
         $this->filesystemMock = $this->createMock(Filesystem::class);
 
         $this->creatorFacade = new ConfigCreatorFacade($this->locator, $this->filesystemMock);
@@ -132,7 +129,7 @@ final class ConfigCreatorFacadeTest extends TestCase
     {
         $this->locator
             ->method('locateOneOf')
-            ->will($this->throwException(new LocatorException()));
+            ->will($this->throwException(new FileNotFound()));
 
         $infectionConfig = $this->creatorFacade->createConfig(null);
 

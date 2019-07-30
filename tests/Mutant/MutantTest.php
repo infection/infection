@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,31 +39,26 @@ use Infection\Mutant\Mutant;
 use Infection\MutationInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class MutantTest extends TestCase
 {
     public function test_it_passes_along_its_input_without_changing_it(): void
     {
         $filepath = 'path/to/file';
         $mutation = $this->createMock(MutationInterface::class);
-        $mutation->expects($this->never())->method($this->anything());
-        $diff = 'diff string';
-        $isCoveredByTest = true;
         $coverageTests = ['tests'];
+        $mutation->expects($this->once())->method('getAllTests')->willReturn($coverageTests);
+        $mutation->expects($this->once())->method('isCoveredByTest')->willReturn(true);
+        $diff = 'diff string';
 
         $mutant = new Mutant(
             $filepath,
             $mutation,
-            $diff,
-            $isCoveredByTest,
-            $coverageTests
+            $diff
         );
         $this->assertSame($filepath, $mutant->getMutatedFilePath());
         $this->assertSame($mutation, $mutant->getMutation());
         $this->assertSame($diff, $mutant->getDiff());
-        $this->assertSame($isCoveredByTest, $mutant->isCoveredByTest());
+        $this->assertTrue($mutant->isCoveredByTest());
         $this->assertSame($coverageTests, $mutant->getCoverageTests());
     }
 }

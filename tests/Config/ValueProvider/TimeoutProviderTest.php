@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,9 +39,6 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\InfectionConfig;
 use Infection\Config\ValueProvider\TimeoutProvider;
 
-/**
- * @internal
- */
 final class TimeoutProviderTest extends AbstractBaseProviderTest
 {
     /**

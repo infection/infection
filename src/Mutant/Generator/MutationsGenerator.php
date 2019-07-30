@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,7 @@ use Infection\Finder\SourceFilesFinder;
 use Infection\Mutant\Exception\ParserException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
-use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Traverser\PriorityNodeTraverser;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
@@ -66,7 +66,7 @@ final class MutationsGenerator
     private $srcDirs;
 
     /**
-     * @var CodeCoverageData
+     * @var LineCodeCoverage
      */
     private $codeCoverageData;
 
@@ -93,7 +93,7 @@ final class MutationsGenerator
     public function __construct(
         array $srcDirs,
         array $excludeDirsOrFiles,
-        CodeCoverageData $codeCoverageData,
+        LineCodeCoverage $codeCoverageData,
         array $mutators,
         EventDispatcherInterface $eventDispatcher,
         Parser $parser

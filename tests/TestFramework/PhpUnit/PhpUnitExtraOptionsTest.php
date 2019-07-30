@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,9 +38,6 @@ namespace Infection\Tests\TestFramework\PhpUnit;
 use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class PhpUnitExtraOptionsTest extends TestCase
 {
     /**

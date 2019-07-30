@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,19 +44,26 @@ use PhpParser\NodeVisitorAbstract;
  * @internal
  *
  * Adds FullyQualifiedClassName (FQCN) string to class node:
- *      $node->name                    // Plus
- *      $node->fullyQualifiedClassName // Infection\Mutator\Plus
+ *      $node->name                                                  // Plus
+ *      $node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY) // Infection\Mutator\Plus
  */
 final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
 {
+    public const FQN_KEY = 'fullyQualifiedClassName';
+
+    /**
+     * @var Node\Name|null
+     */
     private $namespace;
 
-    public function enterNode(Node $node): void
+    public function enterNode(Node $node): ?Node
     {
         if ($node instanceof Stmt\Namespace_) {
             $this->namespace = $node->name;
         } elseif ($node instanceof Stmt\ClassLike) {
-            $node->fullyQualifiedClassName = $node->name ? Name::concat($this->namespace, $node->name->name) : null;
+            $node->setAttribute(self::FQN_KEY, $node->name ? Name::concat($this->namespace, $node->name->name) : null);
         }
+
+        return null;
     }
 }

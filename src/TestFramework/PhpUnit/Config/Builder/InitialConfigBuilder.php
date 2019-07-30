@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
-use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 
 /**
@@ -143,7 +143,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
         $coverageXmlLog = $dom->createElement('log');
         $coverageXmlLog->setAttribute('type', 'coverage-xml');
-        $coverageXmlLog->setAttribute('target', $this->tmpDir . '/' . CodeCoverageData::PHP_UNIT_COVERAGE_DIR);
+        $coverageXmlLog->setAttribute('target', $this->tmpDir . '/' . XMLLineCodeCoverage::PHP_UNIT_COVERAGE_DIR);
 
         $logging->appendChild($coverageXmlLog);
     }

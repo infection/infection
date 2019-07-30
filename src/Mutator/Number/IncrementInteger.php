@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,6 +45,7 @@ final class IncrementInteger extends AbstractNumberMutator
     /**
      * Increments an integer by 1
      *
+     * @param Node&Node\Scalar\LNumber $node
      *
      * @return Node\Scalar\LNumber
      */

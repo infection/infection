@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,6 +46,7 @@ final class For_ extends Mutator
     /**
      * Replaces "for($i=0; $i<10; $i++)" with "for($i=0; false; $i++)"
      *
+     * @param Node&Node\Stmt\For_ $node
      *
      * @return Node\Stmt\For_
      */

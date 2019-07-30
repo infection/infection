@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -182,19 +182,27 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInt
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getErrorCount()) . '</options=bold> errors were encountered');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getTimedOutCount()) . '</options=bold> time outs were encountered');
 
-        $msiTag = $this->getPercentageTag($this->metricsCalculator->getMutationScoreIndicator());
-        $mutationCoverageTag = $this->getPercentageTag($this->metricsCalculator->getCoverageRate());
-        $coveredMsiTag = $this->getPercentageTag($this->metricsCalculator->getCoveredCodeMutationScoreIndicator());
+        $mutationScoreIndicator = floor($this->metricsCalculator->getMutationScoreIndicator());
+        $msiTag = $this->getPercentageTag($mutationScoreIndicator);
+
+        $coverageRate = floor($this->metricsCalculator->getCoverageRate());
+        $mutationCoverageTag = $this->getPercentageTag($coverageRate);
+
+        $coveredMsi = floor($this->metricsCalculator->getCoveredCodeMutationScoreIndicator());
+        $coveredMsiTag = $this->getPercentageTag($coveredMsi);
 
         $this->output->writeln(['', 'Metrics:']);
+
         $this->output->writeln(
-            $this->addIndentation("Mutation Score Indicator (MSI): <{$msiTag}>{$this->metricsCalculator->getMutationScoreIndicator()}%</{$msiTag}>")
+            $this->addIndentation("Mutation Score Indicator (MSI): <{$msiTag}>{$mutationScoreIndicator}%</{$msiTag}>")
         );
+
         $this->output->writeln(
-            $this->addIndentation("Mutation Code Coverage: <{$mutationCoverageTag}>{$this->metricsCalculator->getCoverageRate()}%</{$mutationCoverageTag}>")
+            $this->addIndentation("Mutation Code Coverage: <{$mutationCoverageTag}>{$coverageRate}%</{$mutationCoverageTag}>")
         );
+
         $this->output->writeln(
-            $this->addIndentation("Covered Code MSI: <{$coveredMsiTag}>{$this->metricsCalculator->getCoveredCodeMutationScoreIndicator()}%</{$coveredMsiTag}>")
+            $this->addIndentation("Covered Code MSI: <{$coveredMsiTag}>{$coveredMsi}%</{$coveredMsiTag}>")
         );
 
         $this->output->writeln(['', 'Please note that some mutants will inevitably be harmless (i.e. false positives).']);

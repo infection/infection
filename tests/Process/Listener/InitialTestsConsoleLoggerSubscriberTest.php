@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,15 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Listener;
 
 use Infection\EventDispatcher\EventDispatcher;
+use Infection\Events\InitialTestSuiteFinished;
 use Infection\Events\InitialTestSuiteStarted;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @internal
- */
 final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
 {
     public function test_it_reacts_on_initial_test_suite_run(): void
@@ -58,7 +56,7 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
             ->method('getVersion');
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework));
+        $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, false));
 
         $dispatcher->dispatch(new InitialTestSuiteStarted());
     }
@@ -85,8 +83,27 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
             ->will($this->throwException(new \InvalidArgumentException()));
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework));
+        $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, false));
 
         $dispatcher->dispatch(new InitialTestSuiteStarted());
+    }
+
+    public function test_it_outputs_the_initial_process_text_if_in_debug_mode(): void
+    {
+        $processText = 'PHPUnit Test suite ...';
+        $output = $this->createMock(OutputInterface::class);
+        $output->expects($this->once())
+            ->method('writeln')
+            ->with(PHP_EOL . $processText);
+
+        $output->method('getVerbosity')
+            ->willReturn(OutputInterface::VERBOSITY_QUIET);
+
+        $testFramework = $this->createMock(AbstractTestFrameworkAdapter::class);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, true));
+
+        $dispatcher->dispatch(new InitialTestSuiteFinished($processText));
     }
 }

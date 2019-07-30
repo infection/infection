@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,4 +40,12 @@ namespace Infection\TestFramework\PhpSpec\Config;
  */
 final class NoCodeCoverageException extends \Exception
 {
+    public static function fromTestFramework(string $framework): self
+    {
+        return new self(sprintf(
+            'No code coverage Extension detected for %s. %sWithout code coverage, running Infection is not useful.',
+            $framework,
+            "\n"
+        ));
+    }
 }

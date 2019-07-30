@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,8 +42,6 @@ use PHPUnit\Framework\TestCase;
  * All these tests should be ran in separate processes, as otherwise they may rely
  * on the internal state of XdebugHandler.
  *
- * @internal
- *
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
@@ -53,6 +51,18 @@ final class CoverageRequirementCheckerTest extends TestCase
     {
         $this->requirePhpDbg();
         $this->requireNoXdebug();
+        $this->requireNoPcov();
+
+        $coverageChecker = new CoverageRequirementChecker(false, '');
+
+        $this->assertTrue($coverageChecker->hasDebuggerOrCoverageOption());
+    }
+
+    public function test_it_has_debugger_or_coverage_option_on_pcov(): void
+    {
+        $this->requireNoPhpDbg();
+        $this->requireNoXdebug();
+        $this->requirePcov();
 
         $coverageChecker = new CoverageRequirementChecker(false, '');
 
@@ -62,6 +72,7 @@ final class CoverageRequirementCheckerTest extends TestCase
     public function test_it_has_debugger_or_coverage_option_with_xdebug(): void
     {
         $this->requireNoPhpDbg();
+        $this->requireNoPcov();
         $this->requireXdebug();
 
         $coverageChecker = new CoverageRequirementChecker(false, '');
@@ -73,6 +84,7 @@ final class CoverageRequirementCheckerTest extends TestCase
     {
         $this->requireNoPhpDbg();
         $this->requireNoXdebug();
+        $this->requireNoPcov();
 
         $coverageChecker = new CoverageRequirementChecker(true, '');
 
@@ -83,6 +95,7 @@ final class CoverageRequirementCheckerTest extends TestCase
     {
         $this->requireNoPhpDbg();
         $this->requireNoXdebug();
+        $this->requireNoPcov();
 
         $coverageChecker = new CoverageRequirementChecker(false, '-d zend_extension=xdebug.so');
 
@@ -93,6 +106,7 @@ final class CoverageRequirementCheckerTest extends TestCase
     {
         $this->requireNoPhpDbg();
         $this->requireNoXdebug();
+        $this->requireNoPcov();
 
         $coverageChecker = new CoverageRequirementChecker(false, '--help');
 
@@ -124,6 +138,20 @@ final class CoverageRequirementCheckerTest extends TestCase
     {
         if (\extension_loaded('xdebug')) {
             $this->markTestSkipped('Test requires xdebug to be disabled to run.');
+        }
+    }
+
+    private function requirePcov(): void
+    {
+        if (!\extension_loaded('pcov')) {
+            $this->markTestSkipped('Test requires pcov to run.');
+        }
+    }
+
+    private function requireNoPcov(): void
+    {
+        if (\extension_loaded('pcov')) {
+            $this->markTestSkipped('Test requires pcov to be disabled to run.');
         }
     }
 }

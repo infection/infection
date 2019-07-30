@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,9 +43,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Process;
 
-/**
- * @internal
- */
 final class ConsoleOutputTest extends TestCase
 {
     public function test_log_verbosity_deprecation_notice(): void
@@ -107,7 +104,7 @@ final class ConsoleOutputTest extends TestCase
     public function test_log_bad_msi_error_message(): void
     {
         $metrics = $this->createMock(MetricsCalculator::class);
-        $metrics->expects($this->once())->method('getMutationScoreIndicator')->willReturn('75.0');
+        $metrics->expects($this->once())->method('getMutationScoreIndicator')->willReturn(75.0);
         $io = $this->createMock(SymfonyStyle::class);
         $io->expects($this->once())->method('error')->with(
             'The minimum required MSI percentage should be 25%, but actual is 75%. Improve your tests!'
@@ -131,7 +128,7 @@ final class ConsoleOutputTest extends TestCase
     public function test_log_bad_covered_msi_error_message(): void
     {
         $metrics = $this->createMock(MetricsCalculator::class);
-        $metrics->expects($this->once())->method('getCoveredCodeMutationScoreIndicator')->willReturn('75.0');
+        $metrics->expects($this->once())->method('getCoveredCodeMutationScoreIndicator')->willReturn(75.0);
         $io = $this->createMock(SymfonyStyle::class);
         $io->expects($this->once())->method('error')->with(
             'The minimum required Covered Code MSI percentage should be 25%, but actual is 75%. Improve your tests!'

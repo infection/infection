@@ -12,6 +12,7 @@
         }
     },
     "mutators": {
+        "@default": true,
         "MethodCallRemoval": {
             "ignore": [
                 "Infection\\Finder\\SourceFilesFinder::__construct::63"

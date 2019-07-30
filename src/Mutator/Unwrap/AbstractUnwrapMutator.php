@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,7 +46,9 @@ abstract class AbstractUnwrapMutator extends Mutator
     /**
      * Replaces "$a = function(arg1, arg2);" with "$a = arg1;"
      *
-     * @return Node\Param;
+     * @param Node&Node\Expr\FuncCall $node
+     *
+     * @return Node\Param[]|\Generator;
      */
     final public function mutate(Node $node)
     {
@@ -57,7 +59,10 @@ abstract class AbstractUnwrapMutator extends Mutator
 
     abstract protected function getFunctionName(): string;
 
-    abstract protected function getParameterIndexes(Node $node): \Generator;
+    /**
+     * @return int[]|\Generator
+     */
+    abstract protected function getParameterIndexes(Node\Expr\FuncCall $node): \Generator;
 
     final protected function mutatesNode(Node $node): bool
     {

@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpSpec\Config;
 
-use Infection\TestFramework\Coverage\CodeCoverageData;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -43,11 +43,6 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class InitialYamlConfiguration extends AbstractYamlConfiguration
 {
-    /**
-     * @var string
-     */
-    protected $originalYamlConfigPath;
-
     /**
      * @var bool
      */
@@ -66,7 +61,7 @@ final class InitialYamlConfiguration extends AbstractYamlConfiguration
             $this->removeCoverageExtension($this->parsedYaml);
         } else {
             if (!$this->hasCodeCoverageExtension($this->parsedYaml)) {
-                throw new NoCodeCoverageException("No code coverage Extension detected for PhpSpec. \nWithout code coverage, running Infection is not useful.");
+                throw NoCodeCoverageException::fromTestFramework('PhpSpec');
             }
 
             $this->updateCodeCoveragePath($this->parsedYaml);
@@ -84,7 +79,7 @@ final class InitialYamlConfiguration extends AbstractYamlConfiguration
 
             $options['format'] = ['xml'];
             $options['output'] = [
-                'xml' => $this->tempDirectory . '/' . CodeCoverageData::PHP_SPEC_COVERAGE_DIR,
+                'xml' => $this->tempDirectory . '/' . XMLLineCodeCoverage::PHP_SPEC_COVERAGE_DIR,
             ];
         }
         unset($options);

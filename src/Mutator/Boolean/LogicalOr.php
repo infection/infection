@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,6 +46,7 @@ final class LogicalOr extends Mutator
     /**
      * Replaces "||" with "&&"
      *
+     * @param Node&Node\Expr\BinaryOp\BooleanOr $node
      *
      * @return Node\Expr\BinaryOp\BooleanAnd
      */

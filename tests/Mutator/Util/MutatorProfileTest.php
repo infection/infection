@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,9 +39,6 @@ use Infection\Mutator\Util\MutatorProfile;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
 
-/**
- * @internal
- */
 final class MutatorProfileTest extends TestCase
 {
     public function test_all_mutators_have_the_correct_name_in_the_full_mutator_list(): void

@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,9 +40,6 @@ use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class PriorityNodeTraverserTest extends TestCase
 {
     public function test_it_sorts_visitors_by_priorites(): void

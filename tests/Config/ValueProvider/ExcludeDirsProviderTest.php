@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,9 +39,6 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @internal
- */
 final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
 {
     /**
@@ -129,6 +126,30 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
         );
 
         $this->assertContains('foo', $excludeDirs);
+    }
+
+    public function test_returns_an_array_with_incremented_keys_started_from_zero(): void
+    {
+        if (!$this->hasSttyAvailable()) {
+            $this->markTestSkipped('Stty is not available');
+        }
+
+        $dirA = $this->workspace . \DIRECTORY_SEPARATOR . 'a' . \DIRECTORY_SEPARATOR;
+        $dirB = $this->workspace . \DIRECTORY_SEPARATOR . 'b' . \DIRECTORY_SEPARATOR;
+        $dirC = $this->workspace . \DIRECTORY_SEPARATOR . 'c' . \DIRECTORY_SEPARATOR;
+
+        \mkdir($dirA);
+        \mkdir($dirB);
+        \mkdir($dirC);
+
+        $excludeDirs = $this->provider->get(
+            $this->createStreamableInputInterfaceMock($this->getInputStream("$dirA\n$dirA\n$dirC\n")),
+            $this->createOutputInterface(),
+            [$dirA, $dirB, $dirC],
+            ['.']
+        );
+
+        $this->assertSame([0 => $dirA, 1 => $dirC], $excludeDirs);
     }
 
     public function excludeDirsProvider()

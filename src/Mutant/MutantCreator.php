@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,11 +37,11 @@ namespace Infection\Mutant;
 
 use Infection\Differ\Differ;
 use Infection\MutationInterface;
-use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\Visitor\CloneVisitor;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\PrettyPrinter\Standard;
+use function Safe\file_get_contents;
 
 /**
  * @internal
@@ -75,7 +75,7 @@ final class MutantCreator
         $this->prettyPrinter = $prettyPrinter;
     }
 
-    public function create(MutationInterface $mutation, CodeCoverageData $codeCoverageData): MutantInterface
+    public function create(MutationInterface $mutation): MutantInterface
     {
         $mutatedFilePath = sprintf('%s/mutant.%s.infection.php', $this->tempDir, $mutation->getHash());
 
@@ -88,9 +88,7 @@ final class MutantCreator
         return new Mutant(
             $mutatedFilePath,
             $mutation,
-            $diff,
-            $mutation->isCoveredByTest(),
-            $codeCoverageData->getAllTestsFor($mutation)
+            $diff
         );
     }
 
@@ -98,7 +96,6 @@ final class MutantCreator
     {
         if (is_readable($mutatedFilePath)) {
             $mutatedCode = file_get_contents($mutatedFilePath);
-            \assert(\is_string($mutatedCode));
 
             return $mutatedCode;
         }

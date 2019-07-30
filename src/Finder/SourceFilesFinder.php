@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Finder;
 
 use Infection\Finder\Iterator\RealPathFilterIterator;
+use Iterator;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -89,6 +90,9 @@ final class SourceFilesFinder extends Finder
         return $this;
     }
 
+    /**
+     * @return RealPathFilterIterator|(iterable<\Symfony\Component\Finder\SplFileInfo>&Iterator)
+     */
     public function getIterator()
     {
         $iterator = parent::getIterator();

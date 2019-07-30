@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -52,9 +52,6 @@ use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 abstract class AbstractMutatorTestCase extends TestCase
 {
     /**
@@ -154,10 +151,10 @@ abstract class AbstractMutatorTestCase extends TestCase
         $mutationsCollectorVisitor = new SimpleMutationsCollectorVisitor($this->getMutator($settings), $initialStatements);
 
         $traverser->addVisitor(new NotMutableIgnoreVisitor());
-        $traverser->addVisitor($mutationsCollectorVisitor);
         $traverser->addVisitor(new ParentConnectorVisitor());
         $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
         $traverser->addVisitor(new ReflectionVisitor());
+        $traverser->addVisitor($mutationsCollectorVisitor);
 
         $traverser->traverse($initialStatements);
 

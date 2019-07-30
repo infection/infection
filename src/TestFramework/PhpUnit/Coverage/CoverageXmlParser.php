@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,12 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Coverage;
 
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
+use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\Coverage\MethodLocationData;
+use Infection\TestFramework\PhpUnit\Coverage\Exception\NoLinesExecutedException;
+use function Safe\file_get_contents;
+use function Safe\realpath;
 
 /**
  * @internal
@@ -52,11 +58,18 @@ class CoverageXmlParser
         $this->coverageDir = $coverageDir;
     }
 
+    /**
+     * @return CoverageFileData[]
+     *
+     * @throws \Exception
+     */
     public function parse(string $coverageXmlContent): array
     {
         $dom = new \DOMDocument();
         $dom->loadXML($this->removeNamespace($coverageXmlContent));
         $xPath = new \DOMXPath($dom);
+
+        $this->assertHasCoverage($xPath);
 
         $coverage = [[]];
 
@@ -66,21 +79,34 @@ class CoverageXmlParser
         foreach ($nodes as $node) {
             $relativeFilePath = $node->getAttribute('href');
 
-            $fileCoverage = $this->processXmlFileCoverage($relativeFilePath, $projectSource);
-
-            $coverage[] = $fileCoverage;
+            $coverage[] = $this->processXmlFileCoverage($relativeFilePath, $projectSource);
         }
 
         return array_merge(...$coverage);
     }
 
+    private function assertHasCoverage(\DOMXPath $xPath): void
+    {
+        $lineCoverage = $xPath->query('/phpunit/project/directory[@name="/"]/totals/lines')->item(0);
+
+        if (
+            !$lineCoverage instanceof \DOMElement
+            || ($coverageCount = $lineCoverage->getAttribute('executed')) === '0'
+            || $coverageCount === ''
+        ) {
+            throw NoLinesExecutedException::noLinesExecuted();
+        }
+    }
+
+    /**
+     * @return array<string, CoverageFileData>
+     *
+     * @throws \Exception
+     */
     private function processXmlFileCoverage(string $relativeCoverageFilePath, string $projectSource): array
     {
         $absolutePath = realpath($this->coverageDir . '/' . $relativeCoverageFilePath);
-        \assert(\is_string($absolutePath));
-
         $coverageFileXml = file_get_contents($absolutePath);
-        \assert(\is_string($coverageFileXml));
 
         $dom = new \DOMDocument();
         $dom->loadXML($this->removeNamespace($coverageFileXml));
@@ -91,17 +117,15 @@ class CoverageXmlParser
         $linesNode = $xPath->query('/phpunit/file/totals/lines')[0];
         $percentage = (float) $linesNode->getAttribute('percent');
 
-        $defaultCoverageFileData = ['byLine' => [], 'byMethod' => []];
-
         if (!$percentage) {
-            return [$sourceFilePath => $defaultCoverageFileData];
+            return [$sourceFilePath => new CoverageFileData()];
         }
 
         /** @var \DOMNodeList $lineCoverageNodes */
         $lineCoverageNodes = $xPath->query('/phpunit/file/coverage/line');
 
         if (!$lineCoverageNodes->length) {
-            return [$sourceFilePath => $defaultCoverageFileData];
+            return [$sourceFilePath => new CoverageFileData()];
         }
 
         $methodsCoverageNodes = $xPath->query('/phpunit/file/class/method');
@@ -111,10 +135,10 @@ class CoverageXmlParser
         }
 
         return [
-            $sourceFilePath => [
-                'byLine' => $this->getCoveredLinesData($lineCoverageNodes),
-                'byMethod' => $this->getMethodsCoverageData($methodsCoverageNodes),
-            ],
+            $sourceFilePath => new CoverageFileData(
+                $this->getCoveredLinesData($lineCoverageNodes),
+                $this->getMethodsCoverageData($methodsCoverageNodes)
+            ),
         ];
     }
 
@@ -123,7 +147,7 @@ class CoverageXmlParser
      */
     private function removeNamespace(string $xml): string
     {
-        return preg_replace('/xmlns=\".*?\"/', '', $xml);
+        return (string) preg_replace('/xmlns=\".*?\"/', '', $xml);
     }
 
     /**
@@ -155,19 +179,22 @@ class CoverageXmlParser
         throw CoverageDoesNotExistException::forFileAtPath($fileName, $path);
     }
 
+    /**
+     * @return array<int, array<int, CoverageLineData>>
+     */
     private function getCoveredLinesData(\DOMNodeList $lineCoverageNodes): array
     {
         $fileCoverage = [];
 
         foreach ($lineCoverageNodes as $lineCoverageNode) {
             /** @var \DOMNode $lineCoverageNode */
-            $lineNumber = $lineCoverageNode->getAttribute('nr');
+            $lineNumber = (int) $lineCoverageNode->getAttribute('nr');
 
             foreach ($lineCoverageNode->childNodes as $coveredNode) {
                 if ($coveredNode->nodeName === 'covered') {
                     $testMethod = $coveredNode->getAttribute('by');
 
-                    $fileCoverage[$lineNumber][] = ['testMethod' => $testMethod];
+                    $fileCoverage[$lineNumber][] = CoverageLineData::withTestMethod($testMethod);
                 }
             }
         }
@@ -175,6 +202,9 @@ class CoverageXmlParser
         return $fileCoverage;
     }
 
+    /**
+     * @return MethodLocationData[]
+     */
     private function getMethodsCoverageData(\DOMNodeList $methodsCoverageNodes): array
     {
         $methodsCoverage = [];
@@ -182,13 +212,10 @@ class CoverageXmlParser
         foreach ($methodsCoverageNodes as $methodsCoverageNode) {
             $methodName = $methodsCoverageNode->getAttribute('name');
 
-            $methodsCoverage[$methodName] = [
-                'startLine' => (int) $methodsCoverageNode->getAttribute('start'),
-                'endLine' => (int) $methodsCoverageNode->getAttribute('end'),
-                'executable' => (int) $methodsCoverageNode->getAttribute('executable'),
-                'executed' => (int) $methodsCoverageNode->getAttribute('executed'),
-                'coverage' => (int) $methodsCoverageNode->getAttribute('coverage'),
-            ];
+            $methodsCoverage[$methodName] = new MethodLocationData(
+                (int) $methodsCoverageNode->getAttribute('start'),
+                (int) $methodsCoverageNode->getAttribute('end')
+            );
         }
 
         return $methodsCoverage;

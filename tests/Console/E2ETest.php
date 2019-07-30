@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,6 +40,7 @@ use Infection\Command\ConfigureCommand;
 use Infection\Console\Application;
 use Infection\Console\InfectionContainer;
 use Infection\Finder\ComposerExecutableFinder;
+use Infection\Finder\Exception\FinderException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -47,9 +48,6 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
-/**
- * @internal
- */
 final class E2ETest extends TestCase
 {
     private const MAX_FAILING_COMPOSER_INSTALL = 5;
@@ -71,15 +69,15 @@ final class E2ETest extends TestCase
             $this->markTestSkipped('Running this test on PHPDBG causes failures on Travis, see https://github.com/infection/infection/pull/622.');
         }
 
+        if (getenv('DEPS') === 'LOW') {
+            $this->markTestSkipped('Running tests with different lowest versions of dependencies between Infection and underlying e2e tests causes failures, see https://github.com/infection/infection/pull/741.');
+        }
+
         // Without overcommit this test fails with `proc_open(): fork failed - Cannot allocate memory`
         if (strpos(PHP_OS, 'Linux') === 0 &&
             is_readable('/proc/sys/vm/overcommit_memory') &&
             (int) file_get_contents('/proc/sys/vm/overcommit_memory') === 2) {
             $this->markTestSkipped('This test needs copious amounts of virtual memory. It will fail unless it is allowed to overcommit memory.');
-        }
-
-        if (\version_compare(\PHPUnit\Runner\Version::id(), '8', '>=')) {
-            $this->markTestSkipped('Most E2E tests use an earlier version of PHPUnit, which is incompatible with PHPUnit 8 and later');
         }
 
         // E2E tests usually require to chdir to their location
@@ -200,7 +198,10 @@ final class E2ETest extends TestCase
             $this->assertNotEmpty(getenv('PATH') ?: getenv('Path'), 'E2E tests need a system composer installed, but it could not be found without a PATH set');
 
             try {
-                $process = new Process(sprintf('%s %s', (new ComposerExecutableFinder())->find(), 'install'));
+                $process = new Process([
+                    (new ComposerExecutableFinder())->find(),
+                    'install',
+                ]);
                 $process->setTimeout(300);
                 $process->mustRun();
             } catch (ProcessTimedOutException $e) {
@@ -215,6 +216,13 @@ final class E2ETest extends TestCase
 
                 ++self::$countFailingComposerInstall;
                 $this->markTestSkipped($e->getMessage());
+            } catch (FinderException $e) {
+                if (\DIRECTORY_SEPARATOR !== '\\') {
+                    throw $e;
+                }
+
+                // It is not our call to work around ComposerExecutableFinder's misbehavior on Windows
+                $this->markTestIncomplete($e->getMessage());
             }
         }
 
@@ -296,7 +304,7 @@ final class E2ETest extends TestCase
             $this->markTestSkipped("Infection from within PHPUnit won't run without xdebug or phpdbg");
         }
 
-        $container = new InfectionContainer();
+        $container = InfectionContainer::create();
         $input = new ArgvInput(array_merge([
             'bin/infection',
             'run',

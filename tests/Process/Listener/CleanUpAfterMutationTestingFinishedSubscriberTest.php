@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,9 +40,6 @@ use Infection\Process\Listener\CleanUpAfterMutationTestingFinishedSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @internal
- */
 final class CleanUpAfterMutationTestingFinishedSubscriberTest extends TestCase
 {
     public function test_it_execute_remove_on_mutation_testing_finished(): void

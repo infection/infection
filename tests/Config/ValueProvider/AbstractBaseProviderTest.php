@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,9 +40,6 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 
-/**
- * @internal
- */
 abstract class AbstractBaseProviderTest extends TestCase
 {
     protected static $stty;
@@ -70,7 +67,7 @@ abstract class AbstractBaseProviderTest extends TestCase
     {
         $mock = $this->createMock(StreamableInputInterface::class);
         $mock->method('isInteractive')
-            ->will($this->returnValue($interactive));
+            ->willReturn($interactive);
 
         if ($stream) {
             $mock->method('getStream')

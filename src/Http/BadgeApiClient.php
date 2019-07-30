@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Http;
 
+use function Safe\curl_init;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -70,8 +71,6 @@ class BadgeApiClient
         ]);
 
         $ch = curl_init();
-
-        \assert(\is_resource($ch));
 
         curl_setopt($ch, CURLOPT_URL, self::STRYKER_DASHBOARD_API_URL);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

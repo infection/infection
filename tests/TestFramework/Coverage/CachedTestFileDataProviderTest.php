@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,11 +37,9 @@ namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
+use Infection\TestFramework\Coverage\TestFileTimeData;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class CachedTestFileDataProviderTest extends TestCase
 {
     public function test_the_second_call_returns_cached_result(): void
@@ -51,7 +49,7 @@ final class CachedTestFileDataProviderTest extends TestCase
         $providerMock->expects($this->once())
             ->method('getTestFileInfo')
             ->with($class)
-            ->willReturn(['data']);
+            ->willReturn(new TestFileTimeData('path/to/Test.php', 4.567));
 
         $infoProvider = new CachedTestFileDataProvider($providerMock);
 

@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,6 +49,7 @@ final class ProtectedVisibility extends Mutator
     /**
      * Replaces "protected function..." with "private function ..."
      *
+     * @param Node&ClassMethod $node
      *
      * @return ClassMethod
      */
@@ -85,7 +86,7 @@ final class ProtectedVisibility extends Mutator
         return !$this->hasSameProtectedParentMethod($node);
     }
 
-    private function hasSameProtectedParentMethod(Node $node): bool
+    private function hasSameProtectedParentMethod(ClassMethod $node): bool
     {
         /** @var \ReflectionClass|null $reflection */
         $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
@@ -95,22 +96,10 @@ final class ProtectedVisibility extends Mutator
             return true;
         }
 
-        $parent = $reflection->getParentClass();
-
-        while ($parent) {
-            try {
-                $method = $parent->getMethod($node->name->name);
-
-                if ($method->isProtected()) {
-                    return true;
-                }
-            } catch (\ReflectionException $e) {
-                return false;
-            } finally {
-                $parent = $parent->getParentClass();
-            }
+        try {
+            return $reflection->getMethod($node->name->name)->getPrototype()->isProtected();
+        } catch (\ReflectionException $e) {
+            return false;
         }
-
-        return false;
     }
 }

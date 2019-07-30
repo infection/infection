@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,9 +40,6 @@ use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 
-/**
- * @internal
- */
 final class FullyQualifiedClassNameVisitorTest extends AbstractBaseVisitorTest
 {
     private $spyVisitor;
@@ -61,7 +58,7 @@ final class FullyQualifiedClassNameVisitorTest extends AbstractBaseVisitorTest
         $this->assertCount(1, $this->spyVisitor->processedNodes);
         $this->assertSame(
             'FqcnEmptyClass\EmptyClass',
-            $this->spyVisitor->processedNodes[0]->fullyQualifiedClassName->toString()
+            $this->spyVisitor->processedNodes[0]->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)->toString()
         );
     }
 
@@ -74,7 +71,7 @@ final class FullyQualifiedClassNameVisitorTest extends AbstractBaseVisitorTest
         $this->assertCount(1, $this->spyVisitor->processedNodes);
         $this->assertSame(
             'FqcnClassInterface\Ci',
-            $this->spyVisitor->processedNodes[0]->fullyQualifiedClassName->toString()
+            $this->spyVisitor->processedNodes[0]->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)->toString()
         );
     }
 
@@ -87,7 +84,7 @@ final class FullyQualifiedClassNameVisitorTest extends AbstractBaseVisitorTest
         $this->assertCount(1, $this->spyVisitor->processedNodes);
         $this->assertSame(
             'FqcnClassAnonymous\Ci',
-            $this->spyVisitor->processedNodes[0]->fullyQualifiedClassName->toString()
+            $this->spyVisitor->processedNodes[0]->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)->toString()
         );
     }
 
@@ -98,7 +95,7 @@ final class FullyQualifiedClassNameVisitorTest extends AbstractBaseVisitorTest
 
             public function enterNode(Node $node): void
             {
-                if (isset($node->fullyQualifiedClassName)) {
+                if ($node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)) {
                     $this->processedNodes[] = $node;
                 }
             }

@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -158,7 +158,7 @@ final class XmlConfigurationHelper
         $errors = libxml_get_errors();
 
         foreach ($errors as $key => $error) {
-            $level = $error->level === LIBXML_ERR_WARNING ? 'Warning' : $error->level === LIBXML_ERR_ERROR ? 'Error' : 'Fatal';
+            $level = $this->getErrorLevelString($error);
             $errorsString .= sprintf('[%s] %s', $level, $error->message);
 
             if ($error->file) {
@@ -205,5 +205,18 @@ final class XmlConfigurationHelper
             $node = $xPath->query('/phpunit')[0];
             $node->setAttribute($name, $value);
         }
+    }
+
+    private function getErrorLevelString(\LibXMLError $error): string
+    {
+        if ($error->level === LIBXML_ERR_WARNING) {
+            return 'Warning';
+        }
+
+        if ($error->level === LIBXML_ERR_ERROR) {
+            return 'Error';
+        }
+
+        return 'Fatal';
     }
 }

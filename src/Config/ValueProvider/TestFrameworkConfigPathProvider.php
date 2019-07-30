@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,6 +39,8 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\PhpUnitPathGuesser;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\TestFrameworkTypes;
+use function Safe\file_get_contents;
+use function Safe\json_decode;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -86,7 +88,6 @@ final class TestFrameworkConfigPathProvider
             }
 
             $composerJsonText = file_get_contents('composer.json');
-            \assert(\is_string($composerJsonText));
 
             $phpUnitPathGuesser = new PhpUnitPathGuesser(json_decode($composerJsonText));
             $defaultValue = $phpUnitPathGuesser->guess();

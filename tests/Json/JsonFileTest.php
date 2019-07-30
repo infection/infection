@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,9 +42,6 @@ use JsonSchema\Exception\ValidationException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @internal
- */
 final class JsonFileTest extends TestCase
 {
     /**
@@ -95,6 +92,16 @@ final class JsonFileTest extends TestCase
         $jsonPath = $this->tmpDir . '/file.json';
 
         $this->filesystem->dumpFile($jsonPath, $jsonString);
+
+        self::expectException(ParseException::class);
+
+        (new JsonFile($jsonPath))->decode();
+    }
+
+    public function test_it_throws_parse_exception_when_file_is_not_found(): void
+    {
+        $jsonPath = $this->tmpDir . '/missing-invalid.json';
+        self::assertFileNotExists($jsonPath);
 
         self::expectException(ParseException::class);
 

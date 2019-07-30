@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -72,7 +72,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
 
     public function getMemoryUsed(string $output): float
     {
-        if (preg_match('/Memory: (\d+(?:\.\d+))MB/', $output, $match)) {
+        if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match)) {
             return (float) $match[1];
         }
 

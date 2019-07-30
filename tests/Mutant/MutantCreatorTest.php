@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,13 +38,9 @@ namespace Infection\Tests\Mutant;
 use Infection\Differ\Differ;
 use Infection\Mutant\MutantCreator;
 use Infection\MutationInterface;
-use Infection\TestFramework\Coverage\CodeCoverageData;
 use PhpParser\PrettyPrinter\Standard;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
 final class MutantCreatorTest extends TestCase
 {
     private const TEST_FILE_NAME = '/mutant.hash.infection.php';
@@ -74,7 +70,7 @@ PHP
         rmdir($this->directory);
     }
 
-    public function test_it_uses_avaialable_file_if_hash_is_the_same(): void
+    public function test_it_uses_available_file_if_hash_is_the_same(): void
     {
         $standard = $this->createMock(Standard::class);
         $standard->method('prettyPrintFile')
@@ -90,15 +86,12 @@ PHP
         $mutation->method('getOriginalFilePath')->willReturn('original/path');
         $mutation->method('getOriginalFileAst')->willReturn(['ast']);
         $mutation->method('getAttributes')->willReturn(['startLine' => 1]);
-        $mutation->method('isOnFunctionSignature')->willReturn(true);
+        $mutation->method('getAllTests')->willReturn(['test', 'list']);
+
         $mutation->expects($this->once())->method('isCoveredByTest')->willReturn(true);
 
-        $coverage = $this->createMock(CodeCoverageData::class);
-        $coverage->method('hasExecutedMethodOnLine')->willReturn(true);
-        $coverage->method('getAllTestsFor')->willReturn(['test', 'list']);
-
         $creator = new MutantCreator($this->directory, $differ, $standard);
-        $mutant = $creator->create($mutation, $coverage);
+        $mutant = $creator->create($mutation);
 
         $this->assertSame($this->directory . self::TEST_FILE_NAME, $mutant->getMutatedFilePath());
         $this->assertSame('This is the Diff', $mutant->getDiff());

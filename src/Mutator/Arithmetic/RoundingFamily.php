@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 2017-2019, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -55,13 +55,15 @@ final class RoundingFamily extends Mutator
      *     2. ceil() to floor() and round()
      *     3. round() to ceil() and floor()
      *
-     * @param Node\Expr\FuncCall|Node $node
+     * @param Node&Node\Expr\FuncCall $node
      *
      * @return \Generator
      */
     public function mutate(Node $node)
     {
-        $currentFunctionName = $this->getNormalizedFunctionName($node->name);
+        /** @var Node\Name $name */
+        $name = $node->name;
+        $currentFunctionName = $name->toLowerString();
 
         $mutateToFunctions = array_diff(self::MUTATORS_MAP, [$currentFunctionName]);
 
@@ -81,16 +83,11 @@ final class RoundingFamily extends Mutator
         }
 
         if (!$node->name instanceof Node\Name ||
-            !\in_array($this->getNormalizedFunctionName($node->name), self::MUTATORS_MAP, true)
+            !\in_array($node->name->toLowerString(), self::MUTATORS_MAP, true)
         ) {
             return false;
         }
 
         return true;
-    }
-
-    private function getNormalizedFunctionName(Node\Name $name): string
-    {
-        return strtolower((string) $name);
     }
 }

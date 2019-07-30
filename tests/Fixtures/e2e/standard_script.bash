@@ -4,7 +4,7 @@ readonly INFECTION=../../../../${1}
 
 set -e pipefail
 
-if [ "$PHPDBG" = "1" ]
+if [ "$DRIVER" = "phpdbg" ]
 then
     phpdbg -qrr $INFECTION
 else
