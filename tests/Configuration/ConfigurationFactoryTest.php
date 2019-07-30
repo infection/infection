@@ -10,6 +10,8 @@ use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mutator\Mutators;
+use Infection\Configuration\Entry\Mutator\TrueValue;
+use Infection\Configuration\Entry\Mutator\TrueValueSettings;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use InvalidArgumentException;
@@ -654,6 +656,248 @@ JSON
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'testFrameworkOptions' => '--debug',
+            ]),
+        ];
+
+        yield '[mutators][TrueValue] true' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "TrueValue": true
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    new TrueValue(
+                        true,
+                        [],
+                        new TrueValueSettings(
+                            true,
+                            true
+                        )
+
+                    ),
+                    null,
+                    null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[mutators][TrueValue] false' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "TrueValue": false
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    new TrueValue(
+                        false,
+                        [],
+                        new TrueValueSettings(
+                            false,
+                            false
+                        )
+
+                    ),
+                    null,
+                    null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[mutators][TrueValue] ignore' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "TrueValue": {
+            "ignore": ["fileA", "fileB"]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    new TrueValue(
+                        true,
+                        ['fileA', 'fileB'],
+                        new TrueValueSettings(
+                            true,
+                            true
+                        )
+
+                    ),
+                    null,
+                    null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[mutators][TrueValue] empty & untrimmed ignore' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "TrueValue": {
+            "ignore": [" file ", ""]
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    new TrueValue(
+                        true,
+                        ['file'],
+                        new TrueValueSettings(
+                            true,
+                            true
+                        )
+
+                    ),
+                    null,
+                    null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[mutators][TrueValue] in_array' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "TrueValue": {
+            "settings": {
+                "in_array": false
+            }
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    new TrueValue(
+                        true,
+                        [],
+                        new TrueValueSettings(
+                            false,
+                            true
+                        )
+
+                    ),
+                    null,
+                    null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[mutators][TrueValue] array_search' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "TrueValue": {
+            "settings": {
+                "array_search": false
+            }
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    new TrueValue(
+                        true,
+                        [],
+                        new TrueValueSettings(
+                            true,
+                            false
+                        )
+
+                    ),
+                    null,
+                    null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield '[mutators][TrueValue] nominal' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "TrueValue": {
+            "ignore": ["fileA"],
+            "settings": {
+                "in_array": false,
+                "array_search": false
+            }
+        }
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [],
+                    new TrueValue(
+                        true,
+                        ['fileA'],
+                        new TrueValueSettings(
+                            false,
+                            false
+                        )
+
+                    ),
+                    null,
+                    null,
+                    null
+                ),
             ]),
         ];
     }

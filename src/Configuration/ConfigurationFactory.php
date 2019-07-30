@@ -147,7 +147,7 @@ class ConfigurationFactory
         } else {
             $enabled = true;
 
-            $ignore = array_values(array_unique(array_map('trim', $value->ignore)));
+            $ignore = self::normalizeStringArray($value->ignore ?? []);
 
             $settings = new TrueValueSettings(
                 $value->settings->in_array ?? true,
