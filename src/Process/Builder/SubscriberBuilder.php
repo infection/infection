@@ -66,20 +66,79 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class SubscriberBuilder
 {
+    /**
+     * @var bool
+     */
     private $showMutations;
+
+    /**
+     * @var string
+     */
     private $logVerbosity;
+
+    /**
+     * @var bool
+     */
     private $debug;
+
+    /**
+     * @var bool
+     */
     private $onlyCovered;
+
+    /**
+     * @var bool
+     */
     private $noProgress;
+
+    /**
+     * @var string
+     */
     private $formatter;
+
+    /**
+     * @var MetricsCalculator
+     */
     private $metricsCalculator;
+
+    /**
+     * @var EventDispatcherInterface
+     */
     private $eventDispatcher;
+
+    /**
+     * @var DiffColorizer
+     */
     private $diffColorizer;
+
+    /**
+     * @var InfectionConfig
+     */
     private $infectionConfig;
+
+    /**
+     * @var Filesystem
+     */
     private $fs;
+
+    /**
+     * @var string
+     */
     private $tmpDir;
+
+    /**
+     * @var Timer
+     */
     private $timer;
+
+    /**
+     * @var TimeFormatter
+     */
     private $timeFormatter;
+
+    /**
+     * @var MemoryFormatter
+     */
     private $memoryFormatter;
 
     public function __construct(
