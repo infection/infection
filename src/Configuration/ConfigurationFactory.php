@@ -1,9 +1,43 @@
 <?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 declare(strict_types=1);
 
 namespace Infection\Configuration;
 
+use function array_filter;
+use function array_map;
+use function array_values;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mutator\ArrayItemRemoval;
@@ -18,11 +52,6 @@ use Infection\Configuration\Entry\Mutator\TrueValueSettings;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use stdClass;
-use function array_filter;
-use function array_map;
-use function array_unique;
-use function array_values;
-use function is_bool;
 use function strpos;
 use function trim;
 
@@ -37,7 +66,7 @@ class ConfigurationFactory
             $rawConfig->timeout ?? null,
             self::createSource($rawConfig->source),
             self::createLogs($rawConfig->logs ?? new stdClass()),
-            self::normalizeString( $rawConfig->tmpDir ?? null),
+            self::normalizeString($rawConfig->tmpDir ?? null),
             self::createPhpUnit($rawConfig->phpUnit ?? new stdClass()),
             self::createMutators($rawConfig->mutators ?? new stdClass()),
             $rawConfig->testFramework ?? null,
@@ -69,6 +98,7 @@ class ConfigurationFactory
     private static function createBadge(?stdClass $badge): ?Badge
     {
         $branch = self::normalizeString($badge->branch ?? null);
+
         return $branch === null
             ? null
             : new Badge($branch)
@@ -132,7 +162,7 @@ class ConfigurationFactory
      */
     private static function createTrueValue($value): TrueValue
     {
-        if (is_bool($value)) {
+        if (\is_bool($value)) {
             $enabled = $value;
 
             $ignore = [];
@@ -160,7 +190,7 @@ class ConfigurationFactory
      */
     private static function createArrayItemRemoval($value): ArrayItemRemoval
     {
-        if (is_bool($value)) {
+        if (\is_bool($value)) {
             $enabled = $value;
 
             $ignore = [];
@@ -185,7 +215,7 @@ class ConfigurationFactory
      */
     private static function createBCMath($value): BCMath
     {
-        if (is_bool($value)) {
+        if (\is_bool($value)) {
             $enabled = $value;
 
             $ignore = [];
@@ -240,7 +270,7 @@ class ConfigurationFactory
      */
     private static function createMBString($value): MBString
     {
-        if (is_bool($value)) {
+        if (\is_bool($value)) {
             $enabled = $value;
 
             $ignore = [];
@@ -325,8 +355,7 @@ class ConfigurationFactory
     private static function normalizeStringArray(
         ?array $values,
         ?array $default = []
-    ): array
-    {
+    ): array {
         if (null === $values) {
             return $default;
         }
@@ -339,8 +368,7 @@ class ConfigurationFactory
     private static function normalizeString(
         ?string $value,
         ?string $default = null
-    ): ?string
-    {
+    ): ?string {
         if (null === $value) {
             return $default;
         }

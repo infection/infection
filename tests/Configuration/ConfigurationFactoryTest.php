@@ -1,10 +1,46 @@
 <?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
+use function array_fill;
+use function array_map;
+use function array_merge;
+use function array_values;
 use Generator;
+use function implode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Badge;
@@ -21,20 +57,15 @@ use Infection\Configuration\Entry\Mutator\TrueValueSettings;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use JsonSchema\Validator;
+use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
-use stdClass;
-use function array_fill;
-use function array_map;
-use function array_merge;
-use function array_values;
-use function implode;
 use function Safe\json_decode;
 use function sprintf;
-use const PHP_EOL;
+use stdClass;
 
 class ConfigurationFactoryTest extends TestCase
 {
-    private const SCHEMA_FILE = 'file://'.__DIR__.'/../../resources/schema.json';
+    private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../resources/schema.json';
 
     /**
      * @dataProvider provideRawConfig
@@ -42,8 +73,7 @@ class ConfigurationFactoryTest extends TestCase
     public function test_it_can_create_a_config(
         string $json,
         Configuration $expected
-    ): void
-    {
+    ): void {
         $rawConfig = json_decode($json);
 
         // Validate the schema here to ensure we are not testing against invalid
@@ -54,7 +84,7 @@ class ConfigurationFactoryTest extends TestCase
 
         $actual = (new ConfigurationFactory())->create($rawConfig);
 
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public function provideRawConfig(): Generator
@@ -175,7 +205,7 @@ JSON
                     null,
                     null,
                     null
-                )
+                ),
             ]),
         ];
 
@@ -199,7 +229,7 @@ JSON
                     null,
                     null,
                     null
-                )
+                ),
             ]),
         ];
 
@@ -223,7 +253,7 @@ JSON
                     'debug.log',
                     null,
                     null
-                )
+                ),
             ]),
         ];
 
@@ -247,7 +277,7 @@ JSON
                     null,
                     'perMutator.log',
                     null
-                )
+                ),
             ]),
         ];
 
@@ -273,7 +303,7 @@ JSON
                     null,
                     null,
                     new Badge('master')
-                )
+                ),
             ]),
         ];
 
@@ -303,7 +333,7 @@ JSON
                     'debug.log',
                     'perMutator.log',
                     new Badge('master')
-                )
+                ),
             ]),
         ];
 
@@ -333,7 +363,7 @@ JSON
                     null,
                     null,
                     null
-                )
+                ),
             ]),
         ];
 
@@ -363,7 +393,7 @@ JSON
                     'debug.log',
                     'perMutator.log',
                     new Badge('master')
-                )
+                ),
             ]),
         ];
 
@@ -1312,11 +1342,11 @@ JSON
             'bcpow',
             'bcsub',
             'bcsqrt',
-            'bcpowmod'
+            'bcpowmod',
         ];
 
         foreach ($orderedBcMathSettings as $index => $bcMathSetting) {
-            yield '[mutators][BCMath] setting '.$bcMathSetting => (static function () use (
+            yield '[mutators][BCMath] setting ' . $bcMathSetting => (static function () use (
                 $index,
                 $bcMathSetting
             ): array {
@@ -1622,7 +1652,7 @@ JSON
         ];
 
         foreach ($orderedMBStringSettings as $index => $mbStringSetting) {
-            yield '[mutators][MBString] setting '.$mbStringSetting => (static function () use (
+            yield '[mutators][MBString] setting ' . $mbStringSetting => (static function () use (
                 $index,
                 $mbStringSetting
             ): array {
@@ -1733,7 +1763,7 @@ JSON
         ];
 
         foreach (Mutators::PROFILES as $index => $profile) {
-            yield '[mutators][profile] '.$profile.' false' => (static function () use (
+            yield '[mutators][profile] ' . $profile . ' false' => (static function () use (
                 $index,
                 $profile
             ): array {
@@ -1765,7 +1795,7 @@ JSON
                 ];
             })();
 
-            yield '[mutators][profile] '.$profile.' true' => (static function () use (
+            yield '[mutators][profile] ' . $profile . ' true' => (static function () use (
                 $index,
                 $profile
             ): array {
@@ -1827,20 +1857,20 @@ JSON
                 'source' => new Source(['src'], []),
                 'mutators' => new Mutators(
                     [
-                        '@arithmetic' =>true,
-                        '@boolean' =>true,
-                        '@cast' =>true,
-                        '@conditional_boundary' =>true,
-                        '@conditional_negotiation' =>true,
-                        '@function_signature' =>true,
-                        '@number' =>true,
-                        '@operator' =>true,
-                        '@regex' =>true,
-                        '@removal' =>true,
-                        '@return_value' =>true,
-                        '@sort' =>true,
-                        '@zero_iteration' =>true,
-                        '@default' =>true,
+                        '@arithmetic' => true,
+                        '@boolean' => true,
+                        '@cast' => true,
+                        '@conditional_boundary' => true,
+                        '@conditional_negotiation' => true,
+                        '@function_signature' => true,
+                        '@number' => true,
+                        '@operator' => true,
+                        '@regex' => true,
+                        '@removal' => true,
+                        '@return_value' => true,
+                        '@sort' => true,
+                        '@zero_iteration' => true,
+                        '@default' => true,
                     ],
                     null,
                     null,
@@ -1993,20 +2023,20 @@ JSON
                 'testFrameworkOptions' => '--debug',
                 'mutators' => new Mutators(
                     [
-                        '@arithmetic' =>true,
-                        '@boolean' =>true,
-                        '@cast' =>true,
-                        '@conditional_boundary' =>true,
-                        '@conditional_negotiation' =>true,
-                        '@function_signature' =>true,
-                        '@number' =>true,
-                        '@operator' =>true,
-                        '@regex' =>true,
-                        '@removal' =>true,
-                        '@return_value' =>true,
-                        '@sort' =>true,
-                        '@zero_iteration' =>true,
-                        '@default' =>true,
+                        '@arithmetic' => true,
+                        '@boolean' => true,
+                        '@cast' => true,
+                        '@conditional_boundary' => true,
+                        '@conditional_negotiation' => true,
+                        '@function_signature' => true,
+                        '@number' => true,
+                        '@operator' => true,
+                        '@regex' => true,
+                        '@removal' => true,
+                        '@return_value' => true,
+                        '@sort' => true,
+                        '@zero_iteration' => true,
+                        '@default' => true,
                     ],
                     new TrueValue(
                         true,
@@ -2092,7 +2122,7 @@ JSON
             'testFramework' => null,
             'bootstrap' => null,
             'initialTestsPhpOptions' => null,
-            'testFrameworkOptions' => null
+            'testFrameworkOptions' => null,
         ];
 
         $args = array_values(array_merge($defaultArgs, $args));
@@ -2117,7 +2147,7 @@ JSON
             $validator->isValid(),
             sprintf(
                 'Expected the given JSON to be valid but is violating the following rules of'
-                .' the schema: %s- %s',
+                . ' the schema: %s- %s',
                 PHP_EOL,
                 implode('- ', $normalizedErrors)
             )
