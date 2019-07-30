@@ -9,7 +9,7 @@ use Webmozart\Assert\Assert;
 
 final class Mutators
 {
-    private const PROFILES = [
+    public const PROFILES = [
         '@arithmetic',
         '@boolean',
         '@cast',
@@ -53,7 +53,7 @@ final class Mutators
     }
 
     /**
-     * @return string[]
+     * @return array<string,bool>
      */
     public function getProfiles(): array
     {

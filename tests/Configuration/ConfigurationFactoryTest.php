@@ -445,7 +445,10 @@ JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
-                'phpunit' => new PhpUnit('phpunit.xml', null),
+                'phpunit' => new PhpUnit(
+                    'phpunit.xml',
+                    null
+                ),
             ]),
         ];
 
@@ -463,7 +466,10 @@ JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
-                'phpunit' => new PhpUnit(null, 'bin/phpunit'),
+                'phpunit' => new PhpUnit(
+                    null,
+                    'bin/phpunit'
+                ),
             ]),
         ];
 
@@ -482,7 +488,10 @@ JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
-                'phpunit' => new PhpUnit('phpunit.xml', 'bin/phpunit'),
+                'phpunit' => new PhpUnit(
+                    'phpunit.xml',
+                    'bin/phpunit'
+                ),
             ]),
         ];
 
@@ -501,7 +510,10 @@ JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
-                'phpunit' => new PhpUnit(null, 'bin/phpunit'),
+                'phpunit' => new PhpUnit(
+                    null,
+                    'bin/phpunit'
+                ),
             ]),
         ];
 
@@ -1348,25 +1360,25 @@ JSON
         yield '[mutators][BCMath] nominal' => [
             <<<'JSON'
 {
-"source": {
-    "directories": ["src"]
-},
-"mutators": {
-    "BCMath": {
-        "ignore": ["file"],
-        "settings": {
-            "bcadd": false,
-            "bccomp": false,
-            "bcdiv": false,
-            "bcmod": false,
-            "bcmul": false,
-            "bcpow": false,
-            "bcsub": false,
-            "bcsqrt": false,
-            "bcpowmod": false
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "BCMath": {
+            "ignore": ["file"],
+            "settings": {
+                "bcadd": false,
+                "bccomp": false,
+                "bcdiv": false,
+                "bcmod": false,
+                "bcmul": false,
+                "bcpow": false,
+                "bcsub": false,
+                "bcsqrt": false,
+                "bcpowmod": false
+            }
         }
     }
-}
 }
 JSON
             ,
@@ -1654,34 +1666,34 @@ JSON
         yield '[mutators][MBString] nominal' => [
             <<<'JSON'
 {
-"source": {
-    "directories": ["src"]
-},
-"mutators": {
-    "MBString": {
-        "ignore": ["file"],
-        "settings": {
-            "mb_chr": false,
-            "mb_ord": false,
-            "mb_parse_str": false,
-            "mb_send_mail": false,
-            "mb_strcut": false,
-            "mb_stripos": false,
-            "mb_stristr": false,
-            "mb_strlen": false,
-            "mb_strpos": false,
-            "mb_strrchr": false,
-            "mb_strripos": false,
-            "mb_strrpos": false,
-            "mb_strstr": false,
-            "mb_strtolower": false,
-            "mb_strtoupper": false,
-            "mb_substr_count": false,
-            "mb_substr": false,
-            "mb_convert_case": false
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "MBString": {
+            "ignore": ["file"],
+            "settings": {
+                "mb_chr": false,
+                "mb_ord": false,
+                "mb_parse_str": false,
+                "mb_send_mail": false,
+                "mb_strcut": false,
+                "mb_stripos": false,
+                "mb_stristr": false,
+                "mb_strlen": false,
+                "mb_strpos": false,
+                "mb_strrchr": false,
+                "mb_strripos": false,
+                "mb_strrpos": false,
+                "mb_strstr": false,
+                "mb_strtolower": false,
+                "mb_strtoupper": false,
+                "mb_substr_count": false,
+                "mb_substr": false,
+                "mb_convert_case": false
+            }
         }
     }
-}
 }
 JSON
             ,
@@ -1692,6 +1704,341 @@ JSON
                     null,
                     null,
                     null,
+                    new MBString(
+                        true,
+                        ['file'],
+                        new MBStringSettings(
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        )
+                    )
+                ),
+            ]),
+        ];
+
+        foreach (Mutators::PROFILES as $index => $profile) {
+            yield '[mutators][profile] '.$profile.' false' => (static function () use (
+                $index,
+                $profile
+            ): array {
+                $settingsArguments = array_fill(0, 18, true);
+                $settingsArguments[$index] = false;
+
+                return [
+                    <<<JSON
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "$profile": false
+    }
+}
+JSON
+                    ,
+                    self::createConfig([
+                        'source' => new Source(['src'], []),
+                        'mutators' => new Mutators(
+                            [$profile => false],
+                            null,
+                            null,
+                            null,
+                            null
+                        ),
+                    ]),
+                ];
+            })();
+
+            yield '[mutators][profile] '.$profile.' true' => (static function () use (
+                $index,
+                $profile
+            ): array {
+                $settingsArguments = array_fill(0, 18, true);
+                $settingsArguments[$index] = false;
+
+                return [
+                    <<<JSON
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "$profile": true
+    }
+}
+JSON
+                    ,
+                    self::createConfig([
+                        'source' => new Source(['src'], []),
+                        'mutators' => new Mutators(
+                            [$profile => true],
+                            null,
+                            null,
+                            null,
+                            null
+                        ),
+                    ]),
+                ];
+            })();
+        }
+
+        yield '[mutators][profile] nominal' => [
+            <<<JSON
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "@arithmetic": true,
+        "@boolean": true,
+        "@cast": true,
+        "@conditional_boundary": true,
+        "@conditional_negotiation": true,
+        "@function_signature": true,
+        "@number": true,
+        "@operator": true,
+        "@regex": true,
+        "@removal": true,
+        "@return_value": true,
+        "@sort": true,
+        "@zero_iteration": true,
+        "@default": true
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mutators' => new Mutators(
+                    [
+                        '@arithmetic' =>true,
+                        '@boolean' =>true,
+                        '@cast' =>true,
+                        '@conditional_boundary' =>true,
+                        '@conditional_negotiation' =>true,
+                        '@function_signature' =>true,
+                        '@number' =>true,
+                        '@operator' =>true,
+                        '@regex' =>true,
+                        '@removal' =>true,
+                        '@return_value' =>true,
+                        '@sort' =>true,
+                        '@zero_iteration' =>true,
+                        '@default' =>true,
+                    ],
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+            ]),
+        ];
+
+        yield 'nominal' => [
+            <<<'JSON'
+{
+    "timeout": 5,
+    "source": {
+        "directories": ["src", "lib"],
+        "excludes": ["fixtures", "tests"]
+    },
+    "logs": {
+        "text": "text.log",
+        "summary": "summary.log",
+        "debug": "debug.log",
+        "perMutator": "perMutator.log",
+        "badge": {
+            "branch": "master"
+        }
+    },
+    "tmpDir": "custom-tmp",
+    "phpUnit": {
+        "configDir": "phpunit.xml",
+        "customPath": "bin/phpunit"
+    },
+    "testFramework": "phpunit",
+    "bootstrap": "src/bootstrap.php",
+    "initialTestsPhpOptions": "-d zend_extension=xdebug.so",
+    "testFrameworkOptions": "--debug",
+    "mutators": {
+        "TrueValue": {
+            "ignore": ["fileA"],
+            "settings": {
+                "in_array": false,
+                "array_search": false
+            }
+        },
+        "ArrayItemRemoval": {
+            "ignore": ["file"],
+            "settings": {
+                "remove": "first",
+                "limit": 10
+            }
+        },
+        "MBString": {
+            "ignore": ["file"],
+            "settings": {
+                "mb_chr": false,
+                "mb_ord": false,
+                "mb_parse_str": false,
+                "mb_send_mail": false,
+                "mb_strcut": false,
+                "mb_stripos": false,
+                "mb_stristr": false,
+                "mb_strlen": false,
+                "mb_strpos": false,
+                "mb_strrchr": false,
+                "mb_strripos": false,
+                "mb_strrpos": false,
+                "mb_strstr": false,
+                "mb_strtolower": false,
+                "mb_strtoupper": false,
+                "mb_substr_count": false,
+                "mb_substr": false,
+                "mb_convert_case": false
+            }
+        },
+        "BCMath": {
+            "ignore": ["file"],
+            "settings": {
+                "bcadd": false,
+                "bccomp": false,
+                "bcdiv": false,
+                "bcmod": false,
+                "bcmul": false,
+                "bcpow": false,
+                "bcsub": false,
+                "bcsqrt": false,
+                "bcpowmod": false
+            }
+        },
+        "MBString": {
+            "ignore": ["file"],
+            "settings": {
+                "mb_chr": false,
+                "mb_ord": false,
+                "mb_parse_str": false,
+                "mb_send_mail": false,
+                "mb_strcut": false,
+                "mb_stripos": false,
+                "mb_stristr": false,
+                "mb_strlen": false,
+                "mb_strpos": false,
+                "mb_strrchr": false,
+                "mb_strripos": false,
+                "mb_strrpos": false,
+                "mb_strstr": false,
+                "mb_strtolower": false,
+                "mb_strtoupper": false,
+                "mb_substr_count": false,
+                "mb_substr": false,
+                "mb_convert_case": false
+            }
+        },
+        "@arithmetic": true,
+        "@boolean": true,
+        "@cast": true,
+        "@conditional_boundary": true,
+        "@conditional_negotiation": true,
+        "@function_signature": true,
+        "@number": true,
+        "@operator": true,
+        "@regex": true,
+        "@removal": true,
+        "@return_value": true,
+        "@sort": true,
+        "@zero_iteration": true,
+        "@default": true
+    }
+}
+JSON
+            ,
+            self::createConfig([
+                'timeout' => 5,
+                'source' => new Source(
+                    ['src', 'lib'],
+                    ['fixtures', 'tests']
+                ),
+                'logs' => new Logs(
+                    'text.log',
+                    'summary.log',
+                    'debug.log',
+                    'perMutator.log',
+                    new Badge('master')
+                ),
+                'tmpDir' => 'custom-tmp',
+                'phpunit' => new PhpUnit(
+                    'phpunit.xml',
+                    'bin/phpunit'
+                ),
+                'testFramework' => 'phpunit',
+                'bootstrap' => 'src/bootstrap.php',
+                'initialTestsPhpOptions' => '-d zend_extension=xdebug.so',
+                'testFrameworkOptions' => '--debug',
+                'mutators' => new Mutators(
+                    [
+                        '@arithmetic' =>true,
+                        '@boolean' =>true,
+                        '@cast' =>true,
+                        '@conditional_boundary' =>true,
+                        '@conditional_negotiation' =>true,
+                        '@function_signature' =>true,
+                        '@number' =>true,
+                        '@operator' =>true,
+                        '@regex' =>true,
+                        '@removal' =>true,
+                        '@return_value' =>true,
+                        '@sort' =>true,
+                        '@zero_iteration' =>true,
+                        '@default' =>true,
+                    ],
+                    new TrueValue(
+                        true,
+                        ['fileA'],
+                        new TrueValueSettings(
+                            false,
+                            false
+                        )
+                    ),
+                    new ArrayItemRemoval(
+                        true,
+                        ['file'],
+                        new ArrayItemRemovalSettings(
+                            'first',
+                            10
+                        )
+                    ),
+                    new BCMath(
+                        true,
+                        ['file'],
+                        new BCMathSettings(
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        )
+                    ),
                     new MBString(
                         true,
                         ['file'],
