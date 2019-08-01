@@ -61,9 +61,6 @@ final class RootsFileOrDirectoryLocator implements Locator
         $this->filesystem = $filesystem;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function locate(string $fileName): string
     {
         $canonicalFileName = Path::canonicalize($fileName);
@@ -87,9 +84,6 @@ final class RootsFileOrDirectoryLocator implements Locator
         throw FileNotFound::fromFileName($canonicalFileName, $this->roots);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function locateOneOf(array $fileNames): string
     {
         $file = $this->innerLocateOneOf($fileNames);
@@ -101,9 +95,6 @@ final class RootsFileOrDirectoryLocator implements Locator
         return $file;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     private function innerLocateOneOf(array $fileNames): ?string
     {
         if ($fileNames === []) {
