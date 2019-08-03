@@ -66,7 +66,7 @@
     },
     "require-dev": {
         "helmich/phpunit-json-assert": "^3.0",
-        "phpunit/phpunit": "^8.2.5",
+        "phpunit/phpunit": "^8.2.5 <8.3",
         "symfony/phpunit-bridge": "^4.3.2"
     },
     "config": {
