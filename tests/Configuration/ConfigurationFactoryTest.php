@@ -63,6 +63,21 @@ use function Safe\json_decode;
 use function sprintf;
 use stdClass;
 
+/**
+ * @covers \Infection\Configuration\Entry\Mutator\ArrayItemRemoval
+ * @covers \Infection\Configuration\Entry\Mutator\ArrayItemRemovalSettings
+ * @covers \Infection\Configuration\Entry\Mutator\BCMath
+ * @covers \Infection\Configuration\Entry\Mutator\BCMathSettings
+ * @covers \Infection\Configuration\Entry\Mutator\MBString
+ * @covers \Infection\Configuration\Entry\Mutator\MBStringSettings
+ * @covers \Infection\Configuration\Entry\Mutator\Mutators
+ * @covers \Infection\Configuration\Entry\Mutator\TrueValue
+ * @covers \Infection\Configuration\Entry\Mutator\TrueValueSettings
+ * @covers \Infection\Configuration\Entry\Badge
+ * @covers \Infection\Configuration\Entry\Logs
+ * @covers \Infection\Configuration\Entry\PhpUnit
+ * @covers \Infection\Configuration\Entry\Source
+ */
 class ConfigurationFactoryTest extends TestCase
 {
     private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../resources/schema.json';
