@@ -149,14 +149,6 @@ class RawConfigurationTest extends TestCase
             )),
         ];
 
-        yield 'unreadable file' => [
-            self::FIXTURES_DIR . '/unreadable-file',
-            new InvalidFile(sprintf(
-                'The file "%s" is not readable.',
-            self::FIXTURES_DIR . '/unreadable-file'
-            )),
-        ];
-
         yield 'invalid JSON contents' => [
             self::FIXTURES_DIR . '/invalid-json',
             new InvalidFile(

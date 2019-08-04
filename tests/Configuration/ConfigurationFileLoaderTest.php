@@ -46,6 +46,7 @@ use Prophecy\Argument\Token\TokenInterface;
 use Prophecy\Argument\Token\TypeToken;
 use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionClass;
+use function Safe\realpath;
 
 class ConfigurationFileLoaderTest extends TestCase
 {
@@ -77,7 +78,8 @@ class ConfigurationFileLoaderTest extends TestCase
 
     public function test_it_create_a_configuration_from_a_file_path(): void
     {
-        $path = '/path/to/config';
+        $path = realpath(__DIR__ . '/../Fixtures/Configuration/file.json');
+        $decodedContents = (object) ['foo' => 'bar'];
         $expectedConfig = (new ReflectionClass(Configuration::class))->newInstanceWithoutConstructor();
 
         $this->schemaValidatorProphecy
@@ -86,7 +88,7 @@ class ConfigurationFileLoaderTest extends TestCase
         ;
 
         $this->configFactoryProphecy
-            ->create(self::createRawConfigWithPathArgument($path))
+            ->create($decodedContents)
             ->willReturn($expectedConfig)
         ;
 

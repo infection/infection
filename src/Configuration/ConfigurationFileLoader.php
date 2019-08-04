@@ -58,6 +58,6 @@ class ConfigurationFileLoader
 
         $this->schemaValidator->validate($rawConfig);
 
-        return $this->factory->create($rawConfig);
+        return $this->factory->create($rawConfig->getDecodedContents());
     }
 }
