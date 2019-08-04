@@ -35,12 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Infection\Config\ConfigCreatorFacade;
+use function array_filter;
 use Infection\Config\InfectionConfig;
+use Infection\Configuration\ConfigurationFactory;
+use Infection\Configuration\ConfigurationFileLoader;
+use Infection\Configuration\ConfigurationLoader;
+use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\EventDispatcher\EventDispatcherInterface;
+use Infection\Locator\RootsFileLocator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
@@ -209,6 +214,30 @@ final class InfectionContainer extends Container
             'memory.limit.applier' => static function (self $container): MemoryLimiter {
                 return new MemoryLimiter($container['filesystem'], \php_ini_loaded_file());
             },
+            ConfigurationLoader::class => static function (self $container): ConfigurationLoader {
+                return new ConfigurationLoader(
+                    $container[RootsFileLocator::class],
+                    $container[ConfigurationFileLoader::class]
+                );
+            },
+            RootsFileLocator::class => static function (self $container): RootsFileLocator {
+                return new RootsFileLocator(
+                    [$container['project.dir']],
+                    $container['filesystem']
+                );
+            },
+            ConfigurationFileLoader::class => static function (self $container): ConfigurationFileLoader {
+                return new ConfigurationFileLoader(
+                    $container[SchemaValidator::class],
+                    $container[ConfigurationFactory::class]
+                );
+            },
+            SchemaValidator::class => static function (): SchemaValidator {
+                return new SchemaValidator();
+            },
+            ConfigurationFactory::class => static function (): ConfigurationFactory {
+                return new ConfigurationFactory();
+            },
         ]);
     }
 
@@ -230,12 +259,11 @@ final class InfectionContainer extends Container
         $clone = clone $this;
 
         $clone['infection.config'] = static function (self $container) use ($configFile): InfectionConfig {
-            $facade = new ConfigCreatorFacade(
-                $container[RootsFileOrDirectoryLocator::class],
-                $container['filesystem']
-            );
-
-            return $facade->createConfig($configFile);
+            return $container[ConfigurationLoader::class]->loadConfiguration(array_filter([
+                $configFile,
+                'infection.json.dist',
+                'infection.json',
+            ]));
         };
 
         $clone['coverage.path'] = static function (self $container) use ($existingCoveragePath): string {

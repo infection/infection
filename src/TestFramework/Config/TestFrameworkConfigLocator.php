@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Config;
 
-use Infection\Locator\FileNotFound;
+use Infection\Locator\FileOrDirectoryNotFound;
 use function Safe\realpath;
 
 /**
@@ -77,7 +77,7 @@ final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInte
             $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
         }
 
-        throw FileNotFound::multipleFilesDoNotExist(
+        throw FileOrDirectoryNotFound::multipleFilesDoNotExist(
             $dir,
             $triedFiles
         );

@@ -37,7 +37,7 @@ namespace Infection\Config;
 
 use Infection\Config\Validator as ConfigValidator;
 use Infection\Json\JsonFile;
-use Infection\Locator\FileNotFound;
+use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\Locator\Locator;
 use function Safe\getcwd;
 use Symfony\Component\Filesystem\Filesystem;
@@ -78,7 +78,7 @@ final class ConfigCreatorFacade
             $content = (new JsonFile($infectionConfigFile))->decode();
 
             $configLocation = \pathinfo($infectionConfigFile, PATHINFO_DIRNAME);
-        } catch (FileNotFound $e) {
+        } catch (FileOrDirectoryNotFound $e) {
             // Generate an empty class to trigger `configure` command.
             $content = new \stdClass();
 

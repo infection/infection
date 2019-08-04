@@ -53,26 +53,12 @@ final class FileNotFound extends RuntimeException
         Assert::allString($roots);
 
         return new self(sprintf(
-            'Could not locate the file/directory "%s"%s.',
+            'Could not locate the file "%s"%s.',
             $file,
             [] === $roots
                 ? ''
                 : sprintf(' in "%s"', implode('", "', $roots))
         ));
-    }
-
-    /**
-     * @deprecated
-     */
-    public static function multipleFilesDoNotExist(string $path, array $files): self
-    {
-        return new self(
-            sprintf(
-                'The path "%s" does not contain any of the requested files: "%s"',
-                $path,
-                implode('", "', $files)
-            )
-        );
     }
 
     /**

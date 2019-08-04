@@ -37,6 +37,7 @@ namespace Infection\Locator;
 
 use function current;
 use const DIRECTORY_SEPARATOR;
+use function is_file;
 use function Safe\realpath;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
@@ -45,7 +46,7 @@ use Webmozart\PathUtil\Path;
 /**
  * @internal
  */
-final class RootsFileOrDirectoryLocator implements Locator
+final class RootsFileLocator implements Locator
 {
     private $roots;
     private $filesystem;
@@ -61,12 +62,17 @@ final class RootsFileOrDirectoryLocator implements Locator
         $this->filesystem = $filesystem;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function locate(string $fileName): string
     {
         $canonicalFileName = Path::canonicalize($fileName);
 
         if ($this->filesystem->isAbsolutePath($canonicalFileName)) {
-            if ($this->filesystem->exists($canonicalFileName)) {
+            if ($this->filesystem->exists($canonicalFileName)
+                && is_file($canonicalFileName)
+            ) {
                 return realpath($canonicalFileName);
             }
 
@@ -76,25 +82,31 @@ final class RootsFileOrDirectoryLocator implements Locator
         foreach ($this->roots as $path) {
             $file = $path . DIRECTORY_SEPARATOR . $canonicalFileName;
 
-            if ($this->filesystem->exists($file)) {
+            if ($this->filesystem->exists($file) && is_file($canonicalFileName)) {
                 return realpath($file);
             }
         }
 
-        throw FileOrDirectoryNotFound::fromFileName($canonicalFileName, $this->roots);
+        throw FileNotFound::fromFileName($canonicalFileName, $this->roots);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function locateOneOf(array $fileNames): string
     {
         $file = $this->innerLocateOneOf($fileNames);
 
         if ($file === null) {
-            throw FileOrDirectoryNotFound::fromFiles($fileNames, $this->roots);
+            throw FileNotFound::fromFiles($fileNames, $this->roots);
         }
 
         return $file;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     private function innerLocateOneOf(array $fileNames): ?string
     {
         if ($fileNames === []) {
@@ -103,7 +115,7 @@ final class RootsFileOrDirectoryLocator implements Locator
 
         try {
             return $this->locate(current($fileNames));
-        } catch (FileOrDirectoryNotFound $exception) {
+        } catch (FileNotFound $exception) {
             array_shift($fileNames);
 
             return $this->innerLocateOneOf($fileNames);

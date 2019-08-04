@@ -44,7 +44,7 @@ use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\ApplicationExecutionFinished;
 use Infection\Events\ApplicationExecutionStarted;
-use Infection\Locator\FileNotFound;
+use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\Locator\Locator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\Generator\MutationsGenerator;
@@ -266,7 +266,6 @@ final class InfectionCommand extends BaseCommand
             throw CoverageDoesNotExistException::unableToGenerate();
         }
 
-        /** @var InfectionConfig $config */
         $config = $this->container['infection.config'];
 
         $this->includeUserBootstrap($config);
@@ -415,7 +414,7 @@ final class InfectionCommand extends BaseCommand
         }
 
         if (!file_exists($bootstrap)) {
-            throw FileNotFound::fromFileName($bootstrap, [__DIR__]);
+            throw FileOrDirectoryNotFound::fromFileName($bootstrap, [__DIR__]);
         }
 
         (static function ($infectionBootstrapFile): void {

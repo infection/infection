@@ -35,78 +35,65 @@ declare(strict_types=1);
 
 namespace Infection\Locator;
 
-use function current;
-use const DIRECTORY_SEPARATOR;
-use function Safe\realpath;
-use Symfony\Component\Filesystem\Filesystem;
+use function implode;
+use RuntimeException;
+use function Safe\sprintf;
 use Webmozart\Assert\Assert;
-use Webmozart\PathUtil\Path;
 
 /**
  * @internal
  */
-final class RootsFileOrDirectoryLocator implements Locator
+final class FileOrDirectoryNotFound extends RuntimeException
 {
-    private $roots;
-    private $filesystem;
-
     /**
-     * @param  string[] $roots
+     * @param string[] $roots
      */
-    public function __construct(array $roots, Filesystem $filesystem)
+    public static function fromFileName(string $file, array $roots): self
     {
         Assert::allString($roots);
 
-        $this->roots = $roots;
-        $this->filesystem = $filesystem;
+        return new self(sprintf(
+            'Could not locate the file/directory "%s"%s.',
+            $file,
+            [] === $roots
+                ? ''
+                : sprintf(' in "%s"', implode('", "', $roots))
+        ));
     }
 
-    public function locate(string $fileName): string
+    /**
+     * @deprecated
+     */
+    public static function multipleFilesDoNotExist(string $path, array $files): self
     {
-        $canonicalFileName = Path::canonicalize($fileName);
-
-        if ($this->filesystem->isAbsolutePath($canonicalFileName)) {
-            if ($this->filesystem->exists($canonicalFileName)) {
-                return realpath($canonicalFileName);
-            }
-
-            throw FileOrDirectoryNotFound::fromFileName($canonicalFileName, $this->roots);
-        }
-
-        foreach ($this->roots as $path) {
-            $file = $path . DIRECTORY_SEPARATOR . $canonicalFileName;
-
-            if ($this->filesystem->exists($file)) {
-                return realpath($file);
-            }
-        }
-
-        throw FileOrDirectoryNotFound::fromFileName($canonicalFileName, $this->roots);
+        return new self(
+            sprintf(
+                'The path "%s" does not contain any of the requested files: "%s"',
+                $path,
+                implode('", "', $files)
+            )
+        );
     }
 
-    public function locateOneOf(array $fileNames): string
+    /**
+     * @param string[] $files
+     * @param string[] $roots
+     */
+    public static function fromFiles(array $files, array $roots): self
     {
-        $file = $this->innerLocateOneOf($fileNames);
+        Assert::allString($files);
+        Assert::allString($roots);
 
-        if ($file === null) {
-            throw FileOrDirectoryNotFound::fromFiles($fileNames, $this->roots);
-        }
-
-        return $file;
-    }
-
-    private function innerLocateOneOf(array $fileNames): ?string
-    {
-        if ($fileNames === []) {
-            return null;
-        }
-
-        try {
-            return $this->locate(current($fileNames));
-        } catch (FileOrDirectoryNotFound $exception) {
-            array_shift($fileNames);
-
-            return $this->innerLocateOneOf($fileNames);
-        }
+        return new self(
+            [] === $files
+                ? 'Could not locate any files (no file provided).'
+                : sprintf(
+                    'Could not locate the files "%s"%s',
+                    implode('", "', $files),
+                    [] === $roots
+                        ? ''
+                        : sprintf(' in "%s"', implode('", "', $roots))
+                )
+        );
     }
 }

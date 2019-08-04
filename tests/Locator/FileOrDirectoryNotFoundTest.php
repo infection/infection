@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Locator;
 
 use Generator;
-use Infection\Locator\FileNotFound;
+use Infection\Locator\FileOrDirectoryNotFound;
 use PHPUnit\Framework\TestCase;
 
-final class FileNotFoundTest extends TestCase
+final class FileOrDirectoryNotFoundTest extends TestCase
 {
     /**
      * @dataProvider nonExistentPathsProvider
@@ -51,7 +51,7 @@ final class FileNotFoundTest extends TestCase
         array $roots,
         string $expectedErrorMessage
     ): void {
-        $exception = FileNotFound::fromFileName($file, $roots);
+        $exception = FileOrDirectoryNotFound::fromFileName($file, $roots);
 
         $this->assertSame($expectedErrorMessage, $exception->getMessage());
         $this->assertSame(0, $exception->getCode());
@@ -69,9 +69,21 @@ final class FileNotFoundTest extends TestCase
         array $roots,
         string $expectedErrorMessage
     ): void {
-        $exception = FileNotFound::fromFiles($files, $roots);
+        $exception = FileOrDirectoryNotFound::fromFiles($files, $roots);
 
         $this->assertSame($expectedErrorMessage, $exception->getMessage());
+        $this->assertSame(0, $exception->getCode());
+        $this->assertNull($exception->getPrevious());
+    }
+
+    public function test_multiple_files_do_not_exist(): void
+    {
+        $exception = FileOrDirectoryNotFound::multipleFilesDoNotExist('foo/bar/', ['file1', 'file2']);
+
+        $this->assertSame(
+            'The path "foo/bar/" does not contain any of the requested files: "file1", "file2"',
+            $exception->getMessage()
+        );
         $this->assertSame(0, $exception->getCode());
         $this->assertNull($exception->getPrevious());
     }
@@ -81,25 +93,25 @@ final class FileNotFoundTest extends TestCase
         yield [
             'unknown',
             [],
-            'Could not locate the file "unknown".',
+            'Could not locate the file/directory "unknown".',
         ];
 
         yield [
             '/unknown',
             [],
-            'Could not locate the file "/unknown".',
+            'Could not locate the file/directory "/unknown".',
         ];
 
         yield [
             'unknown',
             ['root'],
-            'Could not locate the file "unknown" in "root".',
+            'Could not locate the file/directory "unknown" in "root".',
         ];
 
         yield [
             'unknown',
             ['root1', 'root2'],
-            'Could not locate the file "unknown" in "root1", "root2".',
+            'Could not locate the file/directory "unknown" in "root1", "root2".',
         ];
     }
 
