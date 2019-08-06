@@ -36,12 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Console;
 
 use Infection\Console\ConsoleOutput;
-use Infection\Mutant\Exception\MsiCalculationException;
-use Infection\Mutant\MetricsCalculator;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Process\Process;
 
 final class ConsoleOutputTest extends TestCase
 {
@@ -69,90 +65,6 @@ final class ConsoleOutputTest extends TestCase
 
         $consoleOutput = new ConsoleOutput($io);
         $consoleOutput->logUnknownVerbosityOption($option);
-    }
-
-    public function test_log_initial_tests_do_not_pass(): void
-    {
-        $process = $this->createMock(Process::class);
-        $process->expects($this->once())->method('getExitCode')->willReturn(0);
-        $process->expects($this->once())->method('getOutput')->willReturn('output string');
-        $process->expects($this->once())->method('getErrorOutput')->willReturn('error string');
-        $process->expects($this->once())->method('getCommandLine')->willReturn('vendor/bin/phpunit --order=random');
-
-        $testFrameworkAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
-        $testFrameworkAdapter->expects($this->once())->method('getName')->willReturn('phpunit');
-        $testFrameworkAdapter->expects($this->once())->method('getInitialTestsFailRecommendations')->willReturn('-');
-
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('error')->with(
-            [
-                'Project tests must be in a passing state before running Infection.',
-                '-',
-                'phpunit reported an exit code of 0.',
-                'Refer to the phpunit\'s output below:',
-                'STDOUT:',
-                'output string',
-                'STDERR:',
-                'error string',
-            ]
-        );
-
-        $console = new ConsoleOutput($io);
-        $console->logInitialTestsDoNotPass($process, $testFrameworkAdapter);
-    }
-
-    public function test_log_bad_msi_error_message(): void
-    {
-        $metrics = $this->createMock(MetricsCalculator::class);
-        $metrics->expects($this->once())->method('getMutationScoreIndicator')->willReturn(75.0);
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('error')->with(
-            'The minimum required MSI percentage should be 25%, but actual is 75%. Improve your tests!'
-        );
-
-        $console = new ConsoleOutput($io);
-
-        $console->logBadMsiErrorMessage($metrics, 25.0, 'min-msi');
-    }
-
-    public function test_log_bad_msi_error_message_throws_error_on_faulty_msi(): void
-    {
-        $io = $this->createMock(SymfonyStyle::class);
-        $consoleOutput = new ConsoleOutput($io);
-
-        $this->expectException(MsiCalculationException::class);
-
-        $consoleOutput->logBadMsiErrorMessage(new MetricsCalculator(), 0.0, 'min-msi');
-    }
-
-    public function test_log_bad_covered_msi_error_message(): void
-    {
-        $metrics = $this->createMock(MetricsCalculator::class);
-        $metrics->expects($this->once())->method('getCoveredCodeMutationScoreIndicator')->willReturn(75.0);
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('error')->with(
-            'The minimum required Covered Code MSI percentage should be 25%, but actual is 75%. Improve your tests!'
-        );
-
-        $console = new ConsoleOutput($io);
-
-        $console->logBadMsiErrorMessage($metrics, 25.0, 'min-covered-msi');
-    }
-
-    public function test_log_missed_debugger_or_coverage_option(): void
-    {
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('error')
-            ->with([
-                'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:',
-                '- Enable xdebug and run infection again' . PHP_EOL .
-                '- Use phpdbg: phpdbg -qrr infection' . PHP_EOL .
-                '- Use --coverage option with path to the existing coverage report' . PHP_EOL .
-                '- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters',
-            ]);
-
-        $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logMissedDebuggerOrCoverageOption();
     }
 
     public function test_log_running_with_debugger(): void

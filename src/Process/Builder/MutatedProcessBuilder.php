@@ -33,56 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\Process\Builder;
 
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\InitialTestCaseCompleted;
-use Infection\Events\InitialTestSuiteFinished;
-use Infection\Events\InitialTestSuiteStarted;
-use Infection\Process\Builder\InitialProcessBuilder;
+use Infection\Mutant\MutantInterface;
+use Infection\Process\MutantProcess;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
  */
-final class InitialTestsRunner
+final class MutatedProcessBuilder
 {
     /**
-     * @var InitialProcessBuilder
+     * @var AbstractTestFrameworkAdapter
      */
-    private $processBuilder;
+    private $testFrameworkAdapter;
 
     /**
-     * @var EventDispatcherInterface
+     * @var int
      */
-    private $eventDispatcher;
+    private $timeout;
 
-    public function __construct(InitialProcessBuilder $processBuilder, EventDispatcherInterface $eventDispatcher)
+    public function __construct(AbstractTestFrameworkAdapter $testFrameworkAdapter, int $timeout)
     {
-        $this->processBuilder = $processBuilder;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->testFrameworkAdapter = $testFrameworkAdapter;
+        $this->timeout = $timeout;
     }
 
-    public function run(string $testFrameworkExtraOptions, bool $skipCoverage, array $phpExtraOptions = []): Process
+    public function getProcessForMutant(MutantInterface $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
     {
-        $process = $this->processBuilder->getProcessForInitialTestRun(
-            $testFrameworkExtraOptions,
-            $skipCoverage,
-            $phpExtraOptions
+        $process = new Process(
+            $this->testFrameworkAdapter->getMutantCommandLine(
+                $this->testFrameworkAdapter->buildMutationConfigFile($mutant),
+                $testFrameworkExtraOptions
+            )
         );
 
-        $this->eventDispatcher->dispatch(new InitialTestSuiteStarted());
+        $process->setTimeout($this->timeout);
+        $process->inheritEnvironmentVariables();
 
-        $process->run(function ($type) use ($process): void {
-            if ($process::ERR === $type) {
-                $process->stop();
-            }
-
-            $this->eventDispatcher->dispatch(new InitialTestCaseCompleted());
-        });
-
-        $this->eventDispatcher->dispatch(new InitialTestSuiteFinished($process->getOutput()));
-
-        return $process;
+        return new MutantProcess($process, $mutant, $this->testFrameworkAdapter);
     }
 }

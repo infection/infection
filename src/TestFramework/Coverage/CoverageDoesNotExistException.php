@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\InfectionException;
 
 /**
@@ -43,6 +42,11 @@ use Infection\Console\Exception\InfectionException;
  */
 final class CoverageDoesNotExistException extends InfectionException
 {
+    private const INFECTION_USAGE_SUGGESTION = '- Enable xdebug and run infection again' . "\n" .
+        '- Use phpdbg: phpdbg -qrr infection' . "\n" .
+        '- Use --coverage option with path to the existing coverage report' . "\n" .
+        '- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters';
+
     public static function with(string $coverageIndexFilePath, string $testFrameworkKey, string $tempDir, string $processInfo = ''): self
     {
         $message = 'Code Coverage does not exist. File %s is not found. Check %s version Infection was run with and generated config files inside %s.';
@@ -59,7 +63,7 @@ final class CoverageDoesNotExistException extends InfectionException
                 $testFrameworkKey,
                 $tempDir,
                 PHP_EOL,
-                ConsoleOutput::INFECTION_USAGE_SUGGESTION
+                self::INFECTION_USAGE_SUGGESTION
             )
         );
     }
@@ -72,5 +76,14 @@ final class CoverageDoesNotExistException extends InfectionException
     public static function forFileAtPath(string $fileName, string $path): self
     {
         return new self(sprintf('Source file %s was not found at %s', $fileName, $path));
+    }
+
+    public static function unableToGenerate(): self
+    {
+        return new self(
+            'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:' .
+            "\n" .
+            self::INFECTION_USAGE_SUGGESTION
+        );
     }
 }

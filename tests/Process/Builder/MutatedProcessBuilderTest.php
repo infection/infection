@@ -33,56 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\Tests\Process\Builder;
 
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\InitialTestCaseCompleted;
-use Infection\Events\InitialTestSuiteFinished;
-use Infection\Events\InitialTestSuiteStarted;
-use Infection\Process\Builder\InitialProcessBuilder;
-use Symfony\Component\Process\Process;
+use Infection\Mutant\MutantInterface;
+use Infection\Process\Builder\MutatedProcessBuilder;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class InitialTestsRunner
+final class MutatedProcessBuilderTest extends TestCase
 {
-    /**
-     * @var InitialProcessBuilder
-     */
-    private $processBuilder;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    public function __construct(InitialProcessBuilder $processBuilder, EventDispatcherInterface $eventDispatcher)
+    public function test_getProcessForMutant_has_timeout(): void
     {
-        $this->processBuilder = $processBuilder;
-        $this->eventDispatcher = $eventDispatcher;
-    }
+        $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $fwAdapter->method('getMutantCommandLine')
+            ->willReturn(['/usr/bin/php']);
+        $fwAdapter->method('buildMutationConfigFile')
+            ->willReturn('buildMutationConfigFile');
 
-    public function run(string $testFrameworkExtraOptions, bool $skipCoverage, array $phpExtraOptions = []): Process
-    {
-        $process = $this->processBuilder->getProcessForInitialTestRun(
-            $testFrameworkExtraOptions,
-            $skipCoverage,
-            $phpExtraOptions
-        );
+        $builder = new MutatedProcessBuilder($fwAdapter, 100);
 
-        $this->eventDispatcher->dispatch(new InitialTestSuiteStarted());
+        $process = $builder->getProcessForMutant($this->createMock(MutantInterface::class))->getProcess();
 
-        $process->run(function ($type) use ($process): void {
-            if ($process::ERR === $type) {
-                $process->stop();
-            }
-
-            $this->eventDispatcher->dispatch(new InitialTestCaseCompleted());
-        });
-
-        $this->eventDispatcher->dispatch(new InitialTestSuiteFinished($process->getOutput()));
-
-        return $process;
+        $this->assertStringContainsString('/usr/bin/php', $process->getCommandLine());
+        $this->assertSame(100.0, $process->getTimeout());
     }
 }

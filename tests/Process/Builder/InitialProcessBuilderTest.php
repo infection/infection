@@ -33,53 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Runner;
+namespace Infection\Tests\Process\Builder;
 
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\InitialTestCaseCompleted;
-use Infection\Events\InitialTestSuiteFinished;
-use Infection\Events\InitialTestSuiteStarted;
 use Infection\Process\Builder\InitialProcessBuilder;
-use Infection\Process\Runner\InitialTestsRunner;
-use PHPUnit\Framework\MockObject\MockObject;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
 
-final class InitialTestsRunnerTest extends TestCase
+final class InitialProcessBuilderTest extends TestCase
 {
-    public function test_it_dispatches_events(): void
+    public function test_getProcessForInitialTestRun_has_no_timeout(): void
     {
-        /** @var MockObject|Process $process */
-        $process = $this->createMock(Process::class);
+        $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $fwAdapter->method('getInitialTestRunCommandLine')
+            ->willReturn(['/usr/bin/php']);
+        $fwAdapter->method('buildInitialConfigFile')
+            ->willReturn('buildInitialConfigFile');
 
-        $process->expects($this->once())
-            ->method('run')
-            ->with($this->callback(static function ($processCallback): bool {
-                $processCallback(Process::OUT);
+        $builder = new InitialProcessBuilder($fwAdapter);
 
-                return true;
-            }));
-        $process->expects($this->once())
-            ->method('getOutput')
-            ->willReturn('foo');
+        $process = $builder->getProcessForInitialTestRun('', false);
 
-        $processBuilder = $this->createMock(InitialProcessBuilder::class);
-        $processBuilder->method('getProcessForInitialTestRun')
-            ->with('', false, [])
-            ->willReturn($process);
-
-        /** @var MockObject|EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $eventDispatcher->expects($this->exactly(3))
-            ->method('dispatch')
-            ->withConsecutive(
-                $this->isInstanceOf(InitialTestSuiteStarted::class),
-                $this->isInstanceOf(InitialTestCaseCompleted::class),
-                $this->isInstanceOf(InitialTestSuiteFinished::class)
-            );
-
-        $testRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
-
-        $testRunner->run('', false);
+        $this->assertStringContainsString('/usr/bin/php', $process->getCommandLine());
+        $this->assertNull($process->getTimeout());
     }
 }

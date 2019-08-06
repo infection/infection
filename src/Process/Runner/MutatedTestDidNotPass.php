@@ -33,44 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Builder;
+namespace Infection\Process\Runner;
 
-use Infection\Mutant\MutantInterface;
-use Infection\Process\Builder\ProcessBuilder;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use PHPUnit\Framework\TestCase;
+use Exception;
+use Infection\Mutant\Exception\MsiCalculationException;
+use Infection\Mutant\MetricsCalculator;
 
-final class ProcessBuilderTest extends TestCase
+/**
+ * @internal
+ */
+final class MutatedTestDidNotPass extends Exception
 {
-    public function test_getProcessForInitialTestRun_has_no_timeout(): void
+    private const CI_FLAG_ERROR = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
+
+    public static function fromMetrics(MetricsCalculator $metricsCalculator, float $minMsi, string $type): self
     {
-        $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
-        $fwAdapter->method('getInitialTestRunCommandLine')
-            ->willReturn(['/usr/bin/php']);
-        $fwAdapter->method('buildInitialConfigFile')
-            ->willReturn('buildInitialConfigFile');
+        if (!$minMsi) {
+            throw MsiCalculationException::create('min-msi');
+        }
 
-        $builder = new ProcessBuilder($fwAdapter, 100);
-
-        $process = $builder->getProcessForInitialTestRun('', false);
-
-        $this->assertStringContainsString('/usr/bin/php', $process->getCommandLine());
-        $this->assertNull($process->getTimeout());
-    }
-
-    public function test_getProcessForMutant_has_timeout(): void
-    {
-        $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
-        $fwAdapter->method('getMutantCommandLine')
-            ->willReturn(['/usr/bin/php']);
-        $fwAdapter->method('buildMutationConfigFile')
-            ->willReturn('buildMutationConfigFile');
-
-        $builder = new ProcessBuilder($fwAdapter, 100);
-
-        $process = $builder->getProcessForMutant($this->createMock(MutantInterface::class))->getProcess();
-
-        $this->assertStringContainsString('/usr/bin/php', $process->getCommandLine());
-        $this->assertSame(100.0, $process->getTimeout());
+        return new self(
+            sprintf(
+                self::CI_FLAG_ERROR,
+                ($type === TestRunConstraintChecker::MSI_FAILURE ? 'MSI' : 'Covered Code MSI'),
+                $minMsi,
+                ($type === TestRunConstraintChecker::MSI_FAILURE ?
+                    $metricsCalculator->getMutationScoreIndicator() :
+                    $metricsCalculator->getCoveredCodeMutationScoreIndicator()
+                )
+            )
+        );
     }
 }
