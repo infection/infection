@@ -221,16 +221,15 @@ final class InfectionCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $adapter = $this->startUp();
-        $this->initialTest($adapter);
-        $this->infectedTest($adapter);
-        $this->check();
+        $this->runInitialTestSuite($adapter);
+        $this->runMutationTesting($adapter);
+        $this->checkMetrics();
 
         return 0;
     }
 
     /**
      * Run configuration command if config does not exist
-     *
      *
      * @throws InfectionException
      */
@@ -278,7 +277,7 @@ final class InfectionCommand extends BaseCommand
         return $adapter;
     }
 
-    private function initialTest(AbstractTestFrameworkAdapter $adapter): void
+    private function runInitialTestSuite(AbstractTestFrameworkAdapter $adapter): void
     {
         /** @var InfectionConfig $config */
         $config = $this->container['infection.config'];
@@ -303,7 +302,7 @@ final class InfectionCommand extends BaseCommand
         $this->container['memory.limit.applier']->applyMemoryLimitFromProcess($initialTestSuitProcess, $adapter);
     }
 
-    private function infectedTest(AbstractTestFrameworkAdapter $adapter): void
+    private function runMutationTesting(AbstractTestFrameworkAdapter $adapter): void
     {
         /** @var InfectionConfig $config */
         $config = $this->container['infection.config'];
@@ -341,7 +340,7 @@ final class InfectionCommand extends BaseCommand
         );
     }
 
-    private function check(): void
+    private function checkMetrics(): void
     {
         /** @var TestRunConstraintChecker $constraintChecker */
         $constraintChecker = $this->container['test.run.constraint.checker'];
