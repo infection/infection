@@ -94,7 +94,7 @@ final class MutationTestingRunner
             function (MutationInterface $mutation) use ($testFrameworkExtraOptions): MutantProcessInterface {
                 $mutant = $this->mutantCreator->create($mutation);
 
-                $process = $this->processBuilder->getProcessForMutant($mutant, $testFrameworkExtraOptions);
+                $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
 
                 $this->eventDispatcher->dispatch(new MutantCreated());
 

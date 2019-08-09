@@ -51,7 +51,7 @@ final class InitialProcessBuilderTest extends TestCase
 
         $builder = new InitialTestRunProcessBuilder($fwAdapter);
 
-        $process = $builder->getProcessForInitialTestRun('', false);
+        $process = $builder->createProcessForInitialTestRun('', false);
 
         $this->assertStringContainsString('/usr/bin/php', $process->getCommandLine());
         $this->assertNull($process->getTimeout());

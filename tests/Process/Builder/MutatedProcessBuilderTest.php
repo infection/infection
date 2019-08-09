@@ -52,7 +52,7 @@ final class MutatedProcessBuilderTest extends TestCase
 
         $builder = new MutantProcessBuilder($fwAdapter, 100);
 
-        $process = $builder->getProcessForMutant($this->createMock(MutantInterface::class))->getProcess();
+        $process = $builder->createProcessForMutant($this->createMock(MutantInterface::class))->getProcess();
 
         $this->assertStringContainsString('/usr/bin/php', $process->getCommandLine());
         $this->assertSame(100.0, $process->getTimeout());

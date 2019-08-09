@@ -36,44 +36,32 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use Exception;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Symfony\Component\Process\Process;
+use Infection\Mutant\Exception\MsiCalculationException;
+use Infection\Mutant\MetricsCalculator;
 
 /**
  * @internal
  */
-final class InitialTestDidNotPass extends Exception
+final class MutatedTestFailed extends Exception
 {
-    public static function fromProcessAndAdapter(
-        Process $initialTestSuitProcess,
-        AbstractTestFrameworkAdapter $testFrameworkAdapter
-    ): self {
-        $testFrameworkKey = $testFrameworkAdapter->getName();
+    private const CI_FLAG_ERROR = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
 
-        $lines = [
-            'Project tests must be in a passing state before running Infection.',
-            $testFrameworkAdapter->getInitialTestsFailRecommendations($initialTestSuitProcess->getCommandLine()),
-            sprintf(
-                '%s reported an exit code of %d.',
-                $testFrameworkKey,
-                $initialTestSuitProcess->getExitCode()
-            ),
-            sprintf(
-                'Refer to the %s\'s output below:',
-                $testFrameworkKey
-            ),
-        ];
-
-        if ($stdOut = $initialTestSuitProcess->getOutput()) {
-            $lines[] = 'STDOUT:';
-            $lines[] = $stdOut;
+    public static function fromMetrics(MetricsCalculator $metricsCalculator, float $minMsi, string $type): self
+    {
+        if (!$minMsi) {
+            throw MsiCalculationException::create('min-msi');
         }
 
-        if ($stdError = $initialTestSuitProcess->getErrorOutput()) {
-            $lines[] = 'STDERR:';
-            $lines[] = $stdError;
-        }
-
-        return new self(implode("\n", $lines));
+        return new self(
+            sprintf(
+                self::CI_FLAG_ERROR,
+                ($type === TestRunConstraintChecker::MSI_FAILURE ? 'MSI' : 'Covered Code MSI'),
+                $minMsi,
+                ($type === TestRunConstraintChecker::MSI_FAILURE ?
+                    $metricsCalculator->getMutationScoreIndicator() :
+                    $metricsCalculator->getCoveredCodeMutationScoreIndicator()
+                )
+            )
+        );
     }
 }

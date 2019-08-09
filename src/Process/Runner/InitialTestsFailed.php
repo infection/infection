@@ -36,32 +36,44 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use Exception;
-use Infection\Mutant\Exception\MsiCalculationException;
-use Infection\Mutant\MetricsCalculator;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Symfony\Component\Process\Process;
 
 /**
  * @internal
  */
-final class MutatedTestDidNotPass extends Exception
+final class InitialTestsFailed extends Exception
 {
-    private const CI_FLAG_ERROR = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
+    public static function fromProcessAndAdapter(
+        Process $initialTestSuitProcess,
+        AbstractTestFrameworkAdapter $testFrameworkAdapter
+    ): self {
+        $testFrameworkKey = $testFrameworkAdapter->getName();
 
-    public static function fromMetrics(MetricsCalculator $metricsCalculator, float $minMsi, string $type): self
-    {
-        if (!$minMsi) {
-            throw MsiCalculationException::create('min-msi');
+        $lines = [
+            'Project tests must be in a passing state before running Infection.',
+            $testFrameworkAdapter->getInitialTestsFailRecommendations($initialTestSuitProcess->getCommandLine()),
+            sprintf(
+                '%s reported an exit code of %d.',
+                $testFrameworkKey,
+                $initialTestSuitProcess->getExitCode()
+            ),
+            sprintf(
+                'Refer to the %s\'s output below:',
+                $testFrameworkKey
+            ),
+        ];
+
+        if ($stdOut = $initialTestSuitProcess->getOutput()) {
+            $lines[] = 'STDOUT:';
+            $lines[] = $stdOut;
         }
 
-        return new self(
-            sprintf(
-                self::CI_FLAG_ERROR,
-                ($type === TestRunConstraintChecker::MSI_FAILURE ? 'MSI' : 'Covered Code MSI'),
-                $minMsi,
-                ($type === TestRunConstraintChecker::MSI_FAILURE ?
-                    $metricsCalculator->getMutationScoreIndicator() :
-                    $metricsCalculator->getCoveredCodeMutationScoreIndicator()
-                )
-            )
-        );
+        if ($stdError = $initialTestSuitProcess->getErrorOutput()) {
+            $lines[] = 'STDERR:';
+            $lines[] = $stdError;
+        }
+
+        return new self(implode("\n", $lines));
     }
 }

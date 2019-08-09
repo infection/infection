@@ -50,9 +50,9 @@ use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
-use Infection\Process\Runner\InitialTestDidNotPass;
+use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
-use Infection\Process\Runner\MutatedTestDidNotPass;
+use Infection\Process\Runner\MutatedTestFailed;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
@@ -294,7 +294,7 @@ final class InfectionCommand extends BaseCommand
         );
 
         if (!$initialTestSuitProcess->isSuccessful()) {
-            throw InitialTestDidNotPass::fromProcessAndAdapter($initialTestSuitProcess, $adapter);
+            throw InitialTestsFailed::fromProcessAndAdapter($initialTestSuitProcess, $adapter);
         }
 
         $this->assertCodeCoverageExists($initialTestSuitProcess, $this->testFrameworkKey);
@@ -346,7 +346,7 @@ final class InfectionCommand extends BaseCommand
         $constraintChecker = $this->container['test.run.constraint.checker'];
 
         if (!$constraintChecker->hasTestRunPassedConstraints()) {
-            throw MutatedTestDidNotPass::fromMetrics(
+            throw MutatedTestFailed::fromMetrics(
                 $this->container['metrics'],
                 $constraintChecker->getMinRequiredValue(),
                 $constraintChecker->getErrorType()

@@ -61,7 +61,7 @@ final class MutantProcessBuilder
         $this->timeout = $timeout;
     }
 
-    public function getProcessForMutant(MutantInterface $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
+    public function createProcessForMutant(MutantInterface $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
     {
         $process = new Process(
             $this->testFrameworkAdapter->getMutantCommandLine(

@@ -37,7 +37,7 @@ namespace Infection\Tests\Process\Runner;
 
 use Infection\Mutant\Exception\MsiCalculationException;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Process\Runner\MutatedTestDidNotPass;
+use Infection\Process\Runner\MutatedTestFailed;
 use PHPUnit\Framework\TestCase;
 
 final class MutatedTestDidNotPassTest extends TestCase
@@ -47,7 +47,7 @@ final class MutatedTestDidNotPassTest extends TestCase
         $metrics = $this->createMock(MetricsCalculator::class);
         $metrics->expects($this->once())->method('getMutationScoreIndicator')->willReturn(75.0);
 
-        $exception = MutatedTestDidNotPass::fromMetrics($metrics, 25.0, 'min-msi');
+        $exception = MutatedTestFailed::fromMetrics($metrics, 25.0, 'min-msi');
         $this->assertSame(
             'The minimum required MSI percentage should be 25%, but actual is 75%. Improve your tests!',
             $exception->getMessage()
@@ -58,7 +58,7 @@ final class MutatedTestDidNotPassTest extends TestCase
     {
         $this->expectException(MsiCalculationException::class);
 
-        MutatedTestDidNotPass::fromMetrics(new MetricsCalculator(), 0.0, 'min-msi');
+        MutatedTestFailed::fromMetrics(new MetricsCalculator(), 0.0, 'min-msi');
     }
 
     public function test_log_bad_covered_msi_error_message(): void
@@ -66,7 +66,7 @@ final class MutatedTestDidNotPassTest extends TestCase
         $metrics = $this->createMock(MetricsCalculator::class);
         $metrics->expects($this->once())->method('getCoveredCodeMutationScoreIndicator')->willReturn(75.0);
 
-        $exception = MutatedTestDidNotPass::fromMetrics($metrics, 25.0, 'min-covered-msi');
+        $exception = MutatedTestFailed::fromMetrics($metrics, 25.0, 'min-covered-msi');
         $this->assertSame(
             'The minimum required Covered Code MSI percentage should be 25%, but actual is 75%. Improve your tests!',
             $exception->getMessage()

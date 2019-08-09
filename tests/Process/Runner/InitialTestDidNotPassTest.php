@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use Infection\Process\Runner\InitialTestDidNotPass;
+use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -65,7 +65,7 @@ final class InitialTestDidNotPassTest extends TestCase
             'error string',
         ]);
 
-        $exception = InitialTestDidNotPass::fromProcessAndAdapter($process, $testFrameworkAdapter);
+        $exception = InitialTestsFailed::fromProcessAndAdapter($process, $testFrameworkAdapter);
 
         $this->assertSame($error, $exception->getMessage());
     }
