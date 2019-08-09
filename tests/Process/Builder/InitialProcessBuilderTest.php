@@ -41,7 +41,7 @@ use PHPUnit\Framework\TestCase;
 
 final class InitialProcessBuilderTest extends TestCase
 {
-    public function test_getProcessForInitialTestRun_has_no_timeout(): void
+    public function test_it_creates_a_process_with_no_timeout(): void
     {
         $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
         $fwAdapter->method('getInitialTestRunCommandLine')

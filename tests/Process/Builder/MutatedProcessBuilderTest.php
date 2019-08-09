@@ -42,7 +42,7 @@ use PHPUnit\Framework\TestCase;
 
 final class MutatedProcessBuilderTest extends TestCase
 {
-    public function test_getProcessForMutant_has_timeout(): void
+    public function test_it_creates_a_process_with_timeout(): void
     {
         $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
         $fwAdapter->method('getMutantCommandLine')
