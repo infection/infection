@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageParser;
 use function Safe\file_get_contents;
 
 /**
@@ -58,7 +58,7 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
     private $coverageDir;
 
     /**
-     * @var CoverageXmlParser
+     * @var CoverageParser
      */
     private $parser;
 
@@ -72,7 +72,7 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
      */
     private $testFrameworkKey;
 
-    public function __construct(string $coverageDir, CoverageXmlParser $coverageXmlParser, string $testFrameworkKey, TestFileDataProvider $testFileDataProvider = null)
+    public function __construct(string $coverageDir, CoverageParser $coverageXmlParser, string $testFrameworkKey, TestFileDataProvider $testFileDataProvider = null)
     {
         $this->coverageDir = $coverageDir;
         $this->parser = $coverageXmlParser;

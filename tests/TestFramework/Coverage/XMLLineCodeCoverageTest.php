@@ -43,7 +43,7 @@ use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileTimeData;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
-use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageParser;
 use Infection\TestFramework\TestFrameworkTypes;
 use PHPUnit\Framework\TestCase;
 
@@ -236,7 +236,7 @@ final class XMLLineCodeCoverageTest extends TestCase
 
     public function test_it_throws_an_exception_when_no_coverage_found(): void
     {
-        $coverageXmlParserMock = $this->createMock(CoverageXmlParser::class);
+        $coverageXmlParserMock = $this->createMock(CoverageParser::class);
 
         $coverage = new XMLLineCodeCoverage('/abc/foo/bar', $coverageXmlParserMock, TestFrameworkTypes::PHPUNIT);
 
@@ -288,7 +288,7 @@ final class XMLLineCodeCoverageTest extends TestCase
 
     private function getCodeCoverageData(): XMLLineCodeCoverage
     {
-        $coverageXmlParserMock = $this->createMock(CoverageXmlParser::class);
+        $coverageXmlParserMock = $this->createMock(CoverageParser::class);
         $coverageXmlParserMock->expects($this->once())
             ->method('parse')
             ->willReturn($this->getParsedCodeCoverageData());

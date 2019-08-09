@@ -46,7 +46,7 @@ use function Safe\realpath;
 /**
  * @internal
  */
-class CoverageXmlParser
+final class CoverageXmlParser implements CoverageParser
 {
     /**
      * @var string
@@ -63,10 +63,10 @@ class CoverageXmlParser
      *
      * @throws \Exception
      */
-    public function parse(string $coverageXmlContent): array
+    public function parse(string $coverageContent): array
     {
         $dom = new \DOMDocument();
-        $dom->loadXML($this->removeNamespace($coverageXmlContent));
+        $dom->loadXML($this->removeNamespace($coverageContent));
         $xPath = new \DOMXPath($dom);
 
         $this->assertHasCoverage($xPath);
