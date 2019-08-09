@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutator\Util;
 
 use Infection\Mutator;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
@@ -259,159 +261,42 @@ final class MutatorProfile
         '@unwrap',
     ];
 
-    public const FULL_MUTATOR_LIST = [
-        //Arithmetic
-        'Assignment' => Mutator\Arithmetic\Assignment::class,
-        'AssignmentEqual' => Mutator\Arithmetic\AssignmentEqual::class,
-        'BitwiseAnd' => Mutator\Arithmetic\BitwiseAnd::class,
-        'BitwiseNot' => Mutator\Arithmetic\BitwiseNot::class,
-        'BitwiseOr' => Mutator\Arithmetic\BitwiseOr::class,
-        'BitwiseXor' => Mutator\Arithmetic\BitwiseXor::class,
-        'Decrement' => Mutator\Arithmetic\Decrement::class,
-        'DivEqual' => Mutator\Arithmetic\DivEqual::class,
-        'Division' => Mutator\Arithmetic\Division::class,
-        'Exponentiation' => Mutator\Arithmetic\Exponentiation::class,
-        'Increment' => Mutator\Arithmetic\Increment::class,
-        'Minus' => Mutator\Arithmetic\Minus::class,
-        'MinusEqual' => Mutator\Arithmetic\MinusEqual::class,
-        'ModEqual' => Mutator\Arithmetic\ModEqual::class,
-        'Modulus' => Mutator\Arithmetic\Modulus::class,
-        'MulEqual' => Mutator\Arithmetic\MulEqual::class,
-        'Multiplication' => Mutator\Arithmetic\Multiplication::class,
-        'Plus' => Mutator\Arithmetic\Plus::class,
-        'PlusEqual' => Mutator\Arithmetic\PlusEqual::class,
-        'PowEqual' => Mutator\Arithmetic\PowEqual::class,
-        'ShiftLeft' => Mutator\Arithmetic\ShiftLeft::class,
-        'ShiftRight' => Mutator\Arithmetic\ShiftRight::class,
-        'RoundingFamily' => Mutator\Arithmetic\RoundingFamily::class,
+    /**
+     * @var array<string,string>|null
+     */
+    private static $fullMutatorList;
 
-        //Boolean
-        'ArrayItem' => Mutator\Boolean\ArrayItem::class,
-        'EqualIdentical' => Mutator\Boolean\EqualIdentical::class,
-        'FalseValue' => Mutator\Boolean\FalseValue::class,
-        'IdenticalEqual' => Mutator\Boolean\IdenticalEqual::class,
-        'LogicalAnd' => Mutator\Boolean\LogicalAnd::class,
-        'LogicalLowerAnd' => Mutator\Boolean\LogicalLowerAnd::class,
-        'LogicalLowerOr' => Mutator\Boolean\LogicalLowerOr::class,
-        'LogicalNot' => Mutator\Boolean\LogicalNot::class,
-        'LogicalOr' => Mutator\Boolean\LogicalOr::class,
-        'NotEqualNotIdentical' => Mutator\Boolean\NotEqualNotIdentical::class,
-        'NotIdenticalNotEqual' => Mutator\Boolean\NotIdenticalNotEqual::class,
-        'TrueValue' => Mutator\Boolean\TrueValue::class,
-        'Yield_' => Mutator\Boolean\Yield_::class,
+    /**
+     * @return array<string, string>
+     */
+    public static function getFullMutatorList(): array
+    {
+        if (self::$fullMutatorList) {
+            return self::$fullMutatorList;
+        }
+        $finder = Finder::create()
+            ->files()
+            ->name('*.php')
+            ->notName('/Abstract.*/')
+            ->in(__DIR__ . '/..')
+            ->exclude([
+                'Util',
+            ])
+        ;
 
-        //Conditional Boundary
-        'GreaterThan' => Mutator\ConditionalBoundary\GreaterThan::class,
-        'GreaterThanOrEqualTo' => Mutator\ConditionalBoundary\GreaterThanOrEqualTo::class,
-        'LessThan' => Mutator\ConditionalBoundary\LessThan::class,
-        'LessThanOrEqualTo' => Mutator\ConditionalBoundary\LessThanOrEqualTo::class,
+        $classes = [];
+        /** @var SplFileInfo $file */
+        foreach ($finder as $file) {
+            $className = $file->getBasename('.' . $file->getExtension());
+            $classes[$className] = sprintf(
+                '%s\\%s%s%s',
+                'Infection\\Mutator',
+                strtr($file->getRelativePath(), \DIRECTORY_SEPARATOR, '\\'),
+                $file->getRelativePath() ? '\\' : '',
+                $className
+            );
+        }
 
-        //Conditional Negotiation
-        'Equal' => Mutator\ConditionalNegotiation\Equal::class,
-        'GreaterThanNegotiation' => Mutator\ConditionalNegotiation\GreaterThanNegotiation::class,
-        'GreaterThanOrEqualToNegotiation' => Mutator\ConditionalNegotiation\GreaterThanOrEqualToNegotiation::class,
-        'Identical' => Mutator\ConditionalNegotiation\Identical::class,
-        'LessThanNegotiation' => Mutator\ConditionalNegotiation\LessThanNegotiation::class,
-        'LessThanOrEqualToNegotiation' => Mutator\ConditionalNegotiation\LessThanOrEqualToNegotiation::class,
-        'NotEqual' => Mutator\ConditionalNegotiation\NotEqual::class,
-        'NotIdentical' => Mutator\ConditionalNegotiation\NotIdentical::class,
-
-        //Function Signature
-        'PublicVisibility' => Mutator\FunctionSignature\PublicVisibility::class,
-        'ProtectedVisibility' => Mutator\FunctionSignature\ProtectedVisibility::class,
-
-        //Number
-        'DecrementInteger' => Mutator\Number\DecrementInteger::class,
-        'IncrementInteger' => Mutator\Number\IncrementInteger::class,
-        'OneZeroInteger' => Mutator\Number\OneZeroInteger::class,
-        'OneZeroFloat' => Mutator\Number\OneZeroFloat::class,
-
-        //Operator
-        'AssignCoalesce' => Mutator\Operator\AssignCoalesce::class,
-        'Break_' => Mutator\Operator\Break_::class,
-        'Continue_' => Mutator\Operator\Continue_::class,
-        'Throw_' => Mutator\Operator\Throw_::class,
-        'Finally_' => Mutator\Operator\Finally_::class,
-        'Coalesce' => Mutator\Operator\Coalesce::class,
-
-        //Regex
-        'PregQuote' => Mutator\Regex\PregQuote::class,
-        'PregMatchMatches' => Mutator\Regex\PregMatchMatches::class,
-
-        //Removal
-        'ArrayItemRemoval' => Mutator\Removal\ArrayItemRemoval::class,
-        'FunctionCallRemoval' => Mutator\Removal\FunctionCallRemoval::class,
-        'MethodCallRemoval' => Mutator\Removal\MethodCallRemoval::class,
-
-        //Return Value
-        'ArrayOneItem' => Mutator\ReturnValue\ArrayOneItem::class,
-        'FloatNegation' => Mutator\ReturnValue\FloatNegation::class,
-        'FunctionCall' => Mutator\ReturnValue\FunctionCall::class,
-        'IntegerNegation' => Mutator\ReturnValue\IntegerNegation::class,
-        'NewObject' => Mutator\ReturnValue\NewObject::class,
-        'This' => Mutator\ReturnValue\This::class,
-
-        //Sort
-        'Spaceship' => Mutator\Sort\Spaceship::class,
-
-        //Zero Iteration
-        'Foreach_' => Mutator\ZeroIteration\Foreach_::class,
-        'For_' => Mutator\ZeroIteration\For_::class,
-
-        // Cast
-        'CastArray' => Mutator\Cast\CastArray::class,
-        'CastBool' => Mutator\Cast\CastBool::class,
-        'CastFloat' => Mutator\Cast\CastFloat::class,
-        'CastInt' => Mutator\Cast\CastInt::class,
-        'CastObject' => Mutator\Cast\CastObject::class,
-        'CastString' => Mutator\Cast\CastString::class,
-
-        // Unwrap
-        'UnwrapArrayChangeKeyCase' => Mutator\Unwrap\UnwrapArrayChangeKeyCase::class,
-        'UnwrapArrayChunk' => Mutator\Unwrap\UnwrapArrayChunk::class,
-        'UnwrapArrayColumn' => Mutator\Unwrap\UnwrapArrayColumn::class,
-        'UnwrapArrayCombine' => Mutator\Unwrap\UnwrapArrayCombine::class,
-        'UnwrapArrayDiff' => Mutator\Unwrap\UnwrapArrayDiff::class,
-        'UnwrapArrayDiffAssoc' => Mutator\Unwrap\UnwrapArrayDiffAssoc::class,
-        'UnwrapArrayDiffKey' => Mutator\Unwrap\UnwrapArrayDiffKey::class,
-        'UnwrapArrayDiffUassoc' => Mutator\Unwrap\UnwrapArrayDiffUassoc::class,
-        'UnwrapArrayDiffUkey' => Mutator\Unwrap\UnwrapArrayDiffUkey::class,
-        'UnwrapArrayFilter' => Mutator\Unwrap\UnwrapArrayFilter::class,
-        'UnwrapArrayFlip' => Mutator\Unwrap\UnwrapArrayFlip::class,
-        'UnwrapArrayIntersect' => Mutator\Unwrap\UnwrapArrayIntersect::class,
-        'UnwrapArrayIntersectAssoc' => Mutator\Unwrap\UnwrapArrayIntersectAssoc::class,
-        'UnwrapArrayIntersectKey' => Mutator\Unwrap\UnwrapArrayIntersectKey::class,
-        'UnwrapArrayIntersectUassoc' => Mutator\Unwrap\UnwrapArrayIntersectUassoc::class,
-        'UnwrapArrayIntersectUkey' => Mutator\Unwrap\UnwrapArrayIntersectUkey::class,
-        'UnwrapArrayKeys' => Mutator\Unwrap\UnwrapArrayKeys::class,
-        'UnwrapArrayMap' => Mutator\Unwrap\UnwrapArrayMap::class,
-        'UnwrapArrayMerge' => Mutator\Unwrap\UnwrapArrayMerge::class,
-        'UnwrapArrayMergeRecursive' => Mutator\Unwrap\UnwrapArrayMergeRecursive::class,
-        'UnwrapArrayPad' => Mutator\Unwrap\UnwrapArrayPad::class,
-        'UnwrapArrayReduce' => Mutator\Unwrap\UnwrapArrayReduce::class,
-        'UnwrapArrayReplace' => Mutator\Unwrap\UnwrapArrayReplace::class,
-        'UnwrapArrayReplaceRecursive' => Mutator\Unwrap\UnwrapArrayReplaceRecursive::class,
-        'UnwrapArrayReverse' => Mutator\Unwrap\UnwrapArrayReverse::class,
-        'UnwrapArraySlice' => Mutator\Unwrap\UnwrapArraySlice::class,
-        'UnwrapArraySplice' => Mutator\Unwrap\UnwrapArraySplice::class,
-        'UnwrapArrayUdiff' => Mutator\Unwrap\UnwrapArrayUdiff::class,
-        'UnwrapArrayUdiffAssoc' => Mutator\Unwrap\UnwrapArrayUdiffAssoc::class,
-        'UnwrapArrayUdiffUassoc' => Mutator\Unwrap\UnwrapArrayUdiffUassoc::class,
-        'UnwrapArrayUintersect' => Mutator\Unwrap\UnwrapArrayUintersect::class,
-        'UnwrapArrayUintersectAssoc' => Mutator\Unwrap\UnwrapArrayUintersectAssoc::class,
-        'UnwrapArrayUintersectUassoc' => Mutator\Unwrap\UnwrapArrayUintersectUassoc::class,
-        'UnwrapArrayUnique' => Mutator\Unwrap\UnwrapArrayUnique::class,
-        'UnwrapArrayValues' => Mutator\Unwrap\UnwrapArrayValues::class,
-        'UnwrapLcFirst' => Mutator\Unwrap\UnwrapLcFirst::class,
-        'UnwrapStrRepeat' => Mutator\Unwrap\UnwrapStrRepeat::class,
-        'UnwrapStrToLower' => Mutator\Unwrap\UnwrapStrToLower::class,
-        'UnwrapStrToUpper' => Mutator\Unwrap\UnwrapStrToUpper::class,
-        'UnwrapTrim' => Mutator\Unwrap\UnwrapTrim::class,
-        'UnwrapUcFirst' => Mutator\Unwrap\UnwrapUcFirst::class,
-        'UnwrapUcWords' => Mutator\Unwrap\UnwrapUcWords::class,
-
-        // Extensions
-        'BCMath' => Mutator\Extensions\BCMath::class,
-        'MBString' => Mutator\Extensions\MBString::class,
-    ];
+        return self::$fullMutatorList = $classes;
+    }
 }

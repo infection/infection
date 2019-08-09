@@ -43,7 +43,7 @@ final class MutatorProfileTest extends TestCase
 {
     public function test_all_mutators_have_the_correct_name_in_the_full_mutator_list(): void
     {
-        foreach (MutatorProfile::FULL_MUTATOR_LIST as $name => $class) {
+        foreach (MutatorProfile::getFullMutatorList() as $name => $class) {
             $this->assertSame(
                 $name,
                 $class::getName(),
@@ -64,10 +64,9 @@ final class MutatorProfileTest extends TestCase
 
             $this->assertArrayHasKey(
                 $class,
-                MutatorProfile::FULL_MUTATOR_LIST,
+                MutatorProfile::getFullMutatorList(),
                 sprintf(
-                    'The mutator "%s" located in "%s" has not been added to the FULL_MUTATOR_LIST in the MutatorProfile class. ' .
-                    'Please add it to ensure it can be used.',
+                    'The mutator "%s" located in "%s" has not been "getFullMutatorList" method in the MutatorProfile class. ' .
                     $class,
                     $file->getPath()
                 )
@@ -137,7 +136,7 @@ final class MutatorProfileTest extends TestCase
     private function getMutatorProfileConstants(): array
     {
         $reflectionClass = new \ReflectionClass(MutatorProfile::class);
-        $excludedConstants = ['MUTATOR_PROFILE_LIST', 'DEFAULT', 'FULL_MUTATOR_LIST'];
+        $excludedConstants = ['MUTATOR_PROFILE_LIST', 'DEFAULT'];
 
         return array_filter(
             $reflectionClass->getConstants(),

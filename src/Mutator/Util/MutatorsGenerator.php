@@ -141,11 +141,11 @@ final class MutatorsGenerator
      */
     private function registerFromName(string $mutator, $setting): void
     {
-        if (!\array_key_exists($mutator, MutatorProfile::FULL_MUTATOR_LIST)) {
+        if (!\array_key_exists($mutator, MutatorProfile::getFullMutatorList())) {
             throw InvalidConfigException::invalidMutator($mutator);
         }
 
-        $this->registerFromClass(MutatorProfile::FULL_MUTATOR_LIST[$mutator], $setting);
+        $this->registerFromClass(MutatorProfile::getFullMutatorList()[$mutator], $setting);
     }
 
     /**

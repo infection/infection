@@ -88,7 +88,7 @@ final class AllMutatorTest extends TestCase
     public function provideMutatorAndCodeCases(): Generator
     {
         foreach ($this->getCodeSamples() as $codeSample) {
-            foreach (MutatorProfile::FULL_MUTATOR_LIST as $mutator) {
+            foreach (MutatorProfile::getFullMutatorList() as $mutator) {
                 yield [$codeSample->getContents(), new $mutator(new MutatorConfig([])), $codeSample->getFilename()];
             }
         }
