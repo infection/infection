@@ -42,10 +42,13 @@ use Infection\Console\Exception\InfectionException;
  */
 final class CoverageDoesNotExistException extends InfectionException
 {
-    private const INFECTION_USAGE_SUGGESTION = '- Enable xdebug and run infection again' . "\n" .
-        '- Use phpdbg: phpdbg -qrr infection' . "\n" .
-        '- Use --coverage option with path to the existing coverage report' . "\n" .
-        '- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters';
+    private const INFECTION_USAGE_SUGGESTION = <<<TXT
+- Enable xdebug and run infection again
+- Use phpdbg: phpdbg -qrr infection
+- Use --coverage option with path to the existing coverage report
+- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters
+TXT
+    ;
 
     public static function with(string $coverageIndexFilePath, string $testFrameworkKey, string $tempDir, string $processInfo = ''): self
     {
