@@ -48,7 +48,7 @@ use Infection\Locator\FileNotFound;
 use Infection\Locator\Locator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\Generator\MutationsGenerator;
-use Infection\Process\Builder\InitialProcessBuilder;
+use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutatedProcessBuilder;
 use Infection\Process\Runner\InitialTestDidNotPass;
 use Infection\Process\Runner\InitialTestsRunner;
@@ -282,7 +282,7 @@ final class InfectionCommand extends BaseCommand
         /** @var InfectionConfig $config */
         $config = $this->container['infection.config'];
 
-        $processBuilder = new InitialProcessBuilder($adapter);
+        $processBuilder = new InitialTestRunProcessBuilder($adapter);
         $testFrameworkOptions = $this->getTestFrameworkExtraOptions($this->testFrameworkKey);
 
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);

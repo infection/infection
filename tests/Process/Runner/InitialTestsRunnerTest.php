@@ -39,7 +39,7 @@ use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\InitialTestCaseCompleted;
 use Infection\Events\InitialTestSuiteFinished;
 use Infection\Events\InitialTestSuiteStarted;
-use Infection\Process\Builder\InitialProcessBuilder;
+use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Runner\InitialTestsRunner;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -63,7 +63,7 @@ final class InitialTestsRunnerTest extends TestCase
             ->method('getOutput')
             ->willReturn('foo');
 
-        $processBuilder = $this->createMock(InitialProcessBuilder::class);
+        $processBuilder = $this->createMock(InitialTestRunProcessBuilder::class);
         $processBuilder->method('getProcessForInitialTestRun')
             ->with('', false, [])
             ->willReturn($process);

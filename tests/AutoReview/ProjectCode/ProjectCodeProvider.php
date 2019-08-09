@@ -53,7 +53,7 @@ use Infection\Http\BadgeApiClient;
 use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\Util\Mutator;
-use Infection\Process\Builder\InitialProcessBuilder;
+use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -114,7 +114,7 @@ final class ProjectCodeProvider
         TestFrameworkFinder::class,
         BadgeApiClient::class,
         MetricsCalculator::class,
-        InitialProcessBuilder::class,
+        InitialTestRunProcessBuilder::class,
         PhpSpecInitalConfigBuilder::class,
         PhpUnitInitalConfigBuilder::class,
         PhpSpecMutationConfigBuilder::class,

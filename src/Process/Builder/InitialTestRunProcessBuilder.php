@@ -42,7 +42,7 @@ use Symfony\Component\Process\Process;
 /**
  * @internal
  */
-class InitialProcessBuilder
+class InitialTestRunProcessBuilder
 {
     /**
      * @var AbstractTestFrameworkAdapter

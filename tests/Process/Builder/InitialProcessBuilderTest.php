@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Builder;
 
-use Infection\Process\Builder\InitialProcessBuilder;
+use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\TestCase;
 
@@ -49,7 +49,7 @@ final class InitialProcessBuilderTest extends TestCase
         $fwAdapter->method('buildInitialConfigFile')
             ->willReturn('buildInitialConfigFile');
 
-        $builder = new InitialProcessBuilder($fwAdapter);
+        $builder = new InitialTestRunProcessBuilder($fwAdapter);
 
         $process = $builder->getProcessForInitialTestRun('', false);
 
