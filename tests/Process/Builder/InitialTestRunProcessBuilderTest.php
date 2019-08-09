@@ -33,43 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Runner;
+namespace Infection\Tests\Process\Builder;
 
-use Infection\Mutant\Exception\MsiCalculationException;
-use Infection\Mutant\MetricsCalculator;
-use Infection\Process\Runner\MutatedTestFailed;
+use Infection\Process\Builder\InitialTestRunProcessBuilder;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\TestCase;
 
-final class MutatedTestDidNotPassTest extends TestCase
+final class InitialTestRunProcessBuilderTest extends TestCase
 {
-    public function test_log_bad_msi_error_message(): void
+    public function test_it_creates_a_process_with_no_timeout(): void
     {
-        $metrics = $this->createMock(MetricsCalculator::class);
-        $metrics->expects($this->once())->method('getMutationScoreIndicator')->willReturn(75.0);
+        $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $fwAdapter->method('getInitialTestRunCommandLine')
+            ->willReturn(['/usr/bin/php']);
+        $fwAdapter->method('buildInitialConfigFile')
+            ->willReturn('buildInitialConfigFile');
 
-        $exception = MutatedTestFailed::fromMetrics($metrics, 25.0, 'min-msi');
-        $this->assertSame(
-            'The minimum required MSI percentage should be 25%, but actual is 75%. Improve your tests!',
-            $exception->getMessage()
-        );
-    }
+        $builder = new InitialTestRunProcessBuilder($fwAdapter);
 
-    public function test_log_bad_msi_error_message_throws_error_on_faulty_msi(): void
-    {
-        $this->expectException(MsiCalculationException::class);
+        $process = $builder->createProcessForInitialTestRun('', false);
 
-        MutatedTestFailed::fromMetrics(new MetricsCalculator(), 0.0, 'min-msi');
-    }
-
-    public function test_log_bad_covered_msi_error_message(): void
-    {
-        $metrics = $this->createMock(MetricsCalculator::class);
-        $metrics->expects($this->once())->method('getCoveredCodeMutationScoreIndicator')->willReturn(75.0);
-
-        $exception = MutatedTestFailed::fromMetrics($metrics, 25.0, 'min-covered-msi');
-        $this->assertSame(
-            'The minimum required Covered Code MSI percentage should be 25%, but actual is 75%. Improve your tests!',
-            $exception->getMessage()
-        );
+        $this->assertStringContainsString('/usr/bin/php', $process->getCommandLine());
+        $this->assertNull($process->getTimeout());
     }
 }

@@ -33,40 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Runner;
+namespace Infection\Tests\Process\Builder;
 
-use Infection\Process\Runner\InitialTestsFailed;
+use Infection\Mutant\MutantInterface;
+use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
 
-final class InitialTestDidNotPassTest extends TestCase
+final class MutantProcessBuilderTest extends TestCase
 {
-    public function test_log_initial_tests_do_not_pass(): void
+    public function test_it_creates_a_process_with_timeout(): void
     {
-        $process = $this->createMock(Process::class);
-        $process->expects($this->once())->method('getExitCode')->willReturn(0);
-        $process->expects($this->once())->method('getOutput')->willReturn('output string');
-        $process->expects($this->once())->method('getErrorOutput')->willReturn('error string');
-        $process->expects($this->once())->method('getCommandLine')->willReturn('vendor/bin/phpunit --order=random');
+        $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $fwAdapter->method('getMutantCommandLine')
+            ->willReturn(['/usr/bin/php']);
+        $fwAdapter->method('buildMutationConfigFile')
+            ->willReturn('buildMutationConfigFile');
 
-        $testFrameworkAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
-        $testFrameworkAdapter->expects($this->once())->method('getName')->willReturn('phpunit');
-        $testFrameworkAdapter->expects($this->once())->method('getInitialTestsFailRecommendations')->willReturn('-');
+        $builder = new MutantProcessBuilder($fwAdapter, 100);
 
-        $error = implode("\n", [
-            'Project tests must be in a passing state before running Infection.',
-            '-',
-            'phpunit reported an exit code of 0.',
-            'Refer to the phpunit\'s output below:',
-            'STDOUT:',
-            'output string',
-            'STDERR:',
-            'error string',
-        ]);
+        $process = $builder->createProcessForMutant($this->createMock(MutantInterface::class))->getProcess();
 
-        $exception = InitialTestsFailed::fromProcessAndAdapter($process, $testFrameworkAdapter);
-
-        $this->assertSame($error, $exception->getMessage());
+        $this->assertStringContainsString('/usr/bin/php', $process->getCommandLine());
+        $this->assertSame(100.0, $process->getTimeout());
     }
 }

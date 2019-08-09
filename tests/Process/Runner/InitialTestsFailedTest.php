@@ -33,27 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Builder;
+namespace Infection\Tests\Process\Runner;
 
-use Infection\Process\Builder\InitialTestRunProcessBuilder;
+use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 
-final class InitialProcessBuilderTest extends TestCase
+final class InitialTestsFailedTest extends TestCase
 {
-    public function test_it_creates_a_process_with_no_timeout(): void
+    public function test_log_initial_tests_do_not_pass(): void
     {
-        $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
-        $fwAdapter->method('getInitialTestRunCommandLine')
-            ->willReturn(['/usr/bin/php']);
-        $fwAdapter->method('buildInitialConfigFile')
-            ->willReturn('buildInitialConfigFile');
+        $process = $this->createMock(Process::class);
+        $process->expects($this->once())->method('getExitCode')->willReturn(0);
+        $process->expects($this->once())->method('getOutput')->willReturn('output string');
+        $process->expects($this->once())->method('getErrorOutput')->willReturn('error string');
+        $process->expects($this->once())->method('getCommandLine')->willReturn('vendor/bin/phpunit --order=random');
 
-        $builder = new InitialTestRunProcessBuilder($fwAdapter);
+        $testFrameworkAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $testFrameworkAdapter->expects($this->once())->method('getName')->willReturn('phpunit');
+        $testFrameworkAdapter->expects($this->once())->method('getInitialTestsFailRecommendations')->willReturn('-');
 
-        $process = $builder->createProcessForInitialTestRun('', false);
+        $error = implode("\n", [
+            'Project tests must be in a passing state before running Infection.',
+            '-',
+            'phpunit reported an exit code of 0.',
+            'Refer to the phpunit\'s output below:',
+            'STDOUT:',
+            'output string',
+            'STDERR:',
+            'error string',
+        ]);
 
-        $this->assertStringContainsString('/usr/bin/php', $process->getCommandLine());
-        $this->assertNull($process->getTimeout());
+        $exception = InitialTestsFailed::fromProcessAndAdapter($process, $testFrameworkAdapter);
+
+        $this->assertSame($error, $exception->getMessage());
     }
 }
