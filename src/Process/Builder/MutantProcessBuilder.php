@@ -43,7 +43,7 @@ use Symfony\Component\Process\Process;
 /**
  * @internal
  */
-final class MutatedProcessBuilder
+final class MutantProcessBuilder
 {
     /**
      * @var AbstractTestFrameworkAdapter

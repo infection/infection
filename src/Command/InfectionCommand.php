@@ -49,7 +49,7 @@ use Infection\Locator\Locator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
-use Infection\Process\Builder\MutatedProcessBuilder;
+use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Runner\InitialTestDidNotPass;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutatedTestDidNotPass;
@@ -308,7 +308,7 @@ final class InfectionCommand extends BaseCommand
         $config = $this->container['infection.config'];
         $testFrameworkOptions = $this->getTestFrameworkExtraOptions($this->testFrameworkKey);
 
-        $processBuilder = new MutatedProcessBuilder($adapter, $config->getProcessTimeout());
+        $processBuilder = new MutantProcessBuilder($adapter, $config->getProcessTimeout());
 
         $codeCoverageData = $this->getCodeCoverageData($this->testFrameworkKey);
         $mutationsGenerator = new MutationsGenerator(

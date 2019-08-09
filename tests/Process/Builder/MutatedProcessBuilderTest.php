@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Builder;
 
 use Infection\Mutant\MutantInterface;
-use Infection\Process\Builder\MutatedProcessBuilder;
+use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\TestCase;
 
@@ -50,7 +50,7 @@ final class MutatedProcessBuilderTest extends TestCase
         $fwAdapter->method('buildMutationConfigFile')
             ->willReturn('buildMutationConfigFile');
 
-        $builder = new MutatedProcessBuilder($fwAdapter, 100);
+        $builder = new MutantProcessBuilder($fwAdapter, 100);
 
         $process = $builder->getProcessForMutant($this->createMock(MutantInterface::class))->getProcess();
 
