@@ -305,6 +305,13 @@ final class E2ETest extends TestCase
             $this->markTestSkipped("Infection from within PHPUnit won't run without xdebug or phpdbg");
         }
 
+        /*
+         * @see https://github.com/sebastianbergmann/php-code-coverage/blob/7743bbcfff2a907e9ee4a25be13d0f8ec5e73800/src/Driver/PHPDBG.php#L24
+         */
+        if (\PHP_SAPI === 'phpdbg' && !\function_exists('phpdbg_start_oplog')) {
+            $this->markTestIncomplete('This build of PHPDBG does not support code coverage');
+        }
+
         $container = InfectionContainer::create();
         $input = new ArgvInput(array_merge([
             'bin/infection',
