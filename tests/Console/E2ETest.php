@@ -137,6 +137,7 @@ final class E2ETest extends TestCase
     /**
      * @dataProvider e2eTestSuiteDataProvider
      * @group e2e
+     * @runInSeparateProcess
      */
     public function test_it_runs_an_e2e_test_with_success(string $fullPath): void
     {
