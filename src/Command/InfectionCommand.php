@@ -103,6 +103,11 @@ final class InfectionCommand extends BaseCommand
      */
     private $testFrameworkKey = '';
 
+    /**
+     * @var string
+     */
+    private $testFrameworkOptions = '';
+
     protected function configure(): void
     {
         $this->setName('run')
@@ -266,6 +271,7 @@ final class InfectionCommand extends BaseCommand
         $this->includeUserBootstrap($config);
 
         $this->testFrameworkKey = trim((string) $this->input->getOption('test-framework') ?: $config->getTestFramework());
+        $this->testFrameworkOptions = $this->getTestFrameworkExtraOptions($this->testFrameworkKey);
         $adapter = $this->container['test.framework.factory']->create($this->testFrameworkKey, $this->skipCoverage);
 
         LogVerbosity::convertVerbosityLevel($this->input, $this->consoleOutput);
@@ -283,12 +289,11 @@ final class InfectionCommand extends BaseCommand
         $config = $this->container['infection.config'];
 
         $processBuilder = new InitialTestRunProcessBuilder($adapter);
-        $testFrameworkOptions = $this->getTestFrameworkExtraOptions($this->testFrameworkKey);
 
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
         $initialTestsPhpOptions = trim((string) $this->input->getOption('initial-tests-php-options') ?: $config->getInitialTestsPhpOptions());
         $initialTestSuitProcess = $initialTestsRunner->run(
-            $testFrameworkOptions->getForInitialProcess(),
+            $this->testFrameworkOptions->getForInitialProcess(),
             $this->skipCoverage,
             explode(' ', $initialTestsPhpOptions)
         );
@@ -306,7 +311,6 @@ final class InfectionCommand extends BaseCommand
     {
         /** @var InfectionConfig $config */
         $config = $this->container['infection.config'];
-        $testFrameworkOptions = $this->getTestFrameworkExtraOptions($this->testFrameworkKey);
 
         $processBuilder = new MutantProcessBuilder($adapter, $config->getProcessTimeout());
 
@@ -336,7 +340,7 @@ final class InfectionCommand extends BaseCommand
 
         $mutationTestingRunner->run(
             (int) $this->input->getOption('threads'),
-            $testFrameworkOptions->getForMutantProcess()
+            $this->testFrameworkOptions->getForMutantProcess()
         );
     }
 
@@ -425,15 +429,10 @@ final class InfectionCommand extends BaseCommand
 
     private function getTestFrameworkExtraOptions(string $testFrameworkKey): TestFrameworkExtraOptions
     {
-        static $options;
-
-        if ($options) {
-            return $options;
-        }
         $extraOptions = $this->input->getOption('test-framework-options')
             ?? $this->container['infection.config']->getTestFrameworkOptions();
 
-        return $options = TestFrameworkTypes::PHPUNIT === $testFrameworkKey
+        return TestFrameworkTypes::PHPUNIT === $testFrameworkKey
             ? new PhpUnitExtraOptions($extraOptions)
             : new PhpSpecExtraOptions($extraOptions);
     }
