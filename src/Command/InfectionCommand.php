@@ -104,9 +104,9 @@ final class InfectionCommand extends BaseCommand
     private $testFrameworkKey = '';
 
     /**
-     * @var string
+     * @var TestFrameworkExtraOptions
      */
-    private $testFrameworkOptions = '';
+    private $testFrameworkOptions;
 
     protected function configure(): void
     {
