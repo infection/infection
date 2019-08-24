@@ -45,11 +45,6 @@ use Symfony\Component\Filesystem\Filesystem;
 final class SummaryFileLoggerTest extends TestCase
 {
     /**
-     * @var TmpDirectoryCreator
-     */
-    private $creator;
-
-    /**
      * @var string
      */
     private $workspace;
@@ -67,7 +62,6 @@ final class SummaryFileLoggerTest extends TestCase
     protected function setUp(): void
     {
         $this->fileSystem = new Filesystem();
-        $this->creator = new TmpDirectoryCreator($this->fileSystem);
         $this->workspace = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
         $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
     }
