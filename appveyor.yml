@@ -6,10 +6,10 @@ clone_folder: c:\projects\workspace
 environment:
   matrix:
   - dependencies: highest
-    php_ver_target: 7.2
+    php_ver_target: 7.3
     xdebug_ver: '2.6.0-7.2-vc15'
   - dependencies: current
-    php_ver_target: 7.2
+    php_ver_target: 7.3
     xdebug_ver: '2.6.0-7.2-vc15'
 
 cache: # cache is cleared when linked file is modified
@@ -29,8 +29,6 @@ install:
     # Enable Windows update service
     - ps: Set-Service wuauserv -StartupType Manual
     # Install PHP
-    - ps: choco search php --exact --all-versions -r
-    - choco search php --exact --all-versions -r
     - ps: appveyor-retry cinst --params '""/InstallDir:C:\tools\php""' --ignore-checksums -y php --version ((choco search php --exact --all-versions -r | select-string -pattern $env:php_ver_target | sort { [version]($_ -split '\|' | select -last 1) } -Descending | Select-Object -first 1) -replace '[php|]','')
     - cd c:\tools\php
     - copy php.ini-production php.ini /Y
