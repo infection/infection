@@ -7,10 +7,10 @@ environment:
   matrix:
   - dependencies: highest
     php_ver_target: 7.3
-    xdebug_ver: '2.6.0-7.2-vc15'
+    xdebug_ver: '2.7.2-7.3-vc15'
   - dependencies: current
     php_ver_target: 7.3
-    xdebug_ver: '2.6.0-7.2-vc15'
+    xdebug_ver: '2.7.2-7.3-vc15'
 
 cache: # cache is cleared when linked file is modified
     - '%LOCALAPPDATA%\Composer\files -> composer.lock'
