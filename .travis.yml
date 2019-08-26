@@ -45,6 +45,7 @@ jobs:
       install:
         - if [ "$DEPS" == "LOW" ]; then composer update --prefer-lowest $COMPOSER_FLAGS; else composer install $COMPOSER_FLAGS; fi
       before_script:
+          - rm /home/travis/.phpenv/versions/$TRAVIS_PHP_VERSION/bin/phpunit
           - |
               if [[ "$DRIVER" == "pcov" ]]; then
                 echo > $HOME/.phpenv/versions/$TRAVIS_PHP_VERSION/etc/conf.d/xdebug.ini
