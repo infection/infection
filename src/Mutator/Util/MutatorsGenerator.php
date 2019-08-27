@@ -43,15 +43,18 @@ use Infection\Config\Exception\InvalidConfigException;
 final class MutatorsGenerator
 {
     /**
-     * @var array
+     * @var array<string, bool|array<string, string>>
      */
     private $mutatorSettings;
 
     /**
-     * @var array
+     * @var array<string, bool|array<string, string>>
      */
     private $mutatorList = [];
 
+    /**
+     * @param array<string, bool|array<string, string>> $mutatorSettings
+     */
     public function __construct(array $mutatorSettings = [])
     {
         $this->mutatorSettings = $mutatorSettings;
@@ -62,7 +65,7 @@ final class MutatorsGenerator
      *
      * @throws InvalidConfigException
      *
-     * @return Mutator[]
+     * @return array<string, Mutator>
      */
     public function generate(): array
     {
@@ -93,7 +96,7 @@ final class MutatorsGenerator
     }
 
     /**
-     * @param array|bool $setting
+     * @param array<string, string>|bool $setting
      *
      * @throws InvalidConfigException
      */
@@ -119,7 +122,7 @@ final class MutatorsGenerator
     }
 
     /**
-     * @param array|bool|\stdClass $setting
+     * @param array<string, string>|bool|\stdClass $setting
      */
     private function registerFromClass(string $mutator, $setting): void
     {
@@ -135,7 +138,7 @@ final class MutatorsGenerator
     }
 
     /**
-     * @param array|bool $setting
+     * @param array<string, string>|bool $setting
      *
      * @throws InvalidConfigException
      */
@@ -149,7 +152,9 @@ final class MutatorsGenerator
     }
 
     /**
-     * @return Mutator[]
+     * @param array<Mutator,false|array<string>> $mutators
+     *
+     * @return array<string, Mutator>
      */
     private function createFromList(array $mutators): array
     {
@@ -157,7 +162,6 @@ final class MutatorsGenerator
 
         foreach ($mutators as $mutator => $setting) {
             if ($setting !== false) {
-                \assert(\is_string($mutator));
                 $mutatorList[$mutator::getName()] = new $mutator(
                     new MutatorConfig($setting)
                 );

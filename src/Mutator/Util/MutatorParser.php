@@ -48,10 +48,13 @@ final class MutatorParser
     private $inputMutators;
 
     /**
-     * @var array|Mutator[]
+     * @var array<string, Mutator>
      */
     private $configMutators;
 
+    /**
+     * @param array<string, Mutator> $configMutators
+     */
     public function __construct(?string $inputMutators, array $configMutators)
     {
         $this->inputMutators = $inputMutators;
@@ -59,7 +62,7 @@ final class MutatorParser
     }
 
     /**
-     * @return array|Mutator[]
+     * @return array<string, Mutator>
      */
     public function getMutators(): array
     {
@@ -79,6 +82,9 @@ final class MutatorParser
         return $this->configMutators;
     }
 
+    /**
+     * @return array<int, string>
+     */
     private function parseMutators(): array
     {
         if ($this->inputMutators === null) {
