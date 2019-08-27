@@ -70,13 +70,13 @@ final class MutatorParser
 
         if (\count($parsedMutators) === 0) {
             return $this->configMutators;
-
         }
         $mutatorSettings = [];
 
         foreach ($parsedMutators as $mutatorName) {
             $mutatorSettings[$mutatorName] = true;
         }
+
         return (new MutatorsGenerator($mutatorSettings))->generate();
     }
 
