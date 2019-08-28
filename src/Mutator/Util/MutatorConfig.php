@@ -53,7 +53,7 @@ final class MutatorConfig
     public function __construct(array $config)
     {
         $this->ignoreConfig = $config['ignore'] ?? [];
-        $this->mutatorSettings = $config['settings'] ?? [];
+        $this->mutatorSettings = (array) ($config['settings'] ?? []);
     }
 
     public function isIgnored(string $class, string $method, int $lineNumber = null): bool
