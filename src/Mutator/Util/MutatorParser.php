@@ -48,10 +48,13 @@ final class MutatorParser
     private $inputMutators;
 
     /**
-     * @var array|Mutator[]
+     * @var array<string, Mutator>
      */
     private $configMutators;
 
+    /**
+     * @param array<string, Mutator> $configMutators
+     */
     public function __construct(?string $inputMutators, array $configMutators)
     {
         $this->inputMutators = $inputMutators;
@@ -59,26 +62,27 @@ final class MutatorParser
     }
 
     /**
-     * @return array|Mutator[]
+     * @return array<string, Mutator>
      */
     public function getMutators(): array
     {
         $parsedMutators = $this->parseMutators();
 
-        if (\count($parsedMutators) > 0) {
-            $mutatorSettings = [];
+        if (\count($parsedMutators) === 0) {
+            return $this->configMutators;
+        }
+        $mutatorSettings = [];
 
-            foreach ($parsedMutators as $mutatorName) {
-                $mutatorSettings[$mutatorName] = true;
-            }
-            $generator = new MutatorsGenerator($mutatorSettings);
-
-            return $generator->generate();
+        foreach ($parsedMutators as $mutatorName) {
+            $mutatorSettings[$mutatorName] = true;
         }
 
-        return $this->configMutators;
+        return (new MutatorsGenerator($mutatorSettings))->generate();
     }
 
+    /**
+     * @return array<int, string>
+     */
     private function parseMutators(): array
     {
         if ($this->inputMutators === null) {
