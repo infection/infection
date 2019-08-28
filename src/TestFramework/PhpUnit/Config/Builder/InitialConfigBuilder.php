@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
+use DOMElement;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
@@ -195,7 +196,9 @@ class InitialConfigBuilder implements ConfigBuilder
     private function createNode(\DOMDocument $dom, string $nodeName): \DOMElement
     {
         $node = $dom->createElement($nodeName);
-        $dom->documentElement->appendChild($node);
+        $document = $dom->documentElement;
+        \assert($document instanceof DOMElement);
+        $document->appendChild($node);
 
         return $node;
     }

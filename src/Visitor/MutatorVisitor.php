@@ -75,5 +75,7 @@ final class MutatorVisitor extends NodeVisitorAbstract
             // TODO beforeTraverse - FirstFindingVisitor
             // TODO enterNode instead of leaveNode for '<' mutation to not travers children?
         }
+
+        return null;
     }
 }

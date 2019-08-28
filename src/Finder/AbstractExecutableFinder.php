@@ -42,10 +42,7 @@ abstract class AbstractExecutableFinder
 {
     abstract public function find(): string;
 
-    /**
-     * @return string|null
-     */
-    protected function searchNonExecutables(array $probableNames, array $extraDirectories = [])
+    protected function searchNonExecutables(array $probableNames, array $extraDirectories = []): ?string
     {
         $path = getenv('PATH') ?: getenv('Path');
 
@@ -67,5 +64,7 @@ abstract class AbstractExecutableFinder
                 }
             }
         }
+
+        return null;
     }
 }
