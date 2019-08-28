@@ -60,5 +60,7 @@ final class CodeCoverageClassIgnoreVisitor extends NodeVisitorAbstract
         if (strpos($docComment->getText(), '@codeCoverageIgnore') !== false) {
             return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
+
+        return null;
     }
 }

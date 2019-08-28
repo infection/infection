@@ -17,7 +17,7 @@ PHP_CS_FIXER_URL="https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar"
 PHP_CS_FIXER_CACHE=build/cache/.php_cs.cache
 
 PHPSTAN=./.tools/phpstan
-PHPSTAN_URL="https://github.com/phpstan/phpstan/releases/download/0.11.5/phpstan.phar"
+PHPSTAN_URL="https://github.com/phpstan/phpstan/releases/download/0.11.15/phpstan.phar"
 
 PHPUNIT=vendor/bin/phpunit
 
