@@ -45,9 +45,6 @@ final class EventDispatcher implements EventDispatcherInterface
      */
     private $listeners = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public function dispatch($event): void
     {
         $name = \get_class($event);
@@ -57,9 +54,6 @@ final class EventDispatcher implements EventDispatcherInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addSubscriber(EventSubscriberInterface $eventSubscriber): void
     {
         foreach ($eventSubscriber->getSubscribedEvents() as $eventName => $listener) {
