@@ -37,6 +37,7 @@ namespace Infection\Tests\Mutator\Util;
 
 use Infection\Mutator\Util\MutatorConfig;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 final class MutatorConfigTest extends TestCase
 {
@@ -131,5 +132,19 @@ final class MutatorConfigTest extends TestCase
             'Bar\Foo\Test',
             'method',
         ];
+    }
+
+    public function test_it_correctly_converts_settings(): void
+    {
+        $settings = new stdClass();
+        $settings->foo = 'bar';
+        $config = new MutatorConfig(['settings' => $settings]);
+        $this->assertSame(['foo' => 'bar'], $config->getMutatorSettings());
+    }
+
+    public function test_it_can_deal_with_empty_settings(): void
+    {
+        $config = new MutatorConfig([]);
+        $this->assertSame([], $config->getMutatorSettings());
     }
 }
