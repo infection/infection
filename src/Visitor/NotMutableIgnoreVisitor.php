@@ -53,5 +53,7 @@ final class NotMutableIgnoreVisitor extends NodeVisitorAbstract
         if ($node instanceof Node\Stmt\ClassMethod && $node->isAbstract()) {
             return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
+
+        return null;
     }
 }

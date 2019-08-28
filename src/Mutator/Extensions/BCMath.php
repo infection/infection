@@ -59,7 +59,7 @@ final class BCMath extends Mutator
     /**
      * @param Node&Node\Expr\FuncCall $node
      *
-     * @return Node|Node[]|Generator
+     * @return Generator<Node|array<Node>>
      */
     public function mutate(Node $node)
     {

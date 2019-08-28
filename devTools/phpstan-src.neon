@@ -1,3 +1,6 @@
+includes:
+    - phar://%currentWorkingDirectory%/.tools/phpstan/conf/bleedingEdge.neon
+
 parameters:
     ignoreErrors:
         - '#expects .*, array<string>\|bool\|string\|null given#'

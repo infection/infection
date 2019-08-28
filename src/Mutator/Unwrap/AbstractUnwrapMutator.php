@@ -48,7 +48,7 @@ abstract class AbstractUnwrapMutator extends Mutator
      *
      * @param Node&Node\Expr\FuncCall $node
      *
-     * @return Node\Param[]|\Generator;
+     * @return Node\Arg[]|\Generator;
      */
     final public function mutate(Node $node)
     {
