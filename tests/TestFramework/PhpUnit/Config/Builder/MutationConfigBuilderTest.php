@@ -1,8 +1,34 @@
 <?php
 /**
- * Copyright © 2017-2018 Maks Rafalko
+ * This code is licensed under the BSD 3-Clause License.
  *
- * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 declare(strict_types=1);
@@ -11,18 +37,16 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
 use Infection\Mutant\MutantInterface;
 use Infection\MutationInterface;
+use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
-use Infection\Utils\TmpDirectoryCreator;
-use Mockery;
-use Symfony\Component\Filesystem\Filesystem;
 use function Infection\Tests\normalizePath as p;
+use Infection\Utils\TmpDirectoryCreator;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @internal
- */
-final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+final class MutationConfigBuilderTest extends TestCase
 {
     public const HASH = 'a1b2c3';
 
@@ -63,16 +87,23 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         $projectDir = '/project/dir';
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit.xml';
 
-        $this->mutation = Mockery::mock(MutationInterface::class);
-        $this->mutation->shouldReceive('getHash')->andReturn(self::HASH);
-        $this->mutation->shouldReceive('getOriginalFilePath')->andReturn('/original/file/path');
+        $this->mutation = $this->createMock(MutationInterface::class);
+        $this->mutation
+            ->method('getHash')
+            ->willReturn(self::HASH);
+        $this->mutation
+            ->method('getOriginalFilePath')
+            ->willReturn('/original/file/path');
 
-        $this->mutant = Mockery::mock(MutantInterface::class);
-        $this->mutant->shouldReceive('getMutation')->andReturn($this->mutation);
-        $this->mutant->shouldReceive('getMutatedFilePath')->andReturn('/mutated/file/path');
-        $this->mutant->shouldReceive('getMutatedFileCode')->andReturn('<?php');
+        $this->mutant = $this->createMock(MutantInterface::class);
+        $this->mutant
+            ->method('getMutation')
+            ->willReturn($this->mutation);
+        $this->mutant
+            ->method('getMutatedFilePath')
+            ->willReturn('/mutated/file/path');
 
-        $this->xmlConfigurationHelper = new XmlConfigurationHelper(new PathReplacer($this->fileSystem, $this->pathToProject));
+        $this->xmlConfigurationHelper = new XmlConfigurationHelper(new PathReplacer($this->fileSystem, $this->pathToProject), '');
 
         $this->builder = new MutationConfigBuilder(
             $this->tmpDir,
@@ -89,7 +120,9 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
 
     public function test_it_builds_path_to_mutation_config_file(): void
     {
-        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn([]);
 
         $this->assertSame(
             $this->tmpDir . '/phpunitConfiguration.a1b2c3.infection.xml',
@@ -99,7 +132,9 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
 
     public function test_it_sets_custom_autoloader(): void
     {
-        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn([]);
 
         $configurationPath = $this->builder->build($this->mutant);
 
@@ -114,12 +149,15 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         );
 
         $this->assertSame($expectedCustomAutoloadFilePath, $resultAutoLoaderFilePath);
-        $this->assertContains('app/autoload2.php', file_get_contents($expectedCustomAutoloadFilePath));
+        $this->assertStringContainsString('app/autoload2.php', file_get_contents($expectedCustomAutoloadFilePath));
     }
 
     public function test_it_sets_custom_autoloader_when_attribute_is_absent(): void
     {
-        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn([]);
+
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpuit_without_bootstrap.xml';
         $this->builder = new MutationConfigBuilder(
             $this->tmpDir,
@@ -141,12 +179,14 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         );
 
         $this->assertSame($expectedCustomAutoloadFilePath, $resultAutoLoaderFilePath);
-        $this->assertContains('vendor/autoload.php', file_get_contents($expectedCustomAutoloadFilePath));
+        $this->assertStringContainsString('vendor/autoload.php', file_get_contents($expectedCustomAutoloadFilePath));
     }
 
     public function test_it_sets_stop_on_failure_flag(): void
     {
-        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn([]);
 
         $configurationPath = $this->builder->build($this->mutant);
 
@@ -159,7 +199,9 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
 
     public function test_it_sets_colors_flag(): void
     {
-        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn([]);
 
         $configurationPath = $this->builder->build($this->mutant);
 
@@ -172,11 +214,13 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
 
     public function test_it_handles_root_test_suite(): void
     {
-        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn([]);
 
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit_root_test_suite.xml';
         $replacer = new PathReplacer($this->fileSystem, $this->pathToProject);
-        $xmlConfigurationHelper = new XmlConfigurationHelper($replacer);
+        $xmlConfigurationHelper = new XmlConfigurationHelper($replacer, '');
 
         $this->builder = new MutationConfigBuilder(
             $this->tmpDir,
@@ -192,7 +236,9 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
 
     public function test_it_removes_original_loggers(): void
     {
-        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn([]);
 
         $configurationPath = $this->builder->build($this->mutant);
 
@@ -204,7 +250,9 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
 
     public function test_it_removes_printer_class(): void
     {
-        $this->mutant->shouldReceive('getCoverageTests')->andReturn([]);
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn([]);
 
         $configurationPath = $this->builder->build($this->mutant);
 
@@ -220,7 +268,9 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
      */
     public function test_it_sets_sorted_list_of_test_files(array $coverageTests, array $expectedFiles): void
     {
-        $this->mutant->shouldReceive('getCoverageTests')->andReturn($coverageTests);
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn($coverageTests);
 
         $configurationPath = $this->builder->build($this->mutant);
 
@@ -236,31 +286,46 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         $this->assertSame($expectedFiles, $files);
     }
 
+    public function test_it_removes_default_test_suite(): void
+    {
+        $this->mutant
+            ->method('getCoverageTests')
+            ->willReturn([]);
+
+        $configurationPath = $this->builder->build($this->mutant);
+
+        $xml = file_get_contents($configurationPath);
+
+        $value = $this->queryXpath($xml, '/phpunit/@defaultTestSuite');
+
+        $this->assertCount(0, $value);
+    }
+
     public function coverageTestsProvider(): array
     {
         return [
             [
                 [
-                    [
-                        'testMethod' => 'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #5',
-                        'testFilePath' => '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
-                        'time' => 0.086178,
-                    ],
-                    [
-                        'testMethod' => 'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #6',
-                        'testFilePath' => '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
-                        'time' => 0.086178,
-                    ],
-                    [
-                        'testMethod' => 'SimpleHabits\\Domain\\Model\\Goal\\GoalStepTest::it_correctly_returns_id',
-                        'testFilePath' => '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
-                        'time' => 0.035935,
-                    ],
-                    [
-                        'testMethod' => 'SimpleHabits\\Domain\\Model\\Goal\\GoalStepTest::it_correctly_returns_recorded_at_date',
-                        'testFilePath' => '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
-                        'time' => 0.035935,
-                    ],
+                    CoverageLineData::with(
+                        'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #5',
+                        '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
+                        0.086178
+                    ),
+                    CoverageLineData::with(
+                        'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #6',
+                        '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
+                        0.086178
+                    ),
+                    CoverageLineData::with(
+                        'SimpleHabits\\Domain\\Model\\Goal\\GoalStepTest::it_correctly_returns_id',
+                        '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
+                        0.035935
+                    ),
+                    CoverageLineData::with(
+                        'SimpleHabits\\Domain\\Model\\Goal\\GoalStepTest::it_correctly_returns_recorded_at_date',
+                        '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
+                        0.035935
+                    ),
                 ],
                 [
                     '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
@@ -269,21 +334,21 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
             ],
             [
                 [
-                    [
-                        'testMethod' => 'Path\\To\\A::test_a',
-                        'testFilePath' => '/path/to/A.php',
-                        'time' => 0.186178,
-                    ],
-                    [
-                        'testMethod' => 'Path\\To\\B::test_b',
-                        'testFilePath' => '/path/to/B.php',
-                        'time' => 0.086178,
-                    ],
-                    [
-                        'testMethod' => 'Path\\To\\C::test_c',
-                        'testFilePath' => '/path/to/C.php',
-                        'time' => 0.016178,
-                    ],
+                    CoverageLineData::with(
+                        'Path\\To\\A::test_a',
+                        '/path/to/A.php',
+                        0.186178
+                    ),
+                    CoverageLineData::with(
+                        'Path\\To\\B::test_b',
+                        '/path/to/B.php',
+                        0.086178
+                    ),
+                    CoverageLineData::with(
+                        'Path\\To\\C::test_c',
+                        '/path/to/C.php',
+                        0.016178
+                    ),
                 ],
                 [
                     '/path/to/C.php',
@@ -294,7 +359,7 @@ final class MutationConfigBuilderTest extends Mockery\Adapter\Phpunit\MockeryTes
         ];
     }
 
-    protected function queryXpath(string $xml, string $query)
+    private function queryXpath(string $xml, string $query)
     {
         $dom = new \DOMDocument();
         $dom->loadXML($xml);

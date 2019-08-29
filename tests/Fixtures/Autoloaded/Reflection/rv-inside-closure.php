@@ -2,6 +2,13 @@
 
 namespace InfectionReflectionClosure;
 
-$f = function() {
-    return 1;
-};
+class ClassWithAnonymousFunction
+{
+    public function bar()
+    {
+        return function() {
+            return 1;
+        };
+    }
+
+}

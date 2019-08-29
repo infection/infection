@@ -1,8 +1,34 @@
 <?php
 /**
- * Copyright © 2017-2018 Maks Rafalko
+ * This code is licensed under the BSD 3-Clause License.
  *
- * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 declare(strict_types=1);
@@ -11,6 +37,7 @@ namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
 use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
+use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 
 /**
@@ -34,11 +61,6 @@ class MutationConfigBuilder extends ConfigBuilder
     private $xmlConfigurationHelper;
 
     /**
-     * @var string
-     */
-    private $originalXmlConfigContent;
-
-    /**
      * @var \DOMDocument
      */
     private $dom;
@@ -49,12 +71,11 @@ class MutationConfigBuilder extends ConfigBuilder
         $this->projectDir = $projectDir;
 
         $this->xmlConfigurationHelper = $xmlConfigurationHelper;
-        $this->originalXmlConfigContent = $originalXmlConfigContent;
 
         $this->dom = new \DOMDocument();
         $this->dom->preserveWhiteSpace = false;
         $this->dom->formatOutput = true;
-        $this->dom->loadXML($this->originalXmlConfigContent);
+        $this->dom->loadXML($originalXmlConfigContent);
     }
 
     public function build(MutantInterface $mutant): string
@@ -67,8 +88,10 @@ class MutationConfigBuilder extends ConfigBuilder
         $this->xmlConfigurationHelper->replaceWithAbsolutePaths($xPath);
         $this->xmlConfigurationHelper->setStopOnFailure($xPath);
         $this->xmlConfigurationHelper->deactivateColours($xPath);
+        $this->xmlConfigurationHelper->deactivateResultCaching($xPath);
         $this->xmlConfigurationHelper->removeExistingLoggers($dom, $xPath);
         $this->xmlConfigurationHelper->removeExistingPrinters($dom, $xPath);
+        $this->xmlConfigurationHelper->removeDefaultTestSuite($dom, $xPath);
 
         $customAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',
@@ -126,6 +149,9 @@ AUTOLOAD;
         }
     }
 
+    /**
+     * @param CoverageLineData[] $coverageTests
+     */
     private function setFilteredTestsToRun(array $coverageTests, \DOMDocument $dom, \DOMXPath $xPath): void
     {
         $this->removeExistingTestSuite($xPath);
@@ -149,6 +175,9 @@ AUTOLOAD;
         }
     }
 
+    /**
+     * @param CoverageLineData[] $coverageTests
+     */
     private function addTestSuiteWithFilteredTestFiles(array $coverageTests, \DOMDocument $dom, \DOMXPath $xPath): void
     {
         $testSuites = $xPath->query('/phpunit/testsuites');
@@ -162,17 +191,24 @@ AUTOLOAD;
         $testSuite = $dom->createElement('testsuite');
         $testSuite->setAttribute('name', 'Infection testsuite with filtered tests');
 
-        $uniqueCoverageTests = $this->unique($coverageTests);
+        $uniqueCoverageTests = $this->uniqueByTestFile($coverageTests);
 
         // sort tests to run the fastest first
         usort(
             $uniqueCoverageTests,
-            function (array $a, array $b) {
-                return $a['time'] <=> $b['time'];
+            static function (CoverageLineData $a, CoverageLineData $b) {
+                return $a->time <=> $b->time;
             }
         );
 
-        $uniqueTestFilePaths = array_column($uniqueCoverageTests, 'testFilePath');
+        $uniqueTestFilePaths = array_map(
+            static function (CoverageLineData $coverageLineData): string {
+                \assert(\is_string($coverageLineData->testFilePath));
+
+                return $coverageLineData->testFilePath;
+            },
+            $uniqueCoverageTests
+        );
 
         foreach ($uniqueTestFilePaths as $testFilePath) {
             $file = $dom->createElement('file', $testFilePath);
@@ -185,15 +221,20 @@ AUTOLOAD;
         $nodeToAppendTestSuite->appendChild($testSuite);
     }
 
-    private function unique(array $coverageTests): array
+    /**
+     * @param CoverageLineData[] $coverageTests
+     *
+     * @return CoverageLineData[]
+     */
+    private function uniqueByTestFile(array $coverageTests): array
     {
         $usedFileNames = [];
         $uniqueTests = [];
 
         foreach ($coverageTests as $coverageTest) {
-            if (!\in_array($coverageTest['testFilePath'], $usedFileNames, true)) {
+            if (!\in_array($coverageTest->testFilePath, $usedFileNames, true)) {
                 $uniqueTests[] = $coverageTest;
-                $usedFileNames[] = $coverageTest['testFilePath'];
+                $usedFileNames[] = $coverageTest->testFilePath;
             }
         }
 

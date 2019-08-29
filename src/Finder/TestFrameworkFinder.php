@@ -1,8 +1,34 @@
 <?php
 /**
- * Copyright © 2017-2018 Maks Rafalko
+ * This code is licensed under the BSD 3-Clause License.
  *
- * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 declare(strict_types=1);
@@ -10,6 +36,9 @@ declare(strict_types=1);
 namespace Infection\Finder;
 
 use Infection\Finder\Exception\FinderException;
+use Infection\TestFramework\TestFrameworkTypes;
+use function Safe\file_get_contents;
+use function Safe\realpath;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -46,7 +75,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
                 $this->addVendorBinToPath();
             }
 
-            $this->cachedPath = (string) realpath($this->findTestFramework());
+            $this->cachedPath = realpath($this->findTestFramework());
 
             if ('.bat' === substr($this->cachedPath, -4)) {
                 $this->cachedPath = $this->findFromBatchFile($this->cachedPath);
@@ -118,15 +147,24 @@ class TestFrameworkFinder extends AbstractExecutableFinder
             $this->testFrameworkName . '.phar',
         ];
 
+        if ($this->testFrameworkName === TestFrameworkTypes::PHPUNIT) {
+            $candidates[] = 'simple-phpunit.bat';
+            $candidates[] = 'simple-phpunit';
+            $candidates[] = 'simple-phpunit.phar';
+        }
+
         $finder = new ExecutableFinder();
 
+        $cwd = getcwd();
+        $extraDirs = [$cwd, $cwd . '/bin'];
+
         foreach ($candidates as $name) {
-            if ($path = $finder->find($name, null, [getcwd()])) {
+            if ($path = $finder->find($name, null, $extraDirs)) {
                 return $path;
             }
         }
 
-        $path = $this->searchNonExecutables($candidates, [getcwd()]);
+        $path = $this->searchNonExecutables($candidates, $extraDirs);
 
         if (null !== $path) {
             return $path;
@@ -144,9 +182,9 @@ class TestFrameworkFinder extends AbstractExecutableFinder
          *   SET BIN_TARGET=%~dp0/../path
          *   php %~dp0/path %*
          */
-        if (preg_match('/%~dp0(.+$)/mi', (string) file_get_contents($path), $match)) {
+        if (preg_match('/%~dp0(.+$)/mi', file_get_contents($path), $match)) {
             $target = ltrim(rtrim(trim($match[1]), '" %*'), '\\/');
-            $script = (string) realpath(\dirname($path) . '/' . $target);
+            $script = realpath(\dirname($path) . '/' . $target);
 
             if (file_exists($script)) {
                 $path = $script;

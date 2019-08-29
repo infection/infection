@@ -1,5 +1,152 @@
 # Change Log
 
+## [0.13.0](https://github.com/infection/infection/tree/0.13.0)
+
+[Full Changelog](https://github.com/infection/infection/compare/0.12.2...0.13.0) (2019-05-18)
+
+**Added:**
+
+- Log the InitialTestsRun command line when `--debug` is used [\#520](https://github.com/infection/infection/issues/520)
+- Preliminary support for PCOV [\#667](https://github.com/infection/infection/pull/667) 
+- Adding Line Numbers To Mutator Ignore List [\#663](https://github.com/infection/infection/pull/663)
+- Family bc\*-functions mutators \(bcmath support\) [\#658](https://github.com/infection/infection/issues/658)
+- Family mb\_\*-functions mutators [\#654](https://github.com/infection/infection/issues/654)
+- Add a new unwrap mutator: ucwords [\#644](https://github.com/infection/infection/issues/644)
+- New @unwrap mutator: lcfirst\(\) [\#642](https://github.com/infection/infection/issues/642)
+- Provide compact output for CI environments [\#613](https://github.com/infection/infection/issues/613)
+- add unwrap array\_pad mutator [\#680](https://github.com/infection/infection/pull/680)
+- add unwrap array\_intersect\_assoc mutator [\#679](https://github.com/infection/infection/pull/679)
+- \#597 Array item removal mutator [\#649](https://github.com/infection/infection/pull/649)
+- Enhancement: Implement UnwrapTrim mutator [\#638](https://github.com/infection/infection/pull/638)
+- Enhancement: Implement UnwrapArrayUintersect mutator [\#637](https://github.com/infection/infection/pull/637)
+- Enhancement: Implement UnwrapArrayUintersectUassoc mutator [\#633](https://github.com/infection/infection/pull/633)
+- Enhancement: Implement UnwrapArrayUintersectAssoc mutator [\#628](https://github.com/infection/infection/pull/628)
+- Enhancement: Implement UnwrapArrayUdiff mutator [\#624](https://github.com/infection/infection/pull/624)
+- Mutator: AssignCoalesce. Upgrade PHPParser to 4.2.1 [\#641](https://github.com/infection/infection/pull/641)
+- Mutator: UnwrapUcFirst \(unwrap the first argument of ucfirst\(\) function\) [\#635](https://github.com/infection/infection/pull/635)
+
+**Fixed:**
+
+- Multi line arrays are not properly handled by code coverage [\#652](https://github.com/infection/infection/issues/652)
+- Error when parsing method that creates anonymous class [\#616](https://github.com/infection/infection/issues/616)
+- Infection gets stuck in the first execution after configuration file is created [\#576](https://github.com/infection/infection/issues/576)
+- Wrong constructor ownership when returning an anonymous class [\#682](https://github.com/infection/infection/issues/682)
+- Do not mutate \* to / and vice versa if one of the operands is numeric ±1.0 [\#673](https://github.com/infection/infection/pull/673)
+
+
+**Changed:**
+
+- Stop traversal of interfaces and abstract methods [\#656](https://github.com/infection/infection/pull/656)
+- Add a few more count esque functions to not decrement against [\#640](https://github.com/infection/infection/pull/640)
+- Enhancement: Normalize composer.json [\#629](https://github.com/infection/infection/pull/629)
+- Upgrade PHPUnit from ^6.5 to ^7.5 and all dependencies, including root differ [\#627](https://github.com/infection/infection/pull/627)
+- Test against php 7.4 [\#625](https://github.com/infection/infection/pull/625)
+
+## [0.12.0](https://github.com/infection/infection/tree/0.12.0) (2019-01-24) 
+
+[Full Changelog](https://github.com/infection/infection/compare/0.11.0...0.12.0)
+
+**BC Breaks:**
+
+- Disabling mutating "true" -\> "false" in TrueValue mutator for in\_array/array\_search [\#599](https://github.com/infection/infection/pull/599)
+
+**Added:**
+
+- Allow settings for Mutators [\#206](https://github.com/infection/infection/issues/206)
+- Enhancement: Implement UnwrapArrayUdiffAssoc mutator [\#614](https://github.com/infection/infection/pull/614) 
+- Enhancement: Implement UnwrapArraySplice mutator [\#605](https://github.com/infection/infection/pull/605) 
+- Enhancement: Implement UnwrapArraySlice mutator [\#598](https://github.com/infection/infection/pull/598) 
+- Enhancement: Implement UnwrapArrayMergeRecursive mutator [\#594](https://github.com/infection/infection/pull/594) 
+- Enhancement: Implement UnwrapArrayIntersectUkey mutator [\#593](https://github.com/infection/infection/pull/593) 
+- Enhancement: Implement UnwrapArrayIntersectUassoc mutator [\#591](https://github.com/infection/infection/pull/591) 
+- Enhancement: Implement UnwrapArrayColumn mutator [\#590](https://github.com/infection/infection/pull/590) 
+- Enhancement: Implement UnwrapArrayIntersectKey mutator [\#584](https://github.com/infection/infection/pull/584)
+- Enhancement: Implement UnwrapArrayDiffUkey mutator [\#583](https://github.com/infection/infection/pull/583)
+
+**Fixed:**
+
+- Schema does not include initialTestsPhpOptions [\#606](https://github.com/infection/infection/issues/606)
+- Space in PHP interpreter path breaks Infection [\#600](https://github.com/infection/infection/issues/600)
+- Starting infection via phing differs from commandline [\#592](https://github.com/infection/infection/issues/592)
+- symfony/phpunit-bridge isn't supported [\#588](https://github.com/infection/infection/issues/588)
+- Symfony flex should correctly detect phpunit executable [\#493](https://github.com/infection/infection/issues/493)
+
+**Changed:**
+
+- Running command with `--only-covered` should add in log only covered code. [\#581](https://github.com/infection/infection/issues/581)
+- Add a test to check Infection works with PSR-0 compliant autoloader [\#579](https://github.com/infection/infection/pull/579)
+- Update gitattributes file [\#532](https://github.com/infection/infection/pull/532)
+
+
+## [0.11.0](https://github.com/infection/infection/tree/0.11.0) (2018-11-11) 
+
+[Full Changelog](https://github.com/infection/infection/compare/0.10.6...0.11.0)
+
+**BC Breaks:**
+
+- Add counterparts to identical mutator and remove them from default [\#391](https://github.com/infection/infection/pull/391) ([BackEndTea](https://github.com/BackEndTea))
+
+**Added:**
+
+- Add json-schema validation for `infection.json.dist` config file [\#451](https://github.com/infection/infection/issues/451) ([sidz](https://github.com/sidz))
+- Run project's tests in a random order for InitialTestRun process [\#519](https://github.com/infection/infection/pull/519) ([borNfreee](https://github.com/borNfreee))
+- Validate phpunit.xml [\#487](https://github.com/infection/infection/pull/487) ([borNfreee](https://github.com/borNfreee))
+- @codeCoverageIgnore annotations support [\#491](https://github.com/infection/infection/pull/491) ([borNfreee](https://github.com/borNfreee))
+- \[RFC\] Yield mutations [\#450](https://github.com/infection/infection/pull/450) ([borNfreee](https://github.com/borNfreee))
+- \[Feature\] Round Family [\#449](https://github.com/infection/infection/pull/449) ([deleugpn](https://github.com/deleugpn))
+- Add counterparts to identical mutator and remove them from default [\#391](https://github.com/infection/infection/pull/391) ([BackEndTea](https://github.com/BackEndTea))
+- Adding Additional CLI Settings To Config [\#463](https://github.com/infection/infection/pull/463) ([Fenikkusu](https://github.com/Fenikkusu))
+- [Mutator] Implement UnwrapArrayCombine mutator [\#550](https://github.com/infection/infection/pull/550) ([localheinz](https://github.com/localheinz))
+- [Mutator] Use default rules of ordered\_class\_elements fixer [\#530](https://github.com/infection/infection/pull/530) ([localheinz](https://github.com/localheinz))
+- [Mutator] Implement UnwrapArrayFlip mutator [\#529](https://github.com/infection/infection/pull/529) ([localheinz](https://github.com/localheinz))
+- [Mutator] Implement UnwrapArrayReverse mutator [\#527](https://github.com/infection/infection/pull/527) ([localheinz](https://github.com/localheinz))
+- [Mutator] Enable no\_superfluous\_phpdoc\_tags fixer [\#525](https://github.com/infection/infection/pull/525) ([localheinz](https://github.com/localheinz))
+- [Mutator] Implement UnwrapStrRepeat mutator [\#539](https://github.com/infection/infection/pull/539) ([localheinz](https://github.com/localheinz))
+- [Mutator] Fail with a better assertion message [\#538](https://github.com/infection/infection/pull/538) ([localheinz](https://github.com/localheinz))
+- [Mutator] Implement UnwrapArrayReplace mutator [\#536](https://github.com/infection/infection/pull/536) ([localheinz](https://github.com/localheinz))
+- [Mutator] Implement UnwrapStrToLower mutator [\#534](https://github.com/infection/infection/pull/534) ([localheinz](https://github.com/localheinz))
+- [Mutator] Implement UnwrapArrayReduce mutator [\#533](https://github.com/infection/infection/pull/533) ([localheinz](https://github.com/localheinz))
+- [Mutator] Implement UnwrapArrayReplaceRecursive mutator [\#545](https://github.com/infection/infection/pull/545) ([localheinz](https://github.com/localheinz))
+- [Mutator] Implement UnwrapArrayDiff mutator [\#544](https://github.com/infection/infection/pull/544) ([localheinz](https://github.com/localheinz))
+- [Mutator] Implement UnwrapArrayIntersect mutator [\#543](https://github.com/infection/infection/pull/543) ([localheinz](https://github.com/localheinz))
+- [Mutator] Implement UnwrapArrayMerge mutator [\#542](https://github.com/infection/infection/pull/542) ([localheinz](https://github.com/localheinz))
+- [Mutator] Implement UnwrapArrayChunk mutator [\#558](https://github.com/infection/infection/pull/558) ([localheinz](https://github.com/localheinz))
+- [Mutator] Implement UnwrapArrayUnique mutator [\#556](https://github.com/infection/infection/pull/556) ([localheinz](https://github.com/localheinz))
+- [Mutator] Implement UnwrapArrayKeys mutator [\#555](https://github.com/infection/infection/pull/555) ([localheinz](https://github.com/localheinz))
+- [Mutator] Implement UnwrapArrayValues mutator [\#554](https://github.com/infection/infection/pull/554) ([localheinz](https://github.com/localheinz))
+- [Mutator] Unwrap all available arguments to array\_map\(\) [\#553](https://github.com/infection/infection/pull/553) ([localheinz](https://github.com/localheinz))
+- [Mutator] Created new UnwrapStrToUpper mutator [\#559](https://github.com/infection/infection/pull/559) ([zf2timo](https://github.com/zf2timo))
+
+**Fixed:**
+
+- Do not require dev packages on Deploy stage [\#445](https://github.com/infection/infection/pull/445) ([borNfreee](https://github.com/borNfreee))
+- Batch file invoked with php - breaks test framework version [\#469](https://github.com/infection/infection/issues/469)
+- Validate that infection.json contains valid \(writable\) file paths for loggers [\#458](https://github.com/infection/infection/pull/458) ([borNfreee](https://github.com/borNfreee))
+- Fix .bat files being invoked with php [\#470](https://github.com/infection/infection/pull/470) ([johnstevenson](https://github.com/johnstevenson))
+- Exclude --testsuite from PhpUnit mutant options, but allow for initial process [\#480](https://github.com/infection/infection/issues/480)
+- Extend TestFrameworkExtraOptions to cover more complex usages of options [\#483](https://github.com/infection/infection/pull/483) ([tomtomau](https://github.com/tomtomau))
+- Restrict installation with broken versions of symfony/console [\#523](https://github.com/infection/infection/pull/523) ([sanmai](https://github.com/sanmai))
+- Fix Decrement integer [\#485](https://github.com/infection/infection/pull/485) ([BackEndTea](https://github.com/BackEndTea))
+- Update ProtectedVisibility/PublicVisibility to guard against missing reflection [\#502](https://github.com/infection/infection/pull/502) ([sanmai](https://github.com/sanmai))
+- Update TestFrameworkFinder to always look for a .bat first. [\#506](https://github.com/infection/infection/pull/506) ([sanmai](https://github.com/sanmai))
+- TestFrameworkFinderTest fails to run on Mac OS X [\#504](https://github.com/infection/infection/issues/504)
+- PublicVisibility mutator failing due to missing reflection [\#501](https://github.com/infection/infection/issues/501)
+- --initial-tests-php-options ignored on Windows [\#471](https://github.com/infection/infection/issues/471)
+- Do not mutate the code inside plain functions [\#466](https://github.com/infection/infection/issues/466)
+- Infection does not fail gracefully on an invalid phpunit.xml [\#409](https://github.com/infection/infection/issues/409)
+- Do not mutate code that is ignored from code coverage [\#407](https://github.com/infection/infection/issues/407)
+- Fix: Keep mutators in mutator profiles sorted by name [\#541](https://github.com/infection/infection/pull/541) ([localheinz](https://github.com/localheinz))
+
+**Changed:**
+
+- Rename infection-log.txt -\> infection.log [\#454](https://github.com/infection/infection/pull/454) ([borNfreee](https://github.com/borNfreee))
+- Improve compatibility with framework based applications [\#440](https://github.com/infection/infection/pull/440) ([patrickfunke](https://github.com/patrickfunke))
+- Add some breathing space around our logo [\#509](https://github.com/infection/infection/pull/509) ([sanmai](https://github.com/sanmai))
+- Explicitly add the default profile to the list of mutators [\#507](https://github.com/infection/infection/pull/507) ([sanmai](https://github.com/sanmai))
+- Do not travers plain functions unless they are in the method or closures [\#508](https://github.com/infection/infection/pull/508) ([borNfreee](https://github.com/borNfreee))
+- Do not mutate interfaces [\#548](https://github.com/infection/infection/pull/548) ([sanmai](https://github.com/sanmai))
+- Include the complete license in headers [\#528](https://github.com/infection/infection/pull/528) ([sanmai](https://github.com/sanmai))
+
 ## [0.10.0](https://github.com/infection/infection/tree/HEAD)  (2018-08-11) 
 
 [Full Changelog](https://github.com/infection/infection/compare/0.9.3...0.10.0)

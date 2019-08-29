@@ -6,12 +6,15 @@ env:
   global:
     - INFECTION_FLAGS='--threads=4 --min-msi=67 --min-covered-msi=75 --coverage=coverage --log-verbosity=none'
     - PHPUNIT_BIN='vendor/bin/phpunit --coverage-clover=clover.xml --coverage-xml=coverage/coverage-xml --log-junit=coverage/phpunit.junit.xml'
+    - COMPOSER_FLAGS='--no-interaction --no-progress --no-suggest --prefer-dist'
     - secure: KPHUzOeWLeCWzcyPrnrDaR6grVUEXj48KlSQhJiubdkyKtGcvEs+TzZNYa2v+mSZsvrBHez9MRu4itcx05fNrb7/6M23uppv+fENH7tgZi8PXktlEXvD+Iqc9DIaDS1hQKpsnOhOZLlDNQ/kyE6TJAvoBMcbG6RfLqwLP1Abdz11t9Z65SIL7l2YpTjLjgmZUctpEVkivnQ3VQojd3soFTKZ8s9jNhdyUL2F+Rab4wu26Dy+q9xEd5y1tj2242nmVU7U/OD/spTkxRivuUPNM7jEnUvUcdEHd5DIBki702OrSkgsjrxlOlqOWcIRzVZA+A54GiE8qpnLSPN1qbc68ifXhd4lw4zKrE9KfvI8gnnFHtwQP0lhQuwG+j/VtbQRYrb0ufX1sAOUpOIDGMxYrh+Hn6j/nZnBiBh3NRF0u6PLfnAuph5TybylY0cuiGfGOWFf8UG7yz/EH+Br/D5M/IkObU8b9e3YJlUQPcjTi0BSa/+lkLpQMOOVOlQZk+LTVVRjXwSO10JcWhpqwWX74dsa5b2N/XbXOEQldVsYuQZz7re8e5Nwm5dx+B/KF/ohv2GDkQdqAA35ogOAABI3rvGlfOESDeZyGYOiJqBWX+KLKNRQ6l/KRkHNflX5J+0xeRlK4L84n0YwesyEAEFnYrYtQ+/VNd9ZP2+xXyTrePI=
     - secure: gto1Cg/FEurmKP+JNi7G7MBxJx9KX+WzM9VlLnu0x1Hq+2n8dEgNCBc9gvNrdpPPWHdke23uYXxM3XaKh6f/KXNRmYskJwAUP/jWTwkAc9dIz6qo3ObcS3M6WPnohkjhTJjJJH/dbUknR9gbstTvGsan7JysUnast6uyAhuP81ago0BoiCshTGPa7gZkD4dPPvDrUr70kRzgOd2ZJQZcuoCfL00q4Yu0OkjM9VMBxaBKkL8EE7594aYDjFtGbJuvWmZ36qqtUxzc3ly+G3IHfQVMQqN8+H0VB4ULwE1JOzWMsj5gpJtVeyPY5BTcAOE3je5/+1eq14VVnf3iSgMu3DbF1o/KuMxdes5vDadoZaVQmtLtNHvgu/UDCicBKk3BnLtlQe1bFfEsoSDRr+zCVkO5ypcbERxQzVCGdZdHsXLFZSxdLsEqSqD5ItZe1ZXv4K8bsDDY5rJgjyaiQs/FT/G4dlf61MHqzKtErgsNQ99ilV4iWqHGHnbMISyYdiLWTG8z/nhE34M+08J0gpSDfVrs1pvoUIzhD8KvjlU2QC2IXuE38aXTZm4IeTA7P6vZbUoCCcgOxIRqzS0UX9M1ddOUmy6prc3CGgiEgn6ey/eWmfyRQSbuL07aRH7MEzW4ESAJbdjHsuZoIUXGC9okLvk2pKfQxCjV86akPub7BZ8=
+
 cache:
   directories:
     - $HOME/.composer/cache
     - build/cache
+    - .tools
 
 addons:
   apt:
@@ -19,49 +22,61 @@ addons:
       - expect
 
 before_install:
-  - source .ci/xdebug.sh
+  - source .ci/travis-functions.sh
   - xdebug-disable
+  # Since the Makefile timestamp is used in the Makefile as a dependency, we must
+  # ensure its timestamp is the correct one and not the one at the time of cloning
+  - touch -d "$(git log -1 --date=iso --format=%cd Makefile)" Makefile
 
 jobs:
   include:
     - stage: Static Code Analysis
       php: 7.2
       install:
-        - composer install
+        - composer install $COMPOSER_FLAGS
       script:
-        - make analyze-ci --keep-going
+        - make test-autoreview
+        - make analyze --keep-going
 
     - &STANDARD_TEST_JOB
       stage: Test
-      php: 7.1
+      php: 7.2
+      env: DRIVER="xdebug"
       install:
-        - composer install
-        - |
-          if [ "${SYMFONY_VERSION}" != "" ]; then
-            composer config --unset platform
-            composer require \
-            symfony/console:${SYMFONY_VERSION} \
-            symfony/filesystem:${SYMFONY_VERSION} \
-            symfony/process:${SYMFONY_VERSION} \
-            symfony/finder:${SYMFONY_VERSION} \
-            symfony/yaml:${SYMFONY_VERSION}
-          fi
+        - if [ "$DEPS" == "LOW" ]; then composer update --prefer-lowest $COMPOSER_FLAGS; else composer install $COMPOSER_FLAGS; fi
+      before_script:
+          - rm /home/travis/.phpenv/shims/phpunit || true
+          - rm /home/travis/.phpenv/versions/$TRAVIS_PHP_VERSION/bin/phpunit
+          - |
+              if [[ "$DRIVER" == "pcov" ]]; then
+                echo > $HOME/.phpenv/versions/$TRAVIS_PHP_VERSION/etc/conf.d/xdebug.ini
+                git clone --single-branch --branch=v1.0.6 --depth=1 https://github.com/krakjoe/pcov
+                cd pcov
+                phpize
+                ./configure
+                make clean install
+                echo "extension=pcov.so" > $HOME/.phpenv/versions/$TRAVIS_PHP_VERSION/etc/conf.d/pcov.ini
+                cd $TRAVIS_BUILD_DIR
+              fi
       script:
-        - if [[ $PHPDBG != 1 ]]; then xdebug-enable; fi
-        - if [[ $PHPDBG != 1 ]]; then $PHPUNIT_BIN; else phpdbg -qrr $PHPUNIT_BIN; fi
+        - if [[ "$DRIVER" == "xdebug" || "$DRIVER" == "none" ]]; then xdebug-enable; fi
+        - if [[ "$DRIVER" != "phpdbg" ]]; then $PHPUNIT_BIN; else phpdbg -qrr $PHPUNIT_BIN; fi
         - |
-          if [[ "${SYMFONY_VERSION}" != "" ]]; then
+          if [[ "$DEPS" == "LOW" ]]; then
             ./tests/e2e_tests bin/infection;
           else
-            make build/bin/infection.phar;
-            ./tests/e2e_tests build/bin/infection.phar;
+            make compile;
+            ./tests/e2e_tests build/infection.phar;
           fi
-        - if [[ $NO_DEBUGGER == 1 ]]; then xdebug-disable; fi
+        - if [[ "$DRIVER" == "none" ]]; then xdebug-disable; fi
         - |
-          if [[ $PHPDBG != 1 ]]; then
-            bin/infection $INFECTION_FLAGS;
+          INFECTION_PR_FLAGS=$(get-infection-pr-flags);
+          echo "INFECTION_PR_FLAGS=$INFECTION_PR_FLAGS";
+
+          if [[ "$DRIVER" != "phpdbg" ]]; then
+            bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
           else
-            phpdbg -qrr bin/infection $INFECTION_FLAGS;
+            phpdbg -qrr bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
           fi
 
       after_success:
@@ -69,78 +84,64 @@ jobs:
 
     -
       <<: *STANDARD_TEST_JOB
-      php: 7.1
-      env: NO_DEBUGGER=1
+      php: 7.3
+      env: DRIVER="xdebug"
 
     -
       <<: *STANDARD_TEST_JOB
-      php: 7.1
-      env: PHPDBG=1
+      php: 7.3
+      env: DRIVER="phpdbg"
+
+    - <<: *STANDARD_TEST_JOB
+      php: 7.3
+      env: DRIVER="pcov"
+
+    - <<: *STANDARD_TEST_JOB
+      php: 7.3
+      env: DRIVER="none"
 
     -
       <<: *STANDARD_TEST_JOB
-      php: 7.1
-      env: SYMFONY_VERSION="^4.0"
+      php: 7.3
+      env: DEPS="LOW" DRIVER="xdebug"
 
     -
       <<: *STANDARD_TEST_JOB
-      php: 7.1
-      env: SYMFONY_VERSION="^4.0" PHPDBG=1
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.2
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.2
-      env: NO_DEBUGGER=1
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.2
-      env: PHPDBG=1
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.1
-      env: SYMFONY_VERSION="^4.0"
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.2
-      env: SYMFONY_VERSION="^4.0" PHPDBG=1
+      php: 7.4snapshot
+      env: DRIVER="phpdbg"
 
     -
       <<: *STANDARD_TEST_JOB
       php: nightly
-      env: PHPDBG=1
+      env: DRIVER="phpdbg"
 
       script:
         # We don't have xdebug on the nightly build, so we always run with phpdbg.
-        - make build/bin/infection.phar;
-        - ./tests/e2e_tests build/bin/infection.phar;
+        - make compile;
+        - ./tests/e2e_tests build/infection.phar;
         - phpdbg -qrr $PHPUNIT_BIN
-        - phpdbg -qrr bin/infection $INFECTION_FLAGS
+        - |
+          INFECTION_PR_FLAGS=$(get-infection-pr-flags);
+          phpdbg -qrr bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
 
     - stage: Deploy
       php: 7.2
       install:
-        - composer install --no-dev
+        - composer install --no-dev $COMPOSER_FLAGS
       script:
-        make build/bin/infection.phar;
+        make compile;
       before_deploy:
         - echo $DECRYPT_KEY | gpg --passphrase-fd 0 .ci/keys.asc.gpg
         - gpg --batch --yes --import .ci/keys.asc
-        - echo $SIGN_KEY | gpg --passphrase-fd 0 -u C5095986493B4AA0 --armor --detach-sig build/bin/infection.phar
+        - echo $SIGN_KEY | gpg --passphrase-fd 0 -u C5095986493B4AA0 --armor --detach-sig build/infection.phar
 
       deploy:
         provider: releases
         api_key:
           secure: JtdvJBE2ARf6VWN5KlXAburz3FZMriiXBHEdeIocHePBAzgYW7tVMksJR5N3azrE3KjhftMEukXtA1k5VfAGdLCSm6nKGsZwolkd24ryG7PYNuAdFWfbau8QQXn6aLFesF2lkTq89+PqxAdVjwXNgFA7ble3vL66Ogabff6gov6QwT9vDrTqwLmWNGwbt9QB32IE9yVPjW/3lk4MAkMHtKDr2DElyeT2CRRuPuUCA+zNwoGG95wqLAD/RwjsqR3GjotzDKrldqog9jU2OQptUc3BgdKlYR1AzdknxJYnT7a5CRVdmSOEfD9IrDqlYEzn9pHav+Sk4KD2KNKsALQGk/w16BqncN2uyOexUTzXvnDd27G4ZYy+1OsXMdYMhF5ffwj7EqNLm8XfLPtHHV0/FUJY9kkrbf9+wQVjDQmMJLLIiBSt3vuY0ya5SVW8thtjlF2j67smamNe4hDhditBipto+9Y5vI4AYhcm4CQlqP8BVbw3/LgGAl/dJR5ohM7PFZH3EUE1AojBaEXfUymlICdFVZFJbB0D/AM8jSqNmWBQu9QX3MURhT5xLSwc+kir2izQaEo/GQz79AifqkUJgSCzpRUJntCN8A7yk1uxDZDONbINF3ReuF+nqu7GMksgKZLCGbOIaBl9of24K5BeTqxgcEykiHFFY7X9QdI3Dyo=
         file:
-          - build/bin/infection.phar
-          - build/bin/infection.phar.asc
+          - build/infection.phar
+          - build/infection.phar.asc
         skip_cleanup: true
         on:
           tags: true
@@ -148,4 +149,6 @@ jobs:
 
   allow_failures:
     - php: nightly
-      env: PHPDBG=1
+      env: DRIVER="phpdbg"
+    - php: 7.4snapshot
+      env: DRIVER="phpdbg"

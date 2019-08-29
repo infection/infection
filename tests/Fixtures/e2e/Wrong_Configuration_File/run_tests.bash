@@ -6,7 +6,7 @@ run () {
     local INFECTION=${1}
     local PHPARGS=${2}
 
-    if [ "$PHPDBG" = "1" ]
+    if [ "$DRIVER" = "phpdbg" ]
     then
         phpdbg $PHPARGS -qrr $INFECTION
     else
@@ -15,7 +15,7 @@ run () {
 }
 
 test -x $(which tput) && tput setaf 2 # green
-if run "../../../../bin/infection --configuration=fake-file.json" "" < /dev/null 2>&1 | grep -s 'The file/folder "fake-file.json" does not exist'; then
+if run "../../../../bin/infection --configuration=fake-file.json" "" < /dev/null 2>&1 | grep -s 'Could not locate the file/directory "fake-file.json"'; then
 	exit 0;
 fi
 

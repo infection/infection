@@ -1,8 +1,34 @@
 <?php
 /**
- * Copyright © 2017-2018 Maks Rafalko
+ * This code is licensed under the BSD 3-Clause License.
  *
- * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 declare(strict_types=1);
@@ -12,13 +38,10 @@ namespace Infection\Tests\Mutant;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessInterface;
-use Mockery;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-/**
- * @internal
- */
-final class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+final class MetricsCalculatorTest extends TestCase
 {
     public function test_it_shows_zero_values_by_default(): void
     {
@@ -41,20 +64,10 @@ final class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
         $this->assertSame(0.0, $calculator->getCoveredCodeMutationScoreIndicator());
     }
 
-    private function addMutantProcess(MetricsCalculator $calculator, int $resultCode, int $count = 1): void
-    {
-        $mutantProcess = Mockery::mock(MutantProcessInterface::class);
-        $mutantProcess->shouldReceive('getResultCode')->times($count)->andReturn($resultCode);
-
-        while ($count--) {
-            $calculator->collect($mutantProcess);
-        }
-    }
-
     public function test_it_collects_all_values(): void
     {
-        $process = Mockery::mock(Process::class);
-        $process->shouldReceive('stop');
+        $process = $this->createMock(Process::class);
+        $process->method('stop');
 
         $calculator = new MetricsCalculator();
 
@@ -73,8 +86,20 @@ final class MetricsCalculatorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
         $this->addMutantProcess($calculator, MutantProcess::CODE_ERROR, 2);
         $this->assertSame(2, $calculator->getErrorCount());
 
-        $this->assertSame(78.0, $calculator->getMutationScoreIndicator()); // 78.57
-        $this->assertSame(92.0, $calculator->getCoverageRate()); // 92.85
-        $this->assertSame(84.0, $calculator->getCoveredCodeMutationScoreIndicator()); // 84.61
+        $this->assertSame(78.57142857142857, $calculator->getMutationScoreIndicator());
+        $this->assertSame(92.85714285714286, $calculator->getCoverageRate());
+        $this->assertSame(84.61538461538461, $calculator->getCoveredCodeMutationScoreIndicator());
+    }
+
+    private function addMutantProcess(MetricsCalculator $calculator, int $resultCode, int $count = 1): void
+    {
+        $mutantProcess = $this->createMock(MutantProcessInterface::class);
+        $mutantProcess->expects($this->exactly($count))
+            ->method('getResultCode')
+            ->willReturn($resultCode);
+
+        while ($count--) {
+            $calculator->collect($mutantProcess);
+        }
     }
 }

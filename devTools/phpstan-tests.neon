@@ -2,4 +2,4 @@ parameters:
     excludes_analyse:
         - %currentWorkingDirectory%/tests/Fixtures/*
     ignoreErrors:
-        - '#Call to an undefined method Mockery#'
+        - '#Return type \(void\) of method .*[Visitor|Traverser].* should be compatible with return type .* of method PhpParser\\Node.*#'

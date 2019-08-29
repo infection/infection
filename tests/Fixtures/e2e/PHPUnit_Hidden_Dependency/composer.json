@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^8"
+    },
+    "autoload": {
+        "psr-4": {
+            "PHPUnit_Hidden_Dependency\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PHPUnit_Hidden_Dependency\\Test\\": "tests/"
+        }
+    }
+}

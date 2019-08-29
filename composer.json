@@ -1,12 +1,16 @@
 {
     "name": "infection/infection",
-    "description": "Infection is a Mutation Testing framework for PHP. The mutation adequacy score can be used to measure the effectiveness of a test set in terms of its ability to detect faults.",
-    "keywords": ["mutation testing", "mutation framework", "testing", "coverage", "unit testing", "mutant"],
     "type": "library",
+    "description": "Infection is a Mutation Testing framework for PHP. The mutation adequacy score can be used to measure the effectiveness of a test set in terms of its ability to detect faults.",
+    "keywords": [
+        "mutation testing",
+        "mutation framework",
+        "testing",
+        "coverage",
+        "unit testing",
+        "mutant"
+    ],
     "license": "BSD-3-Clause",
-    "support": {
-        "issues": "https://github.com/infection/infection/issues"
-    },
     "authors": [
         {
             "name": "Maks Rafalko",
@@ -30,8 +34,47 @@
             "name": "Alexey Kopytko",
             "email": "alexey@kopytko.com",
             "homepage": "https://www.alexeykopytko.com"
+        },
+        {
+            "name": "Andreas Möller",
+            "email": "am@localheinz.com",
+            "homepage": "https://localheinz.com"
         }
     ],
+    "require": {
+        "php": "^7.2.9",
+        "ext-dom": "*",
+        "ext-json": "*",
+        "ext-libxml": "*",
+        "composer/xdebug-handler": "^1.3.3",
+        "justinrainbow/json-schema": "^5.2",
+        "nikic/php-parser": "^4.2.1",
+        "ocramius/package-versions": "^1.2",
+        "pimple/pimple": "^3.2",
+        "sebastian/diff": "^3.0.2",
+        "symfony/console": "^3.4.29 || ^4.0",
+        "symfony/filesystem": "^3.4.29 || ^4.0",
+        "symfony/finder": "^3.4.29 || ^4.0",
+        "symfony/process": "^3.4.29 || ^4.0",
+        "symfony/yaml": "^3.4.29 || ^4.0",
+        "thecodingmachine/safe": "^0.1.16",
+        "webmozart/assert": "^1.3",
+        "webmozart/path-util": "^2.3"
+    },
+    "conflict": {
+        "symfony/console": "=4.1.5"
+    },
+    "require-dev": {
+        "helmich/phpunit-json-assert": "^3.0",
+        "phpunit/phpunit": "^8.2.4 <8.2.5",
+        "symfony/phpunit-bridge": "^4.3.3"
+    },
+    "config": {
+        "platform": {
+            "php": "7.2.9"
+        },
+        "sort-packages": true
+    },
     "autoload": {
         "psr-4": {
             "Infection\\": "src/"
@@ -41,42 +84,19 @@
         "psr-4": {
             "Infection\\Tests\\": "tests/"
         },
+        "classmap": [
+            "tests/Fixtures/Autoloaded",
+            "tests/Fixtures/CodeSamples"
+        ],
         "files": [
             "tests/Helpers.php",
             "tests/Fixtures/Autoloaded/Reflection/rv-inside-function.php"
-        ],
-        "classmap": ["tests/Fixtures/Autoloaded"]
+        ]
     },
-    "config": {
-        "platform": {
-            "php": "7.1"
-        },
-        "sort-packages": true
-    },
-    "conflict": {
-        "symfony/process": "3.4.2"
-    },
-    "require": {
-        "php": "^7.1",
-        "ext-dom": "*",
-        "ext-json": "*",
-        "ext-libxml": "*",
-        "composer/xdebug-handler": "^1.3",
-        "nikic/php-parser": "^4.1",
-        "ocramius/package-versions": "^1.2",
-        "padraic/phar-updater": "^1.0.4",
-        "pimple/pimple": "^3.2",
-        "sebastian/diff": "^1.4 || ^2.0 || ^3.0",
-        "symfony/console": "^3.2 || ^4.0",
-        "symfony/filesystem": "^3.2 || ^4.0",
-        "symfony/finder": "^3.2 || ^4.0",
-        "symfony/process": "^3.2 || ^4.0",
-        "symfony/yaml": "^3.2 || ^4.0",
-        "webmozart/assert": "^1.3"
-    },
-    "require-dev": {
-        "mockery/mockery": "^1.1",
-        "phpunit/phpunit": "^6"
-    },
-    "bin": ["bin/infection"]
+    "bin": [
+        "bin/infection"
+    ],
+    "support": {
+        "issues": "https://github.com/infection/infection/issues"
+    }
 }

@@ -1,8 +1,34 @@
 <?php
 /**
- * Copyright © 2017-2018 Maks Rafalko
+ * This code is licensed under the BSD 3-Clause License.
  *
- * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 declare(strict_types=1);
@@ -125,8 +151,6 @@ class MetricsCalculator
 
     /**
      * Mutation Score Indicator (MSI)
-     *
-     * @return float
      */
     public function getMutationScoreIndicator(): float
     {
@@ -134,7 +158,7 @@ class MetricsCalculator
         $defeatedTotal = $this->killedCount + $this->timedOutCount + $this->errorCount;
 
         if ($this->totalMutantsCount) {
-            $detectionRateAll = floor(100 * $defeatedTotal / $this->totalMutantsCount);
+            $detectionRateAll = 100 * $defeatedTotal / $this->totalMutantsCount;
         }
 
         return $detectionRateAll;
@@ -142,8 +166,6 @@ class MetricsCalculator
 
     /**
      * Mutation coverage percentage
-     *
-     * @return float
      */
     public function getCoverageRate(): float
     {
@@ -151,7 +173,7 @@ class MetricsCalculator
         $coveredByTestsTotal = $this->totalMutantsCount - $this->notCoveredByTestsCount;
 
         if ($this->totalMutantsCount) {
-            $coveredRate = floor(100 * $coveredByTestsTotal / $this->totalMutantsCount);
+            $coveredRate = 100 * $coveredByTestsTotal / $this->totalMutantsCount;
         }
 
         return $coveredRate;
@@ -164,47 +186,32 @@ class MetricsCalculator
         $defeatedTotal = $this->killedCount + $this->timedOutCount + $this->errorCount;
 
         if ($coveredByTestsTotal) {
-            $detectionRateTested = floor(100 * $defeatedTotal / $coveredByTestsTotal);
+            $detectionRateTested = 100 * $defeatedTotal / $coveredByTestsTotal;
         }
 
         return $detectionRateTested;
     }
 
-    /**
-     * @return int
-     */
     public function getKilledCount(): int
     {
         return $this->killedCount;
     }
 
-    /**
-     * @return int
-     */
     public function getEscapedCount(): int
     {
         return $this->escapedCount;
     }
 
-    /**
-     * @return int
-     */
     public function getTimedOutCount(): int
     {
         return $this->timedOutCount;
     }
 
-    /**
-     * @return int
-     */
     public function getNotCoveredByTestsCount(): int
     {
         return $this->notCoveredByTestsCount;
     }
 
-    /**
-     * @return int
-     */
     public function getTotalMutantsCount(): int
     {
         return $this->totalMutantsCount;

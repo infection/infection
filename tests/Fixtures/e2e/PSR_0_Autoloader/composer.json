@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^8"
+    },
+    "autoload": {
+        "psr-0": {
+            "PSR_0_Autoloader": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-0": {
+            "PSR_0_Autoloader\\Tests": "tests/"
+        }
+    }
+}

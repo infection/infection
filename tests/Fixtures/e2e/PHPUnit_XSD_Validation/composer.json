@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^8"
+    },
+    "autoload": {
+        "psr-4": {
+            "PHPUnit_XSD_Validation\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PHPUnit_XSD_Validation\\Test\\": "tests/"
+        }
+    }
+}

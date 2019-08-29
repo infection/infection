@@ -1,12 +1,13 @@
 {
-    "output": "build/bin/infection.phar",
+    "output": "build/infection.phar",
 
     "git-version": "package_version",
 
     "compression": "GZ",
     "compactors": [
-        "Herrera\\Box\\Compactor\\Json",
-        "Herrera\\Box\\Compactor\\Php",
+        "KevinGH\\Box\\Compactor\\Json",
+        "KevinGH\\Box\\Compactor\\Php",
         "KevinGH\\Box\\Compactor\\PhpScoper"
-    ]
+    ],
+    "files": ["resources/schema.json"]
 }

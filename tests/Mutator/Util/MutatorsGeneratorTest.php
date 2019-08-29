@@ -1,8 +1,34 @@
 <?php
 /**
- * Copyright © 2017-2018 Maks Rafalko
+ * This code is licensed under the BSD 3-Clause License.
  *
- * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 declare(strict_types=1);
@@ -17,15 +43,13 @@ use Infection\Mutator\Util\MutatorProfile;
 use Infection\Mutator\Util\MutatorsGenerator;
 use Infection\Tests\Fixtures\StubMutator;
 use Infection\Visitor\ReflectionVisitor;
-use Mockery;
 use PhpParser\Node;
 use PhpParser\Node\Expr\BinaryOp\Plus as PlusNode;
 use PhpParser\Node\Scalar\DNumber;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCase
+final class MutatorsGeneratorTest extends TestCase
 {
     private static $countDefaultMutators = 0;
 
@@ -38,8 +62,7 @@ final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
 
     public function test_no_setting_returns_the_default_mutators(): void
     {
-        $mutatorGenerator = new MutatorsGenerator([]);
-        $mutators = $mutatorGenerator->generate();
+        $mutators = (new MutatorsGenerator([]))->generate();
 
         $this->assertCount(self::$countDefaultMutators, $mutators);
     }
@@ -99,9 +122,12 @@ final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
 
     public function test_it_keeps_settings(): void
     {
-        /** @var \Mockery\MockInterface|\ReflectionClass $reflectionMock */
-        $reflectionMock = Mockery::mock(\ReflectionClass::class);
-        $reflectionMock->shouldReceive('getName')->once()->andReturn('A');
+        /** @var MockObject|\ReflectionClass $reflectionMock */
+        $reflectionMock = $this->createMock(\ReflectionClass::class);
+        $reflectionMock->expects($this->once())
+            ->method('getName')
+            ->willReturn('A');
+
         $plusNode = $this->getPlusNode('B', $reflectionMock);
 
         $mutatorGenerator = new MutatorsGenerator([
@@ -119,9 +145,12 @@ final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
 
     public function test_it_keeps_settings_when_applied_to_profiles(): void
     {
-        /** @var \Mockery\MockInterface|\ReflectionClass $reflectionMock */
-        $reflectionMock = Mockery::mock(\ReflectionClass::class);
-        $reflectionMock->shouldReceive('getName')->times(3)->andReturn('A');
+        /** @var MockObject|\ReflectionClass $reflectionMock */
+        $reflectionMock = $this->createMock(\ReflectionClass::class);
+        $reflectionMock->expects($this->exactly(3))
+            ->method('getName')
+            ->willReturn('A');
+
         $plusNode = $this->getPlusNode('B', $reflectionMock);
         $falseNode = $this->getBoolNode('false', 'B', $reflectionMock);
         $trueNode = $this->getBoolNode('true', 'B', $reflectionMock);
@@ -167,8 +196,12 @@ final class MutatorsGeneratorTest extends Mockery\Adapter\Phpunit\MockeryTestCas
 
     public function test_it_can_set_a_single_item_with_a_setting(): void
     {
-        $reflectionMock = Mockery::mock(\ReflectionClass::class);
-        $reflectionMock->shouldReceive('getName')->times(2)->andReturn('A');
+        /** @var MockObject|\ReflectionClass $reflectionMock */
+        $reflectionMock = $this->createMock(\ReflectionClass::class);
+        $reflectionMock->expects($this->exactly(2))
+            ->method('getName')
+            ->willReturn('A');
+
         $falseNode = $this->getBoolNode('false', 'B', $reflectionMock);
         $trueNode = $this->getBoolNode('true', 'B', $reflectionMock);
 

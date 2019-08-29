@@ -6,17 +6,11 @@ clone_folder: c:\projects\workspace
 environment:
   matrix:
   - dependencies: highest
-    php_ver_target: 7.2
-    xdebug_ver: '2.6.0-7.2-vc15'
-  - dependencies: highest
-    php_ver_target: 7.1
-    xdebug_ver: '2.6.0-7.1-vc14'
-  - dependencies: current
-    php_ver_target: 7.2
+    php_ver_target: 7.2.20
     xdebug_ver: '2.6.0-7.2-vc15'
   - dependencies: current
-    php_ver_target: 7.1
-    xdebug_ver: '2.6.0-7.1-vc14'
+    php_ver_target: 7.2.20
+    xdebug_ver: '2.6.0-7.2-vc15'
 
 cache: # cache is cleared when linked file is modified
     - '%LOCALAPPDATA%\Composer\files -> composer.lock'
@@ -29,26 +23,27 @@ init:
     - SET PATH=C:\Program Files\OpenSSL;c:\tools\php;%PATH%
     - SET ANSICON=121x90 (121x90)
     - SET COMPOSER_NO_INTERACTION=1
+    - SET COMPOSER_FLAGS=--no-interaction --no-progress --no-suggest --prefer-dist
 
 install:
     # Enable Windows update service
     - ps: Set-Service wuauserv -StartupType Manual
     # Install PHP
-    - ps: appveyor-retry cinst --params '""/InstallDir:C:\tools\php""' --ignore-checksums -y php --version ((choco search php --exact --all-versions -r | select-string -pattern $env:php_ver_target | sort { [version]($_ -split '\|' | select -last 1) } -Descending | Select-Object -first 1) -replace '[php|]','')
+    - choco search php --exact --all-versions -r
+    - ps: appveyor-retry cinst --params '""/InstallDir:C:\tools\php""' --ignore-checksums -y php --version $env:php_ver_target
     - cd c:\tools\php
     - copy php.ini-production php.ini /Y
     - echo date.timezone="UTC" >> php.ini
     - echo extension_dir=ext >> php.ini
     - echo extension=php_openssl.dll >> php.ini
     - echo extension=php_mbstring.dll >> php.ini
+    - echo memory_limit=512M >> php.ini
     # Install composer and update per matrix
-    - copy C:\projects\workspace\.ci\composer.bat c:\tools\php\composer.bat
-    - appveyor-retry appveyor DownloadFile https://getcomposer.org/composer.phar -OutFile C:\tools\php\composer.phar
     - cd c:\projects\workspace
-    - IF %dependencies%==current appveyor-retry composer install
-    - IF %dependencies%==highest appveyor-retry composer update --no-suggest --ignore-platform-reqs
-    - composer show
-    # Install XDebug for code coverage
+    - php -r "readfile('http://getcomposer.org/installer');" | php
+    - IF %dependencies%==current appveyor-retry php composer.phar install %COMPOSER_FLAGS%
+    - IF %dependencies%==highest appveyor-retry php composer.phar update --ignore-platform-reqs %COMPOSER_FLAGS%
+    # Install Xdebug for code coverage
     - ps: .ci\appveyor_install_xdebug.ps1
 
 test_script:

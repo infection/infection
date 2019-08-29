@@ -1,8 +1,34 @@
 <?php
 /**
- * Copyright © 2017-2018 Maks Rafalko
+ * This code is licensed under the BSD 3-Clause License.
  *
- * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 declare(strict_types=1);
@@ -17,15 +43,18 @@ use Infection\Config\Exception\InvalidConfigException;
 final class MutatorsGenerator
 {
     /**
-     * @var array
+     * @var array<string, bool|array<string, string>>
      */
     private $mutatorSettings;
 
     /**
-     * @var array
+     * @var array<string, bool|array<string, string>>
      */
     private $mutatorList = [];
 
+    /**
+     * @param array<string, bool|array<string, string>> $mutatorSettings
+     */
     public function __construct(array $mutatorSettings = [])
     {
         $this->mutatorSettings = $mutatorSettings;
@@ -36,7 +65,7 @@ final class MutatorsGenerator
      *
      * @throws InvalidConfigException
      *
-     * @return Mutator[]
+     * @return array<string, Mutator>
      */
     public function generate(): array
     {
@@ -48,7 +77,7 @@ final class MutatorsGenerator
         $this->mutatorList = [];
 
         foreach ($this->mutatorSettings as $mutatorOrProfile => $setting) {
-            if (array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
+            if (\array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
                 $this->registerFromProfile($mutatorOrProfile, $setting);
 
                 continue;
@@ -67,8 +96,7 @@ final class MutatorsGenerator
     }
 
     /**
-     * @param string $profile
-     * @param array|bool $setting
+     * @param array<string, string>|bool $setting
      *
      * @throws InvalidConfigException
      */
@@ -77,7 +105,7 @@ final class MutatorsGenerator
         $mutators = MutatorProfile::MUTATOR_PROFILE_LIST[$profile];
 
         foreach ($mutators as $mutatorOrProfile) {
-            if (array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
+            if (\array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
                 $this->registerFromProfile($mutatorOrProfile, $setting);
 
                 continue;
@@ -94,31 +122,29 @@ final class MutatorsGenerator
     }
 
     /**
-     * @param string $mutator
-     * @param array|bool|\stdClass $setting
+     * @param array<string, string>|bool|\stdClass $setting
      */
     private function registerFromClass(string $mutator, $setting): void
     {
         if ($setting === false) {
             $this->mutatorList[$mutator] = false;
         } elseif ($setting === true) {
-            if (!array_key_exists($mutator, $this->mutatorList)) {
+            if (!\array_key_exists($mutator, $this->mutatorList)) {
                 $this->mutatorList[$mutator] = [];
             }
-        } elseif (!array_key_exists($mutator, $this->mutatorList) || !$this->mutatorList[$mutator]) {
+        } elseif (!\array_key_exists($mutator, $this->mutatorList) || !$this->mutatorList[$mutator]) {
             $this->mutatorList[$mutator] = (array) $setting;
         }
     }
 
     /**
-     * @param string $mutator
-     * @param array|bool $setting
+     * @param array<string, string>|bool $setting
      *
      * @throws InvalidConfigException
      */
     private function registerFromName(string $mutator, $setting): void
     {
-        if (!array_key_exists($mutator, MutatorProfile::FULL_MUTATOR_LIST)) {
+        if (!\array_key_exists($mutator, MutatorProfile::FULL_MUTATOR_LIST)) {
             throw InvalidConfigException::invalidMutator($mutator);
         }
 
@@ -126,9 +152,9 @@ final class MutatorsGenerator
     }
 
     /**
-     * @param array $mutators
+     * @param array<Mutator,false|array<string>> $mutators
      *
-     * @return Mutator[]
+     * @return array<string, Mutator>
      */
     private function createFromList(array $mutators): array
     {
@@ -136,7 +162,6 @@ final class MutatorsGenerator
 
         foreach ($mutators as $mutator => $setting) {
             if ($setting !== false) {
-                \assert(\is_string($mutator));
                 $mutatorList[$mutator::getName()] = new $mutator(
                     new MutatorConfig($setting)
                 );

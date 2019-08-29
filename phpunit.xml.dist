@@ -3,29 +3,39 @@
          xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="./vendor/autoload.php"
          colors="true"
+         executionOrder="random"
+         stopOnFailure="true"
          verbose="true"
 >
+
+    <php>
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=0" />
+    </php>
+
     <testsuites>
-        <testsuite name="Application Test Suite">
-            <directory>./tests/</directory>
-            <exclude>./tests/Fixtures</exclude>
+        <testsuite name="Infection Test Suite">
+            <directory>tests</directory>
+
+            <exclude>tests/AutoReview</exclude>
+            <exclude>tests/Fixtures</exclude>
         </testsuite>
     </testsuites>
 
     <filter>
         <whitelist>
-            <directory>./src/</directory>
+            <directory>src</directory>
         </whitelist>
     </filter>
-
-    <listeners>
-        <listener class="\Mockery\Adapter\Phpunit\TestListener"></listener>
-    </listeners>
 
     <groups>
         <exclude>
             <group>large</group>
         </exclude>
     </groups>
+
+    <listeners>
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
+        <listener class="Symfony\Bridge\PhpUnit\CoverageListener" />
+    </listeners>
 
 </phpunit>

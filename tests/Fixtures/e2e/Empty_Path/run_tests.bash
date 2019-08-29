@@ -4,7 +4,7 @@ set -e pipefail
 
 readonly INFECTION="./bootstrap"
 
-if [ "$PHPDBG" = "1" ]
+if [ "$DRIVER" = "phpdbg" ]
 then
     $(which phpdbg) -qrr $INFECTION
 else

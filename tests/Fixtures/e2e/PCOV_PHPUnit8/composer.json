@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^8"
+    },
+    "autoload": {
+        "psr-4": {
+            "PCOV_PHPUnit8\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PCOV_PHPUnit8\\Test\\": "tests/"
+        }
+    }
+}

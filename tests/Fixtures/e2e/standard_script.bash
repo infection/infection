@@ -4,7 +4,13 @@ readonly INFECTION=../../../../${1}
 
 set -e pipefail
 
-if [ "$PHPDBG" = "1" ]
+if [ "$DRIVER" = "pcov" ]
+then
+    # `pcov` requires at least PHPUnit 8.0 (used by symfony/phpunit-bridge)
+    export SYMFONY_PHPUNIT_VERSION="8.0"
+fi
+
+if [ "$DRIVER" = "phpdbg" ]
 then
     phpdbg -qrr $INFECTION
 else

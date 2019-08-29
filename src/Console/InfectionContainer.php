@@ -1,22 +1,47 @@
 <?php
 /**
- * Copyright © 2017-2018 Maks Rafalko
+ * This code is licensed under the BSD 3-Clause License.
  *
- * License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Infection\Config\Exception\InvalidConfigException;
+use Infection\Config\ConfigCreatorFacade;
 use Infection\Config\InfectionConfig;
-use Infection\Config\Validator;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Finder\Locator;
+use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutator\Util\MutatorParser;
@@ -31,8 +56,8 @@ use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
-use Infection\TestFramework\Coverage\CodeCoverageData;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
@@ -46,7 +71,7 @@ use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use Pimple\Container;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
-use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -54,262 +79,241 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class InfectionContainer extends Container
 {
-    public function __construct(array $values = [])
+    public static function create(): self
     {
-        parent::__construct($values);
-
-        $this['src.dirs'] = function (): array {
-            return $this->getInfectionConfig()->getSourceDirs();
-        };
-
-        $this['exclude.paths'] = function (): array {
-            return $this->getInfectionConfig()->getSourceExcludePaths();
-        };
-
-        $this['project.dir'] = getcwd();
-
-        $this['phpunit.config.dir'] = function (): string {
-            return $this->getInfectionConfig()->getPhpUnitConfigDir();
-        };
-
-        $this['filesystem'] = function (): Filesystem {
-            return new Filesystem();
-        };
-
-        $this['tmp.dir.creator'] = function (): TmpDirectoryCreator {
-            return new TmpDirectoryCreator($this['filesystem']);
-        };
-
-        $this['tmp.dir'] = function (): string {
-            return $this['tmp.dir.creator']->createAndGet($this->getInfectionConfig()->getTmpDir());
-        };
-
-        $this['coverage.dir.phpunit'] = function () {
-            return sprintf('%s/%s', $this['coverage.path'], CodeCoverageData::PHP_UNIT_COVERAGE_DIR);
-        };
-
-        $this['coverage.dir.phpspec'] = function () {
-            return sprintf('%s/%s', $this['coverage.path'], CodeCoverageData::PHP_SPEC_COVERAGE_DIR);
-        };
-
-        $this['phpunit.junit.file.path'] = function () {
-            return sprintf('%s/%s', $this['coverage.path'], PhpUnitAdapter::JUNIT_FILE_NAME);
-        };
-
-        $this['locator'] = function (): Locator {
-            return new Locator([$this['project.dir']], $this['filesystem']);
-        };
-
-        $this['path.replacer'] = function (): PathReplacer {
-            return new PathReplacer($this['filesystem'], $this['phpunit.config.dir']);
-        };
-
-        $this['test.framework.factory'] = function (): Factory {
-            return new Factory(
-                $this['tmp.dir'],
-                $this['project.dir'],
-                $this['testframework.config.locator'],
-                $this['xml.configuration.helper'],
-                $this['phpunit.junit.file.path'],
-                $this->getInfectionConfig(),
-                $this['version.parser']
-            );
-        };
-
-        $this['xml.configuration.helper'] = function (): XmlConfigurationHelper {
-            return new XmlConfigurationHelper($this['path.replacer']);
-        };
-
-        $this['mutant.creator'] = function (): MutantCreator {
-            return new MutantCreator(
-                $this['tmp.dir'],
-                $this['differ'],
-                $this['pretty.printer']
-            );
-        };
-
-        $this['differ'] = function (): Differ {
-            return new Differ(
-                new BaseDiffer()
-            );
-        };
-
-        $this['dispatcher'] = function (): EventDispatcherInterface {
-            return new EventDispatcher();
-        };
-
-        $this['parallel.process.runner'] = function (): ParallelProcessRunner {
-            return new ParallelProcessRunner($this['dispatcher']);
-        };
-
-        $this['testframework.config.locator'] = function (): TestFrameworkConfigLocator {
-            return new TestFrameworkConfigLocator(
-                $this['phpunit.config.dir'] /*[phpunit.dir, phpspec.dir, ...]*/
-            );
-        };
-
-        $this['diff.colorizer'] = function (): DiffColorizer {
-            return new DiffColorizer();
-        };
-
-        $this['test.file.data.provider.phpunit'] = function (): TestFileDataProvider {
-            return new CachedTestFileDataProvider(
-                new PhpUnitTestFileDataProvider($this['phpunit.junit.file.path'])
-            );
-        };
-
-        $this['version.parser'] = function (): VersionParser {
-            return new VersionParser();
-        };
-
-        $this['lexer'] = function (): Lexer {
-            return new Lexer\Emulative([
-                'usedAttributes' => [
-                    'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
-                ],
-            ]);
-        };
-
-        $this['parser'] = function (): Parser {
-            return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $this['lexer']);
-        };
-
-        $this['pretty.printer'] = function (): Standard {
-            return new Standard();
-        };
-
-        $this['mutators.config'] = function (): array {
-            $mutatorConfig = $this->getInfectionConfig()->getMutatorsConfiguration();
-
-            return (new MutatorsGenerator($mutatorConfig))->generate();
-        };
-
-        $this['metrics'] = function (): MetricsCalculator {
-            return new MetricsCalculator();
-        };
-
-        $this['timer'] = function (): Timer {
-            return new Timer();
-        };
-
-        $this['time.formatter'] = function (): TimeFormatter {
-            return new TimeFormatter();
-        };
-
-        $this['memory.formatter'] = function (): MemoryFormatter {
-            return new MemoryFormatter();
-        };
-
-        $this['infection.config.validator'] = function (): Validator {
-            return new Validator();
-        };
-
-        $this['memory.limit.applier'] = function (): MemoryLimiter {
-            return new MemoryLimiter($this['filesystem'], \php_ini_loaded_file());
-        };
+        return new self([
+            'project.dir' => getcwd(),
+            'filesystem' => static function (): Filesystem {
+                return new Filesystem();
+            },
+            'tmp.dir.creator' => static function (self $container): TmpDirectoryCreator {
+                return new TmpDirectoryCreator($container['filesystem']);
+            },
+            'tmp.dir' => static function (self $container): string {
+                return $container['tmp.dir.creator']->createAndGet($container['infection.config']->getTmpDir());
+            },
+            'coverage.dir.phpunit' => static function (self $container) {
+                return sprintf(
+                    '%s/%s',
+                    $container['coverage.path'],
+                    XMLLineCodeCoverage::PHP_UNIT_COVERAGE_DIR
+                );
+            },
+            'coverage.dir.phpspec' => static function (self $container) {
+                return sprintf(
+                    '%s/%s',
+                    $container['coverage.path'],
+                    XMLLineCodeCoverage::PHP_SPEC_COVERAGE_DIR
+                );
+            },
+            'phpunit.junit.file.path' => static function (self $container) {
+                return sprintf(
+                    '%s/%s',
+                    $container['coverage.path'],
+                    PhpUnitAdapter::JUNIT_FILE_NAME
+                );
+            },
+            RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
+                return new RootsFileOrDirectoryLocator(
+                    [$container['project.dir']],
+                    $container['filesystem']
+                );
+            },
+            'path.replacer' => static function (self $container): PathReplacer {
+                return new PathReplacer(
+                    $container['filesystem'],
+                    $container['infection.config']->getPhpUnitConfigDir()
+                );
+            },
+            'test.framework.factory' => static function (self $container): Factory {
+                return new Factory(
+                    $container['tmp.dir'],
+                    $container['project.dir'],
+                    $container['testframework.config.locator'],
+                    $container['xml.configuration.helper'],
+                    $container['phpunit.junit.file.path'],
+                    $container['infection.config'],
+                    $container['version.parser']
+                );
+            },
+            'xml.configuration.helper' => static function (self $container): XmlConfigurationHelper {
+                return new XmlConfigurationHelper(
+                    $container['path.replacer'],
+                    $container['infection.config']->getPhpUnitConfigDir()
+                );
+            },
+            'mutant.creator' => static function (self $container): MutantCreator {
+                return new MutantCreator(
+                    $container['tmp.dir'],
+                    $container['differ'],
+                    $container['pretty.printer']
+                );
+            },
+            'differ' => static function (): Differ {
+                return new Differ(
+                    new BaseDiffer()
+                );
+            },
+            'dispatcher' => static function (): EventDispatcherInterface {
+                return new EventDispatcher();
+            },
+            'parallel.process.runner' => static function (self $container): ParallelProcessRunner {
+                return new ParallelProcessRunner($container['dispatcher']);
+            },
+            'testframework.config.locator' => static function (self $container): TestFrameworkConfigLocator {
+                return new TestFrameworkConfigLocator(
+                    $container['infection.config']->getPhpUnitConfigDir() /*[phpunit.dir, phpspec.dir, ...]*/
+                );
+            },
+            'diff.colorizer' => static function (): DiffColorizer {
+                return new DiffColorizer();
+            },
+            'test.file.data.provider.phpunit' => static function (self $container): TestFileDataProvider {
+                return new CachedTestFileDataProvider(
+                    new PhpUnitTestFileDataProvider($container['phpunit.junit.file.path'])
+                );
+            },
+            'version.parser' => static function (): VersionParser {
+                return new VersionParser();
+            },
+            'lexer' => static function (): Lexer {
+                return new Lexer\Emulative([
+                    'usedAttributes' => [
+                        'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
+                    ],
+                ]);
+            },
+            'parser' => static function (self $container): Parser {
+                return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $container['lexer']);
+            },
+            'pretty.printer' => static function (): Standard {
+                return new Standard();
+            },
+            'mutators.config' => static function (self $container): array {
+                return (new MutatorsGenerator(
+                    $container['infection.config']->getMutatorsConfiguration()
+                ))->generate();
+            },
+            'metrics' => static function (): MetricsCalculator {
+                return new MetricsCalculator();
+            },
+            'timer' => static function (): Timer {
+                return new Timer();
+            },
+            'time.formatter' => static function (): TimeFormatter {
+                return new TimeFormatter();
+            },
+            'memory.formatter' => static function (): MemoryFormatter {
+                return new MemoryFormatter();
+            },
+            'memory.limit.applier' => static function (self $container): MemoryLimiter {
+                return new MemoryLimiter($container['filesystem'], \php_ini_loaded_file());
+            },
+        ]);
     }
 
-    private function getInfectionConfig(): InfectionConfig
-    {
-        return $this['infection.config'];
-    }
+    public function withDynamicParameters(
+        ?string $configFile,
+        ?string $mutators,
+        bool $showMutations,
+        string $logVerbosity,
+        bool $debug,
+        bool $onlyCovered,
+        string $formatter,
+        bool $noProgress,
+        string $existingCoveragePath,
+        string $initialTestsPhpOptions,
+        bool $ignoreMsiWithNoMutations,
+        float $minMsi,
+        float $minCoveredMsi
+    ): self {
+        $clone = clone $this;
 
-    public function buildDynamicDependencies(InputInterface $input): void
-    {
-        $this['infection.config'] = function () use ($input): InfectionConfig {
-            try {
-                $configPaths = [];
-                $customConfigPath = $input->getOption('configuration');
+        $clone['infection.config'] = static function (self $container) use ($configFile): InfectionConfig {
+            $facade = new ConfigCreatorFacade(
+                $container[RootsFileOrDirectoryLocator::class],
+                $container['filesystem']
+            );
 
-                if ($customConfigPath) {
-                    $configPaths[] = $customConfigPath;
-                }
-
-                $configPaths = array_merge(
-                    $configPaths,
-                    InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES
-                );
-
-                $infectionConfigFile = $this['locator']->locateAnyOf($configPaths);
-                $configLocation = \pathinfo($infectionConfigFile, PATHINFO_DIRNAME);
-                $json = file_get_contents($infectionConfigFile);
-            } catch (\Exception $e) {
-                $infectionConfigFile = null;
-                $json = '{}';
-                $configLocation = getcwd();
-            }
-
-            \assert(\is_string($json));
-            $config = json_decode($json);
-
-            if (\is_string($infectionConfigFile) && null === $config && JSON_ERROR_NONE !== json_last_error()) {
-                throw InvalidConfigException::invalidJson(
-                    $infectionConfigFile,
-                    json_last_error_msg()
-                );
-            }
-
-            // getcwd() may return false in rare circumstances
-            \assert(\is_string($configLocation));
-
-            $infectionConfig = new InfectionConfig($config, $this['filesystem'], $configLocation);
-
-            $this['infection.config.validator']->validate($infectionConfig);
-
-            return $infectionConfig;
+            return $facade->createConfig($configFile);
         };
 
-        $this['coverage.path'] = function () use ($input): string {
-            $existingCoveragePath = '';
-
-            if ($input->hasOption('coverage')) {
-                $existingCoveragePath = trim($input->getOption('coverage'));
-            }
-
+        $clone['coverage.path'] = static function (self $container) use ($existingCoveragePath): string {
             if ($existingCoveragePath === '') {
-                return $this['tmp.dir'];
+                return $container['tmp.dir'];
             }
 
-            return $this['filesystem']->isAbsolutePath($existingCoveragePath)
+            return $container['filesystem']->isAbsolutePath($existingCoveragePath)
                 ? $existingCoveragePath
-                : sprintf('%s/%s', getcwd(), $existingCoveragePath);
+                : sprintf('%s/%s', getcwd(), $existingCoveragePath)
+            ;
         };
 
-        $this['coverage.checker'] = function () use ($input): CoverageRequirementChecker {
+        $clone['coverage.checker'] = static function () use ($initialTestsPhpOptions, $existingCoveragePath): CoverageRequirementChecker {
+            if (!\is_string($initialTestsPhpOptions)) {
+                throw new InvalidArgumentException(
+                    \sprintf(
+                        'Expected initial-tests-php-options to be string, %s given',
+                        \gettype($initialTestsPhpOptions)
+                    )
+                );
+            }
+
             return new CoverageRequirementChecker(
-                \strlen(trim($input->getOption('coverage'))) > 0,
-                $input->getOption('initial-tests-php-options')
+                $existingCoveragePath !== '',
+                $initialTestsPhpOptions
             );
         };
 
-        $this['test.run.constraint.checker'] = function () use ($input): TestRunConstraintChecker {
+        $clone['test.run.constraint.checker'] = static function (self $container) use (
+            $ignoreMsiWithNoMutations,
+            $minMsi,
+            $minCoveredMsi
+        ): TestRunConstraintChecker {
             return new TestRunConstraintChecker(
-                $this['metrics'],
-                $input->getOption('ignore-msi-with-no-mutations'),
-                (float) $input->getOption('min-msi'),
-                (float) $input->getOption('min-covered-msi')
+                $container['metrics'],
+                $ignoreMsiWithNoMutations,
+                $minMsi,
+                $minCoveredMsi
             );
         };
 
-        $this['subscriber.builder'] = function () use ($input): SubscriberBuilder {
+        $clone['subscriber.builder'] = static function (self $container) use (
+            $showMutations,
+            $logVerbosity,
+            $debug,
+            $onlyCovered,
+            $formatter,
+            $noProgress
+        ): SubscriberBuilder {
             return new SubscriberBuilder(
-                $input,
-                $this['metrics'],
-                $this['dispatcher'],
-                $this['diff.colorizer'],
-                $this['infection.config'],
-                $this['filesystem'],
-                $this['tmp.dir'],
-                $this['timer'],
-                $this['time.formatter'],
-                $this['memory.formatter']
+                $showMutations,
+                $logVerbosity,
+                $debug,
+                $onlyCovered,
+                $formatter,
+                $noProgress,
+                $container['metrics'],
+                $container['dispatcher'],
+                $container['diff.colorizer'],
+                $container['infection.config'],
+                $container['filesystem'],
+                $container['tmp.dir'],
+                $container['timer'],
+                $container['time.formatter'],
+                $container['memory.formatter']
             );
         };
 
-        $this['mutators'] = function () use ($input): array {
-            $parser = new MutatorParser($input->getOption('mutators'), $this['mutators.config']);
+        $clone['mutators'] = static function (self $container) use ($mutators): array {
+            $parser = new MutatorParser(
+                $mutators,
+                $container['mutators.config']
+            );
 
             return $parser->getMutators();
         };
+
+        return $clone;
     }
 }
