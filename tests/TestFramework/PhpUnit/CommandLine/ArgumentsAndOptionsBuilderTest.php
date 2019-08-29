@@ -53,8 +53,9 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--configuration',
                 $configPath,
                 '--verbose',
+                '--debug',
             ],
-            $builder->build($configPath, '--verbose')
+            $builder->build($configPath, '--verbose --debug')
         );
     }
 
