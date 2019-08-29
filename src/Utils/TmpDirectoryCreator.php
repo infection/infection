@@ -42,9 +42,6 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class TmpDirectoryCreator
 {
-    /**
-     * @private
-     */
     private const BASE_DIR_NAME = 'infection';
 
     /**

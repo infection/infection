@@ -72,7 +72,6 @@ use PhpParser\PrettyPrinter\Standard;
 use Pimple\Container;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -213,24 +212,33 @@ final class InfectionContainer extends Container
         ]);
     }
 
-    public function buildDynamicDependencies(InputInterface $input): void
-    {
-        $this['infection.config'] = static function (self $container) use ($input): InfectionConfig {
+    public function withDynamicParameters(
+        ?string $configFile,
+        ?string $mutators,
+        bool $showMutations,
+        string $logVerbosity,
+        bool $debug,
+        bool $onlyCovered,
+        string $formatter,
+        bool $noProgress,
+        string $existingCoveragePath,
+        string $initialTestsPhpOptions,
+        bool $ignoreMsiWithNoMutations,
+        float $minMsi,
+        float $minCoveredMsi
+    ): self {
+        $clone = clone $this;
+
+        $clone['infection.config'] = static function (self $container) use ($configFile): InfectionConfig {
             $facade = new ConfigCreatorFacade(
                 $container[RootsFileOrDirectoryLocator::class],
                 $container['filesystem']
             );
 
-            return $facade->createConfig($input->getOption('configuration'));
+            return $facade->createConfig($configFile);
         };
 
-        $this['coverage.path'] = static function (self $container) use ($input): string {
-            $existingCoveragePath = '';
-
-            if ($input->hasOption('coverage')) {
-                $existingCoveragePath = trim($input->getOption('coverage'));
-            }
-
+        $clone['coverage.path'] = static function (self $container) use ($existingCoveragePath): string {
             if ($existingCoveragePath === '') {
                 return $container['tmp.dir'];
             }
@@ -241,9 +249,7 @@ final class InfectionContainer extends Container
             ;
         };
 
-        $this['coverage.checker'] = static function () use ($input): CoverageRequirementChecker {
-            $initialTestsPhpOptions = $input->getOption('initial-tests-php-options') ?? '';
-
+        $clone['coverage.checker'] = static function () use ($initialTestsPhpOptions, $existingCoveragePath): CoverageRequirementChecker {
             if (!\is_string($initialTestsPhpOptions)) {
                 throw new InvalidArgumentException(
                     \sprintf(
@@ -254,23 +260,39 @@ final class InfectionContainer extends Container
             }
 
             return new CoverageRequirementChecker(
-                \strlen(trim($input->getOption('coverage'))) > 0,
+                $existingCoveragePath !== '',
                 $initialTestsPhpOptions
             );
         };
 
-        $this['test.run.constraint.checker'] = static function (self $container) use ($input): TestRunConstraintChecker {
+        $clone['test.run.constraint.checker'] = static function (self $container) use (
+            $ignoreMsiWithNoMutations,
+            $minMsi,
+            $minCoveredMsi
+        ): TestRunConstraintChecker {
             return new TestRunConstraintChecker(
                 $container['metrics'],
-                $input->getOption('ignore-msi-with-no-mutations'),
-                (float) $input->getOption('min-msi'),
-                (float) $input->getOption('min-covered-msi')
+                $ignoreMsiWithNoMutations,
+                $minMsi,
+                $minCoveredMsi
             );
         };
 
-        $this['subscriber.builder'] = static function (self $container) use ($input): SubscriberBuilder {
+        $clone['subscriber.builder'] = static function (self $container) use (
+            $showMutations,
+            $logVerbosity,
+            $debug,
+            $onlyCovered,
+            $formatter,
+            $noProgress
+        ): SubscriberBuilder {
             return new SubscriberBuilder(
-                $input,
+                $showMutations,
+                $logVerbosity,
+                $debug,
+                $onlyCovered,
+                $formatter,
+                $noProgress,
                 $container['metrics'],
                 $container['dispatcher'],
                 $container['diff.colorizer'],
@@ -283,13 +305,15 @@ final class InfectionContainer extends Container
             );
         };
 
-        $this['mutators'] = static function (self $container) use ($input): array {
+        $clone['mutators'] = static function (self $container) use ($mutators): array {
             $parser = new MutatorParser(
-                $input->getOption('mutators'),
+                $mutators,
                 $container['mutators.config']
             );
 
             return $parser->getMutators();
         };
+
+        return $clone;
     }
 }

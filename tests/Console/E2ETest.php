@@ -137,6 +137,7 @@ final class E2ETest extends TestCase
     /**
      * @dataProvider e2eTestSuiteDataProvider
      * @group e2e
+     * @runInSeparateProcess
      */
     public function test_it_runs_an_e2e_test_with_success(string $fullPath): void
     {
@@ -302,6 +303,13 @@ final class E2ETest extends TestCase
     {
         if (!\extension_loaded('xdebug') && \PHP_SAPI !== 'phpdbg') {
             $this->markTestSkipped("Infection from within PHPUnit won't run without xdebug or phpdbg");
+        }
+
+        /*
+         * @see https://github.com/sebastianbergmann/php-code-coverage/blob/7743bbcfff2a907e9ee4a25be13d0f8ec5e73800/src/Driver/PHPDBG.php#L24
+         */
+        if (\PHP_SAPI === 'phpdbg' && !\function_exists('phpdbg_start_oplog')) {
+            $this->markTestIncomplete('This build of PHPDBG does not support code coverage');
         }
 
         $container = InfectionContainer::create();

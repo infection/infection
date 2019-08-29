@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config;
 
+use DOMElement;
 use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 
@@ -76,7 +77,9 @@ final class XmlConfigurationHelper
     public function removeExistingLoggers(\DOMDocument $dom, \DOMXPath $xPath): void
     {
         foreach ($xPath->query('/phpunit/logging') as $node) {
-            $dom->documentElement->removeChild($node);
+            $document = $dom->documentElement;
+            \assert($document instanceof DOMElement);
+            $document->removeChild($node);
         }
     }
 
@@ -188,7 +191,9 @@ final class XmlConfigurationHelper
         ));
 
         if ($nodeList->length) {
-            $dom->documentElement->removeAttribute($name);
+            $document = $dom->documentElement;
+            \assert($document instanceof DOMElement);
+            $document->removeAttribute($name);
         }
     }
 

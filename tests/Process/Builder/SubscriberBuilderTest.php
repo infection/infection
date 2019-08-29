@@ -45,7 +45,6 @@ use Infection\Performance\Time\Timer;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -58,18 +57,6 @@ final class SubscriberBuilderTest extends TestCase
 {
     public function test_it_registers_the_subscribers_when_debugging(): void
     {
-        $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(9))
-            ->method('getOption')
-            ->willReturnMap(
-                [
-                    ['no-progress', true],
-                    ['formatter', 'progress'],
-                    ['show-mutations', true],
-                    ['log-verbosity', 'all'],
-                    ['debug', true],
-                ]
-            );
         $calculator = new MetricsCalculator();
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->exactly(6))->method('addSubscriber');
@@ -80,7 +67,12 @@ final class SubscriberBuilderTest extends TestCase
         $output = $this->createMock(OutputInterface::class);
 
         $subscriberBuilder = new SubscriberBuilder(
-            $input,
+            true,
+            'all',
+            true,
+            false,
+            'progress',
+            true,
             $calculator,
             $dispatcher,
             $diff,
@@ -96,18 +88,6 @@ final class SubscriberBuilderTest extends TestCase
 
     public function test_it_registers_the_subscribers_when_not_debugging(): void
     {
-        $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(9))
-            ->method('getOption')
-            ->willReturnMap(
-                [
-                    ['no-progress', true],
-                    ['formatter', 'progress'],
-                    ['show-mutations', true],
-                    ['log-verbosity', 'all'],
-                    ['debug', false],
-                ]
-            );
         $calculator = new MetricsCalculator();
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->exactly(7))->method('addSubscriber');
@@ -118,7 +98,12 @@ final class SubscriberBuilderTest extends TestCase
         $output = $this->createMock(OutputInterface::class);
 
         $subscriberBuilder = new SubscriberBuilder(
-            $input,
+            true,
+            'all',
+            false,
+            false,
+            'progress',
+            true,
             $calculator,
             $dispatcher,
             $diff,
@@ -134,17 +119,6 @@ final class SubscriberBuilderTest extends TestCase
 
     public function test_it_throws_an_exception_when_output_formatter_is_invalid(): void
     {
-        $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(5))
-            ->method('getOption')
-            ->willReturnMap(
-                [
-                    ['no-progress', true],
-                    ['formatter', 'foo'],
-                    ['show-mutations', true],
-                    ['debug', true],
-                ]
-            );
         $calculator = new MetricsCalculator();
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->never())->method('addSubscriber');
@@ -155,7 +129,12 @@ final class SubscriberBuilderTest extends TestCase
         $output = $this->createMock(OutputInterface::class);
 
         $subscriberBuilder = new SubscriberBuilder(
-            $input,
+            true,
+            'default',
+            true,
+            false,
+            'foo',
+            true,
             $calculator,
             $dispatcher,
             $diff,

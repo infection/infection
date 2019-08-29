@@ -173,9 +173,6 @@ final class Mutation implements MutationInterface
         return \count($this->getAllTests()) !== 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMutatedNode()
     {
         return $this->mutatedNode;

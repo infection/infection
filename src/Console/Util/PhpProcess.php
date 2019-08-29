@@ -55,8 +55,6 @@ final class PhpProcess extends Process
      * This means that we can use xdebug when it is required and not have to
      * worry about it for the bulk of other processes, which do not need it and
      * work better without it.
-     *
-     * {@inheritdoc}
      */
     public function start(callable $callback = null, array $env = null): void
     {

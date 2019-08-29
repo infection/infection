@@ -57,9 +57,6 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
      */
     private $filesystem;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->filesystem = new Filesystem();

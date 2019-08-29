@@ -38,8 +38,6 @@ namespace Infection\Tests\Console;
 use Infection\Console\InfectionContainer;
 use PHPUnit\Framework\TestCase;
 use stdClass;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
-use Symfony\Component\Console\Input\InputInterface;
 
 final class InfectionContainerTest extends TestCase
 {
@@ -83,44 +81,30 @@ final class InfectionContainerTest extends TestCase
         $this->assertNotSame([], $container->keys());
     }
 
-    public function test_it_can_build_dynamic_dependencies(): void
+    public function test_it_can_build_dynamic_services(): void
     {
-        $input = $this->createMock(InputInterface::class);
-        $input->expects($this->once())->method('hasOption')->with('coverage')->willReturn(false);
-
         $container = new InfectionContainer();
-        $tmpDir = sys_get_temp_dir();
-        $container['tmp.dir'] = $tmpDir;
 
-        //Sanity check
-        $this->assertArrayNotHasKey('coverage.path', $container);
-        $container->buildDynamicDependencies($input);
+        // Sanity check
+        $this->assertFalse($container->offsetExists('coverage.path'));
 
-        $this->assertSame(
-            $tmpDir,
-            $container['coverage.path']
+        $newContainer = $container->withDynamicParameters(
+            null,
+            null,
+            false,
+            '',
+            false,
+            false,
+            '',
+            false,
+            '',
+            '',
+            false,
+            .0,
+            .0
         );
-    }
 
-    public function test_it_throws_on_invalid_type(): void
-    {
-        $input = $this->createMock(InputInterface::class);
-        $input
-            ->method('hasOption')
-            ->with('coverage')
-            ->willReturn(false)
-        ;
-        $input
-            ->method('getOption')
-            ->with('initial-tests-php-options')
-            ->willReturn([])
-        ;
-
-        $container = new InfectionContainer();
-        $container->buildDynamicDependencies($input);
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected initial-tests-php-options to be string, array given');
-        $this->assertNotNull($container['coverage.checker']);
+        $this->assertFalse($container->offsetExists('coverage.path'));
+        $this->assertTrue($newContainer->offsetExists('coverage.path'));
     }
 }
