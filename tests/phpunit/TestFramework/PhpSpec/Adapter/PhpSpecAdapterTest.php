@@ -125,7 +125,7 @@ OUTPUT;
     private function getAdapter(): PhpSpecAdapter
     {
         return new PhpSpecAdapter(
-            $this->createMock(AbstractExecutableFinder::class),
+            '/path/to/phpspec',
             $this->createMock(InitialConfigBuilder::class),
             $this->createMock(MutationConfigBuilder::class),
             $this->createMock(CommandLineArgumentsAndOptionsBuilder::class),

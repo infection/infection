@@ -54,14 +54,13 @@ final class PhpUnitAdapterTest extends TestCase
 
     protected function setUp(string $version = '6.5'): void
     {
-        $executableFined = $this->createMock(AbstractExecutableFinder::class);
         $initialConfigBuilder = $this->createMock(InitialConfigBuilder::class);
         $mutationConfigBuilder = $this->createMock(MutationConfigBuilder::class);
         $cliArgumentsBuilder = $this->createMock(CommandLineArgumentsAndOptionsBuilder::class);
         $versionParser = $this->createMock(VersionParser::class);
 
         $this->adapter = new PhpUnitAdapter(
-            $executableFined,
+            '/path/to/phpunit',
             $initialConfigBuilder,
             $mutationConfigBuilder,
             $cliArgumentsBuilder,

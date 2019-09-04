@@ -50,9 +50,9 @@ use Symfony\Component\Process\Process;
 abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
 {
     /**
-     * @var AbstractExecutableFinder
+     * @var string
      */
-    private $testFrameworkFinder;
+    private $testFrameworkExecutable;
 
     /**
      * @var CommandLineArgumentsAndOptionsBuilder
@@ -85,14 +85,13 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     private $cachedPhpCmdLine;
 
     public function __construct(
-        AbstractExecutableFinder $testFrameworkFinder,
+        string $testFrameworkExecutable,
         InitialConfigBuilder $initialConfigBuilder,
         MutationConfigBuilder $mutationConfigBuilder,
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
         VersionParser $versionParser
     ) {
-        // todo remove, path result instead
-        $this->testFrameworkFinder = $testFrameworkFinder;
+        $this->testFrameworkExecutable = $testFrameworkExecutable;
         $this->initialConfigBuilder = $initialConfigBuilder;
         $this->mutationConfigBuilder = $mutationConfigBuilder;
         $this->argumentsAndOptionsBuilder = $argumentsAndOptionsBuilder;
@@ -134,11 +133,10 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         string $extraOptions,
         array $phpExtraArgs = []
     ): array {
-        $frameworkPath = $this->testFrameworkFinder->find();
         $frameworkArgs = $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions);
 
-        if ($this->isBatchFile($frameworkPath)) {
-            return array_merge([$frameworkPath], $frameworkArgs);
+        if ($this->isBatchFile($this->testFrameworkExecutable)) {
+            return array_merge([$this->testFrameworkExecutable], $frameworkArgs);
         }
 
         /*
@@ -152,8 +150,8 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
          *
          * This lets folks use, say, a bash wrapper over phpunit.
          */
-        if ('cli' === \PHP_SAPI && empty($phpExtraArgs) && is_executable($frameworkPath) && `command -v php`) {
-            return array_merge([$frameworkPath], $frameworkArgs);
+        if ('cli' === \PHP_SAPI && empty($phpExtraArgs) && is_executable($this->testFrameworkExecutable) && `command -v php`) {
+            return array_merge([$this->testFrameworkExecutable], $frameworkArgs);
         }
 
         /*
@@ -162,7 +160,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         $commandLineArgs = array_merge(
             $this->findPhp(),
             $phpExtraArgs,
-            [$frameworkPath],
+            [$this->testFrameworkExecutable],
             $frameworkArgs
         );
 
@@ -185,13 +183,12 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
             return $this->cachedVersion;
         }
 
-        $frameworkPath = $this->testFrameworkFinder->find();
-        $phpIfNeeded = $this->isBatchFile($frameworkPath) ? [] : $this->findPhp();
+        $phpIfNeeded = $this->isBatchFile($this->testFrameworkExecutable) ? [] : $this->findPhp();
 
         $process = new Process(array_merge(
             $phpIfNeeded,
             [
-                $frameworkPath,
+                $this->testFrameworkExecutable,
                 '--version',
             ]
         ));
