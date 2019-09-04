@@ -85,7 +85,8 @@ final class FactoryTest extends TestCase
                 false,
                 null
             ),
-            $this->createMock(VersionParser::class)
+            $this->createMock(VersionParser::class),
+            $this->createMock(Filesystem::class)
         );
 
         $this->expectException(\InvalidArgumentException::class);

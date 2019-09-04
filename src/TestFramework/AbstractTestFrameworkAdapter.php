@@ -91,6 +91,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
         VersionParser $versionParser
     ) {
+        // todo remove, path result instead
         $this->testFrameworkFinder = $testFrameworkFinder;
         $this->initialConfigBuilder = $initialConfigBuilder;
         $this->mutationConfigBuilder = $mutationConfigBuilder;
@@ -128,7 +129,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     /**
      * @return string[]
      */
-    public function getCommandLine(
+    private function getCommandLine(
         string $configPath,
         string $extraOptions,
         array $phpExtraArgs = []
