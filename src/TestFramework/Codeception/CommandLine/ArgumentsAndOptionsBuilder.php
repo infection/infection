@@ -15,14 +15,17 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
 {
     public function build(string $configPath, string $extraOptions): array
     {
-        return array_filter([
-            'run',
-            '--no-colors',
-            '--fail-fast',
-            '--config',
-            $configPath,
-            // todo make the same fix for space in extra options and add test
-            $extraOptions
-        ]);
+        return array_filter(
+            array_merge(
+                [
+                    'run',
+                    '--no-colors',
+                    '--fail-fast',
+                    '--config',
+                    $configPath,
+                ],
+                explode(' ', $extraOptions)
+            )
+        );
     }
 }
