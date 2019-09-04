@@ -46,17 +46,6 @@ final class MutationYamlConfiguration extends AbstractYamlConfiguration
         ];
 
         $config['coverage'] = ['enabled' => false];
-
-        // todo detect version
-        // todo move to the root? depending on the versions
-        // todo include previous bootstrap, add tests
-//        $config['settings'] = array_merge(
-//            $config['settings'] ?? [],
-//            [
-//                'bootstrap' => $this->interceptorFilePath
-//            ]
-//        );
-
         $config['bootstrap'] = $this->interceptorFilePath;
 
         return Yaml::dump($config);

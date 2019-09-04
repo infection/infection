@@ -53,7 +53,11 @@ final class MutationConfigBuilder extends ConfigBuilder
     {
         $mutationHash = $mutant->getMutation()->getHash();
 
-        $interceptorFilePath = $this->getInterceptorFilePath($mutationHash);
+        $interceptorFilePath = sprintf(
+            '%s/interceptor.codeception.%s.php',
+            $this->tmpDir,
+            $mutationHash
+        );
 
         file_put_contents($interceptorFilePath, $this->createCustomBootstrapWithInterceptor($mutant));
 
@@ -106,30 +110,6 @@ AUTOLOAD;
         $fileName = sprintf('codeceptionConfiguration.%s.infection.yaml', $mutant->getMutation()->getHash());
 
         return $this->tmpDir . '/' . $fileName;
-    }
-
-    private function getInterceptorFilePath(string $mutationHash): string
-    {
-        // todo do NOT make it for each mutation
-        /** @var string $projectDir */
-        $projectDir = realpath($this->projectDir);
-        /** @var string $tmpDir */
-        $tmpDir = realpath($this->tmpDir);
-        $projectDirParts = explode(DIRECTORY_SEPARATOR, $projectDir);
-        $tempDirParts = explode(DIRECTORY_SEPARATOR, $tmpDir);
-
-        while (count($projectDirParts) > 0 && count($tempDirParts) > 0 && strcmp($projectDirParts[0], $tempDirParts[0]) === 0) {
-            array_shift($projectDirParts);
-            array_shift($tempDirParts);
-        }
-
-        $relativePathToTmpDir = str_repeat('../', count($projectDirParts)) . implode('/', $tempDirParts) . '/';
-
-        return sprintf(
-            '../../%s/interceptor.codeception.%s.php',
-            $relativePathToTmpDir,
-            $mutationHash
-        );
     }
 
     private function getOriginalBootstrapFilePath(): ?string
