@@ -42,7 +42,7 @@ abstract class AbstractYamlConfiguration
 
     abstract public function getYaml(): string;
 
-    protected function getPathToProjectDir(): string
+    protected function getRelativeFromTmpDirPathToProjectDir(): string
     {
         /** @var string $projectDir */
         $projectDir = realpath($this->projectDir);
@@ -57,20 +57,20 @@ abstract class AbstractYamlConfiguration
             array_shift($tempDirParts);
         }
 
-        $pathToProjectDir = str_repeat('../', count($tempDirParts)) . implode('/', $projectDirParts) . '/';
+        $pathToProjectDir = rtrim(str_repeat('../', count($tempDirParts)) . implode('/', $projectDirParts), '/') . '/';
 
         return $pathToProjectDir;
     }
 
-    protected function updatePaths(array $config, string $projectPath): array
+    protected function updatePaths(array $config, string $relativeFromTmpDirPathToProjectDir, string $projectDirRealPath): array
     {
         $returnConfig = [];
 
         foreach($config as $key => $value) {
             if (is_array($value)) {
-                $value = $this->updatePaths($value, $projectPath);
-            } elseif (is_string($value) && file_exists($projectPath . $value)) {
-                $value = $projectPath . $value;
+                $value = $this->updatePaths($value, $relativeFromTmpDirPathToProjectDir, $projectDirRealPath);
+            } elseif (is_string($value) && file_exists(sprintf('%s/%s', $projectDirRealPath, $value))) {
+                $value = $relativeFromTmpDirPathToProjectDir . $value;
             }
 
             $returnConfig[$key] = $value;

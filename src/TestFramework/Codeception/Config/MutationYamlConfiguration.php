@@ -32,17 +32,17 @@ final class MutationYamlConfiguration extends AbstractYamlConfiguration
 
     public function getYaml(): string
     {
-        $pathToProjectDir = $this->getPathToProjectDir();
+        $relativeFromTmpDirPathToProjectDir = $this->getRelativeFromTmpDirPathToProjectDir();
         $config = $this->originalConfig;
 
-        $config = $this->updatePaths($config, $pathToProjectDir);
+        $config = $this->updatePaths($config, $relativeFromTmpDirPathToProjectDir, $this->projectDir);
 
         $config['paths'] = [
-            'tests'   => $config['paths']['tests'] ?? $pathToProjectDir . 'tests',
+            'tests'   => $config['paths']['tests'] ?? $relativeFromTmpDirPathToProjectDir . 'tests',
             'output'  => sprintf('%s/%s', $this->tmpDir, $this->mutationHash),
-            'data'    => $config['paths']['data'] ?? $pathToProjectDir . 'tests/_data',
-            'support' => $config['paths']['support'] ?? $pathToProjectDir . 'tests/_support',
-            'envs'    => $config['paths']['envs'] ?? $pathToProjectDir . 'tests/_envs',
+            'data'    => $config['paths']['data'] ?? $relativeFromTmpDirPathToProjectDir . 'tests/_data',
+            'support' => $config['paths']['support'] ?? $relativeFromTmpDirPathToProjectDir . 'tests/_support',
+            'envs'    => $config['paths']['envs'] ?? $relativeFromTmpDirPathToProjectDir . 'tests/_envs',
         ];
 
         $config['coverage'] = ['enabled' => false];
