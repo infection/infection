@@ -9,7 +9,10 @@ use Infection\TestFramework\Codeception\Config\InitialYamlConfiguration;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Symfony\Component\Yaml\Yaml;
 
-class InitialConfigBuilder implements ConfigBuilder
+/**
+ * @internal
+ */
+final class InitialConfigBuilder implements ConfigBuilder
 {
     /**
      * @var string

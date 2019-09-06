@@ -52,7 +52,7 @@ final class PhpUnitAdapterTest extends TestCase
      */
     private $adapter;
 
-    protected function setUp(string $version = '6.5'): void
+    protected function setUp(): void
     {
         $initialConfigBuilder = $this->createMock(InitialConfigBuilder::class);
         $mutationConfigBuilder = $this->createMock(MutationConfigBuilder::class);

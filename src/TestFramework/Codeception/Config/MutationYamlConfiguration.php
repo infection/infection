@@ -22,9 +22,9 @@ final class MutationYamlConfiguration extends AbstractYamlConfiguration
      */
     private $interceptorFilePath;
 
-    public function __construct(string $tmpDir, string $projectDir, array $originalConfig, bool $skipCoverage, string $mutationHash, string $interceptorFilePath)
+    public function __construct(string $tmpDir, string $projectDir, array $originalConfig, string $mutationHash, string $interceptorFilePath)
     {
-        parent::__construct($tmpDir, $projectDir, $originalConfig, $skipCoverage);
+        parent::__construct($tmpDir, $projectDir, $originalConfig);
 
         $this->mutationHash = $mutationHash;
         $this->interceptorFilePath = $interceptorFilePath;

@@ -33,51 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Utils;
+namespace Infection\Tests\TestFramework\Codeception\CommandLine;
 
-use Infection\Utils\VersionParser;
+use Infection\TestFramework\Codeception\CommandLine\ArgumentsAndOptionsBuilder;
 use PHPUnit\Framework\TestCase;
 
-final class VersionParserTest extends TestCase
+final class ArgumentsAndOptionsBuilderTest extends TestCase
 {
-    /**
-     * @var VersionParser
-     */
-    private $versionParser;
-
-    protected function setUp(): void
+    public function test_it_builds_correct_command(): void
     {
-        $this->versionParser = new VersionParser();
+        $configPath = '/config/path';
+        $builder = new ArgumentsAndOptionsBuilder();
+
+        $this->assertSame(
+            [
+                'run',
+                '--no-colors',
+                '--fail-fast',
+                '--config',
+                $configPath,
+                '--verbose',
+                '--debug',
+            ],
+            $builder->build($configPath, '--verbose --debug')
+        );
     }
 
-    /**
-     * @dataProvider versionProvider
-     */
-    public function test_it_parses_version_from_string(string $content, string $expectedVersion): void
+    public function test_it_removes_empty_extra_options(): void
     {
-        $result = $this->versionParser->parse($content);
+        $configPath = '/config/path';
+        $builder = new ArgumentsAndOptionsBuilder();
 
-        $this->assertSame($expectedVersion, $result);
-    }
-
-    public function test_it_throws_exception_when_content_has_no_version_substring(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-
-        $this->versionParser->parse('abc');
-    }
-
-    public function versionProvider()
-    {
-        return [
-            ['Codeception 3.1.0', '3.1.0'],
-            ['phpspec version 1.2.3', '1.2.3'],
-            ['PHPUnit 1.2.3 by Sebastian Bergmann and contributors.', '1.2.3'],
-            ['1.2.3', '1.2.3'],
-            ['10.20.13', '10.20.13'],
-            ['a 1.2.3-patch b', '1.2.3-patch'],
-            ['v1.2.3', '1.2.3'],
-            ['6.5-abcde', '6.5-abcde'],
-        ];
+        $this->assertSame(
+            [
+                'run',
+                '--no-colors',
+                '--fail-fast',
+                '--config',
+                $configPath,
+            ],
+            $builder->build($configPath, '')
+        );
     }
 }

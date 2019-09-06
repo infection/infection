@@ -172,7 +172,7 @@ final class Factory
                     $skipCoverage,
                     $this->infectionConfig->getSourceDirs()
                 ),
-                new CodeceptionMutationConfigBuilder($this->filesystem, $this->tmpDir, $this->projectDir, $codeceptionConfigContentParsed, $skipCoverage),
+                new CodeceptionMutationConfigBuilder($this->filesystem, $this->tmpDir, $this->projectDir, $codeceptionConfigContentParsed),
                 new CodeceptionArgumentsAndOptionsBuilder(),
                 $this->versionParser
             );

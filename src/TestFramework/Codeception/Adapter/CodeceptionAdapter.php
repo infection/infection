@@ -9,7 +9,10 @@ use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\TestFrameworkTypes;
 
-class CodeceptionAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware
+/**
+ * @internal
+ */
+final class CodeceptionAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware
 {
     public const EXECUTABLE = 'codecept';
 

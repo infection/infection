@@ -35,17 +35,12 @@ final class MutationConfigBuilder extends ConfigBuilder
      * @var array
      */
     private $originalConfigContentParsed;
-    /**
-     * @var bool
-     */
-    private $skipCoverage;
 
-    public function __construct(Filesystem $filesystem, string $tmpDir, string $projectDir, array $originalConfigContentParsed, bool $skipCoverage)
+    public function __construct(Filesystem $filesystem, string $tmpDir, string $projectDir, array $originalConfigContentParsed)
     {
         $this->tmpDir = $tmpDir;
         $this->projectDir = $projectDir;
         $this->originalConfigContentParsed = $originalConfigContentParsed;
-        $this->skipCoverage = $skipCoverage;
         $this->filesystem = $filesystem;
     }
 
@@ -65,7 +60,6 @@ final class MutationConfigBuilder extends ConfigBuilder
             $this->tmpDir,
             $this->projectDir,
             $this->originalConfigContentParsed,
-            $this->skipCoverage,
             $mutationHash,
             $interceptorFilePath
         );
@@ -92,8 +86,7 @@ final class MutationConfigBuilder extends ConfigBuilder
         $customBootstrap = <<<AUTOLOAD
 <?php
 
-%s;
-var_dump('FROM INTERCEPTOR FILE ++++++++++!!!!!!!!!!!!!!');
+%s
 %s
 
 AUTOLOAD;

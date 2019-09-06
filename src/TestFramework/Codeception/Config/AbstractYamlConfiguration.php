@@ -27,21 +27,32 @@ abstract class AbstractYamlConfiguration
      */
     protected $originalConfig;
 
-    /**
-     * @var bool
-     */
-    protected $skipCoverage;
-
-    public function __construct(string $tmpDir, string $projectDir, array $originalConfig, bool $skipCoverage)
+    public function __construct(string $tmpDir, string $projectDir, array $originalConfig)
     {
         $this->tmpDir = $tmpDir;
         $this->projectDir = $projectDir;
         $this->originalConfig = $originalConfig;
-        $this->skipCoverage = $skipCoverage;
     }
 
     abstract public function getYaml(): string;
 
+    /**
+     * Codeception does not support absolute URLs in the config file: codeception.yml
+     *
+     * @see https://github.com/Codeception/Codeception/issues/5642
+     *
+     * All paths in the config are related to `codeception.yml`, that's why when Infection
+     * saves custom `codeception.yml` files in the `tmpDir`, we have to build relative
+     * URLs from `tmpDir` back to the `projectDir`.
+     *
+     * Example:
+     *     project dir: /path/to/project-dir
+     *     temp dir: /tmp/infection
+     *     original path in `/path/to/project-dir/codeception.yml`: tests
+     *     relative path in `/tmp/infection/custom-codeception.yml`: ../../path/to/project-dir/tests
+     *
+     * @return string
+     */
     protected function getRelativeFromTmpDirPathToProjectDir(): string
     {
         /** @var string $projectDir */
