@@ -1,11 +1,39 @@
 <?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 declare(strict_types=1);
 
-
 namespace Infection\TestFramework\Codeception\Config;
-
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -50,8 +78,6 @@ abstract class AbstractYamlConfiguration
      *     temp dir: /tmp/infection
      *     original path in `/path/to/project-dir/codeception.yml`: tests
      *     relative path in `/tmp/infection/custom-codeception.yml`: ../../path/to/project-dir/tests
-     *
-     * @return string
      */
     protected function getRelativeFromTmpDirPathToProjectDir(): string
     {
@@ -60,15 +86,15 @@ abstract class AbstractYamlConfiguration
         /** @var string $tmpDir */
         $tmpDir = realpath($this->tmpDir);
 
-        $projectDirParts = explode(DIRECTORY_SEPARATOR, $projectDir);
-        $tempDirParts = explode(DIRECTORY_SEPARATOR, $tmpDir);
+        $projectDirParts = explode(\DIRECTORY_SEPARATOR, $projectDir);
+        $tempDirParts = explode(\DIRECTORY_SEPARATOR, $tmpDir);
 
-        while (count($projectDirParts) > 0 && count($tempDirParts) > 0 && strcmp($projectDirParts[0], $tempDirParts[0]) === 0) {
+        while (\count($projectDirParts) > 0 && \count($tempDirParts) > 0 && strcmp($projectDirParts[0], $tempDirParts[0]) === 0) {
             array_shift($projectDirParts);
             array_shift($tempDirParts);
         }
 
-        $pathToProjectDir = rtrim(str_repeat('../', count($tempDirParts)) . implode('/', $projectDirParts), '/') . '/';
+        $pathToProjectDir = rtrim(str_repeat('../', \count($tempDirParts)) . implode('/', $projectDirParts), '/') . '/';
 
         return $pathToProjectDir;
     }
@@ -77,10 +103,10 @@ abstract class AbstractYamlConfiguration
     {
         $returnConfig = [];
 
-        foreach($config as $key => $value) {
-            if (is_array($value)) {
+        foreach ($config as $key => $value) {
+            if (\is_array($value)) {
                 $value = $this->updatePaths($value, $relativeFromTmpDirPathToProjectDir, $projectDirRealPath);
-            } elseif (is_string($value) && file_exists(sprintf('%s/%s', $projectDirRealPath, $value))) {
+            } elseif (\is_string($value) && file_exists(sprintf('%s/%s', $projectDirRealPath, $value))) {
                 $value = $relativeFromTmpDirPathToProjectDir . $value;
             }
 

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
-use Infection\Finder\AbstractExecutableFinder;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;

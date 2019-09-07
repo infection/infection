@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpSpec\Adapter;
 
-use Infection\Finder\AbstractExecutableFinder;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder;

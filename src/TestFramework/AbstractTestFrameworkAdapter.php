@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use Infection\Finder\AbstractExecutableFinder;
 use Infection\Finder\Exception\FinderException;
 use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\Config\InitialConfigBuilder;
@@ -125,48 +124,6 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         return $this->getCommandLine($configPath, $extraOptions);
     }
 
-    /**
-     * @return string[]
-     */
-    private function getCommandLine(
-        string $configPath,
-        string $extraOptions,
-        array $phpExtraArgs = []
-    ): array {
-        $frameworkArgs = $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions);
-
-        if ($this->isBatchFile($this->testFrameworkExecutable)) {
-            return array_merge([$this->testFrameworkExecutable], $frameworkArgs);
-        }
-
-        /*
-         * That's an empty options list by all means, we need to see it as such
-         */
-        $phpExtraArgs = array_filter($phpExtraArgs);
-
-        /*
-         * Run an executable as it is if we're using a standard CLI and
-         * there's a standard interpreter available on PATH.
-         *
-         * This lets folks use, say, a bash wrapper over phpunit.
-         */
-        if ('cli' === \PHP_SAPI && empty($phpExtraArgs) && is_executable($this->testFrameworkExecutable) && `command -v php`) {
-            return array_merge([$this->testFrameworkExecutable], $frameworkArgs);
-        }
-
-        /*
-         * In all other cases run it with a chosen PHP interpreter
-         */
-        $commandLineArgs = array_merge(
-            $this->findPhp(),
-            $phpExtraArgs,
-            [$this->testFrameworkExecutable],
-            $frameworkArgs
-        );
-
-        return array_filter($commandLineArgs);
-    }
-
     public function buildInitialConfigFile(): string
     {
         return $this->initialConfigBuilder->build($this->getVersion());
@@ -211,6 +168,48 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     public function getInitialTestsFailRecommendations(string $commandLine): string
     {
         return sprintf('Check the executed command to identify the problem: %s', $commandLine);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getCommandLine(
+        string $configPath,
+        string $extraOptions,
+        array $phpExtraArgs = []
+    ): array {
+        $frameworkArgs = $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions);
+
+        if ($this->isBatchFile($this->testFrameworkExecutable)) {
+            return array_merge([$this->testFrameworkExecutable], $frameworkArgs);
+        }
+
+        /*
+         * That's an empty options list by all means, we need to see it as such
+         */
+        $phpExtraArgs = array_filter($phpExtraArgs);
+
+        /*
+         * Run an executable as it is if we're using a standard CLI and
+         * there's a standard interpreter available on PATH.
+         *
+         * This lets folks use, say, a bash wrapper over phpunit.
+         */
+        if ('cli' === \PHP_SAPI && empty($phpExtraArgs) && is_executable($this->testFrameworkExecutable) && `command -v php`) {
+            return array_merge([$this->testFrameworkExecutable], $frameworkArgs);
+        }
+
+        /*
+         * In all other cases run it with a chosen PHP interpreter
+         */
+        $commandLineArgs = array_merge(
+            $this->findPhp(),
+            $phpExtraArgs,
+            [$this->testFrameworkExecutable],
+            $frameworkArgs
+        );
+
+        return array_filter($commandLineArgs);
     }
 
     /**
