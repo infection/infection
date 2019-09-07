@@ -55,13 +55,16 @@ final class MBString implements MutatorConfiguration
         $this->settings = $settings;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function isEnabled(): bool
     {
         return $this->enabled;
     }
 
     /**
-     * @return string[]
+     * {@inheritDoc}
      */
     public function getIgnore(): array
     {

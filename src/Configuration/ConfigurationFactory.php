@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
+use Infection\Configuration\Entry\Mutator\GenericMutator;
 use function array_filter;
 use function array_map;
 use function array_values;
@@ -52,6 +53,7 @@ use Infection\Configuration\Entry\Mutator\TrueValueSettings;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use stdClass;
+use function is_bool;
 use function strpos;
 use function trim;
 
@@ -121,6 +123,7 @@ class ConfigurationFactory
         $arrayItemRemoval = null;
         $bcMath = null;
         $mbString = null;
+        $generics = [];
 
         foreach ($mutators as $key => $value) {
             if (0 === strpos($key, '@')) {
@@ -131,21 +134,29 @@ class ConfigurationFactory
 
             if ('TrueValue' === $key) {
                 $trueValue = self::createTrueValue($value);
+
+                continue;
             }
 
             if ('ArrayItemRemoval' === $key) {
                 $arrayItemRemoval = self::createArrayItemRemoval($value);
+
+                continue;
             }
 
             if ('BCMath' === $key) {
                 $bcMath = self::createBCMath($value);
+
+                continue;
             }
 
             if ('MBString' === $key) {
                 $mbString = self::createMBString($value);
+
+                continue;
             }
 
-            // TODO: throw an error
+            $generics[] = self::createGeneric($key, $value);
         }
 
         return new Mutators(
@@ -153,7 +164,8 @@ class ConfigurationFactory
             $trueValue,
             $arrayItemRemoval,
             $bcMath,
-            $mbString
+            $mbString,
+            ...$generics
         );
     }
 
@@ -162,7 +174,7 @@ class ConfigurationFactory
      */
     private static function createTrueValue($value): TrueValue
     {
-        if (\is_bool($value)) {
+        if (is_bool($value)) {
             $enabled = $value;
 
             $ignore = [];
@@ -190,7 +202,7 @@ class ConfigurationFactory
      */
     private static function createArrayItemRemoval($value): ArrayItemRemoval
     {
-        if (\is_bool($value)) {
+        if (is_bool($value)) {
             $enabled = $value;
 
             $ignore = [];
@@ -215,7 +227,7 @@ class ConfigurationFactory
      */
     private static function createBCMath($value): BCMath
     {
-        if (\is_bool($value)) {
+        if (is_bool($value)) {
             $enabled = $value;
 
             $ignore = [];
@@ -270,7 +282,7 @@ class ConfigurationFactory
      */
     private static function createMBString($value): MBString
     {
-        if (\is_bool($value)) {
+        if (is_bool($value)) {
             $enabled = $value;
 
             $ignore = [];
@@ -345,6 +357,24 @@ class ConfigurationFactory
         }
 
         return new MBString($enabled, $ignore, $settings);
+    }
+
+    /**
+     * @param bool|stdClass $value
+     */
+    private static function createGeneric(string $name, $value): GenericMutator
+    {
+        if (is_bool($value)) {
+            $enabled = $value;
+
+            $ignore = [];
+        } else {
+            $enabled = true;
+
+            $ignore = self::normalizeStringArray($value->ignore ?? []);
+        }
+
+        return new GenericMutator($name, $enabled, $ignore);
     }
 
     /**

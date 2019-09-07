@@ -62,6 +62,7 @@ final class Mutators
     private $arrayItemRemoval;
     private $bcMath;
     private $mbString;
+    private $genericMutators;
 
     /**
      * @param array<string,bool> $profiles
@@ -71,7 +72,8 @@ final class Mutators
         ?MutatorConfiguration $trueValue,
         ?MutatorConfiguration $arrayItemRemoval,
         ?MutatorConfiguration $bcMath,
-        ?MutatorConfiguration $mbString
+        ?MutatorConfiguration $mbString,
+        GenericMutator ...$genericMutators
     ) {
         Assert::allOneOf(array_keys($profiles), self::PROFILES);
         Assert::allBoolean($profiles);
@@ -81,6 +83,7 @@ final class Mutators
         $this->arrayItemRemoval = $arrayItemRemoval;
         $this->bcMath = $bcMath;
         $this->mbString = $mbString;
+        $this->genericMutators = $genericMutators;
     }
 
     /**
@@ -109,5 +112,13 @@ final class Mutators
     public function getMbString(): ?MutatorConfiguration
     {
         return $this->mbString;
+    }
+
+    /**
+     * @return GenericMutator[]
+     */
+    public function getGenericMutators(): array
+    {
+        return $this->genericMutators;
     }
 }

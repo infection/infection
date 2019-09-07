@@ -35,7 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
+use Infection\Configuration\Entry\Mutator\GenericMutator;
+use Infection\Mutator\Util\MutatorProfile;
+use function array_diff;
+use function array_diff_key;
 use function array_fill;
+use function array_fill_keys;
+use function array_keys;
 use function array_map;
 use function array_merge;
 use function array_values;
@@ -57,6 +63,7 @@ use Infection\Configuration\Entry\Mutator\TrueValueSettings;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use JsonSchema\Validator;
+use function var_export;
 use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
 use function Safe\json_decode;
@@ -64,6 +71,7 @@ use function sprintf;
 use stdClass;
 
 /**
+ * @covers \Infection\Configuration\ConfigurationFactory
  * @covers \Infection\Configuration\Entry\Mutator\ArrayItemRemoval
  * @covers \Infection\Configuration\Entry\Mutator\ArrayItemRemovalSettings
  * @covers \Infection\Configuration\Entry\Mutator\BCMath
@@ -99,7 +107,10 @@ class ConfigurationFactoryTest extends TestCase
 
         $actual = (new ConfigurationFactory())->create($rawConfig);
 
-        $this->assertSame($expected, $actual);
+        $this->assertSame(
+            var_export($expected, true),
+            var_export($actual, true)
+        );
     }
 
     public function provideRawConfig(): Generator
@@ -1777,14 +1788,133 @@ JSON
             ]),
         ];
 
+        $genericMutatorNamesList = array_keys(array_diff_key(
+            MutatorProfile::FULL_MUTATOR_LIST,
+            array_fill_keys(
+                [
+                    'TrueValue',
+                    'ArrayItemRemoval',
+                    'BCMath',
+                    'MBString',
+                ],
+                null
+            )
+        ));
+
+        foreach ($genericMutatorNamesList as $mutator) {
+            yield '[mutators][generic]['.$mutator.'] enabled' => [
+                <<<JSON
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "$mutator": true
+    }
+}
+JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'mutators' => new Mutators(
+                        [],
+                        null,
+                        null,
+                        null,
+                        null,
+                        new GenericMutator($mutator, true, [])
+                    ),
+                ]),
+            ];
+
+            yield '[mutators][generic]['.$mutator.'] disabled' => [
+                <<<JSON
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "$mutator": false
+    }
+}
+JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'mutators' => new Mutators(
+                        [],
+                        null,
+                        null,
+                        null,
+                        null,
+                        new GenericMutator($mutator, false, [])
+                    ),
+                ]),
+            ];
+
+            yield '[mutators][generic]['.$mutator.'] ignore' => [
+                <<<JSON
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "$mutator": {
+            "ignore": ["fileA", "fileB"]
+        }
+    }
+}
+JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'mutators' => new Mutators(
+                        [],
+                        null,
+                        null,
+                        null,
+                        null,
+                        new GenericMutator(
+                            $mutator,
+                            true,
+                            ['fileA', 'fileB']
+                        )
+                    ),
+                ]),
+            ];
+
+            yield '[mutators][generic]['.$mutator.'] ignore empty & untrimmed' => [
+                <<<JSON
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "$mutator": {
+            "ignore": [" file ", ""]
+        }
+    }
+}
+JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'mutators' => new Mutators(
+                        [],
+                        null,
+                        null,
+                        null,
+                        null,
+                        new GenericMutator($mutator, true, ['file'])
+                    ),
+                ]),
+            ];
+        }
+
         foreach (Mutators::PROFILES as $index => $profile) {
             yield '[mutators][profile] ' . $profile . ' false' => (static function () use (
-                $index,
                 $profile
             ): array {
-                $settingsArguments = array_fill(0, 18, true);
-                $settingsArguments[$index] = false;
-
                 return [
                     <<<JSON
 {
@@ -1811,12 +1941,8 @@ JSON
             })();
 
             yield '[mutators][profile] ' . $profile . ' true' => (static function () use (
-                $index,
                 $profile
             ): array {
-                $settingsArguments = array_fill(0, 18, true);
-                $settingsArguments[$index] = false;
-
                 return [
                     <<<JSON
 {
@@ -1996,6 +2122,126 @@ JSON
                 "mb_convert_case": false
             }
         },
+        "Assignment": true,
+        "AssignmentEqual": true,
+        "BitwiseAnd": true,
+        "BitwiseNot": true,
+        "BitwiseOr": true,
+        "BitwiseXor": true,
+        "Decrement": true,
+        "DivEqual": true,
+        "Division": true,
+        "Exponentiation": true,
+        "Increment": true,
+        "Minus": true,
+        "MinusEqual": true,
+        "ModEqual": true,
+        "Modulus": true,
+        "MulEqual": true,
+        "Multiplication": true,
+        "Plus": true,
+        "PlusEqual": true,
+        "PowEqual": true,
+        "ShiftLeft": true,
+        "ShiftRight": true,
+        "RoundingFamily": true,
+        "ArrayItem": true,
+        "EqualIdentical": true,
+        "FalseValue": true,
+        "IdenticalEqual": true,
+        "LogicalAnd": true,
+        "LogicalLowerAnd": true,
+        "LogicalLowerOr": true,
+        "LogicalNot": true,
+        "LogicalOr": true,
+        "NotEqualNotIdentical": true,
+        "NotIdenticalNotEqual": true,
+        "Yield_": true,
+        "GreaterThan": true,
+        "GreaterThanOrEqualTo": true,
+        "LessThan": true,
+        "LessThanOrEqualTo": true,
+        "Equal": true,
+        "GreaterThanNegotiation": true,
+        "GreaterThanOrEqualToNegotiation": true,
+        "Identical": true,
+        "LessThanNegotiation": true,
+        "LessThanOrEqualToNegotiation": true,
+        "NotEqual": true,
+        "NotIdentical": true,
+        "PublicVisibility": true,
+        "ProtectedVisibility": true,
+        "DecrementInteger": true,
+        "IncrementInteger": true,
+        "OneZeroInteger": true,
+        "OneZeroFloat": true,
+        "AssignCoalesce": true,
+        "Break_": true,
+        "Continue_": true,
+        "Throw_": true,
+        "Finally_": true,
+        "Coalesce": true,
+        "PregQuote": true,
+        "PregMatchMatches": true,
+        "FunctionCallRemoval": true,
+        "MethodCallRemoval": true,
+        "ArrayOneItem": true,
+        "FloatNegation": true,
+        "FunctionCall": true,
+        "IntegerNegation": true,
+        "NewObject": true,
+        "This": true,
+        "Spaceship": true,
+        "Foreach_": true,
+        "For_": true,
+        "CastArray": true,
+        "CastBool": true,
+        "CastFloat": true,
+        "CastInt": true,
+        "CastObject": true,
+        "CastString": true,
+        "UnwrapArrayChangeKeyCase": true,
+        "UnwrapArrayChunk": true,
+        "UnwrapArrayColumn": true,
+        "UnwrapArrayCombine": true,
+        "UnwrapArrayDiff": true,
+        "UnwrapArrayDiffAssoc": true,
+        "UnwrapArrayDiffKey": true,
+        "UnwrapArrayDiffUassoc": true,
+        "UnwrapArrayDiffUkey": true,
+        "UnwrapArrayFilter": true,
+        "UnwrapArrayFlip": true,
+        "UnwrapArrayIntersect": true,
+        "UnwrapArrayIntersectAssoc": true,
+        "UnwrapArrayIntersectKey": true,
+        "UnwrapArrayIntersectUassoc": true,
+        "UnwrapArrayIntersectUkey": true,
+        "UnwrapArrayKeys": true,
+        "UnwrapArrayMap": true,
+        "UnwrapArrayMerge": true,
+        "UnwrapArrayMergeRecursive": true,
+        "UnwrapArrayPad": true,
+        "UnwrapArrayReduce": true,
+        "UnwrapArrayReplace": true,
+        "UnwrapArrayReplaceRecursive": true,
+        "UnwrapArrayReverse": true,
+        "UnwrapArraySlice": true,
+        "UnwrapArraySplice": true,
+        "UnwrapArrayUdiff": true,
+        "UnwrapArrayUdiffAssoc": true,
+        "UnwrapArrayUdiffUassoc": true,
+        "UnwrapArrayUintersect": true,
+        "UnwrapArrayUintersectAssoc": true,
+        "UnwrapArrayUintersectUassoc": true,
+        "UnwrapArrayUnique": true,
+        "UnwrapArrayValues": true,
+        "UnwrapLcFirst": true,
+        "UnwrapStrRepeat": true,
+        "UnwrapStrToLower": true,
+        "UnwrapStrToUpper": true,
+        "UnwrapTrim": true,
+        "UnwrapUcFirst": true,
+        "UnwrapUcWords": true,
         "@arithmetic": true,
         "@boolean": true,
         "@cast": true,
@@ -2107,7 +2353,127 @@ JSON
                             false,
                             false
                         )
-                    )
+                    ),
+                    new GenericMutator('Assignment', true, []),
+                    new GenericMutator('AssignmentEqual', true, []),
+                    new GenericMutator('BitwiseAnd', true, []),
+                    new GenericMutator('BitwiseNot', true, []),
+                    new GenericMutator('BitwiseOr', true, []),
+                    new GenericMutator('BitwiseXor', true, []),
+                    new GenericMutator('Decrement', true, []),
+                    new GenericMutator('DivEqual', true, []),
+                    new GenericMutator('Division', true, []),
+                    new GenericMutator('Exponentiation', true, []),
+                    new GenericMutator('Increment', true, []),
+                    new GenericMutator('Minus', true, []),
+                    new GenericMutator('MinusEqual', true, []),
+                    new GenericMutator('ModEqual', true, []),
+                    new GenericMutator('Modulus', true, []),
+                    new GenericMutator('MulEqual', true, []),
+                    new GenericMutator('Multiplication', true, []),
+                    new GenericMutator('Plus', true, []),
+                    new GenericMutator('PlusEqual', true, []),
+                    new GenericMutator('PowEqual', true, []),
+                    new GenericMutator('ShiftLeft', true, []),
+                    new GenericMutator('ShiftRight', true, []),
+                    new GenericMutator('RoundingFamily', true, []),
+                    new GenericMutator('ArrayItem', true, []),
+                    new GenericMutator('EqualIdentical', true, []),
+                    new GenericMutator('FalseValue', true, []),
+                    new GenericMutator('IdenticalEqual', true, []),
+                    new GenericMutator('LogicalAnd', true, []),
+                    new GenericMutator('LogicalLowerAnd', true, []),
+                    new GenericMutator('LogicalLowerOr', true, []),
+                    new GenericMutator('LogicalNot', true, []),
+                    new GenericMutator('LogicalOr', true, []),
+                    new GenericMutator('NotEqualNotIdentical', true, []),
+                    new GenericMutator('NotIdenticalNotEqual', true, []),
+                    new GenericMutator('Yield_', true, []),
+                    new GenericMutator('GreaterThan', true, []),
+                    new GenericMutator('GreaterThanOrEqualTo', true, []),
+                    new GenericMutator('LessThan', true, []),
+                    new GenericMutator('LessThanOrEqualTo', true, []),
+                    new GenericMutator('Equal', true, []),
+                    new GenericMutator('GreaterThanNegotiation', true, []),
+                    new GenericMutator('GreaterThanOrEqualToNegotiation', true, []),
+                    new GenericMutator('Identical', true, []),
+                    new GenericMutator('LessThanNegotiation', true, []),
+                    new GenericMutator('LessThanOrEqualToNegotiation', true, []),
+                    new GenericMutator('NotEqual', true, []),
+                    new GenericMutator('NotIdentical', true, []),
+                    new GenericMutator('PublicVisibility', true, []),
+                    new GenericMutator('ProtectedVisibility', true, []),
+                    new GenericMutator('DecrementInteger', true, []),
+                    new GenericMutator('IncrementInteger', true, []),
+                    new GenericMutator('OneZeroInteger', true, []),
+                    new GenericMutator('OneZeroFloat', true, []),
+                    new GenericMutator('AssignCoalesce', true, []),
+                    new GenericMutator('Break_', true, []),
+                    new GenericMutator('Continue_', true, []),
+                    new GenericMutator('Throw_', true, []),
+                    new GenericMutator('Finally_', true, []),
+                    new GenericMutator('Coalesce', true, []),
+                    new GenericMutator('PregQuote', true, []),
+                    new GenericMutator('PregMatchMatches', true, []),
+                    new GenericMutator('FunctionCallRemoval', true, []),
+                    new GenericMutator('MethodCallRemoval', true, []),
+                    new GenericMutator('ArrayOneItem', true, []),
+                    new GenericMutator('FloatNegation', true, []),
+                    new GenericMutator('FunctionCall', true, []),
+                    new GenericMutator('IntegerNegation', true, []),
+                    new GenericMutator('NewObject', true, []),
+                    new GenericMutator('This', true, []),
+                    new GenericMutator('Spaceship', true, []),
+                    new GenericMutator('Foreach_', true, []),
+                    new GenericMutator('For_', true, []),
+                    new GenericMutator('CastArray', true, []),
+                    new GenericMutator('CastBool', true, []),
+                    new GenericMutator('CastFloat', true, []),
+                    new GenericMutator('CastInt', true, []),
+                    new GenericMutator('CastObject', true, []),
+                    new GenericMutator('CastString', true, []),
+                    new GenericMutator('UnwrapArrayChangeKeyCase', true, []),
+                    new GenericMutator('UnwrapArrayChunk', true, []),
+                    new GenericMutator('UnwrapArrayColumn', true, []),
+                    new GenericMutator('UnwrapArrayCombine', true, []),
+                    new GenericMutator('UnwrapArrayDiff', true, []),
+                    new GenericMutator('UnwrapArrayDiffAssoc', true, []),
+                    new GenericMutator('UnwrapArrayDiffKey', true, []),
+                    new GenericMutator('UnwrapArrayDiffUassoc', true, []),
+                    new GenericMutator('UnwrapArrayDiffUkey', true, []),
+                    new GenericMutator('UnwrapArrayFilter', true, []),
+                    new GenericMutator('UnwrapArrayFlip', true, []),
+                    new GenericMutator('UnwrapArrayIntersect', true, []),
+                    new GenericMutator('UnwrapArrayIntersectAssoc', true, []),
+                    new GenericMutator('UnwrapArrayIntersectKey', true, []),
+                    new GenericMutator('UnwrapArrayIntersectUassoc', true, []),
+                    new GenericMutator('UnwrapArrayIntersectUkey', true, []),
+                    new GenericMutator('UnwrapArrayKeys', true, []),
+                    new GenericMutator('UnwrapArrayMap', true, []),
+                    new GenericMutator('UnwrapArrayMerge', true, []),
+                    new GenericMutator('UnwrapArrayMergeRecursive', true, []),
+                    new GenericMutator('UnwrapArrayPad', true, []),
+                    new GenericMutator('UnwrapArrayReduce', true, []),
+                    new GenericMutator('UnwrapArrayReplace', true, []),
+                    new GenericMutator('UnwrapArrayReplaceRecursive', true, []),
+                    new GenericMutator('UnwrapArrayReverse', true, []),
+                    new GenericMutator('UnwrapArraySlice', true, []),
+                    new GenericMutator('UnwrapArraySplice', true, []),
+                    new GenericMutator('UnwrapArrayUdiff', true, []),
+                    new GenericMutator('UnwrapArrayUdiffAssoc', true, []),
+                    new GenericMutator('UnwrapArrayUdiffUassoc', true, []),
+                    new GenericMutator('UnwrapArrayUintersect', true, []),
+                    new GenericMutator('UnwrapArrayUintersectAssoc', true, []),
+                    new GenericMutator('UnwrapArrayUintersectUassoc', true, []),
+                    new GenericMutator('UnwrapArrayUnique', true, []),
+                    new GenericMutator('UnwrapArrayValues', true, []),
+                    new GenericMutator('UnwrapLcFirst', true, []),
+                    new GenericMutator('UnwrapStrRepeat', true, []),
+                    new GenericMutator('UnwrapStrToLower', true, []),
+                    new GenericMutator('UnwrapStrToUpper', true, []),
+                    new GenericMutator('UnwrapTrim', true, []),
+                    new GenericMutator('UnwrapUcFirst', true, []),
+                    new GenericMutator('UnwrapUcWords', true, [])
                 ),
             ]),
         ];

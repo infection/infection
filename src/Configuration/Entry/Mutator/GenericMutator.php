@@ -33,55 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\resources;
+namespace Infection\Configuration\Entry\Mutator;
 
-use Helmich\JsonAssert\JsonAssertions;
-use PHPUnit\Framework\TestCase;
+use Infection\Mutator\Util\MutatorProfile;
+use Webmozart\Assert\Assert;
+use function array_keys;
+use function in_array;
+use function Safe\sprintf;
 
-final class InfectionConfigJsonSchemaTest extends TestCase
+final class GenericMutator implements MutatorConfiguration
 {
-    use JsonAssertions;
-
-    private const SCHEMA_FILE = __DIR__ . '/../../../resources/schema.json';
+    private $enabled;
+    private $ignore;
+    private $settings;
 
     /**
-     * @var array|null
+     * @param string[] $ignore
      */
-    private static $schema;
+    public function __construct(string $name, bool $enabled, array $ignore)
+    {
+        Assert::oneOf($name, array_keys(MutatorProfile::FULL_MUTATOR_LIST));
+        Assert::false(
+            in_array($name, ['ArrayItemRemoval', 'BCMath', 'MBString', 'TrueValue'], true),
+            sprintf(
+                'The mutator "%s" has a dedicated entry class. Use this class instead '
+                .'of this generic mutator configuration entry',
+                $name
+            )
+        );
+        Assert::allString($ignore);
+
+        $this->enabled = $enabled;
+        $this->ignore = $ignore;
+    }
 
     /**
-     * @dataProvider mutatorsProvider
+     * {@inheritDoc}
      */
-    public function test_all_mutators_support_ignore_key(string $mutator): void
+    public function isEnabled(): bool
     {
-        $infectionJson = <<<"JSON"
-{
-    "timeout": 1,
-    "source": {"directories": ["src"]},
-    "mutators": {
-        "$mutator": {
-            "ignore": ["Foo\\\\Bar::baz"]
-        }
-    }
-}
-JSON;
-
-        self::assertJsonDocumentMatchesSchema($infectionJson, self::getSchema());
+        return $this->enabled;
     }
 
-    public function mutatorsProvider(): \Generator
+    /**
+     * {@inheritDoc}
+     */
+    public function getIgnore(): array
     {
-        foreach (array_keys(self::getSchema()['properties']['mutators']['properties']) as $mutator) {
-            yield $mutator => [$mutator];
-        }
+        return $this->ignore;
     }
 
-    private static function getSchema()
+    public function getSettings(): BCMathSettings
     {
-        if (self::$schema !== null) {
-            return self::$schema;
-        }
-
-        return self::$schema = json_decode(file_get_contents(self::SCHEMA_FILE), true);
+        return $this->settings;
     }
 }

@@ -37,4 +37,10 @@ namespace Infection\Configuration\Entry\Mutator;
 
 interface MutatorConfiguration
 {
+    public function isEnabled(): bool;
+
+    /**
+     * @return string[]
+     */
+    public function getIgnore(): array;
 }
