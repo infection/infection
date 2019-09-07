@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
+use Infection\Configuration\Configuration;
 use function array_filter;
 use Infection\Config\InfectionConfig;
 use Infection\Configuration\ConfigurationFactory;
@@ -78,6 +79,8 @@ use Pimple\Container;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Filesystem\Filesystem;
+use function sprintf;
+use function sys_get_temp_dir;
 
 /**
  * @internal
@@ -95,6 +98,25 @@ final class InfectionContainer extends Container
                 return new TmpDirectoryCreator($container['filesystem']);
             },
             'tmp.dir' => static function (self $container): string {
+                $tmpDir = $container['infection.config']->getTmpDir();
+
+                if ('' === $tmpDir) {
+                    $tmpDir = sys_get_temp_dir();
+                } else {
+                    $tmpDir = $container['filesystem']->isAbsolutePath($tmpDir)
+                        ? $tmpDir
+                        : sprintf(
+                            '%s/%s',
+                            $this->configLocation, $tmpDir
+                        );
+                }
+
+                if ($this->filesystem->isAbsolutePath($tmpDir)) {
+                    return $tmpDir;
+                }
+
+                return ;
+
                 return $container['tmp.dir.creator']->createAndGet($container['infection.config']->getTmpDir());
             },
             'coverage.dir.phpunit' => static function (self $container) {
@@ -258,7 +280,7 @@ final class InfectionContainer extends Container
     ): self {
         $clone = clone $this;
 
-        $clone['infection.config'] = static function (self $container) use ($configFile): InfectionConfig {
+        $clone['infection.config'] = static function (self $container) use ($configFile): Configuration {
             return $container[ConfigurationLoader::class]->loadConfiguration(array_filter([
                 $configFile,
                 'infection.json.dist',

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use Infection\Config\InfectionConfig;
+use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Exception\InfectionException;
@@ -266,6 +267,7 @@ final class InfectionCommand extends BaseCommand
             throw CoverageDoesNotExistException::unableToGenerate();
         }
 
+        /** @var Configuration $config */
         $config = $this->container['infection.config'];
 
         $this->includeUserBootstrap($config);
@@ -405,11 +407,11 @@ final class InfectionCommand extends BaseCommand
         );
     }
 
-    private function includeUserBootstrap(InfectionConfig $config): void
+    private function includeUserBootstrap(Configuration $config): void
     {
         $bootstrap = $config->getBootstrap();
 
-        if ('' === $bootstrap) {
+        if (null === $bootstrap) {
             return;
         }
 
@@ -417,7 +419,7 @@ final class InfectionCommand extends BaseCommand
             throw FileOrDirectoryNotFound::fromFileName($bootstrap, [__DIR__]);
         }
 
-        (static function ($infectionBootstrapFile): void {
+        (static function (string $infectionBootstrapFile): void {
             require_once $infectionBootstrapFile;
         })($bootstrap);
     }

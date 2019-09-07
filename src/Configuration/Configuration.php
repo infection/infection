@@ -97,9 +97,18 @@ final class Configuration
         ?string $initialTestsPhpOptions,
         ?string $testFrameworkOptions
     ): self {
-        $self = $this;
-
-        return $self;
+        return new self(
+            $this->timeout,
+            $source,
+            $logs,
+            $tmpDir,
+            $phpUnit,
+            $mutators,
+            $testFramework,
+            $bootstrap,
+            $initialTestsPhpOptions,
+            $testFrameworkOptions
+        );
     }
 
     public function getTimeout(): ?int
