@@ -145,6 +145,15 @@ final class InitialYamlConfigurationTest extends TestCase
         $this->assertSame('../src/*.php', $initialConfig['coverage']['include'][0]);
     }
 
+    public function test_it_runs_tests_with_a_random_order(): void
+    {
+        $configuration = $this->buildConfiguration();
+
+        $initialConfig = Yaml::parse($configuration->getYaml());
+
+        $this->assertTrue($initialConfig['settings']['shuffle'], 'Tests must be run with a random order (shuffle: true)');
+    }
+
     private function buildConfigurationWithSkippedCoverage(): InitialYamlConfiguration
     {
         return $this->buildConfiguration(self::DEFAULT_CONFIG, true);

@@ -83,6 +83,12 @@ final class InitialYamlConfiguration extends AbstractYamlConfiguration
             $config['coverage'] = $this->prepareCoverageConfig($config, $relativeFromTmpDirPathToProjectDir);
         }
 
+        // run the tests in a random order to make sure we can do mutation testing with a subset of tests
+        $config['settings'] = array_merge(
+            $config['settings'] ?? [],
+            ['shuffle' => true]
+        );
+
         return Yaml::dump($config);
     }
 
