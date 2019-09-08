@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Console;
 
 use Infection\Console\ConsoleOutput;
+use Infection\Mutant\Exception\MsiCalculationException;
+use Infection\Mutant\MetricsCalculator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -65,6 +67,38 @@ final class ConsoleOutputTest extends TestCase
 
         $consoleOutput = new ConsoleOutput($io);
         $consoleOutput->logUnknownVerbosityOption($option);
+    }
+
+    public function test_log_bad_msi_error_message(): void
+    {
+        $metrics = $this->createMock(MetricsCalculator::class);
+        $metrics->expects($this->once())->method('getMutationScoreIndicator')->willReturn(75.0);
+        $io = $this->createMock(SymfonyStyle::class);
+        $io->expects($this->once())->method('error')->with(
+            'The minimum required MSI percentage should be 25%, but actual is 75%. Improve your tests!'
+        );
+        $console = new ConsoleOutput($io);
+        $console->logBadMsiErrorMessage($metrics, 25.0, 'min-msi');
+    }
+
+    public function test_log_bad_msi_error_message_throws_error_on_faulty_msi(): void
+    {
+        $io = $this->createMock(SymfonyStyle::class);
+        $consoleOutput = new ConsoleOutput($io);
+        $this->expectException(MsiCalculationException::class);
+        $consoleOutput->logBadMsiErrorMessage(new MetricsCalculator(), 0.0, 'min-msi');
+    }
+
+    public function test_log_bad_covered_msi_error_message(): void
+    {
+        $metrics = $this->createMock(MetricsCalculator::class);
+        $metrics->expects($this->once())->method('getCoveredCodeMutationScoreIndicator')->willReturn(75.0);
+        $io = $this->createMock(SymfonyStyle::class);
+        $io->expects($this->once())->method('error')->with(
+            'The minimum required Covered Code MSI percentage should be 25%, but actual is 75%. Improve your tests!'
+        );
+        $console = new ConsoleOutput($io);
+        $console->logBadMsiErrorMessage($metrics, 25.0, 'min-covered-msi');
     }
 
     public function test_log_running_with_debugger(): void

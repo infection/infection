@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
+use Infection\Mutant\Exception\MsiCalculationException;
+use Infection\Mutant\MetricsCalculator;
+use Infection\Process\Runner\TestRunConstraintChecker;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -43,6 +46,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class ConsoleOutput
 {
     private const RUNNING_WITH_DEBUGGER_NOTE = 'You are running Infection with %s enabled.';
+    private const CI_FLAG_ERROR = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
 
     /**
      * @var SymfonyStyle
@@ -62,6 +66,25 @@ final class ConsoleOutput
     public function logUnknownVerbosityOption(string $default): void
     {
         $this->io->note('Running infection with an unknown log-verbosity option, falling back to ' . $default . ' option');
+    }
+
+    public function logBadMsiErrorMessage(MetricsCalculator $metricsCalculator, float $minMsi, string $type): void
+    {
+        if (!$minMsi) {
+            throw MsiCalculationException::create('min-msi');
+        }
+
+        $this->io->error(
+            sprintf(
+                self::CI_FLAG_ERROR,
+                ($type === TestRunConstraintChecker::MSI_FAILURE ? 'MSI' : 'Covered Code MSI'),
+                $minMsi,
+                ($type === TestRunConstraintChecker::MSI_FAILURE ?
+                    $metricsCalculator->getMutationScoreIndicator() :
+                    $metricsCalculator->getCoveredCodeMutationScoreIndicator()
+                )
+            )
+        );
     }
 
     public function logRunningWithDebugger(string $debugger): void

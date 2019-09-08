@@ -52,7 +52,6 @@ use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
-use Infection\Process\Runner\MutatedTestFailed;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
@@ -228,7 +227,10 @@ final class InfectionCommand extends BaseCommand
         $adapter = $this->startUp();
         $this->runInitialTestSuite($adapter);
         $this->runMutationTesting($adapter);
-        $this->checkMetrics();
+
+        if (!$this->checkMetrics()) {
+            return 1;
+        }
 
         return 0;
     }
@@ -344,20 +346,24 @@ final class InfectionCommand extends BaseCommand
         );
     }
 
-    private function checkMetrics(): void
+    private function checkMetrics(): bool
     {
         /** @var TestRunConstraintChecker $constraintChecker */
         $constraintChecker = $this->container['test.run.constraint.checker'];
 
         if (!$constraintChecker->hasTestRunPassedConstraints()) {
-            throw MutatedTestFailed::fromMetrics(
+            $this->consoleOutput->logBadMsiErrorMessage(
                 $this->container['metrics'],
                 $constraintChecker->getMinRequiredValue(),
                 $constraintChecker->getErrorType()
             );
+
+            return false;
         }
 
         $this->eventDispatcher->dispatch(new ApplicationExecutionFinished());
+
+        return true;
     }
 
     private function initContainer(InputInterface $input): void
