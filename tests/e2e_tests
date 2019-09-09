@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd tests/Fixtures/e2e
+cd tests/e2e
 
 failure="false"
 

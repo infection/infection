@@ -82,15 +82,15 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Infection\\Tests\\": "tests/"
+            "Infection\\Tests\\": "tests/phpunit"
         },
         "classmap": [
-            "tests/Fixtures/Autoloaded",
-            "tests/Fixtures/CodeSamples"
+            "tests/phpunit/Fixtures/Autoloaded",
+            "tests/phpunit/Fixtures/CodeSamples"
         ],
         "files": [
-            "tests/Helpers.php",
-            "tests/Fixtures/Autoloaded/Reflection/rv-inside-function.php"
+            "tests/phpunit/Helpers.php",
+            "tests/phpunit/Fixtures/Autoloaded/Reflection/rv-inside-function.php"
         ]
     },
     "bin": [
