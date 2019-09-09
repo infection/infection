@@ -56,7 +56,7 @@ TXT
 
         if ($processInfo) {
             $processInfo = str_replace('%', '%%', $processInfo);
-            $message .= $processInfo . PHP_EOL;
+            $message .= $processInfo . "\n";
         }
 
         return new self(
@@ -65,7 +65,7 @@ TXT
                 $coverageIndexFilePath,
                 $testFrameworkKey,
                 $tempDir,
-                PHP_EOL,
+                "\n",
                 self::INFECTION_USAGE_SUGGESTION
             )
         );
