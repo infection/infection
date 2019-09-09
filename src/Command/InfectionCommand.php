@@ -48,10 +48,13 @@ use Infection\Locator\FileNotFound;
 use Infection\Locator\Locator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\Generator\MutationsGenerator;
-use Infection\Process\Builder\ProcessBuilder;
+use Infection\Process\Builder\InitialTestRunProcessBuilder;
+use Infection\Process\Builder\MutantProcessBuilder;
+use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
@@ -93,6 +96,16 @@ final class InfectionCommand extends BaseCommand
      * @var InfectionContainer
      */
     private $container;
+
+    /**
+     * @var string
+     */
+    private $testFrameworkKey = '';
+
+    /**
+     * @var TestFrameworkExtraOptions
+     */
+    private $testFrameworkOptions;
 
     protected function configure(): void
     {
@@ -211,101 +224,19 @@ final class InfectionCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        Assert::notNull($this->container);
+        $adapter = $this->startUp();
+        $this->runInitialTestSuite($adapter);
+        $this->runMutationTesting($adapter);
 
-        if (!$this->container['coverage.checker']->hasDebuggerOrCoverageOption()) {
-            $this->consoleOutput->logMissedDebuggerOrCoverageOption();
-
+        if (!$this->checkMetrics()) {
             return 1;
         }
 
-        /** @var InfectionConfig $config */
-        $config = $this->container['infection.config'];
-
-        $this->includeUserBootstrap($config);
-
-        $testFrameworkKey = trim((string) $input->getOption('test-framework') ?: $config->getTestFramework());
-        $adapter = $this->container['test.framework.factory']->create($testFrameworkKey, $this->skipCoverage);
-
-        LogVerbosity::convertVerbosityLevel($input, $this->consoleOutput);
-
-        $metricsCalculator = $this->container['metrics'];
-        $this->container['subscriber.builder']->registerSubscribers($adapter, $output);
-
-        $this->eventDispatcher->dispatch(new ApplicationExecutionStarted());
-
-        $processBuilder = new ProcessBuilder($adapter, $config->getProcessTimeout());
-        $testFrameworkOptions = $this->getTestFrameworkExtraOptions($testFrameworkKey);
-
-        $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
-        $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options') ?: $config->getInitialTestsPhpOptions());
-        $initialTestSuitProcess = $initialTestsRunner->run(
-            $testFrameworkOptions->getForInitialProcess(),
-            $this->skipCoverage,
-            explode(' ', $initialTestsPhpOptions)
-        );
-
-        if (!$initialTestSuitProcess->isSuccessful()) {
-            $this->consoleOutput->logInitialTestsDoNotPass($initialTestSuitProcess, $adapter);
-
-            return 1;
-        }
-
-        $this->assertCodeCoverageExists($initialTestSuitProcess, $testFrameworkKey);
-
-        $this->container['memory.limit.applier']->applyMemoryLimitFromProcess($initialTestSuitProcess, $adapter);
-
-        $codeCoverageData = $this->getCodeCoverageData($testFrameworkKey);
-        $mutationsGenerator = new MutationsGenerator(
-            $config->getSourceDirs(),
-            $config->getSourceExcludePaths(),
-            $codeCoverageData,
-            $this->container['mutators'],
-            $this->eventDispatcher,
-            $this->container['parser']
-        );
-
-        $mutations = $mutationsGenerator->generate(
-            $input->getOption('only-covered'),
-            $input->getOption('filter'),
-            $adapter instanceof HasExtraNodeVisitors ? $adapter->getMutationsCollectionNodeVisitors() : []
-        );
-
-        $mutationTestingRunner = new MutationTestingRunner(
-            $processBuilder,
-            $this->container['parallel.process.runner'],
-            $this->container['mutant.creator'],
-            $this->eventDispatcher,
-            $mutations
-        );
-
-        $mutationTestingRunner->run(
-            (int) $this->input->getOption('threads'),
-            $testFrameworkOptions->getForMutantProcess()
-        );
-        /** @var TestRunConstraintChecker $constraintChecker */
-        $constraintChecker = $this->container['test.run.constraint.checker'];
-
-        $statusCode = 0;
-
-        if (!$constraintChecker->hasTestRunPassedConstraints()) {
-            $this->consoleOutput->logBadMsiErrorMessage(
-                $metricsCalculator,
-                $constraintChecker->getMinRequiredValue(),
-                $constraintChecker->getErrorType()
-            );
-
-            $statusCode = 1;
-        }
-
-        $this->eventDispatcher->dispatch(new ApplicationExecutionFinished());
-
-        return $statusCode;
+        return 0;
     }
 
     /**
      * Run configuration command if config does not exist
-     *
      *
      * @throws InfectionException
      */
@@ -326,6 +257,113 @@ final class InfectionCommand extends BaseCommand
         $this->consoleOutput = $this->getApplication()->getConsoleOutput();
         $this->skipCoverage = \strlen(trim($input->getOption('coverage'))) > 0;
         $this->eventDispatcher = $this->container['dispatcher'];
+    }
+
+    private function startUp(): AbstractTestFrameworkAdapter
+    {
+        Assert::notNull($this->container);
+
+        if (!$this->container['coverage.checker']->hasDebuggerOrCoverageOption()) {
+            throw CoverageDoesNotExistException::unableToGenerate();
+        }
+
+        /** @var InfectionConfig $config */
+        $config = $this->container['infection.config'];
+
+        $this->includeUserBootstrap($config);
+
+        $this->testFrameworkKey = trim((string) $this->input->getOption('test-framework') ?: $config->getTestFramework());
+        $this->testFrameworkOptions = $this->getTestFrameworkExtraOptions($this->testFrameworkKey);
+        $adapter = $this->container['test.framework.factory']->create($this->testFrameworkKey, $this->skipCoverage);
+
+        LogVerbosity::convertVerbosityLevel($this->input, $this->consoleOutput);
+
+        $this->container['subscriber.builder']->registerSubscribers($adapter, $this->output);
+
+        $this->eventDispatcher->dispatch(new ApplicationExecutionStarted());
+
+        return $adapter;
+    }
+
+    private function runInitialTestSuite(AbstractTestFrameworkAdapter $adapter): void
+    {
+        /** @var InfectionConfig $config */
+        $config = $this->container['infection.config'];
+
+        $processBuilder = new InitialTestRunProcessBuilder($adapter);
+
+        $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
+        $initialTestsPhpOptions = trim((string) $this->input->getOption('initial-tests-php-options') ?: $config->getInitialTestsPhpOptions());
+        $initialTestSuitProcess = $initialTestsRunner->run(
+            $this->testFrameworkOptions->getForInitialProcess(),
+            $this->skipCoverage,
+            explode(' ', $initialTestsPhpOptions)
+        );
+
+        if (!$initialTestSuitProcess->isSuccessful()) {
+            throw InitialTestsFailed::fromProcessAndAdapter($initialTestSuitProcess, $adapter);
+        }
+
+        $this->assertCodeCoverageExists($initialTestSuitProcess, $this->testFrameworkKey);
+
+        $this->container['memory.limit.applier']->applyMemoryLimitFromProcess($initialTestSuitProcess, $adapter);
+    }
+
+    private function runMutationTesting(AbstractTestFrameworkAdapter $adapter): void
+    {
+        /** @var InfectionConfig $config */
+        $config = $this->container['infection.config'];
+
+        $processBuilder = new MutantProcessBuilder($adapter, $config->getProcessTimeout());
+
+        $codeCoverageData = $this->getCodeCoverageData($this->testFrameworkKey);
+        $mutationsGenerator = new MutationsGenerator(
+            $config->getSourceDirs(),
+            $config->getSourceExcludePaths(),
+            $codeCoverageData,
+            $this->container['mutators'],
+            $this->eventDispatcher,
+            $this->container['parser']
+        );
+
+        $mutations = $mutationsGenerator->generate(
+            $this->input->getOption('only-covered'),
+            $this->input->getOption('filter'),
+            $adapter instanceof HasExtraNodeVisitors ? $adapter->getMutationsCollectionNodeVisitors() : []
+        );
+
+        $mutationTestingRunner = new MutationTestingRunner(
+            $processBuilder,
+            $this->container['parallel.process.runner'],
+            $this->container['mutant.creator'],
+            $this->eventDispatcher,
+            $mutations
+        );
+
+        $mutationTestingRunner->run(
+            (int) $this->input->getOption('threads'),
+            $this->testFrameworkOptions->getForMutantProcess()
+        );
+    }
+
+    private function checkMetrics(): bool
+    {
+        /** @var TestRunConstraintChecker $constraintChecker */
+        $constraintChecker = $this->container['test.run.constraint.checker'];
+
+        if (!$constraintChecker->hasTestRunPassedConstraints()) {
+            $this->consoleOutput->logBadMsiErrorMessage(
+                $this->container['metrics'],
+                $constraintChecker->getMinRequiredValue(),
+                $constraintChecker->getErrorType()
+            );
+
+            return false;
+        }
+
+        $this->eventDispatcher->dispatch(new ApplicationExecutionFinished());
+
+        return true;
     }
 
     private function initContainer(InputInterface $input): void

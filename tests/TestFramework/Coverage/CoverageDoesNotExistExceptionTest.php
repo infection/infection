@@ -50,10 +50,10 @@ final class CoverageDoesNotExistExceptionTest extends TestCase
 
         $this->assertInstanceOf(CoverageDoesNotExistException::class, $exception);
         $this->assertSame(
-            'Code Coverage does not exist. File file-index-path is not found. Check phpunit version Infection was run with and generated config files inside tempdir. Make sure to either: ' . PHP_EOL .
-            '- Enable xdebug and run infection again' . PHP_EOL .
-            '- Use phpdbg: phpdbg -qrr infection' . PHP_EOL .
-            '- Use --coverage option with path to the existing coverage report' . PHP_EOL .
+            'Code Coverage does not exist. File file-index-path is not found. Check phpunit version Infection was run with and generated config files inside tempdir. Make sure to either: ' . "\n" .
+            '- Enable xdebug and run infection again' . "\n" .
+            '- Use phpdbg: phpdbg -qrr infection' . "\n" .
+            '- Use --coverage option with path to the existing coverage report' . "\n" .
             '- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters', $exception->getMessage()
         );
     }
@@ -83,5 +83,16 @@ final class CoverageDoesNotExistExceptionTest extends TestCase
         $this->assertInstanceOf(CoverageDoesNotExistException::class, $exception);
 
         $this->assertStringStartsWith('Code Coverage does not exist. File foo.xml is not found. Check bar version Infection was run with and generated config files inside /baz.string with a single % and placeholders %s %d %i.', $exception->getMessage());
+    }
+
+    public function test_log_missed_debugger_or_coverage_option(): void
+    {
+        $message = 'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:' . "\n" .
+            '- Enable xdebug and run infection again' . "\n" .
+            '- Use phpdbg: phpdbg -qrr infection' . "\n" .
+            '- Use --coverage option with path to the existing coverage report' . "\n" .
+            '- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters';
+
+        $this->assertSame($message, CoverageDoesNotExistException::unableToGenerate()->getMessage());
     }
 }

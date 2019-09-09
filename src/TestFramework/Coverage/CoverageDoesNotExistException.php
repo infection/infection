@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\InfectionException;
 
 /**
@@ -43,13 +42,21 @@ use Infection\Console\Exception\InfectionException;
  */
 final class CoverageDoesNotExistException extends InfectionException
 {
+    private const INFECTION_USAGE_SUGGESTION = <<<TXT
+- Enable xdebug and run infection again
+- Use phpdbg: phpdbg -qrr infection
+- Use --coverage option with path to the existing coverage report
+- Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters
+TXT
+    ;
+
     public static function with(string $coverageIndexFilePath, string $testFrameworkKey, string $tempDir, string $processInfo = ''): self
     {
         $message = 'Code Coverage does not exist. File %s is not found. Check %s version Infection was run with and generated config files inside %s.';
 
         if ($processInfo) {
             $processInfo = str_replace('%', '%%', $processInfo);
-            $message .= $processInfo . PHP_EOL;
+            $message .= $processInfo . "\n";
         }
 
         return new self(
@@ -58,8 +65,8 @@ final class CoverageDoesNotExistException extends InfectionException
                 $coverageIndexFilePath,
                 $testFrameworkKey,
                 $tempDir,
-                PHP_EOL,
-                ConsoleOutput::INFECTION_USAGE_SUGGESTION
+                "\n",
+                self::INFECTION_USAGE_SUGGESTION
             )
         );
     }
@@ -72,5 +79,14 @@ final class CoverageDoesNotExistException extends InfectionException
     public static function forFileAtPath(string $fileName, string $path): self
     {
         return new self(sprintf('Source file %s was not found at %s', $fileName, $path));
+    }
+
+    public static function unableToGenerate(): self
+    {
+        return new self(
+            'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:' .
+            "\n" .
+            self::INFECTION_USAGE_SUGGESTION
+        );
     }
 }

@@ -33,44 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Builder;
+namespace Infection\Process\Builder;
 
-use Infection\Mutant\MutantInterface;
-use Infection\Process\Builder\ProcessBuilder;
+use Infection\Console\Util\PhpProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 
-final class ProcessBuilderTest extends TestCase
+/**
+ * @internal
+ */
+class InitialTestRunProcessBuilder
 {
-    public function test_getProcessForInitialTestRun_has_no_timeout(): void
+    /**
+     * @var AbstractTestFrameworkAdapter
+     */
+    private $testFrameworkAdapter;
+
+    public function __construct(AbstractTestFrameworkAdapter $testFrameworkAdapter)
     {
-        $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
-        $fwAdapter->method('getInitialTestRunCommandLine')
-            ->willReturn(['/usr/bin/php']);
-        $fwAdapter->method('buildInitialConfigFile')
-            ->willReturn('buildInitialConfigFile');
-
-        $builder = new ProcessBuilder($fwAdapter, 100);
-
-        $process = $builder->getProcessForInitialTestRun('', false);
-
-        $this->assertStringContainsString('/usr/bin/php', $process->getCommandLine());
-        $this->assertNull($process->getTimeout());
+        $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
 
-    public function test_getProcessForMutant_has_timeout(): void
-    {
-        $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
-        $fwAdapter->method('getMutantCommandLine')
-            ->willReturn(['/usr/bin/php']);
-        $fwAdapter->method('buildMutationConfigFile')
-            ->willReturn('buildMutationConfigFile');
+    /**
+     * Creates process with enabled debugger as test framework is going to use in the code coverage.
+     */
+    public function createProcess(
+        string $testFrameworkExtraOptions,
+        bool $skipCoverage,
+        array $phpExtraOptions = []
+    ): Process {
+        // If we're expecting to receive a code coverage, test process must run in a vanilla environment
+        $processType = $skipCoverage ? Process::class : PhpProcess::class;
 
-        $builder = new ProcessBuilder($fwAdapter, 100);
+        /** @var PhpProcess|Process $process */
+        $process = new $processType(
+            $this->testFrameworkAdapter->getInitialTestRunCommandLine(
+                $this->testFrameworkAdapter->buildInitialConfigFile(),
+                $testFrameworkExtraOptions,
+                $phpExtraOptions
+            )
+        );
 
-        $process = $builder->getProcessForMutant($this->createMock(MutantInterface::class))->getProcess();
+        $process->setTimeout(null); // ignore the default timeout of 60 seconds
+        $process->inheritEnvironmentVariables();
 
-        $this->assertStringContainsString('/usr/bin/php', $process->getCommandLine());
-        $this->assertSame(100.0, $process->getTimeout());
+        return $process;
     }
 }

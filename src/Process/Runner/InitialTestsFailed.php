@@ -35,54 +35,45 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\InitialTestCaseCompleted;
-use Infection\Events\InitialTestSuiteFinished;
-use Infection\Events\InitialTestSuiteStarted;
-use Infection\Process\Builder\InitialTestRunProcessBuilder;
+use Exception;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
  */
-final class InitialTestsRunner
+final class InitialTestsFailed extends Exception
 {
-    /**
-     * @var InitialTestRunProcessBuilder
-     */
-    private $processBuilder;
+    public static function fromProcessAndAdapter(
+        Process $initialTestSuitProcess,
+        AbstractTestFrameworkAdapter $testFrameworkAdapter
+    ): self {
+        $testFrameworkKey = $testFrameworkAdapter->getName();
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
+        $lines = [
+            'Project tests must be in a passing state before running Infection.',
+            $testFrameworkAdapter->getInitialTestsFailRecommendations($initialTestSuitProcess->getCommandLine()),
+            sprintf(
+                '%s reported an exit code of %d.',
+                $testFrameworkKey,
+                $initialTestSuitProcess->getExitCode()
+            ),
+            sprintf(
+                'Refer to the %s\'s output below:',
+                $testFrameworkKey
+            ),
+        ];
 
-    public function __construct(InitialTestRunProcessBuilder $processBuilder, EventDispatcherInterface $eventDispatcher)
-    {
-        $this->processBuilder = $processBuilder;
-        $this->eventDispatcher = $eventDispatcher;
-    }
+        if ($stdOut = $initialTestSuitProcess->getOutput()) {
+            $lines[] = 'STDOUT:';
+            $lines[] = $stdOut;
+        }
 
-    public function run(string $testFrameworkExtraOptions, bool $skipCoverage, array $phpExtraOptions = []): Process
-    {
-        $process = $this->processBuilder->createProcess(
-            $testFrameworkExtraOptions,
-            $skipCoverage,
-            $phpExtraOptions
-        );
+        if ($stdError = $initialTestSuitProcess->getErrorOutput()) {
+            $lines[] = 'STDERR:';
+            $lines[] = $stdError;
+        }
 
-        $this->eventDispatcher->dispatch(new InitialTestSuiteStarted());
-
-        $process->run(function ($type) use ($process): void {
-            if ($process::ERR === $type) {
-                $process->stop();
-            }
-
-            $this->eventDispatcher->dispatch(new InitialTestCaseCompleted());
-        });
-
-        $this->eventDispatcher->dispatch(new InitialTestSuiteFinished($process->getOutput()));
-
-        return $process;
+        return new self(implode("\n", $lines));
     }
 }

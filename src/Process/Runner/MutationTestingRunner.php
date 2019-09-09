@@ -44,7 +44,7 @@ use Infection\Events\MutationTestingStarted;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutation;
 use Infection\MutationInterface;
-use Infection\Process\Builder\ProcessBuilder;
+use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\MutantProcessInterface;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 
@@ -54,7 +54,7 @@ use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 final class MutationTestingRunner
 {
     /**
-     * @var ProcessBuilder
+     * @var MutantProcessBuilder
      */
     private $processBuilder;
 
@@ -75,7 +75,7 @@ final class MutationTestingRunner
      */
     private $eventDispatcher;
 
-    public function __construct(ProcessBuilder $processBuilder, ParallelProcessRunner $parallelProcessManager, MutantCreator $mutantCreator, EventDispatcherInterface $eventDispatcher, array $mutations)
+    public function __construct(MutantProcessBuilder $processBuilder, ParallelProcessRunner $parallelProcessManager, MutantCreator $mutantCreator, EventDispatcherInterface $eventDispatcher, array $mutations)
     {
         $this->processBuilder = $processBuilder;
         $this->mutantCreator = $mutantCreator;
@@ -94,7 +94,7 @@ final class MutationTestingRunner
             function (MutationInterface $mutation) use ($testFrameworkExtraOptions): MutantProcessInterface {
                 $mutant = $this->mutantCreator->create($mutation);
 
-                $process = $this->processBuilder->getProcessForMutant($mutant, $testFrameworkExtraOptions);
+                $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
 
                 $this->eventDispatcher->dispatch(new MutantCreated());
 

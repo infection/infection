@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Process\Builder;
 
-use Infection\Console\Util\PhpProcess;
 use Infection\Mutant\MutantInterface;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
@@ -44,7 +43,7 @@ use Symfony\Component\Process\Process;
 /**
  * @internal
  */
-class ProcessBuilder
+final class MutantProcessBuilder
 {
     /**
      * @var AbstractTestFrameworkAdapter
@@ -62,33 +61,7 @@ class ProcessBuilder
         $this->timeout = $timeout;
     }
 
-    /**
-     * Creates process with enabled debugger as test framework is going to use in the code coverage.
-     */
-    public function getProcessForInitialTestRun(
-        string $testFrameworkExtraOptions,
-        bool $skipCoverage,
-        array $phpExtraOptions = []
-    ): Process {
-        // If we're expecting to receive a code coverage, test process must run in a vanilla environment
-        $processType = $skipCoverage ? Process::class : PhpProcess::class;
-
-        /** @var PhpProcess|Process $process */
-        $process = new $processType(
-            $this->testFrameworkAdapter->getInitialTestRunCommandLine(
-                $this->testFrameworkAdapter->buildInitialConfigFile(),
-                $testFrameworkExtraOptions,
-                $phpExtraOptions
-            )
-        );
-
-        $process->setTimeout(null); // ignore the default timeout of 60 seconds
-        $process->inheritEnvironmentVariables();
-
-        return $process;
-    }
-
-    public function getProcessForMutant(MutantInterface $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
+    public function createProcessForMutant(MutantInterface $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
     {
         $process = new Process(
             $this->testFrameworkAdapter->getMutantCommandLine(
