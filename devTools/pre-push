@@ -1,3 +1,3 @@
 #!/bin/bash
 
-make analyze && make test-unit-71
+make analyze && make test-autoreview && make test-unit
