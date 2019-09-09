@@ -69,9 +69,13 @@ final class CodeceptionAdapter extends AbstractTestFrameworkAdapter implements M
         return $isOk || $isOkWithInfo || $isWarning;
     }
 
-    public function getInitialTestRunCommandLine(string $configPath, string $extraOptions, array $phpExtraArgs): array
+    public function getInitialTestRunCommandLine(string $configPath, string $extraOptions, array $phpExtraArgs, bool $skipCoverage): array
     {
-        $commandLine = parent::getInitialTestRunCommandLine($configPath, $extraOptions, $phpExtraArgs);
+        $commandLine = parent::getInitialTestRunCommandLine($configPath, $extraOptions, $phpExtraArgs, $skipCoverage);
+
+        if ($skipCoverage) {
+            return $commandLine;
+        }
 
         /*
          * Codeception does not support settings for coverage reports in `codeception.yaml`, so we have to

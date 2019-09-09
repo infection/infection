@@ -78,7 +78,8 @@ class InitialTestRunProcessBuilder
             $this->testFrameworkAdapter->getInitialTestRunCommandLine(
                 $this->testFrameworkAdapter->buildInitialConfigFile(),
                 $testFrameworkExtraOptions,
-                $phpExtraOptions
+                $phpExtraOptions,
+                $skipCoverage
             )
         );
 
