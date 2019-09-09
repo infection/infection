@@ -44,14 +44,18 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
 {
     public function build(string $configPath, string $extraOptions): array
     {
-        return array_filter([
-            'run',
-            '--config',
-            $configPath,
-            '--no-ansi',
-            '--format=tap',
-            '--stop-on-failure',
-            $extraOptions,
-        ]);
+        $options = array_merge(
+            [
+                'run',
+                '--config',
+                $configPath,
+                '--no-ansi',
+                '--format=tap',
+                '--stop-on-failure',
+            ],
+            explode(' ', $extraOptions)
+        );
+
+        return array_filter($options);
     }
 }
