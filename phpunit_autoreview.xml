@@ -14,13 +14,13 @@
 
     <testsuites>
         <testsuite name="Auto-Review Test Suite">
-            <directory>tests/AutoReview</directory>
+            <directory>tests/phpunit/AutoReview</directory>
         </testsuite>
     </testsuites>
 
     <filter>
         <whitelist>
-            <directory>tests/AutoReview</directory>
+            <directory>tests/phpunit/AutoReview</directory>
         </whitelist>
     </filter>
 

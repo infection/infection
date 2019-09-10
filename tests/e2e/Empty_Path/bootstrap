@@ -1,0 +1,6 @@
+#!/usr/bin/env php
+<?php
+
+putenv('PATH=');
+
+require __DIR__ . '/../../../bin/infection';

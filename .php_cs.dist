@@ -56,7 +56,8 @@ $finder = Finder::create()
         'build',
         'devTools',
         'resources',
-        'tests/Fixtures',
+        'tests/e2e',
+        'tests/phpunit/Fixtures',
     ])
     ->ignoreDotFiles(false)
     ->name('*php')

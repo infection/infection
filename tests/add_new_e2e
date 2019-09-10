@@ -4,13 +4,13 @@ echo 'What is the directory name of your new test?'
 
 read dirname
 
-if [ -d tests/Fixtures/e2e/"$dirname" ]
+if [ -d tests/e2e/"$dirname" ]
 then
     echo "A directory with the name $dirname already exists."
     exit 1
 fi
 
-cd tests/Fixtures/e2e
+cd tests/e2e
 mkdir $dirname
 
 cp -r Example_Test/src "$dirname"/src

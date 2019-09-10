@@ -50,7 +50,7 @@ cs: $(PHP_CS_FIXER)
 phpstan:  	 ## Runs PHPStan
 phpstan: vendor $(PHPSTAN)
 	$(PHPSTAN) analyse src --level=max --configuration ./devTools/phpstan-src.neon --no-interaction --no-progress
-	$(PHPSTAN) analyse tests --level=4 --configuration ./devTools/phpstan-tests.neon --no-interaction --no-progress
+	$(PHPSTAN) analyse tests/phpunit --level=4 --configuration ./devTools/phpstan-tests.neon --no-interaction --no-progress
 
 .PHONY: analyze
 analyze:	 ## Runs Static analyzers and various other checks

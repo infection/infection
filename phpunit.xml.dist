@@ -14,10 +14,10 @@
 
     <testsuites>
         <testsuite name="Infection Test Suite">
-            <directory>tests</directory>
+            <directory>tests/phpunit</directory>
 
-            <exclude>tests/AutoReview</exclude>
-            <exclude>tests/Fixtures</exclude>
+            <exclude>tests/phpunit/AutoReview</exclude>
+            <exclude>tests/phpunit/Fixtures</exclude>
         </testsuite>
     </testsuites>
 
