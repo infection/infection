@@ -48,7 +48,8 @@ install:
 
 test_script:
     - cd c:\projects\workspace
-    - vendor\bin\phpunit --coverage-clover=clover.xml --coverage-xml=coverage/coverage-xml --log-junit=coverage/phpunit.junit.xml
+    - vendor\bin\phpunit --dump-xdebug-filter xdebug-filter.php
+    - vendor\bin\phpunit --prepend=xdebug-filter.php --coverage-clover=clover.xml --coverage-xml=coverage/coverage-xml --log-junit=coverage/phpunit.junit.xml
     - php bin\infection --threads=4 --log-verbosity=none --coverage=coverage
 
 after_test:

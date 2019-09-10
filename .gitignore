@@ -19,3 +19,4 @@
 /tests/Fixtures/e2e/SymfonyFlex/bin/.phpunit/
 /vendor/
 /phpunit.xml
+/xdebug-filter.php
