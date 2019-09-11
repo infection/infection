@@ -90,6 +90,7 @@
         },
         "mutators": {
             "type": "object",
+            "additionalProperties": false,
             "description": "Contains the settings for different mutations and profiles",
             "properties": {
                 "@arithmetic": { "$ref": "#/definitions/mutator_profile" },
