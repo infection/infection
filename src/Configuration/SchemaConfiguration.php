@@ -41,13 +41,14 @@ use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Webmozart\Assert\Assert;
 
-final class Configuration
+final class SchemaConfiguration
 {
     private const TEST_FRAMEWORKS = [
         'phpunit',
         'phpspec',
     ];
 
+    private $file;
     private $timeout;
     private $source;
     private $logs;
@@ -59,22 +60,8 @@ final class Configuration
     private $initialTestsPhpOptions;
     private $testFrameworkOptions;
 
-    public static function fromSchemaConfig(SchemaConfiguration $config): self {
-        return new self(
-            $config->getTimeout(),
-            $config->getSource(),
-            $config->getLogs(),
-            $config->getTmpDir(),
-            $config->getPhpUnit(),
-            $config->getMutators(),
-            $config->getTestFramework(),
-            $config->getBootstrap(),
-            $config->getInitialTestsPhpOptions(),
-            $config->getTestFrameworkOptions()
-        );
-    }
-
     public function __construct(
+        string $file,
         ?int $timeout,
         Source $source,
         Logs $logs,
@@ -89,6 +76,7 @@ final class Configuration
         Assert::nullOrGreaterThanEq($timeout, 1);
         Assert::nullOrOneOf($testFramework, self::TEST_FRAMEWORKS);
 
+        $this->file = $file;
         $this->timeout = $timeout;
         $this->source = $source;
         $this->logs = $logs;
@@ -99,6 +87,36 @@ final class Configuration
         $this->bootstrap = $bootstrap;
         $this->initialTestsPhpOptions = $initialTestsPhpOptions;
         $this->testFrameworkOptions = $testFrameworkOptions;
+    }
+
+    public function withInput(
+        ?Source $source,
+        ?Logs $logs,
+        ?string $tmpDir,
+        ?PhpUnit $phpUnit,
+        ?Mutators $mutators,
+        ?string $testFramework,
+        ?string $bootstrap,
+        ?string $initialTestsPhpOptions,
+        ?string $testFrameworkOptions
+    ): self {
+        return new self(
+            $this->timeout,
+            $source,
+            $logs,
+            $tmpDir,
+            $phpUnit,
+            $mutators,
+            $testFramework,
+            $bootstrap,
+            $initialTestsPhpOptions,
+            $testFrameworkOptions
+        );
+    }
+
+    public function getFile(): string
+    {
+        return $this->file;
     }
 
     public function getTimeout(): ?int

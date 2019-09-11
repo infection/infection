@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use Infection\Config\InfectionConfig;
-use Infection\Configuration\Configuration;
+use Infection\Configuration\SchemaConfiguration;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Exception\InfectionException;
@@ -267,7 +267,7 @@ final class InfectionCommand extends BaseCommand
             throw CoverageDoesNotExistException::unableToGenerate();
         }
 
-        /** @var Configuration $config */
+        /** @var SchemaConfiguration $config */
         $config = $this->container['infection.config'];
 
         $this->includeUserBootstrap($config);
@@ -407,7 +407,7 @@ final class InfectionCommand extends BaseCommand
         );
     }
 
-    private function includeUserBootstrap(Configuration $config): void
+    private function includeUserBootstrap(SchemaConfiguration $config): void
     {
         $bootstrap = $config->getBootstrap();
 

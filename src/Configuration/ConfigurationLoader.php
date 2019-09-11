@@ -48,7 +48,7 @@ final class ConfigurationLoader
         $this->fileLoader = $fileLoader;
     }
 
-    public function loadConfiguration(array $potentialPaths): Configuration
+    public function loadConfiguration(array $potentialPaths): SchemaConfiguration
     {
         return $this->fileLoader->loadFile(
             $this->locator->locateOneOf($potentialPaths)

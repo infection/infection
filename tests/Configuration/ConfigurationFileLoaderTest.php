@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
-use Infection\Configuration\Configuration;
+use Infection\Configuration\SchemaConfiguration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\ConfigurationFileLoader;
 use Infection\Configuration\RawConfiguration\RawConfiguration;
@@ -80,7 +80,7 @@ class ConfigurationFileLoaderTest extends TestCase
     {
         $path = realpath(__DIR__ . '/../Fixtures/Configuration/file.json');
         $decodedContents = (object) ['foo' => 'bar'];
-        $expectedConfig = (new ReflectionClass(Configuration::class))->newInstanceWithoutConstructor();
+        $expectedConfig = (new ReflectionClass(SchemaConfiguration::class))->newInstanceWithoutConstructor();
 
         $this->schemaValidatorProphecy
             ->validate(self::createRawConfigWithPathArgument($path))

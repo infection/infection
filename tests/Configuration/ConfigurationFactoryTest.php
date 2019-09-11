@@ -47,7 +47,7 @@ use function array_merge;
 use function array_values;
 use Generator;
 use function implode;
-use Infection\Configuration\Configuration;
+use Infection\Configuration\SchemaConfiguration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
@@ -95,7 +95,7 @@ class ConfigurationFactoryTest extends TestCase
      */
     public function test_it_can_create_a_config(
         string $json,
-        Configuration $expected
+        SchemaConfiguration $expected
     ): void {
         $rawConfig = json_decode($json);
 
@@ -2479,7 +2479,7 @@ JSON
         ];
     }
 
-    private static function createConfig(array $args): Configuration
+    private static function createConfig(array $args): SchemaConfiguration
     {
         $defaultArgs = [
             'timeout' => null,
@@ -2508,7 +2508,7 @@ JSON
 
         $args = array_values(array_merge($defaultArgs, $args));
 
-        return new Configuration(...$args);
+        return new SchemaConfiguration(...$args);
     }
 
     private function assertJsonIsSchemaValid(stdClass $decodedJson): void

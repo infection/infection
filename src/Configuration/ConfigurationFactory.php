@@ -62,9 +62,10 @@ use function trim;
  */
 class ConfigurationFactory
 {
-    public function create(stdClass $rawConfig): Configuration
+    public function create(string $path, stdClass $rawConfig): SchemaConfiguration
     {
-        return new Configuration(
+        return new SchemaConfiguration(
+            $path,
             $rawConfig->timeout ?? null,
             self::createSource($rawConfig->source),
             self::createLogs($rawConfig->logs ?? new stdClass()),

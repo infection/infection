@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Infection\Configuration\Configuration;
+use Infection\Configuration\SchemaConfiguration;
 use function array_filter;
 use Infection\Config\InfectionConfig;
 use Infection\Configuration\ConfigurationFactory;
@@ -98,25 +98,6 @@ final class InfectionContainer extends Container
                 return new TmpDirectoryCreator($container['filesystem']);
             },
             'tmp.dir' => static function (self $container): string {
-                $tmpDir = $container['infection.config']->getTmpDir();
-
-                if ('' === $tmpDir) {
-                    $tmpDir = sys_get_temp_dir();
-                } else {
-                    $tmpDir = $container['filesystem']->isAbsolutePath($tmpDir)
-                        ? $tmpDir
-                        : sprintf(
-                            '%s/%s',
-                            $this->configLocation, $tmpDir
-                        );
-                }
-
-                if ($this->filesystem->isAbsolutePath($tmpDir)) {
-                    return $tmpDir;
-                }
-
-                return ;
-
                 return $container['tmp.dir.creator']->createAndGet($container['infection.config']->getTmpDir());
             },
             'coverage.dir.phpunit' => static function (self $container) {
@@ -280,7 +261,7 @@ final class InfectionContainer extends Container
     ): self {
         $clone = clone $this;
 
-        $clone['infection.config'] = static function (self $container) use ($configFile): Configuration {
+        $clone['infection.config'] = static function (self $container) use ($configFile): SchemaConfiguration {
             return $container[ConfigurationLoader::class]->loadConfiguration(array_filter([
                 $configFile,
                 'infection.json.dist',

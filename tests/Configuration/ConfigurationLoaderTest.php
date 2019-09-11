@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration;
 
 use Generator;
-use Infection\Configuration\Configuration;
+use Infection\Configuration\SchemaConfiguration;
 use Infection\Configuration\ConfigurationFileLoader;
 use Infection\Configuration\ConfigurationLoader;
 use Infection\Locator\Locator;
@@ -81,7 +81,7 @@ class ConfigurationLoaderTest extends TestCase
     public function test_it_loads_the_located_file(
         array $potentialPaths,
         string $expectedPath,
-        Configuration $expectedConfig
+        SchemaConfiguration $expectedConfig
     ): void {
         $this->locatorProphecy
             ->locateOneOf($potentialPaths)
@@ -103,7 +103,7 @@ class ConfigurationLoaderTest extends TestCase
 
     public function configurationPathsProvider(): Generator
     {
-        $config = (new ReflectionClass(Configuration::class))->newInstanceWithoutConstructor();
+        $config = (new ReflectionClass(SchemaConfiguration::class))->newInstanceWithoutConstructor();
 
         yield 'first potenal path' => [
             [

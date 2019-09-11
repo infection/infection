@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration;
 
 use Generator;
-use Infection\Configuration\Configuration;
+use Infection\Configuration\SchemaConfiguration;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mutator\ArrayItemRemoval;
@@ -52,7 +52,7 @@ use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use PHPUnit\Framework\TestCase;
 
-class ConfigurationTest extends TestCase
+class SchemaConfigurationTest extends TestCase
 {
     /**
      * @dataProvider valueProvider
@@ -69,7 +69,7 @@ class ConfigurationTest extends TestCase
         ?string $initialTestsPhpOptions,
         ?string $testFrameworkOptions
     ): void {
-        $config = new Configuration(
+        $config = new SchemaConfiguration(
             $timeout,
             $source,
             $logs,

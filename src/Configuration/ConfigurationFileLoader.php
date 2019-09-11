@@ -52,12 +52,15 @@ class ConfigurationFileLoader
         $this->factory = $factory;
     }
 
-    public function loadFile(string $file): Configuration
+    public function loadFile(string $file): SchemaConfiguration
     {
         $rawConfig = new RawConfiguration($file);
 
         $this->schemaValidator->validate($rawConfig);
 
-        return $this->factory->create($rawConfig->getDecodedContents());
+        return $this->factory->create(
+            $rawConfig->getPath(),
+            $rawConfig->getDecodedContents()
+        );
     }
 }
