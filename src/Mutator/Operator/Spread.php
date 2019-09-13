@@ -94,7 +94,6 @@ final class Spread extends Mutator
     {
         return $value instanceof Node\Expr\Array_
             || $value instanceof Node\Expr\Variable
-            || $value instanceof Node\Expr\MethodCall
             || $value instanceof Node\Expr\FuncCall;
     }
 }

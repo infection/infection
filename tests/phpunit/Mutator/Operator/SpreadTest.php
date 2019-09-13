@@ -94,21 +94,6 @@ PHP
             ,
         ];
 
-        yield 'Spread for a method call' => [
-            <<<'PHP'
-<?php
-
-$a = [...$object->getCollection(), 4];
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = [is_array($object->getCollection()) ? $object->getCollection()[0] : iterator_to_array($object->getCollection())[0], 4];
-PHP
-            ,
-        ];
-
         yield 'It does not mutate argument unpacking' => [
             <<<'PHP'
 <?php
