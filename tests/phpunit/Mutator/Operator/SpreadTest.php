@@ -44,6 +44,10 @@ final class SpreadTest extends AbstractMutatorTestCase
      */
     public function test_mutator($input, $expected = null): void
     {
+        if (version_compare(PHP_VERSION, '7.4.0') < 0) {
+            $this->markTestSkipped('Spread operator in Array Expression requires PHP 7.4+');
+        }
+
         $this->doTest($input, $expected);
     }
 
