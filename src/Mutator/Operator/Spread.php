@@ -46,8 +46,7 @@ final class Spread extends Mutator
 {
     /**
      * Replaces "[...[1, 2, 3], 4];" with "[[1, 2, 3][0], 4]"
-     * Replaces "[...$array, 2, 3];" with "[$array[0], 2, 3]"
-     * Replaces "[...getCollection(), 2, 3];" with "[getCollection[0], 2, 3]"
+     * Replaces "[...getCollection(), 2, 3];" with "[is_array($object->getCollection()) ? $object->getCollection()[0] : iterator_to_array($object->getCollection())[0], 2, 3]"
      *
      * @param ArrayItem $node
      *
@@ -55,13 +54,30 @@ final class Spread extends Mutator
      */
     public function mutate(Node $node)
     {
-        $newValue = new Node\Expr\ArrayDimFetch(
-            $node->value,
-            new Node\Scalar\LNumber(0),
-            $node->value->getAttributes()
-        );
-
         $node->unpack = false;
+
+        if ($node->value instanceof Node\Expr\Array_) {
+            $newValue = new Node\Expr\ArrayDimFetch(
+                $node->value,
+                new Node\Scalar\LNumber(0),
+                $node->value->getAttributes()
+            );
+        } else {
+            $newValue = new Node\Expr\Ternary(
+                new Node\Expr\FuncCall(new Node\Name('is_array'), [new Node\Arg($node->value)]),
+                new Node\Expr\ArrayDimFetch(
+                    $node->value,
+                    new Node\Scalar\LNumber(0),
+                    $node->value->getAttributes()
+                ),
+                new Node\Expr\ArrayDimFetch(
+                    new Node\Expr\FuncCall(new Node\Name('iterator_to_array'), [new Node\Arg($node->value)]),
+                    new Node\Scalar\LNumber(0),
+                    $node->value->getAttributes()
+                )
+            );
+        }
+
         $node->value = $newValue;
 
         return $node;

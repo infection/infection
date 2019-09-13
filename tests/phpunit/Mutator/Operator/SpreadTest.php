@@ -74,7 +74,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = [$collection[0], 4];
+$a = [is_array($collection) ? $collection[0] : iterator_to_array($collection)[0], 4];
 PHP
             ,
         ];
@@ -89,7 +89,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = [getCollection()[0], 4];
+$a = [is_array(getCollection()) ? getCollection()[0] : iterator_to_array(getCollection())[0], 4];
 PHP
             ,
         ];
@@ -104,22 +104,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = [$object->getCollection()[0], 4];
-PHP
-            ,
-        ];
-
-        yield 'It works for an old array syntax' => [
-            <<<'PHP'
-<?php
-
-$a = array(...$object->getCollection(), 4);
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = array($object->getCollection()[0], 4);
+$a = [is_array($object->getCollection()) ? $object->getCollection()[0] : iterator_to_array($object->getCollection())[0], 4];
 PHP
             ,
         ];
