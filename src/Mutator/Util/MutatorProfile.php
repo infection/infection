@@ -150,6 +150,7 @@ final class MutatorProfile
         Mutator\Operator\Coalesce::class,
         Mutator\Operator\Continue_::class,
         Mutator\Operator\Finally_::class,
+        Mutator\Operator\Spread::class,
         Mutator\Operator\Throw_::class,
     ];
 
@@ -333,6 +334,7 @@ final class MutatorProfile
         'Throw_' => Mutator\Operator\Throw_::class,
         'Finally_' => Mutator\Operator\Finally_::class,
         'Coalesce' => Mutator\Operator\Coalesce::class,
+        'Spread' => Mutator\Operator\Spread::class,
 
         //Regex
         'PregQuote' => Mutator\Regex\PregQuote::class,
