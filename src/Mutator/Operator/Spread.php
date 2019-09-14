@@ -65,14 +65,14 @@ final class Spread extends Mutator
         } else {
             $newValue = new Node\Expr\Ternary(
                 new Node\Expr\FuncCall(new Node\Name('is_array'), [new Node\Arg($node->value)]),
-                new Node\Expr\ArrayDimFetch(
-                    $node->value,
-                    new Node\Scalar\LNumber(0),
+                new Node\Expr\FuncCall(
+                    new Node\Name('reset'),
+                    [new Node\Arg($node->value)],
                     $node->value->getAttributes()
                 ),
-                new Node\Expr\ArrayDimFetch(
-                    new Node\Expr\FuncCall(new Node\Name('iterator_to_array'), [new Node\Arg($node->value)]),
-                    new Node\Scalar\LNumber(0),
+                new Node\Expr\FuncCall(
+                    new Node\Name('reset'),
+                    [new Node\Arg(new Node\Expr\FuncCall(new Node\Name('iterator_to_array'), [new Node\Arg($node->value)]))],
                     $node->value->getAttributes()
                 )
             );

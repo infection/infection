@@ -78,7 +78,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = [is_array($collection) ? $collection[0] : iterator_to_array($collection)[0], 4];
+$a = [is_array($collection) ? reset($collection) : reset(iterator_to_array($collection)), 4];
 PHP
             ,
         ];
@@ -93,7 +93,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = [is_array(getCollection()) ? getCollection()[0] : iterator_to_array(getCollection())[0], 4];
+$a = [is_array(getCollection()) ? reset(getCollection()) : reset(iterator_to_array(getCollection())), 4];
 PHP
             ,
         ];
@@ -108,7 +108,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = [is_array($object->getCollection()) ? $object->getCollection()[0] : iterator_to_array($object->getCollection())[0], 4];
+$a = [is_array($object->getCollection()) ? reset($object->getCollection()) : reset(iterator_to_array($object->getCollection())), 4];
 PHP
             ,
         ];
