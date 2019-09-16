@@ -57,26 +57,23 @@ final class Spread extends Mutator
         $node->unpack = false;
 
         if ($node->value instanceof Node\Expr\Array_) {
-            $newValue = new Node\Expr\ArrayDimFetch(
-                $node->value,
-                new Node\Scalar\LNumber(0),
-                $node->value->getAttributes()
-            );
+            $slicedArray = $this->getFirstElement($node->value);
         } else {
-            $newValue = new Node\Expr\Ternary(
-                new Node\Expr\FuncCall(new Node\Name('is_array'), [new Node\Arg($node->value)]),
-                new Node\Expr\FuncCall(
-                    new Node\Name('reset'),
-                    [new Node\Arg($node->value)],
-                    $node->value->getAttributes()
-                ),
-                new Node\Expr\FuncCall(
-                    new Node\Name('reset'),
-                    [new Node\Arg(new Node\Expr\FuncCall(new Node\Name('iterator_to_array'), [new Node\Arg($node->value)]))],
-                    $node->value->getAttributes()
-                )
+            $isArray = new Node\Expr\FuncCall(new Node\Name('is_array'), [new Node\Arg($node->value)]);
+            $resultArray = new Node\Expr\Ternary(
+                $isArray,
+                $node->value,
+                new Node\Expr\FuncCall(new Node\Name('iterator_to_array'), [new Node\Arg($node->value)])
             );
+
+            $slicedArray = $this->getFirstElement($resultArray);
         }
+
+        $newValue = new Node\Expr\ArrayDimFetch(
+            $slicedArray,
+            new Node\Scalar\LNumber(0),
+            $node->value->getAttributes()
+        );
 
         $node->value = $newValue;
 
@@ -96,5 +93,14 @@ final class Spread extends Mutator
             || $value instanceof Node\Expr\Variable
             || $value instanceof Node\Expr\MethodCall
             || $value instanceof Node\Expr\FuncCall;
+    }
+
+    private function getFirstElement(Node\Expr $resultArray): Node\Expr\FuncCall
+    {
+        return new Node\Expr\FuncCall(new Node\Name('array_slice'), [
+            new Node\Arg($resultArray),
+            new Node\Arg(new Node\Scalar\LNumber(0)),
+            new Node\Arg(new Node\Scalar\LNumber(1)),
+        ]);
     }
 }

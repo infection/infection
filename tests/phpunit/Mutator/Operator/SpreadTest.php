@@ -45,7 +45,7 @@ final class SpreadTest extends AbstractMutatorTestCase
     public function test_mutator($input, $expected = null): void
     {
         if (version_compare(PHP_VERSION, '7.4.0') < 0) {
-            $this->markTestSkipped('Spread operator in Array Expression requires PHP 7.4+');
+//            $this->markTestSkipped('Spread operator in Array Expression requires PHP 7.4+');
         }
 
         $this->doTest($input, $expected);
@@ -63,7 +63,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = [[1, 2, 3][0], 4];
+$a = [array_slice([1, 2, 3], 0, 1)[0], 4];
 PHP
             ,
         ];
@@ -78,7 +78,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = [is_array($collection) ? reset($collection) : reset(iterator_to_array($collection)), 4];
+$a = [array_slice(is_array($collection) ? $collection : iterator_to_array($collection), 0, 1)[0], 4];
 PHP
             ,
         ];
@@ -93,7 +93,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = [is_array(getCollection()) ? reset(getCollection()) : reset(iterator_to_array(getCollection())), 4];
+$a = [array_slice(is_array(getCollection()) ? getCollection() : iterator_to_array(getCollection()), 0, 1)[0], 4];
 PHP
             ,
         ];
@@ -108,7 +108,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = [is_array($object->getCollection()) ? reset($object->getCollection()) : reset(iterator_to_array($object->getCollection())), 4];
+$a = [array_slice(is_array($object->getCollection()) ? $object->getCollection() : iterator_to_array($object->getCollection()), 0, 1)[0], 4];
 PHP
             ,
         ];
