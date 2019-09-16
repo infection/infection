@@ -95,6 +95,7 @@ final class MBString extends Mutator
             'mb_strstr' => $this->makeFunctionAndRemoveExtraArgsMapper('strstr', 3),
             'mb_strtolower' => $this->makeFunctionAndRemoveExtraArgsMapper('strtolower', 1),
             'mb_strtoupper' => $this->makeFunctionAndRemoveExtraArgsMapper('strtoupper', 1),
+            'mb_str_split' => $this->makeFunctionAndRemoveExtraArgsMapper('str_split', 2),
             'mb_substr_count' => $this->makeFunctionAndRemoveExtraArgsMapper('substr_count', 2),
             'mb_substr' => $this->makeFunctionAndRemoveExtraArgsMapper('substr', 3),
             'mb_convert_case' => $this->makeConvertCaseMapper(),
