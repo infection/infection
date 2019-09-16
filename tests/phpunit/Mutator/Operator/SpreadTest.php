@@ -60,7 +60,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = [array_slice([1, 2, 3], 0, 1)[0], 4];
+$a = [[...[1, 2, 3]][0], 4];
 PHP
             ,
         ];
@@ -75,7 +75,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = [array_slice(is_array($collection) ? $collection : iterator_to_array($collection), 0, 1)[0], 4];
+$a = [[...$collection][0], 4];
 PHP
             ,
         ];
@@ -90,7 +90,7 @@ PHP
             <<<'PHP'
 <?php
 
-$a = [array_slice(is_array(getCollection()) ? getCollection() : iterator_to_array(getCollection()), 0, 1)[0], 4];
+$a = [[...getCollection()][0], 4];
 PHP
             ,
         ];
@@ -105,7 +105,22 @@ PHP
             <<<'PHP'
 <?php
 
-$a = [array_slice(is_array($object->getCollection()) ? $object->getCollection() : iterator_to_array($object->getCollection()), 0, 1)[0], 4];
+$a = [[...$object->getCollection()][0], 4];
+PHP
+            ,
+        ];
+
+        yield 'Spread for a new iterator object' => [
+            <<<'PHP'
+<?php
+
+$a = [...new ArrayIterator(['a', 'b', 'c'])];
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$a = [[...new ArrayIterator(['a', 'b', 'c'])][0]];
 PHP
             ,
         ];

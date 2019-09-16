@@ -45,7 +45,7 @@ use PhpParser\Node\Expr\ArrayItem;
 final class Spread extends Mutator
 {
     /**
-     * Replaces "[...[1, 2, 3], 4];" with "[array_slice([1, 2, 3], 0, 1)[0], 4]"
+     * Replaces "[...$collection, 4, 5];" with "[[...$collection][0], 4, 5]"
      *
      * @param ArrayItem $node
      *
@@ -53,53 +53,24 @@ final class Spread extends Mutator
      */
     public function mutate(Node $node)
     {
-        $node->unpack = false;
-
-        if ($node->value instanceof Node\Expr\Array_) {
-            $slicedArray = $this->getFirstElement($node->value);
-        } else {
-            $isArray = new Node\Expr\FuncCall(new Node\Name('is_array'), [new Node\Arg($node->value)]);
-            $resultArray = new Node\Expr\Ternary(
-                $isArray,
-                $node->value,
-                new Node\Expr\FuncCall(new Node\Name('iterator_to_array'), [new Node\Arg($node->value)])
-            );
-
-            $slicedArray = $this->getFirstElement($resultArray);
-        }
-
-        $newValue = new Node\Expr\ArrayDimFetch(
-            $slicedArray,
-            new Node\Scalar\LNumber(0),
-            $node->value->getAttributes()
+        return new ArrayItem(
+            new Node\Expr\ArrayDimFetch(
+                new Node\Expr\Array_(
+                    [$node],
+                    $node->getAttributes() + ['kind' => Node\Expr\Array_::KIND_SHORT]
+                ),
+                new Node\Scalar\LNumber(0),
+                $node->value->getAttributes()
+            ),
+            null,
+            false,
+            $node->getAttributes(),
+            false
         );
-
-        $node->value = $newValue;
-
-        return $node;
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Expr\ArrayItem
-            && $node->unpack
-            && $this->isSupportedValueType($node->value);
-    }
-
-    private function isSupportedValueType(Node\Expr $value): bool
-    {
-        return $value instanceof Node\Expr\Array_
-            || $value instanceof Node\Expr\Variable
-            || $value instanceof Node\Expr\MethodCall
-            || $value instanceof Node\Expr\FuncCall;
-    }
-
-    private function getFirstElement(Node\Expr $resultArray): Node\Expr\FuncCall
-    {
-        return new Node\Expr\FuncCall(new Node\Name('array_slice'), [
-            new Node\Arg($resultArray),
-            new Node\Arg(new Node\Scalar\LNumber(0)),
-            new Node\Arg(new Node\Scalar\LNumber(1)),
-        ]);
+        return $node instanceof Node\Expr\ArrayItem && $node->unpack;
     }
 }
