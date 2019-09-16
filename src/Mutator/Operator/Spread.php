@@ -45,8 +45,7 @@ use PhpParser\Node\Expr\ArrayItem;
 final class Spread extends Mutator
 {
     /**
-     * Replaces "[...[1, 2, 3], 4];" with "[[1, 2, 3][0], 4]"
-     * Replaces "[...getCollection(), 2, 3];" with "[is_array($object->getCollection()) ? $object->getCollection()[0] : iterator_to_array($object->getCollection())[0], 2, 3]"
+     * Replaces "[...[1, 2, 3], 4];" with "[array_slice([1, 2, 3], 0, 1)[0], 4]"
      *
      * @param ArrayItem $node
      *
