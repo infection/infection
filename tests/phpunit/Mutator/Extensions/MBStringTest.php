@@ -114,6 +114,8 @@ final class MBStringTest extends AbstractMutatorTestCase
         yield from $this->provideMutationCasesForStrRChr();
 
         yield from $this->provideMutationCasesForConvertCase();
+
+        yield from $this->provideMutationCasesForStrSplit();
     }
 
     private function provideMutationCasesForChr(): Generator
@@ -575,6 +577,28 @@ final class MBStringTest extends AbstractMutatorTestCase
 
         yield 'It does not mutate mb_convert_case called via variable' => [
             '<?php $a = "mb_convert_case"; $a("test");',
+        ];
+    }
+
+    private function provideMutationCasesForStrSplit()
+    {
+        yield 'It converts mb_str_split to str_split' => [
+            "<?php mb_str_split('test', 2);",
+            "<?php\n\nstr_split('test', 2);",
+        ];
+
+        yield 'It converts correctly when mb_str_split is wrongly capitalize' => [
+            "<?php MB_str_sPlit('test', 2);",
+            "<?php\n\nstr_split('test', 2);",
+        ];
+
+        yield 'It converts mb_str_split with encoding to str_split' => [
+            "<?php mb_str_split('test', 2, 'utf-8');",
+            "<?php\n\nstr_split('test', 2);",
+        ];
+
+        yield 'It does not mutate mb_str_split called via variable' => [
+            '<?php $a = "mb_str_split"; $a("test", 2);',
         ];
     }
 
