@@ -90,8 +90,61 @@
         },
         "mutators": {
             "type": "object",
+            "additionalProperties": false,
             "description": "Contains the settings for different mutations and profiles",
             "properties": {
+                "@arithmetic": { "$ref": "#/definitions/default-mutator-config" },
+                "@boolean": { "$ref": "#/definitions/default-mutator-config" },
+                "@conditional_boundary": { "$ref": "#/definitions/default-mutator-config" },
+                "@conditional_negotiation": { "$ref": "#/definitions/default-mutator-config" },
+                "@equal": { "$ref": "#/definitions/default-mutator-config" },
+                "@function_signature": { "$ref": "#/definitions/default-mutator-config" },
+                "@identical": { "$ref": "#/definitions/default-mutator-config" },
+                "@number": { "$ref": "#/definitions/default-mutator-config" },
+                "@operator": { "$ref": "#/definitions/default-mutator-config" },
+                "@regex": { "$ref": "#/definitions/default-mutator-config" },
+                "@removal": { "$ref": "#/definitions/default-mutator-config" },
+                "@return_value": { "$ref": "#/definitions/default-mutator-config" },
+                "@sort": { "$ref": "#/definitions/default-mutator-config" },
+                "@zero_iteration": { "$ref": "#/definitions/default-mutator-config" },
+                "@cast": { "$ref": "#/definitions/default-mutator-config" },
+                "@unwrap": { "$ref": "#/definitions/default-mutator-config" },
+                "@extensions": { "$ref": "#/definitions/default-mutator-config" },
+                "@default": { "$ref": "#/definitions/default-mutator-config" },
+                "Assignment": { "$ref": "#/definitions/default-mutator-config" },
+                "AssignmentEqual": { "$ref": "#/definitions/default-mutator-config" },
+                "BitwiseAnd": { "$ref": "#/definitions/default-mutator-config" },
+                "BitwiseNot": { "$ref": "#/definitions/default-mutator-config" },
+                "BitwiseOr": { "$ref": "#/definitions/default-mutator-config" },
+                "BitwiseXor": { "$ref": "#/definitions/default-mutator-config" },
+                "Decrement": { "$ref": "#/definitions/default-mutator-config" },
+                "DivEqual": { "$ref": "#/definitions/default-mutator-config" },
+                "Division": { "$ref": "#/definitions/default-mutator-config" },
+                "Exponentiation": { "$ref": "#/definitions/default-mutator-config" },
+                "Increment": { "$ref": "#/definitions/default-mutator-config" },
+                "Minus": { "$ref": "#/definitions/default-mutator-config" },
+                "MinusEqual": { "$ref": "#/definitions/default-mutator-config" },
+                "ModEqual": { "$ref": "#/definitions/default-mutator-config" },
+                "Modulus": { "$ref": "#/definitions/default-mutator-config" },
+                "MulEqual": { "$ref": "#/definitions/default-mutator-config" },
+                "Multiplication": { "$ref": "#/definitions/default-mutator-config" },
+                "Plus": { "$ref": "#/definitions/default-mutator-config" },
+                "PlusEqual": { "$ref": "#/definitions/default-mutator-config" },
+                "PowEqual": { "$ref": "#/definitions/default-mutator-config" },
+                "ShiftLeft": { "$ref": "#/definitions/default-mutator-config" },
+                "ShiftRight": { "$ref": "#/definitions/default-mutator-config" },
+                "RoundingFamily": { "$ref": "#/definitions/default-mutator-config" },
+                "ArrayItem": { "$ref": "#/definitions/default-mutator-config" },
+                "EqualIdentical": { "$ref": "#/definitions/default-mutator-config" },
+                "FalseValue": { "$ref": "#/definitions/default-mutator-config" },
+                "IdenticalEqual": { "$ref": "#/definitions/default-mutator-config" },
+                "LogicalAnd": { "$ref": "#/definitions/default-mutator-config" },
+                "LogicalLowerAnd": { "$ref": "#/definitions/default-mutator-config" },
+                "LogicalLowerOr": { "$ref": "#/definitions/default-mutator-config" },
+                "LogicalNot": { "$ref": "#/definitions/default-mutator-config" },
+                "LogicalOr": { "$ref": "#/definitions/default-mutator-config" },
+                "NotEqualNotIdentical": { "$ref": "#/definitions/default-mutator-config" },
+                "NotIdenticalNotEqual": { "$ref": "#/definitions/default-mutator-config" },
                 "TrueValue": {
                     "anyOf": [
                         {
@@ -101,19 +154,55 @@
                             "type": "object",
                             "additionalProperties": false,
                             "properties": {
-                                "ignore": {"type": "array", "items": {"type": "string"}},
+                                "ignore": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
                                 "settings": {
                                     "type": "object",
                                     "additionalProperties": false,
                                     "properties": {
-                                        "in_array": {"type": "boolean"},
-                                        "array_search": {"type": "boolean"}
+                                        "in_array": {
+                                            "type": "boolean"
+                                        },
+                                        "array_search": {
+                                            "type": "boolean"
+                                        }
                                     }
                                 }
                             }
                         }
                     ]
                 },
+                "Yield_": { "$ref": "#/definitions/default-mutator-config" },
+                "GreaterThan": { "$ref": "#/definitions/default-mutator-config" },
+                "GreaterThanOrEqualTo": { "$ref": "#/definitions/default-mutator-config" },
+                "LessThan": { "$ref": "#/definitions/default-mutator-config" },
+                "LessThanOrEqualTo": { "$ref": "#/definitions/default-mutator-config" },
+                "Equal": { "$ref": "#/definitions/default-mutator-config" },
+                "GreaterThanNegotiation": { "$ref": "#/definitions/default-mutator-config" },
+                "GreaterThanOrEqualToNegotiation": { "$ref": "#/definitions/default-mutator-config" },
+                "Identical": { "$ref": "#/definitions/default-mutator-config" },
+                "LessThanNegotiation": { "$ref": "#/definitions/default-mutator-config" },
+                "LessThanOrEqualToNegotiation": { "$ref": "#/definitions/default-mutator-config" },
+                "NotEqual": { "$ref": "#/definitions/default-mutator-config" },
+                "NotIdentical": { "$ref": "#/definitions/default-mutator-config" },
+                "PublicVisibility": { "$ref": "#/definitions/default-mutator-config" },
+                "ProtectedVisibility": { "$ref": "#/definitions/default-mutator-config" },
+                "DecrementInteger": { "$ref": "#/definitions/default-mutator-config" },
+                "IncrementInteger": { "$ref": "#/definitions/default-mutator-config" },
+                "OneZeroInteger": { "$ref": "#/definitions/default-mutator-config" },
+                "OneZeroFloat": { "$ref": "#/definitions/default-mutator-config" },
+                "AssignCoalesce": { "$ref": "#/definitions/default-mutator-config" },
+                "Break_": { "$ref": "#/definitions/default-mutator-config" },
+                "Continue_": { "$ref": "#/definitions/default-mutator-config" },
+                "Throw_": { "$ref": "#/definitions/default-mutator-config" },
+                "Finally_": { "$ref": "#/definitions/default-mutator-config" },
+                "Coalesce": { "$ref": "#/definitions/default-mutator-config" },
+                "PregQuote": { "$ref": "#/definitions/default-mutator-config" },
+                "PregMatchMatches": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayItemRemoval": {
                     "anyOf": [
                         {
@@ -123,14 +212,23 @@
                             "type": "object",
                             "additionalProperties": false,
                             "properties": {
-                                "ignore": {"type": "array", "items": {"type": "string"}},
+                                "ignore": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
                                 "settings": {
                                     "type": "object",
                                     "additionalProperties": false,
                                     "properties": {
                                         "remove": {
                                             "type": "string",
-                                            "enum": ["first", "last", "all"]
+                                            "enum": [
+                                                "first",
+                                                "last",
+                                                "all"
+                                            ]
                                         },
                                         "limit": {
                                             "type": "integer",
@@ -142,6 +240,65 @@
                         }
                     ]
                 },
+                "FunctionCallRemoval": { "$ref": "#/definitions/default-mutator-config" },
+                "MethodCallRemoval": { "$ref": "#/definitions/default-mutator-config" },
+                "ArrayOneItem": { "$ref": "#/definitions/default-mutator-config" },
+                "FloatNegation": { "$ref": "#/definitions/default-mutator-config" },
+                "FunctionCall": { "$ref": "#/definitions/default-mutator-config" },
+                "IntegerNegation": { "$ref": "#/definitions/default-mutator-config" },
+                "NewObject": { "$ref": "#/definitions/default-mutator-config" },
+                "This": { "$ref": "#/definitions/default-mutator-config" },
+                "Spaceship": { "$ref": "#/definitions/default-mutator-config" },
+                "Foreach_": { "$ref": "#/definitions/default-mutator-config" },
+                "For_": { "$ref": "#/definitions/default-mutator-config" },
+                "CastArray": { "$ref": "#/definitions/default-mutator-config" },
+                "CastBool": { "$ref": "#/definitions/default-mutator-config" },
+                "CastFloat": { "$ref": "#/definitions/default-mutator-config" },
+                "CastInt": { "$ref": "#/definitions/default-mutator-config" },
+                "CastObject": { "$ref": "#/definitions/default-mutator-config" },
+                "CastString": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayChangeKeyCase": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayChunk": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayColumn": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayCombine": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayDiff": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayDiffAssoc": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayDiffKey": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayDiffUassoc": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayDiffUkey": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayFilter": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayFlip": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayIntersect": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayIntersectAssoc": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayIntersectKey": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayIntersectUassoc": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayIntersectUkey": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayKeys": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayMap": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayMerge": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayMergeRecursive": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayPad": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayReduce": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayReplace": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayReplaceRecursive": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayReverse": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArraySlice": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArraySplice": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayUdiff": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayUdiffAssoc": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayUdiffUassoc": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayUintersect": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayUintersectAssoc": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayUintersectUassoc": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayUnique": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapArrayValues": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapLcFirst": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapStrRepeat": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapStrToLower": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapStrToUpper": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapTrim": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapUcFirst": { "$ref": "#/definitions/default-mutator-config" },
+                "UnwrapUcWords": { "$ref": "#/definitions/default-mutator-config" },
                 "BCMath": {
                     "anyOf": [
                         {
@@ -151,7 +308,12 @@
                             "type": "object",
                             "additionalProperties": false,
                             "properties": {
-                                "ignore": {"type": "array", "items": {"type": "string"}},
+                                "ignore": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
                                 "settings": {
                                     "type": "object",
                                     "additionalProperties": false,
@@ -198,7 +360,12 @@
                             "type": "object",
                             "additionalProperties": false,
                             "properties": {
-                                "ignore": {"type": "array", "items": {"type": "string"}},
+                                "ignore": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
                                 "settings": {
                                     "type": "object",
                                     "additionalProperties": false,
@@ -280,6 +447,27 @@
         "testFrameworkOptions": {
             "type": "string",
             "description": "Specify an additional options to pass to the test framework (IE: Enabling Verbose Mode). --test-framework-options will override this option."
+        }
+    },
+    "definitions": {
+        "default-mutator-config": {
+            "anyOf": [
+                {
+                    "type": "boolean"
+                },
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "ignore": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            ]
         }
     }
 }

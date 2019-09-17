@@ -73,9 +73,9 @@ final class InitialTestsRunnerTest extends TestCase
         $eventDispatcher->expects($this->exactly(3))
             ->method('dispatch')
             ->withConsecutive(
-                $this->isInstanceOf(InitialTestSuiteStarted::class),
-                $this->isInstanceOf(InitialTestCaseCompleted::class),
-                $this->isInstanceOf(InitialTestSuiteFinished::class)
+                [$this->isInstanceOf(InitialTestSuiteStarted::class)],
+                [$this->isInstanceOf(InitialTestCaseCompleted::class)],
+                [$this->isInstanceOf(InitialTestSuiteFinished::class)]
             );
 
         $testRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
