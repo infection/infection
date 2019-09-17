@@ -101,7 +101,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
         $xPath = new \DOMXPath($dom);
 
-        $this->xmlConfigurationHelper->validate($dom, $xPath);
+        $this->xmlConfigurationHelper->validate($xPath);
 
         $this->addCoverageFilterWhitelistIfDoesNotExist($dom, $xPath);
         $this->addRandomTestsOrderAttributesIfNotSet($version, $xPath);
@@ -110,8 +110,8 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->xmlConfigurationHelper->deactivateColours($xPath);
         $this->xmlConfigurationHelper->deactivateResultCaching($xPath);
         $this->xmlConfigurationHelper->deactivateStderrRedirection($xPath);
-        $this->xmlConfigurationHelper->removeExistingLoggers($dom, $xPath);
-        $this->xmlConfigurationHelper->removeExistingPrinters($dom, $xPath);
+        $this->xmlConfigurationHelper->removeExistingLoggers($xPath);
+        $this->xmlConfigurationHelper->removeExistingPrinters($xPath);
 
         if (!$this->skipCoverage) {
             $this->addCodeCoverageLogger($dom, $xPath);
@@ -130,7 +130,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function addJUnitLogger(\DOMDocument $dom, \DOMXPath $xPath): void
     {
-        $logging = $this->getOrCreateNode($dom, $xPath, 'logging');
+        $logging = $this->getOrCreateNode($xPath, 'logging');
 
         $junitLog = $dom->createElement('log');
         $junitLog->setAttribute('type', 'junit');
@@ -141,9 +141,9 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function addCodeCoverageLogger(\DOMDocument $dom, \DOMXPath $xPath): void
     {
-        $logging = $this->getOrCreateNode($dom, $xPath, 'logging');
+        $logging = $this->getOrCreateNode($xPath, 'logging');
 
-        $coverageXmlLog = $dom->createElement('log');
+        $coverageXmlLog = $xPath->document->createElement('log');
         $coverageXmlLog->setAttribute('type', 'coverage-xml');
         $coverageXmlLog->setAttribute('target', $this->tmpDir . '/' . XMLLineCodeCoverage::PHP_UNIT_COVERAGE_DIR);
 
@@ -172,12 +172,12 @@ class InitialConfigBuilder implements ConfigBuilder
         }
     }
 
-    private function getOrCreateNode(\DOMDocument $dom, \DOMXPath $xPath, string $nodeName): \DOMElement
+    private function getOrCreateNode(\DOMXPath $xPath, string $nodeName): \DOMElement
     {
         $node = $this->getNode($xPath, $nodeName);
 
         if (!$node) {
-            $node = $this->createNode($dom, $nodeName);
+            $node = $this->createNode($xPath->document, $nodeName);
         }
 
         return $node;

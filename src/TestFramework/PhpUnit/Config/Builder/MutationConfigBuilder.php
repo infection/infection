@@ -90,9 +90,9 @@ class MutationConfigBuilder extends ConfigBuilder
         $this->xmlConfigurationHelper->deactivateColours($xPath);
         $this->xmlConfigurationHelper->deactivateResultCaching($xPath);
         $this->xmlConfigurationHelper->deactivateStderrRedirection($xPath);
-        $this->xmlConfigurationHelper->removeExistingLoggers($dom, $xPath);
-        $this->xmlConfigurationHelper->removeExistingPrinters($dom, $xPath);
-        $this->xmlConfigurationHelper->removeDefaultTestSuite($dom, $xPath);
+        $this->xmlConfigurationHelper->removeExistingLoggers($xPath);
+        $this->xmlConfigurationHelper->removeExistingPrinters($xPath);
+        $this->xmlConfigurationHelper->removeDefaultTestSuite($xPath);
 
         $customAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',

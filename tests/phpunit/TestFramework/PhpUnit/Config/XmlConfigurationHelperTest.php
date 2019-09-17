@@ -45,14 +45,9 @@ final class XmlConfigurationHelperTest extends TestCase
 {
     public function test_it_replaces_with_absolute_paths(): void
     {
-        $dom = $this->getDomDocument();
-        $xPath = new \DOMXPath($dom);
-
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
-
-        $xmlconfig->replaceWithAbsolutePaths($xPath);
-
-        $this->assertXmlStringEqualsXmlString(<<<XML
+        $this->assertItChangesStandardConfiguration(static function (XmlConfigurationHelper $xmlconfig, \DOMXPath $xPath, \DOMDocument $dom): void {
+            $xmlconfig->replaceWithAbsolutePaths($xPath);
+        }, <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -82,20 +77,14 @@ final class XmlConfigurationHelperTest extends TestCase
     </logging>
 </phpunit>
 XML
-            , $dom->saveXML()
         );
     }
 
     public function test_it_removes_existing_loggers(): void
     {
-        $dom = $this->getDomDocument();
-        $xPath = new \DOMXPath($dom);
-
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
-
-        $xmlconfig->removeExistingLoggers($dom, $xPath);
-
-        $this->assertXmlStringEqualsXmlString(<<<XML
+        $this->assertItChangesStandardConfiguration(static function (XmlConfigurationHelper $xmlconfig, \DOMXPath $xPath, \DOMDocument $dom): void {
+            $xmlconfig->removeExistingLoggers($xPath);
+        }, <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -122,20 +111,14 @@ XML
     </filter>
 </phpunit>
 XML
-            , $dom->saveXML()
         );
     }
 
     public function test_it_sets_set_stop_on_failure(): void
     {
-        $dom = $this->getDomDocument();
-        $xPath = new \DOMXPath($dom);
-
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
-
-        $xmlconfig->setStopOnFailure($xPath);
-
-        $this->assertXmlStringEqualsXmlString(<<<XML
+        $this->assertItChangesStandardConfiguration(static function (XmlConfigurationHelper $xmlconfig, \DOMXPath $xPath, \DOMDocument $dom): void {
+            $xmlconfig->setStopOnFailure($xPath);
+        }, <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -166,16 +149,12 @@ XML
     </logging>
 </phpunit>
 XML
-            , $dom->saveXML()
         );
     }
 
     public function test_it_sets_set_stop_on_failure_when_it_is_already_present(): void
     {
-        $dom = new \DOMDocument();
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $dom->loadXML(<<<XML
+        $this->assertItChangesXML(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -192,14 +171,9 @@ XML
 >
 </phpunit>
 XML
-        );
-        $xPath = new \DOMXPath($dom);
-
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
-
-        $xmlconfig->setStopOnFailure($xPath);
-
-        $this->assertXmlStringEqualsXmlString(<<<XML
+        , static function (XmlConfigurationHelper $xmlconfig, \DOMXPath $xPath, \DOMDocument $dom): void {
+            $xmlconfig->setStopOnFailure($xPath);
+        }, <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -216,20 +190,14 @@ XML
 >
 </phpunit>
 XML
-            , $dom->saveXML()
         );
     }
 
     public function test_it_deactivates_colors(): void
     {
-        $dom = $this->getDomDocument();
-        $xPath = new \DOMXPath($dom);
-
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
-
-        $xmlconfig->deactivateColours($xPath);
-
-        $this->assertXmlStringEqualsXmlString(<<<XML
+        $this->assertItChangesStandardConfiguration(static function (XmlConfigurationHelper $xmlconfig, \DOMXPath $xPath, \DOMDocument $dom): void {
+            $xmlconfig->deactivateColours($xPath);
+        }, <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -259,16 +227,12 @@ XML
     </logging>
 </phpunit>
 XML
-            , $dom->saveXML()
         );
     }
 
     public function test_it_deactivates_colors_when_it_is_not_already_present(): void
     {
-        $dom = new \DOMDocument();
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $dom->loadXML(<<<XML
+        $this->assertItChangesXML(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -284,14 +248,9 @@ XML
 >
 </phpunit>
 XML
-        );
-        $xPath = new \DOMXPath($dom);
-
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
-
-        $xmlconfig->deactivateColours($xPath);
-
-        $this->assertXmlStringEqualsXmlString(<<<XML
+            , static function (XmlConfigurationHelper $xmlconfig, \DOMXPath $xPath, \DOMDocument $dom): void {
+                $xmlconfig->deactivateColours($xPath);
+            }, <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -308,18 +267,12 @@ XML
 >
 </phpunit>
 XML
-            , $dom->saveXML()
         );
     }
 
     public function test_it_sets_cache_result_to_false_when_it_exists(): void
     {
-        $dom = new \DOMDocument();
-
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-
-        $dom->loadXML(<<<XML
+        $this->assertItChangesXML(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -335,14 +288,11 @@ XML
     syntaxCheck="false"
 >
 </phpunit>
+
 XML
-        );
-
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
-
-        $xmlconfig->deactivateResultCaching(new \DOMXPath($dom));
-
-        $this->assertXmlStringEqualsXmlString(<<<XML
+        , static function (XmlConfigurationHelper $xmlconfig, \DOMXPath $xPath, \DOMDocument $dom): void {
+            $xmlconfig->deactivateResultCaching($xPath);
+        }, <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -358,20 +308,13 @@ XML
     syntaxCheck="false"
 >
 </phpunit>
-
 XML
-            , $dom->saveXML()
         );
     }
 
     public function test_it_sets_cache_result_to_false_when_it_does_not_exist(): void
     {
-        $dom = new \DOMDocument();
-
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-
-        $dom->loadXML(<<<XML
+        $this->assertItChangesXML(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -386,15 +329,10 @@ XML
     syntaxCheck="false"
 >
 </phpunit>
-
 XML
-        );
-
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
-
-        $xmlconfig->deactivateResultCaching(new \DOMXPath($dom));
-
-        $this->assertXmlStringEqualsXmlString(<<<XML
+        , static function (XmlConfigurationHelper $xmlconfig, \DOMXPath $xPath, \DOMDocument $dom): void {
+            $xmlconfig->deactivateResultCaching($xPath);
+        }, <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -411,18 +349,12 @@ XML
 >
 </phpunit>
 XML
-            , $dom->saveXML()
         );
     }
 
     public function test_it_sets_stderr_to_false_when_it_exists(): void
     {
-        $dom = new \DOMDocument();
-
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-
-        $dom->loadXML(<<<XML
+        $this->assertItChangesXML(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     stderr="true"
@@ -430,13 +362,9 @@ XML
 >
 </phpunit>
 XML
-        );
-
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
-
-        $xmlconfig->deactivateStderrRedirection(new \DOMXPath($dom));
-
-        $this->assertXmlStringEqualsXmlString(<<<XML
+        , static function (XmlConfigurationHelper $xmlconfig, \DOMXPath $xPath, \DOMDocument $dom): void {
+            $xmlconfig->deactivateStderrRedirection($xPath);
+        }, <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     stderr="false"
@@ -444,31 +372,21 @@ XML
 >
 </phpunit>
 XML
-            , $dom->saveXML()
         );
     }
 
     public function test_it_sets_stderr_to_false_when_it_does_not_exist(): void
     {
-        $dom = new \DOMDocument();
-
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-
-        $dom->loadXML(<<<XML
+        $this->assertItChangesXML(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     syntaxCheck="false"
 >
 </phpunit>
 XML
-        );
-
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
-
-        $xmlconfig->deactivateStderrRedirection(new \DOMXPath($dom));
-
-        $this->assertXmlStringEqualsXmlString(<<<XML
+            , static function (XmlConfigurationHelper $xmlconfig, \DOMXPath $xPath, \DOMDocument $dom): void {
+                $xmlconfig->deactivateStderrRedirection($xPath);
+            }, <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     stderr="false"
@@ -476,16 +394,12 @@ XML
 >
 </phpunit>
 XML
-            , $dom->saveXML()
         );
     }
 
     public function test_it_removes_existing_printers(): void
     {
-        $dom = new \DOMDocument();
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $dom->loadXML(<<<XML
+        $this->assertItChangesXML(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -501,14 +415,9 @@ XML
 >
 </phpunit>
 XML
-        );
-        $xPath = new \DOMXPath($dom);
-
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
-
-        $xmlconfig->removeExistingPrinters($dom, $xPath);
-
-        $this->assertXmlStringEqualsXmlString(<<<XML
+            , static function (XmlConfigurationHelper $xmlconfig, \DOMXPath $xPath, \DOMDocument $dom): void {
+                $xmlconfig->removeExistingPrinters($xPath);
+            }, <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -523,7 +432,6 @@ XML
 >
 </phpunit>
 XML
-            , $dom->saveXML()
         );
     }
 
@@ -539,7 +447,7 @@ XML
         $this->expectException(InvalidPhpUnitXmlConfigException::class);
         $this->expectExceptionMessage('phpunit.xml does not contain a valid PHPUnit configuration.');
 
-        $xmlHelper->validate($dom, $xPath);
+        $xmlHelper->validate($xPath);
     }
 
     /**
@@ -566,7 +474,7 @@ XML
         $this->expectException(InvalidPhpUnitXmlConfigException::class);
         $this->expectExceptionMessageRegExp('/Element \'invalid\'\: This element is not expected/');
 
-        $xmlHelper->validate($dom, $xPath);
+        $xmlHelper->validate($xPath);
     }
 
     public function schemaProvider(): \Generator
@@ -597,15 +505,12 @@ XML
 
         $xmlHelper = new XmlConfigurationHelper($this->getPathReplacer(), '');
 
-        $this->assertTrue($xmlHelper->validate($dom, $xPath));
+        $this->assertTrue($xmlHelper->validate($xPath));
     }
 
     public function test_it_removes_default_test_suite(): void
     {
-        $dom = new \DOMDocument();
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $dom->loadXML(<<<XML
+        $this->assertItChangesXML(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     defaultTestSuite="unit"
@@ -614,14 +519,11 @@ XML
     syntaxCheck="false"
 >
 </phpunit>
+
 XML
-        );
-
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
-
-        $xmlconfig->removeDefaultTestSuite($dom, new \DOMXPath($dom));
-
-        $this->assertXmlStringEqualsXmlString(<<<XML
+            , static function (XmlConfigurationHelper $xmlconfig, \DOMXPath $xPath, \DOMDocument $dom): void {
+                $xmlconfig->removeDefaultTestSuite($xPath);
+            }, <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     printerClass="Fake\Printer\Class"
@@ -629,9 +531,36 @@ XML
     syntaxCheck="false"
 >
 </phpunit>
+
 XML
-            , $dom->saveXML()
         );
+    }
+
+    private function assertItChangesStandardConfiguration(\Closure $callback, string $resultXml): void
+    {
+        $dom = $this->getDomDocument();
+        $xPath = new \DOMXPath($dom);
+
+        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
+
+        $callback($xmlconfig, $xPath, $dom);
+
+        $this->assertXmlStringEqualsXmlString($resultXml, $dom->saveXML());
+    }
+
+    private function assertItChangesXML(string $inputXml, callable $callback, string $expectedXml): void
+    {
+        $dom = new \DOMDocument();
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($inputXml);
+        $xPath = new \DOMXPath($dom);
+
+        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
+
+        $callback($xmlconfig, $xPath, $dom);
+
+        $this->assertXmlStringEqualsXmlString($expectedXml, $dom->saveXML());
     }
 
     private function getDomDocument(): \DOMDocument
