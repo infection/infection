@@ -415,6 +415,71 @@ XML
         );
     }
 
+    public function test_it_sets_stderr_to_false_when_it_exists(): void
+    {
+        $dom = new \DOMDocument();
+
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+
+        $dom->loadXML(<<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    stderr="true"
+    syntaxCheck="false"
+>
+</phpunit>
+XML
+        );
+
+        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
+
+        $xmlconfig->deactivateStderrRedirection(new \DOMXPath($dom));
+
+        $this->assertXmlStringEqualsXmlString(<<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    stderr="false"
+    syntaxCheck="false"
+>
+</phpunit>
+XML
+            , $dom->saveXML()
+        );
+    }
+
+    public function test_it_sets_stderr_to_false_when_it_does_not_exist(): void
+    {
+        $dom = new \DOMDocument();
+
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+
+        $dom->loadXML(<<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    syntaxCheck="false"
+>
+</phpunit>
+XML
+        );
+
+        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
+
+        $xmlconfig->deactivateStderrRedirection(new \DOMXPath($dom));
+
+        $this->assertXmlStringEqualsXmlString(<<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    stderr="false"
+    syntaxCheck="false"
+>
+</phpunit>
+XML
+            , $dom->saveXML()
+        );
+    }
+
     public function test_it_removes_existing_printers(): void
     {
         $dom = new \DOMDocument();
