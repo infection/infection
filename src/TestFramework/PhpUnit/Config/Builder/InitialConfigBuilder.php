@@ -103,7 +103,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
         $this->xmlConfigurationHelper->validate($xPath);
 
-        $this->addCoverageFilterWhitelistIfDoesNotExist($dom, $xPath);
+        $this->addCoverageFilterWhitelistIfDoesNotExist($xPath);
         $this->addRandomTestsOrderAttributesIfNotSet($version, $xPath);
         $this->xmlConfigurationHelper->replaceWithAbsolutePaths($xPath);
         $this->xmlConfigurationHelper->setStopOnFailure($xPath);
@@ -114,8 +114,8 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->xmlConfigurationHelper->removeExistingPrinters($xPath);
 
         if (!$this->skipCoverage) {
-            $this->addCodeCoverageLogger($dom, $xPath);
-            $this->addJUnitLogger($dom, $xPath);
+            $this->addCodeCoverageLogger($xPath);
+            $this->addJUnitLogger($xPath);
         }
 
         file_put_contents($path, $dom->saveXML());
@@ -128,18 +128,18 @@ class InitialConfigBuilder implements ConfigBuilder
         return $this->tmpDir . '/phpunitConfiguration.initial.infection.xml';
     }
 
-    private function addJUnitLogger(\DOMDocument $dom, \DOMXPath $xPath): void
+    private function addJUnitLogger(\DOMXPath $xPath): void
     {
         $logging = $this->getOrCreateNode($xPath, 'logging');
 
-        $junitLog = $dom->createElement('log');
+        $junitLog = $xPath->document->createElement('log');
         $junitLog->setAttribute('type', 'junit');
         $junitLog->setAttribute('target', $this->jUnitFilePath);
 
         $logging->appendChild($junitLog);
     }
 
-    private function addCodeCoverageLogger(\DOMDocument $dom, \DOMXPath $xPath): void
+    private function addCodeCoverageLogger(\DOMXPath $xPath): void
     {
         $logging = $this->getOrCreateNode($xPath, 'logging');
 
@@ -150,17 +150,17 @@ class InitialConfigBuilder implements ConfigBuilder
         $logging->appendChild($coverageXmlLog);
     }
 
-    private function addCoverageFilterWhitelistIfDoesNotExist(\DOMDocument $dom, \DOMXPath $xPath): void
+    private function addCoverageFilterWhitelistIfDoesNotExist(\DOMXPath $xPath): void
     {
         $filterNode = $this->getNode($xPath, 'filter');
 
         if (!$filterNode) {
-            $filterNode = $this->createNode($dom, 'filter');
+            $filterNode = $this->createNode($xPath->document, 'filter');
 
-            $whiteListNode = $dom->createElement('whitelist');
+            $whiteListNode = $xPath->document->createElement('whitelist');
 
             foreach ($this->srcDirs as $srcDir) {
-                $directoryNode = $dom->createElement(
+                $directoryNode = $xPath->document->createElement(
                     'directory',
                     $srcDir
                 );
