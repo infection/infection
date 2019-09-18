@@ -74,10 +74,10 @@ final class XmlConfigurationHelper
         }
     }
 
-    public function removeExistingLoggers(\DOMDocument $dom, \DOMXPath $xPath): void
+    public function removeExistingLoggers(\DOMXPath $xPath): void
     {
         foreach ($xPath->query('/phpunit/logging') as $node) {
-            $document = $dom->documentElement;
+            $document = $xPath->document->documentElement;
             \assert($document instanceof DOMElement);
             $document->removeChild($node);
         }
@@ -111,16 +111,15 @@ final class XmlConfigurationHelper
         );
     }
 
-    public function removeExistingPrinters(\DOMDocument $dom, \DOMXPath $xPath): void
+    public function removeExistingPrinters(\DOMXPath $xPath): void
     {
         $this->removeAttribute(
-            $dom,
             $xPath,
             'printerClass'
         );
     }
 
-    public function validate(\DOMDocument $dom, \DOMXPath $xPath): bool
+    public function validate(\DOMXPath $xPath): bool
     {
         if ($xPath->query('/phpunit')->length === 0) {
             throw InvalidPhpUnitXmlConfigException::byRootNode();
@@ -135,7 +134,7 @@ final class XmlConfigurationHelper
         $original = libxml_use_internal_errors(true);
         $schemaPath = $this->buildSchemaPath($schema[0]->nodeValue);
 
-        if ($schema->length && !$dom->schemaValidate($schemaPath)) {
+        if ($schema->length && !$xPath->document->schemaValidate($schemaPath)) {
             throw InvalidPhpUnitXmlConfigException::byXsdSchema($this->getXmlErrorsString());
         }
 
@@ -144,10 +143,9 @@ final class XmlConfigurationHelper
         return true;
     }
 
-    public function removeDefaultTestSuite(\DOMDocument $dom, \DOMXPath $xPath): void
+    public function removeDefaultTestSuite(\DOMXPath $xPath): void
     {
         $this->removeAttribute(
-            $dom,
             $xPath,
             'defaultTestSuite'
         );
@@ -181,7 +179,7 @@ final class XmlConfigurationHelper
         return sprintf('%s/%s', $this->phpUnitConfigDir, $nodeValue);
     }
 
-    private function removeAttribute(\DOMDocument $dom, \DOMXPath $xPath, string $name): void
+    private function removeAttribute(\DOMXPath $xPath, string $name): void
     {
         $nodeList = $xPath->query(sprintf(
             '/phpunit/@%s',
@@ -189,7 +187,7 @@ final class XmlConfigurationHelper
         ));
 
         if ($nodeList->length) {
-            $document = $dom->documentElement;
+            $document = $xPath->document->documentElement;
             \assert($document instanceof DOMElement);
             $document->removeAttribute($name);
         }
