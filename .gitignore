@@ -13,9 +13,9 @@
 /infection-cache
 /infection.json
 /infection.log
+/phpunit.xml
 /tests/Fixtures/e2e/*/coverage/
 /tests/Fixtures/e2e/*/infection/
 /tests/Fixtures/e2e/Configure/infection.json.dist
 /tests/Fixtures/e2e/SymfonyFlex/bin/.phpunit/
 /vendor/
-/phpunit.xml
