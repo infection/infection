@@ -1,5 +1,58 @@
 # Change Log
 
+## [0.14.0](https://github.com/infection/infection/tree/0.14.0)
+
+[Full Changelog](https://github.com/infection/infection/compare/0.13.0...0.14.0)
+
+**Added:**
+
+- \[Mutator\] Mutate `mb_str_split` to `str_split` [\#787](https://github.com/infection/infection/pull/787)
+- \[Mutator\] Spread operator in Array Expression - leave only the first element [\#784](https://github.com/infection/infection/pull/784)
+- \[Mutator\] Leave only one element in the non empty returned array [\#735](https://github.com/infection/infection/pull/735)
+- Use xdebug-filter to reduce the time needed to collect coverage [\#781](https://github.com/infection/infection/pull/781)
+- Add Symfony PHPUnitBridge [\#755](https://github.com/infection/infection/pull/755)
+- Use codingmachine/safe [\#745](https://github.com/infection/infection/pull/745)
+- Allow installation only with the most recent versions for dev dependencies [\#744](https://github.com/infection/infection/pull/744)
+- Add PCOV to TravisCI [\#741](https://github.com/infection/infection/pull/741)
+- Ensure the dev tools are up to date [\#725](https://github.com/infection/infection/pull/725)
+
+**Changed:**
+
+- Bump requirements up to PHP 7.2 [\#700](https://github.com/infection/infection/pull/700)
+- Do not round down values in MetricsCalculator [\#701](https://github.com/infection/infection/pull/701)
+- Dramatically reduce memory usage by using classes instead of object-like arrays [\#710](https://github.com/infection/infection/pull/710)
+- Rework infection command [\#767](https://github.com/infection/infection/pull/767)
+- Remove the self-update command [\#688](https://github.com/infection/infection/pull/688)
+- Move coverage data to the mutation [\#733](https://github.com/infection/infection/pull/733)
+- Deactivate `stderr` redirection in phpunit.xml [\#791](https://github.com/infection/infection/pull/791)
+- Add missed profile and mutator keys to the validation schema.json [\#782](https://github.com/infection/infection/pull/782)
+- Move `e2e` tests to the correct place. [\#780](https://github.com/infection/infection/pull/780)
+- Remove Travis' phpunit binaries since they conflicts with vendor's phpunit [\#773](https://github.com/infection/infection/pull/773)
+- Consume directly the InfectionContainer instead of a generic PSR-11 [\#761](https://github.com/infection/infection/pull/761)
+- Bump the versions used where appropriate [\#743](https://github.com/infection/infection/pull/743)
+- Update used memory detection for PHPUnit 8 [\#739](https://github.com/infection/infection/pull/739)
+- Update E2E tests to use PHPUnit 8 [\#738](https://github.com/infection/infection/pull/738)
+- Update xdebug-handler to 1.3.3, remove workarounds [\#737](https://github.com/infection/infection/pull/737)
+- Upgrade to PHPUnit 8.2.3 [\#713](https://github.com/infection/infection/pull/713) 
+- Error out when 0 lines of code were covered [\#602](https://github.com/infection/infection/pull/602)
+- Add `ignore` property for each Mutator in JSON schema. [\#699](https://github.com/infection/infection/pull/699)
+- PhpProcess: Reset $\_ENV if it is in use [\#693](https://github.com/infection/infection/pull/693)
+- Update alt text of slack badge [\#707](https://github.com/infection/infection/pull/707)
+
+**Fixed:**
+
+- Multiple extra test framework options escape in the wrong way [\#615](https://github.com/infection/infection/issues/615)
+- "Return value of MutatorConfig::getMutatorSettings\(\) must be of the type array, object returned" with mutator that has settings [\#666](https://github.com/infection/infection/issues/666)
+- Deal with object settings [\#772](https://github.com/infection/infection/pull/772)
+- initialTestsPhpOptions does not get picked from infection.json\[.dist\] [\#672](https://github.com/infection/infection/issues/672)
+- Sort & Remove duplicates entries in .gitignore [\#724](https://github.com/infection/infection/pull/724)
+- ArrayItemRemoval configuration doesn't support the "ignore" property [\#698](https://github.com/infection/infection/issues/698)
+- Error about missing phar pubkey file on self-update [\#684](https://github.com/infection/infection/issues/684)
+- Target MSI on Travis with empty --filter [\#631](https://github.com/infection/infection/issues/631)
+- Zero percent code coverage is not an issue for Infection [\#488](https://github.com/infection/infection/issues/488)
+- Infection config generator fails to handle multiple ignored directories [\#580](https://github.com/infection/infection/issues/580)
+- Fix Infection config builder: make sure it always creates an array for excluded dirs but not object [\#714](https://github.com/infection/infection/pull/714)
+
 ## [0.13.0](https://github.com/infection/infection/tree/0.13.0)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.12.2...0.13.0) (2019-05-18)
