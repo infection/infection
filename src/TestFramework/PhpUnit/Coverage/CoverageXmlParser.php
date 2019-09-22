@@ -87,7 +87,7 @@ class CoverageXmlParser
 
     private function assertHasCoverage(\DOMXPath $xPath): void
     {
-        $lineCoverage = $xPath->query('/phpunit/project/directory[@name="/"]/totals/lines')->item(0);
+        $lineCoverage = $xPath->query('/phpunit/project/directory[1]/totals/lines')->item(0);
 
         if (
             !$lineCoverage instanceof \DOMElement

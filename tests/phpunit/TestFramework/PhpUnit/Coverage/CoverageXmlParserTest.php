@@ -129,6 +129,35 @@ final class CoverageXmlParserTest extends TestCase
         $this->assertSame($expectedByMethodArray, $result);
     }
 
+    public function test_it_correctly_parses_xml_when_directory_has_absolute_path_for_old_phpunit_versions(): void
+    {
+        $xml = <<<'XML'
+<?xml version="1.0"?>
+<phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+  <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
+    <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
+    <driver name="xdebug" version="2.5.1"/>
+  </build>
+  <project source="/path/to/src">
+    <tests>
+      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
+      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
+    </tests>
+    <directory name="/absolute/path">
+      <totals>
+        <lines total="913" comments="130" code="783" executable="348" executed="7" percent="0"/>
+      </totals>
+    </directory>
+  </project>
+  <!-- The rest of the file has been removed for this test-->
+</phpunit>
+XML;
+
+        $coverage = $this->parser->parse($xml);
+
+        $this->assertIsArray($coverage);
+    }
+
     /**
      * @dataProvider providesZeroLinesCoveredCases
      */
