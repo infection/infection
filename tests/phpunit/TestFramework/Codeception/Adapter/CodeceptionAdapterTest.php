@@ -64,7 +64,8 @@ final class CodeceptionAdapterTest extends TestCase
             $initialConfigBuilder,
             $mutationConfigBuilder,
             $cliArgumentsBuilder,
-            $versionParser
+            $versionParser,
+            'path/to/junit'
         );
     }
 

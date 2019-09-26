@@ -14,6 +14,11 @@ class FakeAwareAdapter extends AbstractTestFrameworkAdapter implements MemoryUsa
         $this->memoryLimit = $memoryLimit;
     }
 
+    public function hasJUnitReport(): bool
+    {
+        return false;
+    }
+
     public function testsPass(string $output): bool
     {
         throw new \ErrorException('this should never be called');

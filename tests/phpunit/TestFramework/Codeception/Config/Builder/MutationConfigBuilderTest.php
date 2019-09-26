@@ -38,6 +38,7 @@ namespace Infection\Tests\TestFramework\Codeception\Config\Builder;
 use Infection\Mutant\MutantInterface;
 use Infection\MutationInterface;
 use Infection\TestFramework\Codeception\Config\Builder\MutationConfigBuilder;
+use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
 use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
@@ -158,7 +159,8 @@ final class MutationConfigBuilderTest extends TestCase
             $this->fileSystem,
             $this->tmpDir,
             __DIR__ . '/../../../../Fixtures/Files/codeception',
-            $parsedConfig
+            $parsedConfig,
+            new JUnitTestCaseSorter()
         );
     }
 

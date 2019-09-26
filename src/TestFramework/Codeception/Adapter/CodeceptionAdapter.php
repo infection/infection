@@ -36,9 +36,13 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Codeception\Adapter;
 
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
+use Infection\TestFramework\Config\InitialConfigBuilder;
+use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\TestFrameworkTypes;
+use Infection\Utils\VersionParser;
 
 /**
  * @internal
@@ -46,6 +50,23 @@ use Infection\TestFramework\TestFrameworkTypes;
 final class CodeceptionAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware
 {
     public const EXECUTABLE = 'codecept';
+    public const JUNIT_FILE_NAME = 'codeception.junit.xml';
+    /**
+     * @var string
+     */
+    private $jUnitFilePath;
+
+    public function __construct(string $testFrameworkExecutable, InitialConfigBuilder $initialConfigBuilder, MutationConfigBuilder $mutationConfigBuilder, CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder, VersionParser $versionParser, string $jUnitFilePath)
+    {
+        parent::__construct($testFrameworkExecutable, $initialConfigBuilder, $mutationConfigBuilder, $argumentsAndOptionsBuilder, $versionParser);
+
+        $this->jUnitFilePath = $jUnitFilePath;
+    }
+
+    public function hasJUnitReport(): bool
+    {
+        return true;
+    }
 
     public function testsPass(string $output): bool
     {
@@ -86,8 +107,18 @@ final class CodeceptionAdapter extends AbstractTestFrameworkAdapter implements M
             [
                 '--coverage-phpunit',
                 XMLLineCodeCoverage::CODECEPTION_COVERAGE_DIR,
+                // JUnit report
+                '--xml',
+                $this->jUnitFilePath,
             ]
         );
+    }
+
+    public function getMutantCommandLine(string $configPath, string $extraOptions): array
+    {
+        $commandLine = parent::getMutantCommandLine($configPath, $extraOptions);
+
+        return array_merge($commandLine, ['--group', 'infection']);
     }
 
     public function getMemoryUsed(string $output): float

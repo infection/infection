@@ -68,6 +68,10 @@ final class InitialConfigBuilder implements ConfigBuilder
      */
     private $srcDirs;
 
+    /**
+     * @param array<string, mixed> $originalConfigContentParsed
+     * @param array<int, string> $srcDirs
+     */
     public function __construct(string $tmpDir, string $projectDir, array $originalConfigContentParsed, bool $skipCoverage, array $srcDirs)
     {
         $this->tmpDir = $tmpDir;

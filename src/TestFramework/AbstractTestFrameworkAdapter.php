@@ -48,6 +48,9 @@ use Symfony\Component\Process\Process;
  */
 abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
 {
+    // TODO BC break: https://infection.github.io/guide/command-line-options.html#coverage
+    public const JUNIT_FILE_NAME = 'junit.xml';
+
     /**
      * @var string
      */
@@ -100,6 +103,8 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     abstract public function testsPass(string $output): bool;
 
     abstract public function getName(): string;
+
+    abstract public function hasJUnitReport(): bool;
 
     /**
      * Returns array of arguments to pass them into the Initial Run Symfony Process

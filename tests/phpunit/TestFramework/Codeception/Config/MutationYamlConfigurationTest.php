@@ -94,7 +94,8 @@ final class MutationYamlConfigurationTest extends TestCase
             __DIR__ . '/../../../Fixtures/Files/codeception',
             $parsedConfig,
             '1a2bc3',
-            self::INTERCEPTOR_PATH
+            self::INTERCEPTOR_PATH,
+            ['/path/to/test-file1', '/path/to/test-file2']
         );
     }
 }

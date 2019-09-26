@@ -38,6 +38,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 use Infection\Mutant\MutantInterface;
 use Infection\MutationInterface;
 use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
@@ -109,7 +110,8 @@ final class MutationConfigBuilderTest extends TestCase
             $this->tmpDir,
             file_get_contents($phpunitXmlPath),
             $this->xmlConfigurationHelper,
-            $projectDir
+            $projectDir,
+            new JUnitTestCaseSorter()
         );
     }
 
@@ -163,7 +165,8 @@ final class MutationConfigBuilderTest extends TestCase
             $this->tmpDir,
             file_get_contents($phpunitXmlPath),
             $this->xmlConfigurationHelper,
-            'project/dir'
+            'project/dir',
+            new JUnitTestCaseSorter()
         );
 
         $configurationPath = $this->builder->build($this->mutant);
@@ -226,7 +229,8 @@ final class MutationConfigBuilderTest extends TestCase
             $this->tmpDir,
             file_get_contents($phpunitXmlPath),
             $xmlConfigurationHelper,
-            $this->pathToProject
+            $this->pathToProject,
+            new JUnitTestCaseSorter()
         );
 
         $configurationPath = $this->builder->build($this->mutant);

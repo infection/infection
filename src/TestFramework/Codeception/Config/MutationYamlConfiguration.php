@@ -52,12 +52,21 @@ final class MutationYamlConfiguration extends AbstractYamlConfiguration
      */
     private $interceptorFilePath;
 
-    public function __construct(string $tmpDir, string $projectDir, array $originalConfig, string $mutationHash, string $interceptorFilePath)
+    /**
+     * @var string[]
+     */
+    private $uniqueTestFilePaths;
+
+    /**
+     * @param array<string, mixed> $originalConfig
+     */
+    public function __construct(string $tmpDir, string $projectDir, array $originalConfig, string $mutationHash, string $interceptorFilePath, array $uniqueTestFilePaths)
     {
         parent::__construct($tmpDir, $projectDir, $originalConfig);
 
         $this->mutationHash = $mutationHash;
         $this->interceptorFilePath = $interceptorFilePath;
+        $this->uniqueTestFilePaths = $uniqueTestFilePaths;
     }
 
     public function getYaml(): string
@@ -77,6 +86,8 @@ final class MutationYamlConfiguration extends AbstractYamlConfiguration
 
         $config['coverage'] = ['enabled' => false];
         $config['bootstrap'] = $this->interceptorFilePath;
+
+        $config['groups']['infection'] = $this->uniqueTestFilePaths;
 
         return Yaml::dump($config);
     }

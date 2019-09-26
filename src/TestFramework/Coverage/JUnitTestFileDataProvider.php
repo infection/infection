@@ -33,17 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Coverage;
-
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\Coverage\TestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
-use Infection\TestFramework\Coverage\TestFileTimeData;
+namespace Infection\TestFramework\Coverage;
 
 /**
  * @internal
  */
-final class PhpUnitTestFileDataProvider implements TestFileDataProvider
+final class JUnitTestFileDataProvider implements TestFileDataProvider
 {
     /**
      * @var string
@@ -66,8 +61,15 @@ final class PhpUnitTestFileDataProvider implements TestFileDataProvider
 
         $nodes = $xPath->query(sprintf('//testsuite[@name="%s"]', $fullyQualifiedClassName));
 
+        // todo add test for junit2, move to common folder
+
         if (!$nodes->length) {
-            throw TestFileNameNotFoundException::notFoundFromFQN($fullyQualifiedClassName);
+            // try another format where the class name is inside `class` attribute of `testcase` tag
+            $nodes = $xPath->query(sprintf('//testcase[@class="%s"]', $fullyQualifiedClassName));
+        }
+
+        if (!$nodes->length) {
+            throw TestFileNameNotFoundException::notFoundFromFQN($fullyQualifiedClassName, $this->jUnitFilePath);
         }
 
         return new TestFileTimeData(

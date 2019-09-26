@@ -38,6 +38,7 @@ namespace Infection\TestFramework\Codeception\Config\Builder;
 use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\Codeception\Config\MutationYamlConfiguration;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
+use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -65,12 +66,18 @@ final class MutationConfigBuilder extends ConfigBuilder
      */
     private $originalConfigContentParsed;
 
-    public function __construct(Filesystem $filesystem, string $tmpDir, string $projectDir, array $originalConfigContentParsed)
+    /**
+     * @var JUnitTestCaseSorter
+     */
+    private $jUnitTestCaseSorter;
+
+    public function __construct(Filesystem $filesystem, string $tmpDir, string $projectDir, array $originalConfigContentParsed, JUnitTestCaseSorter $JUnitTestCaseSorter)
     {
         $this->tmpDir = $tmpDir;
         $this->projectDir = $projectDir;
         $this->originalConfigContentParsed = $originalConfigContentParsed;
         $this->filesystem = $filesystem;
+        $this->jUnitTestCaseSorter = $JUnitTestCaseSorter;
     }
 
     public function build(MutantInterface $mutant): string
@@ -90,7 +97,8 @@ final class MutationConfigBuilder extends ConfigBuilder
             $this->projectDir,
             $this->originalConfigContentParsed,
             $mutationHash,
-            $interceptorFilePath
+            $interceptorFilePath,
+            $this->jUnitTestCaseSorter->getUniqueSortedFileNames($mutant->getCoverageTests())
         );
 
         $newYaml = $yamlConfiguration->getYaml();

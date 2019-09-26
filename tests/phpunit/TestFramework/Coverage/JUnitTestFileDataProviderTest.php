@@ -33,24 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
+namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
+use Infection\TestFramework\Coverage\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
-use Infection\TestFramework\PhpUnit\Coverage\PhpUnitTestFileDataProvider;
 use PHPUnit\Framework\TestCase;
 
-final class PhpUnitTestFileDataProviderTest extends TestCase
+final class JUnitTestFileDataProviderTest extends TestCase
 {
     /**
-     * @var PhpUnitTestFileDataProvider
+     * @var JUnitTestFileDataProvider
      */
     private $infoProvider;
 
     protected function setUp(): void
     {
-        $this->infoProvider = new PhpUnitTestFileDataProvider(
-            __DIR__ . '/../../../Fixtures/Files/phpunit/junit.xml'
+        $this->infoProvider = new JUnitTestFileDataProvider(
+            __DIR__ . '/../../Fixtures/Files/phpunit/junit.xml'
         );
     }
 
@@ -80,7 +80,7 @@ final class PhpUnitTestFileDataProviderTest extends TestCase
 
     public function test_it_throws_a_coverage_does_not_exists_exception_when_junit_file_does_not_exist(): void
     {
-        $provider = new PhpUnitTestFileDataProvider('foo/bar/fake-file');
+        $provider = new JUnitTestFileDataProvider('foo/bar/fake-file');
 
         $this->expectException(CoverageDoesNotExistException::class);
 
