@@ -249,7 +249,13 @@ final class InfectionContainer extends Container
             ;
         };
 
-        $clone['coverage.checker'] = static function () use ($initialTestsPhpOptions, $existingCoveragePath): CoverageRequirementChecker {
+        $clone['coverage.checker'] = static function (self $container) use (
+            $initialTestsPhpOptions,
+            $existingCoveragePath
+        ): CoverageRequirementChecker {
+            $initialTestsPhpOptions = $initialTestsPhpOptions ?: $container['infection.config']
+                ->getInitialTestsPhpOptions();
+
             if (!\is_string($initialTestsPhpOptions)) {
                 throw new InvalidArgumentException(
                     \sprintf(
