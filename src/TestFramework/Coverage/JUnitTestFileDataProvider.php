@@ -61,8 +61,6 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
 
         $nodes = $xPath->query(sprintf('//testsuite[@name="%s"]', $fullyQualifiedClassName));
 
-        // todo add test for junit2, move to common folder
-
         if (!$nodes->length) {
             // try another format where the class name is inside `class` attribute of `testcase` tag
             $nodes = $xPath->query(sprintf('//testcase[@class="%s"]', $fullyQualifiedClassName));

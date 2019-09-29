@@ -33,57 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage;
 
-/**
- * @internal
- */
-final class JUnitTestCaseSorter
+use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
+use PHPUnit\Framework\TestCase;
+
+final class JUnitTestCaseSorterTest extends TestCase
 {
-    /**
-     * @param CoverageLineData[] $coverageTestCases
-     *
-     * @return string[]
-     */
-    public function getUniqueSortedFileNames(array $coverageTestCases): array
+    public function test_it_returns_unique_and_sorted_by_time_test_cases(): void
     {
-        $uniqueCoverageTests = $this->uniqueByTestFile($coverageTestCases);
+        $coverageTestCases = [
+            CoverageLineData::with(
+                'testMethod1',
+                '/path/to/test-file-1',
+                0.000234
+            ),
+            CoverageLineData::with(
+                'testMethod2',
+                '/path/to/test-file-2',
+                0.600221
+            ),
+            CoverageLineData::with(
+                'testMethod3_1',
+                '/path/to/test-file-3',
+                0.000022
+            ),
+            CoverageLineData::with(
+                'testMethod3_2',
+                '/path/to/test-file-3',
+                0.010022
+            ),
+        ];
 
-        // sort tests to run the fastest first
-        usort(
-            $uniqueCoverageTests,
-            static function (CoverageLineData $a, CoverageLineData $b) {
-                return $a->time <=> $b->time;
-            }
-        );
+        $sorter = new JUnitTestCaseSorter();
 
-        return array_map(
-            static function (CoverageLineData $coverageLineData): string {
-                \assert(\is_string($coverageLineData->testFilePath));
+        $uniqueSortedFileNames = $sorter->getUniqueSortedFileNames($coverageTestCases);
 
-                return $coverageLineData->testFilePath;
-            },
-            $uniqueCoverageTests
-        );
-    }
-
-    /**
-     * @param CoverageLineData[] $coverageTestCases
-     *
-     * @return CoverageLineData[]
-     */
-    private function uniqueByTestFile(array $coverageTestCases): array
-    {
-        $usedFileNames = [];
-        $uniqueTests = [];
-
-        foreach ($coverageTestCases as $coverageTestCase) {
-            if (!\in_array($coverageTestCase->testFilePath, $usedFileNames, true)) {
-                $uniqueTests[] = $coverageTestCase;
-                $usedFileNames[] = $coverageTestCase->testFilePath;
-            }
-        }
-
-        return $uniqueTests;
+        $this->assertCount(3, $uniqueSortedFileNames);
+        $this->assertSame('/path/to/test-file-3', $uniqueSortedFileNames[0]);
     }
 }

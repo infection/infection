@@ -86,4 +86,15 @@ final class JUnitTestFileDataProviderTest extends TestCase
 
         $provider->getTestFileInfo('Foo\BarTest');
     }
+
+    public function test_it_works_with_different_junit_format(): void
+    {
+        $infoProvider = new JUnitTestFileDataProvider(
+            __DIR__ . '/../../Fixtures/Files/phpunit/junit2.xml'
+        );
+
+        $info1 = $infoProvider->getTestFileInfo('App\Tests\unit\SourceClassTest');
+
+        $this->assertSame('/codeception/tests/unit/SourceClassTest.php', $info1->path);
+    }
 }

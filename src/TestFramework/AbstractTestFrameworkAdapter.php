@@ -48,7 +48,6 @@ use Symfony\Component\Process\Process;
  */
 abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
 {
-    // TODO BC break: https://infection.github.io/guide/command-line-options.html#coverage
     public const JUNIT_FILE_NAME = 'junit.xml';
 
     /**

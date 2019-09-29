@@ -48,7 +48,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
 {
     public function hasJUnitReport(): bool
     {
-        return false;
+        return true;
     }
 
     public function testsPass(string $output): bool
