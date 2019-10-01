@@ -68,6 +68,7 @@ final class CiMutationGeneratingConsoleLoggerSubscriber implements EventSubscrib
             'Generate mutants...',
             '',
             sprintf('Processing source code files: %s', $event->getMutableFilesCount()),
+            '',
         ]);
     }
 }

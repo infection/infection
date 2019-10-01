@@ -65,6 +65,7 @@ final class CiMutationGeneratingConsoleLoggerSubscriberTest extends TestCase
                 'Generate mutants...',
                 '',
                 'Processing source code files: 123',
+                '',
             ]);
 
         $dispatcher = new EventDispatcher();
