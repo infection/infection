@@ -76,6 +76,7 @@ final class InitialConfigBuilderTest extends TestCase
         $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/codeception/codeception.yml';
 
         $builder = new InitialConfigBuilder(
+            $this->fileSystem,
             $this->tmpDir,
             \dirname($originalYamlConfigPath),
             Yaml::parseFile($originalYamlConfigPath),

@@ -167,6 +167,7 @@ final class Factory
             return new CodeceptionAdapter(
                 (new TestFrameworkFinder(CodeceptionAdapter::EXECUTABLE))->find(),
                 new CodeceptionInitialConfigBuilder(
+                    $this->filesystem,
                     $this->tmpDir,
                     $this->projectDir,
                     $codeceptionConfigContentParsed,

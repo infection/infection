@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework\Codeception\Config;
 
 use Infection\TestFramework\Codeception\Config\InitialYamlConfiguration;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 
 final class InitialYamlConfigurationTest extends TestCase
@@ -166,7 +167,8 @@ final class InitialYamlConfigurationTest extends TestCase
             __DIR__ . '/../../../Fixtures/Files/codeception',
             $parsedConfig,
             $skipCoverage,
-            ['src']
+            ['src'],
+            new Filesystem()
         );
     }
 }

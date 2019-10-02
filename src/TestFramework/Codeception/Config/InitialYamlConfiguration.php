@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Codeception\Config;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -45,16 +46,16 @@ final class InitialYamlConfiguration extends AbstractYamlConfiguration
     /**
      * @var string[]
      */
-    protected $srcDirs;
+    private $srcDirs;
 
     /**
      * @var bool
      */
     private $skipCoverage;
 
-    public function __construct(string $tmpDir, string $projectDir, array $originalConfig, bool $skipCoverage, array $srcDirs)
+    public function __construct(string $tmpDir, string $projectDir, array $originalConfig, bool $skipCoverage, array $srcDirs, Filesystem $filesystem)
     {
-        parent::__construct($tmpDir, $projectDir, $originalConfig);
+        parent::__construct($tmpDir, $projectDir, $originalConfig, $filesystem);
 
         $this->srcDirs = $srcDirs;
         $this->skipCoverage = $skipCoverage;

@@ -35,11 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Codeception\Config;
 
+use Symfony\Component\Filesystem\Filesystem;
+
 /**
  * @internal
  */
 abstract class AbstractYamlConfiguration
 {
+    /**
+     * @var Filesystem
+     */
+    protected $filesystem;
+
     /**
      * @var string
      */
@@ -49,17 +56,17 @@ abstract class AbstractYamlConfiguration
      * @var string
      */
     protected $projectDir;
-
     /**
      * @var array
      */
     protected $originalConfig;
 
-    public function __construct(string $tmpDir, string $projectDir, array $originalConfig)
+    public function __construct(string $tmpDir, string $projectDir, array $originalConfig, Filesystem $filesystem)
     {
         $this->tmpDir = $tmpDir;
         $this->projectDir = $projectDir;
         $this->originalConfig = $originalConfig;
+        $this->filesystem = $filesystem;
     }
 
     abstract public function getYaml(): string;
@@ -81,22 +88,7 @@ abstract class AbstractYamlConfiguration
      */
     protected function getRelativeFromTmpDirPathToProjectDir(): string
     {
-        /** @var string $projectDir */
-        $projectDir = realpath($this->projectDir);
-        /** @var string $tmpDir */
-        $tmpDir = realpath($this->tmpDir);
-
-        $projectDirParts = explode(\DIRECTORY_SEPARATOR, $projectDir);
-        $tempDirParts = explode(\DIRECTORY_SEPARATOR, $tmpDir);
-
-        while (\count($projectDirParts) > 0 && \count($tempDirParts) > 0 && strcmp($projectDirParts[0], $tempDirParts[0]) === 0) {
-            array_shift($projectDirParts);
-            array_shift($tempDirParts);
-        }
-
-        $pathToProjectDir = rtrim(str_repeat('../', \count($tempDirParts)) . implode('/', $projectDirParts), '/') . '/';
-
-        return $pathToProjectDir;
+        return $this->filesystem->makePathRelative($this->projectDir, $this->tmpDir);
     }
 
     protected function updatePaths(array $config, string $relativeFromTmpDirPathToProjectDir, string $projectDirRealPath): array

@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework\Codeception\Config;
 
 use Infection\TestFramework\Codeception\Config\MutationYamlConfiguration;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 
 final class MutationYamlConfigurationTest extends TestCase
@@ -95,7 +96,8 @@ final class MutationYamlConfigurationTest extends TestCase
             $parsedConfig,
             '1a2bc3',
             self::INTERCEPTOR_PATH,
-            ['/path/to/test-file1', '/path/to/test-file2']
+            ['/path/to/test-file1', '/path/to/test-file2'],
+            new Filesystem()
         );
     }
 }

@@ -98,7 +98,8 @@ final class MutationConfigBuilder extends ConfigBuilder
             $this->originalConfigContentParsed,
             $mutationHash,
             $interceptorFilePath,
-            $this->jUnitTestCaseSorter->getUniqueSortedFileNames($mutant->getCoverageTests())
+            $this->jUnitTestCaseSorter->getUniqueSortedFileNames($mutant->getCoverageTests()),
+            $this->filesystem
         );
 
         $newYaml = $yamlConfiguration->getYaml();

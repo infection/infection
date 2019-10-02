@@ -37,6 +37,7 @@ namespace Infection\TestFramework\Codeception\Config\Builder;
 
 use Infection\TestFramework\Codeception\Config\InitialYamlConfiguration;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
@@ -69,11 +70,17 @@ final class InitialConfigBuilder implements ConfigBuilder
     private $srcDirs;
 
     /**
+     * @var Filesystem
+     */
+    private $filesystem;
+
+    /**
      * @param array<string, mixed> $originalConfigContentParsed
      * @param array<int, string> $srcDirs
      */
-    public function __construct(string $tmpDir, string $projectDir, array $originalConfigContentParsed, bool $skipCoverage, array $srcDirs)
+    public function __construct(Filesystem $filesystem, string $tmpDir, string $projectDir, array $originalConfigContentParsed, bool $skipCoverage, array $srcDirs)
     {
+        $this->filesystem = $filesystem;
         $this->tmpDir = $tmpDir;
         $this->projectDir = $projectDir;
         $this->originalConfigContentParsed = $originalConfigContentParsed;
@@ -90,7 +97,8 @@ final class InitialConfigBuilder implements ConfigBuilder
             $this->projectDir,
             $this->originalConfigContentParsed,
             $this->skipCoverage,
-            $this->srcDirs
+            $this->srcDirs,
+            $this->filesystem
         );
 
         file_put_contents($path, $yamlConfiguration->getYaml());

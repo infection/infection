@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Codeception\Config;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -60,9 +61,9 @@ final class MutationYamlConfiguration extends AbstractYamlConfiguration
     /**
      * @param array<string, mixed> $originalConfig
      */
-    public function __construct(string $tmpDir, string $projectDir, array $originalConfig, string $mutationHash, string $interceptorFilePath, array $uniqueTestFilePaths)
+    public function __construct(string $tmpDir, string $projectDir, array $originalConfig, string $mutationHash, string $interceptorFilePath, array $uniqueTestFilePaths, Filesystem $filesystem)
     {
-        parent::__construct($tmpDir, $projectDir, $originalConfig);
+        parent::__construct($tmpDir, $projectDir, $originalConfig, $filesystem);
 
         $this->mutationHash = $mutationHash;
         $this->interceptorFilePath = $interceptorFilePath;
