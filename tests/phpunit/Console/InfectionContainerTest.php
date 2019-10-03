@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Console;
 
+use Infection\Config\InfectionConfig;
 use Infection\Console\InfectionContainer;
+use Infection\Process\Coverage\CoverageRequirementChecker;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+use Symfony\Component\Filesystem\Filesystem;
 
 final class InfectionContainerTest extends TestCase
 {
@@ -106,5 +109,61 @@ final class InfectionContainerTest extends TestCase
 
         $this->assertFalse($container->offsetExists('coverage.path'));
         $this->assertTrue($newContainer->offsetExists('coverage.path'));
+    }
+
+    public function test_coverage_checker_xdebug_is_included_by_cli_option(): void
+    {
+        $container = InfectionContainer::create()->withDynamicParameters(
+            null,
+            null,
+            false,
+            '',
+            false,
+            false,
+            '',
+            false,
+            '',
+            '-d zend_extension=xdebug.so',
+            false,
+            .0,
+            .0
+        );
+
+        /** @var CoverageRequirementChecker $checker */
+        $checker = $container['coverage.checker'];
+
+        $this->assertTrue($checker->hasDebuggerOrCoverageOption());
+    }
+
+    public function test_coverage_checker_xdebug_is_included_by_config_file_option(): void
+    {
+        $container = InfectionContainer::create()->withDynamicParameters(
+            null,
+            null,
+            false,
+            '',
+            false,
+            false,
+            '',
+            false,
+            '',
+            '',
+            false,
+            .0,
+            .0
+        );
+
+        // Overwrite config service to simulate infection.json
+        $container['infection.config'] = static function (): InfectionConfig {
+            $config = new stdClass();
+            $config->initialTestsPhpOptions = '-d zend_extension=xdebug.so';
+
+            return new InfectionConfig($config, new Filesystem(), '');
+        };
+
+        /** @var CoverageRequirementChecker $checker */
+        $checker = $container['coverage.checker'];
+
+        $this->assertTrue($checker->hasDebuggerOrCoverageOption());
     }
 }
