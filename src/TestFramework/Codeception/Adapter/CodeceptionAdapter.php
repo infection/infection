@@ -92,6 +92,7 @@ final class CodeceptionAdapter extends AbstractTestFrameworkAdapter implements M
 
     /**
      * @param string[] $phpExtraArgs
+     *
      * @return string[]
      */
     public function getInitialTestRunCommandLine(string $configPath, string $extraOptions, array $phpExtraArgs, bool $skipCoverage): array

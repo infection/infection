@@ -96,6 +96,7 @@ abstract class AbstractYamlConfiguration
 
     /**
      * @param array<string, mixed> $config
+     *
      * @return array<string, mixed>
      */
     protected function updatePaths(array $config, string $relativeFromTmpDirPathToProjectDir, string $projectDirRealPath): array

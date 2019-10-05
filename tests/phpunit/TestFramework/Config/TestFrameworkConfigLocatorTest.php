@@ -37,8 +37,8 @@ namespace Infection\Tests\TestFramework\Config;
 
 use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
-use PHPUnit\Framework\TestCase;
 use function Infection\Tests\normalizePath as p;
+use PHPUnit\Framework\TestCase;
 
 final class TestFrameworkConfigLocatorTest extends TestCase
 {

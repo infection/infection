@@ -95,6 +95,7 @@ final class InitialYamlConfiguration extends AbstractYamlConfiguration
 
     /**
      * @param array<string, mixed> $fullConfig
+     *
      * @return array<string, mixed>
      */
     private function prepareCoverageConfig(array $fullConfig, string $relativeFromTmpDirPathToProjectDir): array

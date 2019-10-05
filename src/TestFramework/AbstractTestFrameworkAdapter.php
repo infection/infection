@@ -107,7 +107,9 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
 
     /**
      * Returns array of arguments to pass them into the Initial Run Symfony Process
+     *
      * @param string[] $phpExtraArgs
+     *
      * @return string[]
      */
     public function getInitialTestRunCommandLine(

@@ -102,16 +102,22 @@ final class CodeceptionAdapterTest extends TestCase
     public function memoryReportProvider(): \Generator
     {
         yield ['Memory: 8.00MB', 8.0];
+
         yield ['Memory: 68.00MB', 68.0];
+
         yield ['Memory: 68.00 MB', 68.0];
+
         yield ['Time: 2.51 seconds', -1.0];
     }
 
     public function passProvider(): \Generator
     {
         yield ['OK, but incomplete, skipped, or risky tests!', true];
+
         yield ['OK (5 tests, 3 assertions)', true];
+
         yield ['FAILURES!', false];
+
         yield ['ERRORS!', false];
     }
 }
