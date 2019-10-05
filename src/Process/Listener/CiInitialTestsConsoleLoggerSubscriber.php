@@ -77,6 +77,7 @@ final class CiInitialTestsConsoleLoggerSubscriber implements EventSubscriberInte
         }
 
         $this->output->writeln([
+            '',
             'Running initial test suite...',
             '',
             sprintf(
