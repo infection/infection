@@ -90,6 +90,10 @@ final class CodeceptionAdapter extends AbstractTestFrameworkAdapter implements M
         return $isOk || $isOkWithInfo || $isWarning;
     }
 
+    /**
+     * @param string[] $phpExtraArgs
+     * @return string[]
+     */
     public function getInitialTestRunCommandLine(string $configPath, string $extraOptions, array $phpExtraArgs, bool $skipCoverage): array
     {
         $commandLine = parent::getInitialTestRunCommandLine($configPath, $extraOptions, $phpExtraArgs, $skipCoverage);

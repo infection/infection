@@ -71,6 +71,9 @@ final class MutationConfigBuilder extends ConfigBuilder
      */
     private $jUnitTestCaseSorter;
 
+    /**
+     * @param array<string, mixed> $originalConfigContentParsed
+     */
     public function __construct(Filesystem $filesystem, string $tmpDir, string $projectDir, array $originalConfigContentParsed, JUnitTestCaseSorter $JUnitTestCaseSorter)
     {
         $this->tmpDir = $tmpDir;

@@ -61,6 +61,9 @@ abstract class AbstractYamlConfiguration
      */
     protected $originalConfig;
 
+    /**
+     * @param array<string, mixed> $originalConfig
+     */
     public function __construct(string $tmpDir, string $projectDir, array $originalConfig, Filesystem $filesystem)
     {
         $this->tmpDir = $tmpDir;
@@ -91,6 +94,10 @@ abstract class AbstractYamlConfiguration
         return $this->filesystem->makePathRelative($this->projectDir, $this->tmpDir);
     }
 
+    /**
+     * @param array<string, mixed> $config
+     * @return array<string, mixed>
+     */
     protected function updatePaths(array $config, string $relativeFromTmpDirPathToProjectDir, string $projectDirRealPath): array
     {
         $returnConfig = [];

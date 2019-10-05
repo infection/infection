@@ -82,6 +82,11 @@ final class MutationConfigBuilderTest extends TestCase
         $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
     }
 
+    protected function tearDown(): void
+    {
+        $this->fileSystem->remove($this->workspace);
+    }
+
     public function test_it_creates_mutation_config_file(): void
     {
         $builder = $this->getMutationConfigBuilder();

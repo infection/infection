@@ -93,6 +93,10 @@ final class InitialYamlConfiguration extends AbstractYamlConfiguration
         return Yaml::dump($config);
     }
 
+    /**
+     * @param array<string, mixed> $fullConfig
+     * @return array<string, mixed>
+     */
     private function prepareCoverageConfig(array $fullConfig, string $relativeFromTmpDirPathToProjectDir): array
     {
         $coverage = array_merge($fullConfig['coverage'] ?? [], ['enabled' => true]);

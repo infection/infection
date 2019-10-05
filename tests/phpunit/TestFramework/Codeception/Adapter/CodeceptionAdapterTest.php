@@ -77,7 +77,7 @@ final class CodeceptionAdapterTest extends TestCase
     /**
      * @dataProvider passProvider
      */
-    public function test_it_determines_whether_tests_pass_or_not($output, $expectedResult): void
+    public function test_it_determines_whether_tests_pass_or_not(string $output, bool $expectedResult): void
     {
         $result = $this->adapter->testsPass($output);
 
@@ -92,30 +92,26 @@ final class CodeceptionAdapterTest extends TestCase
     /**
      * @dataProvider memoryReportProvider
      */
-    public function test_it_determines_used_memory_amount($output, $expectedResult): void
+    public function test_it_determines_used_memory_amount(string $output, float $expectedResult): void
     {
         $result = $this->adapter->getMemoryUsed($output);
 
         $this->assertSame($expectedResult, $result);
     }
 
-    public function memoryReportProvider()
+    public function memoryReportProvider(): \Generator
     {
-        return [
-            ['Memory: 8.00MB', 8.0],
-            ['Memory: 68.00MB', 68.0],
-            ['Memory: 68.00 MB', 68.0],
-            ['Time: 2.51 seconds', -1.0],
-        ];
+        yield ['Memory: 8.00MB', 8.0];
+        yield ['Memory: 68.00MB', 68.0];
+        yield ['Memory: 68.00 MB', 68.0];
+        yield ['Time: 2.51 seconds', -1.0];
     }
 
-    public function passProvider()
+    public function passProvider(): \Generator
     {
-        return [
-            ['OK, but incomplete, skipped, or risky tests!', true],
-            ['OK (5 tests, 3 assertions)', true],
-            ['FAILURES!', false],
-            ['ERRORS!', false],
-        ];
+        yield ['OK, but incomplete, skipped, or risky tests!', true];
+        yield ['OK (5 tests, 3 assertions)', true];
+        yield ['FAILURES!', false];
+        yield ['ERRORS!', false];
     }
 }

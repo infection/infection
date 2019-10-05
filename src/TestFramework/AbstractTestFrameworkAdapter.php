@@ -107,7 +107,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
 
     /**
      * Returns array of arguments to pass them into the Initial Run Symfony Process
-     *
+     * @param string[] $phpExtraArgs
      * @return string[]
      */
     public function getInitialTestRunCommandLine(
@@ -126,7 +126,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
      */
     public function getMutantCommandLine(string $configPath, string $extraOptions): array
     {
-        return $this->getCommandLine($configPath, $extraOptions);
+        return $this->getCommandLine($configPath, $extraOptions, [], false);
     }
 
     public function buildInitialConfigFile(): string
@@ -181,8 +181,8 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     private function getCommandLine(
         string $configPath,
         string $extraOptions,
-        array $phpExtraArgs = [],
-        bool $skipCoverage = false
+        array $phpExtraArgs,
+        bool $skipCoverage
     ): array {
         $frameworkArgs = $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions);
 
