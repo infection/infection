@@ -71,7 +71,7 @@ abstract class AbstractUnwrapMutator extends Mutator
         }
 
         foreach ($this->getParameterIndexes($node) as $index) {
-            if (!\array_key_exists($index, $node->args)) {
+            if (!\array_key_exists($index, $node->args) || $node->args[$index]->unpack) {
                 return false;
             }
         }

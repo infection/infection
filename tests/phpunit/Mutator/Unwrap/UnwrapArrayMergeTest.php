@@ -288,5 +288,14 @@ $b = $a([1,2,3], [3,4,5]);
 PHP
             ,
         ];
+
+        yield 'It does not mutate when the input array is unpacked' => [
+            <<<'PHP'
+<?php
+
+$a = array_merge(...$classes);
+PHP
+            ,
+        ];
     }
 }
