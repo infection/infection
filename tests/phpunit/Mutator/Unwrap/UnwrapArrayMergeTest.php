@@ -288,5 +288,34 @@ $b = $a([1,2,3], [3,4,5]);
 PHP
             ,
         ];
+
+        yield 'It does not mutate when the input array is unpacked' => [
+            <<<'PHP'
+<?php
+
+$a = array_merge(...$classes);
+PHP
+            ,
+        ];
+
+        yield 'It does mutate the elements that are not unpacked' => [
+            <<<'PHP'
+<?php
+$first = [1, 2, 3, 4, 5];
+$other = [[6, 7], [8]];
+
+$result = array_merge($first, ...$other);
+PHP
+            ,
+            [
+                <<<'PHP'
+<?php
+
+$first = [1, 2, 3, 4, 5];
+$other = [[6, 7], [8]];
+$result = $first;
+PHP
+            ],
+        ];
     }
 }

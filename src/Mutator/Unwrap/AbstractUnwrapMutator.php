@@ -53,6 +53,10 @@ abstract class AbstractUnwrapMutator extends Mutator
     final public function mutate(Node $node)
     {
         foreach ($this->getParameterIndexes($node) as $index) {
+            if ($node->args[$index]->unpack) {
+                continue;
+            }
+
             yield $node->args[$index];
         }
     }

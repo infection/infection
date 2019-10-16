@@ -68,6 +68,7 @@ final class CiInitialTestsConsoleLoggerSubscriberTest extends TestCase
         $this->output->expects($this->once())
             ->method('writeln')
             ->with([
+                '',
                 'Running initial test suite...',
                 '',
                 'PHPUnit version: 6.5.4',
