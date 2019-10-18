@@ -61,7 +61,7 @@ final class Application extends BaseApplication
      ____      ____          __  _
     /  _/___  / __/__  _____/ /_(_)___  ____
     / // __ \/ /_/ _ \/ ___/ __/ / __ \/ __ \
-  _/ // / / / __/  __/ /__/ /_/ / /_/ / / / /
+  _/ // / / / __/  __/ /__/ /_/ / /_/ / / / / %version%
  /___/_/ /_/_/  \___/\___/\__/_/\____/_/ /_/
 
 ASCII;
@@ -121,7 +121,7 @@ ASCII;
 
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln(self::LOGO);
+        $output->writeln(str_replace('%version%', $this->getVersion(), self::LOGO));
 
         return parent::doRun($input, $output);
     }
