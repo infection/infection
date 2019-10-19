@@ -78,6 +78,14 @@ final class InitialYamlConfiguration extends AbstractYamlConfiguration
             'envs' => $config['paths']['envs'] ?? $relativeFromTmpDirPathToProjectDir . 'tests/_envs',
         ];
 
+        if (\array_key_exists('modules', $config)) {
+            $config['modules'] = $this->updatePaths($config['modules'], $relativeFromTmpDirPathToProjectDir, $projectDirRealPath);
+        }
+
+        if (\array_key_exists('suites', $config)) {
+            $config['suites'] = $this->updatePaths($config['suites'], $relativeFromTmpDirPathToProjectDir, $projectDirRealPath);
+        }
+
         if ($this->skipCoverage) {
             $config['coverage']['enabled'] = false;
         } else {

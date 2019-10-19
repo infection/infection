@@ -54,6 +54,29 @@ final class InitialYamlConfigurationTest extends TestCase
         'extensions' => [
             'enabled' => ['Codeception\Extension\RunFailed'],
         ],
+        'modules' => [
+            'enabled' => [
+                'Db' => [
+                    'dump' => [
+                        'tests/_data/dump.sql',
+                    ],
+                ],
+            ],
+        ],
+        'suites' => [
+            'integration' => [
+                'actor' => 'IntegrationTester',
+                'modules' => [
+                    'enabled' => [
+                        'Db' => [
+                            'dump' => [
+                                'tests/_data/dump.sql',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
     ];
 
     public function test_it_prepends_paths_with_relative_path_prefix(): void
@@ -153,6 +176,24 @@ final class InitialYamlConfigurationTest extends TestCase
         $initialConfig = Yaml::parse($configuration->getYaml());
 
         $this->assertTrue($initialConfig['settings']['shuffle'], 'Tests must be run with a random order (shuffle: true)');
+    }
+
+    public function test_it_test_it_prepends_paths_with_relative_path_prefix_for_modules(): void
+    {
+        $configuration = $this->buildConfiguration();
+
+        $initialConfig = Yaml::parse($configuration->getYaml());
+
+        $this->assertSame('../tests/_data/dump.sql', $initialConfig['modules']['enabled']['Db']['dump'][0]);
+    }
+
+    public function test_it_test_it_prepends_paths_with_relative_path_prefix_for_suites(): void
+    {
+        $configuration = $this->buildConfiguration();
+
+        $initialConfig = Yaml::parse($configuration->getYaml());
+
+        $this->assertSame('../tests/_data/dump.sql', $initialConfig['suites']['integration']['modules']['enabled']['Db']['dump'][0]);
     }
 
     private function buildConfigurationWithSkippedCoverage(): InitialYamlConfiguration
