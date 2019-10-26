@@ -105,7 +105,10 @@ class ConfigurationFactoryTest extends TestCase
         // improbable cases rather than a test in itself
         $this->assertJsonIsSchemaValid($rawConfig);
 
-        $actual = (new ConfigurationFactory())->create($rawConfig);
+        $actual = (new ConfigurationFactory())->create(
+            '/path/to/config',
+            $rawConfig
+        );
 
         $this->assertSame(
             var_export($expected, true),
@@ -2482,6 +2485,7 @@ JSON
     private static function createConfig(array $args): SchemaConfiguration
     {
         $defaultArgs = [
+            'path' => '/path/to/config',
             'timeout' => null,
             'source' => new Source([], []),
             'logs' => new Logs(

@@ -88,7 +88,7 @@ class ConfigurationFileLoaderTest extends TestCase
         ;
 
         $this->configFactoryProphecy
-            ->create($decodedContents)
+            ->create($path, $decodedContents)
             ->willReturn($expectedConfig)
         ;
 

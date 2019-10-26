@@ -58,6 +58,7 @@ class SchemaConfigurationTest extends TestCase
      * @dataProvider valueProvider
      */
     public function test_it_can_be_instantiated(
+        string $path,
         ?int $timeout,
         Source $source,
         Logs $logs,
@@ -70,6 +71,7 @@ class SchemaConfigurationTest extends TestCase
         ?string $testFrameworkOptions
     ): void {
         $config = new SchemaConfiguration(
+            $path,
             $timeout,
             $source,
             $logs,
@@ -96,28 +98,31 @@ class SchemaConfigurationTest extends TestCase
 
     public function valueProvider(): Generator
     {
-        foreach ($this->provideNullableStrictlyPositiveInteger() as $timeout) {
-            foreach ($this->provideSource() as $source) {
-                foreach ($this->provideLogs() as $log) {
-                    foreach ([null, 'custom-dir'] as $tmpDir) {
-                        foreach ($this->providePhpUnit() as $phpUnit) {
-                            foreach ($this->provideMutators() as $mutators) {
-                                foreach ([null, 'phpunit'] as $testFramework) {
-                                    foreach ([null, 'bin/bootstrap.php'] as $bootstrap) {
-                                        foreach ([null, '-d zend_extension=xdebug.so'] as $initialTestOptions) {
-                                            foreach ([null, '--debug'] as $testFrameworkOptions) {
-                                                yield [
-                                                    $timeout,
-                                                    $source,
-                                                    $log,
-                                                    $tmpDir,
-                                                    $phpUnit,
-                                                    $mutators,
-                                                    $testFramework,
-                                                    $bootstrap,
-                                                    $initialTestOptions,
-                                                    $testFrameworkOptions,
-                                                ];
+        foreach (['/path/to/config', ''] as $path) {
+            foreach ($this->provideNullableStrictlyPositiveInteger() as $timeout) {
+                foreach ($this->provideSource() as $source) {
+                    foreach ($this->provideLogs() as $log) {
+                        foreach ([null, 'custom-dir'] as $tmpDir) {
+                            foreach ($this->providePhpUnit() as $phpUnit) {
+                                foreach ($this->provideMutators() as $mutators) {
+                                    foreach ([null, 'phpunit'] as $testFramework) {
+                                        foreach ([null, 'bin/bootstrap.php'] as $bootstrap) {
+                                            foreach ([null, '-d zend_extension=xdebug.so'] as $initialTestOptions) {
+                                                foreach ([null, '--debug'] as $testFrameworkOptions) {
+                                                    yield [
+                                                        $path,
+                                                        $timeout,
+                                                        $source,
+                                                        $log,
+                                                        $tmpDir,
+                                                        $phpUnit,
+                                                        $mutators,
+                                                        $testFramework,
+                                                        $bootstrap,
+                                                        $initialTestOptions,
+                                                        $testFrameworkOptions,
+                                                    ];
+                                                }
                                             }
                                         }
                                     }
