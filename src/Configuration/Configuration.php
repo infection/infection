@@ -41,6 +41,9 @@ use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Webmozart\Assert\Assert;
 
+/**
+ * @internal
+ */
 final class Configuration
 {
     private const TEST_FRAMEWORKS = [
@@ -58,21 +61,6 @@ final class Configuration
     private $bootstrap;
     private $initialTestsPhpOptions;
     private $testFrameworkOptions;
-
-    public static function fromSchemaConfig(SchemaConfiguration $config): self {
-        return new self(
-            $config->getTimeout(),
-            $config->getSource(),
-            $config->getLogs(),
-            $config->getTmpDir(),
-            $config->getPhpUnit(),
-            $config->getMutators(),
-            $config->getTestFramework(),
-            $config->getBootstrap(),
-            $config->getInitialTestsPhpOptions(),
-            $config->getTestFrameworkOptions()
-        );
-    }
 
     public function __construct(
         ?int $timeout,

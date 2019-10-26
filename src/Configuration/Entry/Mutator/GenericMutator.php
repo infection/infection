@@ -41,6 +41,9 @@ use function array_keys;
 use function in_array;
 use function Safe\sprintf;
 
+/**
+ * @internal
+ */
 final class GenericMutator implements MutatorConfiguration
 {
     private $enabled;

@@ -41,6 +41,24 @@ use Infection\Command\InfectionCommand;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\InfectionConfig;
+use Infection\Configuration\Configuration;
+use Infection\Configuration\ConfigurationFactory;
+use Infection\Configuration\ConfigurationFileLoader;
+use Infection\Configuration\Entry\Badge;
+use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\Mutator\ArrayItemRemoval;
+use Infection\Configuration\Entry\Mutator\ArrayItemRemovalSettings;
+use Infection\Configuration\Entry\Mutator\BCMath;
+use Infection\Configuration\Entry\Mutator\BCMathSettings;
+use Infection\Configuration\Entry\Mutator\GenericMutator;
+use Infection\Configuration\Entry\Mutator\MBString;
+use Infection\Configuration\Entry\Mutator\MBStringSettings;
+use Infection\Configuration\Entry\Mutator\Mutators;
+use Infection\Configuration\Entry\Mutator\TrueValue;
+use Infection\Configuration\Entry\Mutator\TrueValueSettings;
+use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\Entry\Source;
+use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Console\Application;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
@@ -99,6 +117,21 @@ final class ProjectCodeProvider
         TestFrameworkTypes::class,
         MutationsCollectorVisitor::class,
         ParentConnectorVisitor::class,
+        ArrayItemRemoval::class,
+        ArrayItemRemovalSettings::class,
+        BCMath::class,
+        BCMathSettings::class,
+        GenericMutator::class,
+        MBString::class,
+        MBStringSettings::class,
+        Mutators::class,
+        TrueValue::class,
+        TrueValueSettings::class,
+        Badge::class,
+        Logs::class,
+        PhpUnit::class,
+        Source::class,
+        Configuration::class,
     ];
 
     /**
@@ -121,6 +154,9 @@ final class ProjectCodeProvider
         PhpUnitMutationConfigBuilder::class,
         CoverageXmlParser::class,
         VersionParser::class,
+        ConfigurationFactory::class,
+        ConfigurationFileLoader::class,
+        SchemaValidator::class,
     ];
 
     /**
@@ -129,6 +165,9 @@ final class ProjectCodeProvider
     public const EXTENSION_POINTS = [
         Mutator::class,
         OutputFormatter::class,
+        ConfigurationFactory::class,
+        ConfigurationFileLoader::class,
+        SchemaValidator::class,
     ];
 
     /**

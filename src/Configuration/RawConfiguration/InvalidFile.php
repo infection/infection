@@ -39,6 +39,9 @@ use function sprintf;
 use Throwable;
 use UnexpectedValueException;
 
+/**
+ * @internal
+ */
 final class InvalidFile extends UnexpectedValueException
 {
     public static function createForFileNotFound(RawConfiguration $config): self

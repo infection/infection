@@ -42,6 +42,9 @@ use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
 use stdClass;
 
+/**
+ * @internal
+ */
 final class RawConfiguration
 {
     private $path;

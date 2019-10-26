@@ -45,7 +45,7 @@ use ReflectionClass;
 use function Safe\json_last_error_msg;
 use Webmozart\Assert\Assert;
 
-class SchemaValidatorTest extends TestCase
+final class SchemaValidatorTest extends TestCase
 {
     /**
      * @dataProvider configProvider

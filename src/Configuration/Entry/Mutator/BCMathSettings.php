@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Entry\Mutator;
 
+/**
+ * @internal
+ */
 final class BCMathSettings
 {
     private $bcadd;

@@ -38,6 +38,9 @@ namespace Infection\Configuration\Entry\Mutator;
 use function array_keys;
 use Webmozart\Assert\Assert;
 
+/**
+ * @internal
+ */
 final class Mutators
 {
     public const PROFILES = [

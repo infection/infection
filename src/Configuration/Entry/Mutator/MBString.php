@@ -37,6 +37,9 @@ namespace Infection\Configuration\Entry\Mutator;
 
 use Webmozart\Assert\Assert;
 
+/**
+ * @internal
+ */
 final class MBString implements MutatorConfiguration
 {
     private $enabled;

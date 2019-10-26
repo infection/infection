@@ -37,6 +37,9 @@ namespace Infection\Configuration;
 
 use Infection\Locator\Locator;
 
+/**
+ * @internal
+ */
 final class ConfigurationLoader
 {
     private $locator;

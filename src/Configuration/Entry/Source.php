@@ -37,6 +37,9 @@ namespace Infection\Configuration\Entry;
 
 use Webmozart\Assert\Assert;
 
+/**
+ * @internal
+ */
 final class Source
 {
     private $directories;

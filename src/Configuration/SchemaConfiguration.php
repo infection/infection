@@ -41,6 +41,9 @@ use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Webmozart\Assert\Assert;
 
+/**
+ * @internal
+ */
 final class SchemaConfiguration
 {
     private const TEST_FRAMEWORKS = [

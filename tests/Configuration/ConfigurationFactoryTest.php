@@ -86,7 +86,7 @@ use stdClass;
  * @covers \Infection\Configuration\Entry\PhpUnit
  * @covers \Infection\Configuration\Entry\Source
  */
-class ConfigurationFactoryTest extends TestCase
+final class ConfigurationFactoryTest extends TestCase
 {
     private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../resources/schema.json';
 

@@ -40,7 +40,7 @@ use Infection\Configuration\RawConfiguration\RawConfiguration;
 use Infection\Configuration\Schema\InvalidSchema;
 use PHPUnit\Framework\TestCase;
 
-class InvalidSchemaTest extends TestCase
+final class InvalidSchemaTest extends TestCase
 {
     /**
      * @dataProvider configWithErrorsProvider

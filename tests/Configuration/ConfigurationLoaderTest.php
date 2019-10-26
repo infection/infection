@@ -45,7 +45,7 @@ use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionClass;
 
-class ConfigurationLoaderTest extends TestCase
+final class ConfigurationLoaderTest extends TestCase
 {
     /**
      * @var Locator&ObjectProphecy

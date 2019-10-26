@@ -48,7 +48,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionClass;
 use function Safe\realpath;
 
-class ConfigurationFileLoaderTest extends TestCase
+final class ConfigurationFileLoaderTest extends TestCase
 {
     /**
      * @var SchemaValidator&ObjectProphecy

@@ -42,6 +42,9 @@ use function sprintf;
 use UnexpectedValueException;
 use Webmozart\Assert\Assert;
 
+/**
+ * @internal
+ */
 final class InvalidSchema extends UnexpectedValueException
 {
     /**

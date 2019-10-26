@@ -43,7 +43,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Seld\JsonLint\ParsingException;
 
-class RawConfigurationTest extends TestCase
+final class RawConfigurationTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Configuration';
 
