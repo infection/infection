@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration;
 
 use Generator;
-use Infection\Configuration\SchemaConfiguration;
 use Infection\Configuration\ConfigurationFileLoader;
 use Infection\Configuration\ConfigurationLoader;
+use Infection\Configuration\SchemaConfiguration;
 use Infection\Locator\Locator;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;

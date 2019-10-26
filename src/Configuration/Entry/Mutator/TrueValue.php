@@ -59,7 +59,7 @@ final class TrueValue implements MutatorConfiguration
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isEnabled(): bool
     {
@@ -67,7 +67,7 @@ final class TrueValue implements MutatorConfiguration
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getIgnore(): array
     {

@@ -35,11 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Entry\Mutator;
 
-use Infection\Mutator\Util\MutatorProfile;
-use Webmozart\Assert\Assert;
 use function array_keys;
-use function in_array;
+use Infection\Mutator\Util\MutatorProfile;
 use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -57,10 +56,10 @@ final class GenericMutator implements MutatorConfiguration
     {
         Assert::oneOf($name, array_keys(MutatorProfile::FULL_MUTATOR_LIST));
         Assert::false(
-            in_array($name, ['ArrayItemRemoval', 'BCMath', 'MBString', 'TrueValue'], true),
+            \in_array($name, ['ArrayItemRemoval', 'BCMath', 'MBString', 'TrueValue'], true),
             sprintf(
                 'The mutator "%s" has a dedicated entry class. Use this class instead '
-                .'of this generic mutator configuration entry',
+                . 'of this generic mutator configuration entry',
                 $name
             )
         );
@@ -71,7 +70,7 @@ final class GenericMutator implements MutatorConfiguration
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isEnabled(): bool
     {
@@ -79,7 +78,7 @@ final class GenericMutator implements MutatorConfiguration
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getIgnore(): array
     {

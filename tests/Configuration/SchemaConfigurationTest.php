@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration;
 
 use Generator;
-use Infection\Configuration\SchemaConfiguration;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mutator\ArrayItemRemoval;
@@ -50,6 +49,7 @@ use Infection\Configuration\Entry\Mutator\TrueValue;
 use Infection\Configuration\Entry\Mutator\TrueValueSettings;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\Configuration\SchemaConfiguration;
 use PHPUnit\Framework\TestCase;
 
 final class SchemaConfigurationTest extends TestCase

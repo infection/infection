@@ -35,13 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Infection\Configuration\SchemaConfiguration;
 use function array_filter;
-use Infection\Config\InfectionConfig;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\ConfigurationFileLoader;
 use Infection\Configuration\ConfigurationLoader;
 use Infection\Configuration\Schema\SchemaValidator;
+use Infection\Configuration\SchemaConfiguration;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\EventDispatcher\EventDispatcher;
@@ -77,10 +76,9 @@ use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use Pimple\Container;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
+use function sprintf;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Filesystem\Filesystem;
-use function sprintf;
-use function sys_get_temp_dir;
 
 /**
  * @internal

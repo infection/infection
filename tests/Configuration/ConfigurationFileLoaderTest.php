@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
-use Infection\Configuration\SchemaConfiguration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\ConfigurationFileLoader;
 use Infection\Configuration\RawConfiguration\RawConfiguration;
 use Infection\Configuration\Schema\SchemaValidator;
+use Infection\Configuration\SchemaConfiguration;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Argument\Token\TokenInterface;

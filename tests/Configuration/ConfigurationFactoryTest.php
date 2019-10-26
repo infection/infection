@@ -35,9 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
-use Infection\Configuration\Entry\Mutator\GenericMutator;
-use Infection\Mutator\Util\MutatorProfile;
-use function array_diff;
 use function array_diff_key;
 use function array_fill;
 use function array_fill_keys;
@@ -47,7 +44,6 @@ use function array_merge;
 use function array_values;
 use Generator;
 use function implode;
-use Infection\Configuration\SchemaConfiguration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
@@ -55,6 +51,7 @@ use Infection\Configuration\Entry\Mutator\ArrayItemRemoval;
 use Infection\Configuration\Entry\Mutator\ArrayItemRemovalSettings;
 use Infection\Configuration\Entry\Mutator\BCMath;
 use Infection\Configuration\Entry\Mutator\BCMathSettings;
+use Infection\Configuration\Entry\Mutator\GenericMutator;
 use Infection\Configuration\Entry\Mutator\MBString;
 use Infection\Configuration\Entry\Mutator\MBStringSettings;
 use Infection\Configuration\Entry\Mutator\Mutators;
@@ -62,13 +59,15 @@ use Infection\Configuration\Entry\Mutator\TrueValue;
 use Infection\Configuration\Entry\Mutator\TrueValueSettings;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\Configuration\SchemaConfiguration;
+use Infection\Mutator\Util\MutatorProfile;
 use JsonSchema\Validator;
-use function var_export;
 use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
 use function Safe\json_decode;
 use function sprintf;
 use stdClass;
+use function var_export;
 
 /**
  * @covers \Infection\Configuration\ConfigurationFactory
@@ -1805,7 +1804,7 @@ JSON
         ));
 
         foreach ($genericMutatorNamesList as $mutator) {
-            yield '[mutators][generic]['.$mutator.'] enabled' => [
+            yield '[mutators][generic][' . $mutator . '] enabled' => [
                 <<<JSON
 {
     "source": {
@@ -1830,7 +1829,7 @@ JSON
                 ]),
             ];
 
-            yield '[mutators][generic]['.$mutator.'] disabled' => [
+            yield '[mutators][generic][' . $mutator . '] disabled' => [
                 <<<JSON
 {
     "source": {
@@ -1855,7 +1854,7 @@ JSON
                 ]),
             ];
 
-            yield '[mutators][generic]['.$mutator.'] ignore' => [
+            yield '[mutators][generic][' . $mutator . '] ignore' => [
                 <<<JSON
 {
     "source": {
@@ -1886,7 +1885,7 @@ JSON
                 ]),
             ];
 
-            yield '[mutators][generic]['.$mutator.'] ignore empty & untrimmed' => [
+            yield '[mutators][generic][' . $mutator . '] ignore empty & untrimmed' => [
                 <<<JSON
 {
     "source": {
