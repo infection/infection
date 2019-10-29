@@ -361,6 +361,16 @@ final class InfectionCommand extends BaseCommand
             return false;
         }
 
+        foreach ([TestRunConstraintChecker::MSI_FAILURE, ''] as $type) {
+            if ($constraintChecker->isMsiOverMinimumMsi($type)) {
+                $this->consoleOutput->logMinMsiCanGetIncreasedNotice(
+                    $this->container['metrics'],
+                    $constraintChecker->getMinRequiredValue(),
+                    $type
+                );
+            }
+        }
+
         $this->eventDispatcher->dispatch(new ApplicationExecutionFinished());
 
         return true;

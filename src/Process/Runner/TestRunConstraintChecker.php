@@ -104,6 +104,17 @@ final class TestRunConstraintChecker
         return true;
     }
 
+    public function isMsiOverMinimumMsi(string $type): bool
+    {
+        $msi = ($type === TestRunConstraintChecker::MSI_FAILURE)
+            ? $this->metricsCalculator->getMutationScoreIndicator()
+            : $this->metricsCalculator->getCoveredCodeMutationScoreIndicator();
+
+        $min = ($type === TestRunConstraintChecker::MSI_FAILURE) ? $this->minMsi : $this->minCoveredMsi;
+
+        return $min && ($msi > $min);
+    }
+
     public function getErrorType(): string
     {
         return $this->failureType;

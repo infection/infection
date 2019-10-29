@@ -47,6 +47,7 @@ final class ConsoleOutput
 {
     private const RUNNING_WITH_DEBUGGER_NOTE = 'You are running Infection with %s enabled.';
     private const CI_FLAG_ERROR = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
+    private const MIN_MSI_CAN_GET_INCREASED_NOTICE = 'The %s is %s%% percent points over the required %s. Consider increasing the required %s percentage the next time you run infection.';
 
     /**
      * @var SymfonyStyle
@@ -83,6 +84,32 @@ final class ConsoleOutput
                     $metricsCalculator->getMutationScoreIndicator() :
                     $metricsCalculator->getCoveredCodeMutationScoreIndicator()
                 )
+            )
+        );
+    }
+
+    public function logMinMsiCanGetIncreasedNotice(MetricsCalculator $metricsCalculator, float $minMsi, string $type): void
+    {
+        if (!$minMsi) {
+            throw MsiCalculationException::create('min-msi');
+        }
+
+        $typeString = ($type === TestRunConstraintChecker::MSI_FAILURE ? 'MSI' : 'Covered Code MSI');
+
+        $msi = ($type === TestRunConstraintChecker::MSI_FAILURE ?
+                $metricsCalculator->getMutationScoreIndicator() :
+                $metricsCalculator->getCoveredCodeMutationScoreIndicator()
+            );
+
+        $msiDifference = $msi - $minMsi;
+
+        $this->io->note(
+            sprintf(
+                self::MIN_MSI_CAN_GET_INCREASED_NOTICE,
+                $typeString,
+                $msiDifference,
+                $typeString,
+                $typeString
             )
         );
     }
