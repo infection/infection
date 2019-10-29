@@ -59,7 +59,7 @@ use function trim;
 /**
  * @final
  */
-final class ConfigurationFactory
+class ConfigurationFactory
 {
     public function create(string $path, stdClass $rawConfig): SchemaConfiguration
     {

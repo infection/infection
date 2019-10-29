@@ -87,7 +87,7 @@ use function var_export;
  */
 final class ConfigurationFactoryTest extends TestCase
 {
-    private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../resources/schema.json';
+    private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../../resources/schema.json';
 
     /**
      * @dataProvider provideRawConfig

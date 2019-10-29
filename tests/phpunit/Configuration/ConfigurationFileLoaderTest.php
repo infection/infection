@@ -78,7 +78,7 @@ final class ConfigurationFileLoaderTest extends TestCase
 
     public function test_it_create_a_configuration_from_a_file_path(): void
     {
-        $path = realpath(__DIR__ . '/../Fixtures/Configuration/file.json');
+        $path = realpath(__DIR__.'/../Fixtures/Configuration/file.json');
         $decodedContents = (object) ['foo' => 'bar'];
         $expectedConfig = (new ReflectionClass(SchemaConfiguration::class))->newInstanceWithoutConstructor();
 
