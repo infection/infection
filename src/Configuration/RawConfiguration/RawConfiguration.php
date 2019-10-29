@@ -37,10 +37,10 @@ namespace Infection\Configuration\RawConfiguration;
 
 use function is_file;
 use function is_readable;
+use function Safe\file_get_contents;
 use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
 use stdClass;
-use function Safe\file_get_contents;
 
 /**
  * @internal
