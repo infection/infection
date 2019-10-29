@@ -106,11 +106,11 @@ final class TestRunConstraintChecker
 
     public function isMsiOverMinimumMsi(string $type): bool
     {
-        $msi = ($type === TestRunConstraintChecker::MSI_FAILURE)
+        $msi = ($type === self::MSI_FAILURE)
             ? $this->metricsCalculator->getMutationScoreIndicator()
             : $this->metricsCalculator->getCoveredCodeMutationScoreIndicator();
 
-        $min = ($type === TestRunConstraintChecker::MSI_FAILURE) ? $this->minMsi : $this->minCoveredMsi;
+        $min = ($type === self::MSI_FAILURE) ? $this->minMsi : $this->minCoveredMsi;
 
         return $min && ($msi > $min);
     }
