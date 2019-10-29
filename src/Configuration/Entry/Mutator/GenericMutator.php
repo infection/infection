@@ -84,9 +84,4 @@ final class GenericMutator implements MutatorConfiguration
     {
         return $this->ignore;
     }
-
-    public function getSettings(): BCMathSettings
-    {
-        return $this->settings;
-    }
 }

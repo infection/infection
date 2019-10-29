@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\RawConfiguration;
 
-use function file_get_contents;
 use function is_file;
 use function is_readable;
 use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
 use stdClass;
+use function Safe\file_get_contents;
 
 /**
  * @internal
@@ -91,7 +91,7 @@ final class RawConfiguration
             throw InvalidFile::createForFileNotReadable($this);
         }
 
-        $contents = @file_get_contents($this->path);
+        $contents = file_get_contents($this->path);
 
         if (false === $contents) {
             throw InvalidFile::createForCouldNotRetrieveFileContents($this);
