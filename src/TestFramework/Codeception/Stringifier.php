@@ -33,46 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Codeception\CommandLine;
+namespace Infection\TestFramework\Codeception;
 
-use Infection\TestFramework\Codeception\CommandLine\ArgumentsAndOptionsBuilder;
-use PHPUnit\Framework\TestCase;
+use Webmozart\Assert\Assert;
 
-final class ArgumentsAndOptionsBuilderTest extends TestCase
+/**
+ * @internal
+ */
+final class Stringifier
 {
-    public function test_it_builds_correct_command(): void
+    public function stringifyBoolean(bool $value): string
     {
-        $configPath = '/config/path';
-        $builder = new ArgumentsAndOptionsBuilder();
-
-        $this->assertSame(
-            [
-                'run',
-                '--no-colors',
-                '--fail-fast',
-                '--config',
-                $configPath,
-                '--verbose',
-                '--debug',
-            ],
-            $builder->build($configPath, '--verbose --debug')
-        );
+        return $value ? 'true' : 'false';
     }
 
-    public function test_it_removes_empty_extra_options(): void
+    /**
+     * @param string[] $arrayOfStrings
+     */
+    public function stringifyArray(array $arrayOfStrings): string
     {
-        $configPath = '/config/path';
-        $builder = new ArgumentsAndOptionsBuilder();
+        Assert::allString($arrayOfStrings);
 
-        $this->assertSame(
-            [
-                'run',
-                '--no-colors',
-                '--fail-fast',
-                '--config',
-                $configPath,
-            ],
-            $builder->build($configPath, '')
-        );
+        return sprintf('[%s]', implode(',', $arrayOfStrings));
     }
 }

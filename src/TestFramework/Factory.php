@@ -38,9 +38,7 @@ namespace Infection\TestFramework;
 use Infection\Configuration\Configuration;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
-use Infection\TestFramework\Codeception\CommandLine\ArgumentsAndOptionsBuilder as CodeceptionArgumentsAndOptionsBuilder;
-use Infection\TestFramework\Codeception\Config\Builder\InitialConfigBuilder as CodeceptionInitialConfigBuilder;
-use Infection\TestFramework\Codeception\Config\Builder\MutationConfigBuilder as CodeceptionMutationConfigBuilder;
+use Infection\TestFramework\Codeception\Stringifier;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
@@ -102,6 +100,11 @@ final class Factory
      */
     private $filesystem;
 
+    /**
+     * @var CommandLineBuilder
+     */
+    private $commandLineBuilder;
+
     public function __construct(
         string $tmpDir,
         string $projectDir,
@@ -110,7 +113,8 @@ final class Factory
         string $jUnitFilePath,
         Configuration $infectionConfig,
         VersionParser $versionParser,
-        Filesystem $filesystem
+        Filesystem $filesystem,
+        CommandLineBuilder $commandLineBuilder
     ) {
         $this->tmpDir = $tmpDir;
         $this->configLocator = $configLocator;
@@ -120,6 +124,7 @@ final class Factory
         $this->infectionConfig = $infectionConfig;
         $this->versionParser = $versionParser;
         $this->filesystem = $filesystem;
+        $this->commandLineBuilder = $commandLineBuilder;
     }
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
@@ -143,7 +148,8 @@ final class Factory
                 ),
                 new MutationConfigBuilder($this->tmpDir, $phpUnitConfigContent, $this->xmlConfigurationHelper, $this->projectDir, new JUnitTestCaseSorter()),
                 new ArgumentsAndOptionsBuilder(),
-                $this->versionParser
+                $this->versionParser,
+                $this->commandLineBuilder
             );
         }
 
@@ -155,7 +161,8 @@ final class Factory
                 new PhpSpecInitialConfigBuilder($this->tmpDir, $phpSpecConfigPath, $skipCoverage),
                 new PhpSpecMutationConfigBuilder($this->tmpDir, $phpSpecConfigPath, $this->projectDir),
                 new PhpSpecArgumentsAndOptionsBuilder(),
-                $this->versionParser
+                $this->versionParser,
+                $this->commandLineBuilder
             );
         }
 
@@ -166,18 +173,16 @@ final class Factory
 
             return new CodeceptionAdapter(
                 (new TestFrameworkFinder(CodeceptionAdapter::EXECUTABLE))->find(),
-                new CodeceptionInitialConfigBuilder(
-                    $this->filesystem,
-                    $this->tmpDir,
-                    $this->projectDir,
-                    $codeceptionConfigContentParsed,
-                    $skipCoverage,
-                    $this->infectionConfig->getSourceDirs()
-                ),
-                new CodeceptionMutationConfigBuilder($this->filesystem, $this->tmpDir, $this->projectDir, $codeceptionConfigContentParsed, new JUnitTestCaseSorter()),
-                new CodeceptionArgumentsAndOptionsBuilder(),
+                $this->commandLineBuilder,
                 $this->versionParser,
-                $this->jUnitFilePath
+                new JUnitTestCaseSorter(),
+                $this->filesystem,
+                new Stringifier(),
+                $this->jUnitFilePath,
+                $this->tmpDir,
+                $this->projectDir,
+                $codeceptionConfigContentParsed,
+                $this->infectionConfig->getSourceDirs()
             );
         }
 

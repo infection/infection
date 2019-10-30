@@ -33,58 +33,63 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Codeception\Config\Builder;
+namespace Infection\Tests\TestFramework\Codeception;
 
-use Infection\TestFramework\Codeception\Config\Builder\InitialConfigBuilder;
-use Infection\Utils\TmpDirectoryCreator;
+use Infection\TestFramework\Codeception\Stringifier;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Yaml\Yaml;
 
-final class InitialConfigBuilderTest extends TestCase
+final class StringifierTest extends TestCase
 {
     /**
-     * @var Filesystem
+     * @var Stringifier
      */
-    private $fileSystem;
-
-    /**
-     * @var string
-     */
-    private $tmpDir;
-
-    /**
-     * @var string
-     */
-    private $workspace;
+    private $stringifier;
 
     protected function setUp(): void
     {
-        $this->workspace = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
-        $this->fileSystem = new Filesystem();
+        parent::setUp();
 
-        $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
+        $this->stringifier = new Stringifier();
     }
 
-    protected function tearDown(): void
+    /**
+     * @dataProvider provideBooleanStrings
+     */
+    public function test_stringify_boolean(bool $boolean, string $expectedStringBoolean): void
     {
-        $this->fileSystem->remove($this->workspace);
+        $this->assertSame($expectedStringBoolean, $this->stringifier->stringifyBoolean($boolean));
     }
 
-    public function test_it_builds_path_to_initial_config_file(): void
+    /**
+     * @dataProvider provideArrayOfStrings
+     */
+    public function test_stringify_array_of_strings(array $arrayOfStrings, string $expectedStringArray): void
     {
-        $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/codeception/codeception.yml';
+        $this->assertSame($expectedStringArray, $this->stringifier->stringifyArray($arrayOfStrings));
+    }
 
-        $builder = new InitialConfigBuilder(
-            $this->fileSystem,
-            $this->tmpDir,
-            \dirname($originalYamlConfigPath),
-            Yaml::parseFile($originalYamlConfigPath),
-            false,
-            ['src']
-        );
+    public function test_stringify_array_of_strings_works_only_with_array_of_strings(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
 
-        $this->assertSame($this->tmpDir . '/codeception.initial.infection.yml', $builder->build('2.0'));
-        $this->assertFileExists($this->tmpDir . '/codeception.initial.infection.yml');
+        $arrayOfInts = [1, 2, 3];
+
+        $this->stringifier->stringifyArray($arrayOfInts);
+    }
+
+    public function provideBooleanStrings(): \Generator
+    {
+        yield 'True' => [true, 'true'];
+
+        yield 'False' => [false, 'false'];
+    }
+
+    public function provideArrayOfStrings(): \Generator
+    {
+        yield 'Empty array' => [[], '[]'];
+
+        yield 'One element' => [['/path/to/first'], '[/path/to/first]'];
+
+        yield 'Several elements' => [['/path/to/first', '/second'], '[/path/to/first,/second]'];
     }
 }

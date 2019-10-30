@@ -440,7 +440,7 @@ final class InfectionCommand extends BaseCommand
         })($bootstrap);
     }
 
-    private function getCodeCoverageData(string $testFrameworkKey, AbstractTestFrameworkAdapter $adapter): LineCodeCoverage
+    private function getCodeCoverageData(string $testFrameworkKey, TestFrameworkAdapter $adapter): LineCodeCoverage
     {
         $coverageDir = $this->container[sprintf('coverage.dir.%s', $testFrameworkKey)];
         $testFileDataProviderService = $adapter->hasJUnitReport()

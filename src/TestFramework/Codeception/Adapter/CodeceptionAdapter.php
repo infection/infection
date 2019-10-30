@@ -35,32 +35,115 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Codeception\Adapter;
 
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
-use Infection\TestFramework\Config\InitialConfigBuilder;
-use Infection\TestFramework\Config\MutationConfigBuilder;
+use Infection\Mutant\MutantInterface;
+use Infection\TestFramework\Codeception\Stringifier;
+use Infection\TestFramework\CommandLineBuilder;
+use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\MemoryUsageAware;
+use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Utils\VersionParser;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\Process;
 
 /**
  * @internal
  */
-final class CodeceptionAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware
+final class CodeceptionAdapter implements TestFrameworkAdapter, MemoryUsageAware
 {
     public const EXECUTABLE = 'codecept';
-    public const JUNIT_FILE_NAME = 'codeception.junit.xml';
+
+    private const DEFAULT_ARGS_AND_OPTIONS = [
+        'run',
+        '--no-colors',
+        '--fail-fast',
+    ];
+
+    /**
+     * @var string
+     */
+    private $testFrameworkExecutable;
+
+    /**
+     * @var CommandLineBuilder
+     */
+    private $commandLineBuilder;
+
+    /**
+     * @var VersionParser
+     */
+    private $versionParser;
+
+    /**
+     * @var JUnitTestCaseSorter
+     */
+    private $jUnitTestCaseSorter;
+
+    /**
+     * @var Filesystem
+     */
+    private $filesystem;
+
     /**
      * @var string
      */
     private $jUnitFilePath;
 
-    public function __construct(string $testFrameworkExecutable, InitialConfigBuilder $initialConfigBuilder, MutationConfigBuilder $mutationConfigBuilder, CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder, VersionParser $versionParser, string $jUnitFilePath)
-    {
-        parent::__construct($testFrameworkExecutable, $initialConfigBuilder, $mutationConfigBuilder, $argumentsAndOptionsBuilder, $versionParser);
+    /**
+     * @var string
+     */
+    private $tmpDir;
 
+    /**
+     * @var string
+     */
+    private $projectDir;
+
+    /**
+     * @var array<string, mixed>
+     */
+    private $originalConfigContentParsed;
+
+    /**
+     * @var string|null
+     */
+    private $cachedVersion;
+
+    /**
+     * @var Stringifier
+     */
+    private $stringifier;
+
+    /**
+     * @var string[]
+     */
+    private $srcDirs;
+
+    public function __construct(
+        string $testFrameworkExecutable,
+        CommandLineBuilder $commandLineBuilder,
+        VersionParser $versionParser,
+        JUnitTestCaseSorter $jUnitTestCaseSorter,
+        Filesystem $filesystem,
+        Stringifier $stringifier,
+        string $jUnitFilePath,
+        string $tmpDir,
+        string $projectDir,
+        array $originalConfigContentParsed,
+        array $srcDirs
+    ) {
+        $this->commandLineBuilder = $commandLineBuilder;
+        $this->testFrameworkExecutable = $testFrameworkExecutable;
+        $this->versionParser = $versionParser;
         $this->jUnitFilePath = $jUnitFilePath;
+        $this->tmpDir = $tmpDir;
+        $this->jUnitTestCaseSorter = $jUnitTestCaseSorter;
+        $this->filesystem = $filesystem;
+        $this->projectDir = $projectDir;
+        $this->originalConfigContentParsed = $originalConfigContentParsed;
+        $this->stringifier = $stringifier;
+        $this->srcDirs = $srcDirs;
     }
 
     public function hasJUnitReport(): bool
@@ -90,42 +173,6 @@ final class CodeceptionAdapter extends AbstractTestFrameworkAdapter implements M
         return $isOk || $isOkWithInfo || $isWarning;
     }
 
-    /**
-     * @param string[] $phpExtraArgs
-     *
-     * @return string[]
-     */
-    public function getInitialTestRunCommandLine(string $configPath, string $extraOptions, array $phpExtraArgs, bool $skipCoverage): array
-    {
-        $commandLine = parent::getInitialTestRunCommandLine($configPath, $extraOptions, $phpExtraArgs, $skipCoverage);
-
-        if ($skipCoverage) {
-            return $commandLine;
-        }
-
-        /*
-         * Codeception does not support settings for coverage reports in `codeception.yaml`, so we have to
-         * add values in the command line for initial tests run, but don't add coverage for mutants command lines
-         */
-        return array_merge(
-            $commandLine,
-            [
-                '--coverage-phpunit',
-                XMLLineCodeCoverage::CODECEPTION_COVERAGE_DIR,
-                // JUnit report
-                '--xml',
-                $this->jUnitFilePath,
-            ]
-        );
-    }
-
-    public function getMutantCommandLine(string $configPath, string $extraOptions): array
-    {
-        $commandLine = parent::getMutantCommandLine($configPath, $extraOptions);
-
-        return array_merge($commandLine, ['--group', 'infection']);
-    }
-
     public function getMemoryUsed(string $output): float
     {
         if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match)) {
@@ -138,5 +185,211 @@ final class CodeceptionAdapter extends AbstractTestFrameworkAdapter implements M
     public function getName(): string
     {
         return TestFrameworkTypes::CODECEPTION;
+    }
+
+    public function getInitialTestRunCommandLine(string $extraOptions, array $phpExtraArgs, bool $skipCoverage): array
+    {
+        $argumentsAndOptions = $this->prepareArgumentsAndOptions($extraOptions);
+
+        return $this->commandLineBuilder->build(
+            $this->testFrameworkExecutable,
+            $phpExtraArgs,
+            array_merge(
+                $argumentsAndOptions,
+                [
+                    '--coverage-phpunit',
+                    XMLLineCodeCoverage::CODECEPTION_COVERAGE_DIR,
+                    // JUnit report
+                    '--xml',
+                    $this->jUnitFilePath,
+                    '-o',
+                    "paths: output: {$this->tmpDir}",
+                    '-o',
+                    sprintf('coverage: enabled: %s', $this->stringifier->stringifyBoolean(!$skipCoverage)),
+                    '-o',
+                    sprintf('coverage: include: %s', $this->getCoverageIncludeFiles($skipCoverage)),
+                    '-o',
+                    'settings: shuffle: true',
+                ]
+            )
+        );
+    }
+
+    public function getMutantCommandLine(MutantInterface $mutant, string $extraOptions): array
+    {
+        $argumentsAndOptions = $this->prepareArgumentsAndOptions($extraOptions);
+
+        $commandLine = $this->commandLineBuilder->build($this->testFrameworkExecutable, [], $argumentsAndOptions);
+
+        $output = sprintf('%s/%s', $this->tmpDir, $mutant->getMutation()->getHash());
+
+        $interceptorFilePath = sprintf(
+            '%s/interceptor.codeception.%s.php',
+            $this->tmpDir,
+            $mutant->getMutation()->getHash()
+        );
+
+        file_put_contents($interceptorFilePath, $this->createCustomBootstrapWithInterceptor($mutant), LOCK_EX);
+
+        $uniqueTestFilePaths = implode(',', $this->jUnitTestCaseSorter->getUniqueSortedFileNames($mutant->getCoverageTests()));
+
+        return array_merge(
+            $commandLine,
+            [
+                '--group',
+                'infection',
+                '--bootstrap',
+                $interceptorFilePath,
+                '-o',
+                "paths: output: {$output}",
+                '-o',
+                'coverage: enabled: false',
+                '-o',
+                "bootstrap: {$interceptorFilePath}",
+                '-o',
+                "groups: infection: [$uniqueTestFilePaths]",
+            ]
+        );
+    }
+
+    public function getVersion(): string
+    {
+        if ($this->cachedVersion !== null) {
+            return $this->cachedVersion;
+        }
+
+        $testFrameworkVersionExecutable = $this->commandLineBuilder->build(
+            $this->testFrameworkExecutable,
+            [],
+            ['--version']
+        );
+
+        $process = new Process($testFrameworkVersionExecutable);
+        $process->mustRun();
+
+        $version = 'unknown';
+
+        try {
+            $version = $this->versionParser->parse($process->getOutput());
+        } catch (\InvalidArgumentException $e) {
+            $version = 'unknown';
+        } finally {
+            $this->cachedVersion = $version;
+        }
+
+        return $this->cachedVersion;
+    }
+
+    public function getInitialTestsFailRecommendations(string $commandLine): string
+    {
+        return sprintf('Check the executed command to identify the problem: %s', $commandLine);
+    }
+
+    protected function getInterceptorFileContent(string $interceptorPath, string $originalFilePath, string $mutatedFilePath): string
+    {
+        $infectionPhar = '';
+
+        if (0 === strpos(__FILE__, 'phar:')) {
+            $infectionPhar = sprintf(
+                '\Phar::loadPhar("%s", "%s");',
+                str_replace('phar://', '', \Phar::running(true)),
+                'infection.phar'
+            );
+        }
+
+        $namespacePrefix = $this->getInterceptorNamespacePrefix();
+
+        return <<<CONTENT
+{$infectionPhar}
+require_once '{$interceptorPath}';
+
+use {$namespacePrefix}Infection\StreamWrapper\IncludeInterceptor;
+
+IncludeInterceptor::intercept('{$originalFilePath}', '{$mutatedFilePath}');
+IncludeInterceptor::enable();
+CONTENT;
+    }
+
+    private function createCustomBootstrapWithInterceptor(MutantInterface $mutant): string
+    {
+        $originalFilePath = $mutant->getMutation()->getOriginalFilePath();
+        $mutatedFilePath = $mutant->getMutatedFilePath();
+
+        $originalBootstrap = $this->getOriginalBootstrapFilePath();
+        $bootstrapPlaceholder = $originalBootstrap ? "require_once '{$originalBootstrap}';" : '';
+
+        $interceptorPath = \dirname(__DIR__, 3) . '/StreamWrapper/IncludeInterceptor.php';
+
+        $customBootstrap = <<<AUTOLOAD
+<?php
+
+%s
+%s
+
+AUTOLOAD;
+
+        return sprintf(
+            $customBootstrap,
+            $bootstrapPlaceholder,
+            $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutatedFilePath)
+        );
+    }
+
+    private function getOriginalBootstrapFilePath(): ?string
+    {
+        if (!\array_key_exists('bootstrap', $this->originalConfigContentParsed)) {
+            return null;
+        }
+
+        if ($this->filesystem->isAbsolutePath($this->originalConfigContentParsed['bootstrap'])) {
+            return $this->originalConfigContentParsed['bootstrap'];
+        }
+
+        return sprintf(
+            '%s/%s/%s',
+            $this->projectDir,
+            $this->originalConfigContentParsed['paths']['tests'] ?? 'tests',
+            $this->originalConfigContentParsed['bootstrap']
+        );
+    }
+
+    private function getInterceptorNamespacePrefix(): string
+    {
+        $prefix = strstr(__NAMESPACE__, 'Infection', true);
+        \assert(\is_string($prefix));
+
+        return $prefix;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function prepareArgumentsAndOptions(string $extraOptions): array
+    {
+        return array_filter(array_merge(
+            explode(' ', $extraOptions),
+            self::DEFAULT_ARGS_AND_OPTIONS
+        ));
+    }
+
+    private function getCoverageIncludeFiles(bool $skipCoverage): string
+    {
+        // if coverage should be skipped, this anyway will be ignored, return early
+        if ($skipCoverage) {
+            return $this->stringifier->stringifyArray([]);
+        }
+
+        $coverage = array_merge($this->originalConfigContentParsed['coverage'] ?? [], ['enabled' => true]);
+
+        $includedFiles = \array_key_exists('include', $coverage)
+            ? $coverage['include']
+            : array_map(
+                static function ($dir) {
+                    return trim($dir, '/') . '/*.php';
+                },
+                $this->srcDirs
+            );
+
+        return $this->stringifier->stringifyArray($includedFiles);
     }
 }
