@@ -57,11 +57,11 @@ final class Application extends BaseApplication
     private const INFECTION_PREFIX = 'INFECTION';
 
     private const LOGO = '
-         ____      ____          __  _
-        /  _/___  / __/__  _____/ /_(_)___  ____
-        / // __ \/ /_/ _ \/ ___/ __/ / __ \/ __ \
-      _/ // / / / __/  __/ /__/ /_/ / /_/ / / / /
-     /___/_/ /_/_/  \___/\___/\__/_/\____/_/ /_/
+    ____      ____          __  _
+   /  _/___  / __/__  _____/ /_(_)___  ____
+   / // __ \/ /_/ _ \/ ___/ __/ / __ \/ __ \
+ _/ // / / / __/  __/ /__/ /_/ / /_/ / / / /
+/___/_/ /_/_/  \___/\___/\__/_/\____/_/ /_/
 ';
 
     /**
@@ -119,7 +119,7 @@ final class Application extends BaseApplication
 
     public function doRun(InputInterface $input, OutputInterface $output): int
     {
-        $output->writeln([self::LOGO, $this->getLongVersion(), "\n"]);
+        $output->writeln([self::LOGO, $this->getLongVersion()]);
 
         return parent::doRun($input, $output);
     }
