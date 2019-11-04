@@ -28,6 +28,8 @@ DOCKER_RUN_72=$(FLOCK) devTools/*php72*.json $(DOCKER_RUN) infection_php72
 DOCKER_RUN_72_IMAGE=devTools/Dockerfile-php72-xdebug.json
 DOCKER_RUN_73=$(FLOCK) devTools/*php73*.json $(DOCKER_RUN) infection_php73
 DOCKER_RUN_73_IMAGE=devTools/Dockerfile-php73-xdebug.json
+DOCKER_RUN_74=$(FLOCK) devTools/*php74*.json $(DOCKER_RUN) infection_php74
+DOCKER_RUN_74_IMAGE=devTools/Dockerfile-php74-xdebug.json
 
 FLOCK=./devTools/flock
 
@@ -72,7 +74,7 @@ test-autoreview:
 
 .PHONY: test-unit
 test-unit:	 ## Runs the unit tests
-test-unit: test-unit-72 test-unit-73
+test-unit: test-unit-72 test-unit-73 test-unit-74
 
 .PHONY: test-unit-72
 test-unit-72: $(DOCKER_RUN_72_IMAGE) $(PHPUNIT)
@@ -81,6 +83,10 @@ test-unit-72: $(DOCKER_RUN_72_IMAGE) $(PHPUNIT)
 .PHONY: test-unit-73
 test-unit-73: $(DOCKER_RUN_73_IMAGE) $(PHPUNIT)
 	$(DOCKER_RUN_73) $(PHPUNIT) --group default
+
+.PHONY: test-unit-74
+test-unit-74: $(DOCKER_RUN_74_IMAGE) $(PHPUNIT)
+	$(DOCKER_RUN_74) $(PHPUNIT) --group default
 
 .PHONY: test-e2e
 test-e2e: 	 ## Runs the end-to-end tests
@@ -182,4 +188,9 @@ $(DOCKER_RUN_72_IMAGE): devTools/Dockerfile-php72-xdebug
 $(DOCKER_RUN_73_IMAGE): devTools/Dockerfile-php73-xdebug
 	docker build --tag infection_php73 --file devTools/Dockerfile-php73-xdebug .
 	docker image inspect infection_php73 >> $(DOCKER_RUN_73_IMAGE)
+	touch $@
+
+$(DOCKER_RUN_74_IMAGE): devTools/Dockerfile-php74-xdebug
+	docker build --tag infection_php74 --file devTools/Dockerfile-php74-xdebug .
+	docker image inspect infection_php74 >> $(DOCKER_RUN_74_IMAGE)
 	touch $@
