@@ -93,7 +93,7 @@ test-e2e: 	 ## Runs the end-to-end tests
 test-e2e: test-e2e-phpdbg test-e2e-xdebug
 
 .PHONY: test-e2e-phpdbg
-test-e2e-phpdbg: test-e2e-phpdbg-72 test-e2e-phpdbg-73
+test-e2e-phpdbg: test-e2e-phpdbg-72 test-e2e-phpdbg-73 test-e2e-phpdbg-74
 
 .PHONY: test-e2e-phpdbg-72
 test-e2e-phpdbg-72: $(DOCKER_RUN_72_IMAGE) $(INFECTION)
@@ -104,6 +104,11 @@ test-e2e-phpdbg-72: $(DOCKER_RUN_72_IMAGE) $(INFECTION)
 test-e2e-phpdbg-73: $(DOCKER_RUN_73_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_73) $(PHPUNIT) --group integration,e2e
 	$(DOCKER_RUN_73) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
+
+.PHONY: test-e2e-phpdbg-74
+test-e2e-phpdbg-74: $(DOCKER_RUN_74_IMAGE) $(INFECTION)
+	$(DOCKER_RUN_74) $(PHPUNIT) --group integration,e2e
+	$(DOCKER_RUN_74) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-e2e-xdebug
 test-e2e-xdebug: test-e2e-xdebug-72 test-e2e-xdebug-73
@@ -117,6 +122,11 @@ test-e2e-xdebug-72: $(DOCKER_RUN_72_IMAGE) $(INFECTION)
 test-e2e-xdebug-73: $(DOCKER_RUN_73_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_73) $(PHPUNIT) --group integration,e2e
 	$(DOCKER_RUN_73) ./tests/e2e_tests $(INFECTION)
+
+.PHONY: test-e2e-xdebug-74
+test-e2e-xdebug-74: $(DOCKER_RUN_74_IMAGE) $(INFECTION)
+	$(DOCKER_RUN_74) $(PHPUNIT) --group integration,e2e
+	$(DOCKER_RUN_74) ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-infection
 test-infection:  ## Runs Infection against itself
@@ -133,6 +143,10 @@ test-infection-phpdbg-72: $(DOCKER_RUN_72_IMAGE)
 test-infection-phpdbg-73: $(DOCKER_RUN_73_IMAGE)
 	$(DOCKER_RUN_73) phpdbg -qrr bin/infection --threads=4
 
+.PHONY: test-infection-phpdbg-74
+test-infection-phpdbg-74: $(DOCKER_RUN_74_IMAGE)
+	$(DOCKER_RUN_74) phpdbg -qrr bin/infection --threads=4
+
 .PHONY: test-infection-xdebug
 test-infection-xdebug: test-infection-xdebug-72 test-infection-xdebug-73
 
@@ -143,6 +157,10 @@ test-infection-xdebug-72: $(DOCKER_RUN_72_IMAGE)
 .PHONY: test-infection-xdebug-73
 test-infection-xdebug-73: $(DOCKER_RUN_73_IMAGE)
 	$(DOCKER_RUN_73) ./bin/infection --threads=4
+
+.PHONY: test-infection-xdebug-74
+test-infection-xdebug-74: $(DOCKER_RUN_74_IMAGE)
+	$(DOCKER_RUN_74) ./bin/infection --threads=4
 
 
 #
