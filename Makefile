@@ -111,7 +111,7 @@ test-e2e-phpdbg-74: $(DOCKER_RUN_74_IMAGE) $(INFECTION)
 	$(DOCKER_RUN_74) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-e2e-xdebug
-test-e2e-xdebug: test-e2e-xdebug-72 test-e2e-xdebug-73
+test-e2e-xdebug: test-e2e-xdebug-72 test-e2e-xdebug-73 test-e2e-xdebug-74
 
 .PHONY: test-e2e-xdebug-72
 test-e2e-xdebug-72: $(DOCKER_RUN_72_IMAGE) $(INFECTION)
@@ -133,7 +133,7 @@ test-infection:  ## Runs Infection against itself
 test-infection: test-infection-phpdbg test-infection-xdebug
 
 .PHONY: test-infection-phpdbg
-test-infection-phpdbg: test-infection-phpdbg-72 test-infection-phpdbg-73
+test-infection-phpdbg: test-infection-phpdbg-72 test-infection-phpdbg-73 test-infection-phpdbg-74
 
 .PHONY: test-infection-phpdbg-72
 test-infection-phpdbg-72: $(DOCKER_RUN_72_IMAGE)
@@ -148,7 +148,7 @@ test-infection-phpdbg-74: $(DOCKER_RUN_74_IMAGE)
 	$(DOCKER_RUN_74) phpdbg -qrr bin/infection --threads=4
 
 .PHONY: test-infection-xdebug
-test-infection-xdebug: test-infection-xdebug-72 test-infection-xdebug-73
+test-infection-xdebug: test-infection-xdebug-72 test-infection-xdebug-73 test-infection-xdebug-74
 
 .PHONY: test-infection-xdebug-72
 test-infection-xdebug-72: $(DOCKER_RUN_72_IMAGE)
