@@ -184,8 +184,8 @@ $(PHPSTAN): Makefile
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
 	$(BOX) validate
-	$(BOX) compile
-	touch $@
+	ulimit -n 4096 && $(BOX) compile
+	touch -c $@
 
 vendor: composer.lock
 	composer install
@@ -193,22 +193,22 @@ vendor: composer.lock
 
 composer.lock: composer.json
 	composer install
-	touch $@
+	touch -c $@
 
 $(PHPUNIT): vendor
-	touch $@
+	touch -c $@
 
 $(DOCKER_RUN_72_IMAGE): devTools/Dockerfile-php72-xdebug
 	docker build --tag infection_php72 --file devTools/Dockerfile-php72-xdebug .
-	docker image inspect infection_php72 >> $(DOCKER_RUN_72_IMAGE)
+	docker image inspect infection_php72 > $(DOCKER_RUN_72_IMAGE)
 	touch $@
 
 $(DOCKER_RUN_73_IMAGE): devTools/Dockerfile-php73-xdebug
 	docker build --tag infection_php73 --file devTools/Dockerfile-php73-xdebug .
-	docker image inspect infection_php73 >> $(DOCKER_RUN_73_IMAGE)
+	docker image inspect infection_php73 > $(DOCKER_RUN_73_IMAGE)
 	touch $@
 
 $(DOCKER_RUN_74_IMAGE): devTools/Dockerfile-php74-xdebug
 	docker build --tag infection_php74 --file devTools/Dockerfile-php74-xdebug .
-	docker image inspect infection_php74 >> $(DOCKER_RUN_74_IMAGE)
+	docker image inspect infection_php74 > $(DOCKER_RUN_74_IMAGE)
 	touch $@
