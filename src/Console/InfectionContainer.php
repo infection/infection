@@ -282,8 +282,7 @@ final class InfectionContainer extends Container
             $initialTestsPhpOptions,
             $existingCoveragePath
         ): CoverageRequirementChecker {
-            $initialTestsPhpOptions = $initialTestsPhpOptions ?: $container['infection.config']
-                ->getInitialTestsPhpOptions();
+            $initialTestsPhpOptions = $initialTestsPhpOptions ?: $container['infection.config']->getInitialTestsPhpOptions();
 
             if (!\is_string($initialTestsPhpOptions)) {
                 throw new InvalidArgumentException(
