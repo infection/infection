@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use Infection\Config\InfectionConfig;
-use Infection\Configuration\SchemaConfiguration;
+use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Exception\InfectionException;
@@ -70,8 +70,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
-use function trim;
 use Webmozart\Assert\Assert;
+use function trim;
 
 /**
  * @internal

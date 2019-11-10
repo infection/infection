@@ -33,18 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration;
+namespace Infection\Tests\Configuration\Schema;
 
-use function array_diff_key;
-use function array_fill;
-use function array_fill_keys;
-use function array_keys;
-use function array_map;
-use function array_merge;
-use function array_values;
 use Generator;
-use function implode;
-use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mutator\ArrayItemRemoval;
@@ -59,18 +50,27 @@ use Infection\Configuration\Entry\Mutator\TrueValue;
 use Infection\Configuration\Entry\Mutator\TrueValueSettings;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
-use Infection\Configuration\SchemaConfiguration;
+use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Mutator\Util\MutatorProfile;
 use JsonSchema\Validator;
-use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
+use stdClass;
+use function array_diff_key;
+use function array_fill;
+use function array_fill_keys;
+use function array_keys;
+use function array_map;
+use function array_merge;
+use function array_values;
+use function implode;
 use function Safe\json_decode;
 use function sprintf;
-use stdClass;
 use function var_export;
+use const PHP_EOL;
 
 /**
- * @covers \Infection\Configuration\ConfigurationFactory
+ * @covers \Infection\Configuration\Schema\SchemaConfigurationFactory
  * @covers \Infection\Configuration\Entry\Mutator\ArrayItemRemoval
  * @covers \Infection\Configuration\Entry\Mutator\ArrayItemRemovalSettings
  * @covers \Infection\Configuration\Entry\Mutator\BCMath
@@ -85,7 +85,7 @@ use function var_export;
  * @covers \Infection\Configuration\Entry\PhpUnit
  * @covers \Infection\Configuration\Entry\Source
  */
-final class ConfigurationFactoryTest extends TestCase
+final class SchemaConfigurationFactoryTest extends TestCase
 {
     private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../../resources/schema.json';
 
@@ -94,7 +94,7 @@ final class ConfigurationFactoryTest extends TestCase
      */
     public function test_it_can_create_a_config(
         string $json,
-        SchemaConfiguration $expected
+        \Infection\Configuration\Schema\SchemaConfiguration $expected
     ): void {
         $rawConfig = json_decode($json);
 
@@ -104,7 +104,7 @@ final class ConfigurationFactoryTest extends TestCase
         // improbable cases rather than a test in itself
         $this->assertJsonIsSchemaValid($rawConfig);
 
-        $actual = (new ConfigurationFactory())->create(
+        $actual = (new SchemaConfigurationFactory())->create(
             '/path/to/config',
             $rawConfig
         );
@@ -2481,7 +2481,7 @@ JSON
         ];
     }
 
-    private static function createConfig(array $args): SchemaConfiguration
+    private static function createConfig(array $args): \Infection\Configuration\Schema\SchemaConfiguration
     {
         $defaultArgs = [
             'path' => '/path/to/config',

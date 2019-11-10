@@ -33,19 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration;
+namespace Infection\Tests\Configuration\Schema;
 
 use Generator;
-use Infection\Configuration\ConfigurationFileLoader;
-use Infection\Configuration\ConfigurationLoader;
-use Infection\Configuration\SchemaConfiguration;
+use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
+use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Locator\Locator;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionClass;
 
-final class ConfigurationLoaderTest extends TestCase
+final class SchemaConfigurationLoaderTest extends TestCase
 {
     /**
      * @var Locator&ObjectProphecy
@@ -53,21 +53,22 @@ final class ConfigurationLoaderTest extends TestCase
     private $locatorProphecy;
 
     /**
-     * @var ConfigurationFileLoader&ObjectProphecy
+     * @var SchemaConfigurationFileLoader&ObjectProphecy
      */
     private $configFileLoaderProphecy;
 
     /**
-     * @var ConfigurationLoader
+     * @var SchemaConfigurationLoader
      */
     private $loader;
 
     protected function setUp(): void
     {
         $this->locatorProphecy = $this->prophesize(Locator::class);
-        $this->configFileLoaderProphecy = $this->prophesize(ConfigurationFileLoader::class);
+        $this->configFileLoaderProphecy = $this->prophesize(
+            \Infection\Configuration\Schema\SchemaConfigurationFileLoader::class);
 
-        $this->loader = new ConfigurationLoader(
+        $this->loader = new SchemaConfigurationLoader(
             $this->locatorProphecy->reveal(),
             $this->configFileLoaderProphecy->reveal()
         );

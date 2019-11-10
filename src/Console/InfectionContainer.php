@@ -35,12 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use function array_filter;
+use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
-use Infection\Configuration\ConfigurationFileLoader;
-use Infection\Configuration\ConfigurationLoader;
+use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Configuration\Schema\SchemaConfigurationFactory;
+use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
+use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Configuration\Schema\SchemaValidator;
-use Infection\Configuration\SchemaConfiguration;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\EventDispatcher\EventDispatcher;
@@ -76,9 +77,10 @@ use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use Pimple\Container;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
-use function sprintf;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Filesystem\Filesystem;
+use function array_filter;
+use function sprintf;
 
 /**
  * @internal
@@ -215,10 +217,10 @@ final class InfectionContainer extends Container
             'memory.limit.applier' => static function (self $container): MemoryLimiter {
                 return new MemoryLimiter($container['filesystem'], \php_ini_loaded_file());
             },
-            ConfigurationLoader::class => static function (self $container): ConfigurationLoader {
-                return new ConfigurationLoader(
+            SchemaConfigurationLoader::class => static function (self $container): SchemaConfigurationLoader {
+                return new SchemaConfigurationLoader(
                     $container[RootsFileLocator::class],
-                    $container[ConfigurationFileLoader::class]
+                    $container[SchemaConfigurationFileLoader::class]
                 );
             },
             RootsFileLocator::class => static function (self $container): RootsFileLocator {
@@ -227,18 +229,21 @@ final class InfectionContainer extends Container
                     $container['filesystem']
                 );
             },
-            ConfigurationFileLoader::class => static function (self $container): ConfigurationFileLoader {
-                return new ConfigurationFileLoader(
+            SchemaConfigurationFileLoader::class => static function (self $container): SchemaConfigurationFileLoader {
+                return new SchemaConfigurationFileLoader(
                     $container[SchemaValidator::class],
-                    $container[ConfigurationFactory::class]
+                    $container[SchemaConfigurationFactory::class]
                 );
             },
             SchemaValidator::class => static function (): SchemaValidator {
                 return new SchemaValidator();
             },
+            SchemaConfigurationFactory::class => static function (): SchemaConfigurationFactory {
+                return new SchemaConfigurationFactory();
+            },
             ConfigurationFactory::class => static function (): ConfigurationFactory {
                 return new ConfigurationFactory();
-            },
+            }
         ]);
     }
 
@@ -259,12 +264,16 @@ final class InfectionContainer extends Container
     ): self {
         $clone = clone $this;
 
-        $clone['infection.config'] = static function (self $container) use ($configFile): SchemaConfiguration {
-            return $container[ConfigurationLoader::class]->loadConfiguration(array_filter([
+        $clone[SchemaConfiguration::class] = static function (self $container) use ($configFile): SchemaConfiguration {
+            return $container[SchemaConfigurationLoader::class]->loadConfiguration(array_filter([
                 $configFile,
                 'infection.json.dist',
                 'infection.json',
             ]));
+        };
+
+        $clone['infection.config'] = static function (self $container): Configuration {
+            return $container[ConfigurationFactory::class]->create($container[SchemaConfiguration::class]);
         };
 
         $clone['coverage.path'] = static function (self $container) use ($existingCoveragePath): string {

@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration;
+namespace Infection\Tests\Configuration\Schema;
 
 use Generator;
 use Infection\Configuration\Entry\Badge;
@@ -49,7 +49,6 @@ use Infection\Configuration\Entry\Mutator\TrueValue;
 use Infection\Configuration\Entry\Mutator\TrueValueSettings;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
-use Infection\Configuration\SchemaConfiguration;
 use PHPUnit\Framework\TestCase;
 
 final class SchemaConfigurationTest extends TestCase
@@ -70,7 +69,7 @@ final class SchemaConfigurationTest extends TestCase
         ?string $initialTestsPhpOptions,
         ?string $testFrameworkOptions
     ): void {
-        $config = new SchemaConfiguration(
+        $config = new \Infection\Configuration\Schema\SchemaConfiguration(
             $path,
             $timeout,
             $source,

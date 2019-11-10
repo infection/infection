@@ -33,19 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration;
+namespace Infection\Configuration\Schema;
 
 use Infection\Locator\Locator;
 
 /**
  * @internal
  */
-final class ConfigurationLoader
+final class SchemaConfigurationLoader
 {
     private $locator;
     private $fileLoader;
 
-    public function __construct(Locator $locator, ConfigurationFileLoader $fileLoader)
+    public function __construct(Locator $locator, SchemaConfigurationFileLoader $fileLoader)
     {
         $this->locator = $locator;
         $this->fileLoader = $fileLoader;

@@ -33,20 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration;
+namespace Infection\Configuration\Schema;
 
 use Infection\Configuration\RawConfiguration\RawConfiguration;
-use Infection\Configuration\Schema\SchemaValidator;
 
 /**
  * @final
  */
-class ConfigurationFileLoader
+class SchemaConfigurationFileLoader
 {
     private $schemaValidator;
     private $factory;
 
-    public function __construct(SchemaValidator $schemaValidator, ConfigurationFactory $factory)
+    public function __construct(SchemaValidator $schemaValidator, SchemaConfigurationFactory $factory)
     {
         $this->schemaValidator = $schemaValidator;
         $this->factory = $factory;

@@ -33,13 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration;
+namespace Infection\Tests\Configuration\Schema;
 
-use Infection\Configuration\ConfigurationFactory;
-use Infection\Configuration\ConfigurationFileLoader;
 use Infection\Configuration\RawConfiguration\RawConfiguration;
+use Infection\Configuration\Schema\SchemaConfigurationFactory;
+use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
-use Infection\Configuration\SchemaConfiguration;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Argument\Token\TokenInterface;
@@ -48,7 +47,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionClass;
 use function Safe\realpath;
 
-final class ConfigurationFileLoaderTest extends TestCase
+final class SchemaConfigurationFileLoaderTest extends TestCase
 {
     /**
      * @var SchemaValidator&ObjectProphecy
@@ -56,21 +55,21 @@ final class ConfigurationFileLoaderTest extends TestCase
     private $schemaValidatorProphecy;
 
     /**
-     * @var ConfigurationFactory&ObjectProphecy
+     * @var SchemaConfigurationFactory&ObjectProphecy
      */
     private $configFactoryProphecy;
 
     /**
-     * @var ConfigurationFileLoader
+     * @var \Infection\Configuration\Schema\SchemaConfigurationFileLoader
      */
     private $loader;
 
     protected function setUp(): void
     {
         $this->schemaValidatorProphecy = $this->prophesize(SchemaValidator::class);
-        $this->configFactoryProphecy = $this->prophesize(ConfigurationFactory::class);
+        $this->configFactoryProphecy = $this->prophesize(SchemaConfigurationFactory::class);
 
-        $this->loader = new ConfigurationFileLoader(
+        $this->loader = new SchemaConfigurationFileLoader(
             $this->schemaValidatorProphecy->reveal(),
             $this->configFactoryProphecy->reveal()
         );
@@ -80,7 +79,7 @@ final class ConfigurationFileLoaderTest extends TestCase
     {
         $path = realpath(__DIR__.'/../Fixtures/Configuration/file.json');
         $decodedContents = (object) ['foo' => 'bar'];
-        $expectedConfig = (new ReflectionClass(SchemaConfiguration::class))->newInstanceWithoutConstructor();
+        $expectedConfig = (new ReflectionClass(\Infection\Configuration\Schema\SchemaConfiguration::class))->newInstanceWithoutConstructor();
 
         $this->schemaValidatorProphecy
             ->validate(self::createRawConfigWithPathArgument($path))

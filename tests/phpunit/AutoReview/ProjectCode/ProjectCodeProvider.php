@@ -42,8 +42,6 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\InfectionConfig;
 use Infection\Configuration\Configuration;
-use Infection\Configuration\ConfigurationFactory;
-use Infection\Configuration\ConfigurationFileLoader;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mutator\ArrayItemRemoval;
@@ -58,6 +56,8 @@ use Infection\Configuration\Entry\Mutator\TrueValue;
 use Infection\Configuration\Entry\Mutator\TrueValueSettings;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\Configuration\Schema\SchemaConfigurationFactory;
+use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Console\Application;
 use Infection\Console\OutputFormatter\OutputFormatter;
@@ -86,15 +86,15 @@ use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUn
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkTypes;
-use function Infection\Tests\generator_to_phpunit_data_provider;
 use Infection\Utils\VersionParser;
 use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
-use function iterator_to_array;
 use ReflectionClass;
-use const SORT_STRING;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use function Infection\Tests\generator_to_phpunit_data_provider;
+use function iterator_to_array;
+use const SORT_STRING;
 
 final class ProjectCodeProvider
 {
@@ -154,8 +154,8 @@ final class ProjectCodeProvider
         PhpUnitMutationConfigBuilder::class,
         CoverageXmlParser::class,
         VersionParser::class,
-        ConfigurationFactory::class,
-        ConfigurationFileLoader::class,
+        SchemaConfigurationFactory::class,
+        SchemaConfigurationFileLoader::class,
         SchemaValidator::class,
     ];
 
@@ -165,8 +165,8 @@ final class ProjectCodeProvider
     public const EXTENSION_POINTS = [
         Mutator::class,
         OutputFormatter::class,
-        ConfigurationFactory::class,
-        ConfigurationFileLoader::class,
+        SchemaConfigurationFactory::class,
+        SchemaConfigurationFileLoader::class,
         SchemaValidator::class,
     ];
 
