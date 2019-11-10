@@ -275,7 +275,7 @@ final class InfectionCommand extends BaseCommand
 
         $this->includeUserBootstrap($config);
 
-        $this->testFrameworkKey = (string) $config->getTestFramework();
+        $this->testFrameworkKey = $config->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
         $this->testFrameworkOptions = $this->getTestFrameworkExtraOptions($this->testFrameworkKey);
         $adapter = $this->container['test.framework.factory']->create($this->testFrameworkKey, $this->skipCoverage);
 
@@ -300,7 +300,7 @@ final class InfectionCommand extends BaseCommand
         $initialTestSuitProcess = $initialTestsRunner->run(
             $this->testFrameworkOptions->getForInitialProcess(),
             $this->skipCoverage,
-            explode(' ', $config->getInitialTestsPhpOptions())
+            explode(' ', (string) $config->getInitialTestsPhpOptions())
         );
 
         if (!$initialTestSuitProcess->isSuccessful()) {

@@ -118,7 +118,7 @@ final class Factory
             return new PhpUnitAdapter(
                 new TestFrameworkFinder(
                     TestFrameworkTypes::PHPUNIT,
-                    $this->infectionConfig->getPhpUnit()->getCustomPath()
+                    (string) $this->infectionConfig->getPhpUnit()->getCustomPath()
                 ),
                 new InitialConfigBuilder(
                     $this->tmpDir,
@@ -148,7 +148,8 @@ final class Factory
 
         throw new \InvalidArgumentException(
             sprintf(
-                'Invalid name of test framework. Available names are: %s',
+                'Invalid name of test framework "%s". Available names are: %s',
+                $adapterName,
                 implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC])
             )
         );

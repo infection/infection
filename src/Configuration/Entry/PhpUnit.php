@@ -49,6 +49,11 @@ final class PhpUnit
         $this->customPath = $executablePath;
     }
 
+    public function setConfigDir(string $dir): void
+    {
+        $this->configDir = $dir;
+    }
+
     public function getConfigDir(): ?string
     {
         return $this->configDir;

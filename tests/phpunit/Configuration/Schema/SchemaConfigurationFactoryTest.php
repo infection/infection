@@ -69,7 +69,7 @@ use function sprintf;
 use function var_export;
 use const PHP_EOL;
 
-/**
+/**g
  * @covers \Infection\Configuration\Schema\SchemaConfigurationFactory
  * @covers \Infection\Configuration\Entry\Mutator\ArrayItemRemoval
  * @covers \Infection\Configuration\Entry\Mutator\ArrayItemRemovalSettings

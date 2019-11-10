@@ -154,7 +154,7 @@ final class InfectionContainer extends Container
 
                 return new XmlConfigurationHelper(
                     $container['path.replacer'],
-                    $config->getPhpUnit()->getConfigDir()
+                    (string) $config->getPhpUnit()->getConfigDir()
                 );
             },
             'mutant.creator' => static function (self $container): MutantCreator {
@@ -180,7 +180,7 @@ final class InfectionContainer extends Container
                 $config = $container[Configuration::class];
 
                 return new TestFrameworkConfigLocator(
-                    $config->getPhpUnit()->getConfigDir()
+                    (string) $config->getPhpUnit()->getConfigDir()
                 );
             },
             'diff.colorizer' => static function (): DiffColorizer {
@@ -261,7 +261,7 @@ final class InfectionContainer extends Container
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
-                $existingCoveragePath = $config->getExistingCoveragePath();
+                $existingCoveragePath = (string) $config->getExistingCoveragePath();
 
                 if ($existingCoveragePath === '') {
                     return $container['tmp.dir'];

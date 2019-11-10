@@ -36,6 +36,10 @@ declare(strict_types=1);
 namespace Infection\Configuration;
 
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Webmozart\PathUtil\Path;
+use function dirname;
+use function sprintf;
+use function sys_get_temp_dir;
 
 /**
  * @final
@@ -60,12 +64,32 @@ class ConfigurationFactory
         ?string $testFrameworkOptions
     ): Configuration
     {
+        $configDir = dirname($schema->getFile());
+
+        $tmpDir = $schema->getTmpDir();
+
+        if ('' === (string) $tmpDir) {
+            $tmpDir = sys_get_temp_dir();
+        } elseif (!Path::isAbsolute($tmpDir)) {
+            $tmpDir = sprintf('%s/%s', $configDir, $tmpDir);
+        }
+
+        $phpUnitConfigDir = $schema->getPhpUnit()->getConfigDir();
+
+        if (null === $phpUnitConfigDir) {
+            $schema->getPhpUnit()->setConfigDir($configDir);
+        } elseif (!Path::isAbsolute($phpUnitConfigDir)) {
+            $schema->getPhpUnit()->setConfigDir(sprintf(
+                '%s/%s', $configDir, $phpUnitConfigDir
+            ));
+        }
+
         return new Configuration(
             $schema->getTimeout(),
             $schema->getSource(),
             $schema->getLogs(),
             $logVerbosity,
-            $schema->getTmpDir(),
+            $tmpDir,
             $schema->getPhpUnit(),
             $schema->getMutators(),
             $testFramework ?? $schema->getTestFramework(),
