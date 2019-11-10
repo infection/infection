@@ -259,7 +259,7 @@ final class InfectionContainer extends Container
             },
             'coverage.path' => static function (self $container): string {
                 /** @var Configuration $config */
-                $config = $container[Configuration::class;
+                $config = $container[Configuration::class];
 
                 $existingCoveragePath = $config->getExistingCoveragePath();
 

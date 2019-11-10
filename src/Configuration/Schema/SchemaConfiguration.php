@@ -70,7 +70,7 @@ final class SchemaConfiguration
         Logs $logs,
         ?string $tmpDir,
         PhpUnit $phpUnit,
-        Mutators $mutators,
+        array $mutators,
         ?string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
@@ -122,7 +122,7 @@ final class SchemaConfiguration
         return $this->phpUnit;
     }
 
-    public function getMutators(): Mutators
+    public function getMutators(): array
     {
         return $this->mutators;
     }

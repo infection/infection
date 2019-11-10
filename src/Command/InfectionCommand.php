@@ -275,7 +275,7 @@ final class InfectionCommand extends BaseCommand
 
         $this->includeUserBootstrap($config);
 
-        $this->testFrameworkKey = $config->getTestFramework();
+        $this->testFrameworkKey = (string) $config->getTestFramework();
         $this->testFrameworkOptions = $this->getTestFrameworkExtraOptions($this->testFrameworkKey);
         $adapter = $this->container['test.framework.factory']->create($this->testFrameworkKey, $this->skipCoverage);
 

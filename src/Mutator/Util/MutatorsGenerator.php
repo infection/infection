@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Mutator\Util;
 
 use Infection\Config\Exception\InvalidConfigException;
-use Infection\Configuration\Entry\Mutator\Mutators;
 
 /**
  * @internal
@@ -46,7 +45,7 @@ final class MutatorsGenerator
     /**
      * @var array<string, bool|array<string, string>>
      */
-    private $settings;
+    private $mutatorSettings;
 
     /**
      * @var array<string, bool|array<string, string>>
@@ -56,9 +55,9 @@ final class MutatorsGenerator
     /**
      * @param array<string, bool|array<string, string>> $mutatorSettings
      */
-    public function __construct(Mutators $mutatorSettings)
+    public function __construct(array $mutatorSettings = [])
     {
-        $this->settings = $mutatorSettings;
+        $this->mutatorSettings = $mutatorSettings;
     }
 
     /**
@@ -70,25 +69,14 @@ final class MutatorsGenerator
      */
     public function generate(): array
     {
-        $profiles = $this->settings->getProfiles();
-        $genericMutators = $this->settings->getGenericMutators();
-        $trueValue = $this->settings->getTrueValue();
-        $arrayItemRemoval = $this->settings->getArrayItemRemoval();
-        $bcMath = $this->settings->getBcMath();
-        $mbString = $this->settings->getMbString();
-
-
+        if (empty($this->mutatorSettings)) {
+            $this->mutatorSettings = [
+                '@default' => true,
+            ];
+        }
         $this->mutatorList = [];
 
-        foreach ($this->settings->getProfiles() as $profile => $enabled) {
-            $this->registerFromProfile($profile, $enabled);
-        }
-
-        foreach ($this->settings->getGenericMutators() as $mutator) {
-            $this->registerFromName($mutator);
-        }
-
-        foreach ($this->settings as $mutatorOrProfile => $setting) {
+        foreach ($this->mutatorSettings as $mutatorOrProfile => $setting) {
             if (\array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
                 $this->registerFromProfile($mutatorOrProfile, $setting);
 

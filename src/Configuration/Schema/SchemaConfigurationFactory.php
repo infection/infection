@@ -37,16 +37,6 @@ namespace Infection\Configuration\Schema;
 
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
-use Infection\Configuration\Entry\Mutator\ArrayItemRemoval;
-use Infection\Configuration\Entry\Mutator\ArrayItemRemovalSettings;
-use Infection\Configuration\Entry\Mutator\BCMath;
-use Infection\Configuration\Entry\Mutator\BCMathSettings;
-use Infection\Configuration\Entry\Mutator\GenericMutator;
-use Infection\Configuration\Entry\Mutator\MBString;
-use Infection\Configuration\Entry\Mutator\MBStringSettings;
-use Infection\Configuration\Entry\Mutator\Mutators;
-use Infection\Configuration\Entry\Mutator\TrueValue;
-use Infection\Configuration\Entry\Mutator\TrueValueSettings;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use stdClass;
@@ -70,7 +60,7 @@ class SchemaConfigurationFactory
             self::createLogs($rawConfig->logs ?? new stdClass()),
             self::normalizeString($rawConfig->tmpDir ?? null),
             self::createPhpUnit($rawConfig->phpUnit ?? new stdClass()),
-            self::createMutators($rawConfig->mutators ?? new stdClass()),
+            (array) ($rawConfig->mutators ?? []),
             $rawConfig->testFramework ?? null,
             self::normalizeString($rawConfig->bootstrap ?? null),
             self::normalizeString($rawConfig->initialTestsPhpOptions ?? null),
@@ -112,60 +102,6 @@ class SchemaConfigurationFactory
         return new PhpUnit(
             self::normalizeString($phpUnit->configDir ?? null),
             self::normalizeString($phpUnit->customPath ?? null)
-        );
-    }
-
-    private static function createMutators(stdClass $mutators): Mutators
-    {
-        $profiles = [];
-
-        $trueValue = null;
-        $arrayItemRemoval = null;
-        $bcMath = null;
-        $mbString = null;
-        $generics = [];
-
-        foreach ($mutators as $key => $value) {
-            if (0 === strpos($key, '@')) {
-                $profiles[$key] = $value;
-
-                continue;
-            }
-
-            if ('TrueValue' === $key) {
-                $trueValue = self::createTrueValue($value);
-
-                continue;
-            }
-
-            if ('ArrayItemRemoval' === $key) {
-                $arrayItemRemoval = self::createArrayItemRemoval($value);
-
-                continue;
-            }
-
-            if ('BCMath' === $key) {
-                $bcMath = self::createBCMath($value);
-
-                continue;
-            }
-
-            if ('MBString' === $key) {
-                $mbString = self::createMBString($value);
-
-                continue;
-            }
-
-            $generics[] = self::createGeneric($key, $value);
-        }
-
-        return new Mutators(
-            $profiles,
-            $trueValue,
-            $arrayItemRemoval,
-            $bcMath,
-            $mbString,
-            ...$generics
         );
     }
 
