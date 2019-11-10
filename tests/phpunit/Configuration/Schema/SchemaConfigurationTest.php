@@ -49,6 +49,7 @@ use Infection\Configuration\Entry\Mutator\TrueValue;
 use Infection\Configuration\Entry\Mutator\TrueValueSettings;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\Configuration\Schema\SchemaConfiguration;
 use PHPUnit\Framework\TestCase;
 
 final class SchemaConfigurationTest extends TestCase
@@ -63,13 +64,13 @@ final class SchemaConfigurationTest extends TestCase
         Logs $logs,
         ?string $tmpDir,
         PhpUnit $phpUnit,
-        Mutators $mutators,
+        array $mutators,
         ?string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
         ?string $testFrameworkOptions
     ): void {
-        $config = new \Infection\Configuration\Schema\SchemaConfiguration(
+        $config = new SchemaConfiguration(
             $path,
             $timeout,
             $source,
@@ -176,74 +177,11 @@ final class SchemaConfigurationTest extends TestCase
 
     public function provideMutators(): Generator
     {
-        yield new Mutators(
-            [],
-            null,
-            null,
-            null,
-            null
-        );
+        yield [];
 
-        yield new Mutators(
-            [
-                '@arithmetic' => true,
-                '@cast' => false,
-            ],
-            new TrueValue(
-                true,
-                ['fileA'],
-                new TrueValueSettings(
-                    false,
-                    false
-                )
-            ),
-            new ArrayItemRemoval(
-                true,
-                ['file'],
-                new ArrayItemRemovalSettings(
-                    'first',
-                    10
-                )
-            ),
-            new BCMath(
-                true,
-                [],
-                new BCMathSettings(
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true
-                )
-            ),
-            new MBString(
-                true,
-                [],
-                new MBStringSettings(
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true
-                )
-            )
-        );
+        yield [
+            '@arithmetic' => true,
+            '@cast' => false,
+        ];
     }
 }

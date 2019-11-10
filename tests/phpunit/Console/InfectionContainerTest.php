@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Console;
 
 use Infection\Config\InfectionConfig;
+use Infection\Configuration\Configuration;
 use Infection\Console\InfectionContainer;
 use Infection\Process\Coverage\CoverageRequirementChecker;
 use PHPUnit\Framework\TestCase;
@@ -89,7 +90,7 @@ final class InfectionContainerTest extends TestCase
         $container = new InfectionContainer();
 
         // Sanity check
-        $this->assertFalse($container->offsetExists('coverage.path'));
+        $this->assertFalse($container->offsetExists(Configuration::class));
 
         $newContainer = $container->withDynamicParameters(
             null,
@@ -100,15 +101,17 @@ final class InfectionContainerTest extends TestCase
             false,
             '',
             false,
-            '',
+            '/path/to/coverage',
             '',
             false,
             .0,
-            .0
+            .0,
+            'phpunit',
+            ''
         );
 
-        $this->assertFalse($container->offsetExists('coverage.path'));
-        $this->assertTrue($newContainer->offsetExists('coverage.path'));
+        $this->assertFalse($container->offsetExists(Configuration::class));
+        $this->assertTrue($newContainer->offsetExists(Configuration::class));
     }
 
     public function test_coverage_checker_xdebug_is_included_by_cli_option(): void
@@ -117,16 +120,18 @@ final class InfectionContainerTest extends TestCase
             null,
             null,
             false,
-            '',
+            'default',
             false,
             false,
-            '',
+            'dot',
             false,
             '',
             '-d zend_extension=xdebug.so',
             false,
             .0,
-            .0
+            .0,
+            'phpunit',
+            ''
         );
 
         /** @var CoverageRequirementChecker $checker */
@@ -141,16 +146,18 @@ final class InfectionContainerTest extends TestCase
             null,
             null,
             false,
-            '',
+            'default',
             false,
             false,
-            '',
+            'dot',
             false,
             '',
             '',
             false,
             .0,
-            .0
+            .0,
+            'phpunit',
+            ''
         );
 
         // Overwrite config service to simulate infection.json
