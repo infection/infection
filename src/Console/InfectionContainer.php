@@ -80,6 +80,7 @@ use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Filesystem\Filesystem;
 use function array_filter;
+use function getcwd;
 use function sprintf;
 
 /**
@@ -243,7 +244,75 @@ final class InfectionContainer extends Container
             },
             ConfigurationFactory::class => static function (): ConfigurationFactory {
                 return new ConfigurationFactory();
-            }
+            },
+            'coverage.path' => static function (self $container): string {
+                /** @var Configuration $config */
+                $config = $container['infection.config'];
+
+                $existingCoveragePath = $config->getExistingCoveragePath();
+
+                if ($existingCoveragePath === '') {
+                    return $container['tmp.dir'];
+                }
+
+                return $container['filesystem']->isAbsolutePath($existingCoveragePath)
+                    ? $existingCoveragePath
+                    : sprintf('%s/%s', getcwd(), $existingCoveragePath)
+                ;
+            },
+            'coverage.checker' => static function (self $container): CoverageRequirementChecker {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                return new CoverageRequirementChecker(
+                    (string) $config->getExistingCoveragePath() !== '',
+                    $config->getInitialTestsPhpOptions() ?? ''
+                );
+            },
+            'test.run.constraint.checker' => static function (self $container): TestRunConstraintChecker {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                return new TestRunConstraintChecker(
+                    $container['metrics'],
+                    $config->ignoreMsiWithNoMutations(),
+                    (float) $config->getMinMsi(),
+                    (float) $config->getMinCoveredMsi()
+                );
+            },
+            'subscriber.builder' => static function (self $container): SubscriberBuilder {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                return new SubscriberBuilder(
+                    $config->showMutations(),
+                    $config->getLogVerbosity(),
+                    $config->isDebugEnabled(),
+                    $config->mutateOnlyCoveredCode(),
+                    $config->getFormatter(),
+                    $config->showProgress(),
+                    $container['metrics'],
+                    $container['dispatcher'],
+                    $container['diff.colorizer'],
+                    $container['infection.config'],
+                    $container['filesystem'],
+                    $container['tmp.dir'],
+                    $container['timer'],
+                    $container['time.formatter'],
+                    $container['memory.formatter']
+                );
+            },
+            'mutators' => static function (self $container): array {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                $parser = new MutatorParser(
+                    (string) $config->getStringMutators(),
+                    $container['mutators.config']
+                );
+
+                return $parser->getMutators();
+            },
         ]);
     }
 
@@ -301,79 +370,6 @@ final class InfectionContainer extends Container
                 $minCoveredMsi,
                 $mutators
             );
-        };
-
-        $clone['coverage.path'] = static function (self $container): string {
-            /** @var Configuration $config */
-            $config = $container['infection.config'];
-
-            $existingCoveragePath = $config->getExistingCoveragePath();
-
-            if ($existingCoveragePath === '') {
-                return $container['tmp.dir'];
-            }
-
-            return $container['filesystem']->isAbsolutePath($existingCoveragePath)
-                ? $existingCoveragePath
-                : sprintf('%s/%s', getcwd(), $existingCoveragePath)
-            ;
-        };
-
-        $clone['coverage.checker'] = static function (self $container): CoverageRequirementChecker {
-            /** @var Configuration $config */
-            $config = $container[Configuration::class];
-
-            return new CoverageRequirementChecker(
-                (string) $config->getExistingCoveragePath() !== '',
-                $config->getInitialTestsPhpOptions() ?? ''
-            );
-        };
-
-        $clone['test.run.constraint.checker'] = static function (self $container): TestRunConstraintChecker {
-            /** @var Configuration $config */
-            $config = $container[Configuration::class];
-
-            return new TestRunConstraintChecker(
-                $container['metrics'],
-                $config->ignoreMsiWithNoMutations(),
-                $config->getMinMsi(),
-                $config->getMinCoveredMsi()
-            );
-        };
-
-        $clone['subscriber.builder'] = static function (self $container): SubscriberBuilder {
-            /** @var Configuration $config */
-            $config = $container[Configuration::class];
-
-            return new SubscriberBuilder(
-                $config->showMutations(),
-                $config->getLogVerbosity(),
-                $config->isDebugEnabled(),
-                $config->mutateOnlyCoveredCode(),
-                $config->getFormatter(),
-                $config->showProgress(),
-                $container['metrics'],
-                $container['dispatcher'],
-                $container['diff.colorizer'],
-                $container['infection.config'],
-                $container['filesystem'],
-                $container['tmp.dir'],
-                $container['timer'],
-                $container['time.formatter'],
-                $container['memory.formatter']
-            );
-        };
-
-        $clone['mutators'] = static function (self $container): array {
-            /** @var Configuration $config */
-            $config = $container[Configuration::class];
-
-            $parser = new MutatorParser(
-                $config->getStringMutators(),
-                $container['mutators.config']
-            );
-
-            return $parser->getMutators();
         };
 
         return $clone;
