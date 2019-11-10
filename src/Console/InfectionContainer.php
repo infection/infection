@@ -99,7 +99,7 @@ final class InfectionContainer extends Container
                 return new TmpDirectoryCreator($container['filesystem']);
             },
             'tmp.dir' => static function (self $container): string {
-                return $container['tmp.dir.creator']->createAndGet($container['infection.config']->getTmpDir());
+                return $container['tmp.dir.creator']->createAndGet((string) $container[Configuration::class]->getTmpDir());
             },
             'coverage.dir.phpunit' => static function (self $container) {
                 return sprintf(
@@ -129,9 +129,12 @@ final class InfectionContainer extends Container
                 );
             },
             'path.replacer' => static function (self $container): PathReplacer {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
                 return new PathReplacer(
                     $container['filesystem'],
-                    $container['infection.config']->getPhpUnitConfigDir()
+                    $config->getPhpUnit()->getConfigDir()
                 );
             },
             'test.framework.factory' => static function (self $container): Factory {
@@ -141,14 +144,17 @@ final class InfectionContainer extends Container
                     $container['testframework.config.locator'],
                     $container['xml.configuration.helper'],
                     $container['phpunit.junit.file.path'],
-                    $container['infection.config'],
+                    $container[Configuration::class],
                     $container['version.parser']
                 );
             },
             'xml.configuration.helper' => static function (self $container): XmlConfigurationHelper {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
                 return new XmlConfigurationHelper(
                     $container['path.replacer'],
-                    $container['infection.config']->getPhpUnitConfigDir()
+                    $config->getPhpUnit()->getConfigDir()
                 );
             },
             'mutant.creator' => static function (self $container): MutantCreator {
@@ -170,8 +176,11 @@ final class InfectionContainer extends Container
                 return new ParallelProcessRunner($container['dispatcher']);
             },
             'testframework.config.locator' => static function (self $container): TestFrameworkConfigLocator {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
                 return new TestFrameworkConfigLocator(
-                    $container['infection.config']->getPhpUnitConfigDir() /*[phpunit.dir, phpspec.dir, ...]*/
+                    $config->getPhpUnit()->getConfigDir()
                 );
             },
             'diff.colorizer' => static function (): DiffColorizer {
@@ -199,8 +208,11 @@ final class InfectionContainer extends Container
                 return new Standard();
             },
             'mutators.config' => static function (self $container): array {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
                 return (new MutatorsGenerator(
-                    $container['infection.config']->getMutatorsConfiguration()
+                    $config->getMutators()
                 ))->generate();
             },
             'metrics' => static function (): MetricsCalculator {
@@ -247,7 +259,7 @@ final class InfectionContainer extends Container
             },
             'coverage.path' => static function (self $container): string {
                 /** @var Configuration $config */
-                $config = $container['infection.config'];
+                $config = $container[Configuration::class;
 
                 $existingCoveragePath = $config->getExistingCoveragePath();
 
@@ -294,7 +306,7 @@ final class InfectionContainer extends Container
                     $container['metrics'],
                     $container['dispatcher'],
                     $container['diff.colorizer'],
-                    $container['infection.config'],
+                    $config,
                     $container['filesystem'],
                     $container['tmp.dir'],
                     $container['timer'],
@@ -329,7 +341,9 @@ final class InfectionContainer extends Container
         ?string $initialTestsPhpOptions,
         bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
-        ?float $minCoveredMsi
+        ?float $minCoveredMsi,
+        ?string $testFramework,
+        ?string $testFrameworkOptions
     ): self {
         $clone = clone $this;
 
@@ -353,7 +367,9 @@ final class InfectionContainer extends Container
             $minMsi,
             $showMutations,
             $minCoveredMsi,
-            $mutators
+            $mutators,
+            $testFramework,
+            $testFrameworkOptions
         ): Configuration {
             return $container[ConfigurationFactory::class]->create(
                 $container[SchemaConfiguration::class],
@@ -368,7 +384,9 @@ final class InfectionContainer extends Container
                 $minMsi,
                 $showMutations,
                 $minCoveredMsi,
-                $mutators
+                $mutators,
+                $testFramework,
+                $testFrameworkOptions
             );
         };
 

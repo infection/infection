@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process\Listener;
 
 use Infection\Config\InfectionConfig;
+use Infection\Configuration\Configuration;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\MutationTestingFinished;
@@ -56,7 +57,7 @@ use Symfony\Component\Filesystem\Filesystem;
 final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var InfectionConfig
+     * @var Configuration
      */
     private $infectionConfig;
 
@@ -92,7 +93,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
 
     public function __construct(
         OutputInterface $output,
-        InfectionConfig $infectionConfig,
+        Configuration $infectionConfig,
         MetricsCalculator $metricsCalculator,
         Filesystem $fs,
         string $logVerbosity,
@@ -117,9 +118,17 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
 
     public function onMutationTestingFinished(MutationTestingFinished $event): void
     {
-        $logTypes = $this->infectionConfig->getLogsTypes();
+        $logs = $this->infectionConfig->getLogs();
 
-        if (empty($logTypes)) {
+        $logTypes = [
+            'badge' => null,
+            'debug' => $logs->getDebugLogFilePath(),
+            'perMutator' => $logs->getPerMutatorFilePath(),
+            'summary' => $logs->getSummaryLogFilePath(),
+            'text' => $logs->getTextLogFilePath(),
+        ];
+
+        if ([] === $logTypes) {
             return;
         }
 

@@ -55,7 +55,9 @@ class ConfigurationFactory
         ?float $minMsi,
         bool $showMutations,
         ?float $minCoveredMsi,
-        ?string $mutators
+        ?string $mutators,
+        ?string $testFramework,
+        ?string $testFrameworkOptions
     ): Configuration
     {
         return new Configuration(
@@ -66,10 +68,10 @@ class ConfigurationFactory
             $schema->getTmpDir(),
             $schema->getPhpUnit(),
             $schema->getMutators(),
-            $schema->getTestFramework(),
+            $testFramework ?? $schema->getTestFramework(),
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
-            $schema->getTestFrameworkOptions(),
+            $testFrameworkOptions ?? $schema->getTestFrameworkOptions(),
             $existingCoveragePath,
             $debug,
             $onlyCovered,

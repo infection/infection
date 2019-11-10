@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Util;
 
 use Infection\Config\Exception\InvalidConfigException;
+use Infection\Configuration\Entry\Mutator\Mutators;
 
 /**
  * @internal
@@ -45,7 +46,7 @@ final class MutatorsGenerator
     /**
      * @var array<string, bool|array<string, string>>
      */
-    private $mutatorSettings;
+    private $settings;
 
     /**
      * @var array<string, bool|array<string, string>>
@@ -55,9 +56,9 @@ final class MutatorsGenerator
     /**
      * @param array<string, bool|array<string, string>> $mutatorSettings
      */
-    public function __construct(array $mutatorSettings = [])
+    public function __construct(Mutators $mutatorSettings)
     {
-        $this->mutatorSettings = $mutatorSettings;
+        $this->settings = $mutatorSettings;
     }
 
     /**
@@ -69,14 +70,26 @@ final class MutatorsGenerator
      */
     public function generate(): array
     {
-        if (empty($this->mutatorSettings)) {
-            $this->mutatorSettings = [
-                '@default' => true,
-            ];
+        $profiles = $this->settings->getProfiles();
+        $genericMutators = $this->settings->getGenericMutators();
+        $trueValue = $this->settings->getTrueValue();
+        $arrayItemRemoval = $this->settings->getArrayItemRemoval();
+        $bcMath = $this->settings->getBcMath();
+        $mbString = $this->settings->getMbString();
+
+        if ([] === $profiles
+            && [] === $genericMutators
+            && null === $trueValue
+            && null === $arrayItemRemoval
+            && null === $bcMath
+            && null === $mbString
+        ) {
+            $this->settings->setDefaultProfile();
         }
+
         $this->mutatorList = [];
 
-        foreach ($this->mutatorSettings as $mutatorOrProfile => $setting) {
+        foreach ($this->settings as $mutatorOrProfile => $setting) {
             if (\array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
                 $this->registerFromProfile($mutatorOrProfile, $setting);
 

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use Infection\Config\InfectionConfig;
+use Infection\Configuration\Configuration;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
@@ -81,7 +82,7 @@ final class Factory
     private $jUnitFilePath;
 
     /**
-     * @var InfectionConfig
+     * @var Configuration
      */
     private $infectionConfig;
 
@@ -96,7 +97,7 @@ final class Factory
         TestFrameworkConfigLocatorInterface $configLocator,
         XmlConfigurationHelper $xmlConfigurationHelper,
         string $jUnitFilePath,
-        InfectionConfig $infectionConfig,
+        Configuration $infectionConfig,
         VersionParser $versionParser
     ) {
         $this->tmpDir = $tmpDir;
@@ -115,13 +116,16 @@ final class Factory
             $phpUnitConfigContent = file_get_contents($phpUnitConfigPath);
 
             return new PhpUnitAdapter(
-                new TestFrameworkFinder(TestFrameworkTypes::PHPUNIT, $this->infectionConfig->getPhpUnitCustomPath()),
+                new TestFrameworkFinder(
+                    TestFrameworkTypes::PHPUNIT,
+                    $this->infectionConfig->getPhpUnit()->getCustomPath()
+                ),
                 new InitialConfigBuilder(
                     $this->tmpDir,
                     $phpUnitConfigContent,
                     $this->xmlConfigurationHelper,
                     $this->jUnitFilePath,
-                    $this->infectionConfig->getSourceDirs(),
+                    $this->infectionConfig->getSource()->getDirectories(),
                     $skipCoverage
                 ),
                 new MutationConfigBuilder($this->tmpDir, $phpUnitConfigContent, $this->xmlConfigurationHelper, $this->projectDir),

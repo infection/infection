@@ -89,6 +89,11 @@ final class Mutators
         $this->genericMutators = $genericMutators;
     }
 
+    public function setDefaultProfile(): void
+    {
+        $this->profiles['default'] = true;
+    }
+
     /**
      * @return array<string,bool>
      */

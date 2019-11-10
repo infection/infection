@@ -136,7 +136,7 @@ final class Configuration
         $this->stringMutators = $stringMutators;
     }
 
-    public function getTimeout(): ?int
+    public function getProcessTimeout(): ?int
     {
         return $this->timeout;
     }
