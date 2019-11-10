@@ -45,9 +45,9 @@ use Webmozart\Assert\Assert;
  */
 final class GenericMutator implements MutatorConfiguration
 {
+    private $name;
     private $enabled;
     private $ignore;
-    private $settings;
 
     /**
      * @param string[] $ignore
@@ -65,8 +65,14 @@ final class GenericMutator implements MutatorConfiguration
         );
         Assert::allString($ignore);
 
+        $this->name = $name;
         $this->enabled = $enabled;
         $this->ignore = $ignore;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     /**

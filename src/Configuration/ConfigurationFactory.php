@@ -55,11 +55,23 @@ class ConfigurationFactory
         ?float $minMsi,
         bool $showMutations,
         ?float $minCoveredMsi,
-        ?string $mutators,
+        ?string $stringMutators,
         ?string $testFramework,
         ?string $testFrameworkOptions
     ): Configuration
     {
+        $mutators = $schema->getMutators();
+
+        if ([] === $mutators->getProfiles()
+            && [] === $mutators->getGenericMutators()
+            && null === $mutators->getTrueValue()
+            && null === $mutators->getArrayItemRemoval()
+            && null === $mutators->getBcMath()
+            && null === $mutators->getMbString()
+        ) {
+            $mutators->setDefaultProfile();
+        }
+
         return new Configuration(
             $schema->getTimeout(),
             $schema->getSource(),
@@ -67,7 +79,7 @@ class ConfigurationFactory
             $logVerbosity,
             $schema->getTmpDir(),
             $schema->getPhpUnit(),
-            $schema->getMutators(),
+            $mutators,
             $testFramework ?? $schema->getTestFramework(),
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
@@ -81,7 +93,7 @@ class ConfigurationFactory
             $minMsi,
             $showMutations,
             $minCoveredMsi,
-            $mutators
+            $stringMutators
         );
     }
 }

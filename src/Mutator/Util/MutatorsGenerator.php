@@ -77,17 +77,16 @@ final class MutatorsGenerator
         $bcMath = $this->settings->getBcMath();
         $mbString = $this->settings->getMbString();
 
-        if ([] === $profiles
-            && [] === $genericMutators
-            && null === $trueValue
-            && null === $arrayItemRemoval
-            && null === $bcMath
-            && null === $mbString
-        ) {
-            $this->settings->setDefaultProfile();
-        }
 
         $this->mutatorList = [];
+
+        foreach ($this->settings->getProfiles() as $profile => $enabled) {
+            $this->registerFromProfile($profile, $enabled);
+        }
+
+        foreach ($this->settings->getGenericMutators() as $mutator) {
+            $this->registerFromName($mutator);
+        }
 
         foreach ($this->settings as $mutatorOrProfile => $setting) {
             if (\array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
