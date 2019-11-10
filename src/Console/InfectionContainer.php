@@ -256,11 +256,11 @@ final class InfectionContainer extends Container
         bool $onlyCovered,
         string $formatter,
         bool $noProgress,
-        string $existingCoveragePath,
-        string $initialTestsPhpOptions,
+        ?string $existingCoveragePath,
+        ?string $initialTestsPhpOptions,
         bool $ignoreMsiWithNoMutations,
-        float $minMsi,
-        float $minCoveredMsi
+        ?float $minMsi,
+        ?float $minCoveredMsi
     ): self {
         $clone = clone $this;
 
@@ -272,11 +272,43 @@ final class InfectionContainer extends Container
             ]));
         };
 
-        $clone['infection.config'] = static function (self $container): Configuration {
-            return $container[ConfigurationFactory::class]->create($container[SchemaConfiguration::class]);
+        $clone[Configuration::class] = static function (self $container) use (
+            $existingCoveragePath,
+            $initialTestsPhpOptions,
+            $logVerbosity,
+            $debug,
+            $onlyCovered,
+            $formatter,
+            $noProgress,
+            $ignoreMsiWithNoMutations,
+            $minMsi,
+            $showMutations,
+            $minCoveredMsi,
+            $mutators
+        ): Configuration {
+            return $container[ConfigurationFactory::class]->create(
+                $container[SchemaConfiguration::class],
+                $existingCoveragePath,
+                $initialTestsPhpOptions,
+                $logVerbosity,
+                $debug,
+                $onlyCovered,
+                $formatter,
+                $noProgress,
+                $ignoreMsiWithNoMutations,
+                $minMsi,
+                $showMutations,
+                $minCoveredMsi,
+                $mutators
+            );
         };
 
-        $clone['coverage.path'] = static function (self $container) use ($existingCoveragePath): string {
+        $clone['coverage.path'] = static function (self $container): string {
+            /** @var Configuration $config */
+            $config = $container['infection.config'];
+
+            $existingCoveragePath = $config->getExistingCoveragePath();
+
             if ($existingCoveragePath === '') {
                 return $container['tmp.dir'];
             }
@@ -287,55 +319,39 @@ final class InfectionContainer extends Container
             ;
         };
 
-        $clone['coverage.checker'] = static function (self $container) use (
-            $initialTestsPhpOptions,
-            $existingCoveragePath
-        ): CoverageRequirementChecker {
-            $initialTestsPhpOptions = $initialTestsPhpOptions ?: $container['infection.config']->getInitialTestsPhpOptions();
-
-            if (!\is_string($initialTestsPhpOptions)) {
-                throw new InvalidArgumentException(
-                    \sprintf(
-                        'Expected initial-tests-php-options to be string, %s given',
-                        \gettype($initialTestsPhpOptions)
-                    )
-                );
-            }
+        $clone['coverage.checker'] = static function (self $container): CoverageRequirementChecker {
+            /** @var Configuration $config */
+            $config = $container[Configuration::class];
 
             return new CoverageRequirementChecker(
-                $existingCoveragePath !== '',
-                $initialTestsPhpOptions
+                (string) $config->getExistingCoveragePath() !== '',
+                $config->getInitialTestsPhpOptions() ?? ''
             );
         };
 
-        $clone['test.run.constraint.checker'] = static function (self $container) use (
-            $ignoreMsiWithNoMutations,
-            $minMsi,
-            $minCoveredMsi
-        ): TestRunConstraintChecker {
+        $clone['test.run.constraint.checker'] = static function (self $container): TestRunConstraintChecker {
+            /** @var Configuration $config */
+            $config = $container[Configuration::class];
+
             return new TestRunConstraintChecker(
                 $container['metrics'],
-                $ignoreMsiWithNoMutations,
-                $minMsi,
-                $minCoveredMsi
+                $config->ignoreMsiWithNoMutations(),
+                $config->getMinMsi(),
+                $config->getMinCoveredMsi()
             );
         };
 
-        $clone['subscriber.builder'] = static function (self $container) use (
-            $showMutations,
-            $logVerbosity,
-            $debug,
-            $onlyCovered,
-            $formatter,
-            $noProgress
-        ): SubscriberBuilder {
+        $clone['subscriber.builder'] = static function (self $container): SubscriberBuilder {
+            /** @var Configuration $config */
+            $config = $container[Configuration::class];
+
             return new SubscriberBuilder(
-                $showMutations,
-                $logVerbosity,
-                $debug,
-                $onlyCovered,
-                $formatter,
-                $noProgress,
+                $config->showMutations(),
+                $config->getLogVerbosity(),
+                $config->isDebugEnabled(),
+                $config->mutateOnlyCoveredCode(),
+                $config->getFormatter(),
+                $config->showProgress(),
                 $container['metrics'],
                 $container['dispatcher'],
                 $container['diff.colorizer'],
@@ -348,9 +364,12 @@ final class InfectionContainer extends Container
             );
         };
 
-        $clone['mutators'] = static function (self $container) use ($mutators): array {
+        $clone['mutators'] = static function (self $container): array {
+            /** @var Configuration $config */
+            $config = $container[Configuration::class];
+
             $parser = new MutatorParser(
-                $mutators,
+                $config->getStringMutators(),
                 $container['mutators.config']
             );
 

@@ -92,31 +92,6 @@ final class SchemaConfiguration
         $this->testFrameworkOptions = $testFrameworkOptions;
     }
 
-    public function withInput(
-        ?Source $source,
-        ?Logs $logs,
-        ?string $tmpDir,
-        ?PhpUnit $phpUnit,
-        ?Mutators $mutators,
-        ?string $testFramework,
-        ?string $bootstrap,
-        ?string $initialTestsPhpOptions,
-        ?string $testFrameworkOptions
-    ): self {
-        return new self(
-            $this->timeout,
-            $source,
-            $logs,
-            $tmpDir,
-            $phpUnit,
-            $mutators,
-            $testFramework,
-            $bootstrap,
-            $initialTestsPhpOptions,
-            $testFrameworkOptions
-        );
-    }
-
     public function getFile(): string
     {
         return $this->file;

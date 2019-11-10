@@ -65,6 +65,7 @@ use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -72,6 +73,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
 use function trim;
+use function Safe\sprintf;
 
 /**
  * @internal
@@ -368,42 +370,49 @@ final class InfectionCommand extends BaseCommand
 
     private function initContainer(InputInterface $input): void
     {
-        /** @var string|null $configFile */
-        $configFile = $input->hasOption('configuration')
-            ? trim((string) $input->getOption('configuration'))
-            : null
-        ;
+        // Currently the configuration is mandatory hence there is no way to
+        // say "do not use a config". If this becomes possible in the future
+        // though, it will likely be a `--no-config` option rather than relying
+        // on this value to be set to an empty string.
+        $configFile = trim((string) $input->getOption('configuration'));
 
-        if ($configFile === '') {
-            $configFile = null;
+        $coverage = trim((string) $input->getOption('coverage'));
+        $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options'));
+
+        $minMsi = $input->getOption('min-msi');
+
+        if (null !== $minMsi && $minMsi !== (string)(float) $minMsi) {
+            throw new InvalidArgumentException(sprintf(
+                'Expected min-msi to be a float. Got "%s"',
+                $minMsi
+            ));
         }
 
-        /** @var string|null $mutators */
-        $mutators = $input->hasOption('mutators')
-            ? trim((string) $input->getOption('mutators'))
-            : null
-        ;
+        $minCoveredMsi = $input->getOption('min-covered-msi');
 
-        if ($mutators === '') {
-            $mutators = null;
+        if (null !== $minCoveredMsi && $minCoveredMsi !== (string)(float) $minCoveredMsi) {
+            throw new InvalidArgumentException(sprintf(
+                'Expected min-covered-msi to be a float. Got "%s"',
+                $minCoveredMsi
+            ));
         }
+
+        $mutators = trim((string) $input->getOption('mutators'));
 
         $this->container = $this->getApplication()->getContainer()->withDynamicParameters(
-            $configFile,
-            $mutators,
-            (bool) $input->getOption('show-mutations'),
+            '' === $configFile ? null : $configFile,
+            '' === $mutators ? null : $mutators,
+            $input->getOption('show-mutations'),
             trim((string) $input->getOption('log-verbosity')),
-            (bool) $input->getOption('debug'),
-            (bool) $input->getOption('only-covered'),
-            (string) $input->getOption('formatter'),
-            (bool) $input->getOption('no-progress'),
-            $input->hasOption('coverage')
-                ? trim((string) $input->getOption('coverage'))
-                : '',
-            trim((string) $input->getOption('initial-tests-php-options') ?: ''),
-            (bool) $input->getOption('ignore-msi-with-no-mutations'),
-            (float) $input->getOption('min-msi'),
-            (float) $input->getOption('min-covered-msi')
+            $input->getOption('debug'),
+            $input->getOption('only-covered'),
+            trim((string) $input->getOption('formatter')),
+            $input->getOption('no-progress'),
+            '' === $coverage ? null : $coverage,
+            '' === $initialTestsPhpOptions ? null : $initialTestsPhpOptions,
+            $input->getOption('ignore-msi-with-no-mutations'),
+            null === $minMsi ? null : (float) $minMsi,
+            null === $minCoveredMsi ? null : (float) $minCoveredMsi
         );
     }
 

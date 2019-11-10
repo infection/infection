@@ -46,14 +46,26 @@ use Webmozart\Assert\Assert;
  */
 final class Configuration
 {
+    private const LOG_VERBOSITY = [
+        'all',
+        'none',
+        'default',
+    ];
+
     private const TEST_FRAMEWORKS = [
         'phpunit',
         'phpspec',
     ];
 
+    private const FORMATTER = [
+        'dot',
+        'progress',
+    ];
+
     private $timeout;
     private $source;
     private $logs;
+    private $logVerbosity;
     private $tmpDir;
     private $phpUnit;
     private $mutators;
@@ -61,25 +73,50 @@ final class Configuration
     private $bootstrap;
     private $initialTestsPhpOptions;
     private $testFrameworkOptions;
+    private $existingCoveragePath;
+    private $debug;
+    private $onlyCovered;
+    private $formatter;
+    private $noProgress;
+    private $ignoreMsiWithNoMutations;
+    private $minMsi;
+    private $showMutations;
+    private $minCoveredMsi;
+    private $stringMutators;
 
     public function __construct(
         ?int $timeout,
         Source $source,
         Logs $logs,
+        string $logVerbosity,
         ?string $tmpDir,
         PhpUnit $phpUnit,
         Mutators $mutators,
         ?string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
-        ?string $testFrameworkOptions
+        ?string $testFrameworkOptions,
+        ?string $existingCoveragePath,
+        bool $debug,
+        bool $onlyCovered,
+        string $formatter,
+        bool $noProgress,
+        bool $ignoreMsiWithNoMutations,
+        ?float $minMsi,
+        bool $showMutations,
+        ?float $minCoveredMsi,
+        ?string $stringMutators
     ) {
         Assert::nullOrGreaterThanEq($timeout, 1);
+        Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
         Assert::nullOrOneOf($testFramework, self::TEST_FRAMEWORKS);
+        Assert::oneOf($formatter, self::FORMATTER);
+        Assert::nullOrGreaterThanEq($minMsi, 0.);
 
         $this->timeout = $timeout;
         $this->source = $source;
         $this->logs = $logs;
+        $this->logVerbosity = $logVerbosity;
         $this->tmpDir = $tmpDir;
         $this->phpUnit = $phpUnit;
         $this->mutators = $mutators;
@@ -87,6 +124,16 @@ final class Configuration
         $this->bootstrap = $bootstrap;
         $this->initialTestsPhpOptions = $initialTestsPhpOptions;
         $this->testFrameworkOptions = $testFrameworkOptions;
+        $this->existingCoveragePath = $existingCoveragePath;
+        $this->debug = $debug;
+        $this->onlyCovered = $onlyCovered;
+        $this->formatter = $formatter;
+        $this->noProgress = $noProgress;
+        $this->ignoreMsiWithNoMutations = $ignoreMsiWithNoMutations;
+        $this->minMsi = $minMsi;
+        $this->showMutations = $showMutations;
+        $this->minCoveredMsi = $minCoveredMsi;
+        $this->stringMutators = $stringMutators;
     }
 
     public function getTimeout(): ?int
@@ -102,6 +149,11 @@ final class Configuration
     public function getLogs(): Logs
     {
         return $this->logs;
+    }
+
+    public function getLogVerbosity(): string
+    {
+        return $this->logVerbosity;
     }
 
     public function getTmpDir(): ?string
@@ -137,5 +189,55 @@ final class Configuration
     public function getTestFrameworkOptions(): ?string
     {
         return $this->testFrameworkOptions;
+    }
+
+    public function getExistingCoveragePath(): ?string
+    {
+        return $this->existingCoveragePath;
+    }
+
+    public function isDebugEnabled(): bool
+    {
+        return $this->debug;
+    }
+
+    public function mutateOnlyCoveredCode(): bool
+    {
+        return $this->onlyCovered;
+    }
+
+    public function getFormatter(): string
+    {
+        return $this->formatter;
+    }
+
+    public function showProgress(): bool
+    {
+        return $this->noProgress;
+    }
+
+    public function ignoreMsiWithNoMutations(): bool
+    {
+        return $this->ignoreMsiWithNoMutations;
+    }
+
+    public function getMinMsi(): ?float
+    {
+        return $this->minMsi;
+    }
+
+    public function showMutations(): bool
+    {
+        return $this->showMutations;
+    }
+
+    public function getMinCoveredMsi(): ?float
+    {
+        return $this->minCoveredMsi;
+    }
+
+    public function getStringMutators(): ?string
+    {
+        return $this->stringMutators;
     }
 }

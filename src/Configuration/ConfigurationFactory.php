@@ -42,19 +42,44 @@ use Infection\Configuration\Schema\SchemaConfiguration;
  */
 class ConfigurationFactory
 {
-    public function create(SchemaConfiguration $schema): Configuration
+    public function create(
+        SchemaConfiguration $schema,
+        ?string $existingCoveragePath,
+        ?string $initialTestsPhpOptions,
+        string $logVerbosity,
+        bool $debug,
+        bool $onlyCovered,
+        string $formatter,
+        bool $noProgress,
+        bool $ignoreMsiWithNoMutations,
+        ?float $minMsi,
+        bool $showMutations,
+        ?float $minCoveredMsi,
+        ?string $mutators
+    ): Configuration
     {
         return new Configuration(
             $schema->getTimeout(),
             $schema->getSource(),
             $schema->getLogs(),
+            $logVerbosity,
             $schema->getTmpDir(),
             $schema->getPhpUnit(),
             $schema->getMutators(),
             $schema->getTestFramework(),
             $schema->getBootstrap(),
-            $schema->getInitialTestsPhpOptions(),
-            $schema->getTestFrameworkOptions()
+            $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
+            $schema->getTestFrameworkOptions(),
+            $existingCoveragePath,
+            $debug,
+            $onlyCovered,
+            $formatter,
+            $noProgress,
+            $ignoreMsiWithNoMutations,
+            $minMsi,
+            $showMutations,
+            $minCoveredMsi,
+            $mutators
         );
     }
 }
