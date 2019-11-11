@@ -35,7 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Schema;
 
+use function array_diff_key;
+use function array_fill_keys;
+use function array_keys;
+use function array_map;
+use function array_merge;
+use function array_values;
 use Generator;
+use function implode;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
@@ -44,20 +51,12 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Mutator\Util\MutatorProfile;
 use JsonSchema\Validator;
+use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
-use stdClass;
-use function array_diff_key;
-use function array_fill;
-use function array_fill_keys;
-use function array_keys;
-use function array_map;
-use function array_merge;
-use function array_values;
-use function implode;
 use function Safe\json_decode;
 use function sprintf;
+use stdClass;
 use function var_export;
-use const PHP_EOL;
 
 /**g
  * @covers \Infection\Configuration\Schema\SchemaConfigurationFactory
@@ -794,7 +793,7 @@ JSON
                         'ignore' => [
                             'fileA',
                             'fileB',
-                        ]
+                        ],
                     ],
                 ],
             ]),
@@ -821,7 +820,7 @@ JSON
                         'ignore' => [
                             ' file ',
                             '',
-                        ]
+                        ],
                     ],
                 ],
             ]),
@@ -850,7 +849,7 @@ JSON
                         'settings' => (object) [
                             'in_array' => false,
                         ],
-                    ]
+                    ],
                 ],
             ]),
         ];
@@ -878,7 +877,7 @@ JSON
                         'settings' => (object) [
                             'array_search' => false,
                         ],
-                    ]
+                    ],
                 ],
             ]),
         ];
@@ -910,7 +909,7 @@ JSON
                             'in_array' => false,
                             'array_search' => false,
                         ],
-                    ]
+                    ],
                 ],
             ]),
         ];
@@ -1466,7 +1465,7 @@ JSON
                 'source' => new Source(['src'], []),
                 'mutators' => [
                     'MBString' => (object) [
-                        'ignore' =>  ['file'],
+                        'ignore' => ['file'],
                         'settings' => (object) [
                             'mb_chr' => false,
                             'mb_ord' => false,
@@ -1565,7 +1564,7 @@ JSON
                     'mutators' => [
                         $mutator => (object) [
                             'ignore' => ['fileA', 'fileB'],
-                        ]
+                        ],
                     ],
                 ]),
             ];
@@ -1641,7 +1640,7 @@ JSON
                     self::createConfig([
                         'source' => new Source(['src'], []),
                         'mutators' => [
-                            $profile =>  true,
+                            $profile => true,
                         ],
                     ]),
                 ];
@@ -1995,7 +1994,7 @@ JSON
                     ],
                     'BCMath' => (object) [
                         'ignore' => ['file'],
-                        'settings' =>  (object) [
+                        'settings' => (object) [
                             'bcadd' => false,
                             'bccomp' => false,
                             'bcdiv' => false,

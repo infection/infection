@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Listener;
 
-use Infection\Config\InfectionConfig;
+use function array_filter;
 use Infection\Configuration\Configuration;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventSubscriberInterface;
@@ -50,7 +50,6 @@ use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use function array_filter;
 
 /**
  * @internal

@@ -36,10 +36,9 @@ declare(strict_types=1);
 namespace Infection\Configuration;
 
 use Infection\Configuration\Schema\SchemaConfiguration;
-use Webmozart\PathUtil\Path;
-use function dirname;
 use function sprintf;
 use function sys_get_temp_dir;
+use Webmozart\PathUtil\Path;
 
 /**
  * @final
@@ -62,9 +61,8 @@ class ConfigurationFactory
         ?string $mutators,
         ?string $testFramework,
         ?string $testFrameworkOptions
-    ): Configuration
-    {
-        $configDir = dirname($schema->getFile());
+    ): Configuration {
+        $configDir = \dirname($schema->getFile());
 
         $tmpDir = $schema->getTmpDir();
 

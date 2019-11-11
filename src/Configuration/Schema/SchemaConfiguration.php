@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Configuration\Schema;
 
 use Infection\Configuration\Entry\Logs;
-use Infection\Configuration\Entry\Mutator\Mutators;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Webmozart\Assert\Assert;

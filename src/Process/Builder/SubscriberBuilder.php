@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Process\Builder;
 
-use Infection\Config\InfectionConfig;
 use Infection\Configuration\Configuration;
 use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;

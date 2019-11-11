@@ -77,9 +77,6 @@ final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInte
             $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
         }
 
-        throw FileOrDirectoryNotFound::multipleFilesDoNotExist(
-            $dir,
-            $triedFiles
-        );
+        throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);
     }
 }

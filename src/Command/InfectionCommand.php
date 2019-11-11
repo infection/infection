@@ -37,7 +37,6 @@ namespace Infection\Command;
 
 use Infection\Config\InfectionConfig;
 use Infection\Configuration\Configuration;
-use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Exception\InfectionException;
@@ -66,15 +65,15 @@ use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
+use function Safe\sprintf;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
-use Webmozart\Assert\Assert;
 use function trim;
-use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -385,20 +384,14 @@ final class InfectionCommand extends BaseCommand
 
         $minMsi = $input->getOption('min-msi');
 
-        if (null !== $minMsi && $minMsi !== (string)(float) $minMsi) {
-            throw new InvalidArgumentException(sprintf(
-                'Expected min-msi to be a float. Got "%s"',
-                $minMsi
-            ));
+        if (null !== $minMsi && $minMsi !== (string) (float) $minMsi) {
+            throw new InvalidArgumentException(sprintf('Expected min-msi to be a float. Got "%s"', $minMsi));
         }
 
         $minCoveredMsi = $input->getOption('min-covered-msi');
 
-        if (null !== $minCoveredMsi && $minCoveredMsi !== (string)(float) $minCoveredMsi) {
-            throw new InvalidArgumentException(sprintf(
-                'Expected min-covered-msi to be a float. Got "%s"',
-                $minCoveredMsi
-            ));
+        if (null !== $minCoveredMsi && $minCoveredMsi !== (string) (float) $minCoveredMsi) {
+            throw new InvalidArgumentException(sprintf('Expected min-covered-msi to be a float. Got "%s"', $minCoveredMsi));
         }
 
         $mutators = trim((string) $input->getOption('mutators'));
@@ -498,12 +491,7 @@ final class InfectionCommand extends BaseCommand
         );
 
         if (!file_exists($coverageIndexFilePath)) {
-            throw CoverageDoesNotExistException::with(
-                $coverageIndexFilePath,
-                $testFrameworkKey,
-                \dirname($coverageIndexFilePath, 2),
-                $processInfo
-            );
+            throw CoverageDoesNotExistException::with($coverageIndexFilePath, $testFrameworkKey, \dirname($coverageIndexFilePath, 2), $processInfo);
         }
     }
 }

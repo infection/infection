@@ -35,15 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Schema;
 
+use function array_filter;
+use function array_map;
+use function array_values;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use stdClass;
-use function array_filter;
-use function array_map;
-use function array_values;
-use function strpos;
 use function trim;
 
 /**

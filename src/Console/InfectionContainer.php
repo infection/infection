@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
+use function array_filter;
+use function getcwd;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfiguration;
@@ -77,11 +79,8 @@ use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use Pimple\Container;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
-use Symfony\Component\Filesystem\Filesystem;
-use function array_filter;
-use function getcwd;
 use function sprintf;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
