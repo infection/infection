@@ -105,7 +105,12 @@ abstract class FileLogger implements MutationTestingResultsLogger
 
         // If the output should be written to a stream then just write it directly
         if (0 === strpos($this->logFilePath, 'php://')) {
-            file_put_contents($this->logFilePath, $content);
+            if (\in_array($this->logFilePath, ['php://stdout', 'php://stderr'], true)) {
+                file_put_contents($this->logFilePath, $content);
+            } else {
+                // The Symfony filesystem component doesn't support using streams so provide a sensible error message
+                $this->output->writeln(sprintf('<error>%s</error>', 'The only streams supported are php://stdout and php://stderr'));
+            }
 
             return;
         }

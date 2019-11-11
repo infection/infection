@@ -292,6 +292,18 @@ TXT;
         $debugFileLogger->log();
     }
 
+    public function test_it_rejects_invalid_streams_with_a_clear_error_message(): void
+    {
+        $logFilePath = 'php://memory';
+        $calculator = new MetricsCalculator();
+        $fs = $this->createMock(Filesystem::class);
+        $output = $this->createMock(OutputInterface::class);
+        $output->expects($this->once())->method('writeln')->with('<error>The only streams supported are php://stdout and php://stderr</error>');
+
+        $debugFileLogger = new TextFileLogger($output, $logFilePath, $calculator, $fs, false, false);
+        $debugFileLogger->log();
+    }
+
     private function createFilledMetricsCalculator(): MetricsCalculator
     {
         $processes = [];
