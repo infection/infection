@@ -36,15 +36,15 @@ declare(strict_types=1);
 namespace Infection\Configuration;
 
 use Infection\Configuration\Entry\Logs;
-use Infection\Configuration\Entry\Mutator\Mutators;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ * @final
  */
-final class Configuration
+class Configuration
 {
     private const LOG_VERBOSITY = [
         'all',

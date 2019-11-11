@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Listener;
 
 use Infection\Config\InfectionConfig;
+use Infection\Configuration\Configuration;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Events\MutationTestingFinished;
@@ -72,7 +73,7 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
     protected function setUp(): void
     {
         $this->output = $this->createMock(OutputInterface::class);
-        $this->infectionConfig = $this->createMock(InfectionConfig::class);
+        $this->infectionConfig = $this->createMock(Configuration::class);
         $this->metricsCalculator = $this->createMock(MetricsCalculator::class);
         $this->filesystem = $this->createMock(Filesystem::class);
     }

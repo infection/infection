@@ -50,6 +50,7 @@ use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use function array_filter;
 
 /**
  * @internal
@@ -120,13 +121,13 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
     {
         $logs = $this->infectionConfig->getLogs();
 
-        $logTypes = [
-            'badge' => null,
+        $logTypes = array_filter([
+            'badge' => (object) ['branch' => $logs->getBadge()],
             'debug' => $logs->getDebugLogFilePath(),
             'perMutator' => $logs->getPerMutatorFilePath(),
             'summary' => $logs->getSummaryLogFilePath(),
             'text' => $logs->getTextLogFilePath(),
-        ];
+        ]);
 
         if ([] === $logTypes) {
             return;

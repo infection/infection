@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Builder;
 
 use Infection\Config\InfectionConfig;
+use Infection\Configuration\Configuration;
 use Infection\Differ\DiffColorizer;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Mutant\MetricsCalculator;
@@ -61,7 +62,7 @@ final class SubscriberBuilderTest extends TestCase
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->exactly(6))->method('addSubscriber');
         $diff = $this->createMock(DiffColorizer::class);
-        $config = $this->createMock(InfectionConfig::class);
+        $config = $this->createMock(Configuration::class);
         $fs = $this->createMock(Filesystem::class);
         $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
         $output = $this->createMock(OutputInterface::class);
@@ -92,7 +93,7 @@ final class SubscriberBuilderTest extends TestCase
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->exactly(7))->method('addSubscriber');
         $diff = $this->createMock(DiffColorizer::class);
-        $config = $this->createMock(InfectionConfig::class);
+        $config = $this->createMock(Configuration::class);
         $fs = $this->createMock(Filesystem::class);
         $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
         $output = $this->createMock(OutputInterface::class);
@@ -123,7 +124,7 @@ final class SubscriberBuilderTest extends TestCase
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->never())->method('addSubscriber');
         $diff = $this->createMock(DiffColorizer::class);
-        $config = $this->createMock(InfectionConfig::class);
+        $config = $this->createMock(Configuration::class);
         $fs = $this->createMock(Filesystem::class);
         $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
         $output = $this->createMock(OutputInterface::class);

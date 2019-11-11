@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutant\Generator;
 
-use Infection\Configuration\Entry\Mutator\Mutators;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
@@ -77,7 +76,7 @@ final class MutationsGenerator
     private $excludeDirsOrFiles;
 
     /**
-     * @var Mutators
+     * @var Mutator[]
      */
     private $mutators;
 
@@ -95,7 +94,7 @@ final class MutationsGenerator
         array $srcDirs,
         array $excludeDirsOrFiles,
         LineCodeCoverage $codeCoverageData,
-        Mutators $mutators,
+        array $mutators,
         EventDispatcherInterface $eventDispatcher,
         Parser $parser
     ) {
