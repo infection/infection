@@ -3,13 +3,13 @@
     "type": "object",
     "additionalProperties": false,
     "required": [
-        "timeout",
         "source"
     ],
     "properties": {
         "timeout": {
             "type": "integer",
-            "description": "The allowed timeout in seconds configured for Infection."
+            "description": "The allowed timeout in seconds.",
+            "minimum": "1"
         },
         "source": {
             "type": "object",
@@ -24,7 +24,8 @@
                     "description": "Contains all folders with source code you want to mutate.",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "uniqueItems": true
                 },
                 "excludes": {
                     "type": "array",
@@ -32,7 +33,8 @@
                     "description": "Contains all folders or files you want to exclude withing your source folders.",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "uniqueItems": true
                 }
             }
         },
@@ -60,10 +62,11 @@
                 "badge": {
                     "type": "object",
                     "additionalProperties": false,
+                    "required": ["branch"],
                     "properties": {
                         "branch": {
                             "type": "string",
-                            "description": "Mutation score badge for your github project."
+                            "description": "Mutation score badge for your GitHub project."
                         }
                     }
                 }
@@ -249,6 +252,7 @@
                 "NewObject": { "$ref": "#/definitions/default-mutator-config" },
                 "This": { "$ref": "#/definitions/default-mutator-config" },
                 "Spaceship": { "$ref": "#/definitions/default-mutator-config" },
+                "Spread": { "$ref": "#/definitions/default-mutator-config" },
                 "Foreach_": { "$ref": "#/definitions/default-mutator-config" },
                 "For_": { "$ref": "#/definitions/default-mutator-config" },
                 "CastArray": { "$ref": "#/definitions/default-mutator-config" },
@@ -434,7 +438,11 @@
         },
         "testFramework": {
             "type": "string",
-            "description": "Sets the framework to use for testing. Defaults to phpunit."
+            "description": "Sets the framework to use for testing. Defaults to phpunit.",
+            "anyOf": [
+                "phpunit",
+                "phpspec"
+            ]
         },
         "bootstrap": {
             "type": "string",
@@ -442,11 +450,11 @@
         },
         "initialTestsPhpOptions": {
             "type": "string",
-            "description": "Specify an additional php options for the initial test (IE: Enabling X-Debug). --initial-tests-php-options will override this option."
+            "description": "Specify an additional php options for the initial test (e.g. enabling Xdebug). --initial-tests-php-options will override this option."
         },
         "testFrameworkOptions": {
             "type": "string",
-            "description": "Specify an additional options to pass to the test framework (IE: Enabling Verbose Mode). --test-framework-options will override this option."
+            "description": "Specify an additional options to pass to the test framework (e.g. enabling Verbose Mode). --test-framework-options will override this option."
         }
     },
     "definitions": {
