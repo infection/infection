@@ -46,7 +46,6 @@ final class This extends AbstractValueToNullReturnValue
     /**
      * Replaces "return $this;" with "return null;"
      *
-     *
      * @return Node\Stmt\Return_
      */
     public function mutate(Node $node)

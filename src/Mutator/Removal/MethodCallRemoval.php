@@ -46,7 +46,6 @@ final class MethodCallRemoval extends Mutator
     /**
      * Replaces "$object->doSmth()" with ""
      *
-     *
      * @return Node\Stmt\Nop()
      */
     public function mutate(Node $node)

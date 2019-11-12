@@ -257,12 +257,7 @@ final class InfectionContainer extends Container
                 ->getInitialTestsPhpOptions();
 
             if (!\is_string($initialTestsPhpOptions)) {
-                throw new InvalidArgumentException(
-                    \sprintf(
-                        'Expected initial-tests-php-options to be string, %s given',
-                        \gettype($initialTestsPhpOptions)
-                    )
-                );
+                throw new InvalidArgumentException(\sprintf('Expected initial-tests-php-options to be string, %s given', \gettype($initialTestsPhpOptions)));
             }
 
             return new CoverageRequirementChecker(

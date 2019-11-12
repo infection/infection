@@ -62,12 +62,7 @@ final class Validator
             $dir = \dirname($file);
 
             if (is_dir($dir) && !is_writable($dir)) {
-                throw new IOException(
-                    sprintf('Unable to write to the "%s" directory. Check "logs.%s" file path in infection.json.', $dir, $logType),
-                    0,
-                    null,
-                    $dir
-                );
+                throw new IOException(sprintf('Unable to write to the "%s" directory. Check "logs.%s" file path in infection.json.', $dir, $logType), 0, null, $dir);
             }
         }
     }

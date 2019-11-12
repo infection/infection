@@ -479,12 +479,7 @@ final class InfectionCommand extends BaseCommand
         );
 
         if (!file_exists($coverageIndexFilePath)) {
-            throw CoverageDoesNotExistException::with(
-                $coverageIndexFilePath,
-                $testFrameworkKey,
-                \dirname($coverageIndexFilePath, 2),
-                $processInfo
-            );
+            throw CoverageDoesNotExistException::with($coverageIndexFilePath, $testFrameworkKey, \dirname($coverageIndexFilePath, 2), $processInfo);
         }
     }
 }

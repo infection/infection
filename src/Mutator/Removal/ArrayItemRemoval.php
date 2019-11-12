@@ -121,10 +121,6 @@ final class ArrayItemRemoval extends Mutator
     {
         $value = $this->getSettings()[$property];
 
-        throw new InvalidConfigException(sprintf(
-            'Invalid configuration of ArrayItemRemoval mutator. Setting `%s` is invalid (%s)',
-            $property,
-            \is_scalar($value) ? $value : '<' . \strtoupper(\gettype($value)) . '>'
-        ));
+        throw new InvalidConfigException(sprintf('Invalid configuration of ArrayItemRemoval mutator. Setting `%s` is invalid (%s)', $property, \is_scalar($value) ? $value : '<' . \strtoupper(\gettype($value)) . '>'));
     }
 }
