@@ -161,7 +161,11 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
             $coverageIndexFilePath = $this->coverageDir . '/' . self::COVERAGE_INDEX_FILE_NAME;
 
             if (!file_exists($coverageIndexFilePath)) {
-                throw CoverageDoesNotExistException::with($coverageIndexFilePath, $this->testFrameworkKey, \dirname($coverageIndexFilePath, 2));
+                throw CoverageDoesNotExistException::with(
+                    $coverageIndexFilePath,
+                    $this->testFrameworkKey,
+                    \dirname($coverageIndexFilePath, 2)
+                );
             }
 
             $coverageIndexFileContent = file_get_contents($coverageIndexFilePath);
