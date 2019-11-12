@@ -119,9 +119,10 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
     public function onMutationTestingFinished(MutationTestingFinished $event): void
     {
         $logs = $this->infectionConfig->getLogs();
+        $badge = $logs->getBadge();
 
         $logTypes = array_filter([
-            'badge' => (object) ['branch' => $logs->getBadge()],
+            'badge' => null !== $badge ? $badge->getBranch() : null,
             'debug' => $logs->getDebugLogFilePath(),
             'perMutator' => $logs->getPerMutatorFilePath(),
             'summary' => $logs->getSummaryLogFilePath(),

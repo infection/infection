@@ -37,6 +37,7 @@ namespace Infection\Tests\Process\Listener;
 
 use Infection\Config\InfectionConfig;
 use Infection\Configuration\Configuration;
+use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Events\MutationTestingFinished;
@@ -47,6 +48,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use function sys_get_temp_dir;
 
 final class MutationTestingResultsLoggerSubscriberTest extends TestCase
 {
@@ -56,9 +58,9 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
     private $output;
 
     /**
-     * @var InfectionConfig|MockObject
+     * @var Configuration|MockObject
      */
-    private $infectionConfig;
+    private $config;
 
     /**
      * @var Filesystem|MockObject
@@ -73,13 +75,17 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
     protected function setUp(): void
     {
         $this->output = $this->createMock(OutputInterface::class);
-        $this->infectionConfig = $this->createMock(Configuration::class);
+        $this->config = $this->createMock(Configuration::class);
         $this->metricsCalculator = $this->createMock(MetricsCalculator::class);
         $this->filesystem = $this->createMock(Filesystem::class);
     }
 
     public function test_it_do_nothing_when_file_log_path_is_not_defined(): void
     {
+        $this->config->expects($this->once())
+            ->method('getLogs')
+            ->willReturn(new Logs(null, null, null, null, null));
+
         $this->metricsCalculator->expects($this->never())
             ->method('getEscapedMutantProcesses');
 
@@ -95,7 +101,7 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(
             $this->output,
-            $this->infectionConfig,
+            $this->config,
             $this->metricsCalculator,
             $this->filesystem,
             LogVerbosity::DEBUG,
@@ -107,11 +113,15 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_on_mutation_testing_finished(): void
     {
-        $logTypes = ['text' => sys_get_temp_dir() . '/infection.log'];
-
-        $this->infectionConfig->expects($this->once())
-            ->method('getLogsTypes')
-            ->willReturn($logTypes);
+        $this->config->expects($this->once())
+            ->method('getLogs')
+            ->willReturn(new Logs(
+                sys_get_temp_dir() . '/infection.log',
+                null,
+                null,
+                null,
+                null
+            ));
 
         $this->metricsCalculator->expects($this->once())
             ->method('getEscapedMutantProcesses')
@@ -139,7 +149,7 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(
             $this->output,
-            $this->infectionConfig,
+            $this->config,
             $this->metricsCalculator,
             $this->filesystem,
             LogVerbosity::DEBUG,
@@ -151,11 +161,15 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_on_mutation_testing_finished_and_debug_mode_off(): void
     {
-        $logTypes = ['text' => sys_get_temp_dir() . '/infection.log'];
-
-        $this->infectionConfig->expects($this->once())
-            ->method('getLogsTypes')
-            ->willReturn($logTypes);
+        $this->config->expects($this->once())
+            ->method('getLogs')
+            ->willReturn(new Logs(
+                sys_get_temp_dir() . '/infection.log',
+                null,
+                null,
+                null,
+                null
+            ));
 
         $this->metricsCalculator->expects($this->once())
             ->method('getEscapedMutantProcesses')
@@ -181,7 +195,7 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(
             $this->output,
-            $this->infectionConfig,
+            $this->config,
             $this->metricsCalculator,
             $this->filesystem,
             LogVerbosity::NORMAL,
@@ -193,16 +207,21 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_on_mutation_testing_finished_and_no_file_logging(): void
     {
-        $logTypes = ['text' => sys_get_temp_dir() . '/infection.log'];
+        $this->config->expects($this->once())
+            ->method('getLogs')
+            ->willReturn(new Logs(
+                sys_get_temp_dir() . '/infection.log',
+                null,
+                null,
+                null,
+                null
+            ));
 
-        $this->infectionConfig->expects($this->once())
-            ->method('getLogsTypes')
-            ->willReturn($logTypes);
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(
             $this->output,
-            $this->infectionConfig,
+            $this->config,
             $this->metricsCalculator,
             $this->filesystem,
             LogVerbosity::NONE,
@@ -214,11 +233,15 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_to_other_logging_types(): void
     {
-        $logTypes = [ResultsLoggerTypes::PER_MUTATOR => sys_get_temp_dir() . '/infection-log.md'];
-
-        $this->infectionConfig->expects($this->once())
-            ->method('getLogsTypes')
-            ->willReturn($logTypes);
+        $this->config->expects($this->once())
+            ->method('getLogs')
+            ->willReturn(new Logs(
+                null,
+                null,
+                null,
+                sys_get_temp_dir() . '/infection-log.md',
+                null
+            ));
 
         $this->output->expects($this->never())
             ->method($this->anything());
@@ -233,7 +256,7 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(
             $this->output,
-            $this->infectionConfig,
+            $this->config,
             $this->metricsCalculator,
             $this->filesystem,
             LogVerbosity::DEBUG,
