@@ -101,8 +101,22 @@ abstract class FileLogger implements MutationTestingResultsLogger
 
     public function log(): void
     {
+        $content = implode(PHP_EOL, $this->getLogLines());
+
+        // If the output should be written to a stream then just write it directly
+        if (0 === strpos($this->logFilePath, 'php://')) {
+            if (\in_array($this->logFilePath, ['php://stdout', 'php://stderr'], true)) {
+                file_put_contents($this->logFilePath, $content);
+            } else {
+                // The Symfony filesystem component doesn't support using streams so provide a sensible error message
+                $this->output->writeln(sprintf('<error>%s</error>', 'The only streams supported are php://stdout and php://stderr'));
+            }
+
+            return;
+        }
+
         try {
-            $this->fs->dumpFile($this->logFilePath, implode(PHP_EOL, $this->getLogLines()));
+            $this->fs->dumpFile($this->logFilePath, $content);
         } catch (IOException $e) {
             $this->output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
         }
