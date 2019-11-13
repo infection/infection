@@ -120,6 +120,7 @@ return Config::create()
         'static_lambda' => true,
         'strict_comparison' => true,
         'yoda_style' => false,
+        'single_line_throw' => false,
     ])
     ->setFinder($finder)
 ;
