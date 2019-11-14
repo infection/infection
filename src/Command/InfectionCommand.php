@@ -324,7 +324,7 @@ final class InfectionCommand extends BaseCommand
             $config->getSource()->getDirectories(),
             $config->getSource()->getExcludes(),
             $codeCoverageData,
-            $config->getMutators(),
+            $this->container['mutators'],
             $this->eventDispatcher,
             $this->container['parser']
         );

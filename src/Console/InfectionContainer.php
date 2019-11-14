@@ -318,7 +318,7 @@ final class InfectionContainer extends Container
                 $config = $container[Configuration::class];
 
                 $parser = new MutatorParser(
-                    (string) $config->getStringMutators(),
+                    $config->getStringMutators(),
                     $container['mutators.config']
                 );
 
