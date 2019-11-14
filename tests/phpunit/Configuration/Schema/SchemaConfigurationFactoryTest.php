@@ -1647,6 +1647,65 @@ JSON
             })();
         }
 
+        yield '[mutators][profile] ' . $profile . ' ignore' => (static function () use (
+            $profile
+        ): array {
+            return [
+                <<<JSON
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "$profile": {
+            "ignore": ["fileA", "fileB"]
+        }
+    }
+}
+JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'mutators' => [
+                        $profile => (object) [
+                            'ignore' => ['fileA', 'fileB'],
+                        ],
+                    ],
+                ]),
+            ];
+        })();
+
+        yield '[mutators][profile] ' . $profile . ' ignore empty & untrimmed' => (static function () use (
+            $profile
+        ): array {
+            return [
+                <<<JSON
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "mutators": {
+        "$profile": {
+            "ignore": [" file ", ""]
+        }
+    }
+}
+JSON
+                ,
+                self::createConfig([
+                    'source' => new Source(['src'], []),
+                    'mutators' => [
+                        $profile => (object) [
+                            'ignore' => [
+                                ' file ',
+                                '',
+                            ],
+                        ],
+                    ],
+                ]),
+            ];
+        })();
+
         yield '[mutators][profile] nominal' => [
             <<<JSON
 {
