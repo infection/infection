@@ -122,7 +122,9 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
         $badge = $logs->getBadge();
 
         $logTypes = array_filter([
-            'badge' => null !== $badge ? $badge->getBranch() : null,
+            'badge' => null !== $badge
+                ? (object) ['branch' => $badge->getBranch()]
+                : null,
             'debug' => $logs->getDebugLogFilePath(),
             'perMutator' => $logs->getPerMutatorFilePath(),
             'summary' => $logs->getSummaryLogFilePath(),
