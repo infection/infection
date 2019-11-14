@@ -75,6 +75,7 @@ final class SchemaConfigurationTest extends TestCase
             $testFrameworkOptions
         );
 
+        $this->assertSame($path, $config->getFile());
         $this->assertSame($timeout, $config->getTimeout());
         $this->assertSame($source, $config->getSource());
         $this->assertSame($logs, $config->getLogs());
@@ -89,90 +90,47 @@ final class SchemaConfigurationTest extends TestCase
 
     public function valueProvider(): Generator
     {
-        foreach (['/path/to/config', ''] as $path) {
-            foreach ($this->provideNullableStrictlyPositiveInteger() as $timeout) {
-                foreach ($this->provideSource() as $source) {
-                    foreach ($this->provideLogs() as $log) {
-                        foreach ([null, 'custom-dir'] as $tmpDir) {
-                            foreach ($this->providePhpUnit() as $phpUnit) {
-                                foreach ($this->provideMutators() as $mutators) {
-                                    foreach ([null, 'phpunit'] as $testFramework) {
-                                        foreach ([null, 'bin/bootstrap.php'] as $bootstrap) {
-                                            foreach ([null, '-d zend_extension=xdebug.so'] as $initialTestOptions) {
-                                                foreach ([null, '--debug'] as $testFrameworkOptions) {
-                                                    yield [
-                                                        $path,
-                                                        $timeout,
-                                                        $source,
-                                                        $log,
-                                                        $tmpDir,
-                                                        $phpUnit,
-                                                        $mutators,
-                                                        $testFramework,
-                                                        $bootstrap,
-                                                        $initialTestOptions,
-                                                        $testFrameworkOptions,
-                                                    ];
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public function provideNullableStrictlyPositiveInteger(): Generator
-    {
-        yield null;
-
-        yield 10;
-    }
-
-    public function provideSource(): Generator
-    {
-        yield new Source([], []);
-
-        yield new Source(['src', 'lib'], ['fixtures', 'tests']);
-    }
-
-    public function provideLogs(): Generator
-    {
-        yield new Logs(
+        yield 'minimal' => [
+            '',
+            null,
+            new Source([], []),
+            new Logs(
+                null,
+                null,
+                null,
+                null,
+                null
+            ),
+            null,
+            new PhpUnit(null, null),
+            [],
             null,
             null,
             null,
             null,
-            null
-        );
+        ];
 
-        yield new Logs(
-            'text.log',
-            'summary.log',
-            'debug.log',
-            'mutator.log',
-            new Badge('master')
-        );
-    }
-
-    public function providePhpUnit(): Generator
-    {
-        yield new PhpUnit(null, null);
-
-        yield new PhpUnit('dist/phpunit', 'bin/phpunit');
-    }
-
-    public function provideMutators(): Generator
-    {
-        yield [];
-
-        yield [
-            '@arithmetic' => true,
-            '@cast' => false,
+        yield 'complete' => [
+            '/path/to/config',
+            10,
+            new Source(['src', 'lib'], ['fixtures', 'tests']),
+            new Logs(
+                'text.log',
+                'summary.log',
+                'debug.log',
+                'mutator.log',
+                new Badge('master')
+            ),
+            'path/to/tmp',
+            new PhpUnit('dist/phpunit', 'bin/phpunit'),
+            [
+                '@arithmetic' => true,
+                '@cast' => false,
+            ],
+            'phpunit',
+            'bin/bootstrap.php',
+            '-d zend_extension=xdebug.so',
+            '--debug',
         ];
     }
 }
