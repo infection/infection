@@ -36,10 +36,12 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use Composer\XdebugHandler\XdebugHandler;
-use Infection\Command;
+use Infection\Command\ConfigureCommand;
+use Infection\Command\InfectionCommand;
 use Infection\Console\ConsoleOutput as InfectionConsoleOutput;
 use PackageVersions\Versions;
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -117,11 +119,11 @@ final class Application extends BaseApplication
         return parent::run($input, $output);
     }
 
-    public function doRun(InputInterface $input, OutputInterface $output): int
+    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
     {
         $output->writeln([self::LOGO, $this->getLongVersion()]);
 
-        return parent::doRun($input, $output);
+        return parent::doRunCommand($command, $input, $output);
     }
 
     public function getContainer(): InfectionContainer
@@ -137,8 +139,8 @@ final class Application extends BaseApplication
     protected function getDefaultCommands()
     {
         $commands = array_merge(parent::getDefaultCommands(), [
-            new Command\ConfigureCommand(),
-            new Command\InfectionCommand(),
+            new ConfigureCommand(),
+            new InfectionCommand(),
         ]);
 
         return $commands;
