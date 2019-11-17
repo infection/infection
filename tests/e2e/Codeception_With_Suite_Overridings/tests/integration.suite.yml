@@ -1,0 +1,13 @@
+actor: IntegrationTester
+modules:
+    enabled:
+        - \Codeception_With_Suite_Overridings\Helper\Integration
+        - Db:
+              dsn: 'sqlite:stuff.sq3'
+              user: 'test'
+              password: 'test'
+              dump:
+                  - 'tests/_data/stuff.sql'
+              cleanup: false
+              populate: true
+    step_decorators: ~

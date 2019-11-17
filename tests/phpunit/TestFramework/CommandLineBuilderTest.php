@@ -60,27 +60,17 @@ final class CommandLineBuilderTest extends TestCase
     {
         $commandLine = $this->commandLineBuilder->build('phpunit.bat', self::PHP_EXTRA_ARGS, self::TEST_FRAMEWORK_ARGS);
 
-        $this->assertSame(
-            [
-                'phpunit.bat',
-                '--filter XYZ',
-                '--exclude-group=e2e',
-            ],
-            $commandLine
-        );
+        $this->assertContains('phpunit.bat', $commandLine);
+        $this->assertContains('--filter XYZ', $commandLine);
+        $this->assertContains('--exclude-group=e2e', $commandLine);
     }
 
     public function test_it_builds_command_line_with_empty_php_args(): void
     {
         $commandLine = $this->commandLineBuilder->build('vendor/bin/phpunit', [], self::TEST_FRAMEWORK_ARGS);
 
-        $this->assertSame(
-            [
-                'vendor/bin/phpunit',
-                '--filter XYZ',
-                '--exclude-group=e2e',
-            ],
-            $commandLine
-        );
+        $this->assertContains('vendor/bin/phpunit', $commandLine);
+        $this->assertContains('--filter XYZ', $commandLine);
+        $this->assertContains('--exclude-group=e2e', $commandLine);
     }
 }
