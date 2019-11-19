@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Schema;
 
-use UnexpectedValueException;
-use Webmozart\Assert\Assert;
 use function array_filter;
 use function array_map;
 use function sprintf;
+use UnexpectedValueException;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal

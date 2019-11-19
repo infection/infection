@@ -35,13 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Listener;
 
-use Infection\Config\InfectionConfig;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Events\MutationTestingFinished;
-use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Listener\MutationTestingResultsLoggerSubscriber;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -216,7 +214,6 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
                 null,
                 null
             ));
-
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(

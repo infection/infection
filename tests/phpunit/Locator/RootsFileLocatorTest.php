@@ -37,7 +37,6 @@ namespace Infection\Tests\Locator;
 
 use Generator;
 use Infection\Locator\FileNotFound;
-use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\Locator\RootsFileLocator;
 use function Infection\Tests\normalizePath as p;
 use function iterator_to_array;
@@ -72,8 +71,7 @@ final class RootsFileLocatorTest extends TestCase
         array $roots,
         string $file,
         string $expected
-    ): void
-    {
+    ): void {
         $path = (new RootsFileLocator($roots, $this->filesystem))->locate($file);
 
         $this->assertSame(p($expected), p($path));

@@ -45,7 +45,7 @@ use Seld\JsonLint\ParsingException;
 
 final class SchemaConfigurationFileTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__.'/../../Fixtures/Configuration';
+    private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Configuration';
 
     public function test_it_can_be_instantiated(): void
     {

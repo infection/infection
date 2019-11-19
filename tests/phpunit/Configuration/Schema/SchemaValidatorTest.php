@@ -39,11 +39,11 @@ use Generator;
 use Infection\Configuration\Schema\InvalidSchema;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use Infection\Configuration\Schema\SchemaValidator;
+use function json_decode;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use Webmozart\Assert\Assert;
-use function json_decode;
 use function Safe\json_last_error_msg;
+use Webmozart\Assert\Assert;
 
 final class SchemaValidatorTest extends TestCase
 {

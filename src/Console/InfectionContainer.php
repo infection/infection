@@ -78,8 +78,8 @@ use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use Pimple\Container;
-use SebastianBergmann\Diff\Differ as BaseDiffer;
 use function Safe\sprintf;
+use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**

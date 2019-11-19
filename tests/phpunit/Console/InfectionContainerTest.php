@@ -35,13 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Console;
 
-use Infection\Config\InfectionConfig;
 use Infection\Configuration\Configuration;
 use Infection\Console\InfectionContainer;
-use Infection\Process\Coverage\CoverageRequirementChecker;
 use PHPUnit\Framework\TestCase;
 use stdClass;
-use Symfony\Component\Filesystem\Filesystem;
 
 final class InfectionContainerTest extends TestCase
 {

@@ -42,8 +42,6 @@ use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Locator\Locator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
-use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionClass;
 
 final class SchemaConfigurationLoaderTest extends TestCase
