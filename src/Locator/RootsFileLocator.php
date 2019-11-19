@@ -76,13 +76,13 @@ final class RootsFileLocator implements Locator
                 return realpath($canonicalFileName);
             }
 
-            throw FileOrDirectoryNotFound::fromFileName($canonicalFileName, $this->roots);
+            throw FileNotFound::fromFileName($canonicalFileName, $this->roots);
         }
 
         foreach ($this->roots as $path) {
             $file = $path . DIRECTORY_SEPARATOR . $canonicalFileName;
 
-            if ($this->filesystem->exists($file) && is_file($canonicalFileName)) {
+            if ($this->filesystem->exists($file) && is_file($file)) {
                 return realpath($file);
             }
         }
