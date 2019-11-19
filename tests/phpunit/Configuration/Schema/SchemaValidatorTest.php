@@ -36,14 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\Schema;
 
 use Generator;
-use Infection\Configuration\RawConfiguration\RawConfiguration;
 use Infection\Configuration\Schema\InvalidSchema;
+use Infection\Configuration\Schema\SchemaConfigurationFile;
 use Infection\Configuration\Schema\SchemaValidator;
-use function json_decode;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use function Safe\json_last_error_msg;
 use Webmozart\Assert\Assert;
+use function json_decode;
+use function Safe\json_last_error_msg;
 
 final class SchemaValidatorTest extends TestCase
 {
@@ -51,7 +51,7 @@ final class SchemaValidatorTest extends TestCase
      * @dataProvider configProvider
      */
     public function test_it_validates_the_given_raw_config(
-        RawConfiguration $config,
+        SchemaConfigurationFile $config,
         ?string $expectedErrorMessage
     ): void {
         try {
@@ -121,14 +121,14 @@ JSON
     private static function createConfigWithContents(
         string $path,
         string $contents
-    ): RawConfiguration {
-        $config = new RawConfiguration($path);
+    ): SchemaConfigurationFile {
+        $config = new SchemaConfigurationFile($path);
 
         $decodedContents = json_decode($contents);
 
         Assert::notNull($decodedContents, json_last_error_msg());
 
-        $configReflection = new ReflectionClass(RawConfiguration::class);
+        $configReflection = new ReflectionClass(SchemaConfigurationFile::class);
 
         $decodedContentsReflection = $configReflection->getProperty('decodedContents');
         $decodedContentsReflection->setAccessible(true);

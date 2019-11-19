@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Schema;
 
-use Infection\Configuration\RawConfiguration\RawConfiguration;
-
 /**
  * @final
  */
@@ -53,7 +51,7 @@ class SchemaConfigurationFileLoader
 
     public function loadFile(string $file): SchemaConfiguration
     {
-        $rawConfig = new RawConfiguration($file);
+        $rawConfig = new SchemaConfigurationFile($file);
 
         $this->schemaValidator->validate($rawConfig);
 

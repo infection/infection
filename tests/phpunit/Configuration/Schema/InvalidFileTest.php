@@ -33,12 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\RawConfiguration;
+namespace Infection\Tests\Configuration\Schema;
 
 use Error;
 use Generator;
-use Infection\Configuration\RawConfiguration\InvalidFile;
-use Infection\Configuration\RawConfiguration\RawConfiguration;
+use Infection\Configuration\Schema\InvalidFile;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
@@ -46,7 +45,7 @@ final class InvalidFileTest extends TestCase
 {
     public function test_it_can_be_created_for_file_not_found(): void
     {
-        $config = new RawConfiguration('/path/to/config');
+        $config = new \Infection\Configuration\Schema\SchemaConfigurationFile('/path/to/config');
 
         $exception = InvalidFile::createForFileNotFound($config);
 
@@ -60,7 +59,7 @@ final class InvalidFileTest extends TestCase
 
     public function test_it_can_be_created_for_file_not_readable(): void
     {
-        $config = new RawConfiguration('/path/to/config');
+        $config = new \Infection\Configuration\Schema\SchemaConfigurationFile('/path/to/config');
 
         $exception = InvalidFile::createForFileNotReadable($config);
 
@@ -74,9 +73,9 @@ final class InvalidFileTest extends TestCase
 
     public function test_it_can_be_created_for_file_content_could_not_be_retrieved(): void
     {
-        $config = new RawConfiguration('/path/to/config');
+        $config = new \Infection\Configuration\Schema\SchemaConfigurationFile('/path/to/config');
 
-        $exception = InvalidFile::createForCouldNotRetrieveFileContents($config);
+        $exception = \Infection\Configuration\Schema\InvalidFile::createForCouldNotRetrieveFileContents($config);
 
         $this->assertSame(
             'Could not retrieve the contents of the file "/path/to/config".',
@@ -90,7 +89,7 @@ final class InvalidFileTest extends TestCase
      * @dataProvider jsonErrorProvider
      */
     public function test_it_can_be_created_for_file_with_invalid_JSON_content(
-        RawConfiguration $config,
+        \Infection\Configuration\Schema\SchemaConfigurationFile $config,
         string $error,
         Throwable $previous,
         string $expectedErrorMessage
@@ -105,14 +104,14 @@ final class InvalidFileTest extends TestCase
     public function jsonErrorProvider(): Generator
     {
         yield [
-            new RawConfiguration('/path/to/config'),
+            new \Infection\Configuration\Schema\SchemaConfigurationFile('/path/to/config'),
             'Error message',
             new Error(),
             'Could not parse the JSON file "/path/to/config": Error message',
         ];
 
         yield 'empty error message' => [
-            new RawConfiguration('/path/to/config'),
+            new \Infection\Configuration\Schema\SchemaConfigurationFile('/path/to/config'),
             '',
             new Error(),
             'Could not parse the JSON file "/path/to/config": ',

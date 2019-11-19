@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Schema;
 
-use function array_map;
-use Infection\Configuration\RawConfiguration\RawConfiguration;
 use JsonSchema\Validator;
+use function array_map;
 use const PHP_EOL;
 
 /**
@@ -50,7 +49,7 @@ class SchemaValidator
     /**
      * @throws InvalidSchema
      */
-    public function validate(RawConfiguration $rawConfig): void
+    public function validate(SchemaConfigurationFile $rawConfig): void
     {
         $validator = new Validator();
 

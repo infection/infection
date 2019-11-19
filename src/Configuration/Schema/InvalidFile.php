@@ -33,77 +33,54 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\RawConfiguration;
+namespace Infection\Configuration\Schema;
 
-use function is_file;
-use function is_readable;
-use function Safe\file_get_contents;
-use Seld\JsonLint\JsonParser;
-use Seld\JsonLint\ParsingException;
-use stdClass;
+use Throwable;
+use UnexpectedValueException;
+use function sprintf;
 
 /**
  * @internal
  */
-final class RawConfiguration
+final class InvalidFile extends UnexpectedValueException
 {
-    private $path;
-
-    /**
-     * @var stdClass|null
-     */
-    private $decodedContents;
-
-    public function __construct(string $path)
+    public static function createForFileNotFound(SchemaConfigurationFile $config): self
     {
-        $this->path = $path;
+        return new self(sprintf(
+            'The file "%s" could not be found or is not a file.',
+            $config->getPath()
+        ));
     }
 
-    public function getPath(): string
+    public static function createForFileNotReadable(SchemaConfigurationFile $config): self
     {
-        return $this->path;
+        return new self(sprintf(
+            'The file "%s" is not readable.',
+            $config->getPath()
+        ));
     }
 
-    /**
-     * @throws InvalidFile
-     */
-    public function getDecodedContents(): stdClass
+    public static function createForCouldNotRetrieveFileContents(SchemaConfigurationFile $config): self
     {
-        $this->initDecodedContents();
-
-        return $this->decodedContents;
+        return new self(sprintf(
+            'Could not retrieve the contents of the file "%s".',
+            $config->getPath()
+        ));
     }
 
-    /**
-     * @throws InvalidFile
-     */
-    private function initDecodedContents(): void
-    {
-        if (null !== $this->decodedContents) {
-            return;
-        }
-
-        if (!is_file($this->path)) {
-            throw InvalidFile::createForFileNotFound($this);
-        }
-
-        if (!is_readable($this->path)) {
-            throw InvalidFile::createForFileNotReadable($this);
-        }
-
-        $contents = file_get_contents($this->path);
-
-        if (false === $contents) {
-            throw InvalidFile::createForCouldNotRetrieveFileContents($this);
-        }
-
-        try {
-            $this->decodedContents = (new JsonParser())->parse(
-                $contents,
-                JsonParser::DETECT_KEY_CONFLICTS
-            );
-        } catch (ParsingException $exception) {
-            throw InvalidFile::createForInvalidJson($this, $exception->getMessage(), $exception);
-        }
+    public static function createForInvalidJson(
+        SchemaConfigurationFile $config,
+        string $error,
+        Throwable $previous
+    ): self {
+        return new self(
+            sprintf(
+                'Could not parse the JSON file "%s": %s',
+                $config->getPath(),
+                $error
+            ),
+            0,
+            $previous
+        );
     }
 }

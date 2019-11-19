@@ -35,12 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Schema;
 
-use function array_filter;
-use function array_map;
-use Infection\Configuration\RawConfiguration\RawConfiguration;
-use function sprintf;
 use UnexpectedValueException;
 use Webmozart\Assert\Assert;
+use function array_filter;
+use function array_map;
+use function sprintf;
 
 /**
  * @internal
@@ -50,7 +49,7 @@ final class InvalidSchema extends UnexpectedValueException
     /**
      * @param string[]
      */
-    public static function create(RawConfiguration $config, array $errors): self
+    public static function create(SchemaConfigurationFile $config, array $errors): self
     {
         Assert::allString($errors);
 

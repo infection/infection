@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\Schema;
 
 use Generator;
-use Infection\Configuration\RawConfiguration\RawConfiguration;
 use Infection\Configuration\Schema\InvalidSchema;
+use Infection\Configuration\Schema\SchemaConfigurationFile;
 use PHPUnit\Framework\TestCase;
 
 final class InvalidSchemaTest extends TestCase
@@ -46,7 +46,7 @@ final class InvalidSchemaTest extends TestCase
      * @dataProvider configWithErrorsProvider
      */
     public function test_it_can_be_instantiated(
-        RawConfiguration $config,
+        SchemaConfigurationFile $config,
         array $errors,
         string $expectedErrorMessage
     ): void {
@@ -62,19 +62,19 @@ final class InvalidSchemaTest extends TestCase
         $path = '/path/to/config';
 
         yield 'no error' => [
-            new RawConfiguration($path),
+            new SchemaConfigurationFile($path),
             [],
             '"/path/to/config" does not match the expected JSON schema.',
         ];
 
         yield 'pseudo empty error' => [
-            new RawConfiguration($path),
+            new SchemaConfigurationFile($path),
             ['', ''],
             '"/path/to/config" does not match the expected JSON schema.',
         ];
 
         yield 'one error' => [
-            new RawConfiguration($path),
+            new SchemaConfigurationFile($path),
             ['Error message'],
             <<<'ERROR'
 "/path/to/config" does not match the expected JSON schema:
@@ -84,7 +84,7 @@ ERROR
         ];
 
         yield 'multiple errors' => [
-            new RawConfiguration($path),
+            new SchemaConfigurationFile($path),
             [
                 'First error message',
                 'Second error message',
@@ -98,7 +98,7 @@ ERROR
         ];
 
         yield 'worst case' => [
-            new RawConfiguration($path),
+            new SchemaConfigurationFile($path),
             [
                 ' First error message ',
                 '',

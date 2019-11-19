@@ -33,17 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\RawConfiguration;
+namespace Infection\Tests\Configuration\Schema;
 
 use Exception;
 use Generator;
-use Infection\Configuration\RawConfiguration\InvalidFile;
-use Infection\Configuration\RawConfiguration\RawConfiguration;
+use Infection\Configuration\Schema\InvalidFile;
+use Infection\Configuration\Schema\SchemaConfigurationFile;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Seld\JsonLint\ParsingException;
 
-final class RawConfigurationTest extends TestCase
+final class SchemaConfigurationFileTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__.'/../../Fixtures/Configuration';
 
@@ -51,7 +51,7 @@ final class RawConfigurationTest extends TestCase
     {
         $path = '/nowhere';
 
-        $config = new RawConfiguration($path);
+        $config = new \Infection\Configuration\Schema\SchemaConfigurationFile($path);
 
         $this->assertSame($path, $config->getPath());
     }
@@ -60,7 +60,7 @@ final class RawConfigurationTest extends TestCase
     {
         $invalidPath = '/nowhere';
 
-        $config = new RawConfiguration($invalidPath);
+        $config = new SchemaConfigurationFile($invalidPath);
 
         try {
             $config->getDecodedContents();
@@ -73,7 +73,7 @@ final class RawConfigurationTest extends TestCase
         $validPath = self::FIXTURES_DIR . '/file.json';
         $expectedArrayContents = ['foo' => 'bar'];
 
-        $config = new RawConfiguration($validPath);
+        $config = new \Infection\Configuration\Schema\SchemaConfigurationFile($validPath);
         $actualContents = $config->getDecodedContents();
 
         $this->assertSame($expectedArrayContents, (array) $actualContents);
@@ -81,13 +81,14 @@ final class RawConfigurationTest extends TestCase
 
     public function test_its_contents_is_retrieved_only_once(): void
     {
-        $config = new RawConfiguration(self::FIXTURES_DIR . '/file.json');
+        $config = new \Infection\Configuration\Schema\SchemaConfigurationFile(self::FIXTURES_DIR . '/file.json');
         $expectedValue = (object) ['a' => 'b'];
 
         // Fetch the contents once
         $config->getDecodedContents();
 
-        $decodedContentsReflection = (new ReflectionClass(RawConfiguration::class))->getProperty('decodedContents');
+        $decodedContentsReflection = (new ReflectionClass(
+            \Infection\Configuration\Schema\SchemaConfigurationFile::class))->getProperty('decodedContents');
         $decodedContentsReflection->setAccessible(true);
         $decodedContentsReflection->setValue($config, $expectedValue);
 
@@ -101,7 +102,7 @@ final class RawConfigurationTest extends TestCase
         string $path,
         Exception $expectedException
     ): void {
-        $config = new RawConfiguration($path);
+        $config = new \Infection\Configuration\Schema\SchemaConfigurationFile($path);
 
         try {
             $config->getDecodedContents();
@@ -138,12 +139,12 @@ final class RawConfigurationTest extends TestCase
     {
         yield 'unknown path' => [
             '/nowhere',
-            new InvalidFile('The file "/nowhere" could not be found or is not a file.'),
+            new \Infection\Configuration\Schema\InvalidFile('The file "/nowhere" could not be found or is not a file.'),
         ];
 
         yield 'file is a directory' => [
             self::FIXTURES_DIR,
-            new InvalidFile(sprintf(
+            new \Infection\Configuration\Schema\InvalidFile(sprintf(
                 'The file "%s" could not be found or is not a file.',
             self::FIXTURES_DIR
             )),

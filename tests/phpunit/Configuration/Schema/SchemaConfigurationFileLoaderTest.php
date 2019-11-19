@@ -35,19 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Schema;
 
-use Infection\Configuration\RawConfiguration\RawConfiguration;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
+use Infection\Configuration\Schema\SchemaConfigurationFile;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
 use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
-use Prophecy\Argument\Token\TokenInterface;
-use Prophecy\Argument\Token\TypeToken;
-use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionClass;
 use function Safe\realpath;
 
@@ -105,7 +101,7 @@ final class SchemaConfigurationFileLoaderTest extends TestCase
 
     private static function createRawConfigWithPathArgument(string $path): Constraint
     {
-        return new Callback(static function (RawConfiguration $config) use ($path) {
+        return new Callback(static function (SchemaConfigurationFile $config) use ($path) {
             self::assertSame($path, $config->getPath());
 
             return true;
