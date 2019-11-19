@@ -70,8 +70,8 @@ class SchemaConfigurationFactory
     private static function createSource(stdClass $source): Source
     {
         return new Source(
-            self::normalizeStringArray($source->directories) ?? [],
-            self::normalizeStringArray($source->excludes)?? []
+            (array) self::normalizeStringArray($source->directories ?? []),
+            (array) self::normalizeStringArray($source->excludes ?? [])
         );
     }
 
