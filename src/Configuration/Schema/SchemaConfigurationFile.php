@@ -93,10 +93,6 @@ final class SchemaConfigurationFile
 
         $contents = file_get_contents($this->path);
 
-        if (false === $contents) {
-            throw InvalidFile::createForCouldNotRetrieveFileContents($this);
-        }
-
         try {
             $this->decodedContents = (new JsonParser())->parse(
                 $contents,

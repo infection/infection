@@ -47,7 +47,7 @@ use function sprintf;
 final class InvalidSchema extends UnexpectedValueException
 {
     /**
-     * @param string[]
+     * @param string[] $errors
      */
     public static function create(SchemaConfigurationFile $config, array $errors): self
     {

@@ -70,8 +70,8 @@ class SchemaConfigurationFactory
     private static function createSource(stdClass $source): Source
     {
         return new Source(
-            self::normalizeStringArray($source->directories),
-            self::normalizeStringArray($source->excludes ?? [])
+            self::normalizeStringArray($source->directories) ?? [],
+            self::normalizeStringArray($source->excludes)?? []
         );
     }
 
@@ -112,7 +112,7 @@ class SchemaConfigurationFactory
     private static function normalizeStringArray(
         ?array $values,
         ?array $default = []
-    ): array {
+    ): ?array {
         if (null === $values) {
             return $default;
         }

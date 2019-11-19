@@ -65,9 +65,9 @@ class ConfigurationFactory
     ): Configuration {
         $configDir = \dirname($schema->getFile());
 
-        $tmpDir = $schema->getTmpDir();
+        $tmpDir = (string) $schema->getTmpDir();
 
-        if ('' === (string) $tmpDir) {
+        if ('' === $tmpDir) {
             $tmpDir = sys_get_temp_dir();
         } elseif (!Path::isAbsolute($tmpDir)) {
             $tmpDir = sprintf('%s/%s', $configDir, $tmpDir);

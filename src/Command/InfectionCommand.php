@@ -391,7 +391,7 @@ final class InfectionCommand extends BaseCommand
 
         $minCoveredMsi = $input->getOption('min-covered-msi');
 
-        if (null !== $minCoveredMsi && $minCoveredMsi !== (string) (float) $minCoveredMsi) {
+        if (null !== $minCoveredMsi && !is_numeric($minCoveredMsi)) {
             throw new InvalidArgumentException(sprintf('Expected min-covered-msi to be a float. Got "%s"', $minCoveredMsi));
         }
 
