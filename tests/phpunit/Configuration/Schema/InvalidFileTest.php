@@ -38,6 +38,7 @@ namespace Infection\Tests\Configuration\Schema;
 use Error;
 use Generator;
 use Infection\Configuration\Schema\InvalidFile;
+use Infection\Configuration\Schema\SchemaConfigurationFile;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
@@ -45,7 +46,7 @@ final class InvalidFileTest extends TestCase
 {
     public function test_it_can_be_created_for_file_not_found(): void
     {
-        $config = new \Infection\Configuration\Schema\SchemaConfigurationFile('/path/to/config');
+        $config = new SchemaConfigurationFile('/path/to/config');
 
         $exception = InvalidFile::createForFileNotFound($config);
 
@@ -59,7 +60,7 @@ final class InvalidFileTest extends TestCase
 
     public function test_it_can_be_created_for_file_not_readable(): void
     {
-        $config = new \Infection\Configuration\Schema\SchemaConfigurationFile('/path/to/config');
+        $config = new SchemaConfigurationFile('/path/to/config');
 
         $exception = InvalidFile::createForFileNotReadable($config);
 
@@ -73,7 +74,7 @@ final class InvalidFileTest extends TestCase
 
     public function test_it_can_be_created_for_file_content_could_not_be_retrieved(): void
     {
-        $config = new \Infection\Configuration\Schema\SchemaConfigurationFile('/path/to/config');
+        $config = new SchemaConfigurationFile('/path/to/config');
 
         $exception = \Infection\Configuration\Schema\InvalidFile::createForCouldNotRetrieveFileContents($config);
 
@@ -89,7 +90,7 @@ final class InvalidFileTest extends TestCase
      * @dataProvider jsonErrorProvider
      */
     public function test_it_can_be_created_for_file_with_invalid_JSON_content(
-        \Infection\Configuration\Schema\SchemaConfigurationFile $config,
+        SchemaConfigurationFile $config,
         string $error,
         Throwable $previous,
         string $expectedErrorMessage
@@ -104,14 +105,14 @@ final class InvalidFileTest extends TestCase
     public function jsonErrorProvider(): Generator
     {
         yield [
-            new \Infection\Configuration\Schema\SchemaConfigurationFile('/path/to/config'),
+            new SchemaConfigurationFile('/path/to/config'),
             'Error message',
             new Error(),
             'Could not parse the JSON file "/path/to/config": Error message',
         ];
 
         yield 'empty error message' => [
-            new \Infection\Configuration\Schema\SchemaConfigurationFile('/path/to/config'),
+            new SchemaConfigurationFile('/path/to/config'),
             '',
             new Error(),
             'Could not parse the JSON file "/path/to/config": ',

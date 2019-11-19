@@ -51,7 +51,7 @@ final class SchemaConfigurationFileTest extends TestCase
     {
         $path = '/nowhere';
 
-        $config = new \Infection\Configuration\Schema\SchemaConfigurationFile($path);
+        $config = new SchemaConfigurationFile($path);
 
         $this->assertSame($path, $config->getPath());
     }
@@ -73,7 +73,7 @@ final class SchemaConfigurationFileTest extends TestCase
         $validPath = self::FIXTURES_DIR . '/file.json';
         $expectedArrayContents = ['foo' => 'bar'];
 
-        $config = new \Infection\Configuration\Schema\SchemaConfigurationFile($validPath);
+        $config = new SchemaConfigurationFile($validPath);
         $actualContents = $config->getDecodedContents();
 
         $this->assertSame($expectedArrayContents, (array) $actualContents);
@@ -81,14 +81,14 @@ final class SchemaConfigurationFileTest extends TestCase
 
     public function test_its_contents_is_retrieved_only_once(): void
     {
-        $config = new \Infection\Configuration\Schema\SchemaConfigurationFile(self::FIXTURES_DIR . '/file.json');
+        $config = new SchemaConfigurationFile(self::FIXTURES_DIR . '/file.json');
         $expectedValue = (object) ['a' => 'b'];
 
         // Fetch the contents once
         $config->getDecodedContents();
 
         $decodedContentsReflection = (new ReflectionClass(
-            \Infection\Configuration\Schema\SchemaConfigurationFile::class))->getProperty('decodedContents');
+            SchemaConfigurationFile::class))->getProperty('decodedContents');
         $decodedContentsReflection->setAccessible(true);
         $decodedContentsReflection->setValue($config, $expectedValue);
 
@@ -102,7 +102,7 @@ final class SchemaConfigurationFileTest extends TestCase
         string $path,
         Exception $expectedException
     ): void {
-        $config = new \Infection\Configuration\Schema\SchemaConfigurationFile($path);
+        $config = new SchemaConfigurationFile($path);
 
         try {
             $config->getDecodedContents();
@@ -137,12 +137,12 @@ final class SchemaConfigurationFileTest extends TestCase
     {
         yield 'unknown path' => [
             '/nowhere',
-            new \Infection\Configuration\Schema\InvalidFile('The file "/nowhere" could not be found or is not a file.'),
+            new InvalidFile('The file "/nowhere" could not be found or is not a file.'),
         ];
 
         yield 'file is a directory' => [
             self::FIXTURES_DIR,
-            new \Infection\Configuration\Schema\InvalidFile(sprintf(
+            new InvalidFile(sprintf(
                 'The file "%s" could not be found or is not a file.',
             self::FIXTURES_DIR
             )),
