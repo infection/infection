@@ -40,6 +40,7 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Locator\Locator;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -48,14 +49,14 @@ use ReflectionClass;
 final class SchemaConfigurationLoaderTest extends TestCase
 {
     /**
-     * @var Locator&ObjectProphecy
+     * @var Locator&MockObject
      */
-    private $locatorProphecy;
+    private $locatorStub;
 
     /**
-     * @var SchemaConfigurationFileLoader&ObjectProphecy
+     * @var SchemaConfigurationFileLoader&MockObject
      */
-    private $configFileLoaderProphecy;
+    private $configFileLoaderStub;
 
     /**
      * @var SchemaConfigurationLoader
@@ -64,13 +65,12 @@ final class SchemaConfigurationLoaderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->locatorProphecy = $this->prophesize(Locator::class);
-        $this->configFileLoaderProphecy = $this->prophesize(
-            \Infection\Configuration\Schema\SchemaConfigurationFileLoader::class);
+        $this->locatorStub = $this->createMock(Locator::class);
+        $this->configFileLoaderStub = $this->createMock(SchemaConfigurationFileLoader::class);
 
         $this->loader = new SchemaConfigurationLoader(
-            $this->locatorProphecy->reveal(),
-            $this->configFileLoaderProphecy->reveal()
+            $this->locatorStub,
+            $this->configFileLoaderStub
         );
     }
 
@@ -84,29 +84,30 @@ final class SchemaConfigurationLoaderTest extends TestCase
         string $expectedPath,
         SchemaConfiguration $expectedConfig
     ): void {
-        $this->locatorProphecy
-            ->locateOneOf($potentialPaths)
+        $this->locatorStub
+            ->expects($this->once())
+            ->method('locateOneOf')
+            ->with($potentialPaths)
             ->willReturn($expectedPath)
         ;
 
-        $this->configFileLoaderProphecy
-            ->loadFile($expectedPath)
+        $this->configFileLoaderStub
+            ->expects($this->once())
+            ->method('loadFile')
+            ->with($expectedPath)
             ->willReturn($expectedConfig)
         ;
 
         $actualConfig = $this->loader->loadConfiguration($potentialPaths);
 
         $this->assertSame($expectedConfig, $actualConfig);
-
-        $this->locatorProphecy->locateOneOf(Argument::cetera())->shouldHaveBeenCalledTimes(1);
-        $this->configFileLoaderProphecy->loadFile(Argument::cetera())->shouldHaveBeenCalledTimes(1);
     }
 
     public function configurationPathsProvider(): Generator
     {
         $config = (new ReflectionClass(SchemaConfiguration::class))->newInstanceWithoutConstructor();
 
-        yield 'first potenal path' => [
+        yield 'first potential path' => [
             [
                 '/path/to/configA',
                 '/path/to/configB',

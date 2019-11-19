@@ -36,9 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\Schema;
 
 use Infection\Configuration\RawConfiguration\RawConfiguration;
+use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
+use PHPUnit\Framework\Constraint\Callback;
+use PHPUnit\Framework\Constraint\Constraint;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Argument\Token\TokenInterface;
@@ -50,28 +54,28 @@ use function Safe\realpath;
 final class SchemaConfigurationFileLoaderTest extends TestCase
 {
     /**
-     * @var SchemaValidator&ObjectProphecy
+     * @var SchemaValidator&MockObject
      */
-    private $schemaValidatorProphecy;
+    private $schemaValidatorStub;
 
     /**
-     * @var SchemaConfigurationFactory&ObjectProphecy
+     * @var SchemaConfigurationFactory&MockObject
      */
-    private $configFactoryProphecy;
+    private $configFactoryStub;
 
     /**
-     * @var \Infection\Configuration\Schema\SchemaConfigurationFileLoader
+     * @var SchemaConfigurationFileLoader
      */
     private $loader;
 
     protected function setUp(): void
     {
-        $this->schemaValidatorProphecy = $this->prophesize(SchemaValidator::class);
-        $this->configFactoryProphecy = $this->prophesize(SchemaConfigurationFactory::class);
+        $this->schemaValidatorStub = $this->createMock(SchemaValidator::class);
+        $this->configFactoryStub = $this->createMock(SchemaConfigurationFactory::class);
 
         $this->loader = new SchemaConfigurationFileLoader(
-            $this->schemaValidatorProphecy->reveal(),
-            $this->configFactoryProphecy->reveal()
+            $this->schemaValidatorStub,
+            $this->configFactoryStub
         );
     }
 
@@ -79,32 +83,32 @@ final class SchemaConfigurationFileLoaderTest extends TestCase
     {
         $path = realpath(__DIR__.'/../../Fixtures/Configuration/file.json');
         $decodedContents = (object) ['foo' => 'bar'];
-        $expectedConfig = (new ReflectionClass(\Infection\Configuration\Schema\SchemaConfiguration::class))->newInstanceWithoutConstructor();
+        $expectedConfig = (new ReflectionClass(SchemaConfiguration::class))->newInstanceWithoutConstructor();
 
-        $this->schemaValidatorProphecy
-            ->validate(self::createRawConfigWithPathArgument($path))
-            ->shouldBeCalled()
+        $this->schemaValidatorStub
+            ->expects($this->once())
+            ->method('validate')
+            ->with(self::createRawConfigWithPathArgument($path))
         ;
 
-        $this->configFactoryProphecy
-            ->create($path, $decodedContents)
+        $this->configFactoryStub
+            ->expects($this->once())
+            ->method('create')
+            ->with($path, $decodedContents)
             ->willReturn($expectedConfig)
         ;
 
         $actual = $this->loader->loadFile($path);
 
         $this->assertSame($expectedConfig, $actual);
-
-        $this->schemaValidatorProphecy->validate(Argument::cetera())->shouldHaveBeenCalledTimes(1);
-        $this->configFactoryProphecy->create(Argument::cetera())->shouldHaveBeenCalledTimes(1);
     }
 
-    private static function createRawConfigWithPathArgument(string $path): TokenInterface
+    private static function createRawConfigWithPathArgument(string $path): Constraint
     {
-        return Argument::that(static function (RawConfiguration $config) use ($path) {
+        return new Callback(static function (RawConfiguration $config) use ($path) {
             self::assertSame($path, $config->getPath());
 
-            return new TypeToken(RawConfiguration::class);
+            return true;
         });
     }
 }
