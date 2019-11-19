@@ -96,7 +96,7 @@ final class ConfigurationTest extends TestCase
     public function valueProvider(): Generator
     {
         yield [
-            null,
+            10,
             new Source([], []),
             new Logs(
                 null,

@@ -58,7 +58,7 @@ final class FactoryTest extends TestCase
             new XmlConfigurationHelper(new PathReplacer(new Filesystem()), ''),
             '',
             new Configuration(
-                null,
+                10,
                 new Source([], []),
                 new Logs(
                     null,

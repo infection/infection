@@ -85,7 +85,7 @@ class Configuration
     private $stringMutators;
 
     public function __construct(
-        ?int $timeout,
+        int $timeout,
         Source $source,
         Logs $logs,
         string $logVerbosity,
@@ -136,7 +136,7 @@ class Configuration
         $this->stringMutators = $stringMutators;
     }
 
-    public function getProcessTimeout(): ?int
+    public function getProcessTimeout(): int
     {
         return $this->timeout;
     }

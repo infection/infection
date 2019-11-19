@@ -41,7 +41,7 @@ use function sys_get_temp_dir;
 use Webmozart\PathUtil\Path;
 
 /**
- * @internal 
+ * @internal
  * @final
  */
 class ConfigurationFactory
@@ -84,7 +84,7 @@ class ConfigurationFactory
         }
 
         return new Configuration(
-            $schema->getTimeout(),
+            $schema->getTimeout() ?? 10,
             $schema->getSource(),
             $schema->getLogs(),
             $logVerbosity,

@@ -38,7 +38,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $inputMutators,
         ?string $inputTestFramework,
         ?string $inputTestFrameworkOptions,
-        ?int $expectedTimeout,
+        int $expectedTimeout,
         Source $expectedSource,
         Logs $expectedLogs,
         ?string $expectedLogVerbosity,
@@ -140,7 +140,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             null,
-            null,
+            10,
             new Source([], []),
             new Logs(
                 null,
@@ -168,6 +168,16 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
         ];
+
+        yield 'null timeout' => self::createValueForTimeout(
+            null,
+            10
+        );
+
+        yield 'config timeout' => self::createValueForTimeout(
+            20,
+            20
+        );
 
         yield 'null tmp dir' => self::createValueForTmpDir(
             null,
@@ -347,6 +357,74 @@ final class ConfigurationFactoryTest extends TestCase
         ];
     }
 
+    private static function createValueForTimeout(
+        ?int $schemaTimeout,
+        int $expectedTimeOut
+    ): array {
+        return [
+            new SchemaConfiguration(
+                '/path/to/infection.json',
+                $schemaTimeout,
+                new Source([], []),
+                new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                null,
+                new PhpUnit(null, null),
+                [],
+                null,
+                null,
+                null,
+                null
+            ),
+            null,
+            null,
+            'none',
+            false,
+            false,
+            'progress',
+            false,
+            false,
+            null,
+            false,
+            null,
+            null,
+            null,
+            null,
+            $expectedTimeOut,
+            new Source([], []),
+            new Logs(
+                null,
+                null,
+                null,
+                null,
+                null
+            ),
+            'none',
+            sys_get_temp_dir(),
+            new PhpUnit('/path/to', null),
+            [],
+            null,
+            null,
+            null,
+            null,
+            null,
+            false,
+            false,
+            'progress',
+            false,
+            false,
+            null,
+            false,
+            null,
+            null,
+        ];
+    }
+
     private static function createValueForTmpDir(
         ?string $configTmpDir,
         ?string $expectedTmpDir
@@ -385,7 +463,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             null,
-            null,
+            10,
             new Source([], []),
             new Logs(
                 null,
@@ -453,7 +531,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             null,
-            null,
+            10,
             new Source([], []),
             new Logs(
                 null,
@@ -522,7 +600,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             $inputTestFramework,
             null,
-            null,
+            10,
             new Source([], []),
             new Logs(
                 null,
@@ -591,7 +669,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             null,
-            null,
+            10,
             new Source([], []),
             new Logs(
                 null,
@@ -660,7 +738,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             $inputInitialTestsFrameworkOptions,
-            null,
+            10,
             new Source([], []),
             new Logs(
                 null,
