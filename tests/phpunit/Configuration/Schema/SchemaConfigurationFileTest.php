@@ -109,29 +109,27 @@ final class SchemaConfigurationFileTest extends TestCase
 
             $this->fail('Expected the config contents to be invalid.');
         } catch (Exception $exception) {
-            // Continue
-        }
+            $this->assertSame(
+                $expectedException->getMessage(),
+                $exception->getMessage()
+            );
+            $this->assertSame(
+                $expectedException->getCode(),
+                $exception->getCode()
+            );
 
-        $this->assertSame(
-            $expectedException->getMessage(),
-            $exception->getMessage()
-        );
-        $this->assertSame(
-            $expectedException->getCode(),
-            $exception->getCode()
-        );
+            if (null === $expectedException->getPrevious()) {
+                $this->assertNull($exception->getPrevious());
+            } else {
+                $expectedPrevious = $expectedException->getPrevious();
+                $previous = $exception->getPrevious();
 
-        if (null === $expectedException->getPrevious()) {
-            $this->assertNull($exception->getPrevious());
-        } else {
-            $expectedPrevious = $expectedException->getPrevious();
-            $previous = $exception->getPrevious();
-
-            $this->assertNotNull($previous);
-            $this->assertInstanceOf(\get_class($expectedPrevious), $previous);
-            $this->assertSame($expectedPrevious->getMessage(), $previous->getMessage());
-            $this->assertSame($expectedPrevious->getCode(), $previous->getCode());
-            $this->assertSame($expectedPrevious->getPrevious(), $previous->getPrevious());
+                $this->assertNotNull($previous);
+                $this->assertInstanceOf(\get_class($expectedPrevious), $previous);
+                $this->assertSame($expectedPrevious->getMessage(), $previous->getMessage());
+                $this->assertSame($expectedPrevious->getCode(), $previous->getCode());
+                $this->assertSame($expectedPrevious->getPrevious(), $previous->getPrevious());
+            }
         }
     }
 

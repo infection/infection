@@ -50,12 +50,12 @@ use function Safe\realpath;
 final class SchemaConfigurationFileLoaderTest extends TestCase
 {
     /**
-     * @var SchemaValidator&MockObject
+     * @var SchemaValidator|MockObject
      */
     private $schemaValidatorStub;
 
     /**
-     * @var SchemaConfigurationFactory&MockObject
+     * @var SchemaConfigurationFactory|MockObject
      */
     private $configFactoryStub;
 

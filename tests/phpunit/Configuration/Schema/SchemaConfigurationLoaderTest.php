@@ -49,12 +49,12 @@ use ReflectionClass;
 final class SchemaConfigurationLoaderTest extends TestCase
 {
     /**
-     * @var Locator&MockObject
+     * @var Locator|MockObject
      */
     private $locatorStub;
 
     /**
-     * @var SchemaConfigurationFileLoader&MockObject
+     * @var SchemaConfigurationFileLoader|MockObject
      */
     private $configFileLoaderStub;
 
