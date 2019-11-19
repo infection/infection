@@ -65,6 +65,7 @@ use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
+use function is_numeric;
 use function Safe\sprintf;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -384,7 +385,7 @@ final class InfectionCommand extends BaseCommand
 
         $minMsi = $input->getOption('min-msi');
 
-        if (null !== $minMsi && $minMsi !== (string) (float) $minMsi) {
+        if (null !== $minMsi && !is_numeric($minMsi)) {
             throw new InvalidArgumentException(sprintf('Expected min-msi to be a float. Got "%s"', $minMsi));
         }
 

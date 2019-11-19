@@ -44,16 +44,6 @@ use Infection\Config\InfectionConfig;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
-use Infection\Configuration\Entry\Mutator\ArrayItemRemoval;
-use Infection\Configuration\Entry\Mutator\ArrayItemRemovalSettings;
-use Infection\Configuration\Entry\Mutator\BCMath;
-use Infection\Configuration\Entry\Mutator\BCMathSettings;
-use Infection\Configuration\Entry\Mutator\GenericMutator;
-use Infection\Configuration\Entry\Mutator\MBString;
-use Infection\Configuration\Entry\Mutator\MBStringSettings;
-use Infection\Configuration\Entry\Mutator\Mutators;
-use Infection\Configuration\Entry\Mutator\TrueValue;
-use Infection\Configuration\Entry\Mutator\TrueValueSettings;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
@@ -191,7 +181,7 @@ final class ProjectCodeProvider
                 return sprintf(
                     '%s\\%s%s%s',
                     'Infection',
-                    strtr($file->getRelativePath(), \DIRECTORY_SEPARATOR, '\\'),
+                    str_replace(\DIRECTORY_SEPARATOR, '\\', $file->getRelativePath()),
                     $file->getRelativePath() ? '\\' : '',
                     $file->getBasename('.' . $file->getExtension())
                 );
@@ -287,7 +277,7 @@ final class ProjectCodeProvider
         $classes = array_map(
             static function (SplFileInfo $file) {
                 $fqcnPart = ltrim(str_replace('phpunit', '', $file->getRelativePath()), \DIRECTORY_SEPARATOR);
-                $fqcnPart = strtr($fqcnPart, \DIRECTORY_SEPARATOR, '\\');
+                $fqcnPart = str_replace(\DIRECTORY_SEPARATOR, '\\', $fqcnPart);
 
                 return sprintf(
                     'Infection\\Tests\\%s%s%s',

@@ -145,6 +145,10 @@ final class Factory
             );
         }
 
-        throw new \InvalidArgumentException(sprintf('Invalid name of test framework "%s". Available names are: %s', $adapterName, implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC])));
+        throw new \InvalidArgumentException(sprintf(
+            'Invalid name of test framework "%s". Available names are: %s',
+            $adapterName,
+            implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC])
+        ));
     }
 }
