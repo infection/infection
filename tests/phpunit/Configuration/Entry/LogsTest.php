@@ -9,7 +9,7 @@ use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use PHPUnit\Framework\TestCase;
 
-class LogsTest extends TestCase
+final class LogsTest extends TestCase
 {
     use LogsAssertions;
 

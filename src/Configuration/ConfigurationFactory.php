@@ -41,6 +41,7 @@ use function sys_get_temp_dir;
 use Webmozart\PathUtil\Path;
 
 /**
+ * @internal 
  * @final
  */
 class ConfigurationFactory

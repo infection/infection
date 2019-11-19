@@ -15,7 +15,7 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use PHPUnit\Framework\TestCase;
 use function sys_get_temp_dir;
 
-class ConfigurationFactoryTest extends TestCase
+final class ConfigurationFactoryTest extends TestCase
 {
     use ConfigurationAssertions;
 

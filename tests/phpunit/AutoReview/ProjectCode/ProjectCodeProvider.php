@@ -42,6 +42,7 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\InfectionConfig;
 use Infection\Configuration\Configuration;
+use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
@@ -107,11 +108,6 @@ final class ProjectCodeProvider
         TestFrameworkTypes::class,
         MutationsCollectorVisitor::class,
         ParentConnectorVisitor::class,
-        Badge::class,
-        Logs::class,
-        PhpUnit::class,
-        Source::class,
-        Configuration::class,
     ];
 
     /**
@@ -137,6 +133,8 @@ final class ProjectCodeProvider
         SchemaConfigurationFactory::class,
         SchemaConfigurationFileLoader::class,
         SchemaValidator::class,
+        Configuration::class,
+        ConfigurationFactory::class,
     ];
 
     /**

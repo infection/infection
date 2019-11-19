@@ -7,7 +7,7 @@ namespace Infection\Tests\Configuration\Entry;
 use Infection\Configuration\Entry\Badge;
 use PHPUnit\Framework\TestCase;
 
-class BadgeTest extends TestCase
+final class BadgeTest extends TestCase
 {
     use BadgeAssertions;
 

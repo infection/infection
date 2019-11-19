@@ -8,7 +8,7 @@ use Generator;
 use Infection\Configuration\Entry\Source;
 use PHPUnit\Framework\TestCase;
 
-class SourceTest extends TestCase
+final class SourceTest extends TestCase
 {
     use SourceAssertions;
 
