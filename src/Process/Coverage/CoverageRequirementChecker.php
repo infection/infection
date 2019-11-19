@@ -65,13 +65,22 @@ final class CoverageRequirementChecker
             || \extension_loaded('xdebug')
             || \extension_loaded('pcov')
             || XdebugHandler::getSkippedVersion()
-            || $this->isXdebugIncludedInInitialTestPhpOptions();
+            || $this->isXdebugIncludedInInitialTestPhpOptions()
+            || $this->isPcovIncludedInInitialTestPhpOptions();
     }
 
     private function isXdebugIncludedInInitialTestPhpOptions(): bool
     {
         return (bool) preg_match(
             '/(zend_extension\s*=.*xdebug.*)/mi',
+            $this->initialTestPhpOptions
+        );
+    }
+
+    private function isPcovIncludedInInitialTestPhpOptions(): bool
+    {
+        return (bool) preg_match(
+            '/(extension\s*=.*pcov.*)/mi',
             $this->initialTestPhpOptions
         );
     }

@@ -28,6 +28,8 @@ DOCKER_RUN_72=$(FLOCK) devTools/*php72*.json $(DOCKER_RUN) infection_php72
 DOCKER_RUN_72_IMAGE=devTools/Dockerfile-php72-xdebug.json
 DOCKER_RUN_73=$(FLOCK) devTools/*php73*.json $(DOCKER_RUN) infection_php73
 DOCKER_RUN_73_IMAGE=devTools/Dockerfile-php73-xdebug.json
+DOCKER_RUN_74=$(FLOCK) devTools/*php74*.json $(DOCKER_RUN) infection_php74
+DOCKER_RUN_74_IMAGE=devTools/Dockerfile-php74-xdebug.json
 
 FLOCK=./devTools/flock
 
@@ -72,48 +74,66 @@ test-autoreview:
 
 .PHONY: test-unit
 test-unit:	 ## Runs the unit tests
-test-unit: test-unit-72 test-unit-73
+test-unit: test-unit-72 test-unit-73 test-unit-74
 
 .PHONY: test-unit-72
 test-unit-72: $(DOCKER_RUN_72_IMAGE) $(PHPUNIT)
-	$(DOCKER_RUN_72) $(PHPUNIT)
+	$(DOCKER_RUN_72) $(PHPUNIT) --group default
 
 .PHONY: test-unit-73
 test-unit-73: $(DOCKER_RUN_73_IMAGE) $(PHPUNIT)
-	$(DOCKER_RUN_73) $(PHPUNIT)
+	$(DOCKER_RUN_73) $(PHPUNIT) --group default
+
+.PHONY: test-unit-74
+test-unit-74: $(DOCKER_RUN_74_IMAGE) $(PHPUNIT)
+	$(DOCKER_RUN_74) $(PHPUNIT) --group default
 
 .PHONY: test-e2e
 test-e2e: 	 ## Runs the end-to-end tests
 test-e2e: test-e2e-phpdbg test-e2e-xdebug
 
 .PHONY: test-e2e-phpdbg
-test-e2e-phpdbg: test-e2e-phpdbg-72 test-e2e-phpdbg-73
+test-e2e-phpdbg: test-e2e-phpdbg-72 test-e2e-phpdbg-73 test-e2e-phpdbg-74
 
 .PHONY: test-e2e-phpdbg-72
 test-e2e-phpdbg-72: $(DOCKER_RUN_72_IMAGE) $(INFECTION)
+	$(DOCKER_RUN_72) $(PHPUNIT) --group integration,e2e
 	$(DOCKER_RUN_72) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-e2e-phpdbg-73
 test-e2e-phpdbg-73: $(DOCKER_RUN_73_IMAGE) $(INFECTION)
+	$(DOCKER_RUN_73) $(PHPUNIT) --group integration,e2e
 	$(DOCKER_RUN_73) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
 
+.PHONY: test-e2e-phpdbg-74
+test-e2e-phpdbg-74: $(DOCKER_RUN_74_IMAGE) $(INFECTION)
+	$(DOCKER_RUN_74) $(PHPUNIT) --group integration,e2e
+	$(DOCKER_RUN_74) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
+
 .PHONY: test-e2e-xdebug
-test-e2e-xdebug: test-e2e-xdebug-72 test-e2e-xdebug-73
+test-e2e-xdebug: test-e2e-xdebug-72 test-e2e-xdebug-73 test-e2e-xdebug-74
 
 .PHONY: test-e2e-xdebug-72
 test-e2e-xdebug-72: $(DOCKER_RUN_72_IMAGE) $(INFECTION)
+	$(DOCKER_RUN_72) $(PHPUNIT) --group integration,e2e
 	$(DOCKER_RUN_72) ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-e2e-xdebug-73
 test-e2e-xdebug-73: $(DOCKER_RUN_73_IMAGE) $(INFECTION)
+	$(DOCKER_RUN_73) $(PHPUNIT) --group integration,e2e
 	$(DOCKER_RUN_73) ./tests/e2e_tests $(INFECTION)
+
+.PHONY: test-e2e-xdebug-74
+test-e2e-xdebug-74: $(DOCKER_RUN_74_IMAGE) $(INFECTION)
+	$(DOCKER_RUN_74) $(PHPUNIT) --group integration,e2e
+	$(DOCKER_RUN_74) ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-infection
 test-infection:  ## Runs Infection against itself
 test-infection: test-infection-phpdbg test-infection-xdebug
 
 .PHONY: test-infection-phpdbg
-test-infection-phpdbg: test-infection-phpdbg-72 test-infection-phpdbg-73
+test-infection-phpdbg: test-infection-phpdbg-72 test-infection-phpdbg-73 test-infection-phpdbg-74
 
 .PHONY: test-infection-phpdbg-72
 test-infection-phpdbg-72: $(DOCKER_RUN_72_IMAGE)
@@ -123,8 +143,12 @@ test-infection-phpdbg-72: $(DOCKER_RUN_72_IMAGE)
 test-infection-phpdbg-73: $(DOCKER_RUN_73_IMAGE)
 	$(DOCKER_RUN_73) phpdbg -qrr bin/infection --threads=4
 
+.PHONY: test-infection-phpdbg-74
+test-infection-phpdbg-74: $(DOCKER_RUN_74_IMAGE)
+	$(DOCKER_RUN_74) phpdbg -qrr bin/infection --threads=4
+
 .PHONY: test-infection-xdebug
-test-infection-xdebug: test-infection-xdebug-72 test-infection-xdebug-73
+test-infection-xdebug: test-infection-xdebug-72 test-infection-xdebug-73 test-infection-xdebug-74
 
 .PHONY: test-infection-xdebug-72
 test-infection-xdebug-72: $(DOCKER_RUN_72_IMAGE)
@@ -133,6 +157,10 @@ test-infection-xdebug-72: $(DOCKER_RUN_72_IMAGE)
 .PHONY: test-infection-xdebug-73
 test-infection-xdebug-73: $(DOCKER_RUN_73_IMAGE)
 	$(DOCKER_RUN_73) ./bin/infection --threads=4
+
+.PHONY: test-infection-xdebug-74
+test-infection-xdebug-74: $(DOCKER_RUN_74_IMAGE)
+	$(DOCKER_RUN_74) ./bin/infection --threads=4
 
 
 #
@@ -156,8 +184,8 @@ $(PHPSTAN): Makefile
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
 	$(BOX) validate
-	$(BOX) compile
-	touch $@
+	ulimit -n 4096 && $(BOX) compile
+	touch -c $@
 
 vendor: composer.lock
 	composer install
@@ -165,17 +193,22 @@ vendor: composer.lock
 
 composer.lock: composer.json
 	composer install
-	touch $@
+	touch -c $@
 
 $(PHPUNIT): vendor
-	touch $@
+	touch -c $@
 
 $(DOCKER_RUN_72_IMAGE): devTools/Dockerfile-php72-xdebug
 	docker build --tag infection_php72 --file devTools/Dockerfile-php72-xdebug .
-	docker image inspect infection_php72 >> $(DOCKER_RUN_72_IMAGE)
+	docker image inspect infection_php72 > $(DOCKER_RUN_72_IMAGE)
 	touch $@
 
 $(DOCKER_RUN_73_IMAGE): devTools/Dockerfile-php73-xdebug
 	docker build --tag infection_php73 --file devTools/Dockerfile-php73-xdebug .
-	docker image inspect infection_php73 >> $(DOCKER_RUN_73_IMAGE)
+	docker image inspect infection_php73 > $(DOCKER_RUN_73_IMAGE)
+	touch $@
+
+$(DOCKER_RUN_74_IMAGE): devTools/Dockerfile-php74-xdebug
+	docker build --tag infection_php74 --file devTools/Dockerfile-php74-xdebug .
+	docker image inspect infection_php74 > $(DOCKER_RUN_74_IMAGE)
 	touch $@

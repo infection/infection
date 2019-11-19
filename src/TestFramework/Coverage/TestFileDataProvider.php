@@ -48,7 +48,6 @@ interface TestFileDataProvider
      *      param:  '\NameSpace\Sub\TestClass'
      *      return: '/path/to/NameSpace/Sub/TestClass.php'
      *
-     *
      * @return TestFileTimeData file path and time
      */
     public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData;

@@ -52,7 +52,6 @@ final class TrueValue extends Mutator
     /**
      * Replaces "true" with "false"
      *
-     *
      * @return Node\Expr\ConstFetch
      */
     public function mutate(Node $node)

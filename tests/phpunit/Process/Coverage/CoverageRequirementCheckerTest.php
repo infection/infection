@@ -91,13 +91,24 @@ final class CoverageRequirementCheckerTest extends TestCase
         $this->assertTrue($coverageChecker->hasDebuggerOrCoverageOption());
     }
 
-    public function test_it_has_debug_or_coverage_option_when_provided_with_correct_initial_php_settings(): void
+    public function test_it_has_debug_or_coverage_option_when_provided_with_correct_xdebug_initial_php_settings(): void
     {
         $this->requireNoPhpDbg();
         $this->requireNoXdebug();
         $this->requireNoPcov();
 
         $coverageChecker = new CoverageRequirementChecker(false, '-d zend_extension=xdebug.so');
+
+        $this->assertTrue($coverageChecker->hasDebuggerOrCoverageOption());
+    }
+
+    public function test_it_has_debug_or_coverage_option_when_provided_with_correct_pcov_initial_php_settings(): void
+    {
+        $this->requireNoPhpDbg();
+        $this->requireNoXdebug();
+        $this->requireNoPcov();
+
+        $coverageChecker = new CoverageRequirementChecker(false, '-d extension=pcov.so');
 
         $this->assertTrue($coverageChecker->hasDebuggerOrCoverageOption());
     }

@@ -105,7 +105,6 @@ abstract class AbstractTestFrameworkAdapter
     /**
      * Returns array of arguments to pass them into the Initial Run Symfony Process
      *
-     *
      * @return string[]
      */
     public function getInitialTestRunCommandLine(
@@ -218,7 +217,6 @@ abstract class AbstractTestFrameworkAdapter
 
     /**
      * Need to return string for cases when user run phpdbg with -qrr argument.s
-     *
      *
      * @return string[]
      */
