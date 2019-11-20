@@ -39,6 +39,7 @@ use Generator;
 use Infection\Configuration\Schema\InvalidSchema;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use PHPUnit\Framework\TestCase;
+use function Infection\Tests\normalizeLineReturn;
 
 final class InvalidSchemaTest extends TestCase
 {
@@ -52,7 +53,10 @@ final class InvalidSchemaTest extends TestCase
     ): void {
         $exception = InvalidSchema::create($config, $errors);
 
-        $this->assertSame($expectedErrorMessage, $exception->getMessage());
+        $this->assertSame(
+            $expectedErrorMessage,
+            normalizeLineReturn($exception->getMessage())
+        );
         $this->assertSame(0, $exception->getCode());
         $this->assertNull($exception->getPrevious());
     }
