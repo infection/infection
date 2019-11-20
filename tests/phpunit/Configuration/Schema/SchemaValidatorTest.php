@@ -39,6 +39,7 @@ use Generator;
 use Infection\Configuration\Schema\InvalidSchema;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use Infection\Configuration\Schema\SchemaValidator;
+use function Infection\Tests\normalizeLineReturn;
 use function json_decode;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -68,7 +69,7 @@ final class SchemaValidatorTest extends TestCase
             } else {
                 $this->assertSame(
                     $expectedErrorMessage,
-                    $exception->getMessage()
+                    normalizeLineReturn($exception->getMessage())
                 );
             }
         }
