@@ -47,7 +47,6 @@ final class Continue_ extends Mutator
     /**
      * Replaces "continue;" with "break;"
      *
-     *
      * @return Node\Stmt\Break_
      */
     public function mutate(Node $node)

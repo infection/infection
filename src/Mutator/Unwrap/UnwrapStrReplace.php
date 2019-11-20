@@ -33,55 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Coverage;
+namespace Infection\Mutator\Unwrap;
 
-use Composer\XdebugHandler\XdebugHandler;
+use PhpParser\Node;
 
 /**
  * @internal
  */
-final class CoverageRequirementChecker
+final class UnwrapStrReplace extends AbstractUnwrapMutator
 {
-    /**
-     * @var bool
-     */
-    private $skipCoverage;
-
-    /**
-     * @var string
-     */
-    private $initialTestPhpOptions;
-
-    public function __construct(bool $skipCoverage, string $initialTestPhpOptions)
+    protected function getFunctionName(): string
     {
-        $this->skipCoverage = $skipCoverage;
-        $this->initialTestPhpOptions = $initialTestPhpOptions;
+        return 'str_replace';
     }
 
-    public function hasDebuggerOrCoverageOption(): bool
+    protected function getParameterIndexes(Node\Expr\FuncCall $node): \Generator
     {
-        return $this->skipCoverage
-            || \PHP_SAPI === 'phpdbg'
-            || \extension_loaded('xdebug')
-            || \extension_loaded('pcov')
-            || XdebugHandler::getSkippedVersion()
-            || $this->isXdebugIncludedInInitialTestPhpOptions()
-            || $this->isPcovIncludedInInitialTestPhpOptions();
-    }
-
-    private function isXdebugIncludedInInitialTestPhpOptions(): bool
-    {
-        return (bool) preg_match(
-            '/(zend_extension\s*=.*xdebug.*)/mi',
-            $this->initialTestPhpOptions
-        );
-    }
-
-    private function isPcovIncludedInInitialTestPhpOptions(): bool
-    {
-        return (bool) preg_match(
-            '/(extension\s*=.*pcov.*)/mi',
-            $this->initialTestPhpOptions
-        );
+        yield 2;
     }
 }

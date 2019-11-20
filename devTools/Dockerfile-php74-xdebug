@@ -1,6 +1,6 @@
-FROM php:7.2-cli
+FROM php:7.4-rc-cli
 
-RUN pecl install xdebug && docker-php-ext-enable xdebug
+RUN pecl install xdebug-beta && docker-php-ext-enable xdebug
 RUN apt-get update && apt-get install -y --no-install-recommends \
     expect git zip \
     && rm -rf /var/lib/apt/lists/*
