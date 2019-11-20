@@ -42,7 +42,7 @@ final class UnwrapStrReplaceTest extends AbstractMutatorTestCase
     /**
      * @dataProvider provideMutationCases
      */
-    public function testMutator($input, $expected = null): void
+    public function test_mutator($input, $expected = null): void
     {
         $this->doTest($input, $expected);
     }
@@ -68,7 +68,8 @@ PHP
 <?php
 
 $a = str_replace('X', 'Y', \Class_With_Const::Const);
-PHP,
+PHP
+            ,
             <<<'PHP'
 <?php
 
@@ -115,7 +116,8 @@ PHP
 <?php
 
 $a = sTr_RepLace('Afternoon', 'Evening' ,'Good Afternoon!');
-PHP,
+PHP
+            ,
             <<<'PHP'
 <?php
 
@@ -155,12 +157,12 @@ $a = array_reduce($words, function (string $carry, string $item) {
 PHP
         ];
 
-        yield 'It does not mutate other str* calls' => [
+        yield 'It does not mutate other str_ calls' => [
             <<<'PHP'
 <?php
 
 $a = str_ireplace('Afternoon', 'Evening' ,'Good Afternoon!');
-PHP,
+PHP
         ];
 
         yield 'It does not mutate functions named str_replace' => [
