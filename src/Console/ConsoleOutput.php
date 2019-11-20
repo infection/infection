@@ -90,10 +90,6 @@ final class ConsoleOutput
 
     public function logMinMsiCanGetIncreasedNotice(MetricsCalculator $metricsCalculator, float $minMsi, string $type): void
     {
-        if (!$minMsi) {
-            throw MsiCalculationException::create('min-msi');
-        }
-
         $typeString = ($type === TestRunConstraintChecker::MSI_FAILURE ? 'MSI' : 'Covered Code MSI');
 
         $msi = ($type === TestRunConstraintChecker::MSI_FAILURE ?
