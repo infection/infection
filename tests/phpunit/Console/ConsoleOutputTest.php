@@ -123,4 +123,24 @@ final class ConsoleOutputTest extends TestCase
         $consoleOutput = new ConsoleOutput($io);
         $consoleOutput->logNotInControlOfExitCodes();
     }
+
+    public function test_log_min_msi_can_get_increased_notice(): void
+    {
+        $actualMsi = 10.0;
+        $minMsi = 5.0;
+        $msiDifference = $actualMsi - $minMsi;
+
+        $io = $this->createMock(SymfonyStyle::class);
+        $io->expects($this->once())->method('note')
+            ->with(
+                'The Covered Code MSI is ' . $msiDifference . '% percent points over the required Covered Code MSI. ' .
+                'Consider increasing the required Covered Code MSI percentage the next time you run infection.');
+        $metricsCalculator = $this->createMock(MetricsCalculator::class);
+
+        $metricsCalculator->expects($this->once())->method('getCoveredCodeMutationScoreIndicator')
+            ->willReturn($actualMsi);
+
+        $consoleOutput = new ConsoleOutput($io);
+        $consoleOutput->logMinMsiCanGetIncreasedNotice($metricsCalculator, $minMsi, '');
+    }
 }
