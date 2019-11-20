@@ -119,13 +119,6 @@ final class Application extends BaseApplication
         return parent::run($input, $output);
     }
 
-    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
-    {
-        $output->writeln([self::LOGO, $this->getLongVersion()]);
-
-        return parent::doRunCommand($command, $input, $output);
-    }
-
     public function getContainer(): InfectionContainer
     {
         return $this->container;
@@ -134,6 +127,13 @@ final class Application extends BaseApplication
     public function getConsoleOutput(): InfectionConsoleOutput
     {
         return $this->consoleOutput;
+    }
+
+    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln([self::LOGO, $this->getLongVersion()]);
+
+        return parent::doRunCommand($command, $input, $output);
     }
 
     protected function getDefaultCommands()
