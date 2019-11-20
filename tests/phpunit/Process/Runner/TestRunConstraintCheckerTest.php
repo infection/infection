@@ -221,13 +221,14 @@ final class TestRunConstraintCheckerTest extends TestCase
             $minCoveredMsi
         );
 
-        $this->assertEquals($expected, $constraintChecker->isMsiOverMinimumMsi($type));
+        $this->assertSame($expected, $constraintChecker->isMsiOverMinimumMsi($type));
     }
 
     public function is_msi_over_minimum_msi_provider(): array
     {
         $minMsi = 10.0;
         $minCoveredMsi = 10.0;
+
         return [
             [
                 'actualMsi' => $minMsi + 1.0,
