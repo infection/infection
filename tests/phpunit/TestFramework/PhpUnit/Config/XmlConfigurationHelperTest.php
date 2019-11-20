@@ -453,7 +453,7 @@ XML
     /**
      * @dataProvider schemaProvider
      *
-     * @group integration
+     * @group integration Might require an external connection to download the XSD
      */
     public function test_it_validates_xml_by_xsd(string $xsdSchema): void
     {
@@ -489,7 +489,7 @@ XML
     /**
      * @dataProvider schemaProvider
      *
-     * @group integration
+     * @group integration Might require an external connection to download the XSD
      */
     public function test_it_passes_validation_by_xsd(string $xsdSchema): void
     {
