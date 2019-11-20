@@ -202,4 +202,82 @@ final class TestRunConstraintCheckerTest extends TestCase
 
         $this->assertTrue($constraintChecker->hasTestRunPassedConstraints());
     }
+
+    /** @dataProvider is_msi_over_minimum_msi_provider */
+    public function test_is_msi_over_minimum_msi(?float $actualMsi, ?float $actualCoveredMsi, float $minMsi, float $minCoveredMsi, string $type, bool $expected): void
+    {
+        $metrics = $this->createMock(MetricsCalculator::class);
+
+        if ($actualMsi !== null) {
+            $metrics->expects($this->once())->method('getMutationScoreIndicator')->willReturn($actualMsi);
+        }
+        if ($actualCoveredMsi !== null) {
+            $metrics->expects($this->once())->method('getCoveredCodeMutationScoreIndicator')->willReturn($actualCoveredMsi);
+        }
+        $constraintChecker = new TestRunConstraintChecker(
+            $metrics,
+            false,
+            $minMsi,
+            $minCoveredMsi
+        );
+
+        $this->assertEquals($expected, $constraintChecker->isMsiOverMinimumMsi($type));
+    }
+
+    public function is_msi_over_minimum_msi_provider(): array
+    {
+        $minMsi = 10.0;
+        $minCoveredMsi = 10.0;
+        return [
+            [
+                'actualMsi' => $minMsi + 1.0,
+                'actualCoveredMsi' => null,
+                'minMsi' => $minMsi,
+                'minCoveredMsi' => $minCoveredMsi,
+                'type' => TestRunConstraintChecker::MSI_FAILURE,
+                'expected' => true,
+            ],
+            [
+                'actualMsi' => $minMsi,
+                'actualCoveredMsi' => null,
+                'minMsi' => $minMsi,
+                'minCoveredMsi' => $minCoveredMsi,
+                'type' => TestRunConstraintChecker::MSI_FAILURE,
+                'expected' => false,
+            ],
+            [
+                'actualMsi' => $minMsi - 1.0,
+                'actualCoveredMsi' => null,
+                'minMsi' => $minMsi,
+                'minCoveredMsi' => $minCoveredMsi,
+                'type' => TestRunConstraintChecker::MSI_FAILURE,
+                'expected' => false,
+            ],
+
+            [
+                'actualMsi' => null,
+                'actualCoveredMsi' => $minCoveredMsi + 1.0,
+                'minMsi' => $minMsi,
+                'minCoveredMsi' => $minCoveredMsi,
+                'type' => '',
+                'expected' => true,
+            ],
+            [
+                'actualMsi' => null,
+                'actualCoveredMsi' => $minCoveredMsi,
+                'minMsi' => $minMsi,
+                'minCoveredMsi' => $minCoveredMsi,
+                'type' => '',
+                'expected' => false,
+            ],
+            [
+                'actualMsi' => null,
+                'actualCoveredMsi' => $minCoveredMsi - 1.0,
+                'minMsi' => $minMsi,
+                'minCoveredMsi' => $minCoveredMsi,
+                'type' => '',
+                'expected' => false,
+            ],
+        ];
+    }
 }
