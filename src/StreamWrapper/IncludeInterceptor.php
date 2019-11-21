@@ -290,15 +290,19 @@ final class IncludeInterceptor
         switch ($option) {
             case STREAM_OPTION_BLOCKING:
                 stream_set_blocking($this->fp, (bool) $arg1);
+
                 break;
             case STREAM_OPTION_READ_TIMEOUT:
                 stream_set_timeout($this->fp, $arg1, $arg2);
+
                 break;
             case STREAM_OPTION_WRITE_BUFFER:
                 stream_set_write_buffer($this->fp, $arg1);
+
                 break;
             case STREAM_OPTION_READ_BUFFER:
                 stream_set_read_buffer($this->fp, $arg1);
+
                 break;
         }
 
