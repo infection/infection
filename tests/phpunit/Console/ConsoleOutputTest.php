@@ -38,6 +38,7 @@ namespace Infection\Tests\Console;
 use Infection\Console\ConsoleOutput;
 use Infection\Mutant\Exception\MsiCalculationException;
 use Infection\Mutant\MetricsCalculator;
+use Infection\Process\Runner\TestRunConstraintChecker;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -124,7 +125,27 @@ final class ConsoleOutputTest extends TestCase
         $consoleOutput->logNotInControlOfExitCodes();
     }
 
-    public function test_log_min_msi_can_get_increased_notice(): void
+    public function test_log_min_msi_can_get_increased_notice_for_msi(): void
+    {
+        $actualMsi = 10.0;
+        $minMsi = 5.0;
+        $msiDifference = $actualMsi - $minMsi;
+
+        $io = $this->createMock(SymfonyStyle::class);
+        $io->expects($this->once())->method('note')
+            ->with(
+                'The MSI is ' . $msiDifference . '% percent points over the required MSI. ' .
+                'Consider increasing the required MSI percentage the next time you run infection.');
+        $metricsCalculator = $this->createMock(MetricsCalculator::class);
+
+        $metricsCalculator->expects($this->once())->method('getMutationScoreIndicator')
+            ->willReturn($actualMsi);
+
+        $consoleOutput = new ConsoleOutput($io);
+        $consoleOutput->logMinMsiCanGetIncreasedNotice($metricsCalculator, $minMsi, TestRunConstraintChecker::MSI_FAILURE);
+    }
+
+    public function test_log_min_msi_can_get_increased_notice_for_covered_msi(): void
     {
         $actualMsi = 10.0;
         $minMsi = 5.0;
@@ -141,6 +162,6 @@ final class ConsoleOutputTest extends TestCase
             ->willReturn($actualMsi);
 
         $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logMinMsiCanGetIncreasedNotice($metricsCalculator, $minMsi, '');
+        $consoleOutput->logMinMsiCanGetIncreasedNotice($metricsCalculator, $minMsi, TestRunConstraintChecker::COVERED_MSI_FAILURE);
     }
 }
