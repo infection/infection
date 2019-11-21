@@ -52,6 +52,7 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\VersionParser;
 use function Safe\file_get_contents;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -167,8 +168,7 @@ final class Factory
 
         if ($adapterName === TestFrameworkTypes::CODECEPTION) {
             $codeceptionConfigPath = $this->configLocator->locate(TestFrameworkTypes::CODECEPTION);
-            $codeceptionConfigContent = file_get_contents($codeceptionConfigPath);
-            $codeceptionConfigContentParsed = Yaml::parse($codeceptionConfigContent);
+            $codeceptionConfigContentParsed = $this->parseYaml($codeceptionConfigPath);
 
             return new CodeceptionAdapter(
                 (new TestFrameworkFinder(CodeceptionAdapter::EXECUTABLE))->find(),
@@ -189,5 +189,21 @@ final class Factory
             $adapterName,
             implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC])
         ));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function parseYaml(string $codeceptionConfigPath): array
+    {
+        $codeceptionConfigContent = file_get_contents($codeceptionConfigPath);
+
+        try {
+            $codeceptionConfigContentParsed = Yaml::parse($codeceptionConfigContent);
+        } catch (ParseException $e) {
+            throw TestFrameworkConfigParseException::fromPath($codeceptionConfigPath, $e);
+        }
+
+        return $codeceptionConfigContentParsed;
     }
 }
