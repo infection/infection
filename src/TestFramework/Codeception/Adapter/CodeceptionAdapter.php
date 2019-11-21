@@ -44,9 +44,9 @@ use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Utils\VersionParser;
+use function Safe\file_put_contents;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
-use function Safe\file_put_contents;
 
 /**
  * @internal

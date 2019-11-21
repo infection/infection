@@ -38,7 +38,6 @@ namespace Infection\Tests\TestFramework\Codeception\Adapter;
 use Infection\Mutant\MutantInterface;
 use Infection\MutationInterface;
 use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
-use Infection\TestFramework\Codeception\Stringifier;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;

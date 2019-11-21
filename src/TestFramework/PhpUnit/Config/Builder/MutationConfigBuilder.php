@@ -71,8 +71,13 @@ class MutationConfigBuilder extends ConfigBuilder
      */
     private $jUnitTestCaseSorter;
 
-    public function __construct(string $tempDirectory, string $originalXmlConfigContent, XmlConfigurationHelper $xmlConfigurationHelper, string $projectDir, JUnitTestCaseSorter $jUnitTestCaseSorter)
-    {
+    public function __construct(
+        string $tempDirectory,
+        string $originalXmlConfigContent,
+        XmlConfigurationHelper $xmlConfigurationHelper,
+        string $projectDir,
+        JUnitTestCaseSorter $jUnitTestCaseSorter
+    ) {
         $this->tempDirectory = $tempDirectory;
         $this->projectDir = $projectDir;
 

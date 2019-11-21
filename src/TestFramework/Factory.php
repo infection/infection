@@ -38,7 +38,6 @@ namespace Infection\TestFramework;
 use Infection\Configuration\Configuration;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
-use Infection\TestFramework\Codeception\Stringifier;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
@@ -177,7 +176,6 @@ final class Factory
                 $this->versionParser,
                 new JUnitTestCaseSorter(),
                 $this->filesystem,
-                new Stringifier(),
                 $this->jUnitFilePath,
                 $this->tmpDir,
                 $this->projectDir,
