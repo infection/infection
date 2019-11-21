@@ -41,23 +41,11 @@ use PHPUnit\Framework\TestCase;
 final class StringifierTest extends TestCase
 {
     /**
-     * @var Stringifier
-     */
-    private $stringifier;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->stringifier = new Stringifier();
-    }
-
-    /**
      * @dataProvider provideBooleanStrings
      */
     public function test_stringify_boolean(bool $boolean, string $expectedStringBoolean): void
     {
-        $this->assertSame($expectedStringBoolean, $this->stringifier->stringifyBoolean($boolean));
+        $this->assertSame($expectedStringBoolean, Stringifier::stringifyBoolean($boolean));
     }
 
     /**
@@ -65,7 +53,7 @@ final class StringifierTest extends TestCase
      */
     public function test_stringify_array_of_strings(array $arrayOfStrings, string $expectedStringArray): void
     {
-        $this->assertSame($expectedStringArray, $this->stringifier->stringifyArray($arrayOfStrings));
+        $this->assertSame($expectedStringArray, Stringifier::stringifyArray($arrayOfStrings));
     }
 
     public function test_stringify_array_of_strings_works_only_with_array_of_strings(): void
@@ -74,7 +62,7 @@ final class StringifierTest extends TestCase
 
         $arrayOfInts = [1, 2, 3];
 
-        $this->stringifier->stringifyArray($arrayOfInts);
+        Stringifier::stringifyArray($arrayOfInts);
     }
 
     public function provideBooleanStrings(): \Generator

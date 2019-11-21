@@ -42,7 +42,11 @@ use Webmozart\Assert\Assert;
  */
 final class Stringifier
 {
-    public function stringifyBoolean(bool $value): string
+    private function __construct()
+    {
+    }
+
+    public static function stringifyBoolean(bool $value): string
     {
         return $value ? 'true' : 'false';
     }
@@ -50,7 +54,7 @@ final class Stringifier
     /**
      * @param string[] $arrayOfStrings
      */
-    public function stringifyArray(array $arrayOfStrings): string
+    public static function stringifyArray(array $arrayOfStrings): string
     {
         Assert::allString($arrayOfStrings);
 

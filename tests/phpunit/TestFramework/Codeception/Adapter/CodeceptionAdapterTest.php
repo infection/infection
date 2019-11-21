@@ -354,7 +354,6 @@ final class CodeceptionAdapterTest extends TestCase
             $versionParser,
             new JUnitTestCaseSorter(),
             $this->fileSystem,
-            new Stringifier(),
             'path/to/junit',
             $this->tmpDir,
             $this->pathToProject,

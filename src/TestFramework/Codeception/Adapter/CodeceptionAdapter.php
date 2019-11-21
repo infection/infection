@@ -46,6 +46,7 @@ use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Utils\VersionParser;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
+use function Safe\file_put_contents;
 
 /**
  * @internal
@@ -111,11 +112,6 @@ final class CodeceptionAdapter implements TestFrameworkAdapter, MemoryUsageAware
     private $cachedVersion;
 
     /**
-     * @var Stringifier
-     */
-    private $stringifier;
-
-    /**
      * @var string[]
      */
     private $srcDirs;
@@ -126,7 +122,6 @@ final class CodeceptionAdapter implements TestFrameworkAdapter, MemoryUsageAware
         VersionParser $versionParser,
         JUnitTestCaseSorter $jUnitTestCaseSorter,
         Filesystem $filesystem,
-        Stringifier $stringifier,
         string $jUnitFilePath,
         string $tmpDir,
         string $projectDir,
@@ -142,7 +137,6 @@ final class CodeceptionAdapter implements TestFrameworkAdapter, MemoryUsageAware
         $this->filesystem = $filesystem;
         $this->projectDir = $projectDir;
         $this->originalConfigContentParsed = $originalConfigContentParsed;
-        $this->stringifier = $stringifier;
         $this->srcDirs = $srcDirs;
     }
 
@@ -205,7 +199,7 @@ final class CodeceptionAdapter implements TestFrameworkAdapter, MemoryUsageAware
                     '-o',
                     "paths: output: {$this->tmpDir}",
                     '-o',
-                    sprintf('coverage: enabled: %s', $this->stringifier->stringifyBoolean(!$skipCoverage)),
+                    sprintf('coverage: enabled: %s', Stringifier::stringifyBoolean(!$skipCoverage)),
                     '-o',
                     sprintf('coverage: include: %s', $this->getCoverageIncludeFiles($skipCoverage)),
                     '-o',
@@ -376,7 +370,7 @@ AUTOLOAD;
     {
         // if coverage should be skipped, this anyway will be ignored, return early
         if ($skipCoverage) {
-            return $this->stringifier->stringifyArray([]);
+            return Stringifier::stringifyArray([]);
         }
 
         $coverage = array_merge($this->originalConfigContentParsed['coverage'] ?? [], ['enabled' => true]);
@@ -390,6 +384,6 @@ AUTOLOAD;
                 $this->srcDirs
             );
 
-        return $this->stringifier->stringifyArray($includedFiles);
+        return Stringifier::stringifyArray($includedFiles);
     }
 }
