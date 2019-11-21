@@ -159,8 +159,7 @@ final class InfectionCommand extends BaseCommand
                 'coverage',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Path to existing coverage (`xml` and `junit` reports are required)',
-                ''
+                'Path to existing coverage (`xml` and `junit` reports are required)'
             )
             ->addOption(
                 'mutators',
@@ -255,7 +254,7 @@ final class InfectionCommand extends BaseCommand
         }
 
         $this->consoleOutput = $this->getApplication()->getConsoleOutput();
-        $this->skipCoverage = \strlen(trim($input->getOption('coverage'))) > 0;
+        $this->skipCoverage = trim((string) $input->getOption('coverage')) !== '';
         $this->eventDispatcher = $this->container['dispatcher'];
     }
 
@@ -421,15 +420,17 @@ final class InfectionCommand extends BaseCommand
     {
         $bootstrap = $config->getBootstrap();
 
-        if ($bootstrap) {
-            if (!file_exists($bootstrap)) {
-                throw FileNotFound::fromFileName($bootstrap, [__DIR__]);
-            }
-
-            (function ($infectionBootstrapFile): void {
-                require_once $infectionBootstrapFile;
-            })($bootstrap);
+        if ('' === $bootstrap) {
+            return;
         }
+
+        if (!file_exists($bootstrap)) {
+            throw FileNotFound::fromFileName($bootstrap, [__DIR__]);
+        }
+
+        (static function ($infectionBootstrapFile): void {
+            require_once $infectionBootstrapFile;
+        })($bootstrap);
     }
 
     private function getCodeCoverageData(string $testFrameworkKey): LineCodeCoverage
