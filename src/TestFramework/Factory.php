@@ -180,7 +180,7 @@ final class Factory
                 $this->tmpDir,
                 $this->projectDir,
                 $codeceptionConfigContentParsed,
-                $this->infectionConfig->getSourceDirs()
+                $this->infectionConfig->getSource()->getDirectories()
             );
         }
 
