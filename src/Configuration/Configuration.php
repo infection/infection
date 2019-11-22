@@ -38,6 +38,7 @@ namespace Infection\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\TestFramework\TestFrameworkTypes;
 use Webmozart\Assert\Assert;
 
 /**
@@ -50,11 +51,6 @@ class Configuration
         'all',
         'none',
         'default',
-    ];
-
-    private const TEST_FRAMEWORKS = [
-        'phpunit',
-        'phpspec',
     ];
 
     private const FORMATTER = [
@@ -109,7 +105,7 @@ class Configuration
     ) {
         Assert::nullOrGreaterThanEq($timeout, 1);
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
-        Assert::nullOrOneOf($testFramework, self::TEST_FRAMEWORKS);
+        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
         Assert::oneOf($formatter, self::FORMATTER);
         Assert::nullOrGreaterThanEq($minMsi, 0.);
 

@@ -38,6 +38,7 @@ namespace Infection\Configuration\Schema;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\TestFramework\TestFrameworkTypes;
 use Webmozart\Assert\Assert;
 
 /**
@@ -45,11 +46,6 @@ use Webmozart\Assert\Assert;
  */
 final class SchemaConfiguration
 {
-    private const TEST_FRAMEWORKS = [
-        'phpunit',
-        'phpspec',
-    ];
-
     private $file;
     private $timeout;
     private $source;
@@ -76,7 +72,7 @@ final class SchemaConfiguration
         ?string $testFrameworkOptions
     ) {
         Assert::nullOrGreaterThanEq($timeout, 1);
-        Assert::nullOrOneOf($testFramework, self::TEST_FRAMEWORKS);
+        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
 
         $this->file = $file;
         $this->timeout = $timeout;
