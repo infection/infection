@@ -76,42 +76,30 @@ final class FileNotFoundTest extends TestCase
         $this->assertNull($exception->getPrevious());
     }
 
-    public function test_multiple_files_do_not_exist(): void
-    {
-        $exception = FileNotFound::multipleFilesDoNotExist('foo/bar/', ['file1', 'file2']);
-
-        $this->assertSame(
-            'The path "foo/bar/" does not contain any of the requested files: "file1", "file2"',
-            $exception->getMessage()
-        );
-        $this->assertSame(0, $exception->getCode());
-        $this->assertNull($exception->getPrevious());
-    }
-
     public function nonExistentPathsProvider(): Generator
     {
         yield [
             'unknown',
             [],
-            'Could not locate the file/directory "unknown".',
+            'Could not locate the file "unknown".',
         ];
 
         yield [
             '/unknown',
             [],
-            'Could not locate the file/directory "/unknown".',
+            'Could not locate the file "/unknown".',
         ];
 
         yield [
             'unknown',
             ['root'],
-            'Could not locate the file/directory "unknown" in "root".',
+            'Could not locate the file "unknown" in "root".',
         ];
 
         yield [
             'unknown',
             ['root1', 'root2'],
-            'Could not locate the file/directory "unknown" in "root1", "root2".',
+            'Could not locate the file "unknown" in "root1", "root2".',
         ];
     }
 

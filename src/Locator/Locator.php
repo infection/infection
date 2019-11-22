@@ -43,7 +43,7 @@ interface Locator
     /**
      * Determine the realpath of the given file or directory located.
      *
-     * @throws FileNotFound
+     * @throws FileNotFound|FileOrDirectoryNotFound
      */
     public function locate(string $fileName): string;
 
@@ -52,7 +52,7 @@ interface Locator
      *
      * @param string[] $fileNames
      *
-     * @throws FileNotFound
+     * @throws FileNotFound|FileOrDirectoryNotFound
      */
     public function locateOneOf(array $fileNames): string;
 }

@@ -33,42 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config;
+namespace Infection\Configuration\Schema;
 
-use Infection\Logger\ResultsLoggerTypes;
-use Symfony\Component\Filesystem\Exception\IOException;
+use function array_map;
+use JsonSchema\Validator;
+use const PHP_EOL;
 
 /**
- * @internal
+ * @final
  */
-final class Validator
+class SchemaValidator
 {
-    public function validate(InfectionConfig $infectionConfig): bool
+    private const SCHEMA_FILE = __DIR__ . '/../../../resources/schema.json';
+
+    /**
+     * @throws InvalidSchema
+     */
+    public function validate(SchemaConfigurationFile $rawConfig): void
     {
-        $this->validateLogFilePaths($infectionConfig);
+        $validator = new Validator();
 
-        return true;
-    }
+        $schemaFile = self::SCHEMA_FILE;
 
-    private function validateLogFilePaths(InfectionConfig $config): void
-    {
-        $logTypes = $config->getLogsTypes();
-
-        foreach ($logTypes as $logType => $file) {
-            if ($logType === ResultsLoggerTypes::BADGE) {
-                continue;
-            }
-
-            $dir = \dirname($file);
-
-            if (is_dir($dir) && !is_writable($dir)) {
-                throw new IOException(
-                    sprintf('Unable to write to the "%s" directory. Check "logs.%s" file path in infection.json.', $dir, $logType),
-                    0,
-                    null,
-                    $dir
-                );
-            }
+        // Prepend with file:// only when not using a special schema already (e.g. in the PHAR)
+        if (false === strpos($schemaFile, '://')) {
+            $schemaFile = 'file://' . $schemaFile;
         }
+
+        $contents = $rawConfig->getDecodedContents();
+
+        $validator->validate($contents, (object) ['$ref' => $schemaFile]);
+
+        if ($validator->isValid()) {
+            return;
+        }
+
+        $errors = array_map(
+            static function (array $error): string {
+                return sprintf('[%s] %s%s', $error['property'], $error['message'], PHP_EOL);
+            },
+            $validator->getErrors()
+        );
+
+        throw InvalidSchema::create($rawConfig, $errors);
     }
 }

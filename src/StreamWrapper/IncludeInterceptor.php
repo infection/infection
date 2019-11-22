@@ -65,15 +65,11 @@ final class IncludeInterceptor
     public static function intercept($file, $with): void
     {
         if (!file_exists($file)) {
-            throw new \InvalidArgumentException(
-                'File to intercept and replace does not exist: ' . $file
-            );
+            throw new \InvalidArgumentException('File to intercept and replace does not exist: ' . $file);
         }
 
         if (!file_exists($with)) {
-            throw new \InvalidArgumentException(
-                'File to replace intercepted file with does not exist: ' . $file
-            );
+            throw new \InvalidArgumentException('File to replace intercepted file with does not exist: ' . $file);
         }
         self::$intercept = $file;
         self::$replacement = $with;
@@ -82,9 +78,7 @@ final class IncludeInterceptor
     public static function enable(): void
     {
         if (!isset(self::$intercept) || !isset(self::$replacement)) {
-            throw new \RuntimeException(
-                'Set a file to intercept and its replacement before enabling wrapper'
-            );
+            throw new \RuntimeException('Set a file to intercept and its replacement before enabling wrapper');
         }
         stream_wrapper_unregister('file');
         stream_wrapper_register('file', __CLASS__);

@@ -8,4 +8,4 @@ parameters:
         -
             path: '%currentWorkingDirectory%/src/Process/Runner/Parallel/ParallelProcessRunner.php'
             message: '#Left side of [\&]{2} is always true#'
-
+        - '#Method Infection\Configuration\Schema\SchemaConfigurationFile::getDecodedContents() should return stdClass but returns stdClass|null.#'

@@ -33,55 +33,67 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\resources;
+namespace Infection\Locator;
 
-use Helmich\JsonAssert\JsonAssertions;
-use PHPUnit\Framework\TestCase;
+use function implode;
+use RuntimeException;
+use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
-final class InfectionConfigJsonSchemaTest extends TestCase
+/**
+ * @internal
+ */
+final class FileOrDirectoryNotFound extends RuntimeException
 {
-    use JsonAssertions;
+    /**
+     * @param string[] $roots
+     */
+    public static function fromFileName(string $file, array $roots): self
+    {
+        Assert::allString($roots);
 
-    private const SCHEMA_FILE = __DIR__ . '/../../../resources/schema.json';
+        return new self(sprintf(
+            'Could not locate the file/directory "%s"%s.',
+            $file,
+            [] === $roots
+                ? ''
+                : sprintf(' in "%s"', implode('", "', $roots))
+        ));
+    }
 
     /**
-     * @var array|null
+     * @deprecated
      */
-    private static $schema;
+    public static function multipleFilesDoNotExist(string $path, array $files): self
+    {
+        return new self(
+            sprintf(
+                'The path "%s" does not contain any of the requested files: "%s"',
+                $path,
+                implode('", "', $files)
+            )
+        );
+    }
 
     /**
-     * @dataProvider mutatorsProvider
+     * @param string[] $files
+     * @param string[] $roots
      */
-    public function test_all_mutators_support_ignore_key(string $mutator): void
+    public static function fromFiles(array $files, array $roots): self
     {
-        $infectionJson = <<<"JSON"
-{
-    "timeout": 1,
-    "source": {"directories": ["src"]},
-    "mutators": {
-        "$mutator": {
-            "ignore": ["Foo\\\\Bar::baz"]
-        }
-    }
-}
-JSON;
+        Assert::allString($files);
+        Assert::allString($roots);
 
-        self::assertJsonDocumentMatchesSchema($infectionJson, self::getSchema());
-    }
-
-    public function mutatorsProvider(): \Generator
-    {
-        foreach (array_keys(self::getSchema()['properties']['mutators']['properties']) as $mutator) {
-            yield $mutator => [$mutator];
-        }
-    }
-
-    private static function getSchema()
-    {
-        if (self::$schema !== null) {
-            return self::$schema;
-        }
-
-        return self::$schema = json_decode(file_get_contents(self::SCHEMA_FILE), true);
+        return new self(
+            [] === $files
+                ? 'Could not locate any files (no file provided).'
+                : sprintf(
+                    'Could not locate the files "%s"%s',
+                    implode('", "', $files),
+                    [] === $roots
+                        ? ''
+                        : sprintf(' in "%s"', implode('", "', $roots))
+                )
+        );
     }
 }

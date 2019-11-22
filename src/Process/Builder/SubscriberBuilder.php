@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Builder;
 
-use Infection\Config\InfectionConfig;
+use Infection\Configuration\Configuration;
 use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
@@ -112,7 +112,7 @@ final class SubscriberBuilder
     private $diffColorizer;
 
     /**
-     * @var InfectionConfig
+     * @var Configuration
      */
     private $infectionConfig;
 
@@ -151,7 +151,7 @@ final class SubscriberBuilder
         MetricsCalculator $metricsCalculator,
         EventDispatcherInterface $eventDispatcher,
         DiffColorizer $diffColorizer,
-        InfectionConfig $infectionConfig,
+        Configuration $infectionConfig,
         Filesystem $fs,
         string $tmpDir,
         Timer $timer,

@@ -40,6 +40,8 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
+ *
+ * @deprecated Should use {@see \Infection\Configuration\Configuration} instead
  */
 class InfectionConfig
 {

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use Infection\Config\InfectionConfig;
+use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Exception\InfectionException;
@@ -44,7 +45,7 @@ use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\ApplicationExecutionFinished;
 use Infection\Events\ApplicationExecutionStarted;
-use Infection\Locator\FileNotFound;
+use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\Locator\Locator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\Generator\MutationsGenerator;
@@ -64,6 +65,9 @@ use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
+use function is_numeric;
+use function Safe\sprintf;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -266,12 +270,12 @@ final class InfectionCommand extends BaseCommand
             throw CoverageDoesNotExistException::unableToGenerate();
         }
 
-        /** @var InfectionConfig $config */
-        $config = $this->container['infection.config'];
+        /** @var Configuration $config */
+        $config = $this->container[Configuration::class];
 
         $this->includeUserBootstrap($config);
 
-        $this->testFrameworkKey = trim((string) $this->input->getOption('test-framework') ?: $config->getTestFramework());
+        $this->testFrameworkKey = $config->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
         $this->testFrameworkOptions = $this->getTestFrameworkExtraOptions($this->testFrameworkKey);
         $adapter = $this->container['test.framework.factory']->create($this->testFrameworkKey, $this->skipCoverage);
 
@@ -286,17 +290,17 @@ final class InfectionCommand extends BaseCommand
 
     private function runInitialTestSuite(AbstractTestFrameworkAdapter $adapter): void
     {
-        /** @var InfectionConfig $config */
-        $config = $this->container['infection.config'];
+        /** @var Configuration $config */
+        $config = $this->container[Configuration::class];
 
         $processBuilder = new InitialTestRunProcessBuilder($adapter);
 
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
-        $initialTestsPhpOptions = trim((string) $this->input->getOption('initial-tests-php-options') ?: $config->getInitialTestsPhpOptions());
+
         $initialTestSuitProcess = $initialTestsRunner->run(
             $this->testFrameworkOptions->getForInitialProcess(),
             $this->skipCoverage,
-            explode(' ', $initialTestsPhpOptions)
+            explode(' ', (string) $config->getInitialTestsPhpOptions())
         );
 
         if (!$initialTestSuitProcess->isSuccessful()) {
@@ -310,15 +314,16 @@ final class InfectionCommand extends BaseCommand
 
     private function runMutationTesting(AbstractTestFrameworkAdapter $adapter): void
     {
-        /** @var InfectionConfig $config */
-        $config = $this->container['infection.config'];
+        /** @var Configuration $config */
+        $config = $this->container[Configuration::class];
 
         $processBuilder = new MutantProcessBuilder($adapter, $config->getProcessTimeout());
 
         $codeCoverageData = $this->getCodeCoverageData($this->testFrameworkKey);
+
         $mutationsGenerator = new MutationsGenerator(
-            $config->getSourceDirs(),
-            $config->getSourceExcludePaths(),
+            $config->getSource()->getDirectories(),
+            $config->getSource()->getExcludes(),
             $codeCoverageData,
             $this->container['mutators'],
             $this->eventDispatcher,
@@ -367,58 +372,63 @@ final class InfectionCommand extends BaseCommand
 
     private function initContainer(InputInterface $input): void
     {
-        /** @var string|null $configFile */
-        $configFile = $input->hasOption('configuration')
-            ? trim((string) $input->getOption('configuration'))
-            : null
-        ;
+        // Currently the configuration is mandatory hence there is no way to
+        // say "do not use a config". If this becomes possible in the future
+        // though, it will likely be a `--no-config` option rather than relying
+        // on this value to be set to an empty string.
+        $configFile = trim((string) $input->getOption('configuration'));
 
-        if ($configFile === '') {
-            $configFile = null;
+        $coverage = trim((string) $input->getOption('coverage'));
+        $testFramework = trim((string) $this->input->getOption('test-framework'));
+        $testFrameworkOptions = trim((string) $this->input->getOption('test-framework-options'));
+        $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options'));
+
+        $minMsi = $input->getOption('min-msi');
+
+        if (null !== $minMsi && !is_numeric($minMsi)) {
+            throw new InvalidArgumentException(sprintf('Expected min-msi to be a float. Got "%s"', $minMsi));
         }
 
-        /** @var string|null $mutators */
-        $mutators = $input->hasOption('mutators')
-            ? trim((string) $input->getOption('mutators'))
-            : null
-        ;
+        $minCoveredMsi = $input->getOption('min-covered-msi');
 
-        if ($mutators === '') {
-            $mutators = null;
+        if (null !== $minCoveredMsi && !is_numeric($minCoveredMsi)) {
+            throw new InvalidArgumentException(sprintf('Expected min-covered-msi to be a float. Got "%s"', $minCoveredMsi));
         }
+
+        $mutators = trim((string) $input->getOption('mutators'));
 
         $this->container = $this->getApplication()->getContainer()->withDynamicParameters(
-            $configFile,
-            $mutators,
-            (bool) $input->getOption('show-mutations'),
+            '' === $configFile ? null : $configFile,
+            '' === $mutators ? null : $mutators,
+            $input->getOption('show-mutations'),
             trim((string) $input->getOption('log-verbosity')),
-            (bool) $input->getOption('debug'),
-            (bool) $input->getOption('only-covered'),
-            (string) $input->getOption('formatter'),
-            (bool) $input->getOption('no-progress'),
-            $input->hasOption('coverage')
-                ? trim((string) $input->getOption('coverage'))
-                : '',
-            trim((string) $input->getOption('initial-tests-php-options') ?: ''),
-            (bool) $input->getOption('ignore-msi-with-no-mutations'),
-            (float) $input->getOption('min-msi'),
-            (float) $input->getOption('min-covered-msi')
+            $input->getOption('debug'),
+            $input->getOption('only-covered'),
+            trim((string) $input->getOption('formatter')),
+            $input->getOption('no-progress'),
+            '' === $coverage ? null : $coverage,
+            '' === $initialTestsPhpOptions ? null : $initialTestsPhpOptions,
+            $input->getOption('ignore-msi-with-no-mutations'),
+            null === $minMsi ? null : (float) $minMsi,
+            null === $minCoveredMsi ? null : (float) $minCoveredMsi,
+            '' === $testFramework ? null : $testFramework,
+            '' === $testFrameworkOptions ? null : $testFrameworkOptions
         );
     }
 
-    private function includeUserBootstrap(InfectionConfig $config): void
+    private function includeUserBootstrap(Configuration $config): void
     {
         $bootstrap = $config->getBootstrap();
 
-        if ('' === $bootstrap) {
+        if (null === $bootstrap) {
             return;
         }
 
         if (!file_exists($bootstrap)) {
-            throw FileNotFound::fromFileName($bootstrap, [__DIR__]);
+            throw FileOrDirectoryNotFound::fromFileName($bootstrap, [__DIR__]);
         }
 
-        (static function ($infectionBootstrapFile): void {
+        (static function (string $infectionBootstrapFile): void {
             require_once $infectionBootstrapFile;
         })($bootstrap);
     }
@@ -436,8 +446,10 @@ final class InfectionCommand extends BaseCommand
 
     private function getTestFrameworkExtraOptions(string $testFrameworkKey): TestFrameworkExtraOptions
     {
-        $extraOptions = $this->input->getOption('test-framework-options')
-            ?? $this->container['infection.config']->getTestFrameworkOptions();
+        /** @var Configuration $config */
+        $config = $this->container[Configuration::class];
+
+        $extraOptions = $config->getTestFrameworkOptions();
 
         return TestFrameworkTypes::PHPUNIT === $testFrameworkKey
             ? new PhpUnitExtraOptions($extraOptions)
