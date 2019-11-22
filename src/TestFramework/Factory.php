@@ -108,7 +108,7 @@ final class Factory
         $this->versionParser = $versionParser;
     }
 
-    public function create(string $adapterName, bool $skipCoverage): AbstractTestFrameworkAdapter
+    public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);

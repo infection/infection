@@ -39,7 +39,7 @@ use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\InitialTestCaseCompleted;
 use Infection\Events\InitialTestSuiteFinished;
 use Infection\Events\InitialTestSuiteStarted;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\TestFrameworkAdapter;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -59,7 +59,7 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterf
     private $progressBar;
 
     /**
-     * @var AbstractTestFrameworkAdapter
+     * @var TestFrameworkAdapter
      */
     private $testFrameworkAdapter;
 
@@ -68,7 +68,7 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterf
      */
     private $debug;
 
-    public function __construct(OutputInterface $output, AbstractTestFrameworkAdapter $testFrameworkAdapter, bool $debug)
+    public function __construct(OutputInterface $output, TestFrameworkAdapter $testFrameworkAdapter, bool $debug)
     {
         $this->output = $output;
         $this->testFrameworkAdapter = $testFrameworkAdapter;

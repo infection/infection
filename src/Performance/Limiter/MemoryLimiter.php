@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Performance\Limiter;
 
 use Composer\XdebugHandler\XdebugHandler;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\MemoryUsageAware;
+use Infection\TestFramework\TestFrameworkAdapter;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
@@ -62,7 +62,7 @@ final class MemoryLimiter
         $this->iniLocation = $iniLocation;
     }
 
-    public function applyMemoryLimitFromProcess(Process $process, AbstractTestFrameworkAdapter $adapter): void
+    public function applyMemoryLimitFromProcess(Process $process, TestFrameworkAdapter $adapter): void
     {
         if (!$adapter instanceof MemoryUsageAware || $this->hasMemoryLimitSet() || $this->isUsingSystemIni()) {
             return;
