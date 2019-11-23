@@ -38,7 +38,7 @@ namespace Infection\Process;
 use Infection\Mutant\MutantInterface;
 use Infection\MutationInterface;
 use Infection\Mutator\Util\Mutator;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\TestFrameworkAdapter;
 use Symfony\Component\Process\Process;
 
 /**
@@ -78,11 +78,11 @@ final class MutantProcess implements MutantProcessInterface
     private $isTimedOut = false;
 
     /**
-     * @var AbstractTestFrameworkAdapter
+     * @var TestFrameworkAdapter
      */
     private $testFrameworkAdapter;
 
-    public function __construct(Process $process, MutantInterface $mutant, AbstractTestFrameworkAdapter $testFrameworkAdapter)
+    public function __construct(Process $process, MutantInterface $mutant, TestFrameworkAdapter $testFrameworkAdapter)
     {
         $this->process = $process;
         $this->mutant = $mutant;

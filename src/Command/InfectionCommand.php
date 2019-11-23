@@ -55,7 +55,6 @@ use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
@@ -63,6 +62,7 @@ use Infection\TestFramework\HasExtraNodeVisitors;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
+use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_numeric;
@@ -262,7 +262,7 @@ final class InfectionCommand extends BaseCommand
         $this->eventDispatcher = $this->container['dispatcher'];
     }
 
-    private function startUp(): AbstractTestFrameworkAdapter
+    private function startUp(): TestFrameworkAdapter
     {
         Assert::notNull($this->container);
 
@@ -288,7 +288,7 @@ final class InfectionCommand extends BaseCommand
         return $adapter;
     }
 
-    private function runInitialTestSuite(AbstractTestFrameworkAdapter $adapter): void
+    private function runInitialTestSuite(TestFrameworkAdapter $adapter): void
     {
         /** @var Configuration $config */
         $config = $this->container[Configuration::class];
@@ -312,7 +312,7 @@ final class InfectionCommand extends BaseCommand
         $this->container['memory.limit.applier']->applyMemoryLimitFromProcess($initialTestSuitProcess, $adapter);
     }
 
-    private function runMutationTesting(AbstractTestFrameworkAdapter $adapter): void
+    private function runMutationTesting(TestFrameworkAdapter $adapter): void
     {
         /** @var Configuration $config */
         $config = $this->container[Configuration::class];

@@ -47,7 +47,7 @@ use Symfony\Component\Process\Process;
 /**
  * @internal
  */
-abstract class AbstractTestFrameworkAdapter
+abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
 {
     /**
      * @var AbstractExecutableFinder

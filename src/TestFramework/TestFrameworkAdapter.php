@@ -33,46 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Builder;
+namespace Infection\TestFramework;
 
 use Infection\Mutant\MutantInterface;
-use Infection\Process\MutantProcess;
-use Infection\TestFramework\TestFrameworkAdapter;
-use Symfony\Component\Process\Process;
 
 /**
  * @internal
  */
-final class MutantProcessBuilder
+interface TestFrameworkAdapter
 {
-    /**
-     * @var TestFrameworkAdapter
-     */
-    private $testFrameworkAdapter;
+    public const JUNIT_FILE_NAME = 'junit.xml';
+
+    public function getName(): string;
+
+    public function testsPass(string $output): bool;
 
     /**
-     * @var int
+     * @param string[] $phpExtraArgs
+     *
+     * @return string[]
      */
-    private $timeout;
+    public function getInitialTestRunCommandLine(string $configPath, string $extraOptions, array $phpExtraArgs): array;
 
-    public function __construct(TestFrameworkAdapter $testFrameworkAdapter, int $timeout)
-    {
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
-        $this->timeout = $timeout;
-    }
+    /**
+     * @return string[]
+     */
+    public function getMutantCommandLine(string $configPath, string $extraOptions): array;
 
-    public function createProcessForMutant(MutantInterface $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
-    {
-        $process = new Process(
-            $this->testFrameworkAdapter->getMutantCommandLine(
-                $this->testFrameworkAdapter->buildMutationConfigFile($mutant),
-                $testFrameworkExtraOptions
-            )
-        );
+    public function getVersion(): string;
 
-        $process->setTimeout($this->timeout);
-        $process->inheritEnvironmentVariables();
+    public function getInitialTestsFailRecommendations(string $commandLine): string;
 
-        return new MutantProcess($process, $mutant, $this->testFrameworkAdapter);
-    }
+    public function buildInitialConfigFile();
+
+    public function buildMutationConfigFile(MutantInterface $mutant);
 }

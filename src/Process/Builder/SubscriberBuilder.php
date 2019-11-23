@@ -56,7 +56,7 @@ use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationTestingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationTestingResultsLoggerSubscriber;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\TestFrameworkAdapter;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -176,7 +176,7 @@ final class SubscriberBuilder
     }
 
     public function registerSubscribers(
-        AbstractTestFrameworkAdapter $testFrameworkAdapter,
+        TestFrameworkAdapter $testFrameworkAdapter,
         OutputInterface $output
     ): void {
         foreach ($this->getSubscribers($testFrameworkAdapter, $output) as $subscriber) {
@@ -185,7 +185,7 @@ final class SubscriberBuilder
     }
 
     private function getSubscribers(
-        AbstractTestFrameworkAdapter $testFrameworkAdapter,
+        TestFrameworkAdapter $testFrameworkAdapter,
         OutputInterface $output
     ): array {
         $subscribers = [
@@ -257,7 +257,7 @@ final class SubscriberBuilder
         return new MutationGeneratingConsoleLoggerSubscriber($output);
     }
 
-    private function getInitialTestsConsoleLoggerSubscriber(AbstractTestFrameworkAdapter $testFrameworkAdapter, OutputInterface $output): EventSubscriberInterface
+    private function getInitialTestsConsoleLoggerSubscriber(TestFrameworkAdapter $testFrameworkAdapter, OutputInterface $output): EventSubscriberInterface
     {
         if ($this->shouldSkipProgressBars()) {
             return new CiInitialTestsConsoleLoggerSubscriber($output, $testFrameworkAdapter);
