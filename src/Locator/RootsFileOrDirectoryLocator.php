@@ -70,7 +70,7 @@ final class RootsFileOrDirectoryLocator implements Locator
                 return realpath($canonicalFileName);
             }
 
-            throw FileNotFound::fromFileName($canonicalFileName, $this->roots);
+            throw FileOrDirectoryNotFound::fromFileName($canonicalFileName, $this->roots);
         }
 
         foreach ($this->roots as $path) {
@@ -81,7 +81,7 @@ final class RootsFileOrDirectoryLocator implements Locator
             }
         }
 
-        throw FileNotFound::fromFileName($canonicalFileName, $this->roots);
+        throw FileOrDirectoryNotFound::fromFileName($canonicalFileName, $this->roots);
     }
 
     public function locateOneOf(array $fileNames): string
@@ -89,7 +89,7 @@ final class RootsFileOrDirectoryLocator implements Locator
         $file = $this->innerLocateOneOf($fileNames);
 
         if ($file === null) {
-            throw FileNotFound::fromFiles($fileNames, $this->roots);
+            throw FileOrDirectoryNotFound::fromFiles($fileNames, $this->roots);
         }
 
         return $file;
@@ -103,7 +103,7 @@ final class RootsFileOrDirectoryLocator implements Locator
 
         try {
             return $this->locate(current($fileNames));
-        } catch (FileNotFound $exception) {
+        } catch (FileOrDirectoryNotFound $exception) {
             array_shift($fileNames);
 
             return $this->innerLocateOneOf($fileNames);

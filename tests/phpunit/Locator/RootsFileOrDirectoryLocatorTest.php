@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Locator;
 
 use Generator;
-use Infection\Locator\FileNotFound;
+use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use function Infection\Tests\normalizePath as p;
 use function iterator_to_array;
@@ -86,7 +86,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
             $locator->locate($file);
 
             $this->fail('Expected an exception to be thrown.');
-        } catch (FileNotFound $exception) {
+        } catch (FileOrDirectoryNotFound $exception) {
             $this->assertSame($expectedErrorMessage, $exception->getMessage());
             $this->assertSame(0, $exception->getCode());
             $this->assertNull($exception->getPrevious());
@@ -120,7 +120,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
             $locator->locateOneOf($files);
 
             $this->fail('Expected an exception to be thrown.');
-        } catch (FileNotFound $exception) {
+        } catch (FileOrDirectoryNotFound $exception) {
             $this->assertSame(
                 $expectedErrorMessage,
                 $exception->getMessage()

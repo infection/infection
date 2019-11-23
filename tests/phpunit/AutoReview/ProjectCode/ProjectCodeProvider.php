@@ -41,6 +41,12 @@ use Infection\Command\InfectionCommand;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\InfectionConfig;
+use Infection\Configuration\Configuration;
+use Infection\Configuration\ConfigurationFactory;
+use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\Schema\SchemaConfigurationFactory;
+use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
+use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Console\Application;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
@@ -121,6 +127,11 @@ final class ProjectCodeProvider
         PhpUnitMutationConfigBuilder::class,
         CoverageXmlParser::class,
         VersionParser::class,
+        SchemaConfigurationFactory::class,
+        SchemaConfigurationFileLoader::class,
+        SchemaValidator::class,
+        Configuration::class,
+        ConfigurationFactory::class,
     ];
 
     /**
@@ -129,6 +140,9 @@ final class ProjectCodeProvider
     public const EXTENSION_POINTS = [
         Mutator::class,
         OutputFormatter::class,
+        SchemaConfigurationFactory::class,
+        SchemaConfigurationFileLoader::class,
+        SchemaValidator::class,
     ];
 
     /**
@@ -162,7 +176,7 @@ final class ProjectCodeProvider
                 return sprintf(
                     '%s\\%s%s%s',
                     'Infection',
-                    strtr($file->getRelativePath(), \DIRECTORY_SEPARATOR, '\\'),
+                    str_replace(\DIRECTORY_SEPARATOR, '\\', $file->getRelativePath()),
                     $file->getRelativePath() ? '\\' : '',
                     $file->getBasename('.' . $file->getExtension())
                 );
@@ -258,7 +272,7 @@ final class ProjectCodeProvider
         $classes = array_map(
             static function (SplFileInfo $file) {
                 $fqcnPart = ltrim(str_replace('phpunit', '', $file->getRelativePath()), \DIRECTORY_SEPARATOR);
-                $fqcnPart = strtr($fqcnPart, \DIRECTORY_SEPARATOR, '\\');
+                $fqcnPart = str_replace(\DIRECTORY_SEPARATOR, '\\', $fqcnPart);
 
                 return sprintf(
                     'Infection\\Tests\\%s%s%s',

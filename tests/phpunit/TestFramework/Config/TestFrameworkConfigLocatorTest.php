@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Config;
 
-use Infection\Locator\FileNotFound;
+use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use function Infection\Tests\normalizePath as p;
 
@@ -48,7 +48,7 @@ final class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
         $dir = $this->baseDir . 'NoFiles/';
         $locator = new TestFrameworkConfigLocator($dir);
 
-        $this->expectException(FileNotFound::class);
+        $this->expectException(FileOrDirectoryNotFound::class);
         $this->expectExceptionMessage(
             sprintf(
                 'The path "%s" does not contain any of the requested files: "phpunit.xml", "phpunit.yml", "phpunit.xml.dist", "phpunit.yml.dist", "phpunit.dist.xml", "phpunit.dist.yml"',
@@ -128,7 +128,7 @@ final class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
             'Did not find the correct phpunit.xml.dist file.'
         );
 
-        $this->expectException(FileNotFound::class);
+        $this->expectException(FileOrDirectoryNotFound::class);
         $locator->locate('phpunit' . $dir . 'NoFiles/');
     }
 }

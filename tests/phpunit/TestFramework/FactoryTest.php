@@ -35,7 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
-use Infection\Config\InfectionConfig;
+use Infection\Configuration\Configuration;
+use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\Entry\Source;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
@@ -54,7 +57,35 @@ final class FactoryTest extends TestCase
             $this->createMock(TestFrameworkConfigLocatorInterface::class),
             new XmlConfigurationHelper(new PathReplacer(new Filesystem()), ''),
             '',
-            new InfectionConfig(new \stdClass(), new Filesystem(), ''),
+            new Configuration(
+                10,
+                new Source([], []),
+                new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                'default',
+                null,
+                new PhpUnit(null, null),
+                [],
+                null,
+                null,
+                null,
+                null,
+                null,
+                false,
+                false,
+                'dot',
+                false,
+                false,
+                null,
+                false,
+                null,
+                null
+            ),
             $this->createMock(VersionParser::class)
         );
 

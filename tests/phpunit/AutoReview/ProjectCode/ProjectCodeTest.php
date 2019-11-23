@@ -174,7 +174,7 @@ final class ProjectCodeTest extends TestCase
             sprintf(
                 'Expected the class "%s" to be a trait, an interface, an abstract or final '
                 . 'class. Either fix it or if it is an extension point, add it to '
-                . '%s::EXTENSION_POINTS.',
+                . '%s::NON_FINAL_EXTENSION_CLASSES.',
                 $className,
                 ProjectCodeProvider::class
             )

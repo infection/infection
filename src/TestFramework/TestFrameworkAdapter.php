@@ -33,42 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config;
+namespace Infection\TestFramework;
 
-use Infection\Logger\ResultsLoggerTypes;
-use Symfony\Component\Filesystem\Exception\IOException;
+use Infection\Mutant\MutantInterface;
 
 /**
  * @internal
  */
-final class Validator
+interface TestFrameworkAdapter
 {
-    public function validate(InfectionConfig $infectionConfig): bool
-    {
-        $this->validateLogFilePaths($infectionConfig);
+    public const JUNIT_FILE_NAME = 'junit.xml';
 
-        return true;
-    }
+    public function getName(): string;
 
-    private function validateLogFilePaths(InfectionConfig $config): void
-    {
-        $logTypes = $config->getLogsTypes();
+    public function testsPass(string $output): bool;
 
-        foreach ($logTypes as $logType => $file) {
-            if ($logType === ResultsLoggerTypes::BADGE) {
-                continue;
-            }
+    /**
+     * @param string[] $phpExtraArgs
+     *
+     * @return string[]
+     */
+    public function getInitialTestRunCommandLine(string $configPath, string $extraOptions, array $phpExtraArgs): array;
 
-            $dir = \dirname($file);
+    /**
+     * @return string[]
+     */
+    public function getMutantCommandLine(string $configPath, string $extraOptions): array;
 
-            if (is_dir($dir) && !is_writable($dir)) {
-                throw new IOException(
-                    sprintf('Unable to write to the "%s" directory. Check "logs.%s" file path in infection.json.', $dir, $logType),
-                    0,
-                    null,
-                    $dir
-                );
-            }
-        }
-    }
+    public function getVersion(): string;
+
+    public function getInitialTestsFailRecommendations(string $commandLine): string;
+
+    public function buildInitialConfigFile();
+
+    public function buildMutationConfigFile(MutantInterface $mutant);
 }

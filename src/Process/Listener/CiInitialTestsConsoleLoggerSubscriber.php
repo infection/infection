@@ -37,7 +37,7 @@ namespace Infection\Process\Listener;
 
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\InitialTestSuiteStarted;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\TestFrameworkAdapter;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -51,11 +51,11 @@ final class CiInitialTestsConsoleLoggerSubscriber implements EventSubscriberInte
     private $output;
 
     /**
-     * @var AbstractTestFrameworkAdapter
+     * @var TestFrameworkAdapter
      */
     private $testFrameworkAdapter;
 
-    public function __construct(OutputInterface $output, AbstractTestFrameworkAdapter $testFrameworkAdapter)
+    public function __construct(OutputInterface $output, TestFrameworkAdapter $testFrameworkAdapter)
     {
         $this->output = $output;
         $this->testFrameworkAdapter = $testFrameworkAdapter;

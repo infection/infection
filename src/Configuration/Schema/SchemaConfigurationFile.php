@@ -33,78 +33,73 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config;
+namespace Infection\Configuration\Schema;
 
-use Infection\Config\Validator as ConfigValidator;
-use Infection\Json\JsonFile;
-use Infection\Locator\FileNotFound;
-use Infection\Locator\Locator;
-use function Safe\getcwd;
-use Symfony\Component\Filesystem\Filesystem;
+use function is_file;
+use function is_readable;
+use function Safe\file_get_contents;
+use Seld\JsonLint\JsonParser;
+use Seld\JsonLint\ParsingException;
+use stdClass;
 
 /**
  * @internal
  */
-final class ConfigCreatorFacade
+final class SchemaConfigurationFile
 {
-    /**
-     * @var ConfigValidator
-     */
-    private $configValidator;
+    private $path;
 
     /**
-     * @var Locator
+     * @var stdClass|null
      */
-    private $locator;
+    private $decodedContents;
 
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
-
-    public function __construct(Locator $locator, Filesystem $filesystem)
+    public function __construct(string $path)
     {
-        $this->locator = $locator;
-        $this->filesystem = $filesystem;
-
-        $this->configValidator = new Validator();
+        $this->path = $path;
     }
 
-    public function createConfig(?string $customConfigPath): InfectionConfig
+    public function getPath(): string
     {
+        return $this->path;
+    }
+
+    /**
+     * @throws InvalidFile
+     */
+    public function getDecodedContents(): stdClass
+    {
+        $this->initDecodedContents();
+
+        return $this->decodedContents;
+    }
+
+    /**
+     * @throws InvalidFile
+     */
+    private function initDecodedContents(): void
+    {
+        if (null !== $this->decodedContents) {
+            return;
+        }
+
+        if (!is_file($this->path)) {
+            throw InvalidFile::createForFileNotFound($this);
+        }
+
+        if (!is_readable($this->path)) {
+            throw InvalidFile::createForFileNotReadable($this);
+        }
+
+        $contents = file_get_contents($this->path);
+
         try {
-            $infectionConfigFile = $this->locateConfigFile($customConfigPath);
-
-            $content = (new JsonFile($infectionConfigFile))->decode();
-
-            $configLocation = \pathinfo($infectionConfigFile, PATHINFO_DIRNAME);
-        } catch (FileNotFound $e) {
-            // Generate an empty class to trigger `configure` command.
-            $content = new \stdClass();
-
-            $configLocation = getcwd();
+            $this->decodedContents = (new JsonParser())->parse(
+                $contents,
+                JsonParser::DETECT_KEY_CONFLICTS
+            );
+        } catch (ParsingException $exception) {
+            throw InvalidFile::createForInvalidJson($this, $exception->getMessage(), $exception);
         }
-
-        $infectionConfig = new InfectionConfig($content, $this->filesystem, $configLocation);
-
-        $this->configValidator->validate($infectionConfig);
-
-        return $infectionConfig;
-    }
-
-    private function locateConfigFile(?string $customConfigPath): string
-    {
-        $configPaths = [];
-
-        if ($customConfigPath) {
-            $configPaths[] = $customConfigPath;
-        }
-
-        $configPaths = array_merge(
-            $configPaths,
-            InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES
-        );
-
-        return $this->locator->locateOneOf($configPaths);
     }
 }

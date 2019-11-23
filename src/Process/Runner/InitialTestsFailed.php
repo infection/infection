@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use Exception;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\TestFrameworkAdapter;
 use Symfony\Component\Process\Process;
 
 /**
@@ -46,7 +46,7 @@ final class InitialTestsFailed extends Exception
 {
     public static function fromProcessAndAdapter(
         Process $initialTestSuitProcess,
-        AbstractTestFrameworkAdapter $testFrameworkAdapter
+        TestFrameworkAdapter $testFrameworkAdapter
     ): self {
         $testFrameworkKey = $testFrameworkAdapter->getName();
 

@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use Infection\Config\InfectionConfig;
+use Infection\Configuration\Configuration;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
@@ -81,7 +81,7 @@ final class Factory
     private $jUnitFilePath;
 
     /**
-     * @var InfectionConfig
+     * @var Configuration
      */
     private $infectionConfig;
 
@@ -96,7 +96,7 @@ final class Factory
         TestFrameworkConfigLocatorInterface $configLocator,
         XmlConfigurationHelper $xmlConfigurationHelper,
         string $jUnitFilePath,
-        InfectionConfig $infectionConfig,
+        Configuration $infectionConfig,
         VersionParser $versionParser
     ) {
         $this->tmpDir = $tmpDir;
@@ -108,20 +108,23 @@ final class Factory
         $this->versionParser = $versionParser;
     }
 
-    public function create(string $adapterName, bool $skipCoverage): AbstractTestFrameworkAdapter
+    public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
             $phpUnitConfigContent = file_get_contents($phpUnitConfigPath);
 
             return new PhpUnitAdapter(
-                new TestFrameworkFinder(TestFrameworkTypes::PHPUNIT, $this->infectionConfig->getPhpUnitCustomPath()),
+                new TestFrameworkFinder(
+                    TestFrameworkTypes::PHPUNIT,
+                    (string) $this->infectionConfig->getPhpUnit()->getCustomPath()
+                ),
                 new InitialConfigBuilder(
                     $this->tmpDir,
                     $phpUnitConfigContent,
                     $this->xmlConfigurationHelper,
                     $this->jUnitFilePath,
-                    $this->infectionConfig->getSourceDirs(),
+                    $this->infectionConfig->getSource()->getDirectories(),
                     $skipCoverage
                 ),
                 new MutationConfigBuilder($this->tmpDir, $phpUnitConfigContent, $this->xmlConfigurationHelper, $this->projectDir),
@@ -142,11 +145,10 @@ final class Factory
             );
         }
 
-        throw new \InvalidArgumentException(
-            sprintf(
-                'Invalid name of test framework. Available names are: %s',
-                implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC])
-            )
-        );
+        throw new \InvalidArgumentException(sprintf(
+            'Invalid name of test framework "%s". Available names are: %s',
+            $adapterName,
+            implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC])
+        ));
     }
 }
