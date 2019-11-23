@@ -59,7 +59,7 @@ final class ConfigurationFactoryTest extends TestCase
     private static $mutators;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public static function tearDownAfterClass(): void
     {

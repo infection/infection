@@ -41,7 +41,6 @@ use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
-use Infection\Mutator\Boolean\TrueValue;
 use Infection\Tests\Mutator\Fake;
 use PHPUnit\Framework\TestCase;
 
