@@ -144,7 +144,7 @@ final class InfectionContainer extends Container
                     $container['xml.configuration.helper'],
                     $container['phpunit.junit.file.path'],
                     $container[Configuration::class],
-                    $container['version.parser']
+                    $container[VersionParser::class]
                 );
             },
             'xml.configuration.helper' => static function (self $container): XmlConfigurationHelper {
@@ -190,7 +190,7 @@ final class InfectionContainer extends Container
                     new PhpUnitTestFileDataProvider($container['phpunit.junit.file.path'])
                 );
             },
-            'version.parser' => static function (): VersionParser {
+            VersionParser::class => static function (): VersionParser {
                 return new VersionParser();
             },
             'lexer' => static function (): Lexer {
