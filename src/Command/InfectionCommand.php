@@ -65,6 +65,7 @@ use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
+use Infection\Utils\VersionParser;
 use function is_numeric;
 use function Safe\sprintf;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -110,6 +111,11 @@ final class InfectionCommand extends BaseCommand
      * @var TestFrameworkExtraOptions
      */
     private $testFrameworkOptions;
+
+    /**
+     * @var VersionParser
+     */
+    private $versionParser;
 
     protected function configure(): void
     {
@@ -260,6 +266,7 @@ final class InfectionCommand extends BaseCommand
         $this->consoleOutput = $this->getApplication()->getConsoleOutput();
         $this->skipCoverage = trim((string) $input->getOption('coverage')) !== '';
         $this->eventDispatcher = $this->container['dispatcher'];
+        $this->versionParser = $this->container[VersionParser::class];
     }
 
     private function startUp(): TestFrameworkAdapter
@@ -293,7 +300,7 @@ final class InfectionCommand extends BaseCommand
         /** @var Configuration $config */
         $config = $this->container[Configuration::class];
 
-        $processBuilder = new InitialTestRunProcessBuilder($adapter);
+        $processBuilder = new InitialTestRunProcessBuilder($adapter, $this->versionParser);
 
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
 
@@ -317,7 +324,7 @@ final class InfectionCommand extends BaseCommand
         /** @var Configuration $config */
         $config = $this->container[Configuration::class];
 
-        $processBuilder = new MutantProcessBuilder($adapter, $config->getProcessTimeout());
+        $processBuilder = new MutantProcessBuilder($adapter, $this->versionParser, $config->getProcessTimeout());
 
         $codeCoverageData = $this->getCodeCoverageData($this->testFrameworkKey);
 
