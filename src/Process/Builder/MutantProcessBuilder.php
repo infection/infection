@@ -38,6 +38,8 @@ namespace Infection\Process\Builder;
 use Infection\Mutant\MutantInterface;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\TestFrameworkAdapter;
+use Infection\Utils\VersionParser;
+use PackageVersions\Versions;
 use Symfony\Component\Process\Process;
 
 /**
@@ -55,10 +57,16 @@ final class MutantProcessBuilder
      */
     private $timeout;
 
-    public function __construct(TestFrameworkAdapter $testFrameworkAdapter, int $timeout)
+    /**
+     * @var VersionParser
+     */
+    private $versionParser;
+
+    public function __construct(TestFrameworkAdapter $testFrameworkAdapter, VersionParser $versionParser, int $timeout)
     {
         $this->testFrameworkAdapter = $testFrameworkAdapter;
         $this->timeout = $timeout;
+        $this->versionParser = $versionParser;
     }
 
     public function createProcessForMutant(MutantInterface $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
@@ -71,7 +79,13 @@ final class MutantProcessBuilder
         );
 
         $process->setTimeout($this->timeout);
-        $process->inheritEnvironmentVariables();
+
+        $symfonyProcessVersion = $this->versionParser->parse(Versions::getVersion('symfony/process'));
+
+        if (version_compare($symfonyProcessVersion, '4.4.0', '<')) {
+            // in version 4.4.0 this method is deprecated and removed in 5.0.0
+            $process->inheritEnvironmentVariables();
+        }
 
         return new MutantProcess($process, $mutant, $this->testFrameworkAdapter);
     }
