@@ -41,6 +41,8 @@ use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\Mutator\Boolean\TrueValue;
+use Infection\Tests\Mutator\Fake;
 use PHPUnit\Framework\TestCase;
 
 final class ConfigurationTest extends TestCase
@@ -70,8 +72,7 @@ final class ConfigurationTest extends TestCase
         bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
         bool $showMutations,
-        ?float $minCoveredMsi,
-        ?string $stringMutators
+        ?float $minCoveredMsi
     ): void {
         $config = new Configuration(
             $timeout,
@@ -93,8 +94,7 @@ final class ConfigurationTest extends TestCase
             $ignoreMsiWithNoMutations,
             $minMsi,
             $showMutations,
-            $minCoveredMsi,
-            $stringMutators
+            $minCoveredMsi
         );
 
         $this->assertConfigurationStateIs(
@@ -118,8 +118,7 @@ final class ConfigurationTest extends TestCase
             $ignoreMsiWithNoMutations,
             $minMsi,
             $showMutations,
-            $minCoveredMsi,
-            $stringMutators
+            $minCoveredMsi
         );
     }
 
@@ -152,7 +151,6 @@ final class ConfigurationTest extends TestCase
             null,
             false,
             null,
-            null,
         ];
 
         yield [
@@ -169,8 +167,7 @@ final class ConfigurationTest extends TestCase
             'custom-dir',
             new PhpUnit('dist/phpunit', 'bin/phpunit'),
             [
-                '@arithmetic' => true,
-                '@cast' => false,
+                'Fake' => new Fake(),
             ],
             'phpunit',
             'bin/bootstrap.php',
@@ -185,7 +182,6 @@ final class ConfigurationTest extends TestCase
             43.,
             true,
             43.,
-            '',
         ];
     }
 }

@@ -38,6 +38,7 @@ namespace Infection\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\TestFrameworkTypes;
 use Webmozart\Assert\Assert;
 
@@ -78,8 +79,10 @@ class Configuration
     private $minMsi;
     private $showMutations;
     private $minCoveredMsi;
-    private $stringMutators;
 
+    /**
+     * @param array<string, Mutator> $mutators
+     */
     public function __construct(
         int $timeout,
         Source $source,
@@ -100,10 +103,10 @@ class Configuration
         bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
         bool $showMutations,
-        ?float $minCoveredMsi,
-        ?string $stringMutators
+        ?float $minCoveredMsi
     ) {
         Assert::nullOrGreaterThanEq($timeout, 1);
+        Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
         Assert::oneOf($formatter, self::FORMATTER);
@@ -129,7 +132,6 @@ class Configuration
         $this->minMsi = $minMsi;
         $this->showMutations = $showMutations;
         $this->minCoveredMsi = $minCoveredMsi;
-        $this->stringMutators = $stringMutators;
     }
 
     public function getProcessTimeout(): int
@@ -162,6 +164,9 @@ class Configuration
         return $this->phpUnit;
     }
 
+    /**
+     * @return array<string, Mutator>
+     */
     public function getMutators(): array
     {
         return $this->mutators;
@@ -230,10 +235,5 @@ class Configuration
     public function getMinCoveredMsi(): ?float
     {
         return $this->minCoveredMsi;
-    }
-
-    public function getStringMutators(): ?string
-    {
-        return $this->stringMutators;
     }
 }
