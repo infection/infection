@@ -49,26 +49,23 @@ cs: $(PHP_CS_FIXER)
 	LC_ALL=C sort -u .gitignore -o .gitignore
 
 .PHONY: phpstan
-phpstan:  	 ## Runs PHPStan
 phpstan: vendor $(PHPSTAN)
 	$(PHPSTAN) analyse src --level=max --configuration ./devTools/phpstan-src.neon --no-interaction --no-progress
 	$(PHPSTAN) analyse tests/phpunit --level=4 --configuration ./devTools/phpstan-tests.neon --no-interaction --no-progress
 
-.PHONY: analyze
-analyze:	 ## Runs Static analyzers and various other checks
-analyze: phpstan validate
-
 .PHONY: validate
-validate:	 ## Checks that the composer.json file is valid
 validate:
 	composer validate --strict
 
 .PHONY: test
 test:		 ## Runs all the tests
-test: test-autoreview test-unit test-e2e test-infection
+test: autoreview test-unit test-e2e test-infection
+
+.PHONY: autoreview
+autoreview: 	 ## Runs various checks (static analysis & AutoReview test suite)
+autoreview: phpstan validate test-autoreview
 
 .PHONY: test-autoreview
-test-autoreview: ## Runs the AutoReview test suite
 test-autoreview:
 	$(PHPUNIT) --configuration=phpunit_autoreview.xml
 
