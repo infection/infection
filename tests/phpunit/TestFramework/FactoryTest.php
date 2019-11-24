@@ -83,7 +83,6 @@ final class FactoryTest extends TestCase
                 false,
                 null,
                 false,
-                null,
                 null
             ),
             $this->createMock(VersionParser::class)

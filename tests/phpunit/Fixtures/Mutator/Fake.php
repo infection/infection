@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator;
+namespace Infection\Tests\Fixtures\Mutator;
 
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
