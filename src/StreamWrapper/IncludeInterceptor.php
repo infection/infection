@@ -53,6 +53,11 @@ final class IncludeInterceptor
     private $fp;
 
     /**
+     * @var bool
+     */
+    private static $isEnabled = false;
+
+    /**
      * @var string
      */
     private static $intercept;
@@ -88,33 +93,43 @@ final class IncludeInterceptor
         }
         stream_wrapper_unregister('file');
         stream_wrapper_register('file', __CLASS__);
+        self::$isEnabled = true;
     }
 
     public static function disable(): void
     {
         stream_wrapper_restore('file');
+        self::$isEnabled = false;
+    }
+
+    public static function isEnabled(): bool
+    {
+        return self::$isEnabled;
     }
 
     public function stream_open($path, $mode, $options)
     {
         self::disable();
+
         $including = (bool) ($options & self::STREAM_OPEN_FOR_INCLUDE);
 
-        if ($including) {
-            if ($path === self::$intercept || realpath($path) === self::$intercept) {
-                $this->fp = fopen(self::$replacement, 'r');
-                self::enable();
+        try {
+            if ($including) {
+                if ($path === self::$intercept || realpath($path) === self::$intercept) {
+                    $this->fp = fopen(self::$replacement, 'r');
 
-                return true;
+                    return true;
+                }
             }
-        }
 
-        if (isset($this->context)) {
-            $this->fp = fopen($path, $mode, (bool) $options, $this->context);
-        } else {
-            $this->fp = fopen($path, $mode, (bool) $options);
+            if (isset($this->context)) {
+                $this->fp = fopen($path, $mode, (bool) $options, $this->context);
+            } else {
+                $this->fp = fopen($path, $mode, (bool) $options);
+            }
+        } finally {
+            self::enable();
         }
-        self::enable();
 
         return $this->fp !== false;
     }

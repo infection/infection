@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\StreamWrapper;
 
 use Infection\StreamWrapper\IncludeInterceptor;
+use PHPUnit\Framework\Error\Warning;
 
 /**
  * Tests IncludeInterceptor for correct operation.
@@ -222,5 +223,21 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
         rmdir($newname);
 
         IncludeInterceptor::disable();
+    }
+
+    public function test_it_re_enables_interceptor_after_file_not_found(): void
+    {
+        IncludeInterceptor::intercept(self::$files[1], self::$files[2]);
+        IncludeInterceptor::enable();
+
+        try {
+            fopen('file-does-not-exist.txt', 'r');
+        } catch (Warning $e) {
+            $this->assertTrue(IncludeInterceptor::isEnabled());
+
+            return;
+        }
+
+        $this->fail('Badly set up test, exception was not thrown');
     }
 }
