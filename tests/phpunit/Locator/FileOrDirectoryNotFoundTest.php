@@ -39,7 +39,7 @@ use Generator;
 use Infection\Locator\FileOrDirectoryNotFound;
 use PHPUnit\Framework\TestCase;
 
-final class FileOrDirectoryNotFoundTest extends TestCase
+class FileOrDirectoryNotFoundTest extends TestCase
 {
     /**
      * @dataProvider nonExistentPathsProvider

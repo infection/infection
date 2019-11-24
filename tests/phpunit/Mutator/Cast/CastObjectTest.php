@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\Cast;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class CastObjectTest extends AbstractMutatorTestCase
+class CastObjectTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

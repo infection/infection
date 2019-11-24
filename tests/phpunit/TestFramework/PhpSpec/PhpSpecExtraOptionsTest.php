@@ -38,7 +38,7 @@ namespace Infection\Tests\TestFramework\PhpSpec;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
 use PHPUnit\Framework\TestCase;
 
-final class PhpSpecExtraOptionsTest extends TestCase
+class PhpSpecExtraOptionsTest extends TestCase
 {
     /**
      * @dataProvider mutantProcessProvider

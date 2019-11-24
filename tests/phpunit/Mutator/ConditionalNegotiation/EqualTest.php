@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\ConditionalNegotiation;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class EqualTest extends AbstractMutatorTestCase
+class EqualTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class AssignCoalesceTest extends AbstractMutatorTestCase
+class AssignCoalesceTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

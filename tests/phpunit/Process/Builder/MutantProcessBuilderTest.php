@@ -41,7 +41,7 @@ use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\Utils\VersionParser;
 use PHPUnit\Framework\TestCase;
 
-final class MutantProcessBuilderTest extends TestCase
+class MutantProcessBuilderTest extends TestCase
 {
     public function test_it_creates_a_process_with_timeout(): void
     {

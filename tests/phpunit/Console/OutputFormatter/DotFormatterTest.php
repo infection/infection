@@ -41,7 +41,7 @@ use Infection\Process\MutantProcessInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class DotFormatterTest extends TestCase
+class DotFormatterTest extends TestCase
 {
     public function test_start_logs_inital_starting_text(): void
     {

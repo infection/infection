@@ -38,7 +38,7 @@ namespace Infection\Tests\Performance\Time;
 use Infection\Performance\Time\Timer;
 use PHPUnit\Framework\TestCase;
 
-final class TimerTest extends TestCase
+class TimerTest extends TestCase
 {
     /**
      * @var Timer

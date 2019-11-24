@@ -39,7 +39,7 @@ use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use PHPUnit\Framework\TestCase;
 
-final class TestRunConstraintCheckerTest extends TestCase
+class TestRunConstraintCheckerTest extends TestCase
 {
     public function test_runs_fail_with_zero_mutations_and_no_ignore_msi_with_zero_mutations_and_required_msi(): void
     {

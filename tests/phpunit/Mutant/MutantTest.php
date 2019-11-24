@@ -39,7 +39,7 @@ use Infection\Mutant\Mutant;
 use Infection\MutationInterface;
 use PHPUnit\Framework\TestCase;
 
-final class MutantTest extends TestCase
+class MutantTest extends TestCase
 {
     public function test_it_passes_along_its_input_without_changing_it(): void
     {

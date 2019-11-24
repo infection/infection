@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\Regex;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class PregMatchMatchesTest extends AbstractMutatorTestCase
+class PregMatchMatchesTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider providesMutatorCases

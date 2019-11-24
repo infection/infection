@@ -48,7 +48,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
-final class TextFileLoggerTest extends TestCase
+class TextFileLoggerTest extends TestCase
 {
     public function test_it_logs_correctly_with_no_mutations_and_no_debug_verbosity(): void
     {

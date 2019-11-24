@@ -65,7 +65,7 @@ use function var_export;
  * @covers \Infection\Configuration\Entry\PhpUnit
  * @covers \Infection\Configuration\Entry\Source
  */
-final class SchemaConfigurationFactoryTest extends TestCase
+class SchemaConfigurationFactoryTest extends TestCase
 {
     private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../../../resources/schema.json';
 

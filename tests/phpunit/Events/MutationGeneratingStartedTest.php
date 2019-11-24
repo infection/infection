@@ -38,7 +38,7 @@ namespace Infection\Tests\Events;
 use Infection\Events\MutationGeneratingStarted;
 use PHPUnit\Framework\TestCase;
 
-final class MutationGeneratingStartedTest extends TestCase
+class MutationGeneratingStartedTest extends TestCase
 {
     public function test_it_passes_along_its_mutable_file_count_without_changing_it(): void
     {

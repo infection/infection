@@ -41,7 +41,7 @@ use Infection\Configuration\Schema\SchemaConfigurationFile;
 use function Infection\Tests\normalizeLineReturn;
 use PHPUnit\Framework\TestCase;
 
-final class InvalidSchemaTest extends TestCase
+class InvalidSchemaTest extends TestCase
 {
     /**
      * @dataProvider configWithErrorsProvider

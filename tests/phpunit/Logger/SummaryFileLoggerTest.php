@@ -42,7 +42,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class SummaryFileLoggerTest extends TestCase
+class SummaryFileLoggerTest extends TestCase
 {
     /**
      * @var string

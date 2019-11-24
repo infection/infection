@@ -47,7 +47,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\realpath;
 
-final class SchemaConfigurationFileLoaderTest extends TestCase
+class SchemaConfigurationFileLoaderTest extends TestCase
 {
     /**
      * @var SchemaValidator|MockObject

@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class FloatNegationTest extends AbstractMutatorTestCase
+class FloatNegationTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

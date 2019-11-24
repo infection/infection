@@ -49,7 +49,7 @@ use function substr_count;
 /**
  * @coversNothing
  */
-final class MakefileTest extends TestCase
+class MakefileTest extends TestCase
 {
     private const MAKEFILE_PATH = __DIR__ . '/../../../../Makefile';
 

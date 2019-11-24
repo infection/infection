@@ -38,7 +38,7 @@ namespace Infection\Tests\TestFramework\Coverage;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use PHPUnit\Framework\TestCase;
 
-final class CoverageDoesNotExistExceptionTest extends TestCase
+class CoverageDoesNotExistExceptionTest extends TestCase
 {
     public function test_with(): void
     {

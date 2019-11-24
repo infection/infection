@@ -48,7 +48,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use function sys_get_temp_dir;
 
-final class MutationTestingResultsLoggerSubscriberTest extends TestCase
+class MutationTestingResultsLoggerSubscriberTest extends TestCase
 {
     /**
      * @var OutputInterface|MockObject

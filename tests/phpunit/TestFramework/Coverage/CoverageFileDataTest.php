@@ -40,7 +40,7 @@ use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use PHPUnit\Framework\TestCase;
 
-final class CoverageFileDataTest extends TestCase
+class CoverageFileDataTest extends TestCase
 {
     public function test_it_has_default_values(): void
     {

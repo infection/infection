@@ -40,7 +40,7 @@ use Infection\TestFramework\Coverage\NodeLineRangeData;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
-final class NodeLineRangeDataTest extends TestCase
+class NodeLineRangeDataTest extends TestCase
 {
     public function test_it_can_not_have_an_incorrect_range(): void
     {

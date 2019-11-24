@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class ShiftLeftTest extends AbstractMutatorTestCase
+class ShiftLeftTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

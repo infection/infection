@@ -38,7 +38,7 @@ namespace Infection\Tests\Events;
 use Infection\Events\InitialTestSuiteFinished;
 use PHPUnit\Framework\TestCase;
 
-final class InitialTestSuiteFinishedTest extends TestCase
+class InitialTestSuiteFinishedTest extends TestCase
 {
     public function test_it_passes_the_output_along(): void
     {

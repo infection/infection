@@ -57,7 +57,7 @@ use PhpParser\ParserFactory;
 use PHPUnit\Framework\TestCase;
 use Pimple\Container;
 
-final class MutationsGeneratorTest extends TestCase
+class MutationsGeneratorTest extends TestCase
 {
     public function test_it_collects_plus_mutation(): void
     {

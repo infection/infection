@@ -43,7 +43,7 @@ use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use PHPUnit\Framework\TestCase;
 
-final class SchemaConfigurationTest extends TestCase
+class SchemaConfigurationTest extends TestCase
 {
     /**
      * @dataProvider valueProvider

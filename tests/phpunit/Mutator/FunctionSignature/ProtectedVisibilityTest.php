@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\FunctionSignature;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class ProtectedVisibilityTest extends AbstractMutatorTestCase
+class ProtectedVisibilityTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

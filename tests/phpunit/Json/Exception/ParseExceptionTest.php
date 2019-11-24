@@ -38,7 +38,7 @@ namespace Infection\Tests\Json\Exception;
 use Infection\Json\Exception\ParseException;
 use PHPUnit\Framework\TestCase;
 
-final class ParseExceptionTest extends TestCase
+class ParseExceptionTest extends TestCase
 {
     public function test_invalid_json(): void
     {

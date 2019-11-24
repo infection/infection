@@ -48,7 +48,7 @@ use function strpos;
 use function substr;
 use function trim;
 
-final class Parser
+class Parser
 {
     /**
      * @return array<string[]&string[][]>

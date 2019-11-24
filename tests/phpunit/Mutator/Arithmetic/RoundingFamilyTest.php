@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class RoundingFamilyTest extends AbstractMutatorTestCase
+class RoundingFamilyTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

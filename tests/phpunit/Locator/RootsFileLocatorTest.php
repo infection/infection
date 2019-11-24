@@ -48,7 +48,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * @group integration
  */
-final class RootsFileLocatorTest extends TestCase
+class RootsFileLocatorTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../Fixtures/Locator';
 

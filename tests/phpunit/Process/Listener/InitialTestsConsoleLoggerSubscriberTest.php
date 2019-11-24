@@ -43,7 +43,7 @@ use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
+class InitialTestsConsoleLoggerSubscriberTest extends TestCase
 {
     public function test_it_reacts_on_initial_test_suite_run(): void
     {

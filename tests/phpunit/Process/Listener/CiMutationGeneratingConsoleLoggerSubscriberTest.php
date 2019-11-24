@@ -42,7 +42,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class CiMutationGeneratingConsoleLoggerSubscriberTest extends TestCase
+class CiMutationGeneratingConsoleLoggerSubscriberTest extends TestCase
 {
     /**
      * @var OutputInterface|MockObject

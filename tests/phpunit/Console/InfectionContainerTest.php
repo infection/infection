@@ -40,7 +40,7 @@ use Infection\Console\InfectionContainer;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-final class InfectionContainerTest extends TestCase
+class InfectionContainerTest extends TestCase
 {
     public function test_it_can_be_instantiated_without_any_services(): void
     {

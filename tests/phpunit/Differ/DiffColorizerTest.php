@@ -38,7 +38,7 @@ namespace Infection\Tests\Differ;
 use Infection\Differ\DiffColorizer;
 use PHPUnit\Framework\TestCase;
 
-final class DiffColorizerTest extends TestCase
+class DiffColorizerTest extends TestCase
 {
     public function test_id_adds_colours(): void
     {

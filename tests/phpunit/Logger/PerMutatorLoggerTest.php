@@ -46,7 +46,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class PerMutatorLoggerTest extends TestCase
+class PerMutatorLoggerTest extends TestCase
 {
     public function test_it_correctly_build_log_lines(): void
     {

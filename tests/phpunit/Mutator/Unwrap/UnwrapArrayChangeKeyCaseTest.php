@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\Unwrap;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class UnwrapArrayChangeKeyCaseTest extends AbstractMutatorTestCase
+class UnwrapArrayChangeKeyCaseTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

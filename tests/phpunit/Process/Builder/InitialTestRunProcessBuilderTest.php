@@ -40,7 +40,7 @@ use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\Utils\VersionParser;
 use PHPUnit\Framework\TestCase;
 
-final class InitialTestRunProcessBuilderTest extends TestCase
+class InitialTestRunProcessBuilderTest extends TestCase
 {
     public function test_it_creates_a_process_with_no_timeout(): void
     {

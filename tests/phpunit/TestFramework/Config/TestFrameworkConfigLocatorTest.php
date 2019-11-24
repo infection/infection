@@ -39,7 +39,7 @@ use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use function Infection\Tests\normalizePath as p;
 
-final class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
+class TestFrameworkConfigLocatorTest extends \PHPUnit\Framework\TestCase
 {
     private $baseDir = __DIR__ . '/../../Fixtures/ConfigLocator/';
 

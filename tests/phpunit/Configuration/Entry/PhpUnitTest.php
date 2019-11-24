@@ -39,7 +39,7 @@ use Generator;
 use Infection\Configuration\Entry\PhpUnit;
 use PHPUnit\Framework\TestCase;
 
-final class PhpUnitTest extends TestCase
+class PhpUnitTest extends TestCase
 {
     use PhpUnitAssertions;
 

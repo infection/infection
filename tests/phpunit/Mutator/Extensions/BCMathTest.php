@@ -38,7 +38,7 @@ namespace Infection\Tests\Mutator\Extensions;
 use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class BCMathTest extends AbstractMutatorTestCase
+class BCMathTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

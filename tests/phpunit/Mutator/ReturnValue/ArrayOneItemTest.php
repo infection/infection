@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class ArrayOneItemTest extends AbstractMutatorTestCase
+class ArrayOneItemTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

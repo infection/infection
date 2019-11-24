@@ -38,7 +38,7 @@ namespace Infection\Tests\Events;
 use Infection\Events\MutantCreated;
 use PHPUnit\Framework\TestCase;
 
-final class MutantCreatedTest extends TestCase
+class MutantCreatedTest extends TestCase
 {
     /**
      * This class is only used to fire events, and the only functionality it needs is being instantiated

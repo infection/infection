@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\ZeroIteration;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class Foreach_Test extends AbstractMutatorTestCase
+class Foreach_Test extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

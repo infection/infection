@@ -40,7 +40,7 @@ use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 
-final class FullyQualifiedClassNameVisitorTest extends AbstractBaseVisitorTest
+class FullyQualifiedClassNameVisitorTest extends AbstractBaseVisitorTest
 {
     private $spyVisitor;
 

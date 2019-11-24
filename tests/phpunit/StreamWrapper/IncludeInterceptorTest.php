@@ -52,7 +52,7 @@ use Infection\StreamWrapper\IncludeInterceptor;
  * Other methods are not essential for interception to work,
  * but still are required to be implemented by a full wrapper
  */
-final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
+class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
 {
     private static $files = [];
 

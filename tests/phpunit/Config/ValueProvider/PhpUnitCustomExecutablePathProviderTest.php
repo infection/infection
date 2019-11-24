@@ -43,7 +43,7 @@ use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Exception\RuntimeException as SymfonyRuntimeException;
 
-final class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProviderTest
+class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProviderTest
 {
     /**
      * @var MockObject|TestFrameworkFinder

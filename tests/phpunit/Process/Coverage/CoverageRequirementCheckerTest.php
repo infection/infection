@@ -45,7 +45,7 @@ use PHPUnit\Framework\TestCase;
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
-final class CoverageRequirementCheckerTest extends TestCase
+class CoverageRequirementCheckerTest extends TestCase
 {
     public function test_it_has_debugger_or_coverage_option_on_phpdbg(): void
     {

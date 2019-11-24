@@ -45,7 +45,7 @@ use Symfony\Component\Finder\SplFileInfo;
  * This class is responsible for testing that all Mutator classes adhere to certain rules
  * e.g. 'Mutators shouldn't declare any public methods`
  */
-final class MutatorTest extends TestCase
+class MutatorTest extends TestCase
 {
     /**
      * @dataProvider providesMutatorClasses

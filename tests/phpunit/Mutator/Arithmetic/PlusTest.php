@@ -40,7 +40,7 @@ use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\LNumber;
 
-final class PlusTest extends AbstractMutatorTestCase
+class PlusTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

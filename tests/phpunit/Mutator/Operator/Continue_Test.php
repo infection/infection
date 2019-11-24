@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class Continue_Test extends AbstractMutatorTestCase
+class Continue_Test extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

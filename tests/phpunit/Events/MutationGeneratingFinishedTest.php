@@ -38,7 +38,7 @@ namespace Infection\Tests\Events;
 use Infection\Events\MutationGeneratingFinished;
 use PHPUnit\Framework\TestCase;
 
-final class MutationGeneratingFinishedTest extends TestCase
+class MutationGeneratingFinishedTest extends TestCase
 {
     /**
      * This class is only used to fire events, and the only functionality it needs is being instantiated

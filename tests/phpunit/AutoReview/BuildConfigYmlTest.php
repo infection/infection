@@ -42,7 +42,7 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * @coversNothing
  */
-final class BuildConfigYmlTest extends TestCase
+class BuildConfigYmlTest extends TestCase
 {
     /**
      * @dataProvider providesYamlFilesForTesting

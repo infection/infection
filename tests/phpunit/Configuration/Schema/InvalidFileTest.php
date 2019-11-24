@@ -42,7 +42,7 @@ use Infection\Configuration\Schema\SchemaConfigurationFile;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
-final class InvalidFileTest extends TestCase
+class InvalidFileTest extends TestCase
 {
     public function test_it_can_be_created_for_file_not_found(): void
     {

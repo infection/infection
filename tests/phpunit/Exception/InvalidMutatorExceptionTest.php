@@ -40,7 +40,7 @@ use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Util\MutatorConfig;
 use PHPUnit\Framework\TestCase;
 
-final class InvalidMutatorExceptionTest extends TestCase
+class InvalidMutatorExceptionTest extends TestCase
 {
     public function test_it_has_correct_user_facing_message(): void
     {

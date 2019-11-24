@@ -38,7 +38,7 @@ namespace Infection\Tests\TestFramework\PhpSpec\CommandLine;
 use Infection\TestFramework\PhpSpec\CommandLine\ArgumentsAndOptionsBuilder;
 use PHPUnit\Framework\TestCase;
 
-final class ArgumentsAndOptionsBuilderTest extends TestCase
+class ArgumentsAndOptionsBuilderTest extends TestCase
 {
     public function test_it_builds_correct_command(): void
     {

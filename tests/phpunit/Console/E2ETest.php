@@ -51,7 +51,7 @@ use Symfony\Component\Process\Process;
 /**
  * @group e2e
  */
-final class E2ETest extends TestCase
+class E2ETest extends TestCase
 {
     private const MAX_FAILING_COMPOSER_INSTALL = 5;
     private const EXPECT_ERROR = 1;

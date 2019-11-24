@@ -42,7 +42,7 @@ use function trait_exists;
 /**
  * @requires ProjectCodeProviderTest
  */
-final class ProjectCodeProviderTest extends TestCase
+class ProjectCodeProviderTest extends TestCase
 {
     /**
      * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesProvider()

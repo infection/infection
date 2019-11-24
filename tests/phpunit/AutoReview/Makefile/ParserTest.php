@@ -38,7 +38,7 @@ namespace Infection\Tests\AutoReview\Makefile;
 use Generator;
 use PHPUnit\Framework\TestCase;
 
-final class ParserTest extends TestCase
+class ParserTest extends TestCase
 {
     /**
      * @dataProvider makefileContentProvider

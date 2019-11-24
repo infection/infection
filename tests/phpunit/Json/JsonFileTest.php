@@ -42,7 +42,7 @@ use JsonSchema\Exception\ValidationException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class JsonFileTest extends TestCase
+class JsonFileTest extends TestCase
 {
     /**
      * @var Filesystem

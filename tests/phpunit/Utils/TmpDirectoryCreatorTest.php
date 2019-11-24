@@ -39,7 +39,7 @@ use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class TmpDirectoryCreatorTest extends TestCase
+class TmpDirectoryCreatorTest extends TestCase
 {
     /**
      * @var TmpDirectoryCreator

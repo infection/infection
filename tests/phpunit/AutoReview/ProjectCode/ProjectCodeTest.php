@@ -53,7 +53,7 @@ use function Safe\sprintf;
  * The goal is to reduce pr reviews about style issues that can't be automatically fixed.
  * All test failures should be clear in meaning, to help new contributors.
  */
-final class ProjectCodeTest extends TestCase
+class ProjectCodeTest extends TestCase
 {
     public function test_infection_bin_is_executable(): void
     {
@@ -249,14 +249,14 @@ final class ProjectCodeTest extends TestCase
     /**
      * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::classesTestProvider
      */
-    public function test_all_test_classes_are_trait_abstract_or_final(string $className): void
+    public function test_all_test_classes_are_trait_abstract_or_not_final(string $className): void
     {
         $reflectionClass = new ReflectionClass($className);
 
         $this->assertTrue(
             $reflectionClass->isTrait()
             || $reflectionClass->isAbstract()
-            || $reflectionClass->isFinal(),
+            || !$reflectionClass->isFinal(),
             sprintf(
                 'The test class "%s" should be a trait, an abstract or final class.',
                 $className

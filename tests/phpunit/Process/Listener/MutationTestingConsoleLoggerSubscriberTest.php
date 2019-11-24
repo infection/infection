@@ -48,7 +48,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
+class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 {
     /**
      * @var OutputInterface|MockObject

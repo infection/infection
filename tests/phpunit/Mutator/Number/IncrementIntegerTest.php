@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\Number;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class IncrementIntegerTest extends AbstractMutatorTestCase
+class IncrementIntegerTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

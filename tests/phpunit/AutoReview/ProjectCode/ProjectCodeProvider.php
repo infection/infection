@@ -84,7 +84,7 @@ use const SORT_STRING;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
-final class ProjectCodeProvider
+class ProjectCodeProvider
 {
     /**
      * This array contains all classes that don't have tests yet, due to legacy

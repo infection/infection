@@ -42,7 +42,7 @@ use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class MutationConfigBuilderTest extends TestCase
+class MutationConfigBuilderTest extends TestCase
 {
     private $tmpDir;
 

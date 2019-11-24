@@ -39,7 +39,7 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
 
-final class TrueValueTest extends AbstractMutatorTestCase
+class TrueValueTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

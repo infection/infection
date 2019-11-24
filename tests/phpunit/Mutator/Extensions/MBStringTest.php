@@ -38,7 +38,7 @@ namespace Infection\Tests\Mutator\Extensions;
 use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class MBStringTest extends AbstractMutatorTestCase
+class MBStringTest extends AbstractMutatorTestCase
 {
     public static function setUpBeforeClass(): void
     {

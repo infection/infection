@@ -42,7 +42,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class BadgeLoggerTest extends TestCase
+class BadgeLoggerTest extends TestCase
 {
     /**
      * @var OutputInterface|MockObject

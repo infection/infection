@@ -38,7 +38,7 @@ namespace Infection\Tests\Config\Guesser;
 use Infection\Config\Guesser\PhpUnitPathGuesser;
 use PHPUnit\Framework\TestCase;
 
-final class PhpUnitPathGuesserTest extends TestCase
+class PhpUnitPathGuesserTest extends TestCase
 {
     /**
      * @dataProvider providesJsonComposerAndLocations

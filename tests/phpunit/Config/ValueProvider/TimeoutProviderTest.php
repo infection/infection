@@ -39,7 +39,7 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\InfectionConfig;
 use Infection\Config\ValueProvider\TimeoutProvider;
 
-final class TimeoutProviderTest extends AbstractBaseProviderTest
+class TimeoutProviderTest extends AbstractBaseProviderTest
 {
     /**
      * @var TimeoutProvider

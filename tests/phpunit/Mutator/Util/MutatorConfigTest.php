@@ -39,7 +39,7 @@ use Infection\Mutator\Util\MutatorConfig;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-final class MutatorConfigTest extends TestCase
+class MutatorConfigTest extends TestCase
 {
     /**
      * @dataProvider providesIgnoredValues

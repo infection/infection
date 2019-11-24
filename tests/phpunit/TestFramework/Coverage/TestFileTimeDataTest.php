@@ -38,7 +38,7 @@ namespace Infection\Tests\TestFramework\Coverage;
 use Infection\TestFramework\Coverage\TestFileTimeData;
 use PHPUnit\Framework\TestCase;
 
-final class TestFileTimeDataTest extends TestCase
+class TestFileTimeDataTest extends TestCase
 {
     public function test_it_creates_self_object_with_named_constructor(): void
     {

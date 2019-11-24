@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutant\Exception;
 
 use Infection\Mutant\Exception\MsiCalculationException;
 
-final class MsiCalculationExceptionTest extends \PHPUnit\Framework\TestCase
+class MsiCalculationExceptionTest extends \PHPUnit\Framework\TestCase
 {
     public function test_it_is_instance_of_logic_exception(): void
     {

@@ -46,7 +46,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class PerformanceLoggerSubscriberTest extends TestCase
+class PerformanceLoggerSubscriberTest extends TestCase
 {
     /**
      * @var OutputInterface|MockObject

@@ -41,7 +41,7 @@ use Infection\TestFramework\PhpSpec\Config\NoCodeCoverageException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
 
-final class InitialYamlConfigurationTest extends TestCase
+class InitialYamlConfigurationTest extends TestCase
 {
     protected $tempDir = '/path/to/tmp';
 

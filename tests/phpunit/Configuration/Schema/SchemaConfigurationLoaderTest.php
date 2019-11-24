@@ -44,7 +44,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
-final class SchemaConfigurationLoaderTest extends TestCase
+class SchemaConfigurationLoaderTest extends TestCase
 {
     /**
      * @var Locator|MockObject

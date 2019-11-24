@@ -40,7 +40,7 @@ use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 
-final class NotMutableIgnoreVisitorTest extends AbstractBaseVisitorTest
+class NotMutableIgnoreVisitorTest extends AbstractBaseVisitorTest
 {
     private $spyVisitor;
 

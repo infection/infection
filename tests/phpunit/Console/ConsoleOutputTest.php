@@ -41,7 +41,7 @@ use Infection\Mutant\MetricsCalculator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-final class ConsoleOutputTest extends TestCase
+class ConsoleOutputTest extends TestCase
 {
     public function test_log_verbosity_deprecation_notice(): void
     {

@@ -40,7 +40,7 @@ use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-final class InitialTestsFailedTest extends TestCase
+class InitialTestsFailedTest extends TestCase
 {
     public function test_log_initial_tests_do_not_pass(): void
     {

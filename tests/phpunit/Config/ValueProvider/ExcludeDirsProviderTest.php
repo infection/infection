@@ -39,7 +39,7 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
+class ExcludeDirsProviderTest extends AbstractBaseProviderTest
 {
     /**
      * @var string

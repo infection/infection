@@ -48,7 +48,7 @@ use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PHPUnit\Framework\TestCase;
 
-final class MutatorVisitorTest extends TestCase
+class MutatorVisitorTest extends TestCase
 {
     /**
      * @dataProvider providesMutationCases

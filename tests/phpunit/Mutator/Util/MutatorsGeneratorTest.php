@@ -49,7 +49,7 @@ use PhpParser\Node\Scalar\DNumber;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-final class MutatorsGeneratorTest extends TestCase
+class MutatorsGeneratorTest extends TestCase
 {
     private static $countDefaultMutators = 0;
 

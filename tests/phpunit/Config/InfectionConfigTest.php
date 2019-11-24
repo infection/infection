@@ -41,7 +41,7 @@ use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class InfectionConfigTest extends TestCase
+class InfectionConfigTest extends TestCase
 {
     /**
      * @var Filesystem

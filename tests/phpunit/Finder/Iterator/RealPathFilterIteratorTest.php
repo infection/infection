@@ -39,7 +39,7 @@ use Infection\Tests\Fixtures\Autoloaded\Finder\MockRelativePathFinder;
 use Infection\Tests\Fixtures\Finder\MockRealPathFinder;
 use PHPUnit\Framework\TestCase;
 
-final class RealPathFilterIteratorTest extends TestCase
+class RealPathFilterIteratorTest extends TestCase
 {
     /**
      * @dataProvider providesFinders

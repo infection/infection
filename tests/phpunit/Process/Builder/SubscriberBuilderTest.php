@@ -53,7 +53,7 @@ use Symfony\Component\Filesystem\Filesystem;
  * InputInterfaces should be mocked here so that the 'getOption' method with paramater 'no-progress'
  * should return true. Otherwise you will see different results based on wheter its running in CI or not.
  */
-final class SubscriberBuilderTest extends TestCase
+class SubscriberBuilderTest extends TestCase
 {
     public function test_it_registers_the_subscribers_when_debugging(): void
     {

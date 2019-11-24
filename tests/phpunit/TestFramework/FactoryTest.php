@@ -47,7 +47,7 @@ use Infection\Utils\VersionParser;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class FactoryTest extends TestCase
+class FactoryTest extends TestCase
 {
     public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
     {

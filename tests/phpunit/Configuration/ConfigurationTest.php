@@ -43,7 +43,7 @@ use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use PHPUnit\Framework\TestCase;
 
-final class ConfigurationTest extends TestCase
+class ConfigurationTest extends TestCase
 {
     use ConfigurationAssertions;
 

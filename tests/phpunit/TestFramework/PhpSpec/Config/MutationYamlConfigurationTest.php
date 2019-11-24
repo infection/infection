@@ -39,7 +39,7 @@ use Infection\TestFramework\PhpSpec\Config\MutationYamlConfiguration;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
 
-final class MutationYamlConfigurationTest extends TestCase
+class MutationYamlConfigurationTest extends TestCase
 {
     protected $tempDir = '/path/to/tmp';
 

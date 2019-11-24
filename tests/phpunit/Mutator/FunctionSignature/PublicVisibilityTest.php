@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\FunctionSignature;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class PublicVisibilityTest extends AbstractMutatorTestCase
+class PublicVisibilityTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider blacklistedProvider

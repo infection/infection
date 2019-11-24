@@ -38,7 +38,7 @@ namespace Infection\Tests\AutoReview\ProjectCode;
 use Generator;
 use PHPUnit\Framework\TestCase;
 
-final class DocBlockParserTest extends TestCase
+class DocBlockParserTest extends TestCase
 {
     /**
      * @dataProvider docBlocksProvider

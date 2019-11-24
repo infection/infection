@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class MultiplicationTest extends AbstractMutatorTestCase
+class MultiplicationTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

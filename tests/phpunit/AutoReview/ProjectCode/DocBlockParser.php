@@ -44,7 +44,7 @@ use function implode;
 use function substr;
 use function trim;
 
-final class DocBlockParser
+class DocBlockParser
 {
     public static function parse(string $docblock): string
     {

@@ -37,7 +37,7 @@ namespace Infection\Tests\Finder;
 
 use Symfony\Component\Filesystem\Filesystem;
 
-final class MockVendor
+class MockVendor
 {
     public const VENDOR = 'phptester';
     public const PACKAGE = 'awesome-php-tester';

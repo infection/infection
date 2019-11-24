@@ -39,7 +39,7 @@ use Generator;
 use Infection\Configuration\Entry\Source;
 use PHPUnit\Framework\TestCase;
 
-final class SourceTest extends TestCase
+class SourceTest extends TestCase
 {
     use SourceAssertions;
 

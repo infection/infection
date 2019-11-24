@@ -38,7 +38,7 @@ namespace Infection\Tests\Events;
 use Infection\Events\ApplicationExecutionFinished;
 use PHPUnit\Framework\TestCase;
 
-final class ApplicationExecutionFinishedTest extends TestCase
+class ApplicationExecutionFinishedTest extends TestCase
 {
     /**
      * This class is only used to fire events, and the only functionality it needs is being instantiated
