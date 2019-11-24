@@ -57,13 +57,13 @@ phpstan: vendor $(PHPSTAN)
 validate:
 	composer validate --strict
 
-.PHONY: test
-test:		 ## Runs all the tests
-test: autoreview test-unit test-e2e test-infection
-
 .PHONY: autoreview
 autoreview: 	 ## Runs various checks (static analysis & AutoReview test suite)
 autoreview: phpstan validate test-autoreview
+
+.PHONY: test
+test:		 ## Runs all the tests
+test: autoreview test-unit test-e2e test-infection
 
 .PHONY: test-autoreview
 test-autoreview:
