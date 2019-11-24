@@ -249,14 +249,13 @@ class ProjectCodeTest extends TestCase
     /**
      * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::classesTestProvider
      */
-    public function test_all_test_classes_are_trait_abstract_or_not_final(string $className): void
+    public function test_all_test_classes_are_trait_abstract(string $className): void
     {
         $reflectionClass = new ReflectionClass($className);
 
         $this->assertTrue(
             $reflectionClass->isTrait()
-            || $reflectionClass->isAbstract()
-            || !$reflectionClass->isFinal(),
+            || $reflectionClass->isAbstract(),
             sprintf(
                 'The test class "%s" should be a trait, an abstract or final class.',
                 $className
