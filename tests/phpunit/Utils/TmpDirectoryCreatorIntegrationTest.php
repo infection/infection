@@ -35,99 +35,61 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Utils;
 
-use Generator;
 use Infection\Utils\TmpDirectoryCreator;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Filesystem\Filesystem;
 use function Infection\Tests\make_tmp_dir;
 use function Infection\Tests\normalizePath;
 
-final class TmpDirectoryCreatorTest extends TestCase
+/**
+ * @group integration
+ * @coversNothing
+ */
+final class TmpDirectoryCreatorIntegrationTest extends TestCase
 {
-    /**
-     * @var Filesystem&MockObject
-     */
-    private $fileSystemMock;
-
     /**
      * @var TmpDirectoryCreator
      */
     private $tmpDirCreator;
 
-    protected function setUp(): void
-    {
-        $this->fileSystemMock = $this->createMock(Filesystem::class);
-
-        $this->tmpDirCreator = new TmpDirectoryCreator($this->fileSystemMock);
-    }
+    /**
+     * @var string
+     */
+    private $tmp;
 
     /**
-     * @dataProvider tmpDirProvider
+     * @var Filesystem
      */
-    public function test_it_creates_a_tmp_dir_and_returns_its_path(
-        string $tmpDir,
-        string $expectedTmpDir
-    ): void
-    {
-        $this->fileSystemMock
-            ->expects($this->once())
-            ->method('mkdir')
-            ->with($expectedTmpDir, 0777)
-        ;
+    private $fileSystem;
 
-        $actualTmpDir = $this->tmpDirCreator->createAndGet($tmpDir);
+    protected function setUp(): void
+    {
+        $this->fileSystem = new Filesystem();
+
+        $this->tmpDirCreator = new TmpDirectoryCreator($this->fileSystem);
+
+        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the `tearDown()` method
+        // and as a result some temporary files may still remain.
+        $this->fileSystem->remove(normalizePath(realpath(sys_get_temp_dir())).'/infection-test');
+
+        $this->tmp = make_tmp_dir('infection-test', self::class);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->fileSystem->remove($this->tmp);
+    }
+
+    public function test_it_creates_a_tmp_dir_and_returns_its_path(): void
+    {
+        $expectedTmpDir = $this->tmp.'/infection';
+
+        $this->assertDirectoryNotExists($expectedTmpDir);
+
+        $actualTmpDir = $this->tmpDirCreator->createAndGet($this->tmp);
 
         $this->assertSame($expectedTmpDir, $actualTmpDir);
-    }
 
-    public function test_it_creates_the_tmp_directory_only_once(): void
-    {
-        $tmpDir = '/path/to/tmp';
-        $expectedTmpDir = '/path/to/tmp/infection';
-
-        $this->fileSystemMock
-            ->expects($this->once())
-            ->method('mkdir')
-            ->with($expectedTmpDir, 0777)
-        ;
-
-        $this->assertSame(
-            $expectedTmpDir,
-            $this->tmpDirCreator->createAndGet($tmpDir)
-        );
-        $this->assertSame(
-            $expectedTmpDir,
-            $this->tmpDirCreator->createAndGet($tmpDir)
-        );
-    }
-
-    public function tmpDirProvider(): Generator
-    {
-        yield 'empty dir path' => [
-            '',
-            '/infection',
-        ];
-
-        yield 'root dir path' => [
-            '/',
-            '//infection',
-        ];
-
-        yield 'nominal' => [
-            '/path/to/tmp',
-            '/path/to/tmp/infection',
-        ];
-
-        yield 'relative path' => [
-            'relative/path/to/tmp',
-            'relative/path/to/tmp/infection',
-        ];
-
-        yield 'path with ending slash' => [
-            '/path/to/tmp/',
-            '/path/to/tmp//infection',
-        ];
+        $this->assertDirectoryExists($actualTmpDir);
     }
 }
