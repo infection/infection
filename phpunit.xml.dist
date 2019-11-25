@@ -4,7 +4,6 @@
          bootstrap="./vendor/autoload.php"
          colors="true"
          executionOrder="random"
-         stopOnFailure="true"
          verbose="true"
 >
 

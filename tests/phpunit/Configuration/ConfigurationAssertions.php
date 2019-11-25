@@ -70,8 +70,7 @@ trait ConfigurationAssertions
         bool $expectedIgnoreMsiWithNoMutations,
         ?float $expectedMinMsi,
         bool $expectedShowMutations,
-        ?float $expectedMinCoveredMsi,
-        ?string $expectedStringMutators
+        ?float $expectedMinCoveredMsi
     ): void {
         $this->assertSame($expectedTimeout, $configuration->getProcessTimeout());
         $this->assertSourceStateIs(
@@ -94,7 +93,7 @@ trait ConfigurationAssertions
             $expectedPhpUnit->getConfigDir(),
             $expectedPhpUnit->getCustomPath()
         );
-        $this->assertSame($expectedMutators, $configuration->getMutators());
+        $this->assertEqualsWithDelta($expectedMutators, $configuration->getMutators(), 10.);
         $this->assertSame($expectedTestFramework, $configuration->getTestFramework());
         $this->assertSame($expectedBootstrap, $configuration->getBootstrap());
         $this->assertSame($expectedInitialTestsPhpOptions, $configuration->getInitialTestsPhpOptions());
@@ -108,6 +107,5 @@ trait ConfigurationAssertions
         $this->assertSame($expectedMinMsi, $configuration->getMinMsi());
         $this->assertSame($expectedShowMutations, $configuration->showMutations());
         $this->assertSame($expectedMinCoveredMsi, $configuration->getMinCoveredMsi());
-        $this->assertSame($expectedStringMutators, $configuration->getStringMutators());
     }
 }
