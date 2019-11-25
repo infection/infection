@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Utils;
 
+use function Infection\Tests\make_tmp_dir;
+use function Infection\Tests\normalizePath;
 use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
-use function Infection\Tests\make_tmp_dir;
-use function Infection\Tests\normalizePath;
 
 /**
  * @group integration
@@ -70,7 +70,7 @@ final class TmpDirectoryCreatorIntegrationTest extends TestCase
 
         // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the `tearDown()` method
         // and as a result some temporary files may still remain.
-        $this->fileSystem->remove(normalizePath(realpath(sys_get_temp_dir())).'/infection-test');
+        $this->fileSystem->remove(normalizePath(realpath(sys_get_temp_dir())) . '/infection-test');
 
         $this->tmp = make_tmp_dir('infection-test', self::class);
     }
@@ -82,7 +82,7 @@ final class TmpDirectoryCreatorIntegrationTest extends TestCase
 
     public function test_it_creates_a_tmp_dir_and_returns_its_path(): void
     {
-        $expectedTmpDir = $this->tmp.'/infection';
+        $expectedTmpDir = $this->tmp . '/infection';
 
         $this->assertDirectoryNotExists($expectedTmpDir);
 

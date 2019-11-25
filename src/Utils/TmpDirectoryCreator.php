@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Utils;
 
+use const DIRECTORY_SEPARATOR;
+use function Safe\sprintf;
+use function str_replace;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
-use function str_replace;
-use const DIRECTORY_SEPARATOR;
-use function Safe\sprintf;
 
 /**
  * @internal
@@ -71,7 +71,7 @@ class TmpDirectoryCreator
             Path::isAbsolute($tmpDir),
             sprintf(
                 'Expected the temporary directory passed to be an '
-                .'absolute path. Got "%s"',
+                . 'absolute path. Got "%s"',
                 $tmpDir
             )
         );

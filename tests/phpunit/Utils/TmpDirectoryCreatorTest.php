@@ -40,10 +40,7 @@ use Infection\Utils\TmpDirectoryCreator;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Filesystem\Filesystem;
-use function Infection\Tests\make_tmp_dir;
-use function Infection\Tests\normalizePath;
 
 final class TmpDirectoryCreatorTest extends TestCase
 {
@@ -70,8 +67,7 @@ final class TmpDirectoryCreatorTest extends TestCase
     public function test_it_creates_a_tmp_dir_and_returns_its_path(
         string $tmpDir,
         string $expectedTmpDir
-    ): void
-    {
+    ): void {
         $this->fileSystemMock
             ->expects($this->once())
             ->method('mkdir')
@@ -110,8 +106,7 @@ final class TmpDirectoryCreatorTest extends TestCase
     public function test_the_tmp_dir_given_must_be_an_absolute_path(
         string $tmpDir,
         string $expectedErrorMessage
-    ): void
-    {
+    ): void {
         try {
             $this->tmpDirCreator->createAndGet($tmpDir);
 

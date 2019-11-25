@@ -42,7 +42,6 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
-use Infection\Console\InfectionContainer;
 use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
@@ -51,16 +50,16 @@ use function sys_get_temp_dir;
 final class ConfigurationFactoryTest extends TestCase
 {
     use ConfigurationAssertions;
-    
+
     /**
      * @var ConfigurationFactory
      */
     private $configFactory;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->configFactory = new ConfigurationFactory(
             new TmpDirectoryCreator(
@@ -201,7 +200,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null
             ),
             'none',
-            sys_get_temp_dir().'/infection',
+            sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
             [],
             null,
@@ -232,12 +231,12 @@ final class ConfigurationFactoryTest extends TestCase
 
         yield 'null tmp dir' => self::createValueForTmpDir(
             null,
-            sys_get_temp_dir().'/infection'
+            sys_get_temp_dir() . '/infection'
         );
 
         yield 'empty tmp dir' => self::createValueForTmpDir(
             '',
-            sys_get_temp_dir().'/infection'
+            sys_get_temp_dir() . '/infection'
         );
 
         yield 'relative tmp dir path' => self::createValueForTmpDir(
@@ -455,7 +454,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null
             ),
             'none',
-            sys_get_temp_dir().'/infection',
+            sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
             [],
             null,
@@ -591,7 +590,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null
             ),
             'none',
-            sys_get_temp_dir().'/infection',
+            sys_get_temp_dir() . '/infection',
             new PhpUnit($expectedPhpUnitConfigDir, null),
             [],
             null,
@@ -660,7 +659,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null
             ),
             'none',
-            sys_get_temp_dir().'/infection',
+            sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
             [],
             $expectedTestFramework,
@@ -729,7 +728,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null
             ),
             'none',
-            sys_get_temp_dir().'/infection',
+            sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
             [],
             null,
@@ -798,7 +797,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null
             ),
             'none',
-            sys_get_temp_dir().'/infection',
+            sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
             [],
             null,

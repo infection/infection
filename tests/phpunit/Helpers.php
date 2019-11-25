@@ -36,13 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests;
 
 use Generator;
-use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
 use function random_int;
 use function realpath;
 use function str_replace;
 use function strrpos;
 use function substr;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem;
 use function sys_get_temp_dir;
 
 /**
@@ -88,13 +88,13 @@ function make_tmp_dir(string $namespace, string $className): string
     // We want to know the real path to avoid comparison failures with
     // code that uses real paths only
     $systemTempDir = str_replace('\\', '/', realpath(sys_get_temp_dir()));
-    $basePath = $systemTempDir.'/'.$namespace.'/'.$shortClass;
+    $basePath = $systemTempDir . '/' . $namespace . '/' . $shortClass;
 
     $result = false;
     $attempts = 0;
 
     do {
-        $tmpDir = normalizePath($basePath.random_int(10000, 99999));
+        $tmpDir = normalizePath($basePath . random_int(10000, 99999));
 
         try {
             (new Filesystem())->mkdir($tmpDir, 0777);
