@@ -10,14 +10,14 @@ help:
 # Variables
 #---------------------------------------------------------------------------
 BOX=./.tools/box
-BOX_URL="https://github.com/humbug/box/releases/download/3.8.0/box.phar"
+BOX_URL="https://github.com/humbug/box/releases/download/3.8.3/box.phar"
 
 PHP_CS_FIXER=./.tools/php-cs-fixer
 PHP_CS_FIXER_URL="https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar"
 PHP_CS_FIXER_CACHE=build/cache/.php_cs.cache
 
 PHPSTAN=./.tools/phpstan
-PHPSTAN_URL="https://github.com/phpstan/phpstan/releases/download/0.11.15/phpstan.phar"
+PHPSTAN_URL="https://github.com/phpstan/phpstan/releases/download/0.11.19/phpstan.phar"
 
 PHPUNIT=vendor/bin/phpunit
 
