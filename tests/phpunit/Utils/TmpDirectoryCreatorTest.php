@@ -37,6 +37,7 @@ namespace Infection\Tests\Utils;
 
 use Generator;
 use Infection\Utils\TmpDirectoryCreator;
+use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -103,16 +104,31 @@ final class TmpDirectoryCreatorTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider invalidTmpDirProvider
+     */
+    public function test_the_tmp_dir_given_must_be_an_absolute_path(
+        string $tmpDir,
+        string $expectedErrorMessage
+    ): void
+    {
+        try {
+            $this->tmpDirCreator->createAndGet($tmpDir);
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                $expectedErrorMessage,
+                $exception->getMessage()
+            );
+        }
+    }
+
     public function tmpDirProvider(): Generator
     {
-        yield 'empty dir path' => [
-            '',
-            '/infection',
-        ];
-
         yield 'root dir path' => [
             '/',
-            '//infection',
+            '/infection',
         ];
 
         yield 'nominal' => [
@@ -120,14 +136,22 @@ final class TmpDirectoryCreatorTest extends TestCase
             '/path/to/tmp/infection',
         ];
 
-        yield 'relative path' => [
-            'relative/path/to/tmp',
-            'relative/path/to/tmp/infection',
-        ];
-
         yield 'path with ending slash' => [
             '/path/to/tmp/',
-            '/path/to/tmp//infection',
+            '/path/to/tmp/infection',
+        ];
+    }
+
+    public function invalidTmpDirProvider(): Generator
+    {
+        yield 'empty dir path' => [
+            '',
+            'Expected the temporary directory passed to be an absolute path. Got ""',
+        ];
+
+        yield 'relative path' => [
+            'relative/path/to/tmp',
+            'Expected the temporary directory passed to be an absolute path. Got "relative/path/to/tmp"',
         ];
     }
 }
