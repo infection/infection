@@ -45,7 +45,7 @@ use Symfony\Component\Filesystem\Filesystem;
 final class TmpDirectoryCreatorTest extends TestCase
 {
     /**
-     * @var Filesystem&MockObject
+     * @var Filesystem|MockObject
      */
     private $fileSystemMock;
 

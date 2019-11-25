@@ -256,8 +256,11 @@ final class InfectionContainer extends Container
             SchemaConfigurationFactory::class => static function (): SchemaConfigurationFactory {
                 return new SchemaConfigurationFactory();
             },
-            ConfigurationFactory::class => static function (): ConfigurationFactory {
-                return new ConfigurationFactory();
+            ConfigurationFactory::class => static function (self $container): ConfigurationFactory {
+                /** @var TmpDirectoryCreator $tmpDirCreator */
+                $tmpDirCreator = $container[TmpDirectoryCreator::class];
+
+                return new ConfigurationFactory($tmpDirCreator);
             },
             'coverage.path' => static function (self $container): string {
                 /** @var Configuration $config */
