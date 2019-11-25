@@ -2,6 +2,5 @@ parameters:
     excludes_analyse:
         - %currentWorkingDirectory%/tests/e2e/*
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
-        - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
     ignoreErrors:
         - '#Return type \(void\) of method .*[Visitor|Traverser].* should be compatible with return type .* of method PhpParser\\Node.*#'
