@@ -110,11 +110,7 @@ final class IncludeInterceptor
                 }
             }
 
-            if (isset($this->context)) {
-                $this->fp = fopen($path, $mode, (bool) $options, $this->context);
-            } else {
-                $this->fp = fopen($path, $mode, (bool) $options);
-            }
+            $this->fp = fopen($path, $mode, (bool) $options, $this->context);
         } finally {
             self::enable();
         }
@@ -136,11 +132,7 @@ final class IncludeInterceptor
         self::disable();
 
         try {
-            if (isset($this->context)) {
-                $this->fp = opendir($path, $this->context);
-            } else {
-                $this->fp = opendir($path);
-            }
+            $this->fp = opendir($path, $this->context);
         } finally {
             self::enable();
         }
@@ -169,11 +161,8 @@ final class IncludeInterceptor
 
         $isRecursive = (bool) ($options & STREAM_MKDIR_RECURSIVE);
 
-        if (isset($this->context)) {
-            $return = mkdir($path, $mode, $isRecursive, $this->context);
-        } else {
-            $return = mkdir($path, $mode, $isRecursive);
-        }
+        $return = mkdir($path, $mode, $isRecursive, $this->context);
+
         self::enable();
 
         return $return;
@@ -183,11 +172,8 @@ final class IncludeInterceptor
     {
         self::disable();
 
-        if (isset($this->context)) {
-            $return = rename($path_from, $path_to, $this->context);
-        } else {
-            $return = rename($path_from, $path_to);
-        }
+        $return = rename($path_from, $path_to, $this->context);
+
         self::enable();
 
         return $return;
@@ -197,11 +183,8 @@ final class IncludeInterceptor
     {
         self::disable();
 
-        if (isset($this->context)) {
-            $return = rmdir($path, $this->context);
-        } else {
-            $return = rmdir($path);
-        }
+        $return = rmdir($path, $this->context);
+
         self::enable();
 
         return $return;
@@ -337,11 +320,7 @@ final class IncludeInterceptor
     {
         self::disable();
 
-        if (isset($this->context)) {
-            $return = unlink($path, $this->context);
-        } else {
-            $return = unlink($path);
-        }
+        $return = unlink($path, $this->context);
         self::enable();
 
         return $return;
