@@ -36,10 +36,12 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use Composer\XdebugHandler\XdebugHandler;
-use Infection\Command;
+use Infection\Command\ConfigureCommand;
+use Infection\Command\InfectionCommand;
 use Infection\Console\ConsoleOutput as InfectionConsoleOutput;
 use PackageVersions\Versions;
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -53,18 +55,16 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class Application extends BaseApplication
 {
     private const NAME = 'Infection - PHP Mutation Testing Framework';
-    private const VERSION = '@package_version@';
 
     private const INFECTION_PREFIX = 'INFECTION';
 
-    private const LOGO = <<<'ASCII'
-     ____      ____          __  _
-    /  _/___  / __/__  _____/ /_(_)___  ____
-    / // __ \/ /_/ _ \/ ___/ __/ / __ \/ __ \
-  _/ // / / / __/  __/ /__/ /_/ / /_/ / / / /
- /___/_/ /_/_/  \___/\___/\__/_/\____/_/ /_/
-
-ASCII;
+    private const LOGO = '
+    ____      ____          __  _
+   /  _/___  / __/__  _____/ /_(_)___  ____
+   / // __ \/ /_/ _ \/ ___/ __/ / __ \/ __ \
+ _/ // / / / __/  __/ /__/ /_/ / /_/ / / / /
+/___/_/ /_/_/  \___/\___/\__/_/\____/_/ /_/
+';
 
     /**
      * @var InfectionContainer
@@ -76,15 +76,15 @@ ASCII;
      */
     private $consoleOutput;
 
-    public function __construct(InfectionContainer $container, string $name = self::NAME, string $version = self::VERSION)
+    public function __construct(InfectionContainer $container)
     {
-        parent::__construct($name, $version);
+        parent::__construct(self::NAME, Versions::getVersion('infection/infection'));
 
         $this->container = $container;
         $this->setDefaultCommand('run');
     }
 
-    public function run(InputInterface $input = null, OutputInterface $output = null)
+    public function run(InputInterface $input = null, OutputInterface $output = null): int
     {
         if (null === $input) {
             $input = new ArgvInput();
@@ -119,24 +119,6 @@ ASCII;
         return parent::run($input, $output);
     }
 
-    public function doRun(InputInterface $input, OutputInterface $output)
-    {
-        $output->writeln(self::LOGO);
-
-        return parent::doRun($input, $output);
-    }
-
-    public function getLongVersion()
-    {
-        if (self::VERSION === $this->getVersion()) {
-            $version = Versions::getVersion('infection/infection');
-
-            return sprintf('%s <info>%s</info>', $this->getName(), explode('@', $version)[0]);
-        }
-
-        return parent::getLongVersion();
-    }
-
     public function getContainer(): InfectionContainer
     {
         return $this->container;
@@ -147,11 +129,18 @@ ASCII;
         return $this->consoleOutput;
     }
 
+    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln([self::LOGO, $this->getLongVersion()]);
+
+        return parent::doRunCommand($command, $input, $output);
+    }
+
     protected function getDefaultCommands()
     {
         $commands = array_merge(parent::getDefaultCommands(), [
-            new Command\ConfigureCommand(),
-            new Command\InfectionCommand(),
+            new ConfigureCommand(),
+            new InfectionCommand(),
         ]);
 
         return $commands;
