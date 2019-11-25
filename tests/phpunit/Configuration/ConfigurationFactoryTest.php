@@ -42,7 +42,6 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
-use Infection\Utils\TmpDirectoryCreator;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
@@ -50,6 +49,7 @@ use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Mutator\Util\MutatorsGenerator;
+use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use function sys_get_temp_dir;
@@ -919,7 +919,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null
             ),
             'none',
-            sys_get_temp_dir(),
+            sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
             $expectedMutators,
             null,

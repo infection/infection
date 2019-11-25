@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Configuration;
 
 use Infection\Configuration\Schema\SchemaConfiguration;
-use Infection\Utils\TmpDirectoryCreator;
 use Infection\Mutator\Util\MutatorParser;
 use Infection\Mutator\Util\MutatorsGenerator;
+use Infection\Utils\TmpDirectoryCreator;
 use function sprintf;
 use function sys_get_temp_dir;
 use Webmozart\PathUtil\Path;
