@@ -161,33 +161,33 @@ final class IncludeInterceptor
 
         $isRecursive = (bool) ($options & STREAM_MKDIR_RECURSIVE);
 
-        $return = mkdir($path, $mode, $isRecursive, $this->context);
-
-        self::enable();
-
-        return $return;
+        try {
+            return mkdir($path, $mode, $isRecursive, $this->context);
+        } finally {
+            self::enable();
+        }
     }
 
     public function rename($path_from, $path_to)
     {
         self::disable();
 
-        $return = rename($path_from, $path_to, $this->context);
-
-        self::enable();
-
-        return $return;
+        try {
+            return rename($path_from, $path_to, $this->context);
+        } finally {
+            self::enable();
+        }
     }
 
     public function rmdir($path)
     {
         self::disable();
 
-        $return = rmdir($path, $this->context);
-
-        self::enable();
-
-        return $return;
+        try {
+            return rmdir($path, $this->context);
+        } finally {
+            self::enable();
+        }
     }
 
     public function stream_cast()
@@ -227,33 +227,36 @@ final class IncludeInterceptor
     {
         self::disable();
 
-        switch ($option) {
-            case STREAM_META_TOUCH:
-                if (empty($value)) {
-                    $return = touch($path);
-                } else {
-                    $return = touch($path, $value[0], $value[1]);
-                }
+        try {
+            switch ($option) {
+                case STREAM_META_TOUCH:
+                    if (empty($value)) {
+                        $return = touch($path);
+                    } else {
+                        $return = touch($path, $value[0], $value[1]);
+                    }
 
-                break;
-            case STREAM_META_OWNER_NAME:
-            case STREAM_META_OWNER:
-                $return = chown($path, $value);
+                    break;
+                case STREAM_META_OWNER_NAME:
+                case STREAM_META_OWNER:
+                    $return = chown($path, $value);
 
-                break;
-            case STREAM_META_GROUP_NAME:
-            case STREAM_META_GROUP:
-                $return = chgrp($path, $value);
+                    break;
+                case STREAM_META_GROUP_NAME:
+                case STREAM_META_GROUP:
+                    $return = chgrp($path, $value);
 
-                break;
-            case STREAM_META_ACCESS:
-                $return = chmod($path, $value);
+                    break;
+                case STREAM_META_ACCESS:
+                    $return = chmod($path, $value);
 
-                break;
-            default:
-                throw new \RuntimeException('Unknown stream_metadata option');
+                    break;
+                default:
+                    throw new \RuntimeException('Unknown stream_metadata option');
+            }
+        } finally {
+            self::enable();
         }
-        self::enable();
 
         return $return;
     }
@@ -320,18 +323,21 @@ final class IncludeInterceptor
     {
         self::disable();
 
-        $return = unlink($path, $this->context);
-        self::enable();
-
-        return $return;
+        try {
+            return unlink($path, $this->context);
+        } finally {
+            self::enable();
+        }
     }
 
     public function url_stat($path)
     {
         self::disable();
-        $return = is_readable($path) ? stat($path) : false;
-        self::enable();
 
-        return $return;
+        try {
+            return is_readable($path) ? stat($path) : false;
+        } finally {
+            self::enable();
+        }
     }
 }
