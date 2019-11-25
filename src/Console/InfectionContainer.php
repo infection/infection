@@ -52,8 +52,6 @@ use Infection\Locator\RootsFileLocator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
-use Infection\Mutator\Util\MutatorParser;
-use Infection\Mutator\Util\MutatorsGenerator;
 use Infection\Performance\Limiter\MemoryLimiter;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\TimeFormatter;
@@ -206,14 +204,6 @@ final class InfectionContainer extends Container
             'pretty.printer' => static function (): Standard {
                 return new Standard();
             },
-            'mutators.config' => static function (self $container): array {
-                /** @var Configuration $config */
-                $config = $container[Configuration::class];
-
-                return (new MutatorsGenerator(
-                    $config->getMutators()
-                ))->generate();
-            },
             'metrics' => static function (): MetricsCalculator {
                 return new MetricsCalculator();
             },
@@ -312,17 +302,6 @@ final class InfectionContainer extends Container
                     $container['time.formatter'],
                     $container['memory.formatter']
                 );
-            },
-            'mutators' => static function (self $container): array {
-                /** @var Configuration $config */
-                $config = $container[Configuration::class];
-
-                $parser = new MutatorParser(
-                    $config->getStringMutators(),
-                    $container['mutators.config']
-                );
-
-                return $parser->getMutators();
             },
         ]);
     }
