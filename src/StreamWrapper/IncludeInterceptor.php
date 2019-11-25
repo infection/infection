@@ -110,7 +110,11 @@ final class IncludeInterceptor
                 }
             }
 
-            $this->fp = fopen($path, $mode, (bool) $options, $this->context);
+            if (isset($this->context)) {
+                $this->fp = fopen($path, $mode, (bool) $options, $this->context);
+            } else {
+                $this->fp = fopen($path, $mode, (bool) $options);
+            }
         } finally {
             self::enable();
         }
@@ -132,7 +136,11 @@ final class IncludeInterceptor
         self::disable();
 
         try {
-            $this->fp = opendir($path, $this->context);
+            if (isset($this->context)) {
+                $this->fp = opendir($path, $this->context);
+            } else {
+                $this->fp = opendir($path);
+            }
         } finally {
             self::enable();
         }
@@ -162,10 +170,16 @@ final class IncludeInterceptor
         $isRecursive = (bool) ($options & STREAM_MKDIR_RECURSIVE);
 
         try {
-            return mkdir($path, $mode, $isRecursive, $this->context);
+            if (isset($this->context)) {
+                $return = mkdir($path, $mode, $isRecursive, $this->context);
+            } else {
+                $return = mkdir($path, $mode, $isRecursive);
+            }
         } finally {
             self::enable();
         }
+
+        return $return;
     }
 
     public function rename($path_from, $path_to)
@@ -173,10 +187,16 @@ final class IncludeInterceptor
         self::disable();
 
         try {
-            return rename($path_from, $path_to, $this->context);
+            if (isset($this->context)) {
+                $return = rename($path_from, $path_to, $this->context);
+            } else {
+                $return = rename($path_from, $path_to);
+            }
         } finally {
             self::enable();
         }
+
+        return $return;
     }
 
     public function rmdir($path)
@@ -184,10 +204,16 @@ final class IncludeInterceptor
         self::disable();
 
         try {
-            return rmdir($path, $this->context);
+            if (isset($this->context)) {
+                $return = rmdir($path, $this->context);
+            } else {
+                $return = rmdir($path);
+            }
         } finally {
             self::enable();
         }
+
+        return $return;
     }
 
     public function stream_cast()
@@ -324,10 +350,16 @@ final class IncludeInterceptor
         self::disable();
 
         try {
-            return unlink($path, $this->context);
+            if (isset($this->context)) {
+                $return = unlink($path, $this->context);
+            } else {
+                $return = unlink($path);
+            }
         } finally {
             self::enable();
         }
+
+        return $return;
     }
 
     public function url_stat($path)
