@@ -53,11 +53,6 @@ final class IncludeInterceptor
     private $fp;
 
     /**
-     * @var bool
-     */
-    private static $isEnabled = false;
-
-    /**
      * @var string
      */
     private static $intercept;
@@ -93,18 +88,11 @@ final class IncludeInterceptor
         }
         stream_wrapper_unregister('file');
         stream_wrapper_register('file', __CLASS__);
-        self::$isEnabled = true;
     }
 
     public static function disable(): void
     {
         stream_wrapper_restore('file');
-        self::$isEnabled = false;
-    }
-
-    public static function isEnabled(): bool
-    {
-        return self::$isEnabled;
     }
 
     public function stream_open($path, $mode, $options)

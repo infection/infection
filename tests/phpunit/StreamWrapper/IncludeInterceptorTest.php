@@ -227,13 +227,17 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
 
     public function test_it_re_enables_interceptor_after_file_not_found(): void
     {
+        $expected = include self::$files[2];
+
         IncludeInterceptor::intercept(self::$files[1], self::$files[2]);
         IncludeInterceptor::enable();
 
         try {
             fopen('file-does-not-exist.txt', 'r');
         } catch (Warning $e) {
-            $this->assertTrue(IncludeInterceptor::isEnabled());
+            $after = include self::$files[1];
+
+            $this->assertSame($after, $expected);
 
             return;
         }
