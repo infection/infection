@@ -353,6 +353,10 @@ final class IncludeInterceptorTest extends TestCase
 
     public function test_it_re_enables_interceptor_after_file_not_found_with_stream_metadata(): void
     {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test cannot be run on Windows.');
+        }
+
         $expected = include self::$files[2];
 
         IncludeInterceptor::intercept(self::$files[1], self::$files[2]);
