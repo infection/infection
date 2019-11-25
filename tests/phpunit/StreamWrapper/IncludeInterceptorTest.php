@@ -37,6 +37,7 @@ namespace Infection\Tests\StreamWrapper;
 
 use Infection\StreamWrapper\IncludeInterceptor;
 use PHPUnit\Framework\Error\Warning;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests IncludeInterceptor for correct operation.
@@ -53,7 +54,7 @@ use PHPUnit\Framework\Error\Warning;
  * Other methods are not essential for interception to work,
  * but still are required to be implemented by a full wrapper
  */
-final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
+final class IncludeInterceptorTest extends TestCase
 {
     private static $files = [];
 
@@ -64,6 +65,11 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
             file_put_contents($tempnam, "<?php return $number;");
             self::$files[$number] = $tempnam;
         }
+    }
+
+    protected function tearDown(): void
+    {
+        @IncludeInterceptor::disable();
     }
 
     public static function tearDownAfterClass(): void
@@ -353,7 +359,7 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
         IncludeInterceptor::enable();
 
         try {
-            chown('file-does-not-exist.txt', 'root');
+            touch('/');
         } catch (Warning $e) {
             $after = include self::$files[1];
 
