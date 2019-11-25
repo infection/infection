@@ -55,7 +55,7 @@ trait ConfigurationAssertions
         Source $expectedSource,
         Logs $expectedLogs,
         string $expectedLogVerbosity,
-        ?string $expectedTmpDir,
+        string $expectedTmpDir,
         PhpUnit $expectedPhpUnit,
         array $expectedMutators,
         ?string $expectedTestFramework,

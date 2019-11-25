@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Configuration;
 
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Utils\TmpDirectoryCreator;
 use function sprintf;
 use function sys_get_temp_dir;
 use Webmozart\PathUtil\Path;
@@ -46,6 +47,13 @@ use Webmozart\PathUtil\Path;
  */
 class ConfigurationFactory
 {
+    private $tmpDirectoryCreator;
+
+    public function __construct(TmpDirectoryCreator $tmpDirectoryCreator)
+    {
+        $this->tmpDirectoryCreator = $tmpDirectoryCreator;
+    }
+
     public function create(
         SchemaConfiguration $schema,
         ?string $existingCoveragePath,
@@ -88,7 +96,11 @@ class ConfigurationFactory
             $schema->getSource(),
             $schema->getLogs(),
             $logVerbosity,
-            $tmpDir,
+            // TODO: we might want to consider to separate the "tmp dir
+            // calculation" and the "tmp dir create" in order to not have
+            // the creation of a directory as a potential side-effect of
+            // instantiating a configuration object
+            $this->tmpDirectoryCreator->createAndGet($tmpDir),
             $schema->getPhpUnit(),
             $schema->getMutators(),
             $testFramework ?? $schema->getTestFramework(),

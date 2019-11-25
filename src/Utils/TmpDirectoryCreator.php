@@ -44,8 +44,9 @@ use function Safe\sprintf;
 
 /**
  * @internal
+ * @final
  */
-final class TmpDirectoryCreator
+class TmpDirectoryCreator
 {
     private const BASE_DIR_NAME = 'infection';
 

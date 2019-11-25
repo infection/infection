@@ -55,7 +55,7 @@ final class ConfigurationTest extends TestCase
         Source $source,
         Logs $logs,
         string $logVerbosity,
-        ?string $tmpDir,
+        string $tmpDir,
         PhpUnit $phpUnit,
         array $mutators,
         ?string $testFramework,
@@ -136,7 +136,7 @@ final class ConfigurationTest extends TestCase
                 null
             ),
             'none',
-            null,
+            '',
             new PhpUnit(null, null),
             [],
             null,
