@@ -67,11 +67,6 @@ final class IncludeInterceptorTest extends TestCase
         }
     }
 
-    protected function tearDown(): void
-    {
-        @IncludeInterceptor::disable();
-    }
-
     public static function tearDownAfterClass(): void
     {
         /*
@@ -84,6 +79,11 @@ final class IncludeInterceptorTest extends TestCase
         @IncludeInterceptor::disable();
 
         array_map('unlink', self::$files);
+    }
+
+    protected function tearDown(): void
+    {
+        @IncludeInterceptor::disable();
     }
 
     /**
