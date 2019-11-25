@@ -135,12 +135,15 @@ final class IncludeInterceptor
     {
         self::disable();
 
-        if (isset($this->context)) {
-            $this->fp = opendir($path, $this->context);
-        } else {
-            $this->fp = opendir($path);
+        try {
+            if (isset($this->context)) {
+                $this->fp = opendir($path, $this->context);
+            } else {
+                $this->fp = opendir($path);
+            }
+        } finally {
+            self::enable();
         }
-        self::enable();
 
         return $this->fp !== false;
     }

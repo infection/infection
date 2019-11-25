@@ -244,4 +244,24 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
 
         $this->fail('Badly set up test, exception was not thrown');
     }
+
+    public function test_it_re_enables_interceptor_after_directory_not_found(): void
+    {
+        $expected = include self::$files[2];
+
+        IncludeInterceptor::intercept(self::$files[1], self::$files[2]);
+        IncludeInterceptor::enable();
+
+        try {
+            opendir('dir-does-not-exist');
+        } catch (Warning $e) {
+            $after = include self::$files[1];
+
+            $this->assertSame($after, $expected);
+
+            return;
+        }
+
+        $this->fail('Badly set up test, exception was not thrown');
+    }
 }
