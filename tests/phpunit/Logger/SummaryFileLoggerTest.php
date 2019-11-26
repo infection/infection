@@ -127,12 +127,11 @@ TXT;
         $debugFileLogger->log();
     }
 
+    /**
+     * @requires OSFAMILY Windows Cannot test file permission on Windows
+     */
     public function test_it_outputs_an_error_when_dir_is_not_writable(): void
     {
-        if (\DIRECTORY_SEPARATOR === '\\') {
-            $this->markTestSkipped('Can\'t test file permission on Windows');
-        }
-
         $readOnlyDirPath = $this->tmpDir . '/invalid';
         $logFilePath = $readOnlyDirPath . '/foo.txt';
 
