@@ -161,6 +161,7 @@ final class MutatorProfile
 
     public const REMOVAL = [
         Mutator\Removal\ArrayItemRemoval::class,
+        Mutator\Removal\CloneRemoval::class,
         Mutator\Removal\FunctionCallRemoval::class,
         Mutator\Removal\MethodCallRemoval::class,
     ];
@@ -343,6 +344,7 @@ final class MutatorProfile
 
         //Removal
         'ArrayItemRemoval' => Mutator\Removal\ArrayItemRemoval::class,
+        'CloneRemoval' => Mutator\Removal\CloneRemoval::class,
         'FunctionCallRemoval' => Mutator\Removal\FunctionCallRemoval::class,
         'MethodCallRemoval' => Mutator\Removal\MethodCallRemoval::class,
 
