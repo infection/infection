@@ -81,8 +81,7 @@ final class ConfigurationFactoryTest extends TestCase
     {
         $this->configFactory = new ConfigurationFactory(
             new TmpDirectoryCreator(
-                $this->createMock(Filesystem::class
-                )
+                $this->createMock(Filesystem::class)
             )
         );
     }

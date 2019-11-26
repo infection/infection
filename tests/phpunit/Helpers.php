@@ -92,12 +92,13 @@ function make_tmp_dir(string $namespace, string $className): string
 
     $result = false;
     $attempts = 0;
+    $filesystem = new Filesystem();
 
     do {
         $tmpDir = normalizePath($basePath . random_int(10000, 99999));
 
         try {
-            (new Filesystem())->mkdir($tmpDir, 0777);
+            $filesystem->mkdir($tmpDir, 0777);
 
             $result = true;
         } catch (IOException $exception) {

@@ -70,8 +70,7 @@ class TmpDirectoryCreator
         Assert::true(
             Path::isAbsolute($tmpDir),
             sprintf(
-                'Expected the temporary directory passed to be an '
-                . 'absolute path. Got "%s"',
+                'Expected the temporary directory passed to be an absolute path. Got "%s"',
                 $tmpDir
             )
         );
