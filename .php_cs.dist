@@ -121,6 +121,8 @@ return Config::create()
         'strict_comparison' => true,
         'yoda_style' => false,
         'single_line_throw' => false,
+        'compact_nullable_typehint' => true,
+        'final_static_access' => true,
     ])
     ->setFinder($finder)
 ;
