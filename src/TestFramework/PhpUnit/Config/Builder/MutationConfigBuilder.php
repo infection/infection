@@ -38,6 +38,7 @@ namespace Infection\TestFramework\PhpUnit\Config\Builder;
 use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 
 /**
@@ -65,12 +66,23 @@ class MutationConfigBuilder extends ConfigBuilder
      */
     private $dom;
 
-    public function __construct(string $tempDirectory, string $originalXmlConfigContent, XmlConfigurationHelper $xmlConfigurationHelper, string $projectDir)
-    {
+    /**
+     * @var JUnitTestCaseSorter
+     */
+    private $jUnitTestCaseSorter;
+
+    public function __construct(
+        string $tempDirectory,
+        string $originalXmlConfigContent,
+        XmlConfigurationHelper $xmlConfigurationHelper,
+        string $projectDir,
+        JUnitTestCaseSorter $jUnitTestCaseSorter
+    ) {
         $this->tempDirectory = $tempDirectory;
         $this->projectDir = $projectDir;
 
         $this->xmlConfigurationHelper = $xmlConfigurationHelper;
+        $this->jUnitTestCaseSorter = $jUnitTestCaseSorter;
 
         $this->dom = new \DOMDocument();
         $this->dom->preserveWhiteSpace = false;
@@ -177,9 +189,9 @@ AUTOLOAD;
     }
 
     /**
-     * @param CoverageLineData[] $coverageTests
+     * @param CoverageLineData[] $coverageTestCases
      */
-    private function addTestSuiteWithFilteredTestFiles(array $coverageTests, \DOMDocument $dom, \DOMXPath $xPath): void
+    private function addTestSuiteWithFilteredTestFiles(array $coverageTestCases, \DOMDocument $dom, \DOMXPath $xPath): void
     {
         $testSuites = $xPath->query('/phpunit/testsuites');
         $nodeToAppendTestSuite = $testSuites->item(0);
@@ -192,24 +204,7 @@ AUTOLOAD;
         $testSuite = $dom->createElement('testsuite');
         $testSuite->setAttribute('name', 'Infection testsuite with filtered tests');
 
-        $uniqueCoverageTests = $this->uniqueByTestFile($coverageTests);
-
-        // sort tests to run the fastest first
-        usort(
-            $uniqueCoverageTests,
-            static function (CoverageLineData $a, CoverageLineData $b) {
-                return $a->time <=> $b->time;
-            }
-        );
-
-        $uniqueTestFilePaths = array_map(
-            static function (CoverageLineData $coverageLineData): string {
-                \assert(\is_string($coverageLineData->testFilePath));
-
-                return $coverageLineData->testFilePath;
-            },
-            $uniqueCoverageTests
-        );
+        $uniqueTestFilePaths = $this->jUnitTestCaseSorter->getUniqueSortedFileNames($coverageTestCases);
 
         foreach ($uniqueTestFilePaths as $testFilePath) {
             $file = $dom->createElement('file', $testFilePath);
@@ -220,26 +215,6 @@ AUTOLOAD;
         \assert($nodeToAppendTestSuite instanceof \DOMNode);
 
         $nodeToAppendTestSuite->appendChild($testSuite);
-    }
-
-    /**
-     * @param CoverageLineData[] $coverageTests
-     *
-     * @return CoverageLineData[]
-     */
-    private function uniqueByTestFile(array $coverageTests): array
-    {
-        $usedFileNames = [];
-        $uniqueTests = [];
-
-        foreach ($coverageTests as $coverageTest) {
-            if (!\in_array($coverageTest->testFilePath, $usedFileNames, true)) {
-                $uniqueTests[] = $coverageTest;
-                $usedFileNames[] = $coverageTest->testFilePath;
-            }
-        }
-
-        return $uniqueTests;
     }
 
     private function getOriginalBootstrapFilePath(\DOMXPath $xPath): string

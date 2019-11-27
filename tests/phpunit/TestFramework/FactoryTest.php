@@ -39,6 +39,7 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
@@ -85,7 +86,9 @@ final class FactoryTest extends TestCase
                 false,
                 null
             ),
-            $this->createMock(VersionParser::class)
+            $this->createMock(VersionParser::class),
+            $this->createMock(Filesystem::class),
+            new CommandLineBuilder()
         );
 
         $this->expectException(\InvalidArgumentException::class);
