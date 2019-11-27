@@ -40,24 +40,15 @@ use PhpParser\Node;
 
 final class Fake extends Mutator
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function mutate(Node $node): void
     {
         throw new \LogicException('Not expected to be called');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function mutatesNode(Node $node): bool
     {
         throw new \LogicException('Not expected to be called');
