@@ -50,7 +50,7 @@ final class MBStringTest extends AbstractMutatorTestCase
     /**
      * @dataProvider provideMutationCases
      */
-    public function test_mutator(string $input, string $expected = null, array $settings = []): void
+    public function test_mutator(string $input, ?string $expected = null, array $settings = []): void
     {
         $this->doTest($input, $expected, $settings);
     }

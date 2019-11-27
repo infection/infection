@@ -62,7 +62,7 @@ final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInte
         $this->configDir = $configDir;
     }
 
-    public function locate(string $testFrameworkName, string $customDir = null): string
+    public function locate(string $testFrameworkName, ?string $customDir = null): string
     {
         $dir = $customDir ?: $this->configDir;
         $triedFiles = [];

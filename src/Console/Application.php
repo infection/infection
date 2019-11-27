@@ -86,7 +86,7 @@ final class Application extends BaseApplication
         $this->setDefaultCommand('run');
     }
 
-    public function run(InputInterface $input = null, OutputInterface $output = null): int
+    public function run(?InputInterface $input = null, ?OutputInterface $output = null): int
     {
         if (null === $input) {
             $input = new ArgvInput();

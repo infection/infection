@@ -252,7 +252,7 @@ final class InitialConfigBuilderTest extends TestCase
         return $xPath->query($query);
     }
 
-    private function createConfigBuilder(string $phpUnitXmlConfigPath = null, bool $skipCoverage = false): void
+    private function createConfigBuilder(?string $phpUnitXmlConfigPath = null, bool $skipCoverage = false): void
     {
         $phpunitXmlPath = $phpUnitXmlConfigPath ?: __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit.xml';
 

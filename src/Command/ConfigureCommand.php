@@ -153,9 +153,9 @@ final class ConfigureCommand extends BaseCommand
         array $sourceDirs,
         array $excludedDirs,
         int $timeout,
-        string $phpUnitConfigPath = null,
-        string $phpUnitCustomExecutablePath = null,
-        string $textLogFilePath = null
+        ?string $phpUnitConfigPath = null,
+        ?string $phpUnitCustomExecutablePath = null,
+        ?string $textLogFilePath = null
     ): void {
         $configObject = new stdClass();
 

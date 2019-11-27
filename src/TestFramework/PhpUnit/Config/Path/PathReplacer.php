@@ -54,7 +54,7 @@ final class PathReplacer
      */
     private $phpUnitConfigDir;
 
-    public function __construct(Filesystem $filesystem, string $phpUnitConfigDir = null)
+    public function __construct(Filesystem $filesystem, ?string $phpUnitConfigDir = null)
     {
         $this->filesystem = $filesystem;
         $this->phpUnitConfigDir = $phpUnitConfigDir;
