@@ -172,7 +172,7 @@ class InitialConfigBuilder implements ConfigBuilder
         }
     }
 
-    private function getOrCreateNode(\DOMXPath $xPath, string $nodeName): \DOMElement
+    private function getOrCreateNode(\DOMXPath $xPath, string $nodeName): DOMElement
     {
         $node = $this->getNode($xPath, $nodeName);
 
@@ -194,7 +194,7 @@ class InitialConfigBuilder implements ConfigBuilder
         return null;
     }
 
-    private function createNode(\DOMDocument $dom, string $nodeName): \DOMElement
+    private function createNode(\DOMDocument $dom, string $nodeName): DOMElement
     {
         $node = $dom->createElement($nodeName);
         $document = $dom->documentElement;

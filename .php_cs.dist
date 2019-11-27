@@ -123,6 +123,7 @@ return Config::create()
         'single_line_throw' => false,
         'compact_nullable_typehint' => true,
         'final_static_access' => true,
+        'fully_qualified_strict_types' => true,
     ])
     ->setFinder($finder)
 ;
