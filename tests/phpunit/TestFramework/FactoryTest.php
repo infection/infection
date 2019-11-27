@@ -68,7 +68,7 @@ final class FactoryTest extends TestCase
                     null
                 ),
                 'default',
-                null,
+                '',
                 new PhpUnit(null, null),
                 [],
                 null,

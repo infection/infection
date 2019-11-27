@@ -92,11 +92,8 @@ final class InfectionContainer extends Container
             'filesystem' => static function (): Filesystem {
                 return new Filesystem();
             },
-            'tmp.dir.creator' => static function (self $container): TmpDirectoryCreator {
+            TmpDirectoryCreator::class => static function (self $container): TmpDirectoryCreator {
                 return new TmpDirectoryCreator($container['filesystem']);
-            },
-            'tmp.dir' => static function (self $container): string {
-                return $container['tmp.dir.creator']->createAndGet((string) $container[Configuration::class]->getTmpDir());
             },
             'coverage.dir.phpunit' => static function (self $container) {
                 return sprintf(
@@ -135,8 +132,11 @@ final class InfectionContainer extends Container
                 );
             },
             'test.framework.factory' => static function (self $container): Factory {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
                 return new Factory(
-                    $container['tmp.dir'],
+                    $config->getTmpDir(),
                     $container['project.dir'],
                     $container['testframework.config.locator'],
                     $container['xml.configuration.helper'],
@@ -155,8 +155,11 @@ final class InfectionContainer extends Container
                 );
             },
             'mutant.creator' => static function (self $container): MutantCreator {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
                 return new MutantCreator(
-                    $container['tmp.dir'],
+                    $config->getTmpDir(),
                     $container['differ'],
                     $container['pretty.printer']
                 );
@@ -243,8 +246,11 @@ final class InfectionContainer extends Container
             SchemaConfigurationFactory::class => static function (): SchemaConfigurationFactory {
                 return new SchemaConfigurationFactory();
             },
-            ConfigurationFactory::class => static function (): ConfigurationFactory {
-                return new ConfigurationFactory();
+            ConfigurationFactory::class => static function (self $container): ConfigurationFactory {
+                /** @var TmpDirectoryCreator $tmpDirCreator */
+                $tmpDirCreator = $container[TmpDirectoryCreator::class];
+
+                return new ConfigurationFactory($tmpDirCreator);
             },
             'coverage.path' => static function (self $container): string {
                 /** @var Configuration $config */
@@ -253,7 +259,7 @@ final class InfectionContainer extends Container
                 $existingCoveragePath = (string) $config->getExistingCoveragePath();
 
                 if ($existingCoveragePath === '') {
-                    return $container['tmp.dir'];
+                    return $config->getTmpDir();
                 }
 
                 return $container['filesystem']->isAbsolutePath($existingCoveragePath)
@@ -297,7 +303,7 @@ final class InfectionContainer extends Container
                     $container['diff.colorizer'],
                     $config,
                     $container['filesystem'],
-                    $container['tmp.dir'],
+                    $config->getTmpDir(),
                     $container['timer'],
                     $container['time.formatter'],
                     $container['memory.formatter']

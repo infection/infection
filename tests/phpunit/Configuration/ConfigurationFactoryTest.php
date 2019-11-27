@@ -49,7 +49,10 @@ use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Mutator\Util\MutatorsGenerator;
+use function Infection\Tests\normalizePath;
+use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 use function sys_get_temp_dir;
 
 final class ConfigurationFactoryTest extends TestCase
@@ -59,11 +62,28 @@ final class ConfigurationFactoryTest extends TestCase
     private static $mutators;
 
     /**
+     * @var ConfigurationFactory
+     */
+    private $configFactory;
+
+    /**
      * {@inheritdoc}
      */
     public static function tearDownAfterClass(): void
     {
         self::$mutators = null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        $this->configFactory = new ConfigurationFactory(
+            new TmpDirectoryCreator(
+                $this->createMock(Filesystem::class)
+            )
+        );
     }
 
     /**
@@ -89,7 +109,7 @@ final class ConfigurationFactoryTest extends TestCase
         Source $expectedSource,
         Logs $expectedLogs,
         ?string $expectedLogVerbosity,
-        ?string $expectedTmpDir,
+        string $expectedTmpDir,
         PhpUnit $expectedPhpUnit,
         array $expectedMutators,
         ?string $expectedTestFramework,
@@ -106,7 +126,7 @@ final class ConfigurationFactoryTest extends TestCase
         bool $expectedShowMutations,
         ?float $expectedMinCoveredMsi
     ): void {
-        $config = (new ConfigurationFactory())->create(
+        $config = $this->configFactory->create(
             $schema,
             $inputExistingCoveragePath,
             $inputInitialTestsPhpOptions,
@@ -130,7 +150,7 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedSource,
             $expectedLogs,
             $expectedLogVerbosity,
-            $expectedTmpDir,
+            normalizePath($expectedTmpDir),
             $expectedPhpUnit,
             $expectedMutators,
             $expectedTestFramework,
@@ -163,7 +183,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null
                 ),
-                null,
+                '',
                 new PhpUnit(null, null),
                 [],
                 null,
@@ -195,7 +215,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null
             ),
             'none',
-            sys_get_temp_dir(),
+            sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
             self::getDefaultMutators(),
             null,
@@ -225,22 +245,22 @@ final class ConfigurationFactoryTest extends TestCase
 
         yield 'null tmp dir' => self::createValueForTmpDir(
             null,
-            sys_get_temp_dir()
+            sys_get_temp_dir() . '/infection'
         );
 
         yield 'empty tmp dir' => self::createValueForTmpDir(
             '',
-            sys_get_temp_dir()
+            sys_get_temp_dir() . '/infection'
         );
 
         yield 'relative tmp dir path' => self::createValueForTmpDir(
             'relative/path/to/tmp',
-            '/path/to/relative/path/to/tmp'
+            '/path/to/relative/path/to/tmp/infection'
         );
 
         yield 'absolute tmp dir path' => self::createValueForTmpDir(
             '/absolute/path/to/tmp',
-            '/absolute/path/to/tmp'
+            '/absolute/path/to/tmp/infection'
         );
 
         yield 'no PHPUnit config dir' => self::createValueForPhpUnitConfigDir(
@@ -418,7 +438,7 @@ final class ConfigurationFactoryTest extends TestCase
                 new Badge('master')
             ),
             'none',
-            '/path/to/config/tmp',
+            '/path/to/config/tmp/infection',
             new PhpUnit(
                 '/path/to/config/phpunit-dir',
                 'config/phpunit'
@@ -458,7 +478,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null
                 ),
-                null,
+                '',
                 new PhpUnit(null, null),
                 [],
                 null,
@@ -490,7 +510,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null
             ),
             'none',
-            sys_get_temp_dir(),
+            sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
             self::getDefaultMutators(),
             null,
@@ -592,7 +612,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null
                 ),
-                null,
+                '',
                 new PhpUnit($phpUnitConfigDir, null),
                 [],
                 null,
@@ -624,7 +644,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null
             ),
             'none',
-            sys_get_temp_dir(),
+            sys_get_temp_dir() . '/infection',
             new PhpUnit($expectedPhpUnitConfigDir, null),
             self::getDefaultMutators(),
             null,
@@ -660,7 +680,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null
                 ),
-                null,
+                '',
                 new PhpUnit(null, null),
                 [],
                 $configTestFramework,
@@ -692,7 +712,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null
             ),
             'none',
-            sys_get_temp_dir(),
+            sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
             self::getDefaultMutators(),
             $expectedTestFramework,
@@ -728,7 +748,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null
                 ),
-                null,
+                '',
                 new PhpUnit(null, null),
                 [],
                 null,
@@ -760,7 +780,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null
             ),
             'none',
-            sys_get_temp_dir(),
+            sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
             self::getDefaultMutators(),
             null,
@@ -796,7 +816,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null
                 ),
-                null,
+                '',
                 new PhpUnit(null, null),
                 [],
                 null,
@@ -828,7 +848,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null
             ),
             'none',
-            sys_get_temp_dir(),
+            sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
             self::getDefaultMutators(),
             null,
@@ -899,7 +919,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null
             ),
             'none',
-            sys_get_temp_dir(),
+            sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
             $expectedMutators,
             null,

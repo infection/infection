@@ -35,41 +35,118 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Utils;
 
+use Generator;
 use Infection\Utils\TmpDirectoryCreator;
+use InvalidArgumentException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
 final class TmpDirectoryCreatorTest extends TestCase
 {
     /**
+     * @var Filesystem|MockObject
+     */
+    private $fileSystemMock;
+
+    /**
      * @var TmpDirectoryCreator
      */
-    private $creator;
-
-    /**
-     * @var string
-     */
-    private $workspace;
-
-    /**
-     * @var Filesystem
-     */
-    private $fileSystem;
+    private $tmpDirCreator;
 
     protected function setUp(): void
     {
-        $this->fileSystem = new Filesystem();
-        $this->creator = new TmpDirectoryCreator($this->fileSystem);
-        $this->workspace = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
+        $this->fileSystemMock = $this->createMock(Filesystem::class);
+
+        $this->tmpDirCreator = new TmpDirectoryCreator($this->fileSystemMock);
     }
 
-    protected function tearDown(): void
-    {
-        $this->fileSystem->remove($this->workspace);
+    /**
+     * @dataProvider tmpDirProvider
+     */
+    public function test_it_creates_a_tmp_dir_and_returns_its_path(
+        string $tmpDir,
+        string $expectedTmpDir
+    ): void {
+        $this->fileSystemMock
+            ->expects($this->once())
+            ->method('mkdir')
+            ->with($expectedTmpDir, 0777)
+        ;
+
+        $actualTmpDir = $this->tmpDirCreator->createAndGet($tmpDir);
+
+        $this->assertSame($expectedTmpDir, $actualTmpDir);
     }
 
-    public function test_it_creates_and_return_path(): void
+    public function test_it_creates_the_tmp_directory_only_once(): void
     {
-        $this->assertDirectoryExists($this->creator->createAndGet($this->workspace));
+        $tmpDir = '/path/to/tmp';
+        $expectedTmpDir = '/path/to/tmp/infection';
+
+        $this->fileSystemMock
+            ->expects($this->once())
+            ->method('mkdir')
+            ->with($expectedTmpDir, 0777)
+        ;
+
+        $this->assertSame(
+            $expectedTmpDir,
+            $this->tmpDirCreator->createAndGet($tmpDir)
+        );
+        $this->assertSame(
+            $expectedTmpDir,
+            $this->tmpDirCreator->createAndGet($tmpDir)
+        );
+    }
+
+    /**
+     * @dataProvider invalidTmpDirProvider
+     */
+    public function test_the_tmp_dir_given_must_be_an_absolute_path(
+        string $tmpDir,
+        string $expectedErrorMessage
+    ): void {
+        try {
+            $this->tmpDirCreator->createAndGet($tmpDir);
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                $expectedErrorMessage,
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function tmpDirProvider(): Generator
+    {
+        yield 'root dir path' => [
+            '/',
+            '/infection',
+        ];
+
+        yield 'nominal' => [
+            '/path/to/tmp',
+            '/path/to/tmp/infection',
+        ];
+
+        yield 'path with ending slash' => [
+            '/path/to/tmp/',
+            '/path/to/tmp/infection',
+        ];
+    }
+
+    public function invalidTmpDirProvider(): Generator
+    {
+        yield 'empty dir path' => [
+            '',
+            'Expected the temporary directory passed to be an absolute path. Got ""',
+        ];
+
+        yield 'relative path' => [
+            'relative/path/to/tmp',
+            'Expected the temporary directory passed to be an absolute path. Got "relative/path/to/tmp"',
+        ];
     }
 }
