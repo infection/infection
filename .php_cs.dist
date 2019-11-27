@@ -101,6 +101,7 @@ return Config::create()
             'separate' => 'bottom',
         ],
         'native_function_invocation' => false,
+        'native_constant_invocation' => false,
         'no_superfluous_phpdoc_tags' => true,
         'no_useless_else' => true,
         'ordered_class_elements' => true,
@@ -129,6 +130,9 @@ return Config::create()
             'syntax' => 'short',
         ],
         'logical_operators' => true,
+        'no_alternative_syntax' => true,
+        'no_unset_cast' => true,
+        'no_useless_return' => true,
     ])
     ->setFinder($finder)
 ;
