@@ -141,6 +141,7 @@ return Config::create()
             'case' => 'snake_case',
         ],
         'php_unit_ordered_covers' => true,
+        'phpdoc_no_empty_return' => true,
     ])
     ->setFinder($finder)
 ;
