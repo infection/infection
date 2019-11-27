@@ -49,10 +49,10 @@ use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Mutator\Util\MutatorsGenerator;
+use function Infection\Tests\normalizePath;
 use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
-use function Infection\Tests\normalizePath;
 use function sys_get_temp_dir;
 
 final class ConfigurationFactoryTest extends TestCase
