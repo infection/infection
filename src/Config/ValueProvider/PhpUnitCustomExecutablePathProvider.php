@@ -92,8 +92,6 @@ final class PhpUnitCustomExecutablePathProvider
                 $this->questionHelper->ask($input, $output, $question)
             );
         }
-
-        return null;
     }
 
     private function getValidator(): Closure

@@ -80,7 +80,7 @@ final class TestFrameworkConfigPathProvider
         try {
             $this->testFrameworkConfigLocator->locate($testFramework);
 
-            return null;
+            return;
         } catch (Exception $e) {
             if ($testFramework !== TestFrameworkTypes::PHPUNIT) {
                 return $this->askTestFrameworkConfigLocation($input, $output, $dirsInCurrentDir, $testFramework, '');

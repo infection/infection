@@ -62,7 +62,7 @@ final class MutatorVisitor extends NodeVisitorAbstract
         $attributes = $node->getAttributes();
 
         if (!array_key_exists('startTokenPos', $attributes)) {
-            return null;
+            return;
         }
 
         $mutatedAttributes = $this->mutation->getAttributes();
@@ -77,7 +77,5 @@ final class MutatorVisitor extends NodeVisitorAbstract
             // TODO beforeTraverse - FirstFindingVisitor
             // TODO enterNode instead of leaveNode for '<' mutation to not travers children?
         }
-
-        return null;
     }
 }

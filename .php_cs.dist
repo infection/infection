@@ -143,6 +143,8 @@ return Config::create()
         'php_unit_ordered_covers' => true,
         'phpdoc_no_empty_return' => true,
         'phpdoc_order' => true,
+        'self_static_accessor' => true,
+        'simplified_null_return' => true,
     ])
     ->setFinder($finder)
 ;

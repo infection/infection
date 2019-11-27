@@ -132,7 +132,7 @@ AUTOLOAD;
     private function getOriginalBootstrapFilePath(array $parsedYaml)
     {
         if (!array_key_exists('bootstrap', $parsedYaml)) {
-            return null;
+            return;
         }
 
         return sprintf('%s/%s', $this->projectDir, $parsedYaml['bootstrap']);

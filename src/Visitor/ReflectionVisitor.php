@@ -89,7 +89,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
         // No need to traverse outside of classes
         if (count($this->classScopeStack) === 0) {
-            return null;
+            return;
         }
 
         if ($node instanceof Node\Stmt\ClassMethod) {
@@ -117,8 +117,6 @@ final class ReflectionVisitor extends NodeVisitorAbstract
             $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->classScopeStack[count($this->classScopeStack) - 1]);
             $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
         }
-
-        return null;
     }
 
     public function leaveNode(Node $node): ?Node

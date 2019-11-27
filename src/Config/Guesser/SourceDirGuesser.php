@@ -57,7 +57,7 @@ class SourceDirGuesser implements Guesser
     public function guess()
     {
         if (!isset($this->composerJsonContent->autoload)) {
-            return null;
+            return;
         }
 
         $autoload = $this->composerJsonContent->autoload;
@@ -69,8 +69,6 @@ class SourceDirGuesser implements Guesser
         if (isset($autoload->{'psr-0'})) {
             return $this->getValues('psr-0');
         }
-
-        return null;
     }
 
     private function getValues(string $psr): array

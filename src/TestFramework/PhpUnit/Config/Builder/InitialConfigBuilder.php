@@ -193,8 +193,6 @@ class InitialConfigBuilder implements ConfigBuilder
         if ($nodeList->length) {
             return $nodeList->item(0);
         }
-
-        return null;
     }
 
     private function createNode(DOMDocument $dom, string $nodeName): DOMElement
