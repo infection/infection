@@ -35,17 +35,14 @@ declare(strict_types=1);
 
 use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
-use function strlen;
 
-$header = trim(
-    sprintf(
-        'This code is licensed under the BSD 3-Clause License.%s',
-        substr(
-            file_get_contents('LICENSE'),
-            strlen('BSD 3-Clause License')
-        )
+$header = trim(sprintf(
+    'This code is licensed under the BSD 3-Clause License.%s',
+    substr(
+        file_get_contents('LICENSE'),
+        strlen('BSD 3-Clause License')
     )
-);
+));
 
 $finder = Finder::create()
     ->in(__DIR__)
@@ -103,9 +100,7 @@ return Config::create()
             'location' => 'after_open',
             'separate' => 'bottom',
         ],
-        'native_function_invocation' => [
-            'include' => ['@compiler_optimized'],
-        ],
+        'native_function_invocation' => false,
         'no_superfluous_phpdoc_tags' => true,
         'no_useless_else' => true,
         'ordered_class_elements' => true,
@@ -130,6 +125,10 @@ return Config::create()
             'import_constants' => true,
             'import_functions' => true,
         ],
+        'list_syntax' => [
+            'syntax' => 'short',
+        ],
+        'logical_operators' => true,
     ])
     ->setFinder($finder)
 ;
