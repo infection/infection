@@ -65,9 +65,9 @@ class CoverageXmlParser
     }
 
     /**
-     * @return CoverageFileData[]
-     *
      * @throws Exception
+     *
+     * @return CoverageFileData[]
      */
     public function parse(string $coverageXmlContent): array
     {
@@ -105,9 +105,9 @@ class CoverageXmlParser
     }
 
     /**
-     * @return array<string, CoverageFileData>
-     *
      * @throws Exception
+     *
+     * @return array<string, CoverageFileData>
      */
     private function processXmlFileCoverage(string $relativeCoverageFilePath, string $projectSource): array
     {

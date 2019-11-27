@@ -155,9 +155,9 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
      *    ]
      * ]
      *
-     * @return CoverageFileData[]
-     *
      * @throws CoverageDoesNotExistException
+     *
+     * @return CoverageFileData[]
      */
     private function getCoverage(): array
     {
@@ -208,9 +208,9 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
     }
 
     /**
-     * @return CoverageLineData[]
-     *
      * @throws CoverageDoesNotExistException
+     *
+     * @return CoverageLineData[]
      */
     private function getTestsForExecutedMethodOnLine(string $filePath, int $line): array
     {
