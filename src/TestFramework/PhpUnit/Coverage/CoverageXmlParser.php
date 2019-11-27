@@ -35,6 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Coverage;
 
+use DOMDocument;
+use DOMElement;
+use DOMNode;
+use DOMNodeList;
+use DOMXPath;
+use Exception;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoverageLineData;
@@ -61,13 +67,13 @@ class CoverageXmlParser
     /**
      * @return CoverageFileData[]
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function parse(string $coverageXmlContent): array
     {
-        $dom = new \DOMDocument();
+        $dom = new DOMDocument();
         $dom->loadXML($this->removeNamespace($coverageXmlContent));
-        $xPath = new \DOMXPath($dom);
+        $xPath = new DOMXPath($dom);
 
         $this->assertHasCoverage($xPath);
 
@@ -85,12 +91,12 @@ class CoverageXmlParser
         return array_merge(...$coverage);
     }
 
-    private function assertHasCoverage(\DOMXPath $xPath): void
+    private function assertHasCoverage(DOMXPath $xPath): void
     {
         $lineCoverage = $xPath->query('/phpunit/project/directory[1]/totals/lines')->item(0);
 
         if (
-            !$lineCoverage instanceof \DOMElement
+            !$lineCoverage instanceof DOMElement
             || ($coverageCount = $lineCoverage->getAttribute('executed')) === '0'
             || $coverageCount === ''
         ) {
@@ -101,16 +107,16 @@ class CoverageXmlParser
     /**
      * @return array<string, CoverageFileData>
      *
-     * @throws \Exception
+     * @throws Exception
      */
     private function processXmlFileCoverage(string $relativeCoverageFilePath, string $projectSource): array
     {
         $absolutePath = realpath($this->coverageDir . '/' . $relativeCoverageFilePath);
         $coverageFileXml = file_get_contents($absolutePath);
 
-        $dom = new \DOMDocument();
+        $dom = new DOMDocument();
         $dom->loadXML($this->removeNamespace($coverageFileXml));
-        $xPath = new \DOMXPath($dom);
+        $xPath = new DOMXPath($dom);
 
         $sourceFilePath = $this->getSourceFilePath($xPath, $relativeCoverageFilePath, $projectSource);
 
@@ -121,7 +127,7 @@ class CoverageXmlParser
             return [$sourceFilePath => new CoverageFileData()];
         }
 
-        /** @var \DOMNodeList $lineCoverageNodes */
+        /** @var DOMNodeList $lineCoverageNodes */
         $lineCoverageNodes = $xPath->query('/phpunit/file/coverage/line');
 
         if (!$lineCoverageNodes->length) {
@@ -151,9 +157,9 @@ class CoverageXmlParser
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
-    private function getSourceFilePath(\DOMXPath $xPath, string $relativeCoverageFilePath, string $projectSource): string
+    private function getSourceFilePath(DOMXPath $xPath, string $relativeCoverageFilePath, string $projectSource): string
     {
         $fileNode = $xPath->query('/phpunit/file')[0];
         $fileName = $fileNode->getAttribute('name');
@@ -182,12 +188,12 @@ class CoverageXmlParser
     /**
      * @return array<int, array<int, CoverageLineData>>
      */
-    private function getCoveredLinesData(\DOMNodeList $lineCoverageNodes): array
+    private function getCoveredLinesData(DOMNodeList $lineCoverageNodes): array
     {
         $fileCoverage = [];
 
         foreach ($lineCoverageNodes as $lineCoverageNode) {
-            /** @var \DOMNode $lineCoverageNode */
+            /** @var DOMNode $lineCoverageNode */
             $lineNumber = (int) $lineCoverageNode->getAttribute('nr');
 
             foreach ($lineCoverageNode->childNodes as $coveredNode) {
@@ -205,7 +211,7 @@ class CoverageXmlParser
     /**
      * @return MethodLocationData[]
      */
-    private function getMethodsCoverageData(\DOMNodeList $methodsCoverageNodes): array
+    private function getMethodsCoverageData(DOMNodeList $methodsCoverageNodes): array
     {
         $methodsCoverage = [];
 
@@ -221,7 +227,7 @@ class CoverageXmlParser
         return $methodsCoverage;
     }
 
-    private function getProjectSource(\DOMXPath $xPath): string
+    private function getProjectSource(DOMXPath $xPath): string
     {
         // phpunit >= 6
         $sourceNodes = $xPath->query('//project/@source');

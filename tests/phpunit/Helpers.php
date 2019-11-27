@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use const DIRECTORY_SEPARATOR;
 use Generator;
 
 /**
@@ -42,7 +43,7 @@ use Generator;
  */
 function normalizePath(string $value): string
 {
-    return str_replace(\DIRECTORY_SEPARATOR, '/', $value);
+    return str_replace(DIRECTORY_SEPARATOR, '/', $value);
 }
 
 function normalizeLineReturn(string $value): string

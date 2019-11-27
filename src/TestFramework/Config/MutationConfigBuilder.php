@@ -35,7 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Config;
 
+use function assert;
 use Infection\Mutant\MutantInterface;
+use function is_string;
+use Phar;
 
 /**
  * @internal
@@ -51,7 +54,7 @@ abstract class MutationConfigBuilder
         if (0 === strpos(__FILE__, 'phar:')) {
             $infectionPhar = sprintf(
                 '\Phar::loadPhar("%s", "%s");',
-                str_replace('phar://', '', \Phar::running(true)),
+                str_replace('phar://', '', Phar::running(true)),
                 'infection.phar'
             );
         }
@@ -72,7 +75,7 @@ CONTENT;
     private function getInterceptorNamespacePrefix(): string
     {
         $prefix = strstr(__NAMESPACE__, 'Infection', true);
-        \assert(\is_string($prefix));
+        assert(is_string($prefix));
 
         return $prefix;
     }

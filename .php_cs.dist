@@ -35,13 +35,14 @@ declare(strict_types=1);
 
 use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
+use function strlen;
 
 $header = trim(
     sprintf(
         'This code is licensed under the BSD 3-Clause License.%s',
         substr(
             file_get_contents('LICENSE'),
-            \strlen('BSD 3-Clause License')
+            strlen('BSD 3-Clause License')
         )
     )
 );
@@ -124,6 +125,11 @@ return Config::create()
         'compact_nullable_typehint' => true,
         'final_static_access' => true,
         'fully_qualified_strict_types' => true,
+        'global_namespace_import' => [
+            'import_classes' => true,
+            'import_constants' => true,
+            'import_functions' => true,
+        ],
     ])
     ->setFinder($finder)
 ;

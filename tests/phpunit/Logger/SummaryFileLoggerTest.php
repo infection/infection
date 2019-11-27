@@ -35,10 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use const DIRECTORY_SEPARATOR;
 use Infection\Logger\SummaryFileLogger;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Utils\TmpDirectoryCreator;
+use function microtime;
 use PHPUnit\Framework\TestCase;
+use function random_int;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -62,7 +65,7 @@ final class SummaryFileLoggerTest extends TestCase
     protected function setUp(): void
     {
         $this->fileSystem = new Filesystem();
-        $this->workspace = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
+        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . microtime(true) . random_int(100, 999);
         $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
     }
 

@@ -35,10 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Config\ValueProvider;
 
+use Closure;
+use Exception;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\PhpUnitPathGuesser;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\TestFrameworkTypes;
+use RuntimeException;
 use function Safe\file_get_contents;
 use function Safe\json_decode;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -78,7 +81,7 @@ final class TestFrameworkConfigPathProvider
             $this->testFrameworkConfigLocator->locate($testFramework);
 
             return null;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if ($testFramework !== TestFrameworkTypes::PHPUNIT) {
                 return $this->askTestFrameworkConfigLocation($input, $output, $dirsInCurrentDir, $testFramework, '');
             }
@@ -97,7 +100,7 @@ final class TestFrameworkConfigPathProvider
                     $this->testFrameworkConfigLocator->locate($testFramework, $defaultValue);
 
                     return $defaultValue;
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     // just continue to ask question
                 }
             }
@@ -106,7 +109,7 @@ final class TestFrameworkConfigPathProvider
         }
     }
 
-    private function getValidator(string $testFramework): \Closure
+    private function getValidator(string $testFramework): Closure
     {
         return function (string $answerDir) use ($testFramework): string {
             $answerDir = trim($answerDir);
@@ -116,7 +119,7 @@ final class TestFrameworkConfigPathProvider
             }
 
             if (!is_dir($answerDir)) {
-                throw new \RuntimeException(sprintf('Could not find "%s" directory.', $answerDir));
+                throw new RuntimeException(sprintf('Could not find "%s" directory.', $answerDir));
             }
 
             $this->testFrameworkConfigLocator->locate($testFramework, $answerDir);

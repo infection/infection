@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant\Generator;
 
+use function dirname;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
@@ -132,7 +133,7 @@ final class MutationsGeneratorTest extends TestCase
             $this->createMock(LineCodeCoverage::class),
             Decrement::class,
             null,
-            [\dirname(__DIR__, 2) . '/Fixtures/Files/InvalidFile']
+            [dirname(__DIR__, 2) . '/Fixtures/Files/InvalidFile']
         );
 
         $this->expectException(ParserException::class);
@@ -168,7 +169,7 @@ final class MutationsGeneratorTest extends TestCase
             );
 
         $generator = new MutationsGenerator(
-            [\dirname(__DIR__, 2) . '/Fixtures/Files/Mutation/OneFile'],
+            [dirname(__DIR__, 2) . '/Fixtures/Files/Mutation/OneFile'],
             [],
             $this->createMock(LineCodeCoverage::class),
             [new Plus(new MutatorConfig([]))],
@@ -187,7 +188,7 @@ final class MutationsGeneratorTest extends TestCase
     ): MutationsGenerator {
         if ($srcDirs === []) {
             $srcDirs = [
-                \dirname(__DIR__, 2) . '/Fixtures/Files/Mutation/OneFile',
+                dirname(__DIR__, 2) . '/Fixtures/Files/Mutation/OneFile',
             ];
         }
         $excludedDirsOrFiles = [];

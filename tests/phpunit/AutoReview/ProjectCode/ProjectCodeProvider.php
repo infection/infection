@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
+use const DIRECTORY_SEPARATOR;
 use Generator;
+use function in_array;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\InfectionCommand;
 use Infection\Config\ConsoleHelper;
@@ -176,7 +178,7 @@ final class ProjectCodeProvider
                 return sprintf(
                     '%s\\%s%s%s',
                     'Infection',
-                    str_replace(\DIRECTORY_SEPARATOR, '\\', $file->getRelativePath()),
+                    str_replace(DIRECTORY_SEPARATOR, '\\', $file->getRelativePath()),
                     $file->getRelativePath() ? '\\' : '',
                     $file->getBasename('.' . $file->getExtension())
                 );
@@ -229,7 +231,7 @@ final class ProjectCodeProvider
                 $reflectionClass = new ReflectionClass($className);
 
                 return !$reflectionClass->isInterface()
-                    && !\in_array(
+                    && !in_array(
                         $className,
                         [
                             CoverageFileData::class,
@@ -271,8 +273,8 @@ final class ProjectCodeProvider
 
         $classes = array_map(
             static function (SplFileInfo $file) {
-                $fqcnPart = ltrim(str_replace('phpunit', '', $file->getRelativePath()), \DIRECTORY_SEPARATOR);
-                $fqcnPart = str_replace(\DIRECTORY_SEPARATOR, '\\', $fqcnPart);
+                $fqcnPart = ltrim(str_replace('phpunit', '', $file->getRelativePath()), DIRECTORY_SEPARATOR);
+                $fqcnPart = str_replace(DIRECTORY_SEPARATOR, '\\', $fqcnPart);
 
                 return sprintf(
                     'Infection\\Tests\\%s%s%s',

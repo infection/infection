@@ -41,6 +41,8 @@ use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\Utils\VersionParser;
+use InvalidArgumentException;
+use const PHP_SAPI;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -151,7 +153,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
          *
          * This lets folks use, say, a bash wrapper over phpunit.
          */
-        if ('cli' === \PHP_SAPI && empty($phpExtraArgs) && is_executable($frameworkPath) && `command -v php`) {
+        if ('cli' === PHP_SAPI && empty($phpExtraArgs) && is_executable($frameworkPath) && `command -v php`) {
             return array_merge([$frameworkPath], $frameworkArgs);
         }
 
@@ -201,7 +203,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
 
         try {
             $version = $this->versionParser->parse($process->getOutput());
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $version = 'unknown';
         } finally {
             $this->cachedVersion = $version;
@@ -231,7 +233,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
 
             $phpCmd[] = $phpExec;
 
-            if (\PHP_SAPI === 'phpdbg') {
+            if (PHP_SAPI === 'phpdbg') {
                 $phpCmd[] = '-qrr';
             }
 

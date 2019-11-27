@@ -38,6 +38,7 @@ namespace Infection\Tests\Config\ValueProvider;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\InfectionConfig;
 use Infection\Config\ValueProvider\TimeoutProvider;
+use RuntimeException;
 
 final class TimeoutProviderTest extends AbstractBaseProviderTest
 {
@@ -79,7 +80,7 @@ final class TimeoutProviderTest extends AbstractBaseProviderTest
      */
     public function test_it_does_not_allow_invalid_values($inputValue): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
 
         $timeout = $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("{$inputValue}\n")),

@@ -35,12 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
+use const DIRECTORY_SEPARATOR;
+use DOMDocument;
+use DOMNodeList;
+use DOMXPath;
+use Generator;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use function Infection\Tests\normalizePath as p;
 use Infection\Utils\TmpDirectoryCreator;
+use function microtime;
 use PHPUnit\Framework\TestCase;
+use function random_int;
 use Symfony\Component\Filesystem\Filesystem;
 
 final class InitialConfigBuilderTest extends TestCase
@@ -74,7 +81,7 @@ final class InitialConfigBuilderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->workspace = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
+        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . microtime(true) . random_int(100, 999);
 
         $this->fileSystem = new Filesystem();
         $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
@@ -95,7 +102,7 @@ final class InitialConfigBuilderTest extends TestCase
 
         $xml = file_get_contents($configurationPath);
 
-        /** @var \DOMNodeList $directories */
+        /** @var DOMNodeList $directories */
         $directories = $this->queryXpath($xml, '/phpunit/testsuites/testsuite/directory');
 
         $this->assertSame(1, $directories->length);
@@ -130,7 +137,7 @@ final class InitialConfigBuilderTest extends TestCase
 
         $xml = file_get_contents($configurationPath);
 
-        /** @var \DOMNodeList $logEntries */
+        /** @var DOMNodeList $logEntries */
         $logEntries = $this->queryXpath($xml, '/phpunit/logging/log');
 
         $this->assertSame(2, $logEntries->length);
@@ -146,7 +153,7 @@ final class InitialConfigBuilderTest extends TestCase
 
         $xml = file_get_contents($configurationPath);
 
-        /** @var \DOMNodeList $logEntries */
+        /** @var DOMNodeList $logEntries */
         $logEntries = $this->queryXpath($xml, '/phpunit/logging/log');
 
         $this->assertSame(0, $logEntries->length);
@@ -161,7 +168,7 @@ final class InitialConfigBuilderTest extends TestCase
 
         $xml = file_get_contents($configurationPath);
 
-        /** @var \DOMNodeList $filterNodes */
+        /** @var DOMNodeList $filterNodes */
         $filterNodes = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
 
         $this->assertSame(2, $filterNodes->length);
@@ -173,7 +180,7 @@ final class InitialConfigBuilderTest extends TestCase
 
         $xml = file_get_contents($configurationPath);
 
-        /** @var \DOMNodeList $filterNodes */
+        /** @var DOMNodeList $filterNodes */
         $filterNodes = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
 
         $this->assertSame(1, $filterNodes->length);
@@ -185,7 +192,7 @@ final class InitialConfigBuilderTest extends TestCase
 
         $xml = file_get_contents($configurationPath);
 
-        /** @var \DOMNodeList $filterNodes */
+        /** @var DOMNodeList $filterNodes */
         $filterNodes = $this->queryXpath($xml, '/phpunit/@printerClass');
         $this->assertSame(0, $filterNodes->length);
     }
@@ -199,7 +206,7 @@ final class InitialConfigBuilderTest extends TestCase
 
         $xml = file_get_contents($configurationPath);
 
-        /** @var \DOMNodeList $filterNodes */
+        /** @var DOMNodeList $filterNodes */
         $filterNodes = $this->queryXpath($xml, sprintf('/phpunit/@%s', $attributeName));
         $this->assertSame($expectedNodeCount, $filterNodes->length);
     }
@@ -213,7 +220,7 @@ final class InitialConfigBuilderTest extends TestCase
 
         $xml = file_get_contents($configurationPath);
 
-        /** @var \DOMNodeList $filterNodes */
+        /** @var DOMNodeList $filterNodes */
         $filterNodes = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'executionOrder'));
         $this->assertSame('reverse', $filterNodes[0]->value);
 
@@ -221,7 +228,7 @@ final class InitialConfigBuilderTest extends TestCase
         $this->assertSame(0, $filterNodes->length);
     }
 
-    public function executionOrderProvider(): \Generator
+    public function executionOrderProvider(): Generator
     {
         yield 'PHPUnit 7.1.99 runs without random test order' => ['7.1.99', 'executionOrder', 0];
 
@@ -238,9 +245,9 @@ final class InitialConfigBuilderTest extends TestCase
 
     private function queryXpath(string $xml, string $query)
     {
-        $dom = new \DOMDocument();
+        $dom = new DOMDocument();
         $dom->loadXML($xml);
-        $xPath = new \DOMXPath($dom);
+        $xPath = new DOMXPath($dom);
 
         return $xPath->query($query);
     }

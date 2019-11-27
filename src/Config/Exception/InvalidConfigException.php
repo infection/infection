@@ -35,10 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Config\Exception;
 
+use RuntimeException;
+
 /**
  * @internal
  */
-final class InvalidConfigException extends \RuntimeException
+final class InvalidConfigException extends RuntimeException
 {
     public static function invalidMutator(string $mutator): self
     {
