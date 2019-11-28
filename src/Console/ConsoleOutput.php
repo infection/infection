@@ -94,11 +94,11 @@ final class ConsoleOutput
      */
     public function logMinMsiCanGetIncreasedNotice(MetricsCalculator $metricsCalculator, float $minMsi, string $type): void
     {
-        if ($type !== TestRunConstraintChecker::MSI_FAILURE && $type !== TestRunConstraintChecker::COVERED_MSI_FAILURE) {
+        if ($type !== TestRunConstraintChecker::MSI_OVER_MIN_MSI && $type !== TestRunConstraintChecker::COVERED_MSI_OVER_MIN_MSI) {
             throw InvalidTypeException::create($type);
         }
 
-        if ($type === TestRunConstraintChecker::MSI_FAILURE) {
+        if ($type === TestRunConstraintChecker::MSI_OVER_MIN_MSI) {
             $typeString = 'MSI';
             $msi = $metricsCalculator->getMutationScoreIndicator();
         } else {
