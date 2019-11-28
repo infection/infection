@@ -35,9 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StreamWrapper;
 
+use function count;
 use Infection\StreamWrapper\IncludeInterceptor;
+use InvalidArgumentException;
+use const PHP_SAPI;
 use PHPUnit\Framework\Error\Warning;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 /**
  * Tests IncludeInterceptor for correct operation.
@@ -92,19 +96,19 @@ final class IncludeInterceptorTest extends TestCase
      */
     public function test_it_throws_an_exception_if_not_configured(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         IncludeInterceptor::enable();
     }
 
     public function test_it_throws_an_exception_if_target_not_exists(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         IncludeInterceptor::intercept('', '');
     }
 
     public function test_it_throws_an_exception_if_destination_not_exists(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         IncludeInterceptor::intercept(self::$files[1], '');
     }
 
@@ -159,7 +163,7 @@ final class IncludeInterceptorTest extends TestCase
 
     public function test_passthrough_file_methods_pass(): void
     {
-        if (\PHP_SAPI === 'phpdbg') {
+        if (PHP_SAPI === 'phpdbg') {
             $this->markTestSkipped('Running this test on PHPDBG has issues with FD_SETSIZE. Consider removing this if that issue has been fixed.');
         }
         IncludeInterceptor::intercept(self::$files[1], self::$files[2]);
@@ -210,7 +214,7 @@ final class IncludeInterceptorTest extends TestCase
          * cannot handle any of these
          */
 
-        $this->assertGreaterThan(0, \count(glob(__DIR__ . '/*')));
+        $this->assertGreaterThan(0, count(glob(__DIR__ . '/*')));
 
         $tempnam = tempnam('', basename(__FILE__, 'php'));
         unlink($tempnam);

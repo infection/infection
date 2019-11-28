@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Finder;
 
+use function in_array;
 use Infection\Finder\SourceFilesFinder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
@@ -102,7 +103,7 @@ final class SourceFilesFinderTest extends TestCase
         $expectedFilenames = ['FirstFile.php', 'SecondFile.php'];
 
         foreach ([$firstFile, $secondFile] as $file) {
-            $this->assertTrue(\in_array($file->getFilename(), $expectedFilenames, true));
+            $this->assertTrue(in_array($file->getFilename(), $expectedFilenames, true));
         }
     }
 
@@ -128,7 +129,7 @@ final class SourceFilesFinderTest extends TestCase
         $expectedFilenames = ['FirstFile.php', 'SecondFile.php'];
 
         foreach ([$firstFile, $secondFile] as $file) {
-            $this->assertTrue(\in_array($file->getFilename(), $expectedFilenames, true));
+            $this->assertTrue(in_array($file->getFilename(), $expectedFilenames, true));
         }
     }
 
@@ -151,7 +152,7 @@ final class SourceFilesFinderTest extends TestCase
         $expectedFilenames = ['FirstFile.php', 'SecondFile.php'];
 
         foreach ([$firstFile, $secondFile] as $file) {
-            $this->assertTrue(\in_array($file->getFilename(), $expectedFilenames, true));
+            $this->assertTrue(in_array($file->getFilename(), $expectedFilenames, true));
         }
     }
 

@@ -35,10 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Config;
 
+use Generator;
 use Infection\Config\InfectionConfig;
 use Infection\Tests\Fixtures\StubMutator;
 use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 use Symfony\Component\Filesystem\Filesystem;
 
 final class InfectionConfigTest extends TestCase
@@ -55,7 +57,7 @@ final class InfectionConfigTest extends TestCase
 
     public function test_it_returns_default_timeout_with_no_config(): void
     {
-        $config = new InfectionConfig(new \stdClass(), $this->filesystem, '/path/to/config');
+        $config = new InfectionConfig(new stdClass(), $this->filesystem, '/path/to/config');
 
         $this->assertSame(InfectionConfig::PROCESS_TIMEOUT_SECONDS, $config->getProcessTimeout());
     }
@@ -71,7 +73,7 @@ final class InfectionConfigTest extends TestCase
 
     public function test_it_returns_default_phpunit_config_dir_with_no_config(): void
     {
-        $config = new InfectionConfig(new \stdClass(), $this->filesystem, '/path/to/config');
+        $config = new InfectionConfig(new stdClass(), $this->filesystem, '/path/to/config');
 
         $this->assertSame('/path/to/config', $config->getPhpUnitConfigDir());
     }
@@ -98,7 +100,7 @@ final class InfectionConfigTest extends TestCase
 
     public function test_it_returns_default_source_dirs_with_no_config(): void
     {
-        $config = new InfectionConfig(new \stdClass(), $this->filesystem, '/path/to/config');
+        $config = new InfectionConfig(new stdClass(), $this->filesystem, '/path/to/config');
 
         $this->assertSame(InfectionConfig::DEFAULT_SOURCE_DIRS, $config->getSourceDirs());
     }
@@ -114,7 +116,7 @@ final class InfectionConfigTest extends TestCase
 
     public function test_it_returns_default_exclude_dirs_with_no_config(): void
     {
-        $config = new InfectionConfig(new \stdClass(), $this->filesystem, '/path/to/config');
+        $config = new InfectionConfig(new stdClass(), $this->filesystem, '/path/to/config');
 
         $this->assertSame(InfectionConfig::DEFAULT_EXCLUDE_DIRS, $config->getSourceExcludePaths());
     }
@@ -183,7 +185,7 @@ final class InfectionConfigTest extends TestCase
 
     public function test_it_correctly_gets_config_logs_if_missing(): void
     {
-        $config = new InfectionConfig(new \stdClass(), $this->filesystem, '/path/to/config');
+        $config = new InfectionConfig(new stdClass(), $this->filesystem, '/path/to/config');
 
         $this->assertSame([], $config->getLogsTypes());
     }
@@ -235,11 +237,11 @@ JSON;
     /**
      * @dataProvider configDataProvider
      *
-     * @param \stdClass $config Settings
+     * @param stdClass $config Settings
      * @param string $methodName Method To Call
      * @param string $result Correct Response
      */
-    public function test_config(\stdClass $config, string $methodName, string $result): void
+    public function test_config(stdClass $config, string $methodName, string $result): void
     {
         $testSubject = new InfectionConfig(
             $config,
@@ -250,7 +252,7 @@ JSON;
         $this->assertSame($result, $testSubject->{$methodName}());
     }
 
-    public function configDataProvider(): \Generator
+    public function configDataProvider(): Generator
     {
         yield 'It uses the default framework (PHPUnit)' => [
             (object) [],

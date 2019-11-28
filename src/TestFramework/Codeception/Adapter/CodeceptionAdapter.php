@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Codeception\Adapter;
 
+use function array_key_exists;
+use function assert;
+use function dirname;
 use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\Codeception\Stringifier;
 use Infection\TestFramework\CommandLineBuilder;
@@ -44,6 +47,9 @@ use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Utils\VersionParser;
+use InvalidArgumentException;
+use function is_string;
+use Phar;
 use function Safe\file_put_contents;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
@@ -51,7 +57,7 @@ use Symfony\Component\Process\Process;
 /**
  * @internal
  */
-final class CodeceptionAdapter implements TestFrameworkAdapter, MemoryUsageAware
+final class CodeceptionAdapter implements MemoryUsageAware, TestFrameworkAdapter
 {
     public const EXECUTABLE = 'codecept';
 
@@ -265,7 +271,7 @@ final class CodeceptionAdapter implements TestFrameworkAdapter, MemoryUsageAware
 
         try {
             $version = $this->versionParser->parse($process->getOutput());
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $version = 'unknown';
         } finally {
             $this->cachedVersion = $version;
@@ -286,7 +292,7 @@ final class CodeceptionAdapter implements TestFrameworkAdapter, MemoryUsageAware
         if (0 === strpos(__FILE__, 'phar:')) {
             $infectionPhar = sprintf(
                 '\Phar::loadPhar("%s", "%s");',
-                str_replace('phar://', '', \Phar::running(true)),
+                str_replace('phar://', '', Phar::running(true)),
                 'infection.phar'
             );
         }
@@ -312,7 +318,7 @@ CONTENT;
         $originalBootstrap = $this->getOriginalBootstrapFilePath();
         $bootstrapPlaceholder = $originalBootstrap ? "require_once '{$originalBootstrap}';" : '';
 
-        $interceptorPath = \dirname(__DIR__, 3) . '/StreamWrapper/IncludeInterceptor.php';
+        $interceptorPath = dirname(__DIR__, 3) . '/StreamWrapper/IncludeInterceptor.php';
 
         $customBootstrap = <<<AUTOLOAD
 <?php
@@ -331,7 +337,7 @@ AUTOLOAD;
 
     private function getOriginalBootstrapFilePath(): ?string
     {
-        if (!\array_key_exists('bootstrap', $this->originalConfigContentParsed)) {
+        if (!array_key_exists('bootstrap', $this->originalConfigContentParsed)) {
             return null;
         }
 
@@ -350,7 +356,7 @@ AUTOLOAD;
     private function getInterceptorNamespacePrefix(): string
     {
         $prefix = strstr(__NAMESPACE__, 'Infection', true);
-        \assert(\is_string($prefix));
+        assert(is_string($prefix));
 
         return $prefix;
     }
@@ -375,7 +381,7 @@ AUTOLOAD;
 
         $coverage = array_merge($this->originalConfigContentParsed['coverage'] ?? [], ['enabled' => true]);
 
-        $includedFiles = \array_key_exists('include', $coverage)
+        $includedFiles = array_key_exists('include', $coverage)
             ? $coverage['include']
             : array_map(
                 static function ($dir) {

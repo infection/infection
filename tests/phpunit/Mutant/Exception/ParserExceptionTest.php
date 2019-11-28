@@ -35,18 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant\Exception;
 
+use Exception;
 use Infection\Mutant\Exception\ParserException;
 use PHPUnit\Framework\TestCase;
+use SplFileInfo;
 
 final class ParserExceptionTest extends TestCase
 {
     public function test_it_has_correct_error_message(): void
     {
-        $file = $this->createMock(\SplFileInfo::class);
+        $file = $this->createMock(SplFileInfo::class);
         $file->expects($this->once())
             ->method('getRealPath')
             ->willReturn('foo/bar/baz');
-        $previous = new \Exception('Unintentional thing');
+        $previous = new Exception('Unintentional thing');
 
         $exception = ParserException::fromInvalidFile($file, $previous);
 

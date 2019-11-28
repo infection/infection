@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Config\ValueProvider;
 
+use Closure;
+use const DIRECTORY_SEPARATOR;
 use Infection\Config\ConsoleHelper;
 use Infection\Finder\Exception\FinderException;
 use Infection\Finder\TestFrameworkFinder;
+use RuntimeException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -84,7 +87,7 @@ final class PhpUnitCustomExecutablePathProvider
             $question->setValidator($this->getValidator());
 
             return str_replace(
-                \DIRECTORY_SEPARATOR,
+                DIRECTORY_SEPARATOR,
                 '/',
                 $this->questionHelper->ask($input, $output, $question)
             );
@@ -93,13 +96,13 @@ final class PhpUnitCustomExecutablePathProvider
         return null;
     }
 
-    private function getValidator(): \Closure
+    private function getValidator(): Closure
     {
         return static function ($answerPath) {
             $answerPath = $answerPath ? trim($answerPath) : $answerPath;
 
             if (!$answerPath || !file_exists($answerPath)) {
-                throw new \RuntimeException(sprintf('Custom path "%s" is incorrect.', $answerPath));
+                throw new RuntimeException(sprintf('Custom path "%s" is incorrect.', $answerPath));
             }
 
             return $answerPath;

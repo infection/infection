@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Exception;
 
+use Exception;
 use Infection\Exception\InvalidMutatorException;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Util\MutatorConfig;
@@ -45,7 +46,7 @@ final class InvalidMutatorExceptionTest extends TestCase
     public function test_it_has_correct_user_facing_message(): void
     {
         $mutator = new Plus(new MutatorConfig([]));
-        $original = new \Exception();
+        $original = new Exception();
 
         $exception = InvalidMutatorException::create('foo/bar/baz', $mutator, $original);
 

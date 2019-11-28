@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Visitor;
 
+use Generator;
 use Infection\Mutation;
 use Infection\MutationInterface;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
@@ -66,7 +67,7 @@ final class MutatorVisitorTest extends TestCase
         $this->assertSame($outputCode, $output);
     }
 
-    public function providesMutationCases(): \Generator
+    public function providesMutationCases(): Generator
     {
         $lexer = new Lexer\Emulative([
             'usedAttributes' => [

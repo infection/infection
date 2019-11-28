@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use Infection\Process\MutantProcessInterface;
+use function strlen;
 
 /**
  * This file is used for tests only.
@@ -99,7 +100,7 @@ final class DebugFileLogger extends FileLogger
 
         return [
             $headline,
-            str_repeat('=', \strlen($headline)),
+            str_repeat('=', strlen($headline)),
             '',
         ];
     }

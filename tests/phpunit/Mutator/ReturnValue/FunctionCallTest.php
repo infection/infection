@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ReturnValue;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class FunctionCallTest extends AbstractMutatorTestCase
@@ -47,7 +48,7 @@ final class FunctionCallTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): \Generator
+    public function provideMutationCases(): Generator
     {
         yield 'It does not mutate with not nullable return typehint' => [
             $this->getFileContent('fc-not-mutates-with-not-nullable-typehint.php'),

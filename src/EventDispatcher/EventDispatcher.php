@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\EventDispatcher;
 
+use function get_class;
+
 /**
  * @internal
  */
@@ -47,7 +49,7 @@ final class EventDispatcher implements EventDispatcherInterface
 
     public function dispatch($event): void
     {
-        $name = \get_class($event);
+        $name = get_class($event);
 
         foreach ($this->getListeners($name) as $listener) {
             $listener($event);

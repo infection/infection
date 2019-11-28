@@ -39,6 +39,7 @@ use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\Utils\VersionParser;
+use InvalidArgumentException;
 use Symfony\Component\Process\Process;
 
 /**
@@ -147,7 +148,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
 
         try {
             $version = $this->versionParser->parse($process->getOutput());
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $version = 'unknown';
         } finally {
             $this->cachedVersion = $version;

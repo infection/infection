@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Utils;
 
+use InvalidArgumentException;
+
 /**
  * @internal
  */
@@ -48,7 +50,7 @@ class VersionParser
         $matched = preg_match(self::VERSION_REGEX, $content, $matches);
 
         if (!$matched) {
-            throw new \InvalidArgumentException('Parameter does not contain a valid SemVer (sub)string.');
+            throw new InvalidArgumentException('Parameter does not contain a valid SemVer (sub)string.');
         }
 
         return $matches[0];

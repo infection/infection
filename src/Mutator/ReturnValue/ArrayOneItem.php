@@ -37,6 +37,7 @@ namespace Infection\Mutator\ReturnValue;
 
 use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ReflectionVisitor;
+use function is_string;
 use PhpParser\Node;
 
 /**
@@ -105,6 +106,6 @@ final class ArrayOneItem extends Mutator
             $returnType = $returnType->name;
         }
 
-        return \is_string($returnType) && $returnType === 'array';
+        return is_string($returnType) && $returnType === 'array';
     }
 }

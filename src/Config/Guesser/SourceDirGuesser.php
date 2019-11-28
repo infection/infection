@@ -35,6 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Config\Guesser;
 
+use const DIRECTORY_SEPARATOR;
+use function in_array;
+use function is_array;
+use function is_string;
+use LogicException;
+use stdClass;
+
 /**
  * @internal
  */
@@ -42,7 +49,7 @@ class SourceDirGuesser implements Guesser
 {
     private $composerJsonContent;
 
-    public function __construct(\stdClass $composerJsonContent)
+    public function __construct(stdClass $composerJsonContent)
     {
         $this->composerJsonContent = $composerJsonContent;
     }
@@ -71,7 +78,7 @@ class SourceDirGuesser implements Guesser
         $dirs = $this->parsePsrSection((array) $this->composerJsonContent->autoload->{$psr});
 
         // we don't want to mix different framework's folders like "app" for Symfony
-        if (\in_array('src', $dirs, true)) {
+        if (in_array('src', $dirs, true)) {
             return ['src'];
         }
 
@@ -83,8 +90,8 @@ class SourceDirGuesser implements Guesser
         $dirs = [];
 
         foreach ($autoloadDirs as $path) {
-            if (!\is_array($path) && !\is_string($path)) {
-                throw new \LogicException('autoload section does not match the expected JSON schema');
+            if (!is_array($path) && !is_string($path)) {
+                throw new LogicException('autoload section does not match the expected JSON schema');
             }
 
             $this->parsePath($path, $dirs);
@@ -98,7 +105,7 @@ class SourceDirGuesser implements Guesser
      */
     private function parsePath($path, array &$dirs): void
     {
-        if (\is_array($path)) {
+        if (is_array($path)) {
             array_walk_recursive(
                 $path,
                 function ($el) use (&$dirs): void {
@@ -107,8 +114,8 @@ class SourceDirGuesser implements Guesser
             );
         }
 
-        if (\is_string($path)) {
-            $dirs[] = trim($path, \DIRECTORY_SEPARATOR);
+        if (is_string($path)) {
+            $dirs[] = trim($path, DIRECTORY_SEPARATOR);
         }
     }
 }

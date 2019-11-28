@@ -35,10 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpSpec\Config;
 
+use Exception;
+
 /**
  * @internal
  */
-final class NoCodeCoverageException extends \Exception
+final class NoCodeCoverageException extends Exception
 {
     public static function fromTestFramework(string $framework): self
     {

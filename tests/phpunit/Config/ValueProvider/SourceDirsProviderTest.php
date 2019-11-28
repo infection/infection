@@ -38,6 +38,7 @@ namespace Infection\Tests\Config\ValueProvider;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\ValueProvider\SourceDirsProvider;
+use LogicException;
 use PHPUnit\Framework\MockObject\MockObject;
 
 final class SourceDirsProviderTest extends AbstractBaseProviderTest
@@ -133,7 +134,7 @@ final class SourceDirsProviderTest extends AbstractBaseProviderTest
             ->method('guess')
             ->willReturn(['src']);
 
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
 
         $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("0,1\n")),

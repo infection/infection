@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Unwrap;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class UnwrapTrimTest extends AbstractMutatorTestCase
@@ -47,7 +48,7 @@ final class UnwrapTrimTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): \Generator
+    public function provideMutationCases(): Generator
     {
         yield 'It mutates correctly when provided with a string' => [
             <<<'PHP'

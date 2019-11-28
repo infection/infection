@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Regex;
 
+use function count;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -66,6 +67,6 @@ final class PregMatchMatches extends Mutator
             return false;
         }
 
-        return \count($node->args) >= 3;
+        return count($node->args) >= 3;
     }
 }

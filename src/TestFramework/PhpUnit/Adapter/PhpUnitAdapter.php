@@ -44,7 +44,7 @@ use Infection\Visitor\CodeCoverageMethodIgnoreVisitor;
 /**
  * @internal
  */
-final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, HasExtraNodeVisitors
+final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements HasExtraNodeVisitors, MemoryUsageAware
 {
     public function hasJUnitReport(): bool
     {

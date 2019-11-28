@@ -40,6 +40,8 @@ use PhpParser\Node;
 use PhpParser\Node\Stmt\Function_;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
+use stdClass;
 
 final class AbstractValueToNullReturnValueTest extends TestCase
 {
@@ -101,7 +103,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
             $this->invokeMethod(
                 $this->mockNode(
                     $this->mockFunction(
-                        new \stdClass()
+                        new stdClass()
                     )
                 )
             )
@@ -151,7 +153,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
 
     private function invokeMethod(Node $mockNode)
     {
-        $reflectionMethod = new \ReflectionMethod(AbstractValueToNullReturnValue::class, 'isNullReturnValueAllowed');
+        $reflectionMethod = new ReflectionMethod(AbstractValueToNullReturnValue::class, 'isNullReturnValueAllowed');
         $reflectionMethod->setAccessible(true);
 
         return $reflectionMethod->invoke($this->testSubject, $mockNode);

@@ -35,10 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Exception;
 
+use RuntimeException;
+
 /**
  * @internal
  */
-final class InvalidPhpUnitXmlConfigException extends \RuntimeException
+final class InvalidPhpUnitXmlConfigException extends RuntimeException
 {
     public static function byRootNode(): self
     {

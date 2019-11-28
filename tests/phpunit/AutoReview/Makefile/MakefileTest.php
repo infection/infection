@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\Makefile;
 
 use function array_filter;
+use function array_key_exists;
 use function array_shift;
 use function current;
 use function file_get_contents;
@@ -197,7 +198,7 @@ EOF;
                 continue;
             }
 
-            if (\array_key_exists($target, $targetCounts)) {
+            if (array_key_exists($target, $targetCounts)) {
                 ++$targetCounts[$target];
             } else {
                 $targetCounts[$target] = 1;

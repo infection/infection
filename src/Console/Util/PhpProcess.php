@@ -56,7 +56,7 @@ final class PhpProcess extends Process
      * worry about it for the bulk of other processes, which do not need it and
      * work better without it.
      */
-    public function start(callable $callback = null, array $env = null): void
+    public function start(?callable $callback = null, ?array $env = null): void
     {
         $phpConfig = new PhpConfig();
         $phpConfig->useOriginal();
