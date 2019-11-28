@@ -218,7 +218,7 @@ final class TestRunConstraintCheckerTest extends TestCase
             0.0
         );
 
-        $this->assertSame($expected, $constraintChecker->isMsiOverMinimumMsi(TestRunConstraintChecker::MSI_OVER_MIN_MSI));
+        $this->assertSame($expected, $constraintChecker->isActualOverRequired());
     }
 
     /**
@@ -236,7 +236,7 @@ final class TestRunConstraintCheckerTest extends TestCase
             $minCoveredMsi
         );
 
-        $this->assertSame($expected, $constraintChecker->isMsiOverMinimumMsi(TestRunConstraintChecker::COVERED_MSI_OVER_MIN_MSI));
+        $this->assertSame($expected, $constraintChecker->isActualOverRequired());
     }
 
     public function isMsiOverMinimumMsiProvider(): \Generator
