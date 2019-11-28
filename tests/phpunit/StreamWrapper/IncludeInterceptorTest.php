@@ -35,7 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StreamWrapper;
 
+use function count;
 use Infection\StreamWrapper\IncludeInterceptor;
+use InvalidArgumentException;
+use const PHP_SAPI;
+use PHPUnit\Framework\Error\Warning;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 /**
  * Tests IncludeInterceptor for correct operation.
@@ -52,7 +58,7 @@ use Infection\StreamWrapper\IncludeInterceptor;
  * Other methods are not essential for interception to work,
  * but still are required to be implemented by a full wrapper
  */
-final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
+final class IncludeInterceptorTest extends TestCase
 {
     private static $files = [];
 
@@ -79,25 +85,30 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
         array_map('unlink', self::$files);
     }
 
+    protected function tearDown(): void
+    {
+        @IncludeInterceptor::disable();
+    }
+
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
     public function test_it_throws_an_exception_if_not_configured(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         IncludeInterceptor::enable();
     }
 
     public function test_it_throws_an_exception_if_target_not_exists(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         IncludeInterceptor::intercept('', '');
     }
 
     public function test_it_throws_an_exception_if_destination_not_exists(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         IncludeInterceptor::intercept(self::$files[1], '');
     }
 
@@ -152,7 +163,7 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
 
     public function test_passthrough_file_methods_pass(): void
     {
-        if (\PHP_SAPI === 'phpdbg') {
+        if (PHP_SAPI === 'phpdbg') {
             $this->markTestSkipped('Running this test on PHPDBG has issues with FD_SETSIZE. Consider removing this if that issue has been fixed.');
         }
         IncludeInterceptor::intercept(self::$files[1], self::$files[2]);
@@ -203,7 +214,7 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
          * cannot handle any of these
          */
 
-        $this->assertGreaterThan(0, \count(glob(__DIR__ . '/*')));
+        $this->assertGreaterThan(0, count(glob(__DIR__ . '/*')));
 
         $tempnam = tempnam('', basename(__FILE__, 'php'));
         unlink($tempnam);
@@ -222,5 +233,189 @@ final class IncludeInterceptorTest extends \PHPUnit\Framework\TestCase
         rmdir($newname);
 
         IncludeInterceptor::disable();
+    }
+
+    public function test_it_re_enables_interceptor_after_file_not_found_with_fopen(): void
+    {
+        $expected = include self::$files[2];
+
+        IncludeInterceptor::intercept(self::$files[1], self::$files[2]);
+        IncludeInterceptor::enable();
+
+        try {
+            fopen('file-does-not-exist.txt', 'r');
+        } catch (Warning $e) {
+            $after = include self::$files[1];
+
+            $this->assertSame($after, $expected);
+
+            return;
+        }
+
+        $this->fail('Badly set up test, exception was not thrown');
+    }
+
+    public function test_it_re_enables_interceptor_after_file_not_found_with_include(): void
+    {
+        $expected = include self::$files[2];
+
+        IncludeInterceptor::intercept(self::$files[1], self::$files[2]);
+        IncludeInterceptor::enable();
+
+        try {
+            include 'file-does-not-exist.txt';
+        } catch (Warning $e) {
+            $after = include self::$files[1];
+
+            $this->assertSame($after, $expected);
+
+            return;
+        }
+
+        $this->fail('Badly set up test, exception was not thrown');
+    }
+
+    public function test_it_re_enables_interceptor_after_directory_not_found_with_opendir(): void
+    {
+        $expected = include self::$files[2];
+
+        IncludeInterceptor::intercept(self::$files[1], self::$files[2]);
+        IncludeInterceptor::enable();
+
+        try {
+            opendir('dir-does-not-exist');
+        } catch (Warning $e) {
+            $after = include self::$files[1];
+
+            $this->assertSame($after, $expected);
+
+            return;
+        }
+
+        $this->fail('Badly set up test, exception was not thrown');
+    }
+
+    public function test_it_re_enables_interceptor_after_directory_already_exist_with_mkdir(): void
+    {
+        $expected = include self::$files[2];
+
+        IncludeInterceptor::intercept(self::$files[1], self::$files[2]);
+        IncludeInterceptor::enable();
+
+        try {
+            mkdir(__DIR__);
+        } catch (Warning $e) {
+            $after = include self::$files[1];
+
+            $this->assertSame($after, $expected);
+
+            return;
+        }
+
+        $this->fail('Badly set up test, exception was not thrown');
+    }
+
+    public function test_it_re_enables_interceptor_after_file_not_found_with_rename(): void
+    {
+        $expected = include self::$files[2];
+
+        IncludeInterceptor::intercept(self::$files[1], self::$files[2]);
+        IncludeInterceptor::enable();
+
+        try {
+            rename('file-does-not-exist.txt', 'something-else.txt');
+        } catch (Warning $e) {
+            $after = include self::$files[1];
+
+            $this->assertSame($after, $expected);
+
+            return;
+        }
+
+        $this->fail('Badly set up test, exception was not thrown');
+    }
+
+    public function test_it_re_enables_interceptor_after_directory_not_found_with_rmdir(): void
+    {
+        $expected = include self::$files[2];
+
+        IncludeInterceptor::intercept(self::$files[1], self::$files[2]);
+        IncludeInterceptor::enable();
+
+        try {
+            rmdir('dir-does-not-exist');
+        } catch (Warning $e) {
+            $after = include self::$files[1];
+
+            $this->assertSame($after, $expected);
+
+            return;
+        }
+
+        $this->fail('Badly set up test, exception was not thrown');
+    }
+
+    /**
+     * @requires OSFAMILY Linux
+     * @requires OSFAMILY Darwin
+     */
+    public function test_it_re_enables_interceptor_after_file_not_found_with_stream_metadata(): void
+    {
+        $expected = include self::$files[2];
+
+        IncludeInterceptor::intercept(self::$files[1], self::$files[2]);
+        IncludeInterceptor::enable();
+
+        try {
+            touch('/');
+        } catch (Warning $e) {
+            $after = include self::$files[1];
+
+            $this->assertSame($after, $expected);
+
+            return;
+        }
+
+        $this->fail('Badly set up test, exception was not thrown');
+    }
+
+    public function test_it_re_enables_interceptor_after_file_not_found_with_unlink(): void
+    {
+        $expected = include self::$files[2];
+
+        IncludeInterceptor::intercept(self::$files[1], self::$files[2]);
+        IncludeInterceptor::enable();
+
+        try {
+            unlink('file-does-not-exist.txt');
+        } catch (Warning $e) {
+            $after = include self::$files[1];
+
+            $this->assertSame($after, $expected);
+
+            return;
+        }
+
+        $this->fail('Badly set up test, exception was not thrown');
+    }
+
+    public function test_it_re_enables_interceptor_after_file_not_found_with_url_stat(): void
+    {
+        $expected = include self::$files[2];
+
+        IncludeInterceptor::intercept(self::$files[1], self::$files[2]);
+        IncludeInterceptor::enable();
+
+        try {
+            copy('file-does-not-exist.txt', 'somewhere-else.txt');
+        } catch (Warning $e) {
+            $after = include self::$files[1];
+
+            $this->assertSame($after, $expected);
+
+            return;
+        }
+
+        $this->fail('Badly set up test, exception was not thrown');
     }
 }

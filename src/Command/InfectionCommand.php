@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use function dirname;
+use Exception;
 use Infection\Config\InfectionConfig;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
@@ -55,6 +57,7 @@ use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
+use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
@@ -326,8 +329,7 @@ final class InfectionCommand extends BaseCommand
 
         $processBuilder = new MutantProcessBuilder($adapter, $this->versionParser, $config->getProcessTimeout());
 
-        $codeCoverageData = $this->getCodeCoverageData($this->testFrameworkKey);
-
+        $codeCoverageData = $this->getCodeCoverageData($this->testFrameworkKey, $adapter);
         $mutationsGenerator = new MutationsGenerator(
             $config->getSource()->getDirectories(),
             $config->getSource()->getExcludes(),
@@ -440,12 +442,11 @@ final class InfectionCommand extends BaseCommand
         })($bootstrap);
     }
 
-    private function getCodeCoverageData(string $testFrameworkKey): LineCodeCoverage
+    private function getCodeCoverageData(string $testFrameworkKey, TestFrameworkAdapter $adapter): LineCodeCoverage
     {
         $coverageDir = $this->container[sprintf('coverage.dir.%s', $testFrameworkKey)];
-        $testFileDataProviderServiceId = sprintf('test.file.data.provider.%s', $testFrameworkKey);
-        $testFileDataProviderService = $this->container->offsetExists($testFileDataProviderServiceId)
-            ? $this->container[$testFileDataProviderServiceId]
+        $testFileDataProviderService = $adapter->hasJUnitReport()
+            ? $this->container[CachedTestFileDataProvider::class]
             : null;
 
         return new XMLLineCodeCoverage($coverageDir, new CoverageXmlParser($coverageDir), $testFrameworkKey, $testFileDataProviderService);
@@ -467,7 +468,7 @@ final class InfectionCommand extends BaseCommand
     {
         try {
             $locator->locateOneOf(InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [
@@ -502,7 +503,7 @@ final class InfectionCommand extends BaseCommand
             throw CoverageDoesNotExistException::with(
                 $coverageIndexFilePath,
                 $testFrameworkKey,
-                \dirname($coverageIndexFilePath, 2),
+                dirname($coverageIndexFilePath, 2),
                 $processInfo
             );
         }

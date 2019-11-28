@@ -35,6 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use function array_key_exists;
+use function count;
+use function dirname;
+use Generator;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use function Safe\file_get_contents;
 
@@ -45,6 +49,7 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
 {
     public const PHP_UNIT_COVERAGE_DIR = 'coverage-xml';
     public const PHP_SPEC_COVERAGE_DIR = 'phpspec-coverage-xml';
+    public const CODECEPTION_COVERAGE_DIR = 'codeception-coverage-xml';
     public const COVERAGE_INDEX_FILE_NAME = 'index.xml';
 
     /**
@@ -72,7 +77,7 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
      */
     private $testFrameworkKey;
 
-    public function __construct(string $coverageDir, CoverageXmlParser $coverageXmlParser, string $testFrameworkKey, TestFileDataProvider $testFileDataProvider = null)
+    public function __construct(string $coverageDir, CoverageXmlParser $coverageXmlParser, string $testFrameworkKey, ?TestFileDataProvider $testFileDataProvider = null)
     {
         $this->coverageDir = $coverageDir;
         $this->parser = $coverageXmlParser;
@@ -91,11 +96,11 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
         $coveredLineTestMethods = array_filter(
             $coverageData[$filePath]->byLine,
             static function ($testMethods) {
-                return \count($testMethods) > 0;
+                return count($testMethods) > 0;
             }
         );
 
-        return \count($coveredLineTestMethods) > 0;
+        return count($coveredLineTestMethods) > 0;
     }
 
     /**
@@ -114,9 +119,9 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
     }
 
     /**
-     * @return \Generator<CoverageLineData>
+     * @return Generator<CoverageLineData>
      */
-    private function getTestsForFunctionSignature(string $filePath, NodeLineRangeData $lineRange): \Generator
+    private function getTestsForFunctionSignature(string $filePath, NodeLineRangeData $lineRange): Generator
     {
         foreach ($lineRange->range as $line) {
             yield from $this->getTestsForExecutedMethodOnLine($filePath, $line);
@@ -124,9 +129,9 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
     }
 
     /**
-     * @return \Generator<CoverageLineData>
+     * @return Generator<CoverageLineData>
      */
-    private function getTestsForLineRange(string $filePath, NodeLineRangeData $lineRange): \Generator
+    private function getTestsForLineRange(string $filePath, NodeLineRangeData $lineRange): Generator
     {
         foreach ($lineRange->range as $line) {
             yield from $this->getCoverage()[$filePath]->byLine[$line] ?? [];
@@ -151,9 +156,9 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
      *    ]
      * ]
      *
-     * @return CoverageFileData[]
-     *
      * @throws CoverageDoesNotExistException
+     *
+     * @return CoverageFileData[]
      */
     private function getCoverage(): array
     {
@@ -164,7 +169,7 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
                 throw CoverageDoesNotExistException::with(
                     $coverageIndexFilePath,
                     $this->testFrameworkKey,
-                    \dirname($coverageIndexFilePath, 2)
+                    dirname($coverageIndexFilePath, 2)
                 );
             }
 
@@ -204,15 +209,15 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
     }
 
     /**
-     * @return CoverageLineData[]
-     *
      * @throws CoverageDoesNotExistException
+     *
+     * @return CoverageLineData[]
      */
     private function getTestsForExecutedMethodOnLine(string $filePath, int $line): array
     {
         $coverage = $this->getCoverage();
 
-        if (!\array_key_exists($filePath, $coverage)) {
+        if (!array_key_exists($filePath, $coverage)) {
             return [];
         }
 
@@ -224,7 +229,7 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
                 $allLines = range($coverageMethodData->startLine, $coverageMethodData->endLine);
 
                 foreach ($allLines as $lineInExecutedMethod) {
-                    if (\array_key_exists($lineInExecutedMethod, $this->getCoverage()[$filePath]->byLine)) {
+                    if (array_key_exists($lineInExecutedMethod, $this->getCoverage()[$filePath]->byLine)) {
                         $tests[] = $this->getCoverage()[$filePath]->byLine[$lineInExecutedMethod];
                     }
                 }

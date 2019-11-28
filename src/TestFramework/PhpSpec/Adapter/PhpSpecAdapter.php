@@ -47,6 +47,11 @@ final class PhpSpecAdapter extends AbstractTestFrameworkAdapter
         '/Fatal error happened/i',
     ];
 
+    public function hasJUnitReport(): bool
+    {
+        return false;
+    }
+
     public function testsPass(string $output): bool
     {
         $lines = explode(PHP_EOL, $output);

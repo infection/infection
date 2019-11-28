@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Utils;
 
 use Infection\Utils\VersionParser;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 final class VersionParserTest extends TestCase
@@ -62,7 +63,7 @@ final class VersionParserTest extends TestCase
 
     public function test_it_throws_exception_when_content_has_no_version_substring(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $this->versionParser->parse('abc');
     }
@@ -70,6 +71,7 @@ final class VersionParserTest extends TestCase
     public function versionProvider()
     {
         return [
+            ['Codeception 3.1.0', '3.1.0'],
             ['phpspec version 1.2.3', '1.2.3'],
             ['PHPUnit 1.2.3 by Sebastian Bergmann and contributors.', '1.2.3'],
             ['1.2.3', '1.2.3'],

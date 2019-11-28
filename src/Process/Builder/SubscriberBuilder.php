@@ -57,6 +57,7 @@ use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationTestingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationTestingResultsLoggerSubscriber;
 use Infection\TestFramework\TestFrameworkAdapter;
+use InvalidArgumentException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -236,7 +237,7 @@ final class SubscriberBuilder
             return new DotFormatter($output);
         }
 
-        throw new \InvalidArgumentException('Incorrect formatter. Possible values: "dot", "progress"');
+        throw new InvalidArgumentException('Incorrect formatter. Possible values: "dot", "progress"');
     }
 
     private function getMutantCreatingConsoleLoggerSubscriber(OutputInterface $output): EventSubscriberInterface

@@ -2,6 +2,7 @@
 
 namespace Memory_Aware;
 
+use ErrorException;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\MemoryUsageAware;
 
@@ -14,14 +15,19 @@ class FakeAwareAdapter extends AbstractTestFrameworkAdapter implements MemoryUsa
         $this->memoryLimit = $memoryLimit;
     }
 
+    public function hasJUnitReport(): bool
+    {
+        return false;
+    }
+
     public function testsPass(string $output): bool
     {
-        throw new \ErrorException('this should never be called');
+        throw new ErrorException('this should never be called');
     }
 
     public function getName(): string
     {
-        throw new \ErrorException('this should never be called');
+        throw new ErrorException('this should never be called');
     }
 
     /**

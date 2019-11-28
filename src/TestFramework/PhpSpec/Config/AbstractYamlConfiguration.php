@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpSpec\Config;
 
+use function array_key_exists;
+
 /**
  * @internal
  */
@@ -65,7 +67,7 @@ abstract class AbstractYamlConfiguration
 
     protected function hasCodeCoverageExtension(array $parsedYaml): bool
     {
-        if (!\array_key_exists('extensions', $parsedYaml)) {
+        if (!array_key_exists('extensions', $parsedYaml)) {
             return false;
         }
 

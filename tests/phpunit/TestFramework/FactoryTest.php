@@ -39,11 +39,13 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\VersionParser;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -68,7 +70,7 @@ final class FactoryTest extends TestCase
                     null
                 ),
                 'default',
-                null,
+                '',
                 new PhpUnit(null, null),
                 [],
                 null,
@@ -85,10 +87,12 @@ final class FactoryTest extends TestCase
                 false,
                 null
             ),
-            $this->createMock(VersionParser::class)
+            $this->createMock(VersionParser::class),
+            $this->createMock(Filesystem::class),
+            new CommandLineBuilder()
         );
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $factory->create('Fake Test Framework', false);
     }
 }

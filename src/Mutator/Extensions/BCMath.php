@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Extensions;
 
+use function array_diff_key;
+use function array_filter;
+use function count;
 use Generator;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
@@ -110,17 +113,17 @@ final class BCMath extends Mutator
             ),
         ];
 
-        $functionsToRemove = \array_filter($functionsMap, static function (bool $isOn): bool {
+        $functionsToRemove = array_filter($functionsMap, static function (bool $isOn): bool {
             return !$isOn;
         });
 
-        $this->converters = \array_diff_key($converters, $functionsToRemove);
+        $this->converters = array_diff_key($converters, $functionsToRemove);
     }
 
     private function makeCheckingMinArgsMapper(int $minimumArgsCount, callable $converter)
     {
         return static function (Node\Expr\FuncCall $node) use ($minimumArgsCount, $converter): Generator {
-            if (\count($node->args) >= $minimumArgsCount) {
+            if (count($node->args) >= $minimumArgsCount) {
                 yield from $converter($node);
             }
         };

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use function count;
+use function get_class;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use PhpParser\Node;
@@ -132,7 +134,7 @@ final class Mutation implements MutationInterface
     public function getHash(): string
     {
         if (!isset($this->hash)) {
-            $mutatorClass = \get_class($this->getMutator());
+            $mutatorClass = get_class($this->getMutator());
             $attributes = $this->getAttributes();
             $attributeValues = [
                 $mutatorClass,
@@ -170,7 +172,7 @@ final class Mutation implements MutationInterface
 
     public function isCoveredByTest(): bool
     {
-        return \count($this->getAllTests()) !== 0;
+        return count($this->getAllTests()) !== 0;
     }
 
     public function getMutatedNode()

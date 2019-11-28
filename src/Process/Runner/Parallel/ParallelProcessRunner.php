@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner\Parallel;
 
+use function assert;
+use function count;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutantProcessFinished;
 use Infection\Process\MutantProcess;
@@ -84,12 +86,12 @@ final class ParallelProcessRunner
         }
 
         // fix maxParallel to be max the number of processes or positive
-        $maxParallel = min(max($threadCount, 1), \count($this->processesQueue));
+        $maxParallel = min(max($threadCount, 1), count($this->processesQueue));
 
         // start the initial batch of processes
         do {
             $this->startProcess();
-        } while ($this->processesQueue && \count($this->currentProcesses) < $maxParallel);
+        } while ($this->processesQueue && count($this->currentProcesses) < $maxParallel);
 
         do {
             usleep($poll);
@@ -125,7 +127,7 @@ final class ParallelProcessRunner
     private function startProcess(): bool
     {
         $mutantProcess = array_shift($this->processesQueue);
-        \assert($mutantProcess instanceof MutantProcessInterface);
+        assert($mutantProcess instanceof MutantProcessInterface);
 
         $mutant = $mutantProcess->getMutant();
 

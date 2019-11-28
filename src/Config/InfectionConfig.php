@@ -35,7 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Config;
 
+use const DIRECTORY_SEPARATOR;
 use Infection\TestFramework\TestFrameworkTypes;
+use function is_array;
+use stdClass;
+use function strlen;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -55,7 +59,7 @@ class InfectionConfig
     ];
 
     /**
-     * @var \stdClass
+     * @var stdClass
      */
     private $config;
 
@@ -69,7 +73,7 @@ class InfectionConfig
      */
     private $configLocation;
 
-    public function __construct(\stdClass $config, Filesystem $filesystem, string $configLocation)
+    public function __construct(stdClass $config, Filesystem $filesystem, string $configLocation)
     {
         $this->config = $config;
         $this->filesystem = $filesystem;
@@ -86,7 +90,7 @@ class InfectionConfig
             return $this->config->phpUnit->configDir;
         }
 
-        return $this->configLocation . \DIRECTORY_SEPARATOR . $this->config->phpUnit->configDir;
+        return $this->configLocation . DIRECTORY_SEPARATOR . $this->config->phpUnit->configDir;
     }
 
     public function getPhpUnitCustomPath(): string
@@ -170,7 +174,7 @@ class InfectionConfig
 
     private function getExcludes(): array
     {
-        if (isset($this->config->source->excludes) && \is_array($this->config->source->excludes)) {
+        if (isset($this->config->source->excludes) && is_array($this->config->source->excludes)) {
             return $this->config->source->excludes;
         }
 
@@ -194,8 +198,8 @@ class InfectionConfig
                     array_map(
                         static function ($excludeDir) use ($srcDir) {
                             return ltrim(
-                                substr_replace($excludeDir, '', 0, \strlen($srcDir)),
-                                \DIRECTORY_SEPARATOR
+                                substr_replace($excludeDir, '', 0, strlen($srcDir)),
+                                DIRECTORY_SEPARATOR
                             );
                         },
                         $unpackedPaths

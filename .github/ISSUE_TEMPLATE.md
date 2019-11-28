@@ -1,7 +1,7 @@
 | Question    | Answer
 | ------------| ---------------
 | Infection version | x.y.z (`infection.phar --version`)
-| Test Framework version | PHPUnit/PhpSpec x.y.z
+| Test Framework version | PHPUnit/PhpSpec/Codeception x.y.z
 | PHP version | x.y.z (`php -v`)
 | Platform    | e.g. Ubuntu/Windows/MacOS
 | Github Repo | -

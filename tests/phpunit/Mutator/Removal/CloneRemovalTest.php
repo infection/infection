@@ -33,62 +33,70 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Coverage;
+namespace Infection\Tests\Mutator\Removal;
 
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\Coverage\TestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
-use Infection\TestFramework\Coverage\TestFileTimeData;
+use Generator;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-/**
- * @internal
- */
-final class PhpUnitTestFileDataProvider implements TestFileDataProvider
+final class CloneRemovalTest extends AbstractMutatorTestCase
 {
     /**
-     * @var string
+     * @dataProvider provideMutationCases
      */
-    private $jUnitFilePath;
-
-    /**
-     * @var \DOMXPath|null
-     */
-    private $xPath;
-
-    public function __construct(string $jUnitFilePath)
+    public function test_mutator(string $input, ?string $expected): void
     {
-        $this->jUnitFilePath = $jUnitFilePath;
+        $this->doTest($input, $expected);
     }
 
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
+    public function provideMutationCases(): Generator
     {
-        $xPath = $this->getXPath();
+        yield 'It removes clone from expression clone-new' => [
+          <<<'PHP'
+<?php
 
-        $nodes = $xPath->query(sprintf('//testsuite[@name="%s"]', $fullyQualifiedClassName));
+$class = clone (new stdClass());
+PHP
+            ,
+            <<<'PHP'
+<?php
 
-        if (!$nodes->length) {
-            throw TestFileNameNotFoundException::notFoundFromFQN($fullyQualifiedClassName);
-        }
+$class = new stdClass();
+PHP
+            ,
+        ];
 
-        return new TestFileTimeData(
-            $nodes[0]->getAttribute('file'),
-            (float) $nodes[0]->getAttribute('time')
-        );
-    }
+        yield 'It removes clone from clone variable' => [
+            <<<'PHP'
+<?php
 
-    private function getXPath(): \DOMXPath
-    {
-        if (!$this->xPath) {
-            if (!file_exists($this->jUnitFilePath)) {
-                throw CoverageDoesNotExistException::forJunit($this->jUnitFilePath);
-            }
+$class = new stdClass();
+$clonedClass = clone $class;
+PHP
+            ,
+            <<<'PHP'
+<?php
 
-            $dom = new \DOMDocument();
-            $dom->load($this->jUnitFilePath);
+$class = new stdClass();
+$clonedClass = $class;
+PHP
+            ,
+        ];
 
-            $this->xPath = new \DOMXPath($dom);
-        }
+        yield 'It removes cloe from direct call object function right after cloning' => [
+            <<<'PHP'
+<?php
 
-        return $this->xPath;
+$datetime = new DateTime();
+$clonedClass = (clone $datetime)->format('Y');
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+$datetime = new DateTime();
+$clonedClass = $datetime->format('Y');
+PHP
+            ,
+        ];
     }
 }

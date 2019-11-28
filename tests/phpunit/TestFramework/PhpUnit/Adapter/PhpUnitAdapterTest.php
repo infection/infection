@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
-use Infection\Finder\AbstractExecutableFinder;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
+use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
@@ -52,20 +52,20 @@ final class PhpUnitAdapterTest extends TestCase
      */
     private $adapter;
 
-    protected function setUp(string $version = '6.5'): void
+    protected function setUp(): void
     {
-        $executableFined = $this->createMock(AbstractExecutableFinder::class);
         $initialConfigBuilder = $this->createMock(InitialConfigBuilder::class);
         $mutationConfigBuilder = $this->createMock(MutationConfigBuilder::class);
         $cliArgumentsBuilder = $this->createMock(CommandLineArgumentsAndOptionsBuilder::class);
         $versionParser = $this->createMock(VersionParser::class);
 
         $this->adapter = new PhpUnitAdapter(
-            $executableFined,
+            '/path/to/phpunit',
             $initialConfigBuilder,
             $mutationConfigBuilder,
             $cliArgumentsBuilder,
-            $versionParser
+            $versionParser,
+            new CommandLineBuilder()
         );
     }
 

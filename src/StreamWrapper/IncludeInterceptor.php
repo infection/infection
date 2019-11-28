@@ -35,6 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\StreamWrapper;
 
+use function assert;
+use InvalidArgumentException;
+use function is_resource;
+use RuntimeException;
+
 /**
  * @internal
  */
@@ -65,11 +70,11 @@ final class IncludeInterceptor
     public static function intercept($file, $with): void
     {
         if (!file_exists($file)) {
-            throw new \InvalidArgumentException('File to intercept and replace does not exist: ' . $file);
+            throw new InvalidArgumentException('File to intercept and replace does not exist: ' . $file);
         }
 
         if (!file_exists($with)) {
-            throw new \InvalidArgumentException('File to replace intercepted file with does not exist: ' . $file);
+            throw new InvalidArgumentException('File to replace intercepted file with does not exist: ' . $file);
         }
         self::$intercept = $file;
         self::$replacement = $with;
@@ -78,7 +83,7 @@ final class IncludeInterceptor
     public static function enable(): void
     {
         if (!isset(self::$intercept) || !isset(self::$replacement)) {
-            throw new \RuntimeException('Set a file to intercept and its replacement before enabling wrapper');
+            throw new RuntimeException('Set a file to intercept and its replacement before enabling wrapper');
         }
         stream_wrapper_unregister('file');
         stream_wrapper_register('file', __CLASS__);
@@ -92,30 +97,33 @@ final class IncludeInterceptor
     public function stream_open($path, $mode, $options)
     {
         self::disable();
+
         $including = (bool) ($options & self::STREAM_OPEN_FOR_INCLUDE);
 
-        if ($including) {
-            if ($path === self::$intercept || realpath($path) === self::$intercept) {
-                $this->fp = fopen(self::$replacement, 'r');
-                self::enable();
+        try {
+            if ($including) {
+                if ($path === self::$intercept || realpath($path) === self::$intercept) {
+                    $this->fp = fopen(self::$replacement, 'r');
 
-                return true;
+                    return true;
+                }
             }
-        }
 
-        if (isset($this->context)) {
-            $this->fp = fopen($path, $mode, (bool) $options, $this->context);
-        } else {
-            $this->fp = fopen($path, $mode, (bool) $options);
+            if (isset($this->context)) {
+                $this->fp = fopen($path, $mode, (bool) $options, $this->context);
+            } else {
+                $this->fp = fopen($path, $mode, (bool) $options);
+            }
+        } finally {
+            self::enable();
         }
-        self::enable();
 
         return $this->fp !== false;
     }
 
     public function dir_closedir()
     {
-        \assert(\is_resource($this->fp));
+        assert(is_resource($this->fp));
 
         closedir($this->fp);
 
@@ -126,26 +134,29 @@ final class IncludeInterceptor
     {
         self::disable();
 
-        if (isset($this->context)) {
-            $this->fp = opendir($path, $this->context);
-        } else {
-            $this->fp = opendir($path);
+        try {
+            if (isset($this->context)) {
+                $this->fp = opendir($path, $this->context);
+            } else {
+                $this->fp = opendir($path);
+            }
+        } finally {
+            self::enable();
         }
-        self::enable();
 
         return $this->fp !== false;
     }
 
     public function dir_readdir()
     {
-        \assert(\is_resource($this->fp));
+        assert(is_resource($this->fp));
 
         return readdir($this->fp);
     }
 
     public function dir_rewinddir()
     {
-        \assert(\is_resource($this->fp));
+        assert(is_resource($this->fp));
         rewinddir($this->fp);
 
         return true;
@@ -157,12 +168,15 @@ final class IncludeInterceptor
 
         $isRecursive = (bool) ($options & STREAM_MKDIR_RECURSIVE);
 
-        if (isset($this->context)) {
-            $return = mkdir($path, $mode, $isRecursive, $this->context);
-        } else {
-            $return = mkdir($path, $mode, $isRecursive);
+        try {
+            if (isset($this->context)) {
+                $return = mkdir($path, $mode, $isRecursive, $this->context);
+            } else {
+                $return = mkdir($path, $mode, $isRecursive);
+            }
+        } finally {
+            self::enable();
         }
-        self::enable();
 
         return $return;
     }
@@ -171,12 +185,15 @@ final class IncludeInterceptor
     {
         self::disable();
 
-        if (isset($this->context)) {
-            $return = rename($path_from, $path_to, $this->context);
-        } else {
-            $return = rename($path_from, $path_to);
+        try {
+            if (isset($this->context)) {
+                $return = rename($path_from, $path_to, $this->context);
+            } else {
+                $return = rename($path_from, $path_to);
+            }
+        } finally {
+            self::enable();
         }
-        self::enable();
 
         return $return;
     }
@@ -185,12 +202,15 @@ final class IncludeInterceptor
     {
         self::disable();
 
-        if (isset($this->context)) {
-            $return = rmdir($path, $this->context);
-        } else {
-            $return = rmdir($path);
+        try {
+            if (isset($this->context)) {
+                $return = rmdir($path, $this->context);
+            } else {
+                $return = rmdir($path);
+            }
+        } finally {
+            self::enable();
         }
-        self::enable();
 
         return $return;
     }
@@ -202,28 +222,28 @@ final class IncludeInterceptor
 
     public function stream_close()
     {
-        \assert(\is_resource($this->fp));
+        assert(is_resource($this->fp));
 
         return fclose($this->fp);
     }
 
     public function stream_eof()
     {
-        \assert(\is_resource($this->fp));
+        assert(is_resource($this->fp));
 
         return feof($this->fp);
     }
 
     public function stream_flush()
     {
-        \assert(\is_resource($this->fp));
+        assert(is_resource($this->fp));
 
         return fflush($this->fp);
     }
 
     public function stream_lock($operation)
     {
-        \assert(\is_resource($this->fp));
+        assert(is_resource($this->fp));
 
         return flock($this->fp, $operation);
     }
@@ -232,54 +252,57 @@ final class IncludeInterceptor
     {
         self::disable();
 
-        switch ($option) {
-            case STREAM_META_TOUCH:
-                if (empty($value)) {
-                    $return = touch($path);
-                } else {
-                    $return = touch($path, $value[0], $value[1]);
-                }
+        try {
+            switch ($option) {
+                case STREAM_META_TOUCH:
+                    if (empty($value)) {
+                        $return = touch($path);
+                    } else {
+                        $return = touch($path, $value[0], $value[1]);
+                    }
 
-                break;
-            case STREAM_META_OWNER_NAME:
-            case STREAM_META_OWNER:
-                $return = chown($path, $value);
+                    break;
+                case STREAM_META_OWNER_NAME:
+                case STREAM_META_OWNER:
+                    $return = chown($path, $value);
 
-                break;
-            case STREAM_META_GROUP_NAME:
-            case STREAM_META_GROUP:
-                $return = chgrp($path, $value);
+                    break;
+                case STREAM_META_GROUP_NAME:
+                case STREAM_META_GROUP:
+                    $return = chgrp($path, $value);
 
-                break;
-            case STREAM_META_ACCESS:
-                $return = chmod($path, $value);
+                    break;
+                case STREAM_META_ACCESS:
+                    $return = chmod($path, $value);
 
-                break;
-            default:
-                throw new \RuntimeException('Unknown stream_metadata option');
+                    break;
+                default:
+                    throw new RuntimeException('Unknown stream_metadata option');
+            }
+        } finally {
+            self::enable();
         }
-        self::enable();
 
         return $return;
     }
 
     public function stream_read($count)
     {
-        \assert(\is_resource($this->fp));
+        assert(is_resource($this->fp));
 
         return fread($this->fp, $count);
     }
 
     public function stream_seek($offset, $whence = SEEK_SET)
     {
-        \assert(\is_resource($this->fp));
+        assert(is_resource($this->fp));
 
         return fseek($this->fp, $offset, $whence) === 0;
     }
 
     public function stream_set_option($option, $arg1, $arg2)
     {
-        \assert(\is_resource($this->fp));
+        assert(is_resource($this->fp));
 
         switch ($option) {
             case STREAM_OPTION_BLOCKING:
@@ -305,28 +328,28 @@ final class IncludeInterceptor
 
     public function stream_stat()
     {
-        \assert(\is_resource($this->fp));
+        assert(is_resource($this->fp));
 
         return fstat($this->fp);
     }
 
     public function stream_tell()
     {
-        \assert(\is_resource($this->fp));
+        assert(is_resource($this->fp));
 
         return ftell($this->fp);
     }
 
     public function stream_truncate($new_size)
     {
-        \assert(\is_resource($this->fp));
+        assert(is_resource($this->fp));
 
         return ftruncate($this->fp, $new_size);
     }
 
     public function stream_write($data)
     {
-        \assert(\is_resource($this->fp));
+        assert(is_resource($this->fp));
 
         return fwrite($this->fp, $data);
     }
@@ -335,12 +358,15 @@ final class IncludeInterceptor
     {
         self::disable();
 
-        if (isset($this->context)) {
-            $return = unlink($path, $this->context);
-        } else {
-            $return = unlink($path);
+        try {
+            if (isset($this->context)) {
+                $return = unlink($path, $this->context);
+            } else {
+                $return = unlink($path);
+            }
+        } finally {
+            self::enable();
         }
-        self::enable();
 
         return $return;
     }
@@ -348,9 +374,11 @@ final class IncludeInterceptor
     public function url_stat($path)
     {
         self::disable();
-        $return = is_readable($path) ? stat($path) : false;
-        self::enable();
 
-        return $return;
+        try {
+            return is_readable($path) ? stat($path) : false;
+        } finally {
+            self::enable();
+        }
     }
 }

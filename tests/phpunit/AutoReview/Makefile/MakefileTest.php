@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\Makefile;
 
 use function array_filter;
+use function array_key_exists;
+use function array_replace;
 use function array_shift;
 use function current;
 use function file_get_contents;
@@ -71,11 +73,8 @@ final class MakefileTest extends TestCase
 
 [33mcompile:[0m	  Bundles Infection into a PHAR
 [33mcs:[0m	  	  Runs PHP-CS-Fixer
-[33mphpstan:[0m  	  Runs PHPStan
-[33manalyze:[0m	  Runs Static analyzers and various other checks
-[33mvalidate:[0m	  Checks that the composer.json file is valid
+[33mautoreview:[0m 	  Runs various checks (static analysis & AutoReview test suite)
 [33mtest:[0m		  Runs all the tests
-[33mtest-autoreview:[0m  Runs the AutoReview test suite
 [33mtest-unit:[0m	  Runs the unit tests
 [33mtest-e2e:[0m 	  Runs the end-to-end tests
 [33mtest-infection:[0m   Runs Infection against itself
@@ -197,7 +196,7 @@ EOF;
                 continue;
             }
 
-            if (\array_key_exists($target, $targetCounts)) {
+            if (array_key_exists($target, $targetCounts)) {
                 ++$targetCounts[$target];
             } else {
                 $targetCounts[$target] = 1;
@@ -277,6 +276,8 @@ EOF;
             ),
             0
         );
+
+        $rootTestTargets = array_replace($rootTestTargets, ['test-autoreview'], ['autoreview']);
 
         $this->assertSame($rootTestTargets, $testDependencies);
     }

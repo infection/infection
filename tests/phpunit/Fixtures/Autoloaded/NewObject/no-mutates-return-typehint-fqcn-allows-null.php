@@ -2,10 +2,12 @@
 
 namespace NewObject_ReturnTypehintFqcnAllowsNull;
 
+use stdClass;
+
 class Test
 {
-    function test() : ?\stdClass
+    function test() : ?stdClass
     {
-        return new \stdClass();
+        return new stdClass();
     }
 }

@@ -44,9 +44,12 @@ use Infection\Visitor\CodeCoverageMethodIgnoreVisitor;
 /**
  * @internal
  */
-final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, HasExtraNodeVisitors
+final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements HasExtraNodeVisitors, MemoryUsageAware
 {
-    public const JUNIT_FILE_NAME = 'phpunit.junit.xml';
+    public function hasJUnitReport(): bool
+    {
+        return true;
+    }
 
     public function testsPass(string $output): bool
     {

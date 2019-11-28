@@ -35,15 +35,22 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
+use const DIRECTORY_SEPARATOR;
+use DOMDocument;
+use DOMNodeList;
+use DOMXPath;
 use Infection\Mutant\MutantInterface;
 use Infection\MutationInterface;
 use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use function Infection\Tests\normalizePath as p;
 use Infection\Utils\TmpDirectoryCreator;
+use function microtime;
 use PHPUnit\Framework\TestCase;
+use function random_int;
 use Symfony\Component\Filesystem\Filesystem;
 
 final class MutationConfigBuilderTest extends TestCase
@@ -77,7 +84,7 @@ final class MutationConfigBuilderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->workspace = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
+        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . microtime(true) . random_int(100, 999);
 
         $this->fileSystem = new Filesystem();
         $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
@@ -109,7 +116,8 @@ final class MutationConfigBuilderTest extends TestCase
             $this->tmpDir,
             file_get_contents($phpunitXmlPath),
             $this->xmlConfigurationHelper,
-            $projectDir
+            $projectDir,
+            new JUnitTestCaseSorter()
         );
     }
 
@@ -163,7 +171,8 @@ final class MutationConfigBuilderTest extends TestCase
             $this->tmpDir,
             file_get_contents($phpunitXmlPath),
             $this->xmlConfigurationHelper,
-            'project/dir'
+            'project/dir',
+            new JUnitTestCaseSorter()
         );
 
         $configurationPath = $this->builder->build($this->mutant);
@@ -226,7 +235,8 @@ final class MutationConfigBuilderTest extends TestCase
             $this->tmpDir,
             file_get_contents($phpunitXmlPath),
             $xmlConfigurationHelper,
-            $this->pathToProject
+            $this->pathToProject,
+            new JUnitTestCaseSorter()
         );
 
         $configurationPath = $this->builder->build($this->mutant);
@@ -258,7 +268,7 @@ final class MutationConfigBuilderTest extends TestCase
 
         $xml = file_get_contents($configurationPath);
 
-        /** @var \DOMNodeList $filterNodes */
+        /** @var DOMNodeList $filterNodes */
         $filterNodes = $this->queryXpath($xml, '/phpunit/@printerClass');
         $this->assertSame(0, $filterNodes->length);
     }
@@ -361,9 +371,9 @@ final class MutationConfigBuilderTest extends TestCase
 
     private function queryXpath(string $xml, string $query)
     {
-        $dom = new \DOMDocument();
+        $dom = new DOMDocument();
         $dom->loadXML($xml);
-        $xPath = new \DOMXPath($dom);
+        $xPath = new DOMXPath($dom);
 
         return $xPath->query($query);
     }

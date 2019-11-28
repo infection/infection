@@ -33,12 +33,12 @@ tputx sgr0
 
 if [ "$DRIVER" = "phpdbg" ]
 then
-    PATH=$PATH:bin phpdbg -qrr vendor/bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage/phpunit.junit.xml
+    PATH=$PATH:bin phpdbg -qrr vendor/bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage/junit.xml
 else
-    PATH=$PATH:bin php vendor/bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage/phpunit.junit.xml
+    PATH=$PATH:bin php vendor/bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage/junit.xml
 fi
 
-test -f coverage/phpunit.junit.xml
+test -f coverage/junit.xml
 test -f coverage/coverage-xml/RunShellScript.php.xml
 test -f coverage/coverage-xml/index.xml
 

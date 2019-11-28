@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config;
 
+use function assert;
 use DOMElement;
+use DOMXPath;
 use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
+use LibXMLError;
 
 /**
  * @internal
@@ -60,7 +63,7 @@ final class XmlConfigurationHelper
         $this->phpUnitConfigDir = $phpUnitConfigDir;
     }
 
-    public function replaceWithAbsolutePaths(\DOMXPath $xPath): void
+    public function replaceWithAbsolutePaths(DOMXPath $xPath): void
     {
         $queries = [
             '/phpunit/@bootstrap',
@@ -74,26 +77,26 @@ final class XmlConfigurationHelper
         }
     }
 
-    public function removeExistingLoggers(\DOMXPath $xPath): void
+    public function removeExistingLoggers(DOMXPath $xPath): void
     {
         foreach ($xPath->query('/phpunit/logging') as $node) {
             $document = $xPath->document->documentElement;
-            \assert($document instanceof DOMElement);
+            assert($document instanceof DOMElement);
             $document->removeChild($node);
         }
     }
 
-    public function deactivateResultCaching(\DOMXPath $xPath): void
+    public function deactivateResultCaching(DOMXPath $xPath): void
     {
         $this->setAttributeValue($xPath, 'cacheResult', 'false');
     }
 
-    public function deactivateStderrRedirection(\DOMXPath $xPath): void
+    public function deactivateStderrRedirection(DOMXPath $xPath): void
     {
         $this->setAttributeValue($xPath, 'stderr', 'false');
     }
 
-    public function setStopOnFailure(\DOMXPath $xPath): void
+    public function setStopOnFailure(DOMXPath $xPath): void
     {
         $this->setAttributeValue(
             $xPath,
@@ -102,7 +105,7 @@ final class XmlConfigurationHelper
         );
     }
 
-    public function deactivateColours(\DOMXPath $xPath): void
+    public function deactivateColours(DOMXPath $xPath): void
     {
         $this->setAttributeValue(
             $xPath,
@@ -111,7 +114,7 @@ final class XmlConfigurationHelper
         );
     }
 
-    public function removeExistingPrinters(\DOMXPath $xPath): void
+    public function removeExistingPrinters(DOMXPath $xPath): void
     {
         $this->removeAttribute(
             $xPath,
@@ -119,7 +122,7 @@ final class XmlConfigurationHelper
         );
     }
 
-    public function validate(\DOMXPath $xPath): bool
+    public function validate(DOMXPath $xPath): bool
     {
         if ($xPath->query('/phpunit')->length === 0) {
             throw InvalidPhpUnitXmlConfigException::byRootNode();
@@ -143,7 +146,7 @@ final class XmlConfigurationHelper
         return true;
     }
 
-    public function removeDefaultTestSuite(\DOMXPath $xPath): void
+    public function removeDefaultTestSuite(DOMXPath $xPath): void
     {
         $this->removeAttribute(
             $xPath,
@@ -179,7 +182,7 @@ final class XmlConfigurationHelper
         return sprintf('%s/%s', $this->phpUnitConfigDir, $nodeValue);
     }
 
-    private function removeAttribute(\DOMXPath $xPath, string $name): void
+    private function removeAttribute(DOMXPath $xPath, string $name): void
     {
         $nodeList = $xPath->query(sprintf(
             '/phpunit/@%s',
@@ -188,12 +191,12 @@ final class XmlConfigurationHelper
 
         if ($nodeList->length) {
             $document = $xPath->document->documentElement;
-            \assert($document instanceof DOMElement);
+            assert($document instanceof DOMElement);
             $document->removeAttribute($name);
         }
     }
 
-    private function setAttributeValue(\DOMXPath $xPath, string $name, string $value): void
+    private function setAttributeValue(DOMXPath $xPath, string $name, string $value): void
     {
         $nodeList = $xPath->query(sprintf(
             '/phpunit/@%s',
@@ -208,7 +211,7 @@ final class XmlConfigurationHelper
         }
     }
 
-    private function getErrorLevelString(\LibXMLError $error): string
+    private function getErrorLevelString(LibXMLError $error): string
     {
         if ($error->level === LIBXML_ERR_WARNING) {
             return 'Warning';

@@ -2,7 +2,9 @@
 
 namespace FqcnClassInterface;
 
-class Ci implements \Countable
+use Countable;
+
+class Ci implements Countable
 {
     public function count()
     {

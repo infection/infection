@@ -35,10 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Mutant\Exception;
 
+use LogicException;
+
 /**
  * @internal
  */
-final class MsiCalculationException extends \LogicException
+final class MsiCalculationException extends LogicException
 {
     public static function create(string $type): self
     {
