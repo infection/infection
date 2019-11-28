@@ -65,7 +65,7 @@ final class E2ETest extends TestCase
     private $cwd;
 
     /**
-     * @var \Composer\Autoload\ClassLoader|null
+     * @var ClassLoader|null
      */
     private $previousLoader;
 

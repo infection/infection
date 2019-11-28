@@ -76,7 +76,7 @@ final class InvalidFileTest extends TestCase
     {
         $config = new SchemaConfigurationFile('/path/to/config');
 
-        $exception = \Infection\Configuration\Schema\InvalidFile::createForCouldNotRetrieveFileContents($config);
+        $exception = InvalidFile::createForCouldNotRetrieveFileContents($config);
 
         $this->assertSame(
             'Could not retrieve the contents of the file "/path/to/config".',

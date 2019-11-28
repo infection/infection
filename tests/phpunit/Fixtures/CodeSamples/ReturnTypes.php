@@ -2,7 +2,9 @@
 
 namespace Infection\CodeSamples;
 
-class ReturnTypes extends \ArrayObject
+use ArrayObject;
+
+class ReturnTypes extends ArrayObject
 {
     public function withReturnType(): int
     {
