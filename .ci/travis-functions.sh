@@ -27,7 +27,7 @@ function get-infection-pr-flags() {
         git remote set-branches --add origin $TRAVIS_BRANCH;
         git fetch;
 
-        CHANGED_FILES=$(git diff origin/$TRAVIS_BRANCH --diff-filter=AM --name-only | grep src/ | paste -sd "," -);
+        CHANGED_FILES=$(git diff origin/$TRAVIS_BRANCH --diff-filter=A --name-only | grep src/ | paste -sd "," -);
         MIN_MSI=$(($(grep -o 'min-msi=[0-9]*' .travis.yml | head | cut -f2 -d=) + 1))
         >&2 echo "Assumed minimal MSI: $MIN_MSI%"
 
