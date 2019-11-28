@@ -55,12 +55,11 @@ use function Safe\sprintf;
  */
 final class ProjectCodeTest extends TestCase
 {
+    /**
+     * @requires OSFAMILY Windows Cannot check if the file is executable on Windows
+     */
     public function test_infection_bin_is_executable(): void
     {
-        if (stripos(PHP_OS, 'WIN') === 0) {
-            $this->markTestSkipped('Cannot check if the file is executable on Windows.');
-        }
-
         $infectionFile = __DIR__ . '/../../../../bin/infection';
 
         $this->assertFileExists($infectionFile);

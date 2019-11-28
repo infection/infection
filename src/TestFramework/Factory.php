@@ -37,7 +37,9 @@ namespace Infection\TestFramework;
 
 use Infection\Configuration\Configuration;
 use Infection\Finder\TestFrameworkFinder;
+use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
+use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
 use Infection\TestFramework\PhpSpec\CommandLine\ArgumentsAndOptionsBuilder as PhpSpecArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder as PhpSpecInitialConfigBuilder;
@@ -49,6 +51,9 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\VersionParser;
 use function Safe\file_get_contents;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @internal
@@ -90,6 +95,16 @@ final class Factory
      */
     private $versionParser;
 
+    /**
+     * @var Filesystem
+     */
+    private $filesystem;
+
+    /**
+     * @var CommandLineBuilder
+     */
+    private $commandLineBuilder;
+
     public function __construct(
         string $tmpDir,
         string $projectDir,
@@ -97,7 +112,9 @@ final class Factory
         XmlConfigurationHelper $xmlConfigurationHelper,
         string $jUnitFilePath,
         Configuration $infectionConfig,
-        VersionParser $versionParser
+        VersionParser $versionParser,
+        Filesystem $filesystem,
+        CommandLineBuilder $commandLineBuilder
     ) {
         $this->tmpDir = $tmpDir;
         $this->configLocator = $configLocator;
@@ -106,6 +123,8 @@ final class Factory
         $this->jUnitFilePath = $jUnitFilePath;
         $this->infectionConfig = $infectionConfig;
         $this->versionParser = $versionParser;
+        $this->filesystem = $filesystem;
+        $this->commandLineBuilder = $commandLineBuilder;
     }
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
@@ -115,10 +134,10 @@ final class Factory
             $phpUnitConfigContent = file_get_contents($phpUnitConfigPath);
 
             return new PhpUnitAdapter(
-                new TestFrameworkFinder(
+                (new TestFrameworkFinder(
                     TestFrameworkTypes::PHPUNIT,
                     (string) $this->infectionConfig->getPhpUnit()->getCustomPath()
-                ),
+                ))->find(),
                 new InitialConfigBuilder(
                     $this->tmpDir,
                     $phpUnitConfigContent,
@@ -127,9 +146,10 @@ final class Factory
                     $this->infectionConfig->getSource()->getDirectories(),
                     $skipCoverage
                 ),
-                new MutationConfigBuilder($this->tmpDir, $phpUnitConfigContent, $this->xmlConfigurationHelper, $this->projectDir),
+                new MutationConfigBuilder($this->tmpDir, $phpUnitConfigContent, $this->xmlConfigurationHelper, $this->projectDir, new JUnitTestCaseSorter()),
                 new ArgumentsAndOptionsBuilder(),
-                $this->versionParser
+                $this->versionParser,
+                $this->commandLineBuilder
             );
         }
 
@@ -137,11 +157,30 @@ final class Factory
             $phpSpecConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPSPEC);
 
             return new PhpSpecAdapter(
-                new TestFrameworkFinder(TestFrameworkTypes::PHPSPEC),
+                (new TestFrameworkFinder(TestFrameworkTypes::PHPSPEC))->find(),
                 new PhpSpecInitialConfigBuilder($this->tmpDir, $phpSpecConfigPath, $skipCoverage),
                 new PhpSpecMutationConfigBuilder($this->tmpDir, $phpSpecConfigPath, $this->projectDir),
                 new PhpSpecArgumentsAndOptionsBuilder(),
-                $this->versionParser
+                $this->versionParser,
+                $this->commandLineBuilder
+            );
+        }
+
+        if ($adapterName === TestFrameworkTypes::CODECEPTION) {
+            $codeceptionConfigPath = $this->configLocator->locate(TestFrameworkTypes::CODECEPTION);
+            $codeceptionConfigContentParsed = $this->parseYaml($codeceptionConfigPath);
+
+            return new CodeceptionAdapter(
+                (new TestFrameworkFinder(CodeceptionAdapter::EXECUTABLE))->find(),
+                $this->commandLineBuilder,
+                $this->versionParser,
+                new JUnitTestCaseSorter(),
+                $this->filesystem,
+                $this->jUnitFilePath,
+                $this->tmpDir,
+                $this->projectDir,
+                $codeceptionConfigContentParsed,
+                $this->infectionConfig->getSource()->getDirectories()
             );
         }
 
@@ -150,5 +189,21 @@ final class Factory
             $adapterName,
             implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC])
         ));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function parseYaml(string $codeceptionConfigPath): array
+    {
+        $codeceptionConfigContent = file_get_contents($codeceptionConfigPath);
+
+        try {
+            $codeceptionConfigContentParsed = Yaml::parse($codeceptionConfigContent);
+        } catch (ParseException $e) {
+            throw TestFrameworkConfigParseException::fromPath($codeceptionConfigPath, $e);
+        }
+
+        return $codeceptionConfigContentParsed;
     }
 }

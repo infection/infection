@@ -48,23 +48,21 @@ interface TestFrameworkAdapter
 
     public function testsPass(string $output): bool;
 
+    public function hasJUnitReport(): bool;
+
     /**
      * @param string[] $phpExtraArgs
      *
      * @return string[]
      */
-    public function getInitialTestRunCommandLine(string $configPath, string $extraOptions, array $phpExtraArgs): array;
+    public function getInitialTestRunCommandLine(string $extraOptions, array $phpExtraArgs, bool $skipCoverage): array;
 
     /**
      * @return string[]
      */
-    public function getMutantCommandLine(string $configPath, string $extraOptions): array;
+    public function getMutantCommandLine(MutantInterface $mutant, string $extraOptions): array;
 
     public function getVersion(): string;
 
     public function getInitialTestsFailRecommendations(string $commandLine): string;
-
-    public function buildInitialConfigFile();
-
-    public function buildMutationConfigFile(MutantInterface $mutant);
 }

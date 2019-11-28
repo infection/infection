@@ -35,12 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Utils;
 
+use const DIRECTORY_SEPARATOR;
+use function Safe\sprintf;
+use function str_replace;
 use Symfony\Component\Filesystem\Filesystem;
+use Webmozart\Assert\Assert;
+use Webmozart\PathUtil\Path;
 
 /**
  * @internal
+ * @final
  */
-final class TmpDirectoryCreator
+class TmpDirectoryCreator
 {
     private const BASE_DIR_NAME = 'infection';
 
@@ -59,14 +65,24 @@ final class TmpDirectoryCreator
         $this->fileSystem = $fileSystem;
     }
 
-    public function createAndGet(string $tempDir): string
+    public function createAndGet(string $tmpDir): string
     {
+        Assert::true(
+            Path::isAbsolute($tmpDir),
+            sprintf(
+                'Expected the temporary directory passed to be an absolute path. Got "%s"',
+                $tmpDir
+            )
+        );
+
         if (!$this->path) {
-            $path = sprintf('%s/%s', $tempDir, self::BASE_DIR_NAME);
+            $this->path = str_replace(
+                [DIRECTORY_SEPARATOR, '//'],
+                ['/', '/'],
+                sprintf('%s/%s', $tmpDir, self::BASE_DIR_NAME)
+            );
 
-            $this->fileSystem->mkdir($path, 0777);
-
-            $this->path = $path;
+            $this->fileSystem->mkdir($this->path, 0777);
         }
 
         return $this->path;

@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpSpec\Adapter;
 
-use Infection\Finder\AbstractExecutableFinder;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
+use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
@@ -125,11 +125,12 @@ OUTPUT;
     private function getAdapter(): PhpSpecAdapter
     {
         return new PhpSpecAdapter(
-            $this->createMock(AbstractExecutableFinder::class),
+            '/path/to/phpspec',
             $this->createMock(InitialConfigBuilder::class),
             $this->createMock(MutationConfigBuilder::class),
             $this->createMock(CommandLineArgumentsAndOptionsBuilder::class),
-            $this->createMock(VersionParser::class)
+            $this->createMock(VersionParser::class),
+            new CommandLineBuilder()
         );
     }
 }

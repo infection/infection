@@ -35,13 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use Infection\Finder\AbstractExecutableFinder;
-use Infection\Finder\Exception\FinderException;
 use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\Utils\VersionParser;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 /**
@@ -50,9 +47,9 @@ use Symfony\Component\Process\Process;
 abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
 {
     /**
-     * @var AbstractExecutableFinder
+     * @var string
      */
-    private $testFrameworkFinder;
+    private $testFrameworkExecutable;
 
     /**
      * @var CommandLineArgumentsAndOptionsBuilder
@@ -80,39 +77,45 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     private $cachedVersion;
 
     /**
-     * @var array|null
+     * @var CommandLineBuilder
      */
-    private $cachedPhpCmdLine;
+    private $commandLineBuilder;
 
     public function __construct(
-        AbstractExecutableFinder $testFrameworkFinder,
+        string $testFrameworkExecutable,
         InitialConfigBuilder $initialConfigBuilder,
         MutationConfigBuilder $mutationConfigBuilder,
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
-        VersionParser $versionParser
+        VersionParser $versionParser,
+        CommandLineBuilder $commandLineBuilder
     ) {
-        $this->testFrameworkFinder = $testFrameworkFinder;
+        $this->testFrameworkExecutable = $testFrameworkExecutable;
         $this->initialConfigBuilder = $initialConfigBuilder;
         $this->mutationConfigBuilder = $mutationConfigBuilder;
         $this->argumentsAndOptionsBuilder = $argumentsAndOptionsBuilder;
         $this->versionParser = $versionParser;
+        $this->commandLineBuilder = $commandLineBuilder;
     }
 
     abstract public function testsPass(string $output): bool;
 
     abstract public function getName(): string;
 
+    abstract public function hasJUnitReport(): bool;
+
     /**
      * Returns array of arguments to pass them into the Initial Run Symfony Process
+     *
+     * @param string[] $phpExtraArgs
      *
      * @return string[]
      */
     public function getInitialTestRunCommandLine(
-        string $configPath,
         string $extraOptions,
-        array $phpExtraArgs
+        array $phpExtraArgs,
+        bool $skipCoverage
     ): array {
-        return $this->getCommandLine($configPath, $extraOptions, $phpExtraArgs);
+        return $this->getCommandLine($this->buildInitialConfigFile(), $extraOptions, $phpExtraArgs, $skipCoverage);
     }
 
     /**
@@ -120,62 +123,9 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
      *
      * @return string[]
      */
-    public function getMutantCommandLine(string $configPath, string $extraOptions): array
+    public function getMutantCommandLine(MutantInterface $mutant, string $extraOptions): array
     {
-        return $this->getCommandLine($configPath, $extraOptions);
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getCommandLine(
-        string $configPath,
-        string $extraOptions,
-        array $phpExtraArgs = []
-    ): array {
-        $frameworkPath = $this->testFrameworkFinder->find();
-        $frameworkArgs = $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions);
-
-        if ($this->isBatchFile($frameworkPath)) {
-            return array_merge([$frameworkPath], $frameworkArgs);
-        }
-
-        /*
-         * That's an empty options list by all means, we need to see it as such
-         */
-        $phpExtraArgs = array_filter($phpExtraArgs);
-
-        /*
-         * Run an executable as it is if we're using a standard CLI and
-         * there's a standard interpreter available on PATH.
-         *
-         * This lets folks use, say, a bash wrapper over phpunit.
-         */
-        if ('cli' === \PHP_SAPI && empty($phpExtraArgs) && is_executable($frameworkPath) && `command -v php`) {
-            return array_merge([$frameworkPath], $frameworkArgs);
-        }
-
-        /*
-         * In all other cases run it with a chosen PHP interpreter
-         */
-        $commandLineArgs = array_merge(
-            $this->findPhp(),
-            $phpExtraArgs,
-            [$frameworkPath],
-            $frameworkArgs
-        );
-
-        return array_filter($commandLineArgs);
-    }
-
-    public function buildInitialConfigFile(): string
-    {
-        return $this->initialConfigBuilder->build($this->getVersion());
-    }
-
-    public function buildMutationConfigFile(MutantInterface $mutant): string
-    {
-        return $this->mutationConfigBuilder->build($mutant);
+        return $this->getCommandLine($this->buildMutationConfigFile($mutant), $extraOptions, [], false);
     }
 
     public function getVersion(): string
@@ -184,17 +134,13 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
             return $this->cachedVersion;
         }
 
-        $frameworkPath = $this->testFrameworkFinder->find();
-        $phpIfNeeded = $this->isBatchFile($frameworkPath) ? [] : $this->findPhp();
+        $testFrameworkVersionExecutable = $this->commandLineBuilder->build(
+            $this->testFrameworkExecutable,
+            [],
+            ['--version']
+        );
 
-        $process = new Process(array_merge(
-            $phpIfNeeded,
-            [
-                $frameworkPath,
-                '--version',
-            ]
-        ));
-
+        $process = new Process($testFrameworkVersionExecutable);
         $process->mustRun();
 
         $version = 'unknown';
@@ -215,34 +161,27 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         return sprintf('Check the executed command to identify the problem: %s', $commandLine);
     }
 
-    /**
-     * Need to return string for cases when user run phpdbg with -qrr argument.s
-     *
-     * @return string[]
-     */
-    private function findPhp(): array
+    protected function buildInitialConfigFile(): string
     {
-        if ($this->cachedPhpCmdLine === null) {
-            $phpExec = (new PhpExecutableFinder())->find(false);
-
-            if ($phpExec === false) {
-                throw FinderException::phpExecutableNotFound();
-            }
-
-            $phpCmd[] = $phpExec;
-
-            if (\PHP_SAPI === 'phpdbg') {
-                $phpCmd[] = '-qrr';
-            }
-
-            $this->cachedPhpCmdLine = $phpCmd;
-        }
-
-        return $this->cachedPhpCmdLine;
+        return $this->initialConfigBuilder->build($this->getVersion());
     }
 
-    private function isBatchFile(string $path): bool
+    protected function buildMutationConfigFile(MutantInterface $mutant): string
     {
-        return '.bat' === substr($path, -4);
+        return $this->mutationConfigBuilder->build($mutant);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getCommandLine(
+        string $configPath,
+        string $extraOptions,
+        array $phpExtraArgs,
+        bool $skipCoverage
+    ): array {
+        $frameworkArgs = $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions);
+
+        return $this->commandLineBuilder->build($this->testFrameworkExecutable, $phpExtraArgs, $frameworkArgs);
     }
 }

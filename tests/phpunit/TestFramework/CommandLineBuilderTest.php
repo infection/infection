@@ -33,62 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Coverage;
+namespace Infection\Tests\TestFramework;
 
-use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\Coverage\TestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
-use Infection\TestFramework\Coverage\TestFileTimeData;
+use Infection\TestFramework\CommandLineBuilder;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class PhpUnitTestFileDataProvider implements TestFileDataProvider
+final class CommandLineBuilderTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private $jUnitFilePath;
+    private const PHP_EXTRA_ARGS = ['-d zend_extension=xdebug.so'];
+
+    private const TEST_FRAMEWORK_ARGS = ['--filter XYZ', '--exclude-group=e2e'];
 
     /**
-     * @var \DOMXPath|null
+     * @var CommandLineBuilder
      */
-    private $xPath;
+    private $commandLineBuilder;
 
-    public function __construct(string $jUnitFilePath)
+    protected function setUp(): void
     {
-        $this->jUnitFilePath = $jUnitFilePath;
+        parent::setUp();
+
+        $this->commandLineBuilder = new CommandLineBuilder();
     }
 
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
+    public function test_it_builds_command_line_for_batch_file(): void
     {
-        $xPath = $this->getXPath();
+        $commandLine = $this->commandLineBuilder->build('phpunit.bat', self::PHP_EXTRA_ARGS, self::TEST_FRAMEWORK_ARGS);
 
-        $nodes = $xPath->query(sprintf('//testsuite[@name="%s"]', $fullyQualifiedClassName));
-
-        if (!$nodes->length) {
-            throw TestFileNameNotFoundException::notFoundFromFQN($fullyQualifiedClassName);
-        }
-
-        return new TestFileTimeData(
-            $nodes[0]->getAttribute('file'),
-            (float) $nodes[0]->getAttribute('time')
-        );
+        $this->assertContains('phpunit.bat', $commandLine);
+        $this->assertContains('--filter XYZ', $commandLine);
+        $this->assertContains('--exclude-group=e2e', $commandLine);
     }
 
-    private function getXPath(): \DOMXPath
+    public function test_it_builds_command_line_with_empty_php_args(): void
     {
-        if (!$this->xPath) {
-            if (!file_exists($this->jUnitFilePath)) {
-                throw CoverageDoesNotExistException::forJunit($this->jUnitFilePath);
-            }
+        $commandLine = $this->commandLineBuilder->build('vendor/bin/phpunit', [], self::TEST_FRAMEWORK_ARGS);
 
-            $dom = new \DOMDocument();
-            $dom->load($this->jUnitFilePath);
-
-            $this->xPath = new \DOMXPath($dom);
-        }
-
-        return $this->xPath;
+        $this->assertContains('vendor/bin/phpunit', $commandLine);
+        $this->assertContains('--filter XYZ', $commandLine);
+        $this->assertContains('--exclude-group=e2e', $commandLine);
     }
 }

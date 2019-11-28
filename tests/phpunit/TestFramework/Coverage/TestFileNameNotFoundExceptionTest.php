@@ -42,9 +42,9 @@ final class TestFileNameNotFoundExceptionTest extends TestCase
 {
     public function test_from_fqn(): void
     {
-        $exception = TestFileNameNotFoundException::notFoundFromFQN('Foo\Bar');
+        $exception = TestFileNameNotFoundException::notFoundFromFQN('Foo\Bar', '/path/to/junit/xml');
 
         $this->assertInstanceOf(TestFileNameNotFoundException::class, $exception);
-        $this->assertSame('For FQCN: Foo\Bar', $exception->getMessage());
+        $this->assertSame('For FQCN: Foo\Bar. Junit report: /path/to/junit/xml', $exception->getMessage());
     }
 }

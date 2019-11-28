@@ -92,23 +92,26 @@ final class IncludeInterceptor
     public function stream_open($path, $mode, $options)
     {
         self::disable();
+
         $including = (bool) ($options & self::STREAM_OPEN_FOR_INCLUDE);
 
-        if ($including) {
-            if ($path === self::$intercept || realpath($path) === self::$intercept) {
-                $this->fp = fopen(self::$replacement, 'r');
-                self::enable();
+        try {
+            if ($including) {
+                if ($path === self::$intercept || realpath($path) === self::$intercept) {
+                    $this->fp = fopen(self::$replacement, 'r');
 
-                return true;
+                    return true;
+                }
             }
-        }
 
-        if (isset($this->context)) {
-            $this->fp = fopen($path, $mode, (bool) $options, $this->context);
-        } else {
-            $this->fp = fopen($path, $mode, (bool) $options);
+            if (isset($this->context)) {
+                $this->fp = fopen($path, $mode, (bool) $options, $this->context);
+            } else {
+                $this->fp = fopen($path, $mode, (bool) $options);
+            }
+        } finally {
+            self::enable();
         }
-        self::enable();
 
         return $this->fp !== false;
     }
@@ -126,12 +129,15 @@ final class IncludeInterceptor
     {
         self::disable();
 
-        if (isset($this->context)) {
-            $this->fp = opendir($path, $this->context);
-        } else {
-            $this->fp = opendir($path);
+        try {
+            if (isset($this->context)) {
+                $this->fp = opendir($path, $this->context);
+            } else {
+                $this->fp = opendir($path);
+            }
+        } finally {
+            self::enable();
         }
-        self::enable();
 
         return $this->fp !== false;
     }
@@ -157,12 +163,15 @@ final class IncludeInterceptor
 
         $isRecursive = (bool) ($options & STREAM_MKDIR_RECURSIVE);
 
-        if (isset($this->context)) {
-            $return = mkdir($path, $mode, $isRecursive, $this->context);
-        } else {
-            $return = mkdir($path, $mode, $isRecursive);
+        try {
+            if (isset($this->context)) {
+                $return = mkdir($path, $mode, $isRecursive, $this->context);
+            } else {
+                $return = mkdir($path, $mode, $isRecursive);
+            }
+        } finally {
+            self::enable();
         }
-        self::enable();
 
         return $return;
     }
@@ -171,12 +180,15 @@ final class IncludeInterceptor
     {
         self::disable();
 
-        if (isset($this->context)) {
-            $return = rename($path_from, $path_to, $this->context);
-        } else {
-            $return = rename($path_from, $path_to);
+        try {
+            if (isset($this->context)) {
+                $return = rename($path_from, $path_to, $this->context);
+            } else {
+                $return = rename($path_from, $path_to);
+            }
+        } finally {
+            self::enable();
         }
-        self::enable();
 
         return $return;
     }
@@ -185,12 +197,15 @@ final class IncludeInterceptor
     {
         self::disable();
 
-        if (isset($this->context)) {
-            $return = rmdir($path, $this->context);
-        } else {
-            $return = rmdir($path);
+        try {
+            if (isset($this->context)) {
+                $return = rmdir($path, $this->context);
+            } else {
+                $return = rmdir($path);
+            }
+        } finally {
+            self::enable();
         }
-        self::enable();
 
         return $return;
     }
@@ -232,33 +247,36 @@ final class IncludeInterceptor
     {
         self::disable();
 
-        switch ($option) {
-            case STREAM_META_TOUCH:
-                if (empty($value)) {
-                    $return = touch($path);
-                } else {
-                    $return = touch($path, $value[0], $value[1]);
-                }
+        try {
+            switch ($option) {
+                case STREAM_META_TOUCH:
+                    if (empty($value)) {
+                        $return = touch($path);
+                    } else {
+                        $return = touch($path, $value[0], $value[1]);
+                    }
 
-                break;
-            case STREAM_META_OWNER_NAME:
-            case STREAM_META_OWNER:
-                $return = chown($path, $value);
+                    break;
+                case STREAM_META_OWNER_NAME:
+                case STREAM_META_OWNER:
+                    $return = chown($path, $value);
 
-                break;
-            case STREAM_META_GROUP_NAME:
-            case STREAM_META_GROUP:
-                $return = chgrp($path, $value);
+                    break;
+                case STREAM_META_GROUP_NAME:
+                case STREAM_META_GROUP:
+                    $return = chgrp($path, $value);
 
-                break;
-            case STREAM_META_ACCESS:
-                $return = chmod($path, $value);
+                    break;
+                case STREAM_META_ACCESS:
+                    $return = chmod($path, $value);
 
-                break;
-            default:
-                throw new \RuntimeException('Unknown stream_metadata option');
+                    break;
+                default:
+                    throw new \RuntimeException('Unknown stream_metadata option');
+            }
+        } finally {
+            self::enable();
         }
-        self::enable();
 
         return $return;
     }
@@ -335,12 +353,15 @@ final class IncludeInterceptor
     {
         self::disable();
 
-        if (isset($this->context)) {
-            $return = unlink($path, $this->context);
-        } else {
-            $return = unlink($path);
+        try {
+            if (isset($this->context)) {
+                $return = unlink($path, $this->context);
+            } else {
+                $return = unlink($path);
+            }
+        } finally {
+            self::enable();
         }
-        self::enable();
 
         return $return;
     }
@@ -348,9 +369,11 @@ final class IncludeInterceptor
     public function url_stat($path)
     {
         self::disable();
-        $return = is_readable($path) ? stat($path) : false;
-        self::enable();
 
-        return $return;
+        try {
+            return is_readable($path) ? stat($path) : false;
+        } finally {
+            self::enable();
+        }
     }
 }

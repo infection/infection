@@ -20,7 +20,7 @@ run () {
 
 cd $(dirname "$0")
 
-if [ "$DRIVER" = "phpdbg" ]
+if [ "$DRIVER" != "pcov" ]
 then
     exit 0
 fi

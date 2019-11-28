@@ -60,15 +60,16 @@ use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Coverage\CoverageRequirementChecker;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
+use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
+use Infection\TestFramework\Coverage\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\Factory;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
-use Infection\TestFramework\PhpUnit\Coverage\PhpUnitTestFileDataProvider;
+use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\Utils\TmpDirectoryCreator;
 use Infection\Utils\VersionParser;
 use PhpParser\Lexer;
@@ -92,11 +93,8 @@ final class InfectionContainer extends Container
             'filesystem' => static function (): Filesystem {
                 return new Filesystem();
             },
-            'tmp.dir.creator' => static function (self $container): TmpDirectoryCreator {
+            TmpDirectoryCreator::class => static function (self $container): TmpDirectoryCreator {
                 return new TmpDirectoryCreator($container['filesystem']);
-            },
-            'tmp.dir' => static function (self $container): string {
-                return $container['tmp.dir.creator']->createAndGet((string) $container[Configuration::class]->getTmpDir());
             },
             'coverage.dir.phpunit' => static function (self $container) {
                 return sprintf(
@@ -112,11 +110,14 @@ final class InfectionContainer extends Container
                     XMLLineCodeCoverage::PHP_SPEC_COVERAGE_DIR
                 );
             },
-            'phpunit.junit.file.path' => static function (self $container) {
+            'coverage.dir.codeception' => static function (self $container) {
+                return sprintf('%s/%s', $container['coverage.path'], XMLLineCodeCoverage::CODECEPTION_COVERAGE_DIR);
+            },
+            'junit.file.path' => static function (self $container) {
                 return sprintf(
                     '%s/%s',
                     $container['coverage.path'],
-                    PhpUnitAdapter::JUNIT_FILE_NAME
+                    TestFrameworkAdapter::JUNIT_FILE_NAME
                 );
             },
             RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
@@ -135,14 +136,19 @@ final class InfectionContainer extends Container
                 );
             },
             'test.framework.factory' => static function (self $container): Factory {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
                 return new Factory(
-                    $container['tmp.dir'],
+                    $config->getTmpDir(),
                     $container['project.dir'],
                     $container['testframework.config.locator'],
                     $container['xml.configuration.helper'],
-                    $container['phpunit.junit.file.path'],
+                    $container['junit.file.path'],
                     $container[Configuration::class],
-                    $container[VersionParser::class]
+                    $container[VersionParser::class],
+                    $container['filesystem'],
+                    $container[CommandLineBuilder::class]
                 );
             },
             'xml.configuration.helper' => static function (self $container): XmlConfigurationHelper {
@@ -155,8 +161,11 @@ final class InfectionContainer extends Container
                 );
             },
             'mutant.creator' => static function (self $container): MutantCreator {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
                 return new MutantCreator(
-                    $container['tmp.dir'],
+                    $config->getTmpDir(),
                     $container['differ'],
                     $container['pretty.printer']
                 );
@@ -183,9 +192,9 @@ final class InfectionContainer extends Container
             'diff.colorizer' => static function (): DiffColorizer {
                 return new DiffColorizer();
             },
-            'test.file.data.provider.phpunit' => static function (self $container): TestFileDataProvider {
+            CachedTestFileDataProvider::class => static function (self $container): TestFileDataProvider {
                 return new CachedTestFileDataProvider(
-                    new PhpUnitTestFileDataProvider($container['phpunit.junit.file.path'])
+                    new JUnitTestFileDataProvider($container['junit.file.path'])
                 );
             },
             VersionParser::class => static function (): VersionParser {
@@ -243,8 +252,11 @@ final class InfectionContainer extends Container
             SchemaConfigurationFactory::class => static function (): SchemaConfigurationFactory {
                 return new SchemaConfigurationFactory();
             },
-            ConfigurationFactory::class => static function (): ConfigurationFactory {
-                return new ConfigurationFactory();
+            ConfigurationFactory::class => static function (self $container): ConfigurationFactory {
+                /** @var TmpDirectoryCreator $tmpDirCreator */
+                $tmpDirCreator = $container[TmpDirectoryCreator::class];
+
+                return new ConfigurationFactory($tmpDirCreator);
             },
             'coverage.path' => static function (self $container): string {
                 /** @var Configuration $config */
@@ -253,7 +265,7 @@ final class InfectionContainer extends Container
                 $existingCoveragePath = (string) $config->getExistingCoveragePath();
 
                 if ($existingCoveragePath === '') {
-                    return $container['tmp.dir'];
+                    return $config->getTmpDir();
                 }
 
                 return $container['filesystem']->isAbsolutePath($existingCoveragePath)
@@ -297,11 +309,14 @@ final class InfectionContainer extends Container
                     $container['diff.colorizer'],
                     $config,
                     $container['filesystem'],
-                    $container['tmp.dir'],
+                    $config->getTmpDir(),
                     $container['timer'],
                     $container['time.formatter'],
                     $container['memory.formatter']
                 );
+            },
+            CommandLineBuilder::class => static function (): CommandLineBuilder {
+                return new CommandLineBuilder();
             },
         ]);
     }
