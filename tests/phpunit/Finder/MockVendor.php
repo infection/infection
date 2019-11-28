@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Finder;
 
-use const DIRECTORY_SEPARATOR;
 use Symfony\Component\Filesystem\Filesystem;
 
 final class MockVendor
@@ -109,7 +108,7 @@ final class MockVendor
     {
         $this->emptyVendorBin();
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             // Use an empty batch script to disable finding the main script
             file_put_contents($this->vendorBinBat, '@ECHO OFF');
         } else {

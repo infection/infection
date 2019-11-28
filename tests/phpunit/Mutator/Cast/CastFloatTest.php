@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Cast;
 
-use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class CastFloatTest extends AbstractMutatorTestCase
@@ -48,7 +47,7 @@ final class CastFloatTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): Generator
+    public function provideMutationCases(): \Generator
     {
         yield 'It removes casting to float' => [
             <<<'PHP'

@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Coverage;
 
-use DOMDocument;
-use DOMXPath;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
@@ -53,7 +51,7 @@ final class PhpUnitTestFileDataProvider implements TestFileDataProvider
     private $jUnitFilePath;
 
     /**
-     * @var DOMXPath|null
+     * @var \DOMXPath|null
      */
     private $xPath;
 
@@ -78,17 +76,17 @@ final class PhpUnitTestFileDataProvider implements TestFileDataProvider
         );
     }
 
-    private function getXPath(): DOMXPath
+    private function getXPath(): \DOMXPath
     {
         if (!$this->xPath) {
             if (!file_exists($this->jUnitFilePath)) {
                 throw CoverageDoesNotExistException::forJunit($this->jUnitFilePath);
             }
 
-            $dom = new DOMDocument();
+            $dom = new \DOMDocument();
             $dom->load($this->jUnitFilePath);
 
-            $this->xPath = new DOMXPath($dom);
+            $this->xPath = new \DOMXPath($dom);
         }
 
         return $this->xPath;

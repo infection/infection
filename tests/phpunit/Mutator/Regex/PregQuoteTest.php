@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Regex;
 
-use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class PregQuoteTest extends AbstractMutatorTestCase
@@ -48,7 +47,7 @@ final class PregQuoteTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): Generator
+    public function provideMutationCases(): \Generator
     {
         yield 'It mutates correctly when provided with a string' => [
             <<<'PHP'

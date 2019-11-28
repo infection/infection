@@ -42,5 +42,5 @@ namespace Infection\TestFramework\Config;
  */
 interface TestFrameworkConfigLocatorInterface
 {
-    public function locate(string $testFrameworkName, ?string $customDir = null): string;
+    public function locate(string $testFrameworkName, string $customDir = null): string;
 }

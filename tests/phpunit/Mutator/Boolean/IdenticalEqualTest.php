@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class IdenticalEqualTest extends AbstractMutatorTestCase
@@ -48,7 +47,7 @@ final class IdenticalEqualTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): Generator
+    public function provideMutationCases(): \Generator
     {
         yield 'It mutates identical operator into equal operator with two variables' => [
             <<<'PHP'

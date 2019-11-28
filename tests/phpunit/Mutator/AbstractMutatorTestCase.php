@@ -35,9 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use function count;
-use Exception;
-use function get_class;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Tests\Fixtures\SimpleMutation;
@@ -48,7 +45,6 @@ use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\NotMutableIgnoreVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
-use LogicException;
 use PhpParser\Lexer;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
@@ -75,15 +71,15 @@ abstract class AbstractMutatorTestCase extends TestCase
         $inputCode = rtrim($inputCode, "\n");
 
         if ($inputCode === $expectedCode) {
-            throw new LogicException('Input code cant be the same as mutated code');
+            throw new \LogicException('Input code cant be the same as mutated code');
         }
 
         $mutants = $this->mutate($inputCode, $settings);
 
-        $this->assertSame(count($mutants), count($expectedCodeSamples), sprintf(
+        $this->assertSame(\count($mutants), \count($expectedCodeSamples), sprintf(
             'Failed asserting that the number of code samples (%d) equals the number of mutants (%d) created by the mutator.',
-            count($expectedCodeSamples),
-            count($mutants)
+            \count($expectedCodeSamples),
+            \count($mutants)
         ));
 
         if ($expectedCode !== null) {
@@ -91,7 +87,7 @@ abstract class AbstractMutatorTestCase extends TestCase
                 $expectedCodeSample = array_shift($expectedCodeSamples);
 
                 if ($expectedCodeSample === null) {
-                    throw new Exception('The number of expected mutated code samples must equal the number of generated Mutants by mutator.');
+                    throw new \Exception('The number of expected mutated code samples must equal the number of generated Mutants by mutator.');
                 }
                 $expectedCodeSample = rtrim($expectedCodeSample, "\n");
                 $this->assertSame($expectedCodeSample, $realMutatedCode);
@@ -102,7 +98,7 @@ abstract class AbstractMutatorTestCase extends TestCase
 
     protected function getMutator(array $settings = []): Mutator
     {
-        $class = get_class($this);
+        $class = \get_class($this);
         $mutator = substr(str_replace('\Tests', '', $class), 0, -4);
 
         return new $mutator(new MutatorConfig($settings));

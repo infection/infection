@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Path;
 
-use DOMElement;
-use DOMNode;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -54,16 +52,16 @@ final class PathReplacer
      */
     private $phpUnitConfigDir;
 
-    public function __construct(Filesystem $filesystem, ?string $phpUnitConfigDir = null)
+    public function __construct(Filesystem $filesystem, string $phpUnitConfigDir = null)
     {
         $this->filesystem = $filesystem;
         $this->phpUnitConfigDir = $phpUnitConfigDir;
     }
 
     /**
-     * @param DOMNode|DOMElement $domElement
+     * @param \DOMNode|\DOMElement $domElement
      */
-    public function replaceInNode(DOMNode $domElement): void
+    public function replaceInNode(\DOMNode $domElement): void
     {
         if (!$this->filesystem->isAbsolutePath($domElement->nodeValue)) {
             $newPath = sprintf(

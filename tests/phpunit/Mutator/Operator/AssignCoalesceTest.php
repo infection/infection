@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Operator;
 
-use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class AssignCoalesceTest extends AbstractMutatorTestCase
@@ -48,7 +47,7 @@ final class AssignCoalesceTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): Generator
+    public function provideMutationCases(): \Generator
     {
         yield 'Mutate coalesce when right part is a scalar value' => [
             <<<'PHP'

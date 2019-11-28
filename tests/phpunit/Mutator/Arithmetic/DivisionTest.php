@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class DivisionTest extends AbstractMutatorTestCase
@@ -48,7 +47,7 @@ final class DivisionTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): Generator
+    public function provideMutationCases(): \Generator
     {
         yield 'It changes regular divison' => [
                 <<<'PHP'

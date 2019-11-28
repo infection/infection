@@ -71,7 +71,6 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\PhpUnit\Coverage\PhpUnitTestFileDataProvider;
 use Infection\Utils\TmpDirectoryCreator;
 use Infection\Utils\VersionParser;
-use function php_ini_loaded_file;
 use PhpParser\Lexer;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
@@ -218,7 +217,7 @@ final class InfectionContainer extends Container
                 return new MemoryFormatter();
             },
             'memory.limit.applier' => static function (self $container): MemoryLimiter {
-                return new MemoryLimiter($container['filesystem'], php_ini_loaded_file());
+                return new MemoryLimiter($container['filesystem'], \php_ini_loaded_file());
             },
             SchemaConfigurationLoader::class => static function (self $container): SchemaConfigurationLoader {
                 return new SchemaConfigurationLoader(

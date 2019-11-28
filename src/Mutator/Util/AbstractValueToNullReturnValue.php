@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Mutator\Util;
 
 use Infection\Visitor\ReflectionVisitor;
-use function is_string;
 use PhpParser\Node;
 
 /**
@@ -65,7 +64,7 @@ abstract class AbstractValueToNullReturnValue extends Mutator
         }
 
         // scalar typehint
-        if (is_string($returnType)) {
+        if (\is_string($returnType)) {
             return false;
         }
 

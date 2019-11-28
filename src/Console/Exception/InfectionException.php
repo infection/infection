@@ -35,11 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Console\Exception;
 
-use Exception;
-
 /**
  * @internal
  */
-abstract class InfectionException extends Exception
+abstract class InfectionException extends \Exception
 {
 }

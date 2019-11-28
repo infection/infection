@@ -38,11 +38,8 @@ namespace Infection\Tests\Performance\Limiter;
 use Composer\XdebugHandler\XdebugHandler;
 use Infection\Performance\Limiter\MemoryLimiter;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use LogicException;
 use Memory_Aware\FakeAwareAdapter;
-use const PHP_SAPI;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
@@ -61,7 +58,7 @@ final class MemoryLimiterTest extends TestCase
         $fs = new Filesystem();
         $fs->remove(self::TEST_DIR_LOCATION);
 
-        $xdebug = new ReflectionClass(XdebugHandler::class);
+        $xdebug = new \ReflectionClass(XdebugHandler::class);
         $skipped = $xdebug->getProperty('skipped');
         $skipped->setAccessible(true);
         $skipped->setValue(null);
@@ -73,12 +70,12 @@ final class MemoryLimiterTest extends TestCase
             $this->markTestSkipped('Unable to test if a memory limit is already set.');
         }
 
-        if (PHP_SAPI === 'phpdbg') {
+        if (\PHP_SAPI === 'phpdbg') {
             $this->markTestSkipped('Unable to run tests if PHPDBG is used.');
         }
 
         if (XdebugHandler::getSkippedVersion() === '') {
-            $xdebug = new ReflectionClass(XdebugHandler::class);
+            $xdebug = new \ReflectionClass(XdebugHandler::class);
             $skipped = $xdebug->getProperty('skipped');
             $skipped->setAccessible(true);
             $skipped->setValue('infection-fake');
@@ -87,7 +84,7 @@ final class MemoryLimiterTest extends TestCase
         }
 
         if (XdebugHandler::getSkippedVersion() !== 'infection-fake') {
-            throw new LogicException('Xdebug handler is active during tests, which it should not be.');
+            throw new \LogicException('Xdebug handler is active during tests, which it should not be.');
         }
     }
 

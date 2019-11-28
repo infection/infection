@@ -37,7 +37,6 @@ namespace Infection\Tests\Config\Exception;
 
 use Infection\Config\Exception\InvalidConfigException;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 final class InvalidConfigExceptionTest extends TestCase
 {
@@ -45,7 +44,7 @@ final class InvalidConfigExceptionTest extends TestCase
     {
         $exception = new InvalidConfigException();
 
-        $this->assertInstanceOf(RuntimeException::class, $exception);
+        $this->assertInstanceOf(\RuntimeException::class, $exception);
     }
 
     public function test_invalid_mutator_creates_exception(): void

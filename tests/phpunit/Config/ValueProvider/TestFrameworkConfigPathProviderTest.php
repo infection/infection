@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Config\ValueProvider;
 
-use Exception;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
@@ -99,8 +98,8 @@ final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
             ->method('locate')
             ->will(
                 $this->onConsecutiveCalls(
-                    $this->throwException(new Exception()),
-                    $this->throwException(new Exception()),
+                    $this->throwException(new \Exception()),
+                    $this->throwException(new \Exception()),
                     ''
                 )
             );
@@ -125,7 +124,7 @@ final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
             ->method('locate')
             ->will(
                 $this->onConsecutiveCalls(
-                    $this->throwException(new Exception()),
+                    $this->throwException(new \Exception()),
                     ''
                 )
             );
@@ -155,8 +154,8 @@ final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
             ->method('locate')
             ->will(
                 $this->onConsecutiveCalls(
-                    $this->throwException(new Exception()),
-                    $this->throwException(new Exception()),
+                    $this->throwException(new \Exception()),
+                    $this->throwException(new \Exception()),
                     ''
                 )
             );

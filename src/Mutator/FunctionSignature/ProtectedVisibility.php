@@ -40,8 +40,6 @@ use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
-use ReflectionClass;
-use ReflectionException;
 
 /**
  * @internal
@@ -90,17 +88,17 @@ final class ProtectedVisibility extends Mutator
 
     private function hasSameProtectedParentMethod(ClassMethod $node): bool
     {
-        /** @var ReflectionClass|null $reflection */
+        /** @var \ReflectionClass|null $reflection */
         $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
 
-        if (!$reflection instanceof ReflectionClass) {
+        if (!$reflection instanceof \ReflectionClass) {
             // assuming the worst where a parent class has the same method
             return true;
         }
 
         try {
             return $reflection->getMethod($node->name->name)->getPrototype()->isProtected();
-        } catch (ReflectionException $e) {
+        } catch (\ReflectionException $e) {
             return false;
         }
     }

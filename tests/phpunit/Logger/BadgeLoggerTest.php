@@ -40,7 +40,6 @@ use Infection\Logger\BadgeLogger;
 use Infection\Mutant\MetricsCalculator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class BadgeLoggerTest extends TestCase
@@ -101,7 +100,7 @@ final class BadgeLoggerTest extends TestCase
         $this->output = $this->createMock(OutputInterface::class);
         $this->badgeApiClient = $this->createMock(BadgeApiClient::class);
         $this->metricsCalculator = $this->createMock(MetricsCalculator::class);
-        $config = new stdClass();
+        $config = new \stdClass();
         $config->branch = 'master';
 
         $this->badgeLogger = new BadgeLogger(

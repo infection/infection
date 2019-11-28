@@ -35,12 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Exception;
-
 /**
  * @internal
  */
-final class TestFileNameNotFoundException extends Exception
+final class TestFileNameNotFoundException extends \Exception
 {
     public static function notFoundFromFQN(string $fqn): self
     {

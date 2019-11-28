@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpSpec\Config\Builder;
 
-use function array_key_exists;
-use function dirname;
 use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\MutationYamlConfiguration;
@@ -102,7 +100,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
         $originalBootstrap = $this->getOriginalBootstrapFilePath($parsedYaml);
         $autoloadPlaceholder = $originalBootstrap ? "require_once '{$originalBootstrap}';" : '';
-        $interceptorPath = dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
+        $interceptorPath = \dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
 
         $customAutoload = <<<AUTOLOAD
 <?php
@@ -131,8 +129,8 @@ AUTOLOAD;
      */
     private function getOriginalBootstrapFilePath(array $parsedYaml)
     {
-        if (!array_key_exists('bootstrap', $parsedYaml)) {
-            return;
+        if (!\array_key_exists('bootstrap', $parsedYaml)) {
+            return null;
         }
 
         return sprintf('%s/%s', $this->projectDir, $parsedYaml['bootstrap']);

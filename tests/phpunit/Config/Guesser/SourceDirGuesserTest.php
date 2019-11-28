@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Config\Guesser;
 
 use Infection\Config\Guesser\SourceDirGuesser;
-use LogicException;
 use PHPUnit\Framework\TestCase;
 
 final class SourceDirGuesserTest extends TestCase
@@ -129,7 +128,7 @@ JSON;
             json_decode('{"autoload":{"psr-4": [{"NameSpace\\//": ["sources", "libs"]}]}}')
         );
 
-        $this->expectException(LogicException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('autoload section does not match the expected JSON schema');
 
         $guesser->guess();

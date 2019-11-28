@@ -47,17 +47,19 @@ final class CodeCoverageMethodIgnoreVisitor extends NodeVisitorAbstract
     public function enterNode(Node $node)
     {
         if (!$node instanceof Node\Stmt\ClassMethod) {
-            return;
+            return null;
         }
 
         $docComment = $node->getDocComment();
 
         if ($docComment === null) {
-            return;
+            return null;
         }
 
         if (strpos($docComment->getText(), '@codeCoverageIgnore') !== false) {
             return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
+
+        return null;
     }
 }

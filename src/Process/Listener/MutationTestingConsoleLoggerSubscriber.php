@@ -43,7 +43,6 @@ use Infection\Events\MutationTestingFinished;
 use Infection\Events\MutationTestingStarted;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcessInterface;
-use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -151,7 +150,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInt
         $this->output->writeln([
             '',
             $headline,
-            str_repeat('=', strlen($headline)),
+            str_repeat('=', \strlen($headline)),
             '',
         ]);
 

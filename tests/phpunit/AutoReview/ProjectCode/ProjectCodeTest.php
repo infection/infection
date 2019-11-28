@@ -37,7 +37,6 @@ namespace Infection\Tests\AutoReview\ProjectCode;
 
 use function array_filter;
 use function array_map;
-use function in_array;
 use Infection\StreamWrapper\IncludeInterceptor;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -74,7 +73,7 @@ final class ProjectCodeTest extends TestCase
     {
         $testClassName = preg_replace('/Infection/', 'Infection\\Tests', $className, 1) . 'Test';
 
-        if (false === in_array($className, ProjectCodeProvider::NON_TESTED_CONCRETE_CLASSES, true)) {
+        if (false === \in_array($className, ProjectCodeProvider::NON_TESTED_CONCRETE_CLASSES, true)) {
             $this->assertTrue(
                 class_exists($testClassName, true),
                 sprintf(
@@ -116,7 +115,7 @@ final class ProjectCodeTest extends TestCase
 
         $docBlock = DocBlockParser::parse((string) $reflectionClass->getDocComment());
 
-        if (in_array($className, ProjectCodeProvider::EXTENSION_POINTS, true)) {
+        if (\in_array($className, ProjectCodeProvider::EXTENSION_POINTS, true)) {
             if ($docBlock === '') {
                 $this->markTestSkipped(
                     sprintf(
@@ -160,7 +159,7 @@ final class ProjectCodeTest extends TestCase
     {
         $reflectionClass = new ReflectionClass($className);
 
-        if (in_array($className, ProjectCodeProvider::NON_FINAL_EXTENSION_CLASSES, true)) {
+        if (\in_array($className, ProjectCodeProvider::NON_FINAL_EXTENSION_CLASSES, true)) {
             $this->addToAssertionCount(1);
 
             return;

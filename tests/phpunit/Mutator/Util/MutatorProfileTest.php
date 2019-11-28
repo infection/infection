@@ -35,11 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Util;
 
-use Generator;
-use function in_array;
 use Infection\Mutator\Util\MutatorProfile;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 use Symfony\Component\Finder\Finder;
 
 final class MutatorProfileTest extends TestCase
@@ -117,7 +114,7 @@ final class MutatorProfileTest extends TestCase
         ));
     }
 
-    public function providerMutatorProfile(): Generator
+    public function providerMutatorProfile(): \Generator
     {
         foreach ($this->getMutatorProfileConstants() as $name => $mutators) {
             yield $name => [
@@ -139,13 +136,13 @@ final class MutatorProfileTest extends TestCase
 
     private function getMutatorProfileConstants(): array
     {
-        $reflectionClass = new ReflectionClass(MutatorProfile::class);
+        $reflectionClass = new \ReflectionClass(MutatorProfile::class);
         $excludedConstants = ['MUTATOR_PROFILE_LIST', 'DEFAULT', 'FULL_MUTATOR_LIST'];
 
         return array_filter(
             $reflectionClass->getConstants(),
             static function (string $constantName) use ($excludedConstants): bool {
-                return !in_array($constantName, $excludedConstants, true);
+                return !\in_array($constantName, $excludedConstants, true);
             },
             ARRAY_FILTER_USE_KEY
         );
@@ -156,7 +153,7 @@ final class MutatorProfileTest extends TestCase
         foreach ($profiles as $mutatorsInProfile) {
             $fqcn = sprintf('Infection\\Mutator\\%s', $relativeClassName);
 
-            if (in_array($fqcn, $mutatorsInProfile, true)) {
+            if (\in_array($fqcn, $mutatorsInProfile, true)) {
                 return true;
             }
         }

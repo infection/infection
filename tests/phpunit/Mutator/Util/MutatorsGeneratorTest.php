@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Util;
 
-use function count;
 use Infection\Config\Exception\InvalidConfigException;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\FalseValue;
@@ -49,7 +48,6 @@ use PhpParser\Node\Expr\BinaryOp\Plus as PlusNode;
 use PhpParser\Node\Scalar\DNumber;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
 final class MutatorsGeneratorTest extends TestCase
 {
@@ -58,7 +56,7 @@ final class MutatorsGeneratorTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         foreach (MutatorProfile::DEFAULT as $profileName) {
-            self::$countDefaultMutators += count(MutatorProfile::MUTATOR_PROFILE_LIST[$profileName]);
+            self::$countDefaultMutators += \count(MutatorProfile::MUTATOR_PROFILE_LIST[$profileName]);
         }
     }
 
@@ -76,7 +74,7 @@ final class MutatorsGeneratorTest extends TestCase
         ]);
         $mutators = $mutatorGenerator->generate();
 
-        $this->assertCount(count(MutatorProfile::BOOLEAN), $mutators);
+        $this->assertCount(\count(MutatorProfile::BOOLEAN), $mutators);
     }
 
     public function test_mutators_can_be_ignored(): void
@@ -98,7 +96,7 @@ final class MutatorsGeneratorTest extends TestCase
         ]);
         $mutators = $mutatorGenerator->generate();
 
-        $this->assertCount(self::$countDefaultMutators - count(MutatorProfile::BOOLEAN), $mutators);
+        $this->assertCount(self::$countDefaultMutators - \count(MutatorProfile::BOOLEAN), $mutators);
     }
 
     public function test_names_can_be_ignored(): void
@@ -124,8 +122,8 @@ final class MutatorsGeneratorTest extends TestCase
 
     public function test_it_keeps_settings(): void
     {
-        /** @var MockObject|ReflectionClass $reflectionMock */
-        $reflectionMock = $this->createMock(ReflectionClass::class);
+        /** @var MockObject|\ReflectionClass $reflectionMock */
+        $reflectionMock = $this->createMock(\ReflectionClass::class);
         $reflectionMock->expects($this->once())
             ->method('getName')
             ->willReturn('A');
@@ -147,8 +145,8 @@ final class MutatorsGeneratorTest extends TestCase
 
     public function test_it_keeps_settings_when_applied_to_profiles(): void
     {
-        /** @var MockObject|ReflectionClass $reflectionMock */
-        $reflectionMock = $this->createMock(ReflectionClass::class);
+        /** @var MockObject|\ReflectionClass $reflectionMock */
+        $reflectionMock = $this->createMock(\ReflectionClass::class);
         $reflectionMock->expects($this->exactly(3))
             ->method('getName')
             ->willReturn('A');
@@ -198,8 +196,8 @@ final class MutatorsGeneratorTest extends TestCase
 
     public function test_it_can_set_a_single_item_with_a_setting(): void
     {
-        /** @var MockObject|ReflectionClass $reflectionMock */
-        $reflectionMock = $this->createMock(ReflectionClass::class);
+        /** @var MockObject|\ReflectionClass $reflectionMock */
+        $reflectionMock = $this->createMock(\ReflectionClass::class);
         $reflectionMock->expects($this->exactly(2))
             ->method('getName')
             ->willReturn('A');
@@ -212,7 +210,7 @@ final class MutatorsGeneratorTest extends TestCase
         ]);
         $mutators = $mutatorGenerator->generate();
 
-        $this->assertCount(count(MutatorProfile::BOOLEAN), $mutators);
+        $this->assertCount(\count(MutatorProfile::BOOLEAN), $mutators);
 
         $this->assertArrayNotHasKey(Plus::getName(), $mutators);
 
@@ -227,7 +225,7 @@ final class MutatorsGeneratorTest extends TestCase
         ]);
         $mutators = $mutatorGenerator->generate();
 
-        $this->assertCount(count(MutatorProfile::BOOLEAN), $mutators);
+        $this->assertCount(\count(MutatorProfile::BOOLEAN), $mutators);
 
         $this->assertArrayNotHasKey(Plus::getName(), $mutators);
     }
@@ -256,7 +254,7 @@ JSON
         $this->assertCount(self::$countDefaultMutators - 2, $mutators);
     }
 
-    private function getPlusNode(string $functionName, ReflectionClass $reflectionMock): Node
+    private function getPlusNode(string $functionName, \ReflectionClass $reflectionMock): Node
     {
         return new PlusNode(
             new DNumber(1.23),
@@ -268,7 +266,7 @@ JSON
         );
     }
 
-    private function getBoolNode(string $boolean, string $functionName, ReflectionClass $reflectionMock): Node
+    private function getBoolNode(string $boolean, string $functionName, \ReflectionClass $reflectionMock): Node
     {
         return new Node\Expr\ConstFetch(
             new Node\Name($boolean),

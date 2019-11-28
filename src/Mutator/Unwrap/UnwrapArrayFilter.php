@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
-use Generator;
 use PhpParser\Node;
 
 /**
@@ -48,7 +47,7 @@ final class UnwrapArrayFilter extends AbstractUnwrapMutator
         return 'array_filter';
     }
 
-    protected function getParameterIndexes(Node\Expr\FuncCall $node): Generator
+    protected function getParameterIndexes(Node\Expr\FuncCall $node): \Generator
     {
         yield 0;
     }

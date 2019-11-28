@@ -35,15 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Json;
 
-use const DIRECTORY_SEPARATOR;
-use Generator;
 use Infection\Json\Exception\ParseException;
 use Infection\Json\JsonFile;
 use Infection\Utils\TmpDirectoryCreator;
 use JsonSchema\Exception\ValidationException;
-use function microtime;
 use PHPUnit\Framework\TestCase;
-use function random_int;
 use Symfony\Component\Filesystem\Filesystem;
 
 final class JsonFileTest extends TestCase
@@ -66,7 +62,7 @@ final class JsonFileTest extends TestCase
     protected function setUp(): void
     {
         $this->filesystem = new Filesystem();
-        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . microtime(true) . random_int(100, 999);
+        $this->workspace = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
         $this->tmpDir = (new TmpDirectoryCreator($this->filesystem))->createAndGet($this->workspace);
     }
 
@@ -139,7 +135,7 @@ final class JsonFileTest extends TestCase
         self::assertObjectHasAttribute('mutators', $content);
     }
 
-    public function validTrueValueProvider(): Generator
+    public function validTrueValueProvider(): \Generator
     {
         yield 'Boolean value' => [
             <<<JSON
@@ -191,7 +187,7 @@ JSON
         (new JsonFile($jsonPath))->decode();
     }
 
-    public function invalidTrueValueProvider(): Generator
+    public function invalidTrueValueProvider(): \Generator
     {
         yield 'Extra property for TrueValue mutator' => [
             <<<'JSON'

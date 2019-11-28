@@ -38,7 +38,6 @@ namespace Infection\Tests\Mutator\Util;
 use Infection\Mutator\Boolean\FalseValue;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\Util\MutatorParser;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 final class MutatorParserTest extends TestCase
@@ -54,7 +53,7 @@ final class MutatorParserTest extends TestCase
     {
         $parser = new MutatorParser('    ', [1, 2, 3]);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "--mutators" option requires a value.');
 
         $parser->getMutators();

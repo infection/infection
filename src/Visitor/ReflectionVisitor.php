@@ -35,11 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Visitor;
 
-use function count;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
-use ReflectionClass;
 
 /**
  * @internal
@@ -58,7 +56,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
     private $functionScopeStack = [];
 
     /**
-     * @var ReflectionClass[]|null[]
+     * @var \ReflectionClass[]|null[]
      */
     private $classScopeStack = [];
 
@@ -80,7 +78,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
     {
         if ($node instanceof Node\Stmt\ClassLike) {
             if ($attribute = $node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)) {
-                $this->classScopeStack[] = new ReflectionClass($attribute->toString());
+                $this->classScopeStack[] = new \ReflectionClass($attribute->toString());
             } else {
                 // Anonymous class
                 $this->classScopeStack[] = null;
@@ -88,8 +86,8 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         }
 
         // No need to traverse outside of classes
-        if (count($this->classScopeStack) === 0) {
-            return;
+        if (\count($this->classScopeStack) === 0) {
+            return null;
         }
 
         if ($node instanceof Node\Stmt\ClassMethod) {
@@ -110,13 +108,15 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
         if ($this->isFunctionLikeNode($node)) {
             $this->functionScopeStack[] = $node;
-            $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->classScopeStack[count($this->classScopeStack) - 1]);
+            $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->classScopeStack[\count($this->classScopeStack) - 1]);
             $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
         } elseif ($isInsideFunction) {
-            $node->setAttribute(self::FUNCTION_SCOPE_KEY, $this->functionScopeStack[count($this->functionScopeStack) - 1]);
-            $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->classScopeStack[count($this->classScopeStack) - 1]);
+            $node->setAttribute(self::FUNCTION_SCOPE_KEY, $this->functionScopeStack[\count($this->functionScopeStack) - 1]);
+            $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->classScopeStack[\count($this->classScopeStack) - 1]);
             $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
         }
+
+        return null;
     }
 
     public function leaveNode(Node $node): ?Node

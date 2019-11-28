@@ -37,7 +37,6 @@ namespace Infection\Tests\AutoReview\ProjectCode;
 
 use function array_filter;
 use function array_map;
-use function count;
 use function current;
 use function end;
 use function explode;
@@ -66,7 +65,7 @@ final class DocBlockParser
 
         $lines[0] = substr($firstLine, 3);
 
-        $nbrOfLines = count($lines);
+        $nbrOfLines = \count($lines);
 
         for ($i = 1; $i < $nbrOfLines; ++$i) {
             $lines[$i] = substr($lines[$i], 1);

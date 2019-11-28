@@ -37,7 +37,6 @@ namespace Infection\Config\ValueProvider;
 
 use Infection\Config\ConsoleHelper;
 use Infection\Config\InfectionConfig;
-use RuntimeException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -73,7 +72,7 @@ final class TimeoutProvider
         $timeoutQuestion = new Question($questionText, InfectionConfig::PROCESS_TIMEOUT_SECONDS);
         $timeoutQuestion->setValidator(static function ($answer) {
             if (!$answer || !is_numeric($answer) || (int) $answer <= 0) {
-                throw new RuntimeException('Timeout should be an integer greater than 0');
+                throw new \RuntimeException('Timeout should be an integer greater than 0');
             }
 
             return (int) $answer;

@@ -40,7 +40,6 @@ use Infection\Events\InitialTestSuiteFinished;
 use Infection\Events\InitialTestSuiteStarted;
 use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -82,7 +81,7 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
             ->method('getName')
             ->willReturn('PHPUnit');
         $testFramework->method('getVersion')
-            ->will($this->throwException(new InvalidArgumentException()));
+            ->will($this->throwException(new \InvalidArgumentException()));
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, false));

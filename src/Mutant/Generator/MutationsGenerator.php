@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutant\Generator;
 
-use function assert;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
@@ -51,12 +50,10 @@ use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\NotMutableIgnoreVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
-use function is_string;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\Parser;
 use Symfony\Component\Finder\SplFileInfo;
-use Throwable;
 
 /**
  * @internal
@@ -147,13 +144,13 @@ final class MutationsGenerator
         try {
             /** @var Node[] $initialStatements */
             $initialStatements = $this->parser->parse($file->getContents());
-        } catch (Throwable $t) {
+        } catch (\Throwable $t) {
             throw ParserException::fromInvalidFile($file, $t);
         }
 
         $traverser = new PriorityNodeTraverser();
         $filePath = $file->getRealPath();
-        assert(is_string($filePath));
+        \assert(\is_string($filePath));
 
         $mutationsCollectorVisitor = new MutationsCollectorVisitor(
             $this->mutators,
@@ -181,7 +178,7 @@ final class MutationsGenerator
     private function hasTests(SplFileInfo $file): bool
     {
         $filePath = $file->getRealPath();
-        assert(is_string($filePath));
+        \assert(\is_string($filePath));
 
         return $this->codeCoverageData->hasTests($filePath);
     }

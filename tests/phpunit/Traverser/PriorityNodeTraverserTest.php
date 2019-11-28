@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Traverser;
 
 use Infection\Traverser\PriorityNodeTraverser;
-use InvalidArgumentException;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 use PHPUnit\Framework\TestCase;
@@ -65,7 +64,7 @@ final class PriorityNodeTraverserTest extends TestCase
 
         $callOrder = [];
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Priority 20 is already used');
 
         $traverser->addVisitor($this->createVisitor($callOrder, 20), 20);

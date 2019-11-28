@@ -35,14 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Config\ValueProvider;
 
-use const DIRECTORY_SEPARATOR;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
-use function microtime;
-use function mkdir;
-use function random_int;
 use Symfony\Component\Filesystem\Filesystem;
-use function sys_get_temp_dir;
 
 final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
 {
@@ -63,8 +58,8 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
 
     protected function setUp(): void
     {
-        $this->workspace = sys_get_temp_dir() . '/exclude' . microtime(true) . random_int(100, 999);
-        mkdir($this->workspace, 0777, true);
+        $this->workspace = \sys_get_temp_dir() . '/exclude' . \microtime(true) . \random_int(100, 999);
+        \mkdir($this->workspace, 0777, true);
 
         $this->fileSystem = new Filesystem();
 
@@ -117,11 +112,11 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
             $this->markTestSkipped('Stty is not available');
         }
 
-        $dir1 = $this->workspace . DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR;
-        $dir2 = $this->workspace . DIRECTORY_SEPARATOR . 'foo' . DIRECTORY_SEPARATOR;
+        $dir1 = $this->workspace . \DIRECTORY_SEPARATOR . 'test' . \DIRECTORY_SEPARATOR;
+        $dir2 = $this->workspace . \DIRECTORY_SEPARATOR . 'foo' . \DIRECTORY_SEPARATOR;
 
-        mkdir($dir1);
-        mkdir($dir2);
+        \mkdir($dir1);
+        \mkdir($dir2);
 
         $excludeDirs = $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("foo\n")),
@@ -139,13 +134,13 @@ final class ExcludeDirsProviderTest extends AbstractBaseProviderTest
             $this->markTestSkipped('Stty is not available');
         }
 
-        $dirA = $this->workspace . DIRECTORY_SEPARATOR . 'a' . DIRECTORY_SEPARATOR;
-        $dirB = $this->workspace . DIRECTORY_SEPARATOR . 'b' . DIRECTORY_SEPARATOR;
-        $dirC = $this->workspace . DIRECTORY_SEPARATOR . 'c' . DIRECTORY_SEPARATOR;
+        $dirA = $this->workspace . \DIRECTORY_SEPARATOR . 'a' . \DIRECTORY_SEPARATOR;
+        $dirB = $this->workspace . \DIRECTORY_SEPARATOR . 'b' . \DIRECTORY_SEPARATOR;
+        $dirC = $this->workspace . \DIRECTORY_SEPARATOR . 'c' . \DIRECTORY_SEPARATOR;
 
-        mkdir($dirA);
-        mkdir($dirB);
-        mkdir($dirC);
+        \mkdir($dirA);
+        \mkdir($dirB);
+        \mkdir($dirC);
 
         $excludeDirs = $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("$dirA\n$dirA\n$dirC\n")),

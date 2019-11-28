@@ -35,12 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Coverage\Exception;
 
-use RuntimeException;
-
 /**
  * @internal
  */
-final class NoLinesExecutedException extends RuntimeException
+final class NoLinesExecutedException extends \RuntimeException
 {
     public static function noLinesExecuted(): self
     {

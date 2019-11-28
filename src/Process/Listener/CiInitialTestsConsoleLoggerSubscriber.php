@@ -38,7 +38,6 @@ namespace Infection\Process\Listener;
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\InitialTestSuiteStarted;
 use Infection\TestFramework\TestFrameworkAdapter;
-use InvalidArgumentException;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -73,7 +72,7 @@ final class CiInitialTestsConsoleLoggerSubscriber implements EventSubscriberInte
     {
         try {
             $version = $this->testFrameworkAdapter->getVersion();
-        } catch (InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $version = 'unknown';
         }
 

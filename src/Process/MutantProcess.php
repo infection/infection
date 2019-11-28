@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
-use function in_array;
 use Infection\Mutant\MutantInterface;
 use Infection\MutationInterface;
 use Infection\Mutator\Util\Mutator;
@@ -115,7 +114,7 @@ final class MutantProcess implements MutantProcessInterface
             return self::CODE_TIMED_OUT;
         }
 
-        if (!in_array($this->getProcess()->getExitCode(), self::NOT_FATAL_ERROR_CODES, true)) {
+        if (!\in_array($this->getProcess()->getExitCode(), self::NOT_FATAL_ERROR_CODES, true)) {
             return self::CODE_ERROR;
         }
 

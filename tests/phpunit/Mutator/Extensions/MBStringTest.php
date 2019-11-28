@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Extensions;
 
-use function define;
-use function defined;
 use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
@@ -50,7 +48,7 @@ final class MBStringTest extends AbstractMutatorTestCase
     /**
      * @dataProvider provideMutationCases
      */
-    public function test_mutator(string $input, ?string $expected = null, array $settings = []): void
+    public function test_mutator(string $input, string $expected = null, array $settings = []): void
     {
         $this->doTest($input, $expected, $settings);
     }
@@ -613,8 +611,8 @@ final class MBStringTest extends AbstractMutatorTestCase
             'MB_CASE_TITLE_SIMPLE' => 6,
             'MB_CASE_FOLD_SIMPLE' => 7,
         ] as $constantName => $constantValue) {
-            if (!defined($constantName)) {
-                define($constantName, $constantValue);
+            if (!\defined($constantName)) {
+                \define($constantName, $constantValue);
             }
         }
     }

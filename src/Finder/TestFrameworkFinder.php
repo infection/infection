@@ -35,10 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Finder;
 
-use function dirname;
 use Infection\Finder\Exception\FinderException;
 use Infection\TestFramework\TestFrameworkTypes;
-use RuntimeException;
 use function Safe\file_get_contents;
 use function Safe\realpath;
 use Symfony\Component\Process\ExecutableFinder;
@@ -113,7 +111,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
 
             $process->mustRun();
             $vendorPath = trim($process->getOutput());
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $candidate = getcwd() . '/vendor/bin';
 
             if (file_exists($candidate)) {
@@ -186,7 +184,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
          */
         if (preg_match('/%~dp0(.+$)/mi', file_get_contents($path), $match)) {
             $target = ltrim(rtrim(trim($match[1]), '" %*'), '\\/');
-            $script = realpath(dirname($path) . '/' . $target);
+            $script = realpath(\dirname($path) . '/' . $target);
 
             if (file_exists($script)) {
                 $path = $script;

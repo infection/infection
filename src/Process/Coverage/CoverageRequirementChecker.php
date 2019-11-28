@@ -36,8 +36,6 @@ declare(strict_types=1);
 namespace Infection\Process\Coverage;
 
 use Composer\XdebugHandler\XdebugHandler;
-use function extension_loaded;
-use const PHP_SAPI;
 
 /**
  * @internal
@@ -63,9 +61,9 @@ final class CoverageRequirementChecker
     public function hasDebuggerOrCoverageOption(): bool
     {
         return $this->skipCoverage
-            || PHP_SAPI === 'phpdbg'
-            || extension_loaded('xdebug')
-            || extension_loaded('pcov')
+            || \PHP_SAPI === 'phpdbg'
+            || \extension_loaded('xdebug')
+            || \extension_loaded('pcov')
             || XdebugHandler::getSkippedVersion()
             || $this->isXdebugIncludedInInitialTestPhpOptions()
             || $this->isPcovIncludedInInitialTestPhpOptions();

@@ -35,12 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Json\Exception;
 
-use RuntimeException;
-
 /**
  * @internal
  */
-final class ParseException extends RuntimeException
+final class ParseException extends \RuntimeException
 {
     public static function invalidJson(string $path, string $errorMessage): self
     {

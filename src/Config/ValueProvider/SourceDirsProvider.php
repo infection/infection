@@ -35,11 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Config\ValueProvider;
 
-use function count;
-use function in_array;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
-use LogicException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -92,8 +89,8 @@ final class SourceDirsProvider
 
         $sourceFolders = $this->questionHelper->ask($input, $output, $question);
 
-        if (in_array('.', $sourceFolders, true) && count($sourceFolders) > 1) {
-            throw new LogicException('You cannot use current folder "." with other subfolders');
+        if (\in_array('.', $sourceFolders, true) && \count($sourceFolders) > 1) {
+            throw new \LogicException('You cannot use current folder "." with other subfolders');
         }
 
         return $sourceFolders;

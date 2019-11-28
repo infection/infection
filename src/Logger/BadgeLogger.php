@@ -37,7 +37,6 @@ namespace Infection\Logger;
 
 use Infection\Http\BadgeApiClient;
 use Infection\Mutant\MetricsCalculator;
-use stdClass;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -59,7 +58,7 @@ final class BadgeLogger implements MutationTestingResultsLogger
     private $metricsCalculator;
 
     /**
-     * @var stdClass
+     * @var \stdClass
      */
     private $config;
 
@@ -68,7 +67,7 @@ final class BadgeLogger implements MutationTestingResultsLogger
      */
     private $output;
 
-    public function __construct(OutputInterface $output, BadgeApiClient $badgeApiClient, MetricsCalculator $metricsCalculator, stdClass $config)
+    public function __construct(OutputInterface $output, BadgeApiClient $badgeApiClient, MetricsCalculator $metricsCalculator, \stdClass $config)
     {
         $this->output = $output;
         $this->badgeApiClient = $badgeApiClient;

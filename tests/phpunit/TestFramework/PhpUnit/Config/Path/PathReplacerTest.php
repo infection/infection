@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Path;
 
-use DOMDocument;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\TestCase;
@@ -60,7 +59,7 @@ final class PathReplacerTest extends TestCase
     {
         $pathReplacer = new PathReplacer(new Filesystem());
 
-        $dom = new DOMDocument();
+        $dom = new \DOMDocument();
         $node = $dom->createElement('phpunit', $originalPath);
         $dom->appendChild($node);
 

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Finder\Iterator;
 
-use const DIRECTORY_SEPARATOR;
 use Symfony\Component\Finder\Iterator\MultiplePcreFilterIterator;
 
 /**
@@ -52,7 +51,7 @@ final class RealPathFilterIterator extends MultiplePcreFilterIterator
     {
         $filename = $this->current()->getRealPath();
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $filename = str_replace('\\', '/', $filename);
         }
 

@@ -35,16 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Finder;
 
-use const DIRECTORY_SEPARATOR;
 use Infection\Finder\Exception\FinderException;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\TestFramework\TestFrameworkTypes;
 use function Infection\Tests\normalizePath;
 use Infection\Utils\TmpDirectoryCreator;
-use function microtime;
 use PHPUnit\Framework\TestCase;
-use function random_int;
-use function strlen;
 use Symfony\Component\Filesystem\Filesystem;
 
 final class TestFrameworkFinderTest extends TestCase
@@ -101,7 +97,7 @@ final class TestFrameworkFinderTest extends TestCase
     protected function setUp(): void
     {
         self::restorePathEnvironment();
-        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . microtime(true) . random_int(100, 999);
+        $this->workspace = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
 
         $this->fileSystem = new Filesystem();
         $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
@@ -141,7 +137,7 @@ final class TestFrameworkFinderTest extends TestCase
 
         $frameworkFinder = new TestFrameworkFinder(TestFrameworkTypes::PHPUNIT);
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             // The main script must be found from the .bat file
             $expected = realpath('vendor/phpunit/phpunit/phpunit');
         } else {
@@ -163,8 +159,8 @@ final class TestFrameworkFinderTest extends TestCase
         $this->assertNotSame($path, $pathAfterTest);
 
         $this->assertGreaterThan(
-            strlen($path),
-            strlen($pathAfterTest),
+            \strlen($path),
+            \strlen($pathAfterTest),
             'PATH with vendor added is shorter than without it added, make sure it isn\'t overwritten.'
         );
     }
@@ -180,7 +176,7 @@ final class TestFrameworkFinderTest extends TestCase
 
         $frameworkFinder = new TestFrameworkFinder($mock::PACKAGE);
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             // This .bat has no code, so main script will not be found
             $expected = $mock->getVendorBinBat();
         } else {

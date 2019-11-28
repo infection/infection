@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
-use Generator;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
@@ -52,7 +51,7 @@ abstract class Mutator
     }
 
     /**
-     * @return Node|Node[]|Generator|array
+     * @return Node|Node[]|\Generator|array
      */
     abstract public function mutate(Node $node);
 

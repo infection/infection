@@ -37,7 +37,6 @@ namespace Infection\Tests\Configuration\Schema;
 
 use Exception;
 use Generator;
-use function get_class;
 use Infection\Configuration\Schema\InvalidFile;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use PHPUnit\Framework\TestCase;
@@ -126,7 +125,7 @@ final class SchemaConfigurationFileTest extends TestCase
                 $previous = $exception->getPrevious();
 
                 $this->assertNotNull($previous);
-                $this->assertInstanceOf(get_class($expectedPrevious), $previous);
+                $this->assertInstanceOf(\get_class($expectedPrevious), $previous);
                 $this->assertSame($expectedPrevious->getMessage(), $previous->getMessage());
                 $this->assertSame($expectedPrevious->getCode(), $previous->getCode());
                 $this->assertSame($expectedPrevious->getPrevious(), $previous->getPrevious());

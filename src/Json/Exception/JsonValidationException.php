@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Json\Exception;
 
-use function count;
 use JsonSchema\Exception\ValidationException;
 
 /**
@@ -45,7 +44,7 @@ final class JsonValidationException extends ValidationException
 {
     public static function doesNotMatchSchema(string $path, array $errors = []): self
     {
-        $message = count($errors)
+        $message = \count($errors)
             ? '"' . $path . '" does not match the expected JSON schema:' . PHP_EOL . ' - ' . implode(PHP_EOL . ' - ', $errors)
             : '"' . $path . '" does not match the expected JSON schema.';
 

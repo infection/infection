@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Http;
 
-use function is_string;
 use function Safe\curl_init;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -89,7 +88,7 @@ class BadgeApiClient
             $this->output->writeln(sprintf('Stryker dashboard returned an unexpected response code: %s', $responseCode));
         }
 
-        if (is_string($response)) {
+        if (\is_string($response)) {
             $this->output->writeln('Dashboard response:', OutputInterface::VERBOSITY_VERBOSE);
             $this->output->writeln($response, OutputInterface::VERBOSITY_VERBOSE);
         }

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Config\Guesser;
 
-use Generator;
 use Infection\Config\Guesser\PhpUnitPathGuesser;
 use PHPUnit\Framework\TestCase;
 
@@ -51,7 +50,7 @@ final class PhpUnitPathGuesserTest extends TestCase
         $this->assertSame($directory, $guesser->guess());
     }
 
-    public function providesJsonComposerAndLocations(): Generator
+    public function providesJsonComposerAndLocations(): \Generator
     {
         yield [
             <<<'JSON'

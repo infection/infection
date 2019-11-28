@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use function count;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutantCreated;
 use Infection\Events\MutantsCreatingFinished;
@@ -87,7 +86,7 @@ final class MutationTestingRunner
 
     public function run(int $threadCount, string $testFrameworkExtraOptions): void
     {
-        $mutantCount = count($this->mutations);
+        $mutantCount = \count($this->mutations);
 
         $this->eventDispatcher->dispatch(new MutantsCreatingStarted($mutantCount));
 

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
-use Generator;
 use PhpParser\Node;
 
 /**
@@ -48,7 +47,7 @@ final class UnwrapArrayIntersectAssoc extends AbstractUnwrapMutator
         return 'array_intersect_assoc';
     }
 
-    protected function getParameterIndexes(Node\Expr\FuncCall $node): Generator
+    protected function getParameterIndexes(Node\Expr\FuncCall $node): \Generator
     {
         yield from array_keys($node->args);
     }

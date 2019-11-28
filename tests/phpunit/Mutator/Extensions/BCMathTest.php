@@ -35,18 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Extensions;
 
-use function array_map;
 use Generator;
-use function implode;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
-use function range;
 
 final class BCMathTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases
      */
-    public function test_mutator(string $input, ?string $expected = null, array $settings = []): void
+    public function test_mutator(string $input, string $expected = null, array $settings = []): void
     {
         $this->doTest($input, $expected, $settings);
     }
@@ -202,8 +199,8 @@ final class BCMathTest extends AbstractMutatorTestCase
 
     private function generateArgumentsExpression(int $numberOfArguments): string
     {
-        return implode(', ', array_map(static function (string $argument) {
+        return \implode(', ', \array_map(static function (string $argument) {
             return "'$argument'";
-        }, $numberOfArguments ? range(1, $numberOfArguments) : []));
+        }, $numberOfArguments ? \range(1, $numberOfArguments) : []));
     }
 }

@@ -50,7 +50,6 @@ use Infection\TestFramework\TestFrameworkTypes;
 use function Safe\file_get_contents;
 use function Safe\glob;
 use function Safe\json_decode;
-use stdClass;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -102,7 +101,7 @@ final class ConfigureCommand extends BaseCommand
 
             $sourceDirGuesser = new SourceDirGuesser($content);
         } else {
-            $sourceDirGuesser = new SourceDirGuesser(new stdClass());
+            $sourceDirGuesser = new SourceDirGuesser(new \stdClass());
         }
 
         $sourceDirsProvider = new SourceDirsProvider($consoleHelper, $questionHelper, $sourceDirGuesser);
@@ -153,14 +152,14 @@ final class ConfigureCommand extends BaseCommand
         array $sourceDirs,
         array $excludedDirs,
         int $timeout,
-        ?string $phpUnitConfigPath = null,
-        ?string $phpUnitCustomExecutablePath = null,
-        ?string $textLogFilePath = null
+        string $phpUnitConfigPath = null,
+        string $phpUnitCustomExecutablePath = null,
+        string $textLogFilePath = null
     ): void {
-        $configObject = new stdClass();
+        $configObject = new \stdClass();
 
         $configObject->timeout = $timeout;
-        $configObject->source = new stdClass();
+        $configObject->source = new \stdClass();
 
         if ($sourceDirs) {
             $configObject->source->directories = $sourceDirs;
@@ -171,20 +170,20 @@ final class ConfigureCommand extends BaseCommand
         }
 
         if ($phpUnitConfigPath) {
-            $configObject->phpUnit = new stdClass();
+            $configObject->phpUnit = new \stdClass();
             $configObject->phpUnit->configDir = $phpUnitConfigPath;
         }
 
         if ($phpUnitCustomExecutablePath) {
             if (!isset($configObject->phpUnit)) {
-                $configObject->phpUnit = new stdClass();
+                $configObject->phpUnit = new \stdClass();
             }
 
             $configObject->phpUnit->customPath = $phpUnitCustomExecutablePath;
         }
 
         if ($textLogFilePath) {
-            $configObject->logs = new stdClass();
+            $configObject->logs = new \stdClass();
             $configObject->logs->text = $textLogFilePath;
         }
 

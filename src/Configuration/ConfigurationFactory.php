@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
-use function dirname;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Mutator\Util\MutatorParser;
 use Infection\Mutator\Util\MutatorsGenerator;
@@ -66,7 +65,7 @@ class ConfigurationFactory
         ?string $testFramework,
         ?string $testFrameworkOptions
     ): Configuration {
-        $configDir = dirname($schema->getFile());
+        $configDir = \dirname($schema->getFile());
 
         $tmpDir = (string) $schema->getTmpDir();
 

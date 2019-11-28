@@ -62,12 +62,12 @@ final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInte
         $this->configDir = $configDir;
     }
 
-    public function locate(string $testFrameworkName, ?string $customDir = null): string
+    public function locate(string $testFrameworkName, string $customDir = null): string
     {
         $dir = $customDir ?: $this->configDir;
         $triedFiles = [];
 
-        foreach (self::DEFAULT_EXTENSIONS as $extension) {
+        foreach (static::DEFAULT_EXTENSIONS as $extension) {
             $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
 
             if (file_exists($conf)) {

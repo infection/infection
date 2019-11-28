@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Util;
 
-use Generator;
 use Infection\Mutator\Util\MutatorConfig;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -45,14 +44,14 @@ final class MutatorConfigTest extends TestCase
     /**
      * @dataProvider providesIgnoredValues
      */
-    public function test_is_ignored_returns_true_if_there_is_a_match(array $ignored, string $class, string $method, ?int $lineNumber = null): void
+    public function test_is_ignored_returns_true_if_there_is_a_match(array $ignored, string $class, string $method, int $lineNumber = null): void
     {
         $config = new MutatorConfig(['ignore' => $ignored]);
 
         $this->assertTrue($config->isIgnored($class, $method, $lineNumber));
     }
 
-    public function providesIgnoredValues(): Generator
+    public function providesIgnoredValues(): \Generator
     {
         yield 'It ignores a full class' => [
             ['Foo\Bar\Test'],
@@ -108,7 +107,7 @@ final class MutatorConfigTest extends TestCase
         $this->assertFalse($config->isIgnored($class, $method));
     }
 
-    public function providesNotIgnoredValues(): Generator
+    public function providesNotIgnoredValues(): \Generator
     {
         yield 'It does not ignores a full class when the methods dont match' => [
             ['Foo\Bar\Test::otherMethod'],

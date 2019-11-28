@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use function array_key_exists;
-use function in_array;
 use Symfony\Component\Console\Input\InputInterface;
 
 /**
@@ -73,11 +71,11 @@ final class LogVerbosity
     {
         $verbosityLevel = $input->getOption('log-verbosity');
 
-        if (in_array($verbosityLevel, self::ALLOWED_OPTIONS)) {
+        if (\in_array($verbosityLevel, self::ALLOWED_OPTIONS)) {
             return;
         }
 
-        if (array_key_exists((int) $verbosityLevel, self::ALLOWED_OPTIONS)) {
+        if (\array_key_exists((int) $verbosityLevel, self::ALLOWED_OPTIONS)) {
             $input->setOption('log-verbosity', self::ALLOWED_OPTIONS[$verbosityLevel]);
             $io->logVerbosityDeprecationNotice(self::ALLOWED_OPTIONS[$verbosityLevel]);
 

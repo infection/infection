@@ -39,7 +39,6 @@ use Infection\Json\Exception\JsonValidationException;
 use Infection\Json\Exception\ParseException;
 use JsonSchema\Validator;
 use function Safe\file_get_contents;
-use stdClass;
 
 /**
  * @internal
@@ -54,7 +53,7 @@ final class JsonFile
     private $path;
 
     /**
-     * @var stdClass
+     * @var \stdClass
      */
     private $data;
 
@@ -63,7 +62,7 @@ final class JsonFile
         $this->path = $path;
     }
 
-    public function decode(): stdClass
+    public function decode(): \stdClass
     {
         $this->parse();
         $this->validateSchema();

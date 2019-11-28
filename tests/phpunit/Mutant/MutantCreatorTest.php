@@ -40,7 +40,6 @@ use Infection\Mutant\MutantCreator;
 use Infection\MutationInterface;
 use PhpParser\PrettyPrinter\Standard;
 use PHPUnit\Framework\TestCase;
-use function sys_get_temp_dir;
 
 final class MutantCreatorTest extends TestCase
 {
@@ -53,7 +52,7 @@ final class MutantCreatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->directory = sys_get_temp_dir() . '/infection/MutantCreator';
+        $this->directory = \sys_get_temp_dir() . '/infection/MutantCreator';
         mkdir($this->directory, 0777, true);
         touch($this->directory . self::TEST_FILE_NAME);
 

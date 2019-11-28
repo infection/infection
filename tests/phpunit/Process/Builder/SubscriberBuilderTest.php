@@ -44,7 +44,6 @@ use Infection\Performance\Time\TimeFormatter;
 use Infection\Performance\Time\Timer;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -147,7 +146,7 @@ final class SubscriberBuilderTest extends TestCase
             new MemoryFormatter()
         );
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $subscriberBuilder->registerSubscribers($adapter, $output);
     }
 }

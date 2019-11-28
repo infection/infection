@@ -35,12 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpSpec\Config\Builder;
 
-use const DIRECTORY_SEPARATOR;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder;
 use Infection\Utils\TmpDirectoryCreator;
-use function microtime;
 use PHPUnit\Framework\TestCase;
-use function random_int;
 use Symfony\Component\Filesystem\Filesystem;
 
 final class InitialConfigBuilderTest extends TestCase
@@ -62,7 +59,7 @@ final class InitialConfigBuilderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . microtime(true) . random_int(100, 999);
+        $this->workspace = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
         $this->fileSystem = new Filesystem();
 
         $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
