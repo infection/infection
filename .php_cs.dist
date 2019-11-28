@@ -71,7 +71,6 @@ return Config::create()
         '@Symfony:risky' => true,
         '@PHP71Migration' => true,
         '@PHP71Migration:risky' => true,
-        '@PHP73Migration' => true,
         '@PHPUnit60Migration:risky' => true,
         '@PHPUnit75Migration:risky' => true,
         'blank_line_before_statement' => [
