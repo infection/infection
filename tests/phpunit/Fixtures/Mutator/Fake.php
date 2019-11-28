@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Fixtures\Mutator;
 
 use Infection\Mutator\Util\Mutator;
+use LogicException;
 use PhpParser\Node;
 
 final class Fake extends Mutator
@@ -46,11 +47,11 @@ final class Fake extends Mutator
 
     public function mutate(Node $node): void
     {
-        throw new \LogicException('Not expected to be called');
+        throw new LogicException('Not expected to be called');
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        throw new \LogicException('Not expected to be called');
+        throw new LogicException('Not expected to be called');
     }
 }

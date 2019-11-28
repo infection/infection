@@ -2,6 +2,8 @@
 
 namespace InfectionReflectionWithoutFunction;
 
-new \stdClass();
+use stdClass;
+
+new stdClass();
 
 return 1 - 3;

@@ -35,7 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
+use function assert;
+use DOMDocument;
 use DOMElement;
+use DOMXPath;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
@@ -94,12 +97,12 @@ class InitialConfigBuilder implements ConfigBuilder
     {
         $path = $this->buildPath();
 
-        $dom = new \DOMDocument();
+        $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
         $dom->loadXML($this->originalXmlConfigContent);
 
-        $xPath = new \DOMXPath($dom);
+        $xPath = new DOMXPath($dom);
 
         $this->xmlConfigurationHelper->validate($xPath);
 
@@ -128,7 +131,7 @@ class InitialConfigBuilder implements ConfigBuilder
         return $this->tmpDir . '/phpunitConfiguration.initial.infection.xml';
     }
 
-    private function addJUnitLogger(\DOMXPath $xPath): void
+    private function addJUnitLogger(DOMXPath $xPath): void
     {
         $logging = $this->getOrCreateNode($xPath, 'logging');
 
@@ -139,7 +142,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $logging->appendChild($junitLog);
     }
 
-    private function addCodeCoverageLogger(\DOMXPath $xPath): void
+    private function addCodeCoverageLogger(DOMXPath $xPath): void
     {
         $logging = $this->getOrCreateNode($xPath, 'logging');
 
@@ -150,7 +153,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $logging->appendChild($coverageXmlLog);
     }
 
-    private function addCoverageFilterWhitelistIfDoesNotExist(\DOMXPath $xPath): void
+    private function addCoverageFilterWhitelistIfDoesNotExist(DOMXPath $xPath): void
     {
         $filterNode = $this->getNode($xPath, 'filter');
 
@@ -172,7 +175,7 @@ class InitialConfigBuilder implements ConfigBuilder
         }
     }
 
-    private function getOrCreateNode(\DOMXPath $xPath, string $nodeName): \DOMElement
+    private function getOrCreateNode(DOMXPath $xPath, string $nodeName): DOMElement
     {
         $node = $this->getNode($xPath, $nodeName);
 
@@ -183,7 +186,7 @@ class InitialConfigBuilder implements ConfigBuilder
         return $node;
     }
 
-    private function getNode(\DOMXPath $xPath, string $nodeName)
+    private function getNode(DOMXPath $xPath, string $nodeName)
     {
         $nodeList = $xPath->query(sprintf('/phpunit/%s', $nodeName));
 
@@ -194,17 +197,17 @@ class InitialConfigBuilder implements ConfigBuilder
         return null;
     }
 
-    private function createNode(\DOMDocument $dom, string $nodeName): \DOMElement
+    private function createNode(DOMDocument $dom, string $nodeName): DOMElement
     {
         $node = $dom->createElement($nodeName);
         $document = $dom->documentElement;
-        \assert($document instanceof DOMElement);
+        assert($document instanceof DOMElement);
         $document->appendChild($node);
 
         return $node;
     }
 
-    private function addRandomTestsOrderAttributesIfNotSet(string $version, \DOMXPath $xPath): void
+    private function addRandomTestsOrderAttributesIfNotSet(string $version, DOMXPath $xPath): void
     {
         if (!version_compare($version, '7.2', '>=')) {
             return;
@@ -215,7 +218,7 @@ class InitialConfigBuilder implements ConfigBuilder
         }
     }
 
-    private function addAttributeIfNotSet(string $attribute, string $value, \DOMXPath $xPath): bool
+    private function addAttributeIfNotSet(string $attribute, string $value, DOMXPath $xPath): bool
     {
         $nodeList = $xPath->query(sprintf('/phpunit/@%s', $attribute));
 

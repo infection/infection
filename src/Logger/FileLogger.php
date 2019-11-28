@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use function in_array;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcessInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -105,7 +106,7 @@ abstract class FileLogger implements MutationTestingResultsLogger
 
         // If the output should be written to a stream then just write it directly
         if (0 === strpos($this->logFilePath, 'php://')) {
-            if (\in_array($this->logFilePath, ['php://stdout', 'php://stderr'], true)) {
+            if (in_array($this->logFilePath, ['php://stdout', 'php://stderr'], true)) {
                 file_put_contents($this->logFilePath, $content);
             } else {
                 // The Symfony filesystem component doesn't support using streams so provide a sensible error message

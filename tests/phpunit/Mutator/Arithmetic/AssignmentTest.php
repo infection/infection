@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class AssignmentTest extends AbstractMutatorTestCase
@@ -47,7 +48,7 @@ final class AssignmentTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): \Generator
+    public function provideMutationCases(): Generator
     {
         yield [
             <<<'PHP'

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Config\Guesser;
 
+use stdClass;
+
 /**
  * @internal
  */
@@ -44,7 +46,7 @@ final class PhpUnitPathGuesser implements Guesser
 
     private $composerJsonContent;
 
-    public function __construct(\stdClass $composerJsonContent)
+    public function __construct(stdClass $composerJsonContent)
     {
         $this->composerJsonContent = $composerJsonContent;
     }

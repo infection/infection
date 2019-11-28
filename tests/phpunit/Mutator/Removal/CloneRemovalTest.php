@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Removal;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class CloneRemovalTest extends AbstractMutatorTestCase
@@ -47,7 +48,7 @@ final class CloneRemovalTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): \Generator
+    public function provideMutationCases(): Generator
     {
         yield 'It removes clone from expression clone-new' => [
           <<<'PHP'

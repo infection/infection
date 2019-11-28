@@ -35,12 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Mutant\Exception;
 
+use Exception;
+use SplFileInfo;
+use Throwable;
+
 /**
  * @internal
  */
-final class ParserException extends \Exception
+final class ParserException extends Exception
 {
-    public static function fromInvalidFile(\SplFileInfo $file, \Throwable $original): self
+    public static function fromInvalidFile(SplFileInfo $file, Throwable $original): self
     {
         return new self(
             sprintf(

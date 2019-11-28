@@ -36,11 +36,16 @@ declare(strict_types=1);
 namespace Infection\Tests\Console;
 
 use Composer\Autoload\ClassLoader;
+use const DIRECTORY_SEPARATOR;
+use function extension_loaded;
+use function function_exists;
+use Generator;
 use Infection\Command\ConfigureCommand;
 use Infection\Console\Application;
 use Infection\Console\InfectionContainer;
 use Infection\Finder\ComposerExecutableFinder;
 use Infection\Finder\Exception\FinderException;
+use const PHP_SAPI;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -60,7 +65,7 @@ final class E2ETest extends TestCase
     private $cwd;
 
     /**
-     * @var \Composer\Autoload\ClassLoader|null
+     * @var ClassLoader|null
      */
     private $previousLoader;
 
@@ -68,7 +73,7 @@ final class E2ETest extends TestCase
 
     protected function setUp(): void
     {
-        if (\PHP_SAPI === 'phpdbg') {
+        if (PHP_SAPI === 'phpdbg') {
             $this->markTestSkipped('Running this test on PHPDBG causes failures on Travis, see https://github.com/infection/infection/pull/622.');
         }
 
@@ -147,7 +152,7 @@ final class E2ETest extends TestCase
         $this->runOnE2EFixture($fullPath);
     }
 
-    public function e2eTestSuiteDataProvider(): \Generator
+    public function e2eTestSuiteDataProvider(): Generator
     {
         $directories = Finder::create()
             ->depth('== 0')
@@ -221,7 +226,7 @@ final class E2ETest extends TestCase
                 ++self::$countFailingComposerInstall;
                 $this->markTestSkipped($e->getMessage());
             } catch (FinderException $e) {
-                if (\DIRECTORY_SEPARATOR !== '\\') {
+                if (DIRECTORY_SEPARATOR !== '\\') {
                     throw $e;
                 }
 
@@ -304,14 +309,14 @@ final class E2ETest extends TestCase
 
     private function runInfection(int $expectedExitCode, array $argvExtra = []): string
     {
-        if (!\extension_loaded('xdebug') && \PHP_SAPI !== 'phpdbg') {
+        if (!extension_loaded('xdebug') && PHP_SAPI !== 'phpdbg') {
             $this->markTestSkipped("Infection from within PHPUnit won't run without xdebug or phpdbg");
         }
 
         /*
          * @see https://github.com/sebastianbergmann/php-code-coverage/blob/7743bbcfff2a907e9ee4a25be13d0f8ec5e73800/src/Driver/PHPDBG.php#L24
          */
-        if (\PHP_SAPI === 'phpdbg' && !\function_exists('phpdbg_start_oplog')) {
+        if (PHP_SAPI === 'phpdbg' && !function_exists('phpdbg_start_oplog')) {
             $this->markTestIncomplete('This build of PHPDBG does not support code coverage');
         }
 

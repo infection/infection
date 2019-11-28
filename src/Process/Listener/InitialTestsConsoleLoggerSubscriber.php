@@ -40,6 +40,7 @@ use Infection\Events\InitialTestCaseCompleted;
 use Infection\Events\InitialTestSuiteFinished;
 use Infection\Events\InitialTestSuiteStarted;
 use Infection\TestFramework\TestFrameworkAdapter;
+use InvalidArgumentException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -91,7 +92,7 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterf
     {
         try {
             $version = $this->testFrameworkAdapter->getVersion();
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $version = 'unknown';
         }
 

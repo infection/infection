@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Visitor;
 
+use function count;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -57,7 +58,7 @@ final class ParentConnectorVisitor extends NodeVisitorAbstract
     public function enterNode(Node $node): ?Node
     {
         if (!empty($this->stack)) {
-            $node->setAttribute(self::PARENT_KEY, $this->stack[\count($this->stack) - 1]);
+            $node->setAttribute(self::PARENT_KEY, $this->stack[count($this->stack) - 1]);
         }
 
         $this->stack[] = $node;

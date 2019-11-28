@@ -42,6 +42,7 @@ use Infection\Performance\Listener\PerformanceLoggerSubscriber;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\TimeFormatter;
 use Infection\Performance\Time\Timer;
+use function is_array;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -63,7 +64,7 @@ final class PerformanceLoggerSubscriberTest extends TestCase
         $this->output->expects($this->once())
             ->method('writeln')
             ->with($this->callback(static function ($parameter) {
-                return \is_array($parameter) && '' === $parameter[0] && 0 === strpos($parameter[1], 'Time:');
+                return is_array($parameter) && '' === $parameter[0] && 0 === strpos($parameter[1], 'Time:');
             }));
 
         $dispatcher = new EventDispatcher();

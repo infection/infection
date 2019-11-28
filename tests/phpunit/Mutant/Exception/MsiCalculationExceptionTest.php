@@ -36,15 +36,17 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutant\Exception;
 
 use Infection\Mutant\Exception\MsiCalculationException;
+use LogicException;
+use PHPUnit\Framework\TestCase;
 
-final class MsiCalculationExceptionTest extends \PHPUnit\Framework\TestCase
+final class MsiCalculationExceptionTest extends TestCase
 {
     public function test_it_is_instance_of_logic_exception(): void
     {
         $exception = MsiCalculationException::create('');
 
         $this->assertInstanceOf(
-            \LogicException::class,
+            LogicException::class,
             $exception
         );
     }

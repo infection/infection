@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use function array_key_exists;
+
 /**
  * @internal
  */
@@ -57,7 +59,7 @@ final class CachedTestFileDataProvider implements TestFileDataProvider
 
     public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
     {
-        if (\array_key_exists($fullyQualifiedClassName, $this->testFileInfoCache)) {
+        if (array_key_exists($fullyQualifiedClassName, $this->testFileInfoCache)) {
             return $this->testFileInfoCache[$fullyQualifiedClassName];
         }
 

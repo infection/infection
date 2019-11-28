@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
+use Generator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
@@ -64,7 +65,7 @@ final class BuildConfigYmlTest extends TestCase
         }
     }
 
-    public function providesYamlFilesForTesting(): \Generator
+    public function providesYamlFilesForTesting(): Generator
     {
         $rootPath = __DIR__ . '/../../../';
 

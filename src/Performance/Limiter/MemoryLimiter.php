@@ -38,6 +38,7 @@ namespace Infection\Performance\Limiter;
 use Composer\XdebugHandler\XdebugHandler;
 use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\TestFrameworkAdapter;
+use const PHP_SAPI;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
@@ -106,6 +107,6 @@ final class MemoryLimiter
     {
         // Under phpdbg we're using a system php.ini, can't add a memory limit there
         // If there is no skipped version of xdebug handler we are also using the system php ini
-        return \PHP_SAPI === 'phpdbg' || XdebugHandler::getSkippedVersion() === '';
+        return PHP_SAPI === 'phpdbg' || XdebugHandler::getSkippedVersion() === '';
     }
 }

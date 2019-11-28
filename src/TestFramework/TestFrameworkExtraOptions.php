@@ -45,7 +45,7 @@ abstract class TestFrameworkExtraOptions
      */
     private $extraOptions;
 
-    public function __construct(string $extraOptions = null)
+    public function __construct(?string $extraOptions = null)
     {
         $this->extraOptions = $extraOptions ?: '';
     }

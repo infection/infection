@@ -40,6 +40,7 @@ use function array_map;
 use function array_merge;
 use function array_pop;
 use function array_values;
+use function count;
 use function explode;
 use function ltrim;
 use const PHP_EOL;
@@ -81,7 +82,7 @@ final class Parser
             if (false === $previousMultiline) {
                 $targetParts = explode(':', $line);
 
-                if (\count($targetParts) !== 2) {
+                if (count($targetParts) !== 2) {
                     continue;
                 }
 

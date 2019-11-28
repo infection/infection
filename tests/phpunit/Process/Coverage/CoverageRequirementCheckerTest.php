@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Coverage;
 
+use function extension_loaded;
 use Infection\Process\Coverage\CoverageRequirementChecker;
+use const PHP_SAPI;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -126,42 +128,42 @@ final class CoverageRequirementCheckerTest extends TestCase
 
     private function requirePhpDbg(): void
     {
-        if (\PHP_SAPI !== 'phpdbg') {
+        if (PHP_SAPI !== 'phpdbg') {
             $this->markTestSkipped('Test requires phpdbg to run.');
         }
     }
 
     private function requireNoPhpDbg(): void
     {
-        if (\PHP_SAPI === 'phpdbg') {
+        if (PHP_SAPI === 'phpdbg') {
             $this->markTestSkipped('Test requires phpdbg to be disabled to run.');
         }
     }
 
     private function requireXdebug(): void
     {
-        if (!\extension_loaded('xdebug')) {
+        if (!extension_loaded('xdebug')) {
             $this->markTestSkipped('Test requires xdebug to run.');
         }
     }
 
     private function requireNoXdebug(): void
     {
-        if (\extension_loaded('xdebug')) {
+        if (extension_loaded('xdebug')) {
             $this->markTestSkipped('Test requires xdebug to be disabled to run.');
         }
     }
 
     private function requirePcov(): void
     {
-        if (!\extension_loaded('pcov')) {
+        if (!extension_loaded('pcov')) {
             $this->markTestSkipped('Test requires pcov to run.');
         }
     }
 
     private function requireNoPcov(): void
     {
-        if (\extension_loaded('pcov')) {
+        if (extension_loaded('pcov')) {
             $this->markTestSkipped('Test requires pcov to be disabled to run.');
         }
     }

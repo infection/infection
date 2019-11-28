@@ -45,6 +45,7 @@ use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
+use ReflectionClass;
 
 final class ReflectionVisitorTest extends AbstractBaseVisitorTest
 {
@@ -166,7 +167,7 @@ final class ReflectionVisitorTest extends AbstractBaseVisitorTest
 
         $this->parseAndTraverse($code, $reflectionSpyVisitor);
 
-        $this->assertInstanceOf(\ReflectionClass::class, $reflectionSpyVisitor->reflectionClass);
+        $this->assertInstanceOf(ReflectionClass::class, $reflectionSpyVisitor->reflectionClass);
         $this->assertSame(\InfectionReflectionClassMethod\Foo::class, $reflectionSpyVisitor->reflectionClass->getName());
     }
 
@@ -179,7 +180,7 @@ final class ReflectionVisitorTest extends AbstractBaseVisitorTest
 
         $this->assertNull($reflectionSpyVisitor->fooReflectionClass);
 
-        $this->assertInstanceOf(\ReflectionClass::class, $reflectionSpyVisitor->createAnonymousClassReflectionClass);
+        $this->assertInstanceOf(ReflectionClass::class, $reflectionSpyVisitor->createAnonymousClassReflectionClass);
         $this->assertSame(\InfectionReflectionAnonymousClass\Bug::class, $reflectionSpyVisitor->createAnonymousClassReflectionClass->getName());
     }
 
@@ -264,7 +265,7 @@ final class ReflectionVisitorTest extends AbstractBaseVisitorTest
     private function getReflectionClassSpyVisitor()
     {
         return new class() extends NodeVisitorAbstract {
-            /** @var \ReflectionClass */
+            /** @var ReflectionClass */
             public $reflectionClass;
 
             public function enterNode(Node $node)
@@ -306,7 +307,7 @@ final class ReflectionVisitorTest extends AbstractBaseVisitorTest
         };
     }
 
-    private function parseAndTraverse(string $code, NodeVisitor $nodeVisitor = null): void
+    private function parseAndTraverse(string $code, ?NodeVisitor $nodeVisitor = null): void
     {
         $nodes = $this->getNodes($code);
 

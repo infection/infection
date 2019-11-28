@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Performance\Time;
 
 use Infection\Performance\Time\Timer;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 final class TimerTest extends TestCase
@@ -61,7 +62,7 @@ final class TimerTest extends TestCase
 
     public function test_it_throws_an_exception_when_started_twice_without_stopping(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $this->timer->start();
         $this->timer->start();
@@ -69,7 +70,7 @@ final class TimerTest extends TestCase
 
     public function test_it_throws_an_exception_when_stopped_without_starting(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $this->timer->stop();
     }
