@@ -42,12 +42,29 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Mutator\Arithmetic\AssignmentEqual;
+use Infection\Mutator\Boolean\EqualIdentical;
+use Infection\Mutator\Boolean\TrueValue;
+use Infection\Mutator\Removal\MethodCallRemoval;
+use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\MutatorConfig;
+use Infection\Mutator\Util\MutatorsGenerator;
 use PHPUnit\Framework\TestCase;
 use function sys_get_temp_dir;
 
 final class ConfigurationFactoryTest extends TestCase
 {
     use ConfigurationAssertions;
+
+    private static $mutators;
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function tearDownAfterClass(): void
+    {
+        self::$mutators = null;
+    }
 
     /**
      * @dataProvider valueProvider
@@ -87,8 +104,7 @@ final class ConfigurationFactoryTest extends TestCase
         bool $expectedIgnoreMsiWithNoMutations,
         ?float $expectedMinMsi,
         bool $expectedShowMutations,
-        ?float $expectedMinCoveredMsi,
-        ?string $expectedStringMutators
+        ?float $expectedMinCoveredMsi
     ): void {
         $config = (new ConfigurationFactory())->create(
             $schema,
@@ -129,8 +145,7 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedIgnoreMsiWithNoMutations,
             $expectedMinMsi,
             $expectedShowMutations,
-            $expectedMinCoveredMsi,
-            $expectedStringMutators
+            $expectedMinCoveredMsi
         );
     }
 
@@ -182,7 +197,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir(),
             new PhpUnit('/path/to', null),
-            [],
+            self::getDefaultMutators(),
             null,
             null,
             null,
@@ -195,7 +210,6 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             false,
-            null,
             null,
         ];
 
@@ -316,6 +330,47 @@ final class ConfigurationFactoryTest extends TestCase
             '--debug'
         );
 
+        yield 'no mutator' => self::createValueForMutators(
+            [],
+            null,
+            self::getDefaultMutators()
+        );
+
+        yield 'mutators from config' => self::createValueForMutators(
+            [
+                '@default' => false,
+                'MethodCallRemoval' => (object) [
+                    'ignore' => [
+                        'Infection\Finder\SourceFilesFinder::__construct::63',
+                    ],
+                ],
+            ],
+            null,
+            [
+                'MethodCallRemoval' => new MethodCallRemoval(new MutatorConfig([
+                    'ignore' => [
+                        'Infection\Finder\SourceFilesFinder::__construct::63',
+                    ],
+                ])),
+            ]
+        );
+
+        yield 'mutators from config & input' => self::createValueForMutators(
+            [
+                '@default' => true,
+                'MethodCallRemoval' => (object) [
+                    'ignore' => [
+                        'Infection\Finder\SourceFilesFinder::__construct::63',
+                    ],
+                ],
+            ],
+            'AssignmentEqual,EqualIdentical',
+            [
+                'AssignmentEqual' => new AssignmentEqual(new MutatorConfig([])),
+                'EqualIdentical' => new EqualIdentical(new MutatorConfig([])),
+            ]
+        );
+
         yield 'complete' => [
             new SchemaConfiguration(
                 '/path/to/infection.json',
@@ -368,7 +423,9 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to/config/phpunit-dir',
                 'config/phpunit'
             ),
-            ['@default' => true],
+            [
+                'TrueValue' => new TrueValue(new MutatorConfig([])),
+            ],
             'phpspec',
             'config/bootstrap.php',
             '-d zend_extension=xdebug.so',
@@ -382,7 +439,6 @@ final class ConfigurationFactoryTest extends TestCase
             72.3,
             true,
             81.5,
-            'TrueValue',
         ];
     }
 
@@ -436,7 +492,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir(),
             new PhpUnit('/path/to', null),
-            [],
+            self::getDefaultMutators(),
             null,
             null,
             null,
@@ -449,7 +505,6 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             false,
-            null,
             null,
         ];
     }
@@ -504,7 +559,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             $expectedTmpDir,
             new PhpUnit('/path/to', null),
-            [],
+            self::getDefaultMutators(),
             null,
             null,
             null,
@@ -517,7 +572,6 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             false,
-            null,
             null,
         ];
     }
@@ -572,7 +626,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir(),
             new PhpUnit($expectedPhpUnitConfigDir, null),
-            [],
+            self::getDefaultMutators(),
             null,
             null,
             null,
@@ -585,7 +639,6 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             false,
-            null,
             null,
         ];
     }
@@ -641,7 +694,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir(),
             new PhpUnit('/path/to', null),
-            [],
+            self::getDefaultMutators(),
             $expectedTestFramework,
             null,
             null,
@@ -654,7 +707,6 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             false,
-            null,
             null,
         ];
     }
@@ -710,7 +762,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir(),
             new PhpUnit('/path/to', null),
-            [],
+            self::getDefaultMutators(),
             null,
             null,
             $expectedInitialTestPhpOptions,
@@ -723,7 +775,6 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null,
             false,
-            null,
             null,
         ];
     }
@@ -779,7 +830,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir(),
             new PhpUnit('/path/to', null),
-            [],
+            self::getDefaultMutators(),
             null,
             null,
             null,
@@ -793,7 +844,89 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+        ];
+    }
+
+    /**
+     * @param array<string,Mutator> $expectedMutators
+     */
+    private static function createValueForMutators(
+        array $configMutators,
+        ?string $inputMutators,
+        array $expectedMutators
+    ): array {
+        return [
+            new SchemaConfiguration(
+                '/path/to/infection.json',
+                null,
+                new Source([], []),
+                new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                null,
+                new PhpUnit(null, null),
+                $configMutators,
+                null,
+                null,
+                null,
+                null
+            ),
+            null,
+            null,
+            'none',
+            false,
+            false,
+            'progress',
+            false,
+            false,
+            null,
+            false,
+            null,
+            $inputMutators,
+            null,
+            null,
+            10,
+            new Source([], []),
+            new Logs(
+                null,
+                null,
+                null,
+                null,
+                null
+            ),
+            'none',
+            sys_get_temp_dir(),
+            new PhpUnit('/path/to', null),
+            $expectedMutators,
+            null,
+            null,
+            null,
+            null,
+            null,
+            false,
+            false,
+            'progress',
+            false,
+            false,
+            null,
+            false,
             null,
         ];
+    }
+
+    /**
+     * @return array<string, Mutator>
+     */
+    private static function getDefaultMutators(): array
+    {
+        if (null === self::$mutators) {
+            self::$mutators = (new MutatorsGenerator([]))->generate();
+        }
+
+        return self::$mutators;
     }
 }

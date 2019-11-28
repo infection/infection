@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Configuration;
 
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Mutator\Util\MutatorParser;
+use Infection\Mutator\Util\MutatorsGenerator;
 use function sprintf;
 use function sys_get_temp_dir;
 use Webmozart\PathUtil\Path;
@@ -90,7 +92,10 @@ class ConfigurationFactory
             $logVerbosity,
             $tmpDir,
             $schema->getPhpUnit(),
-            $schema->getMutators(),
+            (new MutatorParser(
+                $mutators,
+                (new MutatorsGenerator($schema->getMutators()))->generate()
+            ))->getMutators(),
             $testFramework ?? $schema->getTestFramework(),
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
@@ -103,8 +108,7 @@ class ConfigurationFactory
             $ignoreMsiWithNoMutations,
             $minMsi,
             $showMutations,
-            $minCoveredMsi,
-            $mutators
+            $minCoveredMsi
         );
     }
 }
