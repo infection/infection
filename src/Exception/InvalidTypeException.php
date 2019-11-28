@@ -43,8 +43,7 @@ final class InvalidTypeException extends \Exception
     public static function create(string $type): self
     {
         return new self(
-            'Invalid type "' . $type . '" passed.',
-            0
+            'Invalid type "' . $type . '" passed.'
         );
     }
 }
