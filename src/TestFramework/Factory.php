@@ -51,7 +51,9 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Utils\VersionParser;
 use InvalidArgumentException;
+use LogicException;
 use function Safe\file_get_contents;
+use function Safe\sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
@@ -168,6 +170,7 @@ final class Factory
         }
 
         if ($adapterName === TestFrameworkTypes::CODECEPTION) {
+            $this->ensureCodeceptionVersionIsSupported();
             $codeceptionConfigPath = $this->configLocator->locate(TestFrameworkTypes::CODECEPTION);
             $codeceptionConfigContentParsed = $this->parseYaml($codeceptionConfigPath);
 
@@ -206,5 +209,21 @@ final class Factory
         }
 
         return $codeceptionConfigContentParsed;
+    }
+
+    private function ensureCodeceptionVersionIsSupported(): void
+    {
+        if (!class_exists('\Codeception\Codecept')) {
+            return;
+        }
+
+        if (version_compare(\Codeception\Codecept::VERSION, '3.1.1', '<')) {
+            throw new LogicException(
+                sprintf(
+                    'Current Codeception version "%s" is not supported by Infection. Please use >=3.1.1',
+                    \Codeception\Codecept::VERSION
+                )
+            );
+        }
     }
 }
