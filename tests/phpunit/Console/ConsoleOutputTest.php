@@ -142,7 +142,7 @@ final class ConsoleOutputTest extends TestCase
             ->willReturn($actualMsi);
 
         $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logMinMsiCanGetIncreasedNotice($metricsCalculator, $minMsi, TestRunConstraintChecker::MSI_FAILURE);
+        $consoleOutput->logMinMsiCanGetIncreasedNotice($metricsCalculator, $minMsi, TestRunConstraintChecker::MSI_OVER_MIN_MSI);
     }
 
     public function test_log_min_msi_can_get_increased_notice_for_covered_msi(): void
@@ -162,6 +162,6 @@ final class ConsoleOutputTest extends TestCase
             ->willReturn($actualMsi);
 
         $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logMinMsiCanGetIncreasedNotice($metricsCalculator, $minMsi, TestRunConstraintChecker::COVERED_MSI_FAILURE);
+        $consoleOutput->logMinMsiCanGetIncreasedNotice($metricsCalculator, $minMsi, TestRunConstraintChecker::COVERED_MSI_OVER_MIN_MSI);
     }
 }
