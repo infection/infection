@@ -140,7 +140,6 @@ return Config::create()
             'style' => 'prefix',
         ],
         'self_static_accessor' => true,
-        'simplified_null_return' => true,
         'single_line_throw' => false,
         'static_lambda' => true,
         'strict_comparison' => true,
