@@ -80,11 +80,12 @@ PHP
 
 namespace NewObject_MutatesWithoutTypehint;
 
+use stdClass;
 class Test
 {
     function test()
     {
-        new \stdClass();
+        new stdClass();
         return null;
     }
 }
@@ -102,14 +103,15 @@ PHP
 
 namespace NewObject_ContainsAnotherFunctionAndNullAllowed;
 
+use stdClass;
 class Test
 {
     function test()
     {
-        \$a = function (\$element) : ?\stdClass {
+        \$a = function (\$element) : ?stdClass {
             return \$element;
         };
-        new \stdClass();
+        new stdClass();
         return null;
     }
 }
@@ -129,11 +131,12 @@ CODE
 
 namespace NewObject_ReturnTypehintFqcnAllowsNull;
 
+use stdClass;
 class Test
 {
-    function test() : ?\stdClass
+    function test() : ?stdClass
     {
-        new \stdClass();
+        new stdClass();
         return null;
     }
 }
@@ -148,11 +151,12 @@ CODE
 
 namespace NewObject_ScalarReturnTypehintsAllowsNull;
 
+use stdClass;
 class Test
 {
     function test() : ?int
     {
-        new \stdClass();
+        new stdClass();
         return null;
     }
 }
