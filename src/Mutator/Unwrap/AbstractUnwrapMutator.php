@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
-use Generator;
 use function array_key_exists;
+use Generator;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
