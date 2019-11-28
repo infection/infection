@@ -40,8 +40,8 @@ namespace Infection\TestFramework\Coverage;
  */
 final class TestFileNameNotFoundException extends \Exception
 {
-    public static function notFoundFromFQN(string $fqn): self
+    public static function notFoundFromFQN(string $fqn, string $jUnitFilePath): self
     {
-        return new self(sprintf('For FQCN: %s', $fqn));
+        return new self(sprintf('For FQCN: %s. Junit report: %s', $fqn, $jUnitFilePath));
     }
 }

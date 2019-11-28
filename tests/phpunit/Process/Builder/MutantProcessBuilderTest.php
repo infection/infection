@@ -48,8 +48,6 @@ final class MutantProcessBuilderTest extends TestCase
         $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
         $fwAdapter->method('getMutantCommandLine')
             ->willReturn(['/usr/bin/php']);
-        $fwAdapter->method('buildMutationConfigFile')
-            ->willReturn('buildMutationConfigFile');
 
         $builder = new MutantProcessBuilder($fwAdapter, new VersionParser(), 100);
 

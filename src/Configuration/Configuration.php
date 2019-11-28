@@ -88,7 +88,7 @@ class Configuration
         Source $source,
         Logs $logs,
         string $logVerbosity,
-        ?string $tmpDir,
+        string $tmpDir,
         PhpUnit $phpUnit,
         array $mutators,
         ?string $testFramework,
@@ -154,7 +154,7 @@ class Configuration
         return $this->logVerbosity;
     }
 
-    public function getTmpDir(): ?string
+    public function getTmpDir(): string
     {
         return $this->tmpDir;
     }

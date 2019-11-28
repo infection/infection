@@ -73,7 +73,7 @@ final class MutantProcessBuilder
     {
         $process = new Process(
             $this->testFrameworkAdapter->getMutantCommandLine(
-                $this->testFrameworkAdapter->buildMutationConfigFile($mutant),
+                $mutant,
                 $testFrameworkExtraOptions
             )
         );

@@ -76,9 +76,9 @@ class InitialTestRunProcessBuilder
         /** @var PhpProcess|Process $process */
         $process = new $processType(
             $this->testFrameworkAdapter->getInitialTestRunCommandLine(
-                $this->testFrameworkAdapter->buildInitialConfigFile(),
                 $testFrameworkExtraOptions,
-                $phpExtraOptions
+                $phpExtraOptions,
+                $skipCoverage
             )
         );
 

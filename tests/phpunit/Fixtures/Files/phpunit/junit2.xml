@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+    <testsuite name="unit" tests="3" assertions="3" errors="0" failures="0" skipped="0" time="0.024666">
+        <testcase name="testSubtraction" class="App\Tests\unit\Inner\InnerSourceClassTest" file="/codeception/tests/unit/Inner/InnerSourceClassTest.php" assertions="1" time="0.013026"/>
+        <testcase name="testSomeFeature" class="App\Tests\unit\SourceClassTest" file="/codeception/tests/unit/SourceClassTest.php" assertions="1" time="0.006096"/>
+        <testcase name="test_it_can_add_small_numbers" class="App\Tests\unit\SourceClassTest" file="/codeception/tests/unit/SourceClassTest.php" assertions="1" time="0.005544"/>
+    </testsuite>
+</testsuites>

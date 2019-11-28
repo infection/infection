@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutant;
 
 use Infection\MutationInterface;
+use Infection\TestFramework\Coverage\CoverageLineData;
 
 /**
  * @internal
@@ -52,5 +53,8 @@ interface MutantInterface
 
     public function isCoveredByTest(): bool;
 
+    /**
+     * @return CoverageLineData[]
+     */
     public function getCoverageTests(): array;
 }
