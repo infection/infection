@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
-use const DIRECTORY_SEPARATOR;
 use DOMDocument;
 use DOMNodeList;
 use DOMXPath;
@@ -43,26 +42,13 @@ use Generator;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
-use Infection\Utils\TmpDirectoryCreator;
-use function microtime;
-use PHPUnit\Framework\TestCase;
-use function random_int;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class InitialConfigBuilderTest extends TestCase
+final class InitialConfigBuilderTest extends FileSystemTestCase
 {
     public const HASH = 'a1b2c3';
-
-    /**
-     * @var string
-     */
-    private $tmpDir;
-
-    /**
-     * @var Filesystem
-     */
-    private $fileSystem;
 
     /**
      * @var string
@@ -74,26 +60,13 @@ final class InitialConfigBuilderTest extends TestCase
      */
     private $builder;
 
-    /**
-     * @var string
-     */
-    private $workspace;
-
     protected function setUp(): void
     {
-        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . microtime(true) . random_int(100, 999);
-
-        $this->fileSystem = new Filesystem();
-        $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
+        parent::setUp();
 
         $this->pathToProject = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
 
         $this->createConfigBuilder();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->fileSystem->remove($this->workspace);
     }
 
     public function test_it_replaces_relative_path_to_absolute_path(): void
@@ -141,7 +114,7 @@ final class InitialConfigBuilderTest extends TestCase
         $logEntries = $this->queryXpath($xml, '/phpunit/logging/log');
 
         $this->assertSame(2, $logEntries->length);
-        $this->assertSame($this->tmpDir . '/coverage-xml', $logEntries[0]->getAttribute('target'));
+        $this->assertSame($this->tmp . '/coverage-xml', $logEntries[0]->getAttribute('target'));
         $this->assertSame('coverage-xml', $logEntries[0]->getAttribute('type'));
         $this->assertSame('junit', $logEntries[1]->getAttribute('type'));
     }
@@ -259,10 +232,10 @@ final class InitialConfigBuilderTest extends TestCase
         $jUnitFilePath = '/path/to/junit.xml';
         $srcDirs = ['src', 'app'];
 
-        $replacer = new PathReplacer($this->fileSystem, $this->pathToProject);
+        $replacer = new PathReplacer(new Filesystem(), $this->pathToProject);
 
         $this->builder = new InitialConfigBuilder(
-            $this->tmpDir,
+            $this->tmp,
             file_get_contents($phpunitXmlPath),
             new XmlConfigurationHelper($replacer, ''),
             $jUnitFilePath,

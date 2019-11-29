@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Codeception\Adapter;
 
-use const DIRECTORY_SEPARATOR;
 use Generator;
 use Infection\Mutant\MutantInterface;
 use Infection\MutationInterface;
@@ -45,16 +44,12 @@ use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\TestFrameworkTypes;
+use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
-use Infection\Utils\TmpDirectoryCreator;
 use Infection\Utils\VersionParser;
-use function microtime;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use function random_int;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class CodeceptionAdapterTest extends TestCase
+final class CodeceptionAdapterTest extends FileSystemTestCase
 {
     private const DEFAULT_CONFIG = [
         'paths' => [
@@ -71,42 +66,15 @@ final class CodeceptionAdapterTest extends TestCase
     ];
 
     /**
-     * @var CodeceptionAdapter|MockObject
-     */
-    private $adapter;
-
-    /**
-     * @var string
-     */
-    private $tmpDir;
-
-    /**
-     * @var Filesystem
-     */
-    private $fileSystem;
-
-    /**
-     * @var string
-     */
-    private $workspace;
-
-    /**
      * @var string
      */
     private $pathToProject;
 
     protected function setUp(): void
     {
-        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . microtime(true) . random_int(100, 999);
-        $this->fileSystem = new Filesystem();
-        $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
+        parent::setUp();
 
         $this->pathToProject = p(realpath(__DIR__ . '/../../../Fixtures/Files/codeception'));
-    }
-
-    protected function tearDown(): void
-    {
-        $this->fileSystem->remove($this->workspace);
     }
 
     public function test_it_has_a_name(): void
@@ -188,7 +156,7 @@ final class CodeceptionAdapterTest extends TestCase
         $adapter = $this->createAdapter();
         $commandLine = $adapter->getInitialTestRunCommandLine('', [], true);
 
-        $this->assertContains(sprintf('paths: output: %s', $this->tmpDir), $commandLine);
+        $this->assertContains(sprintf('paths: output: %s', $this->tmp), $commandLine);
     }
 
     public function test_it_enables_coverage_if_not_skipped(): void
@@ -263,7 +231,7 @@ final class CodeceptionAdapterTest extends TestCase
 
         $adapter->getMutantCommandLine($this->getMutantMock(), '');
 
-        $expectedConfigPath = $this->tmpDir . '/interceptor.codeception.a1b2c3.php';
+        $expectedConfigPath = $this->tmp . '/interceptor.codeception.a1b2c3.php';
 
         $this->assertFileExists($expectedConfigPath);
     }
@@ -276,7 +244,7 @@ final class CodeceptionAdapterTest extends TestCase
 
         $this->assertStringNotContainsString(
             'bootstrap',
-            file_get_contents($this->tmpDir . '/interceptor.codeception.a1b2c3.php')
+            file_get_contents($this->tmp . '/interceptor.codeception.a1b2c3.php')
         );
     }
 
@@ -295,7 +263,7 @@ final class CodeceptionAdapterTest extends TestCase
 
         $this->assertStringContainsString(
             "require_once '/original/bootstrap.php';",
-            file_get_contents($this->tmpDir . '/interceptor.codeception.a1b2c3.php')
+            file_get_contents($this->tmp . '/interceptor.codeception.a1b2c3.php')
         );
     }
 
@@ -314,7 +282,7 @@ final class CodeceptionAdapterTest extends TestCase
 
         $this->assertStringContainsString(
             "tests/original/bootstrap.php';",
-            file_get_contents($this->tmpDir . '/interceptor.codeception.a1b2c3.php')
+            file_get_contents($this->tmp . '/interceptor.codeception.a1b2c3.php')
         );
     }
 
@@ -356,9 +324,9 @@ final class CodeceptionAdapterTest extends TestCase
             new CommandLineBuilder(),
             $versionParser,
             new JUnitTestCaseSorter(),
-            $this->fileSystem,
+            new Filesystem(),
             'path/to/junit',
-            $this->tmpDir,
+            $this->tmp,
             $this->pathToProject,
             $config ?? self::DEFAULT_CONFIG,
             ['projectSrc/dir']

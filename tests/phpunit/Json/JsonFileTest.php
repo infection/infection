@@ -35,51 +35,32 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Json;
 
-use const DIRECTORY_SEPARATOR;
 use Generator;
 use Infection\Json\Exception\ParseException;
 use Infection\Json\JsonFile;
-use Infection\Utils\TmpDirectoryCreator;
+use Infection\Tests\FileSystem\FileSystemTestCase;
 use JsonSchema\Exception\ValidationException;
-use function microtime;
-use PHPUnit\Framework\TestCase;
-use function random_int;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class JsonFileTest extends TestCase
+final class JsonFileTest extends FileSystemTestCase
 {
     /**
      * @var Filesystem
      */
     private $filesystem;
 
-    /**
-     * @var string
-     */
-    private $workspace;
-
-    /**
-     * @var string
-     */
-    private $tmpDir;
-
     protected function setUp(): void
     {
-        $this->filesystem = new Filesystem();
-        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . microtime(true) . random_int(100, 999);
-        $this->tmpDir = (new TmpDirectoryCreator($this->filesystem))->createAndGet($this->workspace);
-    }
+        parent::setUp();
 
-    protected function tearDown(): void
-    {
-        $this->filesystem->remove($this->workspace);
+        $this->filesystem = new Filesystem();
     }
 
     public function test_it_creates_successfully(): void
     {
         $jsonString = '{"timeout": 25, "source": {"directories": ["src"]}}';
 
-        $jsonPath = $this->tmpDir . '/file.json';
+        $jsonPath = $this->tmp . '/file.json';
 
         $this->filesystem->dumpFile($jsonPath, $jsonString);
 
@@ -93,7 +74,7 @@ final class JsonFileTest extends TestCase
     {
         $jsonString = '{"timeout": 25,}';
 
-        $jsonPath = $this->tmpDir . '/file.json';
+        $jsonPath = $this->tmp . '/file.json';
 
         $this->filesystem->dumpFile($jsonPath, $jsonString);
 
@@ -104,7 +85,7 @@ final class JsonFileTest extends TestCase
 
     public function test_it_throws_parse_exception_when_file_is_not_found(): void
     {
-        $jsonPath = $this->tmpDir . '/missing-invalid.json';
+        $jsonPath = $this->tmp . '/missing-invalid.json';
         self::assertFileNotExists($jsonPath);
 
         self::expectException(ParseException::class);
@@ -116,7 +97,7 @@ final class JsonFileTest extends TestCase
     {
         $jsonString = '{"timeout": 25}';
 
-        $jsonPath = $this->tmpDir . '/file.json';
+        $jsonPath = $this->tmp . '/file.json';
 
         $this->filesystem->dumpFile($jsonPath, $jsonString);
 
@@ -130,7 +111,7 @@ final class JsonFileTest extends TestCase
      */
     public function test_it_validates_true_value_mutator(string $jsonString): void
     {
-        $jsonPath = $this->tmpDir . '/file.json';
+        $jsonPath = $this->tmp . '/file.json';
 
         $this->filesystem->dumpFile($jsonPath, $jsonString);
 
@@ -181,7 +162,7 @@ JSON
      */
     public function test_it_throws_exception_for_invalid_true_value_mutator(string $jsonString, string $expectedMessageRegex): void
     {
-        $jsonPath = $this->tmpDir . '/file.json';
+        $jsonPath = $this->tmp . '/file.json';
 
         $this->filesystem->dumpFile($jsonPath, $jsonString);
 
