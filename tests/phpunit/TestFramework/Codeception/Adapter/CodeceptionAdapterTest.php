@@ -35,6 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Codeception\Adapter;
 
+use Infection\FileSystem\TmpDirProvider;
+use function Infection\Tests\make_tmp_dir;
+use function Infection\Tests\normalizePath;
+use function realpath;
+use function sys_get_temp_dir;
+use const DIRECTORY_SEPARATOR;
 use Generator;
 use Infection\Mutant\MutantInterface;
 use Infection\MutationInterface;

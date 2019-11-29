@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
+use Infection\FileSystem\TmpDirProvider;
 use function array_filter;
 use function getcwd;
 use Infection\Configuration\Configuration;
@@ -70,7 +71,6 @@ use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\TestFrameworkAdapter;
-use Infection\Utils\TmpDirectoryCreator;
 use Infection\Utils\VersionParser;
 use function php_ini_loaded_file;
 use PhpParser\Lexer;
@@ -94,8 +94,8 @@ final class InfectionContainer extends Container
             'filesystem' => static function (): Filesystem {
                 return new Filesystem();
             },
-            TmpDirectoryCreator::class => static function (self $container): TmpDirectoryCreator {
-                return new TmpDirectoryCreator($container['filesystem']);
+            TmpDirProvider::class => static function (): TmpDirProvider {
+                return new TmpDirProvider();
             },
             'coverage.dir.phpunit' => static function (self $container) {
                 return sprintf(
@@ -254,10 +254,10 @@ final class InfectionContainer extends Container
                 return new SchemaConfigurationFactory();
             },
             ConfigurationFactory::class => static function (self $container): ConfigurationFactory {
-                /** @var TmpDirectoryCreator $tmpDirCreator */
-                $tmpDirCreator = $container[TmpDirectoryCreator::class];
+                /** @var TmpDirProvider $tmpDirProvider */
+                $tmpDirProvider = $container[TmpDirProvider::class];
 
-                return new ConfigurationFactory($tmpDirCreator);
+                return new ConfigurationFactory($tmpDirProvider);
             },
             'coverage.path' => static function (self $container): string {
                 /** @var Configuration $config */
