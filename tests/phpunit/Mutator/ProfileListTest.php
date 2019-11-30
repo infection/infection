@@ -41,6 +41,8 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
 use function array_keys;
+use function array_merge;
+use function array_values;
 use function in_array;
 use function sort;
 use function sprintf;

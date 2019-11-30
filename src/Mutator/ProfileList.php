@@ -317,7 +317,6 @@ final class ProfileList
         'NotIdentical' => Mutator\ConditionalNegotiation\NotIdentical::class,
 
         // Function Signature
-        'PublicVisibility' => Mutator\FunctionSignature\PublicVisibility::class,
         'ProtectedVisibility' => Mutator\FunctionSignature\ProtectedVisibility::class,
         'PublicVisibility' => Mutator\FunctionSignature\PublicVisibility::class,
 
@@ -337,7 +336,6 @@ final class ProfileList
         'Throw_' => Mutator\Operator\Throw_::class,
 
         // Regex
-        'PregQuote' => Mutator\Regex\PregQuote::class,
         'PregMatchMatches' => Mutator\Regex\PregMatchMatches::class,
         'PregQuote' => Mutator\Regex\PregQuote::class,
 
