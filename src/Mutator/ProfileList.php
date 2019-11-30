@@ -281,9 +281,9 @@ final class ProfileList
         'Plus' => Mutator\Arithmetic\Plus::class,
         'PlusEqual' => Mutator\Arithmetic\PlusEqual::class,
         'PowEqual' => Mutator\Arithmetic\PowEqual::class,
+        'RoundingFamily' => Mutator\Arithmetic\RoundingFamily::class,
         'ShiftLeft' => Mutator\Arithmetic\ShiftLeft::class,
         'ShiftRight' => Mutator\Arithmetic\ShiftRight::class,
-        'RoundingFamily' => Mutator\Arithmetic\RoundingFamily::class,
 
         // Boolean
         'ArrayItem' => Mutator\Boolean\ArrayItem::class,
@@ -317,27 +317,27 @@ final class ProfileList
         'NotIdentical' => Mutator\ConditionalNegotiation\NotIdentical::class,
 
         // Function Signature
-        'PublicVisibility' => Mutator\FunctionSignature\PublicVisibility::class,
         'ProtectedVisibility' => Mutator\FunctionSignature\ProtectedVisibility::class,
+        'PublicVisibility' => Mutator\FunctionSignature\PublicVisibility::class,
 
         // Number
         'DecrementInteger' => Mutator\Number\DecrementInteger::class,
         'IncrementInteger' => Mutator\Number\IncrementInteger::class,
-        'OneZeroInteger' => Mutator\Number\OneZeroInteger::class,
         'OneZeroFloat' => Mutator\Number\OneZeroFloat::class,
+        'OneZeroInteger' => Mutator\Number\OneZeroInteger::class,
 
         // Operator
         'AssignCoalesce' => Mutator\Operator\AssignCoalesce::class,
         'Break_' => Mutator\Operator\Break_::class,
-        'Continue_' => Mutator\Operator\Continue_::class,
-        'Throw_' => Mutator\Operator\Throw_::class,
-        'Finally_' => Mutator\Operator\Finally_::class,
         'Coalesce' => Mutator\Operator\Coalesce::class,
+        'Continue_' => Mutator\Operator\Continue_::class,
+        'Finally_' => Mutator\Operator\Finally_::class,
         'Spread' => Mutator\Operator\Spread::class,
+        'Throw_' => Mutator\Operator\Throw_::class,
 
         // Regex
-        'PregQuote' => Mutator\Regex\PregQuote::class,
         'PregMatchMatches' => Mutator\Regex\PregMatchMatches::class,
+        'PregQuote' => Mutator\Regex\PregQuote::class,
 
         // Removal
         'ArrayItemRemoval' => Mutator\Removal\ArrayItemRemoval::class,
