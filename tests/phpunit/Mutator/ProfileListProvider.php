@@ -104,14 +104,12 @@ final class ProfileListProvider
                 continue;
             }
 
-            $mutatorParentReflection = $mutatorReflection->getParentClass();
-
-            if (false === $mutatorParentReflection || Mutator::class !== $mutatorParentReflection->getName()) {
+            if (!self::extendsMutator($mutatorReflection)) {
                 continue;
             }
 
             $mutators[$className] = [
-                realpath($file->getPath()),
+                realpath($file->getPathname()),
                 $className,
                 $shortClassName,
             ];
@@ -165,6 +163,17 @@ final class ProfileListProvider
                 $profileOrMutators,
             ];
         }
+    }
+
+    private static function extendsMutator(ReflectionClass $mutatorReflection): bool
+    {
+        $mutatorParentReflection = $mutatorReflection->getParentClass();
+
+        if (false === $mutatorParentReflection) {
+            return Mutator::class === $mutatorReflection->getName();
+        }
+
+        return self::extendsMutator($mutatorParentReflection);
     }
 
     private function __construct()
