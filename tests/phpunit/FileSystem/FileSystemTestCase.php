@@ -45,17 +45,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
-use function array_map;
-use function array_values;
-use function chdir;
-use const DIRECTORY_SEPARATOR;
-use function getcwd;
 use function Infection\Tests\make_tmp_dir;
 use function Infection\Tests\normalizePath;
-use function natcasesort;
 use PHPUnit\Framework\TestCase;
-use function realpath;
-use function str_replace;
+use function Safe\chdir;
+use function Safe\getcwd;
+use function Safe\realpath;
 use Symfony\Component\Filesystem\Filesystem;
 use function sys_get_temp_dir;
 
@@ -64,34 +59,39 @@ use function sys_get_temp_dir;
  */
 abstract class FileSystemTestCase extends TestCase
 {
-    /** @var string */
-    protected $cwd;
-
-    /** @var string */
-    protected $tmp;
+    private const TMP_DIR_NAME = 'infection-test';
 
     /**
-     * {@inheritdoc}
+     * @var string
      */
+    protected $cwd;
+
+    /**
+     * @var string
+     */
+    protected $tmp;
+
+    public static function tearDownAfterClass(): void
+    {
+        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the
+        // `tearDown()` method and as a result some temporary files may still remain.
+        self::removeTmpDir();
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the `tearDown()` method
-        // and as a result some temporary files may still remain.
-        (new Filesystem())->remove(
-            normalizePath(realpath(sys_get_temp_dir()) . '/infection-test')
-        );
+        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the
+        // `tearDown()` method and as a result some temporary files may still remain.
+        self::removeTmpDir();
 
         $this->cwd = getcwd();
-        $this->tmp = make_tmp_dir('infection-test', self::class);
+        $this->tmp = make_tmp_dir(self::TMP_DIR_NAME, self::class);
 
         chdir($this->tmp);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -101,26 +101,12 @@ abstract class FileSystemTestCase extends TestCase
         (new Filesystem())->remove($this->tmp);
     }
 
-    /**
-     * @param string[] $files
-     *
-     * @return string[] File real paths relative to the current temporary directory
-     */
-    final protected function normalizePaths(array $files): array
+    final protected static function removeTmpDir(): void
     {
-        $root = $this->tmp;
-
-        $files = array_values(
-            array_map(
-                static function (string $file) use ($root): string {
-                    return str_replace($root . DIRECTORY_SEPARATOR, '', $file);
-                },
-                $files
+        (new Filesystem())->remove(
+            normalizePath(
+                realpath(sys_get_temp_dir()) . '/' . self::TMP_DIR_NAME
             )
         );
-
-        natcasesort($files);
-
-        return array_values($files);
     }
 }
