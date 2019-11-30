@@ -156,6 +156,10 @@ final class ProjectCodeProvider
      */
     private static $testClasses;
 
+    private function __construct()
+    {
+    }
+
     public static function provideSourceClasses(): Generator
     {
         if (null !== self::$sourceClasses) {
@@ -309,9 +313,5 @@ final class ProjectCodeProvider
         yield from generator_to_phpunit_data_provider(
             self::NON_FINAL_EXTENSION_CLASSES
         );
-    }
-
-    private function __construct()
-    {
     }
 }
