@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator;
 
 use Generator;
+use Infection\Mutator\ProfileList;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
-use Infection\Mutator\Util\MutatorProfile;
 use Infection\Tests\Fixtures\NullMutationVisitor;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\NotMutableIgnoreVisitor;
@@ -88,7 +88,7 @@ final class AllMutatorTest extends TestCase
     public function provideMutatorAndCodeCases(): Generator
     {
         foreach ($this->getCodeSamples() as $codeSample) {
-            foreach (MutatorProfile::FULL_MUTATOR_LIST as $mutator) {
+            foreach (ProfileList::ALL_MUTATORS as $mutator) {
                 yield [$codeSample->getContents(), new $mutator(new MutatorConfig([])), $codeSample->getFilename()];
             }
         }

@@ -33,40 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Mutator;
 
 use Infection\Mutator;
 
 /**
  * @internal
  */
-final class MutatorProfile
+final class ProfileList
 {
-    public const MUTATOR_PROFILE_LIST = [
-        //Per category
-        '@arithmetic' => self::ARITHMETIC,
-        '@boolean' => self::BOOLEAN,
-        '@conditional_boundary' => self::CONDITIONAL_BOUNDARY,
-        '@conditional_negotiation' => self::CONDITIONAL_NEGOTIATION,
-        '@equal' => self::EQUAL,
-        '@function_signature' => self::FUNCTION_SIGNATURE,
-        '@identical' => self::IDENTICAL,
-        '@number' => self::NUMBER,
-        '@operator' => self::OPERATOR,
-        '@regex' => self::REGEX,
-        '@removal' => self::REMOVAL,
-        '@return_value' => self::RETURN_VALUE,
-        '@sort' => self::SORT,
-        '@zero_iteration' => self::ZERO_ITERATION,
-        '@cast' => self::CAST,
-        '@unwrap' => self::UNWRAP,
-        '@extensions' => self::EXTENSIONS,
+    public const ALL_PROFILES = [
+        // Per category
+        '@arithmetic' => self::ARITHMETIC_PROFILE,
+        '@boolean' => self::BOOLEAN_PROFILE,
+        '@conditional_boundary' => self::CONDITIONAL_BOUNDARY_PROFILE,
+        '@conditional_negotiation' => self::CONDITIONAL_NEGOTIATION_PROFILE,
+        '@equal' => self::EQUAL_PROFILE,
+        '@function_signature' => self::FUNCTION_SIGNATURE_PROFILE,
+        '@identical' => self::IDENTICAL_PROFILE,
+        '@number' => self::NUMBER_PROFILE,
+        '@operator' => self::OPERATOR_PROFILE,
+        '@regex' => self::REGEX_PROFILE,
+        '@removal' => self::REMOVAL_PROFILE,
+        '@return_value' => self::RETURN_VALUE_PROFILE,
+        '@sort' => self::SORT_PROFILE,
+        '@zero_iteration' => self::ZERO_ITERATION_PROFILE,
+        '@cast' => self::CAST_PROFILE,
+        '@unwrap' => self::UNWRAP_PROFILE,
+        '@extensions' => self::EXTENSIONS_PROFILE,
 
-        //Special Profiles
-        '@default' => self::DEFAULT,
+        // Special Profiles
+        '@default' => self::DEFAULT_PROFILE,
     ];
 
-    public const ARITHMETIC = [
+    public const ARITHMETIC_PROFILE = [
         Mutator\Arithmetic\Assignment::class,
         Mutator\Arithmetic\AssignmentEqual::class,
         Mutator\Arithmetic\BitwiseAnd::class,
@@ -92,7 +92,7 @@ final class MutatorProfile
         Mutator\Arithmetic\ShiftRight::class,
     ];
 
-    public const BOOLEAN = [
+    public const BOOLEAN_PROFILE = [
         Mutator\Boolean\ArrayItem::class,
         Mutator\Boolean\FalseValue::class,
         Mutator\Boolean\LogicalAnd::class,
@@ -104,14 +104,14 @@ final class MutatorProfile
         Mutator\Boolean\Yield_::class,
     ];
 
-    public const CONDITIONAL_BOUNDARY = [
+    public const CONDITIONAL_BOUNDARY_PROFILE = [
         Mutator\ConditionalBoundary\GreaterThan::class,
         Mutator\ConditionalBoundary\GreaterThanOrEqualTo::class,
         Mutator\ConditionalBoundary\LessThan::class,
         Mutator\ConditionalBoundary\LessThanOrEqualTo::class,
     ];
 
-    public const CONDITIONAL_NEGOTIATION = [
+    public const CONDITIONAL_NEGOTIATION_PROFILE = [
         Mutator\ConditionalNegotiation\Equal::class,
         Mutator\ConditionalNegotiation\GreaterThanNegotiation::class,
         Mutator\ConditionalNegotiation\GreaterThanOrEqualToNegotiation::class,
@@ -122,29 +122,29 @@ final class MutatorProfile
         Mutator\ConditionalNegotiation\NotIdentical::class,
     ];
 
-    public const EQUAL = [
+    public const EQUAL_PROFILE = [
         Mutator\Boolean\IdenticalEqual::class,
         Mutator\Boolean\NotIdenticalNotEqual::class,
     ];
 
-    public const FUNCTION_SIGNATURE = [
+    public const FUNCTION_SIGNATURE_PROFILE = [
         Mutator\FunctionSignature\ProtectedVisibility::class,
         Mutator\FunctionSignature\PublicVisibility::class,
     ];
 
-    public const IDENTICAL = [
+    public const IDENTICAL_PROFILE = [
         Mutator\Boolean\EqualIdentical::class,
         Mutator\Boolean\NotEqualNotIdentical::class,
     ];
 
-    public const NUMBER = [
+    public const NUMBER_PROFILE = [
         Mutator\Number\DecrementInteger::class,
         Mutator\Number\IncrementInteger::class,
         Mutator\Number\OneZeroFloat::class,
         Mutator\Number\OneZeroInteger::class,
     ];
 
-    public const OPERATOR = [
+    public const OPERATOR_PROFILE = [
         Mutator\Operator\AssignCoalesce::class,
         Mutator\Operator\Break_::class,
         Mutator\Operator\Coalesce::class,
@@ -154,19 +154,19 @@ final class MutatorProfile
         Mutator\Operator\Throw_::class,
     ];
 
-    public const REGEX = [
+    public const REGEX_PROFILE = [
         Mutator\Regex\PregMatchMatches::class,
         Mutator\Regex\PregQuote::class,
     ];
 
-    public const REMOVAL = [
+    public const REMOVAL_PROFILE = [
         Mutator\Removal\ArrayItemRemoval::class,
         Mutator\Removal\CloneRemoval::class,
         Mutator\Removal\FunctionCallRemoval::class,
         Mutator\Removal\MethodCallRemoval::class,
     ];
 
-    public const RETURN_VALUE = [
+    public const RETURN_VALUE_PROFILE = [
         Mutator\ReturnValue\ArrayOneItem::class,
         Mutator\ReturnValue\FloatNegation::class,
         Mutator\ReturnValue\FunctionCall::class,
@@ -175,16 +175,16 @@ final class MutatorProfile
         Mutator\ReturnValue\This::class,
     ];
 
-    public const SORT = [
+    public const SORT_PROFILE = [
         Mutator\Sort\Spaceship::class,
     ];
 
-    public const ZERO_ITERATION = [
+    public const ZERO_ITERATION_PROFILE = [
         Mutator\ZeroIteration\For_::class,
         Mutator\ZeroIteration\Foreach_::class,
     ];
 
-    public const CAST = [
+    public const CAST_PROFILE = [
         Mutator\Cast\CastArray::class,
         Mutator\Cast\CastBool::class,
         Mutator\Cast\CastFloat::class,
@@ -193,7 +193,7 @@ final class MutatorProfile
         Mutator\Cast\CastString::class,
     ];
 
-    public const UNWRAP = [
+    public const UNWRAP_PROFILE = [
         Mutator\Unwrap\UnwrapArrayChangeKeyCase::class,
         Mutator\Unwrap\UnwrapArrayChunk::class,
         Mutator\Unwrap\UnwrapArrayColumn::class,
@@ -239,12 +239,12 @@ final class MutatorProfile
         Mutator\Unwrap\UnwrapUcWords::class,
     ];
 
-    public const EXTENSIONS = [
+    public const EXTENSIONS_PROFILE = [
         Mutator\Extensions\BCMath::class,
         Mutator\Extensions\MBString::class,
     ];
 
-    public const DEFAULT = [
+    public const DEFAULT_PROFILE = [
         '@arithmetic',
         '@boolean',
         '@cast',
@@ -262,8 +262,8 @@ final class MutatorProfile
         '@unwrap',
     ];
 
-    public const FULL_MUTATOR_LIST = [
-        //Arithmetic
+    public const ALL_MUTATORS = [
+        // Arithmetic
         'Assignment' => Mutator\Arithmetic\Assignment::class,
         'AssignmentEqual' => Mutator\Arithmetic\AssignmentEqual::class,
         'BitwiseAnd' => Mutator\Arithmetic\BitwiseAnd::class,
@@ -288,7 +288,7 @@ final class MutatorProfile
         'ShiftRight' => Mutator\Arithmetic\ShiftRight::class,
         'RoundingFamily' => Mutator\Arithmetic\RoundingFamily::class,
 
-        //Boolean
+        // Boolean
         'ArrayItem' => Mutator\Boolean\ArrayItem::class,
         'EqualIdentical' => Mutator\Boolean\EqualIdentical::class,
         'FalseValue' => Mutator\Boolean\FalseValue::class,
@@ -303,13 +303,13 @@ final class MutatorProfile
         'TrueValue' => Mutator\Boolean\TrueValue::class,
         'Yield_' => Mutator\Boolean\Yield_::class,
 
-        //Conditional Boundary
+        // Conditional Boundary
         'GreaterThan' => Mutator\ConditionalBoundary\GreaterThan::class,
         'GreaterThanOrEqualTo' => Mutator\ConditionalBoundary\GreaterThanOrEqualTo::class,
         'LessThan' => Mutator\ConditionalBoundary\LessThan::class,
         'LessThanOrEqualTo' => Mutator\ConditionalBoundary\LessThanOrEqualTo::class,
 
-        //Conditional Negotiation
+        // Conditional Negotiation
         'Equal' => Mutator\ConditionalNegotiation\Equal::class,
         'GreaterThanNegotiation' => Mutator\ConditionalNegotiation\GreaterThanNegotiation::class,
         'GreaterThanOrEqualToNegotiation' => Mutator\ConditionalNegotiation\GreaterThanOrEqualToNegotiation::class,
@@ -319,17 +319,17 @@ final class MutatorProfile
         'NotEqual' => Mutator\ConditionalNegotiation\NotEqual::class,
         'NotIdentical' => Mutator\ConditionalNegotiation\NotIdentical::class,
 
-        //Function Signature
+        // Function Signature
         'PublicVisibility' => Mutator\FunctionSignature\PublicVisibility::class,
         'ProtectedVisibility' => Mutator\FunctionSignature\ProtectedVisibility::class,
 
-        //Number
+        // Number
         'DecrementInteger' => Mutator\Number\DecrementInteger::class,
         'IncrementInteger' => Mutator\Number\IncrementInteger::class,
         'OneZeroInteger' => Mutator\Number\OneZeroInteger::class,
         'OneZeroFloat' => Mutator\Number\OneZeroFloat::class,
 
-        //Operator
+        // Operator
         'AssignCoalesce' => Mutator\Operator\AssignCoalesce::class,
         'Break_' => Mutator\Operator\Break_::class,
         'Continue_' => Mutator\Operator\Continue_::class,
@@ -338,17 +338,17 @@ final class MutatorProfile
         'Coalesce' => Mutator\Operator\Coalesce::class,
         'Spread' => Mutator\Operator\Spread::class,
 
-        //Regex
+        // Regex
         'PregQuote' => Mutator\Regex\PregQuote::class,
         'PregMatchMatches' => Mutator\Regex\PregMatchMatches::class,
 
-        //Removal
+        // Removal
         'ArrayItemRemoval' => Mutator\Removal\ArrayItemRemoval::class,
         'CloneRemoval' => Mutator\Removal\CloneRemoval::class,
         'FunctionCallRemoval' => Mutator\Removal\FunctionCallRemoval::class,
         'MethodCallRemoval' => Mutator\Removal\MethodCallRemoval::class,
 
-        //Return Value
+        // Return Value
         'ArrayOneItem' => Mutator\ReturnValue\ArrayOneItem::class,
         'FloatNegation' => Mutator\ReturnValue\FloatNegation::class,
         'FunctionCall' => Mutator\ReturnValue\FunctionCall::class,
@@ -356,10 +356,10 @@ final class MutatorProfile
         'NewObject' => Mutator\ReturnValue\NewObject::class,
         'This' => Mutator\ReturnValue\This::class,
 
-        //Sort
+        // Sort
         'Spaceship' => Mutator\Sort\Spaceship::class,
 
-        //Zero Iteration
+        // Zero Iteration
         'Foreach_' => Mutator\ZeroIteration\Foreach_::class,
         'For_' => Mutator\ZeroIteration\For_::class,
 
@@ -420,4 +420,8 @@ final class MutatorProfile
         'BCMath' => Mutator\Extensions\BCMath::class,
         'MBString' => Mutator\Extensions\MBString::class,
     ];
+
+    private function __construct()
+    {
+    }
 }

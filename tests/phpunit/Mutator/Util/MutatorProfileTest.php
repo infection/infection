@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\Util;
 
 use Generator;
 use function in_array;
-use Infection\Mutator\Util\MutatorProfile;
+use Infection\Mutator\ProfileList;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
@@ -46,7 +46,7 @@ final class MutatorProfileTest extends TestCase
 {
     public function test_all_mutators_have_the_correct_name_in_the_full_mutator_list(): void
     {
-        foreach (MutatorProfile::FULL_MUTATOR_LIST as $name => $class) {
+        foreach (ProfileList::ALL_MUTATORS as $name => $class) {
             $this->assertSame(
                 $name,
                 $class::getName(),
@@ -67,7 +67,7 @@ final class MutatorProfileTest extends TestCase
 
             $this->assertArrayHasKey(
                 $class,
-                MutatorProfile::FULL_MUTATOR_LIST,
+                ProfileList::ALL_MUTATORS,
                 sprintf(
                     'The mutator "%s" located in "%s" has not been added to the FULL_MUTATOR_LIST in the MutatorProfile class. ' .
                     'Please add it to ensure it can be used.',
@@ -139,7 +139,7 @@ final class MutatorProfileTest extends TestCase
 
     private function getMutatorProfileConstants(): array
     {
-        $reflectionClass = new ReflectionClass(MutatorProfile::class);
+        $reflectionClass = new ReflectionClass(ProfileList::class);
         $excludedConstants = ['MUTATOR_PROFILE_LIST', 'DEFAULT', 'FULL_MUTATOR_LIST'];
 
         return array_filter(

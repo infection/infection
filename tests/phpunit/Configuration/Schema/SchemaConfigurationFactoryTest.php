@@ -49,7 +49,7 @@ use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
-use Infection\Mutator\Util\MutatorProfile;
+use Infection\Mutator\ProfileList;
 use JsonSchema\Validator;
 use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
@@ -1492,7 +1492,7 @@ JSON
         ];
 
         $genericMutatorNamesList = array_keys(array_diff_key(
-            MutatorProfile::FULL_MUTATOR_LIST,
+            ProfileList::ALL_MUTATORS,
             array_fill_keys(
                 [
                     'TrueValue',
