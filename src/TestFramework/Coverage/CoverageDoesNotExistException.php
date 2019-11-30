@@ -45,6 +45,7 @@ final class CoverageDoesNotExistException extends InfectionException
     private const INFECTION_USAGE_SUGGESTION = <<<TXT
 - Enable xdebug and run infection again
 - Use phpdbg: phpdbg -qrr infection
+- Enable pcov and run infection again
 - Use --coverage option with path to the existing coverage report
 - Use --initial-tests-php-options option with `-d zend_extension=xdebug.so` and/or any extra php parameters
 TXT
@@ -84,7 +85,7 @@ TXT
     public static function unableToGenerate(): self
     {
         return new self(
-            'Neither phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:' .
+            'Neither pcov, phpdbg or xdebug has been found. One of those is required by Infection in order to generate coverage data. Either:' .
             "\n" .
             self::INFECTION_USAGE_SUGGESTION
         );
