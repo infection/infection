@@ -52,7 +52,7 @@ final class ProfileListTest extends TestCase
     /**
      * @dataProvider \Infection\Tests\Mutator\ProfileListProvider::mutatorNameAndClassProvider
      */
-    public function test_all_mutators_have_the_correct_name_in_the_full_mutator_list(
+    public function test_all_mutators_to_be_listed_by_their_short_and_fully_qualified_class_names(
         string $expectedMutatorName,
         string $mutatorClass
     ): void
