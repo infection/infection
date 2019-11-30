@@ -98,12 +98,6 @@ final class ProfileListProvider
             $shortClassName = substr($file->getFilename(), 0, -4);
             $className = self::getMutatorClassNameFromPath($file->getPathname());
 
-            $relativeClassName = str_replace(
-                '/',
-                '\\',
-                substr($file->getRelativePathname(), 0, -4)
-            );
-
             $mutatorReflection = new ReflectionClass($className);
 
             if ($mutatorReflection->isAbstract()) {
@@ -120,7 +114,6 @@ final class ProfileListProvider
                 realpath($file->getPath()),
                 $className,
                 $shortClassName,
-                $relativeClassName,
             ];
         }
 
