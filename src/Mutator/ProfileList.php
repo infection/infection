@@ -250,6 +250,7 @@ final class ProfileList
         '@cast',
         '@conditional_boundary',
         '@conditional_negotiation',
+        '@extensions',
         '@function_signature',
         '@number',
         '@operator',
@@ -257,9 +258,8 @@ final class ProfileList
         '@removal',
         '@return_value',
         '@sort',
-        '@zero_iteration',
-        '@extensions',
         '@unwrap',
+        '@zero_iteration',
     ];
 
     public const ALL_MUTATORS = [
