@@ -40,6 +40,7 @@ use Infection\Mutator\ProfileList;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
+use function array_keys;
 use function in_array;
 use function sort;
 use function sprintf;
@@ -116,7 +117,7 @@ final class ProfileListTest extends TestCase
     /**
      * @dataProvider \Infection\Tests\Mutator\ProfileListProvider::profileProvider
      */
-    public function test_all_mutator_profiles_are_sorted(
+    public function test_all_mutator_profiles_are_sorted_lexicographically(
         string $profile,
         array $profileOrMutators
     ): void
@@ -134,7 +135,28 @@ final class ProfileListTest extends TestCase
                 'Expected the profiles and mutators listed in %s::%s to be sorted lexicographically',
                 ProfileList::class,
                 $profile
-        ));
+            )
+        );
+    }
+
+    public function test_the_all_profile_constant_lists_profiles_in_a_lexicographical_order(): void
+    {
+        $allProfiles = array_keys(ProfileList::ALL_PROFILES);
+
+        $sortedAllProfiles = (static function (array $value): array {
+            sort($value, SORT_STRING);
+
+            return $value;
+        })($allProfiles);
+
+        $this->assertSame(
+            $sortedAllProfiles,
+            $allProfiles,
+            sprintf(
+                'Expected profiles in %s::ALL_PROFILES to be sorted lexicographically',
+                ProfileList::class
+            )
+        );
     }
 
     private static function isMutatorInAtLeastOneProfile(string $className): bool
