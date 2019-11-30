@@ -43,14 +43,12 @@ use Infection\Mutator;
 final class ProfileList
 {
     public const ALL_PROFILES = [
+        // Per category
         '@arithmetic' => self::ARITHMETIC_PROFILE,
         '@boolean' => self::BOOLEAN_PROFILE,
-        '@cast' => self::CAST_PROFILE,
         '@conditional_boundary' => self::CONDITIONAL_BOUNDARY_PROFILE,
         '@conditional_negotiation' => self::CONDITIONAL_NEGOTIATION_PROFILE,
-        '@default' => self::DEFAULT_PROFILE,
         '@equal' => self::EQUAL_PROFILE,
-        '@extensions' => self::EXTENSIONS_PROFILE,
         '@function_signature' => self::FUNCTION_SIGNATURE_PROFILE,
         '@identical' => self::IDENTICAL_PROFILE,
         '@number' => self::NUMBER_PROFILE,
@@ -59,8 +57,13 @@ final class ProfileList
         '@removal' => self::REMOVAL_PROFILE,
         '@return_value' => self::RETURN_VALUE_PROFILE,
         '@sort' => self::SORT_PROFILE,
-        '@unwrap' => self::UNWRAP_PROFILE,
         '@zero_iteration' => self::ZERO_ITERATION_PROFILE,
+        '@cast' => self::CAST_PROFILE,
+        '@unwrap' => self::UNWRAP_PROFILE,
+        '@extensions' => self::EXTENSIONS_PROFILE,
+
+        // Special Profiles
+        '@default' => self::DEFAULT_PROFILE,
     ];
 
     public const ARITHMETIC_PROFILE = [
@@ -317,6 +320,7 @@ final class ProfileList
         'NotIdentical' => Mutator\ConditionalNegotiation\NotIdentical::class,
 
         // Function Signature
+        'PublicVisibility' => Mutator\FunctionSignature\PublicVisibility::class,
         'ProtectedVisibility' => Mutator\FunctionSignature\ProtectedVisibility::class,
         'PublicVisibility' => Mutator\FunctionSignature\PublicVisibility::class,
 
@@ -336,6 +340,7 @@ final class ProfileList
         'Throw_' => Mutator\Operator\Throw_::class,
 
         // Regex
+        'PregQuote' => Mutator\Regex\PregQuote::class,
         'PregMatchMatches' => Mutator\Regex\PregMatchMatches::class,
         'PregQuote' => Mutator\Regex\PregQuote::class,
 
