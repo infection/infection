@@ -22,34 +22,47 @@ final class MutatorFactory
      */
     public function create(array $mutatorSettings): array
     {
+        return self::createFromNames(
+            self::retrieveMutatorNames($mutatorSettings)
+        );
+    }
+
+    /**
+     * @param array<string, bool|array<string, string>> $mutatorSettings
+     *
+     * @return array<string, array<string, string>>
+     */
+    private static function retrieveMutatorNames(array $mutatorSettings): array 
+    {
         $mutators = [];
 
-        // First parse the profiles
         foreach ($mutatorSettings as $mutatorOrProfile => $setting) {
-            if (!array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
+            if (array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
+                self::registerFromProfile($mutatorOrProfile, $setting, $mutators);
+                
                 continue;
             }
 
-            $this->registerFromProfile($mutatorOrProfile, $setting, $mutators);
-        }
+            if (array_key_exists($mutatorOrProfile, MutatorProfile::FULL_MUTATOR_LIST)) {
+                self::registerFromName($mutatorOrProfile, $setting, $mutators);
 
-        // First parse the profiles
-        foreach ($mutatorSettings as $mutatorOrProfile => $setting) {
-            if (!array_key_exists($mutatorOrProfile, MutatorProfile::FULL_MUTATOR_LIST)) {
                 continue;
             }
 
-            $this->registerFromName($mutatorOrProfile, $setting, $mutators);
+            throw new InvalidArgumentException(sprintf(
+                'The profile or mutator "%s" was not recognized.',
+                $mutatorOrProfile
+            ));
         }
-
-        return $this->createFromNames($mutators);
+        
+        return $mutators;
     }
 
     /**
      * @param array<string, string>|bool           $settings
      * @param array<string, array<string, string>> $mutators
      */
-    private function registerFromProfile(
+    private static function registerFromProfile(
         string $profile,
         $settings,
         array &$mutators
@@ -60,13 +73,13 @@ final class MutatorFactory
 
             // A profile may refer to another collection of profiles
             if (array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
-                $this->registerFromProfile($mutatorOrProfile, $settings, $mutators);
+                self::registerFromProfile($mutatorOrProfile, $settings, $mutators);
 
                 continue;
             }
 
             if (class_exists($mutatorOrProfile)) {
-                $this->registerFromClass($mutatorOrProfile, $settings, $mutators);
+                self::registerFromClass($mutatorOrProfile, $settings, $mutators);
 
                 continue;
             }
@@ -83,7 +96,7 @@ final class MutatorFactory
      * @param array<string, string>|bool           $settings
      * @param array<string, array<string, string>> $mutators
      */
-    private function registerFromName(
+    private static function registerFromName(
         string $mutator,
         $settings,
         array &$mutators
@@ -96,7 +109,7 @@ final class MutatorFactory
             ));
         }
 
-        $this->registerFromClass(
+        self::registerFromClass(
             MutatorProfile::FULL_MUTATOR_LIST[$mutator],
             $settings,
             $mutators
@@ -107,7 +120,7 @@ final class MutatorFactory
      * @param array<string, string>|bool|stdClass  $settings
      * @param array<string, array<string, string>> $mutators
      */
-    private function registerFromClass(
+    private static function registerFromClass(
         string $mutator,
         $settings,
         array &$mutators
@@ -125,7 +138,7 @@ final class MutatorFactory
      *
      * @return array<string, Mutator>
      */
-    private function createFromNames(array $mutatorNames): array
+    private static function createFromNames(array $mutatorNames): array
     {
         $mutators = [];
 
