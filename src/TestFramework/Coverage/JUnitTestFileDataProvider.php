@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use DOMDocument;
+use DOMXPath;
+
 /**
  * @internal
  */
@@ -46,7 +49,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
     private $jUnitFilePath;
 
     /**
-     * @var \DOMXPath|null
+     * @var DOMXPath|null
      */
     private $xPath;
 
@@ -76,17 +79,17 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
         );
     }
 
-    private function getXPath(): \DOMXPath
+    private function getXPath(): DOMXPath
     {
         if (!$this->xPath) {
             if (!file_exists($this->jUnitFilePath)) {
                 throw CoverageDoesNotExistException::forJunit($this->jUnitFilePath);
             }
 
-            $dom = new \DOMDocument();
+            $dom = new DOMDocument();
             $dom->load($this->jUnitFilePath);
 
-            $this->xPath = new \DOMXPath($dom);
+            $this->xPath = new DOMXPath($dom);
         }
 
         return $this->xPath;

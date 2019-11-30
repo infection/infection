@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
+use function count;
 use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
@@ -68,6 +69,6 @@ final class Finally_ extends Mutator
         /** @var Node\Stmt\TryCatch $parentNode */
         $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
 
-        return \count($parentNode->catches) > 0;
+        return count($parentNode->catches) > 0;
     }
 }

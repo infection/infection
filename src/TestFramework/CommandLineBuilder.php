@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use Infection\Finder\Exception\FinderException;
+use const PHP_SAPI;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
@@ -71,7 +72,7 @@ final class CommandLineBuilder
          *
          * This lets folks use, say, a bash wrapper over phpunit.
          */
-        if ('cli' === \PHP_SAPI && $phpExtraArgs === [] && is_executable($testFrameworkExecutable) && `command -v php`) {
+        if ('cli' === PHP_SAPI && $phpExtraArgs === [] && is_executable($testFrameworkExecutable) && `command -v php`) {
             return array_merge([$testFrameworkExecutable], $frameworkArgs);
         }
 
@@ -102,7 +103,7 @@ final class CommandLineBuilder
 
             $phpCmd[] = $phpExec;
 
-            if (\PHP_SAPI === 'phpdbg') {
+            if (PHP_SAPI === 'phpdbg') {
                 $phpCmd[] = '-qrr';
             }
 

@@ -66,17 +66,11 @@ final class ConfigurationFactoryTest extends TestCase
      */
     private $configFactory;
 
-    /**
-     * {@inheritdoc}
-     */
     public static function tearDownAfterClass(): void
     {
         self::$mutators = null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->configFactory = new ConfigurationFactory(

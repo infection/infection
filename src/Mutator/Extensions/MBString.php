@@ -35,6 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Extensions;
 
+use function array_diff_key;
+use function array_filter;
+use function array_slice;
+use function constant;
+use function count;
+use function defined;
 use Generator;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
@@ -101,11 +107,11 @@ final class MBString extends Mutator
             'mb_convert_case' => $this->makeConvertCaseMapper(),
         ];
 
-        $functionsToRemove = \array_filter($functionsMap, static function (bool $isOn): bool {
+        $functionsToRemove = array_filter($functionsMap, static function (bool $isOn): bool {
             return !$isOn;
         });
 
-        $this->converters = \array_diff_key($converters, $functionsToRemove);
+        $this->converters = array_diff_key($converters, $functionsToRemove);
     }
 
     private function makeFunctionMapper(string $newFunctionName): callable
@@ -118,7 +124,7 @@ final class MBString extends Mutator
     private function makeFunctionAndRemoveExtraArgsMapper(string $newFunctionName, int $argsAtMost): callable
     {
         return function (Node\Expr\FuncCall $node) use ($newFunctionName, $argsAtMost): Generator {
-            yield $this->mapFunctionCall($node, $newFunctionName, \array_slice($node->args, 0, $argsAtMost));
+            yield $this->mapFunctionCall($node, $newFunctionName, array_slice($node->args, 0, $argsAtMost));
         };
     }
 
@@ -143,7 +149,7 @@ final class MBString extends Mutator
 
     private function getConvertCaseModeValue(Node\Expr\FuncCall $node): ?int
     {
-        if (\count($node->args) < 2) {
+        if (count($node->args) < 2) {
             return null;
         }
 
@@ -154,7 +160,7 @@ final class MBString extends Mutator
         }
 
         if ($mode instanceof Node\Expr\ConstFetch) {
-            return \constant($mode->name->toString());
+            return constant($mode->name->toString());
         }
 
         return null;
@@ -180,7 +186,7 @@ final class MBString extends Mutator
     private function isInMbCaseMode(int $mode, string ...$cases): bool
     {
         foreach ($cases as $constant) {
-            if (\defined($constant) && \constant($constant) === $mode) {
+            if (defined($constant) && constant($constant) === $mode) {
                 return true;
             }
         }

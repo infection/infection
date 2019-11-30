@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use function dirname;
+use Exception;
 use Infection\Config\InfectionConfig;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
@@ -474,7 +476,7 @@ final class InfectionCommand extends BaseCommand
     {
         try {
             $locator->locateOneOf(InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [
@@ -509,7 +511,7 @@ final class InfectionCommand extends BaseCommand
             throw CoverageDoesNotExistException::with(
                 $coverageIndexFilePath,
                 $testFrameworkKey,
-                \dirname($coverageIndexFilePath, 2),
+                dirname($coverageIndexFilePath, 2),
                 $processInfo
             );
         }

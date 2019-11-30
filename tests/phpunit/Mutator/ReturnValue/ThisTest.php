@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ReturnValue;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class ThisTest extends AbstractMutatorTestCase
@@ -47,7 +48,7 @@ final class ThisTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): \Generator
+    public function provideMutationCases(): Generator
     {
         yield 'It does mutate with no typehint' => [
             $this->getFileContent('this_return-this.php'),

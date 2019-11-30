@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Visitor;
 
+use function count;
+use Generator;
+use function get_class;
 use Infection\Exception\InvalidMutatorException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
@@ -42,6 +45,7 @@ use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
+use Throwable;
 
 /**
  * @internal
@@ -98,7 +102,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                 if (!$mutator->shouldMutate($node)) {
                     continue;
                 }
-            } catch (\Throwable $t) {
+            } catch (Throwable $t) {
                 throw InvalidMutatorException::create($this->filePath, $mutator, $t);
             }
 
@@ -117,13 +121,13 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                     $isOnFunctionSignature
                 );
 
-            if ($this->onlyCovered && \count($tests) === 0) {
+            if ($this->onlyCovered && count($tests) === 0) {
                 continue;
             }
 
             $mutatedResult = $mutator->mutate($node);
 
-            $mutatedNodes = $mutatedResult instanceof \Generator ? $mutatedResult : [$mutatedResult];
+            $mutatedNodes = $mutatedResult instanceof Generator ? $mutatedResult : [$mutatedResult];
 
             foreach ($mutatedNodes as $mutationByMutatorIndex => $mutatedNode) {
                 $this->mutations[] = new Mutation(
@@ -131,7 +135,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                     $this->fileAst,
                     $mutator,
                     $node->getAttributes(),
-                    \get_class($node),
+                    get_class($node),
                     $mutatedNode,
                     $mutationByMutatorIndex,
                     $tests

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\FunctionSignature;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class ProtectedVisibilityTest extends AbstractMutatorTestCase
@@ -47,7 +48,7 @@ final class ProtectedVisibilityTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): \Generator
+    public function provideMutationCases(): Generator
     {
         yield 'It mutates protected to private' => [
             $this->getFileContent('pv-one-class.php'),

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
+use function count;
 use Webmozart\Assert\Assert;
 
 /**
@@ -68,7 +69,7 @@ final class MutatorParser
     {
         $parsedMutators = $this->parseMutators();
 
-        if (\count($parsedMutators) === 0) {
+        if (count($parsedMutators) === 0) {
             return $this->configMutators;
         }
         $mutatorSettings = [];

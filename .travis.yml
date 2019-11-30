@@ -35,8 +35,7 @@ jobs:
       install:
         - composer install $COMPOSER_FLAGS
       script:
-        - make test-autoreview
-        - make analyze --keep-going
+        - make autoreview --keep-going
 
     - &STANDARD_TEST_JOB
       stage: Test

@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
+use const DIRECTORY_SEPARATOR;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -67,7 +69,7 @@ final class MutatorTest extends TestCase
      */
     public function test_mutators_do_not_declare_public_methods(string $className): void
     {
-        $rc = new \ReflectionClass($className);
+        $rc = new ReflectionClass($className);
 
         $this->assertCount(
             3,
@@ -135,8 +137,8 @@ final class MutatorTest extends TestCase
 
         $classes = array_map(
             static function (SplFileInfo $file) {
-                $fqcnPart = ltrim(str_replace('phpunit', '', $file->getRelativePath()), \DIRECTORY_SEPARATOR);
-                $fqcnPart = strtr($fqcnPart, \DIRECTORY_SEPARATOR, '\\');
+                $fqcnPart = ltrim(str_replace('phpunit', '', $file->getRelativePath()), DIRECTORY_SEPARATOR);
+                $fqcnPart = strtr($fqcnPart, DIRECTORY_SEPARATOR, '\\');
 
                 return sprintf(
                     '%s\\%s%s%s',
@@ -158,14 +160,14 @@ final class MutatorTest extends TestCase
         return array_filter(
             $this->getMutatorClasses(),
             static function ($item) {
-                $class = new \ReflectionClass($item);
+                $class = new ReflectionClass($item);
 
                 return !$class->isInterface() && !$class->isAbstract() && !$class->isTrait();
             }
         );
     }
 
-    private function getPublicMethods(\ReflectionClass $rc)
+    private function getPublicMethods(ReflectionClass $rc)
     {
         $publicMethods = [];
 

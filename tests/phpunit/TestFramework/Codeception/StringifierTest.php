@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Codeception;
 
+use Generator;
 use Infection\TestFramework\Codeception\Stringifier;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 final class StringifierTest extends TestCase
@@ -58,21 +60,21 @@ final class StringifierTest extends TestCase
 
     public function test_stringify_array_of_strings_works_only_with_array_of_strings(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $arrayOfInts = [1, 2, 3];
 
         Stringifier::stringifyArray($arrayOfInts);
     }
 
-    public function provideBooleanStrings(): \Generator
+    public function provideBooleanStrings(): Generator
     {
         yield 'True' => [true, 'true'];
 
         yield 'False' => [false, 'false'];
     }
 
-    public function provideArrayOfStrings(): \Generator
+    public function provideArrayOfStrings(): Generator
     {
         yield 'Empty array' => [[], '[]'];
 

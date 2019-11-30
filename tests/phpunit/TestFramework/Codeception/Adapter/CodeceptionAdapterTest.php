@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Codeception\Adapter;
 
+use const DIRECTORY_SEPARATOR;
+use Generator;
 use Infection\Mutant\MutantInterface;
 use Infection\MutationInterface;
 use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
@@ -46,8 +48,10 @@ use Infection\TestFramework\TestFrameworkTypes;
 use function Infection\Tests\normalizePath as p;
 use Infection\Utils\TmpDirectoryCreator;
 use Infection\Utils\VersionParser;
+use function microtime;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function random_int;
 use Symfony\Component\Filesystem\Filesystem;
 
 final class CodeceptionAdapterTest extends TestCase
@@ -93,7 +97,7 @@ final class CodeceptionAdapterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->workspace = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'infection-test' . \microtime(true) . \random_int(100, 999);
+        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . microtime(true) . random_int(100, 999);
         $this->fileSystem = new Filesystem();
         $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
 
@@ -139,7 +143,7 @@ final class CodeceptionAdapterTest extends TestCase
         $this->assertSame($expectedResult, $result);
     }
 
-    public function memoryReportProvider(): \Generator
+    public function memoryReportProvider(): Generator
     {
         yield ['Memory: 8.00MB', 8.0];
 
@@ -150,7 +154,7 @@ final class CodeceptionAdapterTest extends TestCase
         yield ['Time: 2.51 seconds', -1.0];
     }
 
-    public function passProvider(): \Generator
+    public function passProvider(): Generator
     {
         yield ['OK, but incomplete, skipped, or risky tests!', true];
 
@@ -343,7 +347,7 @@ final class CodeceptionAdapterTest extends TestCase
         return $mutant;
     }
 
-    private function createAdapter(array $config = null): CodeceptionAdapter
+    private function createAdapter(?array $config = null): CodeceptionAdapter
     {
         $versionParser = $this->createMock(VersionParser::class);
 

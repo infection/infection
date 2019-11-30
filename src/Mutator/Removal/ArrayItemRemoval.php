@@ -35,11 +35,22 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
+use function array_merge;
+use function count;
 use Generator;
+use function gettype;
+use function in_array;
 use Infection\Config\Exception\InvalidConfigException;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
+use function is_numeric;
+use function is_scalar;
+use function is_string;
+use function min;
 use PhpParser\Node;
+use function range;
+use function strtolower;
+use function strtoupper;
 
 /**
  * @internal
@@ -81,7 +92,7 @@ final class ArrayItemRemoval extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Expr\Array_ && \count($node->items);
+        return $node instanceof Node\Expr\Array_ && count($node->items);
     }
 
     private function getItemsIndexes(array $items): array
@@ -90,27 +101,27 @@ final class ArrayItemRemoval extends Mutator
             case 'first':
                 return [0];
             case 'last':
-                return [\count($items) - 1];
+                return [count($items) - 1];
             default:
-                return \range(0, \min(\count($items), $this->limit) - 1);
+                return range(0, min(count($items), $this->limit) - 1);
         }
     }
 
     private function getResultSettings(): array
     {
-        $settings = \array_merge(self::DEFAULT_SETTINGS, $this->getSettings());
+        $settings = array_merge(self::DEFAULT_SETTINGS, $this->getSettings());
 
-        if (!\is_string($settings['remove'])) {
+        if (!is_string($settings['remove'])) {
             $this->throwConfigException('remove');
         }
 
-        $settings['remove'] = \strtolower($settings['remove']);
+        $settings['remove'] = strtolower($settings['remove']);
 
-        if (!\in_array($settings['remove'], ['first', 'last', 'all'])) {
+        if (!in_array($settings['remove'], ['first', 'last', 'all'])) {
             $this->throwConfigException('remove');
         }
 
-        if (!\is_numeric($settings['limit']) || $settings['limit'] < 1) {
+        if (!is_numeric($settings['limit']) || $settings['limit'] < 1) {
             $this->throwConfigException('limit');
         }
 
@@ -124,7 +135,7 @@ final class ArrayItemRemoval extends Mutator
         throw new InvalidConfigException(sprintf(
             'Invalid configuration of ArrayItemRemoval mutator. Setting `%s` is invalid (%s)',
             $property,
-            \is_scalar($value) ? $value : '<' . \strtoupper(\gettype($value)) . '>'
+            is_scalar($value) ? $value : '<' . strtoupper(gettype($value)) . '>'
         ));
     }
 }

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use Generator;
+use function in_array;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -57,7 +59,7 @@ final class RoundingFamily extends Mutator
      *
      * @param Node&Node\Expr\FuncCall $node
      *
-     * @return \Generator
+     * @return Generator
      */
     public function mutate(Node $node)
     {
@@ -83,7 +85,7 @@ final class RoundingFamily extends Mutator
         }
 
         if (!$node->name instanceof Node\Name ||
-            !\in_array($node->name->toLowerString(), self::MUTATORS_MAP, true)
+            !in_array($node->name->toLowerString(), self::MUTATORS_MAP, true)
         ) {
             return false;
         }

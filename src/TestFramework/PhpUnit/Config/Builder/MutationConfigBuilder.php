@@ -35,6 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
+use function assert;
+use function dirname;
+use DOMDocument;
+use DOMNode;
+use DOMXPath;
 use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\Coverage\CoverageLineData;
@@ -62,7 +67,7 @@ class MutationConfigBuilder extends ConfigBuilder
     private $xmlConfigurationHelper;
 
     /**
-     * @var \DOMDocument
+     * @var DOMDocument
      */
     private $dom;
 
@@ -84,7 +89,7 @@ class MutationConfigBuilder extends ConfigBuilder
         $this->xmlConfigurationHelper = $xmlConfigurationHelper;
         $this->jUnitTestCaseSorter = $jUnitTestCaseSorter;
 
-        $this->dom = new \DOMDocument();
+        $this->dom = new DOMDocument();
         $this->dom->preserveWhiteSpace = false;
         $this->dom->formatOutput = true;
         $this->dom->loadXML($originalXmlConfigContent);
@@ -95,7 +100,7 @@ class MutationConfigBuilder extends ConfigBuilder
         // clone the dom document because it's mutated later
         $dom = clone $this->dom;
 
-        $xPath = new \DOMXPath($dom);
+        $xPath = new DOMXPath($dom);
 
         $this->xmlConfigurationHelper->replaceWithAbsolutePaths($xPath);
         $this->xmlConfigurationHelper->setStopOnFailure($xPath);
@@ -130,7 +135,7 @@ class MutationConfigBuilder extends ConfigBuilder
     {
         $originalFilePath = $mutant->getMutation()->getOriginalFilePath();
         $mutatedFilePath = $mutant->getMutatedFilePath();
-        $interceptorPath = \dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
+        $interceptorPath = dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
 
         $customAutoload = <<<AUTOLOAD
 <?php
@@ -150,7 +155,7 @@ AUTOLOAD;
         return $this->tempDirectory . '/' . $fileName;
     }
 
-    private function setCustomBootstrapPath(string $customAutoloadFilePath, \DOMXPath $xPath): void
+    private function setCustomBootstrapPath(string $customAutoloadFilePath, DOMXPath $xPath): void
     {
         $nodeList = $xPath->query('/phpunit/@bootstrap');
 
@@ -165,14 +170,14 @@ AUTOLOAD;
     /**
      * @param CoverageLineData[] $coverageTests
      */
-    private function setFilteredTestsToRun(array $coverageTests, \DOMDocument $dom, \DOMXPath $xPath): void
+    private function setFilteredTestsToRun(array $coverageTests, DOMDocument $dom, DOMXPath $xPath): void
     {
         $this->removeExistingTestSuite($xPath);
 
         $this->addTestSuiteWithFilteredTestFiles($coverageTests, $dom, $xPath);
     }
 
-    private function removeExistingTestSuite(\DOMXPath $xPath): void
+    private function removeExistingTestSuite(DOMXPath $xPath): void
     {
         $nodes = $xPath->query('/phpunit/testsuites/testsuite');
 
@@ -191,7 +196,7 @@ AUTOLOAD;
     /**
      * @param CoverageLineData[] $coverageTestCases
      */
-    private function addTestSuiteWithFilteredTestFiles(array $coverageTestCases, \DOMDocument $dom, \DOMXPath $xPath): void
+    private function addTestSuiteWithFilteredTestFiles(array $coverageTestCases, DOMDocument $dom, DOMXPath $xPath): void
     {
         $testSuites = $xPath->query('/phpunit/testsuites');
         $nodeToAppendTestSuite = $testSuites->item(0);
@@ -212,12 +217,12 @@ AUTOLOAD;
             $testSuite->appendChild($file);
         }
 
-        \assert($nodeToAppendTestSuite instanceof \DOMNode);
+        assert($nodeToAppendTestSuite instanceof DOMNode);
 
         $nodeToAppendTestSuite->appendChild($testSuite);
     }
 
-    private function getOriginalBootstrapFilePath(\DOMXPath $xPath): string
+    private function getOriginalBootstrapFilePath(DOMXPath $xPath): string
     {
         $nodeList = $xPath->query('/phpunit/@bootstrap');
 

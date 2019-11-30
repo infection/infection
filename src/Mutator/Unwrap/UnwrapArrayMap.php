@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
+use function count;
+use Generator;
 use PhpParser\Node;
 
 /**
@@ -47,8 +49,8 @@ final class UnwrapArrayMap extends AbstractUnwrapMutator
         return 'array_map';
     }
 
-    protected function getParameterIndexes(Node\Expr\FuncCall $node): \Generator
+    protected function getParameterIndexes(Node\Expr\FuncCall $node): Generator
     {
-        yield from range(1, \count($node->args) - 1);
+        yield from range(1, count($node->args) - 1);
     }
 }

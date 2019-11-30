@@ -36,10 +36,12 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use Composer\XdebugHandler\XdebugHandler;
+use function extension_loaded;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\InfectionCommand;
 use Infection\Console\ConsoleOutput as InfectionConsoleOutput;
 use PackageVersions\Versions;
+use const PHP_SAPI;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -84,7 +86,7 @@ final class Application extends BaseApplication
         $this->setDefaultCommand('run');
     }
 
-    public function run(InputInterface $input = null, OutputInterface $output = null): int
+    public function run(?InputInterface $input = null, ?OutputInterface $output = null): int
     {
         if (null === $input) {
             $input = new ArgvInput();
@@ -167,11 +169,11 @@ final class Application extends BaseApplication
 
     private function logRunningWithDebugger(): void
     {
-        if (\PHP_SAPI === 'phpdbg') {
-            $this->consoleOutput->logRunningWithDebugger(\PHP_SAPI);
-        } elseif (\extension_loaded('xdebug')) {
+        if (PHP_SAPI === 'phpdbg') {
+            $this->consoleOutput->logRunningWithDebugger(PHP_SAPI);
+        } elseif (extension_loaded('xdebug')) {
             $this->consoleOutput->logRunningWithDebugger('Xdebug');
-        } elseif (\extension_loaded('pcov')) {
+        } elseif (extension_loaded('pcov')) {
             $this->consoleOutput->logRunningWithDebugger('PCOV');
         }
     }

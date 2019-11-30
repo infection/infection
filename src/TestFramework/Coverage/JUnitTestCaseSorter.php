@@ -35,6 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use function assert;
+use function in_array;
+use function is_string;
+
 /**
  * @internal
  */
@@ -59,7 +63,7 @@ final class JUnitTestCaseSorter
 
         return array_map(
             static function (CoverageLineData $coverageLineData): string {
-                \assert(\is_string($coverageLineData->testFilePath));
+                assert(is_string($coverageLineData->testFilePath));
 
                 return $coverageLineData->testFilePath;
             },
@@ -78,7 +82,7 @@ final class JUnitTestCaseSorter
         $uniqueTests = [];
 
         foreach ($coverageTestCases as $coverageTestCase) {
-            if (!\in_array($coverageTestCase->testFilePath, $usedFileNames, true)) {
+            if (!in_array($coverageTestCase->testFilePath, $usedFileNames, true)) {
                 $uniqueTests[] = $coverageTestCase;
                 $usedFileNames[] = $coverageTestCase->testFilePath;
             }

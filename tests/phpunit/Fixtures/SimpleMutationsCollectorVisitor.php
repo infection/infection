@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures;
 
+use Generator;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
@@ -42,7 +43,7 @@ final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
 
         $mutatedResult = $this->mutator->mutate($node);
 
-        $mutatedNodes = $mutatedResult instanceof \Generator ? $mutatedResult : [$mutatedResult];
+        $mutatedNodes = $mutatedResult instanceof Generator ? $mutatedResult : [$mutatedResult];
 
         foreach($mutatedNodes as $mutatedNode) {
             $this->mutations[] = new SimpleMutation(

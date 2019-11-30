@@ -35,12 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Exception;
+
 /**
  * @internal
  */
-final class TestFrameworkConfigParseException extends \Exception
+final class TestFrameworkConfigParseException extends Exception
 {
-    public static function fromPath(string $configPath, \Exception $originalException): self
+    public static function fromPath(string $configPath, Exception $originalException): self
     {
         return new self(
             sprintf(

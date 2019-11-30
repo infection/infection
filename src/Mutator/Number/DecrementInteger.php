@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
+use function in_array;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
@@ -90,7 +91,7 @@ final class DecrementInteger extends AbstractNumberMutator
         }
 
         if ($parentNode->left instanceof Node\Expr\FuncCall && $parentNode->left->name instanceof Node\Name
-            && \in_array(
+            && in_array(
                 $parentNode->left->name->toLowerString(),
                 self::COUNT_NAMES,
                 true)
@@ -99,7 +100,7 @@ final class DecrementInteger extends AbstractNumberMutator
         }
 
         if ($parentNode->right instanceof Node\Expr\FuncCall && $parentNode->right->name instanceof Node\Name
-            && \in_array(
+            && in_array(
                 $parentNode->right->name->toLowerString(),
                 self::COUNT_NAMES,
                 true)

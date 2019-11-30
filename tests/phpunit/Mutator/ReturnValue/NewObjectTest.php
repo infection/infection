@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ReturnValue;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class NewObjectTest extends AbstractMutatorTestCase
@@ -50,7 +51,7 @@ final class NewObjectTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): \Generator
+    public function provideMutationCases(): Generator
     {
         yield 'It does not mutate if no class name found' => [
             <<<'PHP'
@@ -79,11 +80,12 @@ PHP
 
 namespace NewObject_MutatesWithoutTypehint;
 
+use stdClass;
 class Test
 {
     function test()
     {
-        new \stdClass();
+        new stdClass();
         return null;
     }
 }
@@ -101,14 +103,15 @@ PHP
 
 namespace NewObject_ContainsAnotherFunctionAndNullAllowed;
 
+use stdClass;
 class Test
 {
     function test()
     {
-        \$a = function (\$element) : ?\stdClass {
+        \$a = function (\$element) : ?stdClass {
             return \$element;
         };
-        new \stdClass();
+        new stdClass();
         return null;
     }
 }
@@ -128,11 +131,12 @@ CODE
 
 namespace NewObject_ReturnTypehintFqcnAllowsNull;
 
+use stdClass;
 class Test
 {
-    function test() : ?\stdClass
+    function test() : ?stdClass
     {
-        new \stdClass();
+        new stdClass();
         return null;
     }
 }
@@ -147,11 +151,12 @@ CODE
 
 namespace NewObject_ScalarReturnTypehintsAllowsNull;
 
+use stdClass;
 class Test
 {
     function test() : ?int
     {
-        new \stdClass();
+        new stdClass();
         return null;
     }
 }

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
+use Exception;
 use Infection\TestFramework\TestFrameworkConfigParseException;
 use PHPUnit\Framework\TestCase;
 
@@ -44,7 +45,7 @@ final class TestFrameworkConfigParseExceptionTest extends TestCase
     {
         $exception = TestFrameworkConfigParseException::fromPath(
             '/path/to/config.yaml',
-            new \Exception('Yaml can not be parsed')
+            new Exception('Yaml can not be parsed')
         );
 
         $this->assertInstanceOf(TestFrameworkConfigParseException::class, $exception);
