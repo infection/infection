@@ -91,21 +91,6 @@ final class ProfileListTest extends TestCase
                 ProfileList::class
             )
         );
-
-        $listedMutatorClassName = ProfileList::ALL_MUTATORS[$mutatorShortClassName];
-
-        $this->assertSame(
-            $mutatorClassName,
-            $listedMutatorClassName,
-            sprintf(
-                'Expected to find the mutator "%s" for the key "%s" of %s::ALL_MUTATORS. '
-                .'Got "%s',
-                $mutatorClassName,
-                $mutatorShortClassName,
-                ProfileList::class,
-                ProfileList::ALL_MUTATORS[$mutatorShortClassName]
-            )
-        );
     }
 
     /**
@@ -120,7 +105,7 @@ final class ProfileListTest extends TestCase
             self::isMutatorInAtLeastOneProfile($mutatorClassName),
             sprintf(
                 'Expected the mutator "%s" (found in "%s") to be listed in at least one '
-                .'profile. Please add it to one of the *_PROFILE constants of "%s"',
+                .'profile. Please add it to the appropriate %s::*_PROFILE constant',
                 $mutatorClassName,
                 $mutatorFilePath,
                 ProfileList::class
