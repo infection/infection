@@ -33,16 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\Util;
+namespace Infection\Tests\Mutator;
 
 use Generator;
-use function in_array;
 use Infection\Mutator\ProfileList;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
+use function in_array;
 
-final class MutatorProfileTest extends TestCase
+final class ProfileListTest extends TestCase
 {
     public function test_all_mutators_have_the_correct_name_in_the_full_mutator_list(): void
     {
