@@ -55,7 +55,7 @@ use Webmozart\PathUtil\Path;
 final class ProfileListProvider
 {
     /**
-     * @var string[]|null
+     * @var array<int, array<int, string>>|null
      */
     private static $mutators;
 
