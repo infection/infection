@@ -1,5 +1,36 @@
 # Change Log
 
+## [0.15.0](https://github.com/infection/infection/tree/0.15.0)
+
+[Full Changelog](https://github.com/infection/infection/compare/0.14.0...0.15.0)
+
+**Added:**
+
+- [MUTATOR] Add 'clone' removal mutator [\#864](https://github.com/infection/infection/pull/864)
+- [MUTATOR] Add `UnwrapStrReplace` mutator [\#831](https://github.com/infection/infection/pull/831)
+- Add support for Codeception Test Framework [\#800](https://github.com/infection/infection/pull/800)
+- Allow text logs to be written to a PHP stream [\#821](https://github.com/infection/infection/pull/821)
+- Add version number to ASCII banner \(\#809\) [\#855](https://github.com/infection/infection/pull/855)
+- Infection should emit its version when run [\#808](https://github.com/infection/infection/issues/808)
+- Allow to enable pcov with initial-tests-php-options [\#830](https://github.com/infection/infection/pull/830)
+- Enable Symfony 5 components [\#842](https://github.com/infection/infection/pull/842)
+
+**Changed:**
+
+- According to PHP 7.4 changelog, `stream_set_option()` should always return false [\#837](https://github.com/infection/infection/pull/837)
+- Do not call deprecated/removed method for new versions of `symfony/process` [\#843](https://github.com/infection/infection/pull/843)
+- Introduce TestFrameworkAdapter interface [\#840](https://github.com/infection/infection/pull/840)
+- Rework the configuration [\#750](https://github.com/infection/infection/pull/750)
+
+**Fixed:**
+
+- TypeError not detected as failing test [\#836](https://github.com/infection/infection/issues/836)
+- Make interceptor resilient to file not found warnings \(\#846\) [\#862](https://github.com/infection/infection/pull/862)
+- The profile keys are missing in the schema.json [\#732](https://github.com/infection/infection/issues/732)
+- Fix Docker builds for PHP 7.4 [\#818](https://github.com/infection/infection/pull/818)
+- Fatal error by UnwrapArrayMerge and unpack [\#801](https://github.com/infection/infection/issues/801)
+- The console output is missing a few line breaks / new lines [\#798](https://github.com/infection/infection/issues/798)
+
 ## [0.14.0](https://github.com/infection/infection/tree/0.14.0)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.13.0...0.14.0)
