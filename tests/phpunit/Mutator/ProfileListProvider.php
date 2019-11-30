@@ -35,28 +35,22 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use function array_filter;
+use const ARRAY_FILTER_USE_KEY;
+use function array_values;
 use Generator;
 use Infection\Mutator\ProfileList;
 use Infection\Mutator\Util\Mutator;
-use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\PathUtil\Path;
-use function array_filter;
-use function array_map;
-use function array_values;
-use function in_array;
-use function iterator_to_array;
 use function ksort;
-use function sort;
+use ReflectionClass;
+use function Safe\realpath;
+use const SORT_STRING;
 use function sprintf;
 use function str_replace;
 use function substr;
-use const ARRAY_FILTER_USE_KEY;
-use const DIRECTORY_SEPARATOR;
-use const SORT_STRING;
-use function Safe\realpath;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
+use Webmozart\PathUtil\Path;
 
 final class ProfileListProvider
 {
@@ -69,6 +63,10 @@ final class ProfileListProvider
      * @var array<string,string[]>|null
      */
     private static $profileConstants;
+
+    private function __construct()
+    {
+    }
 
     public static function mutatorNameAndClassProvider(): Generator
     {
@@ -94,7 +92,6 @@ final class ProfileListProvider
 
         foreach ($finder as $file) {
             /** @var SplFileInfo $file */
-
             $shortClassName = substr($file->getFilename(), 0, -4);
             $className = self::getMutatorClassNameFromPath($file->getPathname());
 
@@ -141,20 +138,6 @@ final class ProfileListProvider
         return self::$profileConstants;
     }
 
-    private static function getMutatorClassNameFromPath(string $path): string
-    {
-        $cleanedRelativePath = substr(
-            Path::makeRelative($path, __DIR__.'/../../../src'),
-            0,
-            -4
-        );
-
-        return sprintf(
-            'Infection\%s',
-            str_replace('/', '\\', $cleanedRelativePath)
-        );
-    }
-
     public static function profileProvider(): Generator
     {
         foreach (self::getProfiles() as $profile => $profileOrMutators) {
@@ -163,6 +146,20 @@ final class ProfileListProvider
                 $profileOrMutators,
             ];
         }
+    }
+
+    private static function getMutatorClassNameFromPath(string $path): string
+    {
+        $cleanedRelativePath = substr(
+            Path::makeRelative($path, __DIR__ . '/../../../src'),
+            0,
+            -4
+        );
+
+        return sprintf(
+            'Infection\%s',
+            str_replace('/', '\\', $cleanedRelativePath)
+        );
     }
 
     private static function extendsMutator(ReflectionClass $mutatorReflection): bool
@@ -174,9 +171,5 @@ final class ProfileListProvider
         }
 
         return self::extendsMutator($mutatorParentReflection);
-    }
-
-    private function __construct()
-    {
     }
 }

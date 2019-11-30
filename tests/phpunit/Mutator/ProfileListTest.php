@@ -35,20 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use Generator;
+use function array_keys;
+use function in_array;
 use Infection\Mutator\ProfileList;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use Symfony\Component\Finder\Finder;
-use function array_keys;
-use function array_merge;
-use function array_values;
-use function in_array;
 use function sort;
-use function sprintf;
-use function str_replace;
-use function substr;
 use const SORT_STRING;
+use function sprintf;
 
 final class ProfileListTest extends TestCase
 {
@@ -58,8 +51,7 @@ final class ProfileListTest extends TestCase
     public function test_all_mutators_to_be_listed_by_their_short_and_fully_qualified_class_names(
         string $expectedMutatorName,
         string $mutatorClass
-    ): void
-    {
+    ): void {
         $actualMutatorName = $mutatorClass::getName();
 
         $this->assertSame(
@@ -81,14 +73,13 @@ final class ProfileListTest extends TestCase
         string $mutatorFilePath,
         string $mutatorClassName,
         string $mutatorShortClassName
-    ): void
-    {
+    ): void {
         $this->assertArrayHasKey(
             $mutatorShortClassName,
             ProfileList::ALL_MUTATORS,
             sprintf(
                 'Expected to find the mutator "%s" (found in "%s") to be listed in '
-                .'%s::ALL_MUTATORS',
+                . '%s::ALL_MUTATORS',
                 $mutatorClassName,
                 $mutatorFilePath,
                 ProfileList::class
@@ -102,13 +93,12 @@ final class ProfileListTest extends TestCase
     public function test_all_mutators_are_listed_by_at_least_one_profile(
         string $mutatorFilePath,
         string $mutatorClassName
-    ): void
-    {
+    ): void {
         $this->assertTrue(
             self::isMutatorInAtLeastOneProfile($mutatorClassName),
             sprintf(
                 'Expected the mutator "%s" (found in "%s") to be listed in at least one '
-                .'profile. Please add it to the appropriate %s::*_PROFILE constant',
+                . 'profile. Please add it to the appropriate %s::*_PROFILE constant',
                 $mutatorClassName,
                 $mutatorFilePath,
                 ProfileList::class
@@ -122,8 +112,7 @@ final class ProfileListTest extends TestCase
     public function test_all_mutator_profiles_are_sorted_lexicographically(
         string $profile,
         array $profileOrMutators
-    ): void
-    {
+    ): void {
         $sortedProfileOrMutators = (static function (array $value): array {
             sort($value, SORT_STRING);
 
