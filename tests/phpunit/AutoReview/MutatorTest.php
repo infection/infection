@@ -35,14 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
-use Infection\Tests\Mutator\ProfileListProvider;
 use function array_column;
+use Infection\Tests\Mutator\ProfileListProvider;
 use function iterator_to_array;
-use const DIRECTORY_SEPARATOR;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @coversNothing
