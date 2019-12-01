@@ -37,7 +37,6 @@ namespace Infection\Tests\Config;
 
 use Generator;
 use Infection\Config\InfectionConfig;
-use Infection\Tests\Fixtures\StubMutator;
 use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -216,22 +215,6 @@ JSON;
                 ],
             ],
             (array) $config->getMutatorsConfiguration()['PublicVisibility']);
-    }
-
-    public function test_it_accepts_custom_mutators(): void
-    {
-        $config = <<<'JSON'
-{
-    "mutators": {
-        "Infection\\Tests\\Fixtures\\StubMutator": true
-    }
-}
-JSON;
-
-        $config = new InfectionConfig(json_decode($config), $this->filesystem, '/path/to/config');
-        $this->assertSame(
-            [StubMutator::class => true],
-            $config->getMutatorsConfiguration());
     }
 
     /**
