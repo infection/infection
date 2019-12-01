@@ -35,28 +35,25 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use Infection\Mutator\Arithmetic\Minus;
-use Infection\Mutator\Boolean\IdenticalEqual;
-use Infection\Mutator\Boolean\NotIdenticalNotEqual;
-use Infection\Mutator\MutatorFactory;
-use Infection\Mutator\Util\Mutator;
-use InvalidArgumentException;
 use function array_diff;
-use function array_merge;
 use function array_values;
 use function count;
-use Infection\Config\Exception\InvalidConfigException;
+use function get_class;
+use Infection\Mutator\Arithmetic\Minus;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\FalseValue;
+use Infection\Mutator\Boolean\IdenticalEqual;
+use Infection\Mutator\Boolean\NotIdenticalNotEqual;
 use Infection\Mutator\Boolean\TrueValue;
+use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\ProfileList;
-use Infection\Tests\Fixtures\StubMutator;
+use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ReflectionVisitor;
+use InvalidArgumentException;
 use PhpParser\Node;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use function get_class;
 use function Safe\sprintf;
 
 final class MutatorFactoryTest extends TestCase
@@ -75,7 +72,7 @@ final class MutatorFactoryTest extends TestCase
         }
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->mutatorFactory = new MutatorFactory();
     }
@@ -111,7 +108,7 @@ final class MutatorFactoryTest extends TestCase
             '@default' => true,
             '@boolean' => [
                 'ignore' => ['A::B'],
-            ]
+            ],
         ]);
 
         $this->assertSameMutatorsByClass(ProfileList::getDefaultProfileMutators(), $mutators);
@@ -207,7 +204,7 @@ final class MutatorFactoryTest extends TestCase
             '@boolean' => true,
             TrueValue::getName() => [
                 'ignore' => ['A::B'],
-            ]
+            ],
         ]);
 
         $this->assertSameMutatorsByClass(ProfileList::BOOLEAN_PROFILE, $mutators);

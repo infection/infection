@@ -37,7 +37,6 @@ namespace Infection\Mutator;
 
 use function array_values;
 use Infection\Mutator;
-use function array_values;
 
 /**
  * @internal
@@ -429,6 +428,10 @@ final class ProfileList
      */
     private static $defaultProfileMutators;
 
+    private function __construct()
+    {
+    }
+
     /**
      * @return array<string, string>
      */
@@ -449,9 +452,5 @@ final class ProfileList
         self::$defaultProfileMutators = array_values(self::$defaultProfileMutators);
 
         return self::$defaultProfileMutators;
-    }
-
-    private function __construct()
-    {
     }
 }

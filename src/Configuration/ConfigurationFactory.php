@@ -35,10 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
-use Infection\Mutator\MutatorFactory;
 use function dirname;
 use Infection\Configuration\Schema\SchemaConfiguration;
-use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\Util\MutatorParser;
 use Infection\Utils\TmpDirectoryCreator;

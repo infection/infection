@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Infection\Mutator\MutatorFactory;
 use function array_filter;
 use function getcwd;
 use Infection\Configuration\Configuration;
