@@ -77,7 +77,7 @@ final class MutatorFactory
                 continue;
             }
 
-            if (class_exists($mutatorOrProfile)) {
+            if (class_exists($mutatorOrProfile, true)) {
                 self::registerFromClass($mutatorOrProfile, $settings, $mutators);
 
                 continue;
