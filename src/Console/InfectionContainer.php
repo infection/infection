@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
+use Infection\Mutator\MutatorFactory;
 use function array_filter;
 use function getcwd;
 use Infection\Configuration\Configuration;
@@ -255,12 +256,12 @@ final class InfectionContainer extends Container
                 return new SchemaConfigurationFactory();
             },
             ConfigurationFactory::class => static function (self $container): ConfigurationFactory {
-                /** @var TmpDirProvider $tmpDirProvider */
-                $tmpDirProvider = $container[TmpDirProvider::class];
+                /** @var TmpDirectoryCreator $tmpDirCreator */
+                $tmpDirCreator = $container[TmpDirectoryCreator::class];
                 /** @var MutatorFactory $mutatorFactory */
                 $mutatorFactory = $container[MutatorFactory::class];
 
-                return new ConfigurationFactory($tmpDirProvider, $mutatorFactory);
+                return new ConfigurationFactory($tmpDirCreator, $mutatorFactory);
             },
             MutatorFactory::class => static function (): MutatorFactory {
                 return new MutatorFactory();

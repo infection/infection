@@ -6,7 +6,6 @@ namespace Infection\Mutator;
 
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
-use Infection\Mutator\Util\MutatorProfile;
 use InvalidArgumentException;
 use stdClass;
 use function array_key_exists;
@@ -37,13 +36,13 @@ final class MutatorFactory
         $mutators = [];
 
         foreach ($mutatorSettings as $mutatorOrProfile => $setting) {
-            if (array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
+            if (array_key_exists($mutatorOrProfile, ProfileList::ALL_PROFILES)) {
                 self::registerFromProfile($mutatorOrProfile, $setting, $mutators);
                 
                 continue;
             }
 
-            if (array_key_exists($mutatorOrProfile, MutatorProfile::FULL_MUTATOR_LIST)) {
+            if (array_key_exists($mutatorOrProfile, ProfileList::ALL_MUTATORS)) {
                 self::registerFromName($mutatorOrProfile, $setting, $mutators);
 
                 continue;
@@ -68,11 +67,11 @@ final class MutatorFactory
         array &$mutators
     ): void
     {
-        foreach (MutatorProfile::MUTATOR_PROFILE_LIST[$profile] as $mutatorOrProfile) {
+        foreach (ProfileList::ALL_PROFILES[$profile] as $mutatorOrProfile) {
             /** @var string $mutatorOrProfile */
 
             // A profile may refer to another collection of profiles
-            if (array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
+            if (array_key_exists($mutatorOrProfile, ProfileList::ALL_PROFILES)) {
                 self::registerFromProfile($mutatorOrProfile, $settings, $mutators);
 
                 continue;
@@ -102,7 +101,7 @@ final class MutatorFactory
         array &$mutators
     ): void
     {
-        if (!array_key_exists($mutator, MutatorProfile::FULL_MUTATOR_LIST)) {
+        if (!array_key_exists($mutator, ProfileList::ALL_MUTATORS)) {
             throw new InvalidArgumentException(sprintf(
                 'The "%s" mutator/profile was not recognized.',
                 $mutator
@@ -110,7 +109,7 @@ final class MutatorFactory
         }
 
         self::registerFromClass(
-            MutatorProfile::FULL_MUTATOR_LIST[$mutator],
+            ProfileList::ALL_MUTATORS[$mutator],
             $settings,
             $mutators
         );

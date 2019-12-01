@@ -73,7 +73,9 @@ final class ConfigurationFactoryTest extends TestCase
     protected function setUp(): void
     {
         $this->configFactory = new ConfigurationFactory(
-            new TmpDirProvider(),
+            new TmpDirectoryCreator(
+                $this->createMock(Filesystem::class)
+            ),
             new MutatorFactory()
         );
     }
