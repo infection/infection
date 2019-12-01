@@ -418,11 +418,9 @@ final class InfectionCommand extends BaseCommand
             throw new InvalidArgumentException(sprintf('Expected min-covered-msi to be a float. Got "%s"', $minCoveredMsi));
         }
 
-        $mutators = trim((string) $input->getOption('mutators'));
-
         $this->container = $this->getApplication()->getContainer()->withDynamicParameters(
             '' === $configFile ? null : $configFile,
-            '' === $mutators ? null : $mutators,
+            trim((string) $input->getOption('mutators')),
             $input->getOption('show-mutations'),
             trim((string) $input->getOption('log-verbosity')),
             $input->getOption('debug'),

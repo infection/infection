@@ -54,6 +54,7 @@ use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutator\MutatorFactory;
+use Infection\Mutator\MutatorParser;
 use Infection\Performance\Limiter\MemoryLimiter;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\TimeFormatter;
@@ -259,11 +260,20 @@ final class InfectionContainer extends Container
                 $tmpDirCreator = $container[TmpDirectoryCreator::class];
                 /** @var MutatorFactory $mutatorFactory */
                 $mutatorFactory = $container[MutatorFactory::class];
+                /** @var MutatorParser $mutatorParser */
+                $mutatorParser = $container[MutatorParser::class];
 
-                return new ConfigurationFactory($tmpDirCreator, $mutatorFactory);
+                return new ConfigurationFactory(
+                    $tmpDirCreator,
+                    $mutatorFactory,
+                    $mutatorParser
+                );
             },
             MutatorFactory::class => static function (): MutatorFactory {
                 return new MutatorFactory();
+            },
+            MutatorParser::class => static function (): MutatorParser {
+                return new MutatorParser();
             },
             'coverage.path' => static function (self $container): string {
                 /** @var Configuration $config */
@@ -330,7 +340,7 @@ final class InfectionContainer extends Container
 
     public function withDynamicParameters(
         ?string $configFile,
-        ?string $mutators,
+        string $mutatorsInput,
         bool $showMutations,
         string $logVerbosity,
         bool $debug,
@@ -367,11 +377,14 @@ final class InfectionContainer extends Container
             $minMsi,
             $showMutations,
             $minCoveredMsi,
-            $mutators,
+            $mutatorsInput,
             $testFramework,
             $testFrameworkOptions
         ): Configuration {
-            return $container[ConfigurationFactory::class]->create(
+            /** @var ConfigurationFactory $configurationFactory */
+            $configurationFactory = $container[ConfigurationFactory::class];
+
+            return $configurationFactory->create(
                 $container[SchemaConfiguration::class],
                 $existingCoveragePath,
                 $initialTestsPhpOptions,
@@ -384,7 +397,7 @@ final class InfectionContainer extends Container
                 $minMsi,
                 $showMutations,
                 $minCoveredMsi,
-                $mutators,
+                $mutatorsInput,
                 $testFramework,
                 $testFrameworkOptions
             );

@@ -33,51 +33,70 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\Util;
+namespace Infection\Tests\Mutator;
 
-use Infection\Mutator\Boolean\FalseValue;
-use Infection\Mutator\Boolean\TrueValue;
-use Infection\Mutator\Util\MutatorParser;
-use InvalidArgumentException;
+use Generator;
+use Infection\Mutator\MutatorParser;
 use PHPUnit\Framework\TestCase;
 
 final class MutatorParserTest extends TestCase
 {
-    public function test_it_returns_default_mutators_when_no_input_mutators(): void
-    {
-        $parser = new MutatorParser(null, [1, 2, 3]);
+    /**
+     * @var MutatorParser
+     */
+    private $mutatorParser;
 
-        $this->assertSame([1, 2, 3], $parser->getMutators());
+    protected function setUp(): void
+    {
+        $this->mutatorParser = new MutatorParser();
     }
 
-    public function test_it_throws_an_exception_when_mutators_is_only_whitespace(): void
-    {
-        $parser = new MutatorParser('    ', [1, 2, 3]);
+    /**
+     * @dataProvider mutatorInputProvider
+     *
+     * @param string[] $expectedMutators
+     */
+    public function test_it_can_parse_the_provided_input(
+        string $mutatorInput,
+        array $expectedMutators
+    ): void {
+        $parsedMutators = $this->mutatorParser->parse($mutatorInput);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "--mutators" option requires a value.');
-
-        $parser->getMutators();
+        $this->assertSame($expectedMutators, $parsedMutators);
     }
 
-    public function test_it_generates_a_single_mutator_from_the_input_string(): void
+    public function mutatorInputProvider(): Generator
     {
-        $parser = new MutatorParser('TrueValue', []);
+        yield 'empty string' => ['', []];
 
-        $mutatorList = $parser->getMutators();
+        yield 'string with only spaces' => ['  ', []];
 
-        $this->assertCount(1, $mutatorList);
-        $this->assertInstanceOf(TrueValue::class, array_shift($mutatorList));
-    }
+        yield 'mutator by name' => [
+            'TrueValue',
+            ['TrueValue'],
+        ];
 
-    public function test_it_generates_multiple_mutators_from_the_input_string(): void
-    {
-        $parser = new MutatorParser('TrueValue,FalseValue', []);
+        yield 'profile' => [
+            '@boolean',
+            ['@boolean'],
+        ];
 
-        $mutatorList = $parser->getMutators();
+        yield 'nominal' => [
+            'TrueValue,FalseValue, @boolean',
+            [
+                'TrueValue',
+                'FalseValue',
+                '@boolean',
+            ],
+        ];
 
-        $this->assertCount(2, $mutatorList);
-        $this->assertInstanceOf(TrueValue::class, array_shift($mutatorList));
-        $this->assertInstanceOf(FalseValue::class, array_shift($mutatorList));
+        yield 'spaces, empty values & co.' => [
+            '  TrueValue  ,   ,  FalseValue   ,,,   @boolean  ',
+            [
+                'TrueValue',
+                'FalseValue',
+                '@boolean',
+            ],
+        ];
     }
 }

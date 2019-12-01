@@ -91,7 +91,7 @@ final class InfectionContainerTest extends TestCase
 
         $newContainer = $container->withDynamicParameters(
             null,
-            null,
+            '',
             false,
             '',
             false,

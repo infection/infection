@@ -33,11 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Mutator;
 
-use function count;
-use Infection\Mutator\MutatorFactory;
-use Webmozart\Assert\Assert;
+use function array_filter;
+use function array_key_exists;
+use function array_map;
+use function array_search;
+use function array_values;
+use function explode;
+use function Safe\sprintf;
+use UnexpectedValueException;
 
 /**
  * @internal
@@ -45,55 +50,53 @@ use Webmozart\Assert\Assert;
 final class MutatorParser
 {
     /**
-     * @var string|null
+     * @throws UnexpectedValueException
+     *
+     * @return string[]
      */
-    private $inputMutators;
-
-    /**
-     * @var array<string, Mutator>
-     */
-    private $configMutators;
-
-    /**
-     * @param array<string, Mutator> $configMutators
-     */
-    public function __construct(?string $inputMutators, array $configMutators)
+    public function parse(string $unparsedMutators): array
     {
-        $this->inputMutators = $inputMutators;
-        $this->configMutators = $configMutators;
-    }
-
-    /**
-     * @return array<string, Mutator>
-     */
-    public function getMutators(): array
-    {
-        $parsedMutators = $this->parseMutators();
-
-        if (count($parsedMutators) === 0) {
-            return $this->configMutators;
-        }
-        $mutatorSettings = [];
-
-        foreach ($parsedMutators as $mutatorName) {
-            $mutatorSettings[$mutatorName] = true;
-        }
-
-        return (new MutatorFactory())->create($mutatorSettings);
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function parseMutators(): array
-    {
-        if ($this->inputMutators === null) {
+        if ($unparsedMutators === '') {
             return [];
         }
 
-        $trimmedMutators = trim($this->inputMutators);
-        Assert::notEmpty($trimmedMutators, 'The "--mutators" option requires a value.');
+        $parsedMutators = array_filter(array_map(
+            'trim',
+            explode(',', $unparsedMutators)
+        ));
 
-        return explode(',', $trimmedMutators);
+        foreach ($parsedMutators as $index => $profileOrMutator) {
+            if (array_key_exists($profileOrMutator, ProfileList::ALL_PROFILES)) {
+                continue;
+            }
+
+            if (array_key_exists($profileOrMutator, ProfileList::ALL_MUTATORS)) {
+                continue;
+            }
+
+            $mutatorShortName = array_search(
+                $profileOrMutator,
+                ProfileList::ALL_MUTATORS,
+                true
+            );
+
+            if (false !== $mutatorShortName) {
+                $parsedMutators[$index] = $mutatorShortName;
+
+                continue;
+            }
+
+            throw new UnexpectedValueException(
+                sprintf(
+                    'Expected "%s" to be a known mutator or profile. See "%s" and "%s" for '
+                    . 'the list of available mutants and profiles.',
+                    $profileOrMutator,
+                    'https://infection.github.io/guide/mutators.html',
+                    'https://infection.github.io/guide/profiles.html'
+                )
+            );
+        }
+
+        return array_values($parsedMutators);
     }
 }
