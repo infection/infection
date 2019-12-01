@@ -46,6 +46,7 @@ use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
+use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
@@ -72,7 +73,12 @@ final class ConfigurationFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->configFactory = new ConfigurationFactory(new TmpDirProvider());
+        $this->configFactory = new ConfigurationFactory(
+            new TmpDirectoryCreator(
+                $this->createMock(Filesystem::class)
+            ),
+            new MutatorFactory()
+        );
     }
 
     /**

@@ -35,11 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
+use Infection\Mutator\MutatorFactory;
 use function dirname;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Util\MutatorParser;
-use Infection\Mutator\Util\MutatorsGenerator;
+use Infection\Utils\TmpDirectoryCreator;
 use function sprintf;
 use function sys_get_temp_dir;
 use Webmozart\PathUtil\Path;
@@ -50,11 +51,15 @@ use Webmozart\PathUtil\Path;
  */
 class ConfigurationFactory
 {
-    private $tmpDirProvider;
+    private $tmpDirectoryCreator;
+    private $mutatorFactory;
 
-    public function __construct(TmpDirProvider $tmpDirProvider)
-    {
-        $this->tmpDirProvider = $tmpDirProvider;
+    public function __construct(
+        TmpDirectoryCreator $tmpDirectoryCreator,
+        MutatorFactory $mutatorFactory
+    ) {
+        $this->tmpDirectoryCreator = $tmpDirectoryCreator;
+        $this->mutatorFactory = $mutatorFactory;
     }
 
     public function create(
@@ -94,6 +99,8 @@ class ConfigurationFactory
             ));
         }
 
+        $schemaMutators = $schema->getMutators();
+
         return new Configuration(
             $schema->getTimeout() ?? 10,
             $schema->getSource(),
@@ -103,7 +110,11 @@ class ConfigurationFactory
             $schema->getPhpUnit(),
             (new MutatorParser(
                 $mutators,
-                (new MutatorsGenerator($schema->getMutators()))->generate()
+                $this->mutatorFactory->create(
+                    $schemaMutators === []
+                        ? ['@default' => true]
+                        : $schemaMutators
+                )
             ))->getMutators(),
             $testFramework ?? $schema->getTestFramework(),
             $schema->getBootstrap(),
