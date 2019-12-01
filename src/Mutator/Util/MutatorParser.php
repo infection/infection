@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Util;
 
 use function count;
+use Infection\Mutator\MutatorFactory;
 use Webmozart\Assert\Assert;
 
 /**
@@ -78,7 +79,7 @@ final class MutatorParser
             $mutatorSettings[$mutatorName] = true;
         }
 
-        return (new MutatorsGenerator($mutatorSettings))->generate();
+        return (new MutatorFactory())->create($mutatorSettings);
     }
 
     /**
