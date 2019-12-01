@@ -37,6 +37,7 @@ namespace Infection\Mutator;
 
 use function array_values;
 use Infection\Mutator;
+use function array_values;
 
 /**
  * @internal
@@ -422,6 +423,33 @@ final class ProfileList
         'BCMath' => Mutator\Extensions\BCMath::class,
         'MBString' => Mutator\Extensions\MBString::class,
     ];
+
+    /**
+     * @var array<string, string>|null
+     */
+    private static $defaultProfileMutators;
+
+    /**
+     * @return array<string, string>
+     */
+    public static function getDefaultProfileMutators(): array
+    {
+        if (null !== self::$defaultProfileMutators) {
+            return self::$defaultProfileMutators;
+        }
+
+        self::$defaultProfileMutators = [];
+
+        foreach (self::DEFAULT_PROFILE as $profile) {
+            foreach (self::ALL_PROFILES[$profile] as $mutatorClass) {
+                self::$defaultProfileMutators[$mutatorClass] = $mutatorClass;
+            }
+        }
+
+        self::$defaultProfileMutators = array_values(self::$defaultProfileMutators);
+
+        return self::$defaultProfileMutators;
+    }
 
     private function __construct()
     {
