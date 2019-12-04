@@ -58,7 +58,7 @@ final class MutatorsGeneratorTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         foreach (ProfileList::DEFAULT_PROFILE as $profileName) {
-            self::$countDefaultMutators += count(\Infection\Mutator\ProfileList::ALL_PROFILES[$profileName]);
+            self::$countDefaultMutators += count(ProfileList::ALL_PROFILES[$profileName]);
         }
     }
 
