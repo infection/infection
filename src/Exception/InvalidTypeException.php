@@ -35,10 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Exception;
 
+use Exception;
+
 /**
  * @internal
  */
-final class InvalidTypeException extends \Exception
+final class InvalidTypeException extends Exception
 {
     public static function create(string $type): self
     {
