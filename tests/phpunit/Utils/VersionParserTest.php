@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\FileSystem;
+namespace Infection\Tests\Utils;
 
 use Infection\Utils\VersionParser;
 use InvalidArgumentException;

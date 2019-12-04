@@ -43,9 +43,8 @@ use Webmozart\PathUtil\Path;
 
 /**
  * @internal
- * @final
  */
-class TmpDirProvider
+final class TmpDirProvider
 {
     private const BASE_DIR_NAME = 'infection';
 
