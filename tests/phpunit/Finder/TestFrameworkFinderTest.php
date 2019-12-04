@@ -39,15 +39,12 @@ use const DIRECTORY_SEPARATOR;
 use Infection\Finder\Exception\FinderException;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\TestFramework\TestFrameworkTypes;
+use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath;
-use Infection\Utils\TmpDirectoryCreator;
-use function microtime;
-use PHPUnit\Framework\TestCase;
-use function random_int;
 use function strlen;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class TestFrameworkFinderTest extends TestCase
+final class TestFrameworkFinderTest extends FileSystemTestCase
 {
     /**
      * @var string
@@ -70,16 +67,6 @@ final class TestFrameworkFinderTest extends TestCase
     private $fileSystem;
 
     /**
-     * @var string
-     */
-    private $workspace;
-
-    /**
-     * @var string
-     */
-    private $tmpDir;
-
-    /**
      * Saves the current environment
      */
     public static function setUpBeforeClass(): void
@@ -100,21 +87,14 @@ final class TestFrameworkFinderTest extends TestCase
 
     protected function setUp(): void
     {
-        self::restorePathEnvironment();
-        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . microtime(true) . random_int(100, 999);
+        parent::setUp();
 
         $this->fileSystem = new Filesystem();
-        $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->fileSystem->remove($this->workspace);
     }
 
     public function test_it_can_load_a_custom_path(): void
     {
-        $filename = $this->fileSystem->tempnam($this->tmpDir, 'test');
+        $filename = $this->fileSystem->tempnam($this->tmp, 'test');
 
         $frameworkFinder = new TestFrameworkFinder('not-used', $filename);
 
@@ -123,7 +103,7 @@ final class TestFrameworkFinderTest extends TestCase
 
     public function test_invalid_custom_path_throws_exception(): void
     {
-        $filename = $this->fileSystem->tempnam($this->tmpDir, 'test');
+        $filename = $this->fileSystem->tempnam($this->tmp, 'test');
         // Remove it so that the file doesn't exist
         $this->fileSystem->remove($filename);
 
@@ -171,7 +151,7 @@ final class TestFrameworkFinderTest extends TestCase
 
     public function test_it_finds_framework_executable(): void
     {
-        $mock = new MockVendor($this->tmpDir, $this->fileSystem);
+        $mock = new MockVendor($this->tmp, $this->fileSystem);
         $mock->setUpPlatformTest();
 
         // Set the path to a single directory (vendor/bin)
@@ -199,7 +179,7 @@ final class TestFrameworkFinderTest extends TestCase
      */
     public function test_it_finds_framework_script_from_bat(string $methodName): void
     {
-        $mock = new MockVendor($this->tmpDir, $this->fileSystem);
+        $mock = new MockVendor($this->tmp, $this->fileSystem);
         $mock->{$methodName}();
 
         // Set the path to a single directory (vendor/bin)

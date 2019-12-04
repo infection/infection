@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
-use const DIRECTORY_SEPARATOR;
 use DOMDocument;
 use DOMNodeList;
 use DOMXPath;
@@ -46,18 +45,13 @@ use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
-use Infection\Utils\TmpDirectoryCreator;
-use function microtime;
-use PHPUnit\Framework\TestCase;
-use function random_int;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class MutationConfigBuilderTest extends TestCase
+final class MutationConfigBuilderTest extends FileSystemTestCase
 {
     public const HASH = 'a1b2c3';
-
-    private $tmpDir;
 
     private $pathToProject;
 
@@ -72,22 +66,9 @@ final class MutationConfigBuilderTest extends TestCase
 
     private $xmlConfigurationHelper;
 
-    /**
-     * @var Filesystem
-     */
-    private $fileSystem;
-
-    /**
-     * @var string
-     */
-    private $workspace;
-
     protected function setUp(): void
     {
-        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . microtime(true) . random_int(100, 999);
-
-        $this->fileSystem = new Filesystem();
-        $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
+        parent::setUp();
 
         $this->pathToProject = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
 
@@ -110,20 +91,18 @@ final class MutationConfigBuilderTest extends TestCase
             ->method('getMutatedFilePath')
             ->willReturn('/mutated/file/path');
 
-        $this->xmlConfigurationHelper = new XmlConfigurationHelper(new PathReplacer($this->fileSystem, $this->pathToProject), '');
+        $this->xmlConfigurationHelper = new XmlConfigurationHelper(
+            new PathReplacer(new Filesystem(), $this->pathToProject),
+            ''
+        );
 
         $this->builder = new MutationConfigBuilder(
-            $this->tmpDir,
+            $this->tmp,
             file_get_contents($phpunitXmlPath),
             $this->xmlConfigurationHelper,
             $projectDir,
             new JUnitTestCaseSorter()
         );
-    }
-
-    protected function tearDown(): void
-    {
-        $this->fileSystem->remove($this->workspace);
     }
 
     public function test_it_builds_path_to_mutation_config_file(): void
@@ -133,7 +112,7 @@ final class MutationConfigBuilderTest extends TestCase
             ->willReturn([]);
 
         $this->assertSame(
-            $this->tmpDir . '/phpunitConfiguration.a1b2c3.infection.xml',
+            $this->tmp . '/phpunitConfiguration.a1b2c3.infection.xml',
             $this->builder->build($this->mutant)
         );
     }
@@ -152,7 +131,7 @@ final class MutationConfigBuilderTest extends TestCase
 
         $expectedCustomAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',
-            $this->tmpDir,
+            $this->tmp,
             self::HASH
         );
 
@@ -168,7 +147,7 @@ final class MutationConfigBuilderTest extends TestCase
 
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpuit_without_bootstrap.xml';
         $this->builder = new MutationConfigBuilder(
-            $this->tmpDir,
+            $this->tmp,
             file_get_contents($phpunitXmlPath),
             $this->xmlConfigurationHelper,
             'project/dir',
@@ -183,7 +162,7 @@ final class MutationConfigBuilderTest extends TestCase
 
         $expectedCustomAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',
-            $this->tmpDir,
+            $this->tmp,
             self::HASH
         );
 
@@ -228,11 +207,11 @@ final class MutationConfigBuilderTest extends TestCase
             ->willReturn([]);
 
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit_root_test_suite.xml';
-        $replacer = new PathReplacer($this->fileSystem, $this->pathToProject);
+        $replacer = new PathReplacer(new Filesystem(), $this->pathToProject);
         $xmlConfigurationHelper = new XmlConfigurationHelper($replacer, '');
 
         $this->builder = new MutationConfigBuilder(
-            $this->tmpDir,
+            $this->tmp,
             file_get_contents($phpunitXmlPath),
             $xmlConfigurationHelper,
             $this->pathToProject,

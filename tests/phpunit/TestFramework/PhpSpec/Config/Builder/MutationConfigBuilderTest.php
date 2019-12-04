@@ -35,43 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpSpec\Config\Builder;
 
-use const DIRECTORY_SEPARATOR;
 use Infection\Mutant\MutantInterface;
 use Infection\MutationInterface;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
-use Infection\Utils\TmpDirectoryCreator;
-use function microtime;
-use PHPUnit\Framework\TestCase;
-use function random_int;
-use Symfony\Component\Filesystem\Filesystem;
+use Infection\Tests\FileSystem\FileSystemTestCase;
 
-final class MutationConfigBuilderTest extends TestCase
+final class MutationConfigBuilderTest extends FileSystemTestCase
 {
-    private $tmpDir;
-
-    /**
-     * @var Filesystem
-     */
-    private $fileSystem;
-
-    /**
-     * @var string
-     */
-    private $workspace;
-
-    protected function setUp(): void
-    {
-        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . microtime(true) . random_int(100, 999);
-
-        $this->fileSystem = new Filesystem();
-        $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->fileSystem->remove($this->workspace);
-    }
-
     public function test_it_builds_path_to_mutation_config_file(): void
     {
         $projectDir = '/project/dir';
@@ -91,9 +61,9 @@ final class MutationConfigBuilderTest extends TestCase
 
         // TODO for PhpSpec pass file content as well
         // TODO test phpspec after that
-        $builder = new MutationConfigBuilder($this->tmpDir, $originalYamlConfigPath, $projectDir);
+        $builder = new MutationConfigBuilder($this->tmp, $originalYamlConfigPath, $projectDir);
 
-        $this->assertSame($this->tmpDir . '/phpspecConfiguration.a1b2c3.infection.yml', $builder->build($mutant));
+        $this->assertSame($this->tmp . '/phpspecConfiguration.a1b2c3.infection.yml', $builder->build($mutant));
     }
 
     public function test_it_adds_original_bootstrap_file_to_custom_autoload(): void
@@ -113,12 +83,12 @@ final class MutationConfigBuilderTest extends TestCase
         $mutant->method('getMutatedFilePath')
             ->willReturn('/mutated/file/path');
 
-        $builder = new MutationConfigBuilder($this->tmpDir, $originalYamlConfigPath, $projectDir);
+        $builder = new MutationConfigBuilder($this->tmp, $originalYamlConfigPath, $projectDir);
 
-        $this->assertSame($this->tmpDir . '/phpspecConfiguration.a1b2c3.infection.yml', $builder->build($mutant));
+        $this->assertSame($this->tmp . '/phpspecConfiguration.a1b2c3.infection.yml', $builder->build($mutant));
         $this->assertStringContainsString(
             "require_once '/project/dir/bootstrap.php';",
-            file_get_contents($this->tmpDir . '/interceptor.phpspec.autoload.a1b2c3.infection.php')
+            file_get_contents($this->tmp . '/interceptor.phpspec.autoload.a1b2c3.infection.php')
         );
     }
 }

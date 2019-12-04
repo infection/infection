@@ -35,48 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use const DIRECTORY_SEPARATOR;
 use Infection\Logger\SummaryFileLogger;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Utils\TmpDirectoryCreator;
-use function microtime;
-use PHPUnit\Framework\TestCase;
-use function random_int;
+use Infection\Tests\FileSystem\FileSystemTestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class SummaryFileLoggerTest extends TestCase
+final class SummaryFileLoggerTest extends FileSystemTestCase
 {
-    /**
-     * @var string
-     */
-    private $workspace;
-
-    /**
-     * @var Filesystem
-     */
-    private $fileSystem;
-
-    /**
-     * @var string
-     */
-    private $tmpDir;
-
-    protected function setUp(): void
-    {
-        $this->fileSystem = new Filesystem();
-        $this->workspace = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'infection-test' . microtime(true) . random_int(100, 999);
-        $this->tmpDir = (new TmpDirectoryCreator($this->fileSystem))->createAndGet($this->workspace);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->fileSystem->remove($this->workspace);
-    }
-
     public function test_it_logs_the_correct_lines_with_no_mutations(): void
     {
-        $logFilePath = $this->tmpDir . '/foo.txt';
+        $logFilePath = $this->tmp . '/foo.txt';
         $calculator = new MetricsCalculator();
         $output = $this->createMock(OutputInterface::class);
         $content = <<<'TXT'
@@ -101,7 +70,7 @@ TXT;
 
     public function test_it_logs_the_correct_lines_with_mutations(): void
     {
-        $logFilePath = $this->tmpDir . '/foo.txt';
+        $logFilePath = $this->tmp . '/foo.txt';
         $calculator = $this->createMock(MetricsCalculator::class);
         $calculator->expects($this->once())->method('getTotalMutantsCount')->willReturn(6);
         $calculator->expects($this->once())->method('getKilledCount')->willReturn(8);
@@ -135,11 +104,11 @@ TXT;
      */
     public function test_it_outputs_an_error_when_dir_is_not_writable(): void
     {
-        $readOnlyDirPath = $this->tmpDir . '/invalid';
+        $readOnlyDirPath = $this->tmp . '/invalid';
         $logFilePath = $readOnlyDirPath . '/foo.txt';
 
         // make it readonly
-        $this->fileSystem->mkdir($readOnlyDirPath, 0400);
+        (new Filesystem())->mkdir($readOnlyDirPath, 0400);
 
         if (is_writable($readOnlyDirPath)) {
             $this->markTestSkipped('Unable to change file permission to 0400');
