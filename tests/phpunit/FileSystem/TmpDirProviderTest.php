@@ -33,14 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Utils;
+namespace Infection\Tests\FileSystem;
 
 use Generator;
 use Infection\FileSystem\TmpDirProvider;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
-final class TmpDirPathFactoryTest extends TestCase
+final class TmpDirProviderTest extends TestCase
 {
     /**
      * @var TmpDirProvider

@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Utils;
+namespace Infection\Tests\FileSystem;
 
 use Generator;
 use Infection\Utils\TmpDirectoryCreator;

@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Utils;
+namespace Infection\Tests\FileSystem;
 
 use function Infection\Tests\make_tmp_dir;
 use function Infection\Tests\normalizePath;

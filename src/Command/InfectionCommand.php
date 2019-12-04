@@ -231,7 +231,8 @@ final class InfectionCommand extends BaseCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Debug mode. Will not clean up Infection temporary folder.'
-            );
+            )
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -292,10 +293,7 @@ final class InfectionCommand extends BaseCommand
 
         $this->testFrameworkKey = $config->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
         $this->testFrameworkOptions = $this->getTestFrameworkExtraOptions($this->testFrameworkKey);
-        $adapter = $this->container['test.framework.factory']->create(
-            $this->testFrameworkKey,
-            $this->skipCoverage
-        );
+        $adapter = $this->container['test.framework.factory']->create($this->testFrameworkKey, $this->skipCoverage);
 
         LogVerbosity::convertVerbosityLevel($this->input, $this->consoleOutput);
 
@@ -327,10 +325,7 @@ final class InfectionCommand extends BaseCommand
 
         $this->assertCodeCoverageExists($initialTestSuitProcess, $this->testFrameworkKey);
 
-        $this->container['memory.limit.applier']->applyMemoryLimitFromProcess(
-            $initialTestSuitProcess,
-            $adapter
-        );
+        $this->container['memory.limit.applier']->applyMemoryLimitFromProcess($initialTestSuitProcess, $adapter);
     }
 
     private function runMutationTesting(TestFrameworkAdapter $adapter): void
@@ -338,11 +333,7 @@ final class InfectionCommand extends BaseCommand
         /** @var Configuration $config */
         $config = $this->container[Configuration::class];
 
-        $processBuilder = new MutantProcessBuilder(
-            $adapter,
-            $this->versionParser,
-            $config->getProcessTimeout()
-        );
+        $processBuilder = new MutantProcessBuilder($adapter, $this->versionParser, $config->getProcessTimeout());
 
         $codeCoverageData = $this->getCodeCoverageData($this->testFrameworkKey, $adapter);
         $mutationsGenerator = new MutationsGenerator(
@@ -357,8 +348,7 @@ final class InfectionCommand extends BaseCommand
         $mutations = $mutationsGenerator->generate(
             $this->input->getOption('only-covered'),
             $this->input->getOption('filter'),
-            $adapter instanceof HasExtraNodeVisitors ? $adapter->getMutationsCollectionNodeVisitors(
-            ) : []
+            $adapter instanceof HasExtraNodeVisitors ? $adapter->getMutationsCollectionNodeVisitors() : []
         );
 
         $mutationTestingRunner = new MutationTestingRunner(
@@ -411,17 +401,13 @@ final class InfectionCommand extends BaseCommand
         $minMsi = $input->getOption('min-msi');
 
         if (null !== $minMsi && !is_numeric($minMsi)) {
-            throw new InvalidArgumentException(
-                sprintf('Expected min-msi to be a float. Got "%s"', $minMsi)
-            );
+            throw new InvalidArgumentException(sprintf('Expected min-msi to be a float. Got "%s"', $minMsi));
         }
 
         $minCoveredMsi = $input->getOption('min-covered-msi');
 
         if (null !== $minCoveredMsi && !is_numeric($minCoveredMsi)) {
-            throw new InvalidArgumentException(
-                sprintf('Expected min-covered-msi to be a float. Got "%s"', $minCoveredMsi)
-            );
+            throw new InvalidArgumentException(sprintf('Expected min-covered-msi to be a float. Got "%s"', $minCoveredMsi));
         }
 
         $mutators = trim((string) $input->getOption('mutators'));
@@ -459,30 +445,21 @@ final class InfectionCommand extends BaseCommand
 
         (static function (string $infectionBootstrapFile): void {
             require_once $infectionBootstrapFile;
-        })(
-            $bootstrap
-        );
+        })($bootstrap);
     }
 
-    private function getCodeCoverageData(
-        string $testFrameworkKey,
-        TestFrameworkAdapter $adapter
-    ): LineCodeCoverage {
+    private function getCodeCoverageData(string $testFrameworkKey, TestFrameworkAdapter $adapter): LineCodeCoverage
+    {
         $coverageDir = $this->container[sprintf('coverage.dir.%s', $testFrameworkKey)];
         $testFileDataProviderService = $adapter->hasJUnitReport()
             ? $this->container[CachedTestFileDataProvider::class]
             : null;
 
-        return new XMLLineCodeCoverage(
-            $coverageDir,
-            new CoverageXmlParser($coverageDir),
-            $testFrameworkKey,
-            $testFileDataProviderService
-        );
+        return new XMLLineCodeCoverage($coverageDir, new CoverageXmlParser($coverageDir), $testFrameworkKey, $testFileDataProviderService);
     }
 
-    private function getTestFrameworkExtraOptions(string $testFrameworkKey
-    ): TestFrameworkExtraOptions {
+    private function getTestFrameworkExtraOptions(string $testFrameworkKey): TestFrameworkExtraOptions
+    {
         /** @var Configuration $config */
         $config = $this->container[Configuration::class];
 
@@ -501,8 +478,7 @@ final class InfectionCommand extends BaseCommand
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [
-                '--test-framework' => $this->input->getOption('test-framework')
-                    ?: TestFrameworkTypes::PHPUNIT,
+                '--test-framework' => $this->input->getOption('test-framework') ?: TestFrameworkTypes::PHPUNIT,
             ];
 
             $newInput = new ArrayInput($args);
@@ -515,10 +491,8 @@ final class InfectionCommand extends BaseCommand
         }
     }
 
-    private function assertCodeCoverageExists(
-        Process $initialTestsProcess,
-        string $testFrameworkKey
-    ): void {
+    private function assertCodeCoverageExists(Process $initialTestsProcess, string $testFrameworkKey): void
+    {
         $coverageDir = $this->container[sprintf('coverage.dir.%s', $testFrameworkKey)];
 
         $coverageIndexFilePath = $coverageDir . '/' . XMLLineCodeCoverage::COVERAGE_INDEX_FILE_NAME;
