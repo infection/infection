@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use function dirname;
 use Exception;
 use Infection\Config\InfectionConfig;
 use Infection\Configuration\Configuration;
@@ -68,6 +69,8 @@ use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Utils\VersionParser;
+use function is_numeric;
+use function Safe\sprintf;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -75,11 +78,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
-use Webmozart\Assert\Assert;
-use function dirname;
-use function is_numeric;
-use function Safe\sprintf;
 use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -129,7 +129,7 @@ final class InfectionCommand extends BaseCommand
                 'test-framework',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Name of the Test framework to use ('.implode(', ', TestFrameworkTypes::TYPES).')',
+                'Name of the Test framework to use (' . implode(', ', TestFrameworkTypes::TYPES) . ')',
                 ''
             )
             ->addOption(
@@ -521,7 +521,7 @@ final class InfectionCommand extends BaseCommand
     ): void {
         $coverageDir = $this->container[sprintf('coverage.dir.%s', $testFrameworkKey)];
 
-        $coverageIndexFilePath = $coverageDir.'/'.XMLLineCodeCoverage::COVERAGE_INDEX_FILE_NAME;
+        $coverageIndexFilePath = $coverageDir . '/' . XMLLineCodeCoverage::COVERAGE_INDEX_FILE_NAME;
 
         $processInfo = sprintf(
             '%sCommand line: %s%sProcess Output: %s',

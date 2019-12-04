@@ -52,7 +52,6 @@ use Infection\Mutator\Util\MutatorConfig;
 use Infection\Mutator\Util\MutatorsGenerator;
 use function Infection\Tests\normalizePath;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
 use function sys_get_temp_dir;
 
 final class ConfigurationFactoryTest extends TestCase

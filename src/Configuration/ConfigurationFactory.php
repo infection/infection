@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
-use Infection\FileSystem\TmpDirProvider;
-use Infection\Tests\Utils\TmpDirPathFactoryTest;
 use function dirname;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Util\MutatorParser;
 use Infection\Mutator\Util\MutatorsGenerator;
 use function sprintf;

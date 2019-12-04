@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Infection\FileSystem\TmpDirProvider;
 use function array_filter;
 use function getcwd;
 use Infection\Configuration\Configuration;
@@ -49,6 +48,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\EventDispatcher\EventDispatcherInterface;
+use Infection\FileSystem\TmpDirProvider;
 use Infection\Locator\RootsFileLocator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\MetricsCalculator;

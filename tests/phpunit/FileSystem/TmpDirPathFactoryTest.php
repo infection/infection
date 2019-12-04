@@ -37,11 +37,8 @@ namespace Infection\Tests\Utils;
 
 use Generator;
 use Infection\FileSystem\TmpDirProvider;
-use Infection\Utils\TmpDirectoryCreator;
 use InvalidArgumentException;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
 
 final class TmpDirPathFactoryTest extends TestCase
 {
