@@ -33,60 +33,51 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Configuration\Mutator;
 
-use Generator;
-use Infection\Configuration\Mutator\MutatorConfiguration;
-use Infection\Visitor\ReflectionVisitor;
-use PhpParser\Node;
+use function func_get_args;
 
-abstract class Mutator
+/**
+ * @internal
+ */
+final class TrueValue implements MutatorConfiguration
 {
-    /**
-     * @var MutatorConfiguration
-     */
-    private $config;
-
-    public function __construct(MutatorConfiguration $config)
-    {
-        $this->config = $config;
-    }
+    private $ignore;
+    private $inArray;
+    private $arraySearch;
 
     /**
-     * @return Node|Node[]|Generator|array
+     * @param string[]
+     * @param array<string, string|null|bool|int|float>
      */
-    abstract public function mutate(Node $node);
-
-    final public function shouldMutate(Node $node): bool
+    public static function createFromRaw(array $ignore, array $settings): self
     {
-        if (!$this->mutatesNode($node)) {
-            return false;
-        }
-
-        $reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY, false);
-
-        if (!$reflectionClass) {
-            return true;
-        }
-
-        return !$this->config->isIgnored(
-            $reflectionClass->getName(),
-            $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''),
-            $node->getLine()
+        return new self(
+            new Ignore($ignore),
+            $settings['in_array'] ?? true,
+            $settings['array_search'] ?? true
         );
     }
 
-    final public static function getName(): string
+    public function __construct(Ignore $ignore, bool $inArray, bool $arraySearch)
     {
-        $parts = explode('\\', static::class);
-
-        return (string) end($parts);
+        $this->ignore = $ignore;
+        $this->inArray = $inArray;
+        $this->arraySearch = $arraySearch;
     }
 
-    final public function getConfig(): MutatorConfiguration
+    public function isIgnored(string $class, string $method, ?int $lineNumber = null): bool
     {
-        return $this->config;
+        return $this->ignore->isIgnored(...func_get_args());
     }
 
-    abstract protected function mutatesNode(Node $node): bool;
+    public function isInArray(): bool
+    {
+        return $this->inArray;
+    }
+
+    public function isArraySearch(): bool
+    {
+        return $this->arraySearch;
+    }
 }

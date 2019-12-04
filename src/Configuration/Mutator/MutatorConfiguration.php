@@ -33,60 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Configuration\Mutator;
 
-use Generator;
-use Infection\Configuration\Mutator\MutatorConfiguration;
-use Infection\Visitor\ReflectionVisitor;
-use PhpParser\Node;
-
-abstract class Mutator
+/**
+ * @internal
+ */
+interface MutatorConfiguration
 {
-    /**
-     * @var MutatorConfiguration
-     */
-    private $config;
-
-    public function __construct(MutatorConfiguration $config)
-    {
-        $this->config = $config;
-    }
-
-    /**
-     * @return Node|Node[]|Generator|array
-     */
-    abstract public function mutate(Node $node);
-
-    final public function shouldMutate(Node $node): bool
-    {
-        if (!$this->mutatesNode($node)) {
-            return false;
-        }
-
-        $reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY, false);
-
-        if (!$reflectionClass) {
-            return true;
-        }
-
-        return !$this->config->isIgnored(
-            $reflectionClass->getName(),
-            $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''),
-            $node->getLine()
-        );
-    }
-
-    final public static function getName(): string
-    {
-        $parts = explode('\\', static::class);
-
-        return (string) end($parts);
-    }
-
-    final public function getConfig(): MutatorConfiguration
-    {
-        return $this->config;
-    }
-
-    abstract protected function mutatesNode(Node $node): bool;
+    public function isIgnored(string $class, string $method, ?int $lineNumber = null): bool;
 }

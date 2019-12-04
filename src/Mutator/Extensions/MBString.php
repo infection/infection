@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Extensions;
 
+use Infection\Configuration\Mutator\MBString as MBStringConfig;
 use function array_diff_key;
 use function array_filter;
 use function array_slice;
@@ -52,14 +53,16 @@ use PhpParser\Node;
 final class MBString extends Mutator
 {
     private $converters;
+    private $config;
 
-    public function __construct(MutatorConfig $config)
+    public function __construct(MBStringConfig $config)
     {
         parent::__construct($config);
 
         $settings = $this->getSettings();
 
         $this->setupConverters($settings);
+        $this->config = $config;
     }
 
     /**

@@ -45,6 +45,13 @@ use stdClass;
 
 final class MutatorFactory
 {
+    private $mutatorConfigFactory;
+
+    public function __construct(MutatorConfigFactory $mutatorConfigFactory)
+    {
+        $this->mutatorConfigFactory = $mutatorConfigFactory;
+    }
+
     /**
      * @param array<string, bool|array<string, string>> $mutatorSettings
      *
@@ -52,9 +59,27 @@ final class MutatorFactory
      */
     public function create(array $mutatorSettings): array
     {
-        return self::createFromNames(
+        return $this->createFromNames(
             self::retrieveMutatorNames($mutatorSettings)
         );
+    }
+
+    /**
+     * @param array<string, array<string, string>> $mutatorNames
+     *
+     * @return array<string, Mutator>
+     */
+    private function createFromNames(array $mutatorNames): array
+    {
+        $mutators = [];
+
+        foreach ($mutatorNames as $mutator => $settings) {
+            $mutators[$mutator::getName()] = new $mutator(
+                $this->mutatorConfigFactory->create($mutator, $settings)
+            );
+        }
+
+        return $mutators;
     }
 
     /**
@@ -158,23 +183,5 @@ final class MutatorFactory
         } else {
             $mutators[$mutator] = $settings === true ? [] : (array) $settings;
         }
-    }
-
-    /**
-     * @param array<string, array<string, string>> $mutatorNames
-     *
-     * @return array<string, Mutator>
-     */
-    private static function createFromNames(array $mutatorNames): array
-    {
-        $mutators = [];
-
-        foreach ($mutatorNames as $mutator => $settings) {
-            $mutators[$mutator::getName()] = new $mutator(
-                new MutatorConfig($settings)
-            );
-        }
-
-        return $mutators;
     }
 }

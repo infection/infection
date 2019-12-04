@@ -33,60 +33,62 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Configuration\Mutator;
 
-use Generator;
-use Infection\Configuration\Mutator\MutatorConfiguration;
-use Infection\Visitor\ReflectionVisitor;
-use PhpParser\Node;
+use Webmozart\Assert\Assert;
+use function func_get_args;
+use const PHP_INT_MAX;
 
-abstract class Mutator
+/**
+ * @internal
+ */
+final class ArrayItemRemoval implements MutatorConfiguration
 {
+    private const REMOVE_VALUES = [
+        'first',
+        'last',
+        'all',
+    ];
+
+    private $ignore;
+    private $remove;
+    private $limit;
+
     /**
-     * @var MutatorConfiguration
+     * @param string[]
+     * @param array<string, string|null|bool|int|float>
      */
-    private $config;
-
-    public function __construct(MutatorConfiguration $config)
+    public static function createFromRaw(array $ignore, array $settings): self
     {
-        $this->config = $config;
-    }
-
-    /**
-     * @return Node|Node[]|Generator|array
-     */
-    abstract public function mutate(Node $node);
-
-    final public function shouldMutate(Node $node): bool
-    {
-        if (!$this->mutatesNode($node)) {
-            return false;
-        }
-
-        $reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY, false);
-
-        if (!$reflectionClass) {
-            return true;
-        }
-
-        return !$this->config->isIgnored(
-            $reflectionClass->getName(),
-            $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''),
-            $node->getLine()
+        return new self(
+            new Ignore($ignore),
+            $settings['remove'] ?? 'first',
+            $settings['limit'] ?? PHP_INT_MAX
         );
     }
 
-    final public static function getName(): string
+    public function __construct(Ignore $ignore, string $remove, ?int $limit)
     {
-        $parts = explode('\\', static::class);
+        Assert::oneOf($remove, self::REMOVE_VALUES);
+        Assert::nullOrGreaterThanEq($limit, 1);
 
-        return (string) end($parts);
+        $this->ignore = $ignore;
+        $this->remove = $remove;
+        $this->limit = $limit;
     }
 
-    final public function getConfig(): MutatorConfiguration
+    public function isIgnored(string $class, string $method, ?int $lineNumber = null): bool
     {
-        return $this->config;
+        return $this->ignore->isIgnored(...func_get_args());
     }
 
-    abstract protected function mutatesNode(Node $node): bool;
+    public function getRemove(): string
+    {
+        return $this->remove;
+    }
+
+    public function getLimit(): ?int
+    {
+        return $this->limit;
+    }
 }
