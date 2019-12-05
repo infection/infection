@@ -38,6 +38,7 @@ namespace Infection\Configuration;
 use function dirname;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Finder\SourceFilesFinder;
 use Infection\Mutator\Util\MutatorParser;
 use Infection\Mutator\Util\MutatorsGenerator;
 use function sprintf;
@@ -72,7 +73,8 @@ class ConfigurationFactory
         ?float $minCoveredMsi,
         ?string $mutators,
         ?string $testFramework,
-        ?string $testFrameworkOptions
+        ?string $testFrameworkOptions,
+        string $sourceFilesFilter
     ): Configuration {
         $configDir = dirname($schema->getFile());
 
@@ -96,7 +98,11 @@ class ConfigurationFactory
 
         return new Configuration(
             $schema->getTimeout() ?? 10,
-            $schema->getSource(),
+            (new SourceFilesFinder(
+                $schema->getSource()->getDirectories(),
+                $schema->getSource()->getExcludes())
+            )->getSourceFiles($sourceFilesFilter),
+            $schema->getSource()->getDirectories(),
             $schema->getLogs(),
             $logVerbosity,
             $this->tmpDirProvider->providePath($tmpDir),

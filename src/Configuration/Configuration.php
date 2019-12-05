@@ -37,9 +37,9 @@ namespace Infection\Configuration;
 
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\TestFrameworkTypes;
+use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
@@ -60,7 +60,7 @@ class Configuration
     ];
 
     private $timeout;
-    private $source;
+    private $sourceFiles;
     private $logs;
     private $logVerbosity;
     private $tmpDir;
@@ -79,13 +79,17 @@ class Configuration
     private $minMsi;
     private $showMutations;
     private $minCoveredMsi;
+    private $sourceDirectories;
 
     /**
+     * @param SplFileInfo[]          $sourceFiles
+     * @param string[]               $sourceDirectories
      * @param array<string, Mutator> $mutators
      */
     public function __construct(
         int $timeout,
-        Source $source,
+        array $sourceFiles,
+        array $sourceDirectories,
         Logs $logs,
         string $logVerbosity,
         string $tmpDir,
@@ -106,6 +110,8 @@ class Configuration
         ?float $minCoveredMsi
     ) {
         Assert::nullOrGreaterThanEq($timeout, 1);
+        Assert::allIsInstanceOf($sourceFiles, SplFileInfo::class);
+        Assert::allString($sourceDirectories);
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
@@ -113,7 +119,8 @@ class Configuration
         Assert::nullOrGreaterThanEq($minMsi, 0.);
 
         $this->timeout = $timeout;
-        $this->source = $source;
+        $this->sourceFiles = $sourceFiles;
+        $this->sourceDirectories = $sourceDirectories;
         $this->logs = $logs;
         $this->logVerbosity = $logVerbosity;
         $this->tmpDir = $tmpDir;
@@ -139,9 +146,20 @@ class Configuration
         return $this->timeout;
     }
 
-    public function getSource(): Source
+    /**
+     * @return SplFileInfo[]
+     */
+    public function getSourceFiles(): array
     {
-        return $this->source;
+        return $this->sourceFiles;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getSourceDirectories(): array
+    {
+        return $this->sourceDirectories;
     }
 
     public function getLogs(): Logs

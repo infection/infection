@@ -337,8 +337,7 @@ final class InfectionCommand extends BaseCommand
 
         $codeCoverageData = $this->getCodeCoverageData($this->testFrameworkKey, $adapter);
         $mutationsGenerator = new MutationsGenerator(
-            $config->getSource()->getDirectories(),
-            $config->getSource()->getExcludes(),
+            $config->getSourceFiles(),
             $codeCoverageData,
             $config->getMutators(),
             $this->eventDispatcher,
@@ -347,7 +346,6 @@ final class InfectionCommand extends BaseCommand
 
         $mutations = $mutationsGenerator->generate(
             $this->input->getOption('only-covered'),
-            $this->input->getOption('filter'),
             $adapter instanceof HasExtraNodeVisitors ? $adapter->getMutationsCollectionNodeVisitors() : []
         );
 
@@ -435,7 +433,8 @@ final class InfectionCommand extends BaseCommand
             null === $minMsi ? null : (float) $minMsi,
             null === $minCoveredMsi ? null : (float) $minCoveredMsi,
             '' === $testFramework ? null : $testFramework,
-            '' === $testFrameworkOptions ? null : $testFrameworkOptions
+            '' === $testFrameworkOptions ? null : $testFrameworkOptions,
+            trim((string) $input->getOption('filter'))
         );
     }
 

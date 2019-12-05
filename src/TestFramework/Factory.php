@@ -146,7 +146,7 @@ final class Factory
                     $phpUnitConfigContent,
                     $this->xmlConfigurationHelper,
                     $this->jUnitFilePath,
-                    $this->infectionConfig->getSource()->getDirectories(),
+                    $this->infectionConfig->getSourceDirectories(),
                     $skipCoverage
                 ),
                 new MutationConfigBuilder($this->tmpDir, $phpUnitConfigContent, $this->xmlConfigurationHelper, $this->projectDir, new JUnitTestCaseSorter()),
@@ -184,7 +184,7 @@ final class Factory
                 $this->tmpDir,
                 $this->projectDir,
                 $codeceptionConfigContentParsed,
-                $this->infectionConfig->getSource()->getDirectories()
+                $this->infectionConfig->getSourceDirectories()
             );
         }
 

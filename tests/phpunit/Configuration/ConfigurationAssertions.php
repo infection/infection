@@ -74,7 +74,7 @@ trait ConfigurationAssertions
     ): void {
         $this->assertSame($expectedTimeout, $configuration->getProcessTimeout());
         $this->assertSourceStateIs(
-            $configuration->getSource(),
+            $configuration->getSourceFiles(),
             $expectedSource->getDirectories(),
             $expectedSource->getExcludes()
         );

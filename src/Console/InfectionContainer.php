@@ -337,7 +337,8 @@ final class InfectionContainer extends Container
         ?float $minMsi,
         ?float $minCoveredMsi,
         ?string $testFramework,
-        ?string $testFrameworkOptions
+        ?string $testFrameworkOptions,
+        string $sourceFilesFilter
     ): self {
         $clone = clone $this;
 
@@ -363,9 +364,13 @@ final class InfectionContainer extends Container
             $minCoveredMsi,
             $mutators,
             $testFramework,
-            $testFrameworkOptions
+            $testFrameworkOptions,
+            $sourceFilesFilter
         ): Configuration {
-            return $container[ConfigurationFactory::class]->create(
+            /** @var ConfigurationFactory $configFactory */
+            $configFactory = $container[ConfigurationFactory::class];
+
+            return $configFactory->create(
                 $container[SchemaConfiguration::class],
                 $existingCoveragePath,
                 $initialTestsPhpOptions,
@@ -380,7 +385,8 @@ final class InfectionContainer extends Container
                 $minCoveredMsi,
                 $mutators,
                 $testFramework,
-                $testFrameworkOptions
+                $testFrameworkOptions,
+                $sourceFilesFilter
             );
         };
 
