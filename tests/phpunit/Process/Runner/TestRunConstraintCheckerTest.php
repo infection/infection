@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
+use Generator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use PHPUnit\Framework\TestCase;
@@ -201,5 +202,64 @@ final class TestRunConstraintCheckerTest extends TestCase
         );
 
         $this->assertTrue($constraintChecker->hasTestRunPassedConstraints());
+    }
+
+    /**
+     * @dataProvider isMsiOverMinimumMsiProvider
+     */
+    public function test_is_msi_over_minimum_msi_for_msi(?float $actualMsi, float $minMsi, bool $expected): void
+    {
+        $metrics = $this->createMock(MetricsCalculator::class);
+        $metrics->expects($this->once())->method('getMutationScoreIndicator')->willReturn($actualMsi);
+
+        $constraintChecker = new TestRunConstraintChecker(
+            $metrics,
+            false,
+            $minMsi,
+            0.0
+        );
+
+        $this->assertSame($expected, $constraintChecker->isActualOverRequired());
+    }
+
+    /**
+     * @dataProvider isMsiOverMinimumMsiProvider
+     */
+    public function test_is_msi_over_minimum_msi_for_covered_msi(float $actualCoveredMsi, float $minCoveredMsi, bool $expected): void
+    {
+        $metrics = $this->createMock(MetricsCalculator::class);
+        $metrics->expects($this->once())->method('getCoveredCodeMutationScoreIndicator')->willReturn($actualCoveredMsi);
+
+        $constraintChecker = new TestRunConstraintChecker(
+            $metrics,
+            false,
+            0.0,
+            $minCoveredMsi
+        );
+
+        $this->assertSame($expected, $constraintChecker->isActualOverRequired());
+    }
+
+    public function isMsiOverMinimumMsiProvider(): Generator
+    {
+        $minMsi = 10.0;
+
+        yield [
+            'actualMsi' => $minMsi + 1.0,
+            'minMsi' => $minMsi,
+            'expected' => true,
+        ];
+
+        yield [
+            'actualMsi' => $minMsi,
+            'minMsi' => $minMsi,
+            'expected' => false,
+        ];
+
+        yield [
+            'actualMsi' => $minMsi - 1.0,
+            'minMsi' => $minMsi,
+            'expected' => false,
+        ];
     }
 }

@@ -380,6 +380,14 @@ final class InfectionCommand extends BaseCommand
             return false;
         }
 
+        if ($constraintChecker->isActualOverRequired()) {
+            $this->consoleOutput->logMinMsiCanGetIncreasedNotice(
+                $this->container['metrics'],
+                $constraintChecker->getMinRequiredValue(),
+                $constraintChecker->getActualOverRequiredType()
+            );
+        }
+
         $this->eventDispatcher->dispatch(new ApplicationExecutionFinished());
 
         return true;
