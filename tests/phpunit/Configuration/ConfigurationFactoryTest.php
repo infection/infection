@@ -42,6 +42,7 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
@@ -50,9 +51,7 @@ use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Mutator\Util\MutatorsGenerator;
 use function Infection\Tests\normalizePath;
-use Infection\Utils\TmpDirectoryCreator;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
 use function sys_get_temp_dir;
 
 final class ConfigurationFactoryTest extends TestCase
@@ -73,11 +72,7 @@ final class ConfigurationFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->configFactory = new ConfigurationFactory(
-            new TmpDirectoryCreator(
-                $this->createMock(Filesystem::class)
-            )
-        );
+        $this->configFactory = new ConfigurationFactory(new TmpDirProvider());
     }
 
     /**

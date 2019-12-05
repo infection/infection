@@ -76,6 +76,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 use function trim;
 use Webmozart\Assert\Assert;
@@ -284,6 +285,11 @@ final class InfectionCommand extends BaseCommand
         $config = $this->container[Configuration::class];
 
         $this->includeUserBootstrap($config);
+
+        /** @var Filesystem $fileSystem */
+        $fileSystem = $this->container['filesystem'];
+
+        $fileSystem->mkdir($config->getTmpDir());
 
         $this->testFrameworkKey = $config->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
         $this->testFrameworkOptions = $this->getTestFrameworkExtraOptions($this->testFrameworkKey);

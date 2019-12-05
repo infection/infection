@@ -76,7 +76,6 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpU
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkTypes;
 use function Infection\Tests\generator_to_phpunit_data_provider;
-use Infection\Utils\TmpDirectoryCreator;
 use Infection\Utils\VersionParser;
 use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
@@ -134,7 +133,6 @@ final class ProjectCodeProvider
         SchemaValidator::class,
         Configuration::class,
         ConfigurationFactory::class,
-        TmpDirectoryCreator::class,
     ];
 
     /**

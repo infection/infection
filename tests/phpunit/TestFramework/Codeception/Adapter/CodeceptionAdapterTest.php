@@ -47,6 +47,7 @@ use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
 use Infection\Utils\VersionParser;
+use function realpath;
 use Symfony\Component\Filesystem\Filesystem;
 
 final class CodeceptionAdapterTest extends FileSystemTestCase

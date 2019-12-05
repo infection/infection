@@ -33,70 +33,62 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Utils;
+namespace Infection\Tests\FileSystem;
 
 use Generator;
-use Infection\Utils\TmpDirectoryCreator;
+use Infection\FileSystem\TmpDirProvider;
 use InvalidArgumentException;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
 
-final class TmpDirectoryCreatorTest extends TestCase
+final class TmpDirProviderTest extends TestCase
 {
     /**
-     * @var Filesystem|MockObject
+     * @var TmpDirProvider
      */
-    private $fileSystemMock;
-
-    /**
-     * @var TmpDirectoryCreator
-     */
-    private $tmpDirCreator;
+    private $tmpDirProvider;
 
     protected function setUp(): void
     {
-        $this->fileSystemMock = $this->createMock(Filesystem::class);
-
-        $this->tmpDirCreator = new TmpDirectoryCreator($this->fileSystemMock);
+        $this->tmpDirProvider = new TmpDirProvider();
     }
 
     /**
      * @dataProvider tmpDirProvider
      */
-    public function test_it_creates_a_tmp_dir_and_returns_its_path(
+    public function test_it_provides_a_tmp_dir_path(
         string $tmpDir,
         string $expectedTmpDir
     ): void {
-        $this->fileSystemMock
-            ->expects($this->once())
-            ->method('mkdir')
-            ->with($expectedTmpDir, 0777)
-        ;
-
-        $actualTmpDir = $this->tmpDirCreator->createAndGet($tmpDir);
+        $actualTmpDir = $this->tmpDirProvider->providePath($tmpDir);
 
         $this->assertSame($expectedTmpDir, $actualTmpDir);
     }
 
-    public function test_it_creates_the_tmp_directory_only_once(): void
+    public function test_it_is_deterministic(): void
     {
         $tmpDir = '/path/to/tmp';
         $expectedTmpDir = '/path/to/tmp/infection';
 
-        $this->fileSystemMock
-            ->expects($this->once())
-            ->method('mkdir')
-            ->with($expectedTmpDir, 0777)
-        ;
-
         $this->assertSame(
             $expectedTmpDir,
-            $this->tmpDirCreator->createAndGet($tmpDir)
+            $this->tmpDirProvider->providePath($tmpDir)
         );
         $this->assertSame(
             $expectedTmpDir,
-            $this->tmpDirCreator->createAndGet($tmpDir)
+            $this->tmpDirProvider->providePath($tmpDir)
+        );
+    }
+
+    public function test_it_provides_a_different_path_for_different_base_tmp_dir(): void
+    {
+        $this->assertSame(
+            '/path/to/tmp/infection',
+            $this->tmpDirProvider->providePath('/path/to/tmp')
+        );
+
+        $this->assertSame(
+            '/path/to/another-tmp/infection',
+            $this->tmpDirProvider->providePath('/path/to/another-tmp')
         );
     }
 
@@ -108,7 +100,7 @@ final class TmpDirectoryCreatorTest extends TestCase
         string $expectedErrorMessage
     ): void {
         try {
-            $this->tmpDirCreator->createAndGet($tmpDir);
+            $this->tmpDirProvider->providePath($tmpDir);
 
             $this->fail();
         } catch (InvalidArgumentException $exception) {

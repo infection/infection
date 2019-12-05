@@ -33,63 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Utils;
+namespace Infection\FileSystem;
 
-use function Infection\Tests\make_tmp_dir;
-use function Infection\Tests\normalizePath;
-use Infection\Utils\TmpDirectoryCreator;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
+use const DIRECTORY_SEPARATOR;
+use function Safe\sprintf;
+use function str_replace;
+use Webmozart\Assert\Assert;
+use Webmozart\PathUtil\Path;
 
 /**
- * @group integration
- * @coversNothing
+ * @internal
  */
-final class TmpDirectoryCreatorIntegrationTest extends TestCase
+final class TmpDirProvider
 {
-    /**
-     * @var TmpDirectoryCreator
-     */
-    private $tmpDirCreator;
+    private const BASE_DIR_NAME = 'infection';
 
     /**
-     * @var string
+     * Provides a Infection namespaced temporary directory path.
      */
-    private $tmp;
-
-    /**
-     * @var Filesystem
-     */
-    private $fileSystem;
-
-    protected function setUp(): void
+    public function providePath(string $baseTmpDir): string
     {
-        $this->fileSystem = new Filesystem();
+        Assert::true(
+            Path::isAbsolute($baseTmpDir),
+            sprintf(
+                'Expected the temporary directory passed to be an absolute path. Got "%s"',
+                $baseTmpDir
+            )
+        );
 
-        $this->tmpDirCreator = new TmpDirectoryCreator($this->fileSystem);
-
-        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the `tearDown()` method
-        // and as a result some temporary files may still remain.
-        $this->fileSystem->remove(normalizePath(realpath(sys_get_temp_dir())) . '/infection-test');
-
-        $this->tmp = make_tmp_dir('infection-test', self::class);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->fileSystem->remove($this->tmp);
-    }
-
-    public function test_it_creates_a_tmp_dir_and_returns_its_path(): void
-    {
-        $expectedTmpDir = $this->tmp . '/infection';
-
-        $this->assertDirectoryNotExists($expectedTmpDir);
-
-        $actualTmpDir = $this->tmpDirCreator->createAndGet($this->tmp);
-
-        $this->assertSame($expectedTmpDir, $actualTmpDir);
-
-        $this->assertDirectoryExists($actualTmpDir);
+        return str_replace(
+            [DIRECTORY_SEPARATOR, '//'],
+            ['/', '/'],
+            sprintf('%s/%s', $baseTmpDir, self::BASE_DIR_NAME)
+        );
     }
 }
