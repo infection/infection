@@ -58,19 +58,10 @@ use function Safe\sprintf;
 
 final class MutatorFactoryTest extends TestCase
 {
-    private static $countDefaultMutators = 0;
-
     /**
      * @var MutatorFactory
      */
     private $mutatorFactory;
-
-    public static function setUpBeforeClass(): void
-    {
-        foreach (ProfileList::DEFAULT_PROFILE as $profileName) {
-            self::$countDefaultMutators += count(\Infection\Mutator\ProfileList::ALL_PROFILES[$profileName]);
-        }
-    }
 
     protected function setUp(): void
     {
