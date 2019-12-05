@@ -99,10 +99,6 @@ class ConfigurationFactory
             $schema->getSource(),
             $schema->getLogs(),
             $logVerbosity,
-            // TODO: we might want to consider to separate the "tmp dir
-            // calculation" and the "tmp dir create" in order to not have
-            // the creation of a directory as a potential side-effect of
-            // instantiating a configuration object
             $this->tmpDirProvider->providePath($tmpDir),
             $schema->getPhpUnit(),
             (new MutatorParser(
