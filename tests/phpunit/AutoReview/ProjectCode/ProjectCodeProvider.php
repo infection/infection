@@ -45,7 +45,6 @@ use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\InfectionConfig;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
-use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;

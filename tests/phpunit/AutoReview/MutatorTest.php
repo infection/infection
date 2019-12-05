@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
-use const DIRECTORY_SEPARATOR;
+use function array_column;
+use Infection\Tests\Mutator\ProfileListProvider;
+use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @coversNothing
@@ -126,31 +126,10 @@ final class MutatorTest extends TestCase
             return $classes;
         }
 
-        $finder = Finder::create()
-            ->files()
-            ->name('*.php')
-            ->in(__DIR__ . '/../../../src/Mutator')
-            ->exclude([
-                'Util',
-            ])
-        ;
-
-        $classes = array_map(
-            static function (SplFileInfo $file) {
-                $fqcnPart = ltrim(str_replace('phpunit', '', $file->getRelativePath()), DIRECTORY_SEPARATOR);
-                $fqcnPart = strtr($fqcnPart, DIRECTORY_SEPARATOR, '\\');
-
-                return sprintf(
-                    '%s\\%s%s%s',
-                    'Infection\\Mutator',
-                    $fqcnPart,
-                    $file->getRelativePath() === 'phpunit' ? '' : '\\',
-                    $file->getBasename('.' . $file->getExtension())
-                );
-            },
-            iterator_to_array($finder, false)
+        $classes = array_column(
+            iterator_to_array(ProfileListProvider::mutatorNameAndClassProvider(), false),
+            1
         );
-        sort($classes);
 
         return $classes;
     }

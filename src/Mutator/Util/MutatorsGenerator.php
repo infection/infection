@@ -37,6 +37,7 @@ namespace Infection\Mutator\Util;
 
 use function array_key_exists;
 use Infection\Config\Exception\InvalidConfigException;
+use Infection\Mutator\ProfileList;
 use stdClass;
 
 /**
@@ -79,7 +80,7 @@ final class MutatorsGenerator
         $this->mutatorList = [];
 
         foreach ($this->mutatorSettings as $mutatorOrProfile => $setting) {
-            if (array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
+            if (array_key_exists($mutatorOrProfile, ProfileList::ALL_PROFILES)) {
                 $this->registerFromProfile($mutatorOrProfile, $setting);
 
                 continue;
@@ -104,10 +105,10 @@ final class MutatorsGenerator
      */
     private function registerFromProfile(string $profile, $setting): void
     {
-        $mutators = MutatorProfile::MUTATOR_PROFILE_LIST[$profile];
+        $mutators = ProfileList::ALL_PROFILES[$profile];
 
         foreach ($mutators as $mutatorOrProfile) {
-            if (array_key_exists($mutatorOrProfile, MutatorProfile::MUTATOR_PROFILE_LIST)) {
+            if (array_key_exists($mutatorOrProfile, ProfileList::ALL_PROFILES)) {
                 $this->registerFromProfile($mutatorOrProfile, $setting);
 
                 continue;
@@ -146,11 +147,11 @@ final class MutatorsGenerator
      */
     private function registerFromName(string $mutator, $setting): void
     {
-        if (!array_key_exists($mutator, MutatorProfile::FULL_MUTATOR_LIST)) {
+        if (!array_key_exists($mutator, ProfileList::ALL_MUTATORS)) {
             throw InvalidConfigException::invalidMutator($mutator);
         }
 
-        $this->registerFromClass(MutatorProfile::FULL_MUTATOR_LIST[$mutator], $setting);
+        $this->registerFromClass(ProfileList::ALL_MUTATORS[$mutator], $setting);
     }
 
     /**

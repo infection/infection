@@ -40,7 +40,7 @@ use Infection\Config\Exception\InvalidConfigException;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\FalseValue;
 use Infection\Mutator\Boolean\TrueValue;
-use Infection\Mutator\Util\MutatorProfile;
+use Infection\Mutator\ProfileList;
 use Infection\Mutator\Util\MutatorsGenerator;
 use Infection\Tests\Fixtures\StubMutator;
 use Infection\Visitor\ReflectionVisitor;
@@ -57,8 +57,8 @@ final class MutatorsGeneratorTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        foreach (MutatorProfile::DEFAULT as $profileName) {
-            self::$countDefaultMutators += count(MutatorProfile::MUTATOR_PROFILE_LIST[$profileName]);
+        foreach (ProfileList::DEFAULT_PROFILE as $profileName) {
+            self::$countDefaultMutators += count(ProfileList::ALL_PROFILES[$profileName]);
         }
     }
 
@@ -76,7 +76,7 @@ final class MutatorsGeneratorTest extends TestCase
         ]);
         $mutators = $mutatorGenerator->generate();
 
-        $this->assertCount(count(MutatorProfile::BOOLEAN), $mutators);
+        $this->assertCount(count(ProfileList::BOOLEAN_PROFILE), $mutators);
     }
 
     public function test_mutators_can_be_ignored(): void
@@ -98,7 +98,7 @@ final class MutatorsGeneratorTest extends TestCase
         ]);
         $mutators = $mutatorGenerator->generate();
 
-        $this->assertCount(self::$countDefaultMutators - count(MutatorProfile::BOOLEAN), $mutators);
+        $this->assertCount(self::$countDefaultMutators - count(\Infection\Mutator\ProfileList::BOOLEAN_PROFILE), $mutators);
     }
 
     public function test_names_can_be_ignored(): void
@@ -212,7 +212,7 @@ final class MutatorsGeneratorTest extends TestCase
         ]);
         $mutators = $mutatorGenerator->generate();
 
-        $this->assertCount(count(MutatorProfile::BOOLEAN), $mutators);
+        $this->assertCount(count(ProfileList::BOOLEAN_PROFILE), $mutators);
 
         $this->assertArrayNotHasKey(Plus::getName(), $mutators);
 
@@ -227,7 +227,7 @@ final class MutatorsGeneratorTest extends TestCase
         ]);
         $mutators = $mutatorGenerator->generate();
 
-        $this->assertCount(count(MutatorProfile::BOOLEAN), $mutators);
+        $this->assertCount(count(ProfileList::BOOLEAN_PROFILE), $mutators);
 
         $this->assertArrayNotHasKey(Plus::getName(), $mutators);
     }
