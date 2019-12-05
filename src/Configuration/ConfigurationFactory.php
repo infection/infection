@@ -37,9 +37,9 @@ namespace Infection\Configuration;
 
 use function dirname;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\Util\MutatorParser;
-use Infection\Utils\TmpDirectoryCreator;
 use function sprintf;
 use function sys_get_temp_dir;
 use Webmozart\PathUtil\Path;
@@ -50,14 +50,14 @@ use Webmozart\PathUtil\Path;
  */
 class ConfigurationFactory
 {
-    private $tmpDirectoryCreator;
+    private $tmpDirProvider;
     private $mutatorFactory;
 
     public function __construct(
-        TmpDirectoryCreator $tmpDirectoryCreator,
+        TmpDirProvider $tmpDirProvider,
         MutatorFactory $mutatorFactory
     ) {
-        $this->tmpDirectoryCreator = $tmpDirectoryCreator;
+        $this->tmpDirProvider = $tmpDirProvider;
         $this->mutatorFactory = $mutatorFactory;
     }
 

@@ -43,6 +43,9 @@ use InvalidArgumentException;
 use function sprintf;
 use stdClass;
 
+/**
+ * @internal
+ */
 final class MutatorFactory
 {
     /**
@@ -169,10 +172,10 @@ final class MutatorFactory
     {
         $mutators = [];
 
-        foreach ($mutatorNames as $mutator => $settings) {
-            $mutators[$mutator::getName()] = new $mutator(
-                new MutatorConfig($settings)
-            );
+        foreach ($mutatorNames as $mutatorClass => $settings) {
+            /** @var Mutator $mutator */
+            $mutator = new $mutatorClass(new MutatorConfig($settings));
+            $mutators[$mutator::getName()] = $mutator;
         }
 
         return $mutators;

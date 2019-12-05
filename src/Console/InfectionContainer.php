@@ -255,12 +255,12 @@ final class InfectionContainer extends Container
                 return new SchemaConfigurationFactory();
             },
             ConfigurationFactory::class => static function (self $container): ConfigurationFactory {
-                /** @var TmpDirectoryCreator $tmpDirCreator */
-                $tmpDirCreator = $container[TmpDirectoryCreator::class];
+                /** @var TmpDirProvider $tmpDirProvider */
+                $tmpDirProvider = $container[TmpDirProvider::class];
                 /** @var MutatorFactory $mutatorFactory */
                 $mutatorFactory = $container[MutatorFactory::class];
 
-                return new ConfigurationFactory($tmpDirCreator, $mutatorFactory);
+                return new ConfigurationFactory($tmpDirProvider, $mutatorFactory);
             },
             MutatorFactory::class => static function (): MutatorFactory {
                 return new MutatorFactory();

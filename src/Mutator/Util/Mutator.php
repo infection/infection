@@ -82,11 +82,6 @@ abstract class Mutator
         return (string) end($parts);
     }
 
-    final public function getConfig(): MutatorConfig
-    {
-        return $this->config;
-    }
-
     final protected function getSettings(): array
     {
         return $this->config->getMutatorSettings();
