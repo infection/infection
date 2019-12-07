@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
-use Infection\Configuration\Mutator\ArrayItemRemoval as ArrayItemRemovalConfig;
 use function array_merge;
 use function count;
 use Generator;
@@ -58,13 +57,24 @@ use function strtoupper;
  */
 final class ArrayItemRemoval extends Mutator
 {
-    private $config;
+    private const DEFAULT_SETTINGS = [
+        'remove' => 'first',
+        'limit' => PHP_INT_MAX,
+    ];
 
-    public function __construct(ArrayItemRemovalConfig $config)
+    /** @var string first|last|all */
+    private $remove;
+    /** @var int */
+    private $limit;
+
+    public function __construct(MutatorConfig $config)
     {
         parent::__construct($config);
 
-        $this->config = $config;
+        $settings = $this->getResultSettings();
+
+        $this->remove = $settings['remove'];
+        $this->limit = $settings['limit'];
     }
 
     /**
@@ -87,15 +97,45 @@ final class ArrayItemRemoval extends Mutator
 
     private function getItemsIndexes(array $items): array
     {
-        switch ($this->config->getRemove()) {
+        switch ($this->remove) {
             case 'first':
                 return [0];
-
             case 'last':
                 return [count($items) - 1];
-
             default:
-                return range(0, min(count($items), $this->config->getLimit()) - 1);
+                return range(0, min(count($items), $this->limit) - 1);
         }
+    }
+
+    private function getResultSettings(): array
+    {
+        $settings = array_merge(self::DEFAULT_SETTINGS, $this->getSettings());
+
+        if (!is_string($settings['remove'])) {
+            $this->throwConfigException('remove');
+        }
+
+        $settings['remove'] = strtolower($settings['remove']);
+
+        if (!in_array($settings['remove'], ['first', 'last', 'all'])) {
+            $this->throwConfigException('remove');
+        }
+
+        if (!is_numeric($settings['limit']) || $settings['limit'] < 1) {
+            $this->throwConfigException('limit');
+        }
+
+        return $settings;
+    }
+
+    private function throwConfigException(string $property): void
+    {
+        $value = $this->getSettings()[$property];
+
+        throw new InvalidConfigException(sprintf(
+            'Invalid configuration of ArrayItemRemoval mutator. Setting `%s` is invalid (%s)',
+            $property,
+            is_scalar($value) ? $value : '<' . strtoupper(gettype($value)) . '>'
+        ));
     }
 }

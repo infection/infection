@@ -43,18 +43,8 @@ use InvalidArgumentException;
 use function sprintf;
 use stdClass;
 
-/**
- * @internal
- */
 final class MutatorFactory
 {
-    private $mutatorConfigFactory;
-
-    public function __construct(MutatorConfigFactory $mutatorConfigFactory)
-    {
-        $this->mutatorConfigFactory = $mutatorConfigFactory;
-    }
-
     /**
      * @param array<string, bool|array<string, string>> $mutatorSettings
      *
@@ -62,7 +52,7 @@ final class MutatorFactory
      */
     public function create(array $mutatorSettings): array
     {
-        return $this->createFromNames(
+        return self::createFromNames(
             self::retrieveMutatorNames($mutatorSettings)
         );
     }
@@ -175,13 +165,13 @@ final class MutatorFactory
      *
      * @return array<string, Mutator>
      */
-    private function createFromNames(array $mutatorNames): array
+    private static function createFromNames(array $mutatorNames): array
     {
         $mutators = [];
 
         foreach ($mutatorNames as $mutator => $settings) {
             $mutators[$mutator::getName()] = new $mutator(
-                $this->mutatorConfigFactory->create($mutator, $settings)
+                new MutatorConfig($settings)
             );
         }
 

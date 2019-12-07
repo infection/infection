@@ -36,18 +36,17 @@ declare(strict_types=1);
 namespace Infection\Mutator\Util;
 
 use Generator;
-use Infection\Configuration\Mutator\MutatorConfiguration;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
 abstract class Mutator
 {
     /**
-     * @var MutatorConfiguration
+     * @var MutatorConfig
      */
     private $config;
 
-    public function __construct(MutatorConfiguration $config)
+    public function __construct(MutatorConfig $config)
     {
         $this->config = $config;
     }
@@ -83,9 +82,14 @@ abstract class Mutator
         return (string) end($parts);
     }
 
-    final public function getConfig(): MutatorConfiguration
+    final public function getConfig(): MutatorConfig
     {
         return $this->config;
+    }
+
+    final protected function getSettings(): array
+    {
+        return $this->config->getMutatorSettings();
     }
 
     abstract protected function mutatesNode(Node $node): bool;

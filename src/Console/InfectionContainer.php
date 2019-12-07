@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Infection\Mutator\MutatorConfigFactory;
 use function array_filter;
 use function getcwd;
 use Infection\Configuration\Configuration;
@@ -270,14 +269,8 @@ final class InfectionContainer extends Container
                     $mutatorParser
                 );
             },
-            MutatorConfigFactory::class => static function (): MutatorConfigFactory {
-                return new MutatorConfigFactory();
-            },
-            MutatorFactory::class => static function (self $container): MutatorFactory {
-                /** @var MutatorConfigFactory $mutatorConfigFactory */
-                $mutatorConfigFactory = $container[MutatorConfigFactory::class];
-
-                return new MutatorFactory($mutatorConfigFactory);
+            MutatorFactory::class => static function (): MutatorFactory {
+                return new MutatorFactory();
             },
             MutatorParser::class => static function (): MutatorParser {
                 return new MutatorParser();
