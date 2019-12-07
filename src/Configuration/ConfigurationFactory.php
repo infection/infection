@@ -38,6 +38,7 @@ namespace Infection\Configuration;
 use function array_fill_keys;
 use function dirname;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Utils\TmpDirectoryCreator;
@@ -51,16 +52,16 @@ use Webmozart\PathUtil\Path;
  */
 class ConfigurationFactory
 {
-    private $tmpDirectoryCreator;
+    private $tmpDirProvider;
     private $mutatorFactory;
     private $mutatorParser;
 
     public function __construct(
-        TmpDirectoryCreator $tmpDirectoryCreator,
+        TmpDirProvider $tmpDirProvider,
         MutatorFactory $mutatorFactory,
         MutatorParser $mutatorParser
     ) {
-        $this->tmpDirectoryCreator = $tmpDirectoryCreator;
+        $this->tmpDirProvider = $tmpDirProvider;
         $this->mutatorFactory = $mutatorFactory;
         $this->mutatorParser = $mutatorParser;
     }
