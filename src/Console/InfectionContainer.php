@@ -53,6 +53,7 @@ use Infection\Locator\RootsFileLocator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
+use Infection\Mutator\MutatorFactory;
 use Infection\Performance\Limiter\MemoryLimiter;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\TimeFormatter;
@@ -256,8 +257,13 @@ final class InfectionContainer extends Container
             ConfigurationFactory::class => static function (self $container): ConfigurationFactory {
                 /** @var TmpDirProvider $tmpDirProvider */
                 $tmpDirProvider = $container[TmpDirProvider::class];
+                /** @var MutatorFactory $mutatorFactory */
+                $mutatorFactory = $container[MutatorFactory::class];
 
-                return new ConfigurationFactory($tmpDirProvider);
+                return new ConfigurationFactory($tmpDirProvider, $mutatorFactory);
+            },
+            MutatorFactory::class => static function (): MutatorFactory {
+                return new MutatorFactory();
             },
             'coverage.path' => static function (self $container): string {
                 /** @var Configuration $config */

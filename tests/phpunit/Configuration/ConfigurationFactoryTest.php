@@ -46,10 +46,10 @@ use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
+use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
-use Infection\Mutator\Util\MutatorsGenerator;
 use function Infection\Tests\normalizePath;
 use PHPUnit\Framework\TestCase;
 use function sys_get_temp_dir;
@@ -72,7 +72,10 @@ final class ConfigurationFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->configFactory = new ConfigurationFactory(new TmpDirProvider());
+        $this->configFactory = new ConfigurationFactory(
+            new TmpDirProvider(),
+            new MutatorFactory()
+        );
     }
 
     /**
@@ -933,7 +936,7 @@ final class ConfigurationFactoryTest extends TestCase
     private static function getDefaultMutators(): array
     {
         if (null === self::$mutators) {
-            self::$mutators = (new MutatorsGenerator([]))->generate();
+            self::$mutators = (new MutatorFactory())->create(['@default' => true]);
         }
 
         return self::$mutators;

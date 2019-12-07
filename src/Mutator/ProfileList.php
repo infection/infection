@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use function array_values;
 use Infection\Mutator;
 
 /**
@@ -91,12 +92,16 @@ final class ProfileList
 
     public const BOOLEAN_PROFILE = [
         Mutator\Boolean\ArrayItem::class,
+        // EqualIdentical disabled from the default boolean profile
         Mutator\Boolean\FalseValue::class,
+        // IdenticalEqual disabled from the default boolean profile
         Mutator\Boolean\LogicalAnd::class,
         Mutator\Boolean\LogicalLowerAnd::class,
         Mutator\Boolean\LogicalLowerOr::class,
         Mutator\Boolean\LogicalNot::class,
         Mutator\Boolean\LogicalOr::class,
+        // NotEqualNotIdentical disabled from the default boolean profile
+        // NotIdenticalNotEqual disabled from the default boolean profile
         Mutator\Boolean\TrueValue::class,
         Mutator\Boolean\Yield_::class,
     ];
@@ -418,7 +423,34 @@ final class ProfileList
         'MBString' => Mutator\Extensions\MBString::class,
     ];
 
+    /**
+     * @var array<string, string>|null
+     */
+    private static $defaultProfileMutators;
+
     private function __construct()
     {
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getDefaultProfileMutators(): array
+    {
+        if (null !== self::$defaultProfileMutators) {
+            return self::$defaultProfileMutators;
+        }
+
+        self::$defaultProfileMutators = [];
+
+        foreach (self::DEFAULT_PROFILE as $profile) {
+            foreach (self::ALL_PROFILES[$profile] as $mutatorClass) {
+                self::$defaultProfileMutators[$mutatorClass] = $mutatorClass;
+            }
+        }
+
+        self::$defaultProfileMutators = array_values(self::$defaultProfileMutators);
+
+        return self::$defaultProfileMutators;
     }
 }
