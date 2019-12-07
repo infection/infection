@@ -92,6 +92,7 @@ final class MutationsGenerator
      * @var Parser
      */
     private $parser;
+    private $filter;
 
     public function __construct(
         array $srcDirs,
@@ -99,7 +100,8 @@ final class MutationsGenerator
         LineCodeCoverage $codeCoverageData,
         array $mutators,
         EventDispatcherInterface $eventDispatcher,
-        Parser $parser
+        Parser $parser,
+        string $filter
     ) {
         $this->srcDirs = $srcDirs;
         $this->codeCoverageData = $codeCoverageData;
@@ -107,6 +109,7 @@ final class MutationsGenerator
         $this->mutators = $mutators;
         $this->eventDispatcher = $eventDispatcher;
         $this->parser = $parser;
+        $this->filter = $filter;
     }
 
     /**
@@ -115,10 +118,10 @@ final class MutationsGenerator
      *
      * @return Mutation[]
      */
-    public function generate(bool $onlyCovered, string $filter = '', array $extraNodeVisitors = []): array
+    public function generate(bool $onlyCovered, array $extraNodeVisitors = []): array
     {
         $sourceFilesFinder = new SourceFilesFinder($this->srcDirs, $this->excludeDirsOrFiles);
-        $files = $sourceFilesFinder->getSourceFiles($filter);
+        $files = $sourceFilesFinder->getSourceFiles($this->filter);
         $allFilesMutations = [[]];
 
         $this->eventDispatcher->dispatch(new MutationGeneratingStarted($files->count()));

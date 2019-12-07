@@ -79,6 +79,7 @@ class Configuration
     private $minMsi;
     private $showMutations;
     private $minCoveredMsi;
+    private $filter;
 
     /**
      * @param array<string, Mutator> $mutators
@@ -103,7 +104,8 @@ class Configuration
         bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
         bool $showMutations,
-        ?float $minCoveredMsi
+        ?float $minCoveredMsi,
+        string $filter
     ) {
         Assert::nullOrGreaterThanEq($timeout, 1);
         Assert::allIsInstanceOf($mutators, Mutator::class);
@@ -132,6 +134,7 @@ class Configuration
         $this->minMsi = $minMsi;
         $this->showMutations = $showMutations;
         $this->minCoveredMsi = $minCoveredMsi;
+        $this->filter = $filter;
     }
 
     public function getProcessTimeout(): int
@@ -235,5 +238,10 @@ class Configuration
     public function getMinCoveredMsi(): ?float
     {
         return $this->minCoveredMsi;
+    }
+
+    public function getFilter(): string
+    {
+        return $this->filter;
     }
 }

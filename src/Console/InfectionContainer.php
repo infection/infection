@@ -353,7 +353,8 @@ final class InfectionContainer extends Container
         ?float $minMsi,
         ?float $minCoveredMsi,
         ?string $testFramework,
-        ?string $testFrameworkOptions
+        ?string $testFrameworkOptions,
+        string $filter
     ): self {
         $clone = clone $this;
 
@@ -379,7 +380,8 @@ final class InfectionContainer extends Container
             $minCoveredMsi,
             $mutatorsInput,
             $testFramework,
-            $testFrameworkOptions
+            $testFrameworkOptions,
+            $filter
         ): Configuration {
             /** @var ConfigurationFactory $configurationFactory */
             $configurationFactory = $container[ConfigurationFactory::class];
@@ -399,7 +401,8 @@ final class InfectionContainer extends Container
                 $minCoveredMsi,
                 $mutatorsInput,
                 $testFramework,
-                $testFrameworkOptions
+                $testFrameworkOptions,
+                $filter
             );
         };
 

@@ -80,7 +80,8 @@ class ConfigurationFactory
         ?float $minCoveredMsi,
         string $mutatorsInput,
         ?string $testFramework,
-        ?string $testFrameworkOptions
+        ?string $testFrameworkOptions,
+        string $filter
     ): Configuration {
         $configDir = dirname($schema->getFile());
 
@@ -131,7 +132,8 @@ class ConfigurationFactory
             $ignoreMsiWithNoMutations,
             $minMsi,
             $showMutations,
-            $minCoveredMsi
+            $minCoveredMsi,
+            $filter
         );
     }
 

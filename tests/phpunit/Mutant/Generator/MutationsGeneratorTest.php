@@ -174,7 +174,8 @@ final class MutationsGeneratorTest extends TestCase
             $this->createMock(LineCodeCoverage::class),
             [new Plus(new MutatorConfig([]))],
             $eventDispatcher,
-            $this->getParser()
+            $this->getParser(),
+            ''
         );
 
         $generator->generate(false);
@@ -231,7 +232,8 @@ final class MutationsGeneratorTest extends TestCase
             $codeCoverageDataMock,
             $mutators,
             $eventDispatcherMock,
-            $this->getParser()
+            $this->getParser(),
+            ''
         );
     }
 

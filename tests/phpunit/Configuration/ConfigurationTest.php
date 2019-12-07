@@ -71,7 +71,8 @@ final class ConfigurationTest extends TestCase
         bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
         bool $showMutations,
-        ?float $minCoveredMsi
+        ?float $minCoveredMsi,
+        string $filter
     ): void {
         $config = new Configuration(
             $timeout,
@@ -93,7 +94,8 @@ final class ConfigurationTest extends TestCase
             $ignoreMsiWithNoMutations,
             $minMsi,
             $showMutations,
-            $minCoveredMsi
+            $minCoveredMsi,
+            $filter
         );
 
         $this->assertConfigurationStateIs(
@@ -117,13 +119,14 @@ final class ConfigurationTest extends TestCase
             $ignoreMsiWithNoMutations,
             $minMsi,
             $showMutations,
-            $minCoveredMsi
+            $minCoveredMsi,
+            $filter
         );
     }
 
     public function valueProvider(): Generator
     {
-        yield [
+        yield 'empty' => [
             10,
             new Source([], []),
             new Logs(
@@ -150,9 +153,10 @@ final class ConfigurationTest extends TestCase
             null,
             false,
             null,
+            '',
         ];
 
-        yield [
+        yield 'nominal' => [
             10,
             new Source(['src', 'lib'], ['fixtures', 'tests']),
             new Logs(
@@ -181,6 +185,7 @@ final class ConfigurationTest extends TestCase
             43.,
             true,
             43.,
+            'src/Foo.php, src/Bar.php',
         ];
     }
 }
