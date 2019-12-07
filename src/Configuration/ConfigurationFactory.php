@@ -41,7 +41,6 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
-use Infection\Utils\TmpDirectoryCreator;
 use function sprintf;
 use function sys_get_temp_dir;
 use Webmozart\PathUtil\Path;
