@@ -433,7 +433,7 @@ final class ProfileList
     }
 
     /**
-     * @return array<string, string>
+     * @return string[]
      */
     public static function getDefaultProfileMutators(): array
     {
