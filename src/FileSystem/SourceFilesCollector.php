@@ -33,11 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Finder;
+namespace Infection\FileSystem;
 
 use function array_filter;
 use function array_map;
 use function explode;
+use Infection\Finder\FilterableFinder;
 use function iterator_to_array;
 use Symfony\Component\Finder\SplFileInfo;
 
