@@ -35,149 +35,227 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Finder;
 
-use function in_array;
+use function array_map;
+use function array_values;
+use Generator;
 use Infection\Finder\SourceFilesFinder;
+use function iterator_to_array;
+use function natcasesort;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\Finder;
+use Webmozart\PathUtil\Path;
 
 final class SourceFilesFinderTest extends TestCase
 {
-    public function test_it_lists_all_php_files_without_a_filter(): void
+    private const FIXTURES = __DIR__ . '/../Fixtures/Files/SourceFileCollector';
+
+    /**
+     * @dataProvider sourceFilesProvider
+     */
+    public function test_it_can_collect_files(array $sourceDirectories, array $excludedFiles, string $filter, array $expected): void
     {
-        $sourceFilesFinder = new SourceFilesFinder(['tests/phpunit/Fixtures/Files/Finder'], []);
+        $root = self::FIXTURES;
 
-        $files = $sourceFilesFinder->getSourceFiles();
+        $files = (new SourceFilesFinder($sourceDirectories, $excludedFiles))->getSourceFiles($filter);
 
-        $this->assertInstanceOf(Finder::class, $files);
-        $this->assertSame(2, $files->count());
+        $this->assertSame(
+            $expected,
+            self::normalizePaths(
+                iterator_to_array(
+                    $files,
+                    false
+                ),
+                $root
+            )
+        );
     }
 
-    public function test_it_can_filter_one_file_by_a_relative_path(): void
+    public function sourceFilesProvider(): Generator
     {
-        $sourceFilesFinder = new SourceFilesFinder(['tests/phpunit/Fixtures/Files/Finder'], []);
+        yield 'one directory, no filter, no excludes' => [
+            [self::FIXTURES . '/case0'],
+            [],
+            '',
+            [
+                'case0/a.php',
+                'case0/outside-symlink.php',
+                'case0/sub-dir/b.php',
+            ],
+        ];
 
-        $filter = 'tests/phpunit/Fixtures/Files/Finder/FirstFile.php';
-        $files = $sourceFilesFinder->getSourceFiles($filter);
+        yield 'multiple directories, no filter, no excludes' => [
+            [self::FIXTURES . '/case0', self::FIXTURES . '/case1'],
+            [],
+            '',
+            [
+                'case0/a.php',
+                'case0/outside-symlink.php',
+                'case0/sub-dir/b.php',
+                'case1/a.php',
+                'case1/sub-dir/b.php',
+            ],
+        ];
 
-        $iterator = $files->getIterator();
-        $iterator->rewind();
-        $firstFile = $iterator->current();
+        yield 'filter by file name, no excludes' => [
+            [self::FIXTURES . '/case0'],
+            [],
+            'a.php',
+            [
+                'case0/a.php',
+            ],
+        ];
 
-        $this->assertInstanceOf(Finder::class, $files);
-        $this->assertSame(1, $files->count());
-        $this->assertSame('FirstFile.php', $firstFile->getFilename());
-    }
+        yield 'filter by file name with multiple sources, no excludes' => [
+            [self::FIXTURES . '/case0', self::FIXTURES . '/case1'],
+            [],
+            'a.php',
+            [
+                'case0/a.php',
+                'case1/a.php',
+            ],
+        ];
 
-    public function test_it_can_filter_one_file_by_filename(): void
-    {
-        $sourceFilesFinder = new SourceFilesFinder(['tests/phpunit/Fixtures/Files/Finder'], []);
+        yield 'filter by file name file in sub-dir, no excludes' => [
+            [self::FIXTURES . '/case0'],
+            [],
+            'b.php',
+            [
+                'case0/sub-dir/b.php',
+            ],
+        ];
 
-        $filter = 'FirstFile.php';
-        $files = $sourceFilesFinder->getSourceFiles($filter);
+        yield 'filter by file name relative from source root, no excludes' => [
+            [self::FIXTURES . '/case0'],
+            [],
+            'case0/a.php',
+            [
+                'case0/a.php',
+            ],
+        ];
 
-        $iterator = $files->getIterator();
-        $iterator->rewind();
-        $firstFile = $iterator->current();
+        yield 'filter by file name relative from source root which excludes other possible match, no excludes' => [
+            [self::FIXTURES . '/case0', self::FIXTURES . '/case1'],
+            [],
+            'case0/a.php',
+            [
+                'case0/a.php',
+            ],
+        ];
 
-        $this->assertInstanceOf(Finder::class, $files);
-        $this->assertSame(1, $files->count());
-        $this->assertSame('FirstFile.php', $firstFile->getFilename());
-    }
+        yield 'filter by file name relative from file outside of source roo, no excludes' => [
+            [self::FIXTURES . '/case0'],
+            [],
+            './../Fixtures/Files/SourceFileCollector/case0/a.php',
+            [],
+        ];
 
-    public function test_it_can_filter_a_list_of_files_by_relative_paths(): void
-    {
-        $sourceFilesFinder = new SourceFilesFinder(['tests/phpunit/Fixtures/Files/Finder'], []);
+        yield 'filter by absolute file name, no excludes' => [
+            [self::FIXTURES . '/case0'],
+            [],
+            self::FIXTURES . '/case0/a.php',
+            [],
+        ];
 
-        $filter = 'tests/phpunit/Fixtures/Files/Finder/FirstFile.php,tests/phpunit/Fixtures/Files/Finder/SecondFile.php';
-        $files = $sourceFilesFinder->getSourceFiles($filter);
+        yield 'filter by comma separated file names, no excludes' => [
+            [self::FIXTURES . '/case0'],
+            [],
+            'a.php,b.php',
+            [
+                'case0/a.php',
+                'case0/sub-dir/b.php',
+            ],
+        ];
 
-        $iterator = $files->getIterator();
-        $iterator->rewind();
-        $firstFile = $iterator->current();
-        $iterator->next();
-        $secondFile = $iterator->current();
+        yield 'filter by comma separated (with spaces) file names, no excludes' => [
+            [self::FIXTURES . '/case0'],
+            [],
+            'a.php, b.php',
+            [
+                'case0/a.php',
+                'case0/sub-dir/b.php',
+            ],
+        ];
 
-        $this->assertInstanceOf(Finder::class, $files);
-        $this->assertSame(2, $files->count());
+        yield 'filter by unknown file' => [
+            [self::FIXTURES . '/case0'],
+            [],
+            'unknown',
+            [],
+        ];
 
-        $expectedFilenames = ['FirstFile.php', 'SecondFile.php'];
+        yield 'one directory, no filter, one excludes' => [
+            [self::FIXTURES . '/case0'],
+            ['sub-dir'],
+            '',
+            [
+                'case0/a.php',
+                'case0/outside-symlink.php',
+            ],
+        ];
 
-        foreach ([$firstFile, $secondFile] as $file) {
-            $this->assertTrue(in_array($file->getFilename(), $expectedFilenames, true));
-        }
+        yield 'one directory, no filter, absolute path excludes' => [
+            [self::FIXTURES . '/case0'],
+            [self::FIXTURES . '/sub-dir'],
+            '',
+            [
+                'case0/a.php',
+                'case0/outside-symlink.php',
+                'case0/sub-dir/b.php',
+            ],
+        ];
+
+        yield 'one directory, no filter, relative path excludes relative to source root' => [
+            [self::FIXTURES . '/case0'],
+            ['case0/sub-dir'],
+            '',
+            [
+                'case0/a.php',
+                'case0/outside-symlink.php',
+                'case0/sub-dir/b.php',
+            ],
+        ];
+
+        yield 'multiple directories, no filter, one common excludes' => [
+            [self::FIXTURES . '/case0', self::FIXTURES . '/case1'],
+            ['sub-dir'],
+            '',
+            [
+                'case0/a.php',
+                'case0/outside-symlink.php',
+                'case1/a.php',
+            ],
+        ];
+
+        yield 'nominal' => [
+            [self::FIXTURES . '/case0', self::FIXTURES . '/case1'],
+            ['sub-dir'],
+            'a.php',
+            [
+                'case0/a.php',
+                'case1/a.php',
+            ],
+        ];
     }
 
     /**
-     * IE: --filter=1,,2,3,
+     * @param string[] $files
+     *
+     * @return string[] File real paths relative to the current temporary directory
      */
-    public function test_extra_commas_in_filters(): void
+    private static function normalizePaths(array $files, string $root): array
     {
-        $sourceFilesFinder = new SourceFilesFinder(['tests/phpunit/Fixtures/Files/Finder'], []);
+        $root = Path::normalize($root);
 
-        $filter = 'tests/phpunit/Fixtures/Files/Finder/FirstFile.php,,tests/phpunit/Fixtures/Files/Finder/SecondFile.php,';
-        $files = $sourceFilesFinder->getSourceFiles($filter);
+        $files = array_values(
+            array_map(
+                static function (string $file) use ($root): string {
+                    return Path::makeRelative($file, $root);
+                },
+                $files
+            )
+        );
 
-        $iterator = $files->getIterator();
-        $iterator->rewind();
-        $firstFile = $iterator->current();
-        $iterator->next();
-        $secondFile = $iterator->current();
+        natcasesort($files);
 
-        $this->assertInstanceOf(Finder::class, $files);
-        $this->assertSame(2, $files->count());
-
-        $expectedFilenames = ['FirstFile.php', 'SecondFile.php'];
-
-        foreach ([$firstFile, $secondFile] as $file) {
-            $this->assertTrue(in_array($file->getFilename(), $expectedFilenames, true));
-        }
-    }
-
-    public function test_it_can_filter_a_list_of_files_by_filename(): void
-    {
-        $sourceFilesFinder = new SourceFilesFinder(['tests/phpunit/Fixtures/Files/Finder'], []);
-
-        $filter = 'FirstFile.php,SecondFile.php';
-        $files = $sourceFilesFinder->getSourceFiles($filter);
-
-        $iterator = $files->getIterator();
-        $iterator->rewind();
-        $firstFile = $iterator->current();
-        $iterator->next();
-        $secondFile = $iterator->current();
-
-        $this->assertInstanceOf(Finder::class, $files);
-        $this->assertSame(2, $files->count());
-
-        $expectedFilenames = ['FirstFile.php', 'SecondFile.php'];
-
-        foreach ([$firstFile, $secondFile] as $file) {
-            $this->assertTrue(in_array($file->getFilename(), $expectedFilenames, true));
-        }
-    }
-
-    public function test_it_can_filter_to_an_empty_result(): void
-    {
-        $sourceFilesFinder = new SourceFilesFinder(['tests/phpunit/Fixtures/Files/Finder'], []);
-
-        $filter = 'ThisFileDoesNotExist.php';
-        $files = $sourceFilesFinder->getSourceFiles($filter);
-
-        $this->assertInstanceOf(Finder::class, $files);
-        $this->assertSame(0, $files->count());
-    }
-
-    public function test_it_can_exclude_a_directory(): void
-    {
-        $sourceFilesFinder = new SourceFilesFinder(['tests/phpunit/Fixtures/Files/ExcludeFinder'], ['Folder2']);
-
-        $files = $sourceFilesFinder->getSourceFiles();
-
-        $this->assertInstanceOf(Finder::class, $files);
-        $this->assertSame(1, $files->count());
-
-        foreach ($files as $file) {
-            $this->assertSame('File.php', $file->getFilename());
-        }
+        return array_values($files);
     }
 }

@@ -38,6 +38,7 @@ namespace Infection\Finder;
 use Infection\Finder\Iterator\RealPathFilterIterator;
 use Iterator;
 use Symfony\Component\Finder\Finder;
+use function trim;
 
 /**
  * @internal
@@ -84,7 +85,7 @@ final class SourceFilesFinder extends Finder
         $filters = array_filter(explode(',', $filter));
 
         foreach ($filters as $filter) {
-            $this->filters[] = $filter;
+            $this->filters[] = trim($filter);
         }
 
         return $this;
