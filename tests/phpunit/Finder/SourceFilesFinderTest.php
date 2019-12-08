@@ -39,11 +39,14 @@ use function array_map;
 use function array_values;
 use Generator;
 use Infection\Finder\SourceFilesFinder;
-use function iterator_to_array;
 use function natcasesort;
 use PHPUnit\Framework\TestCase;
 use Webmozart\PathUtil\Path;
 
+/**
+ * @covers \Infection\Finder\FilterableFinder
+ * @covers \Infection\Finder\SourceFilesFinder
+ */
 final class SourceFilesFinderTest extends TestCase
 {
     private const FIXTURES = __DIR__ . '/../Fixtures/Files/SourceFileCollector';
@@ -55,17 +58,11 @@ final class SourceFilesFinderTest extends TestCase
     {
         $root = self::FIXTURES;
 
-        $files = (new SourceFilesFinder($sourceDirectories, $excludedFiles))->getSourceFiles($filter);
+        $files = (new SourceFilesFinder())->collectFiles($sourceDirectories, $excludedFiles, $filter);
 
         $this->assertSame(
             $expected,
-            self::normalizePaths(
-                iterator_to_array(
-                    $files,
-                    false
-                ),
-                $root
-            )
+            self::normalizePaths($files, $root)
         );
     }
 

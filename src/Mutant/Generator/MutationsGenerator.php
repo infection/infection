@@ -120,8 +120,11 @@ final class MutationsGenerator
      */
     public function generate(bool $onlyCovered, array $extraNodeVisitors = []): array
     {
-        $sourceFilesFinder = new SourceFilesFinder($this->srcDirs, $this->excludeDirsOrFiles);
-        $files = $sourceFilesFinder->getSourceFiles($this->filter);
+        $files = (new SourceFilesFinder())->collectFiles(
+            $this->srcDirs,
+            $this->excludeDirsOrFiles,
+            $this->filter
+        );
         $allFilesMutations = [[]];
 
         $this->eventDispatcher->dispatch(new MutationGeneratingStarted($files->count()));

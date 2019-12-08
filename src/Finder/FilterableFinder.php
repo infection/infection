@@ -35,50 +35,42 @@ declare(strict_types=1);
 
 namespace Infection\Finder;
 
-use function array_filter;
-use function array_map;
-use function explode;
-use function iterator_to_array;
-use Symfony\Component\Finder\SplFileInfo;
+use Infection\Finder\Iterator\RealPathFilterIterator;
+use Iterator;
+use Symfony\Component\Finder\Finder;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class SourceFilesFinder
+final class FilterableFinder extends Finder
 {
     /**
-     * @param string[] $sourceDirectories
-     * @param string[] $excludeDirectories
-     *
-     * @return SplFileInfo[]
+     * @var string[]
      */
-    public function collectFiles(
-        array $sourceDirectories,
-        array $excludeDirectories,
-        string $filter
-    ): array {
-        $finder = FilterableFinder::create()
-            ->exclude($excludeDirectories)
-            ->in($sourceDirectories)
-            ->files()
-        ;
+    private $filters = [];
 
-        if ('' === $filter) {
-            $finder->name('*.php');
-        } else {
-            $finder->filterFiles(
-                array_filter(
-                    array_map(
-                        'trim',
-                        explode(',', $filter)
-                    )
-                )
-            );
+    /**
+     * @param string[] $files
+     */
+    public function filterFiles(array $files): void
+    {
+        Assert::allString($files);
+
+        $this->filters = $files;
+    }
+
+    /**
+     * @return RealPathFilterIterator|(iterable<\Symfony\Component\Finder\SplFileInfo>&Iterator)
+     */
+    public function getIterator(): Iterator
+    {
+        $iterator = parent::getIterator();
+
+        if ($this->filters) {
+            $iterator = new RealPathFilterIterator($iterator, $this->filters, []);
         }
 
-        return iterator_to_array(
-            $finder,
-            false
-        );
+        return $iterator;
     }
 }
