@@ -40,7 +40,7 @@ use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
-use Infection\Finder\SourceFilesFinder;
+use Infection\Finder\SourceFilesCollector;
 use Infection\Mutant\Exception\ParserException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
@@ -120,7 +120,7 @@ final class MutationsGenerator
      */
     public function generate(bool $onlyCovered, array $extraNodeVisitors = []): array
     {
-        $files = (new SourceFilesFinder())->collectFiles(
+        $files = (new SourceFilesCollector())->collectFiles(
             $this->srcDirs,
             $this->excludeDirsOrFiles,
             $this->filter

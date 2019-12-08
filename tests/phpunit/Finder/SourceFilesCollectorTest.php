@@ -38,16 +38,16 @@ namespace Infection\Tests\Finder;
 use function array_map;
 use function array_values;
 use Generator;
-use Infection\Finder\SourceFilesFinder;
+use Infection\Finder\SourceFilesCollector;
 use function natcasesort;
 use PHPUnit\Framework\TestCase;
 use Webmozart\PathUtil\Path;
 
 /**
  * @covers \Infection\Finder\FilterableFinder
- * @covers \Infection\Finder\SourceFilesFinder
+ * @covers \Infection\Finder\SourceFilesCollector
  */
-final class SourceFilesFinderTest extends TestCase
+final class SourceFilesCollectorTest extends TestCase
 {
     private const FIXTURES = __DIR__ . '/../Fixtures/Files/SourceFileCollector';
 
@@ -58,7 +58,7 @@ final class SourceFilesFinderTest extends TestCase
     {
         $root = self::FIXTURES;
 
-        $files = (new SourceFilesFinder())->collectFiles($sourceDirectories, $excludedFiles, $filter);
+        $files = (new SourceFilesCollector())->collectFiles($sourceDirectories, $excludedFiles, $filter);
 
         $this->assertSame(
             $expected,

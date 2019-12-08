@@ -44,7 +44,7 @@ use Symfony\Component\Finder\SplFileInfo;
 /**
  * @internal
  */
-final class SourceFilesFinder
+final class SourceFilesCollector
 {
     /**
      * @param string[] $sourceDirectories
