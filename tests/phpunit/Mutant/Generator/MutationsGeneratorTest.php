@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant\Generator;
 
-use function dirname;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
 use Infection\Exception\InvalidMutatorException;
+use Infection\FileSystem\SourceFileCollector;
 use Infection\Mutant\Exception\ParserException;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutator\Arithmetic\Decrement;
@@ -60,6 +60,8 @@ use Pimple\Container;
 
 final class MutationsGeneratorTest extends TestCase
 {
+    private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Files';
+
     public function test_it_collects_plus_mutation(): void
     {
         $codeCoverageDataMock = $this->createMock(LineCodeCoverage::class);
@@ -133,7 +135,7 @@ final class MutationsGeneratorTest extends TestCase
             $this->createMock(LineCodeCoverage::class),
             Decrement::class,
             null,
-            [dirname(__DIR__, 2) . '/Fixtures/Files/InvalidFile']
+            [self::FIXTURES_DIR . '/InvalidFile']
         );
 
         $this->expectException(ParserException::class);
@@ -169,13 +171,15 @@ final class MutationsGeneratorTest extends TestCase
             );
 
         $generator = new MutationsGenerator(
-            [dirname(__DIR__, 2) . '/Fixtures/Files/Mutation/OneFile'],
-            [],
+            (new SourceFileCollector())->collectFiles(
+                [self::FIXTURES_DIR . '/Mutation/OneFile'],
+                [],
+                ''
+            ),
             $this->createMock(LineCodeCoverage::class),
             [new Plus(new MutatorConfig([]))],
             $eventDispatcher,
-            $this->getParser(),
-            ''
+            $this->getParser()
         );
 
         $generator->generate(false);
@@ -189,7 +193,7 @@ final class MutationsGeneratorTest extends TestCase
     ): MutationsGenerator {
         if ($srcDirs === []) {
             $srcDirs = [
-                dirname(__DIR__, 2) . '/Fixtures/Files/Mutation/OneFile',
+                self::FIXTURES_DIR . '/Mutation/OneFile',
             ];
         }
         $excludedDirsOrFiles = [];
@@ -227,13 +231,15 @@ final class MutationsGeneratorTest extends TestCase
         $eventDispatcherMock->expects($this->any())->method('dispatch');
 
         return new MutationsGenerator(
-            $srcDirs,
-            $excludedDirsOrFiles,
+            (new SourceFileCollector())->collectFiles(
+                $srcDirs,
+                $excludedDirsOrFiles,
+                ''
+            ),
             $codeCoverageDataMock,
             $mutators,
             $eventDispatcherMock,
-            $this->getParser(),
-            ''
+            $this->getParser()
         );
     }
 

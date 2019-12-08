@@ -42,6 +42,7 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
@@ -53,6 +54,8 @@ use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use function Infection\Tests\normalizePath;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
+use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
 
 final class ConfigurationFactoryTest extends TestCase
@@ -73,10 +76,26 @@ final class ConfigurationFactoryTest extends TestCase
 
     protected function setUp(): void
     {
+        /** @var SourceFileCollector&ObjectProphecy $sourceFilesCollectorProphecy */
+        $sourceFilesCollectorProphecy = $this->prophesize(SourceFileCollector::class);
+
+        $sourceFilesCollectorProphecy
+            ->collectFiles([], [], '')
+            ->willReturn([])
+        ;
+        $sourceFilesCollectorProphecy
+            ->collectFiles(['src/'], ['vendor/'], 'src/Foo.php, src/Bar.php')
+            ->willReturn([
+                new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
+                new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
+            ])
+        ;
+
         $this->configFactory = new ConfigurationFactory(
             new TmpDirProvider(),
             new MutatorFactory(),
-            new MutatorParser()
+            new MutatorParser(),
+            $sourceFilesCollectorProphecy->reveal()
         );
     }
 
@@ -101,7 +120,8 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $inputTestFrameworkOptions,
         string $inputFilter,
         int $expectedTimeout,
-        Source $expectedSource,
+        array $expectedSourceDirectories,
+        array $expectedSourceFiles,
         Logs $expectedLogs,
         ?string $expectedLogVerbosity,
         string $expectedTmpDir,
@@ -119,8 +139,7 @@ final class ConfigurationFactoryTest extends TestCase
         bool $expectedIgnoreMsiWithNoMutations,
         ?float $expectedMinMsi,
         bool $expectedShowMutations,
-        ?float $expectedMinCoveredMsi,
-        string $expectedFilter
+        ?float $expectedMinCoveredMsi
     ): void {
         $config = $this->configFactory->create(
             $schema,
@@ -144,7 +163,8 @@ final class ConfigurationFactoryTest extends TestCase
         $this->assertConfigurationStateIs(
             $config,
             $expectedTimeout,
-            $expectedSource,
+            $expectedSourceDirectories,
+            $expectedSourceFiles,
             $expectedLogs,
             $expectedLogVerbosity,
             normalizePath($expectedTmpDir),
@@ -162,8 +182,7 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedIgnoreMsiWithNoMutations,
             $expectedMinMsi,
             $expectedShowMutations,
-            $expectedMinCoveredMsi,
-            $expectedFilter
+            $expectedMinCoveredMsi
         );
     }
 
@@ -205,7 +224,8 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             10,
-            new Source([], []),
+            [],
+            [],
             new Logs(
                 null,
                 null,
@@ -230,7 +250,6 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
-            '',
         ];
 
         yield 'null timeout' => self::createValueForTimeout(
@@ -391,6 +410,73 @@ final class ConfigurationFactoryTest extends TestCase
             ]
         );
 
+        yield 'with source files' => [
+            new SchemaConfiguration(
+                '/path/to/infection.json',
+                null,
+                new Source(['src/'], ['vendor/']),
+                new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                '',
+                new PhpUnit(null, null),
+                [],
+                null,
+                null,
+                null,
+                null
+            ),
+            null,
+            null,
+            'none',
+            false,
+            false,
+            'progress',
+            false,
+            false,
+            null,
+            false,
+            null,
+            '',
+            null,
+            null,
+            'src/Foo.php, src/Bar.php',
+            10,
+            ['src/'],
+            [
+                new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
+                new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
+            ],
+            new Logs(
+                null,
+                null,
+                null,
+                null,
+                null
+            ),
+            'none',
+            sys_get_temp_dir() . '/infection',
+            new PhpUnit('/path/to', null),
+            self::getDefaultMutators(),
+            null,
+            null,
+            null,
+            null,
+            null,
+            false,
+            false,
+            'progress',
+            false,
+            false,
+            null,
+            false,
+            null,
+        ];
+
         yield 'complete' => [
             new SchemaConfiguration(
                 '/path/to/infection.json',
@@ -430,7 +516,11 @@ final class ConfigurationFactoryTest extends TestCase
             '--stop-on-failure',
             'src/Foo.php, src/Bar.php',
             10,
-            new Source(['src/'], ['vendor/']),
+            ['src/'],
+            [
+                new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
+                new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
+            ],
             new Logs(
                 'text.log',
                 'summary.log',
@@ -460,7 +550,6 @@ final class ConfigurationFactoryTest extends TestCase
             72.3,
             true,
             81.5,
-            'src/Foo.php, src/Bar.php',
         ];
     }
 
@@ -504,7 +593,8 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             $expectedTimeOut,
-            new Source([], []),
+            [],
+            [],
             new Logs(
                 null,
                 null,
@@ -529,7 +619,6 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
-            '',
         ];
     }
 
@@ -573,7 +662,8 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             10,
-            new Source([], []),
+            [],
+            [],
             new Logs(
                 null,
                 null,
@@ -598,7 +688,6 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
-            '',
         ];
     }
 
@@ -642,7 +731,8 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             10,
-            new Source([], []),
+            [],
+            [],
             new Logs(
                 null,
                 null,
@@ -667,7 +757,6 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
-            '',
         ];
     }
 
@@ -712,7 +801,8 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             10,
-            new Source([], []),
+            [],
+            [],
             new Logs(
                 null,
                 null,
@@ -737,7 +827,6 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
-            '',
         ];
     }
 
@@ -782,7 +871,8 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             10,
-            new Source([], []),
+            [],
+            [],
             new Logs(
                 null,
                 null,
@@ -807,7 +897,6 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
-            '',
         ];
     }
 
@@ -852,7 +941,8 @@ final class ConfigurationFactoryTest extends TestCase
             $inputInitialTestsFrameworkOptions,
             '',
             10,
-            new Source([], []),
+            [],
+            [],
             new Logs(
                 null,
                 null,
@@ -877,7 +967,6 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
-            '',
         ];
     }
 
@@ -925,7 +1014,8 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             10,
-            new Source([], []),
+            [],
+            [],
             new Logs(
                 null,
                 null,
@@ -950,7 +1040,6 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
-            '',
         ];
     }
 

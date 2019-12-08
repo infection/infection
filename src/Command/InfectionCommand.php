@@ -338,13 +338,11 @@ final class InfectionCommand extends BaseCommand
         $codeCoverageData = $this->getCodeCoverageData($this->testFrameworkKey, $adapter);
 
         $mutationsGenerator = new MutationsGenerator(
-            $config->getSource()->getDirectories(),
-            $config->getSource()->getExcludes(),
+            $config->getSourceFiles(),
             $codeCoverageData,
             $config->getMutators(),
             $this->eventDispatcher,
             $this->container['parser'],
-            $config->getFilter()
         );
 
         $mutations = $mutationsGenerator->generate(

@@ -43,9 +43,11 @@ use function iterator_to_array;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
+ * @final
+ *
  * @internal
  */
-final class SourceFileCollector
+class SourceFileCollector
 {
     /**
      * @param string[] $sourceDirectories
@@ -58,23 +60,27 @@ final class SourceFileCollector
         array $excludeDirectories,
         string $filter
     ): array {
+        if ([] === $sourceDirectories) {
+            return [];
+        }
+
         $finder = FilterableFinder::create()
             ->exclude($excludeDirectories)
             ->in($sourceDirectories)
             ->files()
         ;
 
-        $filters = array_filter(
-            array_map(
-                'trim',
-                explode(',', $filter)
-            )
-        );
-
-        if ($filters === []) {
+        if ('' === $filter) {
             $finder->name('*.php');
         } else {
-            $finder->filterFiles($filters);
+            $finder->filterFiles(
+                array_filter(
+                    array_map(
+                        'trim',
+                        explode(',', $filter)
+                    )
+                )
+            );
         }
 
         return iterator_to_array(

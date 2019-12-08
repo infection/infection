@@ -48,6 +48,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\EventDispatcher\EventDispatcherInterface;
+use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Locator\RootsFileLocator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
@@ -262,11 +263,14 @@ final class InfectionContainer extends Container
                 $mutatorFactory = $container[MutatorFactory::class];
                 /** @var MutatorParser $mutatorParser */
                 $mutatorParser = $container[MutatorParser::class];
+                /** @var SourceFileCollector $sourceFileCollector */
+                $sourceFileCollector = $container[SourceFileCollector::class];
 
                 return new ConfigurationFactory(
                     $tmpDirProvider,
                     $mutatorFactory,
-                    $mutatorParser
+                    $mutatorParser,
+                    $sourceFileCollector
                 );
             },
             MutatorFactory::class => static function (): MutatorFactory {
@@ -334,6 +338,9 @@ final class InfectionContainer extends Container
             },
             CommandLineBuilder::class => static function (): CommandLineBuilder {
                 return new CommandLineBuilder();
+            },
+            SourceFileCollector::class => static function (): SourceFileCollector {
+                return new SourceFileCollector();
             },
         ]);
     }

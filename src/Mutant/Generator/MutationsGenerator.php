@@ -41,7 +41,6 @@ use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
-use Infection\FileSystem\SourceFileCollector;
 use Infection\Mutant\Exception\ParserException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
@@ -65,19 +64,14 @@ use Throwable;
 final class MutationsGenerator
 {
     /**
-     * @var array source directories
+     * @var SplFileInfo[]
      */
-    private $srcDirs;
+    private $sourceFiles;
 
     /**
      * @var LineCodeCoverage
      */
     private $codeCoverageData;
-
-    /**
-     * @var array
-     */
-    private $excludeDirsOrFiles;
 
     /**
      * @var Mutator[]
@@ -93,24 +87,22 @@ final class MutationsGenerator
      * @var Parser
      */
     private $parser;
-    private $filter;
 
+    /**
+     * @param SplFileInfo[] $sourceFiles
+     */
     public function __construct(
-        array $srcDirs,
-        array $excludeDirsOrFiles,
+        array $sourceFiles,
         LineCodeCoverage $codeCoverageData,
         array $mutators,
         EventDispatcherInterface $eventDispatcher,
-        Parser $parser,
-        string $filter
+        Parser $parser
     ) {
-        $this->srcDirs = $srcDirs;
+        $this->sourceFiles = $sourceFiles;
         $this->codeCoverageData = $codeCoverageData;
-        $this->excludeDirsOrFiles = $excludeDirsOrFiles;
         $this->mutators = $mutators;
         $this->eventDispatcher = $eventDispatcher;
         $this->parser = $parser;
-        $this->filter = $filter;
     }
 
     /**
@@ -121,16 +113,11 @@ final class MutationsGenerator
      */
     public function generate(bool $onlyCovered, array $extraNodeVisitors = []): array
     {
-        $files = (new SourceFileCollector())->collectFiles(
-            $this->srcDirs,
-            $this->excludeDirsOrFiles,
-            $this->filter
-        );
         $allFilesMutations = [[]];
 
-        $this->eventDispatcher->dispatch(new MutationGeneratingStarted(count($files)));
+        $this->eventDispatcher->dispatch(new MutationGeneratingStarted(count($this->sourceFiles)));
 
-        foreach ($files as $file) {
+        foreach ($this->sourceFiles as $file) {
             if (!$onlyCovered || $this->hasTests($file)) {
                 $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered, $extraNodeVisitors);
             }
