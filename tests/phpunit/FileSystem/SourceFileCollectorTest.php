@@ -43,10 +43,10 @@ use PHPUnit\Framework\TestCase;
 use Webmozart\PathUtil\Path;
 
 /**
- * @covers \Infection\FileSystem\SourceFilesCollector
+ * @covers \Infection\FileSystem\SourceFileCollector
  * @covers \Infection\Finder\FilterableFinder
  */
-final class SourceFilesCollectorTest extends TestCase
+final class SourceFileCollectorTest extends TestCase
 {
     private const FIXTURES = __DIR__ . '/../Fixtures/Files/SourceFileCollector';
 
@@ -57,7 +57,7 @@ final class SourceFilesCollectorTest extends TestCase
     {
         $root = self::FIXTURES;
 
-        $files = (new \Infection\FileSystem\SourceFilesCollector())->collectFiles($sourceDirectories, $excludedFiles, $filter);
+        $files = (new \Infection\FileSystem\SourceFileCollector())->collectFiles($sourceDirectories, $excludedFiles, $filter);
 
         $this->assertSame(
             $expected,
