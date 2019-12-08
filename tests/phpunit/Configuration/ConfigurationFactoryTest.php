@@ -47,6 +47,7 @@ use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\MutatorFactory;
+use Infection\Mutator\MutatorParser;
 use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
@@ -74,7 +75,8 @@ final class ConfigurationFactoryTest extends TestCase
     {
         $this->configFactory = new ConfigurationFactory(
             new TmpDirProvider(),
-            new MutatorFactory()
+            new MutatorFactory(),
+            new MutatorParser()
         );
     }
 
@@ -94,7 +96,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?float $inputMinMsi,
         bool $inputShowMutations,
         ?float $inputMinCoveredMsi,
-        ?string $inputMutators,
+        string $inputMutators,
         ?string $inputTestFramework,
         ?string $inputTestFrameworkOptions,
         int $expectedTimeout,
@@ -194,7 +196,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
-            null,
+            '',
             null,
             null,
             10,
@@ -344,7 +346,7 @@ final class ConfigurationFactoryTest extends TestCase
 
         yield 'no mutator' => self::createValueForMutators(
             [],
-            null,
+            '',
             self::getDefaultMutators()
         );
 
@@ -357,7 +359,7 @@ final class ConfigurationFactoryTest extends TestCase
                     ],
                 ],
             ],
-            null,
+            '',
             [
                 'MethodCallRemoval' => new MethodCallRemoval(new MutatorConfig([
                     'ignore' => [
@@ -489,7 +491,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
-            null,
+            '',
             null,
             null,
             $expectedTimeOut,
@@ -556,7 +558,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
-            null,
+            '',
             null,
             null,
             10,
@@ -623,7 +625,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
-            null,
+            '',
             null,
             null,
             10,
@@ -691,7 +693,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
-            null,
+            '',
             $inputTestFramework,
             null,
             10,
@@ -759,7 +761,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
-            null,
+            '',
             null,
             null,
             10,
@@ -827,7 +829,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
-            null,
+            '',
             null,
             $inputInitialTestsFrameworkOptions,
             10,
@@ -864,7 +866,7 @@ final class ConfigurationFactoryTest extends TestCase
      */
     private static function createValueForMutators(
         array $configMutators,
-        ?string $inputMutators,
+        string $inputMutators,
         array $expectedMutators
     ): array {
         return [

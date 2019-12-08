@@ -35,11 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
+use function array_fill_keys;
 use function dirname;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\MutatorFactory;
-use Infection\Mutator\Util\MutatorParser;
+use Infection\Mutator\MutatorParser;
 use function sprintf;
 use function sys_get_temp_dir;
 use Webmozart\PathUtil\Path;
@@ -52,13 +53,16 @@ class ConfigurationFactory
 {
     private $tmpDirProvider;
     private $mutatorFactory;
+    private $mutatorParser;
 
     public function __construct(
         TmpDirProvider $tmpDirProvider,
-        MutatorFactory $mutatorFactory
+        MutatorFactory $mutatorFactory,
+        MutatorParser $mutatorParser
     ) {
         $this->tmpDirProvider = $tmpDirProvider;
         $this->mutatorFactory = $mutatorFactory;
+        $this->mutatorParser = $mutatorParser;
     }
 
     public function create(
@@ -74,7 +78,7 @@ class ConfigurationFactory
         ?float $minMsi,
         bool $showMutations,
         ?float $minCoveredMsi,
-        ?string $mutators,
+        string $mutatorsInput,
         ?string $testFramework,
         ?string $testFrameworkOptions
     ): Configuration {
@@ -107,14 +111,14 @@ class ConfigurationFactory
             $logVerbosity,
             $this->tmpDirProvider->providePath($tmpDir),
             $schema->getPhpUnit(),
-            (new MutatorParser(
-                $mutators,
-                $this->mutatorFactory->create(
+            $this->mutatorFactory->create(
+                $this->retrieveMutators(
                     $schemaMutators === []
                         ? ['@default' => true]
-                        : $schemaMutators
+                        : $schemaMutators,
+                    $mutatorsInput
                 )
-            ))->getMutators(),
+            ),
             $testFramework ?? $schema->getTestFramework(),
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
@@ -129,5 +133,16 @@ class ConfigurationFactory
             $showMutations,
             $minCoveredMsi
         );
+    }
+
+    private function retrieveMutators(array $schemaMutators, string $mutatorsInput): array
+    {
+        $parsedMutatorsInput = $this->mutatorParser->parse($mutatorsInput);
+
+        if ([] === $parsedMutatorsInput) {
+            return $schemaMutators;
+        }
+
+        return array_fill_keys($parsedMutatorsInput, true);
     }
 }
