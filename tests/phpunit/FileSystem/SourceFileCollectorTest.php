@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
+use Infection\FileSystem\SourceFileCollector;
 use function array_map;
 use function array_values;
 use Generator;
@@ -57,7 +58,7 @@ final class SourceFileCollectorTest extends TestCase
     {
         $root = self::FIXTURES;
 
-        $files = (new \Infection\FileSystem\SourceFileCollector())->collectFiles($sourceDirectories, $excludedFiles, $filter);
+        $files = (new SourceFileCollector())->collectFiles($sourceDirectories, $excludedFiles, $filter);
 
         $this->assertSame(
             $expected,
