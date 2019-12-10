@@ -64,17 +64,17 @@ final class SourceFileCollector
             ->files()
         ;
 
-        if ('' === $filter) {
+        $filters = array_filter(
+            array_map(
+                'trim',
+                explode(',', $filter)
+            )
+        );
+
+        if ($filters === []) {
             $finder->name('*.php');
         } else {
-            $finder->filterFiles(
-                array_filter(
-                    array_map(
-                        'trim',
-                        explode(',', $filter)
-                    )
-                )
-            );
+            $finder->filterFiles($filters);
         }
 
         return iterator_to_array(
