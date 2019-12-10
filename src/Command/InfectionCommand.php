@@ -336,18 +336,19 @@ final class InfectionCommand extends BaseCommand
         $processBuilder = new MutantProcessBuilder($adapter, $this->versionParser, $config->getProcessTimeout());
 
         $codeCoverageData = $this->getCodeCoverageData($this->testFrameworkKey, $adapter);
+
         $mutationsGenerator = new MutationsGenerator(
             $config->getSource()->getDirectories(),
             $config->getSource()->getExcludes(),
             $codeCoverageData,
             $config->getMutators(),
             $this->eventDispatcher,
-            $this->container['parser']
+            $this->container['parser'],
+            $config->getFilter()
         );
 
         $mutations = $mutationsGenerator->generate(
-            $this->input->getOption('only-covered'),
-            $this->input->getOption('filter'),
+            $config->mutateOnlyCoveredCode(),
             $adapter instanceof HasExtraNodeVisitors ? $adapter->getMutationsCollectionNodeVisitors() : []
         );
 
@@ -433,7 +434,8 @@ final class InfectionCommand extends BaseCommand
             null === $minMsi ? null : (float) $minMsi,
             null === $minCoveredMsi ? null : (float) $minCoveredMsi,
             '' === $testFramework ? null : $testFramework,
-            '' === $testFrameworkOptions ? null : $testFrameworkOptions
+            '' === $testFrameworkOptions ? null : $testFrameworkOptions,
+            trim((string) $input->getOption('filter'))
         );
     }
 

@@ -99,6 +99,7 @@ final class ConfigurationFactoryTest extends TestCase
         string $inputMutators,
         ?string $inputTestFramework,
         ?string $inputTestFrameworkOptions,
+        string $inputFilter,
         int $expectedTimeout,
         Source $expectedSource,
         Logs $expectedLogs,
@@ -118,7 +119,8 @@ final class ConfigurationFactoryTest extends TestCase
         bool $expectedIgnoreMsiWithNoMutations,
         ?float $expectedMinMsi,
         bool $expectedShowMutations,
-        ?float $expectedMinCoveredMsi
+        ?float $expectedMinCoveredMsi,
+        string $expectedFilter
     ): void {
         $config = $this->configFactory->create(
             $schema,
@@ -135,7 +137,8 @@ final class ConfigurationFactoryTest extends TestCase
             $inputMinCoveredMsi,
             $inputMutators,
             $inputTestFramework,
-            $inputTestFrameworkOptions
+            $inputTestFrameworkOptions,
+            $inputFilter
         );
 
         $this->assertConfigurationStateIs(
@@ -159,7 +162,8 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedIgnoreMsiWithNoMutations,
             $expectedMinMsi,
             $expectedShowMutations,
-            $expectedMinCoveredMsi
+            $expectedMinCoveredMsi,
+            $expectedFilter
         );
     }
 
@@ -199,6 +203,7 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             null,
             null,
+            '',
             10,
             new Source([], []),
             new Logs(
@@ -225,6 +230,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            '',
         ];
 
         yield 'null timeout' => self::createValueForTimeout(
@@ -422,6 +428,7 @@ final class ConfigurationFactoryTest extends TestCase
             'TrueValue',
             'phpspec',
             '--stop-on-failure',
+            'src/Foo.php, src/Bar.php',
             10,
             new Source(['src/'], ['vendor/']),
             new Logs(
@@ -453,6 +460,7 @@ final class ConfigurationFactoryTest extends TestCase
             72.3,
             true,
             81.5,
+            'src/Foo.php, src/Bar.php',
         ];
     }
 
@@ -494,6 +502,7 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             null,
             null,
+            '',
             $expectedTimeOut,
             new Source([], []),
             new Logs(
@@ -520,6 +529,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            '',
         ];
     }
 
@@ -561,6 +571,7 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             null,
             null,
+            '',
             10,
             new Source([], []),
             new Logs(
@@ -587,6 +598,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            '',
         ];
     }
 
@@ -628,6 +640,7 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             null,
             null,
+            '',
             10,
             new Source([], []),
             new Logs(
@@ -654,6 +667,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            '',
         ];
     }
 
@@ -696,6 +710,7 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             $inputTestFramework,
             null,
+            '',
             10,
             new Source([], []),
             new Logs(
@@ -722,6 +737,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            '',
         ];
     }
 
@@ -764,6 +780,7 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             null,
             null,
+            '',
             10,
             new Source([], []),
             new Logs(
@@ -790,6 +807,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            '',
         ];
     }
 
@@ -832,6 +850,7 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             null,
             $inputInitialTestsFrameworkOptions,
+            '',
             10,
             new Source([], []),
             new Logs(
@@ -858,6 +877,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            '',
         ];
     }
 
@@ -903,6 +923,7 @@ final class ConfigurationFactoryTest extends TestCase
             $inputMutators,
             null,
             null,
+            '',
             10,
             new Source([], []),
             new Logs(
@@ -929,6 +950,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
+            '',
         ];
     }
 

@@ -70,7 +70,8 @@ trait ConfigurationAssertions
         bool $expectedIgnoreMsiWithNoMutations,
         ?float $expectedMinMsi,
         bool $expectedShowMutations,
-        ?float $expectedMinCoveredMsi
+        ?float $expectedMinCoveredMsi,
+        string $expectedFilter
     ): void {
         $this->assertSame($expectedTimeout, $configuration->getProcessTimeout());
         $this->assertSourceStateIs(
@@ -107,5 +108,6 @@ trait ConfigurationAssertions
         $this->assertSame($expectedMinMsi, $configuration->getMinMsi());
         $this->assertSame($expectedShowMutations, $configuration->showMutations());
         $this->assertSame($expectedMinCoveredMsi, $configuration->getMinCoveredMsi());
+        $this->assertSame($expectedFilter, $configuration->getFilter());
     }
 }
