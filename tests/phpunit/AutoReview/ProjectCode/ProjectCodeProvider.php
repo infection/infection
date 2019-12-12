@@ -55,6 +55,7 @@ use Infection\Console\Util\PhpProcess;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Finder\ComposerExecutableFinder;
+use Infection\Finder\FilterableFinder;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\Http\BadgeApiClient;
 use Infection\Logger\ResultsLoggerTypes;
@@ -106,6 +107,7 @@ final class ProjectCodeProvider
         TestFrameworkTypes::class,
         MutationsCollectorVisitor::class,
         ParentConnectorVisitor::class,
+        FilterableFinder::class,
     ];
 
     /**

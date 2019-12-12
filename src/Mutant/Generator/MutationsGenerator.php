@@ -36,11 +36,12 @@ declare(strict_types=1);
 namespace Infection\Mutant\Generator;
 
 use function assert;
+use function count;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
-use Infection\Finder\SourceFilesFinder;
+use Infection\FileSystem\SourceFileCollector;
 use Infection\Mutant\Exception\ParserException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
@@ -120,11 +121,14 @@ final class MutationsGenerator
      */
     public function generate(bool $onlyCovered, array $extraNodeVisitors = []): array
     {
-        $sourceFilesFinder = new SourceFilesFinder($this->srcDirs, $this->excludeDirsOrFiles);
-        $files = $sourceFilesFinder->getSourceFiles($this->filter);
+        $files = (new SourceFileCollector())->collectFiles(
+            $this->srcDirs,
+            $this->excludeDirsOrFiles,
+            $this->filter
+        );
         $allFilesMutations = [[]];
 
-        $this->eventDispatcher->dispatch(new MutationGeneratingStarted($files->count()));
+        $this->eventDispatcher->dispatch(new MutationGeneratingStarted(count($files)));
 
         foreach ($files as $file) {
             if (!$onlyCovered || $this->hasTests($file)) {
