@@ -366,10 +366,13 @@ final class InfectionContainer extends Container
         $clone = clone $this;
 
         $clone[SchemaConfiguration::class] = static function (self $container) use ($configFile): SchemaConfiguration {
-            return $container[SchemaConfigurationLoader::class]->loadConfiguration(array_filter([
+            /** @var SchemaConfigurationLoader $schemaConfigLoader */
+            $schemaConfigLoader = $container[SchemaConfigurationLoader::class];
+
+            return $schemaConfigLoader->loadConfiguration(array_filter([
                 $configFile,
-                'infection.json.dist',
-                'infection.json',
+                SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
+                SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
             ]));
         };
 
