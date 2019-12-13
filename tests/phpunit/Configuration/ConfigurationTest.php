@@ -160,7 +160,7 @@ final class ConfigurationTest extends TestCase
         ];
 
         yield 'nominal' => [
-            10,
+            1,
             ['src', 'lib'],
             [
                 new SplFileInfo('Foo.php', 'Foo.php', 'Foo.php'),

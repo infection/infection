@@ -187,6 +187,16 @@ final class SourceFileCollectorTest extends TestCase
             ],
         ];
 
+        yield 'filter by comma separated (with spaces & empty) file names, no excludes' => [
+            [self::FIXTURES . '/case0'],
+            [],
+            'a.php, ,, b.php',
+            [
+                'case0/a.php',
+                'case0/sub-dir/b.php',
+            ],
+        ];
+
         yield 'filter by unknown file' => [
             [self::FIXTURES . '/case0'],
             [],
