@@ -64,6 +64,14 @@ final class SourceFileCollectorTest extends TestCase
             $expected,
             self::normalizePaths($files, $root)
         );
+
+        if ($files !== []) {
+            $this->assertSame(
+                range(0, count($files) - 1),
+                array_keys($files),
+                'Expected the collected files to be a list'
+            );
+        }
     }
 
     public function sourceFilesProvider(): Generator
