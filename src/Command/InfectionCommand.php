@@ -342,7 +342,7 @@ final class InfectionCommand extends BaseCommand
             $codeCoverageData,
             $config->getMutators(),
             $this->eventDispatcher,
-            $this->container['parser'],
+            $this->container['parser']
         );
 
         $mutations = $mutationsGenerator->generate(

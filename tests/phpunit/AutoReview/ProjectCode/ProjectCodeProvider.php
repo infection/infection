@@ -54,6 +54,7 @@ use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\Util\PhpProcess;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
+use Infection\FileSystem\SourceFileCollector;
 use Infection\Finder\ComposerExecutableFinder;
 use Infection\Finder\FilterableFinder;
 use Infection\Finder\TestFrameworkFinder;
@@ -135,6 +136,7 @@ final class ProjectCodeProvider
         SchemaValidator::class,
         Configuration::class,
         ConfigurationFactory::class,
+        SourceFileCollector::class,
     ];
 
     /**
