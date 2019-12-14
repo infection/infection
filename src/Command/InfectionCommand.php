@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use function dirname;
 use Exception;
 use Infection\Config\InfectionConfig;
 use Infection\Configuration\Configuration;
@@ -50,7 +49,7 @@ use Infection\Events\ApplicationExecutionStarted;
 use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\Locator\Locator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
-use Infection\Mutant\Generator\MutationsGenerator;
+use Infection\Mutation\MutationGenerator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Runner\InitialTestsFailed;
@@ -69,8 +68,6 @@ use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Utils\VersionParser;
-use function is_numeric;
-use function Safe\sprintf;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -78,8 +75,11 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
-use function trim;
 use Webmozart\Assert\Assert;
+use function dirname;
+use function is_numeric;
+use function Safe\sprintf;
+use function trim;
 
 /**
  * @internal
@@ -337,7 +337,7 @@ final class InfectionCommand extends BaseCommand
 
         $codeCoverageData = $this->getCodeCoverageData($this->testFrameworkKey, $adapter);
 
-        $mutationsGenerator = new MutationsGenerator(
+        $mutationsGenerator = new MutationGenerator(
             $config->getSourceFiles(),
             $codeCoverageData,
             $config->getMutators(),

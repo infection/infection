@@ -33,10 +33,8 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant\Generator;
+namespace Infection\Mutation;
 
-use function assert;
-use function count;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
@@ -51,17 +49,19 @@ use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\NotMutableIgnoreVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
-use function is_string;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\Parser;
 use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
+use function assert;
+use function count;
+use function is_string;
 
 /**
  * @internal
  */
-final class MutationsGenerator
+final class MutationGenerator
 {
     /**
      * @var SplFileInfo[]
@@ -118,9 +118,7 @@ final class MutationsGenerator
         $this->eventDispatcher->dispatch(new MutationGeneratingStarted(count($this->sourceFiles)));
 
         foreach ($this->sourceFiles as $file) {
-            if (!$onlyCovered || $this->hasTests($file)) {
-                $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered, $extraNodeVisitors);
-            }
+            $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered, $extraNodeVisitors);
 
             $this->eventDispatcher->dispatch(new MutableFileProcessed());
         }
@@ -138,6 +136,10 @@ final class MutationsGenerator
      */
     private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered, array $extraNodeVisitors): array
     {
+        if (!$onlyCovered || $this->hasTests($file)) {
+            return [];
+        }
+
         try {
             /** @var Node[] $initialStatements */
             $initialStatements = $this->parser->parse($file->getContents());
