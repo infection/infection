@@ -52,6 +52,11 @@ use Webmozart\PathUtil\Path;
  */
 class ConfigurationFactory
 {
+    /**
+     * Default allowed timeout (on a test basis) in seconds
+     */
+    private const DEFAULT_TIMEOUT = 10;
+
     private $tmpDirProvider;
     private $mutatorFactory;
     private $mutatorParser;
@@ -110,7 +115,7 @@ class ConfigurationFactory
         $schemaMutators = $schema->getMutators();
 
         return new Configuration(
-            $schema->getTimeout() ?? 10,
+            $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
             $schema->getSource()->getDirectories(),
             $this->sourceFileCollector->collectFiles(
                 $schema->getSource()->getDirectories(),
