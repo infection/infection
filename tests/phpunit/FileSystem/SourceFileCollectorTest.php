@@ -35,15 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
-use function array_keys;
 use function array_map;
 use function array_values;
-use function count;
 use Generator;
 use Infection\FileSystem\SourceFileCollector;
 use function natcasesort;
 use PHPUnit\Framework\TestCase;
-use function range;
 use Webmozart\PathUtil\Path;
 
 /**
@@ -63,6 +60,11 @@ final class SourceFileCollectorTest extends TestCase
 
         $files = (new SourceFileCollector())->collectFiles($sourceDirectories, $excludedFiles, $filter);
 
+        $this->assertSame(
+            $expected,
+            self::normalizePaths($files, $root)
+        );
+
         if ($files !== []) {
             $this->assertSame(
                 range(0, count($files) - 1),
@@ -70,15 +72,17 @@ final class SourceFileCollectorTest extends TestCase
                 'Expected the collected files to be a list'
             );
         }
-
-        $this->assertSame(
-            $expected,
-            self::normalizePaths($files, $root)
-        );
     }
 
     public function sourceFilesProvider(): Generator
     {
+        yield 'empty' => [
+            [],
+            [],
+            '',
+            [],
+        ];
+
         yield 'one directory, no filter, no excludes' => [
             [self::FIXTURES . '/case0'],
             [],
@@ -100,17 +104,6 @@ final class SourceFileCollectorTest extends TestCase
                 'case0/sub-dir/b.php',
                 'case1/a.php',
                 'case1/sub-dir/b.php',
-            ],
-        ];
-
-        yield 'one directory, empty filter, no excludes' => [
-            [self::FIXTURES . '/case0'],
-            [],
-            ' ',
-            [
-                'case0/a.php',
-                'case0/outside-symlink.php',
-                'case0/sub-dir/b.php',
             ],
         ];
 
@@ -188,6 +181,16 @@ final class SourceFileCollectorTest extends TestCase
             [self::FIXTURES . '/case0'],
             [],
             'a.php, b.php',
+            [
+                'case0/a.php',
+                'case0/sub-dir/b.php',
+            ],
+        ];
+
+        yield 'filter by comma separated (with spaces & empty) file names, no excludes' => [
+            [self::FIXTURES . '/case0'],
+            [],
+            'a.php, ,, b.php',
             [
                 'case0/a.php',
                 'case0/sub-dir/b.php',

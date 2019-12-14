@@ -40,9 +40,9 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
 use Infection\Tests\Fixtures\Mutator\Fake;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Finder\SplFileInfo;
 
 final class ConfigurationTest extends TestCase
 {
@@ -50,10 +50,14 @@ final class ConfigurationTest extends TestCase
 
     /**
      * @dataProvider valueProvider
+     *
+     * @param string[]      $sourceDirectories
+     * @param SplFileInfo[] $sourceFiles
      */
     public function test_it_can_be_instantiated(
         ?int $timeout,
-        Source $source,
+        array $sourceDirectories,
+        array $sourceFiles,
         Logs $logs,
         string $logVerbosity,
         string $tmpDir,
@@ -71,12 +75,12 @@ final class ConfigurationTest extends TestCase
         bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
         bool $showMutations,
-        ?float $minCoveredMsi,
-        string $filter
+        ?float $minCoveredMsi
     ): void {
         $config = new Configuration(
             $timeout,
-            $source,
+            $sourceDirectories,
+            $sourceFiles,
             $logs,
             $logVerbosity,
             $tmpDir,
@@ -94,14 +98,14 @@ final class ConfigurationTest extends TestCase
             $ignoreMsiWithNoMutations,
             $minMsi,
             $showMutations,
-            $minCoveredMsi,
-            $filter
+            $minCoveredMsi
         );
 
         $this->assertConfigurationStateIs(
             $config,
             $timeout,
-            $source,
+            $sourceDirectories,
+            $sourceFiles,
             $logs,
             $logVerbosity,
             $tmpDir,
@@ -119,8 +123,7 @@ final class ConfigurationTest extends TestCase
             $ignoreMsiWithNoMutations,
             $minMsi,
             $showMutations,
-            $minCoveredMsi,
-            $filter
+            $minCoveredMsi
         );
     }
 
@@ -128,7 +131,8 @@ final class ConfigurationTest extends TestCase
     {
         yield 'empty' => [
             10,
-            new Source([], []),
+            [],
+            [],
             new Logs(
                 null,
                 null,
@@ -153,12 +157,15 @@ final class ConfigurationTest extends TestCase
             null,
             false,
             null,
-            '',
         ];
 
         yield 'nominal' => [
-            10,
-            new Source(['src', 'lib'], ['fixtures', 'tests']),
+            1,
+            ['src', 'lib'],
+            [
+                new SplFileInfo('Foo.php', 'Foo.php', 'Foo.php'),
+                new SplFileInfo('Bar.php', 'Bar.php', 'Bar.php'),
+            ],
             new Logs(
                 'text.log',
                 'summary.log',
@@ -185,7 +192,6 @@ final class ConfigurationTest extends TestCase
             43.,
             true,
             43.,
-            'src/Foo.php, src/Bar.php',
         ];
     }
 }

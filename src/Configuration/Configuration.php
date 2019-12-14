@@ -37,9 +37,9 @@ namespace Infection\Configuration;
 
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\TestFrameworkTypes;
+use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
@@ -60,7 +60,8 @@ class Configuration
     ];
 
     private $timeout;
-    private $source;
+    private $sourceDirectories;
+    private $sourceFiles;
     private $logs;
     private $logVerbosity;
     private $tmpDir;
@@ -79,14 +80,16 @@ class Configuration
     private $minMsi;
     private $showMutations;
     private $minCoveredMsi;
-    private $filter;
 
     /**
+     * @param string[]               $sourceDirectories
+     * @param SplFileInfo[]          $sourceFiles
      * @param array<string, Mutator> $mutators
      */
     public function __construct(
         int $timeout,
-        Source $source,
+        array $sourceDirectories,
+        array $sourceFiles,
         Logs $logs,
         string $logVerbosity,
         string $tmpDir,
@@ -104,10 +107,11 @@ class Configuration
         bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
         bool $showMutations,
-        ?float $minCoveredMsi,
-        string $filter
+        ?float $minCoveredMsi
     ) {
         Assert::nullOrGreaterThanEq($timeout, 1);
+        Assert::allString($sourceDirectories);
+        Assert::allIsInstanceOf($sourceFiles, SplFileInfo::class);
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
@@ -115,7 +119,8 @@ class Configuration
         Assert::nullOrGreaterThanEq($minMsi, 0.);
 
         $this->timeout = $timeout;
-        $this->source = $source;
+        $this->sourceDirectories = $sourceDirectories;
+        $this->sourceFiles = $sourceFiles;
         $this->logs = $logs;
         $this->logVerbosity = $logVerbosity;
         $this->tmpDir = $tmpDir;
@@ -134,7 +139,6 @@ class Configuration
         $this->minMsi = $minMsi;
         $this->showMutations = $showMutations;
         $this->minCoveredMsi = $minCoveredMsi;
-        $this->filter = $filter;
     }
 
     public function getProcessTimeout(): int
@@ -142,9 +146,20 @@ class Configuration
         return $this->timeout;
     }
 
-    public function getSource(): Source
+    /**
+     * @return string[]
+     */
+    public function getSourceDirectories(): array
     {
-        return $this->source;
+        return $this->sourceDirectories;
+    }
+
+    /**
+     * @return SplFileInfo[]
+     */
+    public function getSourceFiles(): array
+    {
+        return $this->sourceFiles;
     }
 
     public function getLogs(): Logs
@@ -238,10 +253,5 @@ class Configuration
     public function getMinCoveredMsi(): ?float
     {
         return $this->minCoveredMsi;
-    }
-
-    public function getFilter(): string
-    {
-        return $this->filter;
     }
 }

@@ -35,24 +35,28 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
+use function array_map;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
 use Infection\Tests\Configuration\Entry\LogsAssertions;
 use Infection\Tests\Configuration\Entry\PhpUnitAssertions;
-use Infection\Tests\Configuration\Entry\SourceAssertions;
+use Symfony\Component\Finder\SplFileInfo;
 
 trait ConfigurationAssertions
 {
     use LogsAssertions;
     use PhpUnitAssertions;
-    use SourceAssertions;
 
+    /**
+     * @param string[]      $expectedSourceDirectories
+     * @param SplFileInfo[] $expectedSourceFiles
+     */
     private function assertConfigurationStateIs(
         Configuration $configuration,
         ?int $expectedTimeout,
-        Source $expectedSource,
+        array $expectedSourceDirectories,
+        array $expectedSourceFiles,
         Logs $expectedLogs,
         string $expectedLogVerbosity,
         string $expectedTmpDir,
@@ -70,14 +74,13 @@ trait ConfigurationAssertions
         bool $expectedIgnoreMsiWithNoMutations,
         ?float $expectedMinMsi,
         bool $expectedShowMutations,
-        ?float $expectedMinCoveredMsi,
-        string $expectedFilter
+        ?float $expectedMinCoveredMsi
     ): void {
         $this->assertSame($expectedTimeout, $configuration->getProcessTimeout());
-        $this->assertSourceStateIs(
-            $configuration->getSource(),
-            $expectedSource->getDirectories(),
-            $expectedSource->getExcludes()
+        $this->assertSame($expectedSourceDirectories, $configuration->getSourceDirectories());
+        $this->assertSame(
+            self::normalizePaths($expectedSourceFiles),
+            self::normalizePaths($configuration->getSourceFiles())
         );
         $this->assertLogsStateIs(
             $configuration->getLogs(),
@@ -108,6 +111,20 @@ trait ConfigurationAssertions
         $this->assertSame($expectedMinMsi, $configuration->getMinMsi());
         $this->assertSame($expectedShowMutations, $configuration->showMutations());
         $this->assertSame($expectedMinCoveredMsi, $configuration->getMinCoveredMsi());
-        $this->assertSame($expectedFilter, $configuration->getFilter());
+    }
+
+    /**
+     * @param SplFileInfo[] $fileInfos
+     *
+     * @return string[]
+     */
+    private static function normalizePaths(array $fileInfos): array
+    {
+        return array_map(
+            static function (SplFileInfo $fileInfo): string {
+                return $fileInfo->getPathname();
+            },
+            $fileInfos
+        );
     }
 }

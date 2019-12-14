@@ -38,6 +38,7 @@ namespace Infection\Configuration;
 use function array_fill_keys;
 use function dirname;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
@@ -54,15 +55,18 @@ class ConfigurationFactory
     private $tmpDirProvider;
     private $mutatorFactory;
     private $mutatorParser;
+    private $sourceFileCollector;
 
     public function __construct(
         TmpDirProvider $tmpDirProvider,
         MutatorFactory $mutatorFactory,
-        MutatorParser $mutatorParser
+        MutatorParser $mutatorParser,
+        SourceFileCollector $sourceFileCollector
     ) {
         $this->tmpDirProvider = $tmpDirProvider;
         $this->mutatorFactory = $mutatorFactory;
         $this->mutatorParser = $mutatorParser;
+        $this->sourceFileCollector = $sourceFileCollector;
     }
 
     public function create(
@@ -107,7 +111,12 @@ class ConfigurationFactory
 
         return new Configuration(
             $schema->getTimeout() ?? 10,
-            $schema->getSource(),
+            $schema->getSource()->getDirectories(),
+            $this->sourceFileCollector->collectFiles(
+                $schema->getSource()->getDirectories(),
+                $schema->getSource()->getExcludes(),
+                $filter
+            ),
             $schema->getLogs(),
             $logVerbosity,
             $this->tmpDirProvider->providePath($tmpDir),
@@ -132,8 +141,7 @@ class ConfigurationFactory
             $ignoreMsiWithNoMutations,
             $minMsi,
             $showMutations,
-            $minCoveredMsi,
-            $filter
+            $minCoveredMsi
         );
     }
 

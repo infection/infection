@@ -38,7 +38,6 @@ namespace Infection\Tests\TestFramework;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
@@ -61,7 +60,8 @@ final class FactoryTest extends TestCase
             '',
             new Configuration(
                 10,
-                new Source([], []),
+                [],
+                [],
                 new Logs(
                     null,
                     null,
@@ -85,8 +85,7 @@ final class FactoryTest extends TestCase
                 false,
                 null,
                 false,
-                null,
-                ''
+                null
             ),
             $this->createMock(VersionParser::class),
             $this->createMock(Filesystem::class),
