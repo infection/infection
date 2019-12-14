@@ -35,70 +35,64 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use function count;
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\MutableFileProcessed;
-use Infection\Events\MutationGeneratingFinished;
-use Infection\Events\MutationGeneratingStarted;
+use function assert;
+use Infection\Mutant\Exception\ParserException;
 use Infection\Mutation;
+use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
+use function is_string;
 use PhpParser\NodeVisitor;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
  */
-final class MutationGenerator
+final class FileMutationGenerator
 {
-    private $sourceFiles;
-    private $codeCoverageData;
-    private $mutators;
-    private $eventDispatcher;
-    private $fileMutationGenerator;
+    private $parser;
+    private $traverserFactory;
 
-    /**
-     * @param SplFileInfo[] $sourceFiles
-     */
-    public function __construct(
-        array $sourceFiles,
-        LineCodeCoverage $codeCoverageData,
-        array $mutators,
-        EventDispatcherInterface $eventDispatcher,
-        FileMutationGenerator $fileMutationGenerator
-    ) {
-        $this->sourceFiles = $sourceFiles;
-        $this->codeCoverageData = $codeCoverageData;
-        $this->mutators = $mutators;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->fileMutationGenerator = $fileMutationGenerator;
+    public function __construct(FileParser $parser, NodeTraverserFactory $traverserFactory)
+    {
+        $this->parser = $parser;
+        $this->traverserFactory = $traverserFactory;
     }
 
     /**
-     * @param bool          $onlyCovered Mutate only covered by tests lines of code
+     * @param Mutator[]     $mutators
      * @param NodeVisitor[] $extraNodeVisitors
+     *
+     * @throws ParserException
      *
      * @return Mutation[]
      */
-    public function generate(bool $onlyCovered, array $extraNodeVisitors = []): array
-    {
-        $allFilesMutations = [[]];
+    public function generate(
+        SplFileInfo $file,
+        bool $onlyCovered,
+        LineCodeCoverage $codeCoverageData,
+        array $mutators,
+        array $extraNodeVisitors
+    ): array {
+        $filePath = $file->getRealPath();
+        assert(is_string($filePath));
 
-        $this->eventDispatcher->dispatch(new MutationGeneratingStarted(count($this->sourceFiles)));
-
-        foreach ($this->sourceFiles as $file) {
-            $allFilesMutations[] = $this->fileMutationGenerator->generate(
-                $file,
-                $onlyCovered,
-                $this->codeCoverageData,
-                $this->mutators,
-                $extraNodeVisitors
-            );
-
-            $this->eventDispatcher->dispatch(new MutableFileProcessed());
+        if (!$onlyCovered || $codeCoverageData->hasTests($filePath)) {
+            return [];
         }
 
-        $this->eventDispatcher->dispatch(new MutationGeneratingFinished());
+        $initialStatements = $this->parser->parse($file);
 
-        return array_merge(...$allFilesMutations);
+        $traverser = $this->traverserFactory->create(
+            $filePath,
+            $codeCoverageData,
+            $mutators,
+            $onlyCovered,
+            $initialStatements,
+            $extraNodeVisitors
+        );
+
+        $traverser->traverse($initialStatements);
+
+        return $traverser->getMutationsCollectorVisitor()->getMutations();
     }
 }
