@@ -42,7 +42,6 @@ use Infection\Command\ConfigureCommand;
 use Infection\Command\InfectionCommand;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
-use Infection\Config\InfectionConfig;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
@@ -118,7 +117,6 @@ final class ProjectCodeProvider
     public const NON_FINAL_EXTENSION_CLASSES = [
         ConsoleHelper::class,
         SourceDirGuesser::class,
-        InfectionConfig::class,
         DiffColorizer::class,
         Differ::class,
         TestFrameworkFinder::class,

@@ -24,4 +24,5 @@
 /tests/e2e/SymfonyFlex/phpunit.xml*
 /tests/e2e/SymfonyFlex/symfony.lock
 /tests/e2e/SymfonyFlex/tests/.gitignore
+/tests/error.log
 /vendor/

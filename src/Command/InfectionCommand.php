@@ -37,8 +37,8 @@ namespace Infection\Command;
 
 use function dirname;
 use Exception;
-use Infection\Config\InfectionConfig;
 use Infection\Configuration\Configuration;
+use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Exception\InfectionException;
@@ -479,7 +479,10 @@ final class InfectionCommand extends BaseCommand
     private function runConfigurationCommand(Locator $locator): void
     {
         try {
-            $locator->locateOneOf(InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES);
+            $locator->locateOneOf([
+                SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
+                SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
+            ]);
         } catch (Exception $e) {
             $configureCommand = $this->getApplication()->find('configure');
 
