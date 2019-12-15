@@ -146,7 +146,7 @@ final class LoggerFactory
                     $this->isDebugMode
                 );
             default:
-                return new NullLogger();
+                throw UnknownLogType::fromLogType($logType);
         }
     }
 }
