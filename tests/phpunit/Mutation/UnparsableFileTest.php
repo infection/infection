@@ -33,31 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant\Exception;
+namespace Infection\Tests\Mutation;
 
 use Exception;
-use Infection\Mutant\Exception\ParserException;
+use Infection\Mutation\UnparsableFile;
 use PHPUnit\Framework\TestCase;
-use SplFileInfo;
 
-final class ParserExceptionTest extends TestCase
+final class UnparsableFileTest extends TestCase
 {
-    public function test_it_has_correct_error_message(): void
+    public function test_it_can_create_a_user_friendly_error_for_a_given_file(): void
     {
-        $file = $this->createMock(SplFileInfo::class);
-        $file->expects($this->once())
-            ->method('getRealPath')
-            ->willReturn('foo/bar/baz');
         $previous = new Exception('Unintentional thing');
 
-        $exception = ParserException::fromInvalidFile($file, $previous);
+        $exception = UnparsableFile::fromInvalidFile('/path/to/file', $previous);
 
         $this->assertSame(
-            'Unable to parse file "foo/bar/baz", most likely due to syntax errors.',
+            'Could not parse the file "/path/to/file". Check if it is a valid PHP file',
             $exception->getMessage()
         );
-        $this->assertSame($previous,
-            $exception->getPrevious()
-        );
+        $this->assertSame(0, $exception->getCode());
+        $this->assertSame($previous, $exception->getPrevious());
     }
 }

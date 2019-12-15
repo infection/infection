@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use Infection\Mutant\Exception\ParserException;
 use PhpParser\Node;
 use PhpParser\Parser;
 use Symfony\Component\Finder\SplFileInfo;
@@ -54,16 +53,21 @@ final class FileParser
     }
 
     /**
-     * @throws ParserException
+     *@throws UnparsableFile
      *
      * @return Node[]
      */
-    public function parse(SplFileInfo $file): array
+    public function parse(SplFileInfo $fileInfo): array
     {
         try {
-            return $this->parser->parse($file->getContents());
+            return $this->parser->parse($fileInfo->getContents());
         } catch (Throwable $throwable) {
-            throw ParserException::fromInvalidFile($file, $throwable);
+            $filePath = false === $fileInfo->getRealPath()
+                ? $fileInfo->getPathname()
+                : $fileInfo->getRealPath()
+            ;
+
+            throw UnparsableFile::fromInvalidFile($filePath, $throwable);
         }
     }
 }

@@ -33,23 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant\Exception;
+namespace Infection\Mutation;
 
-use Exception;
-use SplFileInfo;
+use RuntimeException;
 use Throwable;
 
 /**
  * @internal
  */
-final class ParserException extends Exception
+final class UnparsableFile extends RuntimeException
 {
-    public static function fromInvalidFile(SplFileInfo $file, Throwable $original): self
+    public static function fromInvalidFile(string $filePath, Throwable $original): self
     {
         return new self(
             sprintf(
-                'Unable to parse file "%s", most likely due to syntax errors.',
-                $file->getRealPath()
+                'Could not parse the file "%s". Check if it is a valid PHP file',
+                $filePath
             ),
             0,
             $original

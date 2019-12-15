@@ -42,7 +42,6 @@ use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
 use Infection\Exception\InvalidMutatorException;
 use Infection\FileSystem\SourceFileCollector;
-use Infection\Mutant\Exception\ParserException;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutation\FileParser;
 use Infection\Mutator\Arithmetic\Decrement;
@@ -126,20 +125,6 @@ final class MutationsGeneratorTest extends TestCase
         $mutations = $generator->generate(false);
 
         $this->assertCount(0, $mutations);
-    }
-
-    public function test_it_throws_correct_error_when_file_is_invalid(): void
-    {
-        $generator = $this->createMutationGenerator(
-            $this->createMock(LineCodeCoverage::class),
-            Decrement::class,
-            null,
-            [self::FIXTURES_DIR . '/InvalidFile']
-        );
-
-        $this->expectException(ParserException::class);
-        $this->expectExceptionMessageRegExp('#Fixtures(/|\\\)Files(/|\\\)InvalidFile(/|\\\)InvalidFile\.php#');
-        $generator->generate(false);
     }
 
     public function test_it_throws_correct_exception_when_mutator_is_invalid(): void
