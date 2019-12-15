@@ -60,7 +60,7 @@ use Pimple\Container;
 
 final class MutationGeneratorTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Files';
+    private const FIXTURES_DIR = __DIR__ . '/../Fixtures/Files';
 
     public function test_it_collects_plus_mutation(): void
     {

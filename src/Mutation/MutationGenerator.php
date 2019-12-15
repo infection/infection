@@ -136,7 +136,7 @@ final class MutationGenerator
      */
     private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered, array $extraNodeVisitors): array
     {
-        if (!$onlyCovered || $this->hasTests($file)) {
+        if ($onlyCovered && !$this->hasTests($file)) {
             return [];
         }
 
