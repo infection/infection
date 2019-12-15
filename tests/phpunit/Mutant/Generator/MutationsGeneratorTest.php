@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant\Generator;
 
+use Infection\Console\InfectionContainer;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
@@ -44,6 +45,7 @@ use Infection\FileSystem\SourceFileCollector;
 use Infection\Mutant\Exception\ParserException;
 use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutation\NodeTraverserFactory;
+use Infection\Mutation\FileParser;
 use Infection\Mutator\Arithmetic\Decrement;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\TrueValue;
@@ -53,9 +55,6 @@ use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Tests\Fixtures\Files\Mutation\OneFile\OneFile;
 use Infection\WrongMutator\ErrorMutator;
-use PhpParser\Lexer;
-use PhpParser\Parser;
-use PhpParser\ParserFactory;
 use PHPUnit\Framework\TestCase;
 use Pimple\Container;
 
@@ -241,19 +240,13 @@ final class MutationsGeneratorTest extends TestCase
             $codeCoverageDataMock,
             $mutators,
             $eventDispatcherMock,
-            $this->getParser(),
+            InfectionContainer::create()[FileParser::class],
             new NodeTraverserFactory()
         );
     }
 
-    private function getParser(): Parser
+    private function getParser(): FileParser
     {
-        $lexer = new Lexer\Emulative([
-            'usedAttributes' => [
-                'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
-            ],
-        ]);
-
-        return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
+        return InfectionContainer::create()[FileParser::class];
     }
 }
