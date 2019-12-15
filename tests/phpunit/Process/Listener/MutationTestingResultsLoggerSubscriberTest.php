@@ -103,7 +103,8 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->filesystem,
             LogVerbosity::DEBUG,
-            true
+            true,
+            false
         ));
 
         $dispatcher->dispatch(new MutationTestingFinished());
@@ -151,7 +152,8 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->filesystem,
             LogVerbosity::DEBUG,
-            true
+            true,
+            false
         ));
 
         $dispatcher->dispatch(new MutationTestingFinished());
@@ -197,6 +199,7 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->filesystem,
             LogVerbosity::NORMAL,
+            false,
             false
         ));
 
@@ -222,7 +225,8 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->filesystem,
             LogVerbosity::NONE,
-            true
+            true,
+            false
         ));
 
         $dispatcher->dispatch(new MutationTestingFinished());
@@ -257,7 +261,8 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->filesystem,
             LogVerbosity::DEBUG,
-            true
+            true,
+            false
         ));
 
         $dispatcher->dispatch(new MutationTestingFinished());

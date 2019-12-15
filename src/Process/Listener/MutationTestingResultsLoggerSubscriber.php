@@ -66,7 +66,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
         Filesystem $fs,
         string $logVerbosity,
         bool $isDebugMode,
-        bool $isOnlyCoveredMode = false
+        bool $isOnlyCoveredMode
     ) {
         $this->logFactory = new LoggerFactory(
             $output,
