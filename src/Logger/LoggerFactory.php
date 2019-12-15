@@ -33,18 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Listener;
+namespace Infection\Logger;
 
 use Infection\Console\LogVerbosity;
 use Infection\Http\BadgeApiClient;
-use Infection\Logger\BadgeLogger;
-use Infection\Logger\DebugFileLogger;
-use Infection\Logger\MutationTestingResultsLogger;
-use Infection\Logger\PerMutatorLogger;
-use Infection\Logger\ResultsLoggerTypes;
-use Infection\Logger\SummaryFileLogger;
-use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
+use stdClass;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -53,11 +47,6 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class LoggerFactory
 {
-    /**
-     * @var OutputInterface
-     */
-    private $output;
-
     /**
      * @var MetricsCalculator
      */
@@ -84,14 +73,12 @@ final class LoggerFactory
     private $isOnlyCoveredMode;
 
     public function __construct(
-        OutputInterface $output,
         MetricsCalculator $metricsCalculator,
         Filesystem $fs,
         string $logVerbosity,
         bool $isDebugMode,
         bool $isOnlyCoveredMode
     ) {
-        $this->output = $output;
         $this->metricsCalculator = $metricsCalculator;
         $this->fs = $fs;
         $this->logVerbosity = $logVerbosity;
@@ -99,14 +86,23 @@ final class LoggerFactory
         $this->isOnlyCoveredMode = $isOnlyCoveredMode;
     }
 
-    public function createConfig(string $logType, $config): MutationTestingResultsLogger
+    /**
+     * @param string|stdClass $config
+     */
+    public function createLogger(OutputInterface $output, string $logType, $config): MutationTestingResultsLogger
     {
+        if ($this->logVerbosity === LogVerbosity::NONE
+            && !in_array($logType, ResultsLoggerTypes::ALLOWED_WITHOUT_LOGGING, true)
+        ) {
+            return new NullLogger();
+        }
+
         $isDebugVerbosity = $this->logVerbosity === LogVerbosity::DEBUG;
 
         switch ($logType) {
             case ResultsLoggerTypes::TEXT_FILE:
                 return new TextFileLogger(
-                    $this->output,
+                    $output,
                     $config,
                     $this->metricsCalculator,
                     $this->fs,
@@ -116,7 +112,7 @@ final class LoggerFactory
                 );
             case ResultsLoggerTypes::SUMMARY_FILE:
                 return new SummaryFileLogger(
-                    $this->output,
+                    $output,
                     $config,
                     $this->metricsCalculator,
                     $this->fs,
@@ -125,7 +121,7 @@ final class LoggerFactory
                 );
             case ResultsLoggerTypes::DEBUG_FILE:
                 return new DebugFileLogger(
-                    $this->output,
+                    $output,
                     $config,
                     $this->metricsCalculator,
                     $this->fs,
@@ -135,14 +131,14 @@ final class LoggerFactory
                 );
             case ResultsLoggerTypes::BADGE:
                 return new BadgeLogger(
-                    $this->output,
-                    new BadgeApiClient($this->output),
+                    $output,
+                    new BadgeApiClient($output),
                     $this->metricsCalculator,
                     $config
                 );
             case ResultsLoggerTypes::PER_MUTATOR:
                 return new PerMutatorLogger(
-                    $this->output,
+                    $output,
                     $config,
                     $this->metricsCalculator,
                     $this->fs,
@@ -150,7 +146,7 @@ final class LoggerFactory
                     $this->isDebugMode
                 );
             default:
-                throw new LogicException();
+                return new NullLogger();
         }
     }
 }

@@ -39,16 +39,19 @@ use function array_filter;
 use Infection\Configuration\Configuration;
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\MutationTestingFinished;
-use Infection\Logger\MutationTestingResultsLogger;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Logger\LoggerFactory;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
  */
 final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var OutputInterface
+     */
+    private $output;
+
     /**
      * @var Configuration
      */
@@ -62,20 +65,10 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
     public function __construct(
         OutputInterface $output,
         Configuration $infectionConfig,
-        MetricsCalculator $metricsCalculator,
-        Filesystem $fs,
-        string $logVerbosity,
-        bool $isDebugMode,
-        bool $isOnlyCoveredMode
+        LoggerFactory $loggerFactory
     ) {
-        $this->logFactory = new LoggerFactory(
-            $output,
-            $metricsCalculator,
-            $fs,
-            $logVerbosity,
-            $isDebugMode,
-            $isOnlyCoveredMode
-        );
+        $this->logFactory = $loggerFactory;
+        $this->output = $output;
         $this->infectionConfig = $infectionConfig;
     }
 
@@ -102,12 +95,7 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
         ]);
 
         foreach ($logTypes as $logType => $config) {
-            $this->createLogger($logType, $config)->log();
+            $this->logFactory->createLogger($this->output, $logType, $config)->log();
         }
-    }
-
-    private function createLogger(string $logType, $config): MutationTestingResultsLogger
-    {
-        return $this->logFactory->createConfig($logType, $config);
     }
 }

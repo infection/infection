@@ -33,20 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger;
+namespace Infection\Tests\Logger;
 
-/**
- * @internal
- */
-final class ResultsLoggerTypes
+use Infection\Logger\NullLogger;
+use PHPUnit\Framework\TestCase;
+
+final class NullLoggerTest extends TestCase
 {
-    public const TEXT_FILE = 'text';
-    public const SUMMARY_FILE = 'summary';
-    public const DEBUG_FILE = 'debug';
-    public const BADGE = 'badge';
-    public const PER_MUTATOR = 'perMutator';
-
-    public const ALLOWED_WITHOUT_LOGGING = [
-        self::BADGE,
-    ];
+    public function test_it_does_nothing(): void
+    {
+        $logger = new NullLogger();
+        $logger->log();
+        $this->addToAssertionCount(1);
+    }
 }

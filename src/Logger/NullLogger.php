@@ -38,15 +38,13 @@ namespace Infection\Logger;
 /**
  * @internal
  */
-final class ResultsLoggerTypes
+final class NullLogger implements MutationTestingResultsLogger
 {
-    public const TEXT_FILE = 'text';
-    public const SUMMARY_FILE = 'summary';
-    public const DEBUG_FILE = 'debug';
-    public const BADGE = 'badge';
-    public const PER_MUTATOR = 'perMutator';
-
-    public const ALLOWED_WITHOUT_LOGGING = [
-        self::BADGE,
-    ];
+    /**
+     * Logs results of Mutation Testing to somewhere
+     */
+    public function log(): void
+    {
+        // do nothing
+    }
 }

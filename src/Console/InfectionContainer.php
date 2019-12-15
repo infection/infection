@@ -52,6 +52,7 @@ use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Locator\RootsFileLocator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
+use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutation\FileParser;
@@ -331,9 +332,7 @@ final class InfectionContainer extends Container
 
                 return new SubscriberBuilder(
                     $config->showMutations(),
-                    $config->getLogVerbosity(),
                     $config->isDebugEnabled(),
-                    $config->mutateOnlyCoveredCode(),
                     $config->getFormatter(),
                     $config->showProgress(),
                     $container['metrics'],
@@ -344,7 +343,8 @@ final class InfectionContainer extends Container
                     $config->getTmpDir(),
                     $container['timer'],
                     $container['time.formatter'],
-                    $container['memory.formatter']
+                    $container['memory.formatter'],
+                    $container[LoggerFactory::class]
                 );
             },
             CommandLineBuilder::class => static function (): CommandLineBuilder {
@@ -355,6 +355,18 @@ final class InfectionContainer extends Container
             },
             NodeTraverserFactory::class => static function (): NodeTraverserFactory {
                 return new NodeTraverserFactory();
+            },
+            LoggerFactory::class => static function (self $container): LoggerFactory {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                return new LoggerFactory(
+                    $container['metrics'],
+                    $container['filesystem'],
+                    $config->getLogVerbosity(),
+                    $config->isDebugEnabled(),
+                    $config->mutateOnlyCoveredCode()
+                );
             },
         ]);
     }

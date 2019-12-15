@@ -40,6 +40,7 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\Events\MutationTestingFinished;
+use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Listener\MutationTestingResultsLoggerSubscriber;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -100,11 +101,13 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
         $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(
             $this->output,
             $this->config,
-            $this->metricsCalculator,
-            $this->filesystem,
-            LogVerbosity::DEBUG,
-            true,
-            false
+            new LoggerFactory(
+                $this->metricsCalculator,
+                $this->filesystem,
+                LogVerbosity::DEBUG,
+                true,
+                false
+            )
         ));
 
         $dispatcher->dispatch(new MutationTestingFinished());
@@ -149,11 +152,13 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
         $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(
             $this->output,
             $this->config,
-            $this->metricsCalculator,
-            $this->filesystem,
-            LogVerbosity::DEBUG,
-            true,
-            false
+            new LoggerFactory(
+                $this->metricsCalculator,
+                $this->filesystem,
+                LogVerbosity::DEBUG,
+                true,
+                false
+            )
         ));
 
         $dispatcher->dispatch(new MutationTestingFinished());
@@ -196,11 +201,13 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
         $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(
             $this->output,
             $this->config,
-            $this->metricsCalculator,
-            $this->filesystem,
-            LogVerbosity::NORMAL,
-            false,
-            false
+            new LoggerFactory(
+                $this->metricsCalculator,
+                $this->filesystem,
+                LogVerbosity::NORMAL,
+                false,
+                false
+            )
         ));
 
         $dispatcher->dispatch(new MutationTestingFinished());
@@ -222,11 +229,13 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
         $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(
             $this->output,
             $this->config,
-            $this->metricsCalculator,
-            $this->filesystem,
-            LogVerbosity::NONE,
-            true,
-            false
+            new LoggerFactory(
+                $this->metricsCalculator,
+                $this->filesystem,
+                LogVerbosity::NONE,
+                true,
+                false
+            )
         ));
 
         $dispatcher->dispatch(new MutationTestingFinished());
@@ -258,11 +267,13 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
         $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber(
             $this->output,
             $this->config,
-            $this->metricsCalculator,
-            $this->filesystem,
-            LogVerbosity::DEBUG,
-            true,
-            false
+            new LoggerFactory(
+                $this->metricsCalculator,
+                $this->filesystem,
+                LogVerbosity::DEBUG,
+                true,
+                false
+            )
         ));
 
         $dispatcher->dispatch(new MutationTestingFinished());
