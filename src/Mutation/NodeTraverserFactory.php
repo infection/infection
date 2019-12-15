@@ -33,61 +33,57 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Traverser;
+namespace Infection\Mutation;
 
-use Infection\Traverser\PriorityNodeTraverser;
-use InvalidArgumentException;
+use Infection\Mutator\Util\Mutator;
+use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\Visitor\FullyQualifiedClassNameVisitor;
+use Infection\Visitor\MutationsCollectorVisitor;
+use Infection\Visitor\NotMutableIgnoreVisitor;
+use Infection\Visitor\ParentConnectorVisitor;
+use Infection\Visitor\ReflectionVisitor;
+use PhpParser\Node;
 use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitorAbstract;
-use PHPUnit\Framework\TestCase;
 
-final class PriorityNodeTraverserTest extends TestCase
+/**
+ * @internal
+ */
+final class NodeTraverserFactory
 {
-    public function test_it_sorts_visitors_by_priorites(): void
-    {
+    /**
+     * @param Mutator[]     $mutators
+     * @param Node[]        $initialStatements
+     * @param NodeVisitor[] $extraNodeVisitors
+     */
+    public function create(
+        string $filePath,
+        LineCodeCoverage $codeCoverageData,
+        array $mutators,
+        bool $onlyCovered,
+        array $initialStatements,
+        array $extraNodeVisitors
+    ): PriorityNodeTraverser {
         $traverser = new PriorityNodeTraverser();
 
-        $callOrder = [];
+        $traverser->addVisitor(new NotMutableIgnoreVisitor(), 50);
+        $traverser->addVisitor(new ParentConnectorVisitor(), 40);
+        $traverser->addVisitor(new FullyQualifiedClassNameVisitor(), 30);
+        $traverser->addVisitor(new ReflectionVisitor(), 20);
+        $traverser->addMutationsCollectorVisitor(
+            new MutationsCollectorVisitor(
+                $mutators,
+                $filePath,
+                $initialStatements,
+                $codeCoverageData,
+                $onlyCovered
+            ),
+            10
+        );
 
-        $traverser->addVisitor($this->createVisitor($callOrder, 20), 20);
-        $traverser->addVisitor($this->createVisitor($callOrder, 30), 30);
-        $traverser->addVisitor($this->createVisitor($callOrder, 5), 5);
-        $traverser->addVisitor($this->createVisitor($callOrder, 10), 10);
+        foreach ($extraNodeVisitors as $priority => $visitor) {
+            $traverser->addVisitor($visitor, $priority);
+        }
 
-        $traverser->traverse([]);
-
-        $this->assertSame([30, 20, 10, 5], $callOrder);
-    }
-
-    public function test_it_does_not_allow_duplicater_priorities(): void
-    {
-        $traverser = new PriorityNodeTraverser();
-
-        $callOrder = [];
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Priority 20 is already used');
-
-        $traverser->addVisitor($this->createVisitor($callOrder, 20), 20);
-        $traverser->addVisitor($this->createVisitor($callOrder, 20), 20);
-    }
-
-    private function createVisitor(array &$callOrder, int $priority): NodeVisitor
-    {
-        return new class($callOrder, $priority) extends NodeVisitorAbstract {
-            public $callOrder;
-            public $priority;
-
-            public function __construct(array &$callOrder, int $priority)
-            {
-                $this->callOrder = &$callOrder;
-                $this->priority = $priority;
-            }
-
-            public function beforeTraverse(array $nodes): void
-            {
-                $this->callOrder[] = $this->priority;
-            }
-        };
+        return $traverser;
     }
 }

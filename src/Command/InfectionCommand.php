@@ -51,6 +51,7 @@ use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\Locator\Locator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\Generator\MutationsGenerator;
+use Infection\Mutation\NodeTraverserFactory;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Runner\InitialTestsFailed;
@@ -337,12 +338,16 @@ final class InfectionCommand extends BaseCommand
 
         $codeCoverageData = $this->getCodeCoverageData($this->testFrameworkKey, $adapter);
 
+        /** @var NodeTraverserFactory $traverserFactory */
+        $traverserFactory = $this->container[NodeTraverserFactory::class];
+
         $mutationsGenerator = new MutationsGenerator(
             $config->getSourceFiles(),
             $codeCoverageData,
             $config->getMutators(),
             $this->eventDispatcher,
-            $this->container['parser']
+            $this->container['parser'],
+            $traverserFactory
         );
 
         $mutations = $mutationsGenerator->generate(

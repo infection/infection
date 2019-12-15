@@ -43,14 +43,9 @@ use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
 use Infection\Mutant\Exception\ParserException;
 use Infection\Mutation;
+use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
-use Infection\Traverser\PriorityNodeTraverser;
-use Infection\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\Visitor\MutationsCollectorVisitor;
-use Infection\Visitor\NotMutableIgnoreVisitor;
-use Infection\Visitor\ParentConnectorVisitor;
-use Infection\Visitor\ReflectionVisitor;
 use function is_string;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
@@ -87,6 +82,7 @@ final class MutationsGenerator
      * @var Parser
      */
     private $parser;
+    private $traverserFactory;
 
     /**
      * @param SplFileInfo[] $sourceFiles
@@ -96,13 +92,15 @@ final class MutationsGenerator
         LineCodeCoverage $codeCoverageData,
         array $mutators,
         EventDispatcherInterface $eventDispatcher,
-        Parser $parser
+        Parser $parser,
+        NodeTraverserFactory $traverserFactory
     ) {
         $this->sourceFiles = $sourceFiles;
         $this->codeCoverageData = $codeCoverageData;
         $this->mutators = $mutators;
         $this->eventDispatcher = $eventDispatcher;
         $this->parser = $parser;
+        $this->traverserFactory = $traverserFactory;
     }
 
     /**
@@ -145,31 +143,21 @@ final class MutationsGenerator
             throw ParserException::fromInvalidFile($file, $t);
         }
 
-        $traverser = new PriorityNodeTraverser();
         $filePath = $file->getRealPath();
         assert(is_string($filePath));
 
-        $mutationsCollectorVisitor = new MutationsCollectorVisitor(
-            $this->mutators,
+        $traverser = $this->traverserFactory->create(
             $filePath,
-            $initialStatements,
             $this->codeCoverageData,
-            $onlyCovered
+            $this->mutators,
+            $onlyCovered,
+            $initialStatements,
+            $extraNodeVisitors
         );
-
-        $traverser->addVisitor(new NotMutableIgnoreVisitor(), 50);
-        $traverser->addVisitor(new ParentConnectorVisitor(), 40);
-        $traverser->addVisitor(new FullyQualifiedClassNameVisitor(), 30);
-        $traverser->addVisitor(new ReflectionVisitor(), 20);
-        $traverser->addVisitor($mutationsCollectorVisitor, 10);
-
-        foreach ($extraNodeVisitors as $priority => $visitor) {
-            $traverser->addVisitor($visitor, $priority);
-        }
 
         $traverser->traverse($initialStatements);
 
-        return $mutationsCollectorVisitor->getMutations();
+        return $traverser->getMutationsCollectorVisitor()->getMutations();
     }
 
     private function hasTests(SplFileInfo $file): bool
