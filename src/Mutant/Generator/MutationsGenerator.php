@@ -46,6 +46,7 @@ use Infection\Mutation\FileParser;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\Visitor\MutationsCollectorVisitor;
 use function is_string;
 use PhpParser\NodeVisitorAbstract;
 use Symfony\Component\Finder\SplFileInfo;
@@ -138,18 +139,21 @@ final class MutationsGenerator
         $filePath = $file->getRealPath();
         assert(is_string($filePath));
 
-        $traverser = $this->traverserFactory->create(
-            $filePath,
-            $this->codeCoverageData,
+        $mutationsCollectorVisitor = new MutationsCollectorVisitor(
             $this->mutators,
-            $onlyCovered,
+            $filePath,
             $initialStatements,
-            $extraNodeVisitors
+            $this->codeCoverageData,
+            $onlyCovered
         );
+
+        $extraNodeVisitors[10] = $mutationsCollectorVisitor;
+
+        $traverser = $this->traverserFactory->create($extraNodeVisitors);
 
         $traverser->traverse($initialStatements);
 
-        return $traverser->getMutationsCollectorVisitor()->getMutations();
+        return $mutationsCollectorVisitor->getMutations();
     }
 
     private function hasTests(SplFileInfo $file): bool

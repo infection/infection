@@ -35,14 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use Infection\Mutator\Util\Mutator;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\NotMutableIgnoreVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
-use PhpParser\Node;
 use PhpParser\NodeVisitor;
 
 /**
@@ -51,36 +47,18 @@ use PhpParser\NodeVisitor;
 final class NodeTraverserFactory
 {
     /**
-     * @param Mutator[]     $mutators
-     * @param Node[]        $initialStatements
-     * @param NodeVisitor[] $extraNodeVisitors
+     * @param NodeVisitor[] $extraVisitors
      */
-    public function create(
-        string $filePath,
-        LineCodeCoverage $codeCoverageData,
-        array $mutators,
-        bool $onlyCovered,
-        array $initialStatements,
-        array $extraNodeVisitors
-    ): PriorityNodeTraverser {
+    public function create(array $extraVisitors): PriorityNodeTraverser
+    {
         $traverser = new PriorityNodeTraverser();
 
         $traverser->addVisitor(new NotMutableIgnoreVisitor(), 50);
         $traverser->addVisitor(new ParentConnectorVisitor(), 40);
         $traverser->addVisitor(new FullyQualifiedClassNameVisitor(), 30);
         $traverser->addVisitor(new ReflectionVisitor(), 20);
-        $traverser->addMutationsCollectorVisitor(
-            new MutationsCollectorVisitor(
-                $mutators,
-                $filePath,
-                $initialStatements,
-                $codeCoverageData,
-                $onlyCovered
-            ),
-            10
-        );
 
-        foreach ($extraNodeVisitors as $priority => $visitor) {
+        foreach ($extraVisitors as $priority => $visitor) {
             $traverser->addVisitor($visitor, $priority);
         }
 

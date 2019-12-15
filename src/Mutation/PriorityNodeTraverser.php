@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use Infection\Visitor\MutationsCollectorVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use Webmozart\Assert\Assert;
@@ -45,8 +44,6 @@ use Webmozart\Assert\Assert;
  */
 final class PriorityNodeTraverser extends NodeTraverser
 {
-    private $mutationsCollectorVisitor;
-
     public function addVisitor(NodeVisitor $visitor, int $priority = 1): void
     {
         Assert::keyNotExists($this->visitors, $priority, sprintf('Priority %d is already used', $priority));
@@ -62,17 +59,5 @@ final class PriorityNodeTraverser extends NodeTraverser
     public function getVisitors(): array
     {
         return $this->visitors;
-    }
-
-    public function addMutationsCollectorVisitor(MutationsCollectorVisitor $visitor, int $priority): void
-    {
-        $this->addVisitor($visitor, $priority);
-
-        $this->mutationsCollectorVisitor = $visitor;
-    }
-
-    public function getMutationsCollectorVisitor(): MutationsCollectorVisitor
-    {
-        return $this->mutationsCollectorVisitor;
     }
 }

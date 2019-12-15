@@ -37,9 +37,7 @@ namespace Infection\Tests\Mutation;
 
 use function array_map;
 use Infection\Mutation\NodeTraverserFactory;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\NotMutableIgnoreVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
@@ -60,14 +58,7 @@ final class NodeTraverserFactoryTest extends TestCase
 
     public function test_it_can_create_a_traverser(): void
     {
-        $traverser = $this->traverserFactory->create(
-            '/unknown',
-            $this->createMock(LineCodeCoverage::class),
-            [],
-            true,
-            [],
-            []
-        );
+        $traverser = $this->traverserFactory->create([]);
 
         $visitors = array_map('get_class', $traverser->getVisitors());
 
@@ -77,7 +68,6 @@ final class NodeTraverserFactoryTest extends TestCase
                 40 => ParentConnectorVisitor::class,
                 30 => FullyQualifiedClassNameVisitor::class,
                 20 => ReflectionVisitor::class,
-                10 => MutationsCollectorVisitor::class,
             ],
             $visitors
         );
@@ -85,17 +75,10 @@ final class NodeTraverserFactoryTest extends TestCase
 
     public function test_it_can_create_a_traverser_with_extra_visitors(): void
     {
-        $traverser = $this->traverserFactory->create(
-            '/unknown',
-            $this->createMock(LineCodeCoverage::class),
-            [],
-            true,
-            [],
-            [
-                51 => new NodeVisitorA(),
-                100 => new NodeVisitorB(),
-            ]
-        );
+        $traverser = $this->traverserFactory->create([
+            51 => new NodeVisitorA(),
+            100 => new NodeVisitorB(),
+        ]);
 
         $visitors = array_map('get_class', $traverser->getVisitors());
 
@@ -107,7 +90,6 @@ final class NodeTraverserFactoryTest extends TestCase
                 40 => ParentConnectorVisitor::class,
                 30 => FullyQualifiedClassNameVisitor::class,
                 20 => ReflectionVisitor::class,
-                10 => MutationsCollectorVisitor::class,
             ],
             $visitors
         );
