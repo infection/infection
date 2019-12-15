@@ -46,7 +46,7 @@ use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
-class FileParserTest extends TestCase
+final class FileParserTest extends TestCase
 {
     public function test_it_parses_the_given_file_only_once(): void
     {

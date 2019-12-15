@@ -135,7 +135,7 @@ final class MutationsGenerator
      */
     private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered, array $extraNodeVisitors): array
     {
-        $initialStatements = $this->parser->parse($file->getContents());
+        $initialStatements = $this->parser->parse($file);
 
         $traverser = new PriorityNodeTraverser();
         $filePath = $file->getRealPath();
