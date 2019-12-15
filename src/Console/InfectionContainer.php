@@ -54,6 +54,7 @@ use Infection\Locator\RootsFileLocator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
+use Infection\Mutation\FileParser;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Performance\Limiter\MemoryLimiter;
@@ -204,15 +205,24 @@ final class InfectionContainer extends Container
             VersionParser::class => static function (): VersionParser {
                 return new VersionParser();
             },
-            'lexer' => static function (): Lexer {
+            Lexer::class => static function (): Lexer {
                 return new Lexer\Emulative([
                     'usedAttributes' => [
                         'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
                     ],
                 ]);
             },
-            'parser' => static function (self $container): Parser {
-                return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $container['lexer']);
+            Parser::class => static function (self $container): Parser {
+                /** @var Lexer $lexer */
+                $lexer = $container[Lexer::class];
+
+                return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
+            },
+            FileParser::class => static function (self $container): FileParser {
+                /** @var Parser $phpParser */
+                $phpParser = $container[Parser::class];
+
+                return new FileParser($phpParser);
             },
             'pretty.printer' => static function (): Standard {
                 return new Standard();
