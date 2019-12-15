@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Builder;
 
 use Infection\Configuration\Configuration;
+use Infection\Configuration\Entry\Logs;
 use Infection\Differ\DiffColorizer;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Logger\LoggerFactory;
@@ -64,6 +65,9 @@ final class SubscriberBuilderTest extends TestCase
         $dispatcher->expects($this->exactly(6))->method('addSubscriber');
         $diff = $this->createMock(DiffColorizer::class);
         $config = $this->createMock(Configuration::class);
+        $config->expects($this->once())->method('getLogs')->willReturn(
+            new Logs(null, null, null, null, null)
+        );
         $fs = $this->createMock(Filesystem::class);
         $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
         $output = $this->createMock(OutputInterface::class);
@@ -94,6 +98,9 @@ final class SubscriberBuilderTest extends TestCase
         $dispatcher->expects($this->exactly(7))->method('addSubscriber');
         $diff = $this->createMock(DiffColorizer::class);
         $config = $this->createMock(Configuration::class);
+        $config->expects($this->once())->method('getLogs')->willReturn(
+            new Logs(null, null, null, null, null)
+        );
         $fs = $this->createMock(Filesystem::class);
         $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
         $output = $this->createMock(OutputInterface::class);

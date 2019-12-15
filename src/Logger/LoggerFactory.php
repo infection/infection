@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
 use Infection\Http\BadgeApiClient;
 use Infection\Mutant\MetricsCalculator;
-use stdClass;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -87,66 +87,102 @@ final class LoggerFactory
     }
 
     /**
-     * @param string|stdClass $config
+     * @return MutationTestingResultsLogger[]
      */
-    public function createLogger(OutputInterface $output, string $logType, $config): MutationTestingResultsLogger
+    public function createLoggersFromLogEntries(Logs $logs, OutputInterface $output): array
     {
-        if ($this->logVerbosity === LogVerbosity::NONE
-            && !in_array($logType, ResultsLoggerTypes::ALLOWED_WITHOUT_LOGGING, true)
-        ) {
-            return new NullLogger();
-        }
-
         $isDebugVerbosity = $this->logVerbosity === LogVerbosity::DEBUG;
+        $badge = $logs->getBadge();
+        $debug = $logs->getDebugLogFilePath();
+        $perMutator = $logs->getPerMutatorFilePath();
+        $summary = $logs->getSummaryLogFilePath();
+        $text = $logs->getTextLogFilePath();
 
-        switch ($logType) {
-            case ResultsLoggerTypes::TEXT_FILE:
-                return new TextFileLogger(
-                    $output,
-                    $config,
-                    $this->metricsCalculator,
-                    $this->fs,
-                    $isDebugVerbosity,
-                    $this->isDebugMode,
-                    $this->isOnlyCoveredMode
-                );
-            case ResultsLoggerTypes::SUMMARY_FILE:
-                return new SummaryFileLogger(
-                    $output,
-                    $config,
-                    $this->metricsCalculator,
-                    $this->fs,
-                    $isDebugVerbosity,
-                    $this->isDebugMode
-                );
-            case ResultsLoggerTypes::DEBUG_FILE:
-                return new DebugFileLogger(
-                    $output,
-                    $config,
-                    $this->metricsCalculator,
-                    $this->fs,
-                    $isDebugVerbosity,
-                    $this->isDebugMode,
-                    $this->isOnlyCoveredMode
-                );
-            case ResultsLoggerTypes::BADGE:
-                return new BadgeLogger(
-                    $output,
-                    new BadgeApiClient($output),
-                    $this->metricsCalculator,
-                    $config
-                );
-            case ResultsLoggerTypes::PER_MUTATOR:
-                return new PerMutatorLogger(
-                    $output,
-                    $config,
-                    $this->metricsCalculator,
-                    $this->fs,
-                    $isDebugVerbosity,
-                    $this->isDebugMode
-                );
-            default:
-                throw UnknownLogType::fromLogType($logType);
-        }
+        /** @var array<MutationTestingResultsLogger> $loggers */
+        $loggers = array_filter([
+            ResultsLoggerTypes::BADGE => $badge === null
+                ? null
+                : $this->createBadgeLogger($output, $badge->getBranch()),
+            ResultsLoggerTypes::DEBUG_FILE => $debug === null
+                ? null
+                : $this->createDebugLogger($output, $debug, $isDebugVerbosity),
+            ResultsLoggerTypes::PER_MUTATOR => $perMutator === null
+                ? null
+                : $this->createPerMutatorLogger($output, $perMutator, $isDebugVerbosity),
+            ResultsLoggerTypes::SUMMARY_FILE => $summary === null
+                ? null
+                : $this->createSummaryLogger($output, $summary, $isDebugVerbosity),
+            ResultsLoggerTypes::TEXT_FILE => $text === null
+                ? null
+                : $this->createTextLogger($output, $text, $isDebugVerbosity),
+        ]);
+
+        return array_filter($loggers, [$this, 'isAllowedToLog'], ARRAY_FILTER_USE_KEY);
+    }
+
+    private function createTextLogger(OutputInterface $output, string $location, bool $isDebugVerbosity): TextFileLogger
+    {
+        return new TextFileLogger(
+            $output,
+            $location,
+            $this->metricsCalculator,
+            $this->fs,
+            $isDebugVerbosity,
+            $this->isDebugMode,
+            $this->isOnlyCoveredMode
+        );
+    }
+
+    private function createSummaryLogger(OutputInterface $output, string $location, bool $isDebugVerbosity): SummaryFileLogger
+    {
+        return new SummaryFileLogger(
+            $output,
+            $location,
+            $this->metricsCalculator,
+            $this->fs,
+            $isDebugVerbosity,
+            $this->isDebugMode
+        );
+    }
+
+    private function createDebugLogger(OutputInterface $output, string $location, bool $isDebugVerbosity): DebugFileLogger
+    {
+        return new DebugFileLogger(
+            $output,
+            $location,
+            $this->metricsCalculator,
+            $this->fs,
+            $isDebugVerbosity,
+            $this->isDebugMode,
+            $this->isOnlyCoveredMode
+        );
+    }
+
+    private function createPerMutatorLogger(OutputInterface $output, string $location, bool $isDebugVerbosity): PerMutatorLogger
+    {
+        return new PerMutatorLogger(
+            $output,
+            $location,
+            $this->metricsCalculator,
+            $this->fs,
+            $isDebugVerbosity,
+            $this->isDebugMode
+        );
+    }
+
+    private function createBadgeLogger(OutputInterface $output, string $branch): BadgeLogger
+    {
+        return new BadgeLogger(
+            $output,
+            new BadgeApiClient($output),
+            $this->metricsCalculator,
+            (object) ['branch' => $branch]
+        );
+    }
+
+    private function isAllowedToLog(string $logType): bool
+    {
+        return $this->logVerbosity !== LogVerbosity::NONE
+            || in_array($logType, ResultsLoggerTypes::ALLOWED_WITHOUT_LOGGING, true);
     }
 }

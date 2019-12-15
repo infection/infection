@@ -36,28 +36,23 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use Generator;
+use Infection\Configuration\Entry\Badge;
+use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
 use Infection\Logger\BadgeLogger;
 use Infection\Logger\DebugFileLogger;
 use Infection\Logger\LoggerFactory;
-use Infection\Logger\NullLogger;
 use Infection\Logger\PerMutatorLogger;
-use Infection\Logger\ResultsLoggerTypes;
 use Infection\Logger\SummaryFileLogger;
 use Infection\Logger\TextFileLogger;
-use Infection\Logger\UnknownLogType;
 use Infection\Mutant\MetricsCalculator;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 final class LoggerFactoryTest extends TestCase
 {
-    /**
-     * @dataProvider provideLogTypesThatAreNotAllowedOnLowVerbosity
-     */
-    public function test_it_creates_null_logger_for_low_verbosity(string $logType): void
+    public function test_it_creates_no_logger_for_low_verbosity(): void
     {
         $factory = new LoggerFactory(
             new MetricsCalculator(),
@@ -67,46 +62,24 @@ final class LoggerFactoryTest extends TestCase
             true
         );
 
-        $this->assertInstanceOf(NullLogger::class, $factory->createLogger(
-            $this->createMock(OutputInterface::class),
-            $logType,
-            ''
-        ));
-    }
-
-    public function provideLogTypesThatAreNotAllowedOnLowVerbosity(): Generator
-    {
-        yield [ResultsLoggerTypes::DEBUG_FILE];
-
-        yield [ResultsLoggerTypes::PER_MUTATOR];
-
-        yield [ResultsLoggerTypes::SUMMARY_FILE];
-
-        yield [ResultsLoggerTypes::TEXT_FILE];
-    }
-
-    public function test_it_throws_an_exception_on_unknown_log_type(): void
-    {
-        $factory = new LoggerFactory(
-            new MetricsCalculator(),
-            new Filesystem(),
-            LogVerbosity::NORMAL,
-            true,
-            true
+        $loggers = $factory->createLoggersFromLogEntries(
+            new Logs(
+                '/a/file',
+                '/a/file',
+                '/a/file',
+                '/a/file',
+                null
+            ),
+            $this->createMock(OutputInterface::class)
         );
 
-        $this->expectException(UnknownLogType::class);
-        $factory->createLogger(
-            $this->createMock(OutputInterface::class),
-            'foo',
-            ''
-        );
+        $this->assertCount(0, $loggers);
     }
 
     /**
      * @dataProvider provideLogTypesAndClasses
      */
-    public function test_it_creates_logger_for_log_type(string $logType, string $expectedLogClass): void
+    public function test_it_creates_logger_for_log_type(Logs $logs, string $expectedLogClass): void
     {
         $factory = new LoggerFactory(
             new MetricsCalculator(),
@@ -116,22 +89,35 @@ final class LoggerFactoryTest extends TestCase
             true
         );
 
-        $this->assertInstanceOf($expectedLogClass, $factory->createLogger(
-            $this->createMock(OutputInterface::class),
-            $logType,
-            ''
-        ));
+        $loggers = $factory->createLoggersFromLogEntries(
+            $logs,
+            $this->createMock(OutputInterface::class)
+        );
+        $this->assertCount(1, $loggers);
+        $this->assertInstanceOf($expectedLogClass, current($loggers));
     }
 
     public function provideLogTypesAndClasses(): Generator
     {
-        yield [ResultsLoggerTypes::TEXT_FILE, TextFileLogger::class];
+        yield [
+            new Logs('text', null, null, null, null),
+            TextFileLogger::class,
+        ];
 
-        yield [ResultsLoggerTypes::PER_MUTATOR, PerMutatorLogger::class];
+        yield [
+            new Logs(null, null, null, 'per_muator', null),
+            PerMutatorLogger::class,
+        ];
 
-        yield [ResultsLoggerTypes::SUMMARY_FILE, SummaryFileLogger::class];
+        yield [
+            new Logs(null, 'summary_file', null, null, null),
+            SummaryFileLogger::class,
+        ];
 
-        yield [ResultsLoggerTypes::DEBUG_FILE, DebugFileLogger::class];
+        yield [
+            new Logs(null, null, 'debug_file', null, null),
+            DebugFileLogger::class,
+        ];
     }
 
     public function test_it_creates_a_bade_logger(): void
@@ -144,11 +130,14 @@ final class LoggerFactoryTest extends TestCase
             true
         );
 
-        $this->assertInstanceOf(BadgeLogger::class, $factory->createLogger(
-            $this->createMock(OutputInterface::class),
-            ResultsLoggerTypes::BADGE,
-            new stdClass()
-        ));
+        $loggers = $factory->createLoggersFromLogEntries(
+            new Logs(null, null, null, null, new Badge('foo')),
+            $this->createMock(OutputInterface::class)
+        );
+        $this->assertCount(1, $loggers);
+        $this->assertInstanceOf(BadgeLogger::class,
+            current($loggers)
+        );
     }
 
     public function test_it_creates_a_bade_logger_on_low_verbosity(): void
@@ -161,10 +150,35 @@ final class LoggerFactoryTest extends TestCase
             true
         );
 
-        $this->assertInstanceOf(BadgeLogger::class, $factory->createLogger(
-            $this->createMock(OutputInterface::class),
-            ResultsLoggerTypes::BADGE,
-            new stdClass()
-        ));
+        $loggers = $factory->createLoggersFromLogEntries(
+            new Logs(null, null, null, null, new Badge('branch_name')),
+            $this->createMock(OutputInterface::class)
+        );
+        $this->assertCount(1, $loggers);
+        $this->assertInstanceOf(BadgeLogger::class, current($loggers));
+    }
+
+    public function test_it_creates_multiple_loggers(): void
+    {
+        $factory = new LoggerFactory(
+            new MetricsCalculator(),
+            new Filesystem(),
+            LogVerbosity::NORMAL,
+            true,
+            true
+        );
+
+        $loggers = $factory->createLoggersFromLogEntries(
+            new Logs(
+                '/a/file',
+                '/a/file',
+                '/a/file',
+                '/a/file',
+                null
+            ),
+            $this->createMock(OutputInterface::class)
+        );
+
+        $this->assertCount(4, $loggers);
     }
 }

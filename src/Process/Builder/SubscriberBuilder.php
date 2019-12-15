@@ -74,19 +74,9 @@ final class SubscriberBuilder
     private $showMutations;
 
     /**
-     * @var string
-     */
-    private $logVerbosity;
-
-    /**
      * @var bool
      */
     private $debug;
-
-    /**
-     * @var bool
-     */
-    private $onlyCovered;
 
     /**
      * @var bool
@@ -204,9 +194,10 @@ final class SubscriberBuilder
                 $this->showMutations
             ),
             new MutationTestingResultsLoggerSubscriber(
-                $output,
-                $this->infectionConfig,
-                $this->loggerFactory
+                $this->loggerFactory->createLoggersFromLogEntries(
+                    $this->infectionConfig->getLogs(),
+                    $output
+                )
             ),
             new PerformanceLoggerSubscriber(
                 $this->timer,

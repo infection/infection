@@ -35,12 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Process\Listener;
 
-use function array_filter;
-use Infection\Configuration\Configuration;
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\MutationTestingFinished;
-use Infection\Logger\LoggerFactory;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Logger\MutationTestingResultsLogger;
 
 /**
  * @internal
@@ -48,28 +45,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var OutputInterface
+     * @var MutationTestingResultsLogger[]
      */
-    private $output;
+    private $loggers;
 
     /**
-     * @var Configuration
+     * @param MutationTestingResultsLogger[] $loggers
      */
-    private $infectionConfig;
-
-    /**
-     * @var LoggerFactory
-     */
-    private $logFactory;
-
     public function __construct(
-        OutputInterface $output,
-        Configuration $infectionConfig,
-        LoggerFactory $loggerFactory
+        array $loggers
     ) {
-        $this->logFactory = $loggerFactory;
-        $this->output = $output;
-        $this->infectionConfig = $infectionConfig;
+        $this->loggers = $loggers;
     }
 
     public function getSubscribedEvents(): array
@@ -81,21 +67,8 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
 
     public function onMutationTestingFinished(MutationTestingFinished $event): void
     {
-        $logs = $this->infectionConfig->getLogs();
-        $badge = $logs->getBadge();
-
-        $logTypes = array_filter([
-            'badge' => null !== $badge
-                ? (object) ['branch' => $badge->getBranch()]
-                : null,
-            'debug' => $logs->getDebugLogFilePath(),
-            'perMutator' => $logs->getPerMutatorFilePath(),
-            'summary' => $logs->getSummaryLogFilePath(),
-            'text' => $logs->getTextLogFilePath(),
-        ]);
-
-        foreach ($logTypes as $logType => $config) {
-            $this->logFactory->createLogger($this->output, $logType, $config)->log();
+        foreach ($this->loggers as $logger) {
+            $logger->log();
         }
     }
 }
