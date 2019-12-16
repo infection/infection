@@ -341,7 +341,7 @@ final class InfectionCommand extends BaseCommand
         /** @var FileParser $parser */
         $parser = $this->container[FileParser::class];
 
-        $mutationsGenerator = new MutationGenerator(
+        $mutationGenerator = new MutationGenerator(
             $config->getSourceFiles(),
             $codeCoverageData,
             $config->getMutators(),
@@ -349,7 +349,7 @@ final class InfectionCommand extends BaseCommand
             $parser
         );
 
-        $mutations = $mutationsGenerator->generate(
+        $mutations = $mutationGenerator->generate(
             $config->mutateOnlyCoveredCode(),
             $adapter instanceof HasExtraNodeVisitors ? $adapter->getMutationsCollectionNodeVisitors() : []
         );
