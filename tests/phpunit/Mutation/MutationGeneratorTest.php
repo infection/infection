@@ -35,13 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
+use Infection\Console\InfectionContainer;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
 use Infection\Exception\InvalidMutatorException;
 use Infection\FileSystem\SourceFileCollector;
-use Infection\Mutant\Exception\ParserException;
+use Infection\Mutation\FileParser;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\Arithmetic\Decrement;
 use Infection\Mutator\Arithmetic\Plus;
@@ -52,9 +53,6 @@ use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Tests\Fixtures\Files\Mutation\OneFile\OneFile;
 use Infection\WrongMutator\ErrorMutator;
-use PhpParser\Lexer;
-use PhpParser\Parser;
-use PhpParser\ParserFactory;
 use PHPUnit\Framework\TestCase;
 use Pimple\Container;
 
@@ -127,20 +125,6 @@ final class MutationGeneratorTest extends TestCase
         $mutations = $generator->generate(false);
 
         $this->assertCount(0, $mutations);
-    }
-
-    public function test_it_throws_correct_error_when_file_is_invalid(): void
-    {
-        $generator = $this->createMutationGenerator(
-            $this->createMock(LineCodeCoverage::class),
-            Decrement::class,
-            null,
-            [self::FIXTURES_DIR . '/InvalidFile']
-        );
-
-        $this->expectException(ParserException::class);
-        $this->expectExceptionMessageRegExp('#Fixtures(/|\\\)Files(/|\\\)InvalidFile(/|\\\)InvalidFile\.php#');
-        $generator->generate(false);
     }
 
     public function test_it_throws_correct_exception_when_mutator_is_invalid(): void
@@ -239,18 +223,12 @@ final class MutationGeneratorTest extends TestCase
             $codeCoverageDataMock,
             $mutators,
             $eventDispatcherMock,
-            $this->getParser()
+            InfectionContainer::create()[FileParser::class]
         );
     }
 
-    private function getParser(): Parser
+    private function getParser(): FileParser
     {
-        $lexer = new Lexer\Emulative([
-            'usedAttributes' => [
-                'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
-            ],
-        ]);
-
-        return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
+        return InfectionContainer::create()[FileParser::class];
     }
 }

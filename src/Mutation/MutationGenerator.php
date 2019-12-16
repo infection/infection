@@ -41,7 +41,6 @@ use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
-use Infection\Mutant\Exception\ParserException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
@@ -52,11 +51,8 @@ use Infection\Visitor\NotMutableIgnoreVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
 use function is_string;
-use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use PhpParser\Parser;
 use Symfony\Component\Finder\SplFileInfo;
-use Throwable;
 
 /**
  * @internal
@@ -84,7 +80,7 @@ final class MutationGenerator
     private $eventDispatcher;
 
     /**
-     * @var Parser
+     * @var FileParser
      */
     private $parser;
 
@@ -96,7 +92,7 @@ final class MutationGenerator
         LineCodeCoverage $codeCoverageData,
         array $mutators,
         EventDispatcherInterface $eventDispatcher,
-        Parser $parser
+        FileParser $parser
     ) {
         $this->sourceFiles = $sourceFiles;
         $this->codeCoverageData = $codeCoverageData;
@@ -140,12 +136,7 @@ final class MutationGenerator
             return [];
         }
 
-        try {
-            /** @var Node[] $initialStatements */
-            $initialStatements = $this->parser->parse($file->getContents());
-        } catch (Throwable $t) {
-            throw ParserException::fromInvalidFile($file, $t);
-        }
+        $initialStatements = $this->parser->parse($file);
 
         $traverser = new PriorityNodeTraverser();
         $filePath = $file->getRealPath();

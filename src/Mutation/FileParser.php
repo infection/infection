@@ -33,26 +33,41 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant\Exception;
+namespace Infection\Mutation;
 
-use Exception;
-use SplFileInfo;
+use PhpParser\Node;
+use PhpParser\Parser;
+use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
 
 /**
  * @internal
  */
-final class ParserException extends Exception
+final class FileParser
 {
-    public static function fromInvalidFile(SplFileInfo $file, Throwable $original): self
+    private $parser;
+
+    public function __construct(Parser $parser)
     {
-        return new self(
-            sprintf(
-                'Unable to parse file "%s", most likely due to syntax errors.',
-                $file->getRealPath()
-            ),
-            0,
-            $original
-        );
+        $this->parser = $parser;
+    }
+
+    /**
+     * @throws UnparsableFile
+     *
+     * @return Node[]
+     */
+    public function parse(SplFileInfo $fileInfo): array
+    {
+        try {
+            return $this->parser->parse($fileInfo->getContents());
+        } catch (Throwable $throwable) {
+            $filePath = false === $fileInfo->getRealPath()
+                ? $fileInfo->getPathname()
+                : $fileInfo->getRealPath()
+            ;
+
+            throw UnparsableFile::fromInvalidFile($filePath, $throwable);
+        }
     }
 }
