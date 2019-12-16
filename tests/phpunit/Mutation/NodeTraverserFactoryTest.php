@@ -35,51 +35,28 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
-<<<<<<< HEAD:tests/phpunit/Mutation/NodeTraverserFactoryTest.php
 use function array_map;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\NotMutableIgnoreVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
-=======
-use Infection\Mutation\PriorityNodeTraverser;
-use InvalidArgumentException;
-use PhpParser\NodeVisitor;
->>>>>>> upstream/master:tests/phpunit/Mutation/PriorityNodeTraverserTest.php
 use PhpParser\NodeVisitorAbstract;
 use PHPUnit\Framework\TestCase;
 
 final class NodeTraverserFactoryTest extends TestCase
 {
-<<<<<<< HEAD:tests/phpunit/Mutation/NodeTraverserFactoryTest.php
     /**
      * @var NodeTraverserFactory
      */
     private $traverserFactory;
-=======
-    public function test_it_sorts_visitors_by_priorities(): void
-    {
-        $traverser = new PriorityNodeTraverser();
-
-        $callOrder = [];
-
-        $traverser->addVisitor($this->createVisitor($callOrder, 20), 20);
-        $traverser->addVisitor($this->createVisitor($callOrder, 30), 30);
-        $traverser->addVisitor($this->createVisitor($callOrder, 5), 5);
-        $traverser->addVisitor($this->createVisitor($callOrder, 10), 10);
->>>>>>> upstream/master:tests/phpunit/Mutation/PriorityNodeTraverserTest.php
 
     protected function setUp(): void
     {
         $this->traverserFactory = new NodeTraverserFactory();
     }
 
-<<<<<<< HEAD:tests/phpunit/Mutation/NodeTraverserFactoryTest.php
     public function test_it_can_create_a_traverser(): void
-=======
-    public function test_it_does_not_allow_duplicated_priorities(): void
->>>>>>> upstream/master:tests/phpunit/Mutation/PriorityNodeTraverserTest.php
     {
         $traverser = $this->traverserFactory->create([]);
 

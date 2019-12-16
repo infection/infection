@@ -38,13 +38,12 @@ namespace Infection\Tests\Mutation;
 use DomainException;
 use Generator;
 use Infection\Mutation\PrioritizedVisitorsNodeTraverser;
+use Infection\Tests\Fixtures\Mutation\FakeNodeTraverser;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use Infection\Tests\Fixtures\PhpParser\RecordedVisitor;
 use InvalidArgumentException;
 use PhpParser\NodeTraverser;
-use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 final class PrioritizedVisitorsNodeTraverserTest extends TestCase
@@ -56,11 +55,7 @@ final class PrioritizedVisitorsNodeTraverserTest extends TestCase
 
     protected function setUp(): void
     {
-        /** @var NodeTraverserInterface|MockObject $decoratedTraverser */
-        $decoratedTraverser = $this->createMock(NodeTraverserInterface::class);
-        $decoratedTraverser->expects($this->never());
-
-        $this->traverser = new PrioritizedVisitorsNodeTraverser($decoratedTraverser);
+        $this->traverser = new PrioritizedVisitorsNodeTraverser(new FakeNodeTraverser());
     }
 
     public function test_it_cannot_add_visitors_without_a_priority(): void
