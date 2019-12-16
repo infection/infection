@@ -44,6 +44,7 @@ use Infection\Exception\InvalidMutatorException;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\Mutation\FileParser;
 use Infection\Mutation\MutationGenerator;
+use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\Arithmetic\Decrement;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\TrueValue;
@@ -163,7 +164,8 @@ final class MutationGeneratorTest extends TestCase
             $this->createMock(LineCodeCoverage::class),
             [new Plus(new MutatorConfig([]))],
             $eventDispatcher,
-            $this->getParser()
+            $this->getParser(),
+            new NodeTraverserFactory()
         );
 
         $generator->generate(false);
@@ -223,7 +225,8 @@ final class MutationGeneratorTest extends TestCase
             $codeCoverageDataMock,
             $mutators,
             $eventDispatcherMock,
-            InfectionContainer::create()[FileParser::class]
+            InfectionContainer::create()[FileParser::class],
+            new NodeTraverserFactory()
         );
     }
 

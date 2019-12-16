@@ -52,6 +52,7 @@ use Infection\Locator\Locator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutation\FileParser;
 use Infection\Mutation\MutationGenerator;
+use Infection\Mutation\NodeTraverserFactory;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Runner\InitialTestsFailed;
@@ -341,12 +342,16 @@ final class InfectionCommand extends BaseCommand
         /** @var FileParser $parser */
         $parser = $this->container[FileParser::class];
 
+        /** @var NodeTraverserFactory $traverserFactory */
+        $traverserFactory = $this->container[NodeTraverserFactory::class];
+
         $mutationGenerator = new MutationGenerator(
             $config->getSourceFiles(),
             $codeCoverageData,
             $config->getMutators(),
             $this->eventDispatcher,
-            $parser
+            $parser,
+            $traverserFactory
         );
 
         $mutations = $mutationGenerator->generate(

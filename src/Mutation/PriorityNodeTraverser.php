@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Traverser;
+namespace Infection\Mutation;
 
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
@@ -51,5 +51,13 @@ final class PriorityNodeTraverser extends NodeTraverser
         $this->visitors[$priority] = $visitor;
 
         krsort($this->visitors);
+    }
+
+    /**
+     * @return NodeVisitor[]
+     */
+    public function getVisitors(): array
+    {
+        return $this->visitors;
     }
 }

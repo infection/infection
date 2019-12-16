@@ -44,12 +44,7 @@ use Infection\Events\MutationGeneratingStarted;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
-use Infection\Traverser\PriorityNodeTraverser;
-use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\MutationsCollectorVisitor;
-use Infection\Visitor\NotMutableIgnoreVisitor;
-use Infection\Visitor\ParentConnectorVisitor;
-use Infection\Visitor\ReflectionVisitor;
 use function is_string;
 use PhpParser\NodeVisitorAbstract;
 use Symfony\Component\Finder\SplFileInfo;
@@ -83,6 +78,7 @@ final class MutationGenerator
      * @var FileParser
      */
     private $parser;
+    private $traverserFactory;
 
     /**
      * @param SplFileInfo[] $sourceFiles
@@ -92,13 +88,15 @@ final class MutationGenerator
         LineCodeCoverage $codeCoverageData,
         array $mutators,
         EventDispatcherInterface $eventDispatcher,
-        FileParser $parser
+        FileParser $parser,
+        NodeTraverserFactory $traverserFactory
     ) {
         $this->sourceFiles = $sourceFiles;
         $this->codeCoverageData = $codeCoverageData;
         $this->mutators = $mutators;
         $this->eventDispatcher = $eventDispatcher;
         $this->parser = $parser;
+        $this->traverserFactory = $traverserFactory;
     }
 
     /**
@@ -138,7 +136,6 @@ final class MutationGenerator
 
         $initialStatements = $this->parser->parse($file);
 
-        $traverser = new PriorityNodeTraverser();
         $filePath = $file->getRealPath();
         assert(is_string($filePath));
 
@@ -150,15 +147,9 @@ final class MutationGenerator
             $onlyCovered
         );
 
-        $traverser->addVisitor(new NotMutableIgnoreVisitor(), 50);
-        $traverser->addVisitor(new ParentConnectorVisitor(), 40);
-        $traverser->addVisitor(new FullyQualifiedClassNameVisitor(), 30);
-        $traverser->addVisitor(new ReflectionVisitor(), 20);
-        $traverser->addVisitor($mutationsCollectorVisitor, 10);
+        $extraNodeVisitors[10] = $mutationsCollectorVisitor;
 
-        foreach ($extraNodeVisitors as $priority => $visitor) {
-            $traverser->addVisitor($visitor, $priority);
-        }
+        $traverser = $this->traverserFactory->create($extraNodeVisitors);
 
         $traverser->traverse($initialStatements);
 

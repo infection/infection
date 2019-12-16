@@ -55,6 +55,7 @@ use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutation\FileParser;
+use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Performance\Limiter\MemoryLimiter;
@@ -351,6 +352,9 @@ final class InfectionContainer extends Container
             },
             SourceFileCollector::class => static function (): SourceFileCollector {
                 return new SourceFileCollector();
+            },
+            NodeTraverserFactory::class => static function (): NodeTraverserFactory {
+                return new NodeTraverserFactory();
             },
         ]);
     }
