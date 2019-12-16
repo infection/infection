@@ -50,8 +50,8 @@ use Infection\Events\ApplicationExecutionStarted;
 use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\Locator\Locator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
-use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutation\FileParser;
+use Infection\Mutation\MutationGenerator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Runner\InitialTestsFailed;
@@ -341,7 +341,7 @@ final class InfectionCommand extends BaseCommand
         /** @var FileParser $parser */
         $parser = $this->container[FileParser::class];
 
-        $mutationsGenerator = new MutationsGenerator(
+        $mutationGenerator = new MutationGenerator(
             $config->getSourceFiles(),
             $codeCoverageData,
             $config->getMutators(),
@@ -349,7 +349,7 @@ final class InfectionCommand extends BaseCommand
             $parser
         );
 
-        $mutations = $mutationsGenerator->generate(
+        $mutations = $mutationGenerator->generate(
             $config->mutateOnlyCoveredCode(),
             $adapter instanceof HasExtraNodeVisitors ? $adapter->getMutationsCollectionNodeVisitors() : []
         );

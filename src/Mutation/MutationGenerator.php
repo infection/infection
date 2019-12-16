@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant\Generator;
+namespace Infection\Mutation;
 
 use function assert;
 use function count;
@@ -42,7 +42,6 @@ use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
 use Infection\Mutation;
-use Infection\Mutation\FileParser;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Traverser\PriorityNodeTraverser;
@@ -58,7 +57,7 @@ use Symfony\Component\Finder\SplFileInfo;
 /**
  * @internal
  */
-final class MutationsGenerator
+final class MutationGenerator
 {
     /**
      * @var SplFileInfo[]
@@ -115,9 +114,7 @@ final class MutationsGenerator
         $this->eventDispatcher->dispatch(new MutationGeneratingStarted(count($this->sourceFiles)));
 
         foreach ($this->sourceFiles as $file) {
-            if (!$onlyCovered || $this->hasTests($file)) {
-                $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered, $extraNodeVisitors);
-            }
+            $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered, $extraNodeVisitors);
 
             $this->eventDispatcher->dispatch(new MutableFileProcessed());
         }
@@ -135,6 +132,10 @@ final class MutationsGenerator
      */
     private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered, array $extraNodeVisitors): array
     {
+        if ($onlyCovered && !$this->hasTests($file)) {
+            return [];
+        }
+
         $initialStatements = $this->parser->parse($file);
 
         $traverser = new PriorityNodeTraverser();
