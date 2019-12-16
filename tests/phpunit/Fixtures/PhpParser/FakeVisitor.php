@@ -12,21 +12,21 @@ final class FakeVisitor implements NodeVisitor
 {
     public function beforeTraverse(array $nodes)
     {
-        throw new LogicException('');
+        throw new LogicException();
     }
 
     public function enterNode(Node $node)
     {
-        throw new LogicException('');
+        throw new LogicException();
     }
 
     public function leaveNode(Node $node)
     {
-        throw new LogicException('');
+        throw new LogicException();
     }
 
     public function afterTraverse(array $nodes)
     {
-        throw new LogicException('');
+        throw new LogicException();
     }
 }
