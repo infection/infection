@@ -51,11 +51,5 @@ test_script:
     - vendor\bin\phpunit --prepend=devTools/xdebug-filter.php --coverage-clover=clover.xml --coverage-xml=coverage/coverage-xml --log-junit=coverage/junit.xml
     - php bin\infection --threads=4 --log-verbosity=none --coverage=coverage
 
-after_test:
-  - ps: |
-      $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
-      Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
-      bash codecov.sh
-
 matrix:
   fast_finish: true
