@@ -50,8 +50,8 @@ use Infection\Events\ApplicationExecutionStarted;
 use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\Locator\Locator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
-use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutation\FileParser;
+use Infection\Mutation\MutationGenerator;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
@@ -345,7 +345,7 @@ final class InfectionCommand extends BaseCommand
         /** @var NodeTraverserFactory $traverserFactory */
         $traverserFactory = $this->container[NodeTraverserFactory::class];
 
-        $mutationsGenerator = new MutationsGenerator(
+        $mutationGenerator = new MutationGenerator(
             $config->getSourceFiles(),
             $codeCoverageData,
             $config->getMutators(),
@@ -354,7 +354,7 @@ final class InfectionCommand extends BaseCommand
             $traverserFactory
         );
 
-        $mutations = $mutationsGenerator->generate(
+        $mutations = $mutationGenerator->generate(
             $config->mutateOnlyCoveredCode(),
             $adapter instanceof HasExtraNodeVisitors ? $adapter->getMutationsCollectionNodeVisitors() : []
         );

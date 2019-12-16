@@ -80,7 +80,6 @@ final class PrioritizedVisitorsNodeTraverserTest extends TestCase
     /**
      * @dataProvider visitorsWithPriorityProvider
      *
-     * @param array                   $visitorsWithPriority
      * @param array<int, NodeVisitor> $expectedVisitors
      */
     public function test_it_can_add_visitors_which_will_be_sorted_by_priorities(
@@ -88,7 +87,7 @@ final class PrioritizedVisitorsNodeTraverserTest extends TestCase
         array $expectedVisitors
     ): void {
         foreach ($visitorsWithPriority as [$visitor, $priority]) {
-            /**
+            /*
              * @var NodeVisitor $visitor
              * @var int         $priority
              */

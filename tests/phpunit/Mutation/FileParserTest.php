@@ -37,13 +37,15 @@ namespace Infection\Tests\Mutation;
 
 use Generator;
 use Infection\Console\InfectionContainer;
-use Infection\Mutant\Exception\ParserException;
 use Infection\Mutation\FileParser;
+use Infection\Mutation\UnparsableFile;
 use PhpParser\Error;
 use PhpParser\Node;
 use PhpParser\NodeDumper;
 use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
+use function realpath;
+use function Safe\sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 
 final class FileParserTest extends TestCase
@@ -95,9 +97,29 @@ final class FileParserTest extends TestCase
             $parser->parse(self::createFileInfo('/unknown', '<?php use foo as self;'));
 
             $this->fail('Expected PHPParser to be unable to parse the above expression');
-        } catch (ParserException $exception) {
+        } catch (UnparsableFile $exception) {
             $this->assertSame(
-                'Unable to parse file "", most likely due to syntax errors.',
+                'Could not parse the file "/unknown". Check if it is a valid PHP file',
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertInstanceOf(Error::class, $exception->getPrevious());
+        }
+
+        $fileRealPath = realpath(__FILE__);
+
+        $this->assertNotFalse($fileRealPath);
+
+        try {
+            $parser->parse(self::createFileInfo($fileRealPath, '<?php use foo as self;'));
+
+            $this->fail('Expected PHPParser to be unable to parse the above expression');
+        } catch (UnparsableFile $exception) {
+            $this->assertSame(
+                sprintf(
+                    'Could not parse the file "%s". Check if it is a valid PHP file',
+                    $fileRealPath
+                ),
                 $exception->getMessage()
             );
             $this->assertSame(0, $exception->getCode());

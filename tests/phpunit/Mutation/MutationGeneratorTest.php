@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant\Generator;
+namespace Infection\Tests\Mutation;
 
 use Infection\Console\InfectionContainer;
 use Infection\EventDispatcher\EventDispatcherInterface;
@@ -42,9 +42,8 @@ use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
 use Infection\Exception\InvalidMutatorException;
 use Infection\FileSystem\SourceFileCollector;
-use Infection\Mutant\Exception\ParserException;
-use Infection\Mutant\Generator\MutationsGenerator;
 use Infection\Mutation\FileParser;
+use Infection\Mutation\MutationGenerator;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\Arithmetic\Decrement;
 use Infection\Mutator\Arithmetic\Plus;
@@ -58,9 +57,9 @@ use Infection\WrongMutator\ErrorMutator;
 use PHPUnit\Framework\TestCase;
 use Pimple\Container;
 
-final class MutationsGeneratorTest extends TestCase
+final class MutationGeneratorTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Files';
+    private const FIXTURES_DIR = __DIR__ . '/../Fixtures/Files';
 
     public function test_it_collects_plus_mutation(): void
     {
@@ -129,20 +128,6 @@ final class MutationsGeneratorTest extends TestCase
         $this->assertCount(0, $mutations);
     }
 
-    public function test_it_throws_correct_error_when_file_is_invalid(): void
-    {
-        $generator = $this->createMutationGenerator(
-            $this->createMock(LineCodeCoverage::class),
-            Decrement::class,
-            null,
-            [self::FIXTURES_DIR . '/InvalidFile']
-        );
-
-        $this->expectException(ParserException::class);
-        $this->expectExceptionMessageRegExp('#Fixtures(/|\\\)Files(/|\\\)InvalidFile(/|\\\)InvalidFile\.php#');
-        $generator->generate(false);
-    }
-
     public function test_it_throws_correct_exception_when_mutator_is_invalid(): void
     {
         $generator = $this->createMutationGenerator(
@@ -170,7 +155,7 @@ final class MutationsGeneratorTest extends TestCase
                 [new MutationGeneratingFinished()]
             );
 
-        $generator = new MutationsGenerator(
+        $generator = new MutationGenerator(
             (new SourceFileCollector())->collectFiles(
                 [self::FIXTURES_DIR . '/Mutation/OneFile'],
                 [],
@@ -191,7 +176,7 @@ final class MutationsGeneratorTest extends TestCase
         ?string $whitelistedMutatorName = null,
         ?MutatorConfig $mutatorConfig = null,
         array $srcDirs = []
-    ): MutationsGenerator {
+    ): MutationGenerator {
         if ($srcDirs === []) {
             $srcDirs = [
                 self::FIXTURES_DIR . '/Mutation/OneFile',
@@ -231,7 +216,7 @@ final class MutationsGeneratorTest extends TestCase
         $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcherMock->expects($this->any())->method('dispatch');
 
-        return new MutationsGenerator(
+        return new MutationGenerator(
             (new SourceFileCollector())->collectFiles(
                 $srcDirs,
                 $excludedDirsOrFiles,
