@@ -43,7 +43,7 @@ use Infection\Events\MutationGeneratingStarted;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
-use PhpParser\NodeVisitorAbstract;
+use PhpParser\NodeVisitor;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
@@ -75,6 +75,7 @@ final class MutationGenerator
 
     /**
      * @param SplFileInfo[] $sourceFiles
+     * @param Mutator[]     $mutators
      */
     public function __construct(
         array $sourceFiles,
@@ -91,8 +92,10 @@ final class MutationGenerator
     }
 
     /**
-     * @param bool $onlyCovered mutate only covered by tests lines of code
-     * @param NodeVisitorAbstract[] $extraNodeVisitors
+     * @param bool          $onlyCovered Mutates only covered by tests lines of code
+     * @param NodeVisitor[] $extraNodeVisitors
+     *
+     * @throws UnparsableFile
      *
      * @return Mutation[]
      */
