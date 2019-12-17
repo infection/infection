@@ -98,7 +98,7 @@ final class LoggerFactory
         $summary = $logs->getSummaryLogFilePath();
         $text = $logs->getTextLogFilePath();
 
-        /** @var array<MutationTestingResultsLogger> $loggers */
+        /** @var MutationTestingResultsLogger[] $loggers */
         $loggers = array_filter([
             ResultsLoggerTypes::BADGE => $badge === null
                 ? null

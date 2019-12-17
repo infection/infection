@@ -76,10 +76,28 @@ final class LoggerFactoryTest extends TestCase
         $this->assertCount(0, $loggers);
     }
 
+    public function test_it_creates_a_bade_logger_on_low_verbosity(): void
+    {
+        $factory = new LoggerFactory(
+            new MetricsCalculator(),
+            new Filesystem(),
+            LogVerbosity::NONE,
+            true,
+            true
+        );
+
+        $loggers = $factory->createFromLogEntries(
+            new Logs(null, null, null, null, new Badge('branch_name')),
+            $this->createMock(OutputInterface::class)
+        );
+        $this->assertCount(1, $loggers);
+        $this->assertInstanceOf(BadgeLogger::class, current($loggers));
+    }
+
     /**
      * @dataProvider provideLogTypesAndClasses
      */
-    public function test_it_creates_logger_for_log_type(Logs $logs, string $expectedLogClass): void
+    public function test_it_creates_a_logger_for_log_type(Logs $logs, string $expectedLogClass): void
     {
         $factory = new LoggerFactory(
             new MetricsCalculator(),
@@ -105,11 +123,6 @@ final class LoggerFactoryTest extends TestCase
         ];
 
         yield [
-            new Logs(null, null, null, 'per_muator', null),
-            PerMutatorLogger::class,
-        ];
-
-        yield [
             new Logs(null, 'summary_file', null, null, null),
             SummaryFileLogger::class,
         ];
@@ -118,47 +131,22 @@ final class LoggerFactoryTest extends TestCase
             new Logs(null, null, 'debug_file', null, null),
             DebugFileLogger::class,
         ];
-    }
 
-    public function test_it_creates_a_bade_logger(): void
-    {
-        $factory = new LoggerFactory(
-            new MetricsCalculator(),
-            new Filesystem(),
-            LogVerbosity::NORMAL,
-            true,
-            true
-        );
+        yield [
+            new Logs(null, null, null, 'per_muator', null),
+            PerMutatorLogger::class,
+        ];
 
-        $loggers = $factory->createFromLogEntries(
+        yield [
             new Logs(null, null, null, null, new Badge('foo')),
-            $this->createMock(OutputInterface::class)
-        );
-        $this->assertCount(1, $loggers);
-        $this->assertInstanceOf(BadgeLogger::class,
-            current($loggers)
-        );
+            BadgeLogger::class,
+        ];
     }
 
-    public function test_it_creates_a_bade_logger_on_low_verbosity(): void
-    {
-        $factory = new LoggerFactory(
-            new MetricsCalculator(),
-            new Filesystem(),
-            LogVerbosity::NONE,
-            true,
-            true
-        );
-
-        $loggers = $factory->createFromLogEntries(
-            new Logs(null, null, null, null, new Badge('branch_name')),
-            $this->createMock(OutputInterface::class)
-        );
-        $this->assertCount(1, $loggers);
-        $this->assertInstanceOf(BadgeLogger::class, current($loggers));
-    }
-
-    public function test_it_creates_multiple_loggers(): void
+    /**
+     * @dataProvider provideLogsAndCount
+     */
+    public function test_it_creates_multiple_loggers(Logs $logs, int $loggerCount): void
     {
         $factory = new LoggerFactory(
             new MetricsCalculator(),
@@ -169,16 +157,43 @@ final class LoggerFactoryTest extends TestCase
         );
 
         $loggers = $factory->createFromLogEntries(
-            new Logs(
-                '/a/file',
-                '/a/file',
-                '/a/file',
-                '/a/file',
-                null
-            ),
+            $logs,
             $this->createMock(OutputInterface::class)
         );
 
-        $this->assertCount(4, $loggers);
+        $this->assertCount($loggerCount, $loggers);
+    }
+
+    public function provideLogsAndCount(): Generator
+    {
+        yield [
+            new Logs(null, null, null, null, null),
+            0,
+        ];
+
+        yield [
+            new Logs('infection.log', null, null, null, new Badge('master')),
+            2,
+        ];
+
+        yield [
+            new Logs('text', 'summary', 'debug', null, null),
+            3,
+        ];
+
+        yield [
+            new Logs(null, null, 'debug', 'per_mutator', new Badge('f')),
+            3,
+        ];
+
+        yield [
+            new Logs('text', null, 'debug', 'per_mutator', new Badge('f')),
+            4,
+        ];
+
+        yield [
+            new Logs('text', 'summary', 'debug', 'per_mutator', new Badge('f')),
+            5,
+        ];
     }
 }
