@@ -329,6 +329,8 @@ final class InfectionContainer extends Container
             'subscriber.builder' => static function (self $container): SubscriberBuilder {
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
+                /** @var LoggerFactory $loggerFactory */
+                $loggerFactory = $container[LoggerFactory::class];
 
                 return new SubscriberBuilder(
                     $config->showMutations(),
@@ -344,7 +346,7 @@ final class InfectionContainer extends Container
                     $container['timer'],
                     $container['time.formatter'],
                     $container['memory.formatter'],
-                    $container[LoggerFactory::class]
+                    $loggerFactory
                 );
             },
             CommandLineBuilder::class => static function (): CommandLineBuilder {
@@ -359,10 +361,14 @@ final class InfectionContainer extends Container
             LoggerFactory::class => static function (self $container): LoggerFactory {
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
+                /** @var MetricsCalculator $metrics */
+                $metrics = $container['metrics'];
+                /** @var Filesystem $fileSystem */
+                $fileSystem = $container['filesystem'];
 
                 return new LoggerFactory(
-                    $container['metrics'],
-                    $container['filesystem'],
+                    $metrics,
+                    $fileSystem,
                     $config->getLogVerbosity(),
                     $config->isDebugEnabled(),
                     $config->mutateOnlyCoveredCode()
