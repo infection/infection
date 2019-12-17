@@ -91,16 +91,8 @@ final class FileMutationGeneratorTest extends TestCase
 
         $container = InfectionContainer::create();
 
-        /** @var FileParser $fileParser */
-        $fileParser = $container[FileParser::class];
-
-        /** @var NodeTraverserFactory $traverserFactory */
-        $traverserFactory = $container[NodeTraverserFactory::class];
-
-        $mutationGenerator = new FileMutationGenerator(
-            $fileParser,
-            $traverserFactory
-        );
+        /** @var FileMutationGenerator $mutationGenerator */
+        $mutationGenerator = $container[FileMutationGenerator::class];
 
         $mutations = $mutationGenerator->generate(
             new SplFileInfo(self::FIXTURES_DIR . '/Mutation/OneFile/OneFile.php', '', ''),
