@@ -35,201 +35,130 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
-use Infection\Console\InfectionContainer;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
-use Infection\Exception\InvalidMutatorException;
-use Infection\FileSystem\SourceFileCollector;
+use Infection\Mutation;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\MutationGenerator;
-use Infection\Mutator\Arithmetic\Decrement;
 use Infection\Mutator\Arithmetic\Plus;
-use Infection\Mutator\Boolean\TrueValue;
-use Infection\Mutator\FunctionSignature\PublicVisibility;
-use Infection\Mutator\Number\DecrementInteger;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
-use Infection\Tests\Fixtures\Files\Mutation\OneFile\OneFile;
-use Infection\WrongMutator\ErrorMutator;
+use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use PHPUnit\Framework\TestCase;
-use Pimple\Container;
+use Prophecy\Prophecy\ObjectProphecy;
+use Symfony\Component\Finder\SplFileInfo;
 
 final class MutationGeneratorTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/../Fixtures/Files';
-
-    public function test_it_collects_plus_mutation(): void
+    public function test_it_returns_all_the_mutations_generated_for_each_files(): void
     {
-        $codeCoverageDataMock = $this->createMock(LineCodeCoverage::class);
-        $codeCoverageDataMock->method('getAllTestsForMutation');
-
-        $mutations = $this->createMutationGenerator($codeCoverageDataMock)->generate(false);
-
-        $this->assertInstanceOf(Plus::class, $mutations[3]->getMutator());
-    }
-
-    public function test_it_collects_public_visibility_mutation(): void
-    {
-        $codeCoverageDataMock = $this->createMock(LineCodeCoverage::class);
-        $codeCoverageDataMock->method('getAllTestsForMutation');
-
-        $mutations = $this->createMutationGenerator($codeCoverageDataMock)->generate(false);
-
-        $this->assertInstanceOf(Plus::class, $mutations[3]->getMutator());
-        $this->assertInstanceOf(PublicVisibility::class, $mutations[4]->getMutator());
-    }
-
-    public function test_it_can_skip_not_covered_on_file_level(): void
-    {
-        $codeCoverageDataMock = $this->createMock(LineCodeCoverage::class);
-
-        $codeCoverageDataMock->expects($this->never())->method('getAllTestsForMutation');
-
-        $codeCoverageDataMock->expects($this->once())
-            ->method('hasTests')
-            ->willReturn(false);
-
-        $mutations = $this->createMutationGenerator($codeCoverageDataMock)->generate(true);
-
-        $this->assertCount(0, $mutations);
-    }
-
-    public function test_it_can_skip_ignored_classes(): void
-    {
-        $codeCoverageDataMock = $this->createMock(LineCodeCoverage::class);
-
-        $codeCoverageDataMock->expects($this->once())
-            ->method('hasTests')
-            ->willReturn(true);
-
-        $generator = $this->createMutationGenerator($codeCoverageDataMock, null, new MutatorConfig([
-            'ignore' => [
-                OneFile::class,
-            ],
-        ]));
-
-        $mutations = $generator->generate(true);
-
-        $this->assertCount(0, $mutations);
-    }
-
-    public function test_it_executes_only_whitelisted_mutators(): void
-    {
-        $generator = $this->createMutationGenerator(
-            $this->createMock(LineCodeCoverage::class),
-            Decrement::class
-        );
-
-        $mutations = $generator->generate(false);
-
-        $this->assertCount(0, $mutations);
-    }
-
-    public function test_it_throws_correct_exception_when_mutator_is_invalid(): void
-    {
-        $generator = $this->createMutationGenerator(
-            $this->createMock(LineCodeCoverage::class),
-            ErrorMutator::class
-        );
-
-        $this->expectException(InvalidMutatorException::class);
-        $this->expectExceptionMessageRegExp(
-            '#Encountered an error with the "ErrorMutator" mutator in the ".+OneFile.php"' .
-            ' file. This is most likely a bug in Infection, so please report this in our issue tracker.#'
-        );
-
-        $generator->generate(false);
-    }
-
-    public function test_it_dispatches_the_correct_events(): void
-    {
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $eventDispatcher->expects($this->exactly(3))
-            ->method('dispatch')
-            ->withConsecutive(
-                [new MutationGeneratingStarted(1)],
-                [new MutableFileProcessed()],
-                [new MutationGeneratingFinished()]
-            );
-
-        /** @var FileMutationGenerator $fileMutationGenerator */
-        $fileMutationGenerator = InfectionContainer::create()[FileMutationGenerator::class];
-
-        $generator = new MutationGenerator(
-            (new SourceFileCollector())->collectFiles(
-                [self::FIXTURES_DIR . '/Mutation/OneFile'],
-                [],
-                ''
-            ),
-            $this->createMock(LineCodeCoverage::class),
-            [new Plus(new MutatorConfig([]))],
-            $eventDispatcher,
-            $fileMutationGenerator
-        );
-
-        $generator->generate(false);
-    }
-
-    private function createMutationGenerator(
-        LineCodeCoverage $codeCoverageDataMock,
-        ?string $whitelistedMutatorName = null,
-        ?MutatorConfig $mutatorConfig = null,
-        array $srcDirs = []
-    ): MutationGenerator {
-        if ($srcDirs === []) {
-            $srcDirs = [
-                self::FIXTURES_DIR . '/Mutation/OneFile',
-            ];
-        }
-        $excludedDirsOrFiles = [];
-
-        $container = new Container();
-
-        $mutatorConfig = $mutatorConfig ?? new MutatorConfig([]);
-
-        $container[Plus::class] = static function () use ($mutatorConfig) {
-            return new Plus($mutatorConfig);
-        };
-
-        $container[PublicVisibility::class] = static function () use ($mutatorConfig) {
-            return new PublicVisibility($mutatorConfig);
-        };
-
-        $container[TrueValue::class] = static function () use ($mutatorConfig) {
-            return new TrueValue($mutatorConfig);
-        };
-
-        $container[DecrementInteger::class] = static function (Container $c) use ($mutatorConfig) {
-            return new DecrementInteger($mutatorConfig);
-        };
-
-        $defaultMutators = [
-            $container[Plus::class],
-            $container[PublicVisibility::class],
-            $container[TrueValue::class],
-            $container[DecrementInteger::class],
+        $sourceFiles = [
+            $fileInfoA = new SplFileInfo('fileA', 'relativePathToFileA', 'relativePathnameToFileA'),
+            $fileInfoB = new SplFileInfo('fileB', 'relativePathToFileB', 'relativePathnameToFileB'),
         ];
 
-        $mutators = $whitelistedMutatorName ? [new $whitelistedMutatorName($mutatorConfig)] : $defaultMutators;
-
+        $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
+        $mutators = [new Plus(new MutatorConfig([]))];
         $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
-        $eventDispatcherMock->expects($this->any())->method('dispatch');
+        $onlyCovered = true;
+        $extraVisitors = [2 => new FakeVisitor()];
 
-        /** @var FileMutationGenerator $fileMutationGenerator */
-        $fileMutationGenerator = InfectionContainer::create()[FileMutationGenerator::class];
+        $mutation0 = self::createMutation();
+        $mutation1 = self::createMutation();
+        $mutation2 = self::createMutation();
 
-        return new MutationGenerator(
-            (new SourceFileCollector())->collectFiles(
-                $srcDirs,
-                $excludedDirsOrFiles,
-                ''
-            ),
-            $codeCoverageDataMock,
+        /** @var FileMutationGenerator|ObjectProphecy $fileMutationGeneratorProphecy */
+        $fileMutationGeneratorProphecy = $this->prophesize(FileMutationGenerator::class);
+        $fileMutationGeneratorProphecy
+            ->generate($fileInfoA, $onlyCovered, $codeCoverageMock, $mutators, $extraVisitors)
+            ->willReturn([
+                $mutation0,
+                $mutation1,
+            ])
+        ;
+        $fileMutationGeneratorProphecy
+            ->generate($fileInfoB, $onlyCovered, $codeCoverageMock, $mutators, $extraVisitors)
+            ->willReturn([
+                $mutation1,
+                $mutation2,
+            ])
+        ;
+
+        $expectedMutations = [
+            $mutation0,
+            $mutation1,
+            $mutation1,
+            $mutation2,
+        ];
+
+        $mutationGenerator = new MutationGenerator(
+            $sourceFiles,
+            $codeCoverageMock,
             $mutators,
             $eventDispatcherMock,
-            $fileMutationGenerator
+            $fileMutationGeneratorProphecy->reveal()
+        );
+
+        $mutations = $mutationGenerator->generate($onlyCovered, $extraVisitors);
+
+        $this->assertSame($expectedMutations, $mutations);
+    }
+
+    public function test_it_dispatches_events(): void
+    {
+        $sourceFiles = [
+            new SplFileInfo('fileA', 'relativePathToFileA', 'relativePathnameToFileA'),
+            new SplFileInfo('fileB', 'relativePathToFileB', 'relativePathnameToFileB'),
+        ];
+
+        $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
+
+        $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcherMock
+            ->expects($this->exactly(4))
+            ->method('dispatch')
+            ->withConsecutive(
+                [new MutationGeneratingStarted(2)],
+                [new MutableFileProcessed()],
+                [new MutableFileProcessed()],
+                [new MutationGeneratingFinished()]
+            )
+        ;
+
+        $fileMutationGeneratorMock = $this->createMock(FileMutationGenerator::class);
+        $fileMutationGeneratorMock
+            ->expects($this->exactly(2))
+            ->method('generate')
+            ->willReturnOnConsecutiveCalls(
+                [],
+                []
+            )
+        ;
+
+        $mutationGenerator = new MutationGenerator(
+            $sourceFiles,
+            $codeCoverageMock,
+            [],
+            $eventDispatcherMock,
+            $fileMutationGeneratorMock
+        );
+
+        $mutationGenerator->generate(false, []);
+    }
+
+    private static function createMutation(): Mutation
+    {
+        return new Mutation(
+            '',
+            [],
+            new Plus(new MutatorConfig([])),
+            [],
+            '',
+            null,
+            0,
+            []
         );
     }
 }

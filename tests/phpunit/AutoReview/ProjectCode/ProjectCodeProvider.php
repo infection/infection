@@ -35,9 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
-use Infection\Mutation\FileParser;
-use Infection\Mutation\NodeTraverserFactory;
-use Infection\Mutation\PriorityNodeTraverser;
 use const DIRECTORY_SEPARATOR;
 use Generator;
 use function in_array;
@@ -63,6 +60,10 @@ use Infection\Finder\TestFrameworkFinder;
 use Infection\Http\BadgeApiClient;
 use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
+use Infection\Mutation\FileMutationGenerator;
+use Infection\Mutation\FileParser;
+use Infection\Mutation\NodeTraverserFactory;
+use Infection\Mutation\PriorityNodeTraverser;
 use Infection\Mutator\Util\Mutator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
@@ -140,7 +141,8 @@ final class ProjectCodeProvider
         SourceFileCollector::class,
         FileParser::class,
         NodeTraverserFactory::class,
-        PriorityNodeTraverser::class
+        PriorityNodeTraverser::class,
+        FileMutationGenerator::class,
     ];
 
     /**

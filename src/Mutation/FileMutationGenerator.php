@@ -48,8 +48,9 @@ use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
+ * @final
  */
-final class FileMutationGenerator
+class FileMutationGenerator
 {
     private const MUTATION_COLLECTOR_VISITOR_PRIORITY = 10;
 
