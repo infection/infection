@@ -35,20 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use PhpParser\NodeVisitor;
-use function assert;
-use function count;
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\MutableFileProcessed;
-use Infection\Events\MutationGeneratingFinished;
-use Infection\Events\MutationGeneratingStarted;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Visitor\MutationsCollectorVisitor;
-use function is_string;
-use PhpParser\NodeVisitorAbstract;
+use InvalidArgumentException;
+use PhpParser\NodeVisitor;
 use Symfony\Component\Finder\SplFileInfo;
+use Webmozart\Assert\Assert;
+use function array_key_exists;
+use function get_class;
+use function Safe\sprintf;
 
 /**
  * @internal
@@ -75,7 +72,7 @@ final class FileMutationGenerator
     public function generate(
         SplFileInfo $fileInfo,
         bool $onlyCovered,
-        LineCodeCoverage $codeCoverageData,
+        LineCodeCoverage $codeCoverage,
         array $mutators,
         array $extraNodeVisitors
     ): array
@@ -85,8 +82,18 @@ final class FileMutationGenerator
             : $fileInfo->getRealPath()
         ;
 
-        if ($onlyCovered && !$codeCoverageData->hasTests($filePath)) {
+        if ($onlyCovered && !$codeCoverage->hasTests($filePath)) {
             return [];
+        }
+
+        if (array_key_exists(10, $extraNodeVisitors)) {
+            throw new InvalidArgumentException(sprintf(
+                'Did not expect to find a visitor for the priority "%d". Found "%s". Please'
+                .' free that priority as it is reserved for "%s".',
+                10,
+                get_class($extraNodeVisitors[10]),
+                MutationsCollectorVisitor::class
+            ));
         }
 
         $initialStatements = $this->parser->parse($fileInfo);
@@ -95,7 +102,7 @@ final class FileMutationGenerator
             $mutators,
             $filePath,
             $initialStatements,
-            $codeCoverageData,
+            $codeCoverage,
             $onlyCovered
         );
 
