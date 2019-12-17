@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
+use Infection\Mutation\FileMutationGenerator;
 use function array_filter;
 use function getcwd;
 use Infection\Configuration\Configuration;
@@ -355,6 +356,15 @@ final class InfectionContainer extends Container
             },
             NodeTraverserFactory::class => static function (): NodeTraverserFactory {
                 return new NodeTraverserFactory();
+            },
+            FileMutationGenerator::class => static function (self $container): FileMutationGenerator {
+                /** @var FileParser $fileParser */
+                $fileParser = $container[FileParser::class];
+
+                /** @var NodeTraverserFactory $nodeTraverserFactory */
+                $nodeTraverserFactory = $container[NodeTraverserFactory::class];
+
+                return new FileMutationGenerator($fileParser, $nodeTraverserFactory);
             },
         ]);
     }

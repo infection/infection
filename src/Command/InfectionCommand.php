@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Infection\Mutation\FileMutationGenerator;
 use function dirname;
 use Exception;
 use Infection\Configuration\Configuration;
@@ -339,19 +340,15 @@ final class InfectionCommand extends BaseCommand
 
         $codeCoverageData = $this->getCodeCoverageData($this->testFrameworkKey, $adapter);
 
-        /** @var FileParser $parser */
-        $parser = $this->container[FileParser::class];
-
-        /** @var NodeTraverserFactory $traverserFactory */
-        $traverserFactory = $this->container[NodeTraverserFactory::class];
+        /** @var FileMutationGenerator $fileMutationGenerator */
+        $fileMutationGenerator = $this->container[FileMutationGenerator::class];
 
         $mutationGenerator = new MutationGenerator(
             $config->getSourceFiles(),
             $codeCoverageData,
             $config->getMutators(),
             $this->eventDispatcher,
-            $parser,
-            $traverserFactory
+            $fileMutationGenerator
         );
 
         $mutations = $mutationGenerator->generate(

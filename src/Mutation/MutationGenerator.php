@@ -74,11 +74,7 @@ final class MutationGenerator
      */
     private $eventDispatcher;
 
-    /**
-     * @var FileParser
-     */
-    private $parser;
-    private $traverserFactory;
+    private $fileMutationGenerator;
 
     /**
      * @param SplFileInfo[] $sourceFiles
@@ -88,15 +84,13 @@ final class MutationGenerator
         LineCodeCoverage $codeCoverageData,
         array $mutators,
         EventDispatcherInterface $eventDispatcher,
-        FileParser $parser,
-        NodeTraverserFactory $traverserFactory
+        FileMutationGenerator $fileMutationGenerator
     ) {
         $this->sourceFiles = $sourceFiles;
         $this->codeCoverageData = $codeCoverageData;
         $this->mutators = $mutators;
         $this->eventDispatcher = $eventDispatcher;
-        $this->parser = $parser;
-        $this->traverserFactory = $traverserFactory;
+        $this->fileMutationGenerator = $fileMutationGenerator;
     }
 
     /**
@@ -111,8 +105,14 @@ final class MutationGenerator
 
         $this->eventDispatcher->dispatch(new MutationGeneratingStarted(count($this->sourceFiles)));
 
-        foreach ($this->sourceFiles as $file) {
-            $allFilesMutations[] = $this->getMutationsFromFile($file, $onlyCovered, $extraNodeVisitors);
+        foreach ($this->sourceFiles as $fileInfo) {
+            $allFilesMutations[] = $this->fileMutationGenerator->generate(
+                $fileInfo,
+                $onlyCovered,
+                $this->codeCoverageData,
+                $this->mutators,
+                $extraNodeVisitors
+            );
 
             $this->eventDispatcher->dispatch(new MutableFileProcessed());
         }
@@ -120,47 +120,5 @@ final class MutationGenerator
         $this->eventDispatcher->dispatch(new MutationGeneratingFinished());
 
         return array_merge(...$allFilesMutations);
-    }
-
-    /**
-     * @param bool $onlyCovered mutate only covered by tests lines of code
-     * @param NodeVisitorAbstract[] $extraNodeVisitors extra visitors to influence to mutation collection process
-     *
-     * @return Mutation[]
-     */
-    private function getMutationsFromFile(SplFileInfo $file, bool $onlyCovered, array $extraNodeVisitors): array
-    {
-        if ($onlyCovered && !$this->hasTests($file)) {
-            return [];
-        }
-
-        $initialStatements = $this->parser->parse($file);
-
-        $filePath = $file->getRealPath();
-        assert(is_string($filePath));
-
-        $mutationsCollectorVisitor = new MutationsCollectorVisitor(
-            $this->mutators,
-            $filePath,
-            $initialStatements,
-            $this->codeCoverageData,
-            $onlyCovered
-        );
-
-        $extraNodeVisitors[10] = $mutationsCollectorVisitor;
-
-        $traverser = $this->traverserFactory->create($extraNodeVisitors);
-
-        $traverser->traverse($initialStatements);
-
-        return $mutationsCollectorVisitor->getMutations();
-    }
-
-    private function hasTests(SplFileInfo $file): bool
-    {
-        $filePath = $file->getRealPath();
-        assert(is_string($filePath));
-
-        return $this->codeCoverageData->hasTests($filePath);
     }
 }
