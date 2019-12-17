@@ -55,7 +55,7 @@ final class LoggerFactory
     /**
      * @var Filesystem
      */
-    private $fs;
+    private $filesystem;
 
     /**
      * @var string
@@ -65,25 +65,25 @@ final class LoggerFactory
     /**
      * @var bool
      */
-    private $isDebugMode;
+    private $debugMode;
 
     /**
      * @var bool
      */
-    private $isOnlyCoveredMode;
+    private $onlyCoveredMode;
 
     public function __construct(
         MetricsCalculator $metricsCalculator,
-        Filesystem $fs,
+        Filesystem $filesystem,
         string $logVerbosity,
-        bool $isDebugMode,
-        bool $isOnlyCoveredMode
+        bool $debugMode,
+        bool $onlyCoveredMode
     ) {
         $this->metricsCalculator = $metricsCalculator;
-        $this->fs = $fs;
+        $this->filesystem = $filesystem;
         $this->logVerbosity = $logVerbosity;
-        $this->isDebugMode = $isDebugMode;
-        $this->isOnlyCoveredMode = $isOnlyCoveredMode;
+        $this->debugMode = $debugMode;
+        $this->onlyCoveredMode = $onlyCoveredMode;
     }
 
     /**
@@ -126,10 +126,10 @@ final class LoggerFactory
             $output,
             $location,
             $this->metricsCalculator,
-            $this->fs,
+            $this->filesystem,
             $isDebugVerbosity,
-            $this->isDebugMode,
-            $this->isOnlyCoveredMode
+            $this->debugMode,
+            $this->onlyCoveredMode
         );
     }
 
@@ -139,9 +139,9 @@ final class LoggerFactory
             $output,
             $location,
             $this->metricsCalculator,
-            $this->fs,
+            $this->filesystem,
             $isDebugVerbosity,
-            $this->isDebugMode
+            $this->debugMode
         );
     }
 
@@ -151,10 +151,10 @@ final class LoggerFactory
             $output,
             $location,
             $this->metricsCalculator,
-            $this->fs,
+            $this->filesystem,
             $isDebugVerbosity,
-            $this->isDebugMode,
-            $this->isOnlyCoveredMode
+            $this->debugMode,
+            $this->onlyCoveredMode
         );
     }
 
@@ -164,9 +164,9 @@ final class LoggerFactory
             $output,
             $location,
             $this->metricsCalculator,
-            $this->fs,
+            $this->filesystem,
             $isDebugVerbosity,
-            $this->isDebugMode
+            $this->debugMode
         );
     }
 
