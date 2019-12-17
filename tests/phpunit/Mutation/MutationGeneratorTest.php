@@ -42,6 +42,7 @@ use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
 use Infection\Exception\InvalidMutatorException;
 use Infection\FileSystem\SourceFileCollector;
+use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\FileParser;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutation\NodeTraverserFactory;
@@ -155,6 +156,9 @@ final class MutationGeneratorTest extends TestCase
                 [new MutationGeneratingFinished()]
             );
 
+        /** @var FileMutationGenerator $fileMutationGenerator */
+        $fileMutationGenerator = InfectionContainer::create()[FileMutationGenerator::class];
+
         $generator = new MutationGenerator(
             (new SourceFileCollector())->collectFiles(
                 [self::FIXTURES_DIR . '/Mutation/OneFile'],
@@ -164,8 +168,7 @@ final class MutationGeneratorTest extends TestCase
             $this->createMock(LineCodeCoverage::class),
             [new Plus(new MutatorConfig([]))],
             $eventDispatcher,
-            $this->getParser(),
-            new NodeTraverserFactory()
+            $fileMutationGenerator
         );
 
         $generator->generate(false);
@@ -216,6 +219,9 @@ final class MutationGeneratorTest extends TestCase
         $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcherMock->expects($this->any())->method('dispatch');
 
+        /** @var FileMutationGenerator $fileMutationGenerator */
+        $fileMutationGenerator = InfectionContainer::create()[FileMutationGenerator::class];
+
         return new MutationGenerator(
             (new SourceFileCollector())->collectFiles(
                 $srcDirs,
@@ -225,13 +231,7 @@ final class MutationGeneratorTest extends TestCase
             $codeCoverageDataMock,
             $mutators,
             $eventDispatcherMock,
-            InfectionContainer::create()[FileParser::class],
-            new NodeTraverserFactory()
+            $fileMutationGenerator
         );
-    }
-
-    private function getParser(): FileParser
-    {
-        return InfectionContainer::create()[FileParser::class];
     }
 }
