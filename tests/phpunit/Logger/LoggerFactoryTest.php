@@ -62,7 +62,7 @@ final class LoggerFactoryTest extends TestCase
             true
         );
 
-        $loggers = $factory->createLoggersFromLogEntries(
+        $loggers = $factory->createFromLogEntries(
             new Logs(
                 '/a/file',
                 '/a/file',
@@ -89,7 +89,7 @@ final class LoggerFactoryTest extends TestCase
             true
         );
 
-        $loggers = $factory->createLoggersFromLogEntries(
+        $loggers = $factory->createFromLogEntries(
             $logs,
             $this->createMock(OutputInterface::class)
         );
@@ -130,7 +130,7 @@ final class LoggerFactoryTest extends TestCase
             true
         );
 
-        $loggers = $factory->createLoggersFromLogEntries(
+        $loggers = $factory->createFromLogEntries(
             new Logs(null, null, null, null, new Badge('foo')),
             $this->createMock(OutputInterface::class)
         );
@@ -150,7 +150,7 @@ final class LoggerFactoryTest extends TestCase
             true
         );
 
-        $loggers = $factory->createLoggersFromLogEntries(
+        $loggers = $factory->createFromLogEntries(
             new Logs(null, null, null, null, new Badge('branch_name')),
             $this->createMock(OutputInterface::class)
         );
@@ -168,7 +168,7 @@ final class LoggerFactoryTest extends TestCase
             true
         );
 
-        $loggers = $factory->createLoggersFromLogEntries(
+        $loggers = $factory->createFromLogEntries(
             new Logs(
                 '/a/file',
                 '/a/file',

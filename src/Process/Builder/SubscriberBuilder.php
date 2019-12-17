@@ -194,7 +194,7 @@ final class SubscriberBuilder
                 $this->showMutations
             ),
             new MutationTestingResultsLoggerSubscriber(
-                $this->loggerFactory->createLoggersFromLogEntries(
+                $this->loggerFactory->createFromLogEntries(
                     $this->infectionConfig->getLogs(),
                     $output
                 )

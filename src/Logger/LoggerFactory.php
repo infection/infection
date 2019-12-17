@@ -89,7 +89,7 @@ final class LoggerFactory
     /**
      * @return MutationTestingResultsLogger[]
      */
-    public function createLoggersFromLogEntries(Logs $logs, OutputInterface $output): array
+    public function createFromLogEntries(Logs $logs, OutputInterface $output): array
     {
         $isDebugVerbosity = $this->logVerbosity === LogVerbosity::DEBUG;
         $badge = $logs->getBadge();
