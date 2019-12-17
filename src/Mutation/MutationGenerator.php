@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use function assert;
 use function count;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutableFileProcessed;
@@ -44,8 +43,6 @@ use Infection\Events\MutationGeneratingStarted;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
-use Infection\Visitor\MutationsCollectorVisitor;
-use function is_string;
 use PhpParser\NodeVisitorAbstract;
 use Symfony\Component\Finder\SplFileInfo;
 

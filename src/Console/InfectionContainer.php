@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Infection\Mutation\FileMutationGenerator;
 use function array_filter;
 use function getcwd;
 use Infection\Configuration\Configuration;
@@ -55,6 +54,7 @@ use Infection\Locator\RootsFileLocator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
+use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\FileParser;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\MutatorFactory;

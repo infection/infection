@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use Infection\Mutation\FileMutationGenerator;
 use function dirname;
 use Exception;
 use Infection\Configuration\Configuration;
@@ -51,9 +50,8 @@ use Infection\Events\ApplicationExecutionStarted;
 use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\Locator\Locator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
-use Infection\Mutation\FileParser;
+use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\MutationGenerator;
-use Infection\Mutation\NodeTraverserFactory;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Runner\InitialTestsFailed;

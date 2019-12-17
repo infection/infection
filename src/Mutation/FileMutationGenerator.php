@@ -35,17 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use function array_key_exists;
+use function get_class;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Visitor\MutationsCollectorVisitor;
 use InvalidArgumentException;
 use PhpParser\NodeVisitor;
-use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\Assert\Assert;
-use function array_key_exists;
-use function get_class;
 use function Safe\sprintf;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
@@ -77,8 +76,7 @@ final class FileMutationGenerator
         LineCodeCoverage $codeCoverage,
         array $mutators,
         array $extraNodeVisitors
-    ): array
-    {
+    ): array {
         $filePath = false === $fileInfo->getRealPath()
             ? $fileInfo->getPathname()
             : $fileInfo->getRealPath()
@@ -91,7 +89,7 @@ final class FileMutationGenerator
         if (array_key_exists(self::MUTATION_COLLECTOR_VISITOR_PRIORITY, $extraNodeVisitors)) {
             throw new InvalidArgumentException(sprintf(
                 'Did not expect to find a visitor for the priority "%d". Found "%s". Please'
-                .' free that priority as it is reserved for "%s".',
+                . ' free that priority as it is reserved for "%s".',
                 self::MUTATION_COLLECTOR_VISITOR_PRIORITY,
                 get_class($extraNodeVisitors[self::MUTATION_COLLECTOR_VISITOR_PRIORITY]),
                 MutationsCollectorVisitor::class
