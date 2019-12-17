@@ -334,7 +334,10 @@ final class FileMutationGeneratorTest extends TestCase
         yield from [true, false];
     }
 
-    private function createCodeCoverageMock(string $expectedPath, bool $tests): LineCodeCoverage
+    /**
+     * @return LineCodeCoverage|MockObject
+     */
+    private function createCodeCoverageMock(string $expectedPath, bool $tests)
     {
         $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
         $codeCoverageMock

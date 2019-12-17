@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
+use Infection\Mutation\FileParser;
+use Infection\Mutation\NodeTraverserFactory;
+use Infection\Mutation\PriorityNodeTraverser;
 use const DIRECTORY_SEPARATOR;
 use Generator;
 use function in_array;
@@ -135,6 +138,9 @@ final class ProjectCodeProvider
         Configuration::class,
         ConfigurationFactory::class,
         SourceFileCollector::class,
+        FileParser::class,
+        NodeTraverserFactory::class,
+        PriorityNodeTraverser::class
     ];
 
     /**
