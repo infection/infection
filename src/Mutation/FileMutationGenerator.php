@@ -52,6 +52,8 @@ use function Safe\sprintf;
  */
 final class FileMutationGenerator
 {
+    private const MUTATION_COLLECTOR_VISITOR_PRIORITY = 10;
+
     private $parser;
     private $traverserFactory;
 
@@ -86,12 +88,12 @@ final class FileMutationGenerator
             return [];
         }
 
-        if (array_key_exists(10, $extraNodeVisitors)) {
+        if (array_key_exists(self::MUTATION_COLLECTOR_VISITOR_PRIORITY, $extraNodeVisitors)) {
             throw new InvalidArgumentException(sprintf(
                 'Did not expect to find a visitor for the priority "%d". Found "%s". Please'
                 .' free that priority as it is reserved for "%s".',
-                10,
-                get_class($extraNodeVisitors[10]),
+                self::MUTATION_COLLECTOR_VISITOR_PRIORITY,
+                get_class($extraNodeVisitors[self::MUTATION_COLLECTOR_VISITOR_PRIORITY]),
                 MutationsCollectorVisitor::class
             ));
         }
@@ -106,7 +108,7 @@ final class FileMutationGenerator
             $onlyCovered
         );
 
-        $extraNodeVisitors[10] = $mutationsCollectorVisitor;
+        $extraNodeVisitors[self::MUTATION_COLLECTOR_VISITOR_PRIORITY] = $mutationsCollectorVisitor;
 
         $traverser = $this->traverserFactory->create($extraNodeVisitors);
 
