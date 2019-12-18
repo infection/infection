@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use function array_filter;
-use function getcwd;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfiguration;
@@ -84,6 +83,7 @@ use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use Pimple\Container;
+use function Safe\getcwd;
 use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Filesystem\Filesystem;
@@ -258,25 +258,37 @@ final class InfectionContainer extends Container
                 return new MemoryFormatter();
             },
             'memory.limit.applier' => static function (self $container): MemoryLimiter {
-                return new MemoryLimiter($container['filesystem'], php_ini_loaded_file());
+                /** @var Filesystem $fileSystem */
+                $fileSystem = $container['filesystem'];
+
+                return new MemoryLimiter($fileSystem, php_ini_loaded_file());
             },
             SchemaConfigurationLoader::class => static function (self $container): SchemaConfigurationLoader {
-                return new SchemaConfigurationLoader(
-                    $container[RootsFileLocator::class],
-                    $container[SchemaConfigurationFileLoader::class]
-                );
+                /** @var RootsFileLocator $rootsFileLocator */
+                $rootsFileLocator = $container[RootsFileLocator::class];
+
+                /** @var SchemaConfigurationFileLoader $schemaConfigFileLoader */
+                $schemaConfigFileLoader = $container[SchemaConfigurationFileLoader::class];
+
+                return new SchemaConfigurationLoader($rootsFileLocator, $schemaConfigFileLoader);
             },
             RootsFileLocator::class => static function (self $container): RootsFileLocator {
-                return new RootsFileLocator(
-                    [$container['project.dir']],
-                    $container['filesystem']
-                );
+                /** @var string $projectDir */
+                $projectDir = $container['project.dir'];
+
+                /** @var Filesystem $fileSystem */
+                $fileSystem = $container['filesystem'];
+
+                return new RootsFileLocator([$projectDir], $fileSystem);
             },
             SchemaConfigurationFileLoader::class => static function (self $container): SchemaConfigurationFileLoader {
-                return new SchemaConfigurationFileLoader(
-                    $container[SchemaValidator::class],
-                    $container[SchemaConfigurationFactory::class]
-                );
+                /** @var SchemaValidator $schemaValidator */
+                $schemaValidator = $container[SchemaValidator::class];
+
+                /** @var SchemaConfigurationFactory $schemaConfigFactory */
+                $schemaConfigFactory = $container[SchemaConfigurationFactory::class];
+
+                return new SchemaConfigurationFileLoader($schemaValidator, $schemaConfigFactory);
             },
             SchemaValidator::class => static function (): SchemaValidator {
                 return new SchemaValidator();
@@ -287,10 +299,13 @@ final class InfectionContainer extends Container
             ConfigurationFactory::class => static function (self $container): ConfigurationFactory {
                 /** @var TmpDirProvider $tmpDirProvider */
                 $tmpDirProvider = $container[TmpDirProvider::class];
+
                 /** @var MutatorFactory $mutatorFactory */
                 $mutatorFactory = $container[MutatorFactory::class];
+
                 /** @var MutatorParser $mutatorParser */
                 $mutatorParser = $container[MutatorParser::class];
+
                 /** @var SourceFileCollector $sourceFileCollector */
                 $sourceFileCollector = $container[SourceFileCollector::class];
 
@@ -320,8 +335,11 @@ final class InfectionContainer extends Container
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
+                /** @var MetricsCalculator $metricsCalculator */
+                $metricsCalculator = $container['metrics'];
+
                 return new TestRunConstraintChecker(
-                    $container['metrics'],
+                    $metricsCalculator,
                     $config->ignoreMsiWithNoMutations(),
                     (float) $config->getMinMsi(),
                     (float) $config->getMinCoveredMsi()
@@ -331,6 +349,27 @@ final class InfectionContainer extends Container
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
+                /** @var MetricsCalculator $metricsCalculator */
+                $metricsCalculator = $container['metrics'];
+
+                /** @var EventDispatcherInterface $eventDispatcher */
+                $eventDispatcher = $container['dispatcher'];
+
+                /** @var DiffColorizer $diffColorizer */
+                $diffColorizer = $container['diff.colorizer'];
+
+                /** @var Filesystem $fileSystem */
+                $fileSystem = $container['filesystem'];
+
+                /** @var Timer $timer */
+                $timer = $container['timer'];
+
+                /** @var TimeFormatter $timeFormatter */
+                $timeFormatter = $container['time.formatter'];
+
+                /** @var MemoryFormatter $memoryFormatter */
+                $memoryFormatter = $container['memory.formatter'];
+
                 return new SubscriberBuilder(
                     $config->showMutations(),
                     $config->getLogVerbosity(),
@@ -338,15 +377,15 @@ final class InfectionContainer extends Container
                     $config->mutateOnlyCoveredCode(),
                     $config->getFormatter(),
                     $config->showProgress(),
-                    $container['metrics'],
-                    $container['dispatcher'],
-                    $container['diff.colorizer'],
+                    $metricsCalculator,
+                    $eventDispatcher,
+                    $diffColorizer,
                     $config,
-                    $container['filesystem'],
+                    $fileSystem,
                     $config->getTmpDir(),
-                    $container['timer'],
-                    $container['time.formatter'],
-                    $container['memory.formatter']
+                    $timer,
+                    $timeFormatter,
+                    $memoryFormatter
                 );
             },
             CommandLineBuilder::class => static function (): CommandLineBuilder {
@@ -421,8 +460,11 @@ final class InfectionContainer extends Container
             /** @var ConfigurationFactory $configurationFactory */
             $configurationFactory = $container[ConfigurationFactory::class];
 
+            /** @var SchemaConfiguration $schemaConfig */
+            $schemaConfig = $container[SchemaConfiguration::class];
+
             return $configurationFactory->create(
-                $container[SchemaConfiguration::class],
+                $schemaConfig,
                 $existingCoveragePath,
                 $initialTestsPhpOptions,
                 $logVerbosity,
