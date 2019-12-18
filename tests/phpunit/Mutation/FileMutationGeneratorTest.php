@@ -43,7 +43,7 @@ use Infection\Mutation;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\FileParser;
 use Infection\Mutation\NodeTraverserFactory;
-use Infection\Mutation\PriorityNodeTraverser;
+use Infection\Mutation\PrioritizedVisitorsNodeTraverser;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
@@ -137,7 +137,7 @@ final class FileMutationGeneratorTest extends TestCase
             ])
         ;
 
-        $traverserMock = $this->createMock(PriorityNodeTraverser::class);
+        $traverserMock = $this->createMock(PrioritizedVisitorsNodeTraverser::class);
         $traverserMock
             ->expects($this->once())
             ->method('traverse')

@@ -63,7 +63,7 @@ use Infection\Mutant\MetricsCalculator;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\FileParser;
 use Infection\Mutation\NodeTraverserFactory;
-use Infection\Mutation\PriorityNodeTraverser;
+use Infection\Mutation\PrioritizedVisitorsNodeTraverser;
 use Infection\Mutator\Util\Mutator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
@@ -141,7 +141,7 @@ final class ProjectCodeProvider
         SourceFileCollector::class,
         FileParser::class,
         NodeTraverserFactory::class,
-        PriorityNodeTraverser::class,
+        PrioritizedVisitorsNodeTraverser::class,
         FileMutationGenerator::class,
     ];
 

@@ -47,8 +47,9 @@ use const SORT_NUMERIC;
 
 /**
  * @internal
+ * @final
  */
-final class PrioritizedVisitorsNodeTraverser implements NodeTraverserInterface
+class PrioritizedVisitorsNodeTraverser implements NodeTraverserInterface
 {
     /**
      * @var array<int,NodeVisitor>
