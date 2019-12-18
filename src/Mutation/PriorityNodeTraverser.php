@@ -41,8 +41,9 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ * @final
  */
-final class PriorityNodeTraverser extends NodeTraverser
+class PriorityNodeTraverser extends NodeTraverser
 {
     public function addVisitor(NodeVisitor $visitor, int $priority = 1): void
     {

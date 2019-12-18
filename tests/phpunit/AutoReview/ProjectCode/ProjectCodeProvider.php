@@ -60,6 +60,10 @@ use Infection\Finder\TestFrameworkFinder;
 use Infection\Http\BadgeApiClient;
 use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
+use Infection\Mutation\FileMutationGenerator;
+use Infection\Mutation\FileParser;
+use Infection\Mutation\NodeTraverserFactory;
+use Infection\Mutation\PriorityNodeTraverser;
 use Infection\Mutator\Util\Mutator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
@@ -135,6 +139,10 @@ final class ProjectCodeProvider
         Configuration::class,
         ConfigurationFactory::class,
         SourceFileCollector::class,
+        FileParser::class,
+        NodeTraverserFactory::class,
+        PriorityNodeTraverser::class,
+        FileMutationGenerator::class,
     ];
 
     /**

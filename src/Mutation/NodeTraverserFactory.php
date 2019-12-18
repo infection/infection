@@ -43,8 +43,9 @@ use PhpParser\NodeVisitor;
 
 /**
  * @internal
+ * @final
  */
-final class NodeTraverserFactory
+class NodeTraverserFactory
 {
     /**
      * @param NodeVisitor[] $extraVisitors
