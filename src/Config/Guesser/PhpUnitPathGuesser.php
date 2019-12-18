@@ -73,7 +73,7 @@ final class PhpUnitPathGuesser implements Guesser
     private function getPhpUnitDir(array $parsedPaths)
     {
         foreach ($parsedPaths as $namespace => $parsedPath) {
-            // for old Symfony prjects (<=2.7) phpunit.xml is located in ./app folder
+            // for old Symfony projects (<=2.7) phpunit.xml is located in ./app folder
             if (strpos($namespace, 'SymfonyStandard') !== false && trim($parsedPath, '/') === 'app') {
                 return 'app';
             }
