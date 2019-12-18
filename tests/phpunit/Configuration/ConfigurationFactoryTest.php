@@ -402,6 +402,24 @@ final class ConfigurationFactoryTest extends TestCase
             new PhpSpecExtraOptions('--debug')
         );
 
+        yield 'PHPUnit test framework' => self::createValueForTestFrameworkKey(
+            'phpunit',
+            '--debug',
+            new PhpUnitExtraOptions('--debug')
+        );
+
+        yield 'phpSpec test framework' => self::createValueForTestFrameworkKey(
+            'phpspec',
+            '--debug',
+            new PhpSpecExtraOptions('--debug')
+        );
+
+        yield 'codeception test framework' => self::createValueForTestFrameworkKey(
+            'codeception',
+            '--debug',
+            new PhpSpecExtraOptions('--debug')
+        );
+
         yield 'no mutator' => self::createValueForMutators(
             [],
             '',
@@ -1064,6 +1082,76 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             $expectedTestFrameworkOptions,
+            sys_get_temp_dir() . '/infection',
+            false,
+            false,
+            'progress',
+            false,
+            false,
+            null,
+            false,
+            null,
+        ];
+    }
+
+    private static function createValueForTestFrameworkKey(
+        string $configTestFramework,
+        string $inputTestsFrameworkOptions,
+        TestFrameworkExtraOptions $expectedTestFrameworkExtraOptions
+    ): array {
+        return [
+            new SchemaConfiguration(
+                '/path/to/infection.json',
+                null,
+                new Source([], []),
+                new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                '',
+                new PhpUnit(null, null),
+                [],
+                $configTestFramework,
+                null,
+                null,
+                null
+            ),
+            null,
+            null,
+            'none',
+            false,
+            false,
+            'progress',
+            false,
+            false,
+            null,
+            false,
+            null,
+            '',
+            null,
+            $inputTestsFrameworkOptions,
+            '',
+            10,
+            [],
+            [],
+            new Logs(
+                null,
+                null,
+                null,
+                null,
+                null
+            ),
+            'none',
+            sys_get_temp_dir() . '/infection',
+            new PhpUnit('/path/to', null),
+            self::getDefaultMutators(),
+            $configTestFramework,
+            null,
+            null,
+            $expectedTestFrameworkExtraOptions,
             sys_get_temp_dir() . '/infection',
             false,
             false,
