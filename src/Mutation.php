@@ -73,8 +73,8 @@ final class Mutation implements MutationInterface
     private $tests;
 
     /**
-     * @param Node[]   $originalFileAst
-     * @param (string|int|float)[]   $attributes
+     * @param Node[] $originalFileAst
+     * @param array<string|int|float> $attributes
      * @param Node|Node[] $mutatedNode
      */
     public function __construct(
