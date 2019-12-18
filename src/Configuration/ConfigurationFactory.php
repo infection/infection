@@ -104,7 +104,7 @@ class ConfigurationFactory
 
         $namespacedTmpDir = $this->retrieveTmpDir($schema, $configDir);
 
-        $testFramework = ($testFramework ?? $schema->getTestFramework()) ?? TestFrameworkTypes::PHPUNIT;
+        $testFramework = $testFramework ?? $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
 
         return new Configuration(
             $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
@@ -129,7 +129,7 @@ class ConfigurationFactory
             $testFramework,
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
-            self::retrieveTestFrameworkOptions($testFrameworkOptions, $schema, $testFramework),
+            self::retrieveTestFrameworkExtraOptions($testFrameworkOptions, $schema, $testFramework),
             self::retrieveExistingCoverageBasePath($existingCoveragePath, $configDir, $namespacedTmpDir),
             $debug,
             $onlyCovered,
@@ -203,7 +203,7 @@ class ConfigurationFactory
         return array_fill_keys($parsedMutatorsInput, true);
     }
 
-    private static function retrieveTestFrameworkOptions(
+    private static function retrieveTestFrameworkExtraOptions(
         ?string $testFrameworkOptions,
         SchemaConfiguration $schema,
         string $testFramework

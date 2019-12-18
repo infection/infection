@@ -318,25 +318,29 @@ final class ConfigurationFactoryTest extends TestCase
         yield 'no test framework' => self::createValueForTestFramework(
             null,
             null,
-            'phpunit'
+            'phpunit',
+            new PhpUnitExtraOptions()
         );
 
         yield 'test framework from config' => self::createValueForTestFramework(
             'phpspec',
             null,
-            'phpspec'
+            'phpspec',
+            new PhpSpecExtraOptions()
         );
 
         yield 'test framework from input' => self::createValueForTestFramework(
             null,
             'phpspec',
-            'phpspec'
+            'phpspec',
+            new PhpSpecExtraOptions()
         );
 
         yield 'test framework from config & input' => self::createValueForTestFramework(
             'phpunit',
             'phpspec',
-            'phpspec'
+            'phpspec',
+            new PhpSpecExtraOptions()
         );
 
         yield 'test no test PHP options' => self::createValueForInitialTestsPhpOptions(
@@ -363,35 +367,35 @@ final class ConfigurationFactoryTest extends TestCase
             '-d zend_extension=xdebug.so'
         );
 
-        yield 'test no framework PHP options' => self::createValueForTestsFrameworkOptions(
+        yield 'test no framework PHP options' => self::createValueForTestFrameworkExtraOptions(
             'phpunit',
             null,
             null,
             new PhpUnitExtraOptions()
         );
 
-        yield 'test framework PHP options from config' => self::createValueForTestsFrameworkOptions(
+        yield 'test framework PHP options from config' => self::createValueForTestFrameworkExtraOptions(
             'phpunit',
             '--debug',
             null,
             new PhpUnitExtraOptions('--debug')
         );
 
-        yield 'test framework PHP options from input' => self::createValueForTestsFrameworkOptions(
+        yield 'test framework PHP options from input' => self::createValueForTestFrameworkExtraOptions(
             'phpunit',
             null,
             '--debug',
             new PhpUnitExtraOptions('--debug')
         );
 
-        yield 'test framework PHP options from config & input' => self::createValueForTestsFrameworkOptions(
+        yield 'test framework PHP options from config & input' => self::createValueForTestFrameworkExtraOptions(
             'phpunit',
             '--stop-on-failure',
             '--debug',
             new PhpUnitExtraOptions('--debug')
         );
 
-        yield 'test framework PHP options from config with phpspec framework' => self::createValueForTestsFrameworkOptions(
+        yield 'test framework PHP options from config with phpspec framework' => self::createValueForTestFrameworkExtraOptions(
             'phpspec',
             '--debug',
             null,
@@ -569,7 +573,7 @@ final class ConfigurationFactoryTest extends TestCase
             'phpspec',
             'config/bootstrap.php',
             '-d zend_extension=xdebug.so',
-            new PhpUnitExtraOptions('--stop-on-failure'),
+            new PhpSpecExtraOptions('--stop-on-failure'),
             '/path/to/dist/coverage',
             true,
             true,
@@ -861,7 +865,10 @@ final class ConfigurationFactoryTest extends TestCase
     private static function createValueForTestFramework(
         ?string $configTestFramework,
         ?string $inputTestFramework,
-        ?string $expectedTestFramework
+        ?string $expectedTestFramework,
+        // We are passing this expected result because we cannot do otherwise but it is not the
+        // element under test in this scenario hence "resulting" instead of "expected"
+        TestFrameworkExtraOptions $resultingTestFrameworkExtraOptions
     ): array {
         return [
             new SchemaConfiguration(
@@ -915,7 +922,7 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedTestFramework,
             null,
             null,
-            new PhpUnitExtraOptions(),
+            $resultingTestFrameworkExtraOptions,
             sys_get_temp_dir() . '/infection',
             false,
             false,
@@ -998,10 +1005,10 @@ final class ConfigurationFactoryTest extends TestCase
         ];
     }
 
-    private static function createValueForTestsFrameworkOptions(
+    private static function createValueForTestFrameworkExtraOptions(
         string $configTestFramework,
-        ?string $configTestsFrameworkOptions,
-        ?string $inputTestsFrameworkOptions,
+        ?string $configTestsFrameworkExtraOptions,
+        ?string $inputTestsFrameworkExtraOptions,
         TestFrameworkExtraOptions $expectedTestFrameworkOptions
     ): array {
         return [
@@ -1022,7 +1029,7 @@ final class ConfigurationFactoryTest extends TestCase
                 $configTestFramework,
                 null,
                 null,
-                $configTestsFrameworkOptions
+                $configTestsFrameworkExtraOptions
             ),
             null,
             null,
@@ -1037,7 +1044,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             null,
-            $inputTestsFrameworkOptions,
+            $inputTestsFrameworkExtraOptions,
             '',
             10,
             [],

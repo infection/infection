@@ -302,7 +302,7 @@ final class InfectionCommand extends BaseCommand
         $fileSystem->mkdir($config->getTmpDir());
 
         $this->testFrameworkKey = $config->getTestFramework();
-        $this->testFrameworkOptions = $config->getTestFrameworkOptions();
+        $this->testFrameworkOptions = $config->getTestFrameworkExtraOptions();
 
         /** @var Factory $testFrameworkFactory */
         $testFrameworkFactory = $this->container['test.framework.factory'];

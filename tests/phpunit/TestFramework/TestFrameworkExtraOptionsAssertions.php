@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
+use function get_class;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 
 trait TestFrameworkExtraOptionsAssertions
@@ -43,6 +44,7 @@ trait TestFrameworkExtraOptionsAssertions
         TestFrameworkExtraOptions $extraOptions,
         TestFrameworkExtraOptions $expectedExtraOptions
     ): void {
+        $this->assertSame(get_class($expectedExtraOptions), get_class($extraOptions));
         $this->assertSame($expectedExtraOptions->getForInitialProcess(), $extraOptions->getForInitialProcess());
         $this->assertSame($expectedExtraOptions->getForMutantProcess(), $extraOptions->getForMutantProcess());
     }
