@@ -95,7 +95,7 @@ class Configuration
         string $tmpDir,
         PhpUnit $phpUnit,
         array $mutators,
-        ?string $testFramework,
+        string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
         ?string $testFrameworkOptions,
@@ -190,7 +190,7 @@ class Configuration
         return $this->mutators;
     }
 
-    public function getTestFramework(): ?string
+    public function getTestFramework(): string
     {
         return $this->testFramework;
     }

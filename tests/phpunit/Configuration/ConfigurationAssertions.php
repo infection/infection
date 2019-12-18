@@ -62,7 +62,7 @@ trait ConfigurationAssertions
         string $expectedTmpDir,
         PhpUnit $expectedPhpUnit,
         array $expectedMutators,
-        ?string $expectedTestFramework,
+        string $expectedTestFramework,
         ?string $expectedBootstrap,
         ?string $expectedInitialTestsPhpOptions,
         ?string $expectedTestFrameworkOptions,
