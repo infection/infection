@@ -57,7 +57,6 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
-use Webmozart\PathUtil\Path;
 
 final class ConfigurationFactoryTest extends TestCase
 {
@@ -295,7 +294,7 @@ final class ConfigurationFactoryTest extends TestCase
 
         yield 'relative base path for code coverage' => self::createValueForCoverageBasePath(
             'relative/path/to/coverage',
-            Path::canonicalize(__DIR__ . '/../../../relative/path/to/coverage')
+            '/path/to/relative/path/to/coverage'
         );
 
         yield 'no PHPUnit config dir' => self::createValueForPhpUnitConfigDir(
@@ -557,7 +556,7 @@ final class ConfigurationFactoryTest extends TestCase
             'config/bootstrap.php',
             '-d zend_extension=xdebug.so',
             '--stop-on-failure',
-            Path::canonicalize(__DIR__ . '/../../../dist/coverage'),
+            '/path/to/dist/coverage',
             true,
             true,
             'dot',

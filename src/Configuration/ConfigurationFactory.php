@@ -42,7 +42,6 @@ use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
-use function Safe\getcwd;
 use function Safe\sprintf;
 use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
@@ -142,7 +141,7 @@ class ConfigurationFactory
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
             $testFrameworkOptions ?? $schema->getTestFrameworkOptions(),
-            self::retrieveCoverageBasePath($existingCoveragePath, $namespacedTmpDir),
+            self::retrieveCoverageBasePath($existingCoveragePath, $configDir, $namespacedTmpDir),
             $debug,
             $onlyCovered,
             $formatter,
@@ -156,6 +155,7 @@ class ConfigurationFactory
 
     private static function retrieveCoverageBasePath(
         ?string $existingCoveragePath,
+        string $configDir,
         string $tmpDir
     ): string {
         Assert::nullOrStringNotEmpty($existingCoveragePath);
@@ -168,7 +168,7 @@ class ConfigurationFactory
             return $existingCoveragePath;
         }
 
-        return sprintf('%s/%s', getcwd(), $existingCoveragePath);
+        return sprintf('%s/%s', $configDir, $existingCoveragePath);
     }
 
     private function retrieveMutators(array $schemaMutators, string $mutatorsInput): array
