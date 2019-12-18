@@ -43,6 +43,7 @@ use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
 use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use Infection\TestFramework\TestFrameworkExtraOptions;
@@ -62,6 +63,12 @@ class ConfigurationFactory
      * Default allowed timeout (on a test basis) in seconds
      */
     private const DEFAULT_TIMEOUT = 10;
+
+    private const TEST_FRAMEWORK_COVERAGE_DIRECTORY = [
+        TestFrameworkTypes::PHPUNIT => XMLLineCodeCoverage::PHP_UNIT_COVERAGE_DIR,
+        TestFrameworkTypes::PHPSPEC => XMLLineCodeCoverage::PHP_SPEC_COVERAGE_DIR,
+        TestFrameworkTypes::CODECEPTION => XMLLineCodeCoverage::CODECEPTION_COVERAGE_DIR,
+    ];
 
     private $tmpDirProvider;
     private $mutatorFactory;
@@ -104,7 +111,7 @@ class ConfigurationFactory
 
         $namespacedTmpDir = $this->retrieveTmpDir($schema, $configDir);
 
-        $testFramework = ($testFramework ?? $schema->getTestFramework()) ?? TestFrameworkTypes::PHPUNIT;
+        $testFramework = self::retrieveTestFramework($schema, $testFramework);
 
         return new Configuration(
             $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
@@ -130,7 +137,10 @@ class ConfigurationFactory
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
             self::retrieveTestFrameworkOptions($testFrameworkOptions, $schema, $testFramework),
-            self::retrieveExistingCoverageBasePath($existingCoveragePath, $configDir, $namespacedTmpDir),
+            self::retrieveExistingCoveragePath(
+                self::retrieveExistingCoverageBasePath($existingCoveragePath, $configDir, $namespacedTmpDir),
+                $testFramework
+            ),
             $debug,
             $onlyCovered,
             $formatter,
@@ -172,6 +182,26 @@ class ConfigurationFactory
         }
 
         return $phpUnit;
+    }
+
+    private static function retrieveTestFramework(
+        SchemaConfiguration $schema,
+        ?string $testFrameworkInput
+    ): string {
+        return $testFrameworkInput ?? $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
+    }
+
+    private static function retrieveExistingCoveragePath(
+        string $existingCoverageBasePath,
+        string $testFramework
+    ): string {
+        Assert::keyExists(self::TEST_FRAMEWORK_COVERAGE_DIRECTORY, $testFramework);
+
+        return sprintf(
+            '%s/%s',
+            $existingCoverageBasePath,
+            self::TEST_FRAMEWORK_COVERAGE_DIRECTORY[$testFramework]
+        );
     }
 
     private static function retrieveExistingCoverageBasePath(

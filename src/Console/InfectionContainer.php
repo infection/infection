@@ -71,7 +71,6 @@ use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
-use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
@@ -103,43 +102,13 @@ final class InfectionContainer extends Container
             TmpDirProvider::class => static function (): TmpDirProvider {
                 return new TmpDirProvider();
             },
-            'coverage.dir.phpunit' => static function (self $container) {
-                /** @var Configuration $config */
-                $config = $container[Configuration::class];
-
-                return sprintf(
-                    '%s/%s',
-                    $config->getExistingCoverageBasePath(),
-                    XMLLineCodeCoverage::PHP_UNIT_COVERAGE_DIR
-                );
-            },
-            'coverage.dir.phpspec' => static function (self $container) {
-                /** @var Configuration $config */
-                $config = $container[Configuration::class];
-
-                return sprintf(
-                    '%s/%s',
-                    $config->getExistingCoverageBasePath(),
-                    XMLLineCodeCoverage::PHP_SPEC_COVERAGE_DIR
-                );
-            },
-            'coverage.dir.codeception' => static function (self $container) {
-                /** @var Configuration $config */
-                $config = $container[Configuration::class];
-
-                return sprintf(
-                    '%s/%s',
-                    $config->getExistingCoverageBasePath(),
-                    XMLLineCodeCoverage::CODECEPTION_COVERAGE_DIR
-                );
-            },
             'junit.file.path' => static function (self $container) {
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
                 return sprintf(
                     '%s/%s',
-                    $config->getExistingCoverageBasePath(),
+                    $config->getExistingCoveragePath(),
                     TestFrameworkAdapter::JUNIT_FILE_NAME
                 );
             },
@@ -327,7 +296,7 @@ final class InfectionContainer extends Container
                 $config = $container[Configuration::class];
 
                 return new CoverageRequirementChecker(
-                    (string) $config->getExistingCoverageBasePath() !== '',
+                    (string) $config->getExistingCoveragePath() !== '',
                     $config->getInitialTestsPhpOptions() ?? ''
                 );
             },

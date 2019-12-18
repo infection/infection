@@ -353,7 +353,11 @@ final class InfectionCommand extends BaseCommand
 
         $processBuilder = new MutantProcessBuilder($adapter, $this->versionParser, $config->getProcessTimeout());
 
-        $codeCoverageData = $this->getCodeCoverageData($this->testFrameworkKey, $adapter);
+        $codeCoverageData = $this->getCodeCoverageData(
+            $config->getExistingCoveragePath(),
+            $this->testFrameworkKey,
+            $adapter
+        );
 
         /** @var FileMutationGenerator $fileMutationGenerator */
         $fileMutationGenerator = $this->container[FileMutationGenerator::class];
@@ -484,11 +488,8 @@ final class InfectionCommand extends BaseCommand
         })($bootstrap);
     }
 
-    private function getCodeCoverageData(string $testFrameworkKey, TestFrameworkAdapter $adapter): LineCodeCoverage
+    private function getCodeCoverageData(string $coverageDir, string $testFrameworkKey, TestFrameworkAdapter $adapter): LineCodeCoverage
     {
-        /** @var string $coverageDir */
-        $coverageDir = $this->container[sprintf('coverage.dir.%s', $testFrameworkKey)];
-
         /** @var CachedTestFileDataProvider $cachedTestFileDataProvider */
         $cachedTestFileDataProvider = $this->container[CachedTestFileDataProvider::class];
 
