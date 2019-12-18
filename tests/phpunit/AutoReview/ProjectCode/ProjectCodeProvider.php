@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
+use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use const DIRECTORY_SEPARATOR;
 use Generator;
 use function in_array;
@@ -143,6 +144,7 @@ final class ProjectCodeProvider
         NodeTraverserFactory::class,
         PriorityNodeTraverser::class,
         FileMutationGenerator::class,
+        CachedTestFileDataProvider::class
     ];
 
     /**

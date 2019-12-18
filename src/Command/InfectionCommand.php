@@ -68,6 +68,7 @@ use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\HasExtraNodeVisitors;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
@@ -355,14 +356,15 @@ final class InfectionCommand extends BaseCommand
 
         $processBuilder = new MutantProcessBuilder($adapter, $this->versionParser, $config->getProcessTimeout());
 
-        $codeCoverageData = $this->getCodeCoverageData($this->testFrameworkKey, $adapter);
+        /** @var XMLLineCodeCoverageFactory $codeCoverageFactory */
+        $codeCoverageFactory = $this->container[XMLLineCodeCoverageFactory::class];
 
         /** @var FileMutationGenerator $fileMutationGenerator */
         $fileMutationGenerator = $this->container[FileMutationGenerator::class];
 
         $mutationGenerator = new MutationGenerator(
             $config->getSourceFiles(),
-            $codeCoverageData,
+            $codeCoverageFactory->create($this->testFrameworkKey, $adapter),
             $config->getMutators(),
             $this->eventDispatcher,
             $fileMutationGenerator

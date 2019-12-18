@@ -35,37 +35,53 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use function array_key_exists;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\TestFrameworkTypes;
+use Webmozart\Assert\Assert;
 
-/**
- * @internal
- * @final
- */
-class CachedTestFileDataProvider implements TestFileDataProvider
+final class XMLLineCodeCoverageFactory
 {
-    /**
-     * @var TestFileDataProvider
-     */
-    private $testFileDataProvider;
+    private $cachedTestFileDataProvider;
+    private $phpUnitCoverageDir;
+    private $phpSpecCoverageDir;
+    private $codeceptionCoverageDir;
 
-    /**
-     * @var array<string, TestFileTimeData>
-     */
-    private $testFileInfoCache = [];
-
-    public function __construct(TestFileDataProvider $testFileDataProvider)
-    {
-        $this->testFileDataProvider = $testFileDataProvider;
+    public function __construct(
+        string $phpUnitCoverageDir,
+        string $phpSpecCoverageDir,
+        string $codeceptionCoverageDir,
+        CachedTestFileDataProvider $cachedTestFileDataProvider
+    ) {
+        $this->phpUnitCoverageDir = $phpUnitCoverageDir;
+        $this->phpSpecCoverageDir = $phpSpecCoverageDir;
+        $this->codeceptionCoverageDir = $codeceptionCoverageDir;
+        $this->cachedTestFileDataProvider = $cachedTestFileDataProvider;
     }
 
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
-    {
-        if (array_key_exists($fullyQualifiedClassName, $this->testFileInfoCache)) {
-            return $this->testFileInfoCache[$fullyQualifiedClassName];
-        }
+    public function create(
+        string $testFrameworkKey,
+        TestFrameworkAdapter $adapter
+    ): XMLLineCodeCoverage {
+        Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
 
-        return $this->testFileInfoCache[$fullyQualifiedClassName] = $this->testFileDataProvider->getTestFileInfo(
-            $fullyQualifiedClassName
+        /** @var string $coverageDir */
+        $coverageDir = [
+            TestFrameworkTypes::PHPUNIT => $this->phpUnitCoverageDir,
+            TestFrameworkTypes::PHPSPEC => $this->phpSpecCoverageDir,
+            TestFrameworkTypes::CODECEPTION => $this->codeceptionCoverageDir,
+        ][$testFrameworkKey];
+
+        $testFileDataProviderService = $adapter->hasJUnitReport()
+            ? $this->cachedTestFileDataProvider
+            : null
+        ;
+
+        return new XMLLineCodeCoverage(
+            $coverageDir,
+            new CoverageXmlParser($coverageDir),
+            $testFrameworkKey,
+            $testFileDataProviderService
         );
     }
 }
