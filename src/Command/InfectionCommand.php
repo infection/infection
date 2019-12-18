@@ -70,9 +70,7 @@ use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\HasExtraNodeVisitors;
-use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
-use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -304,7 +302,7 @@ final class InfectionCommand extends BaseCommand
         $fileSystem->mkdir($config->getTmpDir());
 
         $this->testFrameworkKey = $config->getTestFramework();
-        $this->testFrameworkOptions = $this->getTestFrameworkExtraOptions($this->testFrameworkKey);
+        $this->testFrameworkOptions = $config->getTestFrameworkOptions();
 
         /** @var Factory $testFrameworkFactory */
         $testFrameworkFactory = $this->container['test.framework.factory'];
@@ -499,18 +497,6 @@ final class InfectionCommand extends BaseCommand
             : null;
 
         return new XMLLineCodeCoverage($coverageDir, new CoverageXmlParser($coverageDir), $testFrameworkKey, $testFileDataProviderService);
-    }
-
-    private function getTestFrameworkExtraOptions(string $testFrameworkKey): TestFrameworkExtraOptions
-    {
-        /** @var Configuration $config */
-        $config = $this->container[Configuration::class];
-
-        $extraOptions = $config->getTestFrameworkOptions();
-
-        return TestFrameworkTypes::PHPUNIT === $testFrameworkKey
-            ? new PhpUnitExtraOptions($extraOptions)
-            : new PhpSpecExtraOptions($extraOptions);
     }
 
     private function runConfigurationCommand(Locator $locator): void
