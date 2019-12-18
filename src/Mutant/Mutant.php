@@ -43,19 +43,8 @@ use Infection\TestFramework\Coverage\CoverageLineData;
  */
 final class Mutant implements MutantInterface
 {
-    /**
-     * @var string
-     */
     private $mutatedFilePath;
-
-    /**
-     * @var MutationInterface
-     */
     private $mutation;
-
-    /**
-     * @var string
-     */
     private $diff;
 
     public function __construct(string $mutatedFilePath, MutationInterface $mutation, string $diff)

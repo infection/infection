@@ -44,9 +44,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class CiMutantCreatingConsoleLoggerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var OutputInterface
-     */
     private $output;
 
     public function __construct(OutputInterface $output)

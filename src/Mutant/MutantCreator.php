@@ -48,19 +48,8 @@ use function Safe\file_get_contents;
  */
 final class MutantCreator
 {
-    /**
-     * @var string
-     */
     private $tempDir;
-
-    /**
-     * @var Differ
-     */
     private $differ;
-
-    /**
-     * @var Standard
-     */
     private $prettyPrinter;
 
     /**

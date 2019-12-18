@@ -54,9 +54,6 @@ use function Safe\realpath;
  */
 class CoverageXmlParser
 {
-    /**
-     * @var string
-     */
     private $coverageDir;
 
     public function __construct(string $coverageDir)

@@ -54,18 +54,8 @@ use Symfony\Component\Console\Question\Question;
  */
 final class TestFrameworkConfigPathProvider
 {
-    /**
-     * @var TestFrameworkConfigLocatorInterface
-     */
     private $testFrameworkConfigLocator;
-    /**
-     * @var ConsoleHelper
-     */
     private $consoleHelper;
-
-    /**
-     * @var QuestionHelper
-     */
     private $questionHelper;
 
     public function __construct(TestFrameworkConfigLocatorInterface $testFrameworkConfigLocator, ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)

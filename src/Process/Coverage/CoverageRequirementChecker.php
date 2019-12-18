@@ -44,14 +44,7 @@ use const PHP_SAPI;
  */
 final class CoverageRequirementChecker
 {
-    /**
-     * @var bool
-     */
     private $skipCoverage;
-
-    /**
-     * @var string
-     */
     private $initialTestPhpOptions;
 
     public function __construct(bool $skipCoverage, string $initialTestPhpOptions)

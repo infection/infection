@@ -42,9 +42,6 @@ use function array_key_exists;
  */
 final class CachedTestFileDataProvider implements TestFileDataProvider
 {
-    /**
-     * @var TestFileDataProvider
-     */
     private $testFileDataProvider;
 
     /**

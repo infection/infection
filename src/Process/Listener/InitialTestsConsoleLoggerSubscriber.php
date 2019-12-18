@@ -49,24 +49,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var OutputInterface
-     */
     private $output;
-
-    /**
-     * @var ProgressBar
-     */
     private $progressBar;
-
-    /**
-     * @var TestFrameworkAdapter
-     */
     private $testFrameworkAdapter;
-
-    /**
-     * @var bool
-     */
     private $debug;
 
     public function __construct(OutputInterface $output, TestFrameworkAdapter $testFrameworkAdapter, bool $debug)

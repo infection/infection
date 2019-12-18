@@ -67,50 +67,16 @@ final class CodeceptionAdapter implements MemoryUsageAware, TestFrameworkAdapter
         '--fail-fast',
     ];
 
-    /**
-     * @var string
-     */
     private $testFrameworkExecutable;
-
-    /**
-     * @var CommandLineBuilder
-     */
     private $commandLineBuilder;
-
-    /**
-     * @var VersionParser
-     */
     private $versionParser;
-
-    /**
-     * @var JUnitTestCaseSorter
-     */
     private $jUnitTestCaseSorter;
-
-    /**
-     * @var Filesystem
-     */
     private $filesystem;
-
-    /**
-     * @var string
-     */
     private $jUnitFilePath;
-
-    /**
-     * @var string
-     */
     private $tmpDir;
-
-    /**
-     * @var string
-     */
     private $projectDir;
-
-    /**
-     * @var array<string, mixed>
-     */
     private $originalConfigContentParsed;
+    private $srcDirs;
 
     /**
      * @var string|null
@@ -118,10 +84,8 @@ final class CodeceptionAdapter implements MemoryUsageAware, TestFrameworkAdapter
     private $cachedVersion;
 
     /**
-     * @var string[]
+     * @param  array<string, mixed> $originalConfigContentParsed
      */
-    private $srcDirs;
-
     public function __construct(
         string $testFrameworkExecutable,
         CommandLineBuilder $commandLineBuilder,

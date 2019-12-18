@@ -40,14 +40,7 @@ namespace Infection\TestFramework\Coverage;
  */
 final class MethodLocationData
 {
-    /**
-     * @var int
-     */
     public $startLine;
-
-    /**
-     * @var int
-     */
     public $endLine;
 
     public function __construct(int $startLine, int $endLine)

@@ -57,39 +57,12 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var Configuration
-     */
     private $infectionConfig;
-
-    /**
-     * @var MetricsCalculator
-     */
     private $metricsCalculator;
-
-    /**
-     * @var Filesystem
-     */
     private $fs;
-
-    /**
-     * @var string
-     */
     private $logVerbosity;
-
-    /**
-     * @var OutputInterface
-     */
     private $output;
-
-    /**
-     * @var bool
-     */
     private $isDebugMode;
-
-    /**
-     * @var bool
-     */
     private $isOnlyCoveredMode;
 
     public function __construct(

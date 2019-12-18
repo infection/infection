@@ -47,14 +47,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 abstract class BaseCommand extends Command
 {
-    /**
-     * @var InputInterface
-     */
     protected $input;
-
-    /**
-     * @var OutputInterface
-     */
     protected $output;
 
     protected function initialize(InputInterface $input, OutputInterface $output): void

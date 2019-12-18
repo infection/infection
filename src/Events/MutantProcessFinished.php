@@ -42,9 +42,6 @@ use Infection\Process\MutantProcessInterface;
  */
 final class MutantProcessFinished
 {
-    /**
-     * @var MutantProcessInterface
-     */
     private $mutantProcess;
 
     public function __construct(MutantProcessInterface $mutantProcess)
