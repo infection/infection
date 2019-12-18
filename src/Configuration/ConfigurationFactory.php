@@ -37,6 +37,7 @@ namespace Infection\Configuration;
 
 use function array_fill_keys;
 use function dirname;
+use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
@@ -95,27 +96,9 @@ class ConfigurationFactory
     ): Configuration {
         $configDir = dirname($schema->getFile());
 
-        $tmpDir = (string) $schema->getTmpDir();
-
-        if ('' === $tmpDir) {
-            $tmpDir = sys_get_temp_dir();
-        } elseif (!Path::isAbsolute($tmpDir)) {
-            $tmpDir = sprintf('%s/%s', $configDir, $tmpDir);
-        }
-
-        $phpUnitConfigDir = $schema->getPhpUnit()->getConfigDir();
-
-        if (null === $phpUnitConfigDir) {
-            $schema->getPhpUnit()->setConfigDir($configDir);
-        } elseif (!Path::isAbsolute($phpUnitConfigDir)) {
-            $schema->getPhpUnit()->setConfigDir(sprintf(
-                '%s/%s', $configDir, $phpUnitConfigDir
-            ));
-        }
-
         $schemaMutators = $schema->getMutators();
 
-        $namespacedTmpDir = $this->tmpDirProvider->providePath($tmpDir);
+        $namespacedTmpDir = $this->retrieveTmpDir($schema, $configDir);
 
         return new Configuration(
             $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
@@ -128,7 +111,7 @@ class ConfigurationFactory
             $schema->getLogs(),
             $logVerbosity,
             $namespacedTmpDir,
-            $schema->getPhpUnit(),
+            $this->retrievePhpUnit($schema, $configDir),
             $this->mutatorFactory->create(
                 $this->retrieveMutators(
                     $schemaMutators === []
@@ -151,6 +134,38 @@ class ConfigurationFactory
             $showMutations,
             $minCoveredMsi
         );
+    }
+
+    private function retrieveTmpDir(
+        SchemaConfiguration $schema,
+        string $configDir
+    ): string {
+        $tmpDir = (string) $schema->getTmpDir();
+
+        if ('' === $tmpDir) {
+            $tmpDir = sys_get_temp_dir();
+        } elseif (!Path::isAbsolute($tmpDir)) {
+            $tmpDir = sprintf('%s/%s', $configDir, $tmpDir);
+        }
+
+        return $this->tmpDirProvider->providePath($tmpDir);
+    }
+
+    private function retrievePhpUnit(SchemaConfiguration $schema, string $configDir): PhpUnit
+    {
+        $phpUnit = clone $schema->getPhpUnit();
+
+        $phpUnitConfigDir = $phpUnit->getConfigDir();
+
+        if (null === $phpUnitConfigDir) {
+            $phpUnit->setConfigDir($configDir);
+        } elseif (!Path::isAbsolute($phpUnitConfigDir)) {
+            $phpUnit->setConfigDir(sprintf(
+                '%s/%s', $configDir, $phpUnitConfigDir
+            ));
+        }
+
+        return $phpUnit;
     }
 
     private static function retrieveExistingCoverageBasePath(

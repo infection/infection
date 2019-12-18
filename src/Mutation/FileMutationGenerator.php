@@ -35,90 +35,86 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use function count;
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\MutableFileProcessed;
-use Infection\Events\MutationGeneratingFinished;
-use Infection\Events\MutationGeneratingStarted;
+use function array_key_exists;
+use function get_class;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\Visitor\MutationsCollectorVisitor;
+use InvalidArgumentException;
 use PhpParser\NodeVisitor;
+use function Safe\sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
+ * @final
  */
-final class MutationGenerator
+class FileMutationGenerator
 {
-    /**
-     * @var SplFileInfo[]
-     */
-    private $sourceFiles;
+    private const MUTATION_COLLECTOR_VISITOR_PRIORITY = 10;
 
-    /**
-     * @var LineCodeCoverage
-     */
-    private $codeCoverageData;
+    private $parser;
+    private $traverserFactory;
 
-    /**
-     * @var Mutator[]
-     */
-    private $mutators;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    private $fileMutationGenerator;
-
-    /**
-     * @param SplFileInfo[] $sourceFiles
-     * @param Mutator[]     $mutators
-     */
     public function __construct(
-        array $sourceFiles,
-        LineCodeCoverage $codeCoverageData,
-        array $mutators,
-        EventDispatcherInterface $eventDispatcher,
-        FileMutationGenerator $fileMutationGenerator
+        FileParser $parser,
+        NodeTraverserFactory $traverserFactory
     ) {
-        $this->sourceFiles = $sourceFiles;
-        $this->codeCoverageData = $codeCoverageData;
-        $this->mutators = $mutators;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->fileMutationGenerator = $fileMutationGenerator;
+        $this->parser = $parser;
+        $this->traverserFactory = $traverserFactory;
     }
 
     /**
-     * @param bool          $onlyCovered Mutates only covered by tests lines of code
+     * @param Mutator[]     $mutators
      * @param NodeVisitor[] $extraNodeVisitors
      *
      * @throws UnparsableFile
      *
      * @return Mutation[]
      */
-    public function generate(bool $onlyCovered, array $extraNodeVisitors = []): array
-    {
-        $allFilesMutations = [[]];
+    public function generate(
+        SplFileInfo $fileInfo,
+        bool $onlyCovered,
+        LineCodeCoverage $codeCoverage,
+        array $mutators,
+        array $extraNodeVisitors
+    ): array {
+        $filePath = false === $fileInfo->getRealPath()
+            ? $fileInfo->getPathname()
+            : $fileInfo->getRealPath()
+        ;
 
-        $this->eventDispatcher->dispatch(new MutationGeneratingStarted(count($this->sourceFiles)));
-
-        foreach ($this->sourceFiles as $fileInfo) {
-            $allFilesMutations[] = $this->fileMutationGenerator->generate(
-                $fileInfo,
-                $onlyCovered,
-                $this->codeCoverageData,
-                $this->mutators,
-                $extraNodeVisitors
-            );
-
-            $this->eventDispatcher->dispatch(new MutableFileProcessed());
+        if ($onlyCovered && !$codeCoverage->hasTests($filePath)) {
+            return [];
         }
 
-        $this->eventDispatcher->dispatch(new MutationGeneratingFinished());
+        if (array_key_exists(self::MUTATION_COLLECTOR_VISITOR_PRIORITY, $extraNodeVisitors)) {
+            throw new InvalidArgumentException(sprintf(
+                'Did not expect to find a visitor for the priority "%d". Found "%s". Please'
+                . ' free that priority as it is reserved for "%s".',
+                self::MUTATION_COLLECTOR_VISITOR_PRIORITY,
+                get_class($extraNodeVisitors[self::MUTATION_COLLECTOR_VISITOR_PRIORITY]),
+                MutationsCollectorVisitor::class
+            ));
+        }
 
-        return array_merge(...$allFilesMutations);
+        $initialStatements = $this->parser->parse($fileInfo);
+
+        $mutationsCollectorVisitor = new MutationsCollectorVisitor(
+            $mutators,
+            $filePath,
+            $initialStatements,
+            $codeCoverage,
+            $onlyCovered
+        );
+
+        $extraNodeVisitors[self::MUTATION_COLLECTOR_VISITOR_PRIORITY] = $mutationsCollectorVisitor;
+
+        $traverser = $this->traverserFactory->create($extraNodeVisitors);
+
+        $traverser->traverse($initialStatements);
+
+        return $mutationsCollectorVisitor->getMutations();
     }
 }

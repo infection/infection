@@ -54,6 +54,7 @@ use Infection\Locator\RootsFileLocator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
+use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\FileParser;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\MutatorFactory;
@@ -356,6 +357,15 @@ final class InfectionContainer extends Container
             },
             NodeTraverserFactory::class => static function (): NodeTraverserFactory {
                 return new NodeTraverserFactory();
+            },
+            FileMutationGenerator::class => static function (self $container): FileMutationGenerator {
+                /** @var FileParser $fileParser */
+                $fileParser = $container[FileParser::class];
+
+                /** @var NodeTraverserFactory $nodeTraverserFactory */
+                $nodeTraverserFactory = $container[NodeTraverserFactory::class];
+
+                return new FileMutationGenerator($fileParser, $nodeTraverserFactory);
             },
         ]);
     }
