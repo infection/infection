@@ -131,7 +131,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $expectedBootstrap,
         ?string $expectedInitialTestsPhpOptions,
         ?string $expectedTestFrameworkOptions,
-        ?string $expectedExistingCoveragePath,
+        string $expectedExistingCoverageBasePath,
         bool $expectedDebug,
         bool $expectedOnlyCovered,
         string $expectedFormatter,
@@ -174,7 +174,7 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedBootstrap,
             $expectedInitialTestsPhpOptions,
             $expectedTestFrameworkOptions,
-            $expectedExistingCoveragePath,
+            normalizePath($expectedExistingCoverageBasePath),
             $expectedDebug,
             $expectedOnlyCovered,
             $expectedFormatter,
@@ -241,7 +241,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             null,
-            null,
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             'progress',
@@ -280,6 +280,21 @@ final class ConfigurationFactoryTest extends TestCase
         yield 'absolute tmp dir path' => self::createValueForTmpDir(
             '/absolute/path/to/tmp',
             '/absolute/path/to/tmp/infection'
+        );
+
+        yield 'no existing base path for code coverage' => self::createValueForCoverageBasePath(
+            null,
+            sys_get_temp_dir() . '/infection'
+        );
+
+        yield 'absolute base path for code coverage' => self::createValueForCoverageBasePath(
+            '/path/to/coverage',
+            '/path/to/coverage'
+        );
+
+        yield 'relative base path for code coverage' => self::createValueForCoverageBasePath(
+            'relative/path/to/coverage',
+            '/path/to/relative/path/to/coverage'
         );
 
         yield 'no PHPUnit config dir' => self::createValueForPhpUnitConfigDir(
@@ -466,7 +481,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             null,
-            null,
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             'progress',
@@ -541,7 +556,7 @@ final class ConfigurationFactoryTest extends TestCase
             'config/bootstrap.php',
             '-d zend_extension=xdebug.so',
             '--stop-on-failure',
-            'dist/coverage',
+            '/path/to/dist/coverage',
             true,
             true,
             'dot',
@@ -610,7 +625,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             null,
-            null,
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             'progress',
@@ -679,7 +694,76 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             null,
+            $expectedTmpDir,
+            false,
+            false,
+            'progress',
+            false,
+            false,
             null,
+            false,
+            null,
+        ];
+    }
+
+    private static function createValueForCoverageBasePath(
+        ?string $existingCoverageBasePath,
+        string $expectedCoverageBasePath
+    ): array {
+        return [
+            new SchemaConfiguration(
+                '/path/to/infection.json',
+                null,
+                new Source([], []),
+                new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                '',
+                new PhpUnit(null, null),
+                [],
+                null,
+                null,
+                null,
+                null
+            ),
+            $existingCoverageBasePath,
+            null,
+            'none',
+            false,
+            false,
+            'progress',
+            false,
+            false,
+            null,
+            false,
+            null,
+            '',
+            null,
+            null,
+            '',
+            10,
+            [],
+            [],
+            new Logs(
+                null,
+                null,
+                null,
+                null,
+                null
+            ),
+            'none',
+            sys_get_temp_dir() . '/infection',
+            new PhpUnit('/path/to', null),
+            self::getDefaultMutators(),
+            null,
+            null,
+            null,
+            null,
+            $expectedCoverageBasePath,
             false,
             false,
             'progress',
@@ -748,7 +832,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             null,
-            null,
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             'progress',
@@ -818,7 +902,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             null,
-            null,
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             'progress',
@@ -888,7 +972,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             $expectedInitialTestPhpOptions,
             null,
-            null,
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             'progress',
@@ -958,7 +1042,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             $expectedInitialTestFrameworkOptions,
-            null,
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             'progress',
@@ -1031,7 +1115,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             null,
-            null,
+            sys_get_temp_dir() . '/infection',
             false,
             false,
             'progress',

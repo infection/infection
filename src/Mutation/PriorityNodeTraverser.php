@@ -35,35 +35,30 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use Infection\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\Visitor\NotMutableIgnoreVisitor;
-use Infection\Visitor\ParentConnectorVisitor;
-use Infection\Visitor\ReflectionVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  * @final
  */
-class NodeTraverserFactory
+class PriorityNodeTraverser extends NodeTraverser
 {
-    /**
-     * @param NodeVisitor[] $extraVisitors
-     */
-    public function create(array $extraVisitors): PrioritizedVisitorsNodeTraverser
+    public function addVisitor(NodeVisitor $visitor, int $priority = 1): void
     {
-        $traverser = new PrioritizedVisitorsNodeTraverser(new NodeTraverser());
+        Assert::keyNotExists($this->visitors, $priority, sprintf('Priority %d is already used', $priority));
 
-        $traverser->addPrioritizedVisitor(new NotMutableIgnoreVisitor(), 50);
-        $traverser->addPrioritizedVisitor(new ParentConnectorVisitor(), 40);
-        $traverser->addPrioritizedVisitor(new FullyQualifiedClassNameVisitor(), 30);
-        $traverser->addPrioritizedVisitor(new ReflectionVisitor(), 20);
+        $this->visitors[$priority] = $visitor;
 
-        foreach ($extraVisitors as $priority => $visitor) {
-            $traverser->addPrioritizedVisitor($visitor, $priority);
-        }
+        krsort($this->visitors);
+    }
 
-        return $traverser;
+    /**
+     * @return NodeVisitor[]
+     */
+    public function getVisitors(): array
+    {
+        return $this->visitors;
     }
 }

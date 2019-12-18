@@ -42,8 +42,9 @@ use Throwable;
 
 /**
  * @internal
+ * @final
  */
-final class FileParser
+class FileParser
 {
     private $parser;
 

@@ -54,6 +54,7 @@ use Infection\Locator\RootsFileLocator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
+use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\FileParser;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\MutatorFactory;
@@ -103,26 +104,42 @@ final class InfectionContainer extends Container
                 return new TmpDirProvider();
             },
             'coverage.dir.phpunit' => static function (self $container) {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
                 return sprintf(
                     '%s/%s',
-                    $container['coverage.path'],
+                    $config->getExistingCoverageBasePath(),
                     XMLLineCodeCoverage::PHP_UNIT_COVERAGE_DIR
                 );
             },
             'coverage.dir.phpspec' => static function (self $container) {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
                 return sprintf(
                     '%s/%s',
-                    $container['coverage.path'],
+                    $config->getExistingCoverageBasePath(),
                     XMLLineCodeCoverage::PHP_SPEC_COVERAGE_DIR
                 );
             },
             'coverage.dir.codeception' => static function (self $container) {
-                return sprintf('%s/%s', $container['coverage.path'], XMLLineCodeCoverage::CODECEPTION_COVERAGE_DIR);
-            },
-            'junit.file.path' => static function (self $container) {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
                 return sprintf(
                     '%s/%s',
-                    $container['coverage.path'],
+                    $config->getExistingCoverageBasePath(),
+                    XMLLineCodeCoverage::CODECEPTION_COVERAGE_DIR
+                );
+            },
+            'junit.file.path' => static function (self $container) {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                return sprintf(
+                    '%s/%s',
+                    $config->getExistingCoverageBasePath(),
                     TestFrameworkAdapter::JUNIT_FILE_NAME
                 );
             },
@@ -290,27 +307,12 @@ final class InfectionContainer extends Container
             MutatorParser::class => static function (): MutatorParser {
                 return new MutatorParser();
             },
-            'coverage.path' => static function (self $container): string {
-                /** @var Configuration $config */
-                $config = $container[Configuration::class];
-
-                $existingCoveragePath = (string) $config->getExistingCoveragePath();
-
-                if ($existingCoveragePath === '') {
-                    return $config->getTmpDir();
-                }
-
-                return $container['filesystem']->isAbsolutePath($existingCoveragePath)
-                    ? $existingCoveragePath
-                    : sprintf('%s/%s', getcwd(), $existingCoveragePath)
-                ;
-            },
             'coverage.checker' => static function (self $container): CoverageRequirementChecker {
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
                 return new CoverageRequirementChecker(
-                    (string) $config->getExistingCoveragePath() !== '',
+                    (string) $config->getExistingCoverageBasePath() !== '',
                     $config->getInitialTestsPhpOptions() ?? ''
                 );
             },
@@ -355,6 +357,15 @@ final class InfectionContainer extends Container
             },
             NodeTraverserFactory::class => static function (): NodeTraverserFactory {
                 return new NodeTraverserFactory();
+            },
+            FileMutationGenerator::class => static function (self $container): FileMutationGenerator {
+                /** @var FileParser $fileParser */
+                $fileParser = $container[FileParser::class];
+
+                /** @var NodeTraverserFactory $nodeTraverserFactory */
+                $nodeTraverserFactory = $container[NodeTraverserFactory::class];
+
+                return new FileMutationGenerator($fileParser, $nodeTraverserFactory);
             },
         ]);
     }
