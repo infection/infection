@@ -73,7 +73,7 @@ final class FactoryTest extends TestCase
                 '',
                 new PhpUnit(null, null),
                 [],
-                null,
+                'phpunit',
                 null,
                 null,
                 null,

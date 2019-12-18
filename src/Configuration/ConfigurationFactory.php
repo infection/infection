@@ -43,6 +43,7 @@ use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
+use Infection\TestFramework\TestFrameworkTypes;
 use function Safe\sprintf;
 use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
@@ -120,7 +121,7 @@ class ConfigurationFactory
                     $mutatorsInput
                 )
             ),
-            $testFramework ?? $schema->getTestFramework(),
+            ($testFramework ?? $schema->getTestFramework()) ?? TestFrameworkTypes::PHPUNIT,
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
             $testFrameworkOptions ?? $schema->getTestFrameworkOptions(),

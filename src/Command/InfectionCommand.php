@@ -303,7 +303,7 @@ final class InfectionCommand extends BaseCommand
 
         $fileSystem->mkdir($config->getTmpDir());
 
-        $this->testFrameworkKey = $config->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
+        $this->testFrameworkKey = $config->getTestFramework();
         $this->testFrameworkOptions = $this->getTestFrameworkExtraOptions($this->testFrameworkKey);
 
         /** @var Factory $testFrameworkFactory */
