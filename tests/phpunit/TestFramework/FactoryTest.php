@@ -77,7 +77,7 @@ final class FactoryTest extends TestCase
                 null,
                 null,
                 null,
-                null,
+                '',
                 false,
                 false,
                 'dot',
