@@ -42,8 +42,10 @@ use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
-use function sprintf;
+use function Safe\getcwd;
+use function Safe\sprintf;
 use function sys_get_temp_dir;
+use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
 
 /**
@@ -114,6 +116,8 @@ class ConfigurationFactory
 
         $schemaMutators = $schema->getMutators();
 
+        $namespacedTmpDir = $this->tmpDirProvider->providePath($tmpDir);
+
         return new Configuration(
             $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
             $schema->getSource()->getDirectories(),
@@ -124,7 +128,7 @@ class ConfigurationFactory
             ),
             $schema->getLogs(),
             $logVerbosity,
-            $this->tmpDirProvider->providePath($tmpDir),
+            $namespacedTmpDir,
             $schema->getPhpUnit(),
             $this->mutatorFactory->create(
                 $this->retrieveMutators(
@@ -138,7 +142,7 @@ class ConfigurationFactory
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
             $testFrameworkOptions ?? $schema->getTestFrameworkOptions(),
-            $existingCoveragePath,
+            self::retrieveCoverageBasePath($existingCoveragePath, $namespacedTmpDir),
             $debug,
             $onlyCovered,
             $formatter,
@@ -148,6 +152,23 @@ class ConfigurationFactory
             $showMutations,
             $minCoveredMsi
         );
+    }
+
+    private static function retrieveCoverageBasePath(
+        ?string $existingCoveragePath,
+        string $tmpDir
+    ): string {
+        Assert::nullOrStringNotEmpty($existingCoveragePath);
+
+        if ($existingCoveragePath === null) {
+            return $tmpDir;
+        }
+
+        if (Path::isAbsolute($existingCoveragePath)) {
+            return $existingCoveragePath;
+        }
+
+        return sprintf('%s/%s', getcwd(), $existingCoveragePath);
     }
 
     private function retrieveMutators(array $schemaMutators, string $mutatorsInput): array

@@ -66,7 +66,7 @@ trait ConfigurationAssertions
         ?string $expectedBootstrap,
         ?string $expectedInitialTestsPhpOptions,
         ?string $expectedTestFrameworkOptions,
-        ?string $expectedExistingCoveragePath,
+        string $expectedCoverageBasePath,
         bool $expectedDebug,
         bool $expectedOnlyCovered,
         string $expectedFormatter,
@@ -102,7 +102,7 @@ trait ConfigurationAssertions
         $this->assertSame($expectedBootstrap, $configuration->getBootstrap());
         $this->assertSame($expectedInitialTestsPhpOptions, $configuration->getInitialTestsPhpOptions());
         $this->assertSame($expectedTestFrameworkOptions, $configuration->getTestFrameworkOptions());
-        $this->assertSame($expectedExistingCoveragePath, $configuration->getExistingCoveragePath());
+        $this->assertSame($expectedCoverageBasePath, $configuration->getCoverageBasePath());
         $this->assertSame($expectedDebug, $configuration->isDebugEnabled());
         $this->assertSame($expectedOnlyCovered, $configuration->mutateOnlyCoveredCode());
         $this->assertSame($expectedFormatter, $configuration->getFormatter());
