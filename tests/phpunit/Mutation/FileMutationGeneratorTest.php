@@ -59,6 +59,7 @@ use Symfony\Component\Finder\SplFileInfo;
 final class FileMutationGeneratorTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../Fixtures/Files';
+
     /**
      * @var FileParser|MockObject
      */
