@@ -71,7 +71,7 @@ class Configuration
     private $bootstrap;
     private $initialTestsPhpOptions;
     private $testFrameworkOptions;
-    private $coverageBasePath;
+    private $existingCoverageBasePath;
     private $debug;
     private $onlyCovered;
     private $formatter;
@@ -99,7 +99,7 @@ class Configuration
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
         ?string $testFrameworkOptions,
-        string $coverageBasePath,
+        string $existingCoverageBasePath,
         bool $debug,
         bool $onlyCovered,
         string $formatter,
@@ -130,7 +130,7 @@ class Configuration
         $this->bootstrap = $bootstrap;
         $this->initialTestsPhpOptions = $initialTestsPhpOptions;
         $this->testFrameworkOptions = $testFrameworkOptions;
-        $this->coverageBasePath = $coverageBasePath;
+        $this->existingCoverageBasePath = $existingCoverageBasePath;
         $this->debug = $debug;
         $this->onlyCovered = $onlyCovered;
         $this->formatter = $formatter;
@@ -210,9 +210,9 @@ class Configuration
         return $this->testFrameworkOptions;
     }
 
-    public function getCoverageBasePath(): string
+    public function getExistingCoverageBasePath(): string
     {
-        return $this->coverageBasePath;
+        return $this->existingCoverageBasePath;
     }
 
     public function isDebugEnabled(): bool

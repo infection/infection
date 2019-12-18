@@ -141,7 +141,7 @@ class ConfigurationFactory
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
             $testFrameworkOptions ?? $schema->getTestFrameworkOptions(),
-            self::retrieveCoverageBasePath($existingCoveragePath, $configDir, $namespacedTmpDir),
+            self::retrieveExistingCoverageBasePath($existingCoveragePath, $configDir, $namespacedTmpDir),
             $debug,
             $onlyCovered,
             $formatter,
@@ -153,7 +153,7 @@ class ConfigurationFactory
         );
     }
 
-    private static function retrieveCoverageBasePath(
+    private static function retrieveExistingCoverageBasePath(
         ?string $existingCoveragePath,
         string $configDir,
         string $tmpDir

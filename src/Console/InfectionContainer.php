@@ -108,7 +108,7 @@ final class InfectionContainer extends Container
 
                 return sprintf(
                     '%s/%s',
-                    $config->getCoverageBasePath(),
+                    $config->getExistingCoverageBasePath(),
                     XMLLineCodeCoverage::PHP_UNIT_COVERAGE_DIR
                 );
             },
@@ -118,7 +118,7 @@ final class InfectionContainer extends Container
 
                 return sprintf(
                     '%s/%s',
-                    $config->getCoverageBasePath(),
+                    $config->getExistingCoverageBasePath(),
                     XMLLineCodeCoverage::PHP_SPEC_COVERAGE_DIR
                 );
             },
@@ -128,7 +128,7 @@ final class InfectionContainer extends Container
 
                 return sprintf(
                     '%s/%s',
-                    $config->getCoverageBasePath(),
+                    $config->getExistingCoverageBasePath(),
                     XMLLineCodeCoverage::CODECEPTION_COVERAGE_DIR
                 );
             },
@@ -138,7 +138,7 @@ final class InfectionContainer extends Container
 
                 return sprintf(
                     '%s/%s',
-                    $config->getCoverageBasePath(),
+                    $config->getExistingCoverageBasePath(),
                     TestFrameworkAdapter::JUNIT_FILE_NAME
                 );
             },
@@ -311,7 +311,7 @@ final class InfectionContainer extends Container
                 $config = $container[Configuration::class];
 
                 return new CoverageRequirementChecker(
-                    (string) $config->getCoverageBasePath() !== '',
+                    (string) $config->getExistingCoverageBasePath() !== '',
                     $config->getInitialTestsPhpOptions() ?? ''
                 );
             },
