@@ -47,43 +47,24 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class LoggerFactory
 {
-    /**
-     * @var MetricsCalculator
-     */
     private $metricsCalculator;
-
-    /**
-     * @var Filesystem
-     */
     private $filesystem;
-
-    /**
-     * @var string
-     */
     private $logVerbosity;
-
-    /**
-     * @var bool
-     */
     private $debugMode;
-
-    /**
-     * @var bool
-     */
-    private $onlyCoveredMode;
+    private $onlyCoveredCode;
 
     public function __construct(
         MetricsCalculator $metricsCalculator,
         Filesystem $filesystem,
         string $logVerbosity,
         bool $debugMode,
-        bool $onlyCoveredMode
+        bool $onlyCoveredCode
     ) {
         $this->metricsCalculator = $metricsCalculator;
         $this->filesystem = $filesystem;
         $this->logVerbosity = $logVerbosity;
         $this->debugMode = $debugMode;
-        $this->onlyCoveredMode = $onlyCoveredMode;
+        $this->onlyCoveredCode = $onlyCoveredCode;
     }
 
     /**
@@ -120,8 +101,11 @@ final class LoggerFactory
         return array_filter($loggers, [$this, 'isAllowedToLog'], ARRAY_FILTER_USE_KEY);
     }
 
-    private function createTextLogger(OutputInterface $output, string $location, bool $isDebugVerbosity): TextFileLogger
-    {
+    private function createTextLogger(
+        OutputInterface $output,
+        string $location,
+        bool $isDebugVerbosity
+    ): TextFileLogger {
         return new TextFileLogger(
             $output,
             $location,
@@ -129,12 +113,15 @@ final class LoggerFactory
             $this->filesystem,
             $isDebugVerbosity,
             $this->debugMode,
-            $this->onlyCoveredMode
+            $this->onlyCoveredCode
         );
     }
 
-    private function createSummaryLogger(OutputInterface $output, string $location, bool $isDebugVerbosity): SummaryFileLogger
-    {
+    private function createSummaryLogger(
+        OutputInterface $output,
+        string $location,
+        bool $isDebugVerbosity
+    ): SummaryFileLogger {
         return new SummaryFileLogger(
             $output,
             $location,
@@ -145,8 +132,11 @@ final class LoggerFactory
         );
     }
 
-    private function createDebugLogger(OutputInterface $output, string $location, bool $isDebugVerbosity): DebugFileLogger
-    {
+    private function createDebugLogger(
+        OutputInterface $output,
+        string $location,
+        bool $isDebugVerbosity
+    ): DebugFileLogger {
         return new DebugFileLogger(
             $output,
             $location,
@@ -154,12 +144,15 @@ final class LoggerFactory
             $this->filesystem,
             $isDebugVerbosity,
             $this->debugMode,
-            $this->onlyCoveredMode
+            $this->onlyCoveredCode
         );
     }
 
-    private function createPerMutatorLogger(OutputInterface $output, string $location, bool $isDebugVerbosity): PerMutatorLogger
-    {
+    private function createPerMutatorLogger(
+        OutputInterface $output,
+        string $location,
+        bool $isDebugVerbosity
+    ): PerMutatorLogger {
         return new PerMutatorLogger(
             $output,
             $location,
@@ -183,6 +176,7 @@ final class LoggerFactory
     private function isAllowedToLog(string $logType): bool
     {
         return $this->logVerbosity !== LogVerbosity::NONE
-            || in_array($logType, ResultsLoggerTypes::ALLOWED_WITHOUT_LOGGING, true);
+            || in_array($logType, ResultsLoggerTypes::ALLOWED_WITHOUT_LOGGING, true)
+        ;
     }
 }

@@ -69,15 +69,7 @@ use Symfony\Component\Filesystem\Filesystem;
 final class SubscriberBuilder
 {
     private $showMutations;
-
-    /**
-     * @var bool
-     */
     private $debug;
-
-    /**
-     * @var bool
-     */
     private $noProgress;
     private $formatter;
     private $metricsCalculator;
@@ -89,9 +81,6 @@ final class SubscriberBuilder
     private $timer;
     private $timeFormatter;
     private $memoryFormatter;
-    /**
-     * @var LoggerFactory
-     */
     private $loggerFactory;
 
     public function __construct(

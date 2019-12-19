@@ -38,23 +38,22 @@ namespace Infection\Process\Listener;
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\MutationTestingFinished;
 use Infection\Logger\MutationTestingResultsLogger;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
 final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var MutationTestingResultsLogger[]
-     */
     private $loggers;
 
     /**
      * @param MutationTestingResultsLogger[] $loggers
      */
-    public function __construct(
-        array $loggers
-    ) {
+    public function __construct(array $loggers)
+    {
+        Assert::allIsInstanceOf($loggers, MutationTestingResultsLogger::class);
+
         $this->loggers = $loggers;
     }
 

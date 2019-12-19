@@ -52,7 +52,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 final class LoggerFactoryTest extends TestCase
 {
-    public function test_it_creates_no_logger_for_low_verbosity(): void
+    public function test_it_does_not_create_any_logger_for_no_verbosity_level(): void
     {
         $factory = new LoggerFactory(
             new MetricsCalculator(),
@@ -90,6 +90,7 @@ final class LoggerFactoryTest extends TestCase
             new Logs(null, null, null, null, new Badge('branch_name')),
             $this->createMock(OutputInterface::class)
         );
+
         $this->assertCount(1, $loggers);
         $this->assertInstanceOf(BadgeLogger::class, current($loggers));
     }
@@ -97,7 +98,7 @@ final class LoggerFactoryTest extends TestCase
     /**
      * @dataProvider provideLogTypesAndClasses
      */
-    public function test_it_creates_a_logger_for_log_type(Logs $logs, string $expectedLogClass): void
+    public function test_it_creates_a_logger_for_log_type(Logs $logs, string $expectedLoggerClass): void
     {
         $factory = new LoggerFactory(
             new MetricsCalculator(),
@@ -111,42 +112,15 @@ final class LoggerFactoryTest extends TestCase
             $logs,
             $this->createMock(OutputInterface::class)
         );
+
         $this->assertCount(1, $loggers);
-        $this->assertInstanceOf($expectedLogClass, current($loggers));
-    }
-
-    public function provideLogTypesAndClasses(): Generator
-    {
-        yield [
-            new Logs('text', null, null, null, null),
-            TextFileLogger::class,
-        ];
-
-        yield [
-            new Logs(null, 'summary_file', null, null, null),
-            SummaryFileLogger::class,
-        ];
-
-        yield [
-            new Logs(null, null, 'debug_file', null, null),
-            DebugFileLogger::class,
-        ];
-
-        yield [
-            new Logs(null, null, null, 'per_muator', null),
-            PerMutatorLogger::class,
-        ];
-
-        yield [
-            new Logs(null, null, null, null, new Badge('foo')),
-            BadgeLogger::class,
-        ];
+        $this->assertInstanceOf($expectedLoggerClass, current($loggers));
     }
 
     /**
      * @dataProvider provideLogsAndCount
      */
-    public function test_it_creates_multiple_loggers(Logs $logs, int $loggerCount): void
+    public function test_it_creates_multiple_loggers(Logs $logs, int $expectedLoggerCount): void
     {
         $factory = new LoggerFactory(
             new MetricsCalculator(),
@@ -161,38 +135,88 @@ final class LoggerFactoryTest extends TestCase
             $this->createMock(OutputInterface::class)
         );
 
-        $this->assertCount($loggerCount, $loggers);
+        $this->assertCount($expectedLoggerCount, $loggers);
+    }
+
+    public function provideLogTypesAndClasses(): Generator
+    {
+        yield 'text logger' => [
+            new Logs(
+                'text',
+                null,
+                null,
+                null,
+                null
+            ),
+            TextFileLogger::class,
+        ];
+
+        yield 'summary logger' => [
+            new Logs(
+                null,
+                'summary_file',
+                null,
+                null,
+                null
+            ),
+            SummaryFileLogger::class,
+        ];
+
+        yield 'debug logger' => [
+            new Logs(
+                null,
+                null,
+                'debug_file',
+                null,
+                null
+            ),
+            DebugFileLogger::class,
+        ];
+
+        yield 'per mutator logger' => [
+            new Logs(
+                null,
+                null,
+                null,
+                'per_muator',
+                null
+            ),
+            PerMutatorLogger::class,
+        ];
+
+        yield 'badge logger' => [
+            new Logs(
+                null,
+                null,
+                null,
+                null,
+                new Badge('foo')
+            ),
+            BadgeLogger::class,
+        ];
     }
 
     public function provideLogsAndCount(): Generator
     {
-        yield [
-            new Logs(null, null, null, null, null),
+        yield 'no logger' => [
+            new Logs(
+                null,
+                null,
+                null,
+                null,
+                null
+            ),
             0,
         ];
 
-        yield [
-            new Logs('infection.log', null, null, null, new Badge('master')),
-            2,
-        ];
-
-        yield [
-            new Logs('text', 'summary', 'debug', null, null),
-            3,
-        ];
-
-        yield [
-            new Logs(null, null, 'debug', 'per_mutator', new Badge('f')),
-            3,
-        ];
-
-        yield [
-            new Logs('text', null, 'debug', 'per_mutator', new Badge('f')),
-            4,
-        ];
-
-        yield [
-            new Logs('text', 'summary', 'debug', 'per_mutator', new Badge('f')),
+        yield 'nominal' => [
+            new Logs(
+                'text',
+                'summary',
+                'debug',
+                'per_mutator',
+                new Badge('branch')
+            ),
             5,
         ];
     }
