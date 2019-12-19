@@ -38,6 +38,7 @@ namespace Infection\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Mutator\Util\Mutator;
+use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -70,7 +71,7 @@ class Configuration
     private $testFramework;
     private $bootstrap;
     private $initialTestsPhpOptions;
-    private $testFrameworkOptions;
+    private $testFrameworkExtraOptions;
     private $existingCoverageBasePath;
     private $debug;
     private $onlyCovered;
@@ -98,7 +99,7 @@ class Configuration
         string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
-        ?string $testFrameworkOptions,
+        TestFrameworkExtraOptions $testFrameworkExtraOptions,
         string $existingCoverageBasePath,
         bool $debug,
         bool $onlyCovered,
@@ -129,7 +130,7 @@ class Configuration
         $this->testFramework = $testFramework;
         $this->bootstrap = $bootstrap;
         $this->initialTestsPhpOptions = $initialTestsPhpOptions;
-        $this->testFrameworkOptions = $testFrameworkOptions;
+        $this->testFrameworkExtraOptions = $testFrameworkExtraOptions;
         $this->existingCoverageBasePath = $existingCoverageBasePath;
         $this->debug = $debug;
         $this->onlyCovered = $onlyCovered;
@@ -205,9 +206,9 @@ class Configuration
         return $this->initialTestsPhpOptions;
     }
 
-    public function getTestFrameworkOptions(): ?string
+    public function getTestFrameworkExtraOptions(): TestFrameworkExtraOptions
     {
-        return $this->testFrameworkOptions;
+        return $this->testFrameworkExtraOptions;
     }
 
     public function getExistingCoverageBasePath(): string

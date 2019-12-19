@@ -40,7 +40,9 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\Tests\Fixtures\Mutator\Fake;
+use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkExtraOptions;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -66,7 +68,7 @@ final class ConfigurationTest extends TestCase
         string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
-        ?string $testFrameworkOptions,
+        TestFrameworkExtraOptions $testFrameworkOptions,
         string $existingCoverageBasePath,
         bool $debug,
         bool $onlyCovered,
@@ -147,7 +149,7 @@ final class ConfigurationTest extends TestCase
             'phpunit',
             null,
             null,
-            null,
+            new DummyTestFrameworkExtraOptions(),
             '',
             false,
             false,
@@ -182,7 +184,7 @@ final class ConfigurationTest extends TestCase
             'phpunit',
             'bin/bootstrap.php',
             '-d zend_extension=xdebug.so',
-            '--debug',
+            new DummyTestFrameworkExtraOptions(),
             'coverage/',
             true,
             true,
