@@ -42,7 +42,7 @@ use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;
 use PHPUnit\Framework\TestCase;
 
-class XMLLineCodeCoverageFactoryTest extends TestCase
+final class XMLLineCodeCoverageFactoryTest extends TestCase
 {
     /**
      * @dataProvider valueProvider
