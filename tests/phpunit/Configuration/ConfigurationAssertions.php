@@ -39,14 +39,17 @@ use function array_map;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\Tests\Configuration\Entry\LogsAssertions;
 use Infection\Tests\Configuration\Entry\PhpUnitAssertions;
+use Infection\Tests\TestFramework\TestFrameworkExtraOptionsAssertions;
 use Symfony\Component\Finder\SplFileInfo;
 
 trait ConfigurationAssertions
 {
     use LogsAssertions;
     use PhpUnitAssertions;
+    use TestFrameworkExtraOptionsAssertions;
 
     /**
      * @param string[]      $expectedSourceDirectories
@@ -65,7 +68,7 @@ trait ConfigurationAssertions
         string $expectedTestFramework,
         ?string $expectedBootstrap,
         ?string $expectedInitialTestsPhpOptions,
-        ?string $expectedTestFrameworkOptions,
+        TestFrameworkExtraOptions $expectedTestFrameworkOptions,
         string $expectedExistingCoverageBasePath,
         bool $expectedDebug,
         bool $expectedOnlyCovered,
@@ -101,7 +104,10 @@ trait ConfigurationAssertions
         $this->assertSame($expectedTestFramework, $configuration->getTestFramework());
         $this->assertSame($expectedBootstrap, $configuration->getBootstrap());
         $this->assertSame($expectedInitialTestsPhpOptions, $configuration->getInitialTestsPhpOptions());
-        $this->assertSame($expectedTestFrameworkOptions, $configuration->getTestFrameworkOptions());
+        $this->assertTestFrameworkExtraOptionsStateIs(
+            $expectedTestFrameworkOptions,
+            $configuration->getTestFrameworkExtraOptions()
+        );
         $this->assertSame($expectedExistingCoverageBasePath, $configuration->getExistingCoverageBasePath());
         $this->assertSame($expectedDebug, $configuration->isDebugEnabled());
         $this->assertSame($expectedOnlyCovered, $configuration->mutateOnlyCoveredCode());

@@ -43,6 +43,7 @@ use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkExtraOptions;
 use Infection\Utils\VersionParser;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -76,7 +77,7 @@ final class FactoryTest extends TestCase
                 'phpunit',
                 null,
                 null,
-                null,
+                new DummyTestFrameworkExtraOptions(),
                 '',
                 false,
                 false,

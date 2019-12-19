@@ -43,6 +43,9 @@ use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
+use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
+use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
+use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
 use function Safe\sprintf;
 use function sys_get_temp_dir;
@@ -101,6 +104,8 @@ class ConfigurationFactory
 
         $namespacedTmpDir = $this->retrieveTmpDir($schema, $configDir);
 
+        $testFramework = $testFramework ?? $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
+
         return new Configuration(
             $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
             $schema->getSource()->getDirectories(),
@@ -121,10 +126,10 @@ class ConfigurationFactory
                     $mutatorsInput
                 )
             ),
-            ($testFramework ?? $schema->getTestFramework()) ?? TestFrameworkTypes::PHPUNIT,
+            $testFramework,
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
-            $testFrameworkOptions ?? $schema->getTestFrameworkOptions(),
+            self::retrieveTestFrameworkExtraOptions($testFrameworkOptions, $schema, $testFramework),
             self::retrieveExistingCoverageBasePath($existingCoveragePath, $configDir, $namespacedTmpDir),
             $debug,
             $onlyCovered,
@@ -196,5 +201,18 @@ class ConfigurationFactory
         }
 
         return array_fill_keys($parsedMutatorsInput, true);
+    }
+
+    private static function retrieveTestFrameworkExtraOptions(
+        ?string $testFrameworkOptions,
+        SchemaConfiguration $schema,
+        string $testFramework
+    ): TestFrameworkExtraOptions {
+        $extraOptions = $testFrameworkOptions ?? $schema->getTestFrameworkOptions();
+
+        return TestFrameworkTypes::PHPUNIT === $testFramework
+            ? new PhpUnitExtraOptions($extraOptions)
+            : new PhpSpecExtraOptions($extraOptions)
+        ;
     }
 }
