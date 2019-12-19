@@ -371,7 +371,7 @@ final class ConfigurationFactoryTest extends TestCase
             '-d zend_extension=xdebug.so'
         );
 
-        yield 'test no framework PHP options' => self::createValueForTestsFrameworkOptions(
+        yield 'test no framework PHP options' => self::createValueForTestFrameworkExtraOptions(
             'phpunit',
             null,
             null,
@@ -379,7 +379,7 @@ final class ConfigurationFactoryTest extends TestCase
             sys_get_temp_dir() . '/infection/coverage-xml'
         );
 
-        yield 'test framework PHP options from config' => self::createValueForTestsFrameworkOptions(
+        yield 'test framework PHP options from config' => self::createValueForTestFrameworkExtraOptions(
             'phpunit',
             '--debug',
             null,
@@ -387,7 +387,7 @@ final class ConfigurationFactoryTest extends TestCase
             sys_get_temp_dir() . '/infection/coverage-xml'
         );
 
-        yield 'test framework PHP options from input' => self::createValueForTestsFrameworkOptions(
+        yield 'test framework PHP options from input' => self::createValueForTestFrameworkExtraOptions(
             'phpunit',
             null,
             '--debug',
@@ -395,7 +395,7 @@ final class ConfigurationFactoryTest extends TestCase
             sys_get_temp_dir() . '/infection/coverage-xml'
         );
 
-        yield 'test framework PHP options from config & input' => self::createValueForTestsFrameworkOptions(
+        yield 'test framework PHP options from config & input' => self::createValueForTestFrameworkExtraOptions(
             'phpunit',
             '--stop-on-failure',
             '--debug',
@@ -403,7 +403,7 @@ final class ConfigurationFactoryTest extends TestCase
             sys_get_temp_dir() . '/infection/coverage-xml'
         );
 
-        yield 'test framework PHP options from config with phpspec framework' => self::createValueForTestsFrameworkOptions(
+        yield 'test framework PHP options from config with phpspec framework' => self::createValueForTestFrameworkExtraOptions(
             'phpspec',
             '--debug',
             null,
@@ -671,7 +671,7 @@ final class ConfigurationFactoryTest extends TestCase
             self::getDefaultMutators(),
             'phpunit',
             null,
-            new PhpUnitExtraOptions(),
+            null,
             new PhpUnitExtraOptions(),
             sys_get_temp_dir() . '/infection/coverage-xml',
             false,
@@ -741,7 +741,6 @@ final class ConfigurationFactoryTest extends TestCase
             'phpunit',
             null,
             null,
-            new PhpUnitExtraOptions(),
             new PhpUnitExtraOptions(),
             $expectedTmpDir . '/coverage-xml',
             false,
@@ -880,7 +879,6 @@ final class ConfigurationFactoryTest extends TestCase
             'phpunit',
             null,
             null,
-            new PhpUnitExtraOptions(),
             new PhpUnitExtraOptions(),
             sys_get_temp_dir() . '/infection/coverage-xml',
             false,
@@ -1036,10 +1034,10 @@ final class ConfigurationFactoryTest extends TestCase
         ];
     }
 
-    private static function createValueForTestsFrameworkOptions(
+    private static function createValueForTestFrameworkExtraOptions(
         string $configTestFramework,
-        ?string $configTestsFrameworkOptions,
-        ?string $inputTestsFrameworkOptions,
+        ?string $configTestsFrameworkExtraOptions,
+        ?string $inputTestsFrameworkExtraOptions,
         TestFrameworkExtraOptions $expectedTestFrameworkOptions,
         string $expectedCoveragePath
     ): array {
@@ -1061,7 +1059,7 @@ final class ConfigurationFactoryTest extends TestCase
                 $configTestFramework,
                 null,
                 null,
-                $configTestsFrameworkOptions
+                $configTestsFrameworkExtraOptions
             ),
             null,
             null,
@@ -1076,7 +1074,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             null,
-            $inputTestsFrameworkOptions,
+            $inputTestsFrameworkExtraOptions,
             '',
             10,
             [],
@@ -1111,7 +1109,7 @@ final class ConfigurationFactoryTest extends TestCase
     private static function createValueForTestFrameworkKey(
         string $configTestFramework,
         string $inputTestsFrameworkOptions,
-        TestFrameworkExtraOptions $expectedTestFrameworkOptions,
+        TestFrameworkExtraOptions $expectedTestFrameworkExtraOptions,
         string $expectedCoveragePath
     ): array {
         return [
@@ -1166,7 +1164,7 @@ final class ConfigurationFactoryTest extends TestCase
             $configTestFramework,
             null,
             null,
-            $expectedTestFrameworkOptions,
+            $expectedTestFrameworkExtraOptions,
             $expectedCoveragePath,
             false,
             false,
