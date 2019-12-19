@@ -509,8 +509,10 @@ final class InfectionCommand extends BaseCommand
 
     private function assertCodeCoverageExists(Process $initialTestsProcess, string $testFrameworkKey): void
     {
-        /** @var string $coverageDir */
-        $coverageDir = $this->container[sprintf('coverage.dir.%s', $testFrameworkKey)];
+        /** @var Configuration $config */
+        $config = $this->container[Configuration::class];
+
+        $coverageDir = $config->getExistingCoveragePath();
 
         $coverageIndexFilePath = $coverageDir . '/' . XMLLineCodeCoverage::COVERAGE_INDEX_FILE_NAME;
 
