@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Tests\TestFramework\Coverage;
 
 use Generator;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;

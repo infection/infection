@@ -40,6 +40,9 @@ use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;
 use Webmozart\Assert\Assert;
 
+/**
+ * @internal
+ */
 final class XMLLineCodeCoverageFactory
 {
     private $cachedTestFileDataProvider;
