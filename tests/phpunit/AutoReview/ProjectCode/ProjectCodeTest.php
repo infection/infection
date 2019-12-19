@@ -178,28 +178,37 @@ final class ProjectCodeTest extends TestCase
     {
         $reflectionClass = new ReflectionClass($className);
 
-        if (in_array($className, ProjectCodeProvider::NON_FINAL_EXTENSION_CLASSES, true)) {
-            $this->addToAssertionCount(1);
-
-            return;
-        }
-
         $tagsAsKeys = array_flip(self::$phpDocParser->parse((string) $reflectionClass->getDocComment()));
 
-        $this->assertTrue(
-            $reflectionClass->isTrait()
+        $pass = $reflectionClass->isTrait()
             || $reflectionClass->isInterface()
             || $reflectionClass->isAbstract()
             || $reflectionClass->isFinal()
-            || array_key_exists('@final', $tagsAsKeys),
-            sprintf(
-                'Expected the class "%s" to be a trait, an interface, an abstract or final '
-                . 'class. Either fix it or if it is an extension point, add it to '
-                . '%s::NON_FINAL_EXTENSION_CLASSES.',
-                $className,
-                ProjectCodeProvider::class
-            )
-        );
+            || array_key_exists('@final', $tagsAsKeys)
+        ;
+
+        if (in_array($className, ProjectCodeProvider::NON_FINAL_EXTENSION_CLASSES, true)) {
+            $this->assertFalse(
+                $pass,
+                sprintf(
+                    'The class "%s" is registered to "%s::NON_FINAL_EXTENSION_CLASSES but '
+                    . 'this should not be necessary.',
+                    $className,
+                    ProjectCodeProvider::class
+                )
+            );
+        } else {
+            $this->assertTrue(
+                $pass,
+                sprintf(
+                    'Expected the class "%s" to be a trait, an interface, an abstract or final '
+                    . 'class. Either fix it or if it is an extension point, add it to '
+                    . '%s::NON_FINAL_EXTENSION_CLASSES.',
+                    $className,
+                    ProjectCodeProvider::class
+                )
+            );
+        }
     }
 
     /**
