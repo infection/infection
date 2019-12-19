@@ -51,6 +51,7 @@ use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Locator\RootsFileLocator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
+use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutation\FileMutationGenerator;
@@ -343,6 +344,9 @@ final class InfectionContainer extends Container
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
+                /** @var LoggerFactory $loggerFactory */
+                $loggerFactory = $container[LoggerFactory::class];
+
                 /** @var MetricsCalculator $metricsCalculator */
                 $metricsCalculator = $container['metrics'];
 
@@ -366,9 +370,7 @@ final class InfectionContainer extends Container
 
                 return new SubscriberBuilder(
                     $config->showMutations(),
-                    $config->getLogVerbosity(),
                     $config->isDebugEnabled(),
-                    $config->mutateOnlyCoveredCode(),
                     $config->getFormatter(),
                     $config->showProgress(),
                     $metricsCalculator,
@@ -379,7 +381,8 @@ final class InfectionContainer extends Container
                     $config->getTmpDir(),
                     $timer,
                     $timeFormatter,
-                    $memoryFormatter
+                    $memoryFormatter,
+                    $loggerFactory
                 );
             },
             CommandLineBuilder::class => static function (): CommandLineBuilder {
@@ -399,6 +402,24 @@ final class InfectionContainer extends Container
                 $nodeTraverserFactory = $container[NodeTraverserFactory::class];
 
                 return new FileMutationGenerator($fileParser, $nodeTraverserFactory);
+            },
+            LoggerFactory::class => static function (self $container): LoggerFactory {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                /** @var MetricsCalculator $metricsCalculator */
+                $metricsCalculator = $container['metrics'];
+
+                /** @var Filesystem $fileSystem */
+                $fileSystem = $container['filesystem'];
+
+                return new LoggerFactory(
+                    $metricsCalculator,
+                    $fileSystem,
+                    $config->getLogVerbosity(),
+                    $config->isDebugEnabled(),
+                    $config->mutateOnlyCoveredCode()
+                );
             },
         ]);
     }
