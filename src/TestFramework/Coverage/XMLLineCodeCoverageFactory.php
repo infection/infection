@@ -45,20 +45,17 @@ use Webmozart\Assert\Assert;
  */
 final class XMLLineCodeCoverageFactory
 {
+    private $coverageDir;
+    private $coverageXmlParser;
     private $cachedTestFileDataProvider;
-    private $phpUnitCoverageDir;
-    private $phpSpecCoverageDir;
-    private $codeceptionCoverageDir;
 
     public function __construct(
-        string $phpUnitCoverageDir,
-        string $phpSpecCoverageDir,
-        string $codeceptionCoverageDir,
+        string $coverageDir,
+        CoverageXmlParser $coverageXmlParser,
         CachedTestFileDataProvider $cachedTestFileDataProvider
     ) {
-        $this->phpUnitCoverageDir = $phpUnitCoverageDir;
-        $this->phpSpecCoverageDir = $phpSpecCoverageDir;
-        $this->codeceptionCoverageDir = $codeceptionCoverageDir;
+        $this->coverageDir = $coverageDir;
+        $this->coverageXmlParser = $coverageXmlParser;
         $this->cachedTestFileDataProvider = $cachedTestFileDataProvider;
     }
 
@@ -68,21 +65,14 @@ final class XMLLineCodeCoverageFactory
     ): XMLLineCodeCoverage {
         Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
 
-        /** @var string $coverageDir */
-        $coverageDir = [
-            TestFrameworkTypes::PHPUNIT => $this->phpUnitCoverageDir,
-            TestFrameworkTypes::PHPSPEC => $this->phpSpecCoverageDir,
-            TestFrameworkTypes::CODECEPTION => $this->codeceptionCoverageDir,
-        ][$testFrameworkKey];
-
         $testFileDataProviderService = $adapter->hasJUnitReport()
             ? $this->cachedTestFileDataProvider
             : null
         ;
 
         return new XMLLineCodeCoverage(
-            $coverageDir,
-            new CoverageXmlParser($coverageDir),
+            $this->coverageDir,
+            $this->coverageXmlParser,
             $testFrameworkKey,
             $testFileDataProviderService
         );
