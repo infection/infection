@@ -42,6 +42,7 @@ use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\EventDispatcher\EventSubscriberInterface;
+use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Performance\Listener\PerformanceLoggerSubscriber;
 use Infection\Performance\Memory\MemoryFormatter;
@@ -68,9 +69,15 @@ use Symfony\Component\Filesystem\Filesystem;
 final class SubscriberBuilder
 {
     private $showMutations;
-    private $logVerbosity;
+
+    /**
+     * @var bool
+     */
     private $debug;
-    private $onlyCovered;
+
+    /**
+     * @var bool
+     */
     private $noProgress;
     private $formatter;
     private $metricsCalculator;
@@ -82,12 +89,14 @@ final class SubscriberBuilder
     private $timer;
     private $timeFormatter;
     private $memoryFormatter;
+    /**
+     * @var LoggerFactory
+     */
+    private $loggerFactory;
 
     public function __construct(
         bool $showMutations,
-        string $logVerbosity,
         bool $debug,
-        bool $onlyCovered,
         string $formatter,
         bool $noProgress,
         MetricsCalculator $metricsCalculator,
@@ -98,12 +107,11 @@ final class SubscriberBuilder
         string $tmpDir,
         Timer $timer,
         TimeFormatter $timeFormatter,
-        MemoryFormatter $memoryFormatter
+        MemoryFormatter $memoryFormatter,
+        LoggerFactory $loggerFactory
     ) {
         $this->showMutations = $showMutations;
-        $this->logVerbosity = $logVerbosity;
         $this->debug = $debug;
-        $this->onlyCovered = $onlyCovered;
         $this->formatter = $formatter;
         $this->noProgress = $noProgress;
         $this->metricsCalculator = $metricsCalculator;
@@ -115,6 +123,7 @@ final class SubscriberBuilder
         $this->timer = $timer;
         $this->timeFormatter = $timeFormatter;
         $this->memoryFormatter = $memoryFormatter;
+        $this->loggerFactory = $loggerFactory;
     }
 
     public function registerSubscribers(
@@ -142,13 +151,10 @@ final class SubscriberBuilder
                 $this->showMutations
             ),
             new MutationTestingResultsLoggerSubscriber(
-                $output,
-                $this->infectionConfig,
-                $this->metricsCalculator,
-                $this->fs,
-                $this->logVerbosity,
-                $this->debug,
-                $this->onlyCovered
+                $this->loggerFactory->createFromLogEntries(
+                    $this->infectionConfig->getLogs(),
+                    $output
+                )
             ),
             new PerformanceLoggerSubscriber(
                 $this->timer,

@@ -46,14 +46,6 @@ final class ResultsLoggerTypes
     public const BADGE = 'badge';
     public const PER_MUTATOR = 'perMutator';
 
-    public const ALL = [
-        self::TEXT_FILE,
-        self::DEBUG_FILE,
-        self::SUMMARY_FILE,
-        self::BADGE,
-        self::PER_MUTATOR,
-    ];
-
     public const ALLOWED_WITHOUT_LOGGING = [
         self::BADGE,
     ];

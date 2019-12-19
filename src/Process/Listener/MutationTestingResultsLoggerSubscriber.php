@@ -35,52 +35,27 @@ declare(strict_types=1);
 
 namespace Infection\Process\Listener;
 
-use function array_filter;
-use function in_array;
-use Infection\Configuration\Configuration;
-use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\MutationTestingFinished;
-use Infection\Http\BadgeApiClient;
-use Infection\Logger\BadgeLogger;
-use Infection\Logger\DebugFileLogger;
-use Infection\Logger\PerMutatorLogger;
-use Infection\Logger\ResultsLoggerTypes;
-use Infection\Logger\SummaryFileLogger;
-use Infection\Logger\TextFileLogger;
-use Infection\Mutant\MetricsCalculator;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
+use Infection\Logger\MutationTestingResultsLogger;
 
 /**
  * @internal
  */
 final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
 {
-    private $infectionConfig;
-    private $metricsCalculator;
-    private $fs;
-    private $logVerbosity;
-    private $output;
-    private $isDebugMode;
-    private $isOnlyCoveredMode;
+    /**
+     * @var MutationTestingResultsLogger[]
+     */
+    private $loggers;
 
+    /**
+     * @param MutationTestingResultsLogger[] $loggers
+     */
     public function __construct(
-        OutputInterface $output,
-        Configuration $infectionConfig,
-        MetricsCalculator $metricsCalculator,
-        Filesystem $fs,
-        string $logVerbosity,
-        bool $isDebugMode,
-        bool $isOnlyCoveredMode = false
+        array $loggers
     ) {
-        $this->output = $output;
-        $this->infectionConfig = $infectionConfig;
-        $this->metricsCalculator = $metricsCalculator;
-        $this->fs = $fs;
-        $this->logVerbosity = $logVerbosity;
-        $this->isDebugMode = $isDebugMode;
-        $this->isOnlyCoveredMode = $isOnlyCoveredMode;
+        $this->loggers = $loggers;
     }
 
     public function getSubscribedEvents(): array
@@ -92,109 +67,8 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInt
 
     public function onMutationTestingFinished(MutationTestingFinished $event): void
     {
-        $logs = $this->infectionConfig->getLogs();
-        $badge = $logs->getBadge();
-
-        $logTypes = array_filter([
-            'badge' => null !== $badge
-                ? (object) ['branch' => $badge->getBranch()]
-                : null,
-            'debug' => $logs->getDebugLogFilePath(),
-            'perMutator' => $logs->getPerMutatorFilePath(),
-            'summary' => $logs->getSummaryLogFilePath(),
-            'text' => $logs->getTextLogFilePath(),
-        ]);
-
-        if ([] === $logTypes) {
-            return;
-        }
-
-        $logTypes = $this->filterLogTypes($logTypes);
-
-        foreach ($logTypes as $logType => $config) {
-            $this->useLogger($logType, $config);
-        }
-    }
-
-    private function filterLogTypes(array $logTypes): array
-    {
-        foreach ($logTypes as $key => $value) {
-            if ($this->logVerbosity === LogVerbosity::NONE) {
-                if (!in_array($key, ResultsLoggerTypes::ALLOWED_WITHOUT_LOGGING, true)) {
-                    unset($logTypes[$key]);
-                }
-
-                continue;
-            }
-
-            if (!in_array($key, ResultsLoggerTypes::ALL, true)) {
-                unset($logTypes[$key]);
-            }
-        }
-
-        return $logTypes;
-    }
-
-    private function useLogger(string $logType, $config): void
-    {
-        $isDebugVerbosity = $this->logVerbosity === LogVerbosity::DEBUG;
-
-        switch ($logType) {
-            case ResultsLoggerTypes::TEXT_FILE:
-                (new TextFileLogger(
-                    $this->output,
-                    $config,
-                    $this->metricsCalculator,
-                    $this->fs,
-                    $isDebugVerbosity,
-                    $this->isDebugMode,
-                    $this->isOnlyCoveredMode
-                ))->log();
-
-                break;
-            case ResultsLoggerTypes::SUMMARY_FILE:
-                (new SummaryFileLogger(
-                    $this->output,
-                    $config,
-                    $this->metricsCalculator,
-                    $this->fs,
-                     $isDebugVerbosity,
-                    $this->isDebugMode
-                ))->log();
-
-                break;
-            case ResultsLoggerTypes::DEBUG_FILE:
-                (new DebugFileLogger(
-                    $this->output,
-                    $config,
-                    $this->metricsCalculator,
-                    $this->fs,
-                    $isDebugVerbosity,
-                    $this->isDebugMode,
-                    $this->isOnlyCoveredMode
-                ))->log();
-
-                break;
-            case ResultsLoggerTypes::BADGE:
-                (new BadgeLogger(
-                    $this->output,
-                    new BadgeApiClient($this->output),
-                    $this->metricsCalculator,
-                    $config
-                ))->log();
-
-                break;
-            case ResultsLoggerTypes::PER_MUTATOR:
-                (new PerMutatorLogger(
-                    $this->output,
-                    $config,
-                    $this->metricsCalculator,
-                    $this->fs,
-                    $isDebugVerbosity,
-                    $this->isDebugMode
-                ))->log();
-
-                break;
+        foreach ($this->loggers as $logger) {
+            $logger->log();
         }
     }
 }
