@@ -90,7 +90,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class InfectionCommand extends BaseCommand
+class InfectionCommand extends BaseCommand
 {
     /**
      * @var ConsoleOutput
