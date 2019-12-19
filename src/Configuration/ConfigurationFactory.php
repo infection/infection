@@ -102,7 +102,7 @@ class ConfigurationFactory
         ?float $minCoveredMsi,
         string $mutatorsInput,
         ?string $testFramework,
-        ?string $testFrameworkOptions,
+        ?string $testFrameworkExtraOptions,
         string $filter
     ): Configuration {
         $configDir = dirname($schema->getFile());
@@ -136,7 +136,7 @@ class ConfigurationFactory
             $testFramework,
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
-            self::retrieveTestFrameworkExtraOptions($testFrameworkOptions, $schema, $testFramework),
+            self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema, $testFramework),
             self::retrieveExistingCoveragePath(
                 self::retrieveExistingCoverageBasePath($existingCoveragePath, $configDir, $namespacedTmpDir),
                 $testFramework
@@ -227,11 +227,11 @@ class ConfigurationFactory
     }
 
     private static function retrieveTestFrameworkExtraOptions(
-        ?string $testFrameworkOptions,
+        ?string $testFrameworkExtraOptions,
         SchemaConfiguration $schema,
         string $testFramework
     ): TestFrameworkExtraOptions {
-        $extraOptions = $testFrameworkOptions ?? $schema->getTestFrameworkOptions();
+        $extraOptions = $testFrameworkExtraOptions ?? $schema->getTestFrameworkExtraOptions();
 
         return TestFrameworkTypes::PHPUNIT === $testFramework
             ? new PhpUnitExtraOptions($extraOptions)

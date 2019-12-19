@@ -120,7 +120,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?float $inputMinCoveredMsi,
         string $inputMutators,
         ?string $inputTestFramework,
-        ?string $inputTestFrameworkOptions,
+        ?string $inputTestFrameworkExtraOptions,
         string $inputFilter,
         int $expectedTimeout,
         array $expectedSourceDirectories,
@@ -133,7 +133,7 @@ final class ConfigurationFactoryTest extends TestCase
         string $expectedTestFramework,
         ?string $expectedBootstrap,
         ?string $expectedInitialTestsPhpOptions,
-        TestFrameworkExtraOptions $expectedTestFrameworkOptions,
+        TestFrameworkExtraOptions $expectedTestFrameworkExtraOptions,
         string $expectedExistingCoveragePath,
         bool $expectedDebug,
         bool $expectedOnlyCovered,
@@ -159,7 +159,7 @@ final class ConfigurationFactoryTest extends TestCase
             $inputMinCoveredMsi,
             $inputMutators,
             $inputTestFramework,
-            $inputTestFrameworkOptions,
+            $inputTestFrameworkExtraOptions,
             $inputFilter
         );
 
@@ -176,7 +176,7 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedTestFramework,
             $expectedBootstrap,
             $expectedInitialTestsPhpOptions,
-            $expectedTestFrameworkOptions,
+            $expectedTestFrameworkExtraOptions,
             normalizePath($expectedExistingCoveragePath),
             $expectedDebug,
             $expectedOnlyCovered,
@@ -1036,9 +1036,9 @@ final class ConfigurationFactoryTest extends TestCase
 
     private static function createValueForTestFrameworkExtraOptions(
         string $configTestFramework,
-        ?string $configTestsFrameworkExtraOptions,
-        ?string $inputTestsFrameworkExtraOptions,
-        TestFrameworkExtraOptions $expectedTestFrameworkOptions,
+        ?string $configTestFrameworkExtraOptions,
+        ?string $inputTestFrameworkExtraOptions,
+        TestFrameworkExtraOptions $expectedTestFrameworkExtraOptions,
         string $expectedCoveragePath
     ): array {
         return [
@@ -1059,7 +1059,7 @@ final class ConfigurationFactoryTest extends TestCase
                 $configTestFramework,
                 null,
                 null,
-                $configTestsFrameworkExtraOptions
+                $configTestFrameworkExtraOptions
             ),
             null,
             null,
@@ -1074,7 +1074,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             null,
-            $inputTestsFrameworkExtraOptions,
+            $inputTestFrameworkExtraOptions,
             '',
             10,
             [],
@@ -1093,7 +1093,7 @@ final class ConfigurationFactoryTest extends TestCase
             $configTestFramework,
             null,
             null,
-            $expectedTestFrameworkOptions,
+            $expectedTestFrameworkExtraOptions,
             $expectedCoveragePath,
             false,
             false,
@@ -1108,7 +1108,7 @@ final class ConfigurationFactoryTest extends TestCase
 
     private static function createValueForTestFrameworkKey(
         string $configTestFramework,
-        string $inputTestsFrameworkOptions,
+        string $inputTestFrameworkExtraOptions,
         TestFrameworkExtraOptions $expectedTestFrameworkExtraOptions,
         string $expectedCoveragePath
     ): array {
@@ -1145,7 +1145,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             '',
             null,
-            $inputTestsFrameworkOptions,
+            $inputTestFrameworkExtraOptions,
             '',
             10,
             [],

@@ -56,7 +56,7 @@ final class SchemaConfiguration
     private $testFramework;
     private $bootstrap;
     private $initialTestsPhpOptions;
-    private $testFrameworkOptions;
+    private $testFrameworkExtraOptions;
 
     public function __construct(
         string $file,
@@ -69,7 +69,7 @@ final class SchemaConfiguration
         ?string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
-        ?string $testFrameworkOptions
+        ?string $testFrameworkExtraOptions
     ) {
         Assert::nullOrGreaterThanEq($timeout, 1);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
@@ -84,7 +84,7 @@ final class SchemaConfiguration
         $this->testFramework = $testFramework;
         $this->bootstrap = $bootstrap;
         $this->initialTestsPhpOptions = $initialTestsPhpOptions;
-        $this->testFrameworkOptions = $testFrameworkOptions;
+        $this->testFrameworkExtraOptions = $testFrameworkExtraOptions;
     }
 
     public function getFile(): string
@@ -137,8 +137,8 @@ final class SchemaConfiguration
         return $this->initialTestsPhpOptions;
     }
 
-    public function getTestFrameworkOptions(): ?string
+    public function getTestFrameworkExtraOptions(): ?string
     {
-        return $this->testFrameworkOptions;
+        return $this->testFrameworkExtraOptions;
     }
 }

@@ -59,7 +59,7 @@ final class SchemaConfigurationTest extends TestCase
         ?string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
-        ?string $testFrameworkOptions
+        ?string $testFrameworkExtraOptions
     ): void {
         $config = new SchemaConfiguration(
             $path,
@@ -72,7 +72,7 @@ final class SchemaConfigurationTest extends TestCase
             $testFramework,
             $bootstrap,
             $initialTestsPhpOptions,
-            $testFrameworkOptions
+            $testFrameworkExtraOptions
         );
 
         $this->assertSame($path, $config->getFile());
@@ -85,7 +85,7 @@ final class SchemaConfigurationTest extends TestCase
         $this->assertSame($testFramework, $config->getTestFramework());
         $this->assertSame($bootstrap, $config->getBootstrap());
         $this->assertSame($initialTestsPhpOptions, $config->getInitialTestsPhpOptions());
-        $this->assertSame($testFrameworkOptions, $config->getTestFrameworkOptions());
+        $this->assertSame($testFrameworkExtraOptions, $config->getTestFrameworkExtraOptions());
     }
 
     public function valueProvider(): Generator
