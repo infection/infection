@@ -40,7 +40,9 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\Tests\Fixtures\Mutator\Fake;
+use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkExtraOptions;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -63,11 +65,11 @@ final class ConfigurationTest extends TestCase
         string $tmpDir,
         PhpUnit $phpUnit,
         array $mutators,
-        ?string $testFramework,
+        string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
-        ?string $testFrameworkOptions,
-        string $existingCoverageBasePath,
+        TestFrameworkExtraOptions $testFrameworkExtraOptions,
+        string $existingCoveragePath,
         bool $debug,
         bool $onlyCovered,
         string $formatter,
@@ -89,8 +91,8 @@ final class ConfigurationTest extends TestCase
             $testFramework,
             $bootstrap,
             $initialTestsPhpOptions,
-            $testFrameworkOptions,
-            $existingCoverageBasePath,
+            $testFrameworkExtraOptions,
+            $existingCoveragePath,
             $debug,
             $onlyCovered,
             $formatter,
@@ -114,8 +116,8 @@ final class ConfigurationTest extends TestCase
             $testFramework,
             $bootstrap,
             $initialTestsPhpOptions,
-            $testFrameworkOptions,
-            $existingCoverageBasePath,
+            $testFrameworkExtraOptions,
+            $existingCoveragePath,
             $debug,
             $onlyCovered,
             $formatter,
@@ -144,10 +146,10 @@ final class ConfigurationTest extends TestCase
             '',
             new PhpUnit(null, null),
             [],
+            'phpunit',
             null,
             null,
-            null,
-            null,
+            new DummyTestFrameworkExtraOptions(),
             '',
             false,
             false,
@@ -182,7 +184,7 @@ final class ConfigurationTest extends TestCase
             'phpunit',
             'bin/bootstrap.php',
             '-d zend_extension=xdebug.so',
-            '--debug',
+            new DummyTestFrameworkExtraOptions(),
             'coverage/',
             true,
             true,

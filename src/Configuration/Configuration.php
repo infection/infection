@@ -38,6 +38,7 @@ namespace Infection\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Mutator\Util\Mutator;
+use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -70,8 +71,8 @@ class Configuration
     private $testFramework;
     private $bootstrap;
     private $initialTestsPhpOptions;
-    private $testFrameworkOptions;
-    private $existingCoverageBasePath;
+    private $testFrameworkExtraOptions;
+    private $existingCoveragePath;
     private $debug;
     private $onlyCovered;
     private $formatter;
@@ -95,11 +96,11 @@ class Configuration
         string $tmpDir,
         PhpUnit $phpUnit,
         array $mutators,
-        ?string $testFramework,
+        string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
-        ?string $testFrameworkOptions,
-        string $existingCoverageBasePath,
+        TestFrameworkExtraOptions $testFrameworkExtraOptions,
+        string $existingCoveragePath,
         bool $debug,
         bool $onlyCovered,
         string $formatter,
@@ -129,8 +130,8 @@ class Configuration
         $this->testFramework = $testFramework;
         $this->bootstrap = $bootstrap;
         $this->initialTestsPhpOptions = $initialTestsPhpOptions;
-        $this->testFrameworkOptions = $testFrameworkOptions;
-        $this->existingCoverageBasePath = $existingCoverageBasePath;
+        $this->testFrameworkExtraOptions = $testFrameworkExtraOptions;
+        $this->existingCoveragePath = $existingCoveragePath;
         $this->debug = $debug;
         $this->onlyCovered = $onlyCovered;
         $this->formatter = $formatter;
@@ -190,7 +191,7 @@ class Configuration
         return $this->mutators;
     }
 
-    public function getTestFramework(): ?string
+    public function getTestFramework(): string
     {
         return $this->testFramework;
     }
@@ -205,14 +206,14 @@ class Configuration
         return $this->initialTestsPhpOptions;
     }
 
-    public function getTestFrameworkOptions(): ?string
+    public function getTestFrameworkExtraOptions(): TestFrameworkExtraOptions
     {
-        return $this->testFrameworkOptions;
+        return $this->testFrameworkExtraOptions;
     }
 
-    public function getExistingCoverageBasePath(): string
+    public function getExistingCoveragePath(): string
     {
-        return $this->existingCoverageBasePath;
+        return $this->existingCoveragePath;
     }
 
     public function isDebugEnabled(): bool

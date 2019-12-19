@@ -33,36 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework;
 
-use function array_key_exists;
+use function get_class;
+use Infection\TestFramework\TestFrameworkExtraOptions;
 
-/**
- * @internal
- * @final
- */
-class CachedTestFileDataProvider implements TestFileDataProvider
+trait TestFrameworkExtraOptionsAssertions
 {
-    private $testFileDataProvider;
-
-    /**
-     * @var array<string, TestFileTimeData>
-     */
-    private $testFileInfoCache = [];
-
-    public function __construct(TestFileDataProvider $testFileDataProvider)
-    {
-        $this->testFileDataProvider = $testFileDataProvider;
-    }
-
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
-    {
-        if (array_key_exists($fullyQualifiedClassName, $this->testFileInfoCache)) {
-            return $this->testFileInfoCache[$fullyQualifiedClassName];
-        }
-
-        return $this->testFileInfoCache[$fullyQualifiedClassName] = $this->testFileDataProvider->getTestFileInfo(
-            $fullyQualifiedClassName
-        );
+    private function assertTestFrameworkExtraOptionsStateIs(
+        TestFrameworkExtraOptions $extraOptions,
+        TestFrameworkExtraOptions $expectedExtraOptions
+    ): void {
+        $this->assertSame(get_class($expectedExtraOptions), get_class($extraOptions));
+        $this->assertSame($expectedExtraOptions->getForInitialProcess(), $extraOptions->getForInitialProcess());
+        $this->assertSame($expectedExtraOptions->getForMutantProcess(), $extraOptions->getForMutantProcess());
     }
 }

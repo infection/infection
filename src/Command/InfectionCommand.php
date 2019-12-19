@@ -64,15 +64,11 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
-use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\HasExtraNodeVisitors;
-use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
-use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
-use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -122,7 +118,7 @@ final class InfectionCommand extends BaseCommand
     /**
      * @var TestFrameworkExtraOptions
      */
-    private $testFrameworkOptions;
+    private $testFrameworkExtraOptions;
 
     /**
      * @var VersionParser
@@ -303,8 +299,8 @@ final class InfectionCommand extends BaseCommand
 
         $fileSystem->mkdir($config->getTmpDir());
 
-        $this->testFrameworkKey = $config->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
-        $this->testFrameworkOptions = $this->getTestFrameworkExtraOptions($this->testFrameworkKey);
+        $this->testFrameworkKey = $config->getTestFramework();
+        $this->testFrameworkExtraOptions = $config->getTestFrameworkExtraOptions();
 
         /** @var Factory $testFrameworkFactory */
         $testFrameworkFactory = $this->container['test.framework.factory'];
@@ -332,7 +328,7 @@ final class InfectionCommand extends BaseCommand
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
 
         $initialTestSuitProcess = $initialTestsRunner->run(
-            $this->testFrameworkOptions->getForInitialProcess(),
+            $this->testFrameworkExtraOptions->getForInitialProcess(),
             $this->skipCoverage,
             explode(' ', (string) $config->getInitialTestsPhpOptions())
         );
@@ -355,14 +351,15 @@ final class InfectionCommand extends BaseCommand
 
         $processBuilder = new MutantProcessBuilder($adapter, $this->versionParser, $config->getProcessTimeout());
 
-        $codeCoverageData = $this->getCodeCoverageData($this->testFrameworkKey, $adapter);
+        /** @var XMLLineCodeCoverageFactory $codeCoverageFactory */
+        $codeCoverageFactory = $this->container[XMLLineCodeCoverageFactory::class];
 
         /** @var FileMutationGenerator $fileMutationGenerator */
         $fileMutationGenerator = $this->container[FileMutationGenerator::class];
 
         $mutationGenerator = new MutationGenerator(
             $config->getSourceFiles(),
-            $codeCoverageData,
+            $codeCoverageFactory->create($this->testFrameworkKey, $adapter),
             $config->getMutators(),
             $this->eventDispatcher,
             $fileMutationGenerator
@@ -389,7 +386,7 @@ final class InfectionCommand extends BaseCommand
 
         $mutationTestingRunner->run(
             (int) $this->input->getOption('threads'),
-            $this->testFrameworkOptions->getForMutantProcess()
+            $this->testFrameworkExtraOptions->getForMutantProcess()
         );
     }
 
@@ -434,7 +431,7 @@ final class InfectionCommand extends BaseCommand
 
         $coverage = trim((string) $input->getOption('coverage'));
         $testFramework = trim((string) $this->input->getOption('test-framework'));
-        $testFrameworkOptions = trim((string) $this->input->getOption('test-framework-options'));
+        $testFrameworkExtraOptions = trim((string) $this->input->getOption('test-framework-options'));
         $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options'));
 
         $minMsi = $input->getOption('min-msi');
@@ -464,7 +461,7 @@ final class InfectionCommand extends BaseCommand
             null === $minMsi ? null : (float) $minMsi,
             null === $minCoveredMsi ? null : (float) $minCoveredMsi,
             '' === $testFramework ? null : $testFramework,
-            '' === $testFrameworkOptions ? null : $testFrameworkOptions,
+            '' === $testFrameworkExtraOptions ? null : $testFrameworkExtraOptions,
             trim((string) $input->getOption('filter'))
         );
     }
@@ -484,33 +481,6 @@ final class InfectionCommand extends BaseCommand
         (static function (string $infectionBootstrapFile): void {
             require_once $infectionBootstrapFile;
         })($bootstrap);
-    }
-
-    private function getCodeCoverageData(string $testFrameworkKey, TestFrameworkAdapter $adapter): LineCodeCoverage
-    {
-        /** @var string $coverageDir */
-        $coverageDir = $this->container[sprintf('coverage.dir.%s', $testFrameworkKey)];
-
-        /** @var CachedTestFileDataProvider $cachedTestFileDataProvider */
-        $cachedTestFileDataProvider = $this->container[CachedTestFileDataProvider::class];
-
-        $testFileDataProviderService = $adapter->hasJUnitReport()
-            ? $cachedTestFileDataProvider
-            : null;
-
-        return new XMLLineCodeCoverage($coverageDir, new CoverageXmlParser($coverageDir), $testFrameworkKey, $testFileDataProviderService);
-    }
-
-    private function getTestFrameworkExtraOptions(string $testFrameworkKey): TestFrameworkExtraOptions
-    {
-        /** @var Configuration $config */
-        $config = $this->container[Configuration::class];
-
-        $extraOptions = $config->getTestFrameworkOptions();
-
-        return TestFrameworkTypes::PHPUNIT === $testFrameworkKey
-            ? new PhpUnitExtraOptions($extraOptions)
-            : new PhpSpecExtraOptions($extraOptions);
     }
 
     private function runConfigurationCommand(Locator $locator): void
@@ -539,8 +509,10 @@ final class InfectionCommand extends BaseCommand
 
     private function assertCodeCoverageExists(Process $initialTestsProcess, string $testFrameworkKey): void
     {
-        /** @var string $coverageDir */
-        $coverageDir = $this->container[sprintf('coverage.dir.%s', $testFrameworkKey)];
+        /** @var Configuration $config */
+        $config = $this->container[Configuration::class];
+
+        $coverageDir = $config->getExistingCoveragePath();
 
         $coverageIndexFilePath = $coverageDir . '/' . XMLLineCodeCoverage::COVERAGE_INDEX_FILE_NAME;
 

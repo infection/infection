@@ -71,10 +71,11 @@ use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
-use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\Utils\VersionParser;
 use function php_ini_loaded_file;
@@ -87,6 +88,7 @@ use function Safe\getcwd;
 use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Filesystem\Filesystem;
+use Webmozart\PathUtil\Path;
 
 /**
  * @internal
@@ -103,44 +105,36 @@ final class InfectionContainer extends Container
             TmpDirProvider::class => static function (): TmpDirProvider {
                 return new TmpDirProvider();
             },
-            'coverage.dir.phpunit' => static function (self $container) {
-                /** @var Configuration $config */
-                $config = $container[Configuration::class];
-
-                return sprintf(
-                    '%s/%s',
-                    $config->getExistingCoverageBasePath(),
-                    XMLLineCodeCoverage::PHP_UNIT_COVERAGE_DIR
-                );
-            },
-            'coverage.dir.phpspec' => static function (self $container) {
-                /** @var Configuration $config */
-                $config = $container[Configuration::class];
-
-                return sprintf(
-                    '%s/%s',
-                    $config->getExistingCoverageBasePath(),
-                    XMLLineCodeCoverage::PHP_SPEC_COVERAGE_DIR
-                );
-            },
-            'coverage.dir.codeception' => static function (self $container) {
-                /** @var Configuration $config */
-                $config = $container[Configuration::class];
-
-                return sprintf(
-                    '%s/%s',
-                    $config->getExistingCoverageBasePath(),
-                    XMLLineCodeCoverage::CODECEPTION_COVERAGE_DIR
-                );
-            },
             'junit.file.path' => static function (self $container) {
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
                 return sprintf(
                     '%s/%s',
-                    $config->getExistingCoverageBasePath(),
+                    Path::canonicalize($config->getExistingCoveragePath() . '/..'),
                     TestFrameworkAdapter::JUNIT_FILE_NAME
+                );
+            },
+            CoverageXmlParser::class => static function (self $container): CoverageXmlParser {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                return new CoverageXmlParser($config->getExistingCoveragePath());
+            },
+            XMLLineCodeCoverageFactory::class => static function (self $container): XMLLineCodeCoverageFactory {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                /** @var CoverageXmlParser $coverageXmlParser */
+                $coverageXmlParser = $container[CoverageXmlParser::class];
+
+                /** @var CachedTestFileDataProvider $cachedTestFileDataProvider */
+                $cachedTestFileDataProvider = $container[CachedTestFileDataProvider::class];
+
+                return new XMLLineCodeCoverageFactory(
+                    $config->getExistingCoveragePath(),
+                    $coverageXmlParser,
+                    $cachedTestFileDataProvider
                 );
             },
             RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
@@ -327,7 +321,7 @@ final class InfectionContainer extends Container
                 $config = $container[Configuration::class];
 
                 return new CoverageRequirementChecker(
-                    (string) $config->getExistingCoverageBasePath() !== '',
+                    $config->getExistingCoveragePath() !== '',
                     $config->getInitialTestsPhpOptions() ?? ''
                 );
             },
@@ -424,7 +418,7 @@ final class InfectionContainer extends Container
         ?float $minMsi,
         ?float $minCoveredMsi,
         ?string $testFramework,
-        ?string $testFrameworkOptions,
+        ?string $testFrameworkExtraOptions,
         string $filter
     ): self {
         $clone = clone $this;
@@ -454,7 +448,7 @@ final class InfectionContainer extends Container
             $minCoveredMsi,
             $mutatorsInput,
             $testFramework,
-            $testFrameworkOptions,
+            $testFrameworkExtraOptions,
             $filter
         ): Configuration {
             /** @var ConfigurationFactory $configurationFactory */
@@ -478,7 +472,7 @@ final class InfectionContainer extends Container
                 $minCoveredMsi,
                 $mutatorsInput,
                 $testFramework,
-                $testFrameworkOptions,
+                $testFrameworkExtraOptions,
                 $filter
             );
         };

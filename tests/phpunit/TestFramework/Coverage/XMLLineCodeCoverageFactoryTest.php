@@ -33,36 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage;
 
-use function array_key_exists;
+use Generator;
+use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverageFactory;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\TestFrameworkTypes;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- * @final
- */
-class CachedTestFileDataProvider implements TestFileDataProvider
+final class XMLLineCodeCoverageFactoryTest extends TestCase
 {
-    private $testFileDataProvider;
-
     /**
-     * @var array<string, TestFileTimeData>
+     * @dataProvider valueProvider
      */
-    private $testFileInfoCache = [];
+    public function test_it_can_create_an_XMLLine_code_coverage_instance(
+        string $frameworkKey,
+        bool $jUnitReport
+    ): void {
+        $adapter = $this->createMock(TestFrameworkAdapter::class);
+        $adapter
+            ->expects($this->once())
+            ->method('hasJUnitReport')
+            ->willReturn($jUnitReport)
+        ;
 
-    public function __construct(TestFileDataProvider $testFileDataProvider)
-    {
-        $this->testFileDataProvider = $testFileDataProvider;
+        // We cannot test much of the generated instance here since it does not exposes any state.
+        // We can only ensure that an instance is created in all scenarios
+        (new XMLLineCodeCoverageFactory(
+            '/path/to/coverage/dir',
+            $this->createMock(CoverageXmlParser::class),
+            $this->createMock(CachedTestFileDataProvider::class)
+        ))->create($frameworkKey, $adapter);
+
+        $this->addToAssertionCount(1);
     }
 
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
+    public function valueProvider(): Generator
     {
-        if (array_key_exists($fullyQualifiedClassName, $this->testFileInfoCache)) {
-            return $this->testFileInfoCache[$fullyQualifiedClassName];
+        foreach (TestFrameworkTypes::TYPES as $frameworkKey) {
+            foreach ([true, false] as $jUnitReport) {
+                yield [$frameworkKey, $jUnitReport];
+            }
         }
-
-        return $this->testFileInfoCache[$fullyQualifiedClassName] = $this->testFileDataProvider->getTestFileInfo(
-            $fullyQualifiedClassName
-        );
     }
 }
