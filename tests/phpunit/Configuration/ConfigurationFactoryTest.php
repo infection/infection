@@ -897,11 +897,9 @@ final class ConfigurationFactoryTest extends TestCase
     private static function createValueForTestFramework(
         ?string $configTestFramework,
         ?string $inputTestFramework,
-        ?string $expectedTestFramework,
-        // We are passing this expected result because we cannot do otherwise but it is not the
-        // element under test in this scenario hence "resulting" instead of "expected"
-        TestFrameworkExtraOptions $resultingTestFrameworkExtraOptions,
-        ?string $expectedCoveragePath
+        string $expectedTestFramework,
+        TestFrameworkExtraOptions $expectedTestFrameworkExtraOptions,
+        string $expectedCoveragePath
     ): array {
         return [
             new SchemaConfiguration(
