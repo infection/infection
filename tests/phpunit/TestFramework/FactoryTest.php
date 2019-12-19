@@ -36,14 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework;
 
 use Infection\Configuration\Configuration;
-use Infection\Configuration\Entry\Logs;
-use Infection\Configuration\Entry\PhpUnit;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
-use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkExtraOptions;
 use Infection\Utils\VersionParser;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -59,35 +56,7 @@ final class FactoryTest extends TestCase
             $this->createMock(TestFrameworkConfigLocatorInterface::class),
             new XmlConfigurationHelper(new PathReplacer(new Filesystem()), ''),
             '',
-            new Configuration(
-                10,
-                [],
-                [],
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ),
-                'default',
-                '',
-                new PhpUnit(null, null),
-                [],
-                'phpunit',
-                null,
-                null,
-                new DummyTestFrameworkExtraOptions(),
-                '',
-                false,
-                false,
-                'dot',
-                false,
-                false,
-                null,
-                false,
-                null
-            ),
+            $this->createMock(Configuration::class),
             $this->createMock(VersionParser::class),
             $this->createMock(Filesystem::class),
             new CommandLineBuilder()
