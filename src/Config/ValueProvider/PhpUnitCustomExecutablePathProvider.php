@@ -51,18 +51,8 @@ use Symfony\Component\Console\Question\Question;
  */
 final class PhpUnitCustomExecutablePathProvider
 {
-    /**
-     * @var TestFrameworkFinder
-     */
     private $phpUnitExecutableFinder;
-    /**
-     * @var ConsoleHelper
-     */
     private $consoleHelper;
-
-    /**
-     * @var QuestionHelper
-     */
     private $questionHelper;
 
     public function __construct(TestFrameworkFinder $phpUnitExecutableFinder, ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)

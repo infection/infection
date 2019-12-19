@@ -13,7 +13,6 @@ proc configure {input} {
 
 configure "directories do you want to include"
 configure "Any directories to exclude from"
-configure "timeout in seconds"
 configure "text log file?"
 
 expect "Please note that some mutants will inevitably be harmless"

@@ -37,12 +37,20 @@ namespace Infection\Configuration;
 
 use function array_fill_keys;
 use function dirname;
+use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
-use function sprintf;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
+use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
+use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
+use Infection\TestFramework\TestFrameworkExtraOptions;
+use Infection\TestFramework\TestFrameworkTypes;
+use function Safe\sprintf;
 use function sys_get_temp_dir;
+use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
 
 /**
@@ -51,18 +59,32 @@ use Webmozart\PathUtil\Path;
  */
 class ConfigurationFactory
 {
+    /**
+     * Default allowed timeout (on a test basis) in seconds
+     */
+    private const DEFAULT_TIMEOUT = 10;
+
+    private const TEST_FRAMEWORK_COVERAGE_DIRECTORY = [
+        TestFrameworkTypes::PHPUNIT => XMLLineCodeCoverage::PHP_UNIT_COVERAGE_DIR,
+        TestFrameworkTypes::PHPSPEC => XMLLineCodeCoverage::PHP_SPEC_COVERAGE_DIR,
+        TestFrameworkTypes::CODECEPTION => XMLLineCodeCoverage::CODECEPTION_COVERAGE_DIR,
+    ];
+
     private $tmpDirProvider;
     private $mutatorFactory;
     private $mutatorParser;
+    private $sourceFileCollector;
 
     public function __construct(
         TmpDirProvider $tmpDirProvider,
         MutatorFactory $mutatorFactory,
-        MutatorParser $mutatorParser
+        MutatorParser $mutatorParser,
+        SourceFileCollector $sourceFileCollector
     ) {
         $this->tmpDirProvider = $tmpDirProvider;
         $this->mutatorFactory = $mutatorFactory;
         $this->mutatorParser = $mutatorParser;
+        $this->sourceFileCollector = $sourceFileCollector;
     }
 
     public function create(
@@ -80,37 +102,29 @@ class ConfigurationFactory
         ?float $minCoveredMsi,
         string $mutatorsInput,
         ?string $testFramework,
-        ?string $testFrameworkOptions
+        ?string $testFrameworkExtraOptions,
+        string $filter
     ): Configuration {
         $configDir = dirname($schema->getFile());
 
-        $tmpDir = (string) $schema->getTmpDir();
-
-        if ('' === $tmpDir) {
-            $tmpDir = sys_get_temp_dir();
-        } elseif (!Path::isAbsolute($tmpDir)) {
-            $tmpDir = sprintf('%s/%s', $configDir, $tmpDir);
-        }
-
-        $phpUnitConfigDir = $schema->getPhpUnit()->getConfigDir();
-
-        if (null === $phpUnitConfigDir) {
-            $schema->getPhpUnit()->setConfigDir($configDir);
-        } elseif (!Path::isAbsolute($phpUnitConfigDir)) {
-            $schema->getPhpUnit()->setConfigDir(sprintf(
-                '%s/%s', $configDir, $phpUnitConfigDir
-            ));
-        }
-
         $schemaMutators = $schema->getMutators();
 
+        $namespacedTmpDir = $this->retrieveTmpDir($schema, $configDir);
+
+        $testFramework = $testFramework ?? $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
+
         return new Configuration(
-            $schema->getTimeout() ?? 10,
-            $schema->getSource(),
+            $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
+            $schema->getSource()->getDirectories(),
+            $this->sourceFileCollector->collectFiles(
+                $schema->getSource()->getDirectories(),
+                $schema->getSource()->getExcludes(),
+                $filter
+            ),
             $schema->getLogs(),
             $logVerbosity,
-            $this->tmpDirProvider->providePath($tmpDir),
-            $schema->getPhpUnit(),
+            $namespacedTmpDir,
+            $this->retrievePhpUnit($schema, $configDir),
             $this->mutatorFactory->create(
                 $this->retrieveMutators(
                     $schemaMutators === []
@@ -119,11 +133,14 @@ class ConfigurationFactory
                     $mutatorsInput
                 )
             ),
-            $testFramework ?? $schema->getTestFramework(),
+            $testFramework,
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
-            $testFrameworkOptions ?? $schema->getTestFrameworkOptions(),
-            $existingCoveragePath,
+            self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema, $testFramework),
+            self::retrieveExistingCoveragePath(
+                self::retrieveExistingCoverageBasePath($existingCoveragePath, $configDir, $namespacedTmpDir),
+                $testFramework
+            ),
             $debug,
             $onlyCovered,
             $formatter,
@@ -135,6 +152,69 @@ class ConfigurationFactory
         );
     }
 
+    private function retrieveTmpDir(
+        SchemaConfiguration $schema,
+        string $configDir
+    ): string {
+        $tmpDir = (string) $schema->getTmpDir();
+
+        if ('' === $tmpDir) {
+            $tmpDir = sys_get_temp_dir();
+        } elseif (!Path::isAbsolute($tmpDir)) {
+            $tmpDir = sprintf('%s/%s', $configDir, $tmpDir);
+        }
+
+        return $this->tmpDirProvider->providePath($tmpDir);
+    }
+
+    private function retrievePhpUnit(SchemaConfiguration $schema, string $configDir): PhpUnit
+    {
+        $phpUnit = clone $schema->getPhpUnit();
+
+        $phpUnitConfigDir = $phpUnit->getConfigDir();
+
+        if (null === $phpUnitConfigDir) {
+            $phpUnit->setConfigDir($configDir);
+        } elseif (!Path::isAbsolute($phpUnitConfigDir)) {
+            $phpUnit->setConfigDir(sprintf(
+                '%s/%s', $configDir, $phpUnitConfigDir
+            ));
+        }
+
+        return $phpUnit;
+    }
+
+    private static function retrieveExistingCoveragePath(
+        string $existingCoverageBasePath,
+        string $testFramework
+    ): string {
+        Assert::keyExists(self::TEST_FRAMEWORK_COVERAGE_DIRECTORY, $testFramework);
+
+        return sprintf(
+            '%s/%s',
+            $existingCoverageBasePath,
+            self::TEST_FRAMEWORK_COVERAGE_DIRECTORY[$testFramework]
+        );
+    }
+
+    private static function retrieveExistingCoverageBasePath(
+        ?string $existingCoveragePath,
+        string $configDir,
+        string $tmpDir
+    ): string {
+        Assert::nullOrStringNotEmpty($existingCoveragePath);
+
+        if ($existingCoveragePath === null) {
+            return $tmpDir;
+        }
+
+        if (Path::isAbsolute($existingCoveragePath)) {
+            return $existingCoveragePath;
+        }
+
+        return sprintf('%s/%s', $configDir, $existingCoveragePath);
+    }
+
     private function retrieveMutators(array $schemaMutators, string $mutatorsInput): array
     {
         $parsedMutatorsInput = $this->mutatorParser->parse($mutatorsInput);
@@ -144,5 +224,18 @@ class ConfigurationFactory
         }
 
         return array_fill_keys($parsedMutatorsInput, true);
+    }
+
+    private static function retrieveTestFrameworkExtraOptions(
+        ?string $testFrameworkExtraOptions,
+        SchemaConfiguration $schema,
+        string $testFramework
+    ): TestFrameworkExtraOptions {
+        $extraOptions = $testFrameworkExtraOptions ?? $schema->getTestFrameworkExtraOptions();
+
+        return TestFrameworkTypes::PHPUNIT === $testFramework
+            ? new PhpUnitExtraOptions($extraOptions)
+            : new PhpSpecExtraOptions($extraOptions)
+        ;
     }
 }

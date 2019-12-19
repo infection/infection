@@ -48,24 +48,9 @@ final class BadgeLogger implements MutationTestingResultsLogger
     public const ENV_INFECTION_BADGE_API_KEY = 'INFECTION_BADGE_API_KEY';
     public const ENV_STRYKER_DASHBOARD_API_KEY = 'STRYKER_DASHBOARD_API_KEY';
 
-    /**
-     * @var BadgeApiClient
-     */
     private $badgeApiClient;
-
-    /**
-     * @var MetricsCalculator
-     */
     private $metricsCalculator;
-
-    /**
-     * @var stdClass
-     */
     private $config;
-
-    /**
-     * @var OutputInterface
-     */
     private $output;
 
     public function __construct(OutputInterface $output, BadgeApiClient $badgeApiClient, MetricsCalculator $metricsCalculator, stdClass $config)

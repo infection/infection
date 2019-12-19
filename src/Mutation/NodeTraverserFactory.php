@@ -33,52 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config\ValueProvider;
+namespace Infection\Mutation;
 
-use Infection\Config\ConsoleHelper;
-use Infection\Config\InfectionConfig;
-use RuntimeException;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
+use Infection\Visitor\FullyQualifiedClassNameVisitor;
+use Infection\Visitor\NotMutableIgnoreVisitor;
+use Infection\Visitor\ParentConnectorVisitor;
+use Infection\Visitor\ReflectionVisitor;
+use PhpParser\NodeVisitor;
 
 /**
  * @internal
+ * @final
  */
-final class TimeoutProvider
+class NodeTraverserFactory
 {
     /**
-     * @var ConsoleHelper
+     * @param NodeVisitor[] $extraVisitors
      */
-    private $consoleHelper;
-
-    /**
-     * @var QuestionHelper
-     */
-    private $questionHelper;
-
-    public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
+    public function create(array $extraVisitors): PriorityNodeTraverser
     {
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
-    }
+        $traverser = new PriorityNodeTraverser();
 
-    public function get(InputInterface $input, OutputInterface $output)
-    {
-        $output->writeln(['']);
+        $traverser->addVisitor(new NotMutableIgnoreVisitor(), 50);
+        $traverser->addVisitor(new ParentConnectorVisitor(), 40);
+        $traverser->addVisitor(new FullyQualifiedClassNameVisitor(), 30);
+        $traverser->addVisitor(new ReflectionVisitor(), 20);
 
-        $questionText = $this->consoleHelper->getQuestion('Single test suite timeout in seconds', InfectionConfig::PROCESS_TIMEOUT_SECONDS);
+        foreach ($extraVisitors as $priority => $visitor) {
+            $traverser->addVisitor($visitor, $priority);
+        }
 
-        $timeoutQuestion = new Question($questionText, InfectionConfig::PROCESS_TIMEOUT_SECONDS);
-        $timeoutQuestion->setValidator(static function ($answer) {
-            if (!$answer || !is_numeric($answer) || (int) $answer <= 0) {
-                throw new RuntimeException('Timeout should be an integer greater than 0');
-            }
-
-            return (int) $answer;
-        });
-
-        return $this->questionHelper->ask($input, $output, $timeoutQuestion);
+        return $traverser;
     }
 }

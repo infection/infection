@@ -33,23 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Traverser;
+namespace Infection\Mutation;
 
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use Webmozart\Assert\Assert;
+use PhpParser\Node;
+use PhpParser\Parser;
+use Symfony\Component\Finder\SplFileInfo;
+use Throwable;
 
 /**
  * @internal
+ * @final
  */
-final class PriorityNodeTraverser extends NodeTraverser
+class FileParser
 {
-    public function addVisitor(NodeVisitor $visitor, int $priority = 1): void
+    private $parser;
+
+    public function __construct(Parser $parser)
     {
-        Assert::keyNotExists($this->visitors, $priority, sprintf('Priority %d is already used', $priority));
+        $this->parser = $parser;
+    }
 
-        $this->visitors[$priority] = $visitor;
+    /**
+     * @throws UnparsableFile
+     *
+     * @return Node[]
+     */
+    public function parse(SplFileInfo $fileInfo): array
+    {
+        try {
+            return $this->parser->parse($fileInfo->getContents());
+        } catch (Throwable $throwable) {
+            $filePath = false === $fileInfo->getRealPath()
+                ? $fileInfo->getPathname()
+                : $fileInfo->getRealPath()
+            ;
 
-        krsort($this->visitors);
+            throw UnparsableFile::fromInvalidFile($filePath, $throwable);
+        }
     }
 }

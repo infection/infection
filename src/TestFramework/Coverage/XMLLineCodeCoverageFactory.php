@@ -33,74 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Finder;
+namespace Infection\TestFramework\Coverage;
 
-use Infection\Finder\Iterator\RealPathFilterIterator;
-use Iterator;
-use Symfony\Component\Finder\Finder;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\TestFrameworkTypes;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class SourceFilesFinder extends Finder
+final class XMLLineCodeCoverageFactory
 {
-    /**
-     * @var string[]
-     */
-    private $sourceDirectories;
+    private $coverageDir;
+    private $coverageXmlParser;
+    private $cachedTestFileDataProvider;
 
-    /**
-     * @var string[]
-     */
-    private $excludeDirectories;
-
-    /**
-     * @var string[]
-     */
-    private $filters = [];
-
-    public function __construct(array $sourceDirectories, array $excludeDirectories)
-    {
-        parent::__construct();
-
-        $this->sourceDirectories = $sourceDirectories;
-        $this->excludeDirectories = $excludeDirectories;
+    public function __construct(
+        string $coverageDir,
+        CoverageXmlParser $coverageXmlParser,
+        CachedTestFileDataProvider $cachedTestFileDataProvider
+    ) {
+        $this->coverageDir = $coverageDir;
+        $this->coverageXmlParser = $coverageXmlParser;
+        $this->cachedTestFileDataProvider = $cachedTestFileDataProvider;
     }
 
-    public function getSourceFiles(string $filter = ''): Finder
-    {
-        foreach ($this->excludeDirectories as $excludeDirectory) {
-            $this->notPath($excludeDirectory);
-        }
+    public function create(
+        string $testFrameworkKey,
+        TestFrameworkAdapter $adapter
+    ): XMLLineCodeCoverage {
+        Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
 
-        $this->in($this->sourceDirectories)->files();
+        $testFileDataProviderService = $adapter->hasJUnitReport()
+            ? $this->cachedTestFileDataProvider
+            : null
+        ;
 
-        if ('' === $filter) {
-            $this->name('*.php');
-
-            return $this;
-        }
-
-        $filters = array_filter(explode(',', $filter));
-
-        foreach ($filters as $filter) {
-            $this->filters[] = $filter;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return RealPathFilterIterator|(iterable<\Symfony\Component\Finder\SplFileInfo>&Iterator)
-     */
-    public function getIterator()
-    {
-        $iterator = parent::getIterator();
-
-        if ($this->filters) {
-            $iterator = new RealPathFilterIterator($iterator, $this->filters, []);
-        }
-
-        return $iterator;
+        return new XMLLineCodeCoverage(
+            $this->coverageDir,
+            $this->coverageXmlParser,
+            $testFrameworkKey,
+            $testFileDataProviderService
+        );
     }
 }

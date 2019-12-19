@@ -47,9 +47,6 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class MutatorVisitor extends NodeVisitorAbstract
 {
-    /**
-     * @var MutationInterface
-     */
     private $mutation;
 
     public function __construct(MutationInterface $mutation)

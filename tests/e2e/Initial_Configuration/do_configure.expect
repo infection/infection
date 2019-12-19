@@ -13,7 +13,6 @@ proc configure { input value } {
 
 configure "directories do you want to include" "1\r"
 configure "Any directories to exclude from" "\r"
-configure "timeout in seconds" "\r"
 configure "text log file?" "\r"
 
 expect {

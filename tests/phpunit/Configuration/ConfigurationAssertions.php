@@ -35,34 +35,41 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
+use function array_map;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
+use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\Tests\Configuration\Entry\LogsAssertions;
 use Infection\Tests\Configuration\Entry\PhpUnitAssertions;
-use Infection\Tests\Configuration\Entry\SourceAssertions;
+use Infection\Tests\TestFramework\TestFrameworkExtraOptionsAssertions;
+use Symfony\Component\Finder\SplFileInfo;
 
 trait ConfigurationAssertions
 {
     use LogsAssertions;
     use PhpUnitAssertions;
-    use SourceAssertions;
+    use TestFrameworkExtraOptionsAssertions;
 
+    /**
+     * @param string[]      $expectedSourceDirectories
+     * @param SplFileInfo[] $expectedSourceFiles
+     */
     private function assertConfigurationStateIs(
         Configuration $configuration,
         ?int $expectedTimeout,
-        Source $expectedSource,
+        array $expectedSourceDirectories,
+        array $expectedSourceFiles,
         Logs $expectedLogs,
         string $expectedLogVerbosity,
         string $expectedTmpDir,
         PhpUnit $expectedPhpUnit,
         array $expectedMutators,
-        ?string $expectedTestFramework,
+        string $expectedTestFramework,
         ?string $expectedBootstrap,
         ?string $expectedInitialTestsPhpOptions,
-        ?string $expectedTestFrameworkOptions,
-        ?string $expectedExistingCoveragePath,
+        TestFrameworkExtraOptions $expectedTestFrameworkExtraOptions,
+        string $expectedExistingCoveragePath,
         bool $expectedDebug,
         bool $expectedOnlyCovered,
         string $expectedFormatter,
@@ -73,10 +80,10 @@ trait ConfigurationAssertions
         ?float $expectedMinCoveredMsi
     ): void {
         $this->assertSame($expectedTimeout, $configuration->getProcessTimeout());
-        $this->assertSourceStateIs(
-            $configuration->getSource(),
-            $expectedSource->getDirectories(),
-            $expectedSource->getExcludes()
+        $this->assertSame($expectedSourceDirectories, $configuration->getSourceDirectories());
+        $this->assertSame(
+            self::normalizePaths($expectedSourceFiles),
+            self::normalizePaths($configuration->getSourceFiles())
         );
         $this->assertLogsStateIs(
             $configuration->getLogs(),
@@ -97,7 +104,10 @@ trait ConfigurationAssertions
         $this->assertSame($expectedTestFramework, $configuration->getTestFramework());
         $this->assertSame($expectedBootstrap, $configuration->getBootstrap());
         $this->assertSame($expectedInitialTestsPhpOptions, $configuration->getInitialTestsPhpOptions());
-        $this->assertSame($expectedTestFrameworkOptions, $configuration->getTestFrameworkOptions());
+        $this->assertTestFrameworkExtraOptionsStateIs(
+            $expectedTestFrameworkExtraOptions,
+            $configuration->getTestFrameworkExtraOptions()
+        );
         $this->assertSame($expectedExistingCoveragePath, $configuration->getExistingCoveragePath());
         $this->assertSame($expectedDebug, $configuration->isDebugEnabled());
         $this->assertSame($expectedOnlyCovered, $configuration->mutateOnlyCoveredCode());
@@ -107,5 +117,20 @@ trait ConfigurationAssertions
         $this->assertSame($expectedMinMsi, $configuration->getMinMsi());
         $this->assertSame($expectedShowMutations, $configuration->showMutations());
         $this->assertSame($expectedMinCoveredMsi, $configuration->getMinCoveredMsi());
+    }
+
+    /**
+     * @param SplFileInfo[] $fileInfos
+     *
+     * @return string[]
+     */
+    private static function normalizePaths(array $fileInfos): array
+    {
+        return array_map(
+            static function (SplFileInfo $fileInfo): string {
+                return $fileInfo->getPathname();
+            },
+            $fileInfos
+        );
     }
 }

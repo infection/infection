@@ -37,9 +37,10 @@ namespace Infection\Configuration;
 
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
 use Infection\Mutator\Util\Mutator;
+use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
+use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
@@ -60,7 +61,8 @@ class Configuration
     ];
 
     private $timeout;
-    private $source;
+    private $sourceDirectories;
+    private $sourceFiles;
     private $logs;
     private $logVerbosity;
     private $tmpDir;
@@ -69,7 +71,7 @@ class Configuration
     private $testFramework;
     private $bootstrap;
     private $initialTestsPhpOptions;
-    private $testFrameworkOptions;
+    private $testFrameworkExtraOptions;
     private $existingCoveragePath;
     private $debug;
     private $onlyCovered;
@@ -81,21 +83,24 @@ class Configuration
     private $minCoveredMsi;
 
     /**
+     * @param string[]               $sourceDirectories
+     * @param SplFileInfo[]          $sourceFiles
      * @param array<string, Mutator> $mutators
      */
     public function __construct(
         int $timeout,
-        Source $source,
+        array $sourceDirectories,
+        array $sourceFiles,
         Logs $logs,
         string $logVerbosity,
         string $tmpDir,
         PhpUnit $phpUnit,
         array $mutators,
-        ?string $testFramework,
+        string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
-        ?string $testFrameworkOptions,
-        ?string $existingCoveragePath,
+        TestFrameworkExtraOptions $testFrameworkExtraOptions,
+        string $existingCoveragePath,
         bool $debug,
         bool $onlyCovered,
         string $formatter,
@@ -106,6 +111,8 @@ class Configuration
         ?float $minCoveredMsi
     ) {
         Assert::nullOrGreaterThanEq($timeout, 1);
+        Assert::allString($sourceDirectories);
+        Assert::allIsInstanceOf($sourceFiles, SplFileInfo::class);
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
@@ -113,7 +120,8 @@ class Configuration
         Assert::nullOrGreaterThanEq($minMsi, 0.);
 
         $this->timeout = $timeout;
-        $this->source = $source;
+        $this->sourceDirectories = $sourceDirectories;
+        $this->sourceFiles = $sourceFiles;
         $this->logs = $logs;
         $this->logVerbosity = $logVerbosity;
         $this->tmpDir = $tmpDir;
@@ -122,7 +130,7 @@ class Configuration
         $this->testFramework = $testFramework;
         $this->bootstrap = $bootstrap;
         $this->initialTestsPhpOptions = $initialTestsPhpOptions;
-        $this->testFrameworkOptions = $testFrameworkOptions;
+        $this->testFrameworkExtraOptions = $testFrameworkExtraOptions;
         $this->existingCoveragePath = $existingCoveragePath;
         $this->debug = $debug;
         $this->onlyCovered = $onlyCovered;
@@ -139,9 +147,20 @@ class Configuration
         return $this->timeout;
     }
 
-    public function getSource(): Source
+    /**
+     * @return string[]
+     */
+    public function getSourceDirectories(): array
     {
-        return $this->source;
+        return $this->sourceDirectories;
+    }
+
+    /**
+     * @return SplFileInfo[]
+     */
+    public function getSourceFiles(): array
+    {
+        return $this->sourceFiles;
     }
 
     public function getLogs(): Logs
@@ -172,7 +191,7 @@ class Configuration
         return $this->mutators;
     }
 
-    public function getTestFramework(): ?string
+    public function getTestFramework(): string
     {
         return $this->testFramework;
     }
@@ -187,12 +206,12 @@ class Configuration
         return $this->initialTestsPhpOptions;
     }
 
-    public function getTestFrameworkOptions(): ?string
+    public function getTestFrameworkExtraOptions(): TestFrameworkExtraOptions
     {
-        return $this->testFrameworkOptions;
+        return $this->testFrameworkExtraOptions;
     }
 
-    public function getExistingCoveragePath(): ?string
+    public function getExistingCoveragePath(): string
     {
         return $this->existingCoveragePath;
     }

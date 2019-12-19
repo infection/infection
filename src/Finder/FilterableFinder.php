@@ -33,26 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant\Exception;
+namespace Infection\Finder;
 
-use Exception;
-use SplFileInfo;
-use Throwable;
+use Infection\Finder\Iterator\RealPathFilterIterator;
+use Iterator;
+use Symfony\Component\Finder\Finder;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class ParserException extends Exception
+final class FilterableFinder extends Finder
 {
-    public static function fromInvalidFile(SplFileInfo $file, Throwable $original): self
+    /**
+     * @var string[]
+     */
+    private $filters = [];
+
+    /**
+     * @param string[] $files
+     */
+    public function filterFiles(array $files): void
     {
-        return new self(
-            sprintf(
-                'Unable to parse file "%s", most likely due to syntax errors.',
-                $file->getRealPath()
-            ),
-            0,
-            $original
-        );
+        Assert::allString($files);
+
+        $this->filters = $files;
+    }
+
+    /**
+     * @return RealPathFilterIterator|(iterable<\Symfony\Component\Finder\SplFileInfo>&Iterator)
+     */
+    public function getIterator(): Iterator
+    {
+        $iterator = parent::getIterator();
+
+        if ($this->filters) {
+            $iterator = new RealPathFilterIterator($iterator, $this->filters, []);
+        }
+
+        return $iterator;
     }
 }

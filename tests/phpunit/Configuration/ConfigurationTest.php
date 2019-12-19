@@ -40,9 +40,11 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
+use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\Tests\Fixtures\Mutator\Fake;
+use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkExtraOptions;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Finder\SplFileInfo;
 
 final class ConfigurationTest extends TestCase
 {
@@ -50,20 +52,24 @@ final class ConfigurationTest extends TestCase
 
     /**
      * @dataProvider valueProvider
+     *
+     * @param string[]      $sourceDirectories
+     * @param SplFileInfo[] $sourceFiles
      */
     public function test_it_can_be_instantiated(
         ?int $timeout,
-        Source $source,
+        array $sourceDirectories,
+        array $sourceFiles,
         Logs $logs,
         string $logVerbosity,
         string $tmpDir,
         PhpUnit $phpUnit,
         array $mutators,
-        ?string $testFramework,
+        string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
-        ?string $testFrameworkOptions,
-        ?string $existingCoveragePath,
+        TestFrameworkExtraOptions $testFrameworkExtraOptions,
+        string $existingCoveragePath,
         bool $debug,
         bool $onlyCovered,
         string $formatter,
@@ -75,7 +81,8 @@ final class ConfigurationTest extends TestCase
     ): void {
         $config = new Configuration(
             $timeout,
-            $source,
+            $sourceDirectories,
+            $sourceFiles,
             $logs,
             $logVerbosity,
             $tmpDir,
@@ -84,7 +91,7 @@ final class ConfigurationTest extends TestCase
             $testFramework,
             $bootstrap,
             $initialTestsPhpOptions,
-            $testFrameworkOptions,
+            $testFrameworkExtraOptions,
             $existingCoveragePath,
             $debug,
             $onlyCovered,
@@ -99,7 +106,8 @@ final class ConfigurationTest extends TestCase
         $this->assertConfigurationStateIs(
             $config,
             $timeout,
-            $source,
+            $sourceDirectories,
+            $sourceFiles,
             $logs,
             $logVerbosity,
             $tmpDir,
@@ -108,7 +116,7 @@ final class ConfigurationTest extends TestCase
             $testFramework,
             $bootstrap,
             $initialTestsPhpOptions,
-            $testFrameworkOptions,
+            $testFrameworkExtraOptions,
             $existingCoveragePath,
             $debug,
             $onlyCovered,
@@ -123,9 +131,10 @@ final class ConfigurationTest extends TestCase
 
     public function valueProvider(): Generator
     {
-        yield [
+        yield 'empty' => [
             10,
-            new Source([], []),
+            [],
+            [],
             new Logs(
                 null,
                 null,
@@ -137,11 +146,11 @@ final class ConfigurationTest extends TestCase
             '',
             new PhpUnit(null, null),
             [],
+            'phpunit',
             null,
             null,
-            null,
-            null,
-            null,
+            new DummyTestFrameworkExtraOptions(),
+            '',
             false,
             false,
             'progress',
@@ -152,9 +161,13 @@ final class ConfigurationTest extends TestCase
             null,
         ];
 
-        yield [
-            10,
-            new Source(['src', 'lib'], ['fixtures', 'tests']),
+        yield 'nominal' => [
+            1,
+            ['src', 'lib'],
+            [
+                new SplFileInfo('Foo.php', 'Foo.php', 'Foo.php'),
+                new SplFileInfo('Bar.php', 'Bar.php', 'Bar.php'),
+            ],
             new Logs(
                 'text.log',
                 'summary.log',
@@ -171,7 +184,7 @@ final class ConfigurationTest extends TestCase
             'phpunit',
             'bin/bootstrap.php',
             '-d zend_extension=xdebug.so',
-            '--debug',
+            new DummyTestFrameworkExtraOptions(),
             'coverage/',
             true,
             true,

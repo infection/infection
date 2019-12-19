@@ -43,9 +43,6 @@ use DOMXPath;
  */
 final class JUnitTestFileDataProvider implements TestFileDataProvider
 {
-    /**
-     * @var string
-     */
     private $jUnitFilePath;
 
     /**

@@ -50,9 +50,6 @@ final class ConsoleOutput
     private const CI_FLAG_ERROR = 'The minimum required %s percentage should be %s%%, but actual is %s%%. Improve your tests!';
     private const MIN_MSI_CAN_GET_INCREASED_NOTICE = 'The %s is %s%% percent points over the required %s. Consider increasing the required %s percentage the next time you run infection.';
 
-    /**
-     * @var SymfonyStyle
-     */
     private $io;
 
     public function __construct(SymfonyStyle $io)

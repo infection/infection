@@ -46,14 +46,7 @@ use Symfony\Component\Process\Process;
  */
 class InitialTestRunProcessBuilder
 {
-    /**
-     * @var TestFrameworkAdapter
-     */
     private $testFrameworkAdapter;
-
-    /**
-     * @var VersionParser
-     */
     private $versionParser;
 
     public function __construct(TestFrameworkAdapter $testFrameworkAdapter, VersionParser $versionParser)

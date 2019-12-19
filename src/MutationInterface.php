@@ -48,6 +48,9 @@ interface MutationInterface
 {
     public function getMutator(): Mutator;
 
+    /**
+     * @return (string|int|float)[]   $attributes
+     */
     public function getAttributes(): array;
 
     public function getOriginalFilePath(): string;
@@ -56,6 +59,9 @@ interface MutationInterface
 
     public function getHash(): string;
 
+    /**
+     * @return Node[]
+     */
     public function getOriginalFileAst(): array;
 
     /**

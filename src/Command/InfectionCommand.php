@@ -37,8 +37,8 @@ namespace Infection\Command;
 
 use function dirname;
 use Exception;
-use Infection\Config\InfectionConfig;
 use Infection\Configuration\Configuration;
+use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Exception\InfectionException;
@@ -50,21 +50,25 @@ use Infection\Events\ApplicationExecutionStarted;
 use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\Locator\Locator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
-use Infection\Mutant\Generator\MutationsGenerator;
+use Infection\Mutant\MetricsCalculator;
+use Infection\Mutant\MutantCreator;
+use Infection\Mutation\FileMutationGenerator;
+use Infection\Mutation\MutationGenerator;
+use Infection\Performance\Limiter\MemoryLimiter;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
+use Infection\Process\Builder\SubscriberBuilder;
+use Infection\Process\Coverage\CoverageRequirementChecker;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
+use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
-use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverageFactory;
+use Infection\TestFramework\Factory;
 use Infection\TestFramework\HasExtraNodeVisitors;
-use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
-use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
-use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -114,7 +118,7 @@ final class InfectionCommand extends BaseCommand
     /**
      * @var TestFrameworkExtraOptions
      */
-    private $testFrameworkOptions;
+    private $testFrameworkExtraOptions;
 
     /**
      * @var VersionParser
@@ -259,9 +263,10 @@ final class InfectionCommand extends BaseCommand
 
         $this->initContainer($input);
 
+        /** @var RootsFileOrDirectoryLocator $locator */
         $locator = $this->container[RootsFileOrDirectoryLocator::class];
 
-        if ($customConfigPath = $input->getOption('configuration')) {
+        if ($customConfigPath = (string) $input->getOption('configuration')) {
             $locator->locate($customConfigPath);
         } else {
             $this->runConfigurationCommand($locator);
@@ -277,7 +282,10 @@ final class InfectionCommand extends BaseCommand
     {
         Assert::notNull($this->container);
 
-        if (!$this->container['coverage.checker']->hasDebuggerOrCoverageOption()) {
+        /** @var CoverageRequirementChecker $coverageChecker */
+        $coverageChecker = $this->container['coverage.checker'];
+
+        if (!$coverageChecker->hasDebuggerOrCoverageOption()) {
             throw CoverageDoesNotExistException::unableToGenerate();
         }
 
@@ -291,13 +299,19 @@ final class InfectionCommand extends BaseCommand
 
         $fileSystem->mkdir($config->getTmpDir());
 
-        $this->testFrameworkKey = $config->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
-        $this->testFrameworkOptions = $this->getTestFrameworkExtraOptions($this->testFrameworkKey);
-        $adapter = $this->container['test.framework.factory']->create($this->testFrameworkKey, $this->skipCoverage);
+        $this->testFrameworkKey = $config->getTestFramework();
+        $this->testFrameworkExtraOptions = $config->getTestFrameworkExtraOptions();
+
+        /** @var Factory $testFrameworkFactory */
+        $testFrameworkFactory = $this->container['test.framework.factory'];
+
+        $adapter = $testFrameworkFactory->create($this->testFrameworkKey, $this->skipCoverage);
 
         LogVerbosity::convertVerbosityLevel($this->input, $this->consoleOutput);
 
-        $this->container['subscriber.builder']->registerSubscribers($adapter, $this->output);
+        /** @var SubscriberBuilder $subscriberBuilder */
+        $subscriberBuilder = $this->container['subscriber.builder'];
+        $subscriberBuilder->registerSubscribers($adapter, $this->output);
 
         $this->eventDispatcher->dispatch(new ApplicationExecutionStarted());
 
@@ -314,7 +328,7 @@ final class InfectionCommand extends BaseCommand
         $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
 
         $initialTestSuitProcess = $initialTestsRunner->run(
-            $this->testFrameworkOptions->getForInitialProcess(),
+            $this->testFrameworkExtraOptions->getForInitialProcess(),
             $this->skipCoverage,
             explode(' ', (string) $config->getInitialTestsPhpOptions())
         );
@@ -325,7 +339,9 @@ final class InfectionCommand extends BaseCommand
 
         $this->assertCodeCoverageExists($initialTestSuitProcess, $this->testFrameworkKey);
 
-        $this->container['memory.limit.applier']->applyMemoryLimitFromProcess($initialTestSuitProcess, $adapter);
+        /** @var MemoryLimiter $memoryLimitApplier */
+        $memoryLimitApplier = $this->container['memory.limit.applier'];
+        $memoryLimitApplier->applyMemoryLimitFromProcess($initialTestSuitProcess, $adapter);
     }
 
     private function runMutationTesting(TestFrameworkAdapter $adapter): void
@@ -335,33 +351,42 @@ final class InfectionCommand extends BaseCommand
 
         $processBuilder = new MutantProcessBuilder($adapter, $this->versionParser, $config->getProcessTimeout());
 
-        $codeCoverageData = $this->getCodeCoverageData($this->testFrameworkKey, $adapter);
-        $mutationsGenerator = new MutationsGenerator(
-            $config->getSource()->getDirectories(),
-            $config->getSource()->getExcludes(),
-            $codeCoverageData,
+        /** @var XMLLineCodeCoverageFactory $codeCoverageFactory */
+        $codeCoverageFactory = $this->container[XMLLineCodeCoverageFactory::class];
+
+        /** @var FileMutationGenerator $fileMutationGenerator */
+        $fileMutationGenerator = $this->container[FileMutationGenerator::class];
+
+        $mutationGenerator = new MutationGenerator(
+            $config->getSourceFiles(),
+            $codeCoverageFactory->create($this->testFrameworkKey, $adapter),
             $config->getMutators(),
             $this->eventDispatcher,
-            $this->container['parser']
+            $fileMutationGenerator
         );
 
-        $mutations = $mutationsGenerator->generate(
-            $this->input->getOption('only-covered'),
-            $this->input->getOption('filter'),
+        $mutations = $mutationGenerator->generate(
+            $config->mutateOnlyCoveredCode(),
             $adapter instanceof HasExtraNodeVisitors ? $adapter->getMutationsCollectionNodeVisitors() : []
         );
 
+        /** @var ParallelProcessRunner $parallelProcessRunner */
+        $parallelProcessRunner = $this->container['parallel.process.runner'];
+
+        /** @var MutantCreator $mutantCreator */
+        $mutantCreator = $this->container['mutant.creator'];
+
         $mutationTestingRunner = new MutationTestingRunner(
             $processBuilder,
-            $this->container['parallel.process.runner'],
-            $this->container['mutant.creator'],
+            $parallelProcessRunner,
+            $mutantCreator,
             $this->eventDispatcher,
             $mutations
         );
 
         $mutationTestingRunner->run(
             (int) $this->input->getOption('threads'),
-            $this->testFrameworkOptions->getForMutantProcess()
+            $this->testFrameworkExtraOptions->getForMutantProcess()
         );
     }
 
@@ -370,9 +395,12 @@ final class InfectionCommand extends BaseCommand
         /** @var TestRunConstraintChecker $constraintChecker */
         $constraintChecker = $this->container['test.run.constraint.checker'];
 
+        /** @var MetricsCalculator $metricsCalculator */
+        $metricsCalculator = $this->container['metrics'];
+
         if (!$constraintChecker->hasTestRunPassedConstraints()) {
             $this->consoleOutput->logBadMsiErrorMessage(
-                $this->container['metrics'],
+                $metricsCalculator,
                 $constraintChecker->getMinRequiredValue(),
                 $constraintChecker->getErrorType()
             );
@@ -382,7 +410,7 @@ final class InfectionCommand extends BaseCommand
 
         if ($constraintChecker->isActualOverRequired()) {
             $this->consoleOutput->logMinMsiCanGetIncreasedNotice(
-                $this->container['metrics'],
+                $metricsCalculator,
                 $constraintChecker->getMinRequiredValue(),
                 $constraintChecker->getActualOverRequiredType()
             );
@@ -403,7 +431,7 @@ final class InfectionCommand extends BaseCommand
 
         $coverage = trim((string) $input->getOption('coverage'));
         $testFramework = trim((string) $this->input->getOption('test-framework'));
-        $testFrameworkOptions = trim((string) $this->input->getOption('test-framework-options'));
+        $testFrameworkExtraOptions = trim((string) $this->input->getOption('test-framework-options'));
         $initialTestsPhpOptions = trim((string) $input->getOption('initial-tests-php-options'));
 
         $minMsi = $input->getOption('min-msi');
@@ -433,7 +461,8 @@ final class InfectionCommand extends BaseCommand
             null === $minMsi ? null : (float) $minMsi,
             null === $minCoveredMsi ? null : (float) $minCoveredMsi,
             '' === $testFramework ? null : $testFramework,
-            '' === $testFrameworkOptions ? null : $testFrameworkOptions
+            '' === $testFrameworkExtraOptions ? null : $testFrameworkExtraOptions,
+            trim((string) $input->getOption('filter'))
         );
     }
 
@@ -454,32 +483,13 @@ final class InfectionCommand extends BaseCommand
         })($bootstrap);
     }
 
-    private function getCodeCoverageData(string $testFrameworkKey, TestFrameworkAdapter $adapter): LineCodeCoverage
-    {
-        $coverageDir = $this->container[sprintf('coverage.dir.%s', $testFrameworkKey)];
-        $testFileDataProviderService = $adapter->hasJUnitReport()
-            ? $this->container[CachedTestFileDataProvider::class]
-            : null;
-
-        return new XMLLineCodeCoverage($coverageDir, new CoverageXmlParser($coverageDir), $testFrameworkKey, $testFileDataProviderService);
-    }
-
-    private function getTestFrameworkExtraOptions(string $testFrameworkKey): TestFrameworkExtraOptions
-    {
-        /** @var Configuration $config */
-        $config = $this->container[Configuration::class];
-
-        $extraOptions = $config->getTestFrameworkOptions();
-
-        return TestFrameworkTypes::PHPUNIT === $testFrameworkKey
-            ? new PhpUnitExtraOptions($extraOptions)
-            : new PhpSpecExtraOptions($extraOptions);
-    }
-
     private function runConfigurationCommand(Locator $locator): void
     {
         try {
-            $locator->locateOneOf(InfectionConfig::POSSIBLE_CONFIG_FILE_NAMES);
+            $locator->locateOneOf([
+                SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
+                SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
+            ]);
         } catch (Exception $e) {
             $configureCommand = $this->getApplication()->find('configure');
 
@@ -499,7 +509,10 @@ final class InfectionCommand extends BaseCommand
 
     private function assertCodeCoverageExists(Process $initialTestsProcess, string $testFrameworkKey): void
     {
-        $coverageDir = $this->container[sprintf('coverage.dir.%s', $testFrameworkKey)];
+        /** @var Configuration $config */
+        $config = $this->container[Configuration::class];
+
+        $coverageDir = $config->getExistingCoveragePath();
 
         $coverageIndexFilePath = $coverageDir . '/' . XMLLineCodeCoverage::COVERAGE_INDEX_FILE_NAME;
 

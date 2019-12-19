@@ -63,49 +63,14 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class Factory
 {
-    /**
-     * @var string
-     */
     private $tmpDir;
-
-    /**
-     * @var XmlConfigurationHelper
-     */
     private $xmlConfigurationHelper;
-
-    /**
-     * @var TestFrameworkConfigLocatorInterface
-     */
     private $configLocator;
-
-    /**
-     * @var string
-     */
     private $projectDir;
-
-    /**
-     * @var string
-     */
     private $jUnitFilePath;
-
-    /**
-     * @var Configuration
-     */
     private $infectionConfig;
-
-    /**
-     * @var VersionParser
-     */
     private $versionParser;
-
-    /**
-     * @var Filesystem
-     */
     private $filesystem;
-
-    /**
-     * @var CommandLineBuilder
-     */
     private $commandLineBuilder;
 
     public function __construct(
@@ -146,7 +111,7 @@ final class Factory
                     $phpUnitConfigContent,
                     $this->xmlConfigurationHelper,
                     $this->jUnitFilePath,
-                    $this->infectionConfig->getSource()->getDirectories(),
+                    $this->infectionConfig->getSourceDirectories(),
                     $skipCoverage
                 ),
                 new MutationConfigBuilder($this->tmpDir, $phpUnitConfigContent, $this->xmlConfigurationHelper, $this->projectDir, new JUnitTestCaseSorter()),
@@ -184,7 +149,7 @@ final class Factory
                 $this->tmpDir,
                 $this->projectDir,
                 $codeceptionConfigContentParsed,
-                $this->infectionConfig->getSource()->getDirectories()
+                $this->infectionConfig->getSourceDirectories()
             );
         }
 

@@ -104,6 +104,7 @@ final class InfectionContainerTest extends TestCase
             .0,
             .0,
             'phpunit',
+            '',
             ''
         );
 

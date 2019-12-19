@@ -33,9 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Traverser;
+namespace Infection\Tests\Mutation;
 
-use Infection\Traverser\PriorityNodeTraverser;
+use Infection\Mutation\PriorityNodeTraverser;
 use InvalidArgumentException;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
@@ -43,7 +43,7 @@ use PHPUnit\Framework\TestCase;
 
 final class PriorityNodeTraverserTest extends TestCase
 {
-    public function test_it_sorts_visitors_by_priorites(): void
+    public function test_it_sorts_visitors_by_priorities(): void
     {
         $traverser = new PriorityNodeTraverser();
 
@@ -59,7 +59,7 @@ final class PriorityNodeTraverserTest extends TestCase
         $this->assertSame([30, 20, 10, 5], $callOrder);
     }
 
-    public function test_it_does_not_allow_duplicater_priorities(): void
+    public function test_it_does_not_allow_duplicated_priorities(): void
     {
         $traverser = new PriorityNodeTraverser();
 

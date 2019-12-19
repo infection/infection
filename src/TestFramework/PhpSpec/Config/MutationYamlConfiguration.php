@@ -42,12 +42,9 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class MutationYamlConfiguration extends AbstractYamlConfiguration
 {
-    /**
-     * @var string
-     */
     private $customAutoloadFilePath;
 
-    public function __construct($tmpDir, array $parsedYaml, string $customAutoloadFilePath)
+    public function __construct(string $tmpDir, array $parsedYaml, string $customAutoloadFilePath)
     {
         parent::__construct($tmpDir, $parsedYaml);
 

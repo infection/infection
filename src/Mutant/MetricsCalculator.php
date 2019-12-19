@@ -43,10 +43,12 @@ use Infection\Process\MutantProcessInterface;
  */
 class MetricsCalculator
 {
-    /**
-     * @var int
-     */
     private $killedCount = 0;
+    private $errorCount = 0;
+    private $escapedCount = 0;
+    private $timedOutCount = 0;
+    private $notCoveredByTestsCount = 0;
+    private $totalMutantsCount = 0;
 
     /**
      * @var MutantProcessInterface[]
@@ -54,19 +56,9 @@ class MetricsCalculator
     private $killedMutantProcesses = [];
 
     /**
-     * @var int
-     */
-    private $errorCount = 0;
-
-    /**
      * @var MutantProcessInterface[]
      */
     private $errorProcesses = [];
-
-    /**
-     * @var int
-     */
-    private $escapedCount = 0;
 
     /**
      * @var MutantProcessInterface[]
@@ -74,29 +66,14 @@ class MetricsCalculator
     private $escapedMutantProcesses = [];
 
     /**
-     * @var int
-     */
-    private $timedOutCount = 0;
-
-    /**
      * @var MutantProcessInterface[]
      */
     private $timedOutProcesses = [];
 
     /**
-     * @var int
-     */
-    private $notCoveredByTestsCount = 0;
-
-    /**
      * @var MutantProcessInterface[]
      */
     private $notCoveredMutantProcesses = [];
-
-    /**
-     * @var int
-     */
-    private $totalMutantsCount = 0;
 
     /**
      * Build a metric calculator with a sub-set of mutators

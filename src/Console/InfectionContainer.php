@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use function array_filter;
-use function getcwd;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfiguration;
@@ -48,11 +47,16 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\EventDispatcher\EventDispatcher;
 use Infection\EventDispatcher\EventDispatcherInterface;
+use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Locator\RootsFileLocator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
+use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
+use Infection\Mutation\FileMutationGenerator;
+use Infection\Mutation\FileParser;
+use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Performance\Limiter\MemoryLimiter;
@@ -68,10 +72,11 @@ use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
-use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\Utils\VersionParser;
 use function php_ini_loaded_file;
@@ -80,9 +85,11 @@ use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use Pimple\Container;
+use function Safe\getcwd;
 use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Filesystem\Filesystem;
+use Webmozart\PathUtil\Path;
 
 /**
  * @internal
@@ -99,28 +106,36 @@ final class InfectionContainer extends Container
             TmpDirProvider::class => static function (): TmpDirProvider {
                 return new TmpDirProvider();
             },
-            'coverage.dir.phpunit' => static function (self $container) {
-                return sprintf(
-                    '%s/%s',
-                    $container['coverage.path'],
-                    XMLLineCodeCoverage::PHP_UNIT_COVERAGE_DIR
-                );
-            },
-            'coverage.dir.phpspec' => static function (self $container) {
-                return sprintf(
-                    '%s/%s',
-                    $container['coverage.path'],
-                    XMLLineCodeCoverage::PHP_SPEC_COVERAGE_DIR
-                );
-            },
-            'coverage.dir.codeception' => static function (self $container) {
-                return sprintf('%s/%s', $container['coverage.path'], XMLLineCodeCoverage::CODECEPTION_COVERAGE_DIR);
-            },
             'junit.file.path' => static function (self $container) {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
                 return sprintf(
                     '%s/%s',
-                    $container['coverage.path'],
+                    Path::canonicalize($config->getExistingCoveragePath() . '/..'),
                     TestFrameworkAdapter::JUNIT_FILE_NAME
+                );
+            },
+            CoverageXmlParser::class => static function (self $container): CoverageXmlParser {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                return new CoverageXmlParser($config->getExistingCoveragePath());
+            },
+            XMLLineCodeCoverageFactory::class => static function (self $container): XMLLineCodeCoverageFactory {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                /** @var CoverageXmlParser $coverageXmlParser */
+                $coverageXmlParser = $container[CoverageXmlParser::class];
+
+                /** @var CachedTestFileDataProvider $cachedTestFileDataProvider */
+                $cachedTestFileDataProvider = $container[CachedTestFileDataProvider::class];
+
+                return new XMLLineCodeCoverageFactory(
+                    $config->getExistingCoveragePath(),
+                    $coverageXmlParser,
+                    $cachedTestFileDataProvider
                 );
             },
             RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
@@ -203,15 +218,24 @@ final class InfectionContainer extends Container
             VersionParser::class => static function (): VersionParser {
                 return new VersionParser();
             },
-            'lexer' => static function (): Lexer {
+            Lexer::class => static function (): Lexer {
                 return new Lexer\Emulative([
                     'usedAttributes' => [
                         'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
                     ],
                 ]);
             },
-            'parser' => static function (self $container): Parser {
-                return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $container['lexer']);
+            Parser::class => static function (self $container): Parser {
+                /** @var Lexer $lexer */
+                $lexer = $container[Lexer::class];
+
+                return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
+            },
+            FileParser::class => static function (self $container): FileParser {
+                /** @var Parser $phpParser */
+                $phpParser = $container[Parser::class];
+
+                return new FileParser($phpParser);
             },
             'pretty.printer' => static function (): Standard {
                 return new Standard();
@@ -229,25 +253,37 @@ final class InfectionContainer extends Container
                 return new MemoryFormatter();
             },
             'memory.limit.applier' => static function (self $container): MemoryLimiter {
-                return new MemoryLimiter($container['filesystem'], php_ini_loaded_file());
+                /** @var Filesystem $fileSystem */
+                $fileSystem = $container['filesystem'];
+
+                return new MemoryLimiter($fileSystem, php_ini_loaded_file());
             },
             SchemaConfigurationLoader::class => static function (self $container): SchemaConfigurationLoader {
-                return new SchemaConfigurationLoader(
-                    $container[RootsFileLocator::class],
-                    $container[SchemaConfigurationFileLoader::class]
-                );
+                /** @var RootsFileLocator $rootsFileLocator */
+                $rootsFileLocator = $container[RootsFileLocator::class];
+
+                /** @var SchemaConfigurationFileLoader $schemaConfigFileLoader */
+                $schemaConfigFileLoader = $container[SchemaConfigurationFileLoader::class];
+
+                return new SchemaConfigurationLoader($rootsFileLocator, $schemaConfigFileLoader);
             },
             RootsFileLocator::class => static function (self $container): RootsFileLocator {
-                return new RootsFileLocator(
-                    [$container['project.dir']],
-                    $container['filesystem']
-                );
+                /** @var string $projectDir */
+                $projectDir = $container['project.dir'];
+
+                /** @var Filesystem $fileSystem */
+                $fileSystem = $container['filesystem'];
+
+                return new RootsFileLocator([$projectDir], $fileSystem);
             },
             SchemaConfigurationFileLoader::class => static function (self $container): SchemaConfigurationFileLoader {
-                return new SchemaConfigurationFileLoader(
-                    $container[SchemaValidator::class],
-                    $container[SchemaConfigurationFactory::class]
-                );
+                /** @var SchemaValidator $schemaValidator */
+                $schemaValidator = $container[SchemaValidator::class];
+
+                /** @var SchemaConfigurationFactory $schemaConfigFactory */
+                $schemaConfigFactory = $container[SchemaConfigurationFactory::class];
+
+                return new SchemaConfigurationFileLoader($schemaValidator, $schemaConfigFactory);
             },
             SchemaValidator::class => static function (): SchemaValidator {
                 return new SchemaValidator();
@@ -258,15 +294,21 @@ final class InfectionContainer extends Container
             ConfigurationFactory::class => static function (self $container): ConfigurationFactory {
                 /** @var TmpDirProvider $tmpDirProvider */
                 $tmpDirProvider = $container[TmpDirProvider::class];
+
                 /** @var MutatorFactory $mutatorFactory */
                 $mutatorFactory = $container[MutatorFactory::class];
+
                 /** @var MutatorParser $mutatorParser */
                 $mutatorParser = $container[MutatorParser::class];
+
+                /** @var SourceFileCollector $sourceFileCollector */
+                $sourceFileCollector = $container[SourceFileCollector::class];
 
                 return new ConfigurationFactory(
                     $tmpDirProvider,
                     $mutatorFactory,
-                    $mutatorParser
+                    $mutatorParser,
+                    $sourceFileCollector
                 );
             },
             MutatorFactory::class => static function (): MutatorFactory {
@@ -275,27 +317,12 @@ final class InfectionContainer extends Container
             MutatorParser::class => static function (): MutatorParser {
                 return new MutatorParser();
             },
-            'coverage.path' => static function (self $container): string {
-                /** @var Configuration $config */
-                $config = $container[Configuration::class];
-
-                $existingCoveragePath = (string) $config->getExistingCoveragePath();
-
-                if ($existingCoveragePath === '') {
-                    return $config->getTmpDir();
-                }
-
-                return $container['filesystem']->isAbsolutePath($existingCoveragePath)
-                    ? $existingCoveragePath
-                    : sprintf('%s/%s', getcwd(), $existingCoveragePath)
-                ;
-            },
             'coverage.checker' => static function (self $container): CoverageRequirementChecker {
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
                 return new CoverageRequirementChecker(
-                    (string) $config->getExistingCoveragePath() !== '',
+                    $config->getExistingCoveragePath() !== '',
                     $config->getInitialTestsPhpOptions() ?? ''
                 );
             },
@@ -303,8 +330,11 @@ final class InfectionContainer extends Container
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
+                /** @var MetricsCalculator $metricsCalculator */
+                $metricsCalculator = $container['metrics'];
+
                 return new TestRunConstraintChecker(
-                    $container['metrics'],
+                    $metricsCalculator,
                     $config->ignoreMsiWithNoMutations(),
                     (float) $config->getMinMsi(),
                     (float) $config->getMinCoveredMsi()
@@ -314,26 +344,82 @@ final class InfectionContainer extends Container
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
+                /** @var LoggerFactory $loggerFactory */
+                $loggerFactory = $container[LoggerFactory::class];
+
+                /** @var MetricsCalculator $metricsCalculator */
+                $metricsCalculator = $container['metrics'];
+
+                /** @var EventDispatcherInterface $eventDispatcher */
+                $eventDispatcher = $container['dispatcher'];
+
+                /** @var DiffColorizer $diffColorizer */
+                $diffColorizer = $container['diff.colorizer'];
+
+                /** @var Filesystem $fileSystem */
+                $fileSystem = $container['filesystem'];
+
+                /** @var Timer $timer */
+                $timer = $container['timer'];
+
+                /** @var TimeFormatter $timeFormatter */
+                $timeFormatter = $container['time.formatter'];
+
+                /** @var MemoryFormatter $memoryFormatter */
+                $memoryFormatter = $container['memory.formatter'];
+
                 return new SubscriberBuilder(
                     $config->showMutations(),
-                    $config->getLogVerbosity(),
                     $config->isDebugEnabled(),
-                    $config->mutateOnlyCoveredCode(),
                     $config->getFormatter(),
                     $config->showProgress(),
-                    $container['metrics'],
-                    $container['dispatcher'],
-                    $container['diff.colorizer'],
+                    $metricsCalculator,
+                    $eventDispatcher,
+                    $diffColorizer,
                     $config,
-                    $container['filesystem'],
+                    $fileSystem,
                     $config->getTmpDir(),
-                    $container['timer'],
-                    $container['time.formatter'],
-                    $container['memory.formatter']
+                    $timer,
+                    $timeFormatter,
+                    $memoryFormatter,
+                    $loggerFactory
                 );
             },
             CommandLineBuilder::class => static function (): CommandLineBuilder {
                 return new CommandLineBuilder();
+            },
+            SourceFileCollector::class => static function (): SourceFileCollector {
+                return new SourceFileCollector();
+            },
+            NodeTraverserFactory::class => static function (): NodeTraverserFactory {
+                return new NodeTraverserFactory();
+            },
+            FileMutationGenerator::class => static function (self $container): FileMutationGenerator {
+                /** @var FileParser $fileParser */
+                $fileParser = $container[FileParser::class];
+
+                /** @var NodeTraverserFactory $nodeTraverserFactory */
+                $nodeTraverserFactory = $container[NodeTraverserFactory::class];
+
+                return new FileMutationGenerator($fileParser, $nodeTraverserFactory);
+            },
+            LoggerFactory::class => static function (self $container): LoggerFactory {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                /** @var MetricsCalculator $metricsCalculator */
+                $metricsCalculator = $container['metrics'];
+
+                /** @var Filesystem $fileSystem */
+                $fileSystem = $container['filesystem'];
+
+                return new LoggerFactory(
+                    $metricsCalculator,
+                    $fileSystem,
+                    $config->getLogVerbosity(),
+                    $config->isDebugEnabled(),
+                    $config->mutateOnlyCoveredCode()
+                );
             },
         ]);
     }
@@ -353,15 +439,19 @@ final class InfectionContainer extends Container
         ?float $minMsi,
         ?float $minCoveredMsi,
         ?string $testFramework,
-        ?string $testFrameworkOptions
+        ?string $testFrameworkExtraOptions,
+        string $filter
     ): self {
         $clone = clone $this;
 
         $clone[SchemaConfiguration::class] = static function (self $container) use ($configFile): SchemaConfiguration {
-            return $container[SchemaConfigurationLoader::class]->loadConfiguration(array_filter([
+            /** @var SchemaConfigurationLoader $schemaConfigLoader */
+            $schemaConfigLoader = $container[SchemaConfigurationLoader::class];
+
+            return $schemaConfigLoader->loadConfiguration(array_filter([
                 $configFile,
-                'infection.json.dist',
-                'infection.json',
+                SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
+                SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
             ]));
         };
 
@@ -379,13 +469,17 @@ final class InfectionContainer extends Container
             $minCoveredMsi,
             $mutatorsInput,
             $testFramework,
-            $testFrameworkOptions
+            $testFrameworkExtraOptions,
+            $filter
         ): Configuration {
             /** @var ConfigurationFactory $configurationFactory */
             $configurationFactory = $container[ConfigurationFactory::class];
 
+            /** @var SchemaConfiguration $schemaConfig */
+            $schemaConfig = $container[SchemaConfiguration::class];
+
             return $configurationFactory->create(
-                $container[SchemaConfiguration::class],
+                $schemaConfig,
                 $existingCoveragePath,
                 $initialTestsPhpOptions,
                 $logVerbosity,
@@ -399,7 +493,8 @@ final class InfectionContainer extends Container
                 $minCoveredMsi,
                 $mutatorsInput,
                 $testFramework,
-                $testFrameworkOptions
+                $testFrameworkExtraOptions,
+                $filter
             );
         };
 

@@ -37,13 +37,12 @@ namespace Infection\Command;
 
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
-use Infection\Config\InfectionConfig;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
 use Infection\Config\ValueProvider\PhpUnitCustomExecutablePathProvider;
 use Infection\Config\ValueProvider\SourceDirsProvider;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Config\ValueProvider\TextLogFileProvider;
-use Infection\Config\ValueProvider\TimeoutProvider;
+use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -54,6 +53,7 @@ use stdClass;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
@@ -114,10 +114,13 @@ final class ConfigureCommand extends BaseCommand
             return 1;
         }
 
+        /** @var Filesystem $fileSystem */
+        $fileSystem = $this->getApplication()->getContainer()['filesystem'];
+
         $excludeDirsProvider = new ExcludeDirsProvider(
             $consoleHelper,
             $questionHelper,
-            $this->getApplication()->getContainer()['filesystem']
+            $fileSystem
         );
 
         $excludedDirs = $excludeDirsProvider->get($input, $output, $dirsInCurrentDir, $sourceDirs);
@@ -129,19 +132,16 @@ final class ConfigureCommand extends BaseCommand
         $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $consoleHelper, $questionHelper);
         $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($input, $output);
 
-        $timeoutProvider = new TimeoutProvider($consoleHelper, $questionHelper);
-        $timeout = $timeoutProvider->get($input, $output);
-
         $textLogFileProvider = new TextLogFileProvider($consoleHelper, $questionHelper);
         $textLogFilePath = $textLogFileProvider->get($input, $output, $dirsInCurrentDir);
 
-        $this->saveConfig($sourceDirs, $excludedDirs, $timeout, $phpUnitConfigPath, $phpUnitCustomExecutablePath, $textLogFilePath);
+        $this->saveConfig($sourceDirs, $excludedDirs, $phpUnitConfigPath, $phpUnitCustomExecutablePath, $textLogFilePath);
 
         $output->writeln([
             '',
             sprintf(
                 'Configuration file "<comment>%s</comment>" was created.',
-                InfectionConfig::CONFIG_FILE_NAME . '.dist'
+                SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE
             ),
             '',
         ]);
@@ -152,14 +152,12 @@ final class ConfigureCommand extends BaseCommand
     private function saveConfig(
         array $sourceDirs,
         array $excludedDirs,
-        int $timeout,
         ?string $phpUnitConfigPath = null,
         ?string $phpUnitCustomExecutablePath = null,
         ?string $textLogFilePath = null
     ): void {
         $configObject = new stdClass();
 
-        $configObject->timeout = $timeout;
         $configObject->source = new stdClass();
 
         if ($sourceDirs) {
@@ -197,6 +195,9 @@ final class ConfigureCommand extends BaseCommand
             '@default' => true,
         ];
 
-        file_put_contents(InfectionConfig::CONFIG_FILE_NAME . '.dist', json_encode($configObject, JSON_PRETTY_PRINT));
+        file_put_contents(
+            SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
+            json_encode($configObject, JSON_PRETTY_PRINT)
+        );
     }
 }

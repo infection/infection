@@ -47,16 +47,12 @@ use Symfony\Component\Process\Process;
  */
 final class MemoryLimiter
 {
-    /**
-     * @var Filesystem
-     */
     private $fs;
-
-    /**
-     * @var string|false
-     */
     private $iniLocation;
 
+    /**
+     * @param string|false $iniLocation
+     */
     public function __construct(Filesystem $fs, $iniLocation)
     {
         $this->fs = $fs;
