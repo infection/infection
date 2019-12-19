@@ -64,10 +64,9 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
-use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\HasExtraNodeVisitors;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
@@ -302,7 +301,7 @@ final class InfectionCommand extends BaseCommand
         $fileSystem->mkdir($config->getTmpDir());
 
         $this->testFrameworkKey = $config->getTestFramework();
-        $this->testFrameworkOptions = $config->getTestFrameworkOptions();
+        $this->testFrameworkOptions = $config->getTestFrameworkExtraOptions();
 
         /** @var Factory $testFrameworkFactory */
         $testFrameworkFactory = $this->container['test.framework.factory'];
@@ -353,18 +352,15 @@ final class InfectionCommand extends BaseCommand
 
         $processBuilder = new MutantProcessBuilder($adapter, $this->versionParser, $config->getProcessTimeout());
 
-        $codeCoverageData = $this->getCodeCoverageData(
-            $config->getExistingCoveragePath(),
-            $this->testFrameworkKey,
-            $adapter
-        );
+        /** @var XMLLineCodeCoverageFactory $codeCoverageFactory */
+        $codeCoverageFactory = $this->container[XMLLineCodeCoverageFactory::class];
 
         /** @var FileMutationGenerator $fileMutationGenerator */
         $fileMutationGenerator = $this->container[FileMutationGenerator::class];
 
         $mutationGenerator = new MutationGenerator(
             $config->getSourceFiles(),
-            $codeCoverageData,
+            $codeCoverageFactory->create($this->testFrameworkKey, $adapter),
             $config->getMutators(),
             $this->eventDispatcher,
             $fileMutationGenerator
@@ -486,18 +482,6 @@ final class InfectionCommand extends BaseCommand
         (static function (string $infectionBootstrapFile): void {
             require_once $infectionBootstrapFile;
         })($bootstrap);
-    }
-
-    private function getCodeCoverageData(string $coverageDir, string $testFrameworkKey, TestFrameworkAdapter $adapter): LineCodeCoverage
-    {
-        /** @var CachedTestFileDataProvider $cachedTestFileDataProvider */
-        $cachedTestFileDataProvider = $this->container[CachedTestFileDataProvider::class];
-
-        $testFileDataProviderService = $adapter->hasJUnitReport()
-            ? $cachedTestFileDataProvider
-            : null;
-
-        return new XMLLineCodeCoverage($coverageDir, new CoverageXmlParser($coverageDir), $testFrameworkKey, $testFileDataProviderService);
     }
 
     private function runConfigurationCommand(Locator $locator): void

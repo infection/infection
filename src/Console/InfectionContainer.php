@@ -71,6 +71,7 @@ use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
@@ -110,6 +111,26 @@ final class InfectionContainer extends Container
                     '%s/%s',
                     $config->getExistingCoveragePath(),
                     TestFrameworkAdapter::JUNIT_FILE_NAME
+                );
+            },
+            XMLLineCodeCoverageFactory::class => static function (self $container): XMLLineCodeCoverageFactory {
+                /** @var string $phpUnitCoverageDir */
+                $phpUnitCoverageDir = $container['coverage.dir.phpunit'];
+
+                /** @var string $phpSpecCoverageDir */
+                $phpSpecCoverageDir = $container['coverage.dir.phpspec'];
+
+                /** @var string $codeceptionCoverageDir */
+                $codeceptionCoverageDir = $container['coverage.dir.codeception'];
+
+                /** @var CachedTestFileDataProvider $cachedTestFileDataProvider */
+                $cachedTestFileDataProvider = $container[CachedTestFileDataProvider::class];
+
+                return new XMLLineCodeCoverageFactory(
+                    $phpUnitCoverageDir,
+                    $phpSpecCoverageDir,
+                    $codeceptionCoverageDir,
+                    $cachedTestFileDataProvider
                 );
             },
             RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
@@ -296,7 +317,7 @@ final class InfectionContainer extends Container
                 $config = $container[Configuration::class];
 
                 return new CoverageRequirementChecker(
-                    (string) $config->getExistingCoveragePath() !== '',
+                    $config->getExistingCoveragePath() !== '',
                     $config->getInitialTestsPhpOptions() ?? ''
                 );
             },

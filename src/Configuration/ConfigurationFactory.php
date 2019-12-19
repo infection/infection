@@ -43,11 +43,11 @@ use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
-use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
 use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use function Safe\sprintf;
 use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
@@ -111,7 +111,7 @@ class ConfigurationFactory
 
         $namespacedTmpDir = $this->retrieveTmpDir($schema, $configDir);
 
-        $testFramework = self::retrieveTestFramework($schema, $testFramework);
+        $testFramework = $testFramework ?? $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
 
         return new Configuration(
             $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
@@ -136,7 +136,7 @@ class ConfigurationFactory
             $testFramework,
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
-            self::retrieveTestFrameworkOptions($testFrameworkOptions, $schema, $testFramework),
+            self::retrieveTestFrameworkExtraOptions($testFrameworkOptions, $schema, $testFramework),
             self::retrieveExistingCoveragePath(
                 self::retrieveExistingCoverageBasePath($existingCoveragePath, $configDir, $namespacedTmpDir),
                 $testFramework
@@ -184,13 +184,6 @@ class ConfigurationFactory
         return $phpUnit;
     }
 
-    private static function retrieveTestFramework(
-        SchemaConfiguration $schema,
-        ?string $testFrameworkInput
-    ): string {
-        return $testFrameworkInput ?? $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
-    }
-
     private static function retrieveExistingCoveragePath(
         string $existingCoverageBasePath,
         string $testFramework
@@ -233,7 +226,7 @@ class ConfigurationFactory
         return array_fill_keys($parsedMutatorsInput, true);
     }
 
-    private static function retrieveTestFrameworkOptions(
+    private static function retrieveTestFrameworkExtraOptions(
         ?string $testFrameworkOptions,
         SchemaConfiguration $schema,
         string $testFramework

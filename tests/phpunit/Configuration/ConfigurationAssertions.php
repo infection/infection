@@ -106,7 +106,7 @@ trait ConfigurationAssertions
         $this->assertSame($expectedInitialTestsPhpOptions, $configuration->getInitialTestsPhpOptions());
         $this->assertTestFrameworkExtraOptionsStateIs(
             $expectedTestFrameworkOptions,
-            $configuration->getTestFrameworkOptions()
+            $configuration->getTestFrameworkExtraOptions()
         );
         $this->assertSame($expectedExistingCoveragePath, $configuration->getExistingCoveragePath());
         $this->assertSame($expectedDebug, $configuration->isDebugEnabled());

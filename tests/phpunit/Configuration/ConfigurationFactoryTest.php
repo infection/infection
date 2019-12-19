@@ -671,7 +671,7 @@ final class ConfigurationFactoryTest extends TestCase
             self::getDefaultMutators(),
             'phpunit',
             null,
-            null,
+            new PhpUnitExtraOptions(),
             new PhpUnitExtraOptions(),
             sys_get_temp_dir() . '/infection/coverage-xml',
             false,
@@ -741,6 +741,7 @@ final class ConfigurationFactoryTest extends TestCase
             'phpunit',
             null,
             null,
+            new PhpUnitExtraOptions(),
             new PhpUnitExtraOptions(),
             $expectedTmpDir . '/coverage-xml',
             false,
@@ -880,6 +881,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             new PhpUnitExtraOptions(),
+            new PhpUnitExtraOptions(),
             sys_get_temp_dir() . '/infection/coverage-xml',
             false,
             false,
@@ -896,7 +898,9 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $configTestFramework,
         ?string $inputTestFramework,
         ?string $expectedTestFramework,
-        TestFrameworkExtraOptions $expectedTestFrameworkExtraOptions,
+        // We are passing this expected result because we cannot do otherwise but it is not the
+        // element under test in this scenario hence "resulting" instead of "expected"
+        TestFrameworkExtraOptions $resultingTestFrameworkExtraOptions,
         ?string $expectedCoveragePath
     ): array {
         return [
