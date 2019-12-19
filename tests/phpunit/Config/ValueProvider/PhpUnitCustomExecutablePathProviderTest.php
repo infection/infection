@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Config\ValueProvider;
 
+use Safe\realpath;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\PhpUnitCustomExecutablePathProvider;
 use Infection\Finder\Exception\FinderException;
@@ -84,7 +85,7 @@ final class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProvider
             ->method('find')
             ->will($this->throwException(new FinderException()));
 
-        $customExecutable = p(realpath(__DIR__ . '/../../Fixtures/Files/phpunit/phpunit.phar'));
+        $customExecutable = normalizePath(realpath(__DIR__ . '/../../Fixtures/Files/phpunit/phpunit.phar'));
 
         $path = $this->provider->get(
             $this->createStreamableInputInterfaceMock($this->getInputStream("{$customExecutable}\n")),

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ReturnValue;
 
+use Safe\file_get_contents;
+use Safe\sprintf;
 use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 

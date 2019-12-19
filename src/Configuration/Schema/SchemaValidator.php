@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Schema;
 
+use Safe\sprintf;
 use function array_map;
 use JsonSchema\Validator;
 use const PHP_EOL;

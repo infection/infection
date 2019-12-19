@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
+use Safe\sprintf;
 use Infection\Exception\InvalidTypeException;
 use Infection\Mutant\Exception\MsiCalculationException;
 use Infection\Mutant\MetricsCalculator;

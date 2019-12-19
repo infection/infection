@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpSpec\Config\Builder;
 
+use Safe\file_get_contents;
 use Infection\Mutant\MutantInterface;
 use Infection\MutationInterface;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;

@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
+use PhpParser\Node\Expr\ArrayDimFetch;
+use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Scalar\LNumber;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 use PhpParser\Node\Expr\ArrayItem;
@@ -54,12 +57,12 @@ final class Spread extends Mutator
     public function mutate(Node $node)
     {
         return new ArrayItem(
-            new Node\Expr\ArrayDimFetch(
-                new Node\Expr\Array_(
+            new ArrayDimFetch(
+                new Array_(
                     [$node],
-                    $node->getAttributes() + ['kind' => Node\Expr\Array_::KIND_SHORT]
+                    $node->getAttributes() + ['kind' => Array_::KIND_SHORT]
                 ),
-                new Node\Scalar\LNumber(0),
+                new LNumber(0),
                 $node->value->getAttributes()
             ),
             null,
@@ -71,6 +74,6 @@ final class Spread extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Expr\ArrayItem && $node->unpack;
+        return $node instanceof ArrayItem && $node->unpack;
     }
 }

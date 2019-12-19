@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Differ;
 
+use Safe\preg_match;
+use Safe\substr;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 
 /**

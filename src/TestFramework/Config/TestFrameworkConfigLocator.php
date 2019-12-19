@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Config;
 
+use Safe\sprintf;
 use Infection\Locator\FileOrDirectoryNotFound;
 use function Safe\realpath;
 

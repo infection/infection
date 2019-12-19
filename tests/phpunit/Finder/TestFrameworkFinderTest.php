@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Finder;
 
+use Safe\realpath;
+use Safe\putenv;
+use Safe\sprintf;
 use const DIRECTORY_SEPARATOR;
 use Infection\Finder\Exception\FinderException;
 use Infection\Finder\TestFrameworkFinder;

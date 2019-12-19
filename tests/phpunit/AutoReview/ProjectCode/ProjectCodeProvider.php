@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
+use Safe\sprintf;
+use Safe\sort;
 use const DIRECTORY_SEPARATOR;
 use Generator;
 use function in_array;

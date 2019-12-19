@@ -35,6 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
+use PhpParser\Node\Stmt\Return_;
+use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Name;
+use PhpParser\Node\Expr\Variable;
 use Infection\Mutator\Util\AbstractValueToNullReturnValue;
 use PhpParser\Node;
 
@@ -50,15 +54,15 @@ final class This extends AbstractValueToNullReturnValue
      */
     public function mutate(Node $node)
     {
-        return new Node\Stmt\Return_(
-            new Node\Expr\ConstFetch(new Node\Name('null'))
+        return new Return_(
+            new ConstFetch(new Name('null'))
         );
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Stmt\Return_ &&
-            $node->expr instanceof Node\Expr\Variable &&
+        return $node instanceof Return_ &&
+            $node->expr instanceof Variable &&
             $node->expr->name === 'this'
             && $this->isNullReturnValueAllowed($node);
     }

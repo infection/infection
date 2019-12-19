@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
+use PhpParser\Node\Expr\FuncCall;
 use function array_slice;
 use function count;
 use Generator;
@@ -50,7 +51,7 @@ final class UnwrapArrayUintersectUassoc extends AbstractUnwrapMutator
         return 'array_uintersect_uassoc';
     }
 
-    protected function getParameterIndexes(Node\Expr\FuncCall $node): Generator
+    protected function getParameterIndexes(FuncCall $node): Generator
     {
         yield from array_slice(
             array_keys($node->args),

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Finder;
 
+use Safe\file_put_contents;
 use const DIRECTORY_SEPARATOR;
 use Symfony\Component\Filesystem\Filesystem;
 

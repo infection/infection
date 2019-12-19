@@ -35,6 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Visitor;
 
+use PhpParser\Lexer\Emulative;
+use PhpParser\Node\Expr\FuncCall;
+use InfectionReflectionClassMethod\Foo;
+use InfectionReflectionAnonymousClass\Bug;
+use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Param;
+use PhpParser\Node\Scalar\DNumber;
+use PhpParser\Node\Scalar\LNumber;
+use PhpParser\Node\Expr\BinaryOp\Identical;
+use PhpParser\Node\Arg;
+use PhpParser\Node\Expr\Array_;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
@@ -65,7 +76,7 @@ final class ReflectionVisitorTest extends AbstractBaseVisitorTest
     {
         $this->spyVisitor = $this->getInsideFunctionSpyVisitor();
 
-        $lexer = new Lexer\Emulative([
+        $lexer = new Emulative([
             'usedAttributes' => [
                 'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
             ],
@@ -116,7 +127,7 @@ final class ReflectionVisitorTest extends AbstractBaseVisitorTest
     public function test_travers_plain_function_inside_a_class(): void
     {
         $code = $this->getFileContent('Reflection/rv-inside-plain-function-in-class.php');
-        $spyVisitor = $this->getSpyVisitor(Node\Expr\FuncCall::class);
+        $spyVisitor = $this->getSpyVisitor(FuncCall::class);
 
         $this->parseAndTraverse($code, $spyVisitor);
 
@@ -126,7 +137,7 @@ final class ReflectionVisitorTest extends AbstractBaseVisitorTest
     public function test_travers_plain_function_inside_a_closure(): void
     {
         $code = $this->getFileContent('Reflection/rv-inside-plain-function-in-closure.php');
-        $spyVisitor = $this->getSpyVisitor(Node\Expr\FuncCall::class);
+        $spyVisitor = $this->getSpyVisitor(FuncCall::class);
 
         $this->parseAndTraverse($code, $spyVisitor);
 
@@ -168,7 +179,7 @@ final class ReflectionVisitorTest extends AbstractBaseVisitorTest
         $this->parseAndTraverse($code, $reflectionSpyVisitor);
 
         $this->assertInstanceOf(ReflectionClass::class, $reflectionSpyVisitor->reflectionClass);
-        $this->assertSame(\InfectionReflectionClassMethod\Foo::class, $reflectionSpyVisitor->reflectionClass->getName());
+        $this->assertSame(Foo::class, $reflectionSpyVisitor->reflectionClass->getName());
     }
 
     public function test_it_sets_reflection_class_to_nodes_in_anonymous_class(): void
@@ -181,19 +192,19 @@ final class ReflectionVisitorTest extends AbstractBaseVisitorTest
         $this->assertNull($reflectionSpyVisitor->fooReflectionClass);
 
         $this->assertInstanceOf(ReflectionClass::class, $reflectionSpyVisitor->createAnonymousClassReflectionClass);
-        $this->assertSame(\InfectionReflectionAnonymousClass\Bug::class, $reflectionSpyVisitor->createAnonymousClassReflectionClass->getName());
+        $this->assertSame(Bug::class, $reflectionSpyVisitor->createAnonymousClassReflectionClass->getName());
     }
 
     public function isPartOfSignatureFlagProvider(): array
     {
         return [
-            [Node\Stmt\ClassMethod::class, true],
-            [Node\Param::class, true], // $param
-            [Node\Scalar\DNumber::class, true], // 2.0
-            [Node\Scalar\LNumber::class, false], // 1
-            [Node\Expr\BinaryOp\Identical::class, false], // ===
-            [Node\Arg::class, false],
-            [Node\Expr\Array_::class, false], // []
+            [ClassMethod::class, true],
+            [Param::class, true], // $param
+            [DNumber::class, true], // 2.0
+            [LNumber::class, false], // 1
+            [Identical::class, false], // ===
+            [Arg::class, false],
+            [Array_::class, false], // []
         ];
     }
 

@@ -35,6 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Extensions;
 
+use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Name;
+use PhpParser\Node\Expr\BinaryOp\Plus;
+use PhpParser\Node\Expr\BinaryOp\Div;
+use PhpParser\Node\Expr\BinaryOp\Mod;
+use PhpParser\Node\Expr\BinaryOp\Mul;
+use PhpParser\Node\Expr\BinaryOp\Pow;
+use PhpParser\Node\Expr\BinaryOp\Minus;
+use PhpParser\Node\Expr\BinaryOp\Spaceship;
+use PhpParser\Node\Expr\Cast\String_;
 use function array_diff_key;
 use function array_filter;
 use function count;
@@ -74,7 +84,7 @@ final class BCMath extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        if (!$node instanceof Node\Expr\FuncCall || !$node->name instanceof Node\Name) {
+        if (!$node instanceof FuncCall || !$node->name instanceof Name) {
             return false;
         }
 
@@ -85,22 +95,22 @@ final class BCMath extends Mutator
     {
         $converters = [
             'bcadd' => $this->makeCheckingMinArgsMapper(2, $this->makeCastToStringMapper(
-                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Plus::class)
+                $this->makeBinaryOperatorMapper(Plus::class)
             )),
             'bcdiv' => $this->makeCheckingMinArgsMapper(2, $this->makeCastToStringMapper(
-                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Div::class)
+                $this->makeBinaryOperatorMapper(Div::class)
             )),
             'bcmod' => $this->makeCheckingMinArgsMapper(2, $this->makeCastToStringMapper(
-                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Mod::class)
+                $this->makeBinaryOperatorMapper(Mod::class)
             )),
             'bcmul' => $this->makeCheckingMinArgsMapper(2, $this->makeCastToStringMapper(
-                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Mul::class)
+                $this->makeBinaryOperatorMapper(Mul::class)
             )),
             'bcpow' => $this->makeCheckingMinArgsMapper(2, $this->makeCastToStringMapper(
-                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Pow::class)
+                $this->makeBinaryOperatorMapper(Pow::class)
             )),
             'bcsub' => $this->makeCheckingMinArgsMapper(2, $this->makeCastToStringMapper(
-                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Minus::class)
+                $this->makeBinaryOperatorMapper(Minus::class)
             )),
             'bcsqrt' => $this->makeCheckingMinArgsMapper(1, $this->makeCastToStringMapper(
                 $this->makeSquareRootsMapper()
@@ -109,7 +119,7 @@ final class BCMath extends Mutator
                 $this->makePowerModuloMapper()
             )),
             'bccomp' => $this->makeCheckingMinArgsMapper(2,
-                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Spaceship::class)
+                $this->makeBinaryOperatorMapper(Spaceship::class)
             ),
         ];
 
@@ -122,7 +132,7 @@ final class BCMath extends Mutator
 
     private function makeCheckingMinArgsMapper(int $minimumArgsCount, callable $converter)
     {
-        return static function (Node\Expr\FuncCall $node) use ($minimumArgsCount, $converter): Generator {
+        return static function (FuncCall $node) use ($minimumArgsCount, $converter): Generator {
             if (count($node->args) >= $minimumArgsCount) {
                 yield from $converter($node);
             }
@@ -131,33 +141,33 @@ final class BCMath extends Mutator
 
     private function makeCastToStringMapper(callable $converter): callable
     {
-        return static function (Node\Expr\FuncCall $node) use ($converter): Generator {
+        return static function (FuncCall $node) use ($converter): Generator {
             foreach ($converter($node) as $newNode) {
-                yield new Node\Expr\Cast\String_($newNode);
+                yield new String_($newNode);
             }
         };
     }
 
     private function makeBinaryOperatorMapper(string $operator): callable
     {
-        return static function (Node\Expr\FuncCall $node) use ($operator): Generator {
+        return static function (FuncCall $node) use ($operator): Generator {
             yield new $operator($node->args[0]->value, $node->args[1]->value);
         };
     }
 
     private function makeSquareRootsMapper(): callable
     {
-        return static function (Node\Expr\FuncCall $node): Generator {
-            yield new Node\Expr\FuncCall(new Node\Name('\sqrt'), [$node->args[0]]);
+        return static function (FuncCall $node): Generator {
+            yield new FuncCall(new Name('\sqrt'), [$node->args[0]]);
         };
     }
 
     private function makePowerModuloMapper(): callable
     {
-        return static function (Node\Expr\FuncCall $node): Generator {
-            yield new Node\Expr\BinaryOp\Mod(
-                new Node\Expr\FuncCall(
-                    new Node\Name('\pow'),
+        return static function (FuncCall $node): Generator {
+            yield new Mod(
+                new FuncCall(
+                    new Name('\pow'),
                     [$node->args[0], $node->args[1]]
                 ),
                 $node->args[2]->value

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Visitor;
 
+use PhpParser\Node\Expr\Array_;
 use function count;
 use Generator;
 use function get_class;
@@ -149,7 +150,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
         $outerMostArrayParent = $node;
 
         do {
-            if ($node instanceof Node\Expr\Array_) {
+            if ($node instanceof Array_) {
                 $outerMostArrayParent = $node;
             }
         } while ($node = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY));

@@ -35,6 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Extensions;
 
+use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Name;
+use PhpParser\Node\Scalar\LNumber;
+use PhpParser\Node\Expr\ConstFetch;
 use function array_diff_key;
 use function array_filter;
 use function array_slice;
@@ -76,7 +80,7 @@ final class MBString extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        if (!$node instanceof Node\Expr\FuncCall || !$node->name instanceof Node\Name) {
+        if (!$node instanceof FuncCall || !$node->name instanceof Name) {
             return false;
         }
 
@@ -116,21 +120,21 @@ final class MBString extends Mutator
 
     private function makeFunctionMapper(string $newFunctionName): callable
     {
-        return function (Node\Expr\FuncCall $node) use ($newFunctionName): Generator {
+        return function (FuncCall $node) use ($newFunctionName): Generator {
             yield $this->mapFunctionCall($node, $newFunctionName, $node->args);
         };
     }
 
     private function makeFunctionAndRemoveExtraArgsMapper(string $newFunctionName, int $argsAtMost): callable
     {
-        return function (Node\Expr\FuncCall $node) use ($newFunctionName, $argsAtMost): Generator {
+        return function (FuncCall $node) use ($newFunctionName, $argsAtMost): Generator {
             yield $this->mapFunctionCall($node, $newFunctionName, array_slice($node->args, 0, $argsAtMost));
         };
     }
 
     private function makeConvertCaseMapper(): callable
     {
-        return function (Node\Expr\FuncCall $node): Generator {
+        return function (FuncCall $node): Generator {
             $modeValue = $this->getConvertCaseModeValue($node);
 
             if ($modeValue === null) {
@@ -147,7 +151,7 @@ final class MBString extends Mutator
         };
     }
 
-    private function getConvertCaseModeValue(Node\Expr\FuncCall $node): ?int
+    private function getConvertCaseModeValue(FuncCall $node): ?int
     {
         if (count($node->args) < 2) {
             return null;
@@ -155,11 +159,11 @@ final class MBString extends Mutator
 
         $mode = $node->args[1]->value;
 
-        if ($mode instanceof Node\Scalar\LNumber) {
+        if ($mode instanceof LNumber) {
             return $mode->value;
         }
 
-        if ($mode instanceof Node\Expr\ConstFetch) {
+        if ($mode instanceof ConstFetch) {
             return constant($mode->name->toString());
         }
 
@@ -194,10 +198,10 @@ final class MBString extends Mutator
         return false;
     }
 
-    private function mapFunctionCall(Node\Expr\FuncCall $node, string $newFuncName, array $args): Node\Expr\FuncCall
+    private function mapFunctionCall(FuncCall $node, string $newFuncName, array $args): FuncCall
     {
-        return new Node\Expr\FuncCall(
-            new Node\Name($newFuncName, $node->name->getAttributes()),
+        return new FuncCall(
+            new Name($newFuncName, $node->name->getAttributes()),
             $args,
             $node->getAttributes()
         );

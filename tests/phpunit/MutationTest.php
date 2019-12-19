@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use PhpParser\Node\Scalar\LNumber;
 use Infection\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Util\MutatorConfig;
@@ -61,7 +62,7 @@ final class MutationTest extends TestCase
             $mutator,
             $attributes,
             'Interface_',
-            new Node\Scalar\LNumber(1),
+            new LNumber(1),
             0,
             [1, 2, 3]
         );
@@ -88,7 +89,7 @@ final class MutationTest extends TestCase
             $mutator,
             $attributes,
             'Interface_',
-            new Node\Scalar\LNumber(1),
+            new LNumber(1),
             0,
             [1, 2, 3]
         );

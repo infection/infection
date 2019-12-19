@@ -35,6 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Regex;
 
+use PhpParser\Node\Expr\Cast\Int_;
+use PhpParser\Node\Expr\Assign;
+use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Name;
 use function count;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
@@ -53,16 +58,16 @@ final class PregMatchMatches extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\Cast\Int_(new Node\Expr\Assign($node->args[2]->value, new Node\Expr\Array_()));
+        return new Int_(new Assign($node->args[2]->value, new Array_()));
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        if (!$node instanceof Node\Expr\FuncCall) {
+        if (!$node instanceof FuncCall) {
             return false;
         }
 
-        if (!$node->name instanceof Node\Name ||
+        if (!$node->name instanceof Name ||
             $node->name->toLowerString() !== 'preg_match') {
             return false;
         }

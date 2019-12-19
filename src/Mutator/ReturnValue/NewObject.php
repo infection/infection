@@ -35,6 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
+use PhpParser\Node\Stmt\Expression;
+use PhpParser\Node\Stmt\Return_;
+use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Name;
+use PhpParser\Node\Expr\New_;
 use Infection\Mutator\Util\AbstractValueToNullReturnValue;
 use PhpParser\Node;
 
@@ -56,24 +61,24 @@ final class NewObject extends AbstractValueToNullReturnValue
         $expr = $node->expr;
 
         return [
-            new Node\Stmt\Expression($expr),
-            new Node\Stmt\Return_(
-                new Node\Expr\ConstFetch(new Node\Name('null'))
+            new Expression($expr),
+            new Return_(
+                new ConstFetch(new Name('null'))
             ),
         ];
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        if (!$node instanceof Node\Stmt\Return_) {
+        if (!$node instanceof Return_) {
             return false;
         }
 
-        if (!$node->expr instanceof Node\Expr\New_) {
+        if (!$node->expr instanceof New_) {
             return false;
         }
 
-        if (!$node->expr->class instanceof Node\Name) {
+        if (!$node->expr->class instanceof Name) {
             return false;
         }
 

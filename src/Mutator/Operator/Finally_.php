@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
+use PhpParser\Node\Stmt\Nop;
 use function count;
 use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ParentConnectorVisitor;
@@ -52,7 +53,7 @@ final class Finally_ extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Stmt\Nop();
+        return new Nop();
     }
 
     protected function mutatesNode(Node $node): bool

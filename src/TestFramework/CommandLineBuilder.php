@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Safe\substr;
 use Infection\Finder\Exception\FinderException;
 use const PHP_SAPI;
 use Symfony\Component\Process\PhpExecutableFinder;

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Config\Exception;
 
+use Safe\sprintf;
 use Infection\Config\Exception\InvalidConfigException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

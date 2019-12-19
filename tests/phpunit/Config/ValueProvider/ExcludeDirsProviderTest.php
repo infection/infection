@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Config\ValueProvider;
 
+use Safe\mkdir;
 use const DIRECTORY_SEPARATOR;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;

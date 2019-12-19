@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use Safe\sprintf;
 use Generator;
 use Infection\Mutator\ProfileList;
 use Infection\Mutator\Util\Mutator;

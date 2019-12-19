@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Performance\Limiter;
 
+use Safe\sprintf;
+use Safe\ini_get;
 use Composer\XdebugHandler\XdebugHandler;
 use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\TestFrameworkAdapter;

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use PhpParser\Node\Expr\BinaryOp\Mul;
+use PhpParser\Node\Expr\BinaryOp\Mod;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -52,11 +54,11 @@ final class Modulus extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\BinaryOp\Mul($node->left, $node->right, $node->getAttributes());
+        return new Mul($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\Mod;
+        return $node instanceof Mod;
     }
 }

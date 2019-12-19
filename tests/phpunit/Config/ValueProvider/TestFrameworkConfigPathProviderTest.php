@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Config\ValueProvider;
 
+use Safe\realpath;
 use Exception;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;

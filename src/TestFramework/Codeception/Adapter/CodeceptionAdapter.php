@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Codeception\Adapter;
 
+use Safe\preg_match;
+use Safe\sprintf;
 use function array_key_exists;
 use function assert;
 use function dirname;

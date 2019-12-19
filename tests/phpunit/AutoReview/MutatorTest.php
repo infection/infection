@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
+use Safe\sprintf;
+use Safe\sort;
 use function array_column;
 use Infection\Tests\Mutator\ProfileListProvider;
 use function iterator_to_array;

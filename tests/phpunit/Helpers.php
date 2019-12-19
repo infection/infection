@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use Safe\substr;
+use Safe\realpath;
 use const DIRECTORY_SEPARATOR;
 use Generator;
 use function random_int;

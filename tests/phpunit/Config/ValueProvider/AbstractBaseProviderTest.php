@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Config\ValueProvider;
 
+use Safe\fopen;
+use Safe\fwrite;
+use Safe\rewind;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\StreamableInputInterface;

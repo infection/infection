@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Visitor;
 
+use PhpParser\Node\Scalar\String_;
 use Infection\Visitor\CloneVisitor;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
@@ -77,8 +78,8 @@ PHP;
         return new class() extends NodeVisitorAbstract {
             public function enterNode(Node $node)
             {
-                if ($node instanceof Node\Scalar\String_) {
-                    return new Node\Scalar\String_('foo');
+                if ($node instanceof String_) {
+                    return new String_('foo');
                 }
             }
         };

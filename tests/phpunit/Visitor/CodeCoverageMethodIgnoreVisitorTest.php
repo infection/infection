@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Visitor;
 
+use PhpParser\Node\Stmt\Return_;
 use Infection\Visitor\CodeCoverageMethodIgnoreVisitor;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
@@ -101,7 +102,7 @@ final class CodeCoverageMethodIgnoreVisitorTest extends AbstractBaseVisitorTest
 
             public function leaveNode(Node $node): void
             {
-                if ($node instanceof Node\Stmt\Return_) {
+                if ($node instanceof Return_) {
                     $this->nodeVisited = true;
                 }
             }

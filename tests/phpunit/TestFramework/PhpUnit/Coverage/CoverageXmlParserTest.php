@@ -35,6 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
+use Safe\realpath;
+use Safe\file_get_contents;
+use Safe\preg_replace;
+use Safe\sprintf;
 use Generator;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\PhpUnit\Coverage\Exception\NoLinesExecutedException;

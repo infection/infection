@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Visitor;
 
+use PhpParser\Lexer\Emulative;
 use Generator;
 use Infection\Mutation;
 use Infection\MutationInterface;
@@ -69,7 +70,7 @@ final class MutatorVisitorTest extends TestCase
 
     public function providesMutationCases(): Generator
     {
-        $lexer = new Lexer\Emulative([
+        $lexer = new Emulative([
             'usedAttributes' => [
                 'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
             ],
@@ -169,7 +170,7 @@ PHP
                 range(29, 50)
             ),
         ];
-        $badLexer = new Lexer\Emulative([
+        $badLexer = new Emulative([
             'usedAttributes' => [
                 'comments', 'startLine', 'endLine', 'endTokenPos', 'startFilePos', 'endFilePos',
             ],

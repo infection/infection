@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use Safe\sprintf;
 use function array_key_exists;
 use function class_exists;
 use Infection\Mutator\Util\Mutator;

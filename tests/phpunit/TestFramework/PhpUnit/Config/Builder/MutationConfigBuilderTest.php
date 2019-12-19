@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
+use Safe\realpath;
+use Safe\file_get_contents;
+use Safe\sprintf;
 use DOMDocument;
 use DOMNodeList;
 use DOMXPath;
@@ -70,7 +73,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
     {
         parent::setUp();
 
-        $this->pathToProject = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
+        $this->pathToProject = normalizePath(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
 
         $projectDir = '/project/dir';
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit.xml';

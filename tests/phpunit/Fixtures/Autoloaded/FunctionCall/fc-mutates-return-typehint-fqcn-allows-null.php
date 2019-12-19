@@ -2,9 +2,10 @@
 
 namespace FunctionCall_ReturnTypehintFqcnAllowsNull;
 
+use DateTime;
 class Test
 {
-    function test() : ?\DateTime
+    function test() : ?DateTime
     {
         return count([]);
     }

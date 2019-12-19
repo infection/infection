@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Name;
 use Generator;
 use function in_array;
 use Infection\Mutator\Util\Mutator;
@@ -70,8 +72,8 @@ final class RoundingFamily extends Mutator
         $mutateToFunctions = array_diff(self::MUTATORS_MAP, [$currentFunctionName]);
 
         foreach ($mutateToFunctions as $functionName) {
-            yield new Node\Expr\FuncCall(
-                new Node\Name($functionName),
+            yield new FuncCall(
+                new Name($functionName),
                 [$node->args[0]],
                 $node->getAttributes()
             );
@@ -80,11 +82,11 @@ final class RoundingFamily extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        if (!$node instanceof Node\Expr\FuncCall) {
+        if (!$node instanceof FuncCall) {
             return false;
         }
 
-        if (!$node->name instanceof Node\Name ||
+        if (!$node->name instanceof Name ||
             !in_array($node->name->toLowerString(), self::MUTATORS_MAP, true)
         ) {
             return false;

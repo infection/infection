@@ -35,6 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
+use PhpParser\Node\Scalar\LNumber;
+use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Name;
+use PhpParser\Node\Expr\BinaryOp\Identical;
+use PhpParser\Node\Expr\BinaryOp\NotIdentical;
+use PhpParser\Node\Expr\BinaryOp\Equal;
+use PhpParser\Node\Expr\BinaryOp\NotEqual;
+use PhpParser\Node\Expr\BinaryOp\Greater;
+use PhpParser\Node\Expr\BinaryOp\GreaterOrEqual;
+use PhpParser\Node\Expr\BinaryOp\Smaller;
+use PhpParser\Node\Expr\BinaryOp\SmallerOrEqual;
 use function in_array;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
@@ -62,12 +73,12 @@ final class DecrementInteger extends AbstractNumberMutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Scalar\LNumber($node->value - 1);
+        return new LNumber($node->value - 1);
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        if (!$node instanceof Node\Scalar\LNumber || $node->value === 1) {
+        if (!$node instanceof LNumber || $node->value === 1) {
             return false;
         }
 
@@ -78,7 +89,7 @@ final class DecrementInteger extends AbstractNumberMutator
         return $this->isAllowedComparison($node);
     }
 
-    private function isAllowedComparison(Node\Scalar\LNumber $node): bool
+    private function isAllowedComparison(LNumber $node): bool
     {
         if ($node->value !== 0) {
             return true;
@@ -90,7 +101,7 @@ final class DecrementInteger extends AbstractNumberMutator
             return true;
         }
 
-        if ($parentNode->left instanceof Node\Expr\FuncCall && $parentNode->left->name instanceof Node\Name
+        if ($parentNode->left instanceof FuncCall && $parentNode->left->name instanceof Name
             && in_array(
                 $parentNode->left->name->toLowerString(),
                 self::COUNT_NAMES,
@@ -99,7 +110,7 @@ final class DecrementInteger extends AbstractNumberMutator
             return false;
         }
 
-        if ($parentNode->right instanceof Node\Expr\FuncCall && $parentNode->right->name instanceof Node\Name
+        if ($parentNode->right instanceof FuncCall && $parentNode->right->name instanceof Name
             && in_array(
                 $parentNode->right->name->toLowerString(),
                 self::COUNT_NAMES,
@@ -113,13 +124,13 @@ final class DecrementInteger extends AbstractNumberMutator
 
     private function isComparison(Node $parentNode): bool
     {
-        return $parentNode instanceof Node\Expr\BinaryOp\Identical
-            || $parentNode instanceof Node\Expr\BinaryOp\NotIdentical
-            || $parentNode instanceof Node\Expr\BinaryOp\Equal
-            || $parentNode instanceof Node\Expr\BinaryOp\NotEqual
-            || $parentNode instanceof Node\Expr\BinaryOp\Greater
-            || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            || $parentNode instanceof Node\Expr\BinaryOp\Smaller
-            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual;
+        return $parentNode instanceof Identical
+            || $parentNode instanceof NotIdentical
+            || $parentNode instanceof Equal
+            || $parentNode instanceof NotEqual
+            || $parentNode instanceof Greater
+            || $parentNode instanceof GreaterOrEqual
+            || $parentNode instanceof Smaller
+            || $parentNode instanceof SmallerOrEqual;
     }
 }

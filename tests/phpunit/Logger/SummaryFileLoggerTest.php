@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use Safe\sprintf;
 use Infection\Logger\SummaryFileLogger;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Tests\FileSystem\FileSystemTestCase;

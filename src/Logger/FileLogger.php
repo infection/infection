@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use Safe\file_put_contents;
+use Safe\sprintf;
+use Safe\usort;
 use function in_array;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcessInterface;

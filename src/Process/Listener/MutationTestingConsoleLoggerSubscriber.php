@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Listener;
 
+use Safe\sprintf;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\EventDispatcher\EventSubscriberInterface;

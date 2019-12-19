@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
+use Safe\realpath;
 use Generator;
 use Infection\Console\InfectionContainer;
 use Infection\Mutation\FileParser;

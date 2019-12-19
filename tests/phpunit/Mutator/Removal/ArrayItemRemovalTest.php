@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Removal;
 
+use Safe\sprintf;
 use Generator;
 use Infection\Config\Exception\InvalidConfigException;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use Safe\sprintf;
 use RuntimeException;
 use Throwable;
 

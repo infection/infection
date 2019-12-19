@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Config;
 
+use Safe\sprintf;
 use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use function Infection\Tests\normalizePath as p;
@@ -69,7 +70,7 @@ final class TestFrameworkConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/DistFile/phpunit.xml.dist',
-            p($output),
+            normalizePath($output),
             'Did not find the correct phpunit.xml.dist file.'
         );
     }
@@ -83,7 +84,7 @@ final class TestFrameworkConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/AltDistFile/phpunit.dist.xml',
-            p($output),
+            normalizePath($output),
             'Did not find the correct phpunit.xml.dist file.'
         );
     }
@@ -97,7 +98,7 @@ final class TestFrameworkConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/XmlFile/phpunit.xml',
-            p($output),
+            normalizePath($output),
             'Did not find the correct phpunit.xml file.'
         );
     }
@@ -111,7 +112,7 @@ final class TestFrameworkConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/BothXmlAndDist/phpunit.xml',
-            p($output),
+            normalizePath($output),
             'Did not find the correct phpunit.xml file.'
         );
     }
@@ -125,7 +126,7 @@ final class TestFrameworkConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/DistFile/phpunit.xml.dist',
-            p($output),
+            normalizePath($output),
             'Did not find the correct phpunit.xml.dist file.'
         );
 

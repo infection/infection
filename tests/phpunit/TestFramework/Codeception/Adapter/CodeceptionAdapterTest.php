@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Codeception\Adapter;
 
+use Safe\realpath;
+use Safe\sprintf;
+use Safe\file_get_contents;
 use Generator;
 use Infection\Mutant\MutantInterface;
 use Infection\MutationInterface;
@@ -75,7 +78,7 @@ final class CodeceptionAdapterTest extends FileSystemTestCase
     {
         parent::setUp();
 
-        $this->pathToProject = p(realpath(__DIR__ . '/../../../Fixtures/Files/codeception'));
+        $this->pathToProject = normalizePath(realpath(__DIR__ . '/../../../Fixtures/Files/codeception'));
     }
 
     public function test_it_has_a_name(): void

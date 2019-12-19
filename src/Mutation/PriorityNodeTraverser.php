@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use Safe\sprintf;
+use Safe\krsort;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use Webmozart\Assert\Assert;

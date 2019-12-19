@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use Safe\sprintf;
+use Safe\substr;
+use PhpParser\Lexer\Emulative;
 use function count;
 use Exception;
 use function get_class;
@@ -110,7 +113,7 @@ abstract class AbstractMutatorTestCase extends TestCase
 
     protected function getNodes(string $code): array
     {
-        $lexer = new Lexer\Emulative();
+        $lexer = new Emulative();
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
 
         return $parser->parse($code);
@@ -118,7 +121,7 @@ abstract class AbstractMutatorTestCase extends TestCase
 
     protected function mutate(string $code, array $settings = []): array
     {
-        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, new Lexer\Emulative());
+        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, new Emulative());
         $prettyPrinter = new Standard();
 
         $mutations = $this->getMutationsFromCode($code, $parser, $settings);

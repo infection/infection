@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
+use PhpParser\Node\Expr\Clone_;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -57,6 +58,6 @@ final class CloneRemoval extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Expr\Clone_;
+        return $node instanceof Clone_;
     }
 }

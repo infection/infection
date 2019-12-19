@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
+use Safe\file_put_contents;
+use Safe\sprintf;
 use function assert;
 use DOMDocument;
 use DOMElement;

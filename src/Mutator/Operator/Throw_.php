@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
+use PhpParser\Node\Stmt\Expression;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -52,7 +53,7 @@ final class Throw_ extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Stmt\Expression($node->expr);
+        return new Expression($node->expr);
     }
 
     protected function mutatesNode(Node $node): bool

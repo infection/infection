@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalBoundary;
 
+use PhpParser\Node\Expr\BinaryOp\Greater;
+use PhpParser\Node\Expr\BinaryOp\GreaterOrEqual;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -52,11 +54,11 @@ final class GreaterThanOrEqualTo extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\BinaryOp\Greater($node->left, $node->right, $node->getAttributes());
+        return new Greater($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\GreaterOrEqual;
+        return $node instanceof GreaterOrEqual;
     }
 }

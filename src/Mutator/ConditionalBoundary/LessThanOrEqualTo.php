@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalBoundary;
 
+use PhpParser\Node\Expr\BinaryOp\Smaller;
+use PhpParser\Node\Expr\BinaryOp\SmallerOrEqual;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -52,11 +54,11 @@ final class LessThanOrEqualTo extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\BinaryOp\Smaller($node->left, $node->right, $node->getAttributes());
+        return new Smaller($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\SmallerOrEqual;
+        return $node instanceof SmallerOrEqual;
     }
 }

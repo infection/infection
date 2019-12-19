@@ -35,6 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Finder;
 
+use Safe\substr;
+use Safe\getcwd;
+use Safe\putenv;
+use Safe\preg_match;
 use function dirname;
 use Infection\Finder\Exception\FinderException;
 use Infection\TestFramework\TestFrameworkTypes;

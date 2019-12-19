@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Config\Exception;
 
+use Safe\sprintf;
 use RuntimeException;
 
 /**

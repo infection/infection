@@ -35,6 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
+use PhpParser\Node\Stmt\Nop;
+use PhpParser\Node\Stmt\Expression;
+use PhpParser\Node\Expr\MethodCall;
+use PhpParser\Node\Expr\StaticCall;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -50,15 +54,15 @@ final class MethodCallRemoval extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Stmt\Nop();
+        return new Nop();
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        if (!$node instanceof Node\Stmt\Expression) {
+        if (!$node instanceof Expression) {
             return false;
         }
 
-        return $node->expr instanceof Node\Expr\MethodCall || $node->expr instanceof Node\Expr\StaticCall;
+        return $node->expr instanceof MethodCall || $node->expr instanceof StaticCall;
     }
 }

@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
+use Safe\realpath;
+use Safe\file_get_contents;
+use Safe\sprintf;
 use DOMDocument;
 use DOMNodeList;
 use DOMXPath;
@@ -64,7 +67,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     {
         parent::setUp();
 
-        $this->pathToProject = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
+        $this->pathToProject = normalizePath(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
 
         $this->createConfigBuilder();
     }
@@ -79,7 +82,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $directories = $this->queryXpath($xml, '/phpunit/testsuites/testsuite/directory');
 
         $this->assertSame(1, $directories->length);
-        $this->assertSame($this->pathToProject . '/*Bundle', p($directories[0]->nodeValue));
+        $this->assertSame($this->pathToProject . '/*Bundle', normalizePath($directories[0]->nodeValue));
     }
 
     public function test_it_replaces_bootstrap_file(): void
@@ -88,7 +91,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
         $xml = file_get_contents($configurationPath);
 
-        $value = p($this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue);
+        $value = normalizePath($this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue);
 
         $this->assertSame($this->pathToProject . '/app/autoload2.php', $value);
     }

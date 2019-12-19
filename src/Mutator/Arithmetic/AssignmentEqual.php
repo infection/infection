@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use PhpParser\Node\Expr\Assign;
+use PhpParser\Node\Expr\BinaryOp\Equal;
+use PhpParser\Node\Expr\Variable;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -52,11 +55,11 @@ final class AssignmentEqual extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\Assign($node->left, $node->right, $node->getAttributes());
+        return new Assign($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\Equal && $node->left instanceof Node\Expr\Variable;
+        return $node instanceof Equal && $node->left instanceof Variable;
     }
 }

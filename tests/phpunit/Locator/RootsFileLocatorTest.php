@@ -75,7 +75,7 @@ final class RootsFileLocatorTest extends TestCase
     ): void {
         $path = (new RootsFileLocator($roots, $this->filesystem))->locate($file);
 
-        $this->assertSame(p($expected), p($path));
+        $this->assertSame(normalizePath($expected), normalizePath($path));
     }
 
     /**
@@ -114,7 +114,7 @@ final class RootsFileLocatorTest extends TestCase
     ): void {
         $path = (new RootsFileLocator($roots, $this->filesystem))->locateOneOf($files);
 
-        $this->assertSame(p($expected), p($path));
+        $this->assertSame(normalizePath($expected), normalizePath($path));
     }
 
     /**

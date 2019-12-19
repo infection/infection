@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use PhpParser\Node\Scalar\DNumber;
+use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Name;
 use function array_diff;
 use function array_values;
 use function count;
@@ -287,8 +290,8 @@ final class MutatorFactoryTest extends TestCase
     private function createPlusNode(string $functionName, ReflectionClass $reflectionMock): Node
     {
         return new Node\Expr\BinaryOp\Plus(
-            new Node\Scalar\DNumber(1.23),
-            new Node\Scalar\DNumber(1.23),
+            new DNumber(1.23),
+            new DNumber(1.23),
             [
                 ReflectionVisitor::REFLECTION_CLASS_KEY => $reflectionMock,
                 ReflectionVisitor::FUNCTION_NAME => $functionName,
@@ -298,8 +301,8 @@ final class MutatorFactoryTest extends TestCase
 
     private function createBoolNode(string $boolean, string $functionName, ReflectionClass $reflectionMock): Node
     {
-        return new Node\Expr\ConstFetch(
-            new Node\Name($boolean),
+        return new ConstFetch(
+            new Name($boolean),
             [
                 ReflectionVisitor::REFLECTION_CLASS_KEY => $reflectionMock,
                 ReflectionVisitor::FUNCTION_NAME => $functionName,

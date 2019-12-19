@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Extensions;
 
+use Safe\define;
 use function define;
 use function defined;
 use Generator;

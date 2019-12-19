@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Config\ValueProvider;
 
+use Safe\sprintf;
 use Closure;
 use Exception;
 use Infection\Config\ConsoleHelper;

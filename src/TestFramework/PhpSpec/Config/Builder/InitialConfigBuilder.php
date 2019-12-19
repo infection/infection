@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpSpec\Config\Builder;
 
+use Safe\file_put_contents;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\InitialYamlConfiguration;
 use Symfony\Component\Yaml\Yaml;

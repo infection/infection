@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
+use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node;
 
 /**
@@ -52,15 +53,15 @@ final class OneZeroInteger extends AbstractNumberMutator
     public function mutate(Node $node)
     {
         if ($node->value === 0) {
-            return new Node\Scalar\LNumber(1);
+            return new LNumber(1);
         }
 
-        return new Node\Scalar\LNumber(0);
+        return new LNumber(0);
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Scalar\LNumber
+        return $node instanceof LNumber
             && ($node->value === 0 || $node->value === 1)
             && !$this->isPartOfSizeComparison($node);
     }

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Schema;
 
+use Safe\sprintf;
 use Exception;
 use Generator;
 use function get_class;

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use Safe\putenv;
 use Infection\Http\BadgeApiClient;
 use Infection\Logger\BadgeLogger;
 use Infection\Mutant\MetricsCalculator;

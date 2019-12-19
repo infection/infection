@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalNegotiation;
 
+use PhpParser\Node\Expr\BinaryOp\NotEqual;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -52,7 +53,7 @@ final class Equal extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\BinaryOp\NotEqual($node->left, $node->right, $node->getAttributes());
+        return new NotEqual($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool

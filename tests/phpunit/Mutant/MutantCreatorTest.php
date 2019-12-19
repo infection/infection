@@ -35,6 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
+use Safe\mkdir;
+use Safe\touch;
+use Safe\file_put_contents;
+use Safe\unlink;
+use Safe\rmdir;
 use Infection\Differ\Differ;
 use Infection\Mutant\MutantCreator;
 use Infection\MutationInterface;

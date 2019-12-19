@@ -35,6 +35,133 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use Infection\Mutator\Arithmetic\Assignment;
+use Infection\Mutator\Arithmetic\AssignmentEqual;
+use Infection\Mutator\Arithmetic\BitwiseAnd;
+use Infection\Mutator\Arithmetic\BitwiseNot;
+use Infection\Mutator\Arithmetic\BitwiseOr;
+use Infection\Mutator\Arithmetic\BitwiseXor;
+use Infection\Mutator\Arithmetic\Decrement;
+use Infection\Mutator\Arithmetic\DivEqual;
+use Infection\Mutator\Arithmetic\Division;
+use Infection\Mutator\Arithmetic\Exponentiation;
+use Infection\Mutator\Arithmetic\Increment;
+use Infection\Mutator\Arithmetic\Minus;
+use Infection\Mutator\Arithmetic\MinusEqual;
+use Infection\Mutator\Arithmetic\ModEqual;
+use Infection\Mutator\Arithmetic\Modulus;
+use Infection\Mutator\Arithmetic\MulEqual;
+use Infection\Mutator\Arithmetic\Multiplication;
+use Infection\Mutator\Arithmetic\Plus;
+use Infection\Mutator\Arithmetic\PlusEqual;
+use Infection\Mutator\Arithmetic\PowEqual;
+use Infection\Mutator\Arithmetic\RoundingFamily;
+use Infection\Mutator\Arithmetic\ShiftLeft;
+use Infection\Mutator\Arithmetic\ShiftRight;
+use Infection\Mutator\Boolean\ArrayItem;
+use Infection\Mutator\Boolean\FalseValue;
+use Infection\Mutator\Boolean\LogicalAnd;
+use Infection\Mutator\Boolean\LogicalLowerAnd;
+use Infection\Mutator\Boolean\LogicalLowerOr;
+use Infection\Mutator\Boolean\LogicalNot;
+use Infection\Mutator\Boolean\LogicalOr;
+use Infection\Mutator\Boolean\TrueValue;
+use Infection\Mutator\Boolean\Yield_;
+use Infection\Mutator\ConditionalBoundary\GreaterThan;
+use Infection\Mutator\ConditionalBoundary\GreaterThanOrEqualTo;
+use Infection\Mutator\ConditionalBoundary\LessThan;
+use Infection\Mutator\ConditionalBoundary\LessThanOrEqualTo;
+use Infection\Mutator\ConditionalNegotiation\Equal;
+use Infection\Mutator\ConditionalNegotiation\GreaterThanNegotiation;
+use Infection\Mutator\ConditionalNegotiation\GreaterThanOrEqualToNegotiation;
+use Infection\Mutator\ConditionalNegotiation\Identical;
+use Infection\Mutator\ConditionalNegotiation\LessThanNegotiation;
+use Infection\Mutator\ConditionalNegotiation\LessThanOrEqualToNegotiation;
+use Infection\Mutator\ConditionalNegotiation\NotEqual;
+use Infection\Mutator\ConditionalNegotiation\NotIdentical;
+use Infection\Mutator\Boolean\IdenticalEqual;
+use Infection\Mutator\Boolean\NotIdenticalNotEqual;
+use Infection\Mutator\FunctionSignature\ProtectedVisibility;
+use Infection\Mutator\FunctionSignature\PublicVisibility;
+use Infection\Mutator\Boolean\EqualIdentical;
+use Infection\Mutator\Boolean\NotEqualNotIdentical;
+use Infection\Mutator\Number\DecrementInteger;
+use Infection\Mutator\Number\IncrementInteger;
+use Infection\Mutator\Number\OneZeroFloat;
+use Infection\Mutator\Number\OneZeroInteger;
+use Infection\Mutator\Operator\AssignCoalesce;
+use Infection\Mutator\Operator\Break_;
+use Infection\Mutator\Operator\Coalesce;
+use Infection\Mutator\Operator\Continue_;
+use Infection\Mutator\Operator\Finally_;
+use Infection\Mutator\Operator\Spread;
+use Infection\Mutator\Operator\Throw_;
+use Infection\Mutator\Regex\PregMatchMatches;
+use Infection\Mutator\Regex\PregQuote;
+use Infection\Mutator\Removal\ArrayItemRemoval;
+use Infection\Mutator\Removal\CloneRemoval;
+use Infection\Mutator\Removal\FunctionCallRemoval;
+use Infection\Mutator\Removal\MethodCallRemoval;
+use Infection\Mutator\ReturnValue\ArrayOneItem;
+use Infection\Mutator\ReturnValue\FloatNegation;
+use Infection\Mutator\ReturnValue\FunctionCall;
+use Infection\Mutator\ReturnValue\IntegerNegation;
+use Infection\Mutator\ReturnValue\NewObject;
+use Infection\Mutator\ReturnValue\This;
+use Infection\Mutator\Sort\Spaceship;
+use Infection\Mutator\ZeroIteration\For_;
+use Infection\Mutator\ZeroIteration\Foreach_;
+use Infection\Mutator\Cast\CastArray;
+use Infection\Mutator\Cast\CastBool;
+use Infection\Mutator\Cast\CastFloat;
+use Infection\Mutator\Cast\CastInt;
+use Infection\Mutator\Cast\CastObject;
+use Infection\Mutator\Cast\CastString;
+use Infection\Mutator\Unwrap\UnwrapArrayChangeKeyCase;
+use Infection\Mutator\Unwrap\UnwrapArrayChunk;
+use Infection\Mutator\Unwrap\UnwrapArrayColumn;
+use Infection\Mutator\Unwrap\UnwrapArrayCombine;
+use Infection\Mutator\Unwrap\UnwrapArrayDiff;
+use Infection\Mutator\Unwrap\UnwrapArrayDiffAssoc;
+use Infection\Mutator\Unwrap\UnwrapArrayDiffKey;
+use Infection\Mutator\Unwrap\UnwrapArrayDiffUassoc;
+use Infection\Mutator\Unwrap\UnwrapArrayDiffUkey;
+use Infection\Mutator\Unwrap\UnwrapArrayFilter;
+use Infection\Mutator\Unwrap\UnwrapArrayFlip;
+use Infection\Mutator\Unwrap\UnwrapArrayIntersect;
+use Infection\Mutator\Unwrap\UnwrapArrayIntersectAssoc;
+use Infection\Mutator\Unwrap\UnwrapArrayIntersectKey;
+use Infection\Mutator\Unwrap\UnwrapArrayIntersectUassoc;
+use Infection\Mutator\Unwrap\UnwrapArrayIntersectUkey;
+use Infection\Mutator\Unwrap\UnwrapArrayKeys;
+use Infection\Mutator\Unwrap\UnwrapArrayMap;
+use Infection\Mutator\Unwrap\UnwrapArrayMerge;
+use Infection\Mutator\Unwrap\UnwrapArrayMergeRecursive;
+use Infection\Mutator\Unwrap\UnwrapArrayPad;
+use Infection\Mutator\Unwrap\UnwrapArrayReduce;
+use Infection\Mutator\Unwrap\UnwrapArrayReplace;
+use Infection\Mutator\Unwrap\UnwrapArrayReplaceRecursive;
+use Infection\Mutator\Unwrap\UnwrapArrayReverse;
+use Infection\Mutator\Unwrap\UnwrapArraySlice;
+use Infection\Mutator\Unwrap\UnwrapArraySplice;
+use Infection\Mutator\Unwrap\UnwrapArrayUdiff;
+use Infection\Mutator\Unwrap\UnwrapArrayUdiffAssoc;
+use Infection\Mutator\Unwrap\UnwrapArrayUdiffUassoc;
+use Infection\Mutator\Unwrap\UnwrapArrayUintersect;
+use Infection\Mutator\Unwrap\UnwrapArrayUintersectAssoc;
+use Infection\Mutator\Unwrap\UnwrapArrayUintersectUassoc;
+use Infection\Mutator\Unwrap\UnwrapArrayUnique;
+use Infection\Mutator\Unwrap\UnwrapArrayValues;
+use Infection\Mutator\Unwrap\UnwrapLcFirst;
+use Infection\Mutator\Unwrap\UnwrapStrRepeat;
+use Infection\Mutator\Unwrap\UnwrapStrReplace;
+use Infection\Mutator\Unwrap\UnwrapStrToLower;
+use Infection\Mutator\Unwrap\UnwrapStrToUpper;
+use Infection\Mutator\Unwrap\UnwrapTrim;
+use Infection\Mutator\Unwrap\UnwrapUcFirst;
+use Infection\Mutator\Unwrap\UnwrapUcWords;
+use Infection\Mutator\Extensions\BCMath;
+use Infection\Mutator\Extensions\MBString;
 use function array_values;
 use Infection\Mutator;
 
@@ -65,185 +192,185 @@ final class ProfileList
     ];
 
     public const ARITHMETIC_PROFILE = [
-        Mutator\Arithmetic\Assignment::class,
-        Mutator\Arithmetic\AssignmentEqual::class,
-        Mutator\Arithmetic\BitwiseAnd::class,
-        Mutator\Arithmetic\BitwiseNot::class,
-        Mutator\Arithmetic\BitwiseOr::class,
-        Mutator\Arithmetic\BitwiseXor::class,
-        Mutator\Arithmetic\Decrement::class,
-        Mutator\Arithmetic\DivEqual::class,
-        Mutator\Arithmetic\Division::class,
-        Mutator\Arithmetic\Exponentiation::class,
-        Mutator\Arithmetic\Increment::class,
-        Mutator\Arithmetic\Minus::class,
-        Mutator\Arithmetic\MinusEqual::class,
-        Mutator\Arithmetic\ModEqual::class,
-        Mutator\Arithmetic\Modulus::class,
-        Mutator\Arithmetic\MulEqual::class,
-        Mutator\Arithmetic\Multiplication::class,
-        Mutator\Arithmetic\Plus::class,
-        Mutator\Arithmetic\PlusEqual::class,
-        Mutator\Arithmetic\PowEqual::class,
-        Mutator\Arithmetic\RoundingFamily::class,
-        Mutator\Arithmetic\ShiftLeft::class,
-        Mutator\Arithmetic\ShiftRight::class,
+        Assignment::class,
+        AssignmentEqual::class,
+        BitwiseAnd::class,
+        BitwiseNot::class,
+        BitwiseOr::class,
+        BitwiseXor::class,
+        Decrement::class,
+        DivEqual::class,
+        Division::class,
+        Exponentiation::class,
+        Increment::class,
+        Minus::class,
+        MinusEqual::class,
+        ModEqual::class,
+        Modulus::class,
+        MulEqual::class,
+        Multiplication::class,
+        Plus::class,
+        PlusEqual::class,
+        PowEqual::class,
+        RoundingFamily::class,
+        ShiftLeft::class,
+        ShiftRight::class,
     ];
 
     public const BOOLEAN_PROFILE = [
-        Mutator\Boolean\ArrayItem::class,
+        ArrayItem::class,
         // EqualIdentical disabled from the default boolean profile
-        Mutator\Boolean\FalseValue::class,
+        FalseValue::class,
         // IdenticalEqual disabled from the default boolean profile
-        Mutator\Boolean\LogicalAnd::class,
-        Mutator\Boolean\LogicalLowerAnd::class,
-        Mutator\Boolean\LogicalLowerOr::class,
-        Mutator\Boolean\LogicalNot::class,
-        Mutator\Boolean\LogicalOr::class,
+        LogicalAnd::class,
+        LogicalLowerAnd::class,
+        LogicalLowerOr::class,
+        LogicalNot::class,
+        LogicalOr::class,
         // NotEqualNotIdentical disabled from the default boolean profile
         // NotIdenticalNotEqual disabled from the default boolean profile
-        Mutator\Boolean\TrueValue::class,
-        Mutator\Boolean\Yield_::class,
+        TrueValue::class,
+        Yield_::class,
     ];
 
     public const CONDITIONAL_BOUNDARY_PROFILE = [
-        Mutator\ConditionalBoundary\GreaterThan::class,
-        Mutator\ConditionalBoundary\GreaterThanOrEqualTo::class,
-        Mutator\ConditionalBoundary\LessThan::class,
-        Mutator\ConditionalBoundary\LessThanOrEqualTo::class,
+        GreaterThan::class,
+        GreaterThanOrEqualTo::class,
+        LessThan::class,
+        LessThanOrEqualTo::class,
     ];
 
     public const CONDITIONAL_NEGOTIATION_PROFILE = [
-        Mutator\ConditionalNegotiation\Equal::class,
-        Mutator\ConditionalNegotiation\GreaterThanNegotiation::class,
-        Mutator\ConditionalNegotiation\GreaterThanOrEqualToNegotiation::class,
-        Mutator\ConditionalNegotiation\Identical::class,
-        Mutator\ConditionalNegotiation\LessThanNegotiation::class,
-        Mutator\ConditionalNegotiation\LessThanOrEqualToNegotiation::class,
-        Mutator\ConditionalNegotiation\NotEqual::class,
-        Mutator\ConditionalNegotiation\NotIdentical::class,
+        Equal::class,
+        GreaterThanNegotiation::class,
+        GreaterThanOrEqualToNegotiation::class,
+        Identical::class,
+        LessThanNegotiation::class,
+        LessThanOrEqualToNegotiation::class,
+        NotEqual::class,
+        NotIdentical::class,
     ];
 
     public const EQUAL_PROFILE = [
-        Mutator\Boolean\IdenticalEqual::class,
-        Mutator\Boolean\NotIdenticalNotEqual::class,
+        IdenticalEqual::class,
+        NotIdenticalNotEqual::class,
     ];
 
     public const FUNCTION_SIGNATURE_PROFILE = [
-        Mutator\FunctionSignature\ProtectedVisibility::class,
-        Mutator\FunctionSignature\PublicVisibility::class,
+        ProtectedVisibility::class,
+        PublicVisibility::class,
     ];
 
     public const IDENTICAL_PROFILE = [
-        Mutator\Boolean\EqualIdentical::class,
-        Mutator\Boolean\NotEqualNotIdentical::class,
+        EqualIdentical::class,
+        NotEqualNotIdentical::class,
     ];
 
     public const NUMBER_PROFILE = [
-        Mutator\Number\DecrementInteger::class,
-        Mutator\Number\IncrementInteger::class,
-        Mutator\Number\OneZeroFloat::class,
-        Mutator\Number\OneZeroInteger::class,
+        DecrementInteger::class,
+        IncrementInteger::class,
+        OneZeroFloat::class,
+        OneZeroInteger::class,
     ];
 
     public const OPERATOR_PROFILE = [
-        Mutator\Operator\AssignCoalesce::class,
-        Mutator\Operator\Break_::class,
-        Mutator\Operator\Coalesce::class,
-        Mutator\Operator\Continue_::class,
-        Mutator\Operator\Finally_::class,
-        Mutator\Operator\Spread::class,
-        Mutator\Operator\Throw_::class,
+        AssignCoalesce::class,
+        Break_::class,
+        Coalesce::class,
+        Continue_::class,
+        Finally_::class,
+        Spread::class,
+        Throw_::class,
     ];
 
     public const REGEX_PROFILE = [
-        Mutator\Regex\PregMatchMatches::class,
-        Mutator\Regex\PregQuote::class,
+        PregMatchMatches::class,
+        PregQuote::class,
     ];
 
     public const REMOVAL_PROFILE = [
-        Mutator\Removal\ArrayItemRemoval::class,
-        Mutator\Removal\CloneRemoval::class,
-        Mutator\Removal\FunctionCallRemoval::class,
-        Mutator\Removal\MethodCallRemoval::class,
+        ArrayItemRemoval::class,
+        CloneRemoval::class,
+        FunctionCallRemoval::class,
+        MethodCallRemoval::class,
     ];
 
     public const RETURN_VALUE_PROFILE = [
-        Mutator\ReturnValue\ArrayOneItem::class,
-        Mutator\ReturnValue\FloatNegation::class,
-        Mutator\ReturnValue\FunctionCall::class,
-        Mutator\ReturnValue\IntegerNegation::class,
-        Mutator\ReturnValue\NewObject::class,
-        Mutator\ReturnValue\This::class,
+        ArrayOneItem::class,
+        FloatNegation::class,
+        FunctionCall::class,
+        IntegerNegation::class,
+        NewObject::class,
+        This::class,
     ];
 
     public const SORT_PROFILE = [
-        Mutator\Sort\Spaceship::class,
+        Spaceship::class,
     ];
 
     public const ZERO_ITERATION_PROFILE = [
-        Mutator\ZeroIteration\For_::class,
-        Mutator\ZeroIteration\Foreach_::class,
+        For_::class,
+        Foreach_::class,
     ];
 
     public const CAST_PROFILE = [
-        Mutator\Cast\CastArray::class,
-        Mutator\Cast\CastBool::class,
-        Mutator\Cast\CastFloat::class,
-        Mutator\Cast\CastInt::class,
-        Mutator\Cast\CastObject::class,
-        Mutator\Cast\CastString::class,
+        CastArray::class,
+        CastBool::class,
+        CastFloat::class,
+        CastInt::class,
+        CastObject::class,
+        CastString::class,
     ];
 
     public const UNWRAP_PROFILE = [
-        Mutator\Unwrap\UnwrapArrayChangeKeyCase::class,
-        Mutator\Unwrap\UnwrapArrayChunk::class,
-        Mutator\Unwrap\UnwrapArrayColumn::class,
-        Mutator\Unwrap\UnwrapArrayCombine::class,
-        Mutator\Unwrap\UnwrapArrayDiff::class,
-        Mutator\Unwrap\UnwrapArrayDiffAssoc::class,
-        Mutator\Unwrap\UnwrapArrayDiffKey::class,
-        Mutator\Unwrap\UnwrapArrayDiffUassoc::class,
-        Mutator\Unwrap\UnwrapArrayDiffUkey::class,
-        Mutator\Unwrap\UnwrapArrayFilter::class,
-        Mutator\Unwrap\UnwrapArrayFlip::class,
-        Mutator\Unwrap\UnwrapArrayIntersect::class,
-        Mutator\Unwrap\UnwrapArrayIntersectAssoc::class,
-        Mutator\Unwrap\UnwrapArrayIntersectKey::class,
-        Mutator\Unwrap\UnwrapArrayIntersectUassoc::class,
-        Mutator\Unwrap\UnwrapArrayIntersectUkey::class,
-        Mutator\Unwrap\UnwrapArrayKeys::class,
-        Mutator\Unwrap\UnwrapArrayMap::class,
-        Mutator\Unwrap\UnwrapArrayMerge::class,
-        Mutator\Unwrap\UnwrapArrayMergeRecursive::class,
-        Mutator\Unwrap\UnwrapArrayPad::class,
-        Mutator\Unwrap\UnwrapArrayReduce::class,
-        Mutator\Unwrap\UnwrapArrayReplace::class,
-        Mutator\Unwrap\UnwrapArrayReplaceRecursive::class,
-        Mutator\Unwrap\UnwrapArrayReverse::class,
-        Mutator\Unwrap\UnwrapArraySlice::class,
-        Mutator\Unwrap\UnwrapArraySplice::class,
-        Mutator\Unwrap\UnwrapArrayUdiff::class,
-        Mutator\Unwrap\UnwrapArrayUdiffAssoc::class,
-        Mutator\Unwrap\UnwrapArrayUdiffUassoc::class,
-        Mutator\Unwrap\UnwrapArrayUintersect::class,
-        Mutator\Unwrap\UnwrapArrayUintersectAssoc::class,
-        Mutator\Unwrap\UnwrapArrayUintersectUassoc::class,
-        Mutator\Unwrap\UnwrapArrayUnique::class,
-        Mutator\Unwrap\UnwrapArrayValues::class,
-        Mutator\Unwrap\UnwrapLcFirst::class,
-        Mutator\Unwrap\UnwrapStrRepeat::class,
-        Mutator\Unwrap\UnwrapStrReplace::class,
-        Mutator\Unwrap\UnwrapStrToLower::class,
-        Mutator\Unwrap\UnwrapStrToUpper::class,
-        Mutator\Unwrap\UnwrapTrim::class,
-        Mutator\Unwrap\UnwrapUcFirst::class,
-        Mutator\Unwrap\UnwrapUcWords::class,
+        UnwrapArrayChangeKeyCase::class,
+        UnwrapArrayChunk::class,
+        UnwrapArrayColumn::class,
+        UnwrapArrayCombine::class,
+        UnwrapArrayDiff::class,
+        UnwrapArrayDiffAssoc::class,
+        UnwrapArrayDiffKey::class,
+        UnwrapArrayDiffUassoc::class,
+        UnwrapArrayDiffUkey::class,
+        UnwrapArrayFilter::class,
+        UnwrapArrayFlip::class,
+        UnwrapArrayIntersect::class,
+        UnwrapArrayIntersectAssoc::class,
+        UnwrapArrayIntersectKey::class,
+        UnwrapArrayIntersectUassoc::class,
+        UnwrapArrayIntersectUkey::class,
+        UnwrapArrayKeys::class,
+        UnwrapArrayMap::class,
+        UnwrapArrayMerge::class,
+        UnwrapArrayMergeRecursive::class,
+        UnwrapArrayPad::class,
+        UnwrapArrayReduce::class,
+        UnwrapArrayReplace::class,
+        UnwrapArrayReplaceRecursive::class,
+        UnwrapArrayReverse::class,
+        UnwrapArraySlice::class,
+        UnwrapArraySplice::class,
+        UnwrapArrayUdiff::class,
+        UnwrapArrayUdiffAssoc::class,
+        UnwrapArrayUdiffUassoc::class,
+        UnwrapArrayUintersect::class,
+        UnwrapArrayUintersectAssoc::class,
+        UnwrapArrayUintersectUassoc::class,
+        UnwrapArrayUnique::class,
+        UnwrapArrayValues::class,
+        UnwrapLcFirst::class,
+        UnwrapStrRepeat::class,
+        UnwrapStrReplace::class,
+        UnwrapStrToLower::class,
+        UnwrapStrToUpper::class,
+        UnwrapTrim::class,
+        UnwrapUcFirst::class,
+        UnwrapUcWords::class,
     ];
 
     public const EXTENSIONS_PROFILE = [
-        Mutator\Extensions\BCMath::class,
-        Mutator\Extensions\MBString::class,
+        BCMath::class,
+        MBString::class,
     ];
 
     public const DEFAULT_PROFILE = [
@@ -266,161 +393,161 @@ final class ProfileList
 
     public const ALL_MUTATORS = [
         // Arithmetic
-        'Assignment' => Mutator\Arithmetic\Assignment::class,
-        'AssignmentEqual' => Mutator\Arithmetic\AssignmentEqual::class,
-        'BitwiseAnd' => Mutator\Arithmetic\BitwiseAnd::class,
-        'BitwiseNot' => Mutator\Arithmetic\BitwiseNot::class,
-        'BitwiseOr' => Mutator\Arithmetic\BitwiseOr::class,
-        'BitwiseXor' => Mutator\Arithmetic\BitwiseXor::class,
-        'Decrement' => Mutator\Arithmetic\Decrement::class,
-        'DivEqual' => Mutator\Arithmetic\DivEqual::class,
-        'Division' => Mutator\Arithmetic\Division::class,
-        'Exponentiation' => Mutator\Arithmetic\Exponentiation::class,
-        'Increment' => Mutator\Arithmetic\Increment::class,
-        'Minus' => Mutator\Arithmetic\Minus::class,
-        'MinusEqual' => Mutator\Arithmetic\MinusEqual::class,
-        'ModEqual' => Mutator\Arithmetic\ModEqual::class,
-        'Modulus' => Mutator\Arithmetic\Modulus::class,
-        'MulEqual' => Mutator\Arithmetic\MulEqual::class,
-        'Multiplication' => Mutator\Arithmetic\Multiplication::class,
-        'Plus' => Mutator\Arithmetic\Plus::class,
-        'PlusEqual' => Mutator\Arithmetic\PlusEqual::class,
-        'PowEqual' => Mutator\Arithmetic\PowEqual::class,
-        'RoundingFamily' => Mutator\Arithmetic\RoundingFamily::class,
-        'ShiftLeft' => Mutator\Arithmetic\ShiftLeft::class,
-        'ShiftRight' => Mutator\Arithmetic\ShiftRight::class,
+        'Assignment' => Assignment::class,
+        'AssignmentEqual' => AssignmentEqual::class,
+        'BitwiseAnd' => BitwiseAnd::class,
+        'BitwiseNot' => BitwiseNot::class,
+        'BitwiseOr' => BitwiseOr::class,
+        'BitwiseXor' => BitwiseXor::class,
+        'Decrement' => Decrement::class,
+        'DivEqual' => DivEqual::class,
+        'Division' => Division::class,
+        'Exponentiation' => Exponentiation::class,
+        'Increment' => Increment::class,
+        'Minus' => Minus::class,
+        'MinusEqual' => MinusEqual::class,
+        'ModEqual' => ModEqual::class,
+        'Modulus' => Modulus::class,
+        'MulEqual' => MulEqual::class,
+        'Multiplication' => Multiplication::class,
+        'Plus' => Plus::class,
+        'PlusEqual' => PlusEqual::class,
+        'PowEqual' => PowEqual::class,
+        'RoundingFamily' => RoundingFamily::class,
+        'ShiftLeft' => ShiftLeft::class,
+        'ShiftRight' => ShiftRight::class,
 
         // Boolean
-        'ArrayItem' => Mutator\Boolean\ArrayItem::class,
-        'EqualIdentical' => Mutator\Boolean\EqualIdentical::class,
-        'FalseValue' => Mutator\Boolean\FalseValue::class,
-        'IdenticalEqual' => Mutator\Boolean\IdenticalEqual::class,
-        'LogicalAnd' => Mutator\Boolean\LogicalAnd::class,
-        'LogicalLowerAnd' => Mutator\Boolean\LogicalLowerAnd::class,
-        'LogicalLowerOr' => Mutator\Boolean\LogicalLowerOr::class,
-        'LogicalNot' => Mutator\Boolean\LogicalNot::class,
-        'LogicalOr' => Mutator\Boolean\LogicalOr::class,
-        'NotEqualNotIdentical' => Mutator\Boolean\NotEqualNotIdentical::class,
-        'NotIdenticalNotEqual' => Mutator\Boolean\NotIdenticalNotEqual::class,
-        'TrueValue' => Mutator\Boolean\TrueValue::class,
-        'Yield_' => Mutator\Boolean\Yield_::class,
+        'ArrayItem' => ArrayItem::class,
+        'EqualIdentical' => EqualIdentical::class,
+        'FalseValue' => FalseValue::class,
+        'IdenticalEqual' => IdenticalEqual::class,
+        'LogicalAnd' => LogicalAnd::class,
+        'LogicalLowerAnd' => LogicalLowerAnd::class,
+        'LogicalLowerOr' => LogicalLowerOr::class,
+        'LogicalNot' => LogicalNot::class,
+        'LogicalOr' => LogicalOr::class,
+        'NotEqualNotIdentical' => NotEqualNotIdentical::class,
+        'NotIdenticalNotEqual' => NotIdenticalNotEqual::class,
+        'TrueValue' => TrueValue::class,
+        'Yield_' => Yield_::class,
 
         // Conditional Boundary
-        'GreaterThan' => Mutator\ConditionalBoundary\GreaterThan::class,
-        'GreaterThanOrEqualTo' => Mutator\ConditionalBoundary\GreaterThanOrEqualTo::class,
-        'LessThan' => Mutator\ConditionalBoundary\LessThan::class,
-        'LessThanOrEqualTo' => Mutator\ConditionalBoundary\LessThanOrEqualTo::class,
+        'GreaterThan' => GreaterThan::class,
+        'GreaterThanOrEqualTo' => GreaterThanOrEqualTo::class,
+        'LessThan' => LessThan::class,
+        'LessThanOrEqualTo' => LessThanOrEqualTo::class,
 
         // Conditional Negotiation
-        'Equal' => Mutator\ConditionalNegotiation\Equal::class,
-        'GreaterThanNegotiation' => Mutator\ConditionalNegotiation\GreaterThanNegotiation::class,
-        'GreaterThanOrEqualToNegotiation' => Mutator\ConditionalNegotiation\GreaterThanOrEqualToNegotiation::class,
-        'Identical' => Mutator\ConditionalNegotiation\Identical::class,
-        'LessThanNegotiation' => Mutator\ConditionalNegotiation\LessThanNegotiation::class,
-        'LessThanOrEqualToNegotiation' => Mutator\ConditionalNegotiation\LessThanOrEqualToNegotiation::class,
-        'NotEqual' => Mutator\ConditionalNegotiation\NotEqual::class,
-        'NotIdentical' => Mutator\ConditionalNegotiation\NotIdentical::class,
+        'Equal' => Equal::class,
+        'GreaterThanNegotiation' => GreaterThanNegotiation::class,
+        'GreaterThanOrEqualToNegotiation' => GreaterThanOrEqualToNegotiation::class,
+        'Identical' => Identical::class,
+        'LessThanNegotiation' => LessThanNegotiation::class,
+        'LessThanOrEqualToNegotiation' => LessThanOrEqualToNegotiation::class,
+        'NotEqual' => NotEqual::class,
+        'NotIdentical' => NotIdentical::class,
 
         // Function Signature
-        'ProtectedVisibility' => Mutator\FunctionSignature\ProtectedVisibility::class,
-        'PublicVisibility' => Mutator\FunctionSignature\PublicVisibility::class,
+        'ProtectedVisibility' => ProtectedVisibility::class,
+        'PublicVisibility' => PublicVisibility::class,
 
         // Number
-        'DecrementInteger' => Mutator\Number\DecrementInteger::class,
-        'IncrementInteger' => Mutator\Number\IncrementInteger::class,
-        'OneZeroFloat' => Mutator\Number\OneZeroFloat::class,
-        'OneZeroInteger' => Mutator\Number\OneZeroInteger::class,
+        'DecrementInteger' => DecrementInteger::class,
+        'IncrementInteger' => IncrementInteger::class,
+        'OneZeroFloat' => OneZeroFloat::class,
+        'OneZeroInteger' => OneZeroInteger::class,
 
         // Operator
-        'AssignCoalesce' => Mutator\Operator\AssignCoalesce::class,
-        'Break_' => Mutator\Operator\Break_::class,
-        'Coalesce' => Mutator\Operator\Coalesce::class,
-        'Continue_' => Mutator\Operator\Continue_::class,
-        'Finally_' => Mutator\Operator\Finally_::class,
-        'Spread' => Mutator\Operator\Spread::class,
-        'Throw_' => Mutator\Operator\Throw_::class,
+        'AssignCoalesce' => AssignCoalesce::class,
+        'Break_' => Break_::class,
+        'Coalesce' => Coalesce::class,
+        'Continue_' => Continue_::class,
+        'Finally_' => Finally_::class,
+        'Spread' => Spread::class,
+        'Throw_' => Throw_::class,
 
         // Regex
-        'PregMatchMatches' => Mutator\Regex\PregMatchMatches::class,
-        'PregQuote' => Mutator\Regex\PregQuote::class,
+        'PregMatchMatches' => PregMatchMatches::class,
+        'PregQuote' => PregQuote::class,
 
         // Removal
-        'ArrayItemRemoval' => Mutator\Removal\ArrayItemRemoval::class,
-        'CloneRemoval' => Mutator\Removal\CloneRemoval::class,
-        'FunctionCallRemoval' => Mutator\Removal\FunctionCallRemoval::class,
-        'MethodCallRemoval' => Mutator\Removal\MethodCallRemoval::class,
+        'ArrayItemRemoval' => ArrayItemRemoval::class,
+        'CloneRemoval' => CloneRemoval::class,
+        'FunctionCallRemoval' => FunctionCallRemoval::class,
+        'MethodCallRemoval' => MethodCallRemoval::class,
 
         // Return Value
-        'ArrayOneItem' => Mutator\ReturnValue\ArrayOneItem::class,
-        'FloatNegation' => Mutator\ReturnValue\FloatNegation::class,
-        'FunctionCall' => Mutator\ReturnValue\FunctionCall::class,
-        'IntegerNegation' => Mutator\ReturnValue\IntegerNegation::class,
-        'NewObject' => Mutator\ReturnValue\NewObject::class,
-        'This' => Mutator\ReturnValue\This::class,
+        'ArrayOneItem' => ArrayOneItem::class,
+        'FloatNegation' => FloatNegation::class,
+        'FunctionCall' => FunctionCall::class,
+        'IntegerNegation' => IntegerNegation::class,
+        'NewObject' => NewObject::class,
+        'This' => This::class,
 
         // Sort
-        'Spaceship' => Mutator\Sort\Spaceship::class,
+        'Spaceship' => Spaceship::class,
 
         // Zero Iteration
-        'Foreach_' => Mutator\ZeroIteration\Foreach_::class,
-        'For_' => Mutator\ZeroIteration\For_::class,
+        'Foreach_' => Foreach_::class,
+        'For_' => For_::class,
 
         // Cast
-        'CastArray' => Mutator\Cast\CastArray::class,
-        'CastBool' => Mutator\Cast\CastBool::class,
-        'CastFloat' => Mutator\Cast\CastFloat::class,
-        'CastInt' => Mutator\Cast\CastInt::class,
-        'CastObject' => Mutator\Cast\CastObject::class,
-        'CastString' => Mutator\Cast\CastString::class,
+        'CastArray' => CastArray::class,
+        'CastBool' => CastBool::class,
+        'CastFloat' => CastFloat::class,
+        'CastInt' => CastInt::class,
+        'CastObject' => CastObject::class,
+        'CastString' => CastString::class,
 
         // Unwrap
-        'UnwrapArrayChangeKeyCase' => Mutator\Unwrap\UnwrapArrayChangeKeyCase::class,
-        'UnwrapArrayChunk' => Mutator\Unwrap\UnwrapArrayChunk::class,
-        'UnwrapArrayColumn' => Mutator\Unwrap\UnwrapArrayColumn::class,
-        'UnwrapArrayCombine' => Mutator\Unwrap\UnwrapArrayCombine::class,
-        'UnwrapArrayDiff' => Mutator\Unwrap\UnwrapArrayDiff::class,
-        'UnwrapArrayDiffAssoc' => Mutator\Unwrap\UnwrapArrayDiffAssoc::class,
-        'UnwrapArrayDiffKey' => Mutator\Unwrap\UnwrapArrayDiffKey::class,
-        'UnwrapArrayDiffUassoc' => Mutator\Unwrap\UnwrapArrayDiffUassoc::class,
-        'UnwrapArrayDiffUkey' => Mutator\Unwrap\UnwrapArrayDiffUkey::class,
-        'UnwrapArrayFilter' => Mutator\Unwrap\UnwrapArrayFilter::class,
-        'UnwrapArrayFlip' => Mutator\Unwrap\UnwrapArrayFlip::class,
-        'UnwrapArrayIntersect' => Mutator\Unwrap\UnwrapArrayIntersect::class,
-        'UnwrapArrayIntersectAssoc' => Mutator\Unwrap\UnwrapArrayIntersectAssoc::class,
-        'UnwrapArrayIntersectKey' => Mutator\Unwrap\UnwrapArrayIntersectKey::class,
-        'UnwrapArrayIntersectUassoc' => Mutator\Unwrap\UnwrapArrayIntersectUassoc::class,
-        'UnwrapArrayIntersectUkey' => Mutator\Unwrap\UnwrapArrayIntersectUkey::class,
-        'UnwrapArrayKeys' => Mutator\Unwrap\UnwrapArrayKeys::class,
-        'UnwrapArrayMap' => Mutator\Unwrap\UnwrapArrayMap::class,
-        'UnwrapArrayMerge' => Mutator\Unwrap\UnwrapArrayMerge::class,
-        'UnwrapArrayMergeRecursive' => Mutator\Unwrap\UnwrapArrayMergeRecursive::class,
-        'UnwrapArrayPad' => Mutator\Unwrap\UnwrapArrayPad::class,
-        'UnwrapArrayReduce' => Mutator\Unwrap\UnwrapArrayReduce::class,
-        'UnwrapArrayReplace' => Mutator\Unwrap\UnwrapArrayReplace::class,
-        'UnwrapArrayReplaceRecursive' => Mutator\Unwrap\UnwrapArrayReplaceRecursive::class,
-        'UnwrapArrayReverse' => Mutator\Unwrap\UnwrapArrayReverse::class,
-        'UnwrapArraySlice' => Mutator\Unwrap\UnwrapArraySlice::class,
-        'UnwrapArraySplice' => Mutator\Unwrap\UnwrapArraySplice::class,
-        'UnwrapArrayUdiff' => Mutator\Unwrap\UnwrapArrayUdiff::class,
-        'UnwrapArrayUdiffAssoc' => Mutator\Unwrap\UnwrapArrayUdiffAssoc::class,
-        'UnwrapArrayUdiffUassoc' => Mutator\Unwrap\UnwrapArrayUdiffUassoc::class,
-        'UnwrapArrayUintersect' => Mutator\Unwrap\UnwrapArrayUintersect::class,
-        'UnwrapArrayUintersectAssoc' => Mutator\Unwrap\UnwrapArrayUintersectAssoc::class,
-        'UnwrapArrayUintersectUassoc' => Mutator\Unwrap\UnwrapArrayUintersectUassoc::class,
-        'UnwrapArrayUnique' => Mutator\Unwrap\UnwrapArrayUnique::class,
-        'UnwrapArrayValues' => Mutator\Unwrap\UnwrapArrayValues::class,
-        'UnwrapLcFirst' => Mutator\Unwrap\UnwrapLcFirst::class,
-        'UnwrapStrRepeat' => Mutator\Unwrap\UnwrapStrRepeat::class,
-        'UnwrapStrReplace' => Mutator\Unwrap\UnwrapStrReplace::class,
-        'UnwrapStrToLower' => Mutator\Unwrap\UnwrapStrToLower::class,
-        'UnwrapStrToUpper' => Mutator\Unwrap\UnwrapStrToUpper::class,
-        'UnwrapTrim' => Mutator\Unwrap\UnwrapTrim::class,
-        'UnwrapUcFirst' => Mutator\Unwrap\UnwrapUcFirst::class,
-        'UnwrapUcWords' => Mutator\Unwrap\UnwrapUcWords::class,
+        'UnwrapArrayChangeKeyCase' => UnwrapArrayChangeKeyCase::class,
+        'UnwrapArrayChunk' => UnwrapArrayChunk::class,
+        'UnwrapArrayColumn' => UnwrapArrayColumn::class,
+        'UnwrapArrayCombine' => UnwrapArrayCombine::class,
+        'UnwrapArrayDiff' => UnwrapArrayDiff::class,
+        'UnwrapArrayDiffAssoc' => UnwrapArrayDiffAssoc::class,
+        'UnwrapArrayDiffKey' => UnwrapArrayDiffKey::class,
+        'UnwrapArrayDiffUassoc' => UnwrapArrayDiffUassoc::class,
+        'UnwrapArrayDiffUkey' => UnwrapArrayDiffUkey::class,
+        'UnwrapArrayFilter' => UnwrapArrayFilter::class,
+        'UnwrapArrayFlip' => UnwrapArrayFlip::class,
+        'UnwrapArrayIntersect' => UnwrapArrayIntersect::class,
+        'UnwrapArrayIntersectAssoc' => UnwrapArrayIntersectAssoc::class,
+        'UnwrapArrayIntersectKey' => UnwrapArrayIntersectKey::class,
+        'UnwrapArrayIntersectUassoc' => UnwrapArrayIntersectUassoc::class,
+        'UnwrapArrayIntersectUkey' => UnwrapArrayIntersectUkey::class,
+        'UnwrapArrayKeys' => UnwrapArrayKeys::class,
+        'UnwrapArrayMap' => UnwrapArrayMap::class,
+        'UnwrapArrayMerge' => UnwrapArrayMerge::class,
+        'UnwrapArrayMergeRecursive' => UnwrapArrayMergeRecursive::class,
+        'UnwrapArrayPad' => UnwrapArrayPad::class,
+        'UnwrapArrayReduce' => UnwrapArrayReduce::class,
+        'UnwrapArrayReplace' => UnwrapArrayReplace::class,
+        'UnwrapArrayReplaceRecursive' => UnwrapArrayReplaceRecursive::class,
+        'UnwrapArrayReverse' => UnwrapArrayReverse::class,
+        'UnwrapArraySlice' => UnwrapArraySlice::class,
+        'UnwrapArraySplice' => UnwrapArraySplice::class,
+        'UnwrapArrayUdiff' => UnwrapArrayUdiff::class,
+        'UnwrapArrayUdiffAssoc' => UnwrapArrayUdiffAssoc::class,
+        'UnwrapArrayUdiffUassoc' => UnwrapArrayUdiffUassoc::class,
+        'UnwrapArrayUintersect' => UnwrapArrayUintersect::class,
+        'UnwrapArrayUintersectAssoc' => UnwrapArrayUintersectAssoc::class,
+        'UnwrapArrayUintersectUassoc' => UnwrapArrayUintersectUassoc::class,
+        'UnwrapArrayUnique' => UnwrapArrayUnique::class,
+        'UnwrapArrayValues' => UnwrapArrayValues::class,
+        'UnwrapLcFirst' => UnwrapLcFirst::class,
+        'UnwrapStrRepeat' => UnwrapStrRepeat::class,
+        'UnwrapStrReplace' => UnwrapStrReplace::class,
+        'UnwrapStrToLower' => UnwrapStrToLower::class,
+        'UnwrapStrToUpper' => UnwrapStrToUpper::class,
+        'UnwrapTrim' => UnwrapTrim::class,
+        'UnwrapUcFirst' => UnwrapUcFirst::class,
+        'UnwrapUcWords' => UnwrapUcWords::class,
 
         // Extensions
-        'BCMath' => Mutator\Extensions\BCMath::class,
-        'MBString' => Mutator\Extensions\MBString::class,
+        'BCMath' => BCMath::class,
+        'MBString' => MBString::class,
     ];
 
     /**

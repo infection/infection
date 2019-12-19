@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
+use PhpParser\Node\Expr\Array_;
+use Safe\sprintf;
 use function array_merge;
 use function count;
 use Generator;
@@ -97,7 +99,7 @@ final class ArrayItemRemoval extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Expr\Array_ && count($node->items);
+        return $node instanceof Array_ && count($node->items);
     }
 
     private function getItemsIndexes(array $items): array

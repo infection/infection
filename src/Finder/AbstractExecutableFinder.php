@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Finder;
 
+use Safe\sprintf;
 /**
  * @internal
  */

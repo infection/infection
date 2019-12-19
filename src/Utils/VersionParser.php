@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Utils;
 
+use Safe\preg_match;
 use InvalidArgumentException;
 
 /**

@@ -35,6 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
+use PhpParser\Node\Expr\Variable;
+use PhpParser\Node\Stmt\Return_;
+use PhpParser\Node\Expr\Ternary;
+use PhpParser\Node\Expr\BinaryOp\Greater;
+use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Name;
+use PhpParser\Node\Arg;
+use PhpParser\Node\Scalar\LNumber;
+use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Identifier;
 use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ReflectionVisitor;
 use function is_string;
@@ -59,19 +69,19 @@ final class ArrayOneItem extends Mutator
         /** @var Node\Expr\Variable $expression */
         $expression = $node->expr;
 
-        $arrayVariable = new Node\Expr\Variable($expression->name);
+        $arrayVariable = new Variable($expression->name);
 
-        return new Node\Stmt\Return_(
-            new Node\Expr\Ternary(
-                new Node\Expr\BinaryOp\Greater(
-                    new Node\Expr\FuncCall(new Node\Name('count'), [new Node\Arg($arrayVariable)]),
-                    new Node\Scalar\LNumber(1)
+        return new Return_(
+            new Ternary(
+                new Greater(
+                    new FuncCall(new Name('count'), [new Arg($arrayVariable)]),
+                    new LNumber(1)
                 ),
-                new Node\Expr\FuncCall(new Node\Name('array_slice'), [
-                    new Node\Arg($arrayVariable),
-                    new Node\Arg(new Node\Scalar\LNumber(0)),
-                    new Node\Arg(new Node\Scalar\LNumber(1)),
-                    new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('true'))),
+                new FuncCall(new Name('array_slice'), [
+                    new Arg($arrayVariable),
+                    new Arg(new LNumber(0)),
+                    new Arg(new LNumber(1)),
+                    new Arg(new ConstFetch(new Name('true'))),
                 ]),
                 $arrayVariable
             )
@@ -80,11 +90,11 @@ final class ArrayOneItem extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        if (!$node instanceof Node\Stmt\Return_) {
+        if (!$node instanceof Return_) {
             return false;
         }
 
-        if (!$node->expr instanceof Node\Expr\Variable) {
+        if (!$node->expr instanceof Variable) {
             return false;
         }
 
@@ -102,7 +112,7 @@ final class ArrayOneItem extends Mutator
 
         $returnType = $functionScope->getReturnType();
 
-        if ($returnType instanceof Node\Identifier) {
+        if ($returnType instanceof Identifier) {
             $returnType = $returnType->name;
         }
 

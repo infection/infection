@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use PhpParser\Node\Expr\AssignOp\Mul;
+use PhpParser\Node\Expr\AssignOp\Mod;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -52,11 +54,11 @@ final class ModEqual extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\AssignOp\Mul($node->var, $node->expr, $node->getAttributes());
+        return new Mul($node->var, $node->expr, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Expr\AssignOp\Mod;
+        return $node instanceof Mod;
     }
 }

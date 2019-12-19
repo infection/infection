@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Safe\preg_replace;
+use Safe\sprintf;
 /**
  * @internal
  */

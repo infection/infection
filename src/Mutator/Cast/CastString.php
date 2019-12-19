@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Cast;
 
+use PhpParser\Node\Expr\Cast\String_;
 use PhpParser\Node;
 
 /**
@@ -44,6 +45,6 @@ final class CastString extends AbstractCastMutator
 {
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Expr\Cast\String_;
+        return $node instanceof String_;
     }
 }

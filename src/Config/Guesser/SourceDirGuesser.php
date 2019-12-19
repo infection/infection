@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Config\Guesser;
 
+use Safe\array_walk_recursive;
 use const DIRECTORY_SEPARATOR;
 use function in_array;
 use function is_array;

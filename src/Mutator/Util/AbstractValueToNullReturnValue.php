@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
+use PhpParser\Node\Identifier;
+use PhpParser\Node\NullableType;
+use PhpParser\Node\Name;
 use Infection\Visitor\ReflectionVisitor;
 use function is_string;
 use PhpParser\Node;
@@ -55,7 +58,7 @@ abstract class AbstractValueToNullReturnValue extends Mutator
 
         $returnType = $functionScope->getReturnType();
 
-        if ($returnType instanceof Node\Identifier) {
+        if ($returnType instanceof Identifier) {
             $returnType = $returnType->name;
         }
 
@@ -70,10 +73,10 @@ abstract class AbstractValueToNullReturnValue extends Mutator
         }
 
         // nullable typehint, e.g. "?int" or "?CustomClass"
-        if ($returnType instanceof Node\NullableType) {
+        if ($returnType instanceof NullableType) {
             return true;
         }
 
-        return !$returnType instanceof Node\Name;
+        return !$returnType instanceof Name;
     }
 }

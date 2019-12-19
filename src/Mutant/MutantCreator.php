@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
+use Safe\sprintf;
+use Safe\file_put_contents;
 use Infection\Differ\Differ;
 use Infection\MutationInterface;
 use Infection\Visitor\CloneVisitor;

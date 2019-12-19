@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
+use PhpParser\Node\Expr\BinaryOp\Plus;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
@@ -116,14 +117,14 @@ PHP
 
     public function test_it_should_mutate_plus_expression(): void
     {
-        $plusExpression = new Node\Expr\BinaryOp\Plus(new LNumber(1), new LNumber(2));
+        $plusExpression = new Plus(new LNumber(1), new LNumber(2));
 
         $this->assertTrue($this->mutator->shouldMutate($plusExpression));
     }
 
     public function test_it_should_not_mutate_plus_with_arrays(): void
     {
-        $plusExpression = new Node\Expr\BinaryOp\Plus(
+        $plusExpression = new Plus(
             new Array_([new LNumber(1)]),
             new Array_([new LNumber(1)])
         );

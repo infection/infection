@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use PhpParser\Node\Expr\BinaryOp\BooleanAnd;
+use PhpParser\Node\Expr\BinaryOp\BooleanOr;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -52,11 +54,11 @@ final class LogicalOr extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\BinaryOp\BooleanAnd($node->left, $node->right, $node->getAttributes());
+        return new BooleanAnd($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\BooleanOr;
+        return $node instanceof BooleanOr;
     }
 }

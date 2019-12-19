@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Util;
 
+use PhpParser\Node\Identifier;
+use PhpParser\Node\NullableType;
+use PhpParser\Node\Name;
 use Infection\Mutator\Util\AbstractValueToNullReturnValue;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Function_;
@@ -62,7 +65,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
     public function test_return_type_is_node_identifier(): void
     {
         /** @var Node\Identifier $mockNode */
-        $mockNode = $this->createMock(Node\Identifier::class);
+        $mockNode = $this->createMock(Identifier::class);
 
         $this->assertTrue(
             $this->invokeMethod(
@@ -90,7 +93,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
             $this->invokeMethod(
                 $this->mockNode(
                     $this->mockFunction(
-                        $this->createMock(Node\NullableType::class)
+                        $this->createMock(NullableType::class)
                     )
                 )
             )
@@ -116,7 +119,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
             $this->invokeMethod(
                 $this->mockNode(
                     $this->mockFunction(
-                        $this->createMock(Node\Name::class)
+                        $this->createMock(Name::class)
                     )
                 )
             )

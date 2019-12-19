@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
+use PhpParser\Lexer\Emulative;
 use function array_filter;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
@@ -219,7 +220,7 @@ final class InfectionContainer extends Container
                 return new VersionParser();
             },
             Lexer::class => static function (): Lexer {
-                return new Lexer\Emulative([
+                return new Emulative([
                     'usedAttributes' => [
                         'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
                     ],

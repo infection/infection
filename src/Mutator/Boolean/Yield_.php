@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use PhpParser\Node\Expr\BinaryOp\Greater;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -56,7 +57,7 @@ final class Yield_ extends Mutator
         $key = $node->key;
         /** @var Node\Expr $value */
         $value = $node->value;
-        $node->value = new Node\Expr\BinaryOp\Greater($key, $value, $node->getAttributes());
+        $node->value = new Greater($key, $value, $node->getAttributes());
         $node->key = null;
 
         return $node;

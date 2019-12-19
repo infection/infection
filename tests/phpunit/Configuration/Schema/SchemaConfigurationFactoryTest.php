@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Schema;
 
+use Safe\sprintf;
 use function array_diff_key;
 use function array_fill_keys;
 use function array_keys;

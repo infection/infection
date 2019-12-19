@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Console\OutputFormatter;
 
+use Safe\sprintf;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessInterface;
 use function strlen;

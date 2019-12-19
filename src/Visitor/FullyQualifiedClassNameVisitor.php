@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Visitor;
 
+use PhpParser\Node\Stmt\Namespace_;
+use PhpParser\Node\Stmt\ClassLike;
 use PhpParser\Node;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt;
@@ -58,9 +60,9 @@ final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node): ?Node
     {
-        if ($node instanceof Stmt\Namespace_) {
+        if ($node instanceof Namespace_) {
             $this->namespace = $node->name;
-        } elseif ($node instanceof Stmt\ClassLike) {
+        } elseif ($node instanceof ClassLike) {
             $node->setAttribute(self::FQN_KEY, $node->name ? Name::concat($this->namespace, $node->name->name) : null);
         }
 

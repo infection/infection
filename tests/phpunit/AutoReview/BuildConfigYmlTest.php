@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
+use Safe\file_get_contents;
+use Safe\sprintf;
+use Safe\realpath;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Exception\ParseException;

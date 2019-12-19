@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use PhpParser\Node\Expr\BinaryOp\Plus;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -52,7 +53,7 @@ final class Minus extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\BinaryOp\Plus($node->left, $node->right, $node->getAttributes());
+        return new Plus($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool

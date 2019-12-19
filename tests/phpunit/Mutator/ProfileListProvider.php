@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use Safe\substr;
+use Safe\ksort;
+use Safe\sprintf;
 use function array_filter;
 use const ARRAY_FILTER_USE_KEY;
 use function array_values;

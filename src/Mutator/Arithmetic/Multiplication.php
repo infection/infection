@@ -35,6 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use PhpParser\Node\Expr\BinaryOp\Div;
+use PhpParser\Node\Expr\BinaryOp\Mul;
+use PhpParser\Node\Expr\UnaryMinus;
+use PhpParser\Node\Scalar\LNumber;
+use PhpParser\Node\Scalar\DNumber;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -52,12 +57,12 @@ final class Multiplication extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\BinaryOp\Div($node->left, $node->right, $node->getAttributes());
+        return new Div($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        if (!$node instanceof Node\Expr\BinaryOp\Mul) {
+        if (!$node instanceof Mul) {
             return false;
         }
 
@@ -65,11 +70,11 @@ final class Multiplication extends Mutator
             return false;
         }
 
-        if ($node->left instanceof Node\Expr\UnaryMinus && $this->isNumericOne($node->left->expr)) {
+        if ($node->left instanceof UnaryMinus && $this->isNumericOne($node->left->expr)) {
             return false;
         }
 
-        if ($node->right instanceof Node\Expr\UnaryMinus && $this->isNumericOne($node->right->expr)) {
+        if ($node->right instanceof UnaryMinus && $this->isNumericOne($node->right->expr)) {
             return false;
         }
 
@@ -78,10 +83,10 @@ final class Multiplication extends Mutator
 
     private function isNumericOne(Node $node): bool
     {
-        if ($node instanceof Node\Scalar\LNumber && $node->value === 1) {
+        if ($node instanceof LNumber && $node->value === 1) {
             return true;
         }
 
-        return $node instanceof Node\Scalar\DNumber && $node->value === 1.0;
+        return $node instanceof DNumber && $node->value === 1.0;
     }
 }

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Config\Guesser;
 
+use Safe\json_decode;
 use Generator;
 use Infection\Config\Guesser\PhpUnitPathGuesser;
 use PHPUnit\Framework\TestCase;

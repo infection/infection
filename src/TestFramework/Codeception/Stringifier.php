@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Codeception;
 
+use Safe\sprintf;
 use Webmozart\Assert\Assert;
 
 /**

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalNegotiation;
 
+use PhpParser\Node\Expr\BinaryOp\GreaterOrEqual;
+use PhpParser\Node\Expr\BinaryOp\Smaller;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -52,11 +54,11 @@ final class LessThanNegotiation extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\BinaryOp\GreaterOrEqual($node->left, $node->right, $node->getAttributes());
+        return new GreaterOrEqual($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\Smaller;
+        return $node instanceof Smaller;
     }
 }

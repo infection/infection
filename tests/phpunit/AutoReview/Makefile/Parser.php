@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\Makefile;
 
+use Safe\preg_match;
+use Safe\substr;
 use function array_filter;
 use function array_map;
 use function array_merge;

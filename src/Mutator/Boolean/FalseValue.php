@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Name;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -50,12 +52,12 @@ final class FalseValue extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\ConstFetch(new Node\Name('true'));
+        return new ConstFetch(new Name('true'));
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        if (!($node instanceof Node\Expr\ConstFetch)) {
+        if (!($node instanceof ConstFetch)) {
             return false;
         }
 

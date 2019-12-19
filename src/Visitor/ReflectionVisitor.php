@@ -35,6 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Visitor;
 
+use PhpParser\Node\Stmt\ClassLike;
+use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Function_;
+use PhpParser\Node\Param;
+use PhpParser\Node\Expr\Closure;
 use function count;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
@@ -78,7 +83,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node)
     {
-        if ($node instanceof Node\Stmt\ClassLike) {
+        if ($node instanceof ClassLike) {
             if ($attribute = $node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)) {
                 $this->classScopeStack[] = new ReflectionClass($attribute->toString());
             } else {
@@ -92,7 +97,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
             return null;
         }
 
-        if ($node instanceof Node\Stmt\ClassMethod) {
+        if ($node instanceof ClassMethod) {
             $this->methodName = $node->name->name;
         }
 
@@ -100,7 +105,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
         if ($isInsideFunction) {
             $node->setAttribute(self::IS_INSIDE_FUNCTION_KEY, true);
-        } elseif ($node instanceof Node\Stmt\Function_) {
+        } elseif ($node instanceof Function_) {
             return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
 
@@ -127,7 +132,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
             array_pop($this->functionScopeStack);
         }
 
-        if ($node instanceof  Node\Stmt\ClassLike) {
+        if ($node instanceof  ClassLike) {
             array_pop($this->classScopeStack);
         }
 
@@ -146,7 +151,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
         $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
 
-        return $parent instanceof Node\Param || $node instanceof Node\Param;
+        return $parent instanceof Param || $node instanceof Param;
     }
 
     /**
@@ -173,11 +178,11 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
     private function isFunctionLikeNode(Node $node): bool
     {
-        if ($node instanceof Node\Stmt\ClassMethod) {
+        if ($node instanceof ClassMethod) {
             return true;
         }
 
-        if ($node instanceof Node\Expr\Closure) {
+        if ($node instanceof Closure) {
             return true;
         }
 

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use PhpParser\Node\Expr\BinaryOp\ShiftLeft;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -52,7 +53,7 @@ final class ShiftRight extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\BinaryOp\ShiftLeft($node->left, $node->right, $node->getAttributes());
+        return new ShiftLeft($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool

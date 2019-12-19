@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config;
 
+use Safe\sprintf;
 use function assert;
 use DOMElement;
 use DOMXPath;

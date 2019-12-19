@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Codeception\Codecept;
 use Infection\Configuration\Configuration;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
@@ -182,11 +183,11 @@ final class Factory
             return;
         }
 
-        if (version_compare(\Codeception\Codecept::VERSION, '3.1.1', '<')) {
+        if (version_compare(Codecept::VERSION, '3.1.1', '<')) {
             throw new LogicException(
                 sprintf(
                     'Current Codeception version "%s" is not supported by Infection. Please use >=3.1.1',
-                    \Codeception\Codecept::VERSION
+                    Codecept::VERSION
                 )
             );
         }

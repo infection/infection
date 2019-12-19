@@ -35,6 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Console;
 
+use Safe\file_get_contents;
+use Safe\getcwd;
+use Safe\chdir;
+use Safe\ini_get;
+use Safe\copy;
+use Safe\sprintf;
 use Composer\Autoload\ClassLoader;
 use const DIRECTORY_SEPARATOR;
 use function extension_loaded;

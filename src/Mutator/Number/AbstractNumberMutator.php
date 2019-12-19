@@ -35,6 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
+use PhpParser\Node\Expr\UnaryMinus;
+use PhpParser\Node\Expr\BinaryOp\Greater;
+use PhpParser\Node\Expr\BinaryOp\GreaterOrEqual;
+use PhpParser\Node\Expr\BinaryOp\Smaller;
+use PhpParser\Node\Expr\BinaryOp\SmallerOrEqual;
 use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
@@ -57,13 +62,13 @@ abstract class AbstractNumberMutator extends Mutator
 
     private function isSizeComparison(Node $parentNode): bool
     {
-        if ($parentNode instanceof Node\Expr\UnaryMinus) {
+        if ($parentNode instanceof UnaryMinus) {
             return $this->isSizeComparison($parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY));
         }
 
-        return $parentNode instanceof Node\Expr\BinaryOp\Greater
-            || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            || $parentNode instanceof Node\Expr\BinaryOp\Smaller
-            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual;
+        return $parentNode instanceof Greater
+            || $parentNode instanceof GreaterOrEqual
+            || $parentNode instanceof Smaller
+            || $parentNode instanceof SmallerOrEqual;
     }
 }

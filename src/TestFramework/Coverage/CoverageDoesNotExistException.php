@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use Safe\sprintf;
 use Infection\Console\Exception\InfectionException;
 
 /**

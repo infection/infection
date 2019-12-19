@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ZeroIteration;
 
+use PhpParser\Node\Expr\Array_;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -53,7 +54,7 @@ final class Foreach_ extends Mutator
     public function mutate(Node $node)
     {
         return new Node\Stmt\Foreach_(
-            new Node\Expr\Array_(),
+            new Array_(),
             $node->valueVar,
             [
                 'keyVar' => $node->keyVar,

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Coverage;
 
+use Safe\preg_replace;
+use Safe\sprintf;
 use DOMDocument;
 use DOMElement;
 use DOMNode;

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Path;
 
+use Safe\sprintf;
 use DOMElement;
 use DOMNode;
 use Symfony\Component\Filesystem\Filesystem;

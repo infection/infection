@@ -35,6 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Performance\Limiter;
 
+use Safe\ini_get;
+use Safe\touch;
+use Safe\sprintf;
+use Safe\unlink;
 use Composer\XdebugHandler\XdebugHandler;
 use Infection\Performance\Limiter\MemoryLimiter;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;

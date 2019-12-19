@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
+use PhpParser\Node\Stmt\Break_;
+use PhpParser\Node\Stmt\Case_;
 use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
@@ -51,7 +53,7 @@ final class Continue_ extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Stmt\Break_();
+        return new Break_();
     }
 
     protected function mutatesNode(Node $node): bool
@@ -62,7 +64,7 @@ final class Continue_ extends Mutator
 
         $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
 
-        if ($parentNode instanceof Node\Stmt\Case_) {
+        if ($parentNode instanceof Case_) {
             return false;
         }
 

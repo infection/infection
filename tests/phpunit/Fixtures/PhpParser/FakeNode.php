@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures\PhpParser;
 
+use PhpParser\Comment\Doc;
 use LogicException;
 use PhpParser\Comment;
 use PhpParser\Node;
@@ -65,7 +66,7 @@ final class FakeNode implements Node
         throw new LogicException();
     }
 
-    public function setDocComment(Comment\Doc $docComment)
+    public function setDocComment(Doc $docComment)
     {
         throw new LogicException();
     }

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use PhpParser\Node\Expr\AssignOp\Minus;
+use PhpParser\Node\Expr\AssignOp\Plus;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -52,11 +54,11 @@ final class PlusEqual extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\AssignOp\Minus($node->var, $node->expr, $node->getAttributes());
+        return new Minus($node->var, $node->expr, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Expr\AssignOp\Plus;
+        return $node instanceof Plus;
     }
 }

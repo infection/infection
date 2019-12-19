@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use Safe\ksort;
 use Infection\Mutant\MetricsCalculator;
 
 /**

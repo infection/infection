@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Performance\Listener;
 
+use Safe\sprintf;
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\ApplicationExecutionFinished;
 use Infection\Events\ApplicationExecutionStarted;

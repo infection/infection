@@ -35,6 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use PhpParser\Node\Expr\BinaryOp\Greater;
+use PhpParser\Node\Expr\PropertyFetch;
+use PhpParser\Node\Expr\MethodCall;
+use PhpParser\Node\Expr\FuncCall;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -57,7 +61,7 @@ final class ArrayItem extends Mutator
         /** @var Node\Expr $value */
         $value = $node->value;
 
-        return new Node\Expr\BinaryOp\Greater($key, $value, $node->getAttributes());
+        return new Greater($key, $value, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool
@@ -69,9 +73,9 @@ final class ArrayItem extends Mutator
     {
         return
             // __get() can have side-effects
-            $node instanceof Node\Expr\PropertyFetch ||
+            $node instanceof PropertyFetch ||
             // these clearly can have side-effects
-            $node instanceof Node\Expr\MethodCall ||
-            $node instanceof Node\Expr\FuncCall;
+            $node instanceof MethodCall ||
+            $node instanceof FuncCall;
     }
 }

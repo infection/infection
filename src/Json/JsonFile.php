@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Json;
 
+use Safe\json_decode;
+use Safe\json_last_error_msg;
 use Infection\Json\Exception\JsonValidationException;
 use Infection\Json\Exception\ParseException;
 use JsonSchema\Validator;

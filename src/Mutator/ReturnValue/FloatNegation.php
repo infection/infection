@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
+use PhpParser\Node\Stmt\Return_;
+use PhpParser\Node\Scalar\DNumber;
+use PhpParser\Node\Expr\UnaryMinus;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -53,24 +56,24 @@ final class FloatNegation extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Stmt\Return_(
-            new Node\Scalar\DNumber(-1 * $this->getFloatValueOfNode($node), $node->getAttributes())
+        return new Return_(
+            new DNumber(-1 * $this->getFloatValueOfNode($node), $node->getAttributes())
         );
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        if (!$node instanceof Node\Stmt\Return_) {
+        if (!$node instanceof Return_) {
             return false;
         }
 
         $expr = $node->expr;
 
-        if ($expr instanceof Node\Expr\UnaryMinus) {
+        if ($expr instanceof UnaryMinus) {
             $expr = $expr->expr;
         }
 
-        if (!$expr instanceof Node\Scalar\DNumber) {
+        if (!$expr instanceof DNumber) {
             return false;
         }
 
@@ -89,7 +92,7 @@ final class FloatNegation extends Mutator
         /** @var Node\Expr\UnaryMinus|Node\Scalar\DNumber $expression */
         $expression = $node->expr;
 
-        if ($expression instanceof Node\Expr\UnaryMinus) {
+        if ($expression instanceof UnaryMinus) {
             /** @var Node\Scalar\LNumber $innerExpression */
             $innerExpression = $expression->expr;
 

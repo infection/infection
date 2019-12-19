@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Json\Exception;
 
+use Safe\sprintf;
 use Infection\Json\Exception\ParseException;
 use PHPUnit\Framework\TestCase;
 

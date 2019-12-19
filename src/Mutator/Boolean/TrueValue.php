@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Name;
+use PhpParser\Node\Expr\FuncCall;
 use function array_key_exists;
 use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ParentConnectorVisitor;
@@ -57,12 +60,12 @@ final class TrueValue extends Mutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\ConstFetch(new Node\Name('false'));
+        return new ConstFetch(new Name('false'));
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        if (!($node instanceof Node\Expr\ConstFetch)) {
+        if (!($node instanceof ConstFetch)) {
             return false;
         }
 
@@ -73,7 +76,7 @@ final class TrueValue extends Mutator
         $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
         $grandParentNode = $parentNode !== null ? $parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY) : null;
 
-        if (!$grandParentNode instanceof Node\Expr\FuncCall || !$grandParentNode->name instanceof Node\Name) {
+        if (!$grandParentNode instanceof FuncCall || !$grandParentNode->name instanceof Name) {
             return true;
         }
 

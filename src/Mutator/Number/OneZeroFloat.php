@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
+use PhpParser\Node\Scalar\DNumber;
 use PhpParser\Node;
 
 /**
@@ -52,16 +53,16 @@ final class OneZeroFloat extends AbstractNumberMutator
     public function mutate(Node $node)
     {
         if ($node->value === 0.0) {
-            return new Node\Scalar\DNumber(1.0);
+            return new DNumber(1.0);
         }
 
-        return new Node\Scalar\DNumber(0.0);
+        return new DNumber(0.0);
     }
 
     protected function mutatesNode(Node $node): bool
     {
         return
-            $node instanceof Node\Scalar\DNumber
+            $node instanceof DNumber
             && ($node->value === 0.0 || $node->value === 1.0)
             && !$this->isPartOfSizeComparison($node);
     }

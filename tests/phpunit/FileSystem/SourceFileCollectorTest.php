@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
+use Safe\natcasesort;
 use function array_map;
 use function array_values;
 use Generator;

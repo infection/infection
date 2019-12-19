@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ZeroIteration;
 
+use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Name;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -55,7 +57,7 @@ final class For_ extends Mutator
         return new Node\Stmt\For_(
             [
                 'init' => $node->init,
-                'cond' => [new Node\Expr\ConstFetch(new Node\Name('false'))],
+                'cond' => [new ConstFetch(new Name('false'))],
                 'loop' => $node->loop,
                 'stmts' => $node->stmts,
             ],

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
+use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node;
 
 /**
@@ -51,12 +52,12 @@ final class IncrementInteger extends AbstractNumberMutator
      */
     public function mutate(Node $node)
     {
-        return new Node\Scalar\LNumber($node->value + 1);
+        return new LNumber($node->value + 1);
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Scalar\LNumber
+        return $node instanceof LNumber
             && $node->value !== 0
             && !$this->isPartOfSizeComparison($node);
     }

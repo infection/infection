@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Safe\sprintf;
+use Safe\file_put_contents;
+use Safe\json_encode;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;

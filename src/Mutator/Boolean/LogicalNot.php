@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use PhpParser\Node\Expr\BooleanNot;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -55,13 +56,13 @@ final class LogicalNot extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        if (!($node instanceof Node\Expr\BooleanNot)) {
+        if (!($node instanceof BooleanNot)) {
             return false;
         }
 
         // e.g. "!!someFunc()"
-        $isDoubledLogicalNot = ($node->expr instanceof Node\Expr\BooleanNot) ||
-            $node->getAttribute('parent') instanceof Node\Expr\BooleanNot;
+        $isDoubledLogicalNot = ($node->expr instanceof BooleanNot) ||
+            $node->getAttribute('parent') instanceof BooleanNot;
 
         return !$isDoubledLogicalNot;
     }

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpSpec\Config\Builder;
 
+use Safe\sprintf;
+use Safe\file_put_contents;
 use function array_key_exists;
 use function dirname;
 use Infection\Mutant\MutantInterface;

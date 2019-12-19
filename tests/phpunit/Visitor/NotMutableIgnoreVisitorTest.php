@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Visitor;
 
+use PhpParser\Node\Stmt\ClassMethod;
 use Infection\Visitor\NotMutableIgnoreVisitor;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
@@ -101,7 +102,7 @@ PHP;
 
             public function leaveNode(Node $node): void
             {
-                if ($node instanceof Node\Stmt\ClassMethod) {
+                if ($node instanceof ClassMethod) {
                     ++$this->nodesVisitedCount;
                 }
             }

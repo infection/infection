@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Path;
 
+use Safe\realpath;
 use DOMDocument;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use function Infection\Tests\normalizePath as p;
@@ -50,7 +51,7 @@ final class PathReplacerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->projectPath = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
+        $this->projectPath = normalizePath(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
     }
 
     /**
@@ -66,7 +67,7 @@ final class PathReplacerTest extends TestCase
 
         $pathReplacer->replaceInNode($node);
 
-        $this->assertSame($expectedPath, p($node->nodeValue));
+        $this->assertSame($expectedPath, normalizePath($node->nodeValue));
     }
 
     public function pathProvider(): array

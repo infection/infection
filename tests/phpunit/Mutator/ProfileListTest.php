@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use Safe\sprintf;
+use Safe\sort;
 use function array_keys;
 use function in_array;
 use Infection\Mutator\ProfileList;

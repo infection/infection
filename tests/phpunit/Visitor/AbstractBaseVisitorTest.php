@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Visitor;
 
+use PhpParser\Lexer\Emulative;
+use Safe\file_get_contents;
+use Safe\sprintf;
 use PhpParser\Lexer;
 use PhpParser\ParserFactory;
 use PHPUnit\Framework\TestCase;
@@ -43,7 +46,7 @@ abstract class AbstractBaseVisitorTest extends TestCase
 {
     protected function getNodes(string $code): array
     {
-        $lexer = new Lexer\Emulative();
+        $lexer = new Emulative();
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
 
         return $parser->parse($code);
