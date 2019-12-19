@@ -42,6 +42,9 @@ use Infection\TestFramework\TestFrameworkExtraOptions;
  */
 final class PhpUnitExtraOptions extends TestFrameworkExtraOptions
 {
+    /**
+     * @return string[]
+     */
     protected function getInitialRunOnlyOptions(): array
     {
         return ['--filter', '--testsuite'];

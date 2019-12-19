@@ -47,14 +47,7 @@ use LibXMLError;
  */
 final class XmlConfigurationHelper
 {
-    /**
-     * @var PathReplacer
-     */
     private $pathReplacer;
-
-    /**
-     * @var string
-     */
     private $phpUnitConfigDir;
 
     public function __construct(PathReplacer $pathReplacer, string $phpUnitConfigDir)

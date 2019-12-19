@@ -41,9 +41,6 @@ use PhpParser\Node;
 
 abstract class Mutator
 {
-    /**
-     * @var MutatorConfig
-     */
     private $config;
 
     public function __construct(MutatorConfig $config)

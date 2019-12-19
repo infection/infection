@@ -54,19 +54,8 @@ final class ExcludeDirsProvider
 {
     public const EXCLUDED_ROOT_DIRS = ['vendor', 'tests', 'test'];
 
-    /**
-     * @var ConsoleHelper
-     */
     private $consoleHelper;
-
-    /**
-     * @var QuestionHelper
-     */
     private $questionHelper;
-
-    /**
-     * @var Filesystem
-     */
     private $filesystem;
 
     public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper, Filesystem $filesystem)

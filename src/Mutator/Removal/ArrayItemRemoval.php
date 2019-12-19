@@ -62,9 +62,14 @@ final class ArrayItemRemoval extends Mutator
         'limit' => PHP_INT_MAX,
     ];
 
-    /** @var string first|last|all */
+    /**
+     * @var string first|last|all
+     */
     private $remove;
-    /** @var int */
+
+    /**
+     * @var int
+     */
     private $limit;
 
     public function __construct(MutatorConfig $config)

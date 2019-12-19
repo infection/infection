@@ -40,14 +40,7 @@ namespace Infection\TestFramework\Coverage;
  */
 final class CoverageFileData
 {
-    /**
-     * @var array<int, array<int, CoverageLineData>>
-     */
     public $byLine = [];
-
-    /**
-     * @var MethodLocationData[]
-     */
     public $byMethod = [];
 
     /**

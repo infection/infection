@@ -63,24 +63,9 @@ final class MutantProcess implements MutantProcessInterface
         self::PROCESS_MISUSE_SHELL_BUILTINS,
     ];
 
-    /**
-     * @var Process
-     */
     private $process;
-
-    /**
-     * @var MutantInterface
-     */
     private $mutant;
-
-    /**
-     * @var bool
-     */
     private $isTimedOut = false;
-
-    /**
-     * @var TestFrameworkAdapter
-     */
     private $testFrameworkAdapter;
 
     public function __construct(Process $process, MutantInterface $mutant, TestFrameworkAdapter $testFrameworkAdapter)

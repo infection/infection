@@ -57,24 +57,9 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
      */
     private $coverage;
 
-    /**
-     * @var string
-     */
     private $coverageDir;
-
-    /**
-     * @var CoverageXmlParser
-     */
     private $parser;
-
-    /**
-     * @var TestFileDataProvider|null
-     */
     private $testFileDataProvider;
-
-    /**
-     * @var string
-     */
     private $testFrameworkKey;
 
     public function __construct(string $coverageDir, CoverageXmlParser $coverageXmlParser, string $testFrameworkKey, ?TestFileDataProvider $testFileDataProvider = null)

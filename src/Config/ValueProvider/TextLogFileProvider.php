@@ -48,14 +48,7 @@ final class TextLogFileProvider
 {
     public const TEXT_LOG_FILE_NAME = 'infection.log';
 
-    /**
-     * @var ConsoleHelper
-     */
     private $consoleHelper;
-
-    /**
-     * @var QuestionHelper
-     */
     private $questionHelper;
 
     public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)

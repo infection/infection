@@ -47,14 +47,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class MutantCreatingConsoleLoggerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var OutputInterface
-     */
     private $output;
-
-    /**
-     * @var ProgressBar
-     */
     private $progressBar;
 
     public function __construct(OutputInterface $output)

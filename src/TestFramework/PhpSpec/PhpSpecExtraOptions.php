@@ -42,6 +42,9 @@ use Infection\TestFramework\TestFrameworkExtraOptions;
  */
 final class PhpSpecExtraOptions extends TestFrameworkExtraOptions
 {
+    /**
+     * @return string[]
+     */
     protected function getInitialRunOnlyOptions(): array
     {
         return [];

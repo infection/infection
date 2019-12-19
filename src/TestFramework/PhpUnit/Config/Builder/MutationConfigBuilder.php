@@ -51,29 +51,10 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
  */
 class MutationConfigBuilder extends ConfigBuilder
 {
-    /**
-     * @var string
-     */
     private $tempDirectory;
-
-    /**
-     * @var string
-     */
     private $projectDir;
-
-    /**
-     * @var XmlConfigurationHelper
-     */
     private $xmlConfigurationHelper;
-
-    /**
-     * @var DOMDocument
-     */
     private $dom;
-
-    /**
-     * @var JUnitTestCaseSorter
-     */
     private $jUnitTestCaseSorter;
 
     public function __construct(
