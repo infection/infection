@@ -88,6 +88,7 @@ use function Safe\getcwd;
 use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Filesystem\Filesystem;
+use Webmozart\PathUtil\Path;
 
 /**
  * @internal
@@ -110,7 +111,7 @@ final class InfectionContainer extends Container
 
                 return sprintf(
                     '%s/%s',
-                    $config->getExistingCoveragePath(),
+                    Path::canonicalize($config->getExistingCoveragePath() . '/..'),
                     TestFrameworkAdapter::JUNIT_FILE_NAME
                 );
             },
