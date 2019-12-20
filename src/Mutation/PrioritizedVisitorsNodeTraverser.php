@@ -52,7 +52,7 @@ use const SORT_NUMERIC;
 class PrioritizedVisitorsNodeTraverser implements NodeTraverserInterface
 {
     /**
-     * @var NodeVisitor[]
+     * @var array<int, NodeVisitor>
      */
     private $visitors = [];
 
@@ -91,7 +91,9 @@ class PrioritizedVisitorsNodeTraverser implements NodeTraverserInterface
     }
 
     /**
-     * @return NodeVisitor[]
+     * Warning: should be used for test purposes only
+     *
+     * @return array<int, NodeVisitor>
      */
     public function getVisitors(): array
     {

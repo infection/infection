@@ -188,7 +188,7 @@ final class PrioritizedVisitorsNodeTraverserTest extends TestCase
         ];
 
         // With the given fixtures above and while keeping the same visitor priority pair, then
-        // for each possible permutations of the possible order of those pairs should yiel an
+        // for each possible permutations of the possible order of those pairs should yield an
         // identical result.
         yield 'permutation 0' => [
             [
