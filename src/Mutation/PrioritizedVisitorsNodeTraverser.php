@@ -52,7 +52,7 @@ use const SORT_NUMERIC;
 class PrioritizedVisitorsNodeTraverser implements NodeTraverserInterface
 {
     /**
-     * @var array<int,NodeVisitor>
+     * @var NodeVisitor[]
      */
     private $visitors = [];
 
@@ -74,6 +74,10 @@ class PrioritizedVisitorsNodeTraverser implements NodeTraverserInterface
         }
 
         $this->visitors[$priority] = $visitor;
+
+        // This could on theory be optimized by doing it only once. However for now we need
+        // the `getVisitors()` method for inspecting the visitors state.
+        krsort($this->visitors, SORT_NUMERIC);
     }
 
     public function addVisitor(NodeVisitor $visitor): void
@@ -87,17 +91,10 @@ class PrioritizedVisitorsNodeTraverser implements NodeTraverserInterface
     }
 
     /**
-     * @return array<int,NodeVisitor>
+     * @return NodeVisitor[]
      */
     public function getVisitors(): array
     {
-        // This could on theory be optimized by doing it only once. This would however require to
-        // keep track of whether or not visitors have been already sorted and reset that state
-        // when adding a visitor.
-        // Since this method is mostly used for test-purposes to inspect the configured visitors,
-        // it is most definitely not worth to add more state for this nano-optimization.
-        krsort($this->visitors, SORT_NUMERIC);
-
         return $this->visitors;
     }
 
@@ -106,14 +103,6 @@ class PrioritizedVisitorsNodeTraverser implements NodeTraverserInterface
      */
     public function traverse(array $nodes): array
     {
-        // This could on theory be optimized by doing it only once. This would however require to
-        // keep track of whether or not visitors have been already sorted and reset that state
-        // when adding a visitor.
-        // Since in practice this method is used only once this would be within the real of
-        // nano-optimization hence not worth pursuing since would introduce more state and make
-        // the tests of this class unnecessarily more complex.
-        krsort($this->visitors, SORT_NUMERIC);
-
         foreach ($this->visitors as $visitor) {
             $this->traverser->addVisitor($visitor);
         }
