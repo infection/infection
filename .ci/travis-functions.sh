@@ -5,6 +5,8 @@
 # - https://docs.travis-ci.com/user/languages/php#Disabling-preinstalled-PHP-extensions
 # - https://docs.travis-ci.com/user/languages/php#Custom-PHP-configuration
 
+set -Eeuo pipefail
+
 config="/home/travis/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini"
 
 function xdebug-disable() {
