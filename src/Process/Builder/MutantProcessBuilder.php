@@ -47,19 +47,8 @@ use Symfony\Component\Process\Process;
  */
 final class MutantProcessBuilder
 {
-    /**
-     * @var TestFrameworkAdapter
-     */
     private $testFrameworkAdapter;
-
-    /**
-     * @var int
-     */
     private $timeout;
-
-    /**
-     * @var VersionParser
-     */
     private $versionParser;
 
     public function __construct(TestFrameworkAdapter $testFrameworkAdapter, VersionParser $versionParser, int $timeout)

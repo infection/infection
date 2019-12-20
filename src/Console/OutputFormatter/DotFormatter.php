@@ -47,9 +47,6 @@ final class DotFormatter extends AbstractOutputFormatter
 {
     private const DOTS_PER_ROW = 50;
 
-    /**
-     * @var OutputInterface
-     */
     private $output;
 
     public function __construct(OutputInterface $output)

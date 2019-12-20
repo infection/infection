@@ -52,9 +52,6 @@ use Symfony\Component\Process\Exception\RuntimeException;
  */
 final class ParallelProcessRunner
 {
-    /**
-     * @var EventDispatcherInterface
-     */
     private $eventDispatcher;
 
     /**

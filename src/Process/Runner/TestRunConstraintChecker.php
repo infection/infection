@@ -52,34 +52,11 @@ final class TestRunConstraintChecker
 
     private const VALUE_OVER_REQUIRED_TOLERANCE = 0.1;
 
-    /**
-     * @var MetricsCalculator
-     */
     private $metricsCalculator;
-
-    /**
-     * @var bool
-     */
     private $ignoreMsiWithNoMutations;
-
-    /**
-     * @var float
-     */
     private $minMsi;
-
-    /**
-     * @var float
-     */
     private $minCoveredMsi;
-
-    /**
-     * @var string
-     */
     private $failureType = '';
-
-    /**
-     * @var string
-     */
     private $actualOverRequiredType = '';
 
     public function __construct(

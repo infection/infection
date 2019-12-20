@@ -57,20 +57,12 @@ final class MutationGenerator
     private $sourceFiles;
 
     /**
-     * @var LineCodeCoverage
-     */
-    private $codeCoverageData;
-
-    /**
      * @var Mutator[]
      */
     private $mutators;
 
-    /**
-     * @var EventDispatcherInterface
-     */
+    private $codeCoverageData;
     private $eventDispatcher;
-
     private $fileMutationGenerator;
 
     /**

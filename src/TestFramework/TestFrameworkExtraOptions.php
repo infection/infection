@@ -40,9 +40,6 @@ namespace Infection\TestFramework;
  */
 abstract class TestFrameworkExtraOptions
 {
-    /**
-     * @var string
-     */
     private $extraOptions;
 
     public function __construct(?string $extraOptions = null)
@@ -60,12 +57,14 @@ abstract class TestFrameworkExtraOptions
         $extraOptions = $this->extraOptions;
 
         foreach ($this->getInitialRunOnlyOptions() as $initialRunOnlyOption) {
-            /** @var string $extraOptions */
             $extraOptions = preg_replace(sprintf('/%s[\=| ](?:\"[^\"]*\"|\'[^\']*\'|[^\ ]*)/', $initialRunOnlyOption), '', $extraOptions);
         }
 
         return (string) preg_replace('/\s+/', ' ', trim($extraOptions));
     }
 
+    /**
+     * @return string[]
+     */
     abstract protected function getInitialRunOnlyOptions(): array;
 }

@@ -48,9 +48,6 @@ class BadgeApiClient
 
     private const CREATED_RESPONSE_CODE = 201;
 
-    /**
-     * @var OutputInterface
-     */
     private $output;
 
     public function __construct(OutputInterface $output)

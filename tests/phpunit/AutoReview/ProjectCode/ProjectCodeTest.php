@@ -60,7 +60,7 @@ use function Safe\sprintf;
 final class ProjectCodeTest extends TestCase
 {
     /**
-     * @var PHPDocParser
+     * @var PHPDocParser|null
      */
     private static $phpDocParser;
 

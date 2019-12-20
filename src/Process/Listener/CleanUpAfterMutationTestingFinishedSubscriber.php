@@ -44,14 +44,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class CleanUpAfterMutationTestingFinishedSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var Filesystem
-     */
     private $filesystem;
-
-    /**
-     * @var string
-     */
     private $tmpDir;
 
     public function __construct(Filesystem $filesystem, string $tmpDir)

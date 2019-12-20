@@ -49,14 +49,7 @@ use Symfony\Component\Process\Process;
  */
 class TestFrameworkFinder extends AbstractExecutableFinder
 {
-    /**
-     * @var string
-     */
     private $testFrameworkName;
-
-    /**
-     * @var string
-     */
     private $customPath;
 
     /**

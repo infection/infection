@@ -40,9 +40,6 @@ namespace Infection\Events;
  */
 final class InitialTestSuiteFinished
 {
-    /**
-     * @var string
-     */
     private $outputText;
 
     public function __construct(string $outputText)

@@ -40,9 +40,6 @@ namespace Infection\Events;
  */
 final class MutationGeneratingStarted
 {
-    /**
-     * @var int
-     */
     private $mutableFilesCount;
 
     public function __construct(int $mutableFilesCount)

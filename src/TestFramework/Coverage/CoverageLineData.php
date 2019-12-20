@@ -46,12 +46,12 @@ final class CoverageLineData
     public $testMethod;
 
     /**
-     * @var ?string
+     * @var string|null
      */
     public $testFilePath;
 
     /**
-     * @var ?float
+     * @var float|null
      */
     public $time;
 

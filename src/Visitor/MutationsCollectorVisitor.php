@@ -53,34 +53,20 @@ use Throwable;
 final class MutationsCollectorVisitor extends NodeVisitorAbstract
 {
     /**
-     * @var Mutator[]
-     */
-    private $mutators;
-
-    /**
      * @var Mutation[]
      */
     private $mutations = [];
 
-    /**
-     * @var string
-     */
+    private $mutators;
     private $filePath;
-
-    /**
-     * @var Node[]
-     */
     private $fileAst;
-
-    /**
-     * @var LineCodeCoverage
-     */
     private $codeCoverageData;
-    /**
-     * @var bool
-     */
     private $onlyCovered;
 
+    /**
+     * @param Mutator[] $mutators
+     * @param  Node[] $fileAst
+     */
     public function __construct(
         array $mutators,
         string $filePath,

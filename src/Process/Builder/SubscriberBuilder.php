@@ -42,6 +42,7 @@ use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\EventDispatcher\EventSubscriberInterface;
+use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Performance\Listener\PerformanceLoggerSubscriber;
 use Infection\Performance\Memory\MemoryFormatter;
@@ -67,86 +68,24 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class SubscriberBuilder
 {
-    /**
-     * @var bool
-     */
     private $showMutations;
-
-    /**
-     * @var string
-     */
-    private $logVerbosity;
-
-    /**
-     * @var bool
-     */
     private $debug;
-
-    /**
-     * @var bool
-     */
-    private $onlyCovered;
-
-    /**
-     * @var bool
-     */
     private $noProgress;
-
-    /**
-     * @var string
-     */
     private $formatter;
-
-    /**
-     * @var MetricsCalculator
-     */
     private $metricsCalculator;
-
-    /**
-     * @var EventDispatcherInterface
-     */
     private $eventDispatcher;
-
-    /**
-     * @var DiffColorizer
-     */
     private $diffColorizer;
-
-    /**
-     * @var Configuration
-     */
     private $infectionConfig;
-
-    /**
-     * @var Filesystem
-     */
     private $fs;
-
-    /**
-     * @var string
-     */
     private $tmpDir;
-
-    /**
-     * @var Timer
-     */
     private $timer;
-
-    /**
-     * @var TimeFormatter
-     */
     private $timeFormatter;
-
-    /**
-     * @var MemoryFormatter
-     */
     private $memoryFormatter;
+    private $loggerFactory;
 
     public function __construct(
         bool $showMutations,
-        string $logVerbosity,
         bool $debug,
-        bool $onlyCovered,
         string $formatter,
         bool $noProgress,
         MetricsCalculator $metricsCalculator,
@@ -157,12 +96,11 @@ final class SubscriberBuilder
         string $tmpDir,
         Timer $timer,
         TimeFormatter $timeFormatter,
-        MemoryFormatter $memoryFormatter
+        MemoryFormatter $memoryFormatter,
+        LoggerFactory $loggerFactory
     ) {
         $this->showMutations = $showMutations;
-        $this->logVerbosity = $logVerbosity;
         $this->debug = $debug;
-        $this->onlyCovered = $onlyCovered;
         $this->formatter = $formatter;
         $this->noProgress = $noProgress;
         $this->metricsCalculator = $metricsCalculator;
@@ -174,6 +112,7 @@ final class SubscriberBuilder
         $this->timer = $timer;
         $this->timeFormatter = $timeFormatter;
         $this->memoryFormatter = $memoryFormatter;
+        $this->loggerFactory = $loggerFactory;
     }
 
     public function registerSubscribers(
@@ -201,13 +140,10 @@ final class SubscriberBuilder
                 $this->showMutations
             ),
             new MutationTestingResultsLoggerSubscriber(
-                $output,
-                $this->infectionConfig,
-                $this->metricsCalculator,
-                $this->fs,
-                $this->logVerbosity,
-                $this->debug,
-                $this->onlyCovered
+                $this->loggerFactory->createFromLogEntries(
+                    $this->infectionConfig->getLogs(),
+                    $output
+                )
             ),
             new PerformanceLoggerSubscriber(
                 $this->timer,

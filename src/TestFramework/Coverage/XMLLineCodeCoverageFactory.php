@@ -35,60 +35,46 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use DOMDocument;
-use DOMXPath;
+use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\TestFrameworkTypes;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class JUnitTestFileDataProvider implements TestFileDataProvider
+final class XMLLineCodeCoverageFactory
 {
-    private $jUnitFilePath;
+    private $coverageDir;
+    private $coverageXmlParser;
+    private $cachedTestFileDataProvider;
 
-    /**
-     * @var DOMXPath|null
-     */
-    private $xPath;
-
-    public function __construct(string $jUnitFilePath)
-    {
-        $this->jUnitFilePath = $jUnitFilePath;
+    public function __construct(
+        string $coverageDir,
+        CoverageXmlParser $coverageXmlParser,
+        CachedTestFileDataProvider $cachedTestFileDataProvider
+    ) {
+        $this->coverageDir = $coverageDir;
+        $this->coverageXmlParser = $coverageXmlParser;
+        $this->cachedTestFileDataProvider = $cachedTestFileDataProvider;
     }
 
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
-    {
-        $xPath = $this->getXPath();
+    public function create(
+        string $testFrameworkKey,
+        TestFrameworkAdapter $adapter
+    ): XMLLineCodeCoverage {
+        Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
 
-        $nodes = $xPath->query(sprintf('//testsuite[@name="%s"]', $fullyQualifiedClassName));
+        $testFileDataProviderService = $adapter->hasJUnitReport()
+            ? $this->cachedTestFileDataProvider
+            : null
+        ;
 
-        if (!$nodes->length) {
-            // try another format where the class name is inside `class` attribute of `testcase` tag
-            $nodes = $xPath->query(sprintf('//testcase[@class="%s"]', $fullyQualifiedClassName));
-        }
-
-        if (!$nodes->length) {
-            throw TestFileNameNotFoundException::notFoundFromFQN($fullyQualifiedClassName, $this->jUnitFilePath);
-        }
-
-        return new TestFileTimeData(
-            $nodes[0]->getAttribute('file'),
-            (float) $nodes[0]->getAttribute('time')
+        return new XMLLineCodeCoverage(
+            $this->coverageDir,
+            $this->coverageXmlParser,
+            $testFrameworkKey,
+            $testFileDataProviderService
         );
-    }
-
-    private function getXPath(): DOMXPath
-    {
-        if (!$this->xPath) {
-            if (!file_exists($this->jUnitFilePath)) {
-                throw CoverageDoesNotExistException::forJunit($this->jUnitFilePath);
-            }
-
-            $dom = new DOMDocument();
-            $dom->load($this->jUnitFilePath);
-
-            $this->xPath = new DOMXPath($dom);
-        }
-
-        return $this->xPath;
     }
 }

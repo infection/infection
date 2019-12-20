@@ -48,33 +48,11 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
  */
 class InitialConfigBuilder implements ConfigBuilder
 {
-    /**
-     * @var string
-     */
     private $tmpDir;
-
-    /**
-     * @var string
-     */
     private $originalXmlConfigContent;
-    /**
-     * @var XmlConfigurationHelper
-     */
     private $xmlConfigurationHelper;
-
-    /**
-     * @var string
-     */
     private $jUnitFilePath;
-
-    /**
-     * @var array
-     */
     private $srcDirs = [];
-
-    /**
-     * @var bool
-     */
     private $skipCoverage;
 
     public function __construct(
