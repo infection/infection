@@ -340,11 +340,11 @@ final class InfectionCommand extends BaseCommand
             $processBuilder,
             $parallelProcessRunner,
             $mutantCreator,
-            $eventDispatcher,
-            $mutations
+            $eventDispatcher
         );
 
         $mutationTestingRunner->run(
+            $mutations,
             (int) $this->input->getOption('threads'),
             $config->getTestFrameworkExtraOptions()->getForMutantProcess()
         );

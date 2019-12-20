@@ -55,26 +55,28 @@ use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 final class MutationTestingRunner
 {
     private $processBuilder;
-    private $mutations;
     private $mutantCreator;
     private $parallelProcessManager;
     private $eventDispatcher;
 
-    /**
-     * @param Mutation[] $mutations
-     */
-    public function __construct(MutantProcessBuilder $processBuilder, ParallelProcessRunner $parallelProcessManager, MutantCreator $mutantCreator, EventDispatcherInterface $eventDispatcher, array $mutations)
-    {
+    public function __construct(
+        MutantProcessBuilder $processBuilder,
+        ParallelProcessRunner $parallelProcessManager,
+        MutantCreator $mutantCreator,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         $this->processBuilder = $processBuilder;
         $this->mutantCreator = $mutantCreator;
         $this->parallelProcessManager = $parallelProcessManager;
         $this->eventDispatcher = $eventDispatcher;
-        $this->mutations = $mutations;
     }
 
-    public function run(int $threadCount, string $testFrameworkExtraOptions): void
+    /**
+     * @param Mutation[] $mutations
+     */
+    public function run(array $mutations, int $threadCount, string $testFrameworkExtraOptions): void
     {
-        $mutantCount = count($this->mutations);
+        $mutantCount = count($mutations);
 
         $this->eventDispatcher->dispatch(new MutantsCreatingStarted($mutantCount));
 
@@ -88,7 +90,7 @@ final class MutationTestingRunner
 
                 return $process;
             },
-            $this->mutations
+            $mutations
         );
 
         $this->eventDispatcher->dispatch(new MutantsCreatingFinished());
