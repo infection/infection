@@ -41,12 +41,12 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
-use Infection\Console\Exception\InfectionException;
 use Infection\Console\InfectionContainer;
 use Infection\Console\LogVerbosity;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\ApplicationExecutionFinished;
 use Infection\Events\ApplicationExecutionStarted;
+use Infection\Exception\InvalidTypeException;
 use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\Locator\Locator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
@@ -205,24 +205,6 @@ final class InfectionCommand extends BaseCommand
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $this->startUp();
-        $this->runInitialTestSuite();
-        $this->runMutationTesting();
-
-        if (!$this->checkMetrics()) {
-            return 1;
-        }
-
-        return 0;
-    }
-
-    /**
-     * Run configuration command if config does not exist
-     *
-     * @throws InfectionException
-     */
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         parent::initialize($input, $output);
@@ -241,53 +223,91 @@ final class InfectionCommand extends BaseCommand
         $this->consoleOutput = $this->getApplication()->getConsoleOutput();
     }
 
-    private function startUp(): void
+    /**
+     * @throws CoverageDoesNotExistException
+     * @throws InitialTestsFailed
+     * @throws CoverageDoesNotExistException
+     * @throws InvalidTypeException
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         Assert::notNull($this->container);
-
-        /** @var CoverageRequirementChecker $coverageChecker */
-        $coverageChecker = $this->container['coverage.checker'];
-
-        if (!$coverageChecker->hasDebuggerOrCoverageOption()) {
-            throw CoverageDoesNotExistException::unableToGenerate();
-        }
-
-        /** @var Configuration $config */
-        $config = $this->container[Configuration::class];
-
-        $this->includeUserBootstrap($config);
-
-        /** @var Filesystem $fileSystem */
-        $fileSystem = $this->container['filesystem'];
-
-        $fileSystem->mkdir($config->getTmpDir());
 
         /** @var TestFrameworkAdapter $adapter */
         $adapter = $this->container[TestFrameworkAdapter::class];
 
-        LogVerbosity::convertVerbosityLevel($this->input, $this->consoleOutput);
-
-        /** @var SubscriberBuilder $subscriberBuilder */
-        $subscriberBuilder = $this->container['subscriber.builder'];
-        $subscriberBuilder->registerSubscribers($adapter, $this->output);
+        /** @var Configuration $config */
+        $config = $this->container[Configuration::class];
 
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = $this->container['dispatcher'];
 
+        $this->startUp(
+            $this->container['coverage.checker'],
+            $config,
+            $this->container['filesystem'],
+            $adapter,
+            $this->container['subscriber.builder'],
+            $eventDispatcher
+        );
+        $this->runInitialTestSuite(
+            $adapter,
+            $config,
+            $this->container[InitialTestsRunner::class],
+            $this->container['memory.limit.applier']
+        );
+        $this->runMutationTesting(
+            $adapter,
+            $config,
+            $this->container[MutationGenerator::class],
+            $this->container[MutationTestingRunner::class]
+        );
+
+        $passMetricsCheck = $this->metricsCheck(
+            $this->container['test.run.constraint.checker'],
+            $this->container['metrics'],
+            $eventDispatcher
+        );
+
+        return (int) !$passMetricsCheck;
+    }
+
+    /**
+     * @throws CoverageDoesNotExistException
+     */
+    private function startUp(
+        CoverageRequirementChecker $coverageChecker,
+        Configuration $config,
+        Filesystem $fileSystem,
+        TestFrameworkAdapter $adapter,
+        SubscriberBuilder $subscriberBuilder,
+        EventDispatcherInterface $eventDispatcher
+    ): void {
+        if (!$coverageChecker->hasDebuggerOrCoverageOption()) {
+            throw CoverageDoesNotExistException::unableToGenerate();
+        }
+
+        $this->includeUserBootstrap($config);
+
+        $fileSystem->mkdir($config->getTmpDir());
+
+        LogVerbosity::convertVerbosityLevel($this->input, $this->consoleOutput);
+
+        $subscriberBuilder->registerSubscribers($adapter, $this->output);
+
         $eventDispatcher->dispatch(new ApplicationExecutionStarted());
     }
 
-    private function runInitialTestSuite(): void
-    {
-        /** @var TestFrameworkAdapter $adapter */
-        $adapter = $this->container[TestFrameworkAdapter::class];
-
-        /** @var Configuration $config */
-        $config = $this->container[Configuration::class];
-
-        /** @var InitialTestsRunner $initialTestsRunner */
-        $initialTestsRunner = $this->container[InitialTestsRunner::class];
-
+    /**
+     * @throws InitialTestsFailed
+     * @throws CoverageDoesNotExistException
+     */
+    private function runInitialTestSuite(
+        TestFrameworkAdapter $adapter,
+        Configuration $config,
+        InitialTestsRunner $initialTestsRunner,
+        MemoryLimiter $memoryLimitApplier
+    ): void {
         $initialTestSuitProcess = $initialTestsRunner->run(
             $config->getTestFrameworkExtraOptions()->getForInitialProcess(),
             $config->shouldSkipCoverage(),
@@ -298,31 +318,21 @@ final class InfectionCommand extends BaseCommand
             throw InitialTestsFailed::fromProcessAndAdapter($initialTestSuitProcess, $adapter);
         }
 
-        $this->assertCodeCoverageExists($initialTestSuitProcess, $config->getTestFramework());
+        $this->assertCodeCoverageExists($initialTestSuitProcess, $config);
 
-        /** @var MemoryLimiter $memoryLimitApplier */
-        $memoryLimitApplier = $this->container['memory.limit.applier'];
         $memoryLimitApplier->applyMemoryLimitFromProcess($initialTestSuitProcess, $adapter);
     }
 
-    private function runMutationTesting(): void
-    {
-        /** @var TestFrameworkAdapter $adapter */
-        $adapter = $this->container[TestFrameworkAdapter::class];
-
-        /** @var Configuration $config */
-        $config = $this->container[Configuration::class];
-
-        /** @var MutationGenerator $mutationGenerator */
-        $mutationGenerator = $this->container[MutationGenerator::class];
-
+    private function runMutationTesting(
+        TestFrameworkAdapter $adapter,
+        Configuration $config,
+        MutationGenerator $mutationGenerator,
+        MutationTestingRunner $mutationTestingRunner
+    ): void {
         $mutations = $mutationGenerator->generate(
             $config->mutateOnlyCoveredCode(),
             $adapter instanceof HasExtraNodeVisitors ? $adapter->getMutationsCollectionNodeVisitors() : []
         );
-
-        /** @var MutationTestingRunner $mutationTestingRunner */
-        $mutationTestingRunner = $this->container[MutationTestingRunner::class];
 
         $mutationTestingRunner->run(
             $mutations,
@@ -331,17 +341,14 @@ final class InfectionCommand extends BaseCommand
         );
     }
 
-    private function checkMetrics(): bool
-    {
-        /** @var TestRunConstraintChecker $constraintChecker */
-        $constraintChecker = $this->container['test.run.constraint.checker'];
-
-        /** @var MetricsCalculator $metricsCalculator */
-        $metricsCalculator = $this->container['metrics'];
-
-        /** @var EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = $this->container['dispatcher'];
-
+    /**
+     * @throws InvalidTypeException
+     */
+    private function metricsCheck(
+        TestRunConstraintChecker $constraintChecker,
+        MetricsCalculator $metricsCalculator,
+        EventDispatcherInterface $eventDispatcher
+    ): bool {
         if (!$constraintChecker->hasTestRunPassedConstraints()) {
             $this->consoleOutput->logBadMsiErrorMessage(
                 $metricsCalculator,
@@ -434,7 +441,7 @@ final class InfectionCommand extends BaseCommand
                 SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
                 SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
             ]);
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [
@@ -451,11 +458,13 @@ final class InfectionCommand extends BaseCommand
         }
     }
 
-    private function assertCodeCoverageExists(Process $initialTestsProcess, string $testFrameworkKey): void
-    {
-        /** @var Configuration $config */
-        $config = $this->container[Configuration::class];
-
+    /**
+     * @throws CoverageDoesNotExistException
+     */
+    private function assertCodeCoverageExists(
+        Process $initialTestsProcess,
+        Configuration $config
+    ): void {
         $coverageDir = $config->getCoveragePath();
 
         $coverageIndexFilePath = $coverageDir . '/' . XMLLineCodeCoverage::COVERAGE_INDEX_FILE_NAME;
@@ -471,7 +480,7 @@ final class InfectionCommand extends BaseCommand
         if (!file_exists($coverageIndexFilePath)) {
             throw CoverageDoesNotExistException::with(
                 $coverageIndexFilePath,
-                $testFrameworkKey,
+                $config->getTestFramework(),
                 dirname($coverageIndexFilePath, 2),
                 $processInfo
             );
