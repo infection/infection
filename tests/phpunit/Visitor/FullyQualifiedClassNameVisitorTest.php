@@ -104,7 +104,7 @@ final class FullyQualifiedClassNameVisitorTest extends AbstractBaseVisitorTest
 
     private function parseAndTraverse($code): void
     {
-        $nodes = $this->getNodes($code);
+        $nodes = $this->parseCode($code);
 
         $traverser = new NodeTraverser();
 

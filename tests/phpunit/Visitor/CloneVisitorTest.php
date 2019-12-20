@@ -37,13 +37,15 @@ namespace Infection\Tests\Visitor;
 
 use Infection\Visitor\CloneVisitor;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 
 final class CloneVisitorTest extends AbstractBaseVisitorTest
 {
     private const CODE = <<<'PHP'
-<?php
+<?php declare(strict_types=1);
+
+namespace Acme;
 
 function hello() 
 {
@@ -51,28 +53,41 @@ function hello()
 }
 PHP;
 
-    public function test_it_does_not_save_the_old_nodes_without_the_clone_visitor(): void
+    public function test_mutating_nodes_during_traverse_mutates_the_original_nodes(): void
     {
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor($this->getChangingVisitor());
-        $oldNodes = $this->getNodes(self::CODE);
+        $originalNodes = $this->parseCode(self::CODE);
 
-        $newNodes = $traverser->traverse($oldNodes);
-        $this->assertSame($oldNodes, $newNodes);
+        $originalDump = $this->dumpNodes($originalNodes);
+
+        $traversedNodes = $this->traverse($originalNodes, [$this->createMutateStringValueVisitor()]);
+
+        $newDump = $this->dumpNodes($traversedNodes);
+
+        $this->assertSame($originalNodes, $traversedNodes, 'Expected the nodes to be identical');
+        $this->assertNotSame($originalDump, $newDump, 'Expected the new nodes to have been mutated');
     }
 
-    public function test_it_saves_the_old_nodes_with_the_clone_visitor(): void
+    public function test_mutating_nodes_during_traverse_with_the_clone_visitor_does_not_mutate_the_original_nodes(): void
     {
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new CloneVisitor());
-        $traverser->addVisitor($this->getChangingVisitor());
-        $oldNodes = $this->getNodes(self::CODE);
+        $originalNodes = $this->parseCode(self::CODE);
 
-        $newNodes = $traverser->traverse($oldNodes);
-        $this->assertNotSame($oldNodes, $newNodes);
+        $originalDump = $this->dumpNodes($originalNodes);
+
+        $traversedNodes = $this->traverse(
+            $originalNodes,
+            [
+                new CloneVisitor(),
+                $this->createMutateStringValueVisitor(),
+            ]
+        );
+
+        $newDump = $this->dumpNodes($traversedNodes);
+
+        $this->assertNotSame($originalNodes, $traversedNodes, 'Expected the nodes to be identical');
+        $this->assertNotSame($originalDump, $newDump, 'Expected the new nodes to have been mutated');
     }
 
-    private function getChangingVisitor()
+    private function createMutateStringValueVisitor(): NodeVisitor
     {
         return new class() extends NodeVisitorAbstract {
             public function enterNode(Node $node)
@@ -80,6 +95,8 @@ PHP;
                 if ($node instanceof Node\Scalar\String_) {
                     return new Node\Scalar\String_('foo');
                 }
+
+                return null;
             }
         };
     }

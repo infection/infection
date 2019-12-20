@@ -309,7 +309,7 @@ final class ReflectionVisitorTest extends AbstractBaseVisitorTest
 
     private function parseAndTraverse(string $code, ?NodeVisitor $nodeVisitor = null): void
     {
-        $nodes = $this->getNodes($code);
+        $nodes = $this->parseCode($code);
 
         $traverser = new NodeTraverser();
 
