@@ -70,7 +70,6 @@ use Infection\TestFramework\Coverage\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\HasExtraNodeVisitors;
 use Infection\TestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Utils\VersionParser;
 use function is_numeric;
@@ -96,29 +95,9 @@ final class InfectionCommand extends BaseCommand
     private $consoleOutput;
 
     /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
      * @var InfectionContainer
      */
     private $container;
-
-    /**
-     * @var string
-     */
-    private $testFrameworkKey = '';
-
-    /**
-     * @var TestFrameworkExtraOptions
-     */
-    private $testFrameworkExtraOptions;
-
-    /**
-     * @var VersionParser
-     */
-    private $versionParser;
 
     protected function configure(): void
     {
@@ -268,8 +247,6 @@ final class InfectionCommand extends BaseCommand
         }
 
         $this->consoleOutput = $this->getApplication()->getConsoleOutput();
-        $this->eventDispatcher = $this->container['dispatcher'];
-        $this->versionParser = $this->container[VersionParser::class];
     }
 
     private function startUp(): TestFrameworkAdapter
@@ -293,14 +270,11 @@ final class InfectionCommand extends BaseCommand
 
         $fileSystem->mkdir($config->getTmpDir());
 
-        $this->testFrameworkKey = $config->getTestFramework();
-        $this->testFrameworkExtraOptions = $config->getTestFrameworkExtraOptions();
-
         /** @var Factory $testFrameworkFactory */
         $testFrameworkFactory = $this->container['test.framework.factory'];
 
         $adapter = $testFrameworkFactory->create(
-            $this->testFrameworkKey,
+            $config->getTestFramework(),
             $config->shouldSkipCoverage()
         );
 
@@ -310,7 +284,10 @@ final class InfectionCommand extends BaseCommand
         $subscriberBuilder = $this->container['subscriber.builder'];
         $subscriberBuilder->registerSubscribers($adapter, $this->output);
 
-        $this->eventDispatcher->dispatch(new ApplicationExecutionStarted());
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = $this->container['dispatcher'];
+
+        $eventDispatcher->dispatch(new ApplicationExecutionStarted());
 
         return $adapter;
     }
@@ -320,12 +297,18 @@ final class InfectionCommand extends BaseCommand
         /** @var Configuration $config */
         $config = $this->container[Configuration::class];
 
-        $processBuilder = new InitialTestRunProcessBuilder($adapter, $this->versionParser);
+        /** @var VersionParser $versionParser */
+        $versionParser = $this->container[VersionParser::class];
 
-        $initialTestsRunner = new InitialTestsRunner($processBuilder, $this->eventDispatcher);
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = $this->container['dispatcher'];
+
+        $processBuilder = new InitialTestRunProcessBuilder($adapter, $versionParser);
+
+        $initialTestsRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
 
         $initialTestSuitProcess = $initialTestsRunner->run(
-            $this->testFrameworkExtraOptions->getForInitialProcess(),
+            $config->getTestFrameworkExtraOptions()->getForInitialProcess(),
             $config->shouldSkipCoverage(),
             explode(' ', (string) $config->getInitialTestsPhpOptions())
         );
@@ -334,7 +317,7 @@ final class InfectionCommand extends BaseCommand
             throw InitialTestsFailed::fromProcessAndAdapter($initialTestSuitProcess, $adapter);
         }
 
-        $this->assertCodeCoverageExists($initialTestSuitProcess, $this->testFrameworkKey);
+        $this->assertCodeCoverageExists($initialTestSuitProcess, $config->getTestFramework());
 
         /** @var MemoryLimiter $memoryLimitApplier */
         $memoryLimitApplier = $this->container['memory.limit.applier'];
@@ -346,7 +329,13 @@ final class InfectionCommand extends BaseCommand
         /** @var Configuration $config */
         $config = $this->container[Configuration::class];
 
-        $processBuilder = new MutantProcessBuilder($adapter, $this->versionParser, $config->getProcessTimeout());
+        /** @var VersionParser $versionParser */
+        $versionParser = $this->container[VersionParser::class];
+
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = $this->container['dispatcher'];
+
+        $processBuilder = new MutantProcessBuilder($adapter, $versionParser, $config->getProcessTimeout());
 
         /** @var XMLLineCodeCoverageFactory $codeCoverageFactory */
         $codeCoverageFactory = $this->container[XMLLineCodeCoverageFactory::class];
@@ -356,9 +345,9 @@ final class InfectionCommand extends BaseCommand
 
         $mutationGenerator = new MutationGenerator(
             $config->getSourceFiles(),
-            $codeCoverageFactory->create($this->testFrameworkKey, $adapter),
+            $codeCoverageFactory->create($config->getTestFramework(), $adapter),
             $config->getMutators(),
-            $this->eventDispatcher,
+            $eventDispatcher,
             $fileMutationGenerator
         );
 
@@ -377,13 +366,13 @@ final class InfectionCommand extends BaseCommand
             $processBuilder,
             $parallelProcessRunner,
             $mutantCreator,
-            $this->eventDispatcher,
+            $eventDispatcher,
             $mutations
         );
 
         $mutationTestingRunner->run(
             (int) $this->input->getOption('threads'),
-            $this->testFrameworkExtraOptions->getForMutantProcess()
+            $config->getTestFrameworkExtraOptions()->getForMutantProcess()
         );
     }
 
@@ -394,6 +383,9 @@ final class InfectionCommand extends BaseCommand
 
         /** @var MetricsCalculator $metricsCalculator */
         $metricsCalculator = $this->container['metrics'];
+
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = $this->container['dispatcher'];
 
         if (!$constraintChecker->hasTestRunPassedConstraints()) {
             $this->consoleOutput->logBadMsiErrorMessage(
@@ -413,7 +405,7 @@ final class InfectionCommand extends BaseCommand
             );
         }
 
-        $this->eventDispatcher->dispatch(new ApplicationExecutionFinished());
+        $eventDispatcher->dispatch(new ApplicationExecutionFinished());
 
         return true;
     }
