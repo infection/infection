@@ -42,6 +42,8 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
+use function Safe\file_get_contents;
+use function Safe\sprintf;
 
 abstract class AbstractBaseVisitorTest extends TestCase
 {
@@ -88,7 +90,7 @@ abstract class AbstractBaseVisitorTest extends TestCase
         return $traverser->traverse($nodes);
     }
 
-    protected function getFileContent(string $file): string
+    final protected function getFileContent(string $file): string
     {
         return file_get_contents(sprintf(__DIR__ . '/../Fixtures/Autoloaded/%s', $file));
     }
