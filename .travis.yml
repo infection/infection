@@ -82,16 +82,6 @@ jobs:
       after_success:
         - bash <(curl -s https://codecov.io/bash)
 
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.3
-      env: DRIVER="xdebug"
-
-    -
-      <<: *STANDARD_TEST_JOB
-      php: 7.3
-      env: DRIVER="phpdbg"
-
     - <<: *STANDARD_TEST_JOB
       php: 7.3
       env: DRIVER="pcov"
@@ -99,6 +89,15 @@ jobs:
     - <<: *STANDARD_TEST_JOB
       php: 7.3
       env: DRIVER="none"
+
+    - <<: *STANDARD_TEST_JOB
+      php: 7.3
+      env: DRIVER="phpdbg"
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.3
+      env: DRIVER="xdebug"
 
     -
       <<: *STANDARD_TEST_JOB
