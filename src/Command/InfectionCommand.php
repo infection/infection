@@ -101,11 +101,6 @@ final class InfectionCommand extends BaseCommand
     private $eventDispatcher;
 
     /**
-     * @var bool
-     */
-    private $skipCoverage;
-
-    /**
      * @var InfectionContainer
      */
     private $container;
@@ -273,7 +268,6 @@ final class InfectionCommand extends BaseCommand
         }
 
         $this->consoleOutput = $this->getApplication()->getConsoleOutput();
-        $this->skipCoverage = trim((string) $input->getOption('coverage')) !== '';
         $this->eventDispatcher = $this->container['dispatcher'];
         $this->versionParser = $this->container[VersionParser::class];
     }
@@ -305,7 +299,10 @@ final class InfectionCommand extends BaseCommand
         /** @var Factory $testFrameworkFactory */
         $testFrameworkFactory = $this->container['test.framework.factory'];
 
-        $adapter = $testFrameworkFactory->create($this->testFrameworkKey, $this->skipCoverage);
+        $adapter = $testFrameworkFactory->create(
+            $this->testFrameworkKey,
+            $config->shouldSkipCoverage()
+        );
 
         LogVerbosity::convertVerbosityLevel($this->input, $this->consoleOutput);
 
@@ -329,7 +326,7 @@ final class InfectionCommand extends BaseCommand
 
         $initialTestSuitProcess = $initialTestsRunner->run(
             $this->testFrameworkExtraOptions->getForInitialProcess(),
-            $this->skipCoverage,
+            $config->shouldSkipCoverage(),
             explode(' ', (string) $config->getInitialTestsPhpOptions())
         );
 

@@ -135,6 +135,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $expectedInitialTestsPhpOptions,
         TestFrameworkExtraOptions $expectedTestFrameworkExtraOptions,
         string $expectedExistingCoveragePath,
+        bool $expectedSkipCoverage,
         bool $expectedDebug,
         bool $expectedOnlyCovered,
         string $expectedFormatter,
@@ -178,6 +179,7 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedInitialTestsPhpOptions,
             $expectedTestFrameworkExtraOptions,
             normalizePath($expectedExistingCoveragePath),
+            $expectedSkipCoverage,
             $expectedDebug,
             $expectedOnlyCovered,
             $expectedFormatter,
@@ -247,6 +249,7 @@ final class ConfigurationFactoryTest extends TestCase
             sys_get_temp_dir() . '/infection/coverage-xml',
             false,
             false,
+            false,
             'progress',
             false,
             false,
@@ -287,16 +290,19 @@ final class ConfigurationFactoryTest extends TestCase
 
         yield 'no existing base path for code coverage' => self::createValueForCoveragePath(
             null,
+            false,
             sys_get_temp_dir() . '/infection/coverage-xml'
         );
 
         yield 'absolute base path for code coverage' => self::createValueForCoveragePath(
             '/path/to/coverage',
+            true,
             '/path/to/coverage/coverage-xml'
         );
 
         yield 'relative base path for code coverage' => self::createValueForCoveragePath(
             'relative/path/to/coverage',
+            true,
             '/path/to/relative/path/to/coverage/coverage-xml'
         );
 
@@ -532,6 +538,7 @@ final class ConfigurationFactoryTest extends TestCase
             sys_get_temp_dir() . '/infection/coverage-xml',
             false,
             false,
+            false,
             'progress',
             false,
             false,
@@ -607,6 +614,7 @@ final class ConfigurationFactoryTest extends TestCase
             '/path/to/dist/coverage/phpspec-coverage-xml',
             true,
             true,
+            true,
             'dot',
             true,
             true,
@@ -674,6 +682,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             new PhpUnitExtraOptions(),
             sys_get_temp_dir() . '/infection/coverage-xml',
+            false,
             false,
             false,
             'progress',
@@ -745,6 +754,7 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedTmpDir . '/coverage-xml',
             false,
             false,
+            false,
             'progress',
             false,
             false,
@@ -756,6 +766,7 @@ final class ConfigurationFactoryTest extends TestCase
 
     private static function createValueForCoveragePath(
         ?string $existingCoveragePath,
+        bool $expectedSkipCoverage,
         string $expectedCoveragePath
     ): array {
         return [
@@ -812,6 +823,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             new PhpUnitExtraOptions(),
             $expectedCoveragePath,
+            $expectedSkipCoverage,
             false,
             false,
             'progress',
@@ -881,6 +893,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             new PhpUnitExtraOptions(),
             sys_get_temp_dir() . '/infection/coverage-xml',
+            false,
             false,
             false,
             'progress',
@@ -955,6 +968,7 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedCoveragePath,
             false,
             false,
+            false,
             'progress',
             false,
             false,
@@ -1023,6 +1037,7 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedInitialTestPhpOptions,
             new PhpUnitExtraOptions(),
             sys_get_temp_dir() . '/infection/coverage-xml',
+            false,
             false,
             false,
             'progress',
@@ -1097,6 +1112,7 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedCoveragePath,
             false,
             false,
+            false,
             'progress',
             false,
             false,
@@ -1166,6 +1182,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             $expectedTestFrameworkExtraOptions,
             $expectedCoveragePath,
+            false,
             false,
             false,
             'progress',
@@ -1239,6 +1256,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             new PhpUnitExtraOptions(),
             sys_get_temp_dir() . '/infection/coverage-xml',
+            false,
             false,
             false,
             'progress',
