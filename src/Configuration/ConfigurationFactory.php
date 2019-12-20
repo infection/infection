@@ -113,6 +113,14 @@ class ConfigurationFactory
 
         $testFramework = $testFramework ?? $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
 
+        /** @var bool $skipCoverage */
+        /** @var string $existingCoverageBasePath */
+        [$skipCoverage, $existingCoverageBasePath] = self::retrieveExistingCoverageBasePath(
+            $existingCoveragePath,
+            $configDir,
+            $namespacedTmpDir
+        );
+
         return new Configuration(
             $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
             $schema->getSource()->getDirectories(),
@@ -137,10 +145,8 @@ class ConfigurationFactory
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
             self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema, $testFramework),
-            self::retrieveExistingCoveragePath(
-                self::retrieveExistingCoverageBasePath($existingCoveragePath, $configDir, $namespacedTmpDir),
-                $testFramework
-            ),
+            self::retrieveExistingCoveragePath($existingCoverageBasePath, $testFramework),
+            $skipCoverage,
             $debug,
             $onlyCovered,
             $formatter,
@@ -201,18 +207,18 @@ class ConfigurationFactory
         ?string $existingCoveragePath,
         string $configDir,
         string $tmpDir
-    ): string {
+    ): array {
         Assert::nullOrStringNotEmpty($existingCoveragePath);
 
         if ($existingCoveragePath === null) {
-            return $tmpDir;
+            return [false, $tmpDir];
         }
 
         if (Path::isAbsolute($existingCoveragePath)) {
-            return $existingCoveragePath;
+            return [true, $existingCoveragePath];
         }
 
-        return sprintf('%s/%s', $configDir, $existingCoveragePath);
+        return [true, sprintf('%s/%s', $configDir, $existingCoveragePath)];
     }
 
     private function retrieveMutators(array $schemaMutators, string $mutatorsInput): array
