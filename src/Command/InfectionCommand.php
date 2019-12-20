@@ -51,16 +51,13 @@ use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\Locator\Locator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Mutant\MutantCreator;
 use Infection\Mutation\MutationGenerator;
 use Infection\Performance\Limiter\MemoryLimiter;
-use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Coverage\CoverageRequirementChecker;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
-use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
@@ -316,12 +313,6 @@ final class InfectionCommand extends BaseCommand
         /** @var Configuration $config */
         $config = $this->container[Configuration::class];
 
-        /** @var EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = $this->container['dispatcher'];
-
-        /** @var MutantProcessBuilder $processBuilder */
-        $processBuilder = $this->container[MutantProcessBuilder::class];
-
         /** @var MutationGenerator $mutationGenerator */
         $mutationGenerator = $this->container[MutationGenerator::class];
 
@@ -330,18 +321,8 @@ final class InfectionCommand extends BaseCommand
             $adapter instanceof HasExtraNodeVisitors ? $adapter->getMutationsCollectionNodeVisitors() : []
         );
 
-        /** @var ParallelProcessRunner $parallelProcessRunner */
-        $parallelProcessRunner = $this->container['parallel.process.runner'];
-
-        /** @var MutantCreator $mutantCreator */
-        $mutantCreator = $this->container['mutant.creator'];
-
-        $mutationTestingRunner = new MutationTestingRunner(
-            $processBuilder,
-            $parallelProcessRunner,
-            $mutantCreator,
-            $eventDispatcher
-        );
+        /** @var MutationTestingRunner $mutationTestingRunner */
+        $mutationTestingRunner = $this->container[MutationTestingRunner::class];
 
         $mutationTestingRunner->run(
             $mutations,
