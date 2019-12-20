@@ -72,6 +72,8 @@ jobs:
 
           if [[ "$DRIVER" != "phpdbg" ]]; then
             bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
+          elif [[ "$DRIVER" == "none" ]]; then
+            exit 0
           else
             phpdbg -qrr bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
           fi
