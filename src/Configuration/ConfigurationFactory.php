@@ -113,8 +113,6 @@ class ConfigurationFactory
 
         $testFramework = $testFramework ?? $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
 
-        /** @var bool $skipCoverage */
-        /** @var string $existingCoverageBasePath */
         [$skipCoverage, $existingCoverageBasePath] = self::retrieveExistingCoverageBasePath(
             $existingCoveragePath,
             $configDir,
@@ -203,6 +201,9 @@ class ConfigurationFactory
         );
     }
 
+    /**
+     * @return array{0:bool,1:string}
+     */
     private static function retrieveExistingCoverageBasePath(
         ?string $existingCoveragePath,
         string $configDir,
