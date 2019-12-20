@@ -85,3 +85,7 @@ function get_infection_pr_flags() {
 
     echo "$flags";
 }
+
+# Restore this setting as Travis relies on that
+# see https://github.com/travis-ci/travis-ci/issues/5434#issuecomment-438408950
+set +u
