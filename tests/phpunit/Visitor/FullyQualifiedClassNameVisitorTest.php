@@ -35,9 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Visitor;
 
+use function array_map;
+use Generator;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 
 final class FullyQualifiedClassNameVisitorTest extends AbstractBaseVisitorTest
@@ -49,43 +50,45 @@ final class FullyQualifiedClassNameVisitorTest extends AbstractBaseVisitorTest
         $this->spyVisitor = $this->getSpyVisitor();
     }
 
-    public function test_it_adds_fqcl_to_class_node(): void
-    {
-        $code = $this->getFileContent('Fqcn/fqcn-empty-class.php');
+    /**
+     * @dataProvider codeProvider
+     *
+     * @param string[] $expectedProcessedNodesFqcn
+     */
+    public function test_it_adds_FQCN_to_the_appropriate_node(
+        string $path,
+        array $expectedProcessedNodesFqcn
+    ): void {
+        $code = $this->getFileContent($path);
 
         $this->parseAndTraverse($code);
 
-        $this->assertCount(1, $this->spyVisitor->processedNodes);
-        $this->assertSame(
-            'FqcnEmptyClass\EmptyClass',
-            $this->spyVisitor->processedNodes[0]->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)->toString()
+        $actualProcessedNodesFqcn = array_map(
+            static function (Node $node): string {
+                return $node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)->toString();
+            },
+            $this->spyVisitor->processedNodes
         );
+
+        $this->assertSame($expectedProcessedNodesFqcn, $actualProcessedNodesFqcn);
     }
 
-    public function test_it_adds_fqcl_to_class_with_interface(): void
+    public function codeProvider(): Generator
     {
-        $code = $this->getFileContent('Fqcn/fqcn-class-interface.php');
+        yield [
+            'Fqcn/fqcn-empty-class.php',
+            ['FqcnEmptyClass\EmptyClass'],
+        ];
 
-        $this->parseAndTraverse($code);
+        yield [
+            'Fqcn/fqcn-class-interface.php',
+            ['FqcnClassInterface\Ci'],
+        ];
 
-        $this->assertCount(1, $this->spyVisitor->processedNodes);
-        $this->assertSame(
-            'FqcnClassInterface\Ci',
-            $this->spyVisitor->processedNodes[0]->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)->toString()
-        );
-    }
-
-    public function test_it_adds_fqcl_to_class_with_anonymous_class(): void
-    {
-        $code = $this->getFileContent('Fqcn/fqcn-anonymous-class.php');
-
-        $this->parseAndTraverse($code);
-
-        $this->assertCount(1, $this->spyVisitor->processedNodes);
-        $this->assertSame(
-            'FqcnClassAnonymous\Ci',
-            $this->spyVisitor->processedNodes[0]->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)->toString()
-        );
+        yield [
+            'Fqcn/fqcn-anonymous-class.php',
+            ['FqcnClassAnonymous\Ci'],
+        ];
     }
 
     private function getSpyVisitor()
@@ -106,11 +109,12 @@ final class FullyQualifiedClassNameVisitorTest extends AbstractBaseVisitorTest
     {
         $nodes = $this->parseCode($code);
 
-        $traverser = new NodeTraverser();
-
-        $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
-        $traverser->addVisitor($this->spyVisitor);
-
-        $traverser->traverse($nodes);
+        $this->traverse(
+            $nodes,
+            [
+                new FullyQualifiedClassNameVisitor(),
+                $this->spyVisitor,
+            ]
+        );
     }
 }

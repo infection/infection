@@ -62,7 +62,7 @@ final class PhpUnitClassCodeCoverageIgnoreVisitorTest extends AbstractBaseVisito
     }
 
     /**
-     * @dataProvider provideTraversedCode
+     * @dataProvider traversedCodeProvider
      */
     public function test_it_traverses_a_class_which_does_not_have_the_code_coverage_ignore_PHPUnit_annotation(
         string $path
@@ -77,7 +77,7 @@ final class PhpUnitClassCodeCoverageIgnoreVisitorTest extends AbstractBaseVisito
         );
     }
 
-    public function provideTraversedCode(): Generator
+    public function traversedCodeProvider(): Generator
     {
         yield ['Coverage/code-coverage-class-not-ignored.php'];
 
