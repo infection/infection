@@ -44,9 +44,6 @@ use function Safe\realpath;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 
-
-
-
 /**
  * @internal
  */

@@ -113,6 +113,14 @@ class ConfigurationFactory
 
         $testFramework = $testFramework ?? $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
 
+        $skipCoverage = $existingCoveragePath !== null;
+
+        $existingCoverageBasePath = self::retrieveExistingCoverageBasePath(
+            $existingCoveragePath,
+            $configDir,
+            $namespacedTmpDir
+        );
+
         return new Configuration(
             $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
             $schema->getSource()->getDirectories(),
@@ -137,10 +145,8 @@ class ConfigurationFactory
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
             self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema, $testFramework),
-            self::retrieveExistingCoveragePath(
-                self::retrieveExistingCoverageBasePath($existingCoveragePath, $configDir, $namespacedTmpDir),
-                $testFramework
-            ),
+            self::retrieveExistingCoveragePath($existingCoverageBasePath, $testFramework),
+            $skipCoverage,
             $debug,
             $onlyCovered,
             $formatter,
