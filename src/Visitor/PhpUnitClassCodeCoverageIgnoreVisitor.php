@@ -43,7 +43,7 @@ use PhpParser\NodeVisitorAbstract;
 /**
  * @internal
  */
-final class PhpUnitCodeCoverageClassIgnoreVisitor extends NodeVisitorAbstract
+final class PhpUnitClassCodeCoverageIgnoreVisitor extends NodeVisitorAbstract
 {
     public function enterNode(Node $node)
     {

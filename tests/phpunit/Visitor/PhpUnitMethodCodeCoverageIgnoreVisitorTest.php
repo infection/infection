@@ -36,35 +36,35 @@ declare(strict_types=1);
 namespace Infection\Tests\Visitor;
 
 use Generator;
-use Infection\Visitor\PhpUnitCodeCoverageClassIgnoreVisitor;
+use Infection\Visitor\PhpUnitMethodCodeCoverageIgnoreVisitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-final class PhpUnitCodeCoverageClassIgnoreVisitorTest extends AbstractBaseVisitorTest
+final class PhpUnitMethodCodeCoverageIgnoreVisitorTest extends AbstractBaseVisitorTest
 {
     private $spyVisitor;
 
     protected function setUp(): void
     {
-        $this->spyVisitor = $this->createSpyVisitor();
+        $this->spyVisitor = $this->getSpyVisitor();
     }
 
-    public function test_it_does_not_traverse_a_class_which_has_the_code_coverage_ignore_PHPUnit_annotation(): void
+    public function test_it_does_not_traverse_a_method_which_has_the_code_coverage_ignore_PHPUnit_annotation(): void
     {
-        $code = $this->getFileContent('Coverage/code-coverage-class-ignore.php');
+        $code = $this->getFileContent('Coverage/code-coverage-method-ignore.php');
 
         $this->parseAndTraverse($code);
 
         $this->assertFalse(
             $this->spyVisitor->isNodeVisited(),
-            'ClassMethod node has been visited'
+            'Node\Stmt\Return_ node has been visited'
         );
     }
 
     /**
      * @dataProvider provideTraversedCode
      */
-    public function test_it_traverses_a_class_which_does_not_have_the_code_coverage_ignore_PHPUnit_annotation(
+    public function test_it_traverses_a_method_which_does_not_have_the_code_coverage_ignore_PHPUnit_annotation(
         string $path
     ): void {
         $code = $this->getFileContent($path);
@@ -73,15 +73,15 @@ final class PhpUnitCodeCoverageClassIgnoreVisitorTest extends AbstractBaseVisito
 
         $this->assertTrue(
             $this->spyVisitor->isNodeVisited(),
-            'ClassMethod node has not been visited'
+            'Node\Stmt\Return_ node has not been visited'
         );
     }
 
     public function provideTraversedCode(): Generator
     {
-        yield ['Coverage/code-coverage-class-not-ignored.php'];
+        yield ['Coverage/code-coverage-method-not-ignored.php'];
 
-        yield ['Coverage/code-coverage-class-not-ignored-with-comment.php'];
+        yield ['Coverage/code-coverage-method-not-ignored-with-comment.php'];
     }
 
     private function parseAndTraverse(string $code): void
@@ -91,20 +91,20 @@ final class PhpUnitCodeCoverageClassIgnoreVisitorTest extends AbstractBaseVisito
         $this->traverse(
             $nodes,
             [
-                new PhpUnitCodeCoverageClassIgnoreVisitor(),
+                new PhpUnitMethodCodeCoverageIgnoreVisitor(),
                 $this->spyVisitor,
             ]
         );
     }
 
-    private function createSpyVisitor()
+    private function getSpyVisitor()
     {
         return new class() extends NodeVisitorAbstract {
             private $nodeVisited = false;
 
             public function leaveNode(Node $node): void
             {
-                if ($node instanceof Node\Stmt\ClassMethod) {
+                if ($node instanceof Node\Stmt\Return_) {
                     $this->nodeVisited = true;
                 }
             }

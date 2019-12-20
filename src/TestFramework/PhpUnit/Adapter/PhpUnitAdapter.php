@@ -38,8 +38,8 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\HasExtraNodeVisitors;
 use Infection\TestFramework\MemoryUsageAware;
-use Infection\Visitor\CodeCoverageMethodIgnoreVisitor;
-use Infection\Visitor\PhpUnitCodeCoverageClassIgnoreVisitor;
+use Infection\Visitor\PhpUnitClassCodeCoverageIgnoreVisitor;
+use Infection\Visitor\PhpUnitMethodCodeCoverageIgnoreVisitor;
 
 /**
  * @internal
@@ -85,8 +85,8 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements HasEx
     public function getMutationsCollectionNodeVisitors(): array
     {
         return [
-            100 => new PhpUnitCodeCoverageClassIgnoreVisitor(),
-            15 => new CodeCoverageMethodIgnoreVisitor(),
+            100 => new PhpUnitClassCodeCoverageIgnoreVisitor(),
+            15 => new PhpUnitMethodCodeCoverageIgnoreVisitor(),
         ];
     }
 
