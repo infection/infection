@@ -509,7 +509,7 @@ final class InfectionCommand extends BaseCommand
         /** @var Configuration $config */
         $config = $this->container[Configuration::class];
 
-        $coverageDir = $config->getExistingCoveragePath();
+        $coverageDir = $config->getCoveragePath();
 
         $coverageIndexFilePath = $coverageDir . '/' . XMLLineCodeCoverage::COVERAGE_INDEX_FILE_NAME;
 

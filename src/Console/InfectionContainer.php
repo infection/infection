@@ -112,7 +112,7 @@ final class InfectionContainer extends Container
 
                 return sprintf(
                     '%s/%s',
-                    Path::canonicalize($config->getExistingCoveragePath() . '/..'),
+                    Path::canonicalize($config->getCoveragePath() . '/..'),
                     TestFrameworkAdapter::JUNIT_FILE_NAME
                 );
             },
@@ -120,7 +120,7 @@ final class InfectionContainer extends Container
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
-                return new CoverageXmlParser($config->getExistingCoveragePath());
+                return new CoverageXmlParser($config->getCoveragePath());
             },
             XMLLineCodeCoverageFactory::class => static function (self $container): XMLLineCodeCoverageFactory {
                 /** @var Configuration $config */
@@ -133,7 +133,7 @@ final class InfectionContainer extends Container
                 $cachedTestFileDataProvider = $container[CachedTestFileDataProvider::class];
 
                 return new XMLLineCodeCoverageFactory(
-                    $config->getExistingCoveragePath(),
+                    $config->getCoveragePath(),
                     $coverageXmlParser,
                     $cachedTestFileDataProvider
                 );
@@ -322,7 +322,7 @@ final class InfectionContainer extends Container
                 $config = $container[Configuration::class];
 
                 return new CoverageRequirementChecker(
-                    $config->getExistingCoveragePath() !== '',
+                    $config->getCoveragePath() !== '',
                     $config->getInitialTestsPhpOptions() ?? ''
                 );
             },
