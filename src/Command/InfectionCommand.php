@@ -67,7 +67,6 @@ use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverageFactory;
-use Infection\TestFramework\Factory;
 use Infection\TestFramework\HasExtraNodeVisitors;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -215,9 +214,9 @@ final class InfectionCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $adapter = $this->startUp();
-        $this->runInitialTestSuite($adapter);
-        $this->runMutationTesting($adapter);
+        $this->startUp();
+        $this->runInitialTestSuite();
+        $this->runMutationTesting();
 
         if (!$this->checkMetrics()) {
             return 1;
@@ -249,7 +248,7 @@ final class InfectionCommand extends BaseCommand
         $this->consoleOutput = $this->getApplication()->getConsoleOutput();
     }
 
-    private function startUp(): TestFrameworkAdapter
+    private function startUp(): void
     {
         Assert::notNull($this->container);
 
@@ -270,13 +269,8 @@ final class InfectionCommand extends BaseCommand
 
         $fileSystem->mkdir($config->getTmpDir());
 
-        /** @var Factory $testFrameworkFactory */
-        $testFrameworkFactory = $this->container['test.framework.factory'];
-
-        $adapter = $testFrameworkFactory->create(
-            $config->getTestFramework(),
-            $config->shouldSkipCoverage()
-        );
+        /** @var TestFrameworkAdapter $adapter */
+        $adapter = $this->container[TestFrameworkAdapter::class];
 
         LogVerbosity::convertVerbosityLevel($this->input, $this->consoleOutput);
 
@@ -288,12 +282,13 @@ final class InfectionCommand extends BaseCommand
         $eventDispatcher = $this->container['dispatcher'];
 
         $eventDispatcher->dispatch(new ApplicationExecutionStarted());
-
-        return $adapter;
     }
 
-    private function runInitialTestSuite(TestFrameworkAdapter $adapter): void
+    private function runInitialTestSuite(): void
     {
+        /** @var TestFrameworkAdapter $adapter */
+        $adapter = $this->container[TestFrameworkAdapter::class];
+
         /** @var Configuration $config */
         $config = $this->container[Configuration::class];
 
@@ -324,8 +319,11 @@ final class InfectionCommand extends BaseCommand
         $memoryLimitApplier->applyMemoryLimitFromProcess($initialTestSuitProcess, $adapter);
     }
 
-    private function runMutationTesting(TestFrameworkAdapter $adapter): void
+    private function runMutationTesting(): void
     {
+        /** @var TestFrameworkAdapter $adapter */
+        $adapter = $this->container[TestFrameworkAdapter::class];
+
         /** @var Configuration $config */
         $config = $this->container[Configuration::class];
 

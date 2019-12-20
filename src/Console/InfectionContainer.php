@@ -421,6 +421,18 @@ final class InfectionContainer extends Container
                     $config->mutateOnlyCoveredCode()
                 );
             },
+            TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                /** @var Factory $testFrameworkFactory */
+                $testFrameworkFactory = $container['test.framework.factory'];
+
+                return $testFrameworkFactory->create(
+                    $config->getTestFramework(),
+                    $config->shouldSkipCoverage()
+                );
+            },
         ]);
     }
 
