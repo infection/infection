@@ -48,9 +48,6 @@ final class JsonFile
 {
     private const SCHEMA_FILE = __DIR__ . '/../../resources/schema.json';
 
-    /**
-     * @var string
-     */
     private $path;
 
     /**

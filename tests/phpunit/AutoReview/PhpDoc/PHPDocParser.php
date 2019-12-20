@@ -33,62 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\AutoReview\PhpDoc;
 
-use DOMDocument;
-use DOMXPath;
+use function array_unique;
+use function array_values;
+use function Safe\preg_match_all;
+use function Safe\preg_replace;
+use const SORT_STRING;
 
-/**
- * @internal
- */
-final class JUnitTestFileDataProvider implements TestFileDataProvider
+final class PHPDocParser
 {
-    private $jUnitFilePath;
-
     /**
-     * @var DOMXPath|null
+     * Parses the given PHP doc and returns the list of tags found.
+     *
+     * @return string[]
      */
-    private $xPath;
-
-    public function __construct(string $jUnitFilePath)
+    public function parse(string $phpDoc): array
     {
-        $this->jUnitFilePath = $jUnitFilePath;
-    }
-
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
-    {
-        $xPath = $this->getXPath();
-
-        $nodes = $xPath->query(sprintf('//testsuite[@name="%s"]', $fullyQualifiedClassName));
-
-        if (!$nodes->length) {
-            // try another format where the class name is inside `class` attribute of `testcase` tag
-            $nodes = $xPath->query(sprintf('//testcase[@class="%s"]', $fullyQualifiedClassName));
-        }
-
-        if (!$nodes->length) {
-            throw TestFileNameNotFoundException::notFoundFromFQN($fullyQualifiedClassName, $this->jUnitFilePath);
-        }
-
-        return new TestFileTimeData(
-            $nodes[0]->getAttribute('file'),
-            (float) $nodes[0]->getAttribute('time')
+        $escapedPhpDoc = preg_replace(
+            '/\p{L}@[\p{L}\\\\]+/u',
+            '',
+            $phpDoc
         );
-    }
 
-    private function getXPath(): DOMXPath
-    {
-        if (!$this->xPath) {
-            if (!file_exists($this->jUnitFilePath)) {
-                throw CoverageDoesNotExistException::forJunit($this->jUnitFilePath);
-            }
+        preg_match_all(
+            '/@[\p{L}\\\\]+/u',
+            $escapedPhpDoc,
+            $matches
+        );
 
-            $dom = new DOMDocument();
-            $dom->load($this->jUnitFilePath);
-
-            $this->xPath = new DOMXPath($dom);
-        }
-
-        return $this->xPath;
+        return array_values(array_unique($matches[0], SORT_STRING));
     }
 }

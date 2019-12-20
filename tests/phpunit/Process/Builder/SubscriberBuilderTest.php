@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Builder;
 
 use Infection\Configuration\Configuration;
+use Infection\Configuration\Entry\Logs;
 use Infection\Differ\DiffColorizer;
 use Infection\EventDispatcher\EventDispatcherInterface;
+use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\TimeFormatter;
@@ -63,15 +65,16 @@ final class SubscriberBuilderTest extends TestCase
         $dispatcher->expects($this->exactly(6))->method('addSubscriber');
         $diff = $this->createMock(DiffColorizer::class);
         $config = $this->createMock(Configuration::class);
+        $config->expects($this->once())->method('getLogs')->willReturn(
+            new Logs(null, null, null, null, null)
+        );
         $fs = $this->createMock(Filesystem::class);
         $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
         $output = $this->createMock(OutputInterface::class);
 
         $subscriberBuilder = new SubscriberBuilder(
             true,
-            'all',
             true,
-            false,
             'progress',
             true,
             $calculator,
@@ -82,7 +85,8 @@ final class SubscriberBuilderTest extends TestCase
             sys_get_temp_dir(),
             new Timer(),
             new TimeFormatter(),
-            new MemoryFormatter()
+            new MemoryFormatter(),
+            new LoggerFactory($calculator, $fs, 'all', false, false)
         );
         $subscriberBuilder->registerSubscribers($adapter, $output);
     }
@@ -94,14 +98,15 @@ final class SubscriberBuilderTest extends TestCase
         $dispatcher->expects($this->exactly(7))->method('addSubscriber');
         $diff = $this->createMock(DiffColorizer::class);
         $config = $this->createMock(Configuration::class);
+        $config->expects($this->once())->method('getLogs')->willReturn(
+            new Logs(null, null, null, null, null)
+        );
         $fs = $this->createMock(Filesystem::class);
         $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
         $output = $this->createMock(OutputInterface::class);
 
         $subscriberBuilder = new SubscriberBuilder(
             true,
-            'all',
-            false,
             false,
             'progress',
             true,
@@ -113,7 +118,8 @@ final class SubscriberBuilderTest extends TestCase
             sys_get_temp_dir(),
             new Timer(),
             new TimeFormatter(),
-            new MemoryFormatter()
+            new MemoryFormatter(),
+            new LoggerFactory($calculator, $fs, 'all', false, false)
         );
         $subscriberBuilder->registerSubscribers($adapter, $output);
     }
@@ -131,9 +137,7 @@ final class SubscriberBuilderTest extends TestCase
 
         $subscriberBuilder = new SubscriberBuilder(
             true,
-            'default',
             true,
-            false,
             'foo',
             true,
             $calculator,
@@ -144,7 +148,8 @@ final class SubscriberBuilderTest extends TestCase
             sys_get_temp_dir(),
             new Timer(),
             new TimeFormatter(),
-            new MemoryFormatter()
+            new MemoryFormatter(),
+            new LoggerFactory($calculator, $fs, 'all', false, false)
         );
 
         $this->expectException(InvalidArgumentException::class);

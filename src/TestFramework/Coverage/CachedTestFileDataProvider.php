@@ -39,12 +39,10 @@ use function array_key_exists;
 
 /**
  * @internal
+ * @final
  */
-final class CachedTestFileDataProvider implements TestFileDataProvider
+class CachedTestFileDataProvider implements TestFileDataProvider
 {
-    /**
-     * @var TestFileDataProvider
-     */
     private $testFileDataProvider;
 
     /**

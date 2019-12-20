@@ -46,10 +46,11 @@ use PhpParser\Node;
  */
 final class Mutation implements MutationInterface
 {
-    /**
-     * @var Mutator
-     */
+    private $originalFilePath;
     private $mutator;
+    private $mutatedNodeClass;
+    private $mutatedNode;
+    private $mutationByMutatorIndex;
 
     /**
      * @var array
@@ -57,40 +58,25 @@ final class Mutation implements MutationInterface
     private $attributes;
 
     /**
-     * @var string
-     */
-    private $originalFilePath;
-
-    /**
      * @var Node[]
      */
     private $originalFileAst;
 
     /**
-     * @var string
-     */
-    private $mutatedNodeClass;
-
-    /**
-     * @var string
+     * @var string|null
      */
     private $hash;
-
-    /**
-     * @var Node|Node[]
-     */
-    private $mutatedNode;
-
-    /**
-     * @var int
-     */
-    private $mutationByMutatorIndex;
 
     /**
      * @var CoverageLineData[]
      */
     private $tests;
 
+    /**
+     * @param Node[] $originalFileAst
+     * @param array<string|int|float> $attributes
+     * @param Node|Node[] $mutatedNode
+     */
     public function __construct(
         string $originalFilePath,
         array $originalFileAst,
@@ -116,6 +102,9 @@ final class Mutation implements MutationInterface
         return $this->mutator;
     }
 
+    /**
+     * @return (string|int|float)[]   $attributes
+     */
     public function getAttributes(): array
     {
         return $this->attributes;
@@ -157,6 +146,9 @@ final class Mutation implements MutationInterface
         return $this->hash;
     }
 
+    /**
+     * return Node[]
+     */
     public function getOriginalFileAst(): array
     {
         return $this->originalFileAst;
@@ -175,6 +167,9 @@ final class Mutation implements MutationInterface
         return count($this->getAllTests()) !== 0;
     }
 
+    /**
+     * @return Node|Node[]
+     */
     public function getMutatedNode()
     {
         return $this->mutatedNode;

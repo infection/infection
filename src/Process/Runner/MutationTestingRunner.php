@@ -54,28 +54,15 @@ use Infection\Process\Runner\Parallel\ParallelProcessRunner;
  */
 final class MutationTestingRunner
 {
-    /**
-     * @var MutantProcessBuilder
-     */
     private $processBuilder;
-
-    /**
-     * @var Mutation[]
-     */
     private $mutations;
-    /**
-     * @var MutantCreator
-     */
     private $mutantCreator;
-    /**
-     * @var ParallelProcessRunner
-     */
     private $parallelProcessManager;
-    /**
-     * @var EventDispatcherInterface
-     */
     private $eventDispatcher;
 
+    /**
+     * @param Mutation[] $mutations
+     */
     public function __construct(MutantProcessBuilder $processBuilder, ParallelProcessRunner $parallelProcessManager, MutantCreator $mutantCreator, EventDispatcherInterface $eventDispatcher, array $mutations)
     {
         $this->processBuilder = $processBuilder;

@@ -68,9 +68,6 @@ final class Application extends BaseApplication
 /___/_/ /_/_/  \___/\___/\__/_/\____/_/ /_/
 ';
 
-    /**
-     * @var InfectionContainer
-     */
     private $container;
 
     /**

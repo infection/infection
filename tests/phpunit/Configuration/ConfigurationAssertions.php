@@ -39,14 +39,17 @@ use function array_map;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\Tests\Configuration\Entry\LogsAssertions;
 use Infection\Tests\Configuration\Entry\PhpUnitAssertions;
+use Infection\Tests\TestFramework\TestFrameworkExtraOptionsAssertions;
 use Symfony\Component\Finder\SplFileInfo;
 
 trait ConfigurationAssertions
 {
     use LogsAssertions;
     use PhpUnitAssertions;
+    use TestFrameworkExtraOptionsAssertions;
 
     /**
      * @param string[]      $expectedSourceDirectories
@@ -62,11 +65,11 @@ trait ConfigurationAssertions
         string $expectedTmpDir,
         PhpUnit $expectedPhpUnit,
         array $expectedMutators,
-        ?string $expectedTestFramework,
+        string $expectedTestFramework,
         ?string $expectedBootstrap,
         ?string $expectedInitialTestsPhpOptions,
-        ?string $expectedTestFrameworkOptions,
-        string $expectedExistingCoverageBasePath,
+        TestFrameworkExtraOptions $expectedTestFrameworkExtraOptions,
+        string $expectedExistingCoveragePath,
         bool $expectedDebug,
         bool $expectedOnlyCovered,
         string $expectedFormatter,
@@ -101,8 +104,11 @@ trait ConfigurationAssertions
         $this->assertSame($expectedTestFramework, $configuration->getTestFramework());
         $this->assertSame($expectedBootstrap, $configuration->getBootstrap());
         $this->assertSame($expectedInitialTestsPhpOptions, $configuration->getInitialTestsPhpOptions());
-        $this->assertSame($expectedTestFrameworkOptions, $configuration->getTestFrameworkOptions());
-        $this->assertSame($expectedExistingCoverageBasePath, $configuration->getExistingCoverageBasePath());
+        $this->assertTestFrameworkExtraOptionsStateIs(
+            $expectedTestFrameworkExtraOptions,
+            $configuration->getTestFrameworkExtraOptions()
+        );
+        $this->assertSame($expectedExistingCoveragePath, $configuration->getExistingCoveragePath());
         $this->assertSame($expectedDebug, $configuration->isDebugEnabled());
         $this->assertSame($expectedOnlyCovered, $configuration->mutateOnlyCoveredCode());
         $this->assertSame($expectedFormatter, $configuration->getFormatter());

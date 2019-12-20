@@ -43,6 +43,11 @@ use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
+use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
+use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
+use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
+use Infection\TestFramework\TestFrameworkExtraOptions;
+use Infection\TestFramework\TestFrameworkTypes;
 use function Safe\sprintf;
 use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
@@ -58,6 +63,12 @@ class ConfigurationFactory
      * Default allowed timeout (on a test basis) in seconds
      */
     private const DEFAULT_TIMEOUT = 10;
+
+    private const TEST_FRAMEWORK_COVERAGE_DIRECTORY = [
+        TestFrameworkTypes::PHPUNIT => XMLLineCodeCoverage::PHP_UNIT_COVERAGE_DIR,
+        TestFrameworkTypes::PHPSPEC => XMLLineCodeCoverage::PHP_SPEC_COVERAGE_DIR,
+        TestFrameworkTypes::CODECEPTION => XMLLineCodeCoverage::CODECEPTION_COVERAGE_DIR,
+    ];
 
     private $tmpDirProvider;
     private $mutatorFactory;
@@ -91,7 +102,7 @@ class ConfigurationFactory
         ?float $minCoveredMsi,
         string $mutatorsInput,
         ?string $testFramework,
-        ?string $testFrameworkOptions,
+        ?string $testFrameworkExtraOptions,
         string $filter
     ): Configuration {
         $configDir = dirname($schema->getFile());
@@ -99,6 +110,8 @@ class ConfigurationFactory
         $schemaMutators = $schema->getMutators();
 
         $namespacedTmpDir = $this->retrieveTmpDir($schema, $configDir);
+
+        $testFramework = $testFramework ?? $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
 
         return new Configuration(
             $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
@@ -120,11 +133,14 @@ class ConfigurationFactory
                     $mutatorsInput
                 )
             ),
-            $testFramework ?? $schema->getTestFramework(),
+            $testFramework,
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
-            $testFrameworkOptions ?? $schema->getTestFrameworkOptions(),
-            self::retrieveExistingCoverageBasePath($existingCoveragePath, $configDir, $namespacedTmpDir),
+            self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema, $testFramework),
+            self::retrieveExistingCoveragePath(
+                self::retrieveExistingCoverageBasePath($existingCoveragePath, $configDir, $namespacedTmpDir),
+                $testFramework
+            ),
             $debug,
             $onlyCovered,
             $formatter,
@@ -168,6 +184,19 @@ class ConfigurationFactory
         return $phpUnit;
     }
 
+    private static function retrieveExistingCoveragePath(
+        string $existingCoverageBasePath,
+        string $testFramework
+    ): string {
+        Assert::keyExists(self::TEST_FRAMEWORK_COVERAGE_DIRECTORY, $testFramework);
+
+        return sprintf(
+            '%s/%s',
+            $existingCoverageBasePath,
+            self::TEST_FRAMEWORK_COVERAGE_DIRECTORY[$testFramework]
+        );
+    }
+
     private static function retrieveExistingCoverageBasePath(
         ?string $existingCoveragePath,
         string $configDir,
@@ -195,5 +224,18 @@ class ConfigurationFactory
         }
 
         return array_fill_keys($parsedMutatorsInput, true);
+    }
+
+    private static function retrieveTestFrameworkExtraOptions(
+        ?string $testFrameworkExtraOptions,
+        SchemaConfiguration $schema,
+        string $testFramework
+    ): TestFrameworkExtraOptions {
+        $extraOptions = $testFrameworkExtraOptions ?? $schema->getTestFrameworkExtraOptions();
+
+        return TestFrameworkTypes::PHPUNIT === $testFramework
+            ? new PhpUnitExtraOptions($extraOptions)
+            : new PhpSpecExtraOptions($extraOptions)
+        ;
     }
 }

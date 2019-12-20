@@ -54,38 +54,15 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInt
     private const PAD_LENGTH = 8;
 
     /**
-     * @var OutputInterface
-     */
-    private $output;
-
-    /**
-     * @var OutputFormatter
-     */
-    private $outputFormatter;
-
-    /**
      * @var MutantProcessInterface[]
      */
     private $mutantProcesses = [];
 
-    /**
-     * @var MetricsCalculator
-     */
+    private $output;
+    private $outputFormatter;
     private $metricsCalculator;
-
-    /**
-     * @var bool
-     */
     private $showMutations;
-
-    /**
-     * @var DiffColorizer
-     */
     private $diffColorizer;
-
-    /**
-     * @var int
-     */
     private $mutationCount = 0;
 
     public function __construct(

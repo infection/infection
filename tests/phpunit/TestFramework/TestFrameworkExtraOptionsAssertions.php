@@ -33,62 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework;
 
-use DOMDocument;
-use DOMXPath;
+use function get_class;
+use Infection\TestFramework\TestFrameworkExtraOptions;
 
-/**
- * @internal
- */
-final class JUnitTestFileDataProvider implements TestFileDataProvider
+trait TestFrameworkExtraOptionsAssertions
 {
-    private $jUnitFilePath;
-
-    /**
-     * @var DOMXPath|null
-     */
-    private $xPath;
-
-    public function __construct(string $jUnitFilePath)
-    {
-        $this->jUnitFilePath = $jUnitFilePath;
-    }
-
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
-    {
-        $xPath = $this->getXPath();
-
-        $nodes = $xPath->query(sprintf('//testsuite[@name="%s"]', $fullyQualifiedClassName));
-
-        if (!$nodes->length) {
-            // try another format where the class name is inside `class` attribute of `testcase` tag
-            $nodes = $xPath->query(sprintf('//testcase[@class="%s"]', $fullyQualifiedClassName));
-        }
-
-        if (!$nodes->length) {
-            throw TestFileNameNotFoundException::notFoundFromFQN($fullyQualifiedClassName, $this->jUnitFilePath);
-        }
-
-        return new TestFileTimeData(
-            $nodes[0]->getAttribute('file'),
-            (float) $nodes[0]->getAttribute('time')
-        );
-    }
-
-    private function getXPath(): DOMXPath
-    {
-        if (!$this->xPath) {
-            if (!file_exists($this->jUnitFilePath)) {
-                throw CoverageDoesNotExistException::forJunit($this->jUnitFilePath);
-            }
-
-            $dom = new DOMDocument();
-            $dom->load($this->jUnitFilePath);
-
-            $this->xPath = new DOMXPath($dom);
-        }
-
-        return $this->xPath;
+    private function assertTestFrameworkExtraOptionsStateIs(
+        TestFrameworkExtraOptions $extraOptions,
+        TestFrameworkExtraOptions $expectedExtraOptions
+    ): void {
+        $this->assertSame(get_class($expectedExtraOptions), get_class($extraOptions));
+        $this->assertSame($expectedExtraOptions->getForInitialProcess(), $extraOptions->getForInitialProcess());
+        $this->assertSame($expectedExtraOptions->getForMutantProcess(), $extraOptions->getForMutantProcess());
     }
 }

@@ -48,24 +48,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class PerformanceLoggerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var Timer
-     */
     private $timer;
-
-    /**
-     * @var OutputInterface
-     */
     private $output;
-
-    /**
-     * @var TimeFormatter
-     */
     private $timeFormatter;
-
-    /**
-     * @var MemoryFormatter
-     */
     private $memoryFormatter;
 
     public function __construct(

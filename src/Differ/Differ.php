@@ -44,9 +44,6 @@ class Differ
 {
     public const DIFF_MAX_LINES = 12;
 
-    /**
-     * @var BaseDiffer
-     */
     private $differ;
 
     public function __construct(BaseDiffer $differ)

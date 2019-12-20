@@ -42,8 +42,6 @@ use Infection\Command\ConfigureCommand;
 use Infection\Command\InfectionCommand;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
-use Infection\Configuration\Configuration;
-use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
@@ -53,17 +51,12 @@ use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\Util\PhpProcess;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
-use Infection\FileSystem\SourceFileCollector;
 use Infection\Finder\ComposerExecutableFinder;
 use Infection\Finder\FilterableFinder;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\Http\BadgeApiClient;
 use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Mutation\FileMutationGenerator;
-use Infection\Mutation\FileParser;
-use Infection\Mutation\NodeTraverserFactory;
-use Infection\Mutation\PrioritizedVisitorsNodeTraverser;
 use Infection\Mutator\Util\Mutator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
@@ -133,16 +126,6 @@ final class ProjectCodeProvider
         PhpUnitMutationConfigBuilder::class,
         CoverageXmlParser::class,
         VersionParser::class,
-        SchemaConfigurationFactory::class,
-        SchemaConfigurationFileLoader::class,
-        SchemaValidator::class,
-        Configuration::class,
-        ConfigurationFactory::class,
-        SourceFileCollector::class,
-        FileParser::class,
-        NodeTraverserFactory::class,
-        PrioritizedVisitorsNodeTraverser::class,
-        FileMutationGenerator::class,
     ];
 
     /**

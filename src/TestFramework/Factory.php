@@ -63,49 +63,14 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class Factory
 {
-    /**
-     * @var string
-     */
     private $tmpDir;
-
-    /**
-     * @var XmlConfigurationHelper
-     */
     private $xmlConfigurationHelper;
-
-    /**
-     * @var TestFrameworkConfigLocatorInterface
-     */
     private $configLocator;
-
-    /**
-     * @var string
-     */
     private $projectDir;
-
-    /**
-     * @var string
-     */
     private $jUnitFilePath;
-
-    /**
-     * @var Configuration
-     */
     private $infectionConfig;
-
-    /**
-     * @var VersionParser
-     */
     private $versionParser;
-
-    /**
-     * @var Filesystem
-     */
     private $filesystem;
-
-    /**
-     * @var CommandLineBuilder
-     */
     private $commandLineBuilder;
 
     public function __construct(
