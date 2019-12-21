@@ -115,7 +115,7 @@ PHP;
 
     private function parseAndTraverse(string $code): void
     {
-        $nodes = $this->getNodes($code);
+        $nodes = $this->parseCode($code);
 
         $traverser = new NodeTraverser();
 

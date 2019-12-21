@@ -36,17 +36,18 @@ declare(strict_types=1);
 namespace Infection\Visitor;
 
 use PhpParser\Node;
+use PhpParser\Node\Stmt;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 
 /**
  * @internal
  */
-final class CodeCoverageMethodIgnoreVisitor extends NodeVisitorAbstract
+final class PhpUnitClassCodeCoverageIgnoreVisitor extends NodeVisitorAbstract
 {
     public function enterNode(Node $node)
     {
-        if (!$node instanceof Node\Stmt\ClassMethod) {
+        if (!$node instanceof Stmt\ClassLike) {
             return null;
         }
 

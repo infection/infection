@@ -61,6 +61,7 @@ final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
         if ($node instanceof Stmt\Namespace_) {
             $this->namespace = $node->name;
         } elseif ($node instanceof Stmt\ClassLike) {
+            // TODO: check the cases of multiple namespaces
             $node->setAttribute(self::FQN_KEY, $node->name ? Name::concat($this->namespace, $node->name->name) : null);
         }
 
