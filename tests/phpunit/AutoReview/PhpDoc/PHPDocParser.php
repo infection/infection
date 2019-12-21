@@ -33,37 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutation;
+namespace Infection\Tests\AutoReview\PhpDoc;
 
-use Infection\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\Visitor\NotMutableIgnoreVisitor;
-use Infection\Visitor\ParentConnectorVisitor;
-use Infection\Visitor\ReflectionVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
+use function array_unique;
+use function array_values;
+use function Safe\preg_match_all;
+use function Safe\preg_replace;
+use const SORT_STRING;
 
-/**
- * @internal
- * @final
- */
-class NodeTraverserFactory
+final class PHPDocParser
 {
     /**
-     * @param NodeVisitor[] $extraVisitors
+     * Parses the given PHP doc and returns the list of tags found.
+     *
+     * @return string[]
      */
-    public function create(array $extraVisitors): PrioritizedVisitorsNodeTraverser
+    public function parse(string $phpDoc): array
     {
-        $traverser = new PrioritizedVisitorsNodeTraverser(new NodeTraverser());
+        $escapedPhpDoc = preg_replace(
+            '/\p{L}@[\p{L}\\\\]+/u',
+            '',
+            $phpDoc
+        );
 
-        $traverser->addPrioritizedVisitor(new NotMutableIgnoreVisitor(), 50);
-        $traverser->addPrioritizedVisitor(new ParentConnectorVisitor(), 40);
-        $traverser->addPrioritizedVisitor(new FullyQualifiedClassNameVisitor(), 30);
-        $traverser->addPrioritizedVisitor(new ReflectionVisitor(), 20);
+        preg_match_all(
+            '/@[\p{L}\\\\]+/u',
+            $escapedPhpDoc,
+            $matches
+        );
 
-        foreach ($extraVisitors as $priority => $visitor) {
-            $traverser->addPrioritizedVisitor($visitor, $priority);
-        }
-
-        return $traverser;
+        return array_values(array_unique($matches[0], SORT_STRING));
     }
 }
