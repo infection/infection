@@ -1,5 +1,9 @@
 .DEFAULT_GOAL := help
 
+# See https://tech.davis-hansson.com/p/make/
+MAKEFLAGS += --warn-undefined-variables
+MAKEFLAGS += --no-builtin-rules
+
 .PHONY: help
 help:
 	@echo "\033[33mUsage:\033[0m\n  make TARGET\n\n\033[32m#\n# Commands\n#---------------------------------------------------------------------------\033[0m\n"
