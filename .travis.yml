@@ -35,7 +35,8 @@ jobs:
       install:
         - composer install $COMPOSER_FLAGS
       script:
-        - make autoreview
+        # Ensure that the whole autoreview target is run even if the first sub-target fails
+        - make autoreview --keep-going
 
     - &STANDARD_TEST_JOB
       stage: Test
@@ -71,10 +72,10 @@ jobs:
 
           echo "Flags used: ${INFECTION_FLAGS} ${INFECTION_PR_FLAGS};";
 
-          if [[ "$DRIVER" != "phpdbg" ]]; then
-            bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
-          elif [[ "$DRIVER" == "none" ]]; then
+          if [[ "$DRIVER" == "none" ]]; then
             exit 0
+          elif [[ "$DRIVER" != "phpdbg" ]]; then
+            bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
           else
             phpdbg -qrr bin/infection $INFECTION_FLAGS $INFECTION_PR_FLAGS;
           fi
