@@ -35,11 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Visitor;
 
-use function count;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 use ReflectionClass;
+use function array_pop;
+use function count;
 
 /**
  * @internal
@@ -62,16 +63,10 @@ final class ReflectionVisitor extends NodeVisitorAbstract
      */
     private $classScopeStack = [];
 
-    /**
-     * @var string|null
-     */
-    private $methodName;
-
     public function beforeTraverse(array $nodes): ?array
     {
         $this->functionScopeStack = [];
         $this->classScopeStack = [];
-        $this->methodName = null;
 
         return null;
     }
@@ -92,13 +87,15 @@ final class ReflectionVisitor extends NodeVisitorAbstract
             return null;
         }
 
+        $methodName = null;
+
         if ($node instanceof Node\Stmt\ClassMethod) {
-            $this->methodName = $node->name->name;
+            $methodName = $node->name->name;
         }
 
-        $isInsideFunction = $this->isInsideFunction($node);
+        $insideFunction = $this->isInsideFunction($node);
 
-        if ($isInsideFunction) {
+        if ($insideFunction) {
             $node->setAttribute(self::IS_INSIDE_FUNCTION_KEY, true);
         } elseif ($node instanceof Node\Stmt\Function_) {
             return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
@@ -111,11 +108,11 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         if ($this->isFunctionLikeNode($node)) {
             $this->functionScopeStack[] = $node;
             $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->classScopeStack[count($this->classScopeStack) - 1]);
-            $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
-        } elseif ($isInsideFunction) {
+            $node->setAttribute(self::FUNCTION_NAME, $methodName);
+        } elseif ($insideFunction) {
             $node->setAttribute(self::FUNCTION_SCOPE_KEY, $this->functionScopeStack[count($this->functionScopeStack) - 1]);
             $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->classScopeStack[count($this->classScopeStack) - 1]);
-            $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
+            $node->setAttribute(self::FUNCTION_NAME, $methodName);
         }
 
         return null;
@@ -160,27 +157,14 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
         $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
 
-        if ($parent->getAttribute(self::IS_INSIDE_FUNCTION_KEY)) {
-            return true;
-        }
-
-        if ($this->isFunctionLikeNode($parent)) {
-            return true;
-        }
-
-        return $this->isInsideFunction($parent);
+        return $parent->getAttribute(self::IS_INSIDE_FUNCTION_KEY)
+            || $this->isFunctionLikeNode($parent)
+            || $this->isInsideFunction($parent)
+        ;
     }
 
     private function isFunctionLikeNode(Node $node): bool
     {
-        if ($node instanceof Node\Stmt\ClassMethod) {
-            return true;
-        }
-
-        if ($node instanceof Node\Expr\Closure) {
-            return true;
-        }
-
-        return false;
+        return $node instanceof Node\Stmt\ClassMethod || $node instanceof Node\Expr\Closure;
     }
 }
