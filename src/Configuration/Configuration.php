@@ -72,7 +72,7 @@ class Configuration
     private $bootstrap;
     private $initialTestsPhpOptions;
     private $testFrameworkExtraOptions;
-    private $existingCoveragePath;
+    private $coveragePath;
     private $skipCoverage;
     private $debug;
     private $onlyCovered;
@@ -101,7 +101,7 @@ class Configuration
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
         TestFrameworkExtraOptions $testFrameworkExtraOptions,
-        string $existingCoveragePath,
+        string $coveragePath,
         bool $skipCoverage,
         bool $debug,
         bool $onlyCovered,
@@ -133,7 +133,7 @@ class Configuration
         $this->bootstrap = $bootstrap;
         $this->initialTestsPhpOptions = $initialTestsPhpOptions;
         $this->testFrameworkExtraOptions = $testFrameworkExtraOptions;
-        $this->existingCoveragePath = $existingCoveragePath;
+        $this->coveragePath = $coveragePath;
         $this->skipCoverage = $skipCoverage;
         $this->debug = $debug;
         $this->onlyCovered = $onlyCovered;
@@ -214,9 +214,9 @@ class Configuration
         return $this->testFrameworkExtraOptions;
     }
 
-    public function getExistingCoveragePath(): string
+    public function getCoveragePath(): string
     {
-        return $this->existingCoveragePath;
+        return $this->coveragePath;
     }
 
     public function shouldSkipCoverage(): bool
