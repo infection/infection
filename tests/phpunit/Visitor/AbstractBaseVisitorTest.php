@@ -35,22 +35,81 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Visitor;
 
-use PhpParser\Lexer;
-use PhpParser\ParserFactory;
+use Infection\Console\InfectionContainer;
+use PhpParser\Node;
+use PhpParser\NodeDumper;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor;
+use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
+use function Safe\file_get_contents;
+use function Safe\sprintf;
 
 abstract class AbstractBaseVisitorTest extends TestCase
 {
-    protected function getNodes(string $code): array
-    {
-        $lexer = new Lexer\Emulative();
-        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
+    /**
+     * @var Parser|null
+     */
+    private static $parser;
 
-        return $parser->parse($code);
+    /**
+     * @var NodeDumper|null
+     */
+    private static $dumper;
+
+    /**
+     * @return Node[]
+     */
+    final protected function parseCode(string $code): array
+    {
+        return (array) $this->getParser()->parse($code);
     }
 
-    protected function getFileContent(string $file): string
+    /**
+     * @param Node[] $nodes
+     */
+    final protected function dumpNodes(array $nodes): string
+    {
+        return $this->getDumper()->dump($nodes);
+    }
+
+    /**
+     * @param Node[] $nodes
+     * @param NodeVisitor[] $visitors
+     *
+     * @return Node[]
+     */
+    final protected function traverse(array $nodes, array $visitors): array
+    {
+        $traverser = new NodeTraverser();
+
+        foreach ($visitors as $visitor) {
+            $traverser->addVisitor($visitor);
+        }
+
+        return $traverser->traverse($nodes);
+    }
+
+    final protected function getFileContent(string $file): string
     {
         return file_get_contents(sprintf(__DIR__ . '/../Fixtures/Autoloaded/%s', $file));
+    }
+
+    private function getParser(): Parser
+    {
+        if (null === self::$parser) {
+            self::$parser = InfectionContainer::create()[Parser::class];
+        }
+
+        return self::$parser;
+    }
+
+    private function getDumper(): NodeDumper
+    {
+        if (null === self::$dumper) {
+            self::$dumper = new NodeDumper();
+        }
+
+        return self::$dumper;
     }
 }

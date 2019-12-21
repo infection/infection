@@ -35,60 +35,69 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Visitor;
 
-use Infection\Visitor\CodeCoverageClassIgnoreVisitor;
+use Generator;
+use Infection\Visitor\PhpUnitClassCodeCoverageIgnoreVisitor;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 
-final class CodeCoverageClassIgnoreVisitorTest extends AbstractBaseVisitorTest
+final class PhpUnitClassCodeCoverageIgnoreVisitorTest extends AbstractBaseVisitorTest
 {
     private $spyVisitor;
 
     protected function setUp(): void
     {
-        $this->spyVisitor = $this->getSpyVisitor();
+        $this->spyVisitor = $this->createSpyVisitor();
     }
 
-    public function test_it_do_not_travers_when_coverage_is_ignored(): void
+    public function test_it_does_not_traverse_a_class_which_has_the_code_coverage_ignore_PHPUnit_annotation(): void
     {
         $code = $this->getFileContent('Coverage/code-coverage-class-ignore.php');
 
         $this->parseAndTraverse($code);
 
-        $this->assertFalse($this->spyVisitor->isNodeVisited(), 'ClassMethod node has been visited');
+        $this->assertFalse(
+            $this->spyVisitor->isNodeVisited(),
+            'ClassMethod node has been visited'
+        );
     }
 
-    public function test_it_travers_nodes_when_coverage_is_not_ignored(): void
-    {
-        $code = $this->getFileContent('Coverage/code-coverage-class-not-ignored.php');
+    /**
+     * @dataProvider traversedCodeProvider
+     */
+    public function test_it_traverses_a_class_which_does_not_have_the_code_coverage_ignore_PHPUnit_annotation(
+        string $path
+    ): void {
+        $code = $this->getFileContent($path);
 
         $this->parseAndTraverse($code);
 
-        $this->assertTrue($this->spyVisitor->isNodeVisited(), 'ClassMethod node has not been visited');
+        $this->assertTrue(
+            $this->spyVisitor->isNodeVisited(),
+            'ClassMethod node has not been visited'
+        );
     }
 
-    public function test_it_travers_nodes_when_coverage_is_not_ignored_but_has_a_comment(): void
+    public function traversedCodeProvider(): Generator
     {
-        $code = $this->getFileContent('Coverage/code-coverage-class-not-ignored-with-comment.php');
+        yield ['Coverage/code-coverage-class-not-ignored.php'];
 
-        $this->parseAndTraverse($code);
-
-        $this->assertTrue($this->spyVisitor->isNodeVisited(), 'ClassMethod node has not been visited');
+        yield ['Coverage/code-coverage-class-not-ignored-with-comment.php'];
     }
 
-    protected function parseAndTraverse(string $code): void
+    private function parseAndTraverse(string $code): void
     {
-        $nodes = $this->getNodes($code);
+        $nodes = $this->parseCode($code);
 
-        $traverser = new NodeTraverser();
-
-        $traverser->addVisitor(new CodeCoverageClassIgnoreVisitor());
-        $traverser->addVisitor($this->spyVisitor);
-
-        $traverser->traverse($nodes);
+        $this->traverse(
+            $nodes,
+            [
+                new PhpUnitClassCodeCoverageIgnoreVisitor(),
+                $this->spyVisitor,
+            ]
+        );
     }
 
-    private function getSpyVisitor()
+    private function createSpyVisitor()
     {
         return new class() extends NodeVisitorAbstract {
             private $nodeVisited = false;
