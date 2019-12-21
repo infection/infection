@@ -59,24 +59,24 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
 
     private $mutators;
     private $filePath;
-    private $fileAst;
+    private $fileNodes;
     private $codeCoverageData;
     private $onlyCovered;
 
     /**
      * @param Mutator[] $mutators
-     * @param  Node[] $fileAst
+     * @param Node[]    $fileNodes
      */
     public function __construct(
         array $mutators,
         string $filePath,
-        array $fileAst,
+        array $fileNodes,
         LineCodeCoverage $codeCoverageData,
         bool $onlyCovered
     ) {
         $this->mutators = $mutators;
         $this->filePath = $filePath;
-        $this->fileAst = $fileAst;
+        $this->fileNodes = $fileNodes;
         $this->codeCoverageData = $codeCoverageData;
         $this->onlyCovered = $onlyCovered;
     }
@@ -88,8 +88,8 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                 if (!$mutator->shouldMutate($node)) {
                     continue;
                 }
-            } catch (Throwable $t) {
-                throw InvalidMutatorException::create($this->filePath, $mutator, $t);
+            } catch (Throwable $throwable) {
+                throw InvalidMutatorException::create($this->filePath, $mutator, $throwable);
             }
 
             $isOnFunctionSignature = $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
@@ -100,12 +100,11 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
                 continue;
             }
 
-            $tests = $this->codeCoverageData
-                ->getAllTestsForMutation(
-                    $this->filePath,
-                    $this->getNodeRange($node, $isOnFunctionSignature),
-                    $isOnFunctionSignature
-                );
+            $tests = $this->codeCoverageData->getAllTestsForMutation(
+                $this->filePath,
+                $this->getNodeRange($node, $isOnFunctionSignature),
+                $isOnFunctionSignature
+            );
 
             if ($this->onlyCovered && count($tests) === 0) {
                 continue;
@@ -118,7 +117,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
             foreach ($mutatedNodes as $mutationByMutatorIndex => $mutatedNode) {
                 $this->mutations[] = new Mutation(
                     $this->filePath,
-                    $this->fileAst,
+                    $this->fileNodes,
                     $mutator,
                     $node->getAttributes(),
                     get_class($node),

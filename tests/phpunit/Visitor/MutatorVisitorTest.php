@@ -44,10 +44,7 @@ use Infection\Visitor\MutatorVisitor;
 use PhpParser\Lexer;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Nop;
-use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
-use PhpParser\PrettyPrinter\Standard;
-use PHPUnit\Framework\TestCase;
 use function range;
 
 final class MutatorVisitorTest extends BaseVisitorTest
@@ -59,8 +56,7 @@ final class MutatorVisitorTest extends BaseVisitorTest
         string $nodes,
         string $expectedCodeOutput,
         MutationInterface $mutation
-    ): void
-    {
+    ): void {
         $this->traverse(
             $nodes,
             [new MutatorVisitor($mutation)]
@@ -178,10 +174,10 @@ PHP
             ];
         })();
 
-        yield 'it does not mutate if the parser does not contain startTokenPos' => (function () {
+        yield 'it does not mutate if the parser does not contain startTokenPos' => (static function () {
             $badLexer = new Lexer\Emulative([
                 'usedAttributes' => [
-                    'comments', 
+                    'comments',
                     'startLine',
                     'endLine',
                     // missing startTokenPos

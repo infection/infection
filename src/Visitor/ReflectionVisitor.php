@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Visitor;
 
+use function array_pop;
+use function count;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 use ReflectionClass;
-use function array_pop;
-use function count;
 
 /**
  * @internal

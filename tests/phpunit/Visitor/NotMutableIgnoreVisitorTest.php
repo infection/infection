@@ -37,7 +37,6 @@ namespace Infection\Tests\Visitor;
 
 use Infection\Visitor\NotMutableIgnoreVisitor;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 
 final class NotMutableIgnoreVisitorTest extends BaseVisitorTest

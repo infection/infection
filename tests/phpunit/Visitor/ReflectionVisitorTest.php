@@ -174,11 +174,13 @@ final class ReflectionVisitorTest extends BaseVisitorTest
     public function isPartOfSignatureFlagProvider(): Generator
     {
         yield [Node\Stmt\ClassMethod::class, true];
+
         yield [Node\Param::class, true];                    // $param
         yield [Node\Scalar\DNumber::class, true];           // 2.0
         yield [Node\Scalar\LNumber::class, false];          // 1
         yield [Node\Expr\BinaryOp\Identical::class, false]; // ===
         yield [Node\Arg::class, false];
+
         yield [Node\Expr\Array_::class, false];             // []
     }
 
