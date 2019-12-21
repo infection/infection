@@ -115,7 +115,7 @@ class ConfigurationFactory
 
         $skipCoverage = $existingCoveragePath !== null;
 
-        $existingCoverageBasePath = self::retrieveExistingCoverageBasePath(
+        $coverageBasePath = self::retrieveCoverageBasePath(
             $existingCoveragePath,
             $configDir,
             $namespacedTmpDir
@@ -145,7 +145,7 @@ class ConfigurationFactory
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
             self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema, $testFramework),
-            self::retrieveExistingCoveragePath($existingCoverageBasePath, $testFramework),
+            self::retrieveCoveragePath($coverageBasePath, $testFramework),
             $skipCoverage,
             $debug,
             $onlyCovered,
@@ -190,20 +190,20 @@ class ConfigurationFactory
         return $phpUnit;
     }
 
-    private static function retrieveExistingCoveragePath(
-        string $existingCoverageBasePath,
+    private static function retrieveCoveragePath(
+        string $coverageBasePath,
         string $testFramework
     ): string {
         Assert::keyExists(self::TEST_FRAMEWORK_COVERAGE_DIRECTORY, $testFramework);
 
         return sprintf(
             '%s/%s',
-            $existingCoverageBasePath,
+            $coverageBasePath,
             self::TEST_FRAMEWORK_COVERAGE_DIRECTORY[$testFramework]
         );
     }
 
-    private static function retrieveExistingCoverageBasePath(
+    private static function retrieveCoverageBasePath(
         ?string $existingCoveragePath,
         string $configDir,
         string $tmpDir
