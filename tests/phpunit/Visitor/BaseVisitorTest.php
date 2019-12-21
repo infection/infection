@@ -45,7 +45,7 @@ use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\sprintf;
 
-abstract class AbstractBaseVisitorTest extends TestCase
+abstract class BaseVisitorTest extends TestCase
 {
     /**
      * @var Parser|null

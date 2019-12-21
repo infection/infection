@@ -47,7 +47,7 @@ use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use ReflectionClass;
 
-final class ReflectionVisitorTest extends AbstractBaseVisitorTest
+final class ReflectionVisitorTest extends BaseVisitorTest
 {
     private $spyVisitor;
 

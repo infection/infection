@@ -35,9 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
-use const DIRECTORY_SEPARATOR;
 use Generator;
-use function in_array;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\InfectionCommand;
 use Infection\Config\ConsoleHelper;
@@ -73,15 +71,16 @@ use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUn
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkTypes;
-use function Infection\Tests\generator_to_phpunit_data_provider;
 use Infection\Utils\VersionParser;
 use Infection\Visitor\MutationsCollectorVisitor;
-use Infection\Visitor\ParentConnectorVisitor;
-use function iterator_to_array;
 use ReflectionClass;
-use const SORT_STRING;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use function in_array;
+use function Infection\Tests\generator_to_phpunit_data_provider;
+use function iterator_to_array;
+use const DIRECTORY_SEPARATOR;
+use const SORT_STRING;
 
 final class ProjectCodeProvider
 {
@@ -103,7 +102,6 @@ final class ProjectCodeProvider
         MutationTestingRunner::class,
         TestFrameworkTypes::class,
         MutationsCollectorVisitor::class,
-        ParentConnectorVisitor::class,
         FilterableFinder::class,
     ];
 
