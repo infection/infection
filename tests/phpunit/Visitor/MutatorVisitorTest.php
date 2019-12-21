@@ -42,6 +42,7 @@ use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\Lexer;
+use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\ParserFactory;
@@ -51,9 +52,11 @@ final class MutatorVisitorTest extends BaseVisitorTest
 {
     /**
      * @dataProvider providesMutationCases
+     *
+     * @param Node[] $nodes
      */
     public function test_it_mutates_the_correct_node(
-        string $nodes,
+        array $nodes,
         string $expectedCodeOutput,
         MutationInterface $mutation
     ): void {
@@ -69,14 +72,6 @@ final class MutatorVisitorTest extends BaseVisitorTest
 
     public function providesMutationCases(): Generator
     {
-        $lexer = new Lexer\Emulative([
-            'usedAttributes' => [
-                'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
-            ],
-        ]);
-
-        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
-
         yield 'it mutates the correct node' => (function () {
             return [
                 $nodes = $this->parseCode(<<<'PHP'
