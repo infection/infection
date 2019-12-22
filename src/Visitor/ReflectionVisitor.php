@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Visitor;
 
+use function array_pop;
 use function count;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
@@ -160,14 +161,27 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
         $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
 
-        return $parent->getAttribute(self::IS_INSIDE_FUNCTION_KEY)
-            || $this->isFunctionLikeNode($parent)
-            || $this->isInsideFunction($parent)
-        ;
+        if ($parent->getAttribute(self::IS_INSIDE_FUNCTION_KEY)) {
+            return true;
+        }
+
+        if ($this->isFunctionLikeNode($parent)) {
+            return true;
+        }
+
+        return $this->isInsideFunction($parent);
     }
 
     private function isFunctionLikeNode(Node $node): bool
     {
-        return $node instanceof Node\Stmt\ClassMethod || $node instanceof Node\Expr\Closure;
+        if ($node instanceof Node\Stmt\ClassMethod) {
+            return true;
+        }
+
+        if ($node instanceof Node\Expr\Closure) {
+            return true;
+        }
+
+        return false;
     }
 }
