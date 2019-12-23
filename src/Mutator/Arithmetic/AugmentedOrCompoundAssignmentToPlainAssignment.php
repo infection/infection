@@ -41,10 +41,12 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class Assignment extends Mutator
+final class AugmentedOrCompoundAssignmentToPlainAssignment extends Mutator
 {
     /**
-     * Replaces "+=", "*=", ".=", and similar with a plain "="
+     * Replaces examples of augmented or compound (shorter way to apply an arithmetic or bitwise
+     * operation) assignment operators, i.e. "+=", "*=", ".=", etc. By a plain assignment operator
+     * "=".
      *
      * @param Node&Node\Expr\AssignOp $node
      *

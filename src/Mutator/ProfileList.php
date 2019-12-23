@@ -65,7 +65,7 @@ final class ProfileList
     ];
 
     public const ARITHMETIC_PROFILE = [
-        Mutator\Arithmetic\Assignment::class,
+        Mutator\Arithmetic\AugmentedOrCompoundAssignmentToPlainAssignment::class,
         Mutator\Arithmetic\EqualOrIdenticalToAssignment::class,
         Mutator\Arithmetic\BitwiseAnd::class,
         Mutator\Arithmetic\BitwiseNot::class,
@@ -266,7 +266,7 @@ final class ProfileList
 
     public const ALL_MUTATORS = [
         // Arithmetic
-        'Assignment' => Mutator\Arithmetic\Assignment::class,
+        'Assignment' => Mutator\Arithmetic\AugmentedOrCompoundAssignmentToPlainAssignment::class,
         'AssignmentEqual' => Mutator\Arithmetic\EqualOrIdenticalToAssignment::class,
         'BitwiseAnd' => Mutator\Arithmetic\BitwiseAnd::class,
         'BitwiseNot' => Mutator\Arithmetic\BitwiseNot::class,

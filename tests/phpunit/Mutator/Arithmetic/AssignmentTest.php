@@ -41,16 +41,16 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 final class AssignmentTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
      */
-    public function test_mutator($input, $expected = null): void
+    public function test_it_can_mutate(string $input, ?string $expected): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): Generator
+    public function mutationsProvider(): Generator
     {
-        yield [
+        yield 'addition assignment' => [
             <<<'PHP'
 <?php
 
@@ -64,7 +64,7 @@ $a = $b;
 PHP
         ];
 
-        yield [
+        yield 'subtraction assignment' => [
             <<<'PHP'
 <?php
 
@@ -78,7 +78,7 @@ $a = $b;
 PHP
         ];
 
-        yield [
+        yield 'multiplication assignment' => [
             <<<'PHP'
 <?php
 
@@ -92,7 +92,7 @@ $a = $b;
 PHP
         ];
 
-        yield [
+        yield 'exponentiation assignment' => [
             <<<'PHP'
 <?php
 
@@ -106,7 +106,7 @@ $a = $b;
 PHP
         ];
 
-        yield [
+        yield 'division assignment' => [
             <<<'PHP'
 <?php
 
@@ -120,7 +120,7 @@ $a = $b;
 PHP
         ];
 
-        yield [
+        yield 'remainder assignment' => [
             <<<'PHP'
 <?php
 
@@ -134,7 +134,7 @@ $a = $b;
 PHP
         ];
 
-        yield [
+        yield 'concatenation assignment' => [
             <<<'PHP'
 <?php
 
@@ -148,7 +148,7 @@ $a = $b;
 PHP
         ];
 
-        yield [
+        yield 'bitwise AND assignment' => [
             <<<'PHP'
 <?php
 
@@ -162,7 +162,7 @@ $a = $b;
 PHP
         ];
 
-        yield [
+        yield 'bitwise OR assignment' => [
             <<<'PHP'
 <?php
 
@@ -176,7 +176,7 @@ $a = $b;
 PHP
         ];
 
-        yield [
+        yield 'bitwise XOR assignment' => [
             <<<'PHP'
 <?php
 
@@ -190,7 +190,7 @@ $a = $b;
 PHP
         ];
 
-        yield [
+        yield 'left shift assignment' => [
             <<<'PHP'
 <?php
 
@@ -204,7 +204,7 @@ $a = $b;
 PHP
         ];
 
-        yield [
+        yield 'right shift assignment' => [
             <<<'PHP'
 <?php
 
@@ -216,6 +216,26 @@ PHP
 
 $a = $b;
 PHP
+        ];
+
+        yield 'it does not mutate a loose comparison' => [
+            <<<'PHP'
+<?php
+
+$a == $b;
+PHP
+            ,
+            null,
+        ];
+
+        yield 'it does not mutate a strict comparison' => [
+            <<<'PHP'
+<?php
+
+$a === $b;
+PHP
+            ,
+            null,
         ];
     }
 }
