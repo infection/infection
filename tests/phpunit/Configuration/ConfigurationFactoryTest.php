@@ -472,10 +472,10 @@ final class ConfigurationFactoryTest extends TestCase
                     ],
                 ],
             ],
-            'AssignmentEqual,EqualIdentical',
+            'EqualIdentical,EqualOrIdentical',
             [
-                'AssignmentEqual' => new EqualOrIdentical(new MutatorConfig([])),
                 'EqualIdentical' => new EqualIdentical(new MutatorConfig([])),
+                'EqualOrIdentical' => new EqualOrIdentical(new MutatorConfig([])),
             ]
         );
 

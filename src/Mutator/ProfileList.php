@@ -267,7 +267,6 @@ final class ProfileList
     public const ALL_MUTATORS = [
         // Arithmetic
         'Assignment' => Mutator\Arithmetic\Assignment::class,
-        'AssignmentEqual' => Mutator\Arithmetic\EqualOrIdentical::class,
         'BitwiseAnd' => Mutator\Arithmetic\BitwiseAnd::class,
         'BitwiseNot' => Mutator\Arithmetic\BitwiseNot::class,
         'BitwiseOr' => Mutator\Arithmetic\BitwiseOr::class,
@@ -275,6 +274,7 @@ final class ProfileList
         'Decrement' => Mutator\Arithmetic\Decrement::class,
         'DivEqual' => Mutator\Arithmetic\DivEqual::class,
         'Division' => Mutator\Arithmetic\Division::class,
+        'EqualOrIdentical' => Mutator\Arithmetic\EqualOrIdentical::class,
         'Exponentiation' => Mutator\Arithmetic\Exponentiation::class,
         'Increment' => Mutator\Arithmetic\Increment::class,
         'Minus' => Mutator\Arithmetic\Minus::class,
