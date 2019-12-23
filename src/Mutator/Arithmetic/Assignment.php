@@ -41,7 +41,7 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class AugmentedOrCompoundAssignmentToPlainAssignment extends Mutator
+final class Assignment extends Mutator
 {
     /**
      * Replaces examples of augmented or compound (shorter way to apply an arithmetic or bitwise
