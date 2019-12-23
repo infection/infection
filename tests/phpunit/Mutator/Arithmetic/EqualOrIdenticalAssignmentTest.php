@@ -38,7 +38,7 @@ namespace Infection\Tests\Mutator\Arithmetic;
 use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class EqualOrIdenticalTest extends AbstractMutatorTestCase
+final class EqualOrIdenticalAssignmentTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider

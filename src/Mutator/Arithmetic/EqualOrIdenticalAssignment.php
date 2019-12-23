@@ -41,7 +41,7 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class EqualOrIdentical extends Mutator
+final class EqualOrIdenticalAssignment extends Mutator
 {
     /**
      * Replaces a equal or identical (respectively "==" and "===") comparison into an assignment
