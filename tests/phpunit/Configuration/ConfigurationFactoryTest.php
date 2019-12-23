@@ -44,7 +44,7 @@ use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
-use Infection\Mutator\Arithmetic\EqualOrIdenticalToAssignment;
+use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\MutatorFactory;
@@ -474,7 +474,7 @@ final class ConfigurationFactoryTest extends TestCase
             ],
             'AssignmentEqual,EqualIdentical',
             [
-                'AssignmentEqual' => new EqualOrIdenticalToAssignment(new MutatorConfig([])),
+                'AssignmentEqual' => new AssignmentEqual(new MutatorConfig([])),
                 'EqualIdentical' => new EqualIdentical(new MutatorConfig([])),
             ]
         );
