@@ -76,24 +76,6 @@ abstract class BaseMutatorTestCase extends TestCase
      */
     private static $printer;
 
-    private static function getParser(): Parser
-    {
-        if (null === self::$parser) {
-            self::$parser = InfectionContainer::create()[Parser::class];
-        }
-
-        return self::$parser;
-    }
-
-    private static function getPrinter(): PrettyPrinterAbstract
-    {
-        if (null === self::$printer) {
-            self::$printer = new Standard();
-        }
-
-        return self::$printer;
-    }
-
     protected function setUp(): void
     {
         $this->mutator = $this->createMutator();
@@ -166,10 +148,28 @@ abstract class BaseMutatorTestCase extends TestCase
 
             $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
 
-            $mutants[] = BaseMutatorTestCase::getPrinter()->prettyPrintFile($mutatedStatements);
+            $mutants[] = self::getPrinter()->prettyPrintFile($mutatedStatements);
         }
 
         return $mutants;
+    }
+
+    private static function getParser(): Parser
+    {
+        if (null === self::$parser) {
+            self::$parser = InfectionContainer::create()[Parser::class];
+        }
+
+        return self::$parser;
+    }
+
+    private static function getPrinter(): PrettyPrinterAbstract
+    {
+        if (null === self::$printer) {
+            self::$printer = new Standard();
+        }
+
+        return self::$printer;
     }
 
     /**
@@ -177,7 +177,7 @@ abstract class BaseMutatorTestCase extends TestCase
      */
     private function getMutationsFromCode(string $code, array $settings): array
     {
-        $nodes = BaseMutatorTestCase::getParser()->parse($code);
+        $nodes = self::getParser()->parse($code);
 
         $traverser = new NodeTraverser();
 
