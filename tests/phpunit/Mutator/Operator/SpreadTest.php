@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Operator;
 
 use Generator;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class SpreadTest extends BaseMutatorTestCase
+final class SpreadTest extends AbstractMutatorTestCase
 {
     /**
      * @requires PHP >= 7.4

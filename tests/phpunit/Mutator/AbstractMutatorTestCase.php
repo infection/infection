@@ -61,16 +61,18 @@ use function Safe\sprintf;
 use function str_replace;
 use function substr;
 
-abstract class BaseMutatorTestCase extends TestCase
+abstract class AbstractMutatorTestCase extends TestCase
 {
     /**
      * @var Mutator
      */
     protected $mutator;
+
     /**
      * @var Parser|null
      */
     private static $parser;
+
     /**
      * @var PrettyPrinterAbstract|null
      */

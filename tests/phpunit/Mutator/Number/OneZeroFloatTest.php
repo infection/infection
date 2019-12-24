@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Number;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class OneZeroFloatTest extends BaseMutatorTestCase
+final class OneZeroFloatTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

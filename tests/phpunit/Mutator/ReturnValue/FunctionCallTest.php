@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\ReturnValue;
 
 use Generator;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class FunctionCallTest extends BaseMutatorTestCase
+final class FunctionCallTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

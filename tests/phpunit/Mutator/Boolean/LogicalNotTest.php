@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node\Expr\BooleanNot;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
 
-final class LogicalNotTest extends BaseMutatorTestCase
+final class LogicalNotTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

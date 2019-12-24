@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class LogicalOrTest extends BaseMutatorTestCase
+final class LogicalOrTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

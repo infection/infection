@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class PowEqualTest extends BaseMutatorTestCase
+final class PowEqualTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

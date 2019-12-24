@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Unwrap;
 
 use Generator;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class UnwrapArrayUniqueTest extends BaseMutatorTestCase
+final class UnwrapArrayUniqueTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Cast;
 
 use Generator;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class CastFloatTest extends BaseMutatorTestCase
+final class CastFloatTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

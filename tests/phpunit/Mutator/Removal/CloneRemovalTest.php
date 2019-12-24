@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Removal;
 
 use Generator;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class CloneRemovalTest extends BaseMutatorTestCase
+final class CloneRemovalTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

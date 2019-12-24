@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Boolean;
 
 use Generator;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
-final class IdenticalEqualTest extends BaseMutatorTestCase
+final class IdenticalEqualTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

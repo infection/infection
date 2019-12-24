@@ -38,10 +38,10 @@ namespace Infection\Tests\Mutator\Extensions;
 use function array_map;
 use Generator;
 use function implode;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use function range;
 
-final class BCMathTest extends BaseMutatorTestCase
+final class BCMathTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases
