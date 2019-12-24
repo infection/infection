@@ -33,38 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Visitor;
+namespace Infection\Tests\AutoReview\PhpDoc;
 
-use PhpParser\Node;
-use PhpParser\Node\Name;
-use PhpParser\Node\Stmt;
-use PhpParser\NodeVisitorAbstract;
+use function array_unique;
+use function array_values;
+use function Safe\preg_match_all;
+use function Safe\preg_replace;
+use const SORT_STRING;
 
-/**
- * @internal
- *
- * Adds FullyQualifiedClassName (FQCN) string to class node:
- *      $node->name                                                  // Plus
- *      $node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY) // Infection\Mutator\Plus
- */
-final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
+final class PHPDocParser
 {
-    public const FQN_KEY = 'fullyQualifiedClassName';
-
     /**
-     * @var Node\Name|null
+     * Parses the given PHP doc and returns the list of tags found.
+     *
+     * @return string[]
      */
-    private $namespace;
-
-    public function enterNode(Node $node): ?Node
+    public function parse(string $phpDoc): array
     {
-        if ($node instanceof Stmt\Namespace_) {
-            $this->namespace = $node->name;
-        } elseif ($node instanceof Stmt\ClassLike) {
-            // TODO: check the cases of multiple namespaces
-            $node->setAttribute(self::FQN_KEY, $node->name ? Name::concat($this->namespace, $node->name->name) : null);
-        }
+        $escapedPhpDoc = preg_replace(
+            '/\p{L}@[\p{L}\\\\]+/u',
+            '',
+            $phpDoc
+        );
 
-        return null;
+        preg_match_all(
+            '/@[\p{L}\\\\]+/u',
+            $escapedPhpDoc,
+            $matches
+        );
+
+        return array_values(array_unique($matches[0], SORT_STRING));
     }
 }
