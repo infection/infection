@@ -130,6 +130,6 @@ PHP
     public function test_it_does_not_mutate_zero(): void
     {
         $node = new Return_(new LNumber(0));
-        $this->assertFalse($this->getMutator()->shouldMutate($node));
+        $this->assertFalse($this->createMutator()->shouldMutate($node));
     }
 }
