@@ -58,6 +58,8 @@ use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\TestCase;
 use function rtrim;
 use function Safe\sprintf;
+use function str_replace;
+use function substr;
 
 abstract class BaseMutatorTestCase extends TestCase
 {
@@ -65,12 +67,10 @@ abstract class BaseMutatorTestCase extends TestCase
      * @var Mutator
      */
     protected $mutator;
-
     /**
      * @var Parser|null
      */
     private static $parser;
-
     /**
      * @var PrettyPrinterAbstract|null
      */
@@ -103,21 +103,17 @@ abstract class BaseMutatorTestCase extends TestCase
             )
         );
 
-        if ($expectedCode === null) {
-            return;
-        }
+        if ($expectedCode !== null) {
+            foreach ($mutants as $realMutatedCode) {
+                $expectedCodeSample = array_shift($expectedCodeSamples);
 
-        foreach ($mutants as $realMutatedCode) {
-            $expectedCodeSample = array_shift($expectedCodeSamples);
-
-            if ($expectedCodeSample === null) {
-                $this->fail('The number of expected mutated code samples must equal the number of generated Mutants by mutator.');
+                if ($expectedCodeSample === null) {
+                    $this->fail('The number of expected mutated code samples must equal the number of generated Mutants by mutator.');
+                }
+                $expectedCodeSample = rtrim($expectedCodeSample, "\n");
+                $this->assertSame($expectedCodeSample, $realMutatedCode);
+                $this->assertSyntaxIsValid($realMutatedCode);
             }
-
-            $expectedCodeSample = rtrim($expectedCodeSample, "\n");
-
-            $this->assertSame($expectedCodeSample, $realMutatedCode);
-            $this->assertSyntaxIsValid($realMutatedCode);
         }
     }
 
@@ -149,6 +145,8 @@ abstract class BaseMutatorTestCase extends TestCase
             $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
 
             $mutants[] = self::getPrinter()->prettyPrintFile($mutatedStatements);
+
+            $traverser->removeVisitor($mutatorVisitor);
         }
 
         return $mutants;
@@ -209,7 +207,7 @@ abstract class BaseMutatorTestCase extends TestCase
             0,
             $returnCode,
             sprintf(
-                'Mutator "%s" produces invalid code',
+                'Mutator %s produces invalid code',
                 $this->createMutator()::getName()
             )
         );
