@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use Infection\Tracing\Trace;
 use function array_key_exists;
 use function count;
 use function dirname;
@@ -64,8 +65,12 @@ final class XMLLineCodeCoverage implements Tracer
     private $testFileDataProvider;
     private $testFrameworkKey;
 
-    public function __construct(string $coverageDir, CoverageXmlParser $coverageXmlParser, string $testFrameworkKey, ?TestFileDataProvider $testFileDataProvider = null)
-    {
+    public function __construct(
+        string $coverageDir,
+        CoverageXmlParser $coverageXmlParser,
+        string $testFrameworkKey,
+        ?TestFileDataProvider $testFileDataProvider = null
+    ) {
         $this->coverageDir = $coverageDir;
         $this->parser = $coverageXmlParser;
         $this->testFileDataProvider = $testFileDataProvider;
@@ -91,7 +96,7 @@ final class XMLLineCodeCoverage implements Tracer
     }
 
     /**
-     * @return CoverageLineData[]
+     * @return Trace[]
      */
     public function getAllTestsForMutation(
         string $filePath,
