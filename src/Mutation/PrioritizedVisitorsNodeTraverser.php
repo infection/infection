@@ -35,30 +35,80 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use PhpParser\NodeTraverser;
+use DomainException;
+use function get_class;
+use InvalidArgumentException;
+use function krsort;
+use PhpParser\Node;
+use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
-use Webmozart\Assert\Assert;
+use function Safe\sprintf;
+use const SORT_NUMERIC;
 
 /**
  * @internal
  * @final
  */
-class PriorityNodeTraverser extends NodeTraverser
+class PrioritizedVisitorsNodeTraverser implements NodeTraverserInterface
 {
-    public function addVisitor(NodeVisitor $visitor, int $priority = 1): void
+    /**
+     * @var array<int, NodeVisitor>
+     */
+    private $visitors = [];
+
+    private $traverser;
+
+    public function __construct(NodeTraverserInterface $decoratedTraverser)
     {
-        Assert::keyNotExists($this->visitors, $priority, sprintf('Priority %d is already used', $priority));
+        $this->traverser = $decoratedTraverser;
+    }
+
+    public function addPrioritizedVisitor(NodeVisitor $visitor, int $priority): void
+    {
+        if (array_key_exists($priority, $this->visitors)) {
+            throw new InvalidArgumentException(sprintf(
+                'The priority "%d" is already used for the visitor "%s". Please use a different one',
+                $priority,
+                get_class($this->visitors[$priority])
+            ));
+        }
 
         $this->visitors[$priority] = $visitor;
 
-        krsort($this->visitors);
+        // This could on theory be optimized by doing it only once. However for now we need
+        // the `getVisitors()` method for inspecting the visitors state.
+        krsort($this->visitors, SORT_NUMERIC);
+    }
+
+    public function addVisitor(NodeVisitor $visitor): void
+    {
+        throw new DomainException('Add a non-prioritized visitor is not supported.');
+    }
+
+    public function removeVisitor(NodeVisitor $visitor): void
+    {
+        throw new DomainException('Removing a visitor is not supported.');
     }
 
     /**
-     * @return NodeVisitor[]
+     * Warning: should be used for test purposes only
+     *
+     * @return array<int, NodeVisitor>
      */
     public function getVisitors(): array
     {
         return $this->visitors;
+    }
+
+    /**
+     * @return Node[]
+     */
+    public function traverse(array $nodes): array
+    {
+        foreach ($this->visitors as $visitor) {
+            $this->traverser->addVisitor($visitor);
+        }
+
+        return $this->traverser->traverse($nodes);
     }
 }

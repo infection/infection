@@ -43,8 +43,8 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class CloneVisitor extends NodeVisitorAbstract
 {
-    public function enterNode(Node $origNode)
+    public function enterNode(Node $node)
     {
-        return clone $origNode;
+        return clone $node;
     }
 }

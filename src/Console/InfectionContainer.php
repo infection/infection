@@ -221,7 +221,13 @@ final class InfectionContainer extends Container
             Lexer::class => static function (): Lexer {
                 return new Lexer\Emulative([
                     'usedAttributes' => [
-                        'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
+                        'comments',
+                        'startLine',
+                        'endLine',
+                        'startTokenPos',
+                        'endTokenPos',
+                        'startFilePos',
+                        'endFilePos',
                     ],
                 ]);
             },
