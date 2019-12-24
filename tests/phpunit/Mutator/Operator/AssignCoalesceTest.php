@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Operator;
 
 use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class AssignCoalesceTest extends AbstractMutatorTestCase
+final class AssignCoalesceTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

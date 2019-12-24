@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\ZeroIteration;
 
 use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class For_Test extends AbstractMutatorTestCase
+final class For_Test extends BaseMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

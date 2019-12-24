@@ -37,9 +37,9 @@ namespace Infection\Tests\Mutator\Removal;
 
 use Generator;
 use Infection\Config\Exception\InvalidConfigException;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class ArrayItemRemovalTest extends AbstractMutatorTestCase
+final class ArrayItemRemovalTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Operator;
 
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class Continue_Test extends AbstractMutatorTestCase
+final class Continue_Test extends BaseMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

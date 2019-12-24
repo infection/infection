@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\FunctionSignature;
 
 use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class ProtectedVisibilityTest extends AbstractMutatorTestCase
+final class ProtectedVisibilityTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

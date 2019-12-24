@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Arithmetic;
 
 use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class RoundingFamilyTest extends AbstractMutatorTestCase
+final class RoundingFamilyTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

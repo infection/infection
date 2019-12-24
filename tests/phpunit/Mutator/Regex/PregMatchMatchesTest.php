@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Regex;
 
 use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class PregMatchMatchesTest extends AbstractMutatorTestCase
+final class PregMatchMatchesTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider providesMutatorCases

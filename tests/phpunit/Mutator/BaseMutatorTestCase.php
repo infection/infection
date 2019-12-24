@@ -59,7 +59,7 @@ use PHPUnit\Framework\TestCase;
 use function rtrim;
 use function Safe\sprintf;
 
-abstract class AbstractMutatorTestCase extends TestCase
+abstract class BaseMutatorTestCase extends TestCase
 {
     /**
      * @var Mutator
@@ -75,6 +75,24 @@ abstract class AbstractMutatorTestCase extends TestCase
      * @var PrettyPrinterAbstract|null
      */
     private static $printer;
+
+    private static function getParser(): Parser
+    {
+        if (null === self::$parser) {
+            self::$parser = InfectionContainer::create()[Parser::class];
+        }
+
+        return self::$parser;
+    }
+
+    private static function getPrinter(): PrettyPrinterAbstract
+    {
+        if (null === self::$printer) {
+            self::$printer = new Standard();
+        }
+
+        return self::$printer;
+    }
 
     protected function setUp(): void
     {
@@ -148,28 +166,10 @@ abstract class AbstractMutatorTestCase extends TestCase
 
             $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
 
-            $mutants[] = $this->getPrinter()->prettyPrintFile($mutatedStatements);
+            $mutants[] = BaseMutatorTestCase::getPrinter()->prettyPrintFile($mutatedStatements);
         }
 
         return $mutants;
-    }
-
-    private function getParser(): Parser
-    {
-        if (null === self::$parser) {
-            self::$parser = InfectionContainer::create()[Parser::class];
-        }
-
-        return self::$parser;
-    }
-
-    private function getPrinter(): PrettyPrinterAbstract
-    {
-        if (null === self::$printer) {
-            self::$printer = new Standard();
-        }
-
-        return self::$printer;
     }
 
     /**
@@ -177,7 +177,7 @@ abstract class AbstractMutatorTestCase extends TestCase
      */
     private function getMutationsFromCode(string $code, array $settings): array
     {
-        $nodes = $this->getParser()->parse($code);
+        $nodes = BaseMutatorTestCase::getParser()->parse($code);
 
         $traverser = new NodeTraverser();
 

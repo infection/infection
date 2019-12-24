@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ConditionalNegotiation;
 
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 
-final class LessThanOrEqualToNegotiationTest extends AbstractMutatorTestCase
+final class LessThanOrEqualToNegotiationTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases

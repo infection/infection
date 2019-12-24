@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use Infection\Tests\Mutator\BaseMutatorTestCase;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\LNumber;
 
-final class PlusTest extends AbstractMutatorTestCase
+final class PlusTest extends BaseMutatorTestCase
 {
     /**
      * @dataProvider provideMutationCases
