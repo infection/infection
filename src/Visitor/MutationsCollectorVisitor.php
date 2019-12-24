@@ -41,8 +41,8 @@ use function get_class;
 use Infection\Exception\InvalidMutatorException;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
-use Infection\TestFramework\Coverage\NodeLineRangeData;
+use Infection\Tracing\NodeLineRangeData;
+use Infection\Tracing\Tracer;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 use Throwable;
@@ -71,7 +71,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
         array $mutators,
         string $filePath,
         array $fileAst,
-        LineCodeCoverage $codeCoverageData,
+        Tracer $codeCoverageData,
         bool $onlyCovered
     ) {
         $this->mutators = $mutators;

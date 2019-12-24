@@ -44,8 +44,8 @@ use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Util\MutatorConfig;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
+use Infection\Tracing\Tracer;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
@@ -59,7 +59,7 @@ final class MutationGeneratorTest extends TestCase
             $fileInfoB = new SplFileInfo('fileB', 'relativePathToFileB', 'relativePathnameToFileB'),
         ];
 
-        $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
+        $codeCoverageMock = $this->createMock(Tracer::class);
         $mutators = [new Plus(new MutatorConfig([]))];
         $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
         $onlyCovered = true;
@@ -113,7 +113,7 @@ final class MutationGeneratorTest extends TestCase
             new SplFileInfo('fileB', 'relativePathToFileB', 'relativePathnameToFileB'),
         ];
 
-        $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
+        $codeCoverageMock = $this->createMock(Tracer::class);
 
         $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcherMock

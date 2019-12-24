@@ -46,9 +46,9 @@ use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutation\PrioritizedVisitorsNodeTraverser;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Util\MutatorConfig;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
+use Infection\Tracing\Tracer;
 use Infection\Visitor\MutationsCollectorVisitor;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -88,7 +88,7 @@ final class FileMutationGeneratorTest extends TestCase
 
     public function test_it_generates_mutations_for_a_given_file(): void
     {
-        $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
+        $codeCoverageMock = $this->createMock(Tracer::class);
 
         $container = InfectionContainer::create();
 
@@ -122,7 +122,7 @@ final class FileMutationGeneratorTest extends TestCase
     public function test_it_attempts_to_generate_mutations_for_the_file_if_covered_or_not_only_covered_code(
         SplFileInfo $fileInfo,
         bool $onlyCovered,
-        LineCodeCoverage $codeCoverage,
+        Tracer $codeCoverage,
         string $expectedFilePath
     ): void {
         $extraVisitors = [2 => new FakeVisitor()];
@@ -241,7 +241,7 @@ final class FileMutationGeneratorTest extends TestCase
             $mutationGenerator->generate(
                 $fileInfo,
                 false,
-                $this->createMock(LineCodeCoverage::class),
+                $this->createMock(Tracer::class),
                 [new Plus(new MutatorConfig([]))],
                 $extraVisitors
             );
@@ -336,11 +336,11 @@ final class FileMutationGeneratorTest extends TestCase
     }
 
     /**
-     * @return LineCodeCoverage|MockObject
+     * @return Tracer|MockObject
      */
     private function createCodeCoverageMock(string $expectedPath, bool $tests)
     {
-        $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
+        $codeCoverageMock = $this->createMock(Tracer::class);
         $codeCoverageMock
             ->method('hasTests')
             ->with($expectedPath)

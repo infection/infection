@@ -39,7 +39,7 @@ use function array_key_exists;
 use function get_class;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\Tracing\Tracer;
 use Infection\Visitor\MutationsCollectorVisitor;
 use InvalidArgumentException;
 use PhpParser\NodeVisitor;
@@ -76,7 +76,7 @@ class FileMutationGenerator
     public function generate(
         SplFileInfo $fileInfo,
         bool $onlyCovered,
-        LineCodeCoverage $codeCoverage,
+        Tracer $codeCoverage,
         array $mutators,
         array $extraNodeVisitors
     ): array {

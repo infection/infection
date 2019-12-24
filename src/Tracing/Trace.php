@@ -33,33 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tracing;
 
-use Webmozart\Assert\Assert;
-
-/**
- * This class represents the line range for a given node. Indeed some statements can count as one line but be
- * declared over multiple lines, e.g.:
- *
- * ```
- * $x = [
- *  'a',
- *  'b',
- * ];
- * ```
- *
- * @internal
- */
-final class NodeLineRangeData
+interface Trace
 {
-    /**
-     * @var array<int, int>
-     */
-    public $range;
+    public function getTestFilePath(): string;
 
-    public function __construct(int $start, int $end)
-    {
-        Assert::greaterThanEq($end, $start);
-        $this->range = range($start, $end);
-    }
+    public function getTestMethod(): string;
+
+    /**
+     * Time taken by the test in seconds (s).
+     */
+    public function getTestDuration(): string;
 }

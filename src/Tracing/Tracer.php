@@ -33,17 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tracing;
 
 /**
  * @internal
  */
-interface LineCodeCoverage
+interface Tracer
 {
     public function hasTests(string $filePath): bool;
 
     /**
-     * @return CoverageLineData[]
+     * @return Trace[]
      */
-    public function getAllTestsForMutation(string $filePath, NodeLineRangeData $lineRange, bool $isOnFunctionSignature): array;
+    public function getAllTestsForMutation(string $filePath, NodeLineRangeData $lineRange, bool $onFunctionSignature): array;
 }

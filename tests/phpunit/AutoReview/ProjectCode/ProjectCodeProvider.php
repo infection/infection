@@ -65,7 +65,6 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\MethodLocationData;
-use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\TestFileTimeData;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder as PhpSpecInitalConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder as PhpSpecMutationConfigBuilder;
@@ -74,6 +73,7 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpU
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkTypes;
 use function Infection\Tests\generator_to_phpunit_data_provider;
+use Infection\Tracing\NodeLineRangeData;
 use Infection\Utils\VersionParser;
 use Infection\Visitor\MutationsCollectorVisitor;
 use Infection\Visitor\ParentConnectorVisitor;

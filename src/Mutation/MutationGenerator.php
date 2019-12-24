@@ -42,7 +42,7 @@ use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
 use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\Tracing\Tracer;
 use PhpParser\NodeVisitor;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -71,7 +71,7 @@ final class MutationGenerator
      */
     public function __construct(
         array $sourceFiles,
-        LineCodeCoverage $codeCoverageData,
+        Tracer $codeCoverageData,
         array $mutators,
         EventDispatcherInterface $eventDispatcher,
         FileMutationGenerator $fileMutationGenerator

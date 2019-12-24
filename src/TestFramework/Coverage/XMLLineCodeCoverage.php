@@ -40,12 +40,14 @@ use function count;
 use function dirname;
 use Generator;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\Tracing\NodeLineRangeData;
+use Infection\Tracing\Tracer;
 use function Safe\file_get_contents;
 
 /**
  * @internal
  */
-final class XMLLineCodeCoverage implements LineCodeCoverage
+final class XMLLineCodeCoverage implements Tracer
 {
     public const PHP_UNIT_COVERAGE_DIR = 'coverage-xml';
     public const PHP_SPEC_COVERAGE_DIR = 'phpspec-coverage-xml';
@@ -94,9 +96,9 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
     public function getAllTestsForMutation(
         string $filePath,
         NodeLineRangeData $lineRange,
-        bool $isOnFunctionSignature
+        bool $onFunctionSignature
     ): array {
-        if ($isOnFunctionSignature) {
+        if ($onFunctionSignature) {
             return iterator_to_array($this->getTestsForFunctionSignature($filePath, $lineRange), false);
         }
 
