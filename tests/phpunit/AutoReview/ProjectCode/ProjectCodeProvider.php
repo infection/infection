@@ -76,7 +76,6 @@ use Infection\TestFramework\TestFrameworkTypes;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use Infection\Utils\VersionParser;
 use Infection\Visitor\MutationsCollectorVisitor;
-use Infection\Visitor\ParentConnectorVisitor;
 use function iterator_to_array;
 use ReflectionClass;
 use const SORT_STRING;
@@ -103,7 +102,6 @@ final class ProjectCodeProvider
         MutationTestingRunner::class,
         TestFrameworkTypes::class,
         MutationsCollectorVisitor::class,
-        ParentConnectorVisitor::class,
         FilterableFinder::class,
     ];
 

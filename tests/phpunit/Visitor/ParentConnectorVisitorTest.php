@@ -33,48 +33,60 @@
 
 declare(strict_types=1);
 
-namespace Infection\Visitor;
+namespace Infection\Tests\Visitor;
 
-use function array_key_exists;
-use function get_class;
-use Infection\Mutation;
-use Infection\MutationInterface;
+use function in_array;
+use Infection\Visitor\ParentConnectorVisitor;
+use function is_array;
 use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
 
-/**
- * @internal
- */
-final class MutatorVisitor extends NodeVisitorAbstract
+final class ParentConnectorVisitorTest extends BaseVisitorTest
 {
-    private $mutation;
+    private const CODE = <<<'PHP'
+<?php declare(strict_types=1);
 
-    public function __construct(MutationInterface $mutation)
+namespace Acme;
+
+function hello() 
+{
+    return 'hello';
+}
+PHP;
+
+    public function test_mutating_nodes_during_traverse_mutates_the_original_nodes(): void
     {
-        $this->mutation = $mutation;
+        $nodes = $this->traverse(
+            $this->parseCode(self::CODE),
+            [new ParentConnectorVisitor()]
+        );
+
+        foreach ($nodes as $node) {
+            $this->assertHasParentNode($node, $nodes);
+        }
     }
 
-    public function leaveNode(Node $node)
+    /**
+     * @param Node[] $roots
+     */
+    private function assertHasParentNode(Node $node, array $roots): void
     {
-        $attributes = $node->getAttributes();
-
-        if (!array_key_exists('startTokenPos', $attributes)) {
-            return null;
+        if (!in_array($node, $roots, true)) {
+            $this->assertTrue($node->hasAttribute(ParentConnectorVisitor::PARENT_KEY));
+            $this->assertInstanceOf(Node::class, $node->getAttribute(ParentConnectorVisitor::PARENT_KEY));
         }
 
-        $mutatedAttributes = $this->mutation->getAttributes();
+        foreach ($node->getSubNodeNames() as $subNodeName) {
+            $subNodes = $node->$subNodeName;
 
-        $samePosition = $attributes['startTokenPos'] === $mutatedAttributes['startTokenPos']
-            && $attributes['endTokenPos'] === $mutatedAttributes['endTokenPos'];
+            if (!is_array($subNodes)) {
+                $subNodes = [$subNodes];
+            }
 
-        if ($samePosition && $this->mutation->getMutatedNodeClass() === get_class($node)) {
-            return $this->mutation->getMutatedNode();
-            // TODO STOP TRAVERSING
-            // TODO check all built-in visitors, in particular FirstFindingVisitor
-            // TODO beforeTraverse - FirstFindingVisitor
-            // TODO enterNode instead of leaveNode for '<' mutation to not travers children?
+            foreach ($subNodes as $subNode) {
+                if ($subNode instanceof Node) {
+                    $this->assertHasParentNode($subNode, $roots);
+                }
+            }
         }
-
-        return null;
     }
 }

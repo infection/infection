@@ -40,7 +40,7 @@ use PhpParser\Node;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 
-final class CloneVisitorTest extends AbstractBaseVisitorTest
+final class CloneVisitorTest extends BaseVisitorTest
 {
     private const CODE = <<<'PHP'
 <?php declare(strict_types=1);

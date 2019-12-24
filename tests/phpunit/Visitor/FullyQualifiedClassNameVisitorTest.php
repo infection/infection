@@ -41,7 +41,7 @@ use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-final class FullyQualifiedClassNameVisitorTest extends AbstractBaseVisitorTest
+final class FullyQualifiedClassNameVisitorTest extends BaseVisitorTest
 {
     private $spyVisitor;
 
