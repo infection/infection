@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
+use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\Utils\VersionParser;
 use InvalidArgumentException;
 use Symfony\Component\Process\Process;
@@ -99,11 +99,28 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     /**
      * Returns array of arguments to pass them into the Mutant Symfony Process
      *
+     * @param CoverageLineData[] $coverageTests
+     *
      * @return string[]
      */
-    public function getMutantCommandLine(MutantInterface $mutant, string $extraOptions): array
-    {
-        return $this->getCommandLine($this->buildMutationConfigFile($mutant), $extraOptions, [], false);
+    public function getMutantCommandLine(
+        array $coverageTests,
+        string $mutatedFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath,
+        string $extraOptions
+    ): array {
+        return $this->getCommandLine(
+            $this->buildMutationConfigFile(
+                $coverageTests,
+                $mutatedFilePath,
+                $mutationHash,
+                $mutationOriginalFilePath
+            ),
+            $extraOptions,
+            [],
+            false
+        );
     }
 
     public function getVersion(): string
@@ -144,9 +161,21 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         return $this->initialConfigBuilder->build($this->getVersion());
     }
 
-    protected function buildMutationConfigFile(MutantInterface $mutant): string
-    {
-        return $this->mutationConfigBuilder->build($mutant);
+    /**
+     * @param CoverageLineData[] $coverageTests
+     */
+    protected function buildMutationConfigFile(
+       array $coverageTests,
+       string $mutatedFilePath,
+       string $mutationHash,
+       string $mutationOriginalFilePath
+    ): string {
+        return $this->mutationConfigBuilder->build(
+            $coverageTests,
+            $mutatedFilePath,
+            $mutationHash,
+            $mutationOriginalFilePath
+        );
     }
 
     /**

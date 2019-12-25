@@ -40,7 +40,6 @@ use function dirname;
 use DOMDocument;
 use DOMNode;
 use DOMXPath;
-use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
@@ -76,8 +75,15 @@ class MutationConfigBuilder extends ConfigBuilder
         $this->dom->loadXML($originalXmlConfigContent);
     }
 
-    public function build(MutantInterface $mutant): string
-    {
+    /**
+     * @param CoverageLineData[] $coverageTests
+     */
+    public function build(
+        array $coverageTests,
+        string $mutatedFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath
+    ): string {
         // clone the dom document because it's mutated later
         $dom = clone $this->dom;
 
@@ -95,27 +101,25 @@ class MutationConfigBuilder extends ConfigBuilder
         $customAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',
             $this->tempDirectory,
-            $mutant->getMutation()->getHash()
+            $mutationHash
         );
 
         $originalAutoloadFile = $this->getOriginalBootstrapFilePath($xPath);
 
         $this->setCustomBootstrapPath($customAutoloadFilePath, $xPath);
-        $this->setFilteredTestsToRun($mutant->getCoverageTests(), $dom, $xPath);
+        $this->setFilteredTestsToRun($coverageTests, $dom, $xPath);
 
-        file_put_contents($customAutoloadFilePath, $this->createCustomAutoloadWithInterceptor($mutant, $originalAutoloadFile));
+        file_put_contents($customAutoloadFilePath, $this->createCustomAutoloadWithInterceptor($mutationOriginalFilePath, $mutatedFilePath, $originalAutoloadFile));
 
-        $path = $this->buildPath($mutant);
+        $path = $this->buildPath($mutationHash);
 
         file_put_contents($path, $dom->saveXML());
 
         return $path;
     }
 
-    private function createCustomAutoloadWithInterceptor(MutantInterface $mutant, string $originalAutoloadFile): string
+    private function createCustomAutoloadWithInterceptor(string $originalFilePath, string $mutatedFilePath, string $originalAutoloadFile): string
     {
-        $originalFilePath = $mutant->getMutation()->getOriginalFilePath();
-        $mutatedFilePath = $mutant->getMutatedFilePath();
         $interceptorPath = dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
 
         $customAutoload = <<<AUTOLOAD
@@ -129,9 +133,9 @@ AUTOLOAD;
         return sprintf($customAutoload, $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutatedFilePath));
     }
 
-    private function buildPath(MutantInterface $mutant): string
+    private function buildPath(string $mutationHash): string
     {
-        $fileName = sprintf('phpunitConfiguration.%s.infection.xml', $mutant->getMutation()->getHash());
+        $fileName = sprintf('phpunitConfiguration.%s.infection.xml', $mutationHash);
 
         return $this->tempDirectory . '/' . $fileName;
     }

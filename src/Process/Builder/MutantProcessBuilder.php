@@ -62,7 +62,10 @@ final class MutantProcessBuilder
     {
         $process = new Process(
             $this->testFrameworkAdapter->getMutantCommandLine(
-                $mutant,
+                $mutant->getCoverageTests(),
+                $mutant->getMutatedFilePath(),
+                $mutant->getMutation()->getHash(),
+                $mutant->getMutation()->getOriginalFilePath(),
                 $testFrameworkExtraOptions
             )
         );
