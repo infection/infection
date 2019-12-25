@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\Differ\Differ;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantFactory;
 use Infection\MutatedNode;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
-use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\Mutator\MutatorName;
 use PhpParser\Node;
