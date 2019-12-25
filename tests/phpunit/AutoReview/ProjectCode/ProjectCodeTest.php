@@ -36,12 +36,15 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\ProjectCode;
 
 use function array_filter;
+use function array_key_exists;
 use function array_map;
 use function in_array;
 use Infection\StreamWrapper\IncludeInterceptor;
+use Infection\Tests\AutoReview\PhpDoc\PHPDocParser;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
+use function Safe\array_flip;
 use function Safe\preg_replace;
 use function Safe\sprintf;
 
@@ -56,6 +59,21 @@ use function Safe\sprintf;
  */
 final class ProjectCodeTest extends TestCase
 {
+    /**
+     * @var PHPDocParser|null
+     */
+    private static $phpDocParser;
+
+    public static function setUpBeforeClass(): void
+    {
+        self::$phpDocParser = new PHPDocParser();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        self::$phpDocParser = null;
+    }
+
     /**
      * @requires OSFAMILY Windows Cannot check if the file is executable on Windows
      */
@@ -160,25 +178,37 @@ final class ProjectCodeTest extends TestCase
     {
         $reflectionClass = new ReflectionClass($className);
 
-        if (in_array($className, ProjectCodeProvider::NON_FINAL_EXTENSION_CLASSES, true)) {
-            $this->addToAssertionCount(1);
+        $tagsAsKeys = array_flip(self::$phpDocParser->parse((string) $reflectionClass->getDocComment()));
 
-            return;
-        }
-
-        $this->assertTrue(
-            $reflectionClass->isTrait()
+        $pass = $reflectionClass->isTrait()
             || $reflectionClass->isInterface()
             || $reflectionClass->isAbstract()
-            || $reflectionClass->isFinal(),
-            sprintf(
-                'Expected the class "%s" to be a trait, an interface, an abstract or final '
-                . 'class. Either fix it or if it is an extension point, add it to '
-                . '%s::NON_FINAL_EXTENSION_CLASSES.',
-                $className,
-                ProjectCodeProvider::class
-            )
-        );
+            || $reflectionClass->isFinal()
+            || array_key_exists('@final', $tagsAsKeys)
+        ;
+
+        if (in_array($className, ProjectCodeProvider::NON_FINAL_EXTENSION_CLASSES, true)) {
+            $this->assertFalse(
+                $pass,
+                sprintf(
+                    'The class "%s" is registered to "%s::NON_FINAL_EXTENSION_CLASSES but '
+                    . 'this should not be necessary.',
+                    $className,
+                    ProjectCodeProvider::class
+                )
+            );
+        } else {
+            $this->assertTrue(
+                $pass,
+                sprintf(
+                    'Expected the class "%s" to be a trait, an interface, an abstract or final '
+                    . 'class. Either fix it or if it is an extension point, add it to '
+                    . '%s::NON_FINAL_EXTENSION_CLASSES.',
+                    $className,
+                    ProjectCodeProvider::class
+                )
+            );
+        }
     }
 
     /**

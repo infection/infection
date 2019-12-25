@@ -38,8 +38,6 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 use DOMDocument;
 use DOMNodeList;
 use DOMXPath;
-use Infection\Mutant\MutantInterface;
-use Infection\MutationInterface;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
@@ -52,12 +50,10 @@ use Symfony\Component\Filesystem\Filesystem;
 final class MutationConfigBuilderTest extends FileSystemTestCase
 {
     public const HASH = 'a1b2c3';
+    private const ORIGINAL_FILE_PATH = '/original/file/path';
+    private const MUTATED_FILE_PATH = '/mutated/file/path';
 
     private $pathToProject;
-
-    private $mutation;
-
-    private $mutant;
 
     /**
      * @var MutationConfigBuilder
@@ -75,22 +71,6 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         $projectDir = '/project/dir';
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit.xml';
 
-        $this->mutation = $this->createMock(MutationInterface::class);
-        $this->mutation
-            ->method('getHash')
-            ->willReturn(self::HASH);
-        $this->mutation
-            ->method('getOriginalFilePath')
-            ->willReturn('/original/file/path');
-
-        $this->mutant = $this->createMock(MutantInterface::class);
-        $this->mutant
-            ->method('getMutation')
-            ->willReturn($this->mutation);
-        $this->mutant
-            ->method('getMutatedFilePath')
-            ->willReturn('/mutated/file/path');
-
         $this->xmlConfigurationHelper = new XmlConfigurationHelper(
             new PathReplacer(new Filesystem(), $this->pathToProject),
             ''
@@ -107,23 +87,25 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_builds_path_to_mutation_config_file(): void
     {
-        $this->mutant
-            ->method('getCoverageTests')
-            ->willReturn([]);
-
         $this->assertSame(
             $this->tmp . '/phpunitConfiguration.a1b2c3.infection.xml',
-            $this->builder->build($this->mutant)
+            $this->builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH
+            )
         );
     }
 
     public function test_it_sets_custom_autoloader(): void
     {
-        $this->mutant
-            ->method('getCoverageTests')
-            ->willReturn([]);
-
-        $configurationPath = $this->builder->build($this->mutant);
+        $configurationPath = $this->builder->build(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::HASH,
+            self::ORIGINAL_FILE_PATH
+        );
 
         $xml = file_get_contents($configurationPath);
 
@@ -141,10 +123,6 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_sets_custom_autoloader_when_attribute_is_absent(): void
     {
-        $this->mutant
-            ->method('getCoverageTests')
-            ->willReturn([]);
-
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpuit_without_bootstrap.xml';
         $this->builder = new MutationConfigBuilder(
             $this->tmp,
@@ -154,7 +132,12 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
             new JUnitTestCaseSorter()
         );
 
-        $configurationPath = $this->builder->build($this->mutant);
+        $configurationPath = $this->builder->build(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::HASH,
+            self::ORIGINAL_FILE_PATH
+        );
 
         $xml = file_get_contents($configurationPath);
 
@@ -172,11 +155,12 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_sets_stop_on_failure_flag(): void
     {
-        $this->mutant
-            ->method('getCoverageTests')
-            ->willReturn([]);
-
-        $configurationPath = $this->builder->build($this->mutant);
+        $configurationPath = $this->builder->build(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::HASH,
+            self::ORIGINAL_FILE_PATH
+        );
 
         $xml = file_get_contents($configurationPath);
 
@@ -187,11 +171,12 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_sets_colors_flag(): void
     {
-        $this->mutant
-            ->method('getCoverageTests')
-            ->willReturn([]);
-
-        $configurationPath = $this->builder->build($this->mutant);
+        $configurationPath = $this->builder->build(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::HASH,
+            self::ORIGINAL_FILE_PATH
+        );
 
         $xml = file_get_contents($configurationPath);
 
@@ -202,10 +187,6 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_handles_root_test_suite(): void
     {
-        $this->mutant
-            ->method('getCoverageTests')
-            ->willReturn([]);
-
         $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit_root_test_suite.xml';
         $replacer = new PathReplacer(new Filesystem(), $this->pathToProject);
         $xmlConfigurationHelper = new XmlConfigurationHelper($replacer, '');
@@ -218,18 +199,24 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
             new JUnitTestCaseSorter()
         );
 
-        $configurationPath = $this->builder->build($this->mutant);
+        $configurationPath = $this->builder->build(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::HASH,
+            self::ORIGINAL_FILE_PATH
+        );
 
         $this->assertSame(1, $this->queryXpath(file_get_contents($configurationPath), '/phpunit/testsuite')->length);
     }
 
     public function test_it_removes_original_loggers(): void
     {
-        $this->mutant
-            ->method('getCoverageTests')
-            ->willReturn([]);
-
-        $configurationPath = $this->builder->build($this->mutant);
+        $configurationPath = $this->builder->build(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::HASH,
+            self::ORIGINAL_FILE_PATH
+        );
 
         $xml = file_get_contents($configurationPath);
         $nodeList = $this->queryXpath($xml, '/phpunit/logging/log[@type="coverage-html"]');
@@ -239,11 +226,12 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_removes_printer_class(): void
     {
-        $this->mutant
-            ->method('getCoverageTests')
-            ->willReturn([]);
-
-        $configurationPath = $this->builder->build($this->mutant);
+        $configurationPath = $this->builder->build(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::HASH,
+            self::ORIGINAL_FILE_PATH
+        );
 
         $xml = file_get_contents($configurationPath);
 
@@ -257,11 +245,12 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
      */
     public function test_it_sets_sorted_list_of_test_files(array $coverageTests, array $expectedFiles): void
     {
-        $this->mutant
-            ->method('getCoverageTests')
-            ->willReturn($coverageTests);
-
-        $configurationPath = $this->builder->build($this->mutant);
+        $configurationPath = $this->builder->build(
+            $coverageTests,
+            self::MUTATED_FILE_PATH,
+            self::HASH,
+            self::ORIGINAL_FILE_PATH
+        );
 
         $xml = file_get_contents($configurationPath);
 
@@ -277,11 +266,12 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_removes_default_test_suite(): void
     {
-        $this->mutant
-            ->method('getCoverageTests')
-            ->willReturn([]);
-
-        $configurationPath = $this->builder->build($this->mutant);
+        $configurationPath = $this->builder->build(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::HASH,
+            self::ORIGINAL_FILE_PATH
+        );
 
         $xml = file_get_contents($configurationPath);
 

@@ -33,24 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Visitor;
+namespace Infection\Visitor;
 
-use PhpParser\Lexer;
-use PhpParser\ParserFactory;
-use PHPUnit\Framework\TestCase;
+use PhpParser\Node;
+use PhpParser\Node\Stmt;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitorAbstract;
 
-abstract class AbstractBaseVisitorTest extends TestCase
+/**
+ * @internal
+ */
+final class PhpUnitClassCodeCoverageIgnoreVisitor extends NodeVisitorAbstract
 {
-    protected function getNodes(string $code): array
+    public function enterNode(Node $node)
     {
-        $lexer = new Lexer\Emulative();
-        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
+        if (!$node instanceof Stmt\ClassLike) {
+            return null;
+        }
 
-        return $parser->parse($code);
-    }
+        $docComment = $node->getDocComment();
 
-    protected function getFileContent(string $file): string
-    {
-        return file_get_contents(sprintf(__DIR__ . '/../Fixtures/Autoloaded/%s', $file));
+        if ($docComment === null) {
+            return null;
+        }
+
+        if (strpos($docComment->getText(), '@codeCoverageIgnore') !== false) {
+            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+        }
+
+        return null;
     }
 }

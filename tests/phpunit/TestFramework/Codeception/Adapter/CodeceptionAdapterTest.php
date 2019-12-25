@@ -36,8 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Codeception\Adapter;
 
 use Generator;
-use Infection\Mutant\MutantInterface;
-use Infection\MutationInterface;
 use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
@@ -52,6 +50,10 @@ use Symfony\Component\Filesystem\Filesystem;
 
 final class CodeceptionAdapterTest extends FileSystemTestCase
 {
+    private const MUTATION_HASH = 'a1b2c3';
+    private const ORIGINAL_FILE_PATH = '/original/file/path';
+    private const MUTATED_FILE_PATH = '/mutated/file/path';
+
     private const DEFAULT_CONFIG = [
         'paths' => [
             'tests' => 'tests',
@@ -196,7 +198,13 @@ final class CodeceptionAdapterTest extends FileSystemTestCase
     public function test_it_disables_coverage_for_mutant_command_line(): void
     {
         $adapter = $this->createAdapter();
-        $commandLine = $adapter->getMutantCommandLine($this->getMutantMock(), '');
+        $commandLine = $adapter->getMutantCommandLine(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::MUTATION_HASH,
+            self::ORIGINAL_FILE_PATH,
+            ''
+        );
 
         $this->assertContains('coverage: enabled: false', $commandLine);
     }
@@ -204,7 +212,13 @@ final class CodeceptionAdapterTest extends FileSystemTestCase
     public function test_it_adds_extra_options_for_mutant_command_line(): void
     {
         $adapter = $this->createAdapter();
-        $commandLine = $adapter->getMutantCommandLine($this->getMutantMock(), '--filter=xyz');
+        $commandLine = $adapter->getMutantCommandLine(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::MUTATION_HASH,
+            self::ORIGINAL_FILE_PATH,
+            '--filter=xyz'
+        );
 
         $this->assertContains('--filter=xyz', $commandLine);
     }
@@ -212,7 +226,13 @@ final class CodeceptionAdapterTest extends FileSystemTestCase
     public function test_it_sets_infection_group(): void
     {
         $adapter = $this->createAdapter();
-        $commandLine = $adapter->getMutantCommandLine($this->getMutantMock(), '--filter=xyz');
+        $commandLine = $adapter->getMutantCommandLine(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::MUTATION_HASH,
+            self::ORIGINAL_FILE_PATH,
+            '--filter=xyz'
+        );
 
         $this->assertContains('--group', $commandLine);
         $this->assertContains('infection', $commandLine);
@@ -221,7 +241,13 @@ final class CodeceptionAdapterTest extends FileSystemTestCase
     public function test_it_sets_bootstrap_file(): void
     {
         $adapter = $this->createAdapter();
-        $commandLine = $adapter->getMutantCommandLine($this->getMutantMock(), '--filter=xyz');
+        $commandLine = $adapter->getMutantCommandLine(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::MUTATION_HASH,
+            self::ORIGINAL_FILE_PATH,
+            '--filter=xyz'
+        );
 
         $this->assertContains('--bootstrap', $commandLine);
     }
@@ -230,7 +256,13 @@ final class CodeceptionAdapterTest extends FileSystemTestCase
     {
         $adapter = $this->createAdapter();
 
-        $adapter->getMutantCommandLine($this->getMutantMock(), '');
+        $adapter->getMutantCommandLine(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::MUTATION_HASH,
+            self::ORIGINAL_FILE_PATH,
+            ''
+        );
 
         $expectedConfigPath = $this->tmp . '/interceptor.codeception.a1b2c3.php';
 
@@ -241,7 +273,13 @@ final class CodeceptionAdapterTest extends FileSystemTestCase
     {
         $adapter = $this->createAdapter();
 
-        $adapter->getMutantCommandLine($this->getMutantMock(), '');
+        $adapter->getMutantCommandLine(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::MUTATION_HASH,
+            self::ORIGINAL_FILE_PATH,
+            ''
+        );
 
         $this->assertStringNotContainsString(
             'bootstrap',
@@ -260,7 +298,13 @@ final class CodeceptionAdapterTest extends FileSystemTestCase
 
         $adapter = $this->createAdapter($config);
 
-        $adapter->getMutantCommandLine($this->getMutantMock(), '');
+        $adapter->getMutantCommandLine(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::MUTATION_HASH,
+            self::ORIGINAL_FILE_PATH,
+            ''
+        );
 
         $this->assertStringContainsString(
             "require_once '/original/bootstrap.php';",
@@ -279,7 +323,13 @@ final class CodeceptionAdapterTest extends FileSystemTestCase
 
         $adapter = $this->createAdapter($config);
 
-        $adapter->getMutantCommandLine($this->getMutantMock(), '');
+        $adapter->getMutantCommandLine(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::MUTATION_HASH,
+            self::ORIGINAL_FILE_PATH,
+            ''
+        );
 
         $this->assertStringContainsString(
             "tests/original/bootstrap.php';",
@@ -297,23 +347,6 @@ final class CodeceptionAdapterTest extends FileSystemTestCase
     public function test_codeception_name(): void
     {
         $this->assertSame('codeception', $this->createAdapter()->getName());
-    }
-
-    private function getMutantMock()
-    {
-        $mutation = $this->createMock(MutationInterface::class);
-        $mutation->method('getHash')
-            ->willReturn('a1b2c3');
-        $mutation->method('getOriginalFilePath')
-            ->willReturn('/original/file/path');
-
-        $mutant = $this->createMock(MutantInterface::class);
-        $mutant->method('getMutation')
-            ->willReturn($mutation);
-        $mutant->method('getMutatedFilePath')
-            ->willReturn('/mutated/file/path');
-
-        return $mutant;
     }
 
     private function createAdapter(?array $config = null): CodeceptionAdapter

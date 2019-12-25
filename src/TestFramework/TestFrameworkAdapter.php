@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use Infection\Mutant\MutantInterface;
+use Infection\TestFramework\Coverage\CoverageLineData;
 
 /**
  * @internal
@@ -58,9 +58,17 @@ interface TestFrameworkAdapter
     public function getInitialTestRunCommandLine(string $extraOptions, array $phpExtraArgs, bool $skipCoverage): array;
 
     /**
+     * @param CoverageLineData[] $coverageTests
+     *
      * @return string[]
      */
-    public function getMutantCommandLine(MutantInterface $mutant, string $extraOptions): array;
+    public function getMutantCommandLine(
+        array $coverageTests,
+        string $mutatedFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath,
+        string $extraOptions
+    ): array;
 
     public function getVersion(): string;
 

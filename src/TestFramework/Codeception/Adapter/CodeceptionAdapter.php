@@ -38,9 +38,9 @@ namespace Infection\TestFramework\Codeception\Adapter;
 use function array_key_exists;
 use function assert;
 use function dirname;
-use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\Codeception\Stringifier;
 use Infection\TestFramework\CommandLineBuilder;
+use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\MemoryUsageAware;
@@ -179,23 +179,33 @@ final class CodeceptionAdapter implements MemoryUsageAware, TestFrameworkAdapter
         );
     }
 
-    public function getMutantCommandLine(MutantInterface $mutant, string $extraOptions): array
-    {
+    /**
+     * @param CoverageLineData[] $coverageTests
+     *
+     * @return string[]
+     */
+    public function getMutantCommandLine(
+        array $coverageTests,
+        string $mutatedFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath,
+        string $extraOptions
+    ): array {
         $argumentsAndOptions = $this->prepareArgumentsAndOptions($extraOptions);
 
         $commandLine = $this->commandLineBuilder->build($this->testFrameworkExecutable, [], $argumentsAndOptions);
 
-        $output = sprintf('%s/%s', $this->tmpDir, $mutant->getMutation()->getHash());
+        $output = sprintf('%s/%s', $this->tmpDir, $mutationHash);
 
         $interceptorFilePath = sprintf(
             '%s/interceptor.codeception.%s.php',
             $this->tmpDir,
-            $mutant->getMutation()->getHash()
+            $mutationHash
         );
 
-        file_put_contents($interceptorFilePath, $this->createCustomBootstrapWithInterceptor($mutant), LOCK_EX);
+        file_put_contents($interceptorFilePath, $this->createCustomBootstrapWithInterceptor($mutationOriginalFilePath, $mutatedFilePath), LOCK_EX);
 
-        $uniqueTestFilePaths = implode(',', $this->jUnitTestCaseSorter->getUniqueSortedFileNames($mutant->getCoverageTests()));
+        $uniqueTestFilePaths = implode(',', $this->jUnitTestCaseSorter->getUniqueSortedFileNames($coverageTests));
 
         return array_merge(
             $commandLine,
@@ -274,11 +284,8 @@ IncludeInterceptor::enable();
 CONTENT;
     }
 
-    private function createCustomBootstrapWithInterceptor(MutantInterface $mutant): string
+    private function createCustomBootstrapWithInterceptor(string $originalFilePath, string $mutatedFilePath): string
     {
-        $originalFilePath = $mutant->getMutation()->getOriginalFilePath();
-        $mutatedFilePath = $mutant->getMutatedFilePath();
-
         $originalBootstrap = $this->getOriginalBootstrapFilePath();
         $bootstrapPlaceholder = $originalBootstrap ? "require_once '{$originalBootstrap}';" : '';
 

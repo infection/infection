@@ -37,8 +37,8 @@ namespace Infection\TestFramework\PhpSpec\Config\Builder;
 
 use function array_key_exists;
 use function dirname;
-use Infection\Mutant\MutantInterface;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
+use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\PhpSpec\Config\MutationYamlConfiguration;
 use Symfony\Component\Yaml\Yaml;
 
@@ -58,17 +58,24 @@ class MutationConfigBuilder extends ConfigBuilder
         $this->projectDir = $projectDir;
     }
 
-    public function build(MutantInterface $mutant): string
-    {
+    /**
+     * @param CoverageLineData[] $coverageTests
+     */
+    public function build(
+        array $coverageTests,
+        string $mutatedFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath
+    ): string {
         $customAutoloadFilePath = sprintf(
             '%s/interceptor.phpspec.autoload.%s.infection.php',
             $this->tempDirectory,
-            $mutant->getMutation()->getHash()
+            $mutationHash
         );
 
         $parsedYaml = Yaml::parseFile($this->originalYamlConfigPath);
 
-        file_put_contents($customAutoloadFilePath, $this->createCustomAutoloadWithInterceptor($mutant, $parsedYaml));
+        file_put_contents($customAutoloadFilePath, $this->createCustomAutoloadWithInterceptor($mutationOriginalFilePath, $mutatedFilePath, $parsedYaml));
 
         $yamlConfiguration = new MutationYamlConfiguration(
             $this->tempDirectory,
@@ -78,18 +85,15 @@ class MutationConfigBuilder extends ConfigBuilder
 
         $newYaml = $yamlConfiguration->getYaml();
 
-        $path = $this->buildPath($mutant);
+        $path = $this->buildPath($mutationHash);
 
         file_put_contents($path, $newYaml);
 
         return $path;
     }
 
-    private function createCustomAutoloadWithInterceptor(MutantInterface $mutant, array $parsedYaml): string
+    private function createCustomAutoloadWithInterceptor(string $originalFilePath, string $mutatedFilePath, array $parsedYaml): string
     {
-        $originalFilePath = $mutant->getMutation()->getOriginalFilePath();
-        $mutatedFilePath = $mutant->getMutatedFilePath();
-
         $originalBootstrap = $this->getOriginalBootstrapFilePath($parsedYaml);
         $autoloadPlaceholder = $originalBootstrap ? "require_once '{$originalBootstrap}';" : '';
         $interceptorPath = dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
@@ -109,9 +113,9 @@ AUTOLOAD;
         );
     }
 
-    private function buildPath(MutantInterface $mutant): string
+    private function buildPath(string $mutationHash): string
     {
-        $fileName = sprintf('phpspecConfiguration.%s.infection.yml', $mutant->getMutation()->getHash());
+        $fileName = sprintf('phpspecConfiguration.%s.infection.yml', $mutationHash);
 
         return $this->tempDirectory . '/' . $fileName;
     }
