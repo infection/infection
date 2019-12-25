@@ -35,51 +35,54 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ConditionalNegotiation;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class NotEqualTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator($input, $expected = null): void
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): array
+    public function mutationsProvider(): Generator
     {
-        return [
-            'It mutates not strict comparison' => [
-                <<<'PHP'
+        yield 'It mutates not strict comparison' => [
+            <<<'PHP'
 <?php
 
 1 != 1;
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 1 == 1;
 PHP
-                ,
-            ],
-            'It does not mutate strict comparison' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate strict comparison' => [
+            <<<'PHP'
 <?php
 
 1 !== 1;
 PHP
-                ,
-            ],
-            'It does not mutate normal equals comparison' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate normal equals comparison' => [
+            <<<'PHP'
 <?php
 
 1 == 1;
 PHP
-                ,
-            ],
+            ,
         ];
     }
 }

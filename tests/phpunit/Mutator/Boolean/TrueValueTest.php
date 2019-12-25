@@ -43,14 +43,16 @@ use PhpParser\Node\Name;
 final class TrueValueTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator($input, $expected = null, array $settings = []): void
+    public function test_it_can_mutate($input, $expected = [], array $settings = []): void
     {
         $this->doTest($input, $expected, $settings);
     }
 
-    public function provideMutationCases(): Generator
+    public function mutationsProvider(): Generator
     {
         yield 'It mutates true to false' => [
                 <<<'PHP'

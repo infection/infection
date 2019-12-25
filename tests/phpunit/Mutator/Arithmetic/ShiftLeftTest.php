@@ -35,46 +35,48 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class ShiftLeftTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator($input, $expected = null): void
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): array
+    public function mutationsProvider(): Generator
     {
-        return [
-            'It mutates shift left' => [
-                <<<'PHP'
+        yield 'It mutates shift left' => [
+            <<<'PHP'
 <?php
 
 $a = 1;
 $a << 2;
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 $a = 1;
 $a >> 2;
 PHP
-                ,
-            ],
-            'It does not mutate shift right' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate shift right' => [
+        <<<'PHP'
 <?php
 
 $a = 1;
 $a >> 2;
 PHP
-                ,
-            ],
+            ,
         ];
     }
 }

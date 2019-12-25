@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
@@ -43,74 +44,78 @@ use PhpParser\Node\Scalar\LNumber;
 final class PlusTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator($input, $expected = null): void
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): array
+    public function mutationsProvider(): Generator
     {
-        return [
-            'It mutates normal plus' => [
-                <<<'PHP'
+        yield 'It mutates normal plus' => [
+            <<<'PHP'
 <?php
 
 $a = 10 + 3;
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 $a = 10 - 3;
 PHP
-                ,
-            ],
-            'It does not mutate plus equals' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate plus equals' => [
+            <<<'PHP'
 <?php
 
 $a = 1;
 $a += 2;
 PHP
-                ,
-            ],
-            'It does not mutate increment' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate increment' => [
+            <<<'PHP'
 <?php
 
 $a = 1;
 $a++;
 PHP
-                ,
-            ],
-            'It does mutate a fake increment' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does mutate a fake increment' => [
+            <<<'PHP'
 <?php
 
 $a = 1;
 $a + +1;
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 $a = 1;
 $a - +1;
 PHP
-                ,
-                ],
-                'It does not mutate additon of arrays' => [
-                    <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate additon of arrays' => [
+            <<<'PHP'
 <?php
 
 $a = [0 => 1] + [1 => 3];
 $b = 1 + [1 => 3];
 $c = [1 => 1] + 3;
 PHP
-                    ,
-            ],
+            ,
         ];
     }
 

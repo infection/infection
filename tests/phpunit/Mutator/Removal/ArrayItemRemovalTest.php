@@ -42,14 +42,16 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 final class ArrayItemRemovalTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator(string $input, $expected = null, array $settings = []): void
+    public function test_it_can_mutate(string $input, $expected = [], array $settings = []): void
     {
         $this->doTest($input, $expected, $settings);
     }
 
-    public function provideMutationCases(): Generator
+    public function mutationsProvider(): Generator
     {
         yield 'It does not mutate empty arrays' => [
             '<?php $a = [];',

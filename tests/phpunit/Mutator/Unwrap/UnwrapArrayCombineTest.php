@@ -41,14 +41,16 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 final class UnwrapArrayCombineTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator($input, $expected = null): void
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): Generator
+    public function mutationsProvider(): Generator
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'

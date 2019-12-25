@@ -35,61 +35,64 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class DecrementTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator($input, $expected = null): void
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): array
+    public function mutationsProvider(): Generator
     {
-        return [
-            'It replaces post decrement' => [
-                <<<'PHP'
+        yield 'It replaces post decrement' => [
+            <<<'PHP'
 <?php
 
 $a = 1; 
 $a--;
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 $a = 1;
 $a++;
 PHP
-                ,
-            ],
-            'It replaces pre decrement' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It replaces pre decrement' => [
+            <<<'PHP'
 <?php
 
 $a = 1;
 --$a;
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 $a = 1;
 ++$a;
 PHP
-                ,
-            ],
-            'It does not change when its not a real decrement' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not change when its not a real decrement' => [
+            <<<'PHP'
 <?php
 
 $b - -$a;
 PHP
-                ,
-            ],
+            ,
         ];
     }
 }

@@ -41,14 +41,16 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 final class CloneRemovalTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator(string $input, ?string $expected): void
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): Generator
+    public function mutationsProvider(): Generator
     {
         yield 'It removes clone from expression clone-new' => [
           <<<'PHP'
