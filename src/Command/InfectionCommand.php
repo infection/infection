@@ -52,10 +52,8 @@ use Infection\Locator\Locator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
-use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\MutationGenerator;
 use Infection\Performance\Limiter\MemoryLimiter;
-use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Coverage\CoverageRequirementChecker;
@@ -66,11 +64,9 @@ use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
-use Infection\TestFramework\Coverage\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\HasExtraNodeVisitors;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;
-use Infection\Utils\VersionParser;
 use function is_numeric;
 use function Safe\sprintf;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -292,15 +288,8 @@ final class InfectionCommand extends BaseCommand
         /** @var Configuration $config */
         $config = $this->container[Configuration::class];
 
-        /** @var VersionParser $versionParser */
-        $versionParser = $this->container[VersionParser::class];
-
-        /** @var EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = $this->container['dispatcher'];
-
-        $processBuilder = new InitialTestRunProcessBuilder($adapter, $versionParser);
-
-        $initialTestsRunner = new InitialTestsRunner($processBuilder, $eventDispatcher);
+        /** @var InitialTestsRunner $initialTestsRunner */
+        $initialTestsRunner = $this->container[InitialTestsRunner::class];
 
         $initialTestSuitProcess = $initialTestsRunner->run(
             $config->getTestFrameworkExtraOptions()->getForInitialProcess(),
@@ -327,27 +316,14 @@ final class InfectionCommand extends BaseCommand
         /** @var Configuration $config */
         $config = $this->container[Configuration::class];
 
-        /** @var VersionParser $versionParser */
-        $versionParser = $this->container[VersionParser::class];
-
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = $this->container['dispatcher'];
 
-        $processBuilder = new MutantProcessBuilder($adapter, $versionParser, $config->getProcessTimeout());
+        /** @var MutantProcessBuilder $processBuilder */
+        $processBuilder = $this->container[MutantProcessBuilder::class];
 
-        /** @var XMLLineCodeCoverageFactory $codeCoverageFactory */
-        $codeCoverageFactory = $this->container[XMLLineCodeCoverageFactory::class];
-
-        /** @var FileMutationGenerator $fileMutationGenerator */
-        $fileMutationGenerator = $this->container[FileMutationGenerator::class];
-
-        $mutationGenerator = new MutationGenerator(
-            $config->getSourceFiles(),
-            $codeCoverageFactory->create($config->getTestFramework(), $adapter),
-            $config->getMutators(),
-            $eventDispatcher,
-            $fileMutationGenerator
-        );
+        /** @var MutationGenerator $mutationGenerator */
+        $mutationGenerator = $this->container[MutationGenerator::class];
 
         $mutations = $mutationGenerator->generate(
             $config->mutateOnlyCoveredCode(),

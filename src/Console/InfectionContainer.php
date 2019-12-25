@@ -56,6 +56,7 @@ use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\FileParser;
+use Infection\Mutation\MutationGenerator;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
@@ -63,8 +64,11 @@ use Infection\Performance\Limiter\MemoryLimiter;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\TimeFormatter;
 use Infection\Performance\Time\Timer;
+use Infection\Process\Builder\InitialTestRunProcessBuilder;
+use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Coverage\CoverageRequirementChecker;
+use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\CommandLineBuilder;
@@ -437,6 +441,64 @@ final class InfectionContainer extends Container
                 return $testFrameworkFactory->create(
                     $config->getTestFramework(),
                     $config->shouldSkipCoverage()
+                );
+            },
+            InitialTestRunProcessBuilder::class => static function (self $container): InitialTestRunProcessBuilder {
+                /** @var TestFrameworkAdapter $adapter */
+                $adapter = $container[TestFrameworkAdapter::class];
+
+                /** @var VersionParser $versionParser */
+                $versionParser = $container[VersionParser::class];
+
+                return new InitialTestRunProcessBuilder($adapter, $versionParser);
+            },
+            InitialTestsRunner::class => static function (self $container): InitialTestsRunner {
+                /** @var EventDispatcherInterface $eventDispatcher */
+                $eventDispatcher = $container['dispatcher'];
+
+                /** @var InitialTestRunProcessBuilder $processBuilder */
+                $processBuilder = $container[InitialTestRunProcessBuilder::class];
+
+                return new InitialTestsRunner($processBuilder, $eventDispatcher);
+            },
+            MutantProcessBuilder::class => static function (self $container): MutantProcessBuilder {
+                /** @var TestFrameworkAdapter $adapter */
+                $adapter = $container[TestFrameworkAdapter::class];
+
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                /** @var VersionParser $versionParser */
+                $versionParser = $container[VersionParser::class];
+
+                return new MutantProcessBuilder(
+                    $adapter,
+                    $versionParser,
+                    $config->getProcessTimeout()
+                );
+            },
+            MutationGenerator::class => static function (self $container): MutationGenerator {
+                /** @var TestFrameworkAdapter $adapter */
+                $adapter = $container[TestFrameworkAdapter::class];
+
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                /** @var EventDispatcherInterface $eventDispatcher */
+                $eventDispatcher = $container['dispatcher'];
+
+                /** @var XMLLineCodeCoverageFactory $codeCoverageFactory */
+                $codeCoverageFactory = $container[XMLLineCodeCoverageFactory::class];
+
+                /** @var FileMutationGenerator $fileMutationGenerator */
+                $fileMutationGenerator = $container[FileMutationGenerator::class];
+
+                return new MutationGenerator(
+                    $config->getSourceFiles(),
+                    $codeCoverageFactory->create($config->getTestFramework(), $adapter),
+                    $config->getMutators(),
+                    $eventDispatcher,
+                    $fileMutationGenerator
                 );
             },
         ]);
