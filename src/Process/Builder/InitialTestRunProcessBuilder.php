@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Process\Builder;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Console\Util\PhpProcess;
-use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\Utils\VersionParser;
 use PackageVersions\Versions;
 use Symfony\Component\Process\Process;

@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Generator;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
-use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;
 use PHPUnit\Framework\TestCase;
 

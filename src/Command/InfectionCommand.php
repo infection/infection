@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use Exception;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;

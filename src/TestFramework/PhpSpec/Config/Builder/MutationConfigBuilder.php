@@ -37,8 +37,8 @@ namespace Infection\TestFramework\PhpSpec\Config\Builder;
 
 use function array_key_exists;
 use function dirname;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
-use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\PhpSpec\Config\MutationYamlConfiguration;
 use Symfony\Component\Yaml\Yaml;
 

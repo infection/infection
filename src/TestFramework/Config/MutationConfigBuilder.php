@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Config;
 
 use function assert;
-use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use function is_string;
 use Phar;
 

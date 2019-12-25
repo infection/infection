@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Process\Builder;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Mutant\MutantInterface;
 use Infection\Process\MutantProcess;
-use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\Utils\VersionParser;
 use PackageVersions\Versions;
 use Symfony\Component\Process\Process;

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use function array_filter;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfiguration;
@@ -82,7 +83,6 @@ use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
-use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\Utils\VersionParser;
 use function php_ini_loaded_file;
 use PhpParser\Lexer;

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\Mutant\MutantInterface;
 use Infection\Mutator\Util\Mutator;
 use Symfony\Component\Process\Process;

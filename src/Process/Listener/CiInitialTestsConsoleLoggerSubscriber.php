@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Process\Listener;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\EventDispatcher\EventSubscriberInterface;
 use Infection\Events\InitialTestSuiteStarted;
-use Infection\TestFramework\TestFrameworkAdapter;
 use InvalidArgumentException;
 use Symfony\Component\Console\Output\OutputInterface;
 

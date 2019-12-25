@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a275b90ec46a510759bbb8d7f6ff48d6",
+    "content-hash": "bec2d183a38cdc540e791bc5ba7dbc94",
     "packages": [
         {
             "name": "composer/xdebug-handler",
@@ -49,6 +49,42 @@
                 "performance"
             ],
             "time": "2019-05-27T17:52:04+00:00"
+        },
+        {
+            "name": "infection/abstract-testframework-adapter",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/infection/abstract-testframework-adapter.git",
+                "reference": "03d76ca4a549a6a333e9511652fe998910e6aad3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/infection/abstract-testframework-adapter/zipball/03d76ca4a549a6a333e9511652fe998910e6aad3",
+                "reference": "03d76ca4a549a6a333e9511652fe998910e6aad3",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Infection\\AbstractTestFramework\\": "src/"
+                }
+            },
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Maks Rafalko",
+                    "email": "maks.rafalko@gmail.com"
+                }
+            ],
+            "description": "Abstract Test Framework Adapter for Infection",
+            "support": {
+                "source": "https://github.com/infection/abstract-testframework-adapter/tree/master",
+                "issues": "https://github.com/infection/abstract-testframework-adapter/issues"
+            },
+            "time": "2019-12-25T19:51:11+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -2719,8 +2755,10 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
-    "stability-flags": [],
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "infection/abstract-testframework-adapter": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

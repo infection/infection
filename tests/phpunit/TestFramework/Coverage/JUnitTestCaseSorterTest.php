@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
 use PHPUnit\Framework\TestCase;
 

@@ -37,6 +37,7 @@ namespace Infection\TestFramework\Coverage;
 
 use function assert;
 use function in_array;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use function is_string;
 
 /**

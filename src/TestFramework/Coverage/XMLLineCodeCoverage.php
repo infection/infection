@@ -39,6 +39,7 @@ use function array_key_exists;
 use function count;
 use function dirname;
 use Generator;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use function Safe\file_get_contents;
 

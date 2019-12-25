@@ -40,8 +40,8 @@ use function dirname;
 use DOMDocument;
 use DOMNode;
 use DOMXPath;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
-use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 
