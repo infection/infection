@@ -69,6 +69,7 @@ use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Coverage\CoverageRequirementChecker;
 use Infection\Process\Runner\InitialTestsRunner;
+use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\CommandLineBuilder;
@@ -499,6 +500,26 @@ final class InfectionContainer extends Container
                     $config->getMutators(),
                     $eventDispatcher,
                     $fileMutationGenerator
+                );
+            },
+            MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
+                /** @var EventDispatcherInterface $eventDispatcher */
+                $eventDispatcher = $container['dispatcher'];
+
+                /** @var MutantProcessBuilder $processBuilder */
+                $processBuilder = $container[MutantProcessBuilder::class];
+
+                /** @var ParallelProcessRunner $parallelProcessRunner */
+                $parallelProcessRunner = $container['parallel.process.runner'];
+
+                /** @var MutantCreator $mutantCreator */
+                $mutantCreator = $container['mutant.creator'];
+
+                return new MutationTestingRunner(
+                    $processBuilder,
+                    $parallelProcessRunner,
+                    $mutantCreator,
+                    $eventDispatcher
                 );
             },
         ]);
