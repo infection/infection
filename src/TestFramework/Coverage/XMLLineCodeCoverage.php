@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Infection\Tracing\Trace;
 use function array_key_exists;
 use function count;
 use function dirname;
 use Generator;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\Tracing\NodeLineRangeData;
+use Infection\Tracing\Trace;
 use Infection\Tracing\Tracer;
 use function Safe\file_get_contents;
 

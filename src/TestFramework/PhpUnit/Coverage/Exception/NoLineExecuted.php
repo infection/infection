@@ -33,20 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Coverage\Exception;
+namespace Infection\TestFramework\PhpUnit\Coverage\Exception;
 
-use Infection\TestFramework\PhpUnit\Coverage\Exception\NoLinesExecutedException;
-use PHPUnit\Framework\TestCase;
+use UnexpectedValueException;
 
-final class NoLinesExecutedExceptionTest extends TestCase
+/**
+ * @internal
+ */
+final class NoLineExecuted extends UnexpectedValueException
 {
-    public function test_no_lines_executed(): void
+    public static function create(): self
     {
-        $exception = NoLinesExecutedException::noLinesExecuted();
-        $this->assertSame(
-            '0 Lines of code were executed during tests. This could be due to "@covers" annotations, ' .
-            'or your PHPUnit filters not being set up correctly.',
-            $exception->getMessage()
+        return new self(<<<'MSG'
+No line of code was executed during tests. This could be due to "@covers" annotations or your 
+PHPUnit filters not being set up correctly.
+MSG
         );
     }
 }

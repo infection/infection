@@ -37,28 +37,52 @@ namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
 use Generator;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
-use Infection\TestFramework\PhpUnit\Coverage\Exception\NoLinesExecutedException;
+use Infection\TestFramework\PhpUnit\Coverage\Exception\NoLineExecuted;
 use PHPUnit\Framework\TestCase;
+use function Safe\file_get_contents;
+use function Safe\preg_replace;
+use function Safe\realpath;
+use function Safe\sprintf;
 
 final class CoverageXmlParserTest extends TestCase
 {
+    private const FIXTURES_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage-xml';
+
+    /**
+     * @var string|null
+     */
+    private static $xml;
+
     /**
      * @var CoverageXmlParser
      */
     private $parser;
 
-    private $tempDir = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage-xml';
+    public static function setUpBeforeClass(): void
+    {
+        $xml = file_get_contents(self::FIXTURES_DIR . '/index.xml');
 
-    private $srcDir = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage-xml';
+        // Replaces dummy source path with the real path
+        self::$xml = preg_replace(
+            '/(source=\").*?(\")/',
+            sprintf('$1%s$2', realpath(self::FIXTURES_DIR)),
+            $xml
+        );
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        self::$xml = null;
+    }
 
     protected function setUp(): void
     {
-        $this->parser = new CoverageXmlParser($this->tempDir);
+        $this->parser = new CoverageXmlParser();
     }
 
     public function test_it_collects_data_recursively_for_all_files(): void
     {
-        $coverage = $this->parser->parse($this->getXml());
+        $coverage = $this->parser->parse(self::$xml);
 
         // zeroLevel / firstLevel / secondLevel
         $this->assertCount(4, $coverage);
@@ -66,11 +90,11 @@ final class CoverageXmlParserTest extends TestCase
 
     public function test_it_has_correct_coverage_data_for_each_file(): void
     {
-        $coverage = $this->parser->parse($this->getXml());
+        $coverage = $this->parser->parse(self::$xml);
 
-        $zeroLevelAbsolutePath = realpath($this->tempDir . '/zeroLevel.php');
-        $firstLevelAbsolutePath = realpath($this->tempDir . '/FirstLevel/firstLevel.php');
-        $secondLevelAbsolutePath = realpath($this->tempDir . '/FirstLevel/SecondLevel/secondLevel.php');
+        $zeroLevelAbsolutePath = realpath(self::FIXTURES_DIR . '/zeroLevel.php');
+        $firstLevelAbsolutePath = realpath(self::FIXTURES_DIR . '/FirstLevel/firstLevel.php');
+        $secondLevelAbsolutePath = realpath(self::FIXTURES_DIR . '/FirstLevel/SecondLevel/secondLevel.php');
 
         $this->assertArrayHasKey($zeroLevelAbsolutePath, $coverage);
         $this->assertArrayHasKey($firstLevelAbsolutePath, $coverage);
@@ -88,7 +112,8 @@ final class CoverageXmlParserTest extends TestCase
 
     public function test_it_adds_by_method_coverage_data(): void
     {
-        $firstLevelAbsolutePath = realpath($this->tempDir . '/FirstLevel/firstLevel.php');
+        $firstLevelAbsolutePath = realpath(self::FIXTURES_DIR . '/FirstLevel/firstLevel.php');
+
         $expectedByMethodArray = [
             'mutate' => [
                 'startLine' => 19,
@@ -100,16 +125,16 @@ final class CoverageXmlParserTest extends TestCase
             ],
         ];
 
-        $coverage = $this->parser->parse($this->getXml());
+        $coverage = $this->parser->parse(self::$xml);
 
-        $result = $this->convertObjectsToArray($coverage[$firstLevelAbsolutePath]->byMethod);
+        $result = self::convertObjectsToArray($coverage[$firstLevelAbsolutePath]->byMethod);
 
         $this->assertSame($expectedByMethodArray, $result);
     }
 
     public function test_it_adds_by_method_coverage_data_for_traits(): void
     {
-        $pathToTrait = realpath($this->tempDir . '/FirstLevel/SecondLevel/secondLevelTrait.php');
+        $pathToTrait = realpath(self::FIXTURES_DIR . '/FirstLevel/SecondLevel/secondLevelTrait.php');
 
         $expectedByMethodArray = [
             'mutate' => [
@@ -122,9 +147,9 @@ final class CoverageXmlParserTest extends TestCase
             ],
         ];
 
-        $coverage = $this->parser->parse($this->getXml());
+        $coverage = $this->parser->parse(self::$xml);
 
-        $result = $this->convertObjectsToArray($coverage[$pathToTrait]->byMethod);
+        $result = self::convertObjectsToArray($coverage[$pathToTrait]->byMethod);
 
         $this->assertSame($expectedByMethodArray, $result);
     }
@@ -155,21 +180,22 @@ XML;
 
         $coverage = $this->parser->parse($xml);
 
-        $this->assertIsArray($coverage);
+        $this->assertSame([], $coverage);
     }
 
     /**
-     * @dataProvider providesZeroLinesCoveredCases
+     * @dataProvider noCoveredLineReportProviders
      */
     public function test_it_errors_when_no_lines_were_executed(string $xml): void
     {
-        $this->expectException(NoLinesExecutedException::class);
+        $this->expectException(NoLineExecuted::class);
+
         $this->parser->parse($xml);
     }
 
-    public function providesZeroLinesCoveredCases(): Generator
+    public function noCoveredLineReportProviders(): Generator
     {
-        yield 'Zero lines executed' => [<<<'XML'
+        yield 'zero lines executed' => [<<<'XML'
 <?xml version="1.0"?>
 <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
   <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
@@ -215,27 +241,12 @@ XML
         ];
     }
 
-    private function getXml()
-    {
-        $xml = file_get_contents(__DIR__ . '/../../../Fixtures/Files/phpunit/coverage-xml/index.xml');
-
-        // replace dummy source path with the real path
-        return preg_replace(
-            '/(source=\").*?(\")/',
-            sprintf('$1%s$2', realpath($this->srcDir)),
-            $xml
-        );
-    }
-
-    private function convertObjectsToArray(array $coverageMethodsData): array
+    private static function convertObjectsToArray(array $coverageMethodsData): array
     {
         $result = [];
 
         foreach ($coverageMethodsData as $method => $coverageMethodData) {
-            $result[$method] = [
-                'startLine' => $coverageMethodData->startLine,
-                'endLine' => $coverageMethodData->endLine,
-            ];
+            $result[$method] = (array) $coverageMethodData;
         }
 
         return $result;
