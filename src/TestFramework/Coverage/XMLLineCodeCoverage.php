@@ -47,8 +47,6 @@ use function Safe\file_get_contents;
  */
 final class XMLLineCodeCoverage implements LineCodeCoverage
 {
-    public const COVERAGE_INDEX_FILE_NAME = 'index.xml';
-
     /**
      * @var array
      */
