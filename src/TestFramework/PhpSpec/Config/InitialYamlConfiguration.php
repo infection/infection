@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpSpec\Config;
 
-use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
+use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -76,7 +76,7 @@ final class InitialYamlConfiguration extends AbstractYamlConfiguration
 
             $options['format'] = ['xml'];
             $options['output'] = [
-                'xml' => $this->tempDirectory . '/' . XMLLineCodeCoverage::PHP_SPEC_COVERAGE_DIR,
+                'xml' => $this->tempDirectory . '/' . PhpSpecAdapter::COVERAGE_DIR,
             ];
         }
         unset($options);

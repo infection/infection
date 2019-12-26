@@ -42,7 +42,6 @@ use Infection\TestFramework\Codeception\Stringifier;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
-use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -60,6 +59,8 @@ use Symfony\Component\Process\Process;
 final class CodeceptionAdapter implements MemoryUsageAware, TestFrameworkAdapter
 {
     public const EXECUTABLE = 'codecept';
+
+    public const COVERAGE_DIR = 'codeception-coverage-xml';
 
     private const DEFAULT_ARGS_AND_OPTIONS = [
         'run',
@@ -162,7 +163,7 @@ final class CodeceptionAdapter implements MemoryUsageAware, TestFrameworkAdapter
                 $argumentsAndOptions,
                 [
                     '--coverage-phpunit',
-                    XMLLineCodeCoverage::CODECEPTION_COVERAGE_DIR,
+                    self::COVERAGE_DIR,
                     // JUnit report
                     '--xml',
                     $this->jUnitFilePath,
