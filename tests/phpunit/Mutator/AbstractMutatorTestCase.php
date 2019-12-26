@@ -83,7 +83,7 @@ abstract class AbstractMutatorTestCase extends TestCase
         $this->mutator = $this->createMutator();
     }
 
-    final public function doTest(string $inputCode, $expectedCode = null, array $settings = []): void
+    final public function doTest(string $inputCode, $expectedCode = [], array $settings = []): void
     {
         $expectedCodeSamples = (array) $expectedCode;
 
@@ -105,17 +105,17 @@ abstract class AbstractMutatorTestCase extends TestCase
             )
         );
 
-        if ($expectedCode !== null) {
-            foreach ($mutants as $realMutatedCode) {
-                $expectedCodeSample = array_shift($expectedCodeSamples);
+        foreach ($mutants as $realMutatedCode) {
+            $expectedCodeSample = array_shift($expectedCodeSamples);
 
-                if ($expectedCodeSample === null) {
-                    $this->fail('The number of expected mutated code samples must equal the number of generated Mutants by mutator.');
-                }
-                $expectedCodeSample = rtrim($expectedCodeSample, "\n");
-                $this->assertSame($expectedCodeSample, $realMutatedCode);
-                $this->assertSyntaxIsValid($realMutatedCode);
+            if ($expectedCodeSample === null) {
+                $this->fail('The number of expected mutated code samples must equal the number of generated Mutants by mutator.');
             }
+
+            $expectedCodeSample = rtrim($expectedCodeSample, "\n");
+
+            $this->assertSame($expectedCodeSample, $realMutatedCode);
+            $this->assertSyntaxIsValid($realMutatedCode);
         }
     }
 
