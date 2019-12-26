@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
@@ -42,52 +43,54 @@ use PhpParser\Node\Name;
 final class FalseValueTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator($input, $expected = null): void
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): array
+    public function mutationsProvider(): Generator
     {
-        return [
-            'It mutates false to true' => [
-                <<<'PHP'
+        yield 'It mutates false to true' => [
+            <<<'PHP'
 <?php
 
 return false;
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 return true;
 PHP
-                ,
-            ],
-            'It does not mutate the string false to true' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate the string false to true' => [
+            <<<'PHP'
 <?php
 
 return 'false';
 PHP
-                ,
-            ],
-            'It mutates all caps false to true' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It mutates all caps false to true' => [
+            <<<'PHP'
 <?php
 
 return FALSE;
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 return true;
 PHP
-                ,
-            ],
+            ,
         ];
     }
 
