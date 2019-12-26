@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bec2d183a38cdc540e791bc5ba7dbc94",
+    "content-hash": "045b6033b9c9c15eaaeefc2f3b49c92c",
     "packages": [
         {
             "name": "composer/xdebug-handler",
@@ -52,7 +52,7 @@
         },
         {
             "name": "infection/abstract-testframework-adapter",
-            "version": "dev-master",
+            "version": "0.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/infection/abstract-testframework-adapter.git",
@@ -70,6 +70,7 @@
                     "Infection\\AbstractTestFramework\\": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -80,10 +81,6 @@
                 }
             ],
             "description": "Abstract Test Framework Adapter for Infection",
-            "support": {
-                "source": "https://github.com/infection/abstract-testframework-adapter/tree/master",
-                "issues": "https://github.com/infection/abstract-testframework-adapter/issues"
-            },
             "time": "2019-12-25T19:51:11+00:00"
         },
         {
@@ -2755,10 +2752,8 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "dev",
-    "stability-flags": {
-        "infection/abstract-testframework-adapter": 20
-    },
+    "minimum-stability": "stable",
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

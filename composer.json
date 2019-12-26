@@ -47,7 +47,7 @@
         "ext-json": "*",
         "ext-libxml": "*",
         "composer/xdebug-handler": "^1.3.3",
-        "infection/abstract-testframework-adapter": "dev-master",
+        "infection/abstract-testframework-adapter": "^0.1",
         "justinrainbow/json-schema": "^5.2",
         "nikic/php-parser": "^4.2.2",
         "ocramius/package-versions": "^1.2",
@@ -63,12 +63,6 @@
         "webmozart/assert": "^1.3",
         "webmozart/path-util": "^2.3"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url":  "git@github.com:infection/abstract-testframework-adapter.git"
-        }
-    ],
     "conflict": {
         "symfony/console": "=4.1.5"
     },
@@ -106,6 +100,5 @@
     ],
     "support": {
         "issues": "https://github.com/infection/infection/issues"
-    },
-    "minimum-stability": "dev"
+    }
 }
