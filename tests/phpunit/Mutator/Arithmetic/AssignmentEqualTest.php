@@ -35,73 +35,78 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class AssignmentEqualTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator($input, $expected = null): void
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): array
+    public function mutationsProvider(): Generator
     {
-        return [
-            'It mutates a comparison to an assignment' => [
-                <<<'PHP'
+        yield 'It mutates a comparison to an assignment' => [
+            <<<'PHP'
 <?php
 
 if ($a == $b) {
 }
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 if ($a = $b) {
 }
 PHP
-                ,
-            ],
-            'It does not mutate comparsion to an impossible assignment' => [
-                        <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate comparsion to an impossible assignment' => [
+            <<<'PHP'
 <?php
 
 if (1 == $a) {
 }
 PHP
-                        ,
-            ],
-            'It does not try to assign a variable to a class constant' => [
-                        <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not try to assign a variable to a class constant' => [
+            <<<'PHP'
 <?php
 
 if (BaseClass::CLASS_CONST == $a) {
 }
 PHP
-                        ,
-            ],
-            'It does not try to assign a variable to a built in constant' => [
-                        <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not try to assign a variable to a built in constant' => [
+            <<<'PHP'
 <?php
 
 if (PHP_EOL == $a) {
 }
 PHP
-                        ,
-            ],
-            'It does not try to assign a scalar to a result of a function call' => [
-                        <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not try to assign a scalar to a result of a function call' => [
+            <<<'PHP'
 <?php
 
 if ($x->getFoo() == 1) {
 }
 PHP
-                        ,
-            ],
+            ,
         ];
     }
 }

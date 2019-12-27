@@ -44,35 +44,37 @@ use function range;
 final class BCMathTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator(string $input, ?string $expected = null, array $settings = []): void
+    public function test_it_can_mutate(string $input, $expected = [], array $settings = []): void
     {
         $this->doTest($input, $expected, $settings);
     }
 
-    public function provideMutationCases(): Generator
+    public function mutationsProvider(): Generator
     {
-        yield from $this->provideMutationCasesForBinaryOperator('bcadd', '+', 'summation');
+        yield from $this->mutationsProviderForBinaryOperator('bcadd', '+', 'summation');
 
-        yield from $this->provideMutationCasesForBinaryOperator('bcdiv', '/', 'division');
+        yield from $this->mutationsProviderForBinaryOperator('bcdiv', '/', 'division');
 
-        yield from $this->provideMutationCasesForBinaryOperator('bcmod', '%', 'modulo');
+        yield from $this->mutationsProviderForBinaryOperator('bcmod', '%', 'modulo');
 
-        yield from $this->provideMutationCasesForBinaryOperator('bcmul', '*', 'multiplication');
+        yield from $this->mutationsProviderForBinaryOperator('bcmul', '*', 'multiplication');
 
-        yield from $this->provideMutationCasesForBinaryOperator('bcsub', '-', 'subtraction');
+        yield from $this->mutationsProviderForBinaryOperator('bcsub', '-', 'subtraction');
 
-        yield from $this->provideMutationCasesForPowerOperator();
+        yield from $this->mutationsProviderForPowerOperator();
 
-        yield from $this->provideMutationCasesForSquareRoot();
+        yield from $this->mutationsProviderForSquareRoot();
 
-        yield from $this->provideMutationCasesForPowerModulo();
+        yield from $this->mutationsProviderForPowerModulo();
 
-        yield from $this->provideMutationCasesForComparision();
+        yield from $this->mutationsProviderForComparision();
     }
 
-    private function provideMutationCasesForBinaryOperator(string $bcFunc, string $op, string $expression): Generator
+    private function mutationsProviderForBinaryOperator(string $bcFunc, string $op, string $expression): Generator
     {
         yield "It converts $bcFunc to $expression expression" => [
             "<?php \\$bcFunc('3', \$b);",
@@ -92,7 +94,7 @@ final class BCMathTest extends AbstractMutatorTestCase
         yield from $this->provideCasesWhereMutatorShouldNotApply($bcFunc);
     }
 
-    private function provideMutationCasesForPowerOperator(): Generator
+    private function mutationsProviderForPowerOperator(): Generator
     {
         yield 'It converts bcpow to power expression' => [
             '<?php \\bcpow(5, $b);',
@@ -112,7 +114,7 @@ final class BCMathTest extends AbstractMutatorTestCase
         yield from $this->provideCasesWhereMutatorShouldNotApply('bcpow');
     }
 
-    private function provideMutationCasesForSquareRoot(): Generator
+    private function mutationsProviderForSquareRoot(): Generator
     {
         yield 'It converts bcsqrt to sqrt call' => [
             '<?php \\bcsqrt(2);',
@@ -132,7 +134,7 @@ final class BCMathTest extends AbstractMutatorTestCase
         yield from $this->provideCasesWhereMutatorShouldNotApply('bcsqrt', 1);
     }
 
-    private function provideMutationCasesForPowerModulo(): Generator
+    private function mutationsProviderForPowerModulo(): Generator
     {
         yield 'It converts bcpowmod to power modulo expression' => [
             '<?php \\bcpowmod($a, $b, $mod);',
@@ -152,7 +154,7 @@ final class BCMathTest extends AbstractMutatorTestCase
         yield from $this->provideCasesWhereMutatorShouldNotApply('bcpowmod', 3);
     }
 
-    private function provideMutationCasesForComparision(): Generator
+    private function mutationsProviderForComparision(): Generator
     {
         yield 'It converts bccomp to spaceship expression' => [
             '<?php \\bccomp(\'3\', $b);',

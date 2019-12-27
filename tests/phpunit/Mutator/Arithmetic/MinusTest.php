@@ -35,69 +35,73 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class MinusTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator($input, $expected = null): void
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): array
+    public function mutationsProvider(): Generator
     {
-        return [
-            'It mutates normal minus' => [
-                <<<'PHP'
+        yield 'It mutates normal minus' => [
+            <<<'PHP'
 <?php
 
 $a = 1 - 1;
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 $a = 1 + 1;
 PHP
-                ,
-            ],
-            'It does not mutate minus equals' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate minus equals' => [
+            <<<'PHP'
 <?php
 
 $a = 1;
 $a -= 2;
 PHP
-                ,
-            ],
-            'It does not mutate decrement' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate decrement' => [
+            <<<'PHP'
 <?php
 
 $a = 1;
 $a--;
 PHP
-                ,
-            ],
-            'It does mutate a fake decrement' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does mutate a fake decrement' => [
+            <<<'PHP'
 <?php
 
 $a = 1;
 $a - -1;
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 $a = 1;
 $a + -1;
 PHP
-                ,
-            ],
+            ,
         ];
     }
 }

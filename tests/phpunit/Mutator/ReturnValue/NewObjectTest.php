@@ -41,9 +41,11 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 final class NewObjectTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator($input, $expected = null, bool $allowed = true, $message = ''): void
+    public function test_it_can_mutate($input, $expected = [], bool $allowed = true, $message = ''): void
     {
         if (!$allowed) {
             $this->markTestSkipped($message);
@@ -51,7 +53,7 @@ final class NewObjectTest extends AbstractMutatorTestCase
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): Generator
+    public function mutationsProvider(): Generator
     {
         yield 'It does not mutate if no class name found' => [
             <<<'PHP'

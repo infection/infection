@@ -35,35 +35,36 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Operator;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class Throw_Test extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator($input, $expected = null): void
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): array
+    public function mutationsProvider(): Generator
     {
-        return [
-            'It removes the throw statement' => [
-                <<<'PHP'
+        yield 'It removes the throw statement' => [
+            <<<'PHP'
 <?php
 
 throw new \Exception();
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 new \Exception();
 PHP
-                ,
-            ],
+            ,
         ];
     }
 }

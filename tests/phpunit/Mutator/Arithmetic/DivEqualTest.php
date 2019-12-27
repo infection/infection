@@ -35,45 +35,47 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class DivEqualTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator($input, $expected = null): void
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): array
+    public function mutationsProvider(): Generator
     {
-        return [
-            'It changes divison equals' => [
-                <<<'PHP'
+        yield 'It changes divison equals' => [
+            <<<'PHP'
 <?php
 
 $a = 1;
 $a /=2;
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 $a = 1;
 $a *= 2;
 PHP
-                ,
-            ],
-            'It does not change normal division' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not change normal division' => [
+            <<<'PHP'
 <?php
 
 $a = 10 / 2;
 PHP
-                ,
-            ],
+            ,
         ];
     }
 }
