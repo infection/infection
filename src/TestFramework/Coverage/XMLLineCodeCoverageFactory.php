@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;
 use Webmozart\Assert\Assert;
@@ -51,7 +51,7 @@ final class XMLLineCodeCoverageFactory
 
     public function __construct(
         string $coverageDir,
-        CoverageXmlParser $coverageXmlParser,
+        IndexXmlCoverageParser $coverageXmlParser,
         CachedTestFileDataProvider $cachedTestFileDataProvider
     ) {
         $this->coverageDir = $coverageDir;

@@ -70,7 +70,7 @@ use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder as PhpSp
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder as PhpSpecMutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
-use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkTypes;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use Infection\Tracing\NodeLineRangeData;
@@ -124,7 +124,7 @@ final class ProjectCodeProvider
         PhpUnitInitalConfigBuilder::class,
         PhpSpecMutationConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
-        CoverageXmlParser::class,
+        IndexXmlCoverageParser::class,
         VersionParser::class,
     ];
 

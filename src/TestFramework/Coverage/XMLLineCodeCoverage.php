@@ -39,7 +39,7 @@ use function array_key_exists;
 use function count;
 use function dirname;
 use Generator;
-use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\Tracing\NodeLineRangeData;
 use Infection\Tracing\Trace;
 use Infection\Tracing\Tracer;
@@ -67,7 +67,7 @@ final class XMLLineCodeCoverage implements Tracer
 
     public function __construct(
         string $coverageDir,
-        CoverageXmlParser $coverageXmlParser,
+        IndexXmlCoverageParser $coverageXmlParser,
         string $testFrameworkKey,
         ?TestFileDataProvider $testFileDataProvider = null
     ) {

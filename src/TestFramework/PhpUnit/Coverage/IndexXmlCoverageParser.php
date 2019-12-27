@@ -56,7 +56,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-class CoverageXmlParser
+class IndexXmlCoverageParser
 {
     /**
      * Parses the given PHPUnit XML coverage index report (index.xml) to collect the general

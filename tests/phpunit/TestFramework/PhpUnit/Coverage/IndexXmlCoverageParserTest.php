@@ -37,7 +37,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
 use Generator;
 use Infection\TestFramework\Coverage\CoverageFileData;
-use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\PhpUnit\Coverage\Exception\NoLineExecuted;
 use PHPUnit\Framework\TestCase;
 use function is_array;
@@ -47,7 +47,7 @@ use function Safe\preg_replace;
 use function Safe\realpath;
 use function Safe\sprintf;
 
-final class CoverageXmlParserTest extends TestCase
+final class IndexXmlCoverageParserTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage-xml';
 
@@ -57,7 +57,7 @@ final class CoverageXmlParserTest extends TestCase
     private static $xml;
 
     /**
-     * @var CoverageXmlParser
+     * @var IndexXmlCoverageParser
      */
     private $parser;
 
@@ -80,7 +80,7 @@ final class CoverageXmlParserTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->parser = new CoverageXmlParser();
+        $this->parser = new IndexXmlCoverageParser();
     }
 
     public function test_it_collects_data_recursively_for_all_files(): void
