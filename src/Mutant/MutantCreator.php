@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutant;
 
 use Infection\Differ\Differ;
-use Infection\MutationInterface;
+use Infection\Mutation;
 use Infection\Visitor\CloneVisitor;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\NodeTraverser;
@@ -64,7 +64,7 @@ final class MutantCreator
         $this->prettyPrinter = $prettyPrinter;
     }
 
-    public function create(MutationInterface $mutation): MutantInterface
+    public function create(Mutation $mutation): MutantInterface
     {
         $mutatedFilePath = sprintf('%s/mutant.%s.infection.php', $this->tempDir, $mutation->getHash());
 
@@ -81,7 +81,7 @@ final class MutantCreator
         );
     }
 
-    private function createMutatedCode(MutationInterface $mutation, string $mutatedFilePath): string
+    private function createMutatedCode(Mutation $mutation, string $mutatedFilePath): string
     {
         if (is_readable($mutatedFilePath)) {
             $mutatedCode = file_get_contents($mutatedFilePath);

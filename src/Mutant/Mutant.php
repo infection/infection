@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\MutationInterface;
+use Infection\Mutation;
 use Infection\TestFramework\Coverage\CoverageLineData;
 
 /**
@@ -47,7 +47,7 @@ final class Mutant implements MutantInterface
     private $mutation;
     private $diff;
 
-    public function __construct(string $mutatedFilePath, MutationInterface $mutation, string $diff)
+    public function __construct(string $mutatedFilePath, Mutation $mutation, string $diff)
     {
         $this->mutatedFilePath = $mutatedFilePath;
         $this->mutation = $mutation;
@@ -59,7 +59,7 @@ final class Mutant implements MutantInterface
         return $this->mutatedFilePath;
     }
 
-    public function getMutation(): MutationInterface
+    public function getMutation(): Mutation
     {
         return $this->mutation;
     }

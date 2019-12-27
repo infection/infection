@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\MutationInterface;
+use Infection\Mutation;
 use Infection\TestFramework\Coverage\CoverageLineData;
 
 /**
@@ -47,7 +47,7 @@ interface MutantInterface
 {
     public function getMutatedFilePath(): string;
 
-    public function getMutation(): MutationInterface;
+    public function getMutation(): Mutation;
 
     public function getDiff(): string;
 
