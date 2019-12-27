@@ -59,10 +59,14 @@ use Webmozart\Assert\Assert;
 class CoverageXmlParser
 {
     /**
-     * @throws NoLineExecuted
-     * @throws CoverageDoesNotExistException
+     * Parses the given PHPUnit XML coverage index report (index.xml) to collect the general
+     * coverage data. Note that this data is likely incomplete an will need to be enriched to
+     * contain all the desired data.
      *
      * @return CoverageFileData[]
+     * @throws CoverageDoesNotExistException
+     *
+     * @throws NoLineExecuted
      */
     public function parse(string $coverageXmlContent): array
     {

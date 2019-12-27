@@ -36,9 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
 use Generator;
+use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\PhpUnit\Coverage\Exception\NoLineExecuted;
 use PHPUnit\Framework\TestCase;
+use function is_array;
+use function is_scalar;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
 use function Safe\realpath;
@@ -92,66 +95,124 @@ final class CoverageXmlParserTest extends TestCase
     {
         $coverage = $this->parser->parse(self::$xml);
 
-        $zeroLevelAbsolutePath = realpath(self::FIXTURES_DIR . '/zeroLevel.php');
-        $firstLevelAbsolutePath = realpath(self::FIXTURES_DIR . '/FirstLevel/firstLevel.php');
-        $secondLevelAbsolutePath = realpath(self::FIXTURES_DIR . '/FirstLevel/SecondLevel/secondLevel.php');
-
-        $this->assertArrayHasKey($zeroLevelAbsolutePath, $coverage);
-        $this->assertArrayHasKey($firstLevelAbsolutePath, $coverage);
-        $this->assertArrayHasKey($secondLevelAbsolutePath, $coverage);
-
-        $this->assertCount(0, $coverage[$zeroLevelAbsolutePath]->byLine);
-        $this->assertCount(4, $coverage[$firstLevelAbsolutePath]->byLine);
-        $this->assertCount(1, $coverage[$secondLevelAbsolutePath]->byLine);
+        $zeroLevelPath = realpath(self::FIXTURES_DIR . '/zeroLevel.php');
+        $firstLevelPath = realpath(self::FIXTURES_DIR . '/FirstLevel/firstLevel.php');
+        $secondLevelPath = realpath(self::FIXTURES_DIR . '/FirstLevel/SecondLevel/secondLevel.php');
+        $secondLevelTraitPath = realpath(self::FIXTURES_DIR . '/FirstLevel/SecondLevel/secondLevelTrait.php');
 
         $this->assertSame(
-            'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
-            $coverage[$firstLevelAbsolutePath]->byLine[30][1]->testMethod
+            [
+                $firstLevelPath => [
+                    'byLine' => [
+                        26 => [
+                            [
+                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
+                                'testFilePath' => null,
+                                'time' => null,
+                            ],
+                            [
+                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
+                                'testFilePath' => null,
+                                'time' => null,
+                            ],
+                        ],
+                        30 => [
+                            [
+                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
+                                'testFilePath' => null,
+                                'time' => null,
+                            ],
+                            [
+                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
+                                'testFilePath' => null,
+                                'time' => null,
+                            ],
+                        ],
+                        31 => [
+                            [
+                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
+                                'testFilePath' => null,
+                                'time' => null,
+                            ],
+                        ],
+                        34 => [
+                            [
+                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
+                                'testFilePath' => null,
+                                'time' => null,
+                            ],
+                        ],
+                    ],
+                    'byMethod' => [
+                        'mutate' => [
+                            'startLine' => 19,
+                            'endLine' => 22,
+                        ],
+                        'shouldMutate' => [
+                            'startLine' => 24,
+                            'endLine' => 35,
+                        ],
+                    ],
+                ],
+                $secondLevelPath => [
+                    'byLine' => [
+                        11 => [
+                            [
+                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
+                                'testFilePath' => null,
+                                'time' => null,
+                            ],
+                            [
+                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
+                                'testFilePath' => null,
+                                'time' => null,
+                            ],
+                        ],
+                    ],
+                    'byMethod' => [
+                        'mutate' => [
+                            'startLine' => 19,
+                            'endLine' => 22,
+                        ],
+                        'shouldMutate' => [
+                            'startLine' => 24,
+                            'endLine' => 35,
+                        ],
+                    ],
+                ],
+                $secondLevelTraitPath => [
+                    'byLine' => [
+                        11 => [
+                            [
+                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
+                                'testFilePath' => null,
+                                'time' => null,
+                            ],
+                            [
+                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
+                                'testFilePath' => null,
+                                'time' => null,
+                            ],
+                        ],
+                    ],
+                    'byMethod' => [
+                        'mutate' => [
+                            'startLine' => 19,
+                            'endLine' => 22,
+                        ],
+                        'shouldMutate' => [
+                            'startLine' => 24,
+                            'endLine' => 35,
+                        ],
+                    ],
+                ],
+                $zeroLevelPath => [
+                    'byLine' => [],
+                    'byMethod' => [],
+                ],
+            ],
+            self::convertCoverageToArray($coverage)
         );
-    }
-
-    public function test_it_adds_by_method_coverage_data(): void
-    {
-        $firstLevelAbsolutePath = realpath(self::FIXTURES_DIR . '/FirstLevel/firstLevel.php');
-
-        $expectedByMethodArray = [
-            'mutate' => [
-                'startLine' => 19,
-                'endLine' => 22,
-            ],
-            'shouldMutate' => [
-                'startLine' => 24,
-                'endLine' => 35,
-            ],
-        ];
-
-        $coverage = $this->parser->parse(self::$xml);
-
-        $result = self::convertObjectsToArray($coverage[$firstLevelAbsolutePath]->byMethod);
-
-        $this->assertSame($expectedByMethodArray, $result);
-    }
-
-    public function test_it_adds_by_method_coverage_data_for_traits(): void
-    {
-        $pathToTrait = realpath(self::FIXTURES_DIR . '/FirstLevel/SecondLevel/secondLevelTrait.php');
-
-        $expectedByMethodArray = [
-            'mutate' => [
-                'startLine' => 19,
-                'endLine' => 22,
-            ],
-            'shouldMutate' => [
-                'startLine' => 24,
-                'endLine' => 35,
-            ],
-        ];
-
-        $coverage = $this->parser->parse(self::$xml);
-
-        $result = self::convertObjectsToArray($coverage[$pathToTrait]->byMethod);
-
-        $this->assertSame($expectedByMethodArray, $result);
     }
 
     public function test_it_correctly_parses_xml_when_directory_has_absolute_path_for_old_phpunit_versions(): void
@@ -241,14 +302,41 @@ XML
         ];
     }
 
-    private static function convertObjectsToArray(array $coverageMethodsData): array
+    /**
+     * @param array<string, CoverageFileData>
+     *
+     * @return array<string, mixed>
+     */
+    private static function convertCoverageToArray(array $coverage): array
     {
-        $result = [];
+        return self::serializeValue($coverage);
+    }
 
-        foreach ($coverageMethodsData as $method => $coverageMethodData) {
-            $result[$method] = (array) $coverageMethodData;
+    /**
+     * @param mixed $mixed
+     *
+     * @return mixed
+     */
+    private static function serializeValue($mixed)
+    {
+        if ($mixed === null) {
+            return null;
         }
 
-        return $result;
+        if (is_scalar($mixed)) {
+            return $mixed;
+        }
+
+        if (is_array($mixed)) {
+            $convertedArray = [];
+
+            foreach ($mixed as $key => $value) {
+                $convertedArray[$key] = self::serializeValue($value);
+            }
+
+            return $convertedArray;
+        }
+
+        return self::serializeValue((array) $mixed);
     }
 }
