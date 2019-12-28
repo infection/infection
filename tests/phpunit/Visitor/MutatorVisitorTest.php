@@ -37,7 +37,6 @@ namespace Infection\Tests\Visitor;
 
 use Generator;
 use Infection\Mutation;
-use Infection\MutationInterface;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Visitor\MutatorVisitor;
@@ -58,7 +57,7 @@ final class MutatorVisitorTest extends BaseVisitorTest
     public function test_it_mutates_the_correct_node(
         array $nodes,
         string $expectedCodeOutput,
-        MutationInterface $mutation
+        Mutation $mutation
     ): void {
         $this->traverse(
             $nodes,

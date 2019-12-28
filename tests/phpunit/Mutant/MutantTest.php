@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutant;
 
 use Infection\Mutant\Mutant;
-use Infection\MutationInterface;
+use Infection\Mutation;
 use PHPUnit\Framework\TestCase;
 
 final class MutantTest extends TestCase
@@ -44,7 +44,7 @@ final class MutantTest extends TestCase
     public function test_it_passes_along_its_input_without_changing_it(): void
     {
         $filepath = 'path/to/file';
-        $mutation = $this->createMock(MutationInterface::class);
+        $mutation = $this->createMock(Mutation::class);
         $coverageTests = ['tests'];
         $mutation->expects($this->once())->method('getAllTests')->willReturn($coverageTests);
         $mutation->expects($this->once())->method('isCoveredByTest')->willReturn(true);

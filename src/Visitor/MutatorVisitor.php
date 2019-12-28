@@ -38,7 +38,6 @@ namespace Infection\Visitor;
 use function array_key_exists;
 use function get_class;
 use Infection\Mutation;
-use Infection\MutationInterface;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -49,7 +48,7 @@ final class MutatorVisitor extends NodeVisitorAbstract
 {
     private $mutation;
 
-    public function __construct(MutationInterface $mutation)
+    public function __construct(Mutation $mutation)
     {
         $this->mutation = $mutation;
     }

@@ -44,7 +44,6 @@ use Infection\Events\MutationTestingFinished;
 use Infection\Events\MutationTestingStarted;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutation;
-use Infection\MutationInterface;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\MutantProcessInterface;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
@@ -81,7 +80,7 @@ final class MutationTestingRunner
         $this->eventDispatcher->dispatch(new MutantsCreatingStarted($mutantCount));
 
         $processes = array_map(
-            function (MutationInterface $mutation) use ($testFrameworkExtraOptions): MutantProcessInterface {
+            function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcessInterface {
                 $mutant = $this->mutantCreator->create($mutation);
 
                 $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);

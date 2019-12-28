@@ -43,8 +43,9 @@ use PhpParser\Node;
 
 /**
  * @internal
+ * @final
  */
-final class Mutation implements MutationInterface
+class Mutation
 {
     private $originalFilePath;
     private $mutator;
