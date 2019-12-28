@@ -46,6 +46,8 @@ use Infection\Visitor\PhpUnitMethodCodeCoverageIgnoreVisitor;
  */
 final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements HasExtraNodeVisitors, MemoryUsageAware
 {
+    public const COVERAGE_DIR = 'coverage-xml';
+
     public function hasJUnitReport(): bool
     {
         return true;
