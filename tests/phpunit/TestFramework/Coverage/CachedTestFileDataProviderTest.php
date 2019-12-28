@@ -42,20 +42,23 @@ use PHPUnit\Framework\TestCase;
 
 final class CachedTestFileDataProviderTest extends TestCase
 {
-    public function test_the_second_call_returns_cached_result(): void
+    public function test_it_returns_the_cached_result_on_consecutive_calls(): void
     {
         $class = 'Test\Class';
+
         $providerMock = $this->createMock(TestFileDataProvider::class);
-        $providerMock->expects($this->once())
+        $providerMock
+            ->expects($this->once())
             ->method('getTestFileInfo')
             ->with($class)
-            ->willReturn(new TestFileTimeData('path/to/Test.php', 4.567));
+            ->willReturn(new TestFileTimeData('path/to/Test.php', 4.567))
+        ;
 
-        $infoProvider = new CachedTestFileDataProvider($providerMock);
+        $provider = new CachedTestFileDataProvider($providerMock);
 
-        $info1 = $infoProvider->getTestFileInfo($class);
-        $info2 = $infoProvider->getTestFileInfo($class);
+        $testFileInfo0 = $provider->getTestFileInfo($class);
+        $testFileInfo1 = $provider->getTestFileInfo($class);
 
-        $this->assertSame($info1, $info2);
+        $this->assertSame($testFileInfo0, $testFileInfo1);
     }
 }

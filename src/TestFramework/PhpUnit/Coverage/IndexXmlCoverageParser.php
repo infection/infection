@@ -63,10 +63,10 @@ class IndexXmlCoverageParser
      * coverage data. Note that this data is likely incomplete an will need to be enriched to
      * contain all the desired data.
      *
-     * @return CoverageFileData[]
+     * @throws NoLineExecuted
      * @throws CoverageDoesNotExistException
      *
-     * @throws NoLineExecuted
+     * @return CoverageFileData[]
      */
     public function parse(string $coverageXmlContent): array
     {
@@ -89,9 +89,6 @@ class IndexXmlCoverageParser
         return $data;
     }
 
-    /**
-     * @throws NoLineExecuted
-     */
     private static function createXPath(string $coverageContent): DOMXPath
     {
         $dom = new DOMDocument();
