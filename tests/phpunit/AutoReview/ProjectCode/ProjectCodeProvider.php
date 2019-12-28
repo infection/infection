@@ -57,6 +57,7 @@ use Infection\Finder\TestFrameworkFinder;
 use Infection\Http\BadgeApiClient;
 use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
+use Infection\Mutator\NodeMutationGenerator;
 use Infection\Mutator\Util\Mutator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
@@ -75,7 +76,6 @@ use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkTypes;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use Infection\Utils\VersionParser;
-use Infection\Visitor\MutationsCollectorVisitor;
 use function iterator_to_array;
 use ReflectionClass;
 use const SORT_STRING;
@@ -101,7 +101,7 @@ final class ProjectCodeProvider
         MutationGeneratingConsoleLoggerSubscriber::class,
         MutationTestingRunner::class,
         TestFrameworkTypes::class,
-        MutationsCollectorVisitor::class,
+        NodeMutationGenerator::class,
         FilterableFinder::class,
     ];
 
