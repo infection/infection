@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\Mutation;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use Infection\MutationInterface;
+use Infection\Mutation;
 
 /**
  * @internal
