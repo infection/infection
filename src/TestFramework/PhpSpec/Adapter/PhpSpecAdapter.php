@@ -42,6 +42,8 @@ use Infection\TestFramework\AbstractTestFrameworkAdapter;
  */
 final class PhpSpecAdapter extends AbstractTestFrameworkAdapter
 {
+    public const COVERAGE_DIR = 'phpspec-coverage-xml';
+
     private const ERROR_REGEXPS = [
         '/Fatal error\:/',
         '/Fatal error happened/i',

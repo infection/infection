@@ -60,7 +60,7 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
+use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\HasExtraNodeVisitors;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -458,7 +458,7 @@ final class InfectionCommand extends BaseCommand
 
         $coverageDir = $config->getCoveragePath();
 
-        $coverageIndexFilePath = $coverageDir . '/' . XMLLineCodeCoverage::COVERAGE_INDEX_FILE_NAME;
+        $coverageIndexFilePath = $coverageDir . '/' . LineCodeCoverage::COVERAGE_INDEX_FILE_NAME;
 
         $processInfo = sprintf(
             '%sCommand line: %s%sProcess Output: %s',

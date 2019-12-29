@@ -39,7 +39,6 @@ use Generator;
 use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
-use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\FileSystem\FileSystemTestCase;
@@ -142,7 +141,7 @@ final class CodeceptionAdapterTest extends FileSystemTestCase
         $commandLine = $adapter->getInitialTestRunCommandLine('', [], true);
 
         $this->assertContains('--coverage-phpunit', $commandLine);
-        $this->assertContains(XMLLineCodeCoverage::CODECEPTION_COVERAGE_DIR, $commandLine);
+        $this->assertContains(CodeceptionAdapter::COVERAGE_DIR, $commandLine);
     }
 
     public function test_it_sets_junit_xml_path(): void

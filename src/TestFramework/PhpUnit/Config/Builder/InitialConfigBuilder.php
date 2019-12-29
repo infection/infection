@@ -40,7 +40,7 @@ use DOMDocument;
 use DOMElement;
 use DOMXPath;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
-use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 
 /**
@@ -126,7 +126,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
         $coverageXmlLog = $xPath->document->createElement('log');
         $coverageXmlLog->setAttribute('type', 'coverage-xml');
-        $coverageXmlLog->setAttribute('target', $this->tmpDir . '/' . XMLLineCodeCoverage::PHP_UNIT_COVERAGE_DIR);
+        $coverageXmlLog->setAttribute('target', $this->tmpDir . '/' . PhpUnitAdapter::COVERAGE_DIR);
 
         $logging->appendChild($coverageXmlLog);
     }
