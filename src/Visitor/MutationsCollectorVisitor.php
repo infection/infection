@@ -35,17 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Visitor;
 
-use function count;
-use Generator;
-use function get_class;
-use Infection\Exception\InvalidMutatorException;
 use Infection\Mutation;
-use Infection\Mutator\Util\Mutator;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
-use Infection\TestFramework\Coverage\NodeLineRangeData;
+use Infection\Mutator\NodeMutationGenerator;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use Throwable;
 
 /**
  * @internal
@@ -57,75 +50,22 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
      */
     private $mutations = [];
 
-    private $mutators;
-    private $filePath;
-    private $fileNodes;
-    private $codeCoverageData;
-    private $onlyCovered;
+    private $mutationGenerator;
 
-    /**
-     * @param Mutator[] $mutators
-     * @param Node[]    $fileNodes
-     */
-    public function __construct(
-        array $mutators,
-        string $filePath,
-        array $fileNodes,
-        LineCodeCoverage $codeCoverageData,
-        bool $onlyCovered
-    ) {
-        $this->mutators = $mutators;
-        $this->filePath = $filePath;
-        $this->fileNodes = $fileNodes;
-        $this->codeCoverageData = $codeCoverageData;
-        $this->onlyCovered = $onlyCovered;
+    public function __construct(NodeMutationGenerator $mutationGenerator)
+    {
+        $this->mutationGenerator = $mutationGenerator;
+    }
+
+    public function beforeTraverse(array $nodes): void
+    {
+        $this->mutations = [];
     }
 
     public function leaveNode(Node $node): ?Node
     {
-        foreach ($this->mutators as $mutator) {
-            try {
-                if (!$mutator->shouldMutate($node)) {
-                    continue;
-                }
-            } catch (Throwable $throwable) {
-                throw InvalidMutatorException::create($this->filePath, $mutator, $throwable);
-            }
-
-            $isOnFunctionSignature = $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
-
-            if (!$isOnFunctionSignature
-                && !$node->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY)
-            ) {
-                continue;
-            }
-
-            $tests = $this->codeCoverageData->getAllTestsForMutation(
-                $this->filePath,
-                $this->getNodeRange($node, $isOnFunctionSignature),
-                $isOnFunctionSignature
-            );
-
-            if ($this->onlyCovered && count($tests) === 0) {
-                continue;
-            }
-
-            $mutatedResult = $mutator->mutate($node);
-
-            $mutatedNodes = $mutatedResult instanceof Generator ? $mutatedResult : [$mutatedResult];
-
-            foreach ($mutatedNodes as $mutationByMutatorIndex => $mutatedNode) {
-                $this->mutations[] = new Mutation(
-                    $this->filePath,
-                    $this->fileNodes,
-                    $mutator,
-                    $node->getAttributes(),
-                    get_class($node),
-                    $mutatedNode,
-                    $mutationByMutatorIndex,
-                    $tests
-                );
-            }
+        foreach ($this->mutationGenerator->generate($node) as $mutation) {
+            $this->mutations[] = $mutation;
         }
 
         return null;
@@ -137,31 +77,5 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
     public function getMutations(): array
     {
         return $this->mutations;
-    }
-
-    /**
-     * If the node is part of an array, this will find the outermost array.
-     * Otherwise this will return the node itself
-     */
-    private function getOuterMostArrayNode(Node $node): Node
-    {
-        $outerMostArrayParent = $node;
-
-        do {
-            if ($node instanceof Node\Expr\Array_) {
-                $outerMostArrayParent = $node;
-            }
-        } while ($node = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY));
-
-        return $outerMostArrayParent;
-    }
-
-    private function getNodeRange(Node $node, bool $isOnFunctionSignature): NodeLineRangeData
-    {
-        if ($isOnFunctionSignature) {
-            $node = $this->getOuterMostArrayNode($node);
-        }
-
-        return new NodeLineRangeData($node->getStartLine(), $node->getEndLine());
     }
 }

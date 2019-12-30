@@ -38,6 +38,7 @@ namespace Infection\Mutation;
 use function array_key_exists;
 use function get_class;
 use Infection\Mutation;
+use Infection\Mutator\NodeMutationGenerator;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Visitor\MutationsCollectorVisitor;
@@ -102,11 +103,13 @@ class FileMutationGenerator
         $initialStatements = $this->parser->parse($fileInfo);
 
         $mutationsCollectorVisitor = new MutationsCollectorVisitor(
-            $mutators,
-            $filePath,
-            $initialStatements,
-            $codeCoverage,
-            $onlyCovered
+            new NodeMutationGenerator(
+                $mutators,
+                $filePath,
+                $initialStatements,
+                $codeCoverage,
+                $onlyCovered
+            )
         );
 
         $extraNodeVisitors[self::MUTATION_COLLECTOR_VISITOR_PRIORITY] = $mutationsCollectorVisitor;
