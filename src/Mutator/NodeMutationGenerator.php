@@ -96,7 +96,7 @@ class NodeMutationGenerator
     /**
      * @return Mutation[]
      */
-    public function generateForMutator(Node $node, Mutator $mutator, array $mutations): array
+    private function generateForMutator(Node $node, Mutator $mutator, array $mutations): array
     {
         try {
             if (!$mutator->shouldMutate($node)) {
