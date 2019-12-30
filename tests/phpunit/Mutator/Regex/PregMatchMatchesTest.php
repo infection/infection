@@ -41,14 +41,14 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 final class PregMatchMatchesTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider providesMutatorCases
+     * @dataProvider mutationsProvider
      */
-    public function test_mutator(string $input, ?string $output = null): void
+    public function test_it_can_mutate(string $input, $output = []): void
     {
         $this->doTest($input, $output);
     }
 
-    public function providesMutatorCases(): Generator
+    public function mutationsProvider(): Generator
     {
         yield 'It mutates ' => [
             <<<'PHP'

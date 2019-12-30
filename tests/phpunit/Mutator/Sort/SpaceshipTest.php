@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Sort;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class SpaceshipTest extends AbstractMutatorTestCase
@@ -45,30 +46,30 @@ final class SpaceshipTest extends AbstractMutatorTestCase
     }
 
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator($input, $expected = null): void
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): array
+    public function mutationsProvider(): Generator
     {
-        return [
-            'It swaps spaceship operators' => [
-                <<<'PHP'
+        yield 'It swaps spaceship operators' => [
+            <<<'PHP'
 <?php
 
 $a <=> $b;
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 $b <=> $a;
 PHP
-                ,
-            ],
+            ,
         ];
     }
 }

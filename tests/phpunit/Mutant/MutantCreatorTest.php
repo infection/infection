@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutant;
 
 use Infection\Differ\Differ;
 use Infection\Mutant\MutantCreator;
-use Infection\MutationInterface;
+use Infection\Mutation;
 use PhpParser\PrettyPrinter\Standard;
 use PHPUnit\Framework\TestCase;
 use function sys_get_temp_dir;
@@ -82,7 +82,7 @@ PHP
             ->with('The Print', '<?php return \'This is a diff\';')
             ->willReturn('This is the Diff');
 
-        $mutation = $this->createMock(MutationInterface::class);
+        $mutation = $this->createMock(Mutation::class);
         $mutation->method('getHash')->willReturn('hash');
         $mutation->method('getOriginalFilePath')->willReturn('original/path');
         $mutation->method('getOriginalFileAst')->willReturn(['ast']);

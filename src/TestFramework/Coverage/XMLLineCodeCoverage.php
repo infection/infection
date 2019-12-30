@@ -47,11 +47,6 @@ use function Safe\file_get_contents;
  */
 final class XMLLineCodeCoverage implements LineCodeCoverage
 {
-    public const PHP_UNIT_COVERAGE_DIR = 'coverage-xml';
-    public const PHP_SPEC_COVERAGE_DIR = 'phpspec-coverage-xml';
-    public const CODECEPTION_COVERAGE_DIR = 'codeception-coverage-xml';
-    public const COVERAGE_INDEX_FILE_NAME = 'index.xml';
-
     /**
      * @var array
      */

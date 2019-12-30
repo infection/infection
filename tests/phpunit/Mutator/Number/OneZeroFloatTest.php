@@ -35,91 +35,98 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Number;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class OneZeroFloatTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator($input, $expected = null): void
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): array
+    public function mutationsProvider(): Generator
     {
-        return [
-            'It mutates float one to zero' => [
-                <<<'PHP'
+        yield 'It mutates float one to zero' => [
+            <<<'PHP'
 <?php
 
 10 + 1.0;
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 10 + 0.0;
 PHP
-                ,
-            ],
-            'It mutates float zero to one' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It mutates float zero to one' => [
+            <<<'PHP'
 <?php
 
 10 + 0.0;
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 10 + 1.0;
 PHP
-                ,
-            ],
-            'It does not mutate int zero to one' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate int zero to one' => [
+            <<<'PHP'
 <?php
 
 10 + 0;
 PHP
-                ,
-            ],
-            'It does not mutate int one to zer0' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate int one to zer0' => [
+            <<<'PHP'
 <?php
 
 10 + 1;
 PHP
-                ,
-            ],
-            'It does not mutate the string 0.0' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate the string 0.0' => [
+            <<<'PHP'
 <?php
 
 'a' . '0.0';
 PHP
-            ],
-            'It does not mutate other floats' => [
-                <<<'PHP'
+        ];
+
+        yield 'It does not mutate other floats' => [
+            <<<'PHP'
 <?php
 
 10 + 2.0;
 10 + 1.1;
 10 + 0.5;
 PHP
-                ,
-            ],
-            'It does not mutate in a comparison' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate in a comparison' => [
+            <<<'PHP'
 <?php
 
 if ($a < 0.0) {
     echo "small";
 }
 PHP
-            ],
         ];
     }
 }
