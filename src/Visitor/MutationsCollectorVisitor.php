@@ -57,9 +57,16 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
         $this->mutationGenerator = $mutationGenerator;
     }
 
+    public function beforeTraverse(array $nodes): void
+    {
+        $this->mutations = [];
+    }
+
     public function leaveNode(Node $node): ?Node
     {
-        $this->mutations = $this->mutationGenerator->generate($node);
+        foreach ($this->mutationGenerator->generate($node) as $mutation) {
+            $this->mutations[] = $mutation;
+        }
 
         return null;
     }

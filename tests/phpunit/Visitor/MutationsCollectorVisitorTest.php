@@ -39,6 +39,7 @@ use Infection\Mutator\NodeMutationGenerator;
 use Infection\Visitor\MutationsCollectorVisitor;
 use PhpParser\Node;
 use Prophecy\Argument;
+use Prophecy\Argument\Token\TokenInterface;
 use Prophecy\Prophecy\ObjectProphecy;
 use stdClass;
 
@@ -57,7 +58,7 @@ PHP;
         $nodeMutationGeneratorMock
             ->expects($this->exactly(2))
             ->method('generate')
-            ->willReturn($mutations = [new stdClass()])
+            ->willReturn([$mutation = new stdClass()])
         ;
 
         $visitor = new MutationsCollectorVisitor($nodeMutationGeneratorMock);
@@ -67,7 +68,7 @@ PHP;
             [$visitor]
         );
 
-        $this->assertSame($mutations, $visitor->getMutations());
+        $this->assertSame([$mutation, $mutation], $visitor->getMutations());
     }
 
     public function test_it_resets_its_state_between_two_traverse(): void
@@ -77,37 +78,47 @@ PHP;
 
         $node0 = $this->createMock(Node::class);
         $node1 = $this->createMock(Node::class);
+        $node2 = $this->createMock(Node::class);
+        $node3 = $this->createMock(Node::class);
 
         $nodeMutationGeneratorProphecy
-            ->generate(Argument::that(static function ($arg) use ($node0): bool {
-                return $arg === $node0;
-            }))
-            ->willReturn($mutations0 = [new stdClass()])
+            ->generate(self::createExactArgument($node0))
+            ->willReturn([$mutation0 = new stdClass()])
         ;
         $nodeMutationGeneratorProphecy
-            ->generate(Argument::that(static function ($arg) use ($node1): bool {
-                return $arg === $node1;
-            }))
-            ->willReturn($mutations1 = [new stdClass()])
+            ->generate(self::createExactArgument($node1))
+            ->willReturn([])
+        ;
+        $nodeMutationGeneratorProphecy
+            ->generate(self::createExactArgument($node2))
+            ->willReturn([$mutation2 = new stdClass()])
+        ;
+        $nodeMutationGeneratorProphecy
+            ->generate(self::createExactArgument($node3))
+            ->willReturn([$mutation3 = new stdClass()])
         ;
 
         $visitor = new MutationsCollectorVisitor($nodeMutationGeneratorProphecy->reveal());
 
-        // Sanity check
-        $this->assertNotSame($mutations1, $mutations0);
-
         $this->traverse(
-            [$node0],
+            [$node0, $node1],
             [$visitor]
         );
 
-        $this->assertSame($mutations0, $visitor->getMutations());
+        $this->assertSame([$mutation0], $visitor->getMutations());
 
         $this->traverse(
-            [$node1],
+            [$node2, $node3],
             [$visitor]
         );
 
-        $this->assertSame($mutations1, $visitor->getMutations());
+        $this->assertSame([$mutation2, $mutation3], $visitor->getMutations());
+    }
+
+    private static function createExactArgument(object $value): TokenInterface
+    {
+        return Argument::that(static function ($arg) use ($value): bool {
+            return $arg === $value;
+        });
     }
 }
