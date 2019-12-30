@@ -2,7 +2,7 @@
 
 ## Discussion
 
-When running in a CI context it's useful to display the log file contents, to avoid the time wasted running it again locally to access infection.log  
+When running in a CI context it's useful to display the log file contents, to avoid the time wasted running it again locally to access infection.log
 
 The simple option of just dumping `infection.log` to the console after the tests complete is not that simple, because most CI will stop once the infection command exits with non-zero status.
 

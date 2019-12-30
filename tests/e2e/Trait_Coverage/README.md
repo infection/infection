@@ -10,7 +10,7 @@ Although coverage of traits is correctly set in the coverage files, infections t
 | Question    | Answer
 | ------------| ---------------
 | Infection version | 0.7.1
-| Test Framework version | PHPUnit 6.5.6 
+| Test Framework version | PHPUnit 6.5.6
 | PHP version | PHP 7.1.14-1+ubuntu16.04.1+deb.sury.org+1
 | Platform    | Ubuntu 16.04.3 LTS
 | Github Repo | https://github.com/addiks/symfony_rdm
@@ -24,7 +24,7 @@ Also see: [The trait getting tested](https://github.com/addiks/symfony_rdm/blob/
 <!-- Please past your phpunit.xml[.dist] if no Github link to the repo provided -->
 <details>
  <summary>phpunit.xml</summary>
- 
+
  ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -64,15 +64,15 @@ Also see: [The trait getting tested](https://github.com/addiks/symfony_rdm/blob/
 <!-- Remove this section if not needed -->
 <details>
  <summary>Output with issue</summary>
- 
+
  ```bash
 $ vendor/bin/infection -s -vv --min-msi=100
     ____      ____          __  _
-   /  _/___  / __/__  _____/ /_(_)___  ____ 
+   /  _/___  / __/__  _____/ /_(_)___  ____
    / // __ \/ /_/ _ \/ ___/ __/ / __ \/ __ \
  _/ // / / / __/  __/ /__/ /_/ / /_/ / / / /
 /___/_/ /_/_/  \___/\___/\__/_/\____/_/ /_/
- 
+
     0 [>---------------------------] < 1 secRunning initial test suite...
 
 PHPUnit version: 6.5.6
@@ -120,10 +120,10 @@ Metrics:
          Covered Code MSI: 100%
 
 Please note that some mutants will inevitably be harmless (i.e. false positives).
-                                                                                
- [ERROR] The minimum required MSI percentage should be 100%, but actual is 99%. 
-         Improve your tests!                                                    
-                                                                                
+
+ [ERROR] The minimum required MSI percentage should be 100%, but actual is 99%.
+         Improve your tests!
+
 The command "vendor/bin/infection -s -vv --min-msi=100" exited with 1.
  ```
 </details>

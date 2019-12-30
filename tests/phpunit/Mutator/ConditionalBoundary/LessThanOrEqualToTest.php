@@ -70,7 +70,7 @@ PHP
         yield 'It does not mutate an arrow' => [
             <<<'PHP'
     <?php
-    
+
     [1 => 2];
 PHP
             ,
@@ -79,7 +79,7 @@ PHP
         yield 'It does not mutate a spaceship' => [
             <<<'PHP'
     <?php
-    
+
     1 <=> 2;
 PHP
             ,

@@ -72,7 +72,7 @@ JSON
 {
     "autoload": {
         "psr-0": {
-            "": "src/", 
+            "": "src/",
             "SymfonyStandard": "app/"
         }
     }

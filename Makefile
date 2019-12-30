@@ -46,6 +46,10 @@ FLOCK=./devTools/flock
 compile:	 ## Bundles Infection into a PHAR
 compile: $(INFECTION)
 
+.PHONY: check_trailing_whitespaces
+check_trailing_whitespaces:
+	./devTools/check_trailing_whitespaces.sh
+
 .PHONY: cs
 cs:	  	 ## Runs PHP-CS-Fixer
 cs: $(PHP_CS_FIXER)
@@ -63,7 +67,7 @@ validate:
 
 .PHONY: autoreview
 autoreview: 	 ## Runs various checks (static analysis & AutoReview test suite)
-autoreview: phpstan validate test-autoreview
+autoreview: check_trailing_whitespaces phpstan validate test-autoreview
 
 .PHONY: test
 test:		 ## Runs all the tests
