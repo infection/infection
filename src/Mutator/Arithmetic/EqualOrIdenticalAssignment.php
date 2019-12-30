@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -43,6 +45,22 @@ use PhpParser\Node;
  */
 final class EqualOrIdenticalAssignment extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces examples of augmented or compound (shorter way to apply an arithmetic or bitwise operation)
+assignment operators, i.e. `+=`, `*=`, `.=`, etc. By a plain assignment operator `=`.
+TXT
+            ,
+            Classification::SEMANTIC_REDUCTION,
+            <<<'TXT'
+This operator exposes untested semantics. If the semantic is needed then it should be tested,
+otherwise if unneeded then it should be removed.
+TXT
+        );
+    }
+
     /**
      * Replaces examples of augmented or compound (shorter way to apply an arithmetic or bitwise
      * operation) assignment operators, i.e. "+=", "*=", ".=", etc. By a plain assignment operator

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use Webmozart\Assert\Assert;
+
 final class Definition
 {
     private $effectDescription;
@@ -15,6 +17,8 @@ final class Definition
         string $classification,
         string $remedies
     ) {
+        Assert::oneOf($classification, Classification::ALL);
+
         $this->effectDescription = $effectDescription;
         $this->classification = $classification;
         $this->remedies = $remedies;
