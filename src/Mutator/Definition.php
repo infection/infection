@@ -15,7 +15,7 @@ final class Definition
     public function __construct(
         string $effectDescription,
         string $classification,
-        string $remedies
+        ?string $remedies
     ) {
         Assert::oneOf($classification, Classification::ALL);
 
@@ -34,7 +34,7 @@ final class Definition
         return $this->classification;
     }
 
-    public function getRemedies(): string
+    public function getRemedies(): ?string
     {
         return $this->remedies;
     }

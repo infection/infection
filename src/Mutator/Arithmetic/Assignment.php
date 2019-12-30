@@ -43,13 +43,14 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class EqualOrIdenticalAssignment extends Mutator
+final class Assignment extends Mutator
 {
     public static function getDefinition(): ?Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an equal (`==`) or identical (`===`) comparison operator into an assignment (`=`).
+Replaces examples of augmented or compound (shorter way to apply an arithmetic or bitwise operation)
+assignment operators, i.e. `+=`, `*=`, `.=`, etc. By a plain assignment operator `=`.
 TXT
             ,
             Classification::SEMANTIC_REDUCTION,
@@ -58,22 +59,17 @@ TXT
     }
 
     /**
-     * @param Node&Node\Expr\BinaryOp\Equal $node
+     * @param Node&Node\Expr\AssignOp $node
      *
      * @return Node\Expr\Assign
      */
     public function mutate(Node $node)
     {
-        return new Node\Expr\Assign($node->left, $node->right, $node->getAttributes());
+        return new Node\Expr\Assign($node->var, $node->expr, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        return (
-                $node instanceof Node\Expr\BinaryOp\Equal
-                || $node instanceof Node\Expr\BinaryOp\Identical
-            )
-            && $node->left instanceof Node\Expr\Variable
-        ;
+        return $node instanceof Node\Expr\AssignOp;
     }
 }
