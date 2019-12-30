@@ -41,10 +41,11 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class AssignmentEqual extends Mutator
+final class EqualOrIdenticalAssignment extends Mutator
 {
     /**
-     * Replaces "==" with "="
+     * Replaces a equal or identical (respectively "==" and "===") comparison into an assignment
+     * ("=).
      *
      * @param Node&Node\Expr\BinaryOp\Equal $node
      *
@@ -57,6 +58,11 @@ final class AssignmentEqual extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\Equal && $node->left instanceof Node\Expr\Variable;
+        return (
+                $node instanceof Node\Expr\BinaryOp\Equal
+                || $node instanceof Node\Expr\BinaryOp\Identical
+            )
+            && $node->left instanceof Node\Expr\Variable
+        ;
     }
 }
