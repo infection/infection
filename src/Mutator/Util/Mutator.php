@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Util;
 
 use Generator;
+use Infection\Mutator\Definition;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
@@ -70,6 +71,11 @@ abstract class Mutator
             $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''),
             $node->getLine()
         );
+    }
+
+    public static function getDefinition(): ?Definition
+    {
+        return null;
     }
 
     final public static function getName(): string
