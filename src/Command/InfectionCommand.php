@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use function dirname;
 use Exception;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
@@ -44,8 +43,8 @@ use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Exception\InfectionException;
 use Infection\Console\InfectionContainer;
 use Infection\Console\LogVerbosity;
+use Infection\Engine;
 use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\ApplicationExecutionFinished;
 use Infection\Events\ApplicationExecutionStarted;
 use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\Locator\Locator;
@@ -55,13 +54,10 @@ use Infection\Mutation\MutationGenerator;
 use Infection\Performance\Limiter\MemoryLimiter;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Coverage\CoverageRequirementChecker;
-use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
-use Infection\TestFramework\HasExtraNodeVisitors;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_numeric;
@@ -72,7 +68,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\Process;
 use function trim;
 use Webmozart\Assert\Assert;
 
@@ -93,7 +88,8 @@ final class InfectionCommand extends BaseCommand
 
     protected function configure(): void
     {
-        $this->setName('run')
+        $this
+            ->setName('run')
             ->setDescription('Runs the mutation testing.')
             ->addOption(
                 'test-framework',
@@ -205,17 +201,65 @@ final class InfectionCommand extends BaseCommand
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->startUp();
-        $this->runInitialTestSuite();
-        $this->runMutationTesting();
 
-        if (!$this->checkMetrics()) {
-            return 1;
-        }
+        /** @var CoverageRequirementChecker $coverageChecker */
+        $coverageChecker = $this->container['coverage.checker'];
 
-        return 0;
+        /** @var Configuration $config */
+        $config = $this->container[Configuration::class];
+
+        /** @var Filesystem $fileSystem */
+        $fileSystem = $this->container['filesystem'];
+
+        /** @var TestFrameworkAdapter $adapter */
+        $adapter = $this->container[TestFrameworkAdapter::class];
+
+        /** @var SubscriberBuilder $subscriberBuilder */
+        $subscriberBuilder = $this->container['subscriber.builder'];
+
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = $this->container['dispatcher'];
+
+        /** @var InitialTestsRunner $initialTestsRunner */
+        $initialTestsRunner = $this->container[InitialTestsRunner::class];
+
+        /** @var MemoryLimiter $memoryLimitApplier */
+        $memoryLimitApplier = $this->container['memory.limit.applier'];
+
+        /** @var MutationGenerator $mutationGenerator */
+        $mutationGenerator = $this->container[MutationGenerator::class];
+
+        /** @var MutationTestingRunner $mutationTestingRunner */
+        $mutationTestingRunner = $this->container[MutationTestingRunner::class];
+
+        /** @var TestRunConstraintChecker $constraintChecker */
+        $constraintChecker = $this->container['test.run.constraint.checker'];
+
+        /** @var MetricsCalculator $metricsCalculator */
+        $metricsCalculator = $this->container['metrics'];
+
+        $engine = new Engine(
+            $coverageChecker,
+            $config,
+            $fileSystem,
+            $adapter,
+            $subscriberBuilder,
+            $eventDispatcher,
+            $initialTestsRunner,
+            $memoryLimitApplier,
+            $mutationGenerator,
+            $mutationTestingRunner,
+            $constraintChecker,
+            $this->consoleOutput,
+            $metricsCalculator
+        );
+
+        $result = $engine->execute((int) $this->input->getOption('threads'));
+
+        return $result === true ? 0 : 1;
     }
 
     /**
@@ -275,94 +319,6 @@ final class InfectionCommand extends BaseCommand
         $eventDispatcher = $this->container['dispatcher'];
 
         $eventDispatcher->dispatch(new ApplicationExecutionStarted());
-    }
-
-    private function runInitialTestSuite(): void
-    {
-        /** @var TestFrameworkAdapter $adapter */
-        $adapter = $this->container[TestFrameworkAdapter::class];
-
-        /** @var Configuration $config */
-        $config = $this->container[Configuration::class];
-
-        /** @var InitialTestsRunner $initialTestsRunner */
-        $initialTestsRunner = $this->container[InitialTestsRunner::class];
-
-        $initialTestSuitProcess = $initialTestsRunner->run(
-            $config->getTestFrameworkExtraOptions()->getForInitialProcess(),
-            $config->shouldSkipCoverage(),
-            explode(' ', (string) $config->getInitialTestsPhpOptions())
-        );
-
-        if (!$initialTestSuitProcess->isSuccessful()) {
-            throw InitialTestsFailed::fromProcessAndAdapter($initialTestSuitProcess, $adapter);
-        }
-
-        $this->assertCodeCoverageExists($initialTestSuitProcess, $config->getTestFramework());
-
-        /** @var MemoryLimiter $memoryLimitApplier */
-        $memoryLimitApplier = $this->container['memory.limit.applier'];
-        $memoryLimitApplier->applyMemoryLimitFromProcess($initialTestSuitProcess, $adapter);
-    }
-
-    private function runMutationTesting(): void
-    {
-        /** @var TestFrameworkAdapter $adapter */
-        $adapter = $this->container[TestFrameworkAdapter::class];
-
-        /** @var Configuration $config */
-        $config = $this->container[Configuration::class];
-
-        /** @var MutationGenerator $mutationGenerator */
-        $mutationGenerator = $this->container[MutationGenerator::class];
-
-        $mutations = $mutationGenerator->generate(
-            $config->mutateOnlyCoveredCode(),
-            $adapter instanceof HasExtraNodeVisitors ? $adapter->getMutationsCollectionNodeVisitors() : []
-        );
-
-        /** @var MutationTestingRunner $mutationTestingRunner */
-        $mutationTestingRunner = $this->container[MutationTestingRunner::class];
-
-        $mutationTestingRunner->run(
-            $mutations,
-            (int) $this->input->getOption('threads'),
-            $config->getTestFrameworkExtraOptions()->getForMutantProcess()
-        );
-    }
-
-    private function checkMetrics(): bool
-    {
-        /** @var TestRunConstraintChecker $constraintChecker */
-        $constraintChecker = $this->container['test.run.constraint.checker'];
-
-        /** @var MetricsCalculator $metricsCalculator */
-        $metricsCalculator = $this->container['metrics'];
-
-        /** @var EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = $this->container['dispatcher'];
-
-        if (!$constraintChecker->hasTestRunPassedConstraints()) {
-            $this->consoleOutput->logBadMsiErrorMessage(
-                $metricsCalculator,
-                $constraintChecker->getMinRequiredValue(),
-                $constraintChecker->getErrorType()
-            );
-
-            return false;
-        }
-
-        if ($constraintChecker->isActualOverRequired()) {
-            $this->consoleOutput->logMinMsiCanGetIncreasedNotice(
-                $metricsCalculator,
-                $constraintChecker->getMinRequiredValue(),
-                $constraintChecker->getActualOverRequiredType()
-            );
-        }
-
-        $eventDispatcher->dispatch(new ApplicationExecutionFinished());
-
-        return true;
     }
 
     private function initContainer(InputInterface $input): void
@@ -448,33 +404,6 @@ final class InfectionCommand extends BaseCommand
             if ($result !== 0) {
                 throw ConfigurationException::configurationAborted();
             }
-        }
-    }
-
-    private function assertCodeCoverageExists(Process $initialTestsProcess, string $testFrameworkKey): void
-    {
-        /** @var Configuration $config */
-        $config = $this->container[Configuration::class];
-
-        $coverageDir = $config->getCoveragePath();
-
-        $coverageIndexFilePath = $coverageDir . '/' . LineCodeCoverage::COVERAGE_INDEX_FILE_NAME;
-
-        $processInfo = sprintf(
-            '%sCommand line: %s%sProcess Output: %s',
-            PHP_EOL,
-            $initialTestsProcess->getCommandLine(),
-            PHP_EOL,
-            $initialTestsProcess->getOutput()
-        );
-
-        if (!file_exists($coverageIndexFilePath)) {
-            throw CoverageDoesNotExistException::with(
-                $coverageIndexFilePath,
-                $testFrameworkKey,
-                dirname($coverageIndexFilePath, 2),
-                $processInfo
-            );
         }
     }
 }

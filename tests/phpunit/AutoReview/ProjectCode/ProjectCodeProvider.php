@@ -51,6 +51,7 @@ use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\Util\PhpProcess;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
+use Infection\Engine;
 use Infection\Finder\ComposerExecutableFinder;
 use Infection\Finder\FilterableFinder;
 use Infection\Finder\TestFrameworkFinder;
@@ -103,6 +104,7 @@ final class ProjectCodeProvider
         TestFrameworkTypes::class,
         NodeMutationGenerator::class,
         FilterableFinder::class,
+        Engine::class,
     ];
 
     /**
