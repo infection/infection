@@ -259,7 +259,7 @@ final class InfectionCommand extends BaseCommand
 
         $result = $engine->execute((int) $this->input->getOption('threads'));
 
-        return (int) !$result;
+        return $result === true ? 0 : 1;
     }
 
     /**
