@@ -35,17 +35,28 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * TODO: does this make sense? IMO a more logical change here would be to transform `$a | $b` into `$a` or `$b` instead of `$a & $b`
  */
 final class BitwiseOr extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            'Replaces a bitwise OR operator (`|`) with a bitwise AND operator (`&`).',
+            Classification::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Replaces "|" with "&"
-     *
      * @param Node&Node\Expr\BinaryOp\BitwiseOr $node
      *
      * @return Node\Expr\BinaryOp\BitwiseAnd

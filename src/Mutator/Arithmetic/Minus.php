@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -43,9 +45,16 @@ use PhpParser\Node;
  */
 final class Minus extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            'Replaces a subtraction operator (`-`) with an addition operator (`+`).',
+            Classification::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Replaces "-" with "+"
-     *
      * @param Node&Node\Expr\BinaryOp\Minus $node
      *
      * @return Node\Expr\BinaryOp\Plus

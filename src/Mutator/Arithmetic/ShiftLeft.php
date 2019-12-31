@@ -35,17 +35,31 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * TODO: rename to BitwiseShiftLeft
  */
 final class ShiftLeft extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces a bitwise shift left operator (`<<`) into a bitwise shift right operator (`>>`).
+TXT
+            ,
+            Classification::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Replaces "<<" with ">>"
-     *
      * @param Node&Node\Expr\BinaryOp\ShiftLeft $node
      *
      * @return Node\Expr\BinaryOp\ShiftRight

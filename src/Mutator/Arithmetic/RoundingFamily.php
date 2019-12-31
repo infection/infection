@@ -36,12 +36,17 @@ declare(strict_types=1);
 namespace Infection\Mutator\Arithmetic;
 
 use Generator;
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use function in_array;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * TODO: how does it deal with `round()` when it has some arguments? Can't it do something there e.g. removing its arguments?
+ * TODO: write somewhere: mutation idea is to replace default value or remove an optional value from a call
  */
 final class RoundingFamily extends Mutator
 {
@@ -51,12 +56,20 @@ final class RoundingFamily extends Mutator
         'round',
     ];
 
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces a rounding operation by an analogue one. For example `floor()` will be replaced into
+`ceil()` and `round()`.
+TXT
+            ,
+            Classification::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Mutates from one rounding function to all others:
-     *     1. floor() to ceil() and round()
-     *     2. ceil() to floor() and round()
-     *     3. round() to ceil() and floor()
-     *
      * @param Node&Node\Expr\FuncCall $node
      *
      * @return Generator

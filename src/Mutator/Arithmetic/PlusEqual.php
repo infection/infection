@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -43,6 +45,18 @@ use PhpParser\Node;
  */
 final class PlusEqual extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces an addition assignment operator (`+=`) with a subtraction assignment operator (`-=`).
+TXT
+            ,
+            Classification::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
      * Replaces "+=" with "-="
      *

@@ -35,17 +35,29 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * TODO: wouldn't it make more sense to transform a XOR into an OR?
+ * TODO: shouldn't bitwise operators be moved out of Arithmetic into their own Bitwise directory?
  */
 final class BitwiseXor extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            'Replaces a bitwise XOR operator (`^`) with a bitwise AND operator (`&`).',
+            Classification::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Replaces "^" with "&"
-     *
      * @param Node&Node\Expr\BinaryOp\BitwiseXor $node
      *
      * @return Node\Expr\BinaryOp\BitwiseAnd

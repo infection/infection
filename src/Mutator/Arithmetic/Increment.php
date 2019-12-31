@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 use PhpParser\Node\Expr\PostDec;
@@ -47,9 +49,19 @@ use PhpParser\Node\Expr\PreInc;
  */
 final class Increment extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces a pre or post increment operator (`++`) by the analogue decrement operator (`--`).
+TXT
+            ,
+            Classification::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Replaces "++" with "--"
-     *
      * @param Node&(PostInc|PreInc) $node
      *
      * @return PostDec|PreDec
