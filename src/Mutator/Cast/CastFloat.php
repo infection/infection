@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Cast;
 
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use PhpParser\Node;
 
 /**
@@ -42,6 +44,15 @@ use PhpParser\Node;
  */
 final class CastFloat extends AbstractCastMutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            'Removes an array cast operator (`(float)`).',
+            Classification::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     protected function mutatesNode(Node $node): bool
     {
         return $node instanceof Node\Expr\Cast\Double;

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalNegotiation;
 
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -43,9 +45,19 @@ use PhpParser\Node;
  */
 final class Identical extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces an identical operator (`===`) by its counterpart the not identical operator (`!==`).
+TXT
+            ,
+            Classification::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Replaces "===" with "!=="
-     *
      * @param Node&Node\Expr\BinaryOp\Identical $node
      *
      * @return Node\Expr\BinaryOp\NotIdentical

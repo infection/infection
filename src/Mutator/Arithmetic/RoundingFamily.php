@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Mutator\Arithmetic;
 
 use Generator;
+use function in_array;
 use Infection\Mutator\Classification;
 use Infection\Mutator\Definition;
-use function in_array;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 

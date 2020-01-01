@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -43,6 +45,15 @@ use PhpParser\Node;
  */
 final class FunctionCallRemoval extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            'Removes the function call.',
+            Classification::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     /**
      * Replaces "doSmth()" with ""
      *

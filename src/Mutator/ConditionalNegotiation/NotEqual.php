@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalNegotiation;
 
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -43,9 +45,19 @@ use PhpParser\Node;
  */
 final class NotEqual extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces a not equal operator (`!=`) by its counterpart the not equal operator (`==`).
+TXT
+            ,
+            Classification::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Replaces "!=" with "=="
-     *
      * @param Node&Node\Expr\BinaryOp\NotEqual $node
      *
      * @return Node\Expr\BinaryOp\Equal

@@ -35,17 +35,30 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalNegotiation;
 
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
+ * TODO: check for potential usage of the "counterpart" usage
  */
 final class Equal extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces an equal operator (`==`) by its counterpart the not equal operator (`!=`).
+TXT
+            ,
+            Classification::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Replaces "==" with "!="
-     *
      * @param Node&Node\Expr\BinaryOp\Equal $node
      *
      * @return Node\Expr\BinaryOp\NotEqual

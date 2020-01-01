@@ -56,10 +56,12 @@ use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\TestCase;
+use function implode;
 use function rtrim;
 use function Safe\sprintf;
 use function str_replace;
 use function substr;
+use const PHP_EOL;
 
 abstract class AbstractMutatorTestCase extends TestCase
 {
@@ -99,9 +101,10 @@ abstract class AbstractMutatorTestCase extends TestCase
             count($mutants),
             $expectedCodeSamples,
             sprintf(
-                'Failed asserting that the number of code samples (%d) equals the number of mutants (%d) created by the mutator.',
+                'Failed asserting that the number of code samples (%d) equals the number of mutants (%d) created by the mutator. Mutations found: %s',
                 count($expectedCodeSamples),
-                count($mutants)
+                count($mutants),
+                PHP_EOL.implode(PHP_EOL.'----'.PHP_EOL, $mutants)
             )
         );
 

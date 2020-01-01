@@ -40,6 +40,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * TODO: review that one
  */
 final class PregQuote extends Mutator
 {

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Sort;
 
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -43,10 +45,19 @@ use PhpParser\Node;
  */
 final class Spaceship extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Swaps the spaceship operator (`<=>`) operands, e.g. replaces `$a <=> $b` with `$b <=> $a`. 
+TXT
+            ,
+            Classification::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Swaps the arguments in the Spaceship operator <=>
-     * Replaces "$a <=> $b" with "$b <=> $a"
-     *
      * @param Node&Node\Expr\BinaryOp\Spaceship $node
      *
      * @return Node\Expr\BinaryOp\Spaceship

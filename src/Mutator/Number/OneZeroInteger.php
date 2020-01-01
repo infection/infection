@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use PhpParser\Node;
 
 /**
@@ -42,9 +44,19 @@ use PhpParser\Node;
  */
 final class OneZeroInteger extends AbstractNumberMutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces a zero integer value (`0`) by a non-zero integer value (`1`) and vice-versa.
+TXT
+            ,
+            Classification::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Replaces "0" with "1" or "1" with "0"
-     *
      * @param Node&Node\Scalar\LNumber $node
      *
      * @return Node\Scalar\LNumber

@@ -35,17 +35,27 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
+ * TODO: are those mutators safe against the case? Same question for the ones manipulating NULL
  */
 final class LogicalLowerOr extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            'Replaces an OR logical operator (`or`) by an AND logical operator (`AND`).',
+            Classification::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Replaces "or" with "and"
-     *
      * @param Node&Node\Expr\BinaryOp\LogicalOr $node
      *
      * @return Node\Expr\BinaryOp\LogicalAnd

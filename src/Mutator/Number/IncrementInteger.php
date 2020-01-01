@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use PhpParser\Node;
 
 /**
@@ -42,9 +44,16 @@ use PhpParser\Node;
  */
 final class IncrementInteger extends AbstractNumberMutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            'Increments an integer value by 1.',
+            Classification::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Increments an integer by 1
-     *
      * @param Node&Node\Scalar\LNumber $node
      *
      * @return Node\Scalar\LNumber

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use function array_slice;
 use function count;
 use Generator;
@@ -45,6 +47,28 @@ use PhpParser\Node;
  */
 final class UnwrapArrayUintersectAssoc extends AbstractUnwrapMutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces an `array_uintersect_assoc` function call by its first operand. For example:
+
+```php
+$x = array_uintersect_assoc(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func);
+```
+
+Will be mutated to:
+
+```php
+$x = ['foo => 'bar'];
+```
+TXT
+            ,
+            Classification::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     protected function getFunctionName(): string
     {
         return 'array_uintersect_assoc';

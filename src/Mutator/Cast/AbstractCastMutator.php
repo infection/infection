@@ -40,12 +40,13 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * TODO: should this really be separated mutators?
+ * TODO: maybe should affect similar functions such as `floatval()` and for each mutators does it properly handles all the variants? e.g. `(boolean)` instead of `(bool)`
  */
 abstract class AbstractCastMutator extends Mutator
 {
     /**
-     * Replaces "(cast) $foo;" with "$foo;"
-     *
      * @param Node&Node\Expr\Cast $node
      *
      * @return Node

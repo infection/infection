@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutator\Unwrap;
 
 use Generator;
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use PhpParser\Node;
 
 /**
@@ -43,6 +45,28 @@ use PhpParser\Node;
  */
 final class UnwrapArrayChangeKeyCase extends AbstractUnwrapMutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces an `array_change_key_case` function call by its first operand. For example:
+
+```php
+$x = array_change_key_case($array, CASE_UPPER);
+```
+
+Will be mutated to:
+
+```php
+$x = $array;
+```
+TXT
+            ,
+            Classification::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     protected function getFunctionName(): string
     {
         return 'array_change_key_case';

@@ -41,6 +41,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * TODO: review that one
  */
 final class Continue_ extends Mutator
 {

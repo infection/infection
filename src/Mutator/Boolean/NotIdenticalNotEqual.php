@@ -40,6 +40,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * TODO: remove this mutator, it is an unnecessary semantic addition
  */
 final class NotIdenticalNotEqual extends Mutator
 {

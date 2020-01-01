@@ -35,16 +35,31 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * TODO: review the remedies and the others
+ * TODO: what about -1 or -1.?
  */
 final class OneZeroFloat extends AbstractNumberMutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces a zero float value (`0.0`) by a non-zero float value (`1.0`) and vice-versa.
+TXT
+            ,
+            Classification::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Replaces "0.0" with "1.0" or "1.0" with "0.0"
-     *
      * @param Node&Node\Scalar\DNumber $node
      *
      * @return Node\Scalar\DNumber

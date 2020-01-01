@@ -35,17 +35,46 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ZeroIteration;
 
+use Infection\Mutator\Classification;
+use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * TODO: wouldn't it be better to remove the for loop?
  */
 final class For_ extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces the looping condition of a `for` block statement preventing any statement within the block
+to be executed. For example:
+
+```php`
+for ($i=0; $i<10; $i++) {
+    // ...
+}
+```
+
+Will be mutated to:
+
+```php
+for ($i=0; false; $i++) {
+    // ...
+}
+```
+TXT
+            ,
+            Classification::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     /**
-     * Replaces "for($i=0; $i<10; $i++)" with "for($i=0; false; $i++)"
-     *
      * @param Node&Node\Stmt\For_ $node
      *
      * @return Node\Stmt\For_
