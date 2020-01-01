@@ -59,7 +59,6 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_numeric;
 use function Safe\sprintf;
