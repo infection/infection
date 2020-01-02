@@ -113,12 +113,14 @@ final class MutatorTest extends TestCase
 
         $definition = $mutator::getDefinition();
 
-        if ($definition === null) {
-            $this->addWarning(sprintf(
-                'The mutant "%s" does not have a definition.',
-                $className
-            ));
+        if ($definition !== null) {
+            return;
         }
+
+        $this->addWarning(sprintf(
+            'The mutant "%s" does not have a definition.',
+            $className
+        ));
     }
 
     public function provideConcreteMutatorClasses()
