@@ -47,7 +47,7 @@
         "ext-json": "*",
         "ext-libxml": "*",
         "composer/xdebug-handler": "^1.3.3",
-        "infection/abstract-testframework-adapter": "^0.1",
+        "infection/abstract-testframework-adapter": "^0.2.1",
         "justinrainbow/json-schema": "^5.2",
         "nikic/php-parser": "^4.2.2",
         "ocramius/package-versions": "^1.2",

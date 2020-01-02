@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "045b6033b9c9c15eaaeefc2f3b49c92c",
+    "content-hash": "80006490e37012f5bad1038dc043a8e1",
     "packages": [
         {
             "name": "composer/xdebug-handler",
@@ -52,16 +52,16 @@
         },
         {
             "name": "infection/abstract-testframework-adapter",
-            "version": "0.1.0",
+            "version": "0.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/infection/abstract-testframework-adapter.git",
-                "reference": "03d76ca4a549a6a333e9511652fe998910e6aad3"
+                "reference": "07cd974a375303d631418c291ca5d2cecdf06fbf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/infection/abstract-testframework-adapter/zipball/03d76ca4a549a6a333e9511652fe998910e6aad3",
-                "reference": "03d76ca4a549a6a333e9511652fe998910e6aad3",
+                "url": "https://api.github.com/repos/infection/abstract-testframework-adapter/zipball/07cd974a375303d631418c291ca5d2cecdf06fbf",
+                "reference": "07cd974a375303d631418c291ca5d2cecdf06fbf",
                 "shasum": ""
             },
             "type": "library",
@@ -81,7 +81,7 @@
                 }
             ],
             "description": "Abstract Test Framework Adapter for Infection",
-            "time": "2019-12-25T19:51:11+00:00"
+            "time": "2020-01-02T02:37:59+00:00"
         },
         {
             "name": "justinrainbow/json-schema",

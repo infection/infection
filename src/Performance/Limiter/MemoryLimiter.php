@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Performance\Limiter;
 
 use Composer\XdebugHandler\XdebugHandler;
+use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\MemoryUsageAware;
 use const PHP_SAPI;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;

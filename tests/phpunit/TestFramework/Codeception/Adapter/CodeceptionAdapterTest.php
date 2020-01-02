@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Codeception\Adapter;
 
 use Generator;
+use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
-use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
