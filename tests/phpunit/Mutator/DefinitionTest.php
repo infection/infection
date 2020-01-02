@@ -40,7 +40,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\OperationCategory;
 use PHPUnit\Framework\TestCase;
 
-class DefinitionTest extends TestCase
+final class DefinitionTest extends TestCase
 {
     /**
      * @dataProvider valuesProvider

@@ -44,7 +44,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\sprintf;
 
-class OperationCategoryTest extends TestCase
+final class OperationCategoryTest extends TestCase
 {
     private const ALL_CONSTANT_KEY = 'ALL';
 
