@@ -47,6 +47,6 @@ final class PhpUnitExtraOptions extends TestFrameworkExtraOptions
      */
     protected function getInitialRunOnlyOptions(): array
     {
-        return ['--filter', '--testsuite'];
+        return ['--configuration', '--filter', '--testsuite'];
     }
 }
