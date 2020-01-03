@@ -78,11 +78,6 @@ abstract class Mutator
         );
     }
 
-    public static function getDefinition(): ?Definition
-    {
-        return null;
-    }
-
     final public static function getName(): string
     {
         $parts = explode('\\', static::class);
