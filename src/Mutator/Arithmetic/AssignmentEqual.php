@@ -43,7 +43,7 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class EqualOrIdenticalAssignment extends Mutator
+final class AssignmentEqual extends Mutator
 {
     public static function getDefinition(): ?Definition
     {
