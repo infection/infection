@@ -52,10 +52,10 @@ use function Safe\sprintf;
  * @coversNothing
  *
  * This class is responsible for testing that our code base adheres to certain rules,
- * e.g. 'All classes that aren't intended to be used by users should be marked internal'
+ * e.g. 'All classes that aren't intended to be used by users should be marked internal'.
  *
- * The goal is to reduce pr reviews about style issues that can't be automatically fixed.
- * All test failures should be clear in meaning, to help new contributors.
+ * The goal is to reduce PR reviews about style issues that can't be automatically fixed. All test
+ * failures should have a clear explanation to help contributors unfamiliar with the codebase.
  */
 final class ProjectCodeTest extends TestCase
 {

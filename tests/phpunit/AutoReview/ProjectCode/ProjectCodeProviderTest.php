@@ -40,7 +40,7 @@ use function Safe\sprintf;
 use function trait_exists;
 
 /**
- * @requires ProjectCodeProviderTest
+ * @covers \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider
  */
 final class ProjectCodeProviderTest extends TestCase
 {
