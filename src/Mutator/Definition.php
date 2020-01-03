@@ -33,62 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Mutator;
 
-use Generator;
-use Infection\Mutator\Definition;
-use Infection\Visitor\ReflectionVisitor;
-use PhpParser\Node;
+use Webmozart\Assert\Assert;
 
-abstract class Mutator
+/**
+ * @internal
+ */
+final class Definition
 {
-    private $config;
-
-    public function __construct(MutatorConfig $config)
-    {
-        $this->config = $config;
-    }
-
-    public static function getDefinition(): ?Definition
-    {
-        return null;
-    }
+    private $description;
+    private $category;
+    private $remedies;
 
     /**
-     * @return Node|Node[]|Generator|array
+     * @param string      $description Explanation on what the mutator is about
+     * @param string|null $remedies Guidelines or recommendations on how to kill the generated mutations
      */
-    abstract public function mutate(Node $node);
+    public function __construct(
+        string $description,
+        string $category,
+        ?string $remedies
+    ) {
+        Assert::oneOf($category, MutatorCategory::ALL);
 
-    final public function shouldMutate(Node $node): bool
-    {
-        if (!$this->mutatesNode($node)) {
-            return false;
-        }
-
-        $reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY, false);
-
-        if (!$reflectionClass) {
-            return true;
-        }
-
-        return !$this->config->isIgnored(
-            $reflectionClass->getName(),
-            $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''),
-            $node->getLine()
-        );
+        $this->description = $description;
+        $this->category = $category;
+        $this->remedies = $remedies;
     }
 
-    final public static function getName(): string
+    public function getDescription(): string
     {
-        $parts = explode('\\', static::class);
-
-        return (string) end($parts);
+        return $this->description;
     }
 
-    final protected function getSettings(): array
+    public function getCategory(): string
     {
-        return $this->config->getMutatorSettings();
+        return $this->category;
     }
 
-    abstract protected function mutatesNode(Node $node): bool;
+    public function getRemedies(): ?string
+    {
+        return $this->remedies;
+    }
 }

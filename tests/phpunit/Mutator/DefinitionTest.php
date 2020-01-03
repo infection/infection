@@ -33,62 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Tests\Mutator;
 
 use Generator;
 use Infection\Mutator\Definition;
-use Infection\Visitor\ReflectionVisitor;
-use PhpParser\Node;
+use Infection\Mutator\MutatorCategory;
+use PHPUnit\Framework\TestCase;
 
-abstract class Mutator
+final class DefinitionTest extends TestCase
 {
-    private $config;
-
-    public function __construct(MutatorConfig $config)
-    {
-        $this->config = $config;
-    }
-
-    public static function getDefinition(): ?Definition
-    {
-        return null;
-    }
-
     /**
-     * @return Node|Node[]|Generator|array
+     * @dataProvider valuesProvider
      */
-    abstract public function mutate(Node $node);
+    public function test_it_can_be_instantiated(
+        string $description,
+        string $category,
+        ?string $remedies
+    ): void {
+        $definition = new Definition($description, $category, $remedies);
 
-    final public function shouldMutate(Node $node): bool
-    {
-        if (!$this->mutatesNode($node)) {
-            return false;
-        }
-
-        $reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY, false);
-
-        if (!$reflectionClass) {
-            return true;
-        }
-
-        return !$this->config->isIgnored(
-            $reflectionClass->getName(),
-            $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''),
-            $node->getLine()
-        );
+        $this->assertSame($description, $definition->getDescription());
+        $this->assertSame($category, $definition->getCategory());
+        $this->assertSame($remedies, $definition->getRemedies());
     }
 
-    final public static function getName(): string
+    public function valuesProvider(): Generator
     {
-        $parts = explode('\\', static::class);
+        yield 'empty' => [
+            '',
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null,
+        ];
 
-        return (string) end($parts);
+        yield 'nominal' => [
+            'This text is for explaining what the mutator is about.',
+            MutatorCategory::SEMANTIC_REDUCTION,
+            'This text is for providing guidelines on how to kill the mutant.',
+        ];
     }
-
-    final protected function getSettings(): array
-    {
-        return $this->config->getMutatorSettings();
-    }
-
-    abstract protected function mutatesNode(Node $node): bool;
 }

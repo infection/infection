@@ -36,10 +36,15 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview;
 
 use function array_column;
+use function class_exists;
+use Infection\Mutator\Util\Mutator;
 use Infection\Tests\Mutator\ProfileListProvider;
+use function interface_exists;
 use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use function Safe\sprintf;
+use function trait_exists;
 
 /**
  * @coversNothing
@@ -69,11 +74,11 @@ final class MutatorTest extends TestCase
      */
     public function test_mutators_do_not_declare_public_methods(string $className): void
     {
-        $rc = new ReflectionClass($className);
+        $mutatorReflection = new ReflectionClass($className);
 
         $this->assertCount(
-            3,
-            $this->getPublicMethods($rc),
+            4,
+            $this->getPublicMethods($mutatorReflection),
             sprintf(
                 'Mutator class "%s" has declared a public method, and should not do so, please consider refactoring.',
                 $className
@@ -96,6 +101,26 @@ final class MutatorTest extends TestCase
                 $testClassName
             )
         );
+    }
+
+    /**
+     * @dataProvider provideConcreteMutatorClasses
+     */
+    public function test_mutators_have_a_definition(string $className): void
+    {
+        /** @var Mutator $mutator */
+        $mutator = (new ReflectionClass($className))->newInstanceWithoutConstructor();
+
+        $definition = $mutator::getDefinition();
+
+        if ($definition !== null) {
+            return;
+        }
+
+        $this->addWarning(sprintf(
+            'The mutant "%s" does not have a definition.',
+            $className
+        ));
     }
 
     public function provideConcreteMutatorClasses()
