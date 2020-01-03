@@ -42,8 +42,6 @@ use PhpParser\Node;
 
 /**
  * @internal
- *
- * TODO: review this mutator: this very likely to generate false positives if returns null where not allowed; Same for others
  */
 final class NewObject extends AbstractValueToNullReturnValue
 {

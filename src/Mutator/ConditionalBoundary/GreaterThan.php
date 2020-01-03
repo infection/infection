@@ -40,8 +40,6 @@ use PhpParser\Node;
 
 /**
  * @internal
- *
- * TODO: shouldn't this be the other way around? This is a semantic addition not reduction
  */
 final class GreaterThan extends Mutator
 {

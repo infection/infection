@@ -41,9 +41,6 @@ use PhpParser\Node;
 
 /**
  * @internal
- *
- * TODO: review the remedies and the others
- * TODO: what about -1 or -1.?
  */
 final class OneZeroFloat extends AbstractNumberMutator
 {

@@ -41,8 +41,6 @@ use PhpParser\Node\Expr\ArrayItem;
 
 /**
  * @internal
- *
- * TODO: review that one?
  */
 final class Spread extends Mutator
 {

@@ -41,21 +41,22 @@ use Infection\Tests\Mutator\AbstractMutatorTestCase;
 final class AssignmentEqualTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator($input, $expected = null): void
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
     public function mutationsProvider(): Generator
     {
-        foreach (['==' => 'loose', '===' => 'strict'] as $sign => $title) {
-            yield 'it mutates a ' . $title . ' comparison to an assignment' => [
-                <<<PHP
+        yield 'It mutates a comparison to an assignment' => [
+            <<<'PHP'
 <?php
 
-if (\$a $sign \$b) {
+if ($a == $b) {
 }
 PHP
             ,
@@ -65,53 +66,47 @@ PHP
 if ($a = $b) {
 }
 PHP
-                ,
-                null,
-            ];
+            ,
+        ];
 
-            yield 'it does not mutate a ' . $title . ' comparison which would be an impossible assignment [constant value]' => [
-                <<<PHP
+        yield 'It does not mutate comparsion to an impossible assignment' => [
+            <<<'PHP'
 <?php
 
-if (1 $sign \$a) {
+if (1 == $a) {
 }
 PHP
-                ,
-                null,
-            ];
+            ,
+        ];
 
-            yield 'it does not mutate a ' . $title . ' comparison which would be an impossible assignment [class constant]' => [
-                <<<PHP
+        yield 'It does not try to assign a variable to a class constant' => [
+            <<<'PHP'
 <?php
 
-if (BaseClass::CLASS_CONST $sign \$a) {
+if (BaseClass::CLASS_CONST == $a) {
 }
 PHP
-                ,
-                null,
-            ];
+            ,
+        ];
 
-            yield 'it does not mutate a ' . $title . ' comparison which would be an impossible assignment [constant]' => [
-                <<<PHP
+        yield 'It does not try to assign a variable to a built in constant' => [
+            <<<'PHP'
 <?php
 
-if (PHP_EOL $sign \$a) {
+if (PHP_EOL == $a) {
 }
 PHP
-                ,
-                null,
-            ];
+            ,
+        ];
 
-            yield 'it does not mutate a ' . $title . ' comparison which would result in an object scalar property assignment' => [
-                <<<PHP
+        yield 'It does not try to assign a scalar to a result of a function call' => [
+            <<<'PHP'
 <?php
 
-if (\$x->getFoo() $sign 1) {
+if ($x->getFoo() == 1) {
 }
 PHP
-                ,
-                null,
-            ];
-        }
+            ,
+        ];
     }
 }

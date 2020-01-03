@@ -42,7 +42,6 @@ use PhpParser\Node;
 
 /**
  * @internal
- * TODO: are those mutators safe against the case? Same question for the ones manipulating NULL
  */
 final class LogicalLowerOr extends Mutator
 {

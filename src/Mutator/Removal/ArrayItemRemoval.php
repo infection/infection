@@ -54,8 +54,6 @@ use function strtoupper;
 
 /**
  * @internal
- *
- * TODO: review this one
  */
 final class ArrayItemRemoval extends Mutator
 {

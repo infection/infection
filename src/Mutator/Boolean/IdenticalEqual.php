@@ -40,7 +40,6 @@ use PhpParser\Node;
 
 /**
  * @internal
- * TODO: this mutator should be removed: it's a semantic addition without any value
  */
 final class IdenticalEqual extends Mutator
 {

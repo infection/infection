@@ -42,8 +42,6 @@ use PhpParser\Node;
 
 /**
  * @internal
- *
- * TODO: does that mutator make sense?
  */
 final class Exponentiation extends Mutator
 {

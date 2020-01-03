@@ -42,8 +42,6 @@ use PhpParser\Node;
 
 /**
  * @internal
- *
- * TODO: does this make sense? IMO a more logical change here would be to transform `$a | $b` into `$a` or `$b` instead of `$a & $b`
  */
 final class BitwiseOr extends Mutator
 {

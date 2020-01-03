@@ -41,10 +41,6 @@ use PhpParser\Node;
 
 /**
  * @internal
- *
- * TODO: check when a number is given
- * TODO: is this really relevant? I can see a few cases where you would use break instead of continue
- *          purely for performance reasons but where continuing the loop would not break any code
  */
 final class Break_ extends Mutator
 {

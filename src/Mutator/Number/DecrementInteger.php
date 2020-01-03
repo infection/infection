@@ -43,8 +43,6 @@ use PhpParser\Node;
 
 /**
  * @internal
- *
- * TODO: review the remedies here and the description to see if it can be more helpful; same for others
  */
 final class DecrementInteger extends AbstractNumberMutator
 {

@@ -42,8 +42,6 @@ use PhpParser\Node;
 
 /**
  * @internal
- *
- * TODO: does that mutator makes sense?
  */
 final class ModEqual extends Mutator
 {

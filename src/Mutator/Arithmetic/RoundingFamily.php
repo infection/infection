@@ -44,9 +44,6 @@ use PhpParser\Node;
 
 /**
  * @internal
- *
- * TODO: how does it deal with `round()` when it has some arguments? Can't it do something there e.g. removing its arguments?
- * TODO: write somewhere: mutation idea is to replace default value or remove an optional value from a call
  */
 final class RoundingFamily extends Mutator
 {

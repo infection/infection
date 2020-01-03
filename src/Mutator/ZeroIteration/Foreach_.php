@@ -42,8 +42,6 @@ use PhpParser\Node;
 
 /**
  * @internal
- *
- * TODO: wouldn't it be more efficient to remove the whole block?
  */
 final class Foreach_ extends Mutator
 {

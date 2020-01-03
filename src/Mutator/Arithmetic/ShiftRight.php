@@ -42,7 +42,6 @@ use PhpParser\Node;
 
 /**
  * @internal
- * TODO: rename into BitwiseShiftRight
  */
 final class ShiftRight extends Mutator
 {
