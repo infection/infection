@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator;
 
 use Generator;
 use Infection\Mutator\Definition;
-use Infection\Mutator\OperationCategory;
+use Infection\Mutator\MutatorCategory;
 use PHPUnit\Framework\TestCase;
 
 final class DefinitionTest extends TestCase
@@ -61,13 +61,13 @@ final class DefinitionTest extends TestCase
     {
         yield 'empty' => [
             '',
-            OperationCategory::NEUTRAL,
+            MutatorCategory::SEMANTIC_REDUCTION,
             null,
         ];
 
         yield 'nominal' => [
             'This text is for explaining what the mutator is about.',
-            OperationCategory::NEUTRAL,
+            MutatorCategory::SEMANTIC_REDUCTION,
             'This text is for providing guidelines on how to kill the mutant.',
         ];
     }

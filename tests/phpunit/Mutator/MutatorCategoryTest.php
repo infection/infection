@@ -39,28 +39,28 @@ use function array_keys;
 use function array_unique;
 use function array_values;
 use function in_array;
-use Infection\Mutator\OperationCategory;
+use Infection\Mutator\MutatorCategory;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\sprintf;
 
-final class OperationCategoryTest extends TestCase
+final class MutatorCategoryTest extends TestCase
 {
     private const ALL_CONSTANT_KEY = 'ALL';
 
     public function test_it_cannot_be_instantiated(): void
     {
-        $classReflection = new ReflectionClass(OperationCategory::class);
+        $classReflection = new ReflectionClass(MutatorCategory::class);
 
         $this->assertFalse(
             $classReflection->isInstantiable(),
-            sprintf('Did not expect "%s" to be instantiable', OperationCategory::class)
+            sprintf('Did not expect "%s" to be instantiable', MutatorCategory::class)
         );
     }
 
     public function test_it_lists_all_its_exposed_constants(): void
     {
-        $enumClass = OperationCategory::class;
+        $enumClass = MutatorCategory::class;
 
         $categoryReflection = new ReflectionClass($enumClass);
 

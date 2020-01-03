@@ -35,7 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-final class OperationCategory
+/**
+ * @internal
+ */
+final class MutatorCategory
 {
     /**
      * Semantic reductions exposes unused semantics. For example:
@@ -68,29 +71,11 @@ final class OperationCategory
      */
     public const ORTHOGONAL_REPLACEMENT = 'orthogonalReplacement';
 
-    /**
-     * Neutral mutations aim at discovering integration errors. Example:
-     *
-     * ```
-     * $a = $a + $b;
-     *
-     * // to
-     *
-     * $a += $b;
-     * ```
-     *
-     * Mutating to a semantic equivalent form is useful to test if the structure laws are still
-     * obeyed by having the tests still green. In other words it serves to test the mutation testing
-     * tool errors and language misuse.
-     */
-    public const NEUTRAL = 'neutral';
-
-    // Also known but unused for now: semantic addition
+    // Also known but unused for now: neutral, semantic addition
 
     public const ALL = [
         self::SEMANTIC_REDUCTION,
         self::ORTHOGONAL_REPLACEMENT,
-        self::NEUTRAL,
     ];
 
     private function __construct()

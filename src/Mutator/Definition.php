@@ -37,6 +37,9 @@ namespace Infection\Mutator;
 
 use Webmozart\Assert\Assert;
 
+/**
+ * @internal
+ */
 final class Definition
 {
     private $description;
@@ -52,7 +55,7 @@ final class Definition
         string $category,
         ?string $remedies
     ) {
-        Assert::oneOf($category, OperationCategory::ALL);
+        Assert::oneOf($category, MutatorCategory::ALL);
 
         $this->description = $description;
         $this->category = $category;
