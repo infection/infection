@@ -36,8 +36,6 @@ declare(strict_types=1);
 namespace Infection\Mutator\Unwrap;
 
 use Generator;
-use Infection\Mutator\Definition;
-use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -45,28 +43,6 @@ use PhpParser\Node;
  */
 final class UnwrapArrayDiffUassoc extends AbstractUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
-    {
-        return new Definition(
-            <<<'TXT'
-Replaces an `array_slice` function call by its first operand. For example:
-
-```php
-$x = array_slice(['foo', 'bar', 'baz'], 1);
-```
-
-Will be mutated to:
-
-```php
-$x = ['foo', 'bar', 'baz'];
-```
-TXT
-            ,
-            MutatorCategory::SEMANTIC_REDUCTION,
-            null
-        );
-    }
-
     protected function getFunctionName(): string
     {
         return 'array_diff_uassoc';
