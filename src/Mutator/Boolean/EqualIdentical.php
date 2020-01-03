@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
@@ -53,7 +53,7 @@ Replaces a loose comparison (an equal operator (`==`)) into a strict comparison 
 operator (`===`)). 
 TXT
             ,
-            Classification::SEMANTIC_REDUCTION,
+            MutatorCategory::SEMANTIC_REDUCTION,
             null
         );
     }

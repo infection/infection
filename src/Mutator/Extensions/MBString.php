@@ -42,7 +42,7 @@ use function constant;
 use function count;
 use function defined;
 use Generator;
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
@@ -82,7 +82,7 @@ $x = strlen($str) < 10;
 ```
 TXT
             ,
-            Classification::SEMANTIC_REDUCTION,
+            MutatorCategory::SEMANTIC_REDUCTION,
             null
         );
     }

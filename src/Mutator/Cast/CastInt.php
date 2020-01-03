@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Cast;
 
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use PhpParser\Node;
 
@@ -48,7 +48,7 @@ final class CastInt extends AbstractCastMutator
     {
         return new Definition(
             'Removes an array cast operator (`(int)`).',
-            Classification::SEMANTIC_REDUCTION,
+            MutatorCategory::SEMANTIC_REDUCTION,
             null
         );
     }

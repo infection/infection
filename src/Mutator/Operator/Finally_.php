@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Operator;
 
 use function count;
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ParentConnectorVisitor;
@@ -51,7 +51,7 @@ final class Finally_ extends Mutator
     {
         return new Definition(
             'Removes the `finally` block.',
-            Classification::SEMANTIC_REDUCTION,
+            MutatorCategory::SEMANTIC_REDUCTION,
             null
         );
     }

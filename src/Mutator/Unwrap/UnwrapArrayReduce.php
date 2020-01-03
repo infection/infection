@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Unwrap;
 
 use Generator;
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use PhpParser\Node;
 
@@ -68,7 +68,7 @@ $x = ['foo', 'bar', 'baz'];
 ```
 TXT
             ,
-            Classification::SEMANTIC_REDUCTION,
+            MutatorCategory::SEMANTIC_REDUCTION,
             null
         );
     }

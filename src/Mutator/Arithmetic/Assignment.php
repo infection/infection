@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
@@ -53,7 +53,7 @@ Replaces examples of augmented or compound (shorter way to apply an arithmetic o
 assignment operators, i.e. `+=`, `*=`, `.=`, etc. By a plain assignment operator `=`.
 TXT
             ,
-            Classification::SEMANTIC_REDUCTION,
+            MutatorCategory::SEMANTIC_REDUCTION,
             null
         );
     }

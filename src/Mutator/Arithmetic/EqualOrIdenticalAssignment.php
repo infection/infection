@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
@@ -52,7 +52,7 @@ final class EqualOrIdenticalAssignment extends Mutator
 Replaces an equal (`==`) or identical (`===`) comparison operator into an assignment (`=`).
 TXT
             ,
-            Classification::SEMANTIC_REDUCTION,
+            MutatorCategory::SEMANTIC_REDUCTION,
             null
         );
     }

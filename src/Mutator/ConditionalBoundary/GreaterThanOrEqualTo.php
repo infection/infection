@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalBoundary;
 
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
@@ -53,7 +53,7 @@ Replaces a greater than or equal to operator (`>=`) into its stricter form the g
 operator (`>`). 
 TXT
             ,
-            Classification::SEMANTIC_REDUCTION,
+            MutatorCategory::SEMANTIC_REDUCTION,
             null
         );
     }

@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\FunctionSignature;
 
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ReflectionVisitor;
@@ -54,7 +54,7 @@ final class PublicVisibility extends Mutator
     {
         return new Definition(
             'Replaces the `public` method visibility keyword with `protected`.',
-            Classification::SEMANTIC_REDUCTION,
+            MutatorCategory::SEMANTIC_REDUCTION,
             null
         );
     }

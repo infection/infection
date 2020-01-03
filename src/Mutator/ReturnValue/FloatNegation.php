@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
@@ -52,7 +52,7 @@ final class FloatNegation extends Mutator
 Replaces a float value with its negated value. For example will replace `-33.4` by `33.4`.
 TXT
             ,
-            Classification::ORTHOGONAL_REPLACEMENT,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null
         );
     }

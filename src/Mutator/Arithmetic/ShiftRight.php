@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
@@ -53,7 +53,7 @@ final class ShiftRight extends Mutator
 Replaces a bitwise shift left operator (`>>`) into a bitwise shift right operator (`<<`).
 TXT
             ,
-            Classification::ORTHOGONAL_REPLACEMENT,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null
         );
     }

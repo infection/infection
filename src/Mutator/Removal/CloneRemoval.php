@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
@@ -49,7 +49,7 @@ final class CloneRemoval extends Mutator
     {
         return new Definition(
             'Removes the clone keyword, e.g. replacing `clone $x` by `$x`.',
-            Classification::SEMANTIC_REDUCTION,
+            MutatorCategory::SEMANTIC_REDUCTION,
             null
         );
     }

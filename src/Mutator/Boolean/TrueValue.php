@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Boolean;
 
 use function array_key_exists;
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ParentConnectorVisitor;
@@ -56,7 +56,7 @@ final class TrueValue extends Mutator
     {
         return new Definition(
             'Replaces the boolean literal (`true`) by its opposite value (`false`). ',
-            Classification::ORTHOGONAL_REPLACEMENT,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null
         );
     }

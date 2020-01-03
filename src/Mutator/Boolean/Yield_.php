@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
@@ -54,7 +54,7 @@ key) where the key or the value are potentially impure (i.e. have a side-effect)
 `yield foo() => $b->bar;`. 
 TXT
             ,
-            Classification::SEMANTIC_REDUCTION,
+            MutatorCategory::SEMANTIC_REDUCTION,
             <<<'TXT'
 This mutation highlights the reliance of the side-effect(s) of the called key(s) and/or value(s)
 and completely disregarding the actual yielded pair. The yielded content should either be checked or

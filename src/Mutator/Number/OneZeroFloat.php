@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use PhpParser\Node;
 
@@ -54,7 +54,7 @@ final class OneZeroFloat extends AbstractNumberMutator
 Replaces a zero float value (`0.0`) by a non-zero float value (`1.0`) and vice-versa.
 TXT
             ,
-            Classification::ORTHOGONAL_REPLACEMENT,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null
         );
     }

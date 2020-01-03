@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Number;
 
 use function in_array;
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
@@ -61,7 +61,7 @@ final class DecrementInteger extends AbstractNumberMutator
     {
         return new Definition(
             'Decrements an integer value by 1.',
-            Classification::ORTHOGONAL_REPLACEMENT,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null
         );
     }

@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use function count;
 use Generator;
@@ -63,7 +63,7 @@ $x = ['foo', 'bar', 'baz'];
 ```
 TXT
             ,
-            Classification::SEMANTIC_REDUCTION,
+            MutatorCategory::SEMANTIC_REDUCTION,
             null
         );
     }

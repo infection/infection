@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
@@ -49,7 +49,7 @@ final class LogicalNot extends Mutator
     {
         return new Definition(
             'Removes a negation operator (`!`), e.g. transforms `!$foo` into `$foo`.',
-            Classification::SEMANTIC_REDUCTION,
+            MutatorCategory::SEMANTIC_REDUCTION,
             null
         );
     }

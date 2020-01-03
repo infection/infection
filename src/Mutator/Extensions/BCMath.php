@@ -39,7 +39,7 @@ use function array_diff_key;
 use function array_filter;
 use function count;
 use Generator;
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
@@ -78,7 +78,7 @@ $x = (string) ($a + $b);
 ```
 TXT
             ,
-            Classification::SEMANTIC_REDUCTION,
+            MutatorCategory::SEMANTIC_REDUCTION,
             null
         );
     }

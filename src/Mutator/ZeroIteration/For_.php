@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ZeroIteration;
 
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
@@ -69,7 +69,7 @@ for ($i=0; false; $i++) {
 ```
 TXT
             ,
-            Classification::SEMANTIC_REDUCTION,
+            MutatorCategory::SEMANTIC_REDUCTION,
             null
         );
     }

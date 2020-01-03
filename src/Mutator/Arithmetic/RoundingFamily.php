@@ -37,7 +37,7 @@ namespace Infection\Mutator\Arithmetic;
 
 use Generator;
 use function in_array;
-use Infection\Mutator\Classification;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
@@ -64,7 +64,7 @@ Replaces a rounding operation by an analogue one. For example `floor()` will be 
 `ceil()` and `round()`.
 TXT
             ,
-            Classification::ORTHOGONAL_REPLACEMENT,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null
         );
     }
