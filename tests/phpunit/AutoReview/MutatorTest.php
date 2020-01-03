@@ -33,12 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\Mutator;
+namespace Infection\Tests\AutoReview;
 
+use function array_column;
 use function array_diff;
 use function array_filter;
 use function array_map;
+use Generator;
 use function implode;
+use function Infection\Tests\generator_to_phpunit_data_provider;
+use Infection\Tests\Mutator\ProfileListProvider;
+use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
@@ -63,7 +68,7 @@ final class MutatorTest extends TestCase
     ];
 
     /**
-     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::mutatorClassesProvider
+     * @dataProvider mutatorClassesProvider
      */
     public function test_mutators_do_not_declare_public_methods(string $className): void
     {
@@ -84,6 +89,14 @@ final class MutatorTest extends TestCase
                 self::class
             )
         );
+    }
+
+    public function mutatorClassesProvider(): Generator
+    {
+        yield from generator_to_phpunit_data_provider(array_column(
+            iterator_to_array(ProfileListProvider::mutatorNameAndClassProvider(), false),
+            1
+        ));
     }
 
     /**
