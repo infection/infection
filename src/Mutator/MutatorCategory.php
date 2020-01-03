@@ -33,49 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Visitor;
-
-use Infection\Mutation;
-use Infection\Mutator\NodeMutationGenerator;
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+namespace Infection\Mutator;
 
 /**
  * @internal
  */
-final class MutationsCollectorVisitor extends NodeVisitorAbstract
+final class MutatorCategory
 {
     /**
-     * @var Mutation[]
+     * Semantic reductions exposes unused semantics. For example:
+     *
+     * ```php
+     * $x = $a + $b;
+     *
+     * // to
+     *
+     * $x = $a;
+     * ```
+     *
+     * If the semantics are unneeded, they should be removed. Otherwise they should be tested.
      */
-    private $mutations = [];
-
-    private $mutationGenerator;
-
-    public function __construct(NodeMutationGenerator $mutationGenerator)
-    {
-        $this->mutationGenerator = $mutationGenerator;
-    }
-
-    public function beforeTraverse(array $nodes): void
-    {
-        $this->mutations = [];
-    }
-
-    public function leaveNode(Node $node): ?Node
-    {
-        foreach ($this->mutationGenerator->generate($node) as $mutation) {
-            $this->mutations[] = $mutation;
-        }
-
-        return null;
-    }
+    public const SEMANTIC_REDUCTION = 'semanticReduction';
 
     /**
-     * @return Mutation[]
+     * An example of orthogonal replacement is:
+     *
+     * ```php
+     * $a > $b;
+     *
+     * // to
+     *
+     * $a < $b;
+     * ```
+     *
+     * Neither form has less semantics than the other. It is however a mutation that shows a lack
+     * of coverage.
      */
-    public function getMutations(): array
+    public const ORTHOGONAL_REPLACEMENT = 'orthogonalReplacement';
+
+    // Also known but unused for now: neutral, semantic addition
+
+    public const ALL = [
+        self::SEMANTIC_REDUCTION,
+        self::ORTHOGONAL_REPLACEMENT,
+    ];
+
+    private function __construct()
     {
-        return $this->mutations;
     }
 }

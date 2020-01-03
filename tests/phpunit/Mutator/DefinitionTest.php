@@ -33,49 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Visitor;
+namespace Infection\Tests\Mutator;
 
-use Infection\Mutation;
-use Infection\Mutator\NodeMutationGenerator;
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class MutationsCollectorVisitor extends NodeVisitorAbstract
+final class DefinitionTest extends TestCase
 {
     /**
-     * @var Mutation[]
+     * @dataProvider valuesProvider
      */
-    private $mutations = [];
+    public function test_it_can_be_instantiated(
+        string $description,
+        string $category,
+        ?string $remedies
+    ): void {
+        $definition = new Definition($description, $category, $remedies);
 
-    private $mutationGenerator;
-
-    public function __construct(NodeMutationGenerator $mutationGenerator)
-    {
-        $this->mutationGenerator = $mutationGenerator;
+        $this->assertSame($description, $definition->getDescription());
+        $this->assertSame($category, $definition->getCategory());
+        $this->assertSame($remedies, $definition->getRemedies());
     }
 
-    public function beforeTraverse(array $nodes): void
+    public function valuesProvider(): Generator
     {
-        $this->mutations = [];
-    }
+        yield 'empty' => [
+            '',
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null,
+        ];
 
-    public function leaveNode(Node $node): ?Node
-    {
-        foreach ($this->mutationGenerator->generate($node) as $mutation) {
-            $this->mutations[] = $mutation;
-        }
-
-        return null;
-    }
-
-    /**
-     * @return Mutation[]
-     */
-    public function getMutations(): array
-    {
-        return $this->mutations;
+        yield 'nominal' => [
+            'This text is for explaining what the mutator is about.',
+            MutatorCategory::SEMANTIC_REDUCTION,
+            'This text is for providing guidelines on how to kill the mutant.',
+        ];
     }
 }

@@ -49,6 +49,11 @@ abstract class Mutator
         $this->config = $config;
     }
 
+    public static function getDefinition(): ?Definition
+    {
+        return null;
+    }
+
     /**
      * @return Node|Node[]|Generator|array
      */

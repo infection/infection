@@ -37,32 +37,39 @@ namespace Infection\Mutator;
 
 use Webmozart\Assert\Assert;
 
+/**
+ * @internal
+ */
 final class Definition
 {
-    private $effectDescription;
-    private $classification;
+    private $description;
+    private $category;
     private $remedies;
 
+    /**
+     * @param string      $description Explanation on what the mutator is about
+     * @param string|null $remedies Guidelines or recommendations on how to kill the generated mutations
+     */
     public function __construct(
-        string $effectDescription,
-        string $classification,
+        string $description,
+        string $category,
         ?string $remedies
     ) {
-        Assert::oneOf($classification, Classification::ALL);
+        Assert::oneOf($category, MutatorCategory::ALL);
 
-        $this->effectDescription = $effectDescription;
-        $this->classification = $classification;
+        $this->description = $description;
+        $this->category = $category;
         $this->remedies = $remedies;
     }
 
-    public function getEffectDescription(): string
+    public function getDescription(): string
     {
-        return $this->effectDescription;
+        return $this->description;
     }
 
-    public function getClassification(): string
+    public function getCategory(): string
     {
-        return $this->classification;
+        return $this->category;
     }
 
     public function getRemedies(): ?string

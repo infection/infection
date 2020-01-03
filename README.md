@@ -18,7 +18,7 @@ Twitter: [@infection_php][twitter]
 ### Contributing
 
 Infection is an open source project that welcomes pull requests and issues from anyone. Before
-pening pull requests, please consider reading our short [Contribution Guide][contribution guide].
+opening pull requests, please consider reading our short [Contribution Guide][contribution guide].
 
 
 ### Credits

@@ -71,6 +71,11 @@ final class PhpUnitExtraOptionsTest extends TestCase
             ['--a --testsuite someTest#2 --b=value', '--a --b=value'],
             ['--a --testsuite="some Test#2" --b=value', '--a --b=value'],
             ['--a --testsuite=\'some Test#2\' --b=value', '--a --b=value'],
+            ['--configuration=someTest#2 --a --b=value', '--a --b=value'],
+            ['--a --configuration=someTest#2 --b=value', '--a --b=value'],
+            ['--a --configuration someTest#2 --b=value', '--a --b=value'],
+            ['--a --configuration="some Test#2" --b=value', '--a --b=value'],
+            ['--a --configuration=\'some Test#2\' --b=value', '--a --b=value'],
         ];
     }
 }
