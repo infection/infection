@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Cast;
 
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**

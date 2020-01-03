@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
-use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Definition;
 use function array_slice;
 use function count;
 use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**

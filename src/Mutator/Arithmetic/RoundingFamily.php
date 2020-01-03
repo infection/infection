@@ -37,8 +37,8 @@ namespace Infection\Mutator\Arithmetic;
 
 use Generator;
 use function in_array;
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 

@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutator\Boolean;
 
 use function array_key_exists;
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;

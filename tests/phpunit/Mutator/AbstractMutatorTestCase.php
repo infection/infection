@@ -40,6 +40,7 @@ use function count;
 use function escapeshellarg;
 use function exec;
 use function get_class;
+use function implode;
 use Infection\Console\InfectionContainer;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
@@ -51,17 +52,16 @@ use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\NotMutableIgnoreVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
+use const PHP_EOL;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\TestCase;
-use function implode;
 use function rtrim;
 use function Safe\sprintf;
 use function str_replace;
 use function substr;
-use const PHP_EOL;
 
 abstract class AbstractMutatorTestCase extends TestCase
 {
@@ -104,7 +104,7 @@ abstract class AbstractMutatorTestCase extends TestCase
                 'Failed asserting that the number of code samples (%d) equals the number of mutants (%d) created by the mutator. Mutations found: %s',
                 count($expectedCodeSamples),
                 count($mutants),
-                PHP_EOL.implode(PHP_EOL.'----'.PHP_EOL, $mutants)
+                PHP_EOL . implode(PHP_EOL . '----' . PHP_EOL, $mutants)
             )
         );
 

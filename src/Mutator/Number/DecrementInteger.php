@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutator\Number;
 
 use function in_array;
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 

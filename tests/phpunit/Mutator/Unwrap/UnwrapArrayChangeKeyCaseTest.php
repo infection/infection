@@ -37,7 +37,6 @@ namespace Infection\Tests\Mutator\Unwrap;
 
 use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
-use function Safe\sprintf;
 
 final class UnwrapArrayChangeKeyCaseTest extends AbstractMutatorTestCase
 {
