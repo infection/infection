@@ -39,14 +39,17 @@ use function array_column;
 use function array_diff;
 use function array_filter;
 use function array_map;
+use function count;
 use Generator;
 use function implode;
+use Infection\Mutator\Util\Mutator;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use Infection\Tests\Mutator\ProfileListProvider;
 use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
+use function Safe\sprintf;
 use function sort;
 use const SORT_STRING;
 
@@ -62,6 +65,7 @@ use const SORT_STRING;
 final class MutatorTest extends TestCase
 {
     private const KNOWN_MUTATOR_PUBLIC_METHODS = [
+        'getDefinition',
         'getName',
         'mutate',
         'shouldMutate',
@@ -75,7 +79,7 @@ final class MutatorTest extends TestCase
         $publicMethods = $this->getPublicMethods(new ReflectionClass($className));
 
         $this->assertCount(
-            3,
+            count(self::KNOWN_MUTATOR_PUBLIC_METHODS),
             $publicMethods,
             sprintf(
                 'The mutator class "%s" has the following non-allowed public method(s) '
@@ -91,11 +95,49 @@ final class MutatorTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider concreteMutatorClassesProvider
+     */
+    public function test_mutators_have_a_definition(string $className): void
+    {
+        /** @var Mutator $mutator */
+        $mutator = (new ReflectionClass($className))->newInstanceWithoutConstructor();
+
+        $definition = $mutator::getDefinition();
+
+        if ($definition !== null) {
+            return;
+        }
+
+        $this->addWarning(sprintf(
+            'The mutant "%s" does not have a definition.',
+            $className
+        ));
+    }
+
     public function mutatorClassesProvider(): Generator
     {
         yield from generator_to_phpunit_data_provider(array_column(
-            iterator_to_array(ProfileListProvider::mutatorNameAndClassProvider(), false),
+            iterator_to_array(ProfileListProvider::mutatorNameAndClassProvider(), true),
             1
+        ));
+    }
+
+    public function concreteMutatorClassesProvider(): Generator
+    {
+        yield from generator_to_phpunit_data_provider(array_filter(
+            array_column(
+                iterator_to_array(ProfileListProvider::mutatorNameAndClassProvider(), true),
+                1
+            ),
+            static function (string $className): bool {
+                $reflectionClass = new ReflectionClass($className);
+
+                return !$reflectionClass->isInterface()
+                    && !$reflectionClass->isAbstract()
+                    && !$reflectionClass->isTrait()
+                    ;
+            }
         ));
     }
 

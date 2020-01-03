@@ -33,62 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Mutator;
 
-use Generator;
-use Infection\Mutator\Definition;
-use Infection\Visitor\ReflectionVisitor;
-use PhpParser\Node;
-
-abstract class Mutator
+/**
+ * @internal
+ */
+final class MutatorCategory
 {
-    private $config;
-
-    public function __construct(MutatorConfig $config)
-    {
-        $this->config = $config;
-    }
-
-    public static function getDefinition(): ?Definition
-    {
-        return null;
-    }
+    /**
+     * Semantic reductions exposes unused semantics. For example:
+     *
+     * ```php
+     * $x = $a + $b;
+     *
+     * // to
+     *
+     * $x = $a;
+     * ```
+     *
+     * If the semantics are unneeded, they should be removed. Otherwise they should be tested.
+     */
+    public const SEMANTIC_REDUCTION = 'semanticReduction';
 
     /**
-     * @return Node|Node[]|Generator|array
+     * An example of orthogonal replacement is:
+     *
+     * ```php
+     * $a > $b;
+     *
+     * // to
+     *
+     * $a < $b;
+     * ```
+     *
+     * Neither form has less semantics than the other. It is however a mutation that shows a lack
+     * of coverage.
      */
-    abstract public function mutate(Node $node);
+    public const ORTHOGONAL_REPLACEMENT = 'orthogonalReplacement';
 
-    final public function shouldMutate(Node $node): bool
+    // Also known but unused for now: neutral, semantic addition
+
+    public const ALL = [
+        self::SEMANTIC_REDUCTION,
+        self::ORTHOGONAL_REPLACEMENT,
+    ];
+
+    private function __construct()
     {
-        if (!$this->mutatesNode($node)) {
-            return false;
-        }
-
-        $reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY, false);
-
-        if (!$reflectionClass) {
-            return true;
-        }
-
-        return !$this->config->isIgnored(
-            $reflectionClass->getName(),
-            $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''),
-            $node->getLine()
-        );
     }
-
-    final public static function getName(): string
-    {
-        $parts = explode('\\', static::class);
-
-        return (string) end($parts);
-    }
-
-    final protected function getSettings(): array
-    {
-        return $this->config->getMutatorSettings();
-    }
-
-    abstract protected function mutatesNode(Node $node): bool;
 }
