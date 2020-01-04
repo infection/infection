@@ -33,72 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Tests\Mutator;
 
+use Infection\Mutator\Mutator;
+use PHPUnit\Framework\TestCase;
+use function array_filter;
+use function class_exists;
+use const ARRAY_FILTER_USE_KEY;
+use function array_values;
 use Generator;
-use Infection\Mutator\Definition;
-use Infection\Mutator\Mutator as MutatorInterface;
-use Infection\Visitor\ReflectionVisitor;
-use PhpParser\Node;
+use Infection\Mutator\ProfileList;
+use function ksort;
+use ReflectionClass;
+use function Safe\realpath;
+use const SORT_STRING;
+use function sprintf;
+use function str_replace;
+use function substr;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
+use Webmozart\PathUtil\Path;
 
-/**
- * @deprecated Should not be needed anymore. More work needs to be done but ultimately this class
- *             should go away.
- */
-abstract class Mutator implements MutatorInterface
+final class ProfileListProviderTest extends TestCase
 {
-    private $config;
-
-    public function __construct(MutatorConfig $config)
+    /**
+     * @dataProvider \Infection\Tests\Mutator\ProfileListProvider::mutatorNameAndClassProvider
+     */
+    public function test_mutator_name_and_class_provider_is_valid(string $name, string $className): void
     {
-        $this->config = $config;
-    }
-
-    public static function getDefinition(): ?Definition
-    {
-        return null;
+        $this->assertNotSame($name, $className);
+        $this->assertTrue(class_exists($className));
     }
 
     /**
-     * @return Node|Node[]|Generator|array
+     * @dataProvider \Infection\Tests\Mutator\ProfileListProvider::implementedMutatorProvider
      */
-    abstract public function mutate(Node $node);
-
-    final public function shouldMutate(Node $node): bool
+    public function test_implemented_mutator_provider_is_valid(
+        string $mutatorFilePath,
+        string $mutatorClassName,
+        string $mutatorShortClassName
+    ): void
     {
-        if (!$this->mutatesNode($node)) {
-            return false;
-        }
-
-        $reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY, false);
-
-        if (!$reflectionClass) {
-            return true;
-        }
-
-        return !$this->config->isIgnored(
-            $reflectionClass->getName(),
-            $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''),
-            $node->getLine()
-        );
+        $this->assertFileExists($mutatorFilePath);
+        $this->assertNotSame($mutatorClassName, $mutatorShortClassName);
+        $this->assertTrue(class_exists($mutatorClassName));
     }
-
-    final public static function getName(): string
-    {
-        $parts = explode('\\', static::class);
-
-        return (string) end($parts);
-    }
-
-    public function canMutate(Node $node): bool
-    {
-        return $this->mutatesNode($node);
-    }
-
-    final protected function getSettings(): array
-    {
-        return $this->config->getMutatorSettings();
-    }
-
-    abstract protected function mutatesNode(Node $node): bool;
 }

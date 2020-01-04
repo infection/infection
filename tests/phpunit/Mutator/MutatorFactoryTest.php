@@ -48,7 +48,6 @@ use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\ProfileList;
-use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ReflectionVisitor;
 use InvalidArgumentException;
 use PhpParser\Node;

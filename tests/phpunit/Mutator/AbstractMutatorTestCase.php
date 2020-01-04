@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use Infection\Mutator\Mutator;
 use function array_shift;
 use function count;
 use function escapeshellarg;
 use function exec;
 use function get_class;
 use Infection\Console\InfectionContainer;
-use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Tests\Fixtures\SimpleMutation;
 use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;

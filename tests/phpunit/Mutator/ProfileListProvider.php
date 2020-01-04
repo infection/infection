@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use Infection\Mutator\Util\Mutator;
 use function array_filter;
 use const ARRAY_FILTER_USE_KEY;
 use function array_values;
 use Generator;
 use Infection\Mutator\ProfileList;
-use Infection\Mutator\Util\Mutator;
 use function ksort;
 use ReflectionClass;
 use function Safe\realpath;
