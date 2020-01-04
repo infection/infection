@@ -37,7 +37,7 @@ namespace Infection;
 
 use function count;
 use function get_class;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Mutator;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use PhpParser\Node;
 

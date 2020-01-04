@@ -37,7 +37,6 @@ namespace Infection\Mutator;
 
 use function array_key_exists;
 use function class_exists;
-use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use InvalidArgumentException;
 use function sprintf;

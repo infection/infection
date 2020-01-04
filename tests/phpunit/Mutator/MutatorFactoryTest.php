@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use Infection\Mutator\IgnoreMutator;
 use function array_diff;
 use function array_values;
 use function count;
@@ -46,6 +45,7 @@ use Infection\Mutator\Boolean\FalseValue;
 use Infection\Mutator\Boolean\IdenticalEqual;
 use Infection\Mutator\Boolean\NotIdenticalNotEqual;
 use Infection\Mutator\Boolean\TrueValue;
+use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\ProfileList;
 use Infection\Mutator\Util\Mutator;

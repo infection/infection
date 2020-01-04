@@ -38,14 +38,15 @@ namespace Infection\Mutation;
 use function array_key_exists;
 use function get_class;
 use Infection\Mutation;
+use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Visitor\MutationsCollectorVisitor;
 use InvalidArgumentException;
 use PhpParser\NodeVisitor;
 use function Safe\sprintf;
 use Symfony\Component\Finder\SplFileInfo;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -67,7 +68,7 @@ class FileMutationGenerator
     }
 
     /**
-     * @param Mutator[]     $mutators
+     * @param IgnoreMutator[]     $mutators
      * @param NodeVisitor[] $extraNodeVisitors
      *
      * @throws UnparsableFile
@@ -81,6 +82,9 @@ class FileMutationGenerator
         array $mutators,
         array $extraNodeVisitors
     ): array {
+        Assert::allIsInstanceOf($mutators, IgnoreMutator::class);
+        Assert::allIsInstanceOf($extraNodeVisitors, NodeVisitor::class);
+
         $filePath = false === $fileInfo->getRealPath()
             ? $fileInfo->getPathname()
             : $fileInfo->getRealPath()

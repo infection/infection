@@ -35,9 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use Generator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
+use ReflectionClass;
 
 /**
  * The mutators implement the ignore + canMutator pattern. The downside of this pattern is that
@@ -68,9 +70,10 @@ final class IgnoreMutator
             return false;
         }
 
+        /** @var ReflectionClass|false $reflectionClass */
         $reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY, false);
 
-        if (!$reflectionClass) {
+        if ($reflectionClass === false) {
             return true;
         }
 
@@ -81,8 +84,20 @@ final class IgnoreMutator
         );
     }
 
+    /**
+     * @return Node|Node[]|Generator
+     */
     public function mutate(Node $node)
     {
         return $this->mutator->mutate($node);
+    }
+
+    // TODO: this function is necessary for now mostly because Mutations requires Mutator which is
+    //  expected to be the underlying mutator for now.
+    //  It might be possible to remove this getter if it turns out that Mutation may not require
+    //  the full Mutator object but just some elements of it.
+    public function getMutator(): Mutator
+    {
+        return $this->mutator;
     }
 }

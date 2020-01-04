@@ -38,6 +38,9 @@ namespace Infection\Mutator;
 use Generator;
 use PhpParser\Node;
 
+/**
+ * @internal
+ */
 interface Mutator
 {
     public static function getDefinition(): ?Definition;
@@ -47,7 +50,7 @@ interface Mutator
     public function canMutate(Node $node): bool;
 
     /**
-     * @return Node|Node[]|Generator|array
+     * @return Node|Node[]|Generator
      */
     public function mutate(Node $node);
 }

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
+use Infection\Mutator\Util\Mutator;
 use const DIRECTORY_SEPARATOR;
 use Generator;
 use function in_array;
@@ -59,7 +60,6 @@ use Infection\Http\BadgeApiClient;
 use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\Mutator\Util\Mutator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;

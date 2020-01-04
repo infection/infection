@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use Webmozart\Assert\Assert;
 use function count;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutableFileProcessed;
@@ -46,6 +45,7 @@ use Infection\Mutator\IgnoreMutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use PhpParser\NodeVisitor;
 use Symfony\Component\Finder\SplFileInfo;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
