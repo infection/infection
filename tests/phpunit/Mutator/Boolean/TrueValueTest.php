@@ -271,13 +271,13 @@ PHP
     {
         $falseValue = new ConstFetch(new Name('true'));
 
-        $this->assertTrue($this->mutator->shouldMutate($falseValue));
+        $this->assertTrue($this->mutator->canMutate($falseValue));
     }
 
     public function test_does_not_mutate_false_value(): void
     {
         $trueValue = new ConstFetch(new Name('false'));
 
-        $this->assertFalse($this->mutator->shouldMutate($trueValue));
+        $this->assertFalse($this->mutator->canMutate($trueValue));
     }
 }

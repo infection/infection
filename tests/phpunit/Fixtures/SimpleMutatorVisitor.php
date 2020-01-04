@@ -28,7 +28,7 @@ class SimpleMutatorVisitor extends NodeVisitorAbstract
     {
         $mutator = $this->mutation->getMutator();
 
-        if ($mutator->shouldMutate($node)) {
+        if ($mutator->canMutate($node)) {
             return $this->mutation->getMutatedNode();
         }
     }

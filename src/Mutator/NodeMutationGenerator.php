@@ -105,7 +105,11 @@ class NodeMutationGenerator
                 return $mutations;
             }
         } catch (Throwable $throwable) {
-            throw InvalidMutatorException::create($this->filePath, $mutator, $throwable);
+            throw InvalidMutatorException::create(
+                $this->filePath,
+                $mutator->getMutator(),
+                $throwable
+            );
         }
 
         $isOnFunctionSignature = $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);

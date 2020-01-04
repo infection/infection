@@ -37,7 +37,7 @@ final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node)
     {
-        if (!$this->mutator->shouldMutate($node)) {
+        if (!$this->mutator->canMutate($node)) {
             return;
         }
 

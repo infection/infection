@@ -50,7 +50,7 @@ interface Mutator
     public function canMutate(Node $node): bool;
 
     /**
-     * @return Node|Node[]|Generator
+     * @return Node|Node[]|Generator|array
      */
     public function mutate(Node $node);
 }
