@@ -75,6 +75,7 @@ use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUn
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
 use Infection\TestFramework\TestFrameworkTypes;
+use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use Infection\Utils\VersionParser;
 use function iterator_to_array;
@@ -193,19 +194,10 @@ final class ProjectCodeProvider
 
     public static function provideConcreteSourceClasses(): Generator
     {
-        $sourceClasses = iterator_to_array(self::provideSourceClasses(), true);
-
-        yield from array_filter(
-            $sourceClasses,
-            static function (string $className): bool {
-                $reflectionClass = new ReflectionClass($className);
-
-                return !$reflectionClass->isInterface()
-                    && !$reflectionClass->isAbstract()
-                    && !$reflectionClass->isTrait()
-                ;
-            }
-        );
+        yield from ConcreteClassReflector::filterByConcreteClasses(iterator_to_array(
+            self::provideSourceClasses(),
+            true
+        ));
     }
 
     public static function concreteSourceClassesProvider(): Generator

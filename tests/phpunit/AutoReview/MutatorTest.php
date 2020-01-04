@@ -125,19 +125,11 @@ final class MutatorTest extends TestCase
 
     public function concreteMutatorClassesProvider(): Generator
     {
-        yield from generator_to_phpunit_data_provider(array_filter(
+        yield from generator_to_phpunit_data_provider(ConcreteClassReflector::filterByConcreteClasses(
             array_column(
                 iterator_to_array(ProfileListProvider::mutatorNameAndClassProvider(), true),
                 1
-            ),
-            static function (string $className): bool {
-                $reflectionClass = new ReflectionClass($className);
-
-                return !$reflectionClass->isInterface()
-                    && !$reflectionClass->isAbstract()
-                    && !$reflectionClass->isTrait()
-                    ;
-            }
+            )
         ));
     }
 
