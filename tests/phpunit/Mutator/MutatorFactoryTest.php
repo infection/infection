@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use Infection\Mutator\IgnoreMutator;
 use function array_diff;
 use function array_values;
 use function count;
@@ -309,15 +310,22 @@ final class MutatorFactoryTest extends TestCase
 
     /**
      * @param string[]               $expectedMutators
-     * @param array<string, Mutator> $actualMutators
+     * @param array<string, IgnoreMutator> $actualMutators
      */
     private function assertSameMutatorsByClass(array $expectedMutators, array $actualMutators): void
     {
         $this->assertCount(count($expectedMutators), $actualMutators);
 
+        $ignoreMutatorReflection = new ReflectionClass(IgnoreMutator::class);
+
+        $decoratedMutatorReflection = $ignoreMutatorReflection->getProperty('mutator');
+        $decoratedMutatorReflection->setAccessible(true);
+
         foreach (array_values($actualMutators) as $index => $mutator) {
+            $this->assertInstanceOf(IgnoreMutator::class, $mutator);
+
             $expectedMutatorClass = $expectedMutators[$index];
-            $actualMutatorClass = get_class($mutator);
+            $actualMutatorClass = get_class($decoratedMutatorReflection->getValue($mutator));
 
             $this->assertSame(
                 $expectedMutatorClass,

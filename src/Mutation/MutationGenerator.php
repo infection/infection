@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use Webmozart\Assert\Assert;
 use function count;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutableFileProcessed;
@@ -67,7 +68,7 @@ final class MutationGenerator
 
     /**
      * @param SplFileInfo[] $sourceFiles
-     * @param IgnoreMutator[]     $mutators
+     * @param IgnoreMutator[] $mutators
      */
     public function __construct(
         array $sourceFiles,
@@ -76,6 +77,9 @@ final class MutationGenerator
         EventDispatcherInterface $eventDispatcher,
         FileMutationGenerator $fileMutationGenerator
     ) {
+        Assert::allIsInstanceOf($sourceFiles, SplFileInfo::class);
+        Assert::allIsInstanceOf($mutators, IgnoreMutator::class);
+
         $this->sourceFiles = $sourceFiles;
         $this->codeCoverageData = $codeCoverageData;
         $this->mutators = $mutators;

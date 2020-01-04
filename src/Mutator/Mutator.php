@@ -42,12 +42,12 @@ interface Mutator
 {
     public static function getDefinition(): ?Definition;
 
+    public static function getName(): string;
+
     public function canMutate(Node $node): bool;
 
     /**
      * @return Node|Node[]|Generator|array
      */
     public function mutate(Node $node);
-
-    public static function getName(): string;
 }

@@ -48,6 +48,8 @@ use PhpParser\Node;
  * check internally. We however do not do so because before actually mutating, there is a few
  * expansive steps (e.g. retrieving the tests methods). Hence the currently chosen pattern allows
  * better performance optimization in our case.
+ *
+ * @internal
  */
 final class IgnoreMutator
 {
