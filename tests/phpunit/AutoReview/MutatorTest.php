@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
-use Infection\Mutator\Mutator;
 use function array_column;
 use function array_diff;
 use function array_filter;
@@ -43,6 +42,7 @@ use function array_map;
 use function count;
 use Generator;
 use function implode;
+use Infection\Mutator\Mutator;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use Infection\Tests\Mutator\ProfileListProvider;
 use function iterator_to_array;

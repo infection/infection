@@ -35,24 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use Infection\Mutator\Mutator;
-use PHPUnit\Framework\TestCase;
-use function array_filter;
 use function class_exists;
-use const ARRAY_FILTER_USE_KEY;
-use function array_values;
-use Generator;
-use Infection\Mutator\ProfileList;
-use function ksort;
-use ReflectionClass;
-use function Safe\realpath;
-use const SORT_STRING;
-use function sprintf;
-use function str_replace;
-use function substr;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\PathUtil\Path;
+use PHPUnit\Framework\TestCase;
 
 final class ProfileListProviderTest extends TestCase
 {
@@ -72,8 +56,7 @@ final class ProfileListProviderTest extends TestCase
         string $mutatorFilePath,
         string $mutatorClassName,
         string $mutatorShortClassName
-    ): void
-    {
+    ): void {
         $this->assertFileExists($mutatorFilePath);
         $this->assertNotSame($mutatorClassName, $mutatorShortClassName);
         $this->assertTrue(class_exists($mutatorClassName));

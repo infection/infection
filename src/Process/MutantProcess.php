@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
-use Infection\Mutator\Mutator;
 use function in_array;
 use Infection\Mutant\MutantInterface;
 use Infection\Mutation;
+use Infection\Mutator\Mutator;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Symfony\Component\Process\Process;
 
