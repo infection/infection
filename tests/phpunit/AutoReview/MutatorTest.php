@@ -106,8 +106,6 @@ final class MutatorTest extends TestCase
         $definition = $mutator::getDefinition();
 
         if ($definition !== null) {
-            $this->addToAssertionCount(1);
-
             return;
         }
 

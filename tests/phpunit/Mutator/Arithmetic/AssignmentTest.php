@@ -52,7 +52,7 @@ final class AssignmentTest extends AbstractMutatorTestCase
 
     public function mutationsProvider(): Generator
     {
-        yield 'addition assignment' => [
+        yield [
             <<<'PHP'
 <?php
 
@@ -66,7 +66,7 @@ $a = $b;
 PHP
         ];
 
-        yield 'subtraction assignment' => [
+        yield [
             <<<'PHP'
 <?php
 
@@ -80,7 +80,7 @@ $a = $b;
 PHP
         ];
 
-        yield 'multiplication assignment' => [
+        yield [
             <<<'PHP'
 <?php
 
@@ -94,7 +94,7 @@ $a = $b;
 PHP
         ];
 
-        yield 'exponentiation assignment' => [
+        yield [
             <<<'PHP'
 <?php
 
@@ -108,7 +108,7 @@ $a = $b;
 PHP
         ];
 
-        yield 'division assignment' => [
+        yield [
             <<<'PHP'
 <?php
 
@@ -122,7 +122,7 @@ $a = $b;
 PHP
         ];
 
-        yield 'remainder assignment' => [
+        yield [
             <<<'PHP'
 <?php
 
@@ -136,7 +136,7 @@ $a = $b;
 PHP
         ];
 
-        yield 'concatenation assignment' => [
+        yield [
             <<<'PHP'
 <?php
 
@@ -150,7 +150,7 @@ $a = $b;
 PHP
         ];
 
-        yield 'bitwise AND assignment' => [
+        yield [
             <<<'PHP'
 <?php
 
@@ -164,7 +164,7 @@ $a = $b;
 PHP
         ];
 
-        yield 'bitwise OR assignment' => [
+        yield [
             <<<'PHP'
 <?php
 
@@ -178,7 +178,7 @@ $a = $b;
 PHP
         ];
 
-        yield 'bitwise XOR assignment' => [
+        yield [
             <<<'PHP'
 <?php
 
@@ -192,7 +192,7 @@ $a = $b;
 PHP
         ];
 
-        yield 'left shift assignment' => [
+        yield [
             <<<'PHP'
 <?php
 
@@ -206,7 +206,7 @@ $a = $b;
 PHP
         ];
 
-        yield 'right shift assignment' => [
+        yield [
             <<<'PHP'
 <?php
 
@@ -218,26 +218,6 @@ PHP
 
 $a = $b;
 PHP
-        ];
-
-        yield 'it does not mutate a loose comparison' => [
-            <<<'PHP'
-<?php
-
-$a == $b;
-PHP
-            ,
-            null,
-        ];
-
-        yield 'it does not mutate a strict comparison' => [
-            <<<'PHP'
-<?php
-
-$a === $b;
-PHP
-            ,
-            null,
         ];
     }
 }

@@ -52,62 +52,6 @@ final class UnwrapArrayChangeKeyCaseTest extends AbstractMutatorTestCase
 
     public function mutationsProvider(): Generator
     {
-        yield 'variable for the array' => [
-            <<<'PHP'
-<?php
-
-array_change_key_case($array);
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$array;
-PHP
-            ,
-        ];
-
-        yield 'function for the array' => [
-            <<<'PHP'
-<?php
-
-array_change_key_case(create_array());
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-create_array();
-PHP
-            ,
-        ];
-
-        yield 'case' => [
-            <<<'PHP'
-<?php
-
-array_change_key_case($array, CASE_UPPER);
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$array;
-PHP
-            ,
-        ];
-
-        yield 'it ignores user-defined function' => [
-            <<<'PHP'
-<?php
-
-use Acme\array_change_key_case;
-
-array_change_key_case($array, CASE_UPPER);
-PHP
-            ,
-        ];
-
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
 <?php
