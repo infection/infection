@@ -37,7 +37,7 @@ namespace Infection\Configuration;
 
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\IgnoreMutator;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
 use Symfony\Component\Finder\SplFileInfo;
@@ -86,7 +86,7 @@ class Configuration
     /**
      * @param string[]               $sourceDirectories
      * @param SplFileInfo[]          $sourceFiles
-     * @param array<string, Mutator> $mutators
+     * @param array<string, IgnoreMutator> $mutators
      */
     public function __construct(
         int $timeout,
@@ -115,7 +115,7 @@ class Configuration
         Assert::nullOrGreaterThanEq($timeout, 1);
         Assert::allString($sourceDirectories);
         Assert::allIsInstanceOf($sourceFiles, SplFileInfo::class);
-        Assert::allIsInstanceOf($mutators, Mutator::class);
+        Assert::allIsInstanceOf($mutators, IgnoreMutator::class);
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
         Assert::oneOf($formatter, self::FORMATTER);
@@ -187,7 +187,7 @@ class Configuration
     }
 
     /**
-     * @return array<string, Mutator>
+     * @return array<string, IgnoreMutator>
      */
     public function getMutators(): array
     {

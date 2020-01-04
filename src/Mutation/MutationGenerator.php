@@ -41,7 +41,7 @@ use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
 use Infection\Mutation;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\IgnoreMutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use PhpParser\NodeVisitor;
 use Symfony\Component\Finder\SplFileInfo;
@@ -57,7 +57,7 @@ final class MutationGenerator
     private $sourceFiles;
 
     /**
-     * @var Mutator[]
+     * @var IgnoreMutator[]
      */
     private $mutators;
 
@@ -67,7 +67,7 @@ final class MutationGenerator
 
     /**
      * @param SplFileInfo[] $sourceFiles
-     * @param Mutator[]     $mutators
+     * @param IgnoreMutator[]     $mutators
      */
     public function __construct(
         array $sourceFiles,

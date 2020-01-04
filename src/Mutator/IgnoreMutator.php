@@ -33,36 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Mutator;
 
-use Generator;
-use Infection\Mutator\Definition;
-use Infection\Mutator\Mutator as MutatorInterface;
+use Infection\Mutator\Util\MutatorConfig;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
-abstract class Mutator implements MutatorInterface
+/**
+ * The mutators implement the ignore + canMutator pattern. The downside of this pattern is that
+ * it makes its public API more complex and easier to mess up since the caller needs to be careful
+ * of checking if he should mutate before attempting to mutate.
+ *
+ * A better alternative would be to allow to blindly mutate and do this "ignore + should mutate"
+ * check internally. We however do not do so because before actually mutating, there is a few
+ * expansive steps (e.g. retrieving the tests methods). Hence the currently chosen pattern allows
+ * better performance optimization in our case.
+ */
+final class IgnoreMutator
 {
     private $config;
+    private $mutator;
 
-    public function __construct(MutatorConfig $config)
+    public function __construct(MutatorConfig $config, Mutator $mutator)
     {
         $this->config = $config;
+        $this->mutator = $mutator;
     }
 
-    public static function getDefinition(): ?Definition
+    public function shouldMutate(Node $node): bool
     {
-        return null;
-    }
-
-    /**
-     * @return Node|Node[]|Generator|array
-     */
-    abstract public function mutate(Node $node);
-
-    final public function shouldMutate(Node $node): bool
-    {
-        if (!$this->mutatesNode($node)) {
+        if (!$this->mutator->canMutate($node)) {
             return false;
         }
 
@@ -79,22 +79,8 @@ abstract class Mutator implements MutatorInterface
         );
     }
 
-    final public static function getName(): string
+    public function mutate(Node $node)
     {
-        $parts = explode('\\', static::class);
-
-        return (string) end($parts);
+        return $this->mutator->mutate($node);
     }
-
-    public function canMutate(Node $node): bool
-    {
-        return $this->mutatesNode($node);
-    }
-
-    final protected function getSettings(): array
-    {
-        return $this->config->getMutatorSettings();
-    }
-
-    abstract protected function mutatesNode(Node $node): bool;
 }
