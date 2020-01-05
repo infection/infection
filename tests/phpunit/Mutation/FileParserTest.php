@@ -180,7 +180,7 @@ PHP
 array(
     0: Stmt_InlineHTML(
         value: #!/usr/bin/env php
-
+    
     )
     1: Stmt_Declare(
         declares: array(
