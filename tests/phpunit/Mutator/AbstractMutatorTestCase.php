@@ -41,16 +41,13 @@ use function escapeshellarg;
 use function exec;
 use function get_class;
 use Infection\Console\InfectionContainer;
+use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Tests\Fixtures\SimpleMutation;
 use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;
 use Infection\Tests\Fixtures\SimpleMutatorVisitor;
 use Infection\Visitor\CloneVisitor;
-use Infection\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\Visitor\NotMutableIgnoreVisitor;
-use Infection\Visitor\ParentConnectorVisitor;
-use Infection\Visitor\ReflectionVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
@@ -179,20 +176,15 @@ abstract class AbstractMutatorTestCase extends TestCase
     {
         $nodes = self::getParser()->parse($code);
 
-        $traverser = new NodeTraverser();
-
         $mutationsCollectorVisitor = new SimpleMutationsCollectorVisitor(
             $this->createMutator($settings),
             $nodes
         );
 
-        $traverser->addVisitor(new NotMutableIgnoreVisitor());
-        $traverser->addVisitor(new ParentConnectorVisitor());
-        $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
-        $traverser->addVisitor(new ReflectionVisitor());
-        $traverser->addVisitor($mutationsCollectorVisitor);
-
-        $traverser->traverse($nodes);
+        (new NodeTraverserFactory())
+            ->create([100 => $mutationsCollectorVisitor])
+            ->traverse($nodes)
+        ;
 
         return $mutationsCollectorVisitor->getMutations();
     }
