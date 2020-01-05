@@ -47,7 +47,7 @@ final class ParentConnectorVisitorTest extends BaseVisitorTest
 
 namespace Acme;
 
-function hello() 
+function hello()
 {
     return 'hello';
 }

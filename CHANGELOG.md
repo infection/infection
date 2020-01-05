@@ -64,7 +64,7 @@
 - Update used memory detection for PHPUnit 8 [\#739](https://github.com/infection/infection/pull/739)
 - Update E2E tests to use PHPUnit 8 [\#738](https://github.com/infection/infection/pull/738)
 - Update xdebug-handler to 1.3.3, remove workarounds [\#737](https://github.com/infection/infection/pull/737)
-- Upgrade to PHPUnit 8.2.3 [\#713](https://github.com/infection/infection/pull/713) 
+- Upgrade to PHPUnit 8.2.3 [\#713](https://github.com/infection/infection/pull/713)
 - Error out when 0 lines of code were covered [\#602](https://github.com/infection/infection/pull/602)
 - Add `ignore` property for each Mutator in JSON schema. [\#699](https://github.com/infection/infection/pull/699)
 - PhpProcess: Reset $\_ENV if it is in use [\#693](https://github.com/infection/infection/pull/693)
@@ -91,7 +91,7 @@
 **Added:**
 
 - Log the InitialTestsRun command line when `--debug` is used [\#520](https://github.com/infection/infection/issues/520)
-- Preliminary support for PCOV [\#667](https://github.com/infection/infection/pull/667) 
+- Preliminary support for PCOV [\#667](https://github.com/infection/infection/pull/667)
 - Adding Line Numbers To Mutator Ignore List [\#663](https://github.com/infection/infection/pull/663)
 - Family bc\*-functions mutators \(bcmath support\) [\#658](https://github.com/infection/infection/issues/658)
 - Family mb\_\*-functions mutators [\#654](https://github.com/infection/infection/issues/654)
@@ -126,7 +126,7 @@
 - Upgrade PHPUnit from ^6.5 to ^7.5 and all dependencies, including root differ [\#627](https://github.com/infection/infection/pull/627)
 - Test against php 7.4 [\#625](https://github.com/infection/infection/pull/625)
 
-## [0.12.0](https://github.com/infection/infection/tree/0.12.0) (2019-01-24) 
+## [0.12.0](https://github.com/infection/infection/tree/0.12.0) (2019-01-24)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.11.0...0.12.0)
 
@@ -137,13 +137,13 @@
 **Added:**
 
 - Allow settings for Mutators [\#206](https://github.com/infection/infection/issues/206)
-- Enhancement: Implement UnwrapArrayUdiffAssoc mutator [\#614](https://github.com/infection/infection/pull/614) 
-- Enhancement: Implement UnwrapArraySplice mutator [\#605](https://github.com/infection/infection/pull/605) 
-- Enhancement: Implement UnwrapArraySlice mutator [\#598](https://github.com/infection/infection/pull/598) 
-- Enhancement: Implement UnwrapArrayMergeRecursive mutator [\#594](https://github.com/infection/infection/pull/594) 
-- Enhancement: Implement UnwrapArrayIntersectUkey mutator [\#593](https://github.com/infection/infection/pull/593) 
-- Enhancement: Implement UnwrapArrayIntersectUassoc mutator [\#591](https://github.com/infection/infection/pull/591) 
-- Enhancement: Implement UnwrapArrayColumn mutator [\#590](https://github.com/infection/infection/pull/590) 
+- Enhancement: Implement UnwrapArrayUdiffAssoc mutator [\#614](https://github.com/infection/infection/pull/614)
+- Enhancement: Implement UnwrapArraySplice mutator [\#605](https://github.com/infection/infection/pull/605)
+- Enhancement: Implement UnwrapArraySlice mutator [\#598](https://github.com/infection/infection/pull/598)
+- Enhancement: Implement UnwrapArrayMergeRecursive mutator [\#594](https://github.com/infection/infection/pull/594)
+- Enhancement: Implement UnwrapArrayIntersectUkey mutator [\#593](https://github.com/infection/infection/pull/593)
+- Enhancement: Implement UnwrapArrayIntersectUassoc mutator [\#591](https://github.com/infection/infection/pull/591)
+- Enhancement: Implement UnwrapArrayColumn mutator [\#590](https://github.com/infection/infection/pull/590)
 - Enhancement: Implement UnwrapArrayIntersectKey mutator [\#584](https://github.com/infection/infection/pull/584)
 - Enhancement: Implement UnwrapArrayDiffUkey mutator [\#583](https://github.com/infection/infection/pull/583)
 
@@ -162,7 +162,7 @@
 - Update gitattributes file [\#532](https://github.com/infection/infection/pull/532)
 
 
-## [0.11.0](https://github.com/infection/infection/tree/0.11.0) (2018-11-11) 
+## [0.11.0](https://github.com/infection/infection/tree/0.11.0) (2018-11-11)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.10.6...0.11.0)
 
@@ -231,7 +231,7 @@
 - Do not mutate interfaces [\#548](https://github.com/infection/infection/pull/548) ([sanmai](https://github.com/sanmai))
 - Include the complete license in headers [\#528](https://github.com/infection/infection/pull/528) ([sanmai](https://github.com/sanmai))
 
-## [0.10.0](https://github.com/infection/infection/tree/HEAD)  (2018-08-11) 
+## [0.10.0](https://github.com/infection/infection/tree/HEAD)  (2018-08-11)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.9.3...0.10.0)
 
@@ -259,7 +259,7 @@
 - Fix exclude to excludes for generated config file [\#423](https://github.com/infection/infection/pull/423) ([BackEndTea](https://github.com/BackEndTea))
 - Brew installation isn't supported anymore or docs aren't updated [\#416](https://github.com/infection/infection/issues/416)
 
-## [0.9.0](https://github.com/infection/infection/tree/HEAD) (2018-07-02) 
+## [0.9.0](https://github.com/infection/infection/tree/HEAD) (2018-07-02)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.8.2...0.9.0)
 
@@ -313,7 +313,7 @@
 - Infection can't report on effectiveness of mutators [\#271](https://github.com/infection/infection/issues/271)
 - Do not decrement integer 0 when it is being compared with the result of count\(\) [\#365](https://github.com/infection/infection/pull/365) ([borNfreee](https://github.com/borNfreee))
 
-## [0.8.0](https://github.com/infection/infection/tree/0.8.0) (2018-02-27) 
+## [0.8.0](https://github.com/infection/infection/tree/0.8.0) (2018-02-27)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.7.1...0.8.0)
 

@@ -101,9 +101,9 @@ DOCBLOCK
         yield 'summary with ellipsis' => [
             <<<'DOCBLOCK'
  This is a short (...) description.
- 
+
  This is a long description.
- 
+
  @return void
 DOCBLOCK
             ,
