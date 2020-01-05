@@ -39,9 +39,9 @@ use DOMDocument;
 use DOMElement;
 use DOMNodeList;
 use DOMXPath;
-use Webmozart\Assert\Assert;
 use function file_exists;
 use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal

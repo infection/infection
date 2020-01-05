@@ -79,7 +79,7 @@ final class JUnitTestFileDataProviderTest extends TestCase
         $this->provider->getTestFileInfo('abc');
     }
 
-    public function test_it_throws_an_exception_if_the_jUnit_file_does_not_exist(): void
+    public function test_it_throws_an_exception_if_the_junit_file_does_not_exist(): void
     {
         $provider = new JUnitTestFileDataProvider('foo/bar/fake-file');
 
