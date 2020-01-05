@@ -117,6 +117,8 @@ final class MutatorRobustnessTest extends TestCase
     {
         if (null !== self::$files) {
             yield from self::$files;
+
+            return;
         }
 
         $finder = Finder::create()
