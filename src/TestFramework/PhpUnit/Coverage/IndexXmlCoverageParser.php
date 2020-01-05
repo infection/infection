@@ -43,7 +43,6 @@ use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\MethodLocationData;
-use Webmozart\Assert\Assert;
 use function ltrim;
 use function realpath as native_realpath;
 use function Safe\file_get_contents;
@@ -51,6 +50,7 @@ use function Safe\preg_replace;
 use function Safe\realpath;
 use function Safe\sprintf;
 use function str_replace;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal

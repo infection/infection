@@ -39,9 +39,9 @@ use Generator;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\PhpUnit\Coverage\NoLineExecuted;
-use PHPUnit\Framework\TestCase;
 use function is_array;
 use function is_scalar;
+use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
 use function Safe\realpath;
@@ -312,11 +312,6 @@ XML
         return self::serializeValue($coverage);
     }
 
-    /**
-     * @param mixed $mixed
-     *
-     * @return mixed
-     */
     private static function serializeValue($mixed)
     {
         if ($mixed === null) {
