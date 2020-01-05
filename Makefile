@@ -52,7 +52,7 @@ check_trailing_whitespaces:
 
 .PHONY: cs
 cs:	  	 ## Runs PHP-CS-Fixer
-cs: $(PHP_CS_FIXER)
+cs: check_trailing_whitespaces $(PHP_CS_FIXER)
 	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE)
 	LC_ALL=C sort -u .gitignore -o .gitignore
 
@@ -67,7 +67,7 @@ validate:
 
 .PHONY: autoreview
 autoreview: 	 ## Runs various checks (static analysis & AutoReview test suite)
-autoreview: check_trailing_whitespaces phpstan validate test-autoreview
+autoreview: phpstan validate test-autoreview
 
 .PHONY: test
 test:		 ## Runs all the tests
