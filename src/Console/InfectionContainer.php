@@ -74,8 +74,8 @@ use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
-use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnitTestFileDataProvider;
+use Infection\TestFramework\Coverage\MemoizerTestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\Factory;
@@ -134,8 +134,8 @@ final class InfectionContainer extends Container
                 /** @var CoverageXmlParser $coverageXmlParser */
                 $coverageXmlParser = $container[CoverageXmlParser::class];
 
-                /** @var CachedTestFileDataProvider $cachedTestFileDataProvider */
-                $cachedTestFileDataProvider = $container[CachedTestFileDataProvider::class];
+                /** @var MemoizerTestFileDataProvider $cachedTestFileDataProvider */
+                $cachedTestFileDataProvider = $container[MemoizerTestFileDataProvider::class];
 
                 return new XMLLineCodeCoverageFactory(
                     $config->getCoveragePath(),
@@ -215,8 +215,8 @@ final class InfectionContainer extends Container
             'diff.colorizer' => static function (): DiffColorizer {
                 return new DiffColorizer();
             },
-            CachedTestFileDataProvider::class => static function (self $container): TestFileDataProvider {
-                return new CachedTestFileDataProvider(
+            MemoizerTestFileDataProvider::class => static function (self $container): TestFileDataProvider {
+                return new MemoizerTestFileDataProvider(
                     new JUnitTestFileDataProvider($container['junit.file.path'])
                 );
             },

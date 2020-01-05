@@ -33,36 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage;
 
-use function array_key_exists;
+use Infection\TestFramework\Coverage\MemoizerTestFileDataProvider;
+use Infection\TestFramework\Coverage\TestFileDataProvider;
+use Infection\TestFramework\Coverage\TestFileTimeData;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- * @final
- */
-class CachedTestFileDataProvider implements TestFileDataProvider
+final class MemoizerTestFileDataProviderTest extends TestCase
 {
-    private $testFileDataProvider;
-
-    /**
-     * @var array<string, TestFileTimeData>
-     */
-    private $testFileInfoCache = [];
-
-    public function __construct(TestFileDataProvider $testFileDataProvider)
+    public function test_it_memoize_get_test_file_info_calls(): void
     {
-        $this->testFileDataProvider = $testFileDataProvider;
-    }
+        $class = 'Test\Class';
+        $expectedTestInfo = new TestFileTimeData('path/to/Test.php', 4.567);
 
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
-    {
-        if (array_key_exists($fullyQualifiedClassName, $this->testFileInfoCache)) {
-            return $this->testFileInfoCache[$fullyQualifiedClassName];
-        }
+        $providerMock = $this->createMock(TestFileDataProvider::class);
+        $providerMock
+            ->expects($this->once())
+            ->method('getTestFileInfo')
+            ->with($class)
+            ->willReturn($expectedTestInfo)
+        ;
 
-        return $this->testFileInfoCache[$fullyQualifiedClassName] = $this->testFileDataProvider->getTestFileInfo(
-            $fullyQualifiedClassName
-        );
+        $infoProvider = new MemoizerTestFileDataProvider($providerMock);
+
+        $testInfo0 = $infoProvider->getTestFileInfo($class);
+        $testInfo1 = $infoProvider->getTestFileInfo($class);
+
+        $this->assertSame($expectedTestInfo, $testInfo0);
+        $this->assertSame($expectedTestInfo, $testInfo1);
     }
 }
