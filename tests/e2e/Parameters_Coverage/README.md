@@ -42,7 +42,7 @@ And the following test
     }
 ```
 
-I expected the mutation of $strict to true to be covered. 
+I expected the mutation of $strict to true to be covered.
 
 However it tells me the mutation was not covered, as the code coverage doesn't look at the function signature, but only to the body of the function. So mutating default values always says it was not covered
 

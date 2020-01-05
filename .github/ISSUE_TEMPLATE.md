@@ -22,7 +22,7 @@
 <!-- Please past your phpunit.xml[.dist] if no Github link to the repo provided -->
 <details>
  <summary>phpunit.xml</summary>
- 
+
  ```xml
   %phpunit.xml content%
  ```
@@ -31,7 +31,7 @@
 <!-- Remove this section if not needed -->
 <details>
  <summary>Output with issue</summary>
- 
+
  ```
  The long infection output (probably with stacktrace)
  ```

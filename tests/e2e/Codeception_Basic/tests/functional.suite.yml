@@ -10,4 +10,4 @@ modules:
     enabled:
         # add a framework module here
         - \Helper\Functional
-    step_decorators: ~        
+    step_decorators: ~

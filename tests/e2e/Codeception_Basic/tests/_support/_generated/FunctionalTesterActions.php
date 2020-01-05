@@ -12,5 +12,5 @@ trait FunctionalTesterActions
      */
     abstract protected function getScenario();
 
-    
+
 }
