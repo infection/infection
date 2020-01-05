@@ -39,7 +39,7 @@ use function array_key_exists;
 use function count;
 use function dirname;
 use Generator;
-use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use function Safe\file_get_contents;
 
 /**
@@ -57,7 +57,7 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
     private $testFileDataProvider;
     private $testFrameworkKey;
 
-    public function __construct(string $coverageDir, CoverageXmlParser $coverageXmlParser, string $testFrameworkKey, ?TestFileDataProvider $testFileDataProvider = null)
+    public function __construct(string $coverageDir, IndexXmlCoverageParser $coverageXmlParser, string $testFrameworkKey, ?TestFileDataProvider $testFileDataProvider = null)
     {
         $this->coverageDir = $coverageDir;
         $this->parser = $coverageXmlParser;
