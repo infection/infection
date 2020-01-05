@@ -21,7 +21,7 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 
 files_with_trailing_whitespaces=$(
     find . \
@@ -32,6 +32,7 @@ files_with_trailing_whitespaces=$(
         -not -path "./vendor/*" \
         -not -path "./tests/e2e/*" \
         -not -path "./tests/phpunit/Mutator/*" \
+        -not -path "./tests/phpunit/Visitor/MutatorVisitorTest.php" \
         -exec grep -EIHn "\\s$" {} \;
 )
 
