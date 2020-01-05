@@ -49,7 +49,7 @@ final class UnwrapLcFirst extends AbstractUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a `lcfirst` function call by its first operand. For example:
+Replaces a `lcfirst` function call with its first operand. For example:
 
 ```php
 $x = lcfirst('Hello!');

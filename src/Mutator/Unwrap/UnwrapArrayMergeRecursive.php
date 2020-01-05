@@ -49,7 +49,7 @@ final class UnwrapArrayMergeRecursive extends AbstractUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_merge_recursive` function call by its first operand. For example:
+Replaces an `array_merge_recursive` function call with its first operand. For example:
 
 ```php
 $x = array_merge_recursive(['foo', 'bar', 'baz'], [1]);

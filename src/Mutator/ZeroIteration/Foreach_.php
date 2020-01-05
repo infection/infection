@@ -49,7 +49,7 @@ final class Foreach_ extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces the iterable being iterated over with a `foreach` statement by an empty array, preventing
+Replaces the iterable being iterated over with a `foreach` statement with an empty array, preventing
 any statement within the block to be executed. For example:
 
 ```php`

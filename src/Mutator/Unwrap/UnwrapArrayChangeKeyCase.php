@@ -49,7 +49,7 @@ final class UnwrapArrayChangeKeyCase extends AbstractUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_change_key_case` function call by its first operand. For example:
+Replaces an `array_change_key_case` function call with its first operand. For example:
 
 ```php
 $x = array_change_key_case($array, CASE_UPPER);

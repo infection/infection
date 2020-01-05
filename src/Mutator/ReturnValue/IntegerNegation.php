@@ -49,7 +49,7 @@ final class IntegerNegation extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an integer value with its negated value. For example will replace `-5` by `5`.
+Replaces an integer value with its negated value. For example will replace `-5` with `5`.
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,

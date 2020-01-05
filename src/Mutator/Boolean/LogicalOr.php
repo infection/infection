@@ -48,7 +48,7 @@ final class LogicalOr extends Mutator
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            'Replaces an OR operator (`||`) by an AND operator (`&&`).',
+            'Replaces an OR operator (`||`) with an AND operator (`&&`).',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null
         );

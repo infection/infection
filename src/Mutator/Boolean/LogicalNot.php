@@ -48,7 +48,7 @@ final class LogicalNot extends Mutator
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            'Removes a negation operator (`!`), e.g. transforms `!$foo` into `$foo`.',
+            'Removes a negation operator (`!`), e.g. transforms `!$foo` with `$foo`.',
             MutatorCategory::SEMANTIC_REDUCTION,
             null
         );

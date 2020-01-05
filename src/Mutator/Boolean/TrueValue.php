@@ -55,7 +55,7 @@ final class TrueValue extends Mutator
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            'Replaces the boolean literal (`true`) by its opposite value (`false`). ',
+            'Replaces a boolean literal (`true`) with its opposite value (`false`). ',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null
         );

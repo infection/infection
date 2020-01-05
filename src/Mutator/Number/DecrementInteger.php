@@ -58,7 +58,7 @@ final class DecrementInteger extends AbstractNumberMutator
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            'Decrements an integer value by 1.',
+            'Decrements an integer value with 1.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null
         );

@@ -68,7 +68,7 @@ final class MBString extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a statement making use of the mbstring extension by its vanilla code equivalent. For 
+Replaces a statement making use of the mbstring extension with its vanilla code equivalent. For 
 example:
 
 ```php`

@@ -49,7 +49,7 @@ final class UnwrapStrToLower extends AbstractUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a `strtolower` function call by its first operand. For example:
+Replaces a `strtolower` function call with its first operand. For example:
 
 ```php
 $x = strtolower('Hello!');

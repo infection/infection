@@ -51,7 +51,7 @@ final class AssignCoalesce extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces the null coalescing assignment operator (`??=`) by a plain assignment (`=`).
+Replaces the null coalescing assignment operator (`??=`) with a plain assignment (`=`).
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,

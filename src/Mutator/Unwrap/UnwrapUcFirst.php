@@ -49,7 +49,7 @@ final class UnwrapUcFirst extends AbstractUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a `ucfirst` function call by its first operand. For example:
+Replaces a `ucfirst` function call with its first operand. For example:
 
 ```php
 $x = ucfirst('Hello!');

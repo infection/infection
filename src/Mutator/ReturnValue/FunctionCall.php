@@ -49,7 +49,7 @@ final class FunctionCall extends AbstractValueToNullReturnValue
     {
         return new Definition(
             <<<'TXT'
-Replaces a returned evaluated function by `null` instead. The function evaluation statement is kept
+Replaces a returned evaluated function with `null` instead. The function evaluation statement is kept
 in order to preserve potential side effects. For example:
 
 ```php

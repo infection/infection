@@ -49,7 +49,7 @@ final class UnwrapArrayUdiff extends AbstractUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_udiff` function call by its first operand. For example:
+Replaces an `array_udiff` function call with its first operand. For example:
 
 ```php
 $x = array_udiff(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func);

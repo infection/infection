@@ -49,8 +49,7 @@ final class GreaterThanOrEqualToNegotiation extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a greater than or equal to operator (`>=`) by its boundary counterpart the less than 
-operator (`<=`).
+Replaces a greater-than-or-equal-to operator (`>=`) with the less-than operator (`<=`).
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,

@@ -48,7 +48,7 @@ final class OneZeroInteger extends AbstractNumberMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a zero integer value (`0`) by a non-zero integer value (`1`) and vice-versa.
+Replaces a zero integer value (`0`) with a non-zero integer value (`1`) and vice-versa.
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,

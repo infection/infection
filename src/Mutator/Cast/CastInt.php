@@ -47,7 +47,7 @@ final class CastInt extends AbstractCastMutator
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            'Removes an array cast operator (`(int)`).',
+            'Removes an integer cast operator (`(int)`).',
             MutatorCategory::SEMANTIC_REDUCTION,
             null
         );

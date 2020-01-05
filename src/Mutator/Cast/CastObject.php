@@ -47,7 +47,7 @@ final class CastObject extends AbstractCastMutator
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            'Removes an array cast operator (`(object)`).',
+            'Removes an object cast operator (`(object)`).',
             MutatorCategory::SEMANTIC_REDUCTION,
             null
         );

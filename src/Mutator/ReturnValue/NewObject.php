@@ -49,7 +49,7 @@ final class NewObject extends AbstractValueToNullReturnValue
     {
         return new Definition(
             <<<'TXT'
-Replaces a newly instantiated object by `null` instead. The instantiation statement is kept in order
+Replaces a newly instantiated object with `null` instead. The instantiation statement is kept in order
 to preserve potential side effects. Example:
 
 ```php

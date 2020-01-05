@@ -49,7 +49,7 @@ final class UnwrapStrRepeat extends AbstractUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a `str_repeat` function call by its first operand. For example:
+Replaces a `str_repeat` function call with its first operand. For example:
 
 ```php
 $x = str_repeat('Hello!');

@@ -48,7 +48,7 @@ final class LogicalLowerOr extends Mutator
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            'Replaces an OR logical operator (`or`) by an AND logical operator (`AND`).',
+            'Replaces an OR logical operator (`or`) with an AND logical operator (`AND`).',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null
         );

@@ -49,8 +49,8 @@ final class NotEqualNotIdentical extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a negative loose comparison (an not equal operator (`!=`)) into a negative strict 
-comparison (an identical operator (`!==`)). 
+Replaces a loose inequality comparison (using a not-equal operator (`!=`)) with a strict inequality 
+comparison (using a not-identical operator (`!==`)). 
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,

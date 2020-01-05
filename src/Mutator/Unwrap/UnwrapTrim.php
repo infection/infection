@@ -49,7 +49,7 @@ final class UnwrapTrim extends AbstractUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a `trim` function call by its first operand. For example:
+Replaces a `trim` function call with its first operand. For example:
 
 ```php
 $x = trim('Hello!');

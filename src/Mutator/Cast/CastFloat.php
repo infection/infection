@@ -47,7 +47,7 @@ final class CastFloat extends AbstractCastMutator
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            'Removes an array cast operator (`(float)`).',
+            'Removes a float cast operator (`(float)`).',
             MutatorCategory::SEMANTIC_REDUCTION,
             null
         );

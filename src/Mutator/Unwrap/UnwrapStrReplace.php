@@ -49,7 +49,7 @@ final class UnwrapStrReplace extends AbstractUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a `str_replace` function call by its first operand. For example:
+Replaces a `str_replace` function call with its first operand. For example:
 
 ```php
 $x = str_replace('Hello!');

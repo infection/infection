@@ -49,7 +49,7 @@ final class ShiftRight extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a bitwise shift left operator (`>>`) into a bitwise shift right operator (`<<`).
+Replaces a bitwise shift left operator (`>>`) with a bitwise shift right operator (`<<`).
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,

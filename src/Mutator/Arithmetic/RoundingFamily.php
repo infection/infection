@@ -57,8 +57,7 @@ final class RoundingFamily extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a rounding operation by an analogue one. For example `floor()` will be replaced into
-`ceil()` and `round()`.
+Replaces rounding operations. For example `floor()` will be replaced with `ceil()` and `round()`.
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,

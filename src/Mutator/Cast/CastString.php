@@ -47,7 +47,7 @@ final class CastString extends AbstractCastMutator
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            'Removes an array cast operator (`(string)`).',
+            'Removes a string cast operator (`(string)`).',
             MutatorCategory::SEMANTIC_REDUCTION,
             null
         );

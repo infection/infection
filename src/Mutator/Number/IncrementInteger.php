@@ -47,7 +47,7 @@ final class IncrementInteger extends AbstractNumberMutator
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            'Increments an integer value by 1.',
+            'Increments an integer value with 1.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null
         );

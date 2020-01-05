@@ -49,7 +49,7 @@ final class UnwrapArraySlice extends AbstractUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_slice` function call by its first operand. For example:
+Replaces an `array_slice` function call with its first operand. For example:
 
 ```php
 $x = array_slice(['foo', 'bar', 'baz'], 1);

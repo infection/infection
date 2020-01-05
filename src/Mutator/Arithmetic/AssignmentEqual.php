@@ -49,7 +49,7 @@ final class AssignmentEqual extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an equal (`==`) or identical (`===`) comparison operator into an assignment (`=`).
+Replaces an equal (`==`) or identical (`===`) comparison operator with an assignment operator (`=`).
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,

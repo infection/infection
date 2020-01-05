@@ -49,7 +49,7 @@ final class NotEqual extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a not equal operator (`!=`) by its counterpart the not equal operator (`==`).
+Replaces a not equal operator (`!=`) with its counterpart the not equal operator (`==`).
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,

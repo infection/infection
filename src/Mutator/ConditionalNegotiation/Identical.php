@@ -49,7 +49,7 @@ final class Identical extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an identical operator (`===`) by its counterpart the not identical operator (`!==`).
+Replaces an identical operator (`===`) with its counterpart the not identical operator (`!==`).
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,

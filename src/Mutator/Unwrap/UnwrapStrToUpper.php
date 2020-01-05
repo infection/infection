@@ -49,7 +49,7 @@ final class UnwrapStrToUpper extends AbstractUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a `strtoupper` function call by its first operand. For example:
+Replaces a `strtoupper` function call with its first operand. For example:
 
 ```php
 $x = strtoupper('Hello!');

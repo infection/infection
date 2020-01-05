@@ -49,7 +49,7 @@ final class NotIdentical extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a not identical operator (`!==`) by its counterpart the not identical operator (`===`).
+Replaces a not identical operator (`!==`) with its counterpart the not identical operator (`===`).
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,

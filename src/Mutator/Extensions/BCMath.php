@@ -65,7 +65,7 @@ final class BCMath extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a statement making use of the bcmath extension by its vanilla code equivalent. For example:
+Replaces a statement making use of the bcmath extension with its vanilla code equivalent. For example:
 
 ```php`
 $x = bcadd($a, $b);

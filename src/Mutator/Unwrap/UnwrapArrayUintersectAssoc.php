@@ -51,7 +51,7 @@ final class UnwrapArrayUintersectAssoc extends AbstractUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_uintersect_assoc` function call by its first operand. For example:
+Replaces an `array_uintersect_assoc` function call with its first operand. For example:
 
 ```php
 $x = array_uintersect_assoc(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func);
