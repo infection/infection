@@ -70,7 +70,7 @@ PHP
         yield 'It does not mutate mod equals' => [
             <<<'PHP'
     <?php
-
+    
     $a = 1;
     $a %= 2;
 PHP

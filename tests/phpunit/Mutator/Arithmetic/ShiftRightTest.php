@@ -72,7 +72,7 @@ PHP
         yield 'It does not mutate shift left' => [
             <<<'PHP'
 <?php
-
+    
 $a = 1;
 $a << 2;
 PHP

@@ -31,6 +31,7 @@ files_with_trailing_whitespaces=$(
         -not -path "./.git/*" \
         -not -path "./vendor/*" \
         -not -path "./tests/e2e/*" \
+        -not -path "./tests/phpunit/Mutator/*" \
         -exec grep -EIHn "\\s$" {} \;
 )
 

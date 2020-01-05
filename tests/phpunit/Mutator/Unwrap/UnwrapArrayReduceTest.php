@@ -60,7 +60,7 @@ $a = array_reduce(
     ['A', 1, 'C'],
     function ($carry, $item) {
        return $item;
-    },
+    }, 
     ['D']
 );
 PHP
@@ -80,7 +80,7 @@ $a = array_reduce(
     ['A', 1, 'C'],
     function ($carry, $item) {
        return $item;
-    },
+    }, 
     \Class_With_Const::Const
 );
 PHP
@@ -100,7 +100,7 @@ $a = \array_reduce(
     ['A', 1, 'C'],
     function ($carry, $item) {
        return $item;
-    },
+    },  
     ['D']
 );
 PHP
@@ -138,9 +138,9 @@ PHP
 
 $a = aRrAy_ReDuCe(
     ['A', 1, 'C'],
-    function ($carry, $item) {
+    function ($carry, $item) { 
         return $item;
-    },
+    }, 
     ['D']
 );
 PHP
@@ -157,8 +157,8 @@ PHP
 <?php
 
 $a = array_reduce(
-    $foo->bar(),
-    $foo->baz(),
+    $foo->bar(), 
+    $foo->baz(), 
     $foo->qux()
 );
 PHP

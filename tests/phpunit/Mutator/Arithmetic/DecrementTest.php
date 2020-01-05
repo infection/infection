@@ -56,7 +56,7 @@ final class DecrementTest extends AbstractMutatorTestCase
             <<<'PHP'
 <?php
 
-$a = 1;
+$a = 1; 
 $a--;
 PHP
             ,

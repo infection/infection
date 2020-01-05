@@ -98,7 +98,7 @@ class Test
     {
         return 'hello';
     }
-
+    
 }
 PHP
                 ,
