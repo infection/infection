@@ -4,5 +4,5 @@
 
 ## Summary
 
-This tests ensures that XSD file validation works correctly, when `phpunit.xml` is located in a subfolder
+This tests ensures that XSD file validation works correctly, when `phpunit.xml` is located in a subfolder 
 

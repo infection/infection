@@ -26,8 +26,11 @@ set -Eeuox pipefail
 files_with_trailing_whitespaces=$(
     find . \
         -type f \
+        -not -path "./.composer/*" \
+        -not -path "./build/*" \
         -not -path "./.git/*" \
         -not -path "./vendor/*" \
+        -not -path "./tests/e2e/*" \
         -exec grep -EIHn "\\s$" {} \;
 )
 
