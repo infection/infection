@@ -47,7 +47,7 @@ final class XMLLineCodeCoverageFactory
 {
     private $coverageDir;
     private $coverageXmlParser;
-    private $cachedTestFileDataProvider;
+    private $testFileDataProvider;
 
     public function __construct(
         string $coverageDir,
@@ -56,7 +56,7 @@ final class XMLLineCodeCoverageFactory
     ) {
         $this->coverageDir = $coverageDir;
         $this->coverageXmlParser = $coverageXmlParser;
-        $this->cachedTestFileDataProvider = $testFileDataProvider;
+        $this->testFileDataProvider = $testFileDataProvider;
     }
 
     public function create(
@@ -66,7 +66,7 @@ final class XMLLineCodeCoverageFactory
         Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
 
         $testFileDataProviderService = $adapter->hasJUnitReport()
-            ? $this->cachedTestFileDataProvider
+            ? $this->testFileDataProvider
             : null
         ;
 
