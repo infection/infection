@@ -51,12 +51,20 @@ use function Safe\realpath;
 use function Safe\sprintf;
 use function str_replace;
 use Webmozart\Assert\Assert;
+use function trim;
 
 /**
  * @internal
  */
 class IndexXmlCoverageParser
 {
+    private $coverageDir;
+
+    public function __construct(string $coverageDir)
+    {
+        $this->coverageDir = $coverageDir;
+    }
+    
     /**
      * Parses the given PHPUnit XML coverage index report (index.xml) to collect the general
      * coverage data. Note that this data is likely incomplete an will need to be enriched to
@@ -136,7 +144,7 @@ class IndexXmlCoverageParser
         array &$data
     ): void {
         $xPath = self::createXPath(file_get_contents(
-            realpath($projectSource . '/' . $relativeCoverageFilePath)
+            realpath($this->coverageDir . '/' . $relativeCoverageFilePath)
         ));
 
         $sourceFilePath = self::retrieveSourceFilePath($xPath, $relativeCoverageFilePath, $projectSource);
@@ -196,7 +204,7 @@ class IndexXmlCoverageParser
             );
         }
 
-        $path = $projectSource . '/' . ltrim($relativeFilePath, '/') . '/' . $fileName;
+        $path = $projectSource . '/' . trim($relativeFilePath, '/') . '/' . $fileName;
         $realPath = native_realpath($path);
 
         if ($realPath === false) {

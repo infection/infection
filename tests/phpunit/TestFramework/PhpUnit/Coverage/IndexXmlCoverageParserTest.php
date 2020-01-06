@@ -49,7 +49,8 @@ use function Safe\sprintf;
 
 final class IndexXmlCoverageParserTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage-xml';
+    private const FIXTURES_SRC_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/src';
+    private const FIXTURES_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/xml';
 
     /**
      * @var string|null
@@ -63,12 +64,12 @@ final class IndexXmlCoverageParserTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        $xml = file_get_contents(self::FIXTURES_DIR . '/index.xml');
+        $xml = file_get_contents(self::FIXTURES_COVERAGE_DIR . '/index.xml');
 
         // Replaces dummy source path with the real path
         self::$xml = preg_replace(
             '/(source=\").*?(\")/',
-            sprintf('$1%s$2', realpath(self::FIXTURES_DIR)),
+            sprintf('$1%s$2', realpath(self::FIXTURES_SRC_DIR)),
             $xml
         );
     }
@@ -80,7 +81,7 @@ final class IndexXmlCoverageParserTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->parser = new IndexXmlCoverageParser();
+        $this->parser = new IndexXmlCoverageParser(self::FIXTURES_COVERAGE_DIR);
     }
 
     public function test_it_collects_data_recursively_for_all_files(): void
@@ -95,10 +96,10 @@ final class IndexXmlCoverageParserTest extends TestCase
     {
         $coverage = $this->parser->parse(self::$xml);
 
-        $zeroLevelPath = realpath(self::FIXTURES_DIR . '/zeroLevel.php');
-        $firstLevelPath = realpath(self::FIXTURES_DIR . '/FirstLevel/firstLevel.php');
-        $secondLevelPath = realpath(self::FIXTURES_DIR . '/FirstLevel/SecondLevel/secondLevel.php');
-        $secondLevelTraitPath = realpath(self::FIXTURES_DIR . '/FirstLevel/SecondLevel/secondLevelTrait.php');
+        $zeroLevelPath = realpath(self::FIXTURES_SRC_DIR . '/zeroLevel.php');
+        $firstLevelPath = realpath(self::FIXTURES_SRC_DIR . '/FirstLevel/firstLevel.php');
+        $secondLevelPath = realpath(self::FIXTURES_SRC_DIR . '/FirstLevel/SecondLevel/secondLevel.php');
+        $secondLevelTraitPath = realpath(self::FIXTURES_SRC_DIR . '/FirstLevel/SecondLevel/secondLevelTrait.php');
 
         $this->assertSame(
             [

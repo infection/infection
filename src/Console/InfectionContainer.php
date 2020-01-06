@@ -121,8 +121,11 @@ final class InfectionContainer extends Container
                     TestFrameworkAdapter::JUNIT_FILE_NAME
                 );
             },
-            IndexXmlCoverageParser::class => static function (): IndexXmlCoverageParser {
-                return new IndexXmlCoverageParser();
+            IndexXmlCoverageParser::class => static function (self $container): IndexXmlCoverageParser {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                return new IndexXmlCoverageParser($config->getCoveragePath());
             },
             XMLLineCodeCoverageFactory::class => static function (self $container): XMLLineCodeCoverageFactory {
                 /** @var Configuration $config */
