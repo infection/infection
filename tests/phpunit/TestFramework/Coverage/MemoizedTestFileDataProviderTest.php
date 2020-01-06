@@ -35,27 +35,32 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
+use Infection\TestFramework\Coverage\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileTimeData;
 use PHPUnit\Framework\TestCase;
 
-final class CachedTestFileDataProviderTest extends TestCase
+final class MemoizedTestFileDataProviderTest extends TestCase
 {
-    public function test_the_second_call_returns_cached_result(): void
+    public function test_it_memoize_get_test_file_info_calls(): void
     {
         $class = 'Test\Class';
+        $expectedTestInfo = new TestFileTimeData('path/to/Test.php', 4.567);
+
         $providerMock = $this->createMock(TestFileDataProvider::class);
-        $providerMock->expects($this->once())
+        $providerMock
+            ->expects($this->once())
             ->method('getTestFileInfo')
             ->with($class)
-            ->willReturn(new TestFileTimeData('path/to/Test.php', 4.567));
+            ->willReturn($expectedTestInfo)
+        ;
 
-        $infoProvider = new CachedTestFileDataProvider($providerMock);
+        $infoProvider = new MemoizedTestFileDataProvider($providerMock);
 
-        $info1 = $infoProvider->getTestFileInfo($class);
-        $info2 = $infoProvider->getTestFileInfo($class);
+        $testInfo0 = $infoProvider->getTestFileInfo($class);
+        $testInfo1 = $infoProvider->getTestFileInfo($class);
 
-        $this->assertSame($info1, $info2);
+        $this->assertSame($expectedTestInfo, $testInfo0);
+        $this->assertSame($expectedTestInfo, $testInfo1);
     }
 }

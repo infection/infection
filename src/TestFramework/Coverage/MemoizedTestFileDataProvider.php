@@ -39,30 +39,27 @@ use function array_key_exists;
 
 /**
  * @internal
- * @final
  */
-class CachedTestFileDataProvider implements TestFileDataProvider
+final class MemoizedTestFileDataProvider implements TestFileDataProvider
 {
-    private $testFileDataProvider;
+    private $provider;
 
     /**
      * @var array<string, TestFileTimeData>
      */
-    private $testFileInfoCache = [];
+    private $cache = [];
 
-    public function __construct(TestFileDataProvider $testFileDataProvider)
+    public function __construct(TestFileDataProvider $decoratedProvider)
     {
-        $this->testFileDataProvider = $testFileDataProvider;
+        $this->provider = $decoratedProvider;
     }
 
     public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
     {
-        if (array_key_exists($fullyQualifiedClassName, $this->testFileInfoCache)) {
-            return $this->testFileInfoCache[$fullyQualifiedClassName];
+        if (!array_key_exists($fullyQualifiedClassName, $this->cache)) {
+            $this->cache[$fullyQualifiedClassName] = $this->provider->getTestFileInfo($fullyQualifiedClassName);
         }
 
-        return $this->testFileInfoCache[$fullyQualifiedClassName] = $this->testFileDataProvider->getTestFileInfo(
-            $fullyQualifiedClassName
-        );
+        return $this->cache[$fullyQualifiedClassName];
     }
 }
