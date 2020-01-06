@@ -148,6 +148,11 @@ final class ProjectCodeProvider
     /**
      * @var string[]|null
      */
+    private static $sourceClassesToCheckForPublicProperties;
+
+    /**
+     * @var string[]|null
+     */
     private static $testClasses;
 
     private function __construct()
@@ -158,6 +163,8 @@ final class ProjectCodeProvider
     {
         if (null !== self::$sourceClasses) {
             yield from self::$sourceClasses;
+
+            return;
         }
 
         $finder = Finder::create()
@@ -209,7 +216,13 @@ final class ProjectCodeProvider
 
     public static function provideSourceClassesToCheckForPublicProperties(): Generator
     {
-        yield from array_filter(
+        if (null !== self::$sourceClassesToCheckForPublicProperties) {
+            yield from self::$sourceClassesToCheckForPublicProperties;
+
+            return;
+        }
+
+        self::$sourceClassesToCheckForPublicProperties = array_filter(
             iterator_to_array(self::provideSourceClasses(), true),
             static function (string $className): bool {
                 $reflectionClass = new ReflectionClass($className);
@@ -229,6 +242,8 @@ final class ProjectCodeProvider
                 ;
             }
         );
+
+        yield from self::$sourceClassesToCheckForPublicProperties;
     }
 
     public static function sourceClassesToCheckForPublicPropertiesProvider(): Generator
@@ -242,6 +257,8 @@ final class ProjectCodeProvider
     {
         if (null !== self::$testClasses) {
             yield from self::$testClasses;
+
+            return;
         }
 
         $finder = Finder::create()
