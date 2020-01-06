@@ -52,11 +52,11 @@ final class XMLLineCodeCoverageFactory
     public function __construct(
         string $coverageDir,
         IndexXmlCoverageParser $coverageXmlParser,
-        CachedTestFileDataProvider $cachedTestFileDataProvider
+        TestFileDataProvider $testFileDataProvider
     ) {
         $this->coverageDir = $coverageDir;
         $this->coverageXmlParser = $coverageXmlParser;
-        $this->cachedTestFileDataProvider = $cachedTestFileDataProvider;
+        $this->cachedTestFileDataProvider = $testFileDataProvider;
     }
 
     public function create(
