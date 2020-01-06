@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
 use Generator;
+use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\PhpUnit\Coverage\NoLineExecuted;
@@ -51,6 +52,7 @@ final class IndexXmlCoverageParserTest extends TestCase
 {
     private const FIXTURES_SRC_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/src';
     private const FIXTURES_COVERAGE_DIR = __DIR__.'/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
+    private const FIXTURES_INCORRECT_COVERAGE_DIR = __DIR__.'/../../../Fixtures/Files/phpunit/coverage-incomplete';
 
     /**
      * @var string|null
@@ -253,6 +255,34 @@ XML;
         $this->expectException(NoLineExecuted::class);
 
         $this->parser->parse($xml);
+    }
+
+    public function test_it_errors_when_the_source_file_could_not_be_found(): void
+    {
+        $incorrectCoverageSrcDir = realpath(self::FIXTURES_INCORRECT_COVERAGE_DIR.'/src');
+
+        // Replaces dummy source path with the real path
+        $xml = preg_replace(
+            '/(source=\").*?(\")/',
+            sprintf('$1%s$2', $incorrectCoverageSrcDir),
+            file_get_contents(self::FIXTURES_INCORRECT_COVERAGE_DIR . '/coverage-xml/index.xml')
+        );
+
+        try {
+            $this->parser->parse($xml);
+
+            $this->fail();
+        } catch (CoverageDoesNotExistException $exception) {
+            $this->assertSame(
+                sprintf(
+                    'Source file zeroLevel.php was not found at %s/zeroLevel.php',
+                    $incorrectCoverageSrcDir
+                ),
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertNull($exception->getPrevious());
+        }
     }
 
     public function noCoveredLineReportProviders(): Generator

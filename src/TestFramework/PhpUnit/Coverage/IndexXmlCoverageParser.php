@@ -43,6 +43,8 @@ use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\MethodLocationData;
+use function array_filter;
+use function implode;
 use function ltrim;
 use function realpath as native_realpath;
 use function Safe\file_get_contents;
@@ -194,7 +196,7 @@ class IndexXmlCoverageParser
         $fileName = $fileNode->getAttribute('name');
         $relativeFilePath = $fileNode->getAttribute('path');
 
-        if ($relativeFilePath !== '') {
+        if ($relativeFilePath === '') {
             // The relative path is not present for old versions of PHPUnit. As a result we parse
             // the relative path from the source file path and the XML coverage file
             $relativeFilePath = str_replace(
@@ -204,7 +206,11 @@ class IndexXmlCoverageParser
             );
         }
 
-        $path = $projectSource . '/' . trim($relativeFilePath, '/') . '/' . $fileName;
+        $path = implode(
+            '/',
+            array_filter([$projectSource, trim($relativeFilePath, '/'), $fileName])
+        );
+
         $realPath = native_realpath($path);
 
         if ($realPath === false) {

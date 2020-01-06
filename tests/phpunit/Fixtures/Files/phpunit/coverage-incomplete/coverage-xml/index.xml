@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright © 2017 Maks Rafalko
+  ~
+  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+  -->
+
+<phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+  <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
+    <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
+    <driver name="xdebug" version="2.5.1"/>
+  </build>
+  <project source="/path/to/src">
+    <tests>
+      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
+      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
+    </tests>
+    <directory name="/">
+      <totals>
+        <lines total="913" comments="130" code="783" executable="348" executed="24" percent="6.90"/>
+        <methods count="45" tested="5" percent="11.11"/>
+        <functions count="0" tested="0" percent="0"/>
+        <classes count="18" tested="2" percent="11.11"/>
+        <traits count="0" tested="0" percent="0"/>
+      </totals>
+      <file name="zeroLevel.php" href="zeroLevel.php.xml">
+        <totals>
+          <lines total="99" comments="12" code="87" executable="58" executed="0" percent="0.00"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+    </directory>
+  </project>
+</phpunit>
