@@ -155,12 +155,18 @@ class IndexXmlCoverageParser
         $percentage = $linesNode->getAttribute('percent');
 
         if ($percentage === '') {
+            $percentage = null;
+        } else {
+            Assert::numeric($percentage);
+
+            $percentage = (float) $percentage;
+        }
+
+        if ($percentage === null || $percentage = .0) {
             $data[$sourceFilePath] = new CoverageFileData();
 
             return;
         }
-
-        Assert::numeric($percentage);
 
         $coveredLineNodes = self::safeQuery($xPath, '/phpunit/file/coverage/line');
 

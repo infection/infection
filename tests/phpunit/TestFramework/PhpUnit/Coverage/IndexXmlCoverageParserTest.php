@@ -96,7 +96,7 @@ final class IndexXmlCoverageParserTest extends TestCase
 
     public function test_it_has_correct_coverage_data_for_each_file(): void
     {
-        $coverage = $this->parser->parse(self::$xml);
+        $coverage = $this->parser->parse(preg_replace('/percent=".*"/', '', self::$xml));
 
         $zeroLevelPath = realpath(self::FIXTURES_SRC_DIR . '/zeroLevel.php');
         $firstLevelPath = realpath(self::FIXTURES_SRC_DIR . '/FirstLevel/firstLevel.php');
@@ -285,6 +285,21 @@ XML;
         }
     }
 
+    public function test_it_supports_data_coverage_with_old_PHPUnit_versions(): void
+    {
+        // Replaces dummy source path with the real path
+        $xml = preg_replace(
+            '/(source)(=\".*?\")/',
+            'name$2',
+            self::$xml
+        );
+
+        $coverage = $this->parser->parse($xml);
+
+        // zeroLevel / firstLevel / secondLevel
+        $this->assertCount(4, $coverage);
+    }
+
     public function noCoveredLineReportProviders(): Generator
     {
         yield 'zero lines executed' => [<<<'XML'
@@ -308,7 +323,7 @@ XML;
   <!-- The rest of the file has been removed for this test-->
 </phpunit>
 XML
-            ];
+        ];
 
         yield 'lines is not present' => [<<<'XML'
 <?xml version="1.0"?>
