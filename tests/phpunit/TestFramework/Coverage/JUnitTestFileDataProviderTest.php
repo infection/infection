@@ -42,43 +42,44 @@ use PHPUnit\Framework\TestCase;
 
 final class JUnitTestFileDataProviderTest extends TestCase
 {
+    private const JUNIT = __DIR__ . '/../../Fixtures/Files/phpunit/junit.xml';
+    private const JUNIT_DIFF_FORMAT = __DIR__ . '/../../Fixtures/Files/phpunit/junit2.xml';
+
     /**
      * @var JUnitTestFileDataProvider
      */
-    private $infoProvider;
+    private $provider;
 
     protected function setUp(): void
     {
-        $this->infoProvider = new JUnitTestFileDataProvider(
-            __DIR__ . '/../../Fixtures/Files/phpunit/junit.xml'
-        );
+        $this->provider = new JUnitTestFileDataProvider(self::JUNIT);
+    }
+
+    public function test_it_returns_time_and_path(): void
+    {
+        $testFileInfo = $this->provider->getTestFileInfo('Infection\Tests\Config\InfectionConfigTest');
+
+        $this->assertSame('/project/tests/Config/InfectionConfigTest.php', $testFileInfo->path);
+        $this->assertSame(0.021983, $testFileInfo->time);
+    }
+
+    public function test_it_returns_the_same_result_on_consecutive_calls(): void
+    {
+        $testFileInfo0 = $this->provider->getTestFileInfo('Infection\Tests\Config\InfectionConfigTest');
+        $testFileInfo1 = $this->provider->getTestFileInfo('Infection\Tests\Config\InfectionConfigTest');
+
+        $this->assertSame($testFileInfo0->path, $testFileInfo1->path);
+        $this->assertSame($testFileInfo0->time, $testFileInfo1->time);
     }
 
     public function test_it_throws_an_exception_if_class_is_not_found(): void
     {
         $this->expectException(TestFileNameNotFoundException::class);
 
-        $this->infoProvider->getTestFileInfo('abc');
+        $this->provider->getTestFileInfo('abc');
     }
 
-    public function test_it_returns_time_and_path(): void
-    {
-        $info = $this->infoProvider->getTestFileInfo('Infection\Tests\Config\InfectionConfigTest');
-
-        $this->assertSame('/project/tests/Config/InfectionConfigTest.php', $info->path);
-        $this->assertSame(0.021983, $info->time);
-    }
-
-    public function test_consecutive_calls_with_the_same_class_return_the_same_result(): void
-    {
-        $info1 = $this->infoProvider->getTestFileInfo('Infection\Tests\Config\InfectionConfigTest');
-        $info2 = $this->infoProvider->getTestFileInfo('Infection\Tests\Config\InfectionConfigTest');
-
-        $this->assertSame($info1->path, $info2->path);
-        $this->assertSame($info1->time, $info2->time);
-    }
-
-    public function test_it_throws_a_coverage_does_not_exists_exception_when_junit_file_does_not_exist(): void
+    public function test_it_throws_an_exception_if_the_junit_file_does_not_exist(): void
     {
         $provider = new JUnitTestFileDataProvider('foo/bar/fake-file');
 
@@ -89,12 +90,10 @@ final class JUnitTestFileDataProviderTest extends TestCase
 
     public function test_it_works_with_different_junit_format(): void
     {
-        $infoProvider = new JUnitTestFileDataProvider(
-            __DIR__ . '/../../Fixtures/Files/phpunit/junit2.xml'
-        );
+        $provider = new JUnitTestFileDataProvider(self::JUNIT_DIFF_FORMAT);
 
-        $info1 = $infoProvider->getTestFileInfo('App\Tests\unit\SourceClassTest');
+        $testFileInfo = $provider->getTestFileInfo('App\Tests\unit\SourceClassTest');
 
-        $this->assertSame('/codeception/tests/unit/SourceClassTest.php', $info1->path);
+        $this->assertSame('/codeception/tests/unit/SourceClassTest.php', $testFileInfo->path);
     }
 }
