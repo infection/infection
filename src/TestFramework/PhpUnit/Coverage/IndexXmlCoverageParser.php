@@ -35,25 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Coverage;
 
+use function array_filter;
 use DOMDocument;
 use DOMElement;
 use DOMNodeList;
 use DOMXPath;
+use function implode;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\MethodLocationData;
-use function array_filter;
-use function implode;
-use function ltrim;
 use function realpath as native_realpath;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
 use function Safe\realpath;
 use function Safe\sprintf;
 use function str_replace;
-use Webmozart\Assert\Assert;
 use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -66,7 +65,7 @@ class IndexXmlCoverageParser
     {
         $this->coverageDir = $coverageDir;
     }
-    
+
     /**
      * Parses the given PHPUnit XML coverage index report (index.xml) to collect the general
      * coverage data. Note that this data is likely incomplete an will need to be enriched to

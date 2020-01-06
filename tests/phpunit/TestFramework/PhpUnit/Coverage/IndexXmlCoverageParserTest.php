@@ -51,8 +51,8 @@ use function Safe\sprintf;
 final class IndexXmlCoverageParserTest extends TestCase
 {
     private const FIXTURES_SRC_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/src';
-    private const FIXTURES_COVERAGE_DIR = __DIR__.'/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
-    private const FIXTURES_INCORRECT_COVERAGE_DIR = __DIR__.'/../../../Fixtures/Files/phpunit/coverage-incomplete';
+    private const FIXTURES_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
+    private const FIXTURES_INCORRECT_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage-incomplete';
 
     /**
      * @var string|null
@@ -259,7 +259,7 @@ XML;
 
     public function test_it_errors_when_the_source_file_could_not_be_found(): void
     {
-        $incorrectCoverageSrcDir = realpath(self::FIXTURES_INCORRECT_COVERAGE_DIR.'/src');
+        $incorrectCoverageSrcDir = realpath(self::FIXTURES_INCORRECT_COVERAGE_DIR . '/src');
 
         // Replaces dummy source path with the real path
         $xml = preg_replace(
