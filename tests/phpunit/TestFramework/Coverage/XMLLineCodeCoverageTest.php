@@ -49,7 +49,7 @@ use PHPUnit\Framework\TestCase;
 
 final class XMLLineCodeCoverageTest extends TestCase
 {
-    private $coverageDir = __DIR__ . '/../../Fixtures/Files/phpunit/coverage-xml';
+    private $coverageDir = __DIR__.'/../../Fixtures/Files/phpunit/coverage/coverage-xml';
 
     public function test_it_correctly_sets_coverage_information_for_method_body(): void
     {

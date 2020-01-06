@@ -50,7 +50,7 @@ use function Safe\sprintf;
 final class IndexXmlCoverageParserTest extends TestCase
 {
     private const FIXTURES_SRC_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/src';
-    private const FIXTURES_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/xml';
+    private const FIXTURES_COVERAGE_DIR = __DIR__.'/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
 
     /**
      * @var string|null
