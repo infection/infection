@@ -52,9 +52,10 @@ check_trailing_whitespaces:
 
 .PHONY: cs
 cs:	  	 ## Runs PHP-CS-Fixer
-cs: check_trailing_whitespaces $(PHP_CS_FIXER)
+cs: $(PHP_CS_FIXER)
 	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE)
 	LC_ALL=C sort -u .gitignore -o .gitignore
+	$(MAKE) check_trailing_whitespaces
 
 .PHONY: phpstan
 phpstan: vendor $(PHPSTAN)
