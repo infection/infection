@@ -64,8 +64,17 @@ final class IndexXmlCoverageParserTest extends TestCase
      */
     private $parser;
 
-    public static function setUpBeforeClass(): void
+    protected function setUp(): void
     {
+        $this->parser = new IndexXmlCoverageParser(self::FIXTURES_COVERAGE_DIR);
+    }
+
+    public static function getXml(): string
+    {
+        if (self::$xml !== null) {
+            return self::$xml;
+        }
+
         $xml = file_get_contents(self::FIXTURES_COVERAGE_DIR . '/index.xml');
 
         // Replaces dummy source path with the real path
@@ -74,31 +83,31 @@ final class IndexXmlCoverageParserTest extends TestCase
             sprintf('$1%s$2', realpath(self::FIXTURES_SRC_DIR)),
             $xml
         );
+
+        return self::$xml;
     }
 
-    public static function tearDownAfterClass(): void
+    /**
+     * @dataProvider coverageProvider
+     */
+    public function test_it_collects_data_recursively_for_all_files(string $xml): void
     {
-        self::$xml = null;
-    }
+        $coverage = $this->parser->parse($xml);
 
-    protected function setUp(): void
-    {
-        $this->parser = new IndexXmlCoverageParser(self::FIXTURES_COVERAGE_DIR);
-    }
-
-    public function test_it_collects_data_recursively_for_all_files(): void
-    {
-        $coverage = $this->parser->parse(self::$xml);
-
-        // zeroLevel / firstLevel / secondLevel
-        $this->assertCount(4, $coverage);
+        // zeroLevel + noPercentage + firstLevel + secondLevel
+        $this->assertCount(5, $coverage);
     }
 
     public function test_it_has_correct_coverage_data_for_each_file(): void
     {
-        $coverage = $this->parser->parse(preg_replace('/percent=".*"/', '', self::$xml));
+        $coverage = $this->parser->parse(preg_replace(
+            '/percent=".*"/',
+            '',
+            self::getXml()
+        ));
 
         $zeroLevelPath = realpath(self::FIXTURES_SRC_DIR . '/zeroLevel.php');
+        $noPercentagePath = realpath(self::FIXTURES_SRC_DIR . '/noPercentage.php');
         $firstLevelPath = realpath(self::FIXTURES_SRC_DIR . '/FirstLevel/firstLevel.php');
         $secondLevelPath = realpath(self::FIXTURES_SRC_DIR . '/FirstLevel/SecondLevel/secondLevel.php');
         $secondLevelTraitPath = realpath(self::FIXTURES_SRC_DIR . '/FirstLevel/SecondLevel/secondLevelTrait.php');
@@ -213,6 +222,10 @@ final class IndexXmlCoverageParserTest extends TestCase
                     'byLine' => [],
                     'byMethod' => [],
                 ],
+                $noPercentagePath => [
+                    'byLine' => [],
+                    'byMethod' => [],
+                ],
             ],
             self::convertCoverageToArray($coverage)
         );
@@ -285,19 +298,17 @@ XML;
         }
     }
 
-    public function test_it_supports_data_coverage_with_old_PHPUnit_versions(): void
+    public function coverageProvider(): Generator
     {
-        // Replaces dummy source path with the real path
-        $xml = preg_replace(
-            '/(source)(=\".*?\")/',
-            'name$2',
-            self::$xml
-        );
+        yield 'nominal' => [self::getXml()];
 
-        $coverage = $this->parser->parse($xml);
-
-        // zeroLevel / firstLevel / secondLevel
-        $this->assertCount(4, $coverage);
+        yield 'PHPUnit <6' => [
+            preg_replace(
+                '/(source)(=\".*?\")/',
+                'name$2',
+                self::getXml()
+            ),
+        ];
     }
 
     public function noCoveredLineReportProviders(): Generator
