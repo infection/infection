@@ -73,8 +73,9 @@ use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder as PhpSp
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder as PhpSpecMutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
-use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkTypes;
+use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use Infection\Utils\VersionParser;
 use function iterator_to_array;
@@ -124,7 +125,7 @@ final class ProjectCodeProvider
         PhpUnitInitalConfigBuilder::class,
         PhpSpecMutationConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
-        CoverageXmlParser::class,
+        IndexXmlCoverageParser::class,
         VersionParser::class,
     ];
 
@@ -147,6 +148,11 @@ final class ProjectCodeProvider
     /**
      * @var string[]|null
      */
+    private static $sourceClassesToCheckForPublicProperties;
+
+    /**
+     * @var string[]|null
+     */
     private static $testClasses;
 
     private function __construct()
@@ -157,6 +163,8 @@ final class ProjectCodeProvider
     {
         if (null !== self::$sourceClasses) {
             yield from self::$sourceClasses;
+
+            return;
         }
 
         $finder = Finder::create()
@@ -193,19 +201,10 @@ final class ProjectCodeProvider
 
     public static function provideConcreteSourceClasses(): Generator
     {
-        $sourceClasses = iterator_to_array(self::provideSourceClasses(), true);
-
-        yield from array_filter(
-            $sourceClasses,
-            static function (string $className): bool {
-                $reflectionClass = new ReflectionClass($className);
-
-                return !$reflectionClass->isInterface()
-                    && !$reflectionClass->isAbstract()
-                    && !$reflectionClass->isTrait()
-                ;
-            }
-        );
+        yield from ConcreteClassReflector::filterByConcreteClasses(iterator_to_array(
+            self::provideSourceClasses(),
+            true
+        ));
     }
 
     public static function concreteSourceClassesProvider(): Generator
@@ -217,7 +216,13 @@ final class ProjectCodeProvider
 
     public static function provideSourceClassesToCheckForPublicProperties(): Generator
     {
-        yield from array_filter(
+        if (null !== self::$sourceClassesToCheckForPublicProperties) {
+            yield from self::$sourceClassesToCheckForPublicProperties;
+
+            return;
+        }
+
+        self::$sourceClassesToCheckForPublicProperties = array_filter(
             iterator_to_array(self::provideSourceClasses(), true),
             static function (string $className): bool {
                 $reflectionClass = new ReflectionClass($className);
@@ -237,6 +242,8 @@ final class ProjectCodeProvider
                 ;
             }
         );
+
+        yield from self::$sourceClassesToCheckForPublicProperties;
     }
 
     public static function sourceClassesToCheckForPublicPropertiesProvider(): Generator
@@ -250,6 +257,8 @@ final class ProjectCodeProvider
     {
         if (null !== self::$testClasses) {
             yield from self::$testClasses;
+
+            return;
         }
 
         $finder = Finder::create()

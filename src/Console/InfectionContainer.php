@@ -74,14 +74,14 @@ use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
-use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnitTestFileDataProvider;
+use Infection\TestFramework\Coverage\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
-use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\Utils\VersionParser;
 use function php_ini_loaded_file;
@@ -121,21 +121,21 @@ final class InfectionContainer extends Container
                     TestFrameworkAdapter::JUNIT_FILE_NAME
                 );
             },
-            CoverageXmlParser::class => static function (self $container): CoverageXmlParser {
+            IndexXmlCoverageParser::class => static function (self $container): IndexXmlCoverageParser {
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
-                return new CoverageXmlParser($config->getCoveragePath());
+                return new IndexXmlCoverageParser($config->getCoveragePath());
             },
             XMLLineCodeCoverageFactory::class => static function (self $container): XMLLineCodeCoverageFactory {
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
-                /** @var CoverageXmlParser $coverageXmlParser */
-                $coverageXmlParser = $container[CoverageXmlParser::class];
+                /** @var IndexXmlCoverageParser $coverageXmlParser */
+                $coverageXmlParser = $container[IndexXmlCoverageParser::class];
 
-                /** @var CachedTestFileDataProvider $cachedTestFileDataProvider */
-                $cachedTestFileDataProvider = $container[CachedTestFileDataProvider::class];
+                /** @var MemoizedTestFileDataProvider $cachedTestFileDataProvider */
+                $cachedTestFileDataProvider = $container[MemoizedTestFileDataProvider::class];
 
                 return new XMLLineCodeCoverageFactory(
                     $config->getCoveragePath(),
@@ -215,8 +215,8 @@ final class InfectionContainer extends Container
             'diff.colorizer' => static function (): DiffColorizer {
                 return new DiffColorizer();
             },
-            CachedTestFileDataProvider::class => static function (self $container): TestFileDataProvider {
-                return new CachedTestFileDataProvider(
+            MemoizedTestFileDataProvider::class => static function (self $container): TestFileDataProvider {
+                return new MemoizedTestFileDataProvider(
                     new JUnitTestFileDataProvider($container['junit.file.path'])
                 );
             },

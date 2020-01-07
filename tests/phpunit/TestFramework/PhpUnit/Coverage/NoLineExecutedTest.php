@@ -33,60 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Visitor;
+namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
-use function in_array;
-use Infection\Visitor\ParentConnectorVisitor;
-use function is_array;
-use PhpParser\Node;
+use Infection\TestFramework\PhpUnit\Coverage\NoLineExecuted;
+use PHPUnit\Framework\TestCase;
 
-final class ParentConnectorVisitorTest extends BaseVisitorTest
+final class NoLineExecutedTest extends TestCase
 {
-    private const CODE = <<<'PHP'
-<?php declare(strict_types=1);
-
-namespace Acme;
-
-function hello()
-{
-    return 'hello';
-}
-PHP;
-
-    public function test_mutating_nodes_during_traverse_mutates_the_original_nodes(): void
+    public function test_it_can_create_an_instance(): void
     {
-        $nodes = $this->traverse(
-            $this->parseCode(self::CODE),
-            [new ParentConnectorVisitor()]
-        );
+        $exception = NoLineExecuted::create();
 
-        foreach ($nodes as $node) {
-            $this->assertHasParentNode($node, $nodes);
-        }
-    }
+        $expectedMessage = <<<'MSG'
+No line of code was executed during tests. This could be due to "@covers" annotations or your
+PHPUnit filters not being set up correctly.
+MSG;
 
-    /**
-     * @param Node[] $roots
-     */
-    private function assertHasParentNode(Node $node, array $roots): void
-    {
-        if (!in_array($node, $roots, true)) {
-            $this->assertTrue($node->hasAttribute(ParentConnectorVisitor::PARENT_KEY));
-            $this->assertInstanceOf(Node::class, $node->getAttribute(ParentConnectorVisitor::PARENT_KEY));
-        }
-
-        foreach ($node->getSubNodeNames() as $subNodeName) {
-            $subNodes = $node->$subNodeName;
-
-            if (!is_array($subNodes)) {
-                $subNodes = [$subNodes];
-            }
-
-            foreach ($subNodes as $subNode) {
-                if ($subNode instanceof Node) {
-                    $this->assertHasParentNode($subNode, $roots);
-                }
-            }
-        }
+        $this->assertSame($expectedMessage, $exception->getMessage());
+        $this->assertSame(0, $exception->getCode());
+        $this->assertNull($exception->getPrevious());
     }
 }

@@ -33,20 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Coverage\Exception;
+namespace Infection\Tests\TestFramework\Coverage;
 
-use RuntimeException;
+use Infection\TestFramework\Coverage\MemoizedTestFileDataProvider;
+use Infection\TestFramework\Coverage\TestFileDataProvider;
+use Infection\TestFramework\Coverage\TestFileTimeData;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class NoLinesExecutedException extends RuntimeException
+final class MemoizedTestFileDataProviderTest extends TestCase
 {
-    public static function noLinesExecuted(): self
+    public function test_it_memoize_get_test_file_info_calls(): void
     {
-        return new self(
-            '0 Lines of code were executed during tests. This could be due to "@covers" annotations, ' .
-            'or your PHPUnit filters not being set up correctly.'
-        );
+        $class = 'Test\Class';
+        $expectedTestInfo = new TestFileTimeData('path/to/Test.php', 4.567);
+
+        $providerMock = $this->createMock(TestFileDataProvider::class);
+        $providerMock
+            ->expects($this->once())
+            ->method('getTestFileInfo')
+            ->with($class)
+            ->willReturn($expectedTestInfo)
+        ;
+
+        $infoProvider = new MemoizedTestFileDataProvider($providerMock);
+
+        $testInfo0 = $infoProvider->getTestFileInfo($class);
+        $testInfo1 = $infoProvider->getTestFileInfo($class);
+
+        $this->assertSame($expectedTestInfo, $testInfo0);
+        $this->assertSame($expectedTestInfo, $testInfo1);
     }
 }

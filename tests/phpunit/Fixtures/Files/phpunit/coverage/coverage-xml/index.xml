@@ -77,6 +77,15 @@
           <traits count="0" tested="0" percent="0"/>
         </totals>
       </file>
+      <file name="noPercentage.php.xml" href="noPercentage.php.xml">
+        <totals>
+          <lines total="55" comments="2" code="53" executable="31" executed="0" percent="0.00"/>
+          <methods count="2" tested="0" percent="0.00"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="1" tested="0" percent="0.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
     </directory>
   </project>
 </phpunit>
