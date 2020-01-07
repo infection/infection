@@ -81,7 +81,7 @@ use Infection\TestFramework\Coverage\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
-use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\Utils\VersionParser;
 use function php_ini_loaded_file;
@@ -121,18 +121,18 @@ final class InfectionContainer extends Container
                     TestFrameworkAdapter::JUNIT_FILE_NAME
                 );
             },
-            CoverageXmlParser::class => static function (self $container): CoverageXmlParser {
+            IndexXmlCoverageParser::class => static function (self $container): IndexXmlCoverageParser {
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
-                return new CoverageXmlParser($config->getCoveragePath());
+                return new IndexXmlCoverageParser($config->getCoveragePath());
             },
             XMLLineCodeCoverageFactory::class => static function (self $container): XMLLineCodeCoverageFactory {
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
-                /** @var CoverageXmlParser $coverageXmlParser */
-                $coverageXmlParser = $container[CoverageXmlParser::class];
+                /** @var IndexXmlCoverageParser $coverageXmlParser */
+                $coverageXmlParser = $container[IndexXmlCoverageParser::class];
 
                 /** @var MemoizedTestFileDataProvider $cachedTestFileDataProvider */
                 $cachedTestFileDataProvider = $container[MemoizedTestFileDataProvider::class];

@@ -38,7 +38,7 @@ namespace Infection\Tests\TestFramework\Coverage;
 use Generator;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverageFactory;
-use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;
 use PHPUnit\Framework\TestCase;
@@ -63,7 +63,7 @@ final class XMLLineCodeCoverageFactoryTest extends TestCase
         // We can only ensure that an instance is created in all scenarios
         (new XMLLineCodeCoverageFactory(
             '/path/to/coverage/dir',
-            $this->createMock(CoverageXmlParser::class),
+            $this->createMock(IndexXmlCoverageParser::class),
             $this->createMock(TestFileDataProvider::class)
         ))->create($frameworkKey, $adapter);
 
