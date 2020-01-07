@@ -50,6 +50,7 @@ use function Safe\file_get_contents;
 use function Safe\preg_replace;
 use function Safe\realpath;
 use function Safe\sprintf;
+use function Safe\substr;
 use function str_replace;
 use function trim;
 use Webmozart\Assert\Assert;
@@ -153,6 +154,13 @@ class IndexXmlCoverageParser
         $linesNode = self::safeQuery($xPath, '/phpunit/file/totals/lines')[0];
 
         $percentage = $linesNode->getAttribute('percent');
+
+        if (substr($percentage, -1) === '%') {
+            // In PHPUnit <6 the percentage value would tak ethe form "0.00%" in _some_ cases.
+            // For example could find both with percentage and without in
+            // https://github.com/maks-rafalko/tactician-domain-events/tree/1eb23434d3a833dedb6180ead75ff983ef09a2e9
+            $percentage = substr($percentage, 0, -1);
+        }
 
         if ($percentage === '') {
             $percentage = .0;

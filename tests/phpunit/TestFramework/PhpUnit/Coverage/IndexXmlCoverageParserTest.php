@@ -47,12 +47,14 @@ use function Safe\file_get_contents;
 use function Safe\preg_replace;
 use function Safe\realpath;
 use function Safe\sprintf;
+use function str_replace;
 
 final class IndexXmlCoverageParserTest extends TestCase
 {
     private const FIXTURES_SRC_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/src';
     private const FIXTURES_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
     private const FIXTURES_INCORRECT_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage-incomplete';
+    private const FIXTURES_OLD_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/old-coverage';
 
     /**
      * @var string|null
@@ -258,6 +260,61 @@ XML;
         $coverage = $this->parser->parse($xml);
 
         $this->assertSame([], $coverage);
+    }
+
+    public function test_it_has_correct_coverage_data_for_each_file_for_old_phpunit_versions(): void
+    {
+        $coverage = (new IndexXmlCoverageParser(self::FIXTURES_OLD_COVERAGE_DIR . '/coverage-xml'))->parse(str_replace(
+            '/path/to/src',
+            realpath(self::FIXTURES_OLD_COVERAGE_DIR . '/src'),
+            file_get_contents(self::FIXTURES_OLD_COVERAGE_DIR . '/coverage-xml/index.xml')
+        ));
+
+        $middlewarePath = realpath(self::FIXTURES_OLD_COVERAGE_DIR . '/src/Middleware/ReleaseRecordedEventsMiddleware.php');
+
+        $this->assertSame(
+            [
+                $middlewarePath => [
+                    'byLine' => [
+                        29 => [
+                            [
+                                'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_dispatches_recorded_events',
+                                'testFilePath' => null,
+                                'time' => null,
+                            ],
+                            [
+                                'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_erases_events_when_exception_is_raised',
+                                'testFilePath' => null,
+                                'time' => null,
+                            ],
+                        ],
+                        30 => [
+                            [
+                                'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_dispatches_recorded_events',
+                                'testFilePath' => null,
+                                'time' => null,
+                            ],
+                            [
+                                'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_erases_events_when_exception_is_raised',
+                                'testFilePath' => null,
+                                'time' => null,
+                            ],
+                        ],
+                    ],
+                    'byMethod' => [
+                        '__construct' => [
+                            'startLine' => 27,
+                            'endLine' => 31,
+                        ],
+                        'execute' => [
+                            'startLine' => 43,
+                            'endLine' => 60,
+                        ],
+                    ],
+                ],
+            ],
+            self::convertCoverageToArray($coverage)
+        );
     }
 
     /**
