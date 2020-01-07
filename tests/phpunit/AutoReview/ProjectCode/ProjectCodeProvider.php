@@ -51,12 +51,14 @@ use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\Util\PhpProcess;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
+use Infection\Engine;
 use Infection\Finder\ComposerExecutableFinder;
 use Infection\Finder\FilterableFinder;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\Http\BadgeApiClient;
 use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
+use Infection\Mutator\NodeMutationGenerator;
 use Infection\Mutator\Util\Mutator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
@@ -72,11 +74,10 @@ use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUn
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkTypes;
+use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use Infection\Tracing\NodeLineRangeData;
 use Infection\Utils\VersionParser;
-use Infection\Visitor\MutationsCollectorVisitor;
-use Infection\Visitor\ParentConnectorVisitor;
 use function iterator_to_array;
 use ReflectionClass;
 use const SORT_STRING;
@@ -102,9 +103,9 @@ final class ProjectCodeProvider
         MutationGeneratingConsoleLoggerSubscriber::class,
         MutationTestingRunner::class,
         TestFrameworkTypes::class,
-        MutationsCollectorVisitor::class,
-        ParentConnectorVisitor::class,
+        NodeMutationGenerator::class,
         FilterableFinder::class,
+        Engine::class,
     ];
 
     /**
@@ -147,6 +148,11 @@ final class ProjectCodeProvider
     /**
      * @var string[]|null
      */
+    private static $sourceClassesToCheckForPublicProperties;
+
+    /**
+     * @var string[]|null
+     */
     private static $testClasses;
 
     private function __construct()
@@ -157,6 +163,8 @@ final class ProjectCodeProvider
     {
         if (null !== self::$sourceClasses) {
             yield from self::$sourceClasses;
+
+            return;
         }
 
         $finder = Finder::create()
@@ -193,19 +201,10 @@ final class ProjectCodeProvider
 
     public static function provideConcreteSourceClasses(): Generator
     {
-        $sourceClasses = iterator_to_array(self::provideSourceClasses(), true);
-
-        yield from array_filter(
-            $sourceClasses,
-            static function (string $className): bool {
-                $reflectionClass = new ReflectionClass($className);
-
-                return !$reflectionClass->isInterface()
-                    && !$reflectionClass->isAbstract()
-                    && !$reflectionClass->isTrait()
-                ;
-            }
-        );
+        yield from ConcreteClassReflector::filterByConcreteClasses(iterator_to_array(
+            self::provideSourceClasses(),
+            true
+        ));
     }
 
     public static function concreteSourceClassesProvider(): Generator
@@ -217,7 +216,13 @@ final class ProjectCodeProvider
 
     public static function provideSourceClassesToCheckForPublicProperties(): Generator
     {
-        yield from array_filter(
+        if (null !== self::$sourceClassesToCheckForPublicProperties) {
+            yield from self::$sourceClassesToCheckForPublicProperties;
+
+            return;
+        }
+
+        self::$sourceClassesToCheckForPublicProperties = array_filter(
             iterator_to_array(self::provideSourceClasses(), true),
             static function (string $className): bool {
                 $reflectionClass = new ReflectionClass($className);
@@ -237,6 +242,8 @@ final class ProjectCodeProvider
                 ;
             }
         );
+
+        yield from self::$sourceClassesToCheckForPublicProperties;
     }
 
     public static function sourceClassesToCheckForPublicPropertiesProvider(): Generator
@@ -250,6 +257,8 @@ final class ProjectCodeProvider
     {
         if (null !== self::$testClasses) {
             yield from self::$testClasses;
+
+            return;
         }
 
         $finder = Finder::create()

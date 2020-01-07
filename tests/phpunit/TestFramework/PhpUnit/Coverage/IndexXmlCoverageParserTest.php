@@ -36,20 +36,25 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
 use Generator;
+use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\PhpUnit\Coverage\Exception\NoLineExecuted;
-use PHPUnit\Framework\TestCase;
+use Infection\TestFramework\PhpUnit\Coverage\NoLineExecuted;
 use function is_array;
 use function is_scalar;
+use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
 use function Safe\realpath;
 use function Safe\sprintf;
+use function str_replace;
 
 final class IndexXmlCoverageParserTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage-xml';
+    private const FIXTURES_SRC_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/src';
+    private const FIXTURES_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
+    private const FIXTURES_INCORRECT_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage-incomplete';
+    private const FIXTURES_OLD_COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/old-coverage';
 
     /**
      * @var string|null
@@ -61,44 +66,53 @@ final class IndexXmlCoverageParserTest extends TestCase
      */
     private $parser;
 
-    public static function setUpBeforeClass(): void
+    protected function setUp(): void
     {
-        $xml = file_get_contents(self::FIXTURES_DIR . '/index.xml');
+        $this->parser = new IndexXmlCoverageParser(self::FIXTURES_COVERAGE_DIR);
+    }
+
+    public static function getXml(): string
+    {
+        if (self::$xml !== null) {
+            return self::$xml;
+        }
+
+        $xml = file_get_contents(self::FIXTURES_COVERAGE_DIR . '/index.xml');
 
         // Replaces dummy source path with the real path
         self::$xml = preg_replace(
             '/(source=\").*?(\")/',
-            sprintf('$1%s$2', realpath(self::FIXTURES_DIR)),
+            sprintf('$1%s$2', realpath(self::FIXTURES_SRC_DIR)),
             $xml
         );
+
+        return self::$xml;
     }
 
-    public static function tearDownAfterClass(): void
+    /**
+     * @dataProvider coverageProvider
+     */
+    public function test_it_collects_data_recursively_for_all_files(string $xml): void
     {
-        self::$xml = null;
-    }
+        $coverage = $this->parser->parse($xml);
 
-    protected function setUp(): void
-    {
-        $this->parser = new IndexXmlCoverageParser();
-    }
-
-    public function test_it_collects_data_recursively_for_all_files(): void
-    {
-        $coverage = $this->parser->parse(self::$xml);
-
-        // zeroLevel / firstLevel / secondLevel
-        $this->assertCount(4, $coverage);
+        // zeroLevel + noPercentage + firstLevel + secondLevel
+        $this->assertCount(5, $coverage);
     }
 
     public function test_it_has_correct_coverage_data_for_each_file(): void
     {
-        $coverage = $this->parser->parse(self::$xml);
+        $coverage = $this->parser->parse(preg_replace(
+            '/percent=".*"/',
+            '',
+            self::getXml()
+        ));
 
-        $zeroLevelPath = realpath(self::FIXTURES_DIR . '/zeroLevel.php');
-        $firstLevelPath = realpath(self::FIXTURES_DIR . '/FirstLevel/firstLevel.php');
-        $secondLevelPath = realpath(self::FIXTURES_DIR . '/FirstLevel/SecondLevel/secondLevel.php');
-        $secondLevelTraitPath = realpath(self::FIXTURES_DIR . '/FirstLevel/SecondLevel/secondLevelTrait.php');
+        $zeroLevelPath = realpath(self::FIXTURES_SRC_DIR . '/zeroLevel.php');
+        $noPercentagePath = realpath(self::FIXTURES_SRC_DIR . '/noPercentage.php');
+        $firstLevelPath = realpath(self::FIXTURES_SRC_DIR . '/FirstLevel/firstLevel.php');
+        $secondLevelPath = realpath(self::FIXTURES_SRC_DIR . '/FirstLevel/SecondLevel/secondLevel.php');
+        $secondLevelTraitPath = realpath(self::FIXTURES_SRC_DIR . '/FirstLevel/SecondLevel/secondLevelTrait.php');
 
         $this->assertSame(
             [
@@ -210,6 +224,10 @@ final class IndexXmlCoverageParserTest extends TestCase
                     'byLine' => [],
                     'byMethod' => [],
                 ],
+                $noPercentagePath => [
+                    'byLine' => [],
+                    'byMethod' => [],
+                ],
             ],
             self::convertCoverageToArray($coverage)
         );
@@ -244,6 +262,61 @@ XML;
         $this->assertSame([], $coverage);
     }
 
+    public function test_it_has_correct_coverage_data_for_each_file_for_old_phpunit_versions(): void
+    {
+        $coverage = (new IndexXmlCoverageParser(self::FIXTURES_OLD_COVERAGE_DIR . '/coverage-xml'))->parse(str_replace(
+            '/path/to/src',
+            realpath(self::FIXTURES_OLD_COVERAGE_DIR . '/src'),
+            file_get_contents(self::FIXTURES_OLD_COVERAGE_DIR . '/coverage-xml/index.xml')
+        ));
+
+        $middlewarePath = realpath(self::FIXTURES_OLD_COVERAGE_DIR . '/src/Middleware/ReleaseRecordedEventsMiddleware.php');
+
+        $this->assertSame(
+            [
+                $middlewarePath => [
+                    'byLine' => [
+                        29 => [
+                            [
+                                'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_dispatches_recorded_events',
+                                'testFilePath' => null,
+                                'time' => null,
+                            ],
+                            [
+                                'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_erases_events_when_exception_is_raised',
+                                'testFilePath' => null,
+                                'time' => null,
+                            ],
+                        ],
+                        30 => [
+                            [
+                                'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_dispatches_recorded_events',
+                                'testFilePath' => null,
+                                'time' => null,
+                            ],
+                            [
+                                'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_erases_events_when_exception_is_raised',
+                                'testFilePath' => null,
+                                'time' => null,
+                            ],
+                        ],
+                    ],
+                    'byMethod' => [
+                        '__construct' => [
+                            'startLine' => 27,
+                            'endLine' => 31,
+                        ],
+                        'execute' => [
+                            'startLine' => 43,
+                            'endLine' => 60,
+                        ],
+                    ],
+                ],
+            ],
+            self::convertCoverageToArray($coverage)
+        );
+    }
+
     /**
      * @dataProvider noCoveredLineReportProviders
      */
@@ -252,6 +325,47 @@ XML;
         $this->expectException(NoLineExecuted::class);
 
         $this->parser->parse($xml);
+    }
+
+    public function test_it_errors_when_the_source_file_could_not_be_found(): void
+    {
+        $incorrectCoverageSrcDir = realpath(self::FIXTURES_INCORRECT_COVERAGE_DIR . '/src');
+
+        // Replaces dummy source path with the real path
+        $xml = preg_replace(
+            '/(source=\").*?(\")/',
+            sprintf('$1%s$2', $incorrectCoverageSrcDir),
+            file_get_contents(self::FIXTURES_INCORRECT_COVERAGE_DIR . '/coverage-xml/index.xml')
+        );
+
+        try {
+            $this->parser->parse($xml);
+
+            $this->fail();
+        } catch (CoverageDoesNotExistException $exception) {
+            $this->assertSame(
+                sprintf(
+                    'Source file zeroLevel.php was not found at %s/zeroLevel.php',
+                    $incorrectCoverageSrcDir
+                ),
+                $exception->getMessage()
+            );
+            $this->assertSame(0, $exception->getCode());
+            $this->assertNull($exception->getPrevious());
+        }
+    }
+
+    public function coverageProvider(): Generator
+    {
+        yield 'nominal' => [self::getXml()];
+
+        yield 'PHPUnit <6' => [
+            preg_replace(
+                '/(source)(=\".*?\")/',
+                'name$2',
+                self::getXml()
+            ),
+        ];
     }
 
     public function noCoveredLineReportProviders(): Generator
@@ -277,7 +391,7 @@ XML;
   <!-- The rest of the file has been removed for this test-->
 </phpunit>
 XML
-            ];
+        ];
 
         yield 'lines is not present' => [<<<'XML'
 <?xml version="1.0"?>
@@ -303,7 +417,7 @@ XML
     }
 
     /**
-     * @param array<string, CoverageFileData>
+     * @param array<string, CoverageFileData> $coverage
      *
      * @return array<string, mixed>
      */
@@ -312,11 +426,6 @@ XML
         return self::serializeValue($coverage);
     }
 
-    /**
-     * @param mixed $mixed
-     *
-     * @return mixed
-     */
     private static function serializeValue($mixed)
     {
         if ($mixed === null) {

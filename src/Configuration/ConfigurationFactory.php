@@ -43,7 +43,6 @@ use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
-use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
 use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use Infection\TestFramework\TestFrameworkExtraOptions;
@@ -65,9 +64,9 @@ class ConfigurationFactory
     private const DEFAULT_TIMEOUT = 10;
 
     private const TEST_FRAMEWORK_COVERAGE_DIRECTORY = [
-        TestFrameworkTypes::PHPUNIT => XMLLineCodeCoverage::PHP_UNIT_COVERAGE_DIR,
-        TestFrameworkTypes::PHPSPEC => XMLLineCodeCoverage::PHP_SPEC_COVERAGE_DIR,
-        TestFrameworkTypes::CODECEPTION => XMLLineCodeCoverage::CODECEPTION_COVERAGE_DIR,
+        TestFrameworkTypes::PHPUNIT => 'coverage-xml',
+        TestFrameworkTypes::PHPSPEC => TestFrameworkTypes::PHPSPEC . '-coverage-xml',
+        TestFrameworkTypes::CODECEPTION => TestFrameworkTypes::CODECEPTION . '-coverage-xml',
     ];
 
     private $tmpDirProvider;

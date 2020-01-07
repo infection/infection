@@ -37,10 +37,9 @@ namespace Infection\Tests\Visitor;
 
 use Infection\Visitor\NotMutableIgnoreVisitor;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 
-final class NotMutableIgnoreVisitorTest extends AbstractBaseVisitorTest
+final class NotMutableIgnoreVisitorTest extends BaseVisitorTest
 {
     private $spyVisitor;
 
@@ -51,7 +50,7 @@ final class NotMutableIgnoreVisitorTest extends AbstractBaseVisitorTest
 
     public function test_it_does_not_traverse_interface_methods(): void
     {
-        $code = <<<'PHP'
+        $this->parseAndTraverse(<<<'PHP'
 <?php
 
 interface Foo
@@ -59,14 +58,15 @@ interface Foo
     public function foo(): array;
     public function bar(int $number): string;
 }
-PHP;
-        $this->parseAndTraverse($code);
+PHP
+        );
+
         $this->assertSame(0, $this->spyVisitor->getNumberOfClassMethodsVisited());
     }
 
     public function test_it_does_not_traverse_abstract_methods(): void
     {
-        $code = <<<'PHP'
+        $this->parseAndTraverse(<<<'PHP'
 <?php
 
 abstract class Foo
@@ -74,14 +74,15 @@ abstract class Foo
     abstract public function foo(): array;
     abstract public function bar(int $number): string;
 }
-PHP;
-        $this->parseAndTraverse($code);
+PHP
+        );
+
         $this->assertSame(0, $this->spyVisitor->getNumberOfClassMethodsVisited());
     }
 
-    public function test_it_still_traverses_normal_methods_in_abstract_classes(): void
+    public function test_it_traverses_normal_methods_in_abstract_classes(): void
     {
-        $code = <<<'PHP'
+        $this->parseAndTraverse(<<<'PHP'
 <?php
 
 abstract class Foo
@@ -89,8 +90,9 @@ abstract class Foo
     abstract public function foo(): array;
     public function bar(int $number): string { return ''; }
 }
-PHP;
-        $this->parseAndTraverse($code);
+PHP
+        );
+
         $this->assertSame(1, $this->spyVisitor->getNumberOfClassMethodsVisited());
     }
 
@@ -117,11 +119,12 @@ PHP;
     {
         $nodes = $this->parseCode($code);
 
-        $traverser = new NodeTraverser();
-
-        $traverser->addVisitor(new NotMutableIgnoreVisitor());
-        $traverser->addVisitor($this->spyVisitor);
-
-        $traverser->traverse($nodes);
+        $this->traverse(
+            $nodes,
+            [
+                new NotMutableIgnoreVisitor(),
+                $this->spyVisitor,
+            ]
+        );
     }
 }

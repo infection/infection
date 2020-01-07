@@ -33,24 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Coverage\Exception;
+namespace Infection\Mutator;
 
-use Infection\TestFramework\PhpUnit\Coverage\Exception\NoLineExecuted;
-use PHPUnit\Framework\TestCase;
+use Webmozart\Assert\Assert;
 
-final class NoLineExecutedTest extends TestCase
+/**
+ * @internal
+ */
+final class Definition
 {
-    public function test_it_can_create_an_instance(): void
+    private $description;
+    private $category;
+    private $remedies;
+
+    /**
+     * @param string      $description Explanation on what the mutator is about
+     * @param string|null $remedies Guidelines or recommendations on how to kill the generated mutations
+     */
+    public function __construct(
+        string $description,
+        string $category,
+        ?string $remedies
+    ) {
+        Assert::oneOf($category, MutatorCategory::ALL);
+
+        $this->description = $description;
+        $this->category = $category;
+        $this->remedies = $remedies;
+    }
+
+    public function getDescription(): string
     {
-        $exception = NoLineExecuted::create();
+        return $this->description;
+    }
 
-        $expectedMessage = <<<'MSG'
-No line of code was executed during tests. This could be due to "@covers" annotations or your 
-PHPUnit filters not being set up correctly.
-MSG;
+    public function getCategory(): string
+    {
+        return $this->category;
+    }
 
-        $this->assertSame($expectedMessage, $exception->getMessage());
-        $this->assertSame(0, $exception->getCode());
-        $this->assertNull($exception->getPrevious());
+    public function getRemedies(): ?string
+    {
+        return $this->remedies;
     }
 }

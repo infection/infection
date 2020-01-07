@@ -41,11 +41,13 @@ use PhpParser\NodeDumper;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PhpParser\Parser;
+use PhpParser\PrettyPrinter\Standard;
+use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\sprintf;
 
-abstract class AbstractBaseVisitorTest extends TestCase
+abstract class BaseVisitorTest extends TestCase
 {
     /**
      * @var Parser|null
@@ -56,6 +58,11 @@ abstract class AbstractBaseVisitorTest extends TestCase
      * @var NodeDumper|null
      */
     private static $dumper;
+
+    /**
+     * @var PrettyPrinterAbstract|null
+     */
+    private static $printer;
 
     /**
      * @return Node[]
@@ -95,6 +102,14 @@ abstract class AbstractBaseVisitorTest extends TestCase
         return file_get_contents(sprintf(__DIR__ . '/../Fixtures/Autoloaded/%s', $file));
     }
 
+    /**
+     * @param Node[] $nodes
+     */
+    final protected function print(array $nodes): string
+    {
+        return $this->getPrinter()->prettyPrintFile($nodes);
+    }
+
     private function getParser(): Parser
     {
         if (null === self::$parser) {
@@ -111,5 +126,14 @@ abstract class AbstractBaseVisitorTest extends TestCase
         }
 
         return self::$dumper;
+    }
+
+    private function getPrinter(): PrettyPrinterAbstract
+    {
+        if (null === self::$printer) {
+            self::$printer = new Standard();
+        }
+
+        return self::$printer;
     }
 }

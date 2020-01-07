@@ -44,7 +44,6 @@ use Infection\Events\MutationTestingFinished;
 use Infection\Events\MutationTestingStarted;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutation;
-use Infection\MutationInterface;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\MutantProcessInterface;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
@@ -55,31 +54,33 @@ use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 final class MutationTestingRunner
 {
     private $processBuilder;
-    private $mutations;
     private $mutantCreator;
     private $parallelProcessManager;
     private $eventDispatcher;
 
-    /**
-     * @param Mutation[] $mutations
-     */
-    public function __construct(MutantProcessBuilder $processBuilder, ParallelProcessRunner $parallelProcessManager, MutantCreator $mutantCreator, EventDispatcherInterface $eventDispatcher, array $mutations)
-    {
+    public function __construct(
+        MutantProcessBuilder $processBuilder,
+        ParallelProcessRunner $parallelProcessManager,
+        MutantCreator $mutantCreator,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         $this->processBuilder = $processBuilder;
         $this->mutantCreator = $mutantCreator;
         $this->parallelProcessManager = $parallelProcessManager;
         $this->eventDispatcher = $eventDispatcher;
-        $this->mutations = $mutations;
     }
 
-    public function run(int $threadCount, string $testFrameworkExtraOptions): void
+    /**
+     * @param Mutation[] $mutations
+     */
+    public function run(array $mutations, int $threadCount, string $testFrameworkExtraOptions): void
     {
-        $mutantCount = count($this->mutations);
+        $mutantCount = count($mutations);
 
         $this->eventDispatcher->dispatch(new MutantsCreatingStarted($mutantCount));
 
         $processes = array_map(
-            function (MutationInterface $mutation) use ($testFrameworkExtraOptions): MutantProcessInterface {
+            function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcessInterface {
                 $mutant = $this->mutantCreator->create($mutation);
 
                 $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
@@ -88,7 +89,7 @@ final class MutationTestingRunner
 
                 return $process;
             },
-            $this->mutations
+            $mutations
         );
 
         $this->eventDispatcher->dispatch(new MutantsCreatingFinished());

@@ -39,25 +39,25 @@ use DOMDocument;
 use DOMElement;
 use DOMNodeList;
 use DOMXPath;
-use Webmozart\Assert\Assert;
 use function file_exists;
 use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
 final class JUnitTestFileDataProvider implements TestFileDataProvider
 {
-    private $jUnitPath;
+    private $jUnitFilePath;
 
     /**
      * @var DOMXPath|null
      */
     private $xPath;
 
-    public function __construct(string $jUnitPath)
+    public function __construct(string $jUnitFilePath)
     {
-        $this->jUnitPath = $jUnitPath;
+        $this->jUnitFilePath = $jUnitFilePath;
     }
 
     /**
@@ -83,7 +83,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
         if ($nodes->length === 0) {
             throw TestFileNameNotFoundException::notFoundFromFQN(
                 $fullyQualifiedClassName,
-                $this->jUnitPath
+                $this->jUnitFilePath
             );
         }
 
@@ -99,7 +99,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
     private function getXPath(): DOMXPath
     {
         if (!$this->xPath) {
-            $this->xPath = self::createXPath($this->jUnitPath);
+            $this->xPath = self::createXPath($this->jUnitFilePath);
         }
 
         return $this->xPath;

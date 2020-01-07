@@ -35,51 +35,54 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ConditionalBoundary;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class GreaterThanOrEqualToTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator($input, $expected = null): void
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): array
+    public function mutationsProvider(): Generator
     {
-        return [
-            'It mutates greater than or equal to' => [
-                <<<'PHP'
+        yield 'It mutates greater than or equal to' => [
+            <<<'PHP'
 <?php
 
 1 >= 2;
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 1 > 2;
 PHP
-                ,
-            ],
-            'It does not mutate an arrow' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate an arrow' => [
+            <<<'PHP'
 <?php
 
 [1 => 2];
 PHP
-                ,
-            ],
-            'It does not mutate a spaceship' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate a spaceship' => [
+            <<<'PHP'
 <?php
 
 1 <=> 2;
 PHP
-                ,
-            ],
+            ,
         ];
     }
 }

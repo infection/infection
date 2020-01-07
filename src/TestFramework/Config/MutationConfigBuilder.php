@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Config;
 
 use function assert;
-use Infection\Mutant\MutantInterface;
+use Infection\TestFramework\Coverage\CoverageLineData;
 use function is_string;
 use Phar;
 
@@ -45,7 +45,15 @@ use Phar;
  */
 abstract class MutationConfigBuilder
 {
-    abstract public function build(MutantInterface $mutant): string;
+    /**
+     * @param CoverageLineData[] $coverageTests
+     */
+    abstract public function build(
+        array $coverageTests,
+        string $mutatedFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath
+    ): string;
 
     protected function getInterceptorFileContent(string $interceptorPath, string $originalFilePath, string $mutatedFilePath): string
     {

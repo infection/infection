@@ -36,126 +36,121 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview;
 
 use function array_column;
+use function array_diff;
+use function array_filter;
+use function array_map;
+use function count;
+use Generator;
+use function implode;
+use Infection\Mutator\Util\Mutator;
+use function Infection\Tests\generator_to_phpunit_data_provider;
 use Infection\Tests\Mutator\ProfileListProvider;
 use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use ReflectionMethod;
+use function Safe\sprintf;
+use function sort;
+use const SORT_STRING;
 
 /**
  * @coversNothing
  *
- * This class is responsible for testing that all Mutator classes adhere to certain rules
- * e.g. 'Mutators shouldn't declare any public methods`
+ * This class is responsible for testing that all Mutator classes adhere to certain rules e.g.
+ * 'Mutators shouldn't declare any public methods'.
+ *
+ * The goal is to reduce PR reviews about style issues that can't be automatically fixed. All test
+ * failures should have a clear explanation to help contributors unfamiliar with the codebase.
  */
 final class MutatorTest extends TestCase
 {
-    /**
-     * @dataProvider providesMutatorClasses
-     */
-    public function test_mutator_class_provider_is_valid(string $className): void
-    {
-        $this->assertTrue(
-            class_exists($className) || interface_exists($className) || trait_exists($className),
-            sprintf(
-                'The "%s" class was picked up by the Mutator files finder, but it is not a class, interface or trait. ' .
-                'Please check for typos in the class name. Or exclude the file if in the ProjectCodeTest if it is not a class.',
-                $className
-            )
-        );
-    }
+    private const KNOWN_MUTATOR_PUBLIC_METHODS = [
+        'getDefinition',
+        'getName',
+        'mutate',
+        'shouldMutate',
+    ];
 
     /**
-     * @dataProvider providesMutatorClasses
+     * @dataProvider mutatorClassesProvider
      */
     public function test_mutators_do_not_declare_public_methods(string $className): void
     {
-        $rc = new ReflectionClass($className);
+        $publicMethods = $this->getPublicMethods(new ReflectionClass($className));
 
         $this->assertCount(
-            3,
-            $this->getPublicMethods($rc),
+            count(self::KNOWN_MUTATOR_PUBLIC_METHODS),
+            $publicMethods,
             sprintf(
-                'Mutator class "%s" has declared a public method, and should not do so, please consider refactoring.',
-                $className
+                'The mutator class "%s" has the following non-allowed public method(s) '
+                . 'declared: "%s". Either reconsider if it is necessary for it to be public and make'
+                . ' it protected/private instead or add it to "%s::KNOWN_MUTATOR_PUBLIC_METHODS".',
+                $className,
+                implode(
+                    ', ',
+                    array_diff($publicMethods, self::KNOWN_MUTATOR_PUBLIC_METHODS)
+                ),
+                self::class
             )
         );
     }
 
     /**
-     * @dataProvider provideConcreteMutatorClasses
+     * @dataProvider concreteMutatorClassesProvider
      */
-    public function test_mutators_have_tests(string $className): void
+    public function test_mutators_have_a_definition(string $className): void
     {
-        $testClassName = str_replace('Infection\\', 'Infection\Tests\\', $className) . 'Test';
+        /** @var Mutator $mutator */
+        $mutator = (new ReflectionClass($className))->newInstanceWithoutConstructor();
 
-        $this->assertTrue(
-            class_exists($testClassName),
-            sprintf(
-                'Mutator "%s" does not have a corresponding unit test "%s", please fix this by adding tests.',
-                $className,
-                $testClassName
+        $definition = $mutator::getDefinition();
+
+        if ($definition !== null) {
+            return;
+        }
+
+        $this->addWarning(sprintf(
+            'The mutant "%s" does not have a definition.',
+            $className
+        ));
+    }
+
+    public function mutatorClassesProvider(): Generator
+    {
+        yield from generator_to_phpunit_data_provider(array_column(
+            iterator_to_array(ProfileListProvider::mutatorNameAndClassProvider(), true),
+            1
+        ));
+    }
+
+    public function concreteMutatorClassesProvider(): Generator
+    {
+        yield from generator_to_phpunit_data_provider(ConcreteClassReflector::filterByConcreteClasses(
+            array_column(
+                iterator_to_array(ProfileListProvider::mutatorNameAndClassProvider(), true),
+                1
+            )
+        ));
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getPublicMethods(ReflectionClass $reflectionClass): array
+    {
+        $publicMethods = array_map(
+            static function (ReflectionMethod $reflectionMethod): string {
+                return $reflectionMethod->getName();
+            },
+            array_filter(
+                $reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC),
+                static function (ReflectionMethod $reflectionMethod): bool {
+                    return !$reflectionMethod->isConstructor();
+                }
             )
         );
-    }
 
-    public function provideConcreteMutatorClasses()
-    {
-        return array_map(
-            static function ($item) {
-                return [$item];
-            },
-            $this->getConcreteMutatorClasses()
-        );
-    }
-
-    public function providesMutatorClasses()
-    {
-        return array_map(
-            static function ($item) {
-                return [$item];
-            },
-            $this->getMutatorClasses()
-        );
-    }
-
-    private function getMutatorClasses()
-    {
-        static $classes;
-
-        if (null !== $classes) {
-            return $classes;
-        }
-
-        $classes = array_column(
-            iterator_to_array(ProfileListProvider::mutatorNameAndClassProvider(), false),
-            1
-        );
-
-        return $classes;
-    }
-
-    private function getConcreteMutatorClasses()
-    {
-        return array_filter(
-            $this->getMutatorClasses(),
-            static function ($item) {
-                $class = new ReflectionClass($item);
-
-                return !$class->isInterface() && !$class->isAbstract() && !$class->isTrait();
-            }
-        );
-    }
-
-    private function getPublicMethods(ReflectionClass $rc)
-    {
-        $publicMethods = [];
-
-        foreach ($rc->getMethods() as $method) {
-            if ($method->isPublic() && !$method->isConstructor()) {
-                $publicMethods[] = $method->name;
-            }
-        }
-        sort($publicMethods);
+        sort($publicMethods, SORT_STRING);
 
         return $publicMethods;
     }

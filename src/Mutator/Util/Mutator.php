@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Util;
 
 use Generator;
+use Infection\Mutator\Definition;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
@@ -46,6 +47,11 @@ abstract class Mutator
     public function __construct(MutatorConfig $config)
     {
         $this->config = $config;
+    }
+
+    public static function getDefinition(): ?Definition
+    {
+        return null;
     }
 
     /**

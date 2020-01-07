@@ -35,43 +35,45 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
+use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class LogicalAndTest extends AbstractMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
-    public function test_mutator($input, $expected = null): void
+    public function test_it_can_mutate(string $input, $expected = []): void
     {
         $this->doTest($input, $expected);
     }
 
-    public function provideMutationCases(): array
+    public function mutationsProvider(): Generator
     {
-        return [
-            'It mutates logical and' => [
-                <<<'PHP'
+        yield 'It mutates logical and' => [
+            <<<'PHP'
 <?php
 
 true && false;
 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
 <?php
 
 true || false;
 PHP
-                ,
-            ],
-            'It does not mutate logical lower and' => [
-                <<<'PHP'
+            ,
+        ];
+
+        yield 'It does not mutate logical lower and' => [
+            <<<'PHP'
 <?php
 
 true and false;
 PHP
-                ,
-            ],
+            ,
         ];
     }
 }

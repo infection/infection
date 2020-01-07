@@ -36,34 +36,34 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpSpec\Config\Builder;
 
 use Infection\Mutant\MutantInterface;
-use Infection\MutationInterface;
+use Infection\Mutation;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 
 final class MutationConfigBuilderTest extends FileSystemTestCase
 {
+    private const MUTATION_HASH = 'a1b2c3';
+    private const ORIGINAL_FILE_PATH = '/original/file/path';
+    private const MUTATED_FILE_PATH = '/mutated/file/path';
+
     public function test_it_builds_path_to_mutation_config_file(): void
     {
         $projectDir = '/project/dir';
         $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/phpspec/phpspec.yml';
 
-        $mutation = $this->createMock(MutationInterface::class);
-        $mutation->method('getHash')
-            ->willReturn('a1b2c3');
-        $mutation->method('getOriginalFilePath')
-            ->willReturn('/original/file/path');
-
-        $mutant = $this->createMock(MutantInterface::class);
-        $mutant->method('getMutation')
-            ->willReturn($mutation);
-        $mutant->method('getMutatedFilePath')
-            ->willReturn('/mutated/file/path');
-
         // TODO for PhpSpec pass file content as well
         // TODO test phpspec after that
         $builder = new MutationConfigBuilder($this->tmp, $originalYamlConfigPath, $projectDir);
 
-        $this->assertSame($this->tmp . '/phpspecConfiguration.a1b2c3.infection.yml', $builder->build($mutant));
+        $this->assertSame(
+            $this->tmp . '/phpspecConfiguration.a1b2c3.infection.yml',
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::MUTATION_HASH,
+                self::ORIGINAL_FILE_PATH
+            )
+        );
     }
 
     public function test_it_adds_original_bootstrap_file_to_custom_autoload(): void
@@ -71,7 +71,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         $projectDir = '/project/dir';
         $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/phpspec/phpspec.with.bootstrap.yml';
 
-        $mutation = $this->createMock(MutationInterface::class);
+        $mutation = $this->createMock(Mutation::class);
         $mutation->method('getHash')
             ->willReturn('a1b2c3');
         $mutation->method('getOriginalFilePath')
@@ -85,7 +85,15 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
 
         $builder = new MutationConfigBuilder($this->tmp, $originalYamlConfigPath, $projectDir);
 
-        $this->assertSame($this->tmp . '/phpspecConfiguration.a1b2c3.infection.yml', $builder->build($mutant));
+        $this->assertSame(
+            $this->tmp . '/phpspecConfiguration.a1b2c3.infection.yml',
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::MUTATION_HASH,
+                self::ORIGINAL_FILE_PATH
+            )
+        );
         $this->assertStringContainsString(
             "require_once '/project/dir/bootstrap.php';",
             file_get_contents($this->tmp . '/interceptor.phpspec.autoload.a1b2c3.infection.php')

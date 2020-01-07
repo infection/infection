@@ -35,22 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Coverage;
 
+use function array_filter;
 use DOMDocument;
 use DOMElement;
 use DOMNodeList;
 use DOMXPath;
+use function implode;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\MethodLocationData;
-use Infection\TestFramework\PhpUnit\Coverage\Exception\NoLineExecuted;
-use function ltrim;
 use function realpath as native_realpath;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
 use function Safe\realpath;
 use function Safe\sprintf;
+use function Safe\substr;
 use function str_replace;
+use function trim;
 use Webmozart\Assert\Assert;
 
 /**
@@ -58,6 +60,13 @@ use Webmozart\Assert\Assert;
  */
 class IndexXmlCoverageParser
 {
+    private $coverageDir;
+
+    public function __construct(string $coverageDir)
+    {
+        $this->coverageDir = $coverageDir;
+    }
+
     /**
      * Parses the given PHPUnit XML coverage index report (index.xml) to collect the general
      * coverage data. Note that this data is likely incomplete an will need to be enriched to
@@ -137,7 +146,7 @@ class IndexXmlCoverageParser
         array &$data
     ): void {
         $xPath = self::createXPath(file_get_contents(
-            realpath($projectSource . '/' . $relativeCoverageFilePath)
+            realpath($this->coverageDir . '/' . $relativeCoverageFilePath)
         ));
 
         $sourceFilePath = self::retrieveSourceFilePath($xPath, $relativeCoverageFilePath, $projectSource);
@@ -146,13 +155,26 @@ class IndexXmlCoverageParser
 
         $percentage = $linesNode->getAttribute('percent');
 
+        if (substr($percentage, -1) === '%') {
+            // In PHPUnit <6 the percentage value would take the form "0.00%" in _some_ cases.
+            // For example could find both with percentage and without in
+            // https://github.com/maks-rafalko/tactician-domain-events/tree/1eb23434d3a833dedb6180ead75ff983ef09a2e9
+            $percentage = substr($percentage, 0, -1);
+        }
+
         if ($percentage === '') {
+            $percentage = .0;
+        } else {
+            Assert::numeric($percentage);
+
+            $percentage = (float) $percentage;
+        }
+
+        if ($percentage === .0) {
             $data[$sourceFilePath] = new CoverageFileData();
 
             return;
         }
-
-        Assert::numeric($percentage);
 
         $coveredLineNodes = self::safeQuery($xPath, '/phpunit/file/coverage/line');
 
@@ -187,7 +209,7 @@ class IndexXmlCoverageParser
         $fileName = $fileNode->getAttribute('name');
         $relativeFilePath = $fileNode->getAttribute('path');
 
-        if ($relativeFilePath !== '') {
+        if ($relativeFilePath === '') {
             // The relative path is not present for old versions of PHPUnit. As a result we parse
             // the relative path from the source file path and the XML coverage file
             $relativeFilePath = str_replace(
@@ -197,7 +219,11 @@ class IndexXmlCoverageParser
             );
         }
 
-        $path = $projectSource . '/' . ltrim($relativeFilePath, '/') . '/' . $fileName;
+        $path = implode(
+            '/',
+            array_filter([$projectSource, trim($relativeFilePath, '/'), $fileName])
+        );
+
         $realPath = native_realpath($path);
 
         if ($realPath === false) {

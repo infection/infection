@@ -40,6 +40,8 @@ namespace Infection\Tracing;
  */
 interface Tracer
 {
+    public const COVERAGE_INDEX_FILE_NAME = 'index.xml';
+
     public function hasTests(string $filePath): bool;
 
     /**

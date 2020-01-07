@@ -33,46 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace Infection\Tests\AutoReview;
 
-use Infection\Mutator\Util\Mutator;
-use Infection\TestFramework\Coverage\CoverageLineData;
-use PhpParser\Node;
+use function array_filter;
+use ReflectionClass;
 
-/**
- * @internal
- *
- * @see Mutation
- */
-interface MutationInterface
+final class ConcreteClassReflector
 {
-    public function getMutator(): Mutator;
+    private function __construct()
+    {
+    }
 
     /**
-     * @return (string|int|float)[]   $attributes
+     * @param string[] $classNames
+     *
+     * @return string[]
      */
-    public function getAttributes(): array;
+    public static function filterByConcreteClasses(array $classNames): array
+    {
+        return array_filter(
+            $classNames,
+            static function (string $className): bool {
+                $reflectionClass = new ReflectionClass($className);
 
-    public function getOriginalFilePath(): string;
-
-    public function getMutatedNodeClass(): string;
-
-    public function getHash(): string;
-
-    /**
-     * @return Node[]
-     */
-    public function getOriginalFileAst(): array;
-
-    /**
-     * @return CoverageLineData[]
-     */
-    public function getAllTests(): array;
-
-    public function isCoveredByTest(): bool;
-
-    /**
-     * @return Node|Node[] Node, array of Nodes
-     */
-    public function getMutatedNode();
+                return !$reflectionClass->isInterface()
+                    && !$reflectionClass->isAbstract()
+                    && !$reflectionClass->isTrait()
+                ;
+            }
+        );
+    }
 }

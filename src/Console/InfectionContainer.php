@@ -56,6 +56,7 @@ use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\FileParser;
+use Infection\Mutation\MutationGenerator;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
@@ -63,14 +64,18 @@ use Infection\Performance\Limiter\MemoryLimiter;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\TimeFormatter;
 use Infection\Performance\Time\Timer;
+use Infection\Process\Builder\InitialTestRunProcessBuilder;
+use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Coverage\CoverageRequirementChecker;
+use Infection\Process\Runner\InitialTestsRunner;
+use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
-use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnitTestFileDataProvider;
+use Infection\TestFramework\Coverage\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileDataProvider;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\Factory;
@@ -116,8 +121,11 @@ final class InfectionContainer extends Container
                     TestFrameworkAdapter::JUNIT_FILE_NAME
                 );
             },
-            IndexXmlCoverageParser::class => static function (): IndexXmlCoverageParser {
-                return new IndexXmlCoverageParser();
+            IndexXmlCoverageParser::class => static function (self $container): IndexXmlCoverageParser {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                return new IndexXmlCoverageParser($config->getCoveragePath());
             },
             XMLLineCodeCoverageFactory::class => static function (self $container): XMLLineCodeCoverageFactory {
                 /** @var Configuration $config */
@@ -126,8 +134,8 @@ final class InfectionContainer extends Container
                 /** @var IndexXmlCoverageParser $coverageXmlParser */
                 $coverageXmlParser = $container[IndexXmlCoverageParser::class];
 
-                /** @var CachedTestFileDataProvider $cachedTestFileDataProvider */
-                $cachedTestFileDataProvider = $container[CachedTestFileDataProvider::class];
+                /** @var MemoizedTestFileDataProvider $cachedTestFileDataProvider */
+                $cachedTestFileDataProvider = $container[MemoizedTestFileDataProvider::class];
 
                 return new XMLLineCodeCoverageFactory(
                     $config->getCoveragePath(),
@@ -207,8 +215,8 @@ final class InfectionContainer extends Container
             'diff.colorizer' => static function (): DiffColorizer {
                 return new DiffColorizer();
             },
-            CachedTestFileDataProvider::class => static function (self $container): TestFileDataProvider {
-                return new CachedTestFileDataProvider(
+            MemoizedTestFileDataProvider::class => static function (self $container): TestFileDataProvider {
+                return new MemoizedTestFileDataProvider(
                     new JUnitTestFileDataProvider($container['junit.file.path'])
                 );
             },
@@ -218,7 +226,13 @@ final class InfectionContainer extends Container
             Lexer::class => static function (): Lexer {
                 return new Lexer\Emulative([
                     'usedAttributes' => [
-                        'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
+                        'comments',
+                        'startLine',
+                        'endLine',
+                        'startTokenPos',
+                        'endTokenPos',
+                        'startFilePos',
+                        'endFilePos',
                     ],
                 ]);
             },
@@ -416,6 +430,96 @@ final class InfectionContainer extends Container
                     $config->getLogVerbosity(),
                     $config->isDebugEnabled(),
                     $config->mutateOnlyCoveredCode()
+                );
+            },
+            TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                /** @var Factory $testFrameworkFactory */
+                $testFrameworkFactory = $container['test.framework.factory'];
+
+                return $testFrameworkFactory->create(
+                    $config->getTestFramework(),
+                    $config->shouldSkipCoverage()
+                );
+            },
+            InitialTestRunProcessBuilder::class => static function (self $container): InitialTestRunProcessBuilder {
+                /** @var TestFrameworkAdapter $adapter */
+                $adapter = $container[TestFrameworkAdapter::class];
+
+                /** @var VersionParser $versionParser */
+                $versionParser = $container[VersionParser::class];
+
+                return new InitialTestRunProcessBuilder($adapter, $versionParser);
+            },
+            InitialTestsRunner::class => static function (self $container): InitialTestsRunner {
+                /** @var EventDispatcherInterface $eventDispatcher */
+                $eventDispatcher = $container['dispatcher'];
+
+                /** @var InitialTestRunProcessBuilder $processBuilder */
+                $processBuilder = $container[InitialTestRunProcessBuilder::class];
+
+                return new InitialTestsRunner($processBuilder, $eventDispatcher);
+            },
+            MutantProcessBuilder::class => static function (self $container): MutantProcessBuilder {
+                /** @var TestFrameworkAdapter $adapter */
+                $adapter = $container[TestFrameworkAdapter::class];
+
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                /** @var VersionParser $versionParser */
+                $versionParser = $container[VersionParser::class];
+
+                return new MutantProcessBuilder(
+                    $adapter,
+                    $versionParser,
+                    $config->getProcessTimeout()
+                );
+            },
+            MutationGenerator::class => static function (self $container): MutationGenerator {
+                /** @var TestFrameworkAdapter $adapter */
+                $adapter = $container[TestFrameworkAdapter::class];
+
+                /** @var Configuration $config */
+                $config = $container[Configuration::class];
+
+                /** @var EventDispatcherInterface $eventDispatcher */
+                $eventDispatcher = $container['dispatcher'];
+
+                /** @var XMLLineCodeCoverageFactory $codeCoverageFactory */
+                $codeCoverageFactory = $container[XMLLineCodeCoverageFactory::class];
+
+                /** @var FileMutationGenerator $fileMutationGenerator */
+                $fileMutationGenerator = $container[FileMutationGenerator::class];
+
+                return new MutationGenerator(
+                    $config->getSourceFiles(),
+                    $codeCoverageFactory->create($config->getTestFramework(), $adapter),
+                    $config->getMutators(),
+                    $eventDispatcher,
+                    $fileMutationGenerator
+                );
+            },
+            MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
+                /** @var EventDispatcherInterface $eventDispatcher */
+                $eventDispatcher = $container['dispatcher'];
+
+                /** @var MutantProcessBuilder $processBuilder */
+                $processBuilder = $container[MutantProcessBuilder::class];
+
+                /** @var ParallelProcessRunner $parallelProcessRunner */
+                $parallelProcessRunner = $container['parallel.process.runner'];
+
+                /** @var MutantCreator $mutantCreator */
+                $mutantCreator = $container['mutant.creator'];
+
+                return new MutationTestingRunner(
+                    $processBuilder,
+                    $parallelProcessRunner,
+                    $mutantCreator,
+                    $eventDispatcher
                 );
             },
         ]);

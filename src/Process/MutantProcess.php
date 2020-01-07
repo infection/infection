@@ -37,7 +37,7 @@ namespace Infection\Process;
 
 use function in_array;
 use Infection\Mutant\MutantInterface;
-use Infection\MutationInterface;
+use Infection\Mutation;
 use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Symfony\Component\Process\Process;
@@ -131,7 +131,7 @@ final class MutantProcess implements MutantProcessInterface
         return $this->isTimedOut;
     }
 
-    private function getMutation(): MutationInterface
+    private function getMutation(): Mutation
     {
         return $this->getMutant()->getMutation();
     }

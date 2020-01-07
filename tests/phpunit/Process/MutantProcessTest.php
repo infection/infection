@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process;
 
 use Infection\Mutant\MutantInterface;
-use Infection\MutationInterface;
+use Infection\Mutation;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
@@ -168,7 +168,7 @@ final class MutantProcessTest extends TestCase
     {
         $mutator = new For_(new MutatorConfig([]));
 
-        $mutation = $this->createMock(MutationInterface::class);
+        $mutation = $this->createMock(Mutation::class);
         $mutation->expects($this->once())
             ->method('getMutator')
             ->willReturn($mutator);
@@ -191,7 +191,7 @@ final class MutantProcessTest extends TestCase
             ->expects($this->never())
             ->method($this->anything());
 
-        $mutation = $this->createMock(MutationInterface::class);
+        $mutation = $this->createMock(Mutation::class);
         $mutation->expects($this->once())
             ->method('getOriginalFilePath')
             ->willReturn('foo/bar');
@@ -214,7 +214,7 @@ final class MutantProcessTest extends TestCase
             ->expects($this->never())
             ->method($this->anything());
 
-        $mutation = $this->createMock(MutationInterface::class);
+        $mutation = $this->createMock(Mutation::class);
         $mutation->expects($this->once())
             ->method('getAttributes')
             ->willReturn(['startLine' => '3']);

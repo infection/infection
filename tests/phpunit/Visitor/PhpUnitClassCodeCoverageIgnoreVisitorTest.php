@@ -40,7 +40,7 @@ use Infection\Visitor\PhpUnitClassCodeCoverageIgnoreVisitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-final class PhpUnitClassCodeCoverageIgnoreVisitorTest extends AbstractBaseVisitorTest
+final class PhpUnitClassCodeCoverageIgnoreVisitorTest extends BaseVisitorTest
 {
     private $spyVisitor;
 

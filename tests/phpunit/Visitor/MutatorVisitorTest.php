@@ -37,48 +37,43 @@ namespace Infection\Tests\Visitor;
 
 use Generator;
 use Infection\Mutation;
-use Infection\MutationInterface;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\Lexer;
+use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Nop;
-use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
-use PhpParser\PrettyPrinter\Standard;
-use PHPUnit\Framework\TestCase;
+use function range;
 
-final class MutatorVisitorTest extends TestCase
+final class MutatorVisitorTest extends BaseVisitorTest
 {
     /**
      * @dataProvider providesMutationCases
+     *
+     * @param Node[] $nodes
      */
-    public function test_it_mutates_the_correct_node(array $inputAst, string $outputCode, MutationInterface $mutation): void
-    {
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new MutatorVisitor($mutation));
+    public function test_it_mutates_the_correct_node(
+        array $nodes,
+        string $expectedCodeOutput,
+        Mutation $mutation
+    ): void {
+        $this->traverse(
+            $nodes,
+            [new MutatorVisitor($mutation)]
+        );
 
-        $result = $traverser->traverse($inputAst);
-        $prettyPrinter = new Standard();
+        $output = $this->print($nodes);
 
-        $output = $prettyPrinter->prettyPrintFile($result);
-
-        $this->assertSame($outputCode, $output);
+        $this->assertSame($expectedCodeOutput, $output);
     }
 
     public function providesMutationCases(): Generator
     {
-        $lexer = new Lexer\Emulative([
-            'usedAttributes' => [
-                'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
-            ],
-        ]);
-
-        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
-
-        yield 'It mutates the correct node' => [
-            $inputAst = $parser->parse(<<<'PHP'
+        yield 'it mutates the correct node' => (function () {
+            return [
+                $nodes = $this->parseCode(<<<'PHP'
 <?php
 
 class Test
@@ -93,8 +88,8 @@ class Test
     }
 }
 PHP
-            ),
-            <<<'PHP'
+                ),
+                <<<'PHP'
 <?php
 
 class Test
@@ -106,24 +101,90 @@ class Test
     
 }
 PHP
-            ,
-            new Mutation(
-                'file/to/path',
-                $inputAst,
-                new PublicVisibility(new MutatorConfig([])),
-                [
-                    'startTokenPos' => 29,
-                    'endTokenPos' => 48,
+                ,
+                new Mutation(
+                    'path/to/file',
+                    $nodes,
+                    new PublicVisibility(new MutatorConfig([])),
+                    [
+                        'startTokenPos' => 29,
+                        'endTokenPos' => 48,
+                    ],
+                    ClassMethod::class,
+                    new Nop(),
+                    0,
+                    range(29, 48)
+                ),
+            ];
+        })();
+
+        yield 'it does not mutate if only one of start or end position is correctly set' => (function () {
+            return [
+                $nodes = $this->parseCode(<<<'PHP'
+<?php
+
+class Test
+{
+    public function hello() : string
+    {
+        return 'hello';
+    }
+    public function bye() : string
+    {
+        return 'bye';
+    }
+}
+PHP
+                ),
+                <<<'PHP'
+<?php
+
+class Test
+{
+    public function hello() : string
+    {
+        return 'hello';
+    }
+    public function bye() : string
+    {
+        return 'bye';
+    }
+}
+PHP
+                ,
+                new Mutation(
+                    'path/to/file',
+                    $nodes,
+                    new PublicVisibility(new MutatorConfig([])),
+                    [
+                        'startTokenPos' => 29,
+                        'endTokenPos' => 50,
+                    ],
+                    ClassMethod::class,
+                    new Nop(),
+                    0,
+                    range(29, 50)
+                ),
+            ];
+        })();
+
+        yield 'it does not mutate if the parser does not contain startTokenPos' => (static function () {
+            $badLexer = new Lexer\Emulative([
+                'usedAttributes' => [
+                    'comments',
+                    'startLine',
+                    'endLine',
+                    // missing startTokenPos
+                    'endTokenPos',
+                    'startFilePos',
+                    'endFilePos',
                 ],
-                ClassMethod::class,
-                new Nop(),
-                0,
-                range(29, 48)
-            ),
-        ];
+            ]);
 
-        yield 'It does not mutate if only one of start or end position is correctly set' => [
-            $inputAst = $parser->parse(<<<'PHP'
+            $badParser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $badLexer);
+
+            return [
+                $nodes = $badParser->parse(<<<'PHP'
 <?php
 
 class Test
@@ -138,8 +199,8 @@ class Test
     }
 }
 PHP
-            ),
-            <<<'PHP'
+                ),
+                <<<'PHP'
 <?php
 
 class Test
@@ -154,75 +215,21 @@ class Test
     }
 }
 PHP
-            ,
-            new Mutation(
-                'file/to/path',
-                $inputAst,
-                new PublicVisibility(new MutatorConfig([])),
-                [
-                    'startTokenPos' => 29,
-                    'endTokenPos' => 50,
-                ],
-                ClassMethod::class,
-                new Nop(),
-                0,
-                range(29, 50)
-            ),
-        ];
-        $badLexer = new Lexer\Emulative([
-            'usedAttributes' => [
-                'comments', 'startLine', 'endLine', 'endTokenPos', 'startFilePos', 'endFilePos',
-            ],
-        ]);
-
-        $badParser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $badLexer);
-
-        yield 'It does not mutate if the parser does not contain startTokenPos' => [
-            $inputAst = $badParser->parse(<<<'PHP'
-<?php
-
-class Test
-{
-    public function hello() : string
-    {
-        return 'hello';
-    }
-    public function bye() : string
-    {
-        return 'bye';
-    }
-}
-PHP
-            ),
-            <<<'PHP'
-<?php
-
-class Test
-{
-    public function hello() : string
-    {
-        return 'hello';
-    }
-    public function bye() : string
-    {
-        return 'bye';
-    }
-}
-PHP
-            ,
-            new Mutation(
-                'file/to/path',
-                $inputAst,
-                new PublicVisibility(new MutatorConfig([])),
-                [
-                    'startTokenPos' => 29,
-                    'endTokenPos' => 48,
-                ],
-                ClassMethod::class,
-                new Nop(),
-                0,
-                range(29, 48)
-            ),
-        ];
+                ,
+                new Mutation(
+                    'path/to/file',
+                    $nodes,
+                    new PublicVisibility(new MutatorConfig([])),
+                    [
+                        'startTokenPos' => 29,
+                        'endTokenPos' => 48,
+                    ],
+                    ClassMethod::class,
+                    new Nop(),
+                    0,
+                    range(29, 48)
+                ),
+            ];
+        })();
     }
 }
