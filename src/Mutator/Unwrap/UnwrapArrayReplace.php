@@ -49,7 +49,7 @@ final class UnwrapArrayReplace extends AbstractUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_replace` function call with its first operand. For example:
+Replaces an `array_replace` function call with each of its operands. For example:
 
 ```php
 $x = array_replace(['foo', 'bar', 'baz'], ['oof']);
@@ -60,6 +60,13 @@ Will be mutated to:
 ```php
 $x = ['foo', 'bar', 'baz'];
 ```
+
+And into:
+
+```php
+$x = ['oof'];
+```
+
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
