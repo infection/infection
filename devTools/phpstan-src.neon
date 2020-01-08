@@ -11,5 +11,5 @@ parameters:
         - '#Method Infection\Configuration\Schema\SchemaConfigurationFile::getDecodedContents() should return stdClass but returns stdClass|null.#'
 
         -
-            path: '%currentWorkingDirectory%/src/TestFramework/Factory.php'
+            path: '%currentWorkingDirectory%/src/TestFramework/Codeception/Adapter/CodeceptionAdapterFactory.php'
             message: '#Access to constant VERSION on an unknown class Codeception\\Codecept#'

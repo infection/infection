@@ -33,30 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
-
-use Infection\Configuration\Configuration;
-use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\Factory;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
+namespace Infection\TestFramework;
 
 /**
- * @group integration Requires some I/O operations
+ * @internal
  */
-final class FactoryTest extends TestCase
+interface TestFrameworkAdapterFactory
 {
-    public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
-    {
-        $factory = new Factory(
-            '',
-            '',
-            $this->createMock(TestFrameworkConfigLocatorInterface::class),
-            '',
-            $this->createMock(Configuration::class)
-        );
-
-        $this->expectException(InvalidArgumentException::class);
-        $factory->create('Fake Test Framework', false);
-    }
+    public static function create(
+        string $testFrameworkExecutable,
+        string $tmpDir,
+        string $testFrameworkConfigPath,
+        string $testFrameworkConfigDir,
+        string $jUnitFilePath,
+        string $projectDir,
+        array $sourceDirectories,
+        bool $skipCoverage
+    ): TestFrameworkAdapter;
 }

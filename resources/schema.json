@@ -443,7 +443,8 @@
             "description": "Sets the framework to use for testing. Defaults to phpunit.",
             "anyOf": [
                 "phpunit",
-                "phpspec"
+                "phpspec",
+                "codeception"
             ]
         },
         "bootstrap": {

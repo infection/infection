@@ -38,25 +38,12 @@ namespace Infection\TestFramework;
 use Infection\Configuration\Configuration;
 use Infection\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
+use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapterFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
-use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
-use Infection\TestFramework\PhpSpec\CommandLine\ArgumentsAndOptionsBuilder as PhpSpecArgumentsAndOptionsBuilder;
-use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder as PhpSpecInitialConfigBuilder;
-use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder as PhpSpecMutationConfigBuilder;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
-use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
-use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
-use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
-use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
-use Infection\Utils\VersionParser;
+use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapterFactory;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
-use LogicException;
-use function Safe\file_get_contents;
 use function Safe\sprintf;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * @internal
@@ -64,131 +51,79 @@ use Symfony\Component\Yaml\Yaml;
 final class Factory
 {
     private $tmpDir;
-    private $xmlConfigurationHelper;
     private $configLocator;
     private $projectDir;
     private $jUnitFilePath;
     private $infectionConfig;
-    private $versionParser;
-    private $filesystem;
-    private $commandLineBuilder;
 
     public function __construct(
         string $tmpDir,
         string $projectDir,
         TestFrameworkConfigLocatorInterface $configLocator,
-        XmlConfigurationHelper $xmlConfigurationHelper,
         string $jUnitFilePath,
-        Configuration $infectionConfig,
-        VersionParser $versionParser,
-        Filesystem $filesystem,
-        CommandLineBuilder $commandLineBuilder
+        Configuration $infectionConfig
     ) {
         $this->tmpDir = $tmpDir;
         $this->configLocator = $configLocator;
-        $this->xmlConfigurationHelper = $xmlConfigurationHelper;
         $this->projectDir = $projectDir;
         $this->jUnitFilePath = $jUnitFilePath;
         $this->infectionConfig = $infectionConfig;
-        $this->versionParser = $versionParser;
-        $this->filesystem = $filesystem;
-        $this->commandLineBuilder = $commandLineBuilder;
     }
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
-            $phpUnitConfigContent = file_get_contents($phpUnitConfigPath);
 
-            return new PhpUnitAdapter(
+            return PhpUnitAdapterFactory::create(
                 (new TestFrameworkFinder(
                     TestFrameworkTypes::PHPUNIT,
                     (string) $this->infectionConfig->getPhpUnit()->getCustomPath()
                 ))->find(),
-                new InitialConfigBuilder(
-                    $this->tmpDir,
-                    $phpUnitConfigContent,
-                    $this->xmlConfigurationHelper,
-                    $this->jUnitFilePath,
-                    $this->infectionConfig->getSourceDirectories(),
-                    $skipCoverage
-                ),
-                new MutationConfigBuilder($this->tmpDir, $phpUnitConfigContent, $this->xmlConfigurationHelper, $this->projectDir, new JUnitTestCaseSorter()),
-                new ArgumentsAndOptionsBuilder(),
-                $this->versionParser,
-                $this->commandLineBuilder
+                $this->tmpDir,
+                $phpUnitConfigPath,
+                (string) $this->infectionConfig->getPhpUnit()->getConfigDir(),
+                $this->jUnitFilePath,
+                $this->projectDir,
+                $this->infectionConfig->getSourceDirectories(),
+                $skipCoverage
             );
         }
 
         if ($adapterName === TestFrameworkTypes::PHPSPEC) {
             $phpSpecConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPSPEC);
 
-            return new PhpSpecAdapter(
+            return PhpSpecAdapterFactory::create(
                 (new TestFrameworkFinder(TestFrameworkTypes::PHPSPEC))->find(),
-                new PhpSpecInitialConfigBuilder($this->tmpDir, $phpSpecConfigPath, $skipCoverage),
-                new PhpSpecMutationConfigBuilder($this->tmpDir, $phpSpecConfigPath, $this->projectDir),
-                new PhpSpecArgumentsAndOptionsBuilder(),
-                $this->versionParser,
-                $this->commandLineBuilder
+                $this->tmpDir,
+                $phpSpecConfigPath,
+                null,
+                $this->jUnitFilePath,
+                $this->projectDir,
+                $this->infectionConfig->getSourceDirectories(),
+                $skipCoverage
             );
         }
 
         if ($adapterName === TestFrameworkTypes::CODECEPTION) {
-            $this->ensureCodeceptionVersionIsSupported();
             $codeceptionConfigPath = $this->configLocator->locate(TestFrameworkTypes::CODECEPTION);
-            $codeceptionConfigContentParsed = $this->parseYaml($codeceptionConfigPath);
 
-            return new CodeceptionAdapter(
+            return CodeceptionAdapterFactory::create(
                 (new TestFrameworkFinder(CodeceptionAdapter::EXECUTABLE))->find(),
-                $this->commandLineBuilder,
-                $this->versionParser,
-                new JUnitTestCaseSorter(),
-                $this->filesystem,
-                $this->jUnitFilePath,
                 $this->tmpDir,
+                $codeceptionConfigPath,
+                null,
+                $this->jUnitFilePath,
                 $this->projectDir,
-                $codeceptionConfigContentParsed,
-                $this->infectionConfig->getSourceDirectories()
+                $this->infectionConfig->getSourceDirectories(),
+                $skipCoverage
             );
         }
 
         throw new InvalidArgumentException(sprintf(
             'Invalid name of test framework "%s". Available names are: %s',
             $adapterName,
-            implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC])
+            implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC, TestFrameworkTypes::CODECEPTION])
         ));
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function parseYaml(string $codeceptionConfigPath): array
-    {
-        $codeceptionConfigContent = file_get_contents($codeceptionConfigPath);
-
-        try {
-            $codeceptionConfigContentParsed = Yaml::parse($codeceptionConfigContent);
-        } catch (ParseException $e) {
-            throw TestFrameworkConfigParseException::fromPath($codeceptionConfigPath, $e);
-        }
-
-        return $codeceptionConfigContentParsed;
-    }
-
-    private function ensureCodeceptionVersionIsSupported(): void
-    {
-        if (!class_exists('\Codeception\Codecept')) {
-            return;
-        }
-
-        if (version_compare(\Codeception\Codecept::VERSION, '3.1.1', '<')) {
-            throw new LogicException(
-                sprintf(
-                    'Current Codeception version "%s" is not supported by Infection. Please use >=3.1.1',
-                    \Codeception\Codecept::VERSION
-                )
-            );
-        }
     }
 }
