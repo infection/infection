@@ -35,19 +35,31 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalBoundary;
 
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
- *
- * @deprecated This mutator is a semantic addition
  */
 final class LessThan extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces a less-than operator (`<`) with the less-than-or-equal-to operator (`<=`).
+TXT
+            ,
+            MutatorCategory::SEMANTIC_ADDITION,
+            <<<'TXT'
+This mutator shifts the compared values highlighting an untested boundary.
+TXT
+        );
+    }
+
     /**
-     * Replaces "<" with "<="
-     *
      * @param Node&Node\Expr\BinaryOp\Smaller $node
      *
      * @return Node\Expr\BinaryOp\SmallerOrEqual
