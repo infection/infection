@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework\Coverage\PhpUnit;
 
 use Infection\TestFramework\Coverage\PhpUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\PhpUnit\TestFileDataProvider;
+use Infection\TestFramework\Coverage\PhpUnit\TestFileTimeData;
 use PHPUnit\Framework\TestCase;
 
 final class MemoizedTestFileDataProviderTest extends TestCase

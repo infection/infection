@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\PhpUnit;
+namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use PHPUnit\Framework\TestCase;

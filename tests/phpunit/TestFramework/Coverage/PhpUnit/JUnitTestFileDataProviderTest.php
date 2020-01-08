@@ -37,12 +37,13 @@ namespace Infection\Tests\TestFramework\Coverage\PhpUnit;
 
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\PhpUnit\JUnitTestFileDataProvider;
+use Infection\TestFramework\Coverage\PhpUnit\TestFileNameNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 final class JUnitTestFileDataProviderTest extends TestCase
 {
-    private const JUNIT = __DIR__ . '/../../Fixtures/Files/phpunit/junit.xml';
-    private const JUNIT_DIFF_FORMAT = __DIR__ . '/../../Fixtures/Files/phpunit/junit2.xml';
+    private const JUNIT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit.xml';
+    private const JUNIT_DIFF_FORMAT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit2.xml';
 
     /**
      * @var JUnitTestFileDataProvider
