@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -43,10 +45,19 @@ use PhpParser\Node;
  */
 final class IntegerNegation extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces an integer value with its negated value. For example will replace `-5` with `5`.
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Replaces any integer with negated integer value.
-     * Replaces "-5" with "5"
-     *
      * @param Node&Node\Stmt\Return_ $node
      *
      * @return Node\Stmt\Return_

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Assign;
@@ -45,9 +47,19 @@ use PhpParser\Node\Expr\AssignOp\Coalesce;
  */
 final class AssignCoalesce extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces the null coalescing assignment operator (`??=`) with a plain assignment (`=`).
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     /**
-     * Replaces "$array['a'] ??= 'otherValue';" with "$array['a'] = 'otherValue'"
-     *
      * @param Coalesce $node
      *
      * @return Assign
