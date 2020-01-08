@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -43,9 +45,19 @@ use PhpParser\Node;
  */
 final class MulEqual extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces a multiplication assignment operator (`*=`) with a division assignment operator (`/=`).
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Replaces "*=" with "/="
-     *
      * @param Node&Node\Expr\AssignOp\Mul $node
      *
      * @return Node\Expr\AssignOp\Div

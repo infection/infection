@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutator\Unwrap;
 
 use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -43,6 +45,28 @@ use PhpParser\Node;
  */
 final class UnwrapUcWords extends AbstractUnwrapMutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces a `ucwords` function call with its first operand. For example:
+
+```php
+$x = ucwords('Hello!');
+```
+
+Will be mutated to:
+
+```php
+$x = 'Hello!';
+```
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     protected function getFunctionName(): string
     {
         return 'ucwords';

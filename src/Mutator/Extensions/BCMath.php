@@ -39,6 +39,8 @@ use function array_diff_key;
 use function array_filter;
 use function count;
 use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use PhpParser\Node;
@@ -57,6 +59,28 @@ final class BCMath extends Mutator
         $settings = $this->getSettings();
 
         $this->setupConverters($settings);
+    }
+
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces a statement making use of the bcmath extension with its vanilla code equivalent. For example:
+
+```php`
+$x = bcadd($a, $b);
+```
+
+Will be mutated to:
+
+```php
+$x = (string) ($a + $b);
+```
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
     /**

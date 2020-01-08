@@ -39,8 +39,9 @@ use function in_array;
 
 /**
  * @internal
+ * @final
  */
-final class MutatorConfig
+class MutatorConfig
 {
     /**
      * @var array

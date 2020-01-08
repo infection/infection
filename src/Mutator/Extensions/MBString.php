@@ -42,6 +42,8 @@ use function constant;
 use function count;
 use function defined;
 use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use PhpParser\Node;
@@ -60,6 +62,29 @@ final class MBString extends Mutator
         $settings = $this->getSettings();
 
         $this->setupConverters($settings);
+    }
+
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces a statement making use of the mbstring extension with its vanilla code equivalent. For
+example:
+
+```php
+$x = mb_strlen($str) < 10;
+```
+
+Will be mutated to:
+
+```php
+$x = strlen($str) < 10;
+```
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
     /**

@@ -35,12 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
-use Generator;
 use Infection\Mutator\Definition;
-use Infection\Visitor\ReflectionVisitor;
+use Infection\Mutator\Mutator as MutatorInterface;
 use PhpParser\Node;
 
-abstract class Mutator
+/**
+ * @deprecated Should not be needed anymore. More work needs to be done but ultimately this class
+ *             should go away.
+ */
+abstract class Mutator implements MutatorInterface
 {
     private $config;
 
@@ -54,30 +57,6 @@ abstract class Mutator
         return null;
     }
 
-    /**
-     * @return Node|Node[]|Generator|array
-     */
-    abstract public function mutate(Node $node);
-
-    final public function shouldMutate(Node $node): bool
-    {
-        if (!$this->mutatesNode($node)) {
-            return false;
-        }
-
-        $reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY, false);
-
-        if (!$reflectionClass) {
-            return true;
-        }
-
-        return !$this->config->isIgnored(
-            $reflectionClass->getName(),
-            $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''),
-            $node->getLine()
-        );
-    }
-
     final public static function getName(): string
     {
         $parts = explode('\\', static::class);
@@ -85,10 +64,18 @@ abstract class Mutator
         return (string) end($parts);
     }
 
+    public function canMutate(Node $node): bool
+    {
+        return $this->mutatesNode($node);
+    }
+
     final protected function getSettings(): array
     {
         return $this->config->getMutatorSettings();
     }
 
+    /**
+     * @deprecated Should be removed in favour of canMutate()
+     */
     abstract protected function mutatesNode(Node $node): bool;
 }

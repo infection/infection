@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ZeroIteration;
 
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -43,9 +45,34 @@ use PhpParser\Node;
  */
 final class Foreach_ extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces the iterable being iterated over with a `foreach` statement with an empty array, preventing
+any statement within the block to be executed. For example:
+
+```php`
+foreach ($a as $b) {
+    // ...
+}
+```
+
+Will be mutated to:
+
+```php
+for ([] as $b]) {
+    // ...
+}
+```
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     /**
-     * Replaces "foreach($a as $b)" with "foreach(array() as $b)"
-     *
      * @param Node&Node\Stmt\Foreach_ $node
      *
      * @return Node&Node\Stmt\Foreach_

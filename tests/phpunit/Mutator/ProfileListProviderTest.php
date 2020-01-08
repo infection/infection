@@ -33,41 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Boolean;
+namespace Infection\Tests\Mutator;
 
-use Infection\Mutator\Definition;
-use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\Mutator;
-use PhpParser\Node;
+use function class_exists;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class LogicalLowerAnd extends Mutator
+final class ProfileListProviderTest extends TestCase
 {
-    public static function getDefinition(): ?Definition
+    /**
+     * @dataProvider \Infection\Tests\Mutator\ProfileListProvider::mutatorNameAndClassProvider
+     */
+    public function test_mutator_name_and_class_provider_is_valid(string $name, string $className): void
     {
-        return new Definition(
-            'Replaces an AND logical operator (`and`) with an OR logical operator (`or`).',
-            MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
-        );
+        $this->assertNotSame($name, $className);
+        $this->assertTrue(class_exists($className));
     }
 
     /**
-     * Replaces "and" with "or"
-     *
-     * @param Node&Node\Expr\BinaryOp\LogicalAnd $node
-     *
-     * @return Node\Expr\BinaryOp\LogicalOr
+     * @dataProvider \Infection\Tests\Mutator\ProfileListProvider::implementedMutatorProvider
      */
-    public function mutate(Node $node)
-    {
-        return new Node\Expr\BinaryOp\LogicalOr($node->left, $node->right, $node->getAttributes());
-    }
-
-    protected function mutatesNode(Node $node): bool
-    {
-        return $node instanceof Node\Expr\BinaryOp\LogicalAnd;
+    public function test_implemented_mutator_provider_is_valid(
+        string $mutatorFilePath,
+        string $mutatorClassName,
+        string $mutatorShortClassName
+    ): void {
+        $this->assertFileExists($mutatorFilePath);
+        $this->assertNotSame($mutatorClassName, $mutatorShortClassName);
+        $this->assertTrue(class_exists($mutatorClassName));
     }
 }

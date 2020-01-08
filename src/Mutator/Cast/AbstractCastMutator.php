@@ -44,8 +44,6 @@ use PhpParser\Node;
 abstract class AbstractCastMutator extends Mutator
 {
     /**
-     * Replaces "(cast) $foo;" with "$foo;"
-     *
      * @param Node&Node\Expr\Cast $node
      *
      * @return Node

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\AbstractValueToNullReturnValue;
 use PhpParser\Node;
 
@@ -43,9 +45,42 @@ use PhpParser\Node;
  */
 final class NewObject extends AbstractValueToNullReturnValue
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces a newly instantiated object with `null` instead. The instantiation statement is kept in order
+to preserve potential side effects. Example:
+
+```php
+class X {
+    function foo(): ?stdClass
+    {
+        return new stdClass();
+    }
+}
+```
+
+Will be mutated to:
+
+```php
+class X {
+    function foo(): ?stdClass
+    {
+        new stdClass();
+        return null;
+    }
+}
+```
+
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Replaces "return new Something(anything);" with "new Something(anything); return null;"
-     *
      * @param Node&Node\Stmt\Return_ $node
      *
      * @return Node[]

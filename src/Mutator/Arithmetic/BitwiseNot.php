@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -43,9 +45,16 @@ use PhpParser\Node;
  */
 final class BitwiseNot extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            'Removes a bitwise NOT operator (`~`).',
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     /**
-     * Replaces "~" with "" (removed)
-     *
      * @param Node&Node\Expr\BitwiseNot $node
      */
     public function mutate(Node $node)

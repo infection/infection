@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\AbstractValueToNullReturnValue;
 use PhpParser\Node;
 
@@ -43,9 +45,42 @@ use PhpParser\Node;
  */
 final class FunctionCall extends AbstractValueToNullReturnValue
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces a returned evaluated function with `null` instead. The function evaluation statement is kept
+in order to preserve potential side effects. For example:
+
+```php
+class X {
+    function foo()
+    {
+        return bar();
+    }
+}
+```
+
+Will be mutated to:
+
+```php
+class X {
+    function foo()
+    {
+        bar();
+        return null;
+    }
+}
+```
+
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Replaces "return func();" with "func(); return null;"
-     *
      * @param Node&Node\Stmt\Return_ $node
      *
      * @return Node[]

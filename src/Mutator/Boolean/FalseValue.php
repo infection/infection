@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -43,9 +45,16 @@ use PhpParser\Node;
  */
 final class FalseValue extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            'Replaces a boolean literal (`false`) with its opposite value (`true`). ',
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Replaces "false" with "true"
-     *
      * @return Node\Expr\ConstFetch
      */
     public function mutate(Node $node)

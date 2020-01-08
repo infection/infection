@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -43,9 +45,20 @@ use PhpParser\Node;
  */
 final class Assignment extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces examples of augmented or compound (shorter way to apply an arithmetic or bitwise operation)
+assignment operators, i.e. `+=`, `*=`, `.=`, etc., with a plain assignment operator `=`.
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     /**
-     * Replaces "+=", "*=", ".=", and similar with a plain "="
-     *
      * @param Node&Node\Expr\AssignOp $node
      *
      * @return Node\Expr\Assign

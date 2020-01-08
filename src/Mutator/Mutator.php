@@ -33,41 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Boolean;
+namespace Infection\Mutator;
 
-use Infection\Mutator\Definition;
-use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\Mutator;
+use Generator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class LogicalLowerAnd extends Mutator
+interface Mutator
 {
-    public static function getDefinition(): ?Definition
-    {
-        return new Definition(
-            'Replaces an AND logical operator (`and`) with an OR logical operator (`or`).',
-            MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
-        );
-    }
+    public static function getDefinition(): ?Definition;
+
+    public static function getName(): string;
+
+    public function canMutate(Node $node): bool;
 
     /**
-     * Replaces "and" with "or"
-     *
-     * @param Node&Node\Expr\BinaryOp\LogicalAnd $node
-     *
-     * @return Node\Expr\BinaryOp\LogicalOr
+     * @return Node|Node[]|Generator|array
      */
-    public function mutate(Node $node)
-    {
-        return new Node\Expr\BinaryOp\LogicalOr($node->left, $node->right, $node->getAttributes());
-    }
-
-    protected function mutatesNode(Node $node): bool
-    {
-        return $node instanceof Node\Expr\BinaryOp\LogicalAnd;
-    }
+    public function mutate(Node $node);
 }

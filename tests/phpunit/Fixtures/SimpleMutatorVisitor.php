@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures;
 
-use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -29,7 +28,7 @@ class SimpleMutatorVisitor extends NodeVisitorAbstract
     {
         $mutator = $this->mutation->getMutator();
 
-        if ($mutator->shouldMutate($node)) {
+        if ($mutator->canMutate($node)) {
             return $this->mutation->getMutatedNode();
         }
     }

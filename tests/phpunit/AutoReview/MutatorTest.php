@@ -42,7 +42,7 @@ use function array_map;
 use function count;
 use Generator;
 use function implode;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Mutator;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use Infection\Tests\Mutator\ProfileListProvider;
 use function iterator_to_array;
@@ -106,6 +106,8 @@ final class MutatorTest extends TestCase
         $definition = $mutator::getDefinition();
 
         if ($definition !== null) {
+            $this->addToAssertionCount(1);
+
             return;
         }
 

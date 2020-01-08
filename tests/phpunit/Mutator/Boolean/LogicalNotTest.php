@@ -84,7 +84,7 @@ PHP
     {
         $expr = new BooleanNot(new ConstFetch(new Name('false')));
 
-        $this->assertTrue($this->mutator->shouldMutate($expr));
+        $this->assertTrue($this->mutator->canMutate($expr));
     }
 
     public function test_it_does_not_mutates_doubled_logical_not(): void
@@ -93,6 +93,6 @@ PHP
             new BooleanNot(new ConstFetch(new Name('false')))
         );
 
-        $this->assertFalse($this->mutator->shouldMutate($expr));
+        $this->assertFalse($this->mutator->canMutate($expr));
     }
 }
