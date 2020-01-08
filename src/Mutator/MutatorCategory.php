@@ -65,6 +65,9 @@ final class MutatorCategory
      *
      * $x = $a == $b;
      * ```
+     *
+     * More information on how a mutator of this category should be tackled should be provided in
+     * the mutator definition.
      */
     public const SEMANTIC_ADDITION = 'semanticAddition';
 
@@ -88,6 +91,7 @@ final class MutatorCategory
 
     public const ALL = [
         self::SEMANTIC_REDUCTION,
+        self::SEMANTIC_ADDITION,
         self::ORTHOGONAL_REPLACEMENT,
     ];
 
