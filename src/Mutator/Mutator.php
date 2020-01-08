@@ -33,49 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Mutator;
 
-use Infection\Mutator\Definition;
-use Infection\Mutator\Mutator as MutatorInterface;
+use Generator;
 use PhpParser\Node;
 
 /**
- * @deprecated Should not be needed anymore. More work needs to be done but ultimately this class
- *             should go away.
+ * @internal
  */
-abstract class Mutator implements MutatorInterface
+interface Mutator
 {
-    private $config;
+    public static function getDefinition(): ?Definition;
 
-    public function __construct(MutatorConfig $config)
-    {
-        $this->config = $config;
-    }
+    public static function getName(): string;
 
-    public static function getDefinition(): ?Definition
-    {
-        return null;
-    }
-
-    final public static function getName(): string
-    {
-        $parts = explode('\\', static::class);
-
-        return (string) end($parts);
-    }
-
-    public function canMutate(Node $node): bool
-    {
-        return $this->mutatesNode($node);
-    }
-
-    final protected function getSettings(): array
-    {
-        return $this->config->getMutatorSettings();
-    }
+    public function canMutate(Node $node): bool;
 
     /**
-     * @deprecated Should be removed in favour of canMutate()
+     * @return Node|Node[]|Generator|array
      */
-    abstract protected function mutatesNode(Node $node): bool;
+    public function mutate(Node $node);
 }

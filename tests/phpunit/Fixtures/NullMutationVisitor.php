@@ -26,7 +26,7 @@ final class NullMutationVisitor extends NodeVisitorAbstract
     public function leaveNode(Node $node)
     {
         $clonedNode = clone $node;
-        if (!$this->mutator->shouldMutate($clonedNode)) {
+        if (!$this->mutator->canMutate($clonedNode)) {
             return;
         }
         $this->mutator->mutate($clonedNode);

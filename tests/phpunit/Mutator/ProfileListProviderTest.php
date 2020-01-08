@@ -33,49 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Tests\Mutator;
 
-use Infection\Mutator\Definition;
-use Infection\Mutator\Mutator as MutatorInterface;
-use PhpParser\Node;
+use function class_exists;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @deprecated Should not be needed anymore. More work needs to be done but ultimately this class
- *             should go away.
- */
-abstract class Mutator implements MutatorInterface
+final class ProfileListProviderTest extends TestCase
 {
-    private $config;
-
-    public function __construct(MutatorConfig $config)
+    /**
+     * @dataProvider \Infection\Tests\Mutator\ProfileListProvider::mutatorNameAndClassProvider
+     */
+    public function test_mutator_name_and_class_provider_is_valid(string $name, string $className): void
     {
-        $this->config = $config;
-    }
-
-    public static function getDefinition(): ?Definition
-    {
-        return null;
-    }
-
-    final public static function getName(): string
-    {
-        $parts = explode('\\', static::class);
-
-        return (string) end($parts);
-    }
-
-    public function canMutate(Node $node): bool
-    {
-        return $this->mutatesNode($node);
-    }
-
-    final protected function getSettings(): array
-    {
-        return $this->config->getMutatorSettings();
+        $this->assertNotSame($name, $className);
+        $this->assertTrue(class_exists($className));
     }
 
     /**
-     * @deprecated Should be removed in favour of canMutate()
+     * @dataProvider \Infection\Tests\Mutator\ProfileListProvider::implementedMutatorProvider
      */
-    abstract protected function mutatesNode(Node $node): bool;
+    public function test_implemented_mutator_provider_is_valid(
+        string $mutatorFilePath,
+        string $mutatorClassName,
+        string $mutatorShortClassName
+    ): void {
+        $this->assertFileExists($mutatorFilePath);
+        $this->assertNotSame($mutatorClassName, $mutatorShortClassName);
+        $this->assertTrue(class_exists($mutatorClassName));
+    }
 }

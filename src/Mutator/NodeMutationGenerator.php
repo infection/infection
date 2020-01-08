@@ -41,13 +41,13 @@ use Generator;
 use function get_class;
 use Infection\Exception\InvalidMutatorException;
 use Infection\Mutation;
-use Infection\Mutator\Util\Mutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 use Throwable;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -62,7 +62,7 @@ class NodeMutationGenerator
     private $onlyCovered;
 
     /**
-     * @param Mutator[] $mutators
+     * @param IgnoreMutator[] $mutators
      * @param Node[]    $fileNodes
      */
     public function __construct(
@@ -72,6 +72,8 @@ class NodeMutationGenerator
         LineCodeCoverage $codeCoverageData,
         bool $onlyCovered
     ) {
+        Assert::allIsInstanceOf($mutators, IgnoreMutator::class);
+
         $this->mutators = $mutators;
         $this->filePath = $filePath;
         $this->fileNodes = $fileNodes;
@@ -86,7 +88,7 @@ class NodeMutationGenerator
     {
         return array_reduce(
             $this->mutators,
-            function (array $mutations, Mutator $mutator) use ($node): array {
+            function (array $mutations, IgnoreMutator $mutator) use ($node): array {
                 return $this->generateForMutator($node, $mutator, $mutations);
             },
             []
@@ -96,14 +98,18 @@ class NodeMutationGenerator
     /**
      * @return Mutation[]
      */
-    private function generateForMutator(Node $node, Mutator $mutator, array $mutations): array
+    private function generateForMutator(Node $node, IgnoreMutator $mutator, array $mutations): array
     {
         try {
             if (!$mutator->shouldMutate($node)) {
                 return $mutations;
             }
         } catch (Throwable $throwable) {
-            throw InvalidMutatorException::create($this->filePath, $mutator, $throwable);
+            throw InvalidMutatorException::create(
+                $this->filePath,
+                $mutator->getMutator(),
+                $throwable
+            );
         }
 
         $isOnFunctionSignature = $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
@@ -132,7 +138,7 @@ class NodeMutationGenerator
             $mutations[] = new Mutation(
                 $this->filePath,
                 $this->fileNodes,
-                $mutator,
+                $mutator->getMutator(),
                 $node->getAttributes(),
                 get_class($node),
                 $mutatedNode,
