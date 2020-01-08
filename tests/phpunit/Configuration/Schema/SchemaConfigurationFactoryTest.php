@@ -588,6 +588,38 @@ JSON
             ]),
         ];
 
+        yield '[testFramework] phpspec' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "testFramework": "phpspec"
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'testFramework' => 'phpspec',
+            ]),
+        ];
+
+        yield '[testFramework] codeception' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "testFramework": "codeception"
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'testFramework' => 'codeception',
+            ]),
+        ];
+
         yield '[bootstrap] nominal' => [
             <<<'JSON'
 {
