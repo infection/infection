@@ -40,8 +40,6 @@ namespace Infection\TestFramework\Coverage;
  */
 interface LineCodeCoverage
 {
-    public const COVERAGE_INDEX_FILE_NAME = 'index.xml';
-
     /**
      * @throws CoverageDoesNotExistException
      */
