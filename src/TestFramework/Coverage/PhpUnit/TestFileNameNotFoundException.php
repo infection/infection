@@ -33,19 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\TestFramework\Coverage\PhpUnit;
+
+use Exception;
 
 /**
  * @internal
  */
-final class TestFileTimeData
+final class TestFileNameNotFoundException extends Exception
 {
-    public $path;
-    public $time;
-
-    public function __construct(string $path, float $time)
+    public static function notFoundFromFQN(string $fqn, string $jUnitFilePath): self
     {
-        $this->path = $path;
-        $this->time = $time;
+        return new self(sprintf('For FQCN: %s. Junit report: %s', $fqn, $jUnitFilePath));
     }
 }

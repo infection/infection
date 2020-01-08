@@ -33,44 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\PhpUnit;
 
-use Infection\TestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
+use Generator;
+use Infection\TestFramework\Coverage\PhpUnit\TestFileDataProvider;
+use Infection\TestFramework\Coverage\PhpUnit\XMLLineCodeCoverageFactory;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
+use Infection\TestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\TestFrameworkTypes;
 use PHPUnit\Framework\TestCase;
 
-final class JUnitTestCaseSorterTest extends TestCase
+final class XMLLineCodeCoverageFactoryTest extends TestCase
 {
-    public function test_it_returns_unique_and_sorted_by_time_test_cases(): void
+    /**
+     * @dataProvider valueProvider
+     */
+    public function test_it_can_create_an_XMLLine_code_coverage_instance(
+        string $frameworkKey,
+        bool $jUnitReport
+    ): void {
+        $adapter = $this->createMock(TestFrameworkAdapter::class);
+        $adapter
+            ->expects($this->once())
+            ->method('hasJUnitReport')
+            ->willReturn($jUnitReport)
+        ;
+
+        // We cannot test much of the generated instance here since it does not exposes any state.
+        // We can only ensure that an instance is created in all scenarios
+        (new XMLLineCodeCoverageFactory(
+            '/path/to/coverage/dir',
+            $this->createMock(IndexXmlCoverageParser::class),
+            $this->createMock(TestFileDataProvider::class)
+        ))->create($frameworkKey, $adapter);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function valueProvider(): Generator
     {
-        $coverageTestCases = [
-            CoverageLineData::with(
-                'testMethod1',
-                '/path/to/test-file-1',
-                0.000234
-            ),
-            CoverageLineData::with(
-                'testMethod2',
-                '/path/to/test-file-2',
-                0.600221
-            ),
-            CoverageLineData::with(
-                'testMethod3_1',
-                '/path/to/test-file-3',
-                0.000022
-            ),
-            CoverageLineData::with(
-                'testMethod3_2',
-                '/path/to/test-file-3',
-                0.010022
-            ),
-        ];
-
-        $sorter = new JUnitTestCaseSorter();
-
-        $uniqueSortedFileNames = $sorter->getUniqueSortedFileNames($coverageTestCases);
-
-        $this->assertCount(3, $uniqueSortedFileNames);
-        $this->assertSame('/path/to/test-file-3', $uniqueSortedFileNames[0]);
+        foreach (TestFrameworkTypes::TYPES as $frameworkKey) {
+            foreach ([true, false] as $jUnitReport) {
+                yield [$frameworkKey, $jUnitReport];
+            }
+        }
     }
 }

@@ -33,17 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\PhpUnit;
 
-use Exception;
+use Infection\TestFramework\Coverage\PhpUnit\TestFileNameNotFoundException;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class TestFileNameNotFoundException extends Exception
+final class TestFileNameNotFoundExceptionTest extends TestCase
 {
-    public static function notFoundFromFQN(string $fqn, string $jUnitFilePath): self
+    public function test_from_fqn(): void
     {
-        return new self(sprintf('For FQCN: %s. Junit report: %s', $fqn, $jUnitFilePath));
+        $exception = TestFileNameNotFoundException::notFoundFromFQN('Foo\Bar', '/path/to/junit/xml');
+
+        $this->assertInstanceOf(TestFileNameNotFoundException::class, $exception);
+        $this->assertSame('For FQCN: Foo\Bar. Junit report: /path/to/junit/xml', $exception->getMessage());
     }
 }

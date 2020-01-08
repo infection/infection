@@ -33,49 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\PhpUnit;
 
-use Generator;
-use Infection\TestFramework\Coverage\TestFileDataProvider;
-use Infection\TestFramework\Coverage\XMLLineCodeCoverageFactory;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\TestFrameworkTypes;
+use Infection\TestFramework\Coverage\PhpUnit\MemoizedTestFileDataProvider;
+use Infection\TestFramework\Coverage\PhpUnit\TestFileDataProvider;
 use PHPUnit\Framework\TestCase;
 
-final class XMLLineCodeCoverageFactoryTest extends TestCase
+final class MemoizedTestFileDataProviderTest extends TestCase
 {
-    /**
-     * @dataProvider valueProvider
-     */
-    public function test_it_can_create_an_XMLLine_code_coverage_instance(
-        string $frameworkKey,
-        bool $jUnitReport
-    ): void {
-        $adapter = $this->createMock(TestFrameworkAdapter::class);
-        $adapter
+    public function test_it_memoize_get_test_file_info_calls(): void
+    {
+        $class = 'Test\Class';
+        $expectedTestInfo = new TestFileTimeData('path/to/Test.php', 4.567);
+
+        $providerMock = $this->createMock(TestFileDataProvider::class);
+        $providerMock
             ->expects($this->once())
-            ->method('hasJUnitReport')
-            ->willReturn($jUnitReport)
+            ->method('getTestFileInfo')
+            ->with($class)
+            ->willReturn($expectedTestInfo)
         ;
 
-        // We cannot test much of the generated instance here since it does not exposes any state.
-        // We can only ensure that an instance is created in all scenarios
-        (new XMLLineCodeCoverageFactory(
-            '/path/to/coverage/dir',
-            $this->createMock(IndexXmlCoverageParser::class),
-            $this->createMock(TestFileDataProvider::class)
-        ))->create($frameworkKey, $adapter);
+        $infoProvider = new MemoizedTestFileDataProvider($providerMock);
 
-        $this->addToAssertionCount(1);
-    }
+        $testInfo0 = $infoProvider->getTestFileInfo($class);
+        $testInfo1 = $infoProvider->getTestFileInfo($class);
 
-    public function valueProvider(): Generator
-    {
-        foreach (TestFrameworkTypes::TYPES as $frameworkKey) {
-            foreach ([true, false] as $jUnitReport) {
-                yield [$frameworkKey, $jUnitReport];
-            }
-        }
+        $this->assertSame($expectedTestInfo, $testInfo0);
+        $this->assertSame($expectedTestInfo, $testInfo1);
     }
 }

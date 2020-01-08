@@ -33,61 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
-
-use function assert;
-use function in_array;
-use function is_string;
+namespace Infection\TestFramework\Coverage\PhpUnit;
 
 /**
  * @internal
  */
-final class JUnitTestCaseSorter
+interface TestFileDataProvider
 {
     /**
-     * @param CoverageLineData[] $coverageTestCases
+     * Provides 1) file name of the test file that contains passed as a parameter test class
+     *          2) Time test was executed with
      *
-     * @return string[]
-     */
-    public function getUniqueSortedFileNames(array $coverageTestCases): array
-    {
-        $uniqueCoverageTests = $this->uniqueByTestFile($coverageTestCases);
-
-        // sort tests to run the fastest first
-        usort(
-            $uniqueCoverageTests,
-            static function (CoverageLineData $a, CoverageLineData $b) {
-                return $a->time <=> $b->time;
-            }
-        );
-
-        return array_map(
-            static function (CoverageLineData $coverageLineData): string {
-                assert(is_string($coverageLineData->testFilePath));
-
-                return $coverageLineData->testFilePath;
-            },
-            $uniqueCoverageTests
-        );
-    }
-
-    /**
-     * @param CoverageLineData[] $coverageTestCases
+     * Example for file name:
+     *      param:  '\NameSpace\Sub\TestClass'
+     *      return: '/path/to/NameSpace/Sub/TestClass.php'
      *
-     * @return CoverageLineData[]
+     * @return TestFileTimeData file path and time
      */
-    private function uniqueByTestFile(array $coverageTestCases): array
-    {
-        $usedFileNames = [];
-        $uniqueTests = [];
-
-        foreach ($coverageTestCases as $coverageTestCase) {
-            if (!in_array($coverageTestCase->testFilePath, $usedFileNames, true)) {
-                $uniqueTests[] = $coverageTestCase;
-                $usedFileNames[] = $coverageTestCase->testFilePath;
-            }
-        }
-
-        return $uniqueTests;
-    }
+    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData;
 }

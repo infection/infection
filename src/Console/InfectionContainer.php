@@ -74,10 +74,10 @@ use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
-use Infection\TestFramework\Coverage\JUnitTestFileDataProvider;
-use Infection\TestFramework\Coverage\MemoizedTestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileDataProvider;
-use Infection\TestFramework\Coverage\XMLLineCodeCoverageFactory;
+use Infection\TestFramework\Coverage\PhpUnit\JUnitTestFileDataProvider;
+use Infection\TestFramework\Coverage\PhpUnit\MemoizedTestFileDataProvider;
+use Infection\TestFramework\Coverage\PhpUnit\TestFileDataProvider;
+use Infection\TestFramework\Coverage\PhpUnit\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
@@ -134,13 +134,13 @@ final class InfectionContainer extends Container
                 /** @var IndexXmlCoverageParser $coverageXmlParser */
                 $coverageXmlParser = $container[IndexXmlCoverageParser::class];
 
-                /** @var MemoizedTestFileDataProvider $cachedTestFileDataProvider */
-                $cachedTestFileDataProvider = $container[MemoizedTestFileDataProvider::class];
+                /** @var MemoizedTestFileDataProvider $memoizedTestFileDataProvider */
+                $memoizedTestFileDataProvider = $container[MemoizedTestFileDataProvider::class];
 
                 return new XMLLineCodeCoverageFactory(
                     $config->getCoveragePath(),
                     $coverageXmlParser,
-                    $cachedTestFileDataProvider
+                    $memoizedTestFileDataProvider
                 );
             },
             RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {

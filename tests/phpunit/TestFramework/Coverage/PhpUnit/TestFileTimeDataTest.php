@@ -33,34 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\PhpUnit;
 
-use Infection\TestFramework\Coverage\MemoizedTestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileTimeData;
+use Infection\TestFramework\Coverage\PhpUnit\TestFileTimeData;
 use PHPUnit\Framework\TestCase;
 
-final class MemoizedTestFileDataProviderTest extends TestCase
+final class TestFileTimeDataTest extends TestCase
 {
-    public function test_it_memoize_get_test_file_info_calls(): void
+    public function test_it_creates_self_object_with_named_constructor(): void
     {
-        $class = 'Test\Class';
-        $expectedTestInfo = new TestFileTimeData('path/to/Test.php', 4.567);
+        $testFileTimeData = new TestFileTimeData(
+            '/path/to/Test.php',
+            2.345
+        );
 
-        $providerMock = $this->createMock(TestFileDataProvider::class);
-        $providerMock
-            ->expects($this->once())
-            ->method('getTestFileInfo')
-            ->with($class)
-            ->willReturn($expectedTestInfo)
-        ;
-
-        $infoProvider = new MemoizedTestFileDataProvider($providerMock);
-
-        $testInfo0 = $infoProvider->getTestFileInfo($class);
-        $testInfo1 = $infoProvider->getTestFileInfo($class);
-
-        $this->assertSame($expectedTestInfo, $testInfo0);
-        $this->assertSame($expectedTestInfo, $testInfo1);
+        $this->assertSame('/path/to/Test.php', $testFileTimeData->path);
+        $this->assertSame(2.345, $testFileTimeData->time);
     }
 }

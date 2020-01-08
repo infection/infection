@@ -33,13 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\TestFramework\Coverage\PhpUnit;
 
 use DOMDocument;
 use DOMElement;
 use DOMNodeList;
 use DOMXPath;
 use function file_exists;
+use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 

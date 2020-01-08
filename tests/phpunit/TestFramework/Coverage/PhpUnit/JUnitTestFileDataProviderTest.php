@@ -33,11 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\PhpUnit;
 
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\Coverage\JUnitTestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
+use Infection\TestFramework\Coverage\PhpUnit\JUnitTestFileDataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class JUnitTestFileDataProviderTest extends TestCase

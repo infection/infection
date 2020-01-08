@@ -33,22 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\PhpUnit;
 
-/**
- * @internal
- */
-interface TestFileDataProvider
+use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\Coverage\PhpUnit\JUnitTestCaseSorter;
+use PHPUnit\Framework\TestCase;
+
+final class JUnitTestCaseSorterTest extends TestCase
 {
-    /**
-     * Provides 1) file name of the test file that contains passed as a parameter test class
-     *          2) Time test was executed with
-     *
-     * Example for file name:
-     *      param:  '\NameSpace\Sub\TestClass'
-     *      return: '/path/to/NameSpace/Sub/TestClass.php'
-     *
-     * @return TestFileTimeData file path and time
-     */
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData;
+    public function test_it_returns_unique_and_sorted_by_time_test_cases(): void
+    {
+        $coverageTestCases = [
+            CoverageLineData::with(
+                'testMethod1',
+                '/path/to/test-file-1',
+                0.000234
+            ),
+            CoverageLineData::with(
+                'testMethod2',
+                '/path/to/test-file-2',
+                0.600221
+            ),
+            CoverageLineData::with(
+                'testMethod3_1',
+                '/path/to/test-file-3',
+                0.000022
+            ),
+            CoverageLineData::with(
+                'testMethod3_2',
+                '/path/to/test-file-3',
+                0.010022
+            ),
+        ];
+
+        $sorter = new JUnitTestCaseSorter();
+
+        $uniqueSortedFileNames = $sorter->getUniqueSortedFileNames($coverageTestCases);
+
+        $this->assertCount(3, $uniqueSortedFileNames);
+        $this->assertSame('/path/to/test-file-3', $uniqueSortedFileNames[0]);
+    }
 }

@@ -33,18 +33,62 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\TestFramework\Coverage\PhpUnit;
 
-use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
-use PHPUnit\Framework\TestCase;
+use function assert;
+use function in_array;
+use Infection\TestFramework\Coverage\CoverageLineData;
+use function is_string;
 
-final class TestFileNameNotFoundExceptionTest extends TestCase
+/**
+ * @internal
+ */
+final class JUnitTestCaseSorter
 {
-    public function test_from_fqn(): void
+    /**
+     * @param CoverageLineData[] $coverageTestCases
+     *
+     * @return string[]
+     */
+    public function getUniqueSortedFileNames(array $coverageTestCases): array
     {
-        $exception = TestFileNameNotFoundException::notFoundFromFQN('Foo\Bar', '/path/to/junit/xml');
+        $uniqueCoverageTests = $this->uniqueByTestFile($coverageTestCases);
 
-        $this->assertInstanceOf(TestFileNameNotFoundException::class, $exception);
-        $this->assertSame('For FQCN: Foo\Bar. Junit report: /path/to/junit/xml', $exception->getMessage());
+        // sort tests to run the fastest first
+        usort(
+            $uniqueCoverageTests,
+            static function (CoverageLineData $a, CoverageLineData $b) {
+                return $a->time <=> $b->time;
+            }
+        );
+
+        return array_map(
+            static function (CoverageLineData $coverageLineData): string {
+                assert(is_string($coverageLineData->testFilePath));
+
+                return $coverageLineData->testFilePath;
+            },
+            $uniqueCoverageTests
+        );
+    }
+
+    /**
+     * @param CoverageLineData[] $coverageTestCases
+     *
+     * @return CoverageLineData[]
+     */
+    private function uniqueByTestFile(array $coverageTestCases): array
+    {
+        $usedFileNames = [];
+        $uniqueTests = [];
+
+        foreach ($coverageTestCases as $coverageTestCase) {
+            if (!in_array($coverageTestCase->testFilePath, $usedFileNames, true)) {
+                $uniqueTests[] = $coverageTestCase;
+                $usedFileNames[] = $coverageTestCase->testFilePath;
+            }
+        }
+
+        return $uniqueTests;
     }
 }

@@ -33,33 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\TestFramework\Coverage\PhpUnit;
 
-use function array_key_exists;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
+use Infection\TestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\TestFrameworkTypes;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class MemoizedTestFileDataProvider implements TestFileDataProvider
+final class XMLLineCodeCoverageFactory
 {
-    private $provider;
+    private $coverageDir;
+    private $coverageXmlParser;
+    private $testFileDataProvider;
 
-    /**
-     * @var array<string, TestFileTimeData>
-     */
-    private $cache = [];
-
-    public function __construct(TestFileDataProvider $decoratedProvider)
-    {
-        $this->provider = $decoratedProvider;
+    public function __construct(
+        string $coverageDir,
+        IndexXmlCoverageParser $coverageXmlParser,
+        TestFileDataProvider $testFileDataProvider
+    ) {
+        $this->coverageDir = $coverageDir;
+        $this->coverageXmlParser = $coverageXmlParser;
+        $this->testFileDataProvider = $testFileDataProvider;
     }
 
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
-    {
-        if (!array_key_exists($fullyQualifiedClassName, $this->cache)) {
-            $this->cache[$fullyQualifiedClassName] = $this->provider->getTestFileInfo($fullyQualifiedClassName);
-        }
+    public function create(
+        string $testFrameworkKey,
+        TestFrameworkAdapter $adapter
+    ): XMLLineCodeCoverage {
+        Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
 
-        return $this->cache[$fullyQualifiedClassName];
+        $testFileDataProviderService = $adapter->hasJUnitReport()
+            ? $this->testFileDataProvider
+            : null
+        ;
+
+        return new XMLLineCodeCoverage(
+            new PhpUnitXmlCoverageFactory(
+                $this->coverageDir,
+                $this->coverageXmlParser,
+                $testFrameworkKey,
+                $testFileDataProviderService
+            )
+        );
     }
 }

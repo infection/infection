@@ -33,11 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\TestFramework\Coverage\PhpUnit;
 
 use function array_key_exists;
 use function count;
 use Generator;
+use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
+use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\TestFramework\Coverage\NodeLineRangeData;
 use function range;
 
 /**
