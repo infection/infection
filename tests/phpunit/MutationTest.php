@@ -37,7 +37,6 @@ namespace Infection\Tests;
 
 use Infection\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
-use Infection\Mutator\Util\MutatorConfig;
 use PhpParser\Node;
 use PHPUnit\Framework\TestCase;
 
@@ -45,7 +44,6 @@ final class MutationTest extends TestCase
 {
     public function test_it_correctly_generates_hash(): void
     {
-        $mutator = new Plus(new MutatorConfig([]));
         $attributes = [
             'startLine' => 3,
             'endLine' => 5,
@@ -58,7 +56,7 @@ final class MutationTest extends TestCase
         $mutation = new Mutation(
             '/abc.php',
             [],
-            $mutator,
+            Plus::class,
             $attributes,
             'Interface_',
             new Node\Scalar\LNumber(1),
@@ -71,7 +69,6 @@ final class MutationTest extends TestCase
 
     public function test_it_correctly_sets_original_file_ast(): void
     {
-        $mutator = new Plus(new MutatorConfig([]));
         $attributes = [
             'startLine' => 3,
             'endLine' => 5,
@@ -85,7 +82,7 @@ final class MutationTest extends TestCase
         $mutation = new Mutation(
             '/abc.php',
             $fileAst,
-            $mutator,
+            Plus::class,
             $attributes,
             'Interface_',
             new Node\Scalar\LNumber(1),

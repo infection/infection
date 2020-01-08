@@ -138,7 +138,7 @@ class NodeMutationGenerator
             $mutations[] = new Mutation(
                 $this->filePath,
                 $this->fileNodes,
-                $mutator->getMutator(),
+                get_class($mutator->getMutator()),
                 $node->getAttributes(),
                 get_class($node),
                 $mutatedNode,

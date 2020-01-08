@@ -36,8 +36,6 @@ declare(strict_types=1);
 namespace Infection;
 
 use function count;
-use function get_class;
-use Infection\Mutator\Mutator;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use PhpParser\Node;
 
@@ -48,7 +46,7 @@ use PhpParser\Node;
 class Mutation
 {
     private $originalFilePath;
-    private $mutator;
+    private $mutatorClass;
     private $mutatedNodeClass;
     private $mutatedNode;
     private $mutationByMutatorIndex;
@@ -81,7 +79,7 @@ class Mutation
     public function __construct(
         string $originalFilePath,
         array $originalFileAst,
-        Mutator $mutator,
+        string $mutatorClass,
         array $attributes,
         string $mutatedNodeClass,
         $mutatedNode,
@@ -90,7 +88,7 @@ class Mutation
     ) {
         $this->originalFilePath = $originalFilePath;
         $this->originalFileAst = $originalFileAst;
-        $this->mutator = $mutator;
+        $this->mutatorClass = $mutatorClass;
         $this->attributes = $attributes;
         $this->mutatedNodeClass = $mutatedNodeClass;
         $this->mutatedNode = $mutatedNode;
@@ -98,9 +96,9 @@ class Mutation
         $this->tests = $tests;
     }
 
-    public function getMutator(): Mutator
+    public function getMutatorClass(): string
     {
-        return $this->mutator;
+        return $this->mutatorClass;
     }
 
     /**
@@ -124,10 +122,10 @@ class Mutation
     public function getHash(): string
     {
         if (!isset($this->hash)) {
-            $mutatorClass = get_class($this->getMutator());
             $attributes = $this->getAttributes();
+
             $attributeValues = [
-                $mutatorClass,
+                $this->mutatorClass,
                 $attributes['startLine'],
                 $attributes['endLine'],
                 $attributes['startTokenPos'],
@@ -137,7 +135,7 @@ class Mutation
             ];
 
             $hashKeys = array_merge(
-                [$this->getOriginalFilePath(), $mutatorClass, $this->mutationByMutatorIndex],
+                [$this->getOriginalFilePath(), $this->mutatorClass, $this->mutationByMutatorIndex],
                 $attributeValues
             );
 

@@ -38,7 +38,6 @@ namespace Infection\Process;
 use function in_array;
 use Infection\Mutant\MutantInterface;
 use Infection\Mutation;
-use Infection\Mutator\Mutator;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Symfony\Component\Process\Process;
 
@@ -111,9 +110,9 @@ final class MutantProcess implements MutantProcessInterface
         return self::CODE_KILLED;
     }
 
-    public function getMutator(): Mutator
+    public function getMutatorClass(): string
     {
-        return $this->getMutation()->getMutator();
+        return $this->getMutation()->getMutatorClass();
     }
 
     public function getOriginalFilePath(): string

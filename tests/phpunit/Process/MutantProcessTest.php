@@ -37,7 +37,6 @@ namespace Infection\Tests\Process;
 
 use Infection\Mutant\MutantInterface;
 use Infection\Mutation;
-use Infection\Mutator\Util\MutatorConfig;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
@@ -166,19 +165,17 @@ final class MutantProcessTest extends TestCase
 
     public function test_it_knows_its_mutator(): void
     {
-        $mutator = new For_(new MutatorConfig([]));
-
         $mutation = $this->createMock(Mutation::class);
         $mutation->expects($this->once())
-            ->method('getMutator')
-            ->willReturn($mutator);
+            ->method('getMutatorClass')
+            ->willReturn(For_::class);
 
         $this->mutant
             ->expects($this->once())
             ->method('getMutation')
             ->willReturn($mutation);
 
-        $this->assertSame($mutator, $this->mutantProcess->getMutator());
+        $this->assertSame(For_::class, $this->mutantProcess->getMutatorClass());
     }
 
     public function test_it_knows_its_original_path(): void
