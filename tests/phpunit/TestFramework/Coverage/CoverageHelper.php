@@ -33,50 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\TestFrameworkTypes;
-use Webmozart\Assert\Assert;
+use Infection\TestFramework\Coverage\CoverageFileData;
+use function is_array;
+use function is_scalar;
 
-/**
- * @internal
- */
-final class XMLLineCodeCoverageFactory
+final class CoverageHelper
 {
-    private $coverageDir;
-    private $coverageXmlParser;
-    private $testFileDataProvider;
-
-    public function __construct(
-        string $coverageDir,
-        IndexXmlCoverageParser $coverageXmlParser,
-        TestFileDataProvider $testFileDataProvider
-    ) {
-        $this->coverageDir = $coverageDir;
-        $this->coverageXmlParser = $coverageXmlParser;
-        $this->testFileDataProvider = $testFileDataProvider;
+    private function __construct()
+    {
     }
 
-    public function create(
-        string $testFrameworkKey,
-        TestFrameworkAdapter $adapter
-    ): XMLLineCodeCoverage {
-        Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
+    /**
+     * @param array<string, CoverageFileData> $coverage
+     *
+     * @return array<string, mixed>
+     */
+    public static function convertToArray(array $coverage): array
+    {
+        return self::serializeValue($coverage);
+    }
 
-        $testFileDataProviderService = $adapter->hasJUnitReport()
-            ? $this->testFileDataProvider
-            : null
-        ;
+    private static function serializeValue($mixed)
+    {
+        if ($mixed === null) {
+            return null;
+        }
 
-        return new XMLLineCodeCoverage(
-            new PhpUnitXmlCoverageFactory(
-                $this->coverageDir,
-                $this->coverageXmlParser,
-                $testFrameworkKey,
-                $testFileDataProviderService
-            )
-        );
+        if (is_scalar($mixed)) {
+            return $mixed;
+        }
+
+        if (is_array($mixed)) {
+            $convertedArray = [];
+
+            foreach ($mixed as $key => $value) {
+                $convertedArray[$key] = self::serializeValue($value);
+            }
+
+            return $convertedArray;
+        }
+
+        return self::serializeValue((array) $mixed);
     }
 }

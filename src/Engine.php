@@ -52,7 +52,7 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\TestFramework\Coverage\PhpUnitXmlCoverageFactory;
 use Infection\TestFramework\HasExtraNodeVisitors;
 use Infection\TestFramework\TestFrameworkAdapter;
 use const PHP_EOL;
@@ -179,7 +179,7 @@ final class Engine
     {
         $coverageDir = $this->config->getCoveragePath();
 
-        $coverageIndexFilePath = $coverageDir . '/' . LineCodeCoverage::COVERAGE_INDEX_FILE_NAME;
+        $coverageIndexFilePath = $coverageDir . '/' . PhpUnitXmlCoverageFactory::COVERAGE_INDEX_FILE_NAME;
 
         $processInfo = sprintf(
             '%sCommand line: %s%sProcess Output: %s',
