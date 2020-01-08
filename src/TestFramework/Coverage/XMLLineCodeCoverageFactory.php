@@ -71,10 +71,12 @@ final class XMLLineCodeCoverageFactory
         ;
 
         return new XMLLineCodeCoverage(
-            $this->coverageDir,
-            $this->coverageXmlParser,
-            $testFrameworkKey,
-            $testFileDataProviderService
+            new PhpUnitXmlCoverageFactory(
+                $this->coverageDir,
+                $this->coverageXmlParser,
+                $testFrameworkKey,
+                $testFileDataProviderService
+            )
         );
     }
 }

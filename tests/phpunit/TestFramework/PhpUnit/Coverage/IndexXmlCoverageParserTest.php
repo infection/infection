@@ -40,6 +40,7 @@ use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\PhpUnit\Coverage\NoLineExecuted;
+use Infection\Tests\TestFramework\Coverage\CoverageHelper;
 use function is_array;
 use function is_scalar;
 use PHPUnit\Framework\TestCase;
@@ -229,7 +230,7 @@ final class IndexXmlCoverageParserTest extends TestCase
                     'byMethod' => [],
                 ],
             ],
-            self::convertCoverageToArray($coverage)
+            CoverageHelper::convertToArray($coverage)
         );
     }
 
@@ -313,7 +314,7 @@ XML;
                     ],
                 ],
             ],
-            self::convertCoverageToArray($coverage)
+            CoverageHelper::convertToArray($coverage)
         );
     }
 
@@ -414,38 +415,5 @@ XML
 </phpunit>
 XML
         ];
-    }
-
-    /**
-     * @param array<string, CoverageFileData> $coverage
-     *
-     * @return array<string, mixed>
-     */
-    private static function convertCoverageToArray(array $coverage): array
-    {
-        return self::serializeValue($coverage);
-    }
-
-    private static function serializeValue($mixed)
-    {
-        if ($mixed === null) {
-            return null;
-        }
-
-        if (is_scalar($mixed)) {
-            return $mixed;
-        }
-
-        if (is_array($mixed)) {
-            $convertedArray = [];
-
-            foreach ($mixed as $key => $value) {
-                $convertedArray[$key] = self::serializeValue($value);
-            }
-
-            return $convertedArray;
-        }
-
-        return self::serializeValue((array) $mixed);
     }
 }

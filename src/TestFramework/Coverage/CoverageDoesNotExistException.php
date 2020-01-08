@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 use Infection\Console\Exception\InfectionException;
+use function trim;
 
 /**
  * @internal
@@ -62,7 +63,7 @@ TXT
 
         return new self(
             sprintf(
-                $message . ' Make sure to either: %s%s',
+                $message . ' Make sure to either:%s%s',
                 $coverageIndexFilePath,
                 $testFrameworkKey,
                 $tempDir,

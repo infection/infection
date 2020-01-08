@@ -42,9 +42,14 @@ interface LineCodeCoverage
 {
     public const COVERAGE_INDEX_FILE_NAME = 'index.xml';
 
+    /**
+     * @throws CoverageDoesNotExistException
+     */
     public function hasTests(string $filePath): bool;
 
     /**
+     * @throws CoverageDoesNotExistException
+     *
      * @return CoverageLineData[]
      */
     public function getAllTestsForMutation(string $filePath, NodeLineRangeData $lineRange, bool $isOnFunctionSignature): array;
