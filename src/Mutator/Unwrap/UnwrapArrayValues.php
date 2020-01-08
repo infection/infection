@@ -49,7 +49,7 @@ final class UnwrapArrayValues extends AbstractUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a `array_values` function call with its first operand. For example:
+Replaces a `array_values` function call with its array operand. For example:
 
 ```php
 $x = array_values([10 => 'Hello!']);

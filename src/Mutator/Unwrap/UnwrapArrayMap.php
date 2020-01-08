@@ -37,6 +37,8 @@ namespace Infection\Mutator\Unwrap;
 
 use function count;
 use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -44,6 +46,28 @@ use PhpParser\Node;
  */
 final class UnwrapArrayMap extends AbstractUnwrapMutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces an `array_map` function call with its array operand. For example:
+
+```php
+$x = array_map($callback, ['foo', 'bar', 'baz']);
+```
+
+Will be mutated to:
+
+```php
+$x = ['foo', 'bar', 'baz'];
+```
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     protected function getFunctionName(): string
     {
         return 'array_map';

@@ -51,17 +51,29 @@ final class UnwrapArrayUintersectUassoc extends AbstractUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_uintersect_uassoc` function call with its first operand. For example:
+Replaces an `array_uintersect_uassoc` function call with each of its operands. For example:
 
 ```php
-$x = array_uintersect_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func, $key_compare_func);
+$x = array_uintersect_uassoc(
+    ['foo' => 'bar'],
+    ['baz' => 'bar'],
+    $value_compare_func,
+    $key_compare_func
+);
 ```
 
 Will be mutated to:
 
 ```php
-$x = ['foo => 'bar'];
+$x = ['foo' => 'bar'];
 ```
+
+And into:
+
+```php
+$x = ['baz' => 'bar'];
+```
+
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
