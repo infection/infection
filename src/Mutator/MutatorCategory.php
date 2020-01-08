@@ -56,6 +56,19 @@ final class MutatorCategory
     public const SEMANTIC_REDUCTION = 'semanticReduction';
 
     /**
+     * Semantic additions are a peculiar case and usually do not make sense. For example:
+     *
+     * ```php
+     * $x = $a === $b;
+     *
+     * // to
+     *
+     * $x = $a == $b;
+     * ```
+     */
+    public const SEMANTIC_ADDITION = 'semanticAddition';
+
+    /**
      * An example of orthogonal replacement is:
      *
      * ```php
