@@ -26,6 +26,8 @@ set -Eeuo pipefail
 files_with_trailing_whitespaces=$(
     find . \
         -type f \
+        -not -name "\*.cache" \
+        -not -name "\*.log" \
         -not -path "./.composer/*" \
         -not -path "./build/*" \
         -not -path "./.git/*" \
