@@ -41,11 +41,7 @@ use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\PhpUnitXmlCoverageFactory;
-use Infection\TestFramework\Coverage\TestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileTimeData;
 use Infection\TestFramework\Coverage\XMLLineCodeCoverage;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\TestFrameworkTypes;
 use PHPUnit\Framework\TestCase;
 
 final class XMLLineCodeCoverageTest extends TestCase
@@ -67,7 +63,7 @@ final class XMLLineCodeCoverageTest extends TestCase
                     'testMethod' => 'Infection\Acme\FooTest::test_it_can_do_0',
                     'testFilePath' => '/path/to/acme/FooTest.php',
                     'time' => 0.123,
-                ]
+                ],
             ],
             CoverageHelper::convertToArray($tests)
         );

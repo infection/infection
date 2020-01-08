@@ -37,12 +37,8 @@ namespace Infection\TestFramework\Coverage;
 
 use function array_key_exists;
 use function count;
-use function dirname;
 use Generator;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use function file_exists;
 use function range;
-use function Safe\file_get_contents;
 
 /**
  * @internal

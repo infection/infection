@@ -35,13 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use function array_key_exists;
-use function count;
 use function dirname;
-use Generator;
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use function explode;
 use function file_exists;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use function Safe\file_get_contents;
 
 /**
@@ -65,8 +62,7 @@ class PhpUnitXmlCoverageFactory
         IndexXmlCoverageParser $coverageXmlParser,
         string $testFrameworkKey,
         ?TestFileDataProvider $testFileDataProvider
-    )
-    {
+    ) {
         $this->coverageDir = $coverageDir;
         $this->parser = $coverageXmlParser;
         $this->testFileDataProvider = $testFileDataProvider;

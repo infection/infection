@@ -37,12 +37,9 @@ namespace Infection\Tests\TestFramework\PhpUnit\Coverage;
 
 use Generator;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\PhpUnit\Coverage\NoLineExecuted;
 use Infection\Tests\TestFramework\Coverage\CoverageHelper;
-use function is_array;
-use function is_scalar;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
