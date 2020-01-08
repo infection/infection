@@ -49,8 +49,8 @@ final class NotEqualNotIdentical extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a loose inequality comparison (using a not-equal operator (`!=`)) with a strict inequality 
-comparison (using a not-identical operator (`!==`)). 
+Replaces a loose inequality comparison (using a not-equal operator (`!=`)) with a strict inequality
+comparison (using a not-identical operator (`!==`)).
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
@@ -59,8 +59,6 @@ TXT
     }
 
     /**
-     * Replaces "!=" with "!=="
-     *
      * @param Node&Node\Expr\BinaryOp\NotEqual $node
      *
      * @return Node\Expr\BinaryOp\NotIdentical

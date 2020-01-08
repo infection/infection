@@ -56,7 +56,7 @@ $x = array_reduce(
     ['foo', 'bar', 'baz'],
     static function ($carry, $item) {
        return $item;
-    }, 
+    },
     ['oof']
 );
 ```
