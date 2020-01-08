@@ -50,7 +50,7 @@ final class EqualIdentical extends Mutator
         return new Definition(
             <<<'TXT'
 Replaces a loose comparison (using the equal operator (`==`)) with a strict comparison (using the
-identical operator (`===`)). 
+identical operator (`===`)).
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
