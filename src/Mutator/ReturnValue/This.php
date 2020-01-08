@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\AbstractValueToNullReturnValue;
 use PhpParser\Node;
 
@@ -48,7 +48,7 @@ final class This extends AbstractValueToNullReturnValue
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            'Replaces a `return $this` statement by `return null` instead.',
+            'Replaces a `return $this` statement with `return null` instead.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null
         );

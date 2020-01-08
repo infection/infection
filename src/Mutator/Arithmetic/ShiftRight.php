@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -50,7 +50,7 @@ final class ShiftRight extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a bitwise shift left operator (`>>`) into a bitwise shift right operator (`<<`).
+Replaces a bitwise shift left operator (`>>`) with a bitwise shift right operator (`<<`).
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
@@ -59,6 +59,8 @@ TXT
     }
 
     /**
+     * Replaces ">>" with "<<"
+     *
      * @param Node&Node\Expr\BinaryOp\ShiftRight $node
      *
      * @return Node\Expr\BinaryOp\ShiftLeft

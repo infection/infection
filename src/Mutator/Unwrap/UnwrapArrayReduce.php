@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutator\Unwrap;
 
 use Generator;
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -49,14 +49,14 @@ final class UnwrapArrayReduce extends AbstractUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_reduce` function call by its first operand. For example:
+Replaces an `array_reduce` function call with its first operand. For example:
 
 ```php
 $x = array_reduce(
     ['foo', 'bar', 'baz'],
     static function ($carry, $item) {
        return $item;
-    }, 
+    },
     ['oof']
 );
 ```

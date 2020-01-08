@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -48,7 +48,7 @@ final class BitwiseAnd extends Mutator
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            'Replaces a bitwise AND operator (`&`) by a bitwise OR operator (`|`).',
+            'Replaces a bitwise AND operator (`&`) with a bitwise OR operator (`|`).',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null
         );

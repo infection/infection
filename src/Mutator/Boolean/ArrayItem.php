@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -49,16 +49,16 @@ final class ArrayItem extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a key-value pair (`[$key => $value]`) array declaration by a value array declaration
+Replaces a key-value pair (`[$key => $value]`) array declaration with a value array declaration
 (`[$key > $value]`) where the key or the value are potentially impure (i.e. have a side-effect);
-For example `[foo() => $b->bar]`. 
+For example `[foo() => $b->bar]`.
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             <<<'TXT'
 This mutation highlights the reliance of the side-effect(s) of the called key(s) and/or value(s)
-and completely disregarding the actual values of the array. The array content should either be
-checked or the impure calls should be made outside of the scope of the array.   
+- completely disregarding the actual values of the array. The array content should either be
+checked or the impure calls should be made outside of the scope of the array.
 TXT
         );
     }

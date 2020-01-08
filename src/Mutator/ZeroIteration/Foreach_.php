@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ZeroIteration;
 
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -51,7 +51,7 @@ final class Foreach_ extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces the iterable being iterated over with a `foreach` statement by an empty array, preventing
+Replaces the iterable being iterated over with a `foreach` statement with an empty array, preventing
 any statement within the block to be executed. For example:
 
 ```php`

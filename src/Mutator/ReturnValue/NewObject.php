@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\AbstractValueToNullReturnValue;
 use PhpParser\Node;
 
@@ -51,7 +51,7 @@ final class NewObject extends AbstractValueToNullReturnValue
     {
         return new Definition(
             <<<'TXT'
-Replaces a newly instantiated object by `null` instead. The instantiation statement is kept in order
+Replaces a newly instantiated object with `null` instead. The instantiation statement is kept in order
 to preserve potential side effects. Example:
 
 ```php

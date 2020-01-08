@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -48,7 +48,7 @@ final class LogicalOr extends Mutator
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            'Replaces an OR operator (`||`) by an AND operator (`&&`).',
+            'Replaces an OR operator (`||`) with an AND operator (`&&`).',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null
         );

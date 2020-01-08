@@ -33,29 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\Tests\AutoReview;
 
-use Infection\TestFramework\Coverage\CachedTestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileTimeData;
-use PHPUnit\Framework\TestCase;
+use function array_filter;
+use ReflectionClass;
 
-final class CachedTestFileDataProviderTest extends TestCase
+final class ConcreteClassReflector
 {
-    public function test_the_second_call_returns_cached_result(): void
+    private function __construct()
     {
-        $class = 'Test\Class';
-        $providerMock = $this->createMock(TestFileDataProvider::class);
-        $providerMock->expects($this->once())
-            ->method('getTestFileInfo')
-            ->with($class)
-            ->willReturn(new TestFileTimeData('path/to/Test.php', 4.567));
+    }
 
-        $infoProvider = new CachedTestFileDataProvider($providerMock);
+    /**
+     * @param string[] $classNames
+     *
+     * @return string[]
+     */
+    public static function filterByConcreteClasses(array $classNames): array
+    {
+        return array_filter(
+            $classNames,
+            static function (string $className): bool {
+                $reflectionClass = new ReflectionClass($className);
 
-        $info1 = $infoProvider->getTestFileInfo($class);
-        $info2 = $infoProvider->getTestFileInfo($class);
-
-        $this->assertSame($info1, $info2);
+                return !$reflectionClass->isInterface()
+                    && !$reflectionClass->isAbstract()
+                    && !$reflectionClass->isTrait()
+                ;
+            }
+        );
     }
 }

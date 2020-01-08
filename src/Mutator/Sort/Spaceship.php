@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Sort;
 
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -49,7 +49,7 @@ final class Spaceship extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Swaps the spaceship operator (`<=>`) operands, e.g. replaces `$a <=> $b` with `$b <=> $a`. 
+Swaps the spaceship operator (`<=>`) operands, e.g. replaces `$a <=> $b` with `$b <=> $a`.
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,

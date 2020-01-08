@@ -79,6 +79,8 @@ final class ProfileListProvider
     {
         if (null !== self::$mutators) {
             yield from self::$mutators;
+
+            return;
         }
 
         $finder = Finder::create()

@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -51,7 +51,7 @@ final class OneZeroFloat extends AbstractNumberMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a zero float value (`0.0`) by a non-zero float value (`1.0`) and vice-versa.
+Replaces a zero float value (`0.0`) with a non-zero float value (`1.0`) and vice-versa.
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
@@ -60,6 +60,8 @@ TXT
     }
 
     /**
+     * Replaces "0.0" with "1.0" or "1.0" with "0.0"
+     *
      * @param Node&Node\Scalar\DNumber $node
      *
      * @return Node\Scalar\DNumber

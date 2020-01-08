@@ -37,8 +37,8 @@ namespace Infection\Mutator\Arithmetic;
 
 use Generator;
 use function in_array;
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -60,8 +60,7 @@ final class RoundingFamily extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a rounding operation by an analogue one. For example `floor()` will be replaced into
-`ceil()` and `round()`.
+Replaces rounding operations. For example `floor()` will be replaced with `ceil()` and `round()`.
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,

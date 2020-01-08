@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 use PhpParser\Node\Expr\PostDec;
@@ -53,7 +53,8 @@ final class Increment extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a pre or post increment operator (`++`) by the analogue decrement operator (`--`).
+Replaces a pre- or post-increment operator (`++`) with the analogue pre- or post-decrement operator
+(`--`).
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,

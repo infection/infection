@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutator\Boolean;
 
 use function array_key_exists;
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
@@ -55,7 +55,7 @@ final class TrueValue extends Mutator
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            'Replaces the boolean literal (`true`) by its opposite value (`false`). ',
+            'Replaces a boolean literal (`true`) with its opposite value (`false`). ',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null
         );

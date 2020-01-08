@@ -33,36 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\TestFramework\PhpUnit\Coverage;
 
-use function array_key_exists;
+use UnexpectedValueException;
 
 /**
  * @internal
- * @final
  */
-class CachedTestFileDataProvider implements TestFileDataProvider
+final class NoLineExecuted extends UnexpectedValueException
 {
-    private $testFileDataProvider;
-
-    /**
-     * @var array<string, TestFileTimeData>
-     */
-    private $testFileInfoCache = [];
-
-    public function __construct(TestFileDataProvider $testFileDataProvider)
+    public static function create(): self
     {
-        $this->testFileDataProvider = $testFileDataProvider;
-    }
-
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
-    {
-        if (array_key_exists($fullyQualifiedClassName, $this->testFileInfoCache)) {
-            return $this->testFileInfoCache[$fullyQualifiedClassName];
-        }
-
-        return $this->testFileInfoCache[$fullyQualifiedClassName] = $this->testFileDataProvider->getTestFileInfo(
-            $fullyQualifiedClassName
+        return new self(<<<'MSG'
+No line of code was executed during tests. This could be due to "@covers" annotations or your
+PHPUnit filters not being set up correctly.
+MSG
         );
     }
 }

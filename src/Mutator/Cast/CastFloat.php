@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Cast;
 
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -47,7 +47,7 @@ final class CastFloat extends AbstractCastMutator
     public static function getDefinition(): ?Definition
     {
         return new Definition(
-            'Removes an array cast operator (`(float)`).',
+            'Removes a float cast operator (`(float)`).',
             MutatorCategory::SEMANTIC_REDUCTION,
             null
         );

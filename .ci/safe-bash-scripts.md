@@ -49,7 +49,7 @@ echo "bar"
 Makes the script exit immediately when a command in a pipeline fails instead of
 looking only at the exit code of the pipeline.
 
-Before: 
+Before:
 
 ```
 #!/bin/bash
@@ -85,7 +85,7 @@ echo "bar"
 # line 5: foo: command not found
 #
 # This time around the non-existing foo command causes an immediate exit, as
-# '-o pipefail' will prevent piping from causing non-zero exit codes to be 
+# '-o pipefail' will prevent piping from causing non-zero exit codes to be
 # ignored.
 ```
 
@@ -106,8 +106,8 @@ echo "bar"
 #
 # bar
 #
-# The default behavior will not cause unset variables to trigger an immediate 
-# exit. In this particular example, echoing the non-existing $a variable will 
+# The default behavior will not cause unset variables to trigger an immediate
+# exit. In this particular example, echoing the non-existing $a variable will
 # just cause an empty line to be printed.
 ```
 
@@ -124,11 +124,11 @@ echo "bar"
 # ------
 # line 5: a: unbound variable
 #
-# Notice how 'bar' no longer gets printed. We can clearly see that '-u' did 
+# Notice how 'bar' no longer gets printed. We can clearly see that '-u' did
 # indeed cause an immediate exit upon encountering an unset variable.
 ```
 
-For cases where you want to deal with unset variables, check the 
+For cases where you want to deal with unset variables, check the
 [${a:-b}][unset variable assignment]
 
 
@@ -155,8 +155,8 @@ echo "bar"
 
 ## Set `-E`
 
-[Traps][traps] are fired when a bash script catches certain signals (e.g. `SIGINT` or `SIGTERM`). 
-However using `-e` without `-E` will cause an `ERR` trap to not fire in certain conditions:  
+[Traps][traps] are fired when a bash script catches certain signals (e.g. `SIGINT` or `SIGTERM`).
+However using `-e` without `-E` will cause an `ERR` trap to not fire in certain conditions:
 
 Before:
 
@@ -179,7 +179,7 @@ echo "bar"
 # ------
 # line 9: foo: command not found
 #
-# Notice that while '-e' did indeed cause an immediate exit upon trying to execute the non-existing 
+# Notice that while '-e' did indeed cause an immediate exit upon trying to execute the non-existing
 # foo command, it did not case the ERR trap to be fired.
 ```
 

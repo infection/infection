@@ -33,20 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Coverage\Exception;
+namespace Infection\TestFramework\Coverage;
 
-use Infection\TestFramework\PhpUnit\Coverage\Exception\NoLinesExecutedException;
-use PHPUnit\Framework\TestCase;
+use function array_key_exists;
 
-final class NoLinesExecutedExceptionTest extends TestCase
+/**
+ * @internal
+ */
+final class MemoizedTestFileDataProvider implements TestFileDataProvider
 {
-    public function test_no_lines_executed(): void
+    private $provider;
+
+    /**
+     * @var array<string, TestFileTimeData>
+     */
+    private $cache = [];
+
+    public function __construct(TestFileDataProvider $decoratedProvider)
     {
-        $exception = NoLinesExecutedException::noLinesExecuted();
-        $this->assertSame(
-            '0 Lines of code were executed during tests. This could be due to "@covers" annotations, ' .
-            'or your PHPUnit filters not being set up correctly.',
-            $exception->getMessage()
-        );
+        $this->provider = $decoratedProvider;
+    }
+
+    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
+    {
+        if (!array_key_exists($fullyQualifiedClassName, $this->cache)) {
+            $this->cache[$fullyQualifiedClassName] = $this->provider->getTestFileInfo($fullyQualifiedClassName);
+        }
+
+        return $this->cache[$fullyQualifiedClassName];
     }
 }

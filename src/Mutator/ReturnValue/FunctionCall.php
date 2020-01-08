@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\AbstractValueToNullReturnValue;
 use PhpParser\Node;
 
@@ -49,7 +49,7 @@ final class FunctionCall extends AbstractValueToNullReturnValue
     {
         return new Definition(
             <<<'TXT'
-Replaces a returned evaluated function by `null` instead. The function evaluation statement is kept
+Replaces a returned evaluated function with `null` instead. The function evaluation statement is kept
 in order to preserve potential side effects. For example:
 
 ```php

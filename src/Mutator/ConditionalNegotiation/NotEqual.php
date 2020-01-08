@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalNegotiation;
 
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -49,7 +49,7 @@ final class NotEqual extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a not equal operator (`!=`) by its counterpart the not equal operator (`==`).
+Replaces a not equal operator (`!=`) with its counterpart the not equal operator (`==`).
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,

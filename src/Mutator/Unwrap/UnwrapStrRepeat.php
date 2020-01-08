@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutator\Unwrap;
 
 use Generator;
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -49,7 +49,7 @@ final class UnwrapStrRepeat extends AbstractUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a `str_repeat` function call by its first operand. For example:
+Replaces a `str_repeat` function call with its first operand. For example:
 
 ```php
 $x = str_repeat('Hello!');

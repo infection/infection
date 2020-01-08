@@ -42,8 +42,8 @@ use function constant;
 use function count;
 use function defined;
 use Generator;
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use PhpParser\Node;
@@ -68,10 +68,10 @@ final class MBString extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a statement making use of the mbstring extension by its vanilla code equivalent. For 
+Replaces a statement making use of the mbstring extension with its vanilla code equivalent. For
 example:
 
-```php`
+```php
 $x = mb_strlen($str) < 10;
 ```
 

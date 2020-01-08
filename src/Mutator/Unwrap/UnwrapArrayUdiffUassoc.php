@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutator\Unwrap;
 
 use Generator;
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -49,7 +49,7 @@ final class UnwrapArrayUdiffUassoc extends AbstractUnwrapMutator
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_udiff_uassoc` function call by its first operand. For example:
+Replaces an `array_udiff_uassoc` function call with its first operand. For example:
 
 ```php
 $x = array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func, $key_compare_func);

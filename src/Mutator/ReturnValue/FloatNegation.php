@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -49,7 +49,7 @@ final class FloatNegation extends Mutator
     {
         return new Definition(
             <<<'TXT'
-Replaces a float value with its negated value. For example will replace `-33.4` by `33.4`.
+Replaces a float value with its negated value. For example will replace `-33.4` with `33.4`.
 TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,

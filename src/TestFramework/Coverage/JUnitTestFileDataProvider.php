@@ -36,7 +36,12 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 use DOMDocument;
+use DOMElement;
+use DOMNodeList;
 use DOMXPath;
+use function file_exists;
+use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -55,19 +60,31 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
         $this->jUnitFilePath = $jUnitFilePath;
     }
 
+    /**
+     * @throws TestFileNameNotFoundException
+     */
     public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
     {
         $xPath = $this->getXPath();
 
-        $nodes = $xPath->query(sprintf('//testsuite[@name="%s"]', $fullyQualifiedClassName));
+        $nodes = self::safeQuery(
+            $xPath,
+            sprintf('//testsuite[@name="%s"]', $fullyQualifiedClassName)
+        );
 
-        if (!$nodes->length) {
-            // try another format where the class name is inside `class` attribute of `testcase` tag
-            $nodes = $xPath->query(sprintf('//testcase[@class="%s"]', $fullyQualifiedClassName));
+        if ($nodes->length === 0) {
+            // Try another format where the class name is inside `class` attribute of `testcase` tag
+            $nodes = self::safeQuery(
+                $xPath,
+                sprintf('//testcase[@class="%s"]', $fullyQualifiedClassName)
+            );
         }
 
-        if (!$nodes->length) {
-            throw TestFileNameNotFoundException::notFoundFromFQN($fullyQualifiedClassName, $this->jUnitFilePath);
+        if ($nodes->length === 0) {
+            throw TestFileNameNotFoundException::notFoundFromFQN(
+                $fullyQualifiedClassName,
+                $this->jUnitFilePath
+            );
         }
 
         return new TestFileTimeData(
@@ -76,19 +93,42 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
         );
     }
 
+    /**
+     * @throws CoverageDoesNotExistException
+     */
     private function getXPath(): DOMXPath
     {
         if (!$this->xPath) {
-            if (!file_exists($this->jUnitFilePath)) {
-                throw CoverageDoesNotExistException::forJunit($this->jUnitFilePath);
-            }
-
-            $dom = new DOMDocument();
-            $dom->load($this->jUnitFilePath);
-
-            $this->xPath = new DOMXPath($dom);
+            $this->xPath = self::createXPath($this->jUnitFilePath);
         }
 
         return $this->xPath;
+    }
+
+    /**
+     * @throws CoverageDoesNotExistException
+     */
+    private static function createXPath(string $jUnitPath): DOMXPath
+    {
+        if (!file_exists($jUnitPath)) {
+            throw CoverageDoesNotExistException::forJunit($jUnitPath);
+        }
+
+        $dom = new DOMDocument();
+        $dom->load($jUnitPath);
+
+        return new DOMXPath($dom);
+    }
+
+    /**
+     * @return DOMNodeList|DOMElement[]
+     */
+    private static function safeQuery(DOMXPath $xPath, string $query): DOMNodeList
+    {
+        $nodes = $xPath->query($query);
+
+        Assert::isInstanceOf($nodes, DOMNodeList::class);
+
+        return $nodes;
     }
 }
