@@ -50,6 +50,7 @@ use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Mutator\ProfileList;
+use Infection\TestFramework\TestFrameworkTypes;
 use JsonSchema\Validator;
 use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
@@ -588,37 +589,27 @@ JSON
             ]),
         ];
 
-        yield '[testFramework] phpspec' => [
-            <<<'JSON'
+        foreach (TestFrameworkTypes::TYPES as $testFrameworkType) {
+            yield '[testFramework] ' . $testFrameworkType => (static function () use (
+                $testFrameworkType
+            ): array {
+                return [
+                    <<<"JSON"
 {
     "source": {
         "directories": ["src"]
     },
-    "testFramework": "phpspec"
+    "testFramework": "{$testFrameworkType}"
 }
 JSON
-            ,
-            self::createConfig([
-                'source' => new Source(['src'], []),
-                'testFramework' => 'phpspec',
-            ]),
-        ];
-
-        yield '[testFramework] codeception' => [
-            <<<'JSON'
-{
-    "source": {
-        "directories": ["src"]
-    },
-    "testFramework": "codeception"
-}
-JSON
-            ,
-            self::createConfig([
-                'source' => new Source(['src'], []),
-                'testFramework' => 'codeception',
-            ]),
-        ];
+                    ,
+                    self::createConfig([
+                        'source' => new Source(['src'], []),
+                        'testFramework' => $testFrameworkType,
+                    ]),
+                ];
+            })();
+        }
 
         yield '[bootstrap] nominal' => [
             <<<'JSON'
