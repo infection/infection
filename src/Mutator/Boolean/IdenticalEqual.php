@@ -40,6 +40,7 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
  * @deprecated This mutator is a semantic addition
  */
 final class IdenticalEqual extends Mutator
