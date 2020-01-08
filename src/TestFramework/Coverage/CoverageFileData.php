@@ -40,12 +40,12 @@ namespace Infection\TestFramework\Coverage;
  *
  * ```
  * 'byMethod' => [
- *      'mutate' => ['executed' => 3, 'startLine' => 12, 'endLine' => 16, ...],
+ *      'mutate' => MethodLocationData::['startLine' => 12, 'endLine' => 16],
  *      ...
  * ],
  * 'byLine' => [
  *     22 => [
- *         [
+ *         CoverageLineData::[
  *             'testMethod' => '\A\B\C::test_it_works',
  *             'testFilePath' => '/path/to/A/B/C.php',
  *             'time' => 0.34325,
@@ -63,13 +63,13 @@ final class CoverageFileData
     public $byLine = [];
 
     /**
-     * @var array<string,MethodLocationData>
+     * @var array<string, MethodLocationData>
      */
     public $byMethod = [];
 
     /**
      * @param array<int, array<int, CoverageLineData>> $byLine
-     * @param array<string,MethodLocationData> $byMethod
+     * @param array<string, MethodLocationData> $byMethod
      */
     public function __construct(array $byLine = [], array $byMethod = [])
     {
