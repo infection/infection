@@ -42,6 +42,9 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * TODO: wouldn't it make more sense to transform a XOR into an OR?
+ * TODO: shouldn't bitwise operators be moved out of Arithmetic into their own Bitwise directory?
  */
 final class BitwiseXor extends Mutator
 {

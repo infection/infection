@@ -42,6 +42,7 @@ use PhpParser\Node;
 
 /**
  * @internal
+ * TODO: rename into BitwiseShiftRight
  */
 final class ShiftRight extends Mutator
 {
@@ -58,6 +59,8 @@ TXT
     }
 
     /**
+     * Replaces ">>" with "<<"
+     *
      * @param Node&Node\Expr\BinaryOp\ShiftRight $node
      *
      * @return Node\Expr\BinaryOp\ShiftLeft

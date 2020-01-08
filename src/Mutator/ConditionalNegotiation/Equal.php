@@ -42,6 +42,7 @@ use PhpParser\Node;
 
 /**
  * @internal
+ * TODO: check for potential usage of the "counterpart" usage
  */
 final class Equal extends Mutator
 {

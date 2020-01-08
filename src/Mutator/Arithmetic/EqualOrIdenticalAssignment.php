@@ -35,21 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\Definition;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class AssignmentEqual extends Mutator
+final class EqualOrIdenticalAssignment extends Mutator
 {
     public static function getDefinition(): ?Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an equal (`==`) or identical (`===`) comparison operator with an assignment operator (`=`).
+Replaces an equal (`==`) or identical (`===`) comparison operator into an assignment (`=`).
 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
@@ -69,6 +69,11 @@ TXT
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\Equal && $node->left instanceof Node\Expr\Variable;
+        return (
+                $node instanceof Node\Expr\BinaryOp\Equal
+                || $node instanceof Node\Expr\BinaryOp\Identical
+            )
+            && $node->left instanceof Node\Expr\Variable
+        ;
     }
 }

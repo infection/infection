@@ -42,6 +42,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * TODO: wouldn't it be better to remove the for loop?
  */
 final class For_ extends Mutator
 {

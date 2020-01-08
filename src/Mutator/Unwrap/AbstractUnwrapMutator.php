@@ -42,6 +42,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * TODO: review if those semantic reductions are correct
  */
 abstract class AbstractUnwrapMutator extends Mutator
 {

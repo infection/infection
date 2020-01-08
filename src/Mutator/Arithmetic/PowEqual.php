@@ -42,21 +42,10 @@ use PhpParser\Node;
 
 /**
  * @internal
+ * TODO: does that mutator makes sense?
  */
 final class PowEqual extends Mutator
 {
-    public static function getDefinition(): ?Definition
-    {
-        return new Definition(
-            <<<'TXT'
-Replaces an exponentiation assignment operator (`**=`) with a division assignment operator (`/=`).
-TXT
-            ,
-            MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
-        );
-    }
-
     /**
      * Replaces "**=" with "/="
      *
