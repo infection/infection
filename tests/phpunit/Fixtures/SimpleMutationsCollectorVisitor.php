@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Fixtures;
 
 use Generator;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -37,7 +37,7 @@ final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node)
     {
-        if (!$this->mutator->shouldMutate($node)) {
+        if (!$this->mutator->canMutate($node)) {
             return;
         }
 

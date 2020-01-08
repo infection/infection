@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutator\Unwrap;
 
 use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -43,6 +45,35 @@ use PhpParser\Node;
  */
 final class UnwrapArrayMergeRecursive extends AbstractUnwrapMutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces an `array_merge_recursive` function call with each of its operands. For example:
+
+```php
+$x = array_merge_recursive(['foo', 'bar', 'baz'], ['oof']);
+```
+
+Will be mutated to:
+
+```php
+$x = ['foo', 'bar', 'baz'];
+```
+
+And into:
+
+```php
+$x = ['oof'];
+```
+
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     protected function getFunctionName(): string
     {
         return 'array_merge_recursive';

@@ -42,7 +42,7 @@ use function exec;
 use function get_class;
 use Infection\Console\InfectionContainer;
 use Infection\Mutation\NodeTraverserFactory;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Tests\Fixtures\SimpleMutation;
 use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;

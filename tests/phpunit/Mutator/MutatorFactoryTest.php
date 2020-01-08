@@ -45,9 +45,9 @@ use Infection\Mutator\Boolean\FalseValue;
 use Infection\Mutator\Boolean\IdenticalEqual;
 use Infection\Mutator\Boolean\NotIdenticalNotEqual;
 use Infection\Mutator\Boolean\TrueValue;
+use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\ProfileList;
-use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ReflectionVisitor;
 use InvalidArgumentException;
 use PhpParser\Node;
@@ -309,15 +309,22 @@ final class MutatorFactoryTest extends TestCase
 
     /**
      * @param string[]               $expectedMutators
-     * @param array<string, Mutator> $actualMutators
+     * @param array<string, IgnoreMutator> $actualMutators
      */
     private function assertSameMutatorsByClass(array $expectedMutators, array $actualMutators): void
     {
         $this->assertCount(count($expectedMutators), $actualMutators);
 
+        $ignoreMutatorReflection = new ReflectionClass(IgnoreMutator::class);
+
+        $decoratedMutatorReflection = $ignoreMutatorReflection->getProperty('mutator');
+        $decoratedMutatorReflection->setAccessible(true);
+
         foreach (array_values($actualMutators) as $index => $mutator) {
+            $this->assertInstanceOf(IgnoreMutator::class, $mutator);
+
             $expectedMutatorClass = $expectedMutators[$index];
-            $actualMutatorClass = get_class($mutator);
+            $actualMutatorClass = get_class($decoratedMutatorReflection->getValue($mutator));
 
             $this->assertSame(
                 $expectedMutatorClass,

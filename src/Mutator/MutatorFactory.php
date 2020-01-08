@@ -37,7 +37,6 @@ namespace Infection\Mutator;
 
 use function array_key_exists;
 use function class_exists;
-use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use InvalidArgumentException;
 use function sprintf;
@@ -51,7 +50,7 @@ final class MutatorFactory
     /**
      * @param array<string, bool|array<string, string>> $mutatorSettings
      *
-     * @return array<string, Mutator>
+     * @return array<string, IgnoreMutator>
      */
     public function create(array $mutatorSettings): array
     {
@@ -166,16 +165,19 @@ final class MutatorFactory
     /**
      * @param array<string, array<string, string>> $mutatorNames
      *
-     * @return array<string, Mutator>
+     * @return array<string, IgnoreMutator>
      */
     private static function createFromNames(array $mutatorNames): array
     {
         $mutators = [];
 
         foreach ($mutatorNames as $mutatorClass => $settings) {
+            $mutatorConfig = new MutatorConfig($settings);
+
             /** @var Mutator $mutator */
-            $mutator = new $mutatorClass(new MutatorConfig($settings));
-            $mutators[$mutator::getName()] = $mutator;
+            $mutator = new $mutatorClass($mutatorConfig);
+
+            $mutators[$mutator::getName()] = new IgnoreMutator($mutatorConfig, $mutator);
         }
 
         return $mutators;

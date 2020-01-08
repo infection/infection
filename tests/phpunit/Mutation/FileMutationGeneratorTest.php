@@ -45,6 +45,7 @@ use Infection\Mutation\FileParser;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutation\PrioritizedVisitorsNodeTraverser;
 use Infection\Mutator\Arithmetic\Plus;
+use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
@@ -95,11 +96,13 @@ final class FileMutationGeneratorTest extends TestCase
         /** @var FileMutationGenerator $mutationGenerator */
         $mutationGenerator = $container[FileMutationGenerator::class];
 
+        $mutatorConfig = new MutatorConfig([]);
+
         $mutations = $mutationGenerator->generate(
             new SplFileInfo(self::FIXTURES_DIR . '/Mutation/OneFile/OneFile.php', '', ''),
             false,
             $codeCoverageMock,
-            [new Plus(new MutatorConfig([]))],
+            [new IgnoreMutator($mutatorConfig, new Plus($mutatorConfig))],
             []
         );
 
@@ -167,11 +170,13 @@ final class FileMutationGeneratorTest extends TestCase
             $this->traverserFactoryMock
         );
 
+        $mutatorConfig = new MutatorConfig([]);
+
         $mutations = $mutationGenerator->generate(
             $fileInfo,
             $onlyCovered,
             $codeCoverage,
-            [new Plus(new MutatorConfig([]))],
+            [new IgnoreMutator($mutatorConfig, new Plus($mutatorConfig))],
             $extraVisitors
         );
 
@@ -200,6 +205,8 @@ final class FileMutationGeneratorTest extends TestCase
             $this->traverserFactoryMock
         );
 
+        $mutatorConfig = new MutatorConfig([]);
+
         $mutations = $mutationGenerator->generate(
             $fileInfo,
             true,
@@ -207,7 +214,7 @@ final class FileMutationGeneratorTest extends TestCase
                 $expectedFilePath,
                 false
             ),
-            [new Plus(new MutatorConfig([]))],
+            [new IgnoreMutator($mutatorConfig, new Plus($mutatorConfig))],
             []
         );
 
@@ -237,12 +244,14 @@ final class FileMutationGeneratorTest extends TestCase
             $traverserFactoryMock
         );
 
+        $mutatorConfig = new MutatorConfig([]);
+
         try {
             $mutationGenerator->generate(
                 $fileInfo,
                 false,
                 $this->createMock(LineCodeCoverage::class),
-                [new Plus(new MutatorConfig([]))],
+                [new IgnoreMutator($mutatorConfig, new Plus($mutatorConfig))],
                 $extraVisitors
             );
 

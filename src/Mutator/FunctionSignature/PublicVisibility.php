@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\FunctionSignature;
 
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
@@ -48,9 +50,16 @@ use ReflectionException;
  */
 final class PublicVisibility extends Mutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            'Replaces the `public` method visibility keyword with `protected`.',
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     /**
-     * Replaces "public function..." with "protected function ..."
-     *
      * @param Node&ClassMethod $node
      *
      * @return ClassMethod

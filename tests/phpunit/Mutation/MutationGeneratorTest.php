@@ -43,8 +43,10 @@ use Infection\Mutation;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\Arithmetic\Plus;
+use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -60,7 +62,7 @@ final class MutationGeneratorTest extends TestCase
         ];
 
         $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
-        $mutators = [new Plus(new MutatorConfig([]))];
+        $mutators = ['Fake' => new IgnoreMutator(new MutatorConfig([]), new FakeMutator())];
         $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
         $onlyCovered = true;
         $extraVisitors = [2 => new FakeVisitor()];

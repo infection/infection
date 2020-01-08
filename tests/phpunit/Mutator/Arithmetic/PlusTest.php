@@ -123,7 +123,7 @@ PHP
     {
         $plusExpression = new Node\Expr\BinaryOp\Plus(new LNumber(1), new LNumber(2));
 
-        $this->assertTrue($this->mutator->shouldMutate($plusExpression));
+        $this->assertTrue($this->mutator->canMutate($plusExpression));
     }
 
     public function test_it_should_not_mutate_plus_with_arrays(): void
@@ -133,6 +133,6 @@ PHP
             new Array_([new LNumber(1)])
         );
 
-        $this->assertFalse($this->mutator->shouldMutate($plusExpression));
+        $this->assertFalse($this->mutator->canMutate($plusExpression));
     }
 }

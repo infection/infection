@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Exception;
 
 use Exception;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Mutator;
 use Throwable;
 
 /**

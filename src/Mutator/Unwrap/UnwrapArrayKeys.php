@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutator\Unwrap;
 
 use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -43,6 +45,28 @@ use PhpParser\Node;
  */
 final class UnwrapArrayKeys extends AbstractUnwrapMutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces an `array_keys` function call with its operand. For example:
+
+```php
+$x = array_keys(['foo' => 'bar']);
+```
+
+Will be mutated to:
+
+```php
+$x = ['foo' => 'bar'];
+```
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     protected function getFunctionName(): string
     {
         return 'array_keys';
