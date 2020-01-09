@@ -33,66 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\Arithmetic;
+namespace Infection\Tests;
 
-use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use function array_map;
+use function explode;
+use function implode;
 
-final class DecrementTest extends AbstractMutatorTestCase
+final class StringNormalizer
 {
-    /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
-     */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    private function __construct()
     {
-        $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): Generator
+    public static function normalizeString(string $string): string
     {
-        yield 'It replaces post decrement' => [
-            <<<'PHP'
-<?php
-
-$a = 1;
-$a--;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = 1;
-$a++;
-PHP
-            ,
-        ];
-
-        yield 'It replaces pre decrement' => [
-            <<<'PHP'
-<?php
-
-$a = 1;
---$a;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = 1;
-++$a;
-PHP
-            ,
-        ];
-
-        yield 'It does not change when its not a real decrement' => [
-            <<<'PHP'
-<?php
-
-$b - -$a;
-PHP
-            ,
-        ];
+        return implode(
+            "\n",
+            array_map('rtrim', explode("\n", $string))
+        );
     }
 }

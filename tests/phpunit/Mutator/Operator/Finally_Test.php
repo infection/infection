@@ -72,7 +72,7 @@ try {
     $a = 1;
 } catch (\Exception $e) {
     $a = 2;
-} 
+}
 PHP
             ,
         ];

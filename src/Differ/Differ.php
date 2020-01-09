@@ -39,11 +39,14 @@ use SebastianBergmann\Diff\Differ as BaseDiffer;
 
 /**
  * @internal
+ * @final
+ *
+ * Tiny adapter for Sebastian's differ. It is technically no longer necessary as of now, but there
+ * has been several changes with Sebastian's differ hence having an adapter against which we test
+ * the behaviour is always a nice to have.
  */
 class Differ
 {
-    public const DIFF_MAX_LINES = 12;
-
     private $differ;
 
     public function __construct(BaseDiffer $differ)
@@ -61,17 +64,6 @@ class Differ
      */
     public function diff($from, $to): string
     {
-        $diff = $this->differ->diff($from, $to);
-
-        if (preg_match(
-            '/(?:[^\n]*(\n)){' . self::DIFF_MAX_LINES . '}/',
-            $diff,
-            $matches,
-            PREG_OFFSET_CAPTURE
-        )) {
-            $diff = substr($diff, 0, $matches[1][1]);
-        }
-
-        return $diff;
+        return $this->differ->diff($from, $to);
     }
 }

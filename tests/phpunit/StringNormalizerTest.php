@@ -33,66 +33,59 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\Arithmetic;
+namespace Infection\Tests;
 
 use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use PHPUnit\Framework\TestCase;
 
-final class DecrementTest extends AbstractMutatorTestCase
+final class StringNormalizerTest extends TestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @dataProvider stringValuesProvider
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_remove_right_trailing_spaces(string $input, string $expected): void
     {
-        $this->doTest($input, $expected);
+        $actual = StringNormalizer::normalizeString($input);
+
+        $this->assertSame($expected, $actual);
     }
 
-    public function mutationsProvider(): Generator
+    public function stringValuesProvider(): Generator
     {
-        yield 'It replaces post decrement' => [
-            <<<'PHP'
-<?php
+        yield 'empty' => ['', ''];
 
-$a = 1;
-$a--;
-PHP
-            ,
-            <<<'PHP'
-<?php
+        yield 'spaces' => [' ', ''];
 
-$a = 1;
-$a++;
-PHP
+        yield 'multi-line spaces' => [
+            <<<'TXT'
+ 
+ 
+TXT
             ,
+            <<<'TXT'
+
+
+TXT
         ];
 
-        yield 'It replaces pre decrement' => [
-            <<<'PHP'
-<?php
+        yield 'text' => ['foo', 'foo'];
 
-$a = 1;
---$a;
-PHP
+        yield 'text with spaces' => [' foo ', ' foo'];
+
+        yield 'multi-line text with spaces' => [
+            <<<'TXT'
+ 
+ foo
+ bar 
+ 
+TXT
             ,
-            <<<'PHP'
-<?php
+            <<<'TXT'
 
-$a = 1;
-++$a;
-PHP
-            ,
-        ];
+ foo
+ bar
 
-        yield 'It does not change when its not a real decrement' => [
-            <<<'PHP'
-<?php
-
-$b - -$a;
-PHP
-            ,
+TXT
         ];
     }
 }
