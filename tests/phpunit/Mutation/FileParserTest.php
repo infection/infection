@@ -39,6 +39,7 @@ use Generator;
 use Infection\Console\InfectionContainer;
 use Infection\Mutation\FileParser;
 use Infection\Mutation\UnparsableFile;
+use Infection\Tests\StringNormalizer;
 use PhpParser\Error;
 use PhpParser\Node;
 use PhpParser\NodeDumper;
@@ -85,7 +86,10 @@ final class FileParserTest extends TestCase
 
         $actualPrintedParsedContents = (new NodeDumper())->dump($statements);
 
-        $this->assertSame($expectedPrintedParsedContents, $actualPrintedParsedContents);
+        $this->assertSame(
+            $expectedPrintedParsedContents,
+            StringNormalizer::normalizeString($actualPrintedParsedContents)
+        );
     }
 
     public function test_it_throws_upon_failure(): void
@@ -180,7 +184,7 @@ PHP
 array(
     0: Stmt_InlineHTML(
         value: #!/usr/bin/env php
-    
+
     )
     1: Stmt_Declare(
         declares: array(
