@@ -167,15 +167,15 @@ final class MutantProcessTest extends TestCase
     {
         $mutation = $this->createMock(Mutation::class);
         $mutation->expects($this->once())
-            ->method('getMutatorClass')
-            ->willReturn(For_::class);
+            ->method('getMutatorName')
+            ->willReturn(For_::getName());
 
         $this->mutant
             ->expects($this->once())
             ->method('getMutation')
             ->willReturn($mutation);
 
-        $this->assertSame(For_::class, $this->mutantProcess->getMutatorClass());
+        $this->assertSame('For_', $this->mutantProcess->getMutatorName());
     }
 
     public function test_it_knows_its_original_path(): void

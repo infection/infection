@@ -110,9 +110,9 @@ final class MutantProcess implements MutantProcessInterface
         return self::CODE_KILLED;
     }
 
-    public function getMutatorClass(): string
+    public function getMutatorName(): string
     {
-        return $this->getMutation()->getMutatorClass();
+        return $this->getMutation()->getMutatorName();
     }
 
     public function getOriginalFilePath(): string

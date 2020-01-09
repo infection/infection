@@ -86,21 +86,21 @@ TXT;
 
         for ($i = 0; $i < 10; ++$i) {
             $mutantFor = $this->createMock(MutantProcessInterface::class);
-            $mutantFor->expects($this->once())->method('getMutatorClass')->willReturn(For_::class);
+            $mutantFor->expects($this->once())->method('getMutatorName')->willReturn(For_::getName());
             $mutantFor->expects($this->exactly(2))->method('getResultCode')->willReturn(MutantProcess::CODE_KILLED);
             $processes[] = $mutantFor;
         }
 
         for ($i = 0; $i < 5; ++$i) {
             $mutantFor = $this->createMock(MutantProcessInterface::class);
-            $mutantFor->expects($this->once())->method('getMutatorClass')->willReturn(For_::class);
+            $mutantFor->expects($this->once())->method('getMutatorName')->willReturn(For_::getName());
             $mutantFor->expects($this->exactly(2))->method('getResultCode')->willReturn(MutantProcess::CODE_NOT_COVERED);
             $processes[] = $mutantFor;
         }
 
         for ($i = 0; $i < 5; ++$i) {
             $mutantFor = $this->createMock(MutantProcessInterface::class);
-            $mutantFor->expects($this->once())->method('getMutatorClass')->willReturn(PregQuote::class);
+            $mutantFor->expects($this->once())->method('getMutatorName')->willReturn(PregQuote::getName());
             $mutantFor->expects($this->exactly(2))->method('getResultCode')->willReturn(MutantProcess::CODE_NOT_COVERED);
             $processes[] = $mutantFor;
         }

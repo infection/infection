@@ -79,7 +79,7 @@ final class PerMutatorLogger extends FileLogger
         $processPerMutator = [];
 
         foreach ($processes as $process) {
-            $mutatorName = $process->getMutatorClass()::getName();
+            $mutatorName = $process->getMutatorName();
             $processPerMutator[$mutatorName][] = $process;
         }
 

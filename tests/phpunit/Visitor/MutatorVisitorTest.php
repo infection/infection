@@ -105,15 +105,19 @@ PHP
                 new Mutation(
                     'path/to/file',
                     $nodes,
-                    new PublicVisibility(new MutatorConfig([])),
+                    PublicVisibility::getName(),
                     [
                         'startTokenPos' => 29,
                         'endTokenPos' => 48,
+                        'startLine' => -1,
+                        'endLine' => -1,
+                        'startFilePos' => -1,
+                        'endFilePos' => -1,
                     ],
                     ClassMethod::class,
                     new Nop(),
                     0,
-                    range(29, 48)
+                    []
                 ),
             ];
         })();
@@ -155,15 +159,19 @@ PHP
                 new Mutation(
                     'path/to/file',
                     $nodes,
-                    new PublicVisibility(new MutatorConfig([])),
+                    PublicVisibility::getName(),
                     [
                         'startTokenPos' => 29,
                         'endTokenPos' => 50,
+                        'startLine' => -1,
+                        'endLine' => -1,
+                        'startFilePos' => -1,
+                        'endFilePos' => -1,
                     ],
                     ClassMethod::class,
                     new Nop(),
                     0,
-                    range(29, 50)
+                    []
                 ),
             ];
         })();
@@ -219,15 +227,19 @@ PHP
                 new Mutation(
                     'path/to/file',
                     $nodes,
-                    new PublicVisibility(new MutatorConfig([])),
+                    PublicVisibility::getName(),
                     [
                         'startTokenPos' => 29,
                         'endTokenPos' => 48,
+                        'startLine' => -1,
+                        'endLine' => -1,
+                        'startFilePos' => -1,
+                        'endFilePos' => -1,
                     ],
-                    ClassMethod::class,
+                    PublicVisibility::getName(),
                     new Nop(),
                     0,
-                    range(29, 48)
+                    []
                 ),
             ];
         })();

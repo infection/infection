@@ -116,7 +116,7 @@ final class FileMutationGeneratorTest extends TestCase
         /** @var Mutation $mutation */
         $mutation = current($mutations);
 
-        $this->assertSame(Plus::class, $mutation->getMutatorClass());
+        $this->assertSame(Plus::class, $mutation->getMutatorName());
     }
 
     /**

@@ -35,9 +35,17 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use Infection\Mutator\ProfileList;
+use Webmozart\Assert\Assert;
+use function array_flip;
+use function array_intersect_key;
+use function array_keys;
+use function array_merge;
 use function count;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use PhpParser\Node;
+use function implode;
+use function md5;
 
 /**
  * @internal
@@ -45,21 +53,24 @@ use PhpParser\Node;
  */
 class Mutation
 {
+    private const ATTRIBUTE_KEYS = [
+        'startLine',
+        'endLine',
+        'startTokenPos',
+        'endTokenPos',
+        'startFilePos',
+        'endFilePos',
+    ];
+
     private $originalFilePath;
-    private $mutatorClass;
+    private $mutatorName;
     private $mutatedNodeClass;
     private $mutatedNode;
     private $mutationByMutatorIndex;
-
-    /**
-     * @var array
-     */
     private $attributes;
-
-    /**
-     * @var Node[]
-     */
     private $originalFileAst;
+    private $tests;
+    private $coveredByTests;
 
     /**
      * @var string|null
@@ -67,42 +78,45 @@ class Mutation
     private $hash;
 
     /**
-     * @var CoverageLineData[]
-     */
-    private $tests;
-
-    /**
      * @param Node[] $originalFileAst
      * @param array<string|int|float> $attributes
-     * @param Node|Node[] $mutatedNode
+     * @param CoverageLineData[] $tests
      */
     public function __construct(
         string $originalFilePath,
         array $originalFileAst,
-        string $mutatorClass,
+        string $mutatorName,
         array $attributes,
         string $mutatedNodeClass,
-        $mutatedNode,
+        Node $mutatedNode,
         int $mutationByMutatorIndex,
         array $tests
     ) {
+        Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
+        Assert::allIsInstanceOf($tests, CoverageLineData::class);
+
+        foreach (self::ATTRIBUTE_KEYS as $key) {
+            Assert::keyExists($attributes, $key);
+        }
+
         $this->originalFilePath = $originalFilePath;
         $this->originalFileAst = $originalFileAst;
-        $this->mutatorClass = $mutatorClass;
-        $this->attributes = $attributes;
+        $this->mutatorName = $mutatorName;
+        $this->attributes = array_intersect_key($attributes, array_flip(self::ATTRIBUTE_KEYS));
         $this->mutatedNodeClass = $mutatedNodeClass;
         $this->mutatedNode = $mutatedNode;
         $this->mutationByMutatorIndex = $mutationByMutatorIndex;
         $this->tests = $tests;
+        $this->coveredByTests = count($tests) > 0;
     }
 
-    public function getMutatorClass(): string
+    public function getMutatorName(): string
     {
-        return $this->mutatorClass;
+        return $this->mutatorName;
     }
 
     /**
-     * @return (string|int|float)[]   $attributes
+     * @return (string|int|float)[]
      */
     public function getAttributes(): array
     {
@@ -121,25 +135,8 @@ class Mutation
 
     public function getHash(): string
     {
-        if (!isset($this->hash)) {
-            $attributes = $this->getAttributes();
-
-            $attributeValues = [
-                $this->mutatorClass,
-                $attributes['startLine'],
-                $attributes['endLine'],
-                $attributes['startTokenPos'],
-                $attributes['endTokenPos'],
-                $attributes['startFilePos'],
-                $attributes['endFilePos'],
-            ];
-
-            $hashKeys = array_merge(
-                [$this->getOriginalFilePath(), $this->mutatorClass, $this->mutationByMutatorIndex],
-                $attributeValues
-            );
-
-            $this->hash = md5(implode('_', $hashKeys));
+        if ($this->hash === null) {
+            $this->hash = $this->createHash();
         }
 
         return $this->hash;
@@ -163,14 +160,26 @@ class Mutation
 
     public function isCoveredByTest(): bool
     {
-        return count($this->getAllTests()) !== 0;
+        return $this->coveredByTests;
     }
 
-    /**
-     * @return Node|Node[]
-     */
-    public function getMutatedNode()
+    public function getMutatedNode(): Node
     {
         return $this->mutatedNode;
+    }
+
+    private function createHash(): string
+    {
+        $hashKeys = [
+            $this->originalFilePath,
+            $this->mutatorName,
+            $this->mutationByMutatorIndex
+        ];
+
+        foreach ($this->attributes as $attribute) {
+            $hashKeys[] = $attribute;
+        }
+
+        return md5(implode('_', $hashKeys));
     }
 }

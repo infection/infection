@@ -53,7 +53,7 @@ interface MutantProcessInterface
 
     public function getResultCode(): int;
 
-    public function getMutatorClass(): string;
+    public function getMutatorName(): string;
 
     public function getOriginalFilePath(): string;
 
