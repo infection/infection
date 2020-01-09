@@ -109,7 +109,6 @@ final class IntegrationGroupProvider
         $testCaseFileName = $testCaseReflection->getFileName();
         $testCaseCode = file_get_contents($testCaseFileName);
 
-        // Case where the test case itself use I/O functions
         if (self::codeContainsIoFunctions($testCaseCode)) {
             return [$testCaseClass, $testCaseFileName];
         }
@@ -142,7 +141,6 @@ final class IntegrationGroupProvider
         $classFileName = $classReflection->getFileName();
         $classCode = file_get_contents($classFileName);
 
-        // Case where the test case itself use I/O functions
         if (self::codeContainsIoFunctions($classCode)) {
             return [$testCaseClass, $classFileName];
         }
