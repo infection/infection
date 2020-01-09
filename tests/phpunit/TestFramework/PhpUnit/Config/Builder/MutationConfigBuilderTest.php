@@ -47,6 +47,9 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @group integration Requires I/O reads
+ */
 final class MutationConfigBuilderTest extends FileSystemTestCase
 {
     public const HASH = 'a1b2c3';

@@ -40,6 +40,9 @@ use Infection\Mutation;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 
+/**
+ * @group integration Requires I/O reads
+ */
 final class MutationConfigBuilderTest extends FileSystemTestCase
 {
     private const MUTATION_HASH = 'a1b2c3';

@@ -33,39 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Tests\AutoReview;
 
-use Infection\Configuration\Configuration;
-use Infection\TestFramework\CommandLineBuilder;
-use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\Factory;
-use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
-use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
-use Infection\Utils\VersionParser;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration Requires some I/O operations
- */
-final class FactoryTest extends TestCase
+final class SourceTestClassNameSchemeTest extends TestCase
 {
-    public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
+    public function test_it_can_give_the_test_case_class_name_for_a_source_class(): void
     {
-        $factory = new Factory(
-            '',
-            '',
-            $this->createMock(TestFrameworkConfigLocatorInterface::class),
-            new XmlConfigurationHelper(new PathReplacer(new Filesystem()), ''),
-            '',
-            $this->createMock(Configuration::class),
-            $this->createMock(VersionParser::class),
-            $this->createMock(Filesystem::class),
-            new CommandLineBuilder()
+        $this->assertSame(
+            'Infection\Tests\Acme\FooTest',
+            SourceTestClassNameScheme::getTestClassName('Infection\Acme\Foo')
         );
+    }
 
-        $this->expectException(InvalidArgumentException::class);
-        $factory->create('Fake Test Framework', false);
+    public function test_it_can_give_the_test_case_class_name_for_a_test_source_class(): void
+    {
+        $this->assertSame(
+            'Infection\Tests\Acme\FooTest',
+            SourceTestClassNameScheme::getTestClassName('Infection\Tests\Acme\Foo')
+        );
     }
 }

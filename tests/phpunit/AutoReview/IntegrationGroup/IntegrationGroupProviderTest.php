@@ -33,39 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Tests\AutoReview\IntegrationGroup;
 
-use Infection\Configuration\Configuration;
-use Infection\TestFramework\CommandLineBuilder;
-use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\Factory;
-use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
-use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
-use Infection\Utils\VersionParser;
-use InvalidArgumentException;
+use function class_exists;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
+use ReflectionClass;
+use function Safe\sprintf;
 
 /**
- * @group integration Requires some I/O operations
+ * @covers \Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider
  */
-final class FactoryTest extends TestCase
+final class IntegrationGroupProviderTest extends TestCase
 {
-    public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
+    /**
+     * @dataProvider \Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::ioTestCaseTupleProvider
+     */
+    public function test_io_test_case_classes_provider_is_valid(string $testCaseClassName, string $fileWithIoOperations): void
     {
-        $factory = new Factory(
-            '',
-            '',
-            $this->createMock(TestFrameworkConfigLocatorInterface::class),
-            new XmlConfigurationHelper(new PathReplacer(new Filesystem()), ''),
-            '',
-            $this->createMock(Configuration::class),
-            $this->createMock(VersionParser::class),
-            $this->createMock(Filesystem::class),
-            new CommandLineBuilder()
+        $this->assertTrue(
+            class_exists($testCaseClassName, true),
+            sprintf('Expected "%s" to be a class.', $testCaseClassName)
         );
 
-        $this->expectException(InvalidArgumentException::class);
-        $factory->create('Fake Test Framework', false);
+        $testCaseReflection = new ReflectionClass($testCaseClassName);
+
+        $this->assertInstanceOf(
+            TestCase::class,
+            $testCaseReflection->newInstanceWithoutConstructor()
+        );
+
+        $this->assertFalse(
+            $testCaseReflection->isAbstract(),
+            sprintf(
+                'Expected "%s" to be an actual test case, not a base (abstract) one.',
+                $testCaseClassName
+            )
+        );
+
+        $this->assertFileExists($fileWithIoOperations);
     }
 }

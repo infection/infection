@@ -43,6 +43,9 @@ use Prophecy\Argument\Token\TokenInterface;
 use Prophecy\Prophecy\ObjectProphecy;
 use stdClass;
 
+/**
+ * @group integration Requires I/O reads
+ */
 final class MutationsCollectorVisitorTest extends BaseVisitorTest
 {
     private const CODE = <<<'PHP'

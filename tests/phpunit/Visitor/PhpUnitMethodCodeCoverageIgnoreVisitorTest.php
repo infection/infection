@@ -40,6 +40,9 @@ use Infection\Visitor\PhpUnitMethodCodeCoverageIgnoreVisitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
+/**
+ * @group integration Requires I/O reads
+ */
 final class PhpUnitMethodCodeCoverageIgnoreVisitorTest extends BaseVisitorTest
 {
     private $spyVisitor;

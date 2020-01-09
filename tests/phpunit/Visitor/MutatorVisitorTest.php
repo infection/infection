@@ -47,6 +47,9 @@ use PhpParser\Node\Stmt\Nop;
 use PhpParser\ParserFactory;
 use function range;
 
+/**
+ * @group integration Requires I/O reads
+ */
 final class MutatorVisitorTest extends BaseVisitorTest
 {
     /**

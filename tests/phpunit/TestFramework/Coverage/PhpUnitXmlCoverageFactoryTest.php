@@ -47,6 +47,9 @@ use Infection\TestFramework\TestFrameworkTypes;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class PhpUnitXmlCoverageFactoryTest extends TestCase
 {
     private const COVERAGE_DIR = __DIR__ . '/../../Fixtures/Files/phpunit/coverage/coverage-xml';

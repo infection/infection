@@ -50,6 +50,8 @@ use function substr_count;
 
 /**
  * @coversNothing
+ *
+ * @group integration Requires I/O reads
  */
 final class MakefileTest extends TestCase
 {

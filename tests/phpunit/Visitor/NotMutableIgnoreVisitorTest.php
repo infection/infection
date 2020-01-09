@@ -39,6 +39,9 @@ use Infection\Visitor\NotMutableIgnoreVisitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
+/**
+ * @group integration Requires I/O reads
+ */
 final class NotMutableIgnoreVisitorTest extends BaseVisitorTest
 {
     private $spyVisitor;

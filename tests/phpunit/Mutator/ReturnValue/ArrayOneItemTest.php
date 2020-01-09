@@ -38,6 +38,9 @@ namespace Infection\Tests\Mutator\ReturnValue;
 use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
+/**
+ * @group integration Requires I/O reads
+ */
 final class ArrayOneItemTest extends AbstractMutatorTestCase
 {
     /**

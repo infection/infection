@@ -41,6 +41,9 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class SummaryFileLoggerTest extends FileSystemTestCase
 {
     public function test_it_logs_the_correct_lines_with_no_mutations(): void

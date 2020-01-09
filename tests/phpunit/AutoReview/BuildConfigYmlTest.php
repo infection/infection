@@ -42,6 +42,8 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * @coversNothing
+ *
+ * @group integration Requires I/O reads
  */
 final class BuildConfigYmlTest extends TestCase
 {
