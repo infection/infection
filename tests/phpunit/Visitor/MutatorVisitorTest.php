@@ -38,14 +38,12 @@ namespace Infection\Tests\Visitor;
 use Generator;
 use Infection\Mutation;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
-use Infection\Mutator\Util\MutatorConfig;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\Lexer;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\ParserFactory;
-use function range;
 
 final class MutatorVisitorTest extends BaseVisitorTest
 {
@@ -105,15 +103,19 @@ PHP
                 new Mutation(
                     'path/to/file',
                     $nodes,
-                    new PublicVisibility(new MutatorConfig([])),
+                    PublicVisibility::getName(),
                     [
                         'startTokenPos' => 29,
                         'endTokenPos' => 48,
+                        'startLine' => -1,
+                        'endLine' => -1,
+                        'startFilePos' => -1,
+                        'endFilePos' => -1,
                     ],
                     ClassMethod::class,
                     new Nop(),
                     0,
-                    range(29, 48)
+                    []
                 ),
             ];
         })();
@@ -155,15 +157,19 @@ PHP
                 new Mutation(
                     'path/to/file',
                     $nodes,
-                    new PublicVisibility(new MutatorConfig([])),
+                    PublicVisibility::getName(),
                     [
                         'startTokenPos' => 29,
                         'endTokenPos' => 50,
+                        'startLine' => -1,
+                        'endLine' => -1,
+                        'startFilePos' => -1,
+                        'endFilePos' => -1,
                     ],
                     ClassMethod::class,
                     new Nop(),
                     0,
-                    range(29, 50)
+                    []
                 ),
             ];
         })();
@@ -219,15 +225,19 @@ PHP
                 new Mutation(
                     'path/to/file',
                     $nodes,
-                    new PublicVisibility(new MutatorConfig([])),
+                    PublicVisibility::getName(),
                     [
                         'startTokenPos' => 29,
                         'endTokenPos' => 48,
+                        'startLine' => -1,
+                        'endLine' => -1,
+                        'startFilePos' => -1,
+                        'endFilePos' => -1,
                     ],
-                    ClassMethod::class,
+                    PublicVisibility::getName(),
                     new Nop(),
                     0,
-                    range(29, 48)
+                    []
                 ),
             ];
         })();

@@ -54,6 +54,7 @@ use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
+use Infection\Mutation;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\FileParser;
 use Infection\Mutation\MutationGenerator;
@@ -225,17 +226,10 @@ final class InfectionContainer extends Container
                 return new VersionParser();
             },
             Lexer::class => static function (): Lexer {
-                return new Lexer\Emulative([
-                    'usedAttributes' => [
-                        'comments',
-                        'startLine',
-                        'endLine',
-                        'startTokenPos',
-                        'endTokenPos',
-                        'startFilePos',
-                        'endFilePos',
-                    ],
-                ]);
+                $attributes = Mutation::ATTRIBUTE_KEYS;
+                $attributes[] = 'comments';
+
+                return new Lexer\Emulative(['usedAttributes' => $attributes]);
             },
             Parser::class => static function (self $container): Parser {
                 /** @var Lexer $lexer */

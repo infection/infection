@@ -35,44 +35,64 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use function array_merge;
+use Generator;
 use Infection\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
-use Infection\Mutator\Util\MutatorConfig;
+use Infection\TestFramework\Coverage\CoverageLineData;
+use function md5;
 use PhpParser\Node;
 use PHPUnit\Framework\TestCase;
 
 final class MutationTest extends TestCase
 {
-    public function test_it_correctly_generates_hash(): void
-    {
-        $mutator = new Plus(new MutatorConfig([]));
-        $attributes = [
-            'startLine' => 3,
-            'endLine' => 5,
-            'startTokenPos' => 21,
-            'endTokenPos' => 31,
-            'startFilePos' => 43,
-            'endFilePos' => 53,
-        ];
-
+    /**
+     * @dataProvider valuesProvider
+     *
+     * @param Node[] $originalFileAst
+     * @param array<string|int|float> $attributes
+     * @param array<string|int|float> $expectedAttributes
+     * @param CoverageLineData[] $tests
+     */
+    public function test_it_can_be_instantiated(
+        string $originalFilePath,
+        array $originalFileAst,
+        string $mutatorName,
+        array $attributes,
+        string $mutatedNodeClass,
+        Node $mutatedNode,
+        int $mutationByMutatorIndex,
+        array $tests,
+        array $expectedAttributes,
+        bool $expectedCoveredByTests,
+        string $expectedHash
+    ): void {
         $mutation = new Mutation(
-            '/abc.php',
-            [],
-            $mutator,
+            $originalFilePath,
+            $originalFileAst,
+            $mutatorName,
             $attributes,
-            'Interface_',
-            new Node\Scalar\LNumber(1),
-            0,
-            [1, 2, 3]
+            $mutatedNodeClass,
+            $mutatedNode,
+            $mutationByMutatorIndex,
+            $tests
         );
 
-        $this->assertSame('2930c05082a35248987760a81b9f9a08', $mutation->getHash());
+        $this->assertSame($originalFilePath, $mutation->getOriginalFilePath());
+        $this->assertSame($originalFileAst, $mutation->getOriginalFileAst());
+        $this->assertSame($mutatorName, $mutation->getMutatorName());
+        $this->assertSame($expectedAttributes, $mutation->getAttributes());
+        $this->assertSame($mutatedNodeClass, $mutation->getMutatedNodeClass());
+        $this->assertSame($mutatedNode, $mutation->getMutatedNode());
+        $this->assertSame($tests, $mutation->getAllTests());
+        $this->assertSame($expectedCoveredByTests, $mutation->isCoveredByTest());
+
+        $this->assertSame($expectedHash, $mutation->getHash());
     }
 
-    public function test_it_correctly_sets_original_file_ast(): void
+    public function valuesProvider(): Generator
     {
-        $mutator = new Plus(new MutatorConfig([]));
-        $attributes = [
+        $nominalAttributes = [
             'startLine' => 3,
             'endLine' => 5,
             'startTokenPos' => 21,
@@ -80,19 +100,105 @@ final class MutationTest extends TestCase
             'startFilePos' => 43,
             'endFilePos' => 53,
         ];
-        $fileAst = ['file' => 'ast'];
 
-        $mutation = new Mutation(
-            '/abc.php',
-            $fileAst,
-            $mutator,
-            $attributes,
-            'Interface_',
+        yield 'empty' => [
+            '',
+            [],
+            Plus::getName(),
+            $nominalAttributes,
+            Node\Scalar\LNumber::class,
+            new Node\Scalar\LNumber(1),
+            -1,
+            [],
+            $nominalAttributes,
+            false,
+            md5('_Plus_-1_3_5_21_31_43_53'),
+        ];
+
+        yield 'nominal with a test' => [
+            '/path/to/acme/Foo.php',
+            [new Node\Stmt\Namespace_(
+                new Node\Name('Acme'),
+                [new Node\Scalar\LNumber(0)]
+            )],
+            Plus::getName(),
+            $nominalAttributes,
+            Node\Scalar\LNumber::class,
             new Node\Scalar\LNumber(1),
             0,
-            [1, 2, 3]
-        );
+            [
+                CoverageLineData::with(
+                    'FooTest::test_it_can_instantiate',
+                    '/path/to/acme/FooTest.php',
+                    0.01
+                ),
+            ],
+            $nominalAttributes,
+            true,
+            md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
+        ];
 
-        $this->assertSame($fileAst, $mutation->getOriginalFileAst());
+        yield 'nominal with a test with a different mutator index' => [
+            '/path/to/acme/Foo.php',
+            [new Node\Stmt\Namespace_(
+                new Node\Name('Acme'),
+                [new Node\Scalar\LNumber(0)]
+            )],
+            Plus::getName(),
+            $nominalAttributes,
+            Node\Scalar\LNumber::class,
+            new Node\Scalar\LNumber(1),
+            99,
+            [
+                CoverageLineData::with(
+                    'FooTest::test_it_can_instantiate',
+                    '/path/to/acme/FooTest.php',
+                    0.01
+                ),
+            ],
+            $nominalAttributes,
+            true,
+            md5('/path/to/acme/Foo.php_Plus_99_3_5_21_31_43_53'),
+        ];
+
+        yield 'nominal with a test and additional attributes' => [
+            '/path/to/acme/Foo.php',
+            [new Node\Stmt\Namespace_(
+                new Node\Name('Acme'),
+                [new Node\Scalar\LNumber(0)]
+            )],
+            Plus::getName(),
+            array_merge($nominalAttributes, ['foo' => 100, 'bar' => 1000]),
+            Node\Scalar\LNumber::class,
+            new Node\Scalar\LNumber(1),
+            0,
+            [
+                CoverageLineData::with(
+                    'FooTest::test_it_can_instantiate',
+                    '/path/to/acme/FooTest.php',
+                    0.01
+                ),
+            ],
+            $nominalAttributes,
+            true,
+            md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
+        ];
+
+        yield 'nominal without a test' => [
+            '/path/to/acme/Foo.php',
+            [new Node\Stmt\Namespace_(
+                new Node\Name('Acme'),
+                [new Node\Scalar\LNumber(0)]
+            )],
+            Plus::getName(),
+            $nominalAttributes,
+            Node\Scalar\LNumber::class,
+            new Node\Scalar\LNumber(1),
+            0,
+            [],
+            $nominalAttributes,
+            false,
+            md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
+        ];
     }
 }
