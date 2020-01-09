@@ -23,7 +23,6 @@
 
 set -Eeuo pipefail
 
-# TODO: some tests could leverage the new StringNormalizerTest to avoid having to be ignored here
 files_with_trailing_whitespaces=$(
     find . \
         -type f \
@@ -34,8 +33,6 @@ files_with_trailing_whitespaces=$(
         -not -path "./.git/*" \
         -not -path "./vendor/*" \
         -not -path "./tests/e2e/*" \
-        -not -path "./tests/phpunit/Mutator/*" \
-        -not -path "./tests/phpunit/Mutation/FileParserTest.php" \
         -not -path "./tests/phpunit/StringNormalizerTest.php" \
         -exec grep -EIHn "\\s$" {} \;
 )
