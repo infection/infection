@@ -38,6 +38,9 @@ namespace Infection\Tests\Config\ValueProvider;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TextLogFileProvider;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class TextLogFileProviderTest extends AbstractBaseProviderTest
 {
     /**

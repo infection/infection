@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
-use Infection\Mutant\MutantInterface;
+use Infection\Mutant\Mutant;
 use Infection\Mutation;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
@@ -57,7 +57,7 @@ final class MutantProcessTest extends TestCase
     private $process;
 
     /**
-     * @var MockObject|MutantInterface
+     * @var MockObject|Mutant
      */
     private $mutant;
 
@@ -69,7 +69,7 @@ final class MutantProcessTest extends TestCase
     protected function setUp(): void
     {
         $this->process = $this->createMock(Process::class);
-        $this->mutant = $this->createMock(MutantInterface::class);
+        $this->mutant = $this->createMock(Mutant::class);
         $this->adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
 
         $this->mutantProcess = new MutantProcess($this->process, $this->mutant, $this->adapter);

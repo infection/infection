@@ -33,66 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\Arithmetic;
+namespace Infection\Tests\AutoReview\IntegrationGroup;
 
-use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use function class_exists;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use function Safe\sprintf;
 
-final class DecrementTest extends AbstractMutatorTestCase
+/**
+ * @covers \Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider
+ */
+final class IntegrationGroupProviderTest extends TestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @dataProvider \Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::ioTestCaseTupleProvider
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_io_test_case_classes_provider_is_valid(string $testCaseClassName, string $fileWithIoOperations): void
     {
-        $this->doTest($input, $expected);
-    }
+        $this->assertTrue(
+            class_exists($testCaseClassName, true),
+            sprintf('Expected "%s" to be a class.', $testCaseClassName)
+        );
 
-    public function mutationsProvider(): Generator
-    {
-        yield 'It replaces post decrement' => [
-            <<<'PHP'
-<?php
+        $testCaseReflection = new ReflectionClass($testCaseClassName);
 
-$a = 1;
-$a--;
-PHP
-            ,
-            <<<'PHP'
-<?php
+        $this->assertInstanceOf(
+            TestCase::class,
+            $testCaseReflection->newInstanceWithoutConstructor()
+        );
 
-$a = 1;
-$a++;
-PHP
-            ,
-        ];
+        $this->assertFalse(
+            $testCaseReflection->isAbstract(),
+            sprintf(
+                'Expected "%s" to be an actual test case, not a base (abstract) one.',
+                $testCaseClassName
+            )
+        );
 
-        yield 'It replaces pre decrement' => [
-            <<<'PHP'
-<?php
-
-$a = 1;
---$a;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = 1;
-++$a;
-PHP
-            ,
-        ];
-
-        yield 'It does not change when its not a real decrement' => [
-            <<<'PHP'
-<?php
-
-$b - -$a;
-PHP
-            ,
-        ];
+        $this->assertFileExists($fileWithIoOperations);
     }
 }

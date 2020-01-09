@@ -199,13 +199,13 @@ final class InfectionContainer extends Container
                 /** @var Differ $differ */
                 $differ = $container[Differ::class];
 
-                /** @var PrettyPrinterAbstract $prettyPrinter */
-                $prettyPrinter = $container['pretty.printer'];
+                /** @var PrettyPrinterAbstract $printer */
+                $printer = $container['pretty.printer'];
 
                 return new MutantFactory(
                     $config->getTmpDir(),
                     $differ,
-                    $prettyPrinter
+                    $printer
                 );
             },
             Differ::class => static function (): Differ {
@@ -225,7 +225,7 @@ final class InfectionContainer extends Container
                     (string) $config->getPhpUnit()->getConfigDir()
                 );
             },
-            'diff.colorizer' => static function (): DiffColorizer {
+            DiffColorizer::class => static function (): DiffColorizer {
                 return new DiffColorizer();
             },
             MemoizedTestFileDataProvider::class => static function (self $container): TestFileDataProvider {
@@ -371,7 +371,7 @@ final class InfectionContainer extends Container
                 $eventDispatcher = $container['dispatcher'];
 
                 /** @var DiffColorizer $diffColorizer */
-                $diffColorizer = $container['diff.colorizer'];
+                $diffColorizer = $container[DiffColorizer::class];
 
                 /** @var Filesystem $fileSystem */
                 $fileSystem = $container['filesystem'];

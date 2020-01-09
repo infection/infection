@@ -79,6 +79,7 @@ class Mutation
     /**
      * @param Node[] $originalFileAst
      * @param array<string|int|float> $attributes
+     * @param Node|Node[] $mutatedNode
      * @param CoverageLineData[] $tests
      */
     public function __construct(
@@ -87,7 +88,7 @@ class Mutation
         string $mutatorName,
         array $attributes,
         string $mutatedNodeClass,
-        Node $mutatedNode,
+        $mutatedNode,
         int $mutationByMutatorIndex,
         array $tests
     ) {
@@ -109,6 +110,19 @@ class Mutation
         $this->coveredByTests = count($tests) > 0;
     }
 
+    public function getOriginalFilePath(): string
+    {
+        return $this->originalFilePath;
+    }
+
+    /**
+     * return Node[]
+     */
+    public function getOriginalFileAst(): array
+    {
+        return $this->originalFileAst;
+    }
+
     public function getMutatorName(): string
     {
         return $this->mutatorName;
@@ -122,31 +136,22 @@ class Mutation
         return $this->attributes;
     }
 
-    public function getOriginalFilePath(): string
-    {
-        return $this->originalFilePath;
-    }
-
     public function getMutatedNodeClass(): string
     {
         return $this->mutatedNodeClass;
     }
 
-    public function getHash(): string
+    /**
+     * @return Node|Node[]
+     */
+    public function getMutatedNode()
     {
-        if ($this->hash === null) {
-            $this->hash = $this->createHash();
-        }
-
-        return $this->hash;
+        return $this->mutatedNode;
     }
 
-    /**
-     * return Node[]
-     */
-    public function getOriginalFileAst(): array
+    public function isCoveredByTest(): bool
     {
-        return $this->originalFileAst;
+        return $this->coveredByTests;
     }
 
     /**
@@ -157,14 +162,13 @@ class Mutation
         return $this->tests;
     }
 
-    public function isCoveredByTest(): bool
+    public function getHash(): string
     {
-        return $this->coveredByTests;
-    }
+        if ($this->hash === null) {
+            $this->hash = $this->createHash();
+        }
 
-    public function getMutatedNode(): Node
-    {
-        return $this->mutatedNode;
+        return $this->hash;
     }
 
     private function createHash(): string

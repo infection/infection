@@ -41,11 +41,11 @@ use function array_map;
 use function in_array;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\Tests\AutoReview\PhpDoc\PHPDocParser;
+use Infection\Tests\AutoReview\SourceTestClassNameScheme;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
 use function Safe\array_flip;
-use function Safe\preg_replace;
 use function Safe\sprintf;
 
 /**
@@ -90,7 +90,7 @@ final class ProjectCodeTest extends TestCase
      */
     public function test_all_concrete_classes_have_tests(string $className): void
     {
-        $testClassName = preg_replace('/Infection/', 'Infection\\Tests', $className, 1) . 'Test';
+        $testClassName = SourceTestClassNameScheme::getTestClassName($className);
 
         if (false === in_array($className, ProjectCodeProvider::NON_TESTED_CONCRETE_CLASSES, true)) {
             $this->assertTrue(

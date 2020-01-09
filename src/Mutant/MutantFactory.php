@@ -74,7 +74,7 @@ final class MutantFactory
         $this->mutantCodeFactory = $mutantCodeFactory;
     }
 
-    public function create(Mutation $mutation): MutantInterface
+    public function create(Mutation $mutation): Mutant
     {
         $mutantFilePath = sprintf('%s/mutant.%s.infection.php', $this->tmpDir, $mutation->getHash());
 

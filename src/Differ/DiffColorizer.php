@@ -38,8 +38,8 @@ namespace Infection\Differ;
 use function array_map;
 use function explode;
 use function implode;
-use function strpos;
 use function Safe\sprintf;
+use function strpos;
 
 /**
  * @internal

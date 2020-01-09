@@ -40,8 +40,9 @@ use Infection\TestFramework\Coverage\CoverageLineData;
 
 /**
  * @internal
+ * @final
  */
-final class Mutant implements MutantInterface
+class Mutant
 {
     private $mutantFilePath;
     private $mutation;

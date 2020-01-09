@@ -44,6 +44,11 @@ use function Infection\Tests\normalizePath;
 use function strlen;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @group integration Requires I/O read & writes via the MockVendor
+ *
+ * @see MockVendor
+ */
 final class TestFrameworkFinderTest extends FileSystemTestCase
 {
     /**

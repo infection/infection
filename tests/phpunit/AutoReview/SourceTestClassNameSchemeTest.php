@@ -33,28 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Tests\AutoReview;
 
-use Infection\Mutation;
-use Infection\TestFramework\Coverage\CoverageLineData;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- *
- * @see Mutant
- */
-interface MutantInterface
+final class SourceTestClassNameSchemeTest extends TestCase
 {
-    public function getMutantFilePath(): string;
+    public function test_it_can_give_the_test_case_class_name_for_a_source_class(): void
+    {
+        $this->assertSame(
+            'Infection\Tests\Acme\FooTest',
+            SourceTestClassNameScheme::getTestClassName('Infection\Acme\Foo')
+        );
+    }
 
-    public function getMutation(): Mutation;
-
-    public function getDiff(): string;
-
-    public function isCoveredByTest(): bool;
-
-    /**
-     * @return CoverageLineData[]
-     */
-    public function getTests(): array;
+    public function test_it_can_give_the_test_case_class_name_for_a_test_source_class(): void
+    {
+        $this->assertSame(
+            'Infection\Tests\Acme\FooTest',
+            SourceTestClassNameScheme::getTestClassName('Infection\Tests\Acme\Foo')
+        );
+    }
 }

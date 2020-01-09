@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Builder;
 
-use Infection\Mutant\MutantInterface;
+use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\Utils\VersionParser;
@@ -58,7 +58,7 @@ final class MutantProcessBuilder
         $this->versionParser = $versionParser;
     }
 
-    public function createProcessForMutant(MutantInterface $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
+    public function createProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
     {
         $process = new Process(
             $this->testFrameworkAdapter->getMutantCommandLine(

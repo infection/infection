@@ -33,163 +33,131 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Differ;
+namespace Infection\Tests\AutoReview\IntegrationGroup;
 
-use function array_map;
-use function explode;
 use Generator;
-use function implode;
-use Infection\Differ\Differ;
 use PHPUnit\Framework\TestCase;
-use SebastianBergmann\Diff\Differ as BaseDiffer;
 
-final class DifferTest extends TestCase
+/**
+ * @covers \Infection\Tests\AutoReview\IntegrationGroup\IoCodeDetector
+ */
+final class IoCodeDetectorTest extends TestCase
 {
     /**
-     * @dataProvider diffProvider
+     * @dataProvider codeProvider
      */
-    public function test_it_shows_the_diff_between_two_sources_but_limiting_the_displayed_lines(
-        string $sourceA,
-        string $sourceB,
-        string $expectedDiff
-    ): void {
-        $actualDiff = (new Differ(new BaseDiffer()))->diff($sourceA, $sourceB);
+    public function test_it_can_detect_IO_operations(string $code, bool $expected): void
+    {
+        $actual = IoCodeDetector::codeContainsIoOperations($code);
 
-        $this->assertSame($expectedDiff, self::normalizeString($actualDiff));
+        $this->assertSame($expected, $actual);
     }
 
-    public function diffProvider(): Generator
+    public function codeProvider(): Generator
     {
         yield 'empty' => [
             '',
-            '',
-            <<<'PHP'
---- Original
-+++ New
-
-PHP
+            false,
         ];
 
-        yield 'nominal' => [
+        yield 'core function' => [
             <<<'PHP'
-
-public function echo(): void
-{
-    echo 10;
-}
-
+<?php
+echo basename('/etc/sudoers.d', '.d');
 PHP
             ,
-            <<<'PHP'
-
-public function echo(): void
-{
-    echo 15;
-}
-
-PHP
-            ,
-            <<<'PHP'
---- Original
-+++ New
-@@ @@
-
- public function echo(): void
- {
--    echo 10;
-+    echo 15;
- }
-
-PHP
+            false,  // Cannot detect this one since the call is not fully-qualified and there is no
+                    // use statements - too tricky to detect
         ];
 
-        yield 'no change' => [
+        yield 'core function - use statement' => [
             <<<'PHP'
+<?php
 
-public function echo(): void
-{
-    echo 10;
-}
+use function basename;
 
+echo basename('/etc/sudoers.d', '.d');
 PHP
             ,
-            <<<'PHP'
-
-public function echo(): void
-{
-    echo 10;
-}
-
-PHP
-            ,
-            <<<'PHP'
---- Original
-+++ New
-
-PHP
+            true,
         ];
 
-        yield 'line excess' => [
+        yield 'core function - fully-qualified call' => [
             <<<'PHP'
-0
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-PHP
-            ,
-            <<<'PHP'
-0
-1
-2
-3
-4
-5
-(6)
-7
-8
-9
-10
-11
-12
-13
-14
-15
-PHP
-            ,
-            <<<'PHP'
---- Original
-+++ New
-@@ @@
- 3
- 4
- 5
--6
-+(6)
- 7
- 8
- 9
+<?php
 
+echo \basename('/etc/sudoers.d', '.d');
 PHP
+            ,
+            true,
         ];
-    }
 
-    private static function normalizeString(string $string): string
-    {
-        return implode(
-            "\n",
-            array_map('rtrim', explode("\n", $string))
-        );
+        yield 'Symfony FileSystem - use statement' => [
+            <<<'PHP'
+<?php
+
+use Symfony\Component\Filesystem\Filesystem;
+
+(new Filesystem)->dumpFile('foo.php', '');
+PHP
+            ,
+            true,
+        ];
+
+        yield 'Symfony FileSystem - FQCN' => [
+            <<<'PHP'
+<?php
+
+echo \Symfony\Component\Filesystem\Filesystem::class;
+PHP
+            ,
+            false,
+        ];
+
+        yield 'Safe file-system function' => [
+            <<<'PHP'
+<?php
+
+use function Safe\getcwd;
+
+getcwd();
+PHP
+            ,
+            true,
+        ];
+
+        yield 'Safe file-system function as fully-qualified call' => [
+            <<<'PHP'
+<?php
+
+\Safe\rename('foo', 'bar');
+PHP
+            ,
+            true,
+        ];
+
+        yield 'Safe non-file-system function' => [
+            <<<'PHP'
+<?php
+
+use function Safe\sprintf();
+
+sprintf('%s', 'foo');
+PHP
+            ,
+            false,
+        ];
+
+        yield 'Statement containing a word match of a FS function' => [
+            <<<'PHP'
+<?php
+
+/**
+ * copyright
+ */
+PHP
+            ,
+            false,
+        ];
     }
 }

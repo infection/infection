@@ -33,66 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\Arithmetic;
+namespace Infection\Tests\AutoReview;
 
-use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use function Safe\preg_replace;
+use function strpos;
 
-final class DecrementTest extends AbstractMutatorTestCase
+final class SourceTestClassNameScheme
 {
-    /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
-     */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    private function __construct()
     {
-        $this->doTest($input, $expected);
     }
 
-    public function mutationsProvider(): Generator
+    public static function getTestClassName(string $sourceClassName): string
     {
-        yield 'It replaces post decrement' => [
-            <<<'PHP'
-<?php
+        if (strpos($sourceClassName, 'Infection\\Tests') !== false) {
+            return $sourceClassName . 'Test';
+        }
 
-$a = 1;
-$a--;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = 1;
-$a++;
-PHP
-            ,
-        ];
-
-        yield 'It replaces pre decrement' => [
-            <<<'PHP'
-<?php
-
-$a = 1;
---$a;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = 1;
-++$a;
-PHP
-            ,
-        ];
-
-        yield 'It does not change when its not a real decrement' => [
-            <<<'PHP'
-<?php
-
-$b - -$a;
-PHP
-            ,
-        ];
+        return preg_replace('/Infection/', 'Infection\\Tests', $sourceClassName, 1) . 'Test';
     }
 }

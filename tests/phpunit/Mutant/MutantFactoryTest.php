@@ -49,6 +49,10 @@ use function sys_get_temp_dir;
 use PhpParser\Node;
 
 /**
+ * @group integration Requires some I/O operations
+ */
+final class MutantCreatorTest extends TestCase
+/**
  * @group integration Requires I/O reads & writes
  */
 final class MutantFactoryTest extends FileSystemTestCase
