@@ -33,30 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Tests\TestFramework\Codeception\Adapter;
 
-use Infection\Configuration\Configuration;
-use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\Factory;
-use InvalidArgumentException;
+use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
+use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapterFactory;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @group integration Requires some I/O operations
  */
-final class FactoryTest extends TestCase
+final class CodeceptionAdapterFactoryTest extends TestCase
 {
-    public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
+    public function test_it_creates_codeception_adapter(): void
     {
-        $factory = new Factory(
-            '',
-            '',
-            $this->createMock(TestFrameworkConfigLocatorInterface::class),
-            '',
-            $this->createMock(Configuration::class)
+        $adapter = CodeceptionAdapterFactory::create(
+            '/path/to/codecept',
+            '/tmp',
+            __DIR__ . '/../../../Fixtures/Files/codeception/codeception.yml',
+            null,
+            '/path/to/junit.xml',
+            '/path/to/project',
+            [],
+            true
         );
 
-        $this->expectException(InvalidArgumentException::class);
-        $factory->create('Fake Test Framework', false);
+        $this->assertInstanceOf(CodeceptionAdapter::class, $adapter);
     }
 }
