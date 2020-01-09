@@ -44,20 +44,20 @@ use Infection\TestFramework\Coverage\CoverageLineData;
  */
 class Mutant
 {
-    private $mutatedFilePath;
+    private $mutantFilePath;
     private $mutation;
     private $diff;
 
-    public function __construct(string $mutatedFilePath, Mutation $mutation, string $diff)
+    public function __construct(string $mutantFilePath, Mutation $mutation, string $diff)
     {
-        $this->mutatedFilePath = $mutatedFilePath;
+        $this->mutantFilePath = $mutantFilePath;
         $this->mutation = $mutation;
         $this->diff = $diff;
     }
 
     public function getMutantFilePath(): string
     {
-        return $this->mutatedFilePath;
+        return $this->mutantFilePath;
     }
 
     public function getMutation(): Mutation
