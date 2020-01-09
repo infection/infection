@@ -63,12 +63,30 @@ final class IoCodeDetectorTest extends TestCase
         yield 'core function' => [
             <<<'PHP'
 <?php
-echo "1) ".basename("/etc/sudoers.d", ".d").PHP_EOL;
-echo "2) ".basename("/etc/sudoers.d").PHP_EOL;
-echo "3) ".basename("/etc/passwd").PHP_EOL;
-echo "4) ".basename("/etc/").PHP_EOL;
-echo "5) ".basename(".").PHP_EOL;
-echo "6) ".basename("/");
+echo basename('/etc/sudoers.d', '.d');
+PHP
+            ,
+            false,  // Cannot detect this one since the call is not fully-qualified and there is no
+                    // use statements - too tricky to detect
+        ];
+
+        yield 'core function - use statement' => [
+            <<<'PHP'
+<?php
+
+use function basename;
+
+echo basename('/etc/sudoers.d', '.d');
+PHP
+            ,
+            true,
+        ];
+
+        yield 'core function - fully-qualified call' => [
+            <<<'PHP'
+<?php
+
+echo \basename('/etc/sudoers.d', '.d');
 PHP
             ,
             true,

@@ -167,8 +167,8 @@ final class IoCodeDetector
         }
 
         foreach (self::NATIVE_FUNCTIONS as $safeFunctionName) {
-            self::$statements[] = sprintf('use function Safe\\%s', $safeFunctionName);
-            self::$statements[] = sprintf('\\Safe\\%s(', $safeFunctionName);
+            self::$statements[] = sprintf('use function %s', $safeFunctionName);
+            self::$statements[] = sprintf('\\%s(', $safeFunctionName);
         }
 
         foreach (self::retrieveSafeFileSystemFunctions() as $safeFunctionName) {

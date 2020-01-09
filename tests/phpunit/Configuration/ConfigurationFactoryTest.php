@@ -61,6 +61,9 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class ConfigurationFactoryTest extends TestCase
 {
     use ConfigurationAssertions;
