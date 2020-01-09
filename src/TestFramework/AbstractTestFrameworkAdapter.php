@@ -105,7 +105,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
      */
     public function getMutantCommandLine(
         array $coverageTests,
-        string $mutatntFilePath,
+        string $mutantFilePath,
         string $mutationHash,
         string $mutationOriginalFilePath,
         string $extraOptions
@@ -113,7 +113,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         return $this->getCommandLine(
             $this->buildMutationConfigFile(
                 $coverageTests,
-                $mutatntFilePath,
+                $mutantFilePath,
                 $mutationHash,
                 $mutationOriginalFilePath
             ),

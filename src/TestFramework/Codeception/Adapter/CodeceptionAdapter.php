@@ -187,7 +187,7 @@ final class CodeceptionAdapter implements MemoryUsageAware, TestFrameworkAdapter
      */
     public function getMutantCommandLine(
         array $coverageTests,
-        string $mutatntFilePath,
+        string $mutantFilePath,
         string $mutationHash,
         string $mutationOriginalFilePath,
         string $extraOptions
@@ -204,7 +204,7 @@ final class CodeceptionAdapter implements MemoryUsageAware, TestFrameworkAdapter
             $mutationHash
         );
 
-        file_put_contents($interceptorFilePath, $this->createCustomBootstrapWithInterceptor($mutationOriginalFilePath, $mutatntFilePath), LOCK_EX);
+        file_put_contents($interceptorFilePath, $this->createCustomBootstrapWithInterceptor($mutationOriginalFilePath, $mutantFilePath), LOCK_EX);
 
         $uniqueTestFilePaths = implode(',', $this->jUnitTestCaseSorter->getUniqueSortedFileNames($coverageTests));
 
