@@ -35,11 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpSpec\Config\Builder;
 
-use Infection\Mutant\MutantInterface;
+use Infection\Mutant\Mutant;
 use Infection\Mutation;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class MutationConfigBuilderTest extends FileSystemTestCase
 {
     private const MUTATION_HASH = 'a1b2c3';
@@ -77,10 +80,10 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         $mutation->method('getOriginalFilePath')
             ->willReturn('/original/file/path');
 
-        $mutant = $this->createMock(MutantInterface::class);
+        $mutant = $this->createMock(Mutant::class);
         $mutant->method('getMutation')
             ->willReturn($mutation);
-        $mutant->method('getMutatedFilePath')
+        $mutant->method('getMutantFilePath')
             ->willReturn('/mutated/file/path');
 
         $builder = new MutationConfigBuilder($this->tmp, $originalYamlConfigPath, $projectDir);

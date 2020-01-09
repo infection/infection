@@ -80,7 +80,7 @@ class MutationConfigBuilder extends ConfigBuilder
      */
     public function build(
         array $coverageTests,
-        string $mutatedFilePath,
+        string $mutantFilePath,
         string $mutationHash,
         string $mutationOriginalFilePath
     ): string {
@@ -109,7 +109,7 @@ class MutationConfigBuilder extends ConfigBuilder
         $this->setCustomBootstrapPath($customAutoloadFilePath, $xPath);
         $this->setFilteredTestsToRun($coverageTests, $dom, $xPath);
 
-        file_put_contents($customAutoloadFilePath, $this->createCustomAutoloadWithInterceptor($mutationOriginalFilePath, $mutatedFilePath, $originalAutoloadFile));
+        file_put_contents($customAutoloadFilePath, $this->createCustomAutoloadWithInterceptor($mutationOriginalFilePath, $mutantFilePath, $originalAutoloadFile));
 
         $path = $this->buildPath($mutationHash);
 
@@ -118,7 +118,7 @@ class MutationConfigBuilder extends ConfigBuilder
         return $path;
     }
 
-    private function createCustomAutoloadWithInterceptor(string $originalFilePath, string $mutatedFilePath, string $originalAutoloadFile): string
+    private function createCustomAutoloadWithInterceptor(string $originalFilePath, string $mutantFilePath, string $originalAutoloadFile): string
     {
         $interceptorPath = dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
 
@@ -130,7 +130,7 @@ require_once '{$originalAutoloadFile}';
 
 AUTOLOAD;
 
-        return sprintf($customAutoload, $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutatedFilePath));
+        return sprintf($customAutoload, $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutantFilePath));
     }
 
     private function buildPath(string $mutationHash): string

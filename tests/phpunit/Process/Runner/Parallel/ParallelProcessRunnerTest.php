@@ -37,7 +37,7 @@ namespace Infection\Tests\Process\Runner\Parallel;
 
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutantProcessFinished;
-use Infection\Mutant\MutantInterface;
+use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcessInterface;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -131,7 +131,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
     private function buildUncoveredMutantProcess(): MutantProcessInterface
     {
-        $mutant = $this->createMock(MutantInterface::class);
+        $mutant = $this->createMock(Mutant::class);
         $mutant->expects($this->once())
             ->method('isCoveredByTest')
             ->willReturn(false);
@@ -156,7 +156,7 @@ final class ParallelProcessRunnerTest extends TestCase
             ->method('isRunning')
             ->willReturn(false);
 
-        $mutant = $this->createMock(MutantInterface::class);
+        $mutant = $this->createMock(Mutant::class);
         $mutant->expects($this->once())
             ->method('isCoveredByTest')
             ->willReturn(true);
@@ -185,7 +185,7 @@ final class ParallelProcessRunnerTest extends TestCase
             ->method('isRunning')
             ->willReturn(false);
 
-        $mutant = $this->createMock(MutantInterface::class);
+        $mutant = $this->createMock(Mutant::class);
         $mutant->expects($this->once())
             ->method('isCoveredByTest')
             ->willReturn(true);

@@ -50,6 +50,7 @@ use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Mutator\ProfileList;
+use Infection\TestFramework\TestFrameworkTypes;
 use JsonSchema\Validator;
 use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
@@ -587,6 +588,28 @@ JSON
                 'testFramework' => 'phpunit',
             ]),
         ];
+
+        foreach (TestFrameworkTypes::TYPES as $testFrameworkType) {
+            yield '[testFramework] ' . $testFrameworkType => (static function () use (
+                $testFrameworkType
+            ): array {
+                return [
+                    <<<"JSON"
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "testFramework": "{$testFrameworkType}"
+}
+JSON
+                    ,
+                    self::createConfig([
+                        'source' => new Source(['src'], []),
+                        'testFramework' => $testFrameworkType,
+                    ]),
+                ];
+            })();
+        }
 
         yield '[bootstrap] nominal' => [
             <<<'JSON'

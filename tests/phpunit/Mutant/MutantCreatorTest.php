@@ -42,6 +42,9 @@ use PhpParser\PrettyPrinter\Standard;
 use PHPUnit\Framework\TestCase;
 use function sys_get_temp_dir;
 
+/**
+ * @group integration Requires some I/O operations & writes
+ */
 final class MutantCreatorTest extends TestCase
 {
     private const TEST_FILE_NAME = '/mutant.hash.infection.php';
@@ -94,10 +97,10 @@ PHP
         $creator = new MutantCreator($this->directory, $differ, $standard);
         $mutant = $creator->create($mutation);
 
-        $this->assertSame($this->directory . self::TEST_FILE_NAME, $mutant->getMutatedFilePath());
+        $this->assertSame($this->directory . self::TEST_FILE_NAME, $mutant->getMutantFilePath());
         $this->assertSame('This is the Diff', $mutant->getDiff());
         $this->assertTrue($mutant->isCoveredByTest());
-        $this->assertSame(['test', 'list'], $mutant->getCoverageTests());
+        $this->assertSame(['test', 'list'], $mutant->getTests());
         $this->assertSame('hash', $mutant->getMutation()->getHash());
     }
 }

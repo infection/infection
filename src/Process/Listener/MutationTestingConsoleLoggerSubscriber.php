@@ -142,7 +142,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInt
                     $index + 1,
                     $mutation->getOriginalFilePath(),
                     (int) $mutation->getAttributes()['startLine'],
-                    $mutation->getMutator()::getName()
+                    $mutation->getMutatorName()::getName()
                 ),
             ]);
 

@@ -39,15 +39,19 @@ use Generator;
 use Infection\Console\InfectionContainer;
 use Infection\Mutation\FileParser;
 use Infection\Mutation\UnparsableFile;
+use Infection\Tests\StringNormalizer;
 use PhpParser\Error;
 use PhpParser\Node;
 use PhpParser\NodeDumper;
 use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
-use function realpath;
+use function Safe\realpath;
 use function Safe\sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class FileParserTest extends TestCase
 {
     public function test_it_parses_the_given_file_only_once(): void
@@ -85,7 +89,10 @@ final class FileParserTest extends TestCase
 
         $actualPrintedParsedContents = (new NodeDumper())->dump($statements);
 
-        $this->assertSame($expectedPrintedParsedContents, $actualPrintedParsedContents);
+        $this->assertSame(
+            $expectedPrintedParsedContents,
+            StringNormalizer::normalizeString($actualPrintedParsedContents)
+        );
     }
 
     public function test_it_throws_upon_failure(): void
@@ -180,7 +187,7 @@ PHP
 array(
     0: Stmt_InlineHTML(
         value: #!/usr/bin/env php
-    
+
     )
     1: Stmt_Declare(
         declares: array(

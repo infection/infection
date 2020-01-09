@@ -37,9 +37,8 @@ namespace Infection\Tests\Logger;
 
 use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Mutant\MutantInterface;
+use Infection\Mutant\Mutant;
 use Infection\Mutator\Boolean\TrueValue;
-use Infection\Mutator\Util\MutatorConfig;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessInterface;
@@ -48,6 +47,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class TextFileLoggerTest extends TestCase
 {
     public function test_it_logs_correctly_with_no_mutations_and_no_debug_verbosity(): void
@@ -313,14 +315,14 @@ TXT;
             $phpProcess->expects($this->atMost(1))->method('getCommandLine')->willReturn('bin/foo/bar -c conf');
             $phpProcess->expects($this->atMost(1))->method('isStarted')->willReturn(true);
 
-            $mutant = $this->createMock(MutantInterface::class);
+            $mutant = $this->createMock(Mutant::class);
             $mutant->expects($this->once())->method('getDiff')->willReturn('Diff Diff');
 
             $process = $this->createMock(MutantProcessInterface::class);
             $process->method('getProcess')->willReturn($phpProcess);
             $process->expects($this->once())->method('getMutant')->willReturn($mutant);
 
-            $process->expects($this->once())->method('getMutator')->willReturn(new For_(new MutatorConfig([])));
+            $process->expects($this->once())->method('getMutatorName')->willReturn(For_::getName());
             $process->expects($this->once())->method('getResultCode')->willReturn(MutantProcess::CODE_ESCAPED);
             $process->expects($this->atLeast(2))->method('getOriginalStartingLine')->willReturn(10 - $i);
             $process->expects($this->atLeast(1))->method('getOriginalFilePath')->willReturn('foo/bar');
@@ -333,14 +335,14 @@ TXT;
             $phpProcess->expects($this->atMost(1))->method('getCommandLine')->willReturn('bin/foo/bar -c conf');
             $phpProcess->expects($this->atMost(1))->method('isStarted')->willReturn(true);
 
-            $mutant = $this->createMock(MutantInterface::class);
+            $mutant = $this->createMock(Mutant::class);
             $mutant->expects($this->once())->method('getDiff')->willReturn('Diff Diff Diff');
 
             $process = $this->createMock(MutantProcessInterface::class);
             $process->method('getProcess')->willReturn($phpProcess);
             $process->expects($this->once())->method('getMutant')->willReturn($mutant);
 
-            $process->expects($this->once())->method('getMutator')->willReturn(new TrueValue(new MutatorConfig([])));
+            $process->expects($this->once())->method('getMutatorName')->willReturn(TrueValue::getName());
             $process->expects($this->once())->method('getResultCode')->willReturn(MutantProcess::CODE_ESCAPED);
             $process->expects($this->atLeast(2))->method('getOriginalStartingLine')->willReturn(20 - $i);
             $process->expects($this->atLeast(1))->method('getOriginalFilePath')->willReturn('bar/bar');
@@ -354,14 +356,14 @@ TXT;
             $phpProcess->expects($this->atMost(1))->method('getCommandLine')->willReturn('bin/foo/bar -c conf');
             $phpProcess->expects($this->atMost(1))->method('isStarted')->willReturn(true);
 
-            $mutant = $this->createMock(MutantInterface::class);
+            $mutant = $this->createMock(Mutant::class);
             $mutant->expects($this->once())->method('getDiff')->willReturn('Diff Diff');
 
             $process = $this->createMock(MutantProcessInterface::class);
             $process->method('getProcess')->willReturn($phpProcess);
             $process->expects($this->once())->method('getMutant')->willReturn($mutant);
 
-            $process->expects($this->once())->method('getMutator')->willReturn(new For_(new MutatorConfig([])));
+            $process->expects($this->once())->method('getMutatorName')->willReturn(For_::getName());
             $process->expects($this->once())->method('getResultCode')->willReturn(MutantProcess::CODE_NOT_COVERED);
             $process->expects($this->atLeast(2))->method('getOriginalStartingLine')->willReturn(10 - $i);
             $process->expects($this->atLeast(1))->method('getOriginalFilePath')->willReturn('foo/bar');
@@ -374,14 +376,14 @@ TXT;
             $phpProcess->expects($this->atMost(1))->method('getCommandLine')->willReturn('bin/foo/bar -c conf');
             $phpProcess->expects($this->atMost(1))->method('isStarted')->willReturn(true);
 
-            $mutant = $this->createMock(MutantInterface::class);
+            $mutant = $this->createMock(Mutant::class);
             $mutant->expects($this->atMost(1))->method('getDiff')->willReturn('Diff Diff');
 
             $process = $this->createMock(MutantProcessInterface::class);
             $process->method('getProcess')->willReturn($phpProcess);
             $process->expects($this->atMost(1))->method('getMutant')->willReturn($mutant);
 
-            $process->expects($this->atMost(1))->method('getMutator')->willReturn(new For_(new MutatorConfig([])));
+            $process->expects($this->atMost(1))->method('getMutatorName')->willReturn(For_::getName());
             $process->expects($this->atMost(1))->method('getResultCode')->willReturn(MutantProcess::CODE_KILLED);
             $process->method('getOriginalStartingLine')->willReturn(10 - $i);
             $process->method('getOriginalFilePath')->willReturn('foo/bar');

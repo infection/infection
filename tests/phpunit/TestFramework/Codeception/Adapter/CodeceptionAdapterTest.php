@@ -47,6 +47,9 @@ use Infection\Utils\VersionParser;
 use function realpath;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class CodeceptionAdapterTest extends FileSystemTestCase
 {
     private const MUTATION_HASH = 'a1b2c3';

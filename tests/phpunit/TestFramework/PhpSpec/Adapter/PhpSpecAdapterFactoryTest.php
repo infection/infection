@@ -33,28 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Tests\TestFramework\PhpSpec\Adapter;
 
-use Infection\Mutation;
-use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
+use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapterFactory;
+use PHPUnit\Framework\TestCase;
 
 /**
- * @internal
- *
- * @see Mutant
+ * @group integration Requires some I/O operations
  */
-interface MutantInterface
+final class PhpSpecAdapterFactoryTest extends TestCase
 {
-    public function getMutatedFilePath(): string;
+    public function test_it_creates_phpspec_adapter(): void
+    {
+        $adapter = PhpSpecAdapterFactory::create(
+            '/path/to/phpspec',
+            '/tmp',
+            __DIR__ . '/../../../Fixtures/Files/phpspec/phpspec.yml',
+            null,
+            '/path/to/junit.xml',
+            '/path/to/project',
+            [],
+            true
+        );
 
-    public function getMutation(): Mutation;
-
-    public function getDiff(): string;
-
-    public function isCoveredByTest(): bool;
-
-    /**
-     * @return CoverageLineData[]
-     */
-    public function getCoverageTests(): array;
+        $this->assertInstanceOf(PhpSpecAdapter::class, $adapter);
+    }
 }

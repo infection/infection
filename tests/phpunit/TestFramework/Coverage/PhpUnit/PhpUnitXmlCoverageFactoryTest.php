@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\PhpUnit;
 
+use const DIRECTORY_SEPARATOR;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoverageLineData;
@@ -48,6 +49,9 @@ use Infection\Tests\TestFramework\Coverage\CoverageHelper;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class PhpUnitXmlCoverageFactoryTest extends TestCase
 {
     private const COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
@@ -124,9 +128,11 @@ final class PhpUnitXmlCoverageFactoryTest extends TestCase
 
             $this->fail();
         } catch (CoverageDoesNotExistException $exception) {
+            $directionSeprator = DIRECTORY_SEPARATOR;
+
             $this->assertSame(
-                <<<'TXT'
-Code Coverage does not exist. File /nowhere/index.xml is not found. Check phpunit version Infection was run with and generated config files inside /. Make sure to either:
+                <<<TXT
+Code Coverage does not exist. File /nowhere/index.xml is not found. Check phpunit version Infection was run with and generated config files inside ${directionSeprator}. Make sure to either:
 - Enable xdebug and run infection again
 - Use phpdbg: phpdbg -qrr infection
 - Enable pcov and run infection again

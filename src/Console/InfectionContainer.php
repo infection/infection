@@ -54,6 +54,7 @@ use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCreator;
+use Infection\Mutation;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\FileParser;
 use Infection\Mutation\MutationGenerator;
@@ -166,12 +167,8 @@ final class InfectionContainer extends Container
                     $config->getTmpDir(),
                     $container['project.dir'],
                     $container['testframework.config.locator'],
-                    $container['xml.configuration.helper'],
                     $container['junit.file.path'],
-                    $container[Configuration::class],
-                    $container[VersionParser::class],
-                    $container['filesystem'],
-                    $container[CommandLineBuilder::class]
+                    $container[Configuration::class]
                 );
             },
             'xml.configuration.helper' => static function (self $container): XmlConfigurationHelper {
@@ -187,16 +184,17 @@ final class InfectionContainer extends Container
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
+                /** @var Differ $differ */
+                $differ = $container[Differ::class];
+
                 return new MutantCreator(
                     $config->getTmpDir(),
-                    $container['differ'],
+                    $differ,
                     $container['pretty.printer']
                 );
             },
-            'differ' => static function (): Differ {
-                return new Differ(
-                    new BaseDiffer()
-                );
+            Differ::class => static function (): Differ {
+                return new Differ(new BaseDiffer());
             },
             'dispatcher' => static function (): EventDispatcherInterface {
                 return new EventDispatcher();
@@ -212,7 +210,7 @@ final class InfectionContainer extends Container
                     (string) $config->getPhpUnit()->getConfigDir()
                 );
             },
-            'diff.colorizer' => static function (): DiffColorizer {
+            DiffColorizer::class => static function (): DiffColorizer {
                 return new DiffColorizer();
             },
             MemoizedTestFileDataProvider::class => static function (self $container): TestFileDataProvider {
@@ -224,17 +222,10 @@ final class InfectionContainer extends Container
                 return new VersionParser();
             },
             Lexer::class => static function (): Lexer {
-                return new Lexer\Emulative([
-                    'usedAttributes' => [
-                        'comments',
-                        'startLine',
-                        'endLine',
-                        'startTokenPos',
-                        'endTokenPos',
-                        'startFilePos',
-                        'endFilePos',
-                    ],
-                ]);
+                $attributes = Mutation::ATTRIBUTE_KEYS;
+                $attributes[] = 'comments';
+
+                return new Lexer\Emulative(['usedAttributes' => $attributes]);
             },
             Parser::class => static function (self $container): Parser {
                 /** @var Lexer $lexer */
@@ -365,7 +356,7 @@ final class InfectionContainer extends Container
                 $eventDispatcher = $container['dispatcher'];
 
                 /** @var DiffColorizer $diffColorizer */
-                $diffColorizer = $container['diff.colorizer'];
+                $diffColorizer = $container[DiffColorizer::class];
 
                 /** @var Filesystem $fileSystem */
                 $fileSystem = $container['filesystem'];

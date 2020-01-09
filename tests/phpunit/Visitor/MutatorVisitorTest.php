@@ -38,15 +38,17 @@ namespace Infection\Tests\Visitor;
 use Generator;
 use Infection\Mutation;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
-use Infection\Mutator\Util\MutatorConfig;
+use Infection\Tests\StringNormalizer;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\Lexer;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\ParserFactory;
-use function range;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class MutatorVisitorTest extends BaseVisitorTest
 {
     /**
@@ -66,7 +68,7 @@ final class MutatorVisitorTest extends BaseVisitorTest
 
         $output = $this->print($nodes);
 
-        $this->assertSame($expectedCodeOutput, $output);
+        $this->assertSame($expectedCodeOutput, StringNormalizer::normalizeString($output));
     }
 
     public function providesMutationCases(): Generator
@@ -98,22 +100,78 @@ class Test
     {
         return 'hello';
     }
-    
+
 }
 PHP
                 ,
                 new Mutation(
                     'path/to/file',
                     $nodes,
-                    new PublicVisibility(new MutatorConfig([])),
+                    PublicVisibility::getName(),
                     [
                         'startTokenPos' => 29,
                         'endTokenPos' => 48,
+                        'startLine' => -1,
+                        'endLine' => -1,
+                        'startFilePos' => -1,
+                        'endFilePos' => -1,
                     ],
                     ClassMethod::class,
                     new Nop(),
                     0,
-                    range(29, 48)
+                    []
+                ),
+            ];
+        })();
+
+        yield 'it can mutate the node with multiple-ones' => (function () {
+            return [
+                $nodes = $this->parseCode(<<<'PHP'
+<?php
+
+class Test
+{
+    public function hello() : string
+    {
+        return 'hello';
+    }
+    public function bye() : string
+    {
+        return 'bye';
+    }
+}
+PHP
+                ),
+                <<<'PHP'
+<?php
+
+class Test
+{
+    public function hello() : string
+    {
+        return 'hello';
+    }
+
+
+}
+PHP
+                ,
+                new Mutation(
+                    'path/to/file',
+                    $nodes,
+                    PublicVisibility::getName(),
+                    [
+                        'startTokenPos' => 29,
+                        'endTokenPos' => 48,
+                        'startLine' => -1,
+                        'endLine' => -1,
+                        'startFilePos' => -1,
+                        'endFilePos' => -1,
+                    ],
+                    ClassMethod::class,
+                    [new Nop(), new Nop()],
+                    0,
+                    []
                 ),
             ];
         })();
@@ -155,15 +213,19 @@ PHP
                 new Mutation(
                     'path/to/file',
                     $nodes,
-                    new PublicVisibility(new MutatorConfig([])),
+                    PublicVisibility::getName(),
                     [
                         'startTokenPos' => 29,
                         'endTokenPos' => 50,
+                        'startLine' => -1,
+                        'endLine' => -1,
+                        'startFilePos' => -1,
+                        'endFilePos' => -1,
                     ],
                     ClassMethod::class,
                     new Nop(),
                     0,
-                    range(29, 50)
+                    []
                 ),
             ];
         })();
@@ -219,15 +281,19 @@ PHP
                 new Mutation(
                     'path/to/file',
                     $nodes,
-                    new PublicVisibility(new MutatorConfig([])),
+                    PublicVisibility::getName(),
                     [
                         'startTokenPos' => 29,
                         'endTokenPos' => 48,
+                        'startLine' => -1,
+                        'endLine' => -1,
+                        'startFilePos' => -1,
+                        'endFilePos' => -1,
                     ],
-                    ClassMethod::class,
+                    PublicVisibility::getName(),
                     new Nop(),
                     0,
-                    range(29, 48)
+                    []
                 ),
             ];
         })();

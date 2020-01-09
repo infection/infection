@@ -38,7 +38,6 @@ namespace Infection\Tests\Logger;
 use Infection\Logger\DebugFileLogger;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\Boolean\TrueValue;
-use Infection\Mutator\Util\MutatorConfig;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessInterface;
@@ -46,6 +45,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class DebugFileLoggerTest extends TestCase
 {
     public function test_it_logs_correctly_with_no_mutations(): void
@@ -170,7 +172,7 @@ TXT;
 
         for ($i = 0; $i < 5; ++$i) {
             $process = $this->createMock(MutantProcessInterface::class);
-            $process->expects($this->once())->method('getMutator')->willReturn(new For_(new MutatorConfig([])));
+            $process->expects($this->once())->method('getMutatorName')->willReturn(For_::getName());
             $process->expects($this->once())->method('getResultCode')->willReturn(MutantProcess::CODE_KILLED);
             $process->expects($this->atLeast(2))->method('getOriginalStartingLine')->willReturn(10 - $i);
             $process->expects($this->atLeast(1))->method('getOriginalFilePath')->willReturn('foo/bar');
@@ -179,7 +181,7 @@ TXT;
 
         for ($i = 0; $i < 5; ++$i) {
             $process = $this->createMock(MutantProcessInterface::class);
-            $process->expects($this->once())->method('getMutator')->willReturn(new TrueValue(new MutatorConfig([])));
+            $process->expects($this->once())->method('getMutatorName')->willReturn(TrueValue::getName());
             $process->expects($this->once())->method('getResultCode')->willReturn(MutantProcess::CODE_KILLED);
             $process->expects($this->atLeast(2))->method('getOriginalStartingLine')->willReturn(20 - $i);
             $process->expects($this->atLeast(1))->method('getOriginalFilePath')->willReturn('bar/bar');
@@ -189,7 +191,7 @@ TXT;
 
         for ($i = 0; $i < 2; ++$i) {
             $process = $this->createMock(MutantProcessInterface::class);
-            $process->expects($this->once())->method('getMutator')->willReturn(new For_(new MutatorConfig([])));
+            $process->expects($this->once())->method('getMutatorName')->willReturn(For_::getName());
             $process->expects($this->once())->method('getResultCode')->willReturn(MutantProcess::CODE_ESCAPED);
             $process->expects($this->atLeast(2))->method('getOriginalStartingLine')->willReturn(10 - $i);
             $process->expects($this->atLeast(1))->method('getOriginalFilePath')->willReturn('foo/bar');
