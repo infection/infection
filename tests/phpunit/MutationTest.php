@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use function array_merge;
 use Generator;
 use Infection\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\TestFramework\Coverage\CoverageLineData;
+use function md5;
 use PhpParser\Node;
 use PHPUnit\Framework\TestCase;
-use function array_merge;
-use function md5;
 
 final class MutationTest extends TestCase
 {
@@ -66,8 +66,7 @@ final class MutationTest extends TestCase
         array $expectedAttributes,
         bool $expectedCoveredByTests,
         string $expectedHash
-    ): void
-    {
+    ): void {
         $mutation = new Mutation(
             $originalFilePath,
             $originalFileAst,
@@ -113,7 +112,7 @@ final class MutationTest extends TestCase
             [],
             $nominalAttributes,
             false,
-            md5('_Plus_-1_3_5_21_31_43_53')
+            md5('_Plus_-1_3_5_21_31_43_53'),
         ];
 
         yield 'nominal with a test' => [
@@ -136,7 +135,7 @@ final class MutationTest extends TestCase
             ],
             $nominalAttributes,
             true,
-            md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53')
+            md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
         ];
 
         yield 'nominal with a test with a different mutator index' => [
@@ -159,7 +158,7 @@ final class MutationTest extends TestCase
             ],
             $nominalAttributes,
             true,
-            md5('/path/to/acme/Foo.php_Plus_99_3_5_21_31_43_53')
+            md5('/path/to/acme/Foo.php_Plus_99_3_5_21_31_43_53'),
         ];
 
         yield 'nominal with a test and additional attributes' => [
@@ -182,7 +181,7 @@ final class MutationTest extends TestCase
             ],
             $nominalAttributes,
             true,
-            md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53')
+            md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
         ];
 
         yield 'nominal without a test' => [
@@ -199,7 +198,7 @@ final class MutationTest extends TestCase
             [],
             $nominalAttributes,
             false,
-            md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53')
+            md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
         ];
     }
 }

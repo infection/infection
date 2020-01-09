@@ -42,7 +42,6 @@ use Infection\Events\MutationGeneratingStarted;
 use Infection\Mutation;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\MutationGenerator;
-use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\Coverage\LineCodeCoverage;

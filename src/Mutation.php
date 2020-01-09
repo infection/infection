@@ -35,17 +35,16 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use Infection\Mutator\ProfileList;
-use Webmozart\Assert\Assert;
 use function array_flip;
 use function array_intersect_key;
 use function array_keys;
-use function array_merge;
 use function count;
-use Infection\TestFramework\Coverage\CoverageLineData;
-use PhpParser\Node;
 use function implode;
+use Infection\Mutator\ProfileList;
+use Infection\TestFramework\Coverage\CoverageLineData;
 use function md5;
+use PhpParser\Node;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -53,7 +52,7 @@ use function md5;
  */
 class Mutation
 {
-    private const ATTRIBUTE_KEYS = [
+    public const ATTRIBUTE_KEYS = [
         'startLine',
         'endLine',
         'startTokenPos',
@@ -173,7 +172,7 @@ class Mutation
         $hashKeys = [
             $this->originalFilePath,
             $this->mutatorName,
-            $this->mutationByMutatorIndex
+            $this->mutationByMutatorIndex,
         ];
 
         foreach ($this->attributes as $attribute) {

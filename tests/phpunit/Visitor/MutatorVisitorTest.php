@@ -38,14 +38,12 @@ namespace Infection\Tests\Visitor;
 use Generator;
 use Infection\Mutation;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
-use Infection\Mutator\Util\MutatorConfig;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\Lexer;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\ParserFactory;
-use function range;
 
 final class MutatorVisitorTest extends BaseVisitorTest
 {
