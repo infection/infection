@@ -35,16 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\Differ\Differ;
 use Infection\Mutation;
 use Infection\Visitor\CloneVisitor;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\NodeTraverser;
-use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
-use function is_readable;
-use function Safe\file_get_contents;
-use function Safe\file_put_contents;
 
 /**
  * @internal

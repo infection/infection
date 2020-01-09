@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Infection\Mutant\MutantCodeFactory;
-use PhpParser\PrettyPrinterAbstract;
 use function array_filter;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
@@ -55,6 +53,7 @@ use Infection\Locator\RootsFileLocator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
+use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation;
 use Infection\Mutation\FileMutationGenerator;
@@ -92,6 +91,7 @@ use PhpParser\Lexer;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
+use PhpParser\PrettyPrinterAbstract;
 use Pimple\Container;
 use function Safe\getcwd;
 use function Safe\sprintf;

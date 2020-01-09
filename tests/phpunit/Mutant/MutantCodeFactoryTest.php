@@ -37,18 +37,12 @@ namespace Infection\Tests\Mutant;
 
 use Generator;
 use Infection\Console\InfectionContainer;
-use Infection\Differ\Differ;
 use Infection\Mutant\MutantCodeFactory;
-use Infection\Mutant\MutantFactory;
 use Infection\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
-use Infection\TestFramework\Coverage\CoverageLineData;
-use PhpParser\NodeDumper;
-use PhpParser\Parser;
-use PhpParser\PrettyPrinter\Standard;
-use PHPUnit\Framework\TestCase;
-use function sys_get_temp_dir;
 use PhpParser\Node;
+use PhpParser\NodeDumper;
+use PHPUnit\Framework\TestCase;
 
 final class MutantCodeFactoryTest extends TestCase
 {
@@ -62,7 +56,7 @@ final class MutantCodeFactoryTest extends TestCase
      */
     private $codeFactory;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->codeFactory = InfectionContainer::create()[MutantCodeFactory::class];
     }
@@ -73,8 +67,7 @@ final class MutantCodeFactoryTest extends TestCase
     public function test_it_creates_the_mutant_code_from_the_given_mutation(
         Mutation $mutation,
         string $expectedMutantCode
-    ): void
-    {
+    ): void {
         $mutantCode = $this->codeFactory->createMutantCode($mutation);
 
         $this->assertSame($expectedMutantCode, $mutantCode);
@@ -85,8 +78,7 @@ final class MutantCodeFactoryTest extends TestCase
      */
     public function test_it_creates_the_mutant_code_without_altering_the_original_nodes(
         Mutation $mutation
-    ): void
-    {
+    ): void {
         $originalNodesDump = $this->getDumper()->dump($mutation->getOriginalFileAst());
 
         $this->codeFactory->createMutantCode($mutation);
