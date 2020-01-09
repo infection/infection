@@ -51,6 +51,7 @@ final class MutationTest extends TestCase
      *
      * @param Node[] $originalFileAst
      * @param array<string|int|float> $attributes
+     * @param Node|Node[] $mutatedNode
      * @param array<string|int|float> $expectedAttributes
      * @param CoverageLineData[] $tests
      */
@@ -60,7 +61,7 @@ final class MutationTest extends TestCase
         string $mutatorName,
         array $attributes,
         string $mutatedNodeClass,
-        Node $mutatedNode,
+        $mutatedNode,
         int $mutationByMutatorIndex,
         array $tests,
         array $expectedAttributes,
@@ -198,6 +199,32 @@ final class MutationTest extends TestCase
             [],
             $nominalAttributes,
             false,
+            md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
+        ];
+
+        yield 'nominal with a test and multiple mutated nodes' => [
+            '/path/to/acme/Foo.php',
+            [new Node\Stmt\Namespace_(
+                new Node\Name('Acme'),
+                [new Node\Scalar\LNumber(0)]
+            )],
+            Plus::getName(),
+            $nominalAttributes,
+            Node\Scalar\LNumber::class,
+            [
+                new Node\Scalar\LNumber(1),
+                new Node\Scalar\LNumber(-1),
+            ],
+            0,
+            [
+                CoverageLineData::with(
+                    'FooTest::test_it_can_instantiate',
+                    '/path/to/acme/FooTest.php',
+                    0.01
+                ),
+            ],
+            $nominalAttributes,
+            true,
             md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
         ];
     }
