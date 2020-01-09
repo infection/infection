@@ -42,6 +42,9 @@ use PhpParser\PrettyPrinter\Standard;
 use PHPUnit\Framework\TestCase;
 use function sys_get_temp_dir;
 
+/**
+ * @group integration Requires some I/O operations & writes
+ */
 final class MutantCreatorTest extends TestCase
 {
     private const TEST_FILE_NAME = '/mutant.hash.infection.php';

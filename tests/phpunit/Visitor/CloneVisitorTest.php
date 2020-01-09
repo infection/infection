@@ -40,6 +40,9 @@ use PhpParser\Node;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class CloneVisitorTest extends BaseVisitorTest
 {
     private const CODE = <<<'PHP'

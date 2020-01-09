@@ -45,10 +45,13 @@ use PhpParser\Node;
 use PhpParser\NodeDumper;
 use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
-use function realpath;
+use function Safe\realpath;
 use function Safe\sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class FileParserTest extends TestCase
 {
     public function test_it_parses_the_given_file_only_once(): void

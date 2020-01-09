@@ -33,53 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Tests\AutoReview\IntegrationGroup;
 
-use Infection\Mutation;
-use Infection\TestFramework\Coverage\CoverageLineData;
+use function class_exists;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use function Safe\sprintf;
 
 /**
- * @internal
- * @final
+ * @covers \Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider
  */
-class Mutant
+final class IntegrationGroupProviderTest extends TestCase
 {
-    private $mutantFilePath;
-    private $mutation;
-    private $diff;
-
-    public function __construct(string $mutantFilePath, Mutation $mutation, string $diff)
-    {
-        $this->mutantFilePath = $mutantFilePath;
-        $this->mutation = $mutation;
-        $this->diff = $diff;
-    }
-
-    public function getMutantFilePath(): string
-    {
-        return $this->mutantFilePath;
-    }
-
-    public function getMutation(): Mutation
-    {
-        return $this->mutation;
-    }
-
-    public function getDiff(): string
-    {
-        return $this->diff;
-    }
-
-    public function isCoveredByTest(): bool
-    {
-        return $this->mutation->isCoveredByTest();
-    }
-
     /**
-     * @return CoverageLineData[]
+     * @dataProvider \Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::ioTestCaseTupleProvider
      */
-    public function getTests(): array
+    public function test_io_test_case_classes_provider_is_valid(string $testCaseClassName, string $fileWithIoOperations): void
     {
-        return $this->mutation->getAllTests();
+        $this->assertTrue(
+            class_exists($testCaseClassName, true),
+            sprintf('Expected "%s" to be a class.', $testCaseClassName)
+        );
+
+        $testCaseReflection = new ReflectionClass($testCaseClassName);
+
+        $this->assertInstanceOf(
+            TestCase::class,
+            $testCaseReflection->newInstanceWithoutConstructor()
+        );
+
+        $this->assertFalse(
+            $testCaseReflection->isAbstract(),
+            sprintf(
+                'Expected "%s" to be an actual test case, not a base (abstract) one.',
+                $testCaseClassName
+            )
+        );
+
+        $this->assertFileExists($fileWithIoOperations);
     }
 }

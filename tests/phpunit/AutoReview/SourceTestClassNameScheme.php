@@ -33,53 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Tests\AutoReview;
 
-use Infection\Mutation;
-use Infection\TestFramework\Coverage\CoverageLineData;
+use function Safe\preg_replace;
+use function strpos;
 
-/**
- * @internal
- * @final
- */
-class Mutant
+final class SourceTestClassNameScheme
 {
-    private $mutantFilePath;
-    private $mutation;
-    private $diff;
-
-    public function __construct(string $mutantFilePath, Mutation $mutation, string $diff)
+    private function __construct()
     {
-        $this->mutantFilePath = $mutantFilePath;
-        $this->mutation = $mutation;
-        $this->diff = $diff;
     }
 
-    public function getMutantFilePath(): string
+    public static function getTestClassName(string $sourceClassName): string
     {
-        return $this->mutantFilePath;
-    }
+        if (strpos($sourceClassName, 'Infection\\Tests') !== false) {
+            return $sourceClassName . 'Test';
+        }
 
-    public function getMutation(): Mutation
-    {
-        return $this->mutation;
-    }
-
-    public function getDiff(): string
-    {
-        return $this->diff;
-    }
-
-    public function isCoveredByTest(): bool
-    {
-        return $this->mutation->isCoveredByTest();
-    }
-
-    /**
-     * @return CoverageLineData[]
-     */
-    public function getTests(): array
-    {
-        return $this->mutation->getAllTests();
+        return preg_replace('/Infection/', 'Infection\\Tests', $sourceClassName, 1) . 'Test';
     }
 }

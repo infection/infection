@@ -42,6 +42,9 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use JsonSchema\Exception\ValidationException;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class JsonFileTest extends FileSystemTestCase
 {
     /**

@@ -33,53 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Tests\AutoReview;
 
-use Infection\Mutation;
-use Infection\TestFramework\Coverage\CoverageLineData;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- * @final
- */
-class Mutant
+final class SourceTestClassNameSchemeTest extends TestCase
 {
-    private $mutantFilePath;
-    private $mutation;
-    private $diff;
-
-    public function __construct(string $mutantFilePath, Mutation $mutation, string $diff)
+    public function test_it_can_give_the_test_case_class_name_for_a_source_class(): void
     {
-        $this->mutantFilePath = $mutantFilePath;
-        $this->mutation = $mutation;
-        $this->diff = $diff;
+        $this->assertSame(
+            'Infection\Tests\Acme\FooTest',
+            SourceTestClassNameScheme::getTestClassName('Infection\Acme\Foo')
+        );
     }
 
-    public function getMutantFilePath(): string
+    public function test_it_can_give_the_test_case_class_name_for_a_test_source_class(): void
     {
-        return $this->mutantFilePath;
-    }
-
-    public function getMutation(): Mutation
-    {
-        return $this->mutation;
-    }
-
-    public function getDiff(): string
-    {
-        return $this->diff;
-    }
-
-    public function isCoveredByTest(): bool
-    {
-        return $this->mutation->isCoveredByTest();
-    }
-
-    /**
-     * @return CoverageLineData[]
-     */
-    public function getTests(): array
-    {
-        return $this->mutation->getAllTests();
+        $this->assertSame(
+            'Infection\Tests\Acme\FooTest',
+            SourceTestClassNameScheme::getTestClassName('Infection\Tests\Acme\Foo')
+        );
     }
 }

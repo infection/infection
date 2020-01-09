@@ -41,6 +41,9 @@ use Infection\Config\ValueProvider\SourceDirsProvider;
 use LogicException;
 use PHPUnit\Framework\MockObject\MockObject;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class SourceDirsProviderTest extends AbstractBaseProviderTest
 {
     /**

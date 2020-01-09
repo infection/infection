@@ -46,6 +46,9 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class FactoryTest extends TestCase
 {
     public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
