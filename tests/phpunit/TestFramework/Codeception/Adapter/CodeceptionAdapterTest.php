@@ -48,7 +48,7 @@ use function realpath;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @group integration Requires I/O reads
+ * @group integration Requires some I/O operations
  */
 final class CodeceptionAdapterTest extends FileSystemTestCase
 {

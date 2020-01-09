@@ -58,7 +58,7 @@ use RuntimeException;
  * Other methods are not essential for interception to work,
  * but still are required to be implemented by a full wrapper
  *
- * @group integration Requires I/O reads & writes
+ * @group integration Requires some I/O operations & writes
  */
 final class IncludeInterceptorTest extends TestCase
 {

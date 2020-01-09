@@ -40,7 +40,7 @@ use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
 /**
- * @group integration Requires I/O reads
+ * @group integration Requires some I/O operations
  */
 final class NotMutableIgnoreVisitorTest extends BaseVisitorTest
 {

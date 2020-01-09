@@ -41,7 +41,7 @@ use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 
 /**
- * @group integration Requires I/O reads
+ * @group integration Requires some I/O operations
  */
 final class MutationConfigBuilderTest extends FileSystemTestCase
 {

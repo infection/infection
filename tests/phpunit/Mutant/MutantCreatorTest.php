@@ -43,7 +43,7 @@ use PHPUnit\Framework\TestCase;
 use function sys_get_temp_dir;
 
 /**
- * @group integration Requires I/O reads & writes
+ * @group integration Requires some I/O operations & writes
  */
 final class MutantCreatorTest extends TestCase
 {

@@ -39,7 +39,7 @@ use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 /**
- * @group integration Requires I/O reads
+ * @group integration Requires some I/O operations
  */
 final class FunctionCallTest extends AbstractMutatorTestCase
 {
