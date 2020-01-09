@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process;
 
 use function in_array;
-use Infection\Mutant\MutantInterface;
+use Infection\Mutant\Mutant;
 use Infection\Mutation;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Symfony\Component\Process\Process;
@@ -67,7 +67,7 @@ final class MutantProcess implements MutantProcessInterface
     private $isTimedOut = false;
     private $testFrameworkAdapter;
 
-    public function __construct(Process $process, MutantInterface $mutant, TestFrameworkAdapter $testFrameworkAdapter)
+    public function __construct(Process $process, Mutant $mutant, TestFrameworkAdapter $testFrameworkAdapter)
     {
         $this->process = $process;
         $this->mutant = $mutant;
@@ -79,7 +79,7 @@ final class MutantProcess implements MutantProcessInterface
         return $this->process;
     }
 
-    public function getMutant(): MutantInterface
+    public function getMutant(): Mutant
     {
         return $this->mutant;
     }
