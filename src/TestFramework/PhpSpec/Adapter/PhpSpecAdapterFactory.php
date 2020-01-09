@@ -33,30 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\TestFramework\PhpSpec\Adapter;
 
-use Infection\Configuration\Configuration;
-use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\Factory;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
+use Infection\TestFramework\CommandLineBuilder;
+use Infection\TestFramework\PhpSpec\CommandLine\ArgumentsAndOptionsBuilder;
+use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder;
+use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
+use Infection\TestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\TestFrameworkAdapterFactory;
+use Infection\Utils\VersionParser;
 
 /**
- * @group integration Requires some I/O operations
+ * @internal
  */
-final class FactoryTest extends TestCase
+final class PhpSpecAdapterFactory implements TestFrameworkAdapterFactory
 {
-    public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
-    {
-        $factory = new Factory(
-            '',
-            '',
-            $this->createMock(TestFrameworkConfigLocatorInterface::class),
-            '',
-            $this->createMock(Configuration::class)
+    public static function create(
+        string $testFrameworkExecutable,
+        string $tmpDir,
+        string $testFrameworkConfigPath,
+        ?string $testFrameworkConfigDir,
+        string $jUnitFilePath,
+        string $projectDir,
+        array $sourceDirectories,
+        bool $skipCoverage
+    ): TestFrameworkAdapter {
+        return new PhpSpecAdapter(
+            $testFrameworkExecutable,
+            new InitialConfigBuilder($tmpDir, $testFrameworkConfigPath, $skipCoverage),
+            new MutationConfigBuilder($tmpDir, $testFrameworkConfigPath, $projectDir),
+            new ArgumentsAndOptionsBuilder(),
+            new VersionParser(),
+            new CommandLineBuilder()
         );
-
-        $this->expectException(InvalidArgumentException::class);
-        $factory->create('Fake Test Framework', false);
     }
 }
