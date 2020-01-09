@@ -187,7 +187,7 @@ final class CodeceptionAdapter implements MemoryUsageAware, TestFrameworkAdapter
      */
     public function getMutantCommandLine(
         array $coverageTests,
-        string $mutatedFilePath,
+        string $mutatntFilePath,
         string $mutationHash,
         string $mutationOriginalFilePath,
         string $extraOptions
@@ -204,7 +204,7 @@ final class CodeceptionAdapter implements MemoryUsageAware, TestFrameworkAdapter
             $mutationHash
         );
 
-        file_put_contents($interceptorFilePath, $this->createCustomBootstrapWithInterceptor($mutationOriginalFilePath, $mutatedFilePath), LOCK_EX);
+        file_put_contents($interceptorFilePath, $this->createCustomBootstrapWithInterceptor($mutationOriginalFilePath, $mutatntFilePath), LOCK_EX);
 
         $uniqueTestFilePaths = implode(',', $this->jUnitTestCaseSorter->getUniqueSortedFileNames($coverageTests));
 
@@ -260,7 +260,7 @@ final class CodeceptionAdapter implements MemoryUsageAware, TestFrameworkAdapter
         return sprintf('Check the executed command to identify the problem: %s', $commandLine);
     }
 
-    protected function getInterceptorFileContent(string $interceptorPath, string $originalFilePath, string $mutatedFilePath): string
+    protected function getInterceptorFileContent(string $interceptorPath, string $originalFilePath, string $mutantFilePath): string
     {
         $infectionPhar = '';
 
@@ -280,12 +280,12 @@ require_once '{$interceptorPath}';
 
 use {$namespacePrefix}Infection\StreamWrapper\IncludeInterceptor;
 
-IncludeInterceptor::intercept('{$originalFilePath}', '{$mutatedFilePath}');
+IncludeInterceptor::intercept('{$originalFilePath}', '{$mutantFilePath}');
 IncludeInterceptor::enable();
 CONTENT;
     }
 
-    private function createCustomBootstrapWithInterceptor(string $originalFilePath, string $mutatedFilePath): string
+    private function createCustomBootstrapWithInterceptor(string $originalFilePath, string $mutantFilePath): string
     {
         $originalBootstrap = $this->getOriginalBootstrapFilePath();
         $bootstrapPlaceholder = $originalBootstrap ? "require_once '{$originalBootstrap}';" : '';
@@ -303,7 +303,7 @@ AUTOLOAD;
         return sprintf(
             $customBootstrap,
             $bootstrapPlaceholder,
-            $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutatedFilePath)
+            $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutantFilePath)
         );
     }
 

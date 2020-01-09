@@ -66,25 +66,25 @@ final class MutantCreator
 
     public function create(Mutation $mutation): Mutant
     {
-        $mutatedFilePath = sprintf('%s/mutant.%s.infection.php', $this->tempDir, $mutation->getHash());
+        $mutantFilePath = sprintf('%s/mutant.%s.infection.php', $this->tempDir, $mutation->getHash());
 
-        $mutatedCode = $this->createMutatedCode($mutation, $mutatedFilePath);
+        $mutatedCode = $this->createMutatedCode($mutation, $mutantFilePath);
 
         $originalPrettyPrintedFile = $this->getOriginalPrettyPrintedFile($mutation->getOriginalFilePath(), $mutation->getOriginalFileAst());
 
         $diff = $this->differ->diff($originalPrettyPrintedFile, $mutatedCode);
 
         return new Mutant(
-            $mutatedFilePath,
+            $mutantFilePath,
             $mutation,
             $diff
         );
     }
 
-    private function createMutatedCode(Mutation $mutation, string $mutatedFilePath): string
+    private function createMutatedCode(Mutation $mutation, string $mutantFilePath): string
     {
-        if (is_readable($mutatedFilePath)) {
-            $mutatedCode = file_get_contents($mutatedFilePath);
+        if (is_readable($mutantFilePath)) {
+            $mutatedCode = file_get_contents($mutantFilePath);
 
             return $mutatedCode;
         }
@@ -97,7 +97,7 @@ final class MutantCreator
         $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
 
         $mutatedCode = $this->prettyPrinter->prettyPrintFile($mutatedStatements);
-        file_put_contents($mutatedFilePath, $mutatedCode);
+        file_put_contents($mutantFilePath, $mutatedCode);
 
         return $mutatedCode;
     }

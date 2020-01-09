@@ -64,7 +64,7 @@ interface TestFrameworkAdapter
      */
     public function getMutantCommandLine(
         array $coverageTests,
-        string $mutatedFilePath,
+        string $mutatntFilePath,
         string $mutationHash,
         string $mutationOriginalFilePath,
         string $extraOptions
