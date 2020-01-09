@@ -115,8 +115,6 @@ final class ProjectCodeProvider
     public const NON_FINAL_EXTENSION_CLASSES = [
         ConsoleHelper::class,
         SourceDirGuesser::class,
-        DiffColorizer::class,
-        Differ::class,
         TestFrameworkFinder::class,
         BadgeApiClient::class,
         MetricsCalculator::class,

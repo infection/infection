@@ -35,30 +35,96 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
+use Generator;
 use Infection\Mutant\Mutant;
 use Infection\Mutation;
+use Infection\Mutator\Arithmetic\Plus;
+use Infection\TestFramework\Coverage\CoverageLineData;
 use PHPUnit\Framework\TestCase;
+use function md5;
+use PhpParser\Node;
 
 final class MutantTest extends TestCase
 {
-    public function test_it_passes_along_its_input_without_changing_it(): void
+    /**
+     * @dataProvider valuesProvider
+     *
+     * @param CoverageLineData[] $expectedTests
+     */
+    public function test_it_can_be_instantiated(
+        string $filePath,
+        Mutation $mutation,
+        string $diff,
+        bool $expectedCoveredByTests,
+        array $expectedTests
+    ): void
     {
-        $filepath = 'path/to/file';
-        $mutation = $this->createMock(Mutation::class);
-        $coverageTests = ['tests'];
-        $mutation->expects($this->once())->method('getAllTests')->willReturn($coverageTests);
-        $mutation->expects($this->once())->method('isCoveredByTest')->willReturn(true);
-        $diff = 'diff string';
+        $mutant = new Mutant($filePath, $mutation, $diff);
 
-        $mutant = new Mutant(
-            $filepath,
-            $mutation,
-            $diff
-        );
-        $this->assertSame($filepath, $mutant->getMutatedFilePath());
+        $this->assertSame($filePath, $mutant->getMutantFilePath());
         $this->assertSame($mutation, $mutant->getMutation());
         $this->assertSame($diff, $mutant->getDiff());
-        $this->assertTrue($mutant->isCoveredByTest());
-        $this->assertSame($coverageTests, $mutant->getCoverageTests());
+        $this->assertSame($expectedCoveredByTests, $mutant->isCoveredByTest());
+        $this->assertSame($expectedTests, $mutant->getTests());
+    }
+
+    public function valuesProvider(): Generator
+    {
+        $nominalAttributes = [
+            'startLine' => 3,
+            'endLine' => 5,
+            'startTokenPos' => 21,
+            'endTokenPos' => 31,
+            'startFilePos' => 43,
+            'endFilePos' => 53,
+        ];
+
+        $tests = [
+            CoverageLineData::with(
+                'FooTest::test_it_can_instantiate',
+                '/path/to/acme/FooTest.php',
+                0.01
+            ),
+        ];
+
+        yield 'nominal with tests' => [
+            '/path/to/tmp/mutant.Foo.infection.php',
+            new Mutation(
+                '/path/to/acme/Foo.php',
+                [new Node\Stmt\Namespace_(
+                    new Node\Name('Acme'),
+                    [new Node\Scalar\LNumber(0)]
+                )],
+                Plus::getName(),
+                $nominalAttributes,
+                Node\Scalar\LNumber::class,
+                new Node\Scalar\LNumber(1),
+                0,
+                $tests
+            ),
+            'diff value',
+            true,
+            $tests,
+        ];
+
+        yield 'nominal without tests' => [
+            '/path/to/tmp/mutant.Foo.infection.php',
+            new Mutation(
+                '/path/to/acme/Foo.php',
+                [new Node\Stmt\Namespace_(
+                    new Node\Name('Acme'),
+                    [new Node\Scalar\LNumber(0)]
+                )],
+                Plus::getName(),
+                $nominalAttributes,
+                Node\Scalar\LNumber::class,
+                new Node\Scalar\LNumber(1),
+                0,
+                []
+            ),
+            'diff value',
+            false,
+            [],
+        ];
     }
 }

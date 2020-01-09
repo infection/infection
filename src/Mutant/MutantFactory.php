@@ -39,16 +39,20 @@ use Infection\Differ\Differ;
 use Infection\Mutation;
 use Infection\Visitor\CloneVisitor;
 use Infection\Visitor\MutatorVisitor;
+use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\PrettyPrinter\Standard;
+use PhpParser\PrettyPrinterAbstract;
+use function is_readable;
 use function Safe\file_get_contents;
+use function Safe\file_put_contents;
 
 /**
  * @internal
  */
-final class MutantCreator
+final class MutantFactory
 {
-    private $tempDir;
+    private $tmpDir;
     private $differ;
     private $prettyPrinter;
 
@@ -56,50 +60,57 @@ final class MutantCreator
      * @var string[]
      */
     private $prettyPrintedCache = [];
+    private $mutantCodeFactory;
 
-    public function __construct(string $tempDir, Differ $differ, Standard $prettyPrinter)
-    {
-        $this->tempDir = $tempDir;
+    public function __construct(
+        string $tmpDir,
+        Differ $differ,
+        PrettyPrinterAbstract $prettyPrinter,
+        MutantCodeFactory $mutantCodeFactory
+    ) {
+        $this->tmpDir = $tmpDir;
         $this->differ = $differ;
         $this->prettyPrinter = $prettyPrinter;
+        $this->mutantCodeFactory = $mutantCodeFactory;
     }
 
     public function create(Mutation $mutation): MutantInterface
     {
-        $mutatedFilePath = sprintf('%s/mutant.%s.infection.php', $this->tempDir, $mutation->getHash());
+        $mutantFilePath = sprintf('%s/mutant.%s.infection.php', $this->tmpDir, $mutation->getHash());
 
-        $mutatedCode = $this->createMutatedCode($mutation, $mutatedFilePath);
-
-        $originalPrettyPrintedFile = $this->getOriginalPrettyPrintedFile($mutation->getOriginalFilePath(), $mutation->getOriginalFileAst());
-
-        $diff = $this->differ->diff($originalPrettyPrintedFile, $mutatedCode);
+        $mutantCode = $this->createMutantCode($mutation, $mutantFilePath);
 
         return new Mutant(
-            $mutatedFilePath,
+            $mutantFilePath,
             $mutation,
-            $diff
+            $this->createMutantDiff($mutation, $mutantCode)
         );
     }
 
-    private function createMutatedCode(Mutation $mutation, string $mutatedFilePath): string
+    private function createMutantCode(Mutation $mutation, string $mutantFilePath): string
     {
-        if (is_readable($mutatedFilePath)) {
-            $mutatedCode = file_get_contents($mutatedFilePath);
-
-            return $mutatedCode;
+        if (is_readable($mutantFilePath)) {
+            return file_get_contents($mutantFilePath);
         }
 
-        $traverser = new NodeTraverser();
+        $mutantCode = $this->mutantCodeFactory->createMutantCode($mutation);
 
-        $traverser->addVisitor(new CloneVisitor());
-        $traverser->addVisitor(new MutatorVisitor($mutation));
+        file_put_contents($mutantFilePath, $mutantCode);
 
-        $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
+        return $mutantCode;
+    }
 
-        $mutatedCode = $this->prettyPrinter->prettyPrintFile($mutatedStatements);
-        file_put_contents($mutatedFilePath, $mutatedCode);
+    /**
+     * @param Node[] $originalFilePath
+     */
+    private function createMutantDiff(Mutation $mutation, string $mutantCode): string
+    {
+        $originalPrettyPrintedFile = $this->getOriginalPrettyPrintedFile(
+            $mutation->getOriginalFilePath(),
+            $mutation->getOriginalFileAst()
+        );
 
-        return $mutatedCode;
+        return $this->differ->diff($originalPrettyPrintedFile, $mutantCode);
     }
 
     private function getOriginalPrettyPrintedFile(string $originalFilePath, array $originalStatements): string

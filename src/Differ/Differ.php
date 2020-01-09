@@ -36,13 +36,17 @@ declare(strict_types=1);
 namespace Infection\Differ;
 
 use SebastianBergmann\Diff\Differ as BaseDiffer;
+use function Safe\preg_match;
+use function substr;
+use const PREG_OFFSET_CAPTURE;
 
 /**
  * @internal
+ * @final
  */
 class Differ
 {
-    public const DIFF_MAX_LINES = 12;
+    private const DIFF_MAX_LINES = 12;
 
     private $differ;
 

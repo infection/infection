@@ -38,12 +38,13 @@ namespace Infection\Tests\Differ;
 use Infection\Differ\Differ;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
+use function substr_count;
 
 final class DifferTest extends TestCase
 {
-    public function test_show_diffs_with_max_lines(): void
+    public function test_it_shows_the_diff_between_two_sources_but_limiting_the_displayed_lines(): void
     {
-        $source1 = <<<'CODE'
+        $source1 = <<<'PHP'
 public function diff($from, $to, LongestCommonSubsequence $lcs = null)
 {
     $diff = parent::diff($from, $to, $lcs);
@@ -61,9 +62,9 @@ public function diff($from, $to, LongestCommonSubsequence $lcs = null)
 
     return substr($diff, 0, $characterIndex);
 }
-CODE;
+PHP;
 
-        $source2 = <<<'CODE'
+        $source2 = <<<'PHP'
 public function diff($from, $to, LongestCommonSubsequence $lcs = null)
 {
     $diff = parent::diff($from, $to, $lcs);;
@@ -81,7 +82,7 @@ public function diff($from, $to, LongestCommonSubsequence $lcs = null)
 
     return substr($diff, 0, $characterIndex);
 }
-CODE;
+PHP;
 
         $expectedDiff = <<<'CODE'
 --- Original
@@ -98,16 +99,12 @@ CODE;
          if ($diff[$characterIndex] === "\n") {
 CODE;
 
-        $differ = new Differ(
-            new BaseDiffer()
-        );
+        $actualDiff = (new Differ(new BaseDiffer()))->diff($source1, $source2);
 
-        $diff = $differ->diff($source1, $source2);
-
-        if (substr_count($diff, "\n") < Differ::DIFF_MAX_LINES - 1) {
+        if (substr_count($actualDiff, "\n") < 11) {
             $this->markTestSkipped('See https://github.com/sebastianbergmann/diff/pull/59');
         }
 
-        $this->assertSame($expectedDiff, $diff);
+        $this->assertSame($expectedDiff, $actualDiff);
     }
 }

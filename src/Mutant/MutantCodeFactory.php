@@ -33,37 +33,41 @@
 
 declare(strict_types=1);
 
-namespace Infection\Differ;
+namespace Infection\Mutant;
 
-use function array_map;
-use function explode;
-use function implode;
-use function strpos;
-use function Safe\sprintf;
+use Infection\Differ\Differ;
+use Infection\Mutation;
+use Infection\Visitor\CloneVisitor;
+use Infection\Visitor\MutatorVisitor;
+use PhpParser\NodeTraverser;
+use PhpParser\PrettyPrinter\Standard;
+use PhpParser\PrettyPrinterAbstract;
+use function is_readable;
+use function Safe\file_get_contents;
+use function Safe\file_put_contents;
 
 /**
  * @internal
  * @final
  */
-class DiffColorizer
+class MutantCodeFactory
 {
-    public function colorize(string $diff): string
+    private $printer;
+
+    public function __construct(PrettyPrinterAbstract $prettyPrinter)
     {
-        $lines = array_map(
-            static function (string $line) {
-                if (0 === strpos($line, '-')) {
-                    return sprintf('<diff-del>%s</diff-del>', $line);
-                }
+        $this->printer = $prettyPrinter;
+    }
 
-                if (0 === strpos($line, '+')) {
-                    return sprintf('<diff-add>%s</diff-add>', $line);
-                }
+    public function createMutantCode(Mutation $mutation): string
+    {
+        $traverser = new NodeTraverser();
 
-                return $line;
-            },
-            explode("\n", $diff)
-        );
+        $traverser->addVisitor(new CloneVisitor());
+        $traverser->addVisitor(new MutatorVisitor($mutation));
 
-        return sprintf('<code>%s%s</code>', "\n", implode("\n", $lines));
+        $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
+
+        return $this->printer->prettyPrintFile($mutatedStatements);
     }
 }

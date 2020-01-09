@@ -45,7 +45,7 @@ use Infection\TestFramework\Coverage\CoverageLineData;
  */
 interface MutantInterface
 {
-    public function getMutatedFilePath(): string;
+    public function getMutantFilePath(): string;
 
     public function getMutation(): Mutation;
 
@@ -56,5 +56,5 @@ interface MutantInterface
     /**
      * @return CoverageLineData[]
      */
-    public function getCoverageTests(): array;
+    public function getTests(): array;
 }
