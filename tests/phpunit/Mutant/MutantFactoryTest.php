@@ -42,61 +42,187 @@ use Infection\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use PhpParser\PrettyPrinter\Standard;
-use PhpParser\PrettyPrinterAbstract;
-use PHPUnit\Framework\TestCase;
-use function sys_get_temp_dir;
 use PhpParser\Node;
+use PhpParser\PrettyPrinterAbstract;
+use PHPUnit\Framework\MockObject\MockObject;
+use function Safe\file_get_contents;
+use function Safe\file_put_contents;
+use function Safe\sprintf;
 
 /**
  * @group integration Requires some I/O operations
  */
-final class MutantCreatorTest extends TestCase
-/**
- * @group integration Requires I/O reads & writes
- */
 final class MutantFactoryTest extends FileSystemTestCase
 {
-    private const TEST_FILE_NAME = 'mutant.hash.infection.php';
+    /**
+     * @var MutantCodeFactory|MockObject
+     */
+    private $codeFactoryMock;
 
     /**
-     * @var string
+     * @var PrettyPrinterAbstract|MockObject
      */
-    private $directory;
+    private $printerMock;
+
+    /**
+     * @var Differ|MockObject
+     */
+    private $differMock;
+
+    /**
+     * @var MutantFactory|MockObject
+     */
+    private $mutantFactory;
 
     protected function setUp(): void
     {
-        file_put_contents(
-            $this->tmp .'/'. self::TEST_FILE_NAME,
-            <<<PHP
-<?php return 'This is a diff';
-PHP
+        parent::setUp();
+
+        $this->codeFactoryMock = $this->createMock(MutantCodeFactory::class);
+
+        $this->printerMock = $this->createMock(PrettyPrinterAbstract::class);
+
+        $this->differMock = $this->createMock(Differ::class);
+
+        $this->mutantFactory = new MutantFactory(
+            $this->tmp,
+            $this->differMock,
+            $this->printerMock,
+            $this->codeFactoryMock
         );
     }
 
     public function test_it_creates_a_mutant_instance_from_the_given_mutation(): void
     {
-        $printerMock = $this->createMock(PrettyPrinterAbstract::class);
-        $printerMock
-            ->method('prettyPrintFile')
-            ->willReturn('The Print')
-        ;
-
-        $differMock = $this->createMock(Differ::class);
-        $differMock
-            ->method('diff')
-            ->with('The Print', '<?php return \'This is a diff\';')
-            ->willReturn('This is the Diff')
-        ;
-
-        $mutantCodeFactoryMock = $this->createMock(MutantCodeFactory::class);
-
-        $mutation = new Mutation(
-            '/path/to/acme/Foo.php',
-            [new Node\Stmt\Namespace_(
+        $mutation = self::createMutation(
+            $originalNodes = [new Node\Stmt\Namespace_(
                 new Node\Name('Acme'),
                 [new Node\Scalar\LNumber(0)]
             )],
+            $tests = [
+                CoverageLineData::with(
+                    'FooTest::test_it_can_instantiate',
+                    '/path/to/acme/FooTest.php',
+                    0.01
+                ),
+            ]
+        );
+
+        $expectedMutantFilePath = sprintf(
+            '%s/mutant.%s.infection.php',
+            $this->tmp,
+            $mutation->getHash()
+        );
+
+        $this->codeFactoryMock
+            ->expects($this->once())
+            ->method('createCode')
+            ->with($mutation)
+            ->willReturn('mutant code')
+        ;
+
+        $this->printerMock
+            ->expects($this->once())
+            ->method('prettyPrintFile')
+            ->with($originalNodes)
+            ->willReturn('original code')
+        ;
+
+        $this->differMock
+            ->expects($this->once())
+            ->method('diff')
+            ->with('original code', 'mutant code')
+            ->willReturn('code diff')
+        ;
+
+        $mutant = $this->mutantFactory->create($mutation);
+
+        $this->assertFileExists($expectedMutantFilePath);
+        $this->assertSame('mutant code', file_get_contents($expectedMutantFilePath));
+
+        $this->assertSame($expectedMutantFilePath, $mutant->getMutantFilePath());
+        $this->assertSame($mutation, $mutant->getMutation());
+        $this->assertSame('code diff', $mutant->getDiff());
+        $this->assertSame($tests, $mutant->getTests());
+    }
+
+    public function test_it_uses_the_mutant_code_found_if_available(): void
+    {
+        $mutation = self::createMutation(
+            $originalNodes = [],
+            []
+        );
+
+        $expectedMutantFilePath = sprintf(
+            '%s/mutant.%s.infection.php',
+            $this->tmp,
+            $mutation->getHash()
+        );
+
+        file_put_contents($expectedMutantFilePath, 'mutant code');
+
+        $this->printerMock
+            ->expects($this->once())
+            ->method('prettyPrintFile')
+            ->willReturn('original code')
+        ;
+
+        $this->differMock
+            ->expects($this->once())
+            ->method('diff')
+            ->with('original code', 'mutant code')
+            ->willReturn('code diff')
+        ;
+
+        $mutant = $this->mutantFactory->create($mutation);
+
+        $this->assertSame($expectedMutantFilePath, $mutant->getMutantFilePath());
+        $this->assertSame($mutation, $mutant->getMutation());
+        $this->assertSame('code diff', $mutant->getDiff());
+        $this->assertSame([], $mutant->getTests());
+    }
+
+    public function test_it_printing_the_original_file_is_memoized(): void
+    {
+        $mutation = self::createMutation(
+            $originalNodes = [new Node\Stmt\Nop()],
+            []
+        );
+
+        $expectedMutantFilePath = sprintf(
+            '%s/mutant.%s.infection.php',
+            $this->tmp,
+            $mutation->getHash()
+        );
+
+        file_put_contents($expectedMutantFilePath, 'mutant code');
+
+        $this->printerMock
+            ->expects($this->once())
+            ->method('prettyPrintFile')
+            ->with($originalNodes)
+            ->willReturn('original code')
+        ;
+
+        $this->differMock
+            ->expects($this->atLeastOnce())
+            ->method('diff')
+            ->willReturn('code diff')
+        ;
+
+        $this->mutantFactory->create($mutation);
+        $this->mutantFactory->create($mutation);
+    }
+
+    /**
+     * @param Node[] $originalNodes
+     * @param CoverageLineData[] $tests
+     */
+    private static function createMutation(array $originalNodes, array $tests): Mutation
+    {
+        return new Mutation(
+            '/path/to/acme/Foo.php',
+            $originalNodes,
             Plus::getName(),
             [
                 'startLine' => 3,
@@ -109,59 +235,7 @@ PHP
             Node\Scalar\LNumber::class,
             new Node\Scalar\LNumber(1),
             0,
-            [
-                CoverageLineData::with(
-                    'FooTest::test_it_can_instantiate',
-                    '/path/to/acme/FooTest.php',
-                    0.01
-                ),
-            ]
+            $tests
         );
-
-        $mutantFactory = new MutantFactory(
-            $this->tmp,
-            $differMock,
-            $printerMock,
-            $mutantCodeFactoryMock
-        );
-
-        $mutant = ($mutantFactory)->create($mutation);
-
-        $this->assertSame($this->directory . self::TEST_FILE_NAME, $mutant->getMutantFilePath());
-        $this->assertSame('This is the Diff', $mutant->getDiff());
-        $this->assertTrue($mutant->isCoveredByTest());
-        $this->assertSame(['test', 'list'], $mutant->getTests());
-        $this->assertSame('hash', $mutant->getMutation()->getHash());
-    }
-
-    public function test_it_uses_available_file_if_hash_is_the_same(): void
-    {
-        $standard = $this->createMock(Standard::class);
-        $standard
-            ->method('prettyPrintFile')
-            ->willReturn('The Print');
-
-        $differ = $this->createMock(Differ::class);
-        $differ->method('diff')
-            ->with('The Print', '<?php return \'This is a diff\';')
-            ->willReturn('This is the Diff');
-
-        $mutation = $this->createMock(Mutation::class);
-        $mutation->method('getHash')->willReturn('hash');
-        $mutation->method('getOriginalFilePath')->willReturn('original/path');
-        $mutation->method('getOriginalFileAst')->willReturn(['ast']);
-        $mutation->method('getAttributes')->willReturn(['startLine' => 1]);
-        $mutation->method('getAllTests')->willReturn(['test', 'list']);
-
-        $mutation->expects($this->once())->method('isCoveredByTest')->willReturn(true);
-
-        $creator = new MutantFactory($this->directory, $differ, $standard);
-        $mutant = $creator->create($mutation);
-
-        $this->assertSame($this->directory . self::TEST_FILE_NAME, $mutant->getMutantFilePath());
-        $this->assertSame('This is the Diff', $mutant->getDiff());
-        $this->assertTrue($mutant->isCoveredByTest());
-        $this->assertSame(['test', 'list'], $mutant->getTests());
-        $this->assertSame('hash', $mutant->getMutation()->getHash());
     }
 }

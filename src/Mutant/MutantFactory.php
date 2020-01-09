@@ -49,29 +49,33 @@ final class MutantFactory
 {
     private $tmpDir;
     private $differ;
-    private $prettyPrinter;
+    private $printer;
 
     /**
      * @var string[]
      */
-    private $prettyPrintedCache = [];
+    private $printedFileCache = [];
     private $mutantCodeFactory;
 
     public function __construct(
         string $tmpDir,
         Differ $differ,
-        PrettyPrinterAbstract $prettyPrinter,
+        PrettyPrinterAbstract $printer,
         MutantCodeFactory $mutantCodeFactory
     ) {
         $this->tmpDir = $tmpDir;
         $this->differ = $differ;
-        $this->prettyPrinter = $prettyPrinter;
+        $this->printer = $printer;
         $this->mutantCodeFactory = $mutantCodeFactory;
     }
 
     public function create(Mutation $mutation): Mutant
     {
-        $mutantFilePath = sprintf('%s/mutant.%s.infection.php', $this->tmpDir, $mutation->getHash());
+        $mutantFilePath = sprintf(
+            '%s/mutant.%s.infection.php',
+            $this->tmpDir,
+            $mutation->getHash()
+        );
 
         $mutantCode = $this->createMutantCode($mutation, $mutantFilePath);
 
@@ -88,7 +92,7 @@ final class MutantFactory
             return file_get_contents($mutantFilePath);
         }
 
-        $mutantCode = $this->mutantCodeFactory->createMutantCode($mutation);
+        $mutantCode = $this->mutantCodeFactory->createCode($mutation);
 
         file_put_contents($mutantFilePath, $mutantCode);
 
@@ -107,7 +111,7 @@ final class MutantFactory
 
     private function getOriginalPrettyPrintedFile(string $originalFilePath, array $originalStatements): string
     {
-        return $this->prettyPrintedCache[$originalFilePath]
-            ?? $this->prettyPrintedCache[$originalFilePath] = $this->prettyPrinter->prettyPrintFile($originalStatements);
+        return $this->printedFileCache[$originalFilePath]
+            ?? $this->printedFileCache[$originalFilePath] = $this->printer->prettyPrintFile($originalStatements);
     }
 }

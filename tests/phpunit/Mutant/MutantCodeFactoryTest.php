@@ -68,7 +68,7 @@ final class MutantCodeFactoryTest extends TestCase
         Mutation $mutation,
         string $expectedMutantCode
     ): void {
-        $mutantCode = $this->codeFactory->createMutantCode($mutation);
+        $mutantCode = $this->codeFactory->createCode($mutation);
 
         $this->assertSame($expectedMutantCode, $mutantCode);
     }
@@ -81,7 +81,7 @@ final class MutantCodeFactoryTest extends TestCase
     ): void {
         $originalNodesDump = $this->getDumper()->dump($mutation->getOriginalFileAst());
 
-        $this->codeFactory->createMutantCode($mutation);
+        $this->codeFactory->createCode($mutation);
 
         $originalNodesDumpAfterMutation = $this->getDumper()->dump($mutation->getOriginalFileAst());
 

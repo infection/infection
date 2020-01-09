@@ -54,7 +54,7 @@ class MutantCodeFactory
         $this->printer = $prettyPrinter;
     }
 
-    public function createMutantCode(Mutation $mutation): string
+    public function createCode(Mutation $mutation): string
     {
         $traverser = new NodeTraverser();
 

@@ -187,10 +187,10 @@ final class InfectionContainer extends Container
                 );
             },
             MutantCodeFactory::class => static function (self $container): MutantCodeFactory {
-                /** @var PrettyPrinterAbstract $prettyPrinter */
-                $prettyPrinter = $container['pretty.printer'];
+                /** @var PrettyPrinterAbstract $printer */
+                $printer = $container['pretty.printer'];
 
-                return new MutantCodeFactory($prettyPrinter);
+                return new MutantCodeFactory($printer);
             },
             MutantFactory::class => static function (self $container): MutantFactory {
                 /** @var Configuration $config */
@@ -202,10 +202,14 @@ final class InfectionContainer extends Container
                 /** @var PrettyPrinterAbstract $printer */
                 $printer = $container['pretty.printer'];
 
+                /** @var MutantCodeFactory $codeFactory */
+                $codeFactory = $container[MutantCodeFactory::class];
+
                 return new MutantFactory(
                     $config->getTmpDir(),
                     $differ,
-                    $printer
+                    $printer,
+                    $codeFactory
                 );
             },
             Differ::class => static function (): Differ {
