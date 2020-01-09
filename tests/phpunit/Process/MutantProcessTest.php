@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process;
 
 use Infection\Mutant\Mutant;
-use Infection\Mutation;
+use Infection\Mutation\Mutation;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;

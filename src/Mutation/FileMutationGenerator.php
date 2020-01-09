@@ -37,7 +37,6 @@ namespace Infection\Mutation;
 
 use function array_key_exists;
 use function get_class;
-use Infection\Mutation;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;

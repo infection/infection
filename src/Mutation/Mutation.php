@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace Infection\Mutation;
 
 use function array_flip;
 use function array_intersect_key;

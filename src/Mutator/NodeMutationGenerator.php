@@ -40,7 +40,7 @@ use function count;
 use Generator;
 use function get_class;
 use Infection\Exception\InvalidMutatorException;
-use Infection\Mutation;
+use Infection\Mutation\Mutation;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\Visitor\ParentConnectorVisitor;
@@ -82,7 +82,7 @@ class NodeMutationGenerator
     }
 
     /**
-     * @return Mutation[]
+     * @return \Infection\Mutation\Mutation[]
      */
     public function generate(Node $node): array
     {

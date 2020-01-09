@@ -43,7 +43,7 @@ use Infection\Events\MutantsCreatingStarted;
 use Infection\Events\MutationTestingFinished;
 use Infection\Events\MutationTestingStarted;
 use Infection\Mutant\MutantCreator;
-use Infection\Mutation;
+use Infection\Mutation\Mutation;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\MutantProcessInterface;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;

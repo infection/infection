@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Visitor;
 
 use Generator;
-use Infection\Mutation;
+use Infection\Mutation\Mutation;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\Tests\StringNormalizer;
 use Infection\Visitor\MutatorVisitor;

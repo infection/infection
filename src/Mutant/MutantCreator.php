@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutant;
 
 use Infection\Differ\Differ;
-use Infection\Mutation;
+use Infection\Mutation\Mutation;
 use Infection\Visitor\CloneVisitor;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\NodeTraverser;
