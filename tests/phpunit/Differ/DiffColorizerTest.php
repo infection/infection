@@ -40,9 +40,9 @@ use PHPUnit\Framework\TestCase;
 
 final class DiffColorizerTest extends TestCase
 {
-    public function test_id_adds_colours(): void
+    public function test_id_adds_colours_to_a_given_diff(): void
     {
-        $diff = <<<'CODE'
+        $originalDiff = <<<'CODE'
 --- Original
 +++ New
 @@ @@
@@ -52,7 +52,7 @@ final class DiffColorizerTest extends TestCase
      }
 CODE;
 
-        $expectedColorizedDiff = <<<'CODE'
+        $expected = <<<'CODE'
 <code>
 <diff-del>--- Original</diff-del>
 <diff-add>+++ New</diff-add>
@@ -63,8 +63,8 @@ CODE;
      }</code>
 CODE;
 
-        $colorizer = new DiffColorizer();
+        $actual = (new DiffColorizer())->colorize($originalDiff);
 
-        $this->assertSame($expectedColorizedDiff, $colorizer->colorize($diff));
+        $this->assertSame($expected, $actual);
     }
 }

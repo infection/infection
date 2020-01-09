@@ -49,8 +49,6 @@ use Infection\Console\Application;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\Util\PhpProcess;
-use Infection\Differ\DiffColorizer;
-use Infection\Differ\Differ;
 use Infection\Engine;
 use Infection\Finder\ComposerExecutableFinder;
 use Infection\Finder\FilterableFinder;
@@ -115,8 +113,6 @@ final class ProjectCodeProvider
     public const NON_FINAL_EXTENSION_CLASSES = [
         ConsoleHelper::class,
         SourceDirGuesser::class,
-        DiffColorizer::class,
-        Differ::class,
         TestFrameworkFinder::class,
         BadgeApiClient::class,
         MetricsCalculator::class,
