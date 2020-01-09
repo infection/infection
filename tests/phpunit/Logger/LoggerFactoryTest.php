@@ -50,6 +50,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class LoggerFactoryTest extends TestCase
 {
     public function test_it_does_not_create_any_logger_for_no_verbosity_level(): void

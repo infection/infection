@@ -47,11 +47,24 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionException;
 use function Safe\file_get_contents;
-use function strpos;
 use Webmozart\Assert\Assert;
 
 final class IntegrationGroupProvider
 {
+    private const IO_STATEMENTS = [
+        'file_get_contents',
+        'file_put_contents',
+        'file_exists',
+        'rmdir',
+        'rename(',
+        'fopen',
+        'getcwd',
+        'realpath',
+        'use Symfony\Component\Filesystem\Filesystem',
+        'STDIN',
+        'STDOUT',
+    ];
+
     /**
      * @var string[][]|null
      */
@@ -109,7 +122,7 @@ final class IntegrationGroupProvider
         $testCaseFileName = $testCaseReflection->getFileName();
         $testCaseCode = file_get_contents($testCaseFileName);
 
-        if (self::codeContainsIoFunctions($testCaseCode)) {
+        if (IoCodeDetector::codeContainsIoOperations($testCaseCode)) {
             return [$testCaseClass, $testCaseFileName];
         }
 
@@ -126,7 +139,7 @@ final class IntegrationGroupProvider
 
             $testCaseCode = file_get_contents($parentTestCaseFileName);
 
-            if (self::codeContainsIoFunctions($testCaseCode)) {
+            if (IoCodeDetector::codeContainsIoOperations($testCaseCode)) {
                 return [$testCaseClass, $parentTestCaseFileName];
             }
 
@@ -141,7 +154,7 @@ final class IntegrationGroupProvider
         $classFileName = $classReflection->getFileName();
         $classCode = file_get_contents($classFileName);
 
-        if (self::codeContainsIoFunctions($classCode)) {
+        if (IoCodeDetector::codeContainsIoOperations($classCode)) {
             return [$testCaseClass, $classFileName];
         }
 
@@ -156,7 +169,7 @@ final class IntegrationGroupProvider
 
             $parentClassCode = file_get_contents($parentClassFileName);
 
-            if (self::codeContainsIoFunctions($parentClassCode)) {
+            if (IoCodeDetector::codeContainsIoOperations($parentClassCode)) {
                 return [$testCaseClass, $parentClassFileName];
             }
 
@@ -164,26 +177,5 @@ final class IntegrationGroupProvider
         }
 
         return null;
-    }
-
-    private static function codeContainsIoFunctions(string $code): bool
-    {
-        if (strpos($code, 'file_get_contents') !== false) {
-            return true;
-        }
-
-        if (strpos($code, 'file_put_contents') !== false) {
-            return true;
-        }
-
-        if (strpos($code, 'file_exists') !== false) {
-            return true;
-        }
-
-        if (strpos($code, 'fopen') !== false) {
-            return true;
-        }
-
-        return false;
     }
 }
