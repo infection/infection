@@ -36,15 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework;
 
 use Infection\Configuration\Configuration;
-use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
-use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
-use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
-use Infection\Utils\VersionParser;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @group integration Requires some I/O operations
@@ -57,12 +52,8 @@ final class FactoryTest extends TestCase
             '',
             '',
             $this->createMock(TestFrameworkConfigLocatorInterface::class),
-            new XmlConfigurationHelper(new PathReplacer(new Filesystem()), ''),
             '',
-            $this->createMock(Configuration::class),
-            $this->createMock(VersionParser::class),
-            $this->createMock(Filesystem::class),
-            new CommandLineBuilder()
+            $this->createMock(Configuration::class)
         );
 
         $this->expectException(InvalidArgumentException::class);

@@ -169,12 +169,8 @@ final class InfectionContainer extends Container
                     $config->getTmpDir(),
                     $container['project.dir'],
                     $container['testframework.config.locator'],
-                    $container['xml.configuration.helper'],
                     $container['junit.file.path'],
-                    $container[Configuration::class],
-                    $container[VersionParser::class],
-                    $container['filesystem'],
-                    $container[CommandLineBuilder::class]
+                    $container[Configuration::class]
                 );
             },
             'xml.configuration.helper' => static function (self $container): XmlConfigurationHelper {

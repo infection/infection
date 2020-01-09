@@ -33,44 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\Tests\Mutant;
 
+use Infection\Mutant\Mutant;
+use Infection\Mutation;
 use Infection\TestFramework\Coverage\CoverageLineData;
 
-/**
- * @internal
- */
-interface TestFrameworkAdapter
+trait MutantAssertions
 {
-    public const JUNIT_FILE_NAME = 'junit.xml';
-
-    public function getName(): string;
-
-    public function testsPass(string $output): bool;
-
-    public function hasJUnitReport(): bool;
-
     /**
-     * @param string[] $phpExtraArgs
-     *
-     * @return string[]
+     * @param CoverageLineData[] $expectedTests
      */
-    public function getInitialTestRunCommandLine(string $extraOptions, array $phpExtraArgs, bool $skipCoverage): array;
-
-    /**
-     * @param CoverageLineData[] $coverageTests
-     *
-     * @return string[]
-     */
-    public function getMutantCommandLine(
-        array $coverageTests,
-        string $mutantFilePath,
-        string $mutationHash,
-        string $mutationOriginalFilePath,
-        string $extraOptions
-    ): array;
-
-    public function getVersion(): string;
-
-    public function getInitialTestsFailRecommendations(string $commandLine): string;
+    public function assertMutantStateIs(
+        Mutant $mutant,
+        string $expectedFilePath,
+        Mutation $expectedMutation,
+        string $expectedDiff,
+        bool $expectedCoveredByTests,
+        array $expectedTests
+    ): void {
+        $this->assertSame($expectedFilePath, $mutant->getMutantFilePath());
+        $this->assertSame($expectedMutation, $mutant->getMutation());
+        $this->assertSame($expectedDiff, $mutant->getDiff());
+        $this->assertSame($expectedCoveredByTests, $mutant->isCoveredByTest());
+        $this->assertSame($expectedTests, $mutant->getTests());
+    }
 }

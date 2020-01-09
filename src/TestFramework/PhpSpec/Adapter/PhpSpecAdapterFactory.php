@@ -33,44 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\TestFramework\PhpSpec\Adapter;
 
-use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\CommandLineBuilder;
+use Infection\TestFramework\PhpSpec\CommandLine\ArgumentsAndOptionsBuilder;
+use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder;
+use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
+use Infection\TestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\TestFrameworkAdapterFactory;
+use Infection\Utils\VersionParser;
 
 /**
  * @internal
  */
-interface TestFrameworkAdapter
+final class PhpSpecAdapterFactory implements TestFrameworkAdapterFactory
 {
-    public const JUNIT_FILE_NAME = 'junit.xml';
-
-    public function getName(): string;
-
-    public function testsPass(string $output): bool;
-
-    public function hasJUnitReport(): bool;
-
-    /**
-     * @param string[] $phpExtraArgs
-     *
-     * @return string[]
-     */
-    public function getInitialTestRunCommandLine(string $extraOptions, array $phpExtraArgs, bool $skipCoverage): array;
-
-    /**
-     * @param CoverageLineData[] $coverageTests
-     *
-     * @return string[]
-     */
-    public function getMutantCommandLine(
-        array $coverageTests,
-        string $mutantFilePath,
-        string $mutationHash,
-        string $mutationOriginalFilePath,
-        string $extraOptions
-    ): array;
-
-    public function getVersion(): string;
-
-    public function getInitialTestsFailRecommendations(string $commandLine): string;
+    public static function create(
+        string $testFrameworkExecutable,
+        string $tmpDir,
+        string $testFrameworkConfigPath,
+        ?string $testFrameworkConfigDir,
+        string $jUnitFilePath,
+        string $projectDir,
+        array $sourceDirectories,
+        bool $skipCoverage
+    ): TestFrameworkAdapter {
+        return new PhpSpecAdapter(
+            $testFrameworkExecutable,
+            new InitialConfigBuilder($tmpDir, $testFrameworkConfigPath, $skipCoverage),
+            new MutationConfigBuilder($tmpDir, $testFrameworkConfigPath, $projectDir),
+            new ArgumentsAndOptionsBuilder(),
+            new VersionParser(),
+            new CommandLineBuilder()
+        );
+    }
 }

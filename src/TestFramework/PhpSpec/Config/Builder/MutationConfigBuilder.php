@@ -63,7 +63,7 @@ class MutationConfigBuilder extends ConfigBuilder
      */
     public function build(
         array $coverageTests,
-        string $mutatedFilePath,
+        string $mutantFilePath,
         string $mutationHash,
         string $mutationOriginalFilePath
     ): string {
@@ -75,7 +75,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
         $parsedYaml = Yaml::parseFile($this->originalYamlConfigPath);
 
-        file_put_contents($customAutoloadFilePath, $this->createCustomAutoloadWithInterceptor($mutationOriginalFilePath, $mutatedFilePath, $parsedYaml));
+        file_put_contents($customAutoloadFilePath, $this->createCustomAutoloadWithInterceptor($mutationOriginalFilePath, $mutantFilePath, $parsedYaml));
 
         $yamlConfiguration = new MutationYamlConfiguration(
             $this->tempDirectory,
@@ -92,7 +92,7 @@ class MutationConfigBuilder extends ConfigBuilder
         return $path;
     }
 
-    private function createCustomAutoloadWithInterceptor(string $originalFilePath, string $mutatedFilePath, array $parsedYaml): string
+    private function createCustomAutoloadWithInterceptor(string $originalFilePath, string $mutantFilePath, array $parsedYaml): string
     {
         $originalBootstrap = $this->getOriginalBootstrapFilePath($parsedYaml);
         $autoloadPlaceholder = $originalBootstrap ? "require_once '{$originalBootstrap}';" : '';
@@ -109,7 +109,7 @@ AUTOLOAD;
         return sprintf(
             $customAutoload,
             $autoloadPlaceholder,
-            $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutatedFilePath)
+            $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutantFilePath)
         );
     }
 

@@ -33,44 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\Tests\TestFramework\Codeception\Adapter;
 
-use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
+use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapterFactory;
+use PHPUnit\Framework\TestCase;
 
 /**
- * @internal
+ * @group integration Requires some I/O operations
  */
-interface TestFrameworkAdapter
+final class CodeceptionAdapterFactoryTest extends TestCase
 {
-    public const JUNIT_FILE_NAME = 'junit.xml';
+    public function test_it_creates_codeception_adapter(): void
+    {
+        $adapter = CodeceptionAdapterFactory::create(
+            '/path/to/codecept',
+            '/tmp',
+            __DIR__ . '/../../../Fixtures/Files/codeception/codeception.yml',
+            null,
+            '/path/to/junit.xml',
+            '/path/to/project',
+            [],
+            true
+        );
 
-    public function getName(): string;
-
-    public function testsPass(string $output): bool;
-
-    public function hasJUnitReport(): bool;
-
-    /**
-     * @param string[] $phpExtraArgs
-     *
-     * @return string[]
-     */
-    public function getInitialTestRunCommandLine(string $extraOptions, array $phpExtraArgs, bool $skipCoverage): array;
-
-    /**
-     * @param CoverageLineData[] $coverageTests
-     *
-     * @return string[]
-     */
-    public function getMutantCommandLine(
-        array $coverageTests,
-        string $mutantFilePath,
-        string $mutationHash,
-        string $mutationOriginalFilePath,
-        string $extraOptions
-    ): array;
-
-    public function getVersion(): string;
-
-    public function getInitialTestsFailRecommendations(string $commandLine): string;
+        $this->assertInstanceOf(CodeceptionAdapter::class, $adapter);
+    }
 }

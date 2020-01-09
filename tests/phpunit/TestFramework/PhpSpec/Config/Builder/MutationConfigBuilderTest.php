@@ -83,7 +83,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         $mutant = $this->createMock(Mutant::class);
         $mutant->method('getMutation')
             ->willReturn($mutation);
-        $mutant->method('getMutatedFilePath')
+        $mutant->method('getMutantFilePath')
             ->willReturn('/mutated/file/path');
 
         $builder = new MutationConfigBuilder($this->tmp, $originalYamlConfigPath, $projectDir);

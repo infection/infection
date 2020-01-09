@@ -33,44 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
-use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
+use PHPUnit\Framework\TestCase;
 
 /**
- * @internal
+ * @group integration Requires some I/O operations
  */
-interface TestFrameworkAdapter
+final class PhpUnitAdapterFactoryTest extends TestCase
 {
-    public const JUNIT_FILE_NAME = 'junit.xml';
+    public function test_it_creates_phpunit_adapter(): void
+    {
+        $adapter = PhpUnitAdapterFactory::create(
+            '/path/to/phpunit',
+            '/tmp',
+            __DIR__ . '/../../../Fixtures/Files/phpunit/phpunit.xml',
+            '/path/to/config-dir',
+            '/path/to/junit.xml',
+            '/path/to/project',
+            [],
+            true
+        );
 
-    public function getName(): string;
-
-    public function testsPass(string $output): bool;
-
-    public function hasJUnitReport(): bool;
-
-    /**
-     * @param string[] $phpExtraArgs
-     *
-     * @return string[]
-     */
-    public function getInitialTestRunCommandLine(string $extraOptions, array $phpExtraArgs, bool $skipCoverage): array;
-
-    /**
-     * @param CoverageLineData[] $coverageTests
-     *
-     * @return string[]
-     */
-    public function getMutantCommandLine(
-        array $coverageTests,
-        string $mutantFilePath,
-        string $mutationHash,
-        string $mutationOriginalFilePath,
-        string $extraOptions
-    ): array;
-
-    public function getVersion(): string;
-
-    public function getInitialTestsFailRecommendations(string $commandLine): string;
+        $this->assertInstanceOf(PhpUnitAdapter::class, $adapter);
+    }
 }

@@ -54,6 +54,8 @@ use function Safe\sprintf;
  */
 final class MutantFactoryTest extends FileSystemTestCase
 {
+    use MutantAssertions;
+
     /**
      * @var MutantCodeFactory|MockObject
      */
@@ -137,13 +139,17 @@ final class MutantFactoryTest extends FileSystemTestCase
 
         $mutant = $this->mutantFactory->create($mutation);
 
+        $this->assertMutantStateIs(
+            $mutant,
+            $expectedMutantFilePath,
+            $mutation,
+            'code diff',
+            true,
+            $tests
+        );
+
         $this->assertFileExists($expectedMutantFilePath);
         $this->assertSame('mutant code', file_get_contents($expectedMutantFilePath));
-
-        $this->assertSame($expectedMutantFilePath, $mutant->getMutantFilePath());
-        $this->assertSame($mutation, $mutant->getMutation());
-        $this->assertSame('code diff', $mutant->getDiff());
-        $this->assertSame($tests, $mutant->getTests());
     }
 
     public function test_it_uses_the_mutant_code_found_if_available(): void
@@ -176,10 +182,14 @@ final class MutantFactoryTest extends FileSystemTestCase
 
         $mutant = $this->mutantFactory->create($mutation);
 
-        $this->assertSame($expectedMutantFilePath, $mutant->getMutantFilePath());
-        $this->assertSame($mutation, $mutant->getMutation());
-        $this->assertSame('code diff', $mutant->getDiff());
-        $this->assertSame([], $mutant->getTests());
+        $this->assertMutantStateIs(
+            $mutant,
+            $expectedMutantFilePath,
+            $mutation,
+            'code diff',
+            false,
+            []
+        );
     }
 
     public function test_it_printing_the_original_file_is_memoized(): void
