@@ -37,7 +37,7 @@ namespace Infection\Tests\Logger;
 
 use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Mutant\MutantInterface;
+use Infection\Mutant\Mutant;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Mutator\ZeroIteration\For_;
@@ -313,7 +313,7 @@ TXT;
             $phpProcess->expects($this->atMost(1))->method('getCommandLine')->willReturn('bin/foo/bar -c conf');
             $phpProcess->expects($this->atMost(1))->method('isStarted')->willReturn(true);
 
-            $mutant = $this->createMock(MutantInterface::class);
+            $mutant = $this->createMock(Mutant::class);
             $mutant->expects($this->once())->method('getDiff')->willReturn('Diff Diff');
 
             $process = $this->createMock(MutantProcessInterface::class);
@@ -333,7 +333,7 @@ TXT;
             $phpProcess->expects($this->atMost(1))->method('getCommandLine')->willReturn('bin/foo/bar -c conf');
             $phpProcess->expects($this->atMost(1))->method('isStarted')->willReturn(true);
 
-            $mutant = $this->createMock(MutantInterface::class);
+            $mutant = $this->createMock(Mutant::class);
             $mutant->expects($this->once())->method('getDiff')->willReturn('Diff Diff Diff');
 
             $process = $this->createMock(MutantProcessInterface::class);
@@ -354,7 +354,7 @@ TXT;
             $phpProcess->expects($this->atMost(1))->method('getCommandLine')->willReturn('bin/foo/bar -c conf');
             $phpProcess->expects($this->atMost(1))->method('isStarted')->willReturn(true);
 
-            $mutant = $this->createMock(MutantInterface::class);
+            $mutant = $this->createMock(Mutant::class);
             $mutant->expects($this->once())->method('getDiff')->willReturn('Diff Diff');
 
             $process = $this->createMock(MutantProcessInterface::class);
@@ -374,7 +374,7 @@ TXT;
             $phpProcess->expects($this->atMost(1))->method('getCommandLine')->willReturn('bin/foo/bar -c conf');
             $phpProcess->expects($this->atMost(1))->method('isStarted')->willReturn(true);
 
-            $mutant = $this->createMock(MutantInterface::class);
+            $mutant = $this->createMock(Mutant::class);
             $mutant->expects($this->atMost(1))->method('getDiff')->willReturn('Diff Diff');
 
             $process = $this->createMock(MutantProcessInterface::class);

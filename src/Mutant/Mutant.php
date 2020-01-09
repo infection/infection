@@ -40,8 +40,9 @@ use Infection\TestFramework\Coverage\CoverageLineData;
 
 /**
  * @internal
+ * @final
  */
-final class Mutant implements MutantInterface
+class Mutant
 {
     private $mutatedFilePath;
     private $mutation;
@@ -54,7 +55,7 @@ final class Mutant implements MutantInterface
         $this->diff = $diff;
     }
 
-    public function getMutatedFilePath(): string
+    public function getMutantFilePath(): string
     {
         return $this->mutatedFilePath;
     }
@@ -77,7 +78,7 @@ final class Mutant implements MutantInterface
     /**
      * @return CoverageLineData[]
      */
-    public function getCoverageTests(): array
+    public function getTests(): array
     {
         return $this->mutation->getAllTests();
     }

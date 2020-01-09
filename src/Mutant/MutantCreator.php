@@ -64,7 +64,7 @@ final class MutantCreator
         $this->prettyPrinter = $prettyPrinter;
     }
 
-    public function create(Mutation $mutation): MutantInterface
+    public function create(Mutation $mutation): Mutant
     {
         $mutatedFilePath = sprintf('%s/mutant.%s.infection.php', $this->tempDir, $mutation->getHash());
 

@@ -94,10 +94,10 @@ PHP
         $creator = new MutantCreator($this->directory, $differ, $standard);
         $mutant = $creator->create($mutation);
 
-        $this->assertSame($this->directory . self::TEST_FILE_NAME, $mutant->getMutatedFilePath());
+        $this->assertSame($this->directory . self::TEST_FILE_NAME, $mutant->getMutantFilePath());
         $this->assertSame('This is the Diff', $mutant->getDiff());
         $this->assertTrue($mutant->isCoveredByTest());
-        $this->assertSame(['test', 'list'], $mutant->getCoverageTests());
+        $this->assertSame(['test', 'list'], $mutant->getTests());
         $this->assertSame('hash', $mutant->getMutation()->getHash());
     }
 }

@@ -55,10 +55,10 @@ final class MutantTest extends TestCase
             $mutation,
             $diff
         );
-        $this->assertSame($filepath, $mutant->getMutatedFilePath());
+        $this->assertSame($filepath, $mutant->getMutantFilePath());
         $this->assertSame($mutation, $mutant->getMutation());
         $this->assertSame($diff, $mutant->getDiff());
         $this->assertTrue($mutant->isCoveredByTest());
-        $this->assertSame($coverageTests, $mutant->getCoverageTests());
+        $this->assertSame($coverageTests, $mutant->getTests());
     }
 }

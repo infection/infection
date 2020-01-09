@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpSpec\Config\Builder;
 
-use Infection\Mutant\MutantInterface;
+use Infection\Mutant\Mutant;
 use Infection\Mutation;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use Infection\Tests\FileSystem\FileSystemTestCase;
@@ -77,7 +77,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         $mutation->method('getOriginalFilePath')
             ->willReturn('/original/file/path');
 
-        $mutant = $this->createMock(MutantInterface::class);
+        $mutant = $this->createMock(Mutant::class);
         $mutant->method('getMutation')
             ->willReturn($mutation);
         $mutant->method('getMutatedFilePath')
