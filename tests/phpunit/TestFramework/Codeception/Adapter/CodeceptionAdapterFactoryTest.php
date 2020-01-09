@@ -39,6 +39,9 @@ use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
 use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapterFactory;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class CodeceptionAdapterFactoryTest extends TestCase
 {
     public function test_it_creates_codeception_adapter(): void

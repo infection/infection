@@ -39,6 +39,9 @@ use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapterFactory;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class PhpSpecAdapterFactoryTest extends TestCase
 {
     public function test_it_creates_phpspec_adapter(): void

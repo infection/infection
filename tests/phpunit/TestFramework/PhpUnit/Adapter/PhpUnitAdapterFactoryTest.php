@@ -39,6 +39,9 @@ use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class PhpUnitAdapterFactoryTest extends TestCase
 {
     public function test_it_creates_phpunit_adapter(): void
