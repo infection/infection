@@ -47,16 +47,17 @@ use Infection\Mutator\Util\MutatorConfig;
 use Infection\Tests\Fixtures\SimpleMutation;
 use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;
 use Infection\Tests\Fixtures\SimpleMutatorVisitor;
+use Infection\Tests\StringNormalizer;
 use Infection\Visitor\CloneVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\TestCase;
-use function rtrim;
 use function Safe\sprintf;
 use function str_replace;
 use function substr;
+use Webmozart\Assert\Assert;
 
 abstract class AbstractMutatorTestCase extends TestCase
 {
@@ -80,11 +81,14 @@ abstract class AbstractMutatorTestCase extends TestCase
         $this->mutator = $this->createMutator();
     }
 
+    /**
+     * @var string[]
+     */
     final public function doTest(string $inputCode, $expectedCode = [], array $settings = []): void
     {
         $expectedCodeSamples = (array) $expectedCode;
 
-        $inputCode = rtrim($inputCode, "\n");
+        $inputCode = StringNormalizer::normalizeString($inputCode);
 
         if ($inputCode === $expectedCode) {
             $this->fail('Input code cant be the same as mutated code');
@@ -103,15 +107,19 @@ abstract class AbstractMutatorTestCase extends TestCase
         );
 
         foreach ($mutants as $realMutatedCode) {
+            /** @var string|null $expectedCodeSample */
             $expectedCodeSample = array_shift($expectedCodeSamples);
 
             if ($expectedCodeSample === null) {
                 $this->fail('The number of expected mutated code samples must equal the number of generated Mutants by mutator.');
             }
 
-            $expectedCodeSample = rtrim($expectedCodeSample, "\n");
+            Assert::string($expectedCodeSample);
 
-            $this->assertSame($expectedCodeSample, $realMutatedCode);
+            $this->assertSame(
+                StringNormalizer::normalizeString($expectedCodeSample),
+                StringNormalizer::normalizeString($realMutatedCode)
+            );
             $this->assertSyntaxIsValid($realMutatedCode);
         }
     }

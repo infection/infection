@@ -42,7 +42,6 @@ use Infection\Events\MutationGeneratingStarted;
 use Infection\Mutation;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\MutationGenerator;
-use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
@@ -67,9 +66,9 @@ final class MutationGeneratorTest extends TestCase
         $onlyCovered = true;
         $extraVisitors = [2 => new FakeVisitor()];
 
-        $mutation0 = self::createMutation();
-        $mutation1 = self::createMutation();
-        $mutation2 = self::createMutation();
+        $mutation0 = $this->createMock(Mutation::class);
+        $mutation1 = $this->createMock(Mutation::class);
+        $mutation2 = $this->createMock(Mutation::class);
 
         /** @var FileMutationGenerator|ObjectProphecy $fileMutationGeneratorProphecy */
         $fileMutationGeneratorProphecy = $this->prophesize(FileMutationGenerator::class);
@@ -148,19 +147,5 @@ final class MutationGeneratorTest extends TestCase
         );
 
         $mutationGenerator->generate(false, []);
-    }
-
-    private static function createMutation(): Mutation
-    {
-        return new Mutation(
-            '',
-            [],
-            new Plus(new MutatorConfig([])),
-            [],
-            '',
-            null,
-            0,
-            []
-        );
     }
 }

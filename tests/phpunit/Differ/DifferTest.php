@@ -35,79 +35,161 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Differ;
 
+use function array_map;
+use function explode;
+use Generator;
+use function implode;
 use Infection\Differ\Differ;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 
 final class DifferTest extends TestCase
 {
-    public function test_show_diffs_with_max_lines(): void
+    /**
+     * @dataProvider diffProvider
+     */
+    public function test_it_shows_the_diff_between_two_sources_but_limiting_the_displayed_lines(
+        string $sourceA,
+        string $sourceB,
+        string $expectedDiff
+    ): void {
+        $actualDiff = (new Differ(new BaseDiffer()))->diff($sourceA, $sourceB);
+
+        $this->assertSame($expectedDiff, self::normalizeString($actualDiff));
+    }
+
+    public function diffProvider(): Generator
     {
-        $source1 = <<<'CODE'
-public function diff($from, $to, LongestCommonSubsequence $lcs = null)
+        yield 'empty' => [
+            '',
+            '',
+            <<<'PHP'
+--- Original
++++ New
+
+PHP
+        ];
+
+        yield 'nominal' => [
+            <<<'PHP'
+
+public function echo(): void
 {
-    $diff = parent::diff($from, $to, $lcs);
-    $characterCount = strlen($diff);
-    $lineCount = 0;
-    $characterIndex = 0;
-    for ($characterIndex; $characterIndex < $characterCount; ++$characterIndex) {
-        if ($diff[$characterIndex] === "\n") {
-            ++$lineCount;
-            if ($lineCount >= self::DIFF_MAX_LINES) {
-                break;
-            }
-        }
-    }
-
-    return substr($diff, 0, $characterIndex);
+    echo 10;
 }
-CODE;
 
-        $source2 = <<<'CODE'
-public function diff($from, $to, LongestCommonSubsequence $lcs = null)
+PHP
+            ,
+            <<<'PHP'
+
+public function echo(): void
 {
-    $diff = parent::diff($from, $to, $lcs);;
-    $characterCount = strlen($diff);
-    $lineCount = 0;
-    $characterIndex = 0;
-    for ($characterIndex; $characterIndex < $characterCount; ++$characterIndex) {
-        if ($diff[$characterIndex] === "\n") {
-            ++$lineCount;
-            if ($lineCount >= self::DIFF_MAX_LINES) {
-                break;
-            }
-        }
-    }
-
-    return substr($diff, 0, $characterIndex);
+    echo 15;
 }
-CODE;
 
-        $expectedDiff = <<<'CODE'
+PHP
+            ,
+            <<<'PHP'
 --- Original
 +++ New
 @@ @@
- public function diff($from, $to, LongestCommonSubsequence $lcs = null)
+
+ public function echo(): void
  {
--    $diff = parent::diff($from, $to, $lcs);
-+    $diff = parent::diff($from, $to, $lcs);;
-     $characterCount = strlen($diff);
-     $lineCount = 0;
-     $characterIndex = 0;
-     for ($characterIndex; $characterIndex < $characterCount; ++$characterIndex) {
-         if ($diff[$characterIndex] === "\n") {
-CODE;
+-    echo 10;
++    echo 15;
+ }
 
-        $differ = new Differ(
-            new BaseDiffer()
+PHP
+        ];
+
+        yield 'no change' => [
+            <<<'PHP'
+
+public function echo(): void
+{
+    echo 10;
+}
+
+PHP
+            ,
+            <<<'PHP'
+
+public function echo(): void
+{
+    echo 10;
+}
+
+PHP
+            ,
+            <<<'PHP'
+--- Original
++++ New
+
+PHP
+        ];
+
+        yield 'line excess' => [
+            <<<'PHP'
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+PHP
+            ,
+            <<<'PHP'
+0
+1
+2
+3
+4
+5
+(6)
+7
+8
+9
+10
+11
+12
+13
+14
+15
+PHP
+            ,
+            <<<'PHP'
+--- Original
++++ New
+@@ @@
+ 3
+ 4
+ 5
+-6
++(6)
+ 7
+ 8
+ 9
+
+PHP
+        ];
+    }
+
+    private static function normalizeString(string $string): string
+    {
+        return implode(
+            "\n",
+            array_map('rtrim', explode("\n", $string))
         );
-
-        $diff = $differ->diff($source1, $source2);
-
-        if (substr_count($diff, "\n") < Differ::DIFF_MAX_LINES - 1) {
-            $this->markTestSkipped('See https://github.com/sebastianbergmann/diff/pull/59');
-        }
-
-        $this->assertSame($expectedDiff, $diff);
     }
 }

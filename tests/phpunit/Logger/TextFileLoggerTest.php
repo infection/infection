@@ -39,7 +39,6 @@ use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantInterface;
 use Infection\Mutator\Boolean\TrueValue;
-use Infection\Mutator\Util\MutatorConfig;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessInterface;
@@ -323,7 +322,7 @@ TXT;
             $process->method('getProcess')->willReturn($phpProcess);
             $process->expects($this->once())->method('getMutant')->willReturn($mutant);
 
-            $process->expects($this->once())->method('getMutator')->willReturn(new For_(new MutatorConfig([])));
+            $process->expects($this->once())->method('getMutatorName')->willReturn(For_::getName());
             $process->expects($this->once())->method('getResultCode')->willReturn(MutantProcess::CODE_ESCAPED);
             $process->expects($this->atLeast(2))->method('getOriginalStartingLine')->willReturn(10 - $i);
             $process->expects($this->atLeast(1))->method('getOriginalFilePath')->willReturn('foo/bar');
@@ -343,7 +342,7 @@ TXT;
             $process->method('getProcess')->willReturn($phpProcess);
             $process->expects($this->once())->method('getMutant')->willReturn($mutant);
 
-            $process->expects($this->once())->method('getMutator')->willReturn(new TrueValue(new MutatorConfig([])));
+            $process->expects($this->once())->method('getMutatorName')->willReturn(TrueValue::getName());
             $process->expects($this->once())->method('getResultCode')->willReturn(MutantProcess::CODE_ESCAPED);
             $process->expects($this->atLeast(2))->method('getOriginalStartingLine')->willReturn(20 - $i);
             $process->expects($this->atLeast(1))->method('getOriginalFilePath')->willReturn('bar/bar');
@@ -364,7 +363,7 @@ TXT;
             $process->method('getProcess')->willReturn($phpProcess);
             $process->expects($this->once())->method('getMutant')->willReturn($mutant);
 
-            $process->expects($this->once())->method('getMutator')->willReturn(new For_(new MutatorConfig([])));
+            $process->expects($this->once())->method('getMutatorName')->willReturn(For_::getName());
             $process->expects($this->once())->method('getResultCode')->willReturn(MutantProcess::CODE_NOT_COVERED);
             $process->expects($this->atLeast(2))->method('getOriginalStartingLine')->willReturn(10 - $i);
             $process->expects($this->atLeast(1))->method('getOriginalFilePath')->willReturn('foo/bar');
@@ -384,7 +383,7 @@ TXT;
             $process->method('getProcess')->willReturn($phpProcess);
             $process->expects($this->atMost(1))->method('getMutant')->willReturn($mutant);
 
-            $process->expects($this->atMost(1))->method('getMutator')->willReturn(new For_(new MutatorConfig([])));
+            $process->expects($this->atMost(1))->method('getMutatorName')->willReturn(For_::getName());
             $process->expects($this->atMost(1))->method('getResultCode')->willReturn(MutantProcess::CODE_KILLED);
             $process->method('getOriginalStartingLine')->willReturn(10 - $i);
             $process->method('getOriginalFilePath')->willReturn('foo/bar');
