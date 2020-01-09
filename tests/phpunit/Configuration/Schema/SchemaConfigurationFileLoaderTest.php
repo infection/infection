@@ -47,6 +47,9 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\realpath;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class SchemaConfigurationFileLoaderTest extends TestCase
 {
     /**
