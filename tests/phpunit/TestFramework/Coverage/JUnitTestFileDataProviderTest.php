@@ -40,6 +40,9 @@ use Infection\TestFramework\Coverage\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class JUnitTestFileDataProviderTest extends TestCase
 {
     private const JUNIT = __DIR__ . '/../../Fixtures/Files/phpunit/junit.xml';

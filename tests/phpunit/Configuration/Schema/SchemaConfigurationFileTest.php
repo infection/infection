@@ -44,6 +44,9 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Seld\JsonLint\ParsingException;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class SchemaConfigurationFileTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Configuration';

@@ -33,39 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Tests\AutoReview;
 
-use Infection\Configuration\Configuration;
-use Infection\TestFramework\CommandLineBuilder;
-use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\Factory;
-use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
-use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
-use Infection\Utils\VersionParser;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
+use function Safe\preg_replace;
+use function strpos;
 
-/**
- * @group integration Requires some I/O operations
- */
-final class FactoryTest extends TestCase
+final class SourceTestClassNameScheme
 {
-    public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
+    private function __construct()
     {
-        $factory = new Factory(
-            '',
-            '',
-            $this->createMock(TestFrameworkConfigLocatorInterface::class),
-            new XmlConfigurationHelper(new PathReplacer(new Filesystem()), ''),
-            '',
-            $this->createMock(Configuration::class),
-            $this->createMock(VersionParser::class),
-            $this->createMock(Filesystem::class),
-            new CommandLineBuilder()
-        );
+    }
 
-        $this->expectException(InvalidArgumentException::class);
-        $factory->create('Fake Test Framework', false);
+    public static function getTestClassName(string $sourceClassName): string
+    {
+        if (strpos($sourceClassName, 'Infection\\Tests') !== false) {
+            return $sourceClassName . 'Test';
+        }
+
+        return preg_replace('/Infection/', 'Infection\\Tests', $sourceClassName, 1) . 'Test';
     }
 }
