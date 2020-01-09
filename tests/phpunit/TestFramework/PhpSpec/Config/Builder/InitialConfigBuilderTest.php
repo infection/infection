@@ -38,6 +38,9 @@ namespace Infection\Tests\TestFramework\PhpSpec\Config\Builder;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class InitialConfigBuilderTest extends FileSystemTestCase
 {
     public function test_it_builds_path_to_initial_config_file(): void

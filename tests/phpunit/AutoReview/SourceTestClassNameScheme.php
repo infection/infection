@@ -33,26 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Listener;
+namespace Infection\Tests\AutoReview;
 
-use Infection\Events\MutationTestingFinished;
-use Infection\Process\Listener\CleanUpAfterMutationTestingFinishedSubscriber;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
+use function Safe\preg_replace;
+use function strpos;
 
-/**
- * @group integration Requires some I/O operations
- */
-final class CleanUpAfterMutationTestingFinishedSubscriberTest extends TestCase
+final class SourceTestClassNameScheme
 {
-    public function test_it_execute_remove_on_mutation_testing_finished(): void
+    private function __construct()
     {
-        $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->expects($this->once())
-            ->method('remove');
+    }
 
-        $subscriber = new CleanUpAfterMutationTestingFinishedSubscriber($filesystem, sys_get_temp_dir());
+    public static function getTestClassName(string $sourceClassName): string
+    {
+        if (strpos($sourceClassName, 'Infection\\Tests') !== false) {
+            return $sourceClassName . 'Test';
+        }
 
-        $subscriber->onMutationTestingFinished(new MutationTestingFinished());
+        return preg_replace('/Infection/', 'Infection\\Tests', $sourceClassName, 1) . 'Test';
     }
 }

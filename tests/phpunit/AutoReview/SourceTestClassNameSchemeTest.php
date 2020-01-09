@@ -33,26 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Listener;
+namespace Infection\Tests\AutoReview;
 
-use Infection\Events\MutationTestingFinished;
-use Infection\Process\Listener\CleanUpAfterMutationTestingFinishedSubscriber;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration Requires some I/O operations
- */
-final class CleanUpAfterMutationTestingFinishedSubscriberTest extends TestCase
+final class SourceTestClassNameSchemeTest extends TestCase
 {
-    public function test_it_execute_remove_on_mutation_testing_finished(): void
+    public function test_it_can_give_the_test_case_class_name_for_a_source_class(): void
     {
-        $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->expects($this->once())
-            ->method('remove');
+        $this->assertSame(
+            'Infection\Tests\Acme\FooTest',
+            SourceTestClassNameScheme::getTestClassName('Infection\Acme\Foo')
+        );
+    }
 
-        $subscriber = new CleanUpAfterMutationTestingFinishedSubscriber($filesystem, sys_get_temp_dir());
-
-        $subscriber->onMutationTestingFinished(new MutationTestingFinished());
+    public function test_it_can_give_the_test_case_class_name_for_a_test_source_class(): void
+    {
+        $this->assertSame(
+            'Infection\Tests\Acme\FooTest',
+            SourceTestClassNameScheme::getTestClassName('Infection\Tests\Acme\Foo')
+        );
     }
 }

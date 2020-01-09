@@ -33,26 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Listener;
+namespace Infection\Tests\AutoReview\IntegrationGroup;
 
-use Infection\Events\MutationTestingFinished;
-use Infection\Process\Listener\CleanUpAfterMutationTestingFinishedSubscriber;
+use function class_exists;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
+use ReflectionClass;
+use function Safe\sprintf;
 
 /**
- * @group integration Requires some I/O operations
+ * @covers \Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider
  */
-final class CleanUpAfterMutationTestingFinishedSubscriberTest extends TestCase
+final class IntegrationGroupProviderTest extends TestCase
 {
-    public function test_it_execute_remove_on_mutation_testing_finished(): void
+    /**
+     * @dataProvider \Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::ioTestCaseTupleProvider
+     */
+    public function test_io_test_case_classes_provider_is_valid(string $testCaseClassName, string $fileWithIoOperations): void
     {
-        $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->expects($this->once())
-            ->method('remove');
+        $this->assertTrue(
+            class_exists($testCaseClassName, true),
+            sprintf('Expected "%s" to be a class.', $testCaseClassName)
+        );
 
-        $subscriber = new CleanUpAfterMutationTestingFinishedSubscriber($filesystem, sys_get_temp_dir());
+        $testCaseReflection = new ReflectionClass($testCaseClassName);
 
-        $subscriber->onMutationTestingFinished(new MutationTestingFinished());
+        $this->assertInstanceOf(
+            TestCase::class,
+            $testCaseReflection->newInstanceWithoutConstructor()
+        );
+
+        $this->assertFalse(
+            $testCaseReflection->isAbstract(),
+            sprintf(
+                'Expected "%s" to be an actual test case, not a base (abstract) one.',
+                $testCaseClassName
+            )
+        );
+
+        $this->assertFileExists($fileWithIoOperations);
     }
 }

@@ -46,6 +46,9 @@ use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\ParserFactory;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class MutatorVisitorTest extends BaseVisitorTest
 {
     /**

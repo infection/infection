@@ -47,6 +47,9 @@ use function Safe\realpath;
 use function Safe\sprintf;
 use function str_replace;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class IndexXmlCoverageParserTest extends TestCase
 {
     private const FIXTURES_SRC_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/src';

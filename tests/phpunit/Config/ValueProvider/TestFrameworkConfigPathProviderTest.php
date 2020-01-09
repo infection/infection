@@ -43,6 +43,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class TestFrameworkConfigPathProviderTest extends AbstractBaseProviderTest
 {
     /**
