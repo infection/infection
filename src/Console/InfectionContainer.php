@@ -187,16 +187,17 @@ final class InfectionContainer extends Container
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
+                /** @var Differ $differ */
+                $differ = $container[Differ::class];
+
                 return new MutantCreator(
                     $config->getTmpDir(),
-                    $container['differ'],
+                    $differ,
                     $container['pretty.printer']
                 );
             },
-            'differ' => static function (): Differ {
-                return new Differ(
-                    new BaseDiffer()
-                );
+            Differ::class => static function (): Differ {
+                return new Differ(new BaseDiffer());
             },
             'dispatcher' => static function (): EventDispatcherInterface {
                 return new EventDispatcher();
