@@ -33,47 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Visitor;
+namespace Infection\Tests\Mutant;
 
-use function array_key_exists;
-use function get_class;
+use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use Infection\TestFramework\Coverage\CoverageLineData;
 
-/**
- * @internal
- */
-final class MutatorVisitor extends NodeVisitorAbstract
+trait MutantAssertions
 {
-    private $mutation;
-
-    public function __construct(Mutation $mutation)
-    {
-        $this->mutation = $mutation;
-    }
-
-    public function leaveNode(Node $node)
-    {
-        $attributes = $node->getAttributes();
-
-        if (!array_key_exists('startTokenPos', $attributes)) {
-            return null;
-        }
-
-        $mutatedAttributes = $this->mutation->getAttributes();
-
-        $samePosition = $attributes['startTokenPos'] === $mutatedAttributes['startTokenPos']
-            && $attributes['endTokenPos'] === $mutatedAttributes['endTokenPos'];
-
-        if ($samePosition && $this->mutation->getMutatedNodeClass() === get_class($node)) {
-            return $this->mutation->getMutatedNode()->unwrap();
-            // TODO STOP TRAVERSING
-            // TODO check all built-in visitors, in particular FirstFindingVisitor
-            // TODO beforeTraverse - FirstFindingVisitor
-            // TODO enterNode instead of leaveNode for '<' mutation to not travers children?
-        }
-
-        return null;
+    /**
+     * @param CoverageLineData[] $expectedTests
+     */
+    public function assertMutantStateIs(
+        Mutant $mutant,
+        string $expectedFilePath,
+        Mutation $expectedMutation,
+        string $expectedDiff,
+        bool $expectedCoveredByTests,
+        array $expectedTests
+    ): void {
+        $this->assertSame($expectedFilePath, $mutant->getMutantFilePath());
+        $this->assertSame($expectedMutation, $mutant->getMutation());
+        $this->assertSame($expectedDiff, $mutant->getDiff());
+        $this->assertSame($expectedCoveredByTests, $mutant->isCoveredByTest());
+        $this->assertSame($expectedTests, $mutant->getTests());
     }
 }

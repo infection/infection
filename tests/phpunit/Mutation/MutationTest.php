@@ -37,6 +37,7 @@ namespace Infection\Tests\Mutation;
 
 use function array_merge;
 use Generator;
+use Infection\MutatedNode;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\TestFramework\Coverage\CoverageLineData;
@@ -51,7 +52,6 @@ final class MutationTest extends TestCase
      *
      * @param Node[] $originalFileAst
      * @param array<string|int|float> $attributes
-     * @param Node|Node[] $mutatedNode
      * @param array<string|int|float> $expectedAttributes
      * @param CoverageLineData[] $tests
      */
@@ -61,7 +61,7 @@ final class MutationTest extends TestCase
         string $mutatorName,
         array $attributes,
         string $mutatedNodeClass,
-        $mutatedNode,
+        MutatedNode $mutatedNode,
         int $mutationByMutatorIndex,
         array $tests,
         array $expectedAttributes,
@@ -108,7 +108,7 @@ final class MutationTest extends TestCase
             Plus::getName(),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
-            new Node\Scalar\LNumber(1),
+            MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             -1,
             [],
             $nominalAttributes,
@@ -125,7 +125,7 @@ final class MutationTest extends TestCase
             Plus::getName(),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
-            new Node\Scalar\LNumber(1),
+            MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             0,
             [
                 CoverageLineData::with(
@@ -148,7 +148,7 @@ final class MutationTest extends TestCase
             Plus::getName(),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
-            new Node\Scalar\LNumber(1),
+            MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             99,
             [
                 CoverageLineData::with(
@@ -171,7 +171,7 @@ final class MutationTest extends TestCase
             Plus::getName(),
             array_merge($nominalAttributes, ['foo' => 100, 'bar' => 1000]),
             Node\Scalar\LNumber::class,
-            new Node\Scalar\LNumber(1),
+            MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             0,
             [
                 CoverageLineData::with(
@@ -194,7 +194,7 @@ final class MutationTest extends TestCase
             Plus::getName(),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
-            new Node\Scalar\LNumber(1),
+            MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             0,
             [],
             $nominalAttributes,
@@ -211,10 +211,10 @@ final class MutationTest extends TestCase
             Plus::getName(),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
-            [
+            MutatedNode::wrap([
                 new Node\Scalar\LNumber(1),
                 new Node\Scalar\LNumber(-1),
-            ],
+            ]),
             0,
             [
                 CoverageLineData::with(

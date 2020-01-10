@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Visitor;
 
+use Infection\Mutation\Mutation;
 use Infection\Mutator\NodeMutationGenerator;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
@@ -45,7 +46,7 @@ use PhpParser\NodeVisitorAbstract;
 final class MutationsCollectorVisitor extends NodeVisitorAbstract
 {
     /**
-     * @var \Infection\Mutation\Mutation[]
+     * @var Mutation[]
      */
     private $mutations = [];
 
@@ -71,7 +72,7 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
     }
 
     /**
-     * @return \Infection\Mutation\Mutation[]
+     * @return Mutation[]
      */
     public function getMutations(): array
     {

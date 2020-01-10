@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use Infection\MutatedNode;
 use function array_flip;
 use function array_intersect_key;
 use function array_keys;
@@ -79,7 +80,6 @@ class Mutation
     /**
      * @param Node[] $originalFileAst
      * @param array<string|int|float> $attributes
-     * @param Node|Node[] $mutatedNode
      * @param CoverageLineData[] $tests
      */
     public function __construct(
@@ -88,7 +88,7 @@ class Mutation
         string $mutatorName,
         array $attributes,
         string $mutatedNodeClass,
-        $mutatedNode,
+        MutatedNode $mutatedNode,
         int $mutationByMutatorIndex,
         array $tests
     ) {
@@ -141,10 +141,7 @@ class Mutation
         return $this->mutatedNodeClass;
     }
 
-    /**
-     * @return Node|Node[]
-     */
-    public function getMutatedNode()
+    public function getMutatedNode(): MutatedNode
     {
         return $this->mutatedNode;
     }
