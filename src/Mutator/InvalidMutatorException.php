@@ -33,28 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Exception;
+namespace Infection\Mutator;
 
 use Exception;
-use Infection\Exception\InvalidMutatorException;
-use Infection\Mutator\Arithmetic\Plus;
-use Infection\Mutator\Util\MutatorConfig;
-use PHPUnit\Framework\TestCase;
+use Throwable;
 
-final class InvalidMutatorExceptionTest extends TestCase
+/**
+ * @internal
+ */
+final class InvalidMutatorException extends Exception
 {
-    public function test_it_has_correct_user_facing_message(): void
+    public static function create(string $filePath, Mutator $mutator, Throwable $previous): self
     {
-        $mutator = new Plus(new MutatorConfig([]));
-        $original = new Exception();
-
-        $exception = InvalidMutatorException::create('foo/bar/baz', $mutator, $original);
-
-        $this->assertSame(
-            'Encountered an error with the "Plus" mutator in the "foo/bar/baz" file. ' .
-            'This is most likely a bug in Infection, so please report this in our issue tracker.',
-            $exception->getMessage()
+        return new self(
+            sprintf(
+                'Encountered an error with the "%s" mutator in the "%s" file. ' .
+                'This is most likely a bug in Infection, so please report this in our issue tracker.',
+                $mutator::getName(),
+                $filePath
+            ),
+            0,
+            $previous
         );
-        $this->assertSame($original, $exception->getPrevious());
     }
 }

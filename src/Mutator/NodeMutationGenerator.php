@@ -39,7 +39,6 @@ use function array_reduce;
 use function count;
 use Generator;
 use function get_class;
-use Infection\Exception\InvalidMutatorException;
 use Infection\MutatedNode;
 use Infection\Mutation;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
