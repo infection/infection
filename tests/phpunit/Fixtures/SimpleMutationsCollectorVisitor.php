@@ -8,6 +8,7 @@ use Generator;
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
+use function iterator_to_array;
 
 /**
  * @internal
@@ -41,9 +42,9 @@ final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
             return;
         }
 
-        $mutatedResult = $this->mutator->mutate($node);
-
-        $mutatedNodes = $mutatedResult instanceof Generator ? $mutatedResult : [$mutatedResult];
+        // It is important to not rely on the keys here. It might otherwise result in some elements
+        // being overridden, see https://3v4l.org/JLN73
+        $mutatedNodes = iterator_to_array($this->mutator->mutate($node), false);
 
         foreach($mutatedNodes as $mutatedNode) {
             $this->mutations[] = new SimpleMutation(
