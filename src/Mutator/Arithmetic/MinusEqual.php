@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -59,12 +60,10 @@ TXT
 
     /**
      * @param Node&Node\Expr\AssignOp\Minus $node
-     *
-     * @return Node\Expr\AssignOp\Plus
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return new Node\Expr\AssignOp\Plus($node->var, $node->expr, $node->getAttributes());
+        yield new Node\Expr\AssignOp\Plus($node->var, $node->expr, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool

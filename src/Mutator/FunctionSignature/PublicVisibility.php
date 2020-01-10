@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\FunctionSignature;
 
+use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -60,14 +61,11 @@ final class PublicVisibility extends Mutator
     }
 
     /**
-     * @param Node&ClassMethod $node
-     *
-     * @return ClassMethod
+     * @param ClassMethod $node
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        /* @var ClassMethod $node */
-        return new ClassMethod(
+        yield new ClassMethod(
             $node->name,
             [
                 'flags' => ($node->flags & ~Class_::MODIFIER_PUBLIC) | Class_::MODIFIER_PROTECTED,

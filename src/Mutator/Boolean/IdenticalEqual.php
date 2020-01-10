@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use Generator;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -49,12 +50,10 @@ final class IdenticalEqual extends Mutator
      * Replaces "===" with "=="
      *
      * @param Node&Node\Expr\BinaryOp\Identical $node
-     *
-     * @return Node\Expr\BinaryOp\Equal
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return new Node\Expr\BinaryOp\Equal($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\Equal($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool

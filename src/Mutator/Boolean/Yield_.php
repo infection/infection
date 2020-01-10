@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -65,10 +66,8 @@ TXT
 
     /**
      * @param Node&Node\Expr\Yield_ $node
-     *
-     * @return Node|Node\Expr\Yield_
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
         /** @var Node\Expr $key */
         $key = $node->key;
@@ -77,7 +76,7 @@ TXT
         $node->value = new Node\Expr\BinaryOp\Greater($key, $value, $node->getAttributes());
         $node->key = null;
 
-        return $node;
+        yield $node;
     }
 
     protected function mutatesNode(Node $node): bool
