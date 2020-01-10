@@ -79,7 +79,6 @@ class Mutation
     /**
      * @param Node[] $originalFileAst
      * @param array<string|int|float> $attributes
-     * @param Node|Node[] $mutatedNode
      * @param CoverageLineData[] $tests
      */
     public function __construct(
@@ -88,7 +87,7 @@ class Mutation
         string $mutatorName,
         array $attributes,
         string $mutatedNodeClass,
-        $mutatedNode,
+        EvilNode $mutatedNode,
         int $mutationByMutatorIndex,
         array $tests
     ) {
@@ -141,10 +140,7 @@ class Mutation
         return $this->mutatedNodeClass;
     }
 
-    /**
-     * @return Node|Node[]
-     */
-    public function getMutatedNode()
+    public function getMutatedNode(): EvilNode
     {
         return $this->mutatedNode;
     }

@@ -33,47 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Visitor;
+namespace Infection\Tests;
 
-use function array_key_exists;
-use function get_class;
-use Infection\Mutation;
+use Generator;
+use Infection\EvilNode;
 use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class MutatorVisitor extends NodeVisitorAbstract
+final class EvilNodeTest extends TestCase
 {
-    private $mutation;
-
-    public function __construct(Mutation $mutation)
+    /**
+     * @dataProvider nodeProvider
+     *
+     * @param Node|Node[] $node
+     */
+    public function test_it_can_be_instantiated($node): void
     {
-        $this->mutation = $mutation;
+        $evilNode = EvilNode::wrap($node);
+
+        $this->assertSame($node, $evilNode->unwrap());
     }
 
-    public function leaveNode(Node $node)
+    public function nodeProvider(): Generator
     {
-        $attributes = $node->getAttributes();
+        yield 'single node' => [new Node\Scalar\LNumber(1)];
 
-        if (!array_key_exists('startTokenPos', $attributes)) {
-            return null;
-        }
-
-        $mutatedAttributes = $this->mutation->getAttributes();
-
-        $samePosition = $attributes['startTokenPos'] === $mutatedAttributes['startTokenPos']
-            && $attributes['endTokenPos'] === $mutatedAttributes['endTokenPos'];
-
-        if ($samePosition && $this->mutation->getMutatedNodeClass() === get_class($node)) {
-            return $this->mutation->getMutatedNode()->unwrap();
-            // TODO STOP TRAVERSING
-            // TODO check all built-in visitors, in particular FirstFindingVisitor
-            // TODO beforeTraverse - FirstFindingVisitor
-            // TODO enterNode instead of leaveNode for '<' mutation to not travers children?
-        }
-
-        return null;
+        yield 'multiple nodes' => [
+            [
+                new Node\Scalar\LNumber(1),
+                new Node\Scalar\LNumber(-1),
+            ],
+        ];
     }
 }

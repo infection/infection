@@ -33,47 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Visitor;
+namespace Infection;
 
-use function array_key_exists;
-use function get_class;
-use Infection\Mutation;
+use function is_array;
 use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use Webmozart\Assert\Assert;
 
-/**
- * @internal
- */
-final class MutatorVisitor extends NodeVisitorAbstract
+final class EvilNode
 {
-    private $mutation;
+    private $value;
 
-    public function __construct(Mutation $mutation)
+    /**
+     * @param Node|Node[] $value
+     */
+    private function __construct($value)
     {
-        $this->mutation = $mutation;
+        if (is_array($value)) {
+            Assert::allIsInstanceOf($value, Node::class);
+        } else {
+            Assert::isInstanceOf($value, Node::class);
+        }
+
+        $this->value = $value;
     }
 
-    public function leaveNode(Node $node)
+    /**
+     * @param Node|Node[] $value
+     */
+    public static function wrap($value): self
     {
-        $attributes = $node->getAttributes();
+        return new self($value);
+    }
 
-        if (!array_key_exists('startTokenPos', $attributes)) {
-            return null;
-        }
-
-        $mutatedAttributes = $this->mutation->getAttributes();
-
-        $samePosition = $attributes['startTokenPos'] === $mutatedAttributes['startTokenPos']
-            && $attributes['endTokenPos'] === $mutatedAttributes['endTokenPos'];
-
-        if ($samePosition && $this->mutation->getMutatedNodeClass() === get_class($node)) {
-            return $this->mutation->getMutatedNode()->unwrap();
-            // TODO STOP TRAVERSING
-            // TODO check all built-in visitors, in particular FirstFindingVisitor
-            // TODO beforeTraverse - FirstFindingVisitor
-            // TODO enterNode instead of leaveNode for '<' mutation to not travers children?
-        }
-
-        return null;
+    /**
+     * @return Node|Node[]
+     */
+    public function unwrap()
+    {
+        return $this->value;
     }
 }
