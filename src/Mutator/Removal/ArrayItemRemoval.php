@@ -120,25 +120,25 @@ final class ArrayItemRemoval implements Mutator
         $settings = array_merge(self::DEFAULT_SETTINGS, $settings);
 
         if (!is_string($settings['remove'])) {
-            $this->throwConfigException('remove');
+            $this->throwConfigException($settings, 'remove');
         }
 
         $settings['remove'] = strtolower($settings['remove']);
 
         if (!in_array($settings['remove'], ['first', 'last', 'all'])) {
-            $this->throwConfigException('remove');
+            $this->throwConfigException($settings, 'remove');
         }
 
         if (!is_numeric($settings['limit']) || $settings['limit'] < 1) {
-            $this->throwConfigException('limit');
+            $this->throwConfigException($settings, 'limit');
         }
 
         return $settings;
     }
 
-    private function throwConfigException(string $property): void
+    private function throwConfigException(array $settings, string $property): void
     {
-        $value = $this->getSettings()[$property];
+        $value = $settings[$property];
 
         throw new InvalidConfigException(sprintf(
             'Invalid configuration of ArrayItemRemoval mutator. Setting `%s` is invalid (%s)',

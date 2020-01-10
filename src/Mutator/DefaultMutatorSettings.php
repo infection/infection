@@ -38,6 +38,9 @@ namespace Infection\Mutator;
 use function end;
 use function explode;
 
+/**
+ * @internal
+ */
 trait DefaultMutatorSettings
 {
     // TODO: declare the definitions downstream so eventually this method can be removed from here

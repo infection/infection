@@ -41,6 +41,7 @@ use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\Util\MutatorConfig;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
@@ -55,6 +56,13 @@ final class TrueValue implements Mutator
         'array_search' => false,
         'in_array' => false,
     ];
+
+    private $settings;
+
+    public function __construct(MutatorConfig $config)
+    {
+        $this->settings = $config->getMutatorSettings();
+    }
 
     public static function getDefinition(): ?Definition
     {
@@ -92,7 +100,7 @@ final class TrueValue implements Mutator
             return true;
         }
 
-        $resultSettings = array_merge(self::DEFAULT_SETTINGS, $this->getSettings());
+        $resultSettings = array_merge(self::DEFAULT_SETTINGS, $this->settings);
 
         $functionName = $grandParentNode->name->toLowerString();
 

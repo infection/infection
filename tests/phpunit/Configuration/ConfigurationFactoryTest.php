@@ -461,17 +461,16 @@ final class ConfigurationFactoryTest extends TestCase
                 ],
             ],
             '',
-            (static function (): array {
-                $config = new MutatorConfig([
-                    'ignore' => [
-                        'Infection\Finder\SourceFilesFinder::__construct::63',
-                    ],
-                ]);
-
-                return [
-                    'MethodCallRemoval' => new IgnoreMutator($config, new MethodCallRemoval($config)),
-                ];
-            })()
+            [
+                'MethodCallRemoval' => new IgnoreMutator(
+                    new MutatorConfig([
+                        'ignore' => [
+                            'Infection\Finder\SourceFilesFinder::__construct::63',
+                        ],
+                    ]),
+                    new MethodCallRemoval()
+                ),
+            ]
         );
 
         yield 'mutators from config & input' => self::createValueForMutators(
@@ -488,8 +487,8 @@ final class ConfigurationFactoryTest extends TestCase
                 $config = new MutatorConfig([]);
 
                 return [
-                    'AssignmentEqual' => new IgnoreMutator($config, new AssignmentEqual($config)),
-                    'EqualIdentical' => new IgnoreMutator($config, new EqualIdentical($config)),
+                    'AssignmentEqual' => new IgnoreMutator($config, new AssignmentEqual()),
+                    'EqualIdentical' => new IgnoreMutator($config, new EqualIdentical()),
                 ];
             })()
         );

@@ -174,6 +174,7 @@ final class MutatorFactory
         foreach ($mutatorNames as $mutatorClass => $settings) {
             $mutatorConfig = new MutatorConfig($settings);
 
+            // TODO: only pass the mutator config if necessary
             /** @var Mutator $mutator */
             $mutator = new $mutatorClass($mutatorConfig);
 
