@@ -39,6 +39,9 @@ use function is_array;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
 
+/**
+ * @internal
+ */
 final class MutatedNode
 {
     private $value;
