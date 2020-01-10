@@ -87,7 +87,7 @@ class Mutation
         string $mutatorName,
         array $attributes,
         string $mutatedNodeClass,
-        EvilNode $mutatedNode,
+        MutatedNode $mutatedNode,
         int $mutationByMutatorIndex,
         array $tests
     ) {
@@ -140,7 +140,7 @@ class Mutation
         return $this->mutatedNodeClass;
     }
 
-    public function getMutatedNode(): EvilNode
+    public function getMutatedNode(): MutatedNode
     {
         return $this->mutatedNode;
     }

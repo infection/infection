@@ -33,43 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace Infection\Tests;
 
-use function is_array;
+use Generator;
+use Infection\MutatedNode;
 use PhpParser\Node;
-use Webmozart\Assert\Assert;
+use PHPUnit\Framework\TestCase;
 
-final class EvilNode
+final class MutatedNodeTest extends TestCase
 {
-    private $value;
-
     /**
-     * @param Node|Node[] $value
+     * @dataProvider nodeProvider
+     *
+     * @param Node|Node[] $node
      */
-    private function __construct($value)
+    public function test_it_can_be_instantiated($node): void
     {
-        if (is_array($value)) {
-            Assert::allIsInstanceOf($value, Node::class);
-        } else {
-            Assert::isInstanceOf($value, Node::class);
-        }
+        $mutatedNode = MutatedNode::wrap($node);
 
-        $this->value = $value;
+        $this->assertSame($node, $mutatedNode->unwrap());
     }
 
-    /**
-     * @param Node|Node[] $value
-     */
-    public static function wrap($value): self
+    public function nodeProvider(): Generator
     {
-        return new self($value);
-    }
+        yield 'single node' => [new Node\Scalar\LNumber(1)];
 
-    /**
-     * @return Node|Node[]
-     */
-    public function unwrap()
-    {
-        return $this->value;
+        yield 'multiple nodes' => [
+            [
+                new Node\Scalar\LNumber(1),
+                new Node\Scalar\LNumber(-1),
+            ],
+        ];
     }
 }

@@ -39,8 +39,8 @@ use function array_reduce;
 use function count;
 use Generator;
 use function get_class;
-use Infection\EvilNode;
 use Infection\Exception\InvalidMutatorException;
+use Infection\MutatedNode;
 use Infection\Mutation;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
@@ -142,7 +142,7 @@ class NodeMutationGenerator
                 $mutator->getMutator()::getName(),
                 $node->getAttributes(),
                 get_class($node),
-                EvilNode::wrap($mutatedNode),
+                MutatedNode::wrap($mutatedNode),
                 $mutationByMutatorIndex,
                 $tests
             );
