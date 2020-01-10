@@ -37,7 +37,7 @@ namespace Infection\Process;
 
 use function in_array;
 use Infection\Mutant\Mutant;
-use Infection\Mutation;
+use Infection\Mutation\Mutation;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Symfony\Component\Process\Process;
 

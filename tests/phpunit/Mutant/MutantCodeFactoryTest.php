@@ -38,7 +38,7 @@ namespace Infection\Tests\Mutant;
 use Generator;
 use Infection\Console\InfectionContainer;
 use Infection\Mutant\MutantCodeFactory;
-use Infection\Mutation;
+use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use PhpParser\Node;
 use PhpParser\NodeDumper;

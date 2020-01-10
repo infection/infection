@@ -33,13 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace Infection\Mutation;
 
 use function array_flip;
 use function array_intersect_key;
 use function array_keys;
 use function count;
 use function implode;
+use Infection\MutatedNode;
 use Infection\Mutator\ProfileList;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use function md5;

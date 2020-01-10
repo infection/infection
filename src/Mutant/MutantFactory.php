@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutant;
 
 use Infection\Differ\Differ;
-use Infection\Mutation;
+use Infection\Mutation\Mutation;
 use function is_readable;
 use PhpParser\PrettyPrinterAbstract;
 use function Safe\file_get_contents;

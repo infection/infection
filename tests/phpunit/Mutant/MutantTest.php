@@ -38,7 +38,7 @@ namespace Infection\Tests\Mutant;
 use Generator;
 use Infection\Mutant\Mutant;
 use Infection\MutatedNode;
-use Infection\Mutation;
+use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use PhpParser\Node;

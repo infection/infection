@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpSpec\Config\Builder;
 
 use Infection\Mutant\Mutant;
-use Infection\Mutation;
+use Infection\Mutation\Mutation;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 

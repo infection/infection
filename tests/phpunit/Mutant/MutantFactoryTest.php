@@ -38,7 +38,7 @@ namespace Infection\Tests\Mutant;
 use Infection\Differ\Differ;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantFactory;
-use Infection\Mutation;
+use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\Tests\FileSystem\FileSystemTestCase;

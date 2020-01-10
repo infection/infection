@@ -33,12 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests;
+namespace Infection\Tests\Mutation;
 
 use function array_merge;
 use Generator;
 use Infection\MutatedNode;
-use Infection\Mutation;
+use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use function md5;

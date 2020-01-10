@@ -40,7 +40,7 @@ use function count;
 use Generator;
 use function get_class;
 use Infection\MutatedNode;
-use Infection\Mutation;
+use Infection\Mutation\Mutation;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\Visitor\ParentConnectorVisitor;
