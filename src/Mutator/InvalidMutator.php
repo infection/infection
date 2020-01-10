@@ -33,25 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Exception;
+namespace Infection\Mutator;
 
-use Exception;
-use Infection\Mutator\Mutator;
+use function array_keys;
+use RuntimeException;
+use function Safe\sprintf;
 use Throwable;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class InvalidMutatorException extends Exception
+final class InvalidMutator extends RuntimeException
 {
-    public static function create(string $filePath, Mutator $mutator, Throwable $previous): self
+    private const GITHUB_BUG_LINK = 'https://github.com/infection/infection/issues/new?template=Bug_report.md';
+
+    public static function create(string $filePath, string $mutatorName, Throwable $previous): self
     {
+        Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
+
         return new self(
             sprintf(
-                'Encountered an error with the "%s" mutator in the "%s" file. ' .
-                'This is most likely a bug in Infection, so please report this in our issue tracker.',
-                $mutator::getName(),
-                $filePath
+                <<<'TXT'
+Encountered an error with the "%s" mutator in the "%s" file. This is most likely a bug in Infection.
+Please consider reporting this this in our issue tracker: %s
+TXT
+                ,
+                $mutatorName,
+                $filePath,
+                self::GITHUB_BUG_LINK
             ),
             0,
             $previous
