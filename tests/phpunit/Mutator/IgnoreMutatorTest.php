@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator;
 
 use Generator;
+use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
@@ -167,10 +168,12 @@ final class IgnoreMutatorTest extends TestCase
         $this->assertSame([$mutatedNodeMock], iterator_to_array($mutatedNode));
     }
 
-    public function test_it_exposes_its_decorated_mutator(): void
+    public function test_it_exposes_its_decorated_mutator_name(): void
     {
-        $ignoreMutator = new IgnoreMutator(new MutatorConfig([]), $this->mutatorMock);
+        $config = new MutatorConfig([]);
 
-        $this->assertSame($this->mutatorMock, $ignoreMutator->getMutator());
+        $ignoreMutator = new IgnoreMutator($config, new Plus($config));
+
+        $this->assertSame(Plus::getName(), $ignoreMutator->getMutatorName());
     }
 }

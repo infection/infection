@@ -92,12 +92,8 @@ final class IgnoreMutator
         return $this->mutator->mutate($node);
     }
 
-    // TODO: this function is necessary for now mostly because Mutations requires Mutator which is
-    //  expected to be the underlying mutator for now.
-    //  It might be possible to remove this getter if it turns out that Mutation may not require
-    //  the full Mutator object but just some elements of it.
-    public function getMutator(): Mutator
+    public function getMutatorName(): string
     {
-        return $this->mutator;
+        return $this->mutator::getName();
     }
 }
