@@ -53,7 +53,8 @@ use Infection\Locator\RootsFileLocator;
 use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Mutant\MutantCreator;
+use Infection\Mutant\MutantCodeFactory;
+use Infection\Mutant\MutantFactory;
 use Infection\Mutation;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\FileParser;
@@ -90,6 +91,7 @@ use PhpParser\Lexer;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
+use PhpParser\PrettyPrinterAbstract;
 use Pimple\Container;
 use function Safe\getcwd;
 use function Safe\sprintf;
@@ -180,17 +182,30 @@ final class InfectionContainer extends Container
                     (string) $config->getPhpUnit()->getConfigDir()
                 );
             },
-            'mutant.creator' => static function (self $container): MutantCreator {
+            MutantCodeFactory::class => static function (self $container): MutantCodeFactory {
+                /** @var PrettyPrinterAbstract $printer */
+                $printer = $container['pretty.printer'];
+
+                return new MutantCodeFactory($printer);
+            },
+            MutantFactory::class => static function (self $container): MutantFactory {
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
                 /** @var Differ $differ */
                 $differ = $container[Differ::class];
 
-                return new MutantCreator(
+                /** @var PrettyPrinterAbstract $printer */
+                $printer = $container['pretty.printer'];
+
+                /** @var MutantCodeFactory $codeFactory */
+                $codeFactory = $container[MutantCodeFactory::class];
+
+                return new MutantFactory(
                     $config->getTmpDir(),
                     $differ,
-                    $container['pretty.printer']
+                    $printer,
+                    $codeFactory
                 );
             },
             Differ::class => static function (): Differ {
@@ -503,13 +518,13 @@ final class InfectionContainer extends Container
                 /** @var ParallelProcessRunner $parallelProcessRunner */
                 $parallelProcessRunner = $container['parallel.process.runner'];
 
-                /** @var MutantCreator $mutantCreator */
-                $mutantCreator = $container['mutant.creator'];
+                /** @var MutantFactory $mutantFactory */
+                $mutantFactory = $container[MutantFactory::class];
 
                 return new MutationTestingRunner(
                     $processBuilder,
                     $parallelProcessRunner,
-                    $mutantCreator,
+                    $mutantFactory,
                     $eventDispatcher
                 );
             },

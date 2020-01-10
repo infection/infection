@@ -46,6 +46,8 @@ use PHPUnit\Framework\TestCase;
 
 final class MutantTest extends TestCase
 {
+    use MutantAssertions;
+
     /**
      * @dataProvider valuesProvider
      *
@@ -60,11 +62,14 @@ final class MutantTest extends TestCase
     ): void {
         $mutant = new Mutant($filePath, $mutation, $diff);
 
-        $this->assertSame($filePath, $mutant->getMutantFilePath());
-        $this->assertSame($mutation, $mutant->getMutation());
-        $this->assertSame($diff, $mutant->getDiff());
-        $this->assertSame($expectedCoveredByTests, $mutant->isCoveredByTest());
-        $this->assertSame($expectedTests, $mutant->getTests());
+        $this->assertMutantStateIs(
+            $mutant,
+            $filePath,
+            $mutation,
+            $diff,
+            $expectedCoveredByTests,
+            $expectedTests
+        );
     }
 
     public function valuesProvider(): Generator
