@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -55,11 +56,13 @@ final class BitwiseNot extends Mutator
     }
 
     /**
-     * @param Node&Node\Expr\BitwiseNot $node
+     * @param Node\Expr\BitwiseNot $node
+     *
+     * @return Generator<Node\Expr>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return $node->expr;
+        yield $node->expr;
     }
 
     protected function mutatesNode(Node $node): bool

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Operator;
 
 use function count;
+use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -57,11 +58,13 @@ final class Finally_ extends Mutator
     }
 
     /**
-     * @return Node\Stmt\Nop
+     * @param Node\Stmt\Finally_ $node
+     *
+     * @return Generator<Node\Stmt\Nop>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return new Node\Stmt\Nop();
+        yield new Node\Stmt\Nop();
     }
 
     protected function mutatesNode(Node $node): bool

@@ -35,14 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
-use PhpParser\Node\Expr\PostDec;
-use PhpParser\Node\Expr\PostInc;
-use PhpParser\Node\Expr\PreDec;
-use PhpParser\Node\Expr\PreInc;
 
 /**
  * @internal
@@ -63,23 +60,27 @@ TXT
     }
 
     /**
-     * @param Node&(PreDec|PostDec) $node
+     * @param Node\Expr\PreDec|Node\Expr\PostDec $node
      *
-     * @return PreInc|PostInc
+     * @return Generator<Node\Expr\PreInc|Node\Expr\PostInc>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        if ($node instanceof PreDec) {
-            return new PreInc($node->var, $node->getAttributes());
+        if ($node instanceof Node\Expr\PreDec) {
+            yield new Node\Expr\PreInc($node->var, $node->getAttributes());
+
+            return;
         }
 
-        if ($node instanceof PostDec) {
-            return new PostInc($node->var, $node->getAttributes());
+        if ($node instanceof Node\Expr\PostDec) {
+            yield new Node\Expr\PostInc($node->var, $node->getAttributes());
+
+            return;
         }
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof PreDec || $node instanceof PostDec;
+        return $node instanceof Node\Expr\PreDec || $node instanceof Node\Expr\PostDec;
     }
 }

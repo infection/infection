@@ -35,13 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\FunctionSignature;
 
+use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
-use PhpParser\Node\Stmt\Class_;
-use PhpParser\Node\Stmt\ClassMethod;
 use ReflectionClass;
 use ReflectionException;
 
@@ -60,17 +59,16 @@ final class PublicVisibility extends Mutator
     }
 
     /**
-     * @param Node&ClassMethod $node
+     * @param Node\Stmt\ClassMethod $node
      *
-     * @return ClassMethod
+     * @return Generator<Node\Stmt\ClassMethod>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        /* @var ClassMethod $node */
-        return new ClassMethod(
+        yield new Node\Stmt\ClassMethod(
             $node->name,
             [
-                'flags' => ($node->flags & ~Class_::MODIFIER_PUBLIC) | Class_::MODIFIER_PROTECTED,
+                'flags' => ($node->flags & ~Node\Stmt\Class_::MODIFIER_PUBLIC) | Node\Stmt\Class_::MODIFIER_PROTECTED,
                 'byRef' => $node->returnsByRef(),
                 'params' => $node->getParams(),
                 'returnType' => $node->getReturnType(),
@@ -82,7 +80,7 @@ final class PublicVisibility extends Mutator
 
     protected function mutatesNode(Node $node): bool
     {
-        if (!$node instanceof ClassMethod) {
+        if (!$node instanceof Node\Stmt\ClassMethod) {
             return false;
         }
 
@@ -97,7 +95,7 @@ final class PublicVisibility extends Mutator
         return !$this->hasSamePublicParentMethod($node);
     }
 
-    private function hasSamePublicParentMethod(ClassMethod $node): bool
+    private function hasSamePublicParentMethod(Node\Stmt\ClassMethod $node): bool
     {
         /** @var ReflectionClass|null $reflection */
         $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);

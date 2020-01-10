@@ -84,11 +84,11 @@ TXT
     }
 
     /**
-     * @param Node&Node\Expr\FuncCall $node
+     * @param Node\Expr\FuncCall $node
      *
-     * @return Generator<Node|array<Node>>
+     * @return Generator<Node\Expr\FuncCall>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
         /** @var Node\Name $name */
         $name = $node->name;

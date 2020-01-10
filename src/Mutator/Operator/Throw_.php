@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
+use Generator;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -46,13 +47,13 @@ final class Throw_ extends Mutator
     /**
      * Replaces "throw new Exception();" with "new Exception();"
      *
-     * @param Node&Node\Stmt\Throw_ $node
+     * @param Node\Stmt\Throw_ $node
      *
-     * @return Node\Stmt\Expression
+     * @return Generator<Node\Stmt\Expression>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return new Node\Stmt\Expression($node->expr);
+        yield new Node\Stmt\Expression($node->expr);
     }
 
     protected function mutatesNode(Node $node): bool

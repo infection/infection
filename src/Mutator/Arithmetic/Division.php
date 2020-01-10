@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -55,13 +56,13 @@ final class Division extends Mutator
     }
 
     /**
-     * @param Node&Node\Expr\BinaryOp\Div $node
+     * @param Node\Expr\BinaryOp\Div $node
      *
-     * @return Node\Expr\BinaryOp\Mul
+     * @return Generator<Node\Expr\BinaryOp\Mul>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return new Node\Expr\BinaryOp\Mul($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\Mul($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool

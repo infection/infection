@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
+use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -58,13 +59,13 @@ TXT
     }
 
     /**
-     * @param Node&Node\Stmt\Return_ $node
+     * @param Node\Stmt\Return_ $node
      *
-     * @return Node\Stmt\Return_
+     * @return Generator<Node\Stmt\Return_>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return new Node\Stmt\Return_(
+        yield new Node\Stmt\Return_(
             new Node\Scalar\DNumber(-1 * $this->getFloatValueOfNode($node), $node->getAttributes())
         );
     }
@@ -93,7 +94,7 @@ TXT
     }
 
     /**
-     * @param Node&Node\Stmt\Return_ $node
+     * @param Node\Stmt\Return_ $node
      */
     private function getFloatValueOfNode(Node $node): float
     {

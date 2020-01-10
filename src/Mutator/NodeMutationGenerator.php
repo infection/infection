@@ -37,7 +37,6 @@ namespace Infection\Mutator;
 
 use function array_reduce;
 use function count;
-use Generator;
 use function get_class;
 use Infection\MutatedNode;
 use Infection\Mutation\Mutation;
@@ -45,6 +44,7 @@ use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
+use function iterator_to_array;
 use PhpParser\Node;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -130,9 +130,9 @@ class NodeMutationGenerator
             return $mutations;
         }
 
-        $mutatedResult = $mutator->mutate($node);
-
-        $mutatedNodes = $mutatedResult instanceof Generator ? $mutatedResult : [$mutatedResult];
+        // It is important to not rely on the keys here. It might otherwise result in some elements
+        // being overridden, see https://3v4l.org/JLN73
+        $mutatedNodes = iterator_to_array($mutator->mutate($node), false);
 
         foreach ($mutatedNodes as $mutationByMutatorIndex => $mutatedNode) {
             $mutations[] = new Mutation(
