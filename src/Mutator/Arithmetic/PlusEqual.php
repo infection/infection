@@ -61,7 +61,7 @@ TXT
     /**
      * Replaces "+=" with "-="
      *
-     * @param Node&Node\Expr\AssignOp\Plus $node
+     * @param Node\Expr\AssignOp\Plus $node
      */
     public function mutate(Node $node): Generator
     {

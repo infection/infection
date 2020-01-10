@@ -60,7 +60,7 @@ TXT
     }
 
     /**
-     * @param Node&Node\Expr\BinaryOp\NotEqual $node
+     * @param Node\Expr\BinaryOp\NotEqual $node
      */
     public function mutate(Node $node): Generator
     {

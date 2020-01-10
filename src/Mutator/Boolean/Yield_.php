@@ -65,7 +65,7 @@ TXT
     }
 
     /**
-     * @param Node&Node\Expr\Yield_ $node
+     * @param Node\Expr\Yield_ $node
      */
     public function mutate(Node $node): Generator
     {

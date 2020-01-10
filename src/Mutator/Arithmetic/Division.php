@@ -56,7 +56,7 @@ final class Division extends Mutator
     }
 
     /**
-     * @param Node&Node\Expr\BinaryOp\Div $node
+     * @param Node\Expr\BinaryOp\Div $node
      */
     public function mutate(Node $node): Generator
     {

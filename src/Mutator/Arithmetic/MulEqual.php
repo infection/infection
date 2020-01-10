@@ -59,7 +59,7 @@ TXT
     }
 
     /**
-     * @param Node&Node\Expr\AssignOp\Mul $node
+     * @param Node\Expr\AssignOp\Mul $node
      */
     public function mutate(Node $node): Generator
     {

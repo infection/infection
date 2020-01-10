@@ -82,7 +82,7 @@ TXT
     }
 
     /**
-     * @param Node&Node\Stmt\Return_ $node
+     * @param Node\Stmt\Return_ $node
      */
     public function mutate(Node $node): Generator
     {

@@ -61,7 +61,7 @@ final class ProtectedVisibility extends Mutator
     }
 
     /**
-     * @param Node&ClassMethod $node
+     * @param ClassMethod $node
      */
     public function mutate(Node $node): Generator
     {

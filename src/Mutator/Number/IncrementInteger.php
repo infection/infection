@@ -55,7 +55,7 @@ final class IncrementInteger extends AbstractNumberMutator
     }
 
     /**
-     * @param Node&Node\Scalar\LNumber $node
+     * @param Node\Scalar\LNumber $node
      */
     public function mutate(Node $node): Generator
     {

@@ -88,7 +88,7 @@ TXT
     }
 
     /**
-     * @param Node&Node\Expr\FuncCall $node
+     * @param Node\Expr\FuncCall $node
      */
     public function mutate(Node $node): Generator
     {

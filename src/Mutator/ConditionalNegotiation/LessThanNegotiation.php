@@ -59,7 +59,7 @@ TXT
     }
 
     /**
-     * @param Node&Node\Expr\BinaryOp\Smaller $node
+     * @param Node\Expr\BinaryOp\Smaller $node
      */
     public function mutate(Node $node): Generator
     {

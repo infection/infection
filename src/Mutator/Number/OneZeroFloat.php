@@ -58,7 +58,7 @@ TXT
     }
 
     /**
-     * @param Node&Node\Scalar\DNumber $node
+     * @param Node\Scalar\DNumber $node
      */
     public function mutate(Node $node): Generator
     {

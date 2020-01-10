@@ -56,7 +56,7 @@ final class BitwiseNot extends Mutator
     }
 
     /**
-     * @param Node&Node\Expr\BitwiseNot $node
+     * @param Node\Expr\BitwiseNot $node
      */
     public function mutate(Node $node): Generator
     {

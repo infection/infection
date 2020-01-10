@@ -49,7 +49,7 @@ final class IdenticalEqual extends Mutator
     /**
      * Replaces "===" with "=="
      *
-     * @param Node&Node\Expr\BinaryOp\Identical $node
+     * @param Node\Expr\BinaryOp\Identical $node
      */
     public function mutate(Node $node): Generator
     {

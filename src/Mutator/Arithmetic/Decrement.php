@@ -64,7 +64,7 @@ TXT
     }
 
     /**
-     * @param Node&(PreDec|PostDec) $node
+     * @param (PreDec|PostDec) $node
      */
     public function mutate(Node $node): Generator
     {

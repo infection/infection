@@ -45,7 +45,7 @@ use PhpParser\Node;
 abstract class AbstractCastMutator extends Mutator
 {
     /**
-     * @param Node&Node\Expr\Cast $node
+     * @param Node\Expr\Cast $node
      */
     public function mutate(Node $node): Generator
     {

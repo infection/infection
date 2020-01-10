@@ -65,7 +65,7 @@ TXT
     }
 
     /**
-     * @param Node&Node\Expr\ArrayItem $node
+     * @param Node\Expr\ArrayItem $node
      */
     public function mutate(Node $node): Generator
     {

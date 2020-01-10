@@ -46,7 +46,7 @@ use PhpParser\Node;
 abstract class AbstractUnwrapMutator extends Mutator
 {
     /**
-     * @param Node&Node\Expr\FuncCall $node
+     * @param Node\Expr\FuncCall $node
      */
     final public function mutate(Node $node): Generator
     {

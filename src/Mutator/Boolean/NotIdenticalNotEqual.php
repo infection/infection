@@ -49,7 +49,7 @@ final class NotIdenticalNotEqual extends Mutator
     /**
      * Replaces "!==" with "!="
      *
-     * @param Node&Node\Expr\BinaryOp\NotIdentical $node
+     * @param Node\Expr\BinaryOp\NotIdentical $node
      */
     public function mutate(Node $node): Generator
     {

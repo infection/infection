@@ -37,7 +37,6 @@ namespace Infection\Mutator;
 
 use function array_reduce;
 use function count;
-use Generator;
 use function get_class;
 use Infection\Exception\InvalidMutatorException;
 use Infection\Mutation;
