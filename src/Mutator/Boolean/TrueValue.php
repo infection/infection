@@ -37,17 +37,20 @@ namespace Infection\Mutator\Boolean;
 
 use function array_key_exists;
 use Generator;
+use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class TrueValue extends Mutator
+final class TrueValue implements Mutator
 {
+    use DefaultMutatorSettings;
+
     private const DEFAULT_SETTINGS = [
         'array_search' => false,
         'in_array' => false,
@@ -72,7 +75,7 @@ final class TrueValue extends Mutator
         yield new Node\Expr\ConstFetch(new Node\Name('false'));
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!($node instanceof Node\Expr\ConstFetch)) {
             return false;

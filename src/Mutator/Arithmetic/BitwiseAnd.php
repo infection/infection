@@ -36,16 +36,19 @@ declare(strict_types=1);
 namespace Infection\Mutator\Arithmetic;
 
 use Generator;
+use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class BitwiseAnd extends Mutator
+final class BitwiseAnd implements Mutator
 {
+    use DefaultMutatorSettings;
+
     public static function getDefinition(): ?Definition
     {
         return new Definition(
@@ -65,7 +68,7 @@ final class BitwiseAnd extends Mutator
         yield new Node\Expr\BinaryOp\BitwiseOr($node->left, $node->right, $node->getAttributes());
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\BitwiseAnd;
     }

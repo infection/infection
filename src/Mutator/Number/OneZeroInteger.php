@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Number;
 
 use Generator;
+use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
@@ -45,6 +46,8 @@ use PhpParser\Node;
  */
 final class OneZeroInteger extends AbstractNumberMutator
 {
+    use DefaultMutatorSettings;
+
     public static function getDefinition(): ?Definition
     {
         return new Definition(
@@ -73,7 +76,7 @@ TXT
         yield new Node\Scalar\LNumber(0);
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Scalar\LNumber
             && ($node->value === 0 || $node->value === 1)

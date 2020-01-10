@@ -36,14 +36,17 @@ declare(strict_types=1);
 namespace Infection\Mutator\Operator;
 
 use Generator;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\DefaultMutatorSettings;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Spread extends Mutator
+final class Spread implements Mutator
 {
+    use DefaultMutatorSettings;
+
     /**
      * Replaces "[...$collection, 4, 5];" with "[[...$collection][0], 4, 5]"
      *
@@ -69,7 +72,7 @@ final class Spread extends Mutator
         );
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\ArrayItem && $node->unpack;
     }

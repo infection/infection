@@ -36,15 +36,18 @@ declare(strict_types=1);
 namespace Infection\Mutator\Operator;
 
 use Generator;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\DefaultMutatorSettings;
+use Infection\Mutator\Mutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Continue_ extends Mutator
+final class Continue_ implements Mutator
 {
+    use DefaultMutatorSettings;
+
     /**
      * Replaces "continue;" with "break;"
      *
@@ -57,7 +60,7 @@ final class Continue_ extends Mutator
         yield new Node\Stmt\Break_();
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Stmt\Continue_) {
             return false;

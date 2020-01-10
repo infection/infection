@@ -36,7 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutator\Boolean;
 
 use Generator;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\DefaultMutatorSettings;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
 /**
@@ -44,8 +45,10 @@ use PhpParser\Node;
  *
  * @deprecated This mutator is a semantic addition
  */
-final class NotIdenticalNotEqual extends Mutator
+final class NotIdenticalNotEqual implements Mutator
 {
+    use DefaultMutatorSettings;
+
     /**
      * Replaces "!==" with "!="
      *
@@ -58,7 +61,7 @@ final class NotIdenticalNotEqual extends Mutator
         yield new Node\Expr\BinaryOp\NotEqual($node->left, $node->right, $node->getAttributes());
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\NotIdentical;
     }

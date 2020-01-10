@@ -36,7 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutator\ReturnValue;
 
 use Generator;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\DefaultMutatorSettings;
+use Infection\Mutator\Mutator;
 use Infection\Visitor\ReflectionVisitor;
 use function is_string;
 use PhpParser\Node;
@@ -44,8 +45,10 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class ArrayOneItem extends Mutator
+final class ArrayOneItem implements Mutator
 {
+    use DefaultMutatorSettings;
+
     /**
      * Leaves only one item in the returned array
      *
@@ -79,7 +82,7 @@ final class ArrayOneItem extends Mutator
         );
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Stmt\Return_) {
             return false;

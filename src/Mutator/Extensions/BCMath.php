@@ -39,24 +39,25 @@ use function array_diff_key;
 use function array_filter;
 use function count;
 use Generator;
+use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class BCMath extends Mutator
+final class BCMath implements Mutator
 {
+    use DefaultMutatorSettings;
+
     private $converters;
 
     public function __construct(MutatorConfig $config)
     {
-        parent::__construct($config);
-
-        $settings = $this->getSettings();
+        $settings = $config->getMutatorSettings();
 
         $this->setupConverters($settings);
     }
@@ -96,7 +97,7 @@ TXT
         yield from $this->converters[$name->toLowerString()]($node);
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Expr\FuncCall || !$node->name instanceof Node\Name) {
             return false;

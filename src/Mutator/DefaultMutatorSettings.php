@@ -33,25 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Mutator;
 
-use Infection\Mutator\Definition;
-use Infection\Mutator\Mutator as MutatorInterface;
-use PhpParser\Node;
+use function end;
+use function explode;
 
-/**
- * @deprecated Should not be needed anymore. More work needs to be done but ultimately this class
- *             should go away.
- */
-abstract class Mutator implements MutatorInterface
+trait DefaultMutatorSettings
 {
-    private $config;
-
-    public function __construct(MutatorConfig $config)
-    {
-        $this->config = $config;
-    }
-
+    // TODO: declare the definitions downstream so eventually this method can be removed from here
+    //  and the trait be renamed `GetMutatorName`
     public static function getDefinition(): ?Definition
     {
         return null;
@@ -63,19 +53,4 @@ abstract class Mutator implements MutatorInterface
 
         return (string) end($parts);
     }
-
-    public function canMutate(Node $node): bool
-    {
-        return $this->mutatesNode($node);
-    }
-
-    final protected function getSettings(): array
-    {
-        return $this->config->getMutatorSettings();
-    }
-
-    /**
-     * @deprecated Should be removed in favour of canMutate()
-     */
-    abstract protected function mutatesNode(Node $node): bool;
 }

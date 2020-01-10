@@ -37,6 +37,7 @@ namespace Infection\Mutator\Number;
 
 use Generator;
 use function in_array;
+use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Visitor\ParentConnectorVisitor;
@@ -47,6 +48,8 @@ use PhpParser\Node;
  */
 final class DecrementInteger extends AbstractNumberMutator
 {
+    use DefaultMutatorSettings;
+
     private const COUNT_NAMES = [
         'count',
         'grapheme_strlen',
@@ -75,7 +78,7 @@ final class DecrementInteger extends AbstractNumberMutator
         yield new Node\Scalar\LNumber($node->value - 1);
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Scalar\LNumber || $node->value === 1) {
             return false;

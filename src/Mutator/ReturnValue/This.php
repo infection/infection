@@ -69,7 +69,7 @@ final class This extends AbstractValueToNullReturnValue
         );
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Stmt\Return_ &&
             $node->expr instanceof Node\Expr\Variable &&

@@ -36,16 +36,19 @@ declare(strict_types=1);
 namespace Infection\Mutator\Sort;
 
 use Generator;
+use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Spaceship extends Mutator
+final class Spaceship implements Mutator
 {
+    use DefaultMutatorSettings;
+
     public static function getDefinition(): ?Definition
     {
         return new Definition(
@@ -68,7 +71,7 @@ TXT
         yield new Node\Expr\BinaryOp\Spaceship($node->right, $node->left);
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\Spaceship;
     }

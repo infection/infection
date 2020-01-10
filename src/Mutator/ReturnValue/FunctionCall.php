@@ -99,7 +99,7 @@ TXT
         ];
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Stmt\Return_) {
             return false;

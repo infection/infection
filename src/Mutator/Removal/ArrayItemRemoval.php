@@ -41,7 +41,8 @@ use Generator;
 use function gettype;
 use function in_array;
 use Infection\Config\Exception\InvalidConfigException;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\DefaultMutatorSettings;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use function is_numeric;
 use function is_scalar;
@@ -55,8 +56,10 @@ use function strtoupper;
 /**
  * @internal
  */
-final class ArrayItemRemoval extends Mutator
+final class ArrayItemRemoval implements Mutator
 {
+    use DefaultMutatorSettings;
+
     private const DEFAULT_SETTINGS = [
         'remove' => 'first',
         'limit' => PHP_INT_MAX,
@@ -74,9 +77,7 @@ final class ArrayItemRemoval extends Mutator
 
     public function __construct(MutatorConfig $config)
     {
-        parent::__construct($config);
-
-        $settings = $this->getResultSettings();
+        $settings = $this->getResultSettings($config->getMutatorSettings());
 
         $this->remove = $settings['remove'];
         $this->limit = $settings['limit'];
@@ -97,7 +98,7 @@ final class ArrayItemRemoval extends Mutator
         }
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\Array_ && count($node->items);
     }
@@ -114,9 +115,9 @@ final class ArrayItemRemoval extends Mutator
         }
     }
 
-    private function getResultSettings(): array
+    private function getResultSettings(array $settings): array
     {
-        $settings = array_merge(self::DEFAULT_SETTINGS, $this->getSettings());
+        $settings = array_merge(self::DEFAULT_SETTINGS, $settings);
 
         if (!is_string($settings['remove'])) {
             $this->throwConfigException('remove');

@@ -36,16 +36,19 @@ declare(strict_types=1);
 namespace Infection\Mutator\Removal;
 
 use Generator;
+use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class CloneRemoval extends Mutator
+final class CloneRemoval implements Mutator
 {
+    use DefaultMutatorSettings;
+
     public static function getDefinition(): ?Definition
     {
         return new Definition(
@@ -65,7 +68,7 @@ final class CloneRemoval extends Mutator
         yield $node->expr;
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\Clone_;
     }

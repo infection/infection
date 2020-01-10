@@ -37,17 +37,20 @@ namespace Infection\Mutator\Operator;
 
 use function count;
 use Generator;
+use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Finally_ extends Mutator
+final class Finally_ implements Mutator
 {
+    use DefaultMutatorSettings;
+
     public static function getDefinition(): ?Definition
     {
         return new Definition(
@@ -67,7 +70,7 @@ final class Finally_ extends Mutator
         yield new Node\Stmt\Nop();
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Stmt\Finally_) {
             return false;

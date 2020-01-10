@@ -37,16 +37,19 @@ namespace Infection\Mutator\Arithmetic;
 
 use Generator;
 use function in_array;
+use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class RoundingFamily extends Mutator
+final class RoundingFamily implements Mutator
 {
+    use DefaultMutatorSettings;
+
     private const MUTATORS_MAP = [
         'floor',
         'ceil',
@@ -87,7 +90,7 @@ TXT
         }
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Expr\FuncCall) {
             return false;

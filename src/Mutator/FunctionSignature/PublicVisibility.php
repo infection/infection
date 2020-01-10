@@ -36,9 +36,10 @@ declare(strict_types=1);
 namespace Infection\Mutator\FunctionSignature;
 
 use Generator;
+use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 use ReflectionClass;
@@ -47,8 +48,10 @@ use ReflectionException;
 /**
  * @internal
  */
-final class PublicVisibility extends Mutator
+final class PublicVisibility implements Mutator
 {
+    use DefaultMutatorSettings;
+
     public static function getDefinition(): ?Definition
     {
         return new Definition(
@@ -78,7 +81,7 @@ final class PublicVisibility extends Mutator
         );
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Stmt\ClassMethod) {
             return false;
