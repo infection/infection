@@ -105,7 +105,7 @@ class NodeMutationGenerator
                 return $mutations;
             }
         } catch (Throwable $throwable) {
-            throw InvalidMutatorException::create(
+            throw InvalidMutator::create(
                 $this->filePath,
                 $mutator->getMutator(),
                 $throwable

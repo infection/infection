@@ -41,7 +41,7 @@ use Throwable;
 /**
  * @internal
  */
-final class InvalidMutatorException extends Exception
+final class InvalidMutator extends Exception
 {
     public static function create(string $filePath, Mutator $mutator, Throwable $previous): self
     {

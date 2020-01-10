@@ -37,18 +37,18 @@ namespace Infection\Tests\Mutator;
 
 use Exception;
 use Infection\Mutator\Arithmetic\Plus;
-use Infection\Mutator\InvalidMutatorException;
+use Infection\Mutator\InvalidMutator;
 use Infection\Mutator\Util\MutatorConfig;
 use PHPUnit\Framework\TestCase;
 
-final class InvalidMutatorExceptionTest extends TestCase
+final class InvalidMutatorTest extends TestCase
 {
     public function test_it_has_correct_user_facing_message(): void
     {
         $mutator = new Plus(new MutatorConfig([]));
         $original = new Exception();
 
-        $exception = InvalidMutatorException::create('foo/bar/baz', $mutator, $original);
+        $exception = InvalidMutator::create('foo/bar/baz', $mutator, $original);
 
         $this->assertSame(
             'Encountered an error with the "Plus" mutator in the "foo/bar/baz" file. ' .
