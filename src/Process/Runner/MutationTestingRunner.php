@@ -42,8 +42,8 @@ use Infection\Events\MutantsCreatingFinished;
 use Infection\Events\MutantsCreatingStarted;
 use Infection\Events\MutationTestingFinished;
 use Infection\Events\MutationTestingStarted;
-use Infection\Mutant\MutantCreator;
-use Infection\Mutation;
+use Infection\Mutant\MutantFactory;
+use Infection\Mutation\Mutation;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\MutantProcessInterface;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
@@ -61,7 +61,7 @@ final class MutationTestingRunner
     public function __construct(
         MutantProcessBuilder $processBuilder,
         ParallelProcessRunner $parallelProcessManager,
-        MutantCreator $mutantCreator,
+        MutantFactory $mutantCreator,
         EventDispatcherInterface $eventDispatcher
     ) {
         $this->processBuilder = $processBuilder;

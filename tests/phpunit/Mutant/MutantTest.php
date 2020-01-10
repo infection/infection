@@ -37,7 +37,8 @@ namespace Infection\Tests\Mutant;
 
 use Generator;
 use Infection\Mutant\Mutant;
-use Infection\Mutation;
+use Infection\MutatedNode;
+use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use PhpParser\Node;
@@ -45,6 +46,8 @@ use PHPUnit\Framework\TestCase;
 
 final class MutantTest extends TestCase
 {
+    use MutantAssertions;
+
     /**
      * @dataProvider valuesProvider
      *
@@ -59,11 +62,14 @@ final class MutantTest extends TestCase
     ): void {
         $mutant = new Mutant($filePath, $mutation, $diff);
 
-        $this->assertSame($filePath, $mutant->getMutantFilePath());
-        $this->assertSame($mutation, $mutant->getMutation());
-        $this->assertSame($diff, $mutant->getDiff());
-        $this->assertSame($expectedCoveredByTests, $mutant->isCoveredByTest());
-        $this->assertSame($expectedTests, $mutant->getTests());
+        $this->assertMutantStateIs(
+            $mutant,
+            $filePath,
+            $mutation,
+            $diff,
+            $expectedCoveredByTests,
+            $expectedTests
+        );
     }
 
     public function valuesProvider(): Generator
@@ -96,7 +102,7 @@ final class MutantTest extends TestCase
                 Plus::getName(),
                 $nominalAttributes,
                 Node\Scalar\LNumber::class,
-                new Node\Scalar\LNumber(1),
+                MutatedNode::wrap(new Node\Scalar\LNumber(1)),
                 0,
                 $tests
             ),
@@ -116,7 +122,7 @@ final class MutantTest extends TestCase
                 Plus::getName(),
                 $nominalAttributes,
                 Node\Scalar\LNumber::class,
-                new Node\Scalar\LNumber(1),
+                MutatedNode::wrap(new Node\Scalar\LNumber(1)),
                 0,
                 []
             ),

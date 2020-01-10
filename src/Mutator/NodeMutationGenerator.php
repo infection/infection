@@ -38,8 +38,8 @@ namespace Infection\Mutator;
 use function array_reduce;
 use function count;
 use function get_class;
-use Infection\Exception\InvalidMutatorException;
-use Infection\Mutation;
+use Infection\MutatedNode;
+use Infection\Mutation\Mutation;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\Visitor\ParentConnectorVisitor;
@@ -105,9 +105,9 @@ class NodeMutationGenerator
                 return $mutations;
             }
         } catch (Throwable $throwable) {
-            throw InvalidMutatorException::create(
+            throw InvalidMutator::create(
                 $this->filePath,
-                $mutator->getMutator(),
+                $mutator->getMutator()::getName(),
                 $throwable
             );
         }
@@ -141,7 +141,7 @@ class NodeMutationGenerator
                 $mutator->getMutator()::getName(),
                 $node->getAttributes(),
                 get_class($node),
-                $mutatedNode,
+                MutatedNode::wrap($mutatedNode),
                 $mutationByMutatorIndex,
                 $tests
             );

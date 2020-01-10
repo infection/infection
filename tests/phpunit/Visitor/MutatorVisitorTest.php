@@ -36,7 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Visitor;
 
 use Generator;
-use Infection\Mutation;
+use Infection\MutatedNode;
+use Infection\Mutation\Mutation;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\Tests\StringNormalizer;
 use Infection\Visitor\MutatorVisitor;
@@ -117,7 +118,7 @@ PHP
                         'endFilePos' => -1,
                     ],
                     ClassMethod::class,
-                    new Nop(),
+                    MutatedNode::wrap(new Nop()),
                     0,
                     []
                 ),
@@ -169,7 +170,7 @@ PHP
                         'endFilePos' => -1,
                     ],
                     ClassMethod::class,
-                    [new Nop(), new Nop()],
+                    MutatedNode::wrap([new Nop(), new Nop()]),
                     0,
                     []
                 ),
@@ -223,7 +224,7 @@ PHP
                         'endFilePos' => -1,
                     ],
                     ClassMethod::class,
-                    new Nop(),
+                    MutatedNode::wrap(new Nop()),
                     0,
                     []
                 ),
@@ -291,7 +292,7 @@ PHP
                         'endFilePos' => -1,
                     ],
                     PublicVisibility::getName(),
-                    new Nop(),
+                    MutatedNode::wrap(new Nop()),
                     0,
                     []
                 ),

@@ -33,47 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Visitor;
+namespace Infection\Mutator;
 
-use function array_key_exists;
-use function get_class;
-use Infection\Mutation\Mutation;
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use function array_keys;
+use RuntimeException;
+use function Safe\sprintf;
+use Throwable;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class MutatorVisitor extends NodeVisitorAbstract
+final class InvalidMutator extends RuntimeException
 {
-    private $mutation;
+    private const GITHUB_BUG_LINK = 'https://github.com/infection/infection/issues/new?template=Bug_report.md';
 
-    public function __construct(Mutation $mutation)
+    public static function create(string $filePath, string $mutatorName, Throwable $previous): self
     {
-        $this->mutation = $mutation;
-    }
+        Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
 
-    public function leaveNode(Node $node)
-    {
-        $attributes = $node->getAttributes();
-
-        if (!array_key_exists('startTokenPos', $attributes)) {
-            return null;
-        }
-
-        $mutatedAttributes = $this->mutation->getAttributes();
-
-        $samePosition = $attributes['startTokenPos'] === $mutatedAttributes['startTokenPos']
-            && $attributes['endTokenPos'] === $mutatedAttributes['endTokenPos'];
-
-        if ($samePosition && $this->mutation->getMutatedNodeClass() === get_class($node)) {
-            return $this->mutation->getMutatedNode()->unwrap();
-            // TODO STOP TRAVERSING
-            // TODO check all built-in visitors, in particular FirstFindingVisitor
-            // TODO beforeTraverse - FirstFindingVisitor
-            // TODO enterNode instead of leaveNode for '<' mutation to not travers children?
-        }
-
-        return null;
+        return new self(
+            sprintf(
+                <<<'TXT'
+Encountered an error with the "%s" mutator in the "%s" file. This is most likely a bug in Infection.
+Please consider reporting this this in our issue tracker: %s
+TXT
+                ,
+                $mutatorName,
+                $filePath,
+                self::GITHUB_BUG_LINK
+            ),
+            0,
+            $previous
+        );
     }
 }

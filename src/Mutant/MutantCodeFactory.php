@@ -33,47 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Visitor;
+namespace Infection\Mutant;
 
-use function array_key_exists;
-use function get_class;
 use Infection\Mutation\Mutation;
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use Infection\Visitor\CloneVisitor;
+use Infection\Visitor\MutatorVisitor;
+use PhpParser\NodeTraverser;
+use PhpParser\PrettyPrinterAbstract;
 
 /**
  * @internal
+ * @final
  */
-final class MutatorVisitor extends NodeVisitorAbstract
+class MutantCodeFactory
 {
-    private $mutation;
+    private $printer;
 
-    public function __construct(Mutation $mutation)
+    public function __construct(PrettyPrinterAbstract $prettyPrinter)
     {
-        $this->mutation = $mutation;
+        $this->printer = $prettyPrinter;
     }
 
-    public function leaveNode(Node $node)
+    public function createCode(Mutation $mutation): string
     {
-        $attributes = $node->getAttributes();
+        $traverser = new NodeTraverser();
 
-        if (!array_key_exists('startTokenPos', $attributes)) {
-            return null;
-        }
+        $traverser->addVisitor(new CloneVisitor());
+        $traverser->addVisitor(new MutatorVisitor($mutation));
 
-        $mutatedAttributes = $this->mutation->getAttributes();
+        $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
 
-        $samePosition = $attributes['startTokenPos'] === $mutatedAttributes['startTokenPos']
-            && $attributes['endTokenPos'] === $mutatedAttributes['endTokenPos'];
-
-        if ($samePosition && $this->mutation->getMutatedNodeClass() === get_class($node)) {
-            return $this->mutation->getMutatedNode()->unwrap();
-            // TODO STOP TRAVERSING
-            // TODO check all built-in visitors, in particular FirstFindingVisitor
-            // TODO beforeTraverse - FirstFindingVisitor
-            // TODO enterNode instead of leaveNode for '<' mutation to not travers children?
-        }
-
-        return null;
+        return $this->printer->prettyPrintFile($mutatedStatements);
     }
 }
