@@ -64,7 +64,7 @@ final class IgnoreMutator
         $this->mutator = $mutator;
     }
 
-    public function shouldMutate(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!$this->mutator->canMutate($node)) {
             return false;

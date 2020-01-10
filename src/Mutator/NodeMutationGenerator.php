@@ -101,7 +101,7 @@ class NodeMutationGenerator
     private function generateForMutator(Node $node, IgnoreMutator $mutator, array $mutations): array
     {
         try {
-            if (!$mutator->shouldMutate($node)) {
+            if (!$mutator->canMutate($node)) {
                 return $mutations;
             }
         } catch (Throwable $throwable) {

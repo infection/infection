@@ -75,7 +75,7 @@ final class IgnoreMutatorTest extends TestCase
             ->willReturn(false)
         ;
 
-        $mutate = $ignoreMutator->shouldMutate($this->nodeMock);
+        $mutate = $ignoreMutator->canMutate($this->nodeMock);
 
         $this->assertFalse($mutate);
     }
@@ -98,7 +98,7 @@ final class IgnoreMutatorTest extends TestCase
             ->willReturn(false)
         ;
 
-        $mutate = $ignoreMutator->shouldMutate($this->nodeMock);
+        $mutate = $ignoreMutator->canMutate($this->nodeMock);
 
         $this->assertTrue($mutate);
     }
@@ -142,7 +142,7 @@ final class IgnoreMutatorTest extends TestCase
 
         $ignoreMutator = new IgnoreMutator($configMock, $this->mutatorMock);
 
-        $mutate = $ignoreMutator->shouldMutate($this->nodeMock);
+        $mutate = $ignoreMutator->canMutate($this->nodeMock);
 
         $this->assertFalse($mutate);
     }
