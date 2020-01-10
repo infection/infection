@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Generator;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -48,10 +47,12 @@ final class Coalesce extends Mutator
      * Replaces "'someValue' ?? 'otherValue';" with "'otherValue'"
      *
      * @param Node&Node\Expr\BinaryOp\Coalesce $node
+     *
+     * @return Node\Expr
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node)
     {
-        yield $node->right;
+        return $node->right;
     }
 
     protected function mutatesNode(Node $node): bool

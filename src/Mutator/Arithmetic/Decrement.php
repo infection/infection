@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -65,19 +64,17 @@ TXT
 
     /**
      * @param Node&(PreDec|PostDec) $node
+     *
+     * @return PreInc|PostInc
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node)
     {
         if ($node instanceof PreDec) {
-            yield new PreInc($node->var, $node->getAttributes());
-
-            return;
+            return new PreInc($node->var, $node->getAttributes());
         }
 
         if ($node instanceof PostDec) {
-            yield new PostInc($node->var, $node->getAttributes());
-
-            return;
+            return new PostInc($node->var, $node->getAttributes());
         }
     }
 

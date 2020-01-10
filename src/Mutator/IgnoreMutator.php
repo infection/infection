@@ -85,9 +85,9 @@ final class IgnoreMutator
     }
 
     /**
-     * @return Generator<Node|Node[]>
+     * @return Node|Node[]|Generator
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node)
     {
         return $this->mutator->mutate($node);
     }

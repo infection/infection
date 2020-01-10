@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -57,10 +56,12 @@ final class FunctionCallRemoval extends Mutator
 
     /**
      * Replaces "doSmth()" with ""
+     *
+     * @return Node\Stmt\Nop()
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node)
     {
-        yield new Node\Stmt\Nop();
+        return new Node\Stmt\Nop();
     }
 
     protected function mutatesNode(Node $node): bool

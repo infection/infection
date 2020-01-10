@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalNegotiation;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -60,10 +59,12 @@ TXT
 
     /**
      * @param Node&Node\Expr\BinaryOp\SmallerOrEqual $node
+     *
+     * @return Node\Expr\BinaryOp\Greater
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node)
     {
-        yield new Node\Expr\BinaryOp\Greater($node->left, $node->right, $node->getAttributes());
+        return new Node\Expr\BinaryOp\Greater($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool

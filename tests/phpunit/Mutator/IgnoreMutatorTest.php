@@ -35,12 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use Generator;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Visitor\ReflectionVisitor;
-use function iterator_to_array;
 use PhpParser\Node;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -157,14 +155,12 @@ final class IgnoreMutatorTest extends TestCase
             ->expects($this->once())
             ->method('mutate')
             ->with($this->nodeMock)
-            ->willReturnCallback(static function () use ($mutatedNodeMock): Generator {
-                yield $mutatedNodeMock;
-            })
+            ->willReturn($mutatedNodeMock)
         ;
 
         $mutatedNode = $ignoreMutator->mutate($this->nodeMock);
 
-        $this->assertSame([$mutatedNodeMock], iterator_to_array($mutatedNode));
+        $this->assertSame($mutatedNodeMock, $mutatedNode);
     }
 
     public function test_it_exposes_its_decorated_mutator(): void

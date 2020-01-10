@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -62,10 +61,12 @@ TXT
 
     /**
      * @param Coalesce $node
+     *
+     * @return Assign
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node)
     {
-        yield new Assign($node->var, $node->expr, $node->getAttributes());
+        return new Assign($node->var, $node->expr, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool

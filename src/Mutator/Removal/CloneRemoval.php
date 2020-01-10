@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -57,10 +56,12 @@ final class CloneRemoval extends Mutator
 
     /**
      * @param Node&Node\Expr\Clone_ $node
+     *
+     * @return Node\Expr
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node)
     {
-        yield $node->expr;
+        return $node->expr;
     }
 
     protected function mutatesNode(Node $node): bool

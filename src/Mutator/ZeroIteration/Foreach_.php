@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ZeroIteration;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -75,10 +74,12 @@ TXT
 
     /**
      * @param Node&Node\Stmt\Foreach_ $node
+     *
+     * @return Node&Node\Stmt\Foreach_
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node)
     {
-        yield new Node\Stmt\Foreach_(
+        return new Node\Stmt\Foreach_(
             new Node\Expr\Array_(),
             $node->valueVar,
             [

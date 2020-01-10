@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ZeroIteration;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -75,10 +74,12 @@ TXT
 
     /**
      * @param Node&Node\Stmt\For_ $node
+     *
+     * @return Node\Stmt\For_
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node)
     {
-        yield new Node\Stmt\For_(
+        return new Node\Stmt\For_(
             [
                 'init' => $node->init,
                 'cond' => [new Node\Expr\ConstFetch(new Node\Name('false'))],

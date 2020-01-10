@@ -131,7 +131,11 @@ class NodeMutationGenerator
             return $mutations;
         }
 
-        foreach ($mutator->mutate($node) as $mutationByMutatorIndex => $mutatedNode) {
+        $mutatedResult = $mutator->mutate($node);
+
+        $mutatedNodes = $mutatedResult instanceof Generator ? $mutatedResult : [$mutatedResult];
+
+        foreach ($mutatedNodes as $mutationByMutatorIndex => $mutatedNode) {
             $mutations[] = new Mutation(
                 $this->filePath,
                 $this->fileNodes,

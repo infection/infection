@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
@@ -59,16 +58,16 @@ TXT
 
     /**
      * @param Node&Node\Scalar\DNumber $node
+     *
+     * @return Node\Scalar\DNumber
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node)
     {
         if ($node->value === 0.0) {
-            yield new Node\Scalar\DNumber(1.0);
-
-            return;
+            return new Node\Scalar\DNumber(1.0);
         }
 
-        yield new Node\Scalar\DNumber(0.0);
+        return new Node\Scalar\DNumber(0.0);
     }
 
     protected function mutatesNode(Node $node): bool

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Generator;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -50,10 +49,12 @@ final class NotIdenticalNotEqual extends Mutator
      * Replaces "!==" with "!="
      *
      * @param Node&Node\Expr\BinaryOp\NotIdentical $node
+     *
+     * @return Node\Expr\BinaryOp\NotEqual
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node)
     {
-        yield new Node\Expr\BinaryOp\NotEqual($node->left, $node->right, $node->getAttributes());
+        return new Node\Expr\BinaryOp\NotEqual($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool

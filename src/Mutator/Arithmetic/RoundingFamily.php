@@ -67,8 +67,10 @@ TXT
 
     /**
      * @param Node&Node\Expr\FuncCall $node
+     *
+     * @return Generator
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node)
     {
         /** @var Node\Name $name */
         $name = $node->name;

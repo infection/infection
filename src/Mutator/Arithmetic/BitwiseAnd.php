@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -57,10 +56,12 @@ final class BitwiseAnd extends Mutator
 
     /**
      * @param Node&Node\Expr\BinaryOp\BooleanAnd $node
+     *
+     * @return Node\Expr\BinaryOp\BitwiseOr
      */
-    public function mutate(Node $node): Generator
+    public function mutate(Node $node)
     {
-        yield new Node\Expr\BinaryOp\BitwiseOr($node->left, $node->right, $node->getAttributes());
+        return new Node\Expr\BinaryOp\BitwiseOr($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool
