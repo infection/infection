@@ -38,6 +38,7 @@ namespace Infection\Tests\Mutant;
 use Infection\Differ\Differ;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantFactory;
+use Infection\MutatedNode;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\TestFramework\Coverage\CoverageLineData;
@@ -243,7 +244,7 @@ final class MutantFactoryTest extends FileSystemTestCase
                 'endFilePos' => 53,
             ],
             Node\Scalar\LNumber::class,
-            new Node\Scalar\LNumber(1),
+            MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             0,
             $tests
         );

@@ -38,6 +38,7 @@ namespace Infection\Tests\Mutant;
 use Generator;
 use Infection\Console\InfectionContainer;
 use Infection\Mutant\MutantCodeFactory;
+use Infection\MutatedNode;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use PhpParser\Node;
@@ -148,17 +149,19 @@ final class MutantCodeFactoryTest extends TestCase
                     'kind' => 10,
                 ],
                 Node\Scalar\LNumber::class,
-                new Node\Scalar\LNumber(
-                    15,
-                    [
-                        'startLine' => 5,
-                        'startTokenPos' => 9,
-                        'startFilePos' => 29,
-                        'endLine' => 5,
-                        'endTokenPos' => 9,
-                        'endFilePos' => 30,
-                        'kind' => 10,
-                    ]
+                MutatedNode::wrap(
+                    new Node\Scalar\LNumber(
+                        15,
+                        [
+                            'startLine' => 5,
+                            'startTokenPos' => 9,
+                            'startFilePos' => 29,
+                            'endLine' => 5,
+                            'endTokenPos' => 9,
+                            'endFilePos' => 30,
+                            'kind' => 10,
+                        ]
+                    )
                 ),
                 0,
                 []
