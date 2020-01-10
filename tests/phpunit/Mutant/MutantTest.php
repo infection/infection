@@ -37,6 +37,7 @@ namespace Infection\Tests\Mutant;
 
 use Generator;
 use Infection\Mutant\Mutant;
+use Infection\MutatedNode;
 use Infection\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\TestFramework\Coverage\CoverageLineData;
@@ -96,7 +97,7 @@ final class MutantTest extends TestCase
                 Plus::getName(),
                 $nominalAttributes,
                 Node\Scalar\LNumber::class,
-                new Node\Scalar\LNumber(1),
+                MutatedNode::wrap(new Node\Scalar\LNumber(1)),
                 0,
                 $tests
             ),
@@ -116,7 +117,7 @@ final class MutantTest extends TestCase
                 Plus::getName(),
                 $nominalAttributes,
                 Node\Scalar\LNumber::class,
-                new Node\Scalar\LNumber(1),
+                MutatedNode::wrap(new Node\Scalar\LNumber(1)),
                 0,
                 []
             ),
