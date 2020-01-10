@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Regex;
 
+use Generator;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
@@ -48,9 +49,9 @@ final class PregQuote extends Mutator
      *
      * @param Node&Node\Expr\FuncCall $node
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return $node->args[0];
+        yield $node->args[0];
     }
 
     protected function mutatesNode(Node $node): bool

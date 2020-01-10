@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
+use Generator;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 use PhpParser\Node\Expr\ArrayItem;
@@ -48,12 +49,10 @@ final class Spread extends Mutator
      * Replaces "[...$collection, 4, 5];" with "[[...$collection][0], 4, 5]"
      *
      * @param ArrayItem $node
-     *
-     * @return ArrayItem
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return new ArrayItem(
+        yield new ArrayItem(
             new Node\Expr\ArrayDimFetch(
                 new Node\Expr\Array_(
                     [$node],

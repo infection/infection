@@ -47,10 +47,8 @@ abstract class AbstractUnwrapMutator extends Mutator
 {
     /**
      * @param Node&Node\Expr\FuncCall $node
-     *
-     * @return Node\Arg[]|Generator;
      */
-    final public function mutate(Node $node)
+    final public function mutate(Node $node): Generator
     {
         foreach ($this->getParameterIndexes($node) as $index) {
             if ($node->args[$index]->unpack) {

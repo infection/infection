@@ -89,13 +89,12 @@ TXT
 
     /**
      * @param Node&Node\Expr\FuncCall $node
-     *
-     * @return Node[]|Generator
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
         /** @var Node\Name $name */
         $name = $node->name;
+
         yield from $this->converters[$name->toLowerString()]($node);
     }
 
