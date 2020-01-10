@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator;
 
 use function array_keys;
-use Exception;
+use RuntimeException;
 use function Safe\sprintf;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -44,7 +44,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class InvalidMutator extends Exception
+final class InvalidMutator extends RuntimeException
 {
     private const GITHUB_BUG_LINK = 'https://github.com/infection/infection/issues/new?template=Bug_report.md';
 
