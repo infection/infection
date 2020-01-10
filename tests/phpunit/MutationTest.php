@@ -52,7 +52,6 @@ final class MutationTest extends TestCase
      *
      * @param Node[] $originalFileAst
      * @param array<string|int|float> $attributes
-     * @param Node|Node[] $mutatedNode
      * @param array<string|int|float> $expectedAttributes
      * @param CoverageLineData[] $tests
      */
