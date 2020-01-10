@@ -44,9 +44,7 @@ final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
 
         // It is important to not rely on the keys here. It might otherwise result in some elements
         // being overridden, see https://3v4l.org/JLN73
-        $mutatedNodes = iterator_to_array($this->mutator->mutate($node), false);
-
-        foreach($mutatedNodes as $mutatedNode) {
+        foreach($this->mutator->mutate($node) as $mutatedNode) {
             $this->mutations[] = new SimpleMutation(
                 $this->fileAst,
                 $this->mutator,
