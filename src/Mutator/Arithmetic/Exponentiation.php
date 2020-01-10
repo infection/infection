@@ -60,6 +60,8 @@ TXT
 
     /**
      * @param Node\Expr\BinaryOp\Pow $node
+     *
+     * @return Generator<Node\Expr\BinaryOp\Div>
      */
     public function mutate(Node $node): Generator
     {

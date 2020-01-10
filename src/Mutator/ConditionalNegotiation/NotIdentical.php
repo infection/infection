@@ -62,6 +62,8 @@ TXT
      * Replaces "!==" with "==="
      *
      * @param Node\Expr\BinaryOp\NotIdentical $node
+     *
+     * @return Generator<Node\Expr\BinaryOp\Identical>
      */
     public function mutate(Node $node): Generator
     {

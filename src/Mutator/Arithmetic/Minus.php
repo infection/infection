@@ -57,6 +57,8 @@ final class Minus extends Mutator
 
     /**
      * @param Node\Expr\BinaryOp\Minus $node
+     *
+     * @return Generator<Node\Expr\BinaryOp\Plus>
      */
     public function mutate(Node $node): Generator
     {

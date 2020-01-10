@@ -60,6 +60,8 @@ TXT
 
     /**
      * @param Node\Expr\AssignOp\Mod $node
+     *
+     * @return Generator<Node\Expr\AssignOp\Mul>
      */
     public function mutate(Node $node): Generator
     {

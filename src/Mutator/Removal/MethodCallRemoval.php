@@ -55,6 +55,11 @@ final class MethodCallRemoval extends Mutator
         );
     }
 
+    /**
+     * @param Node\Stmt\Expression $node
+     *
+     * @return Generator<Node\Stmt\Nop>
+     */
     public function mutate(Node $node): Generator
     {
         yield new Node\Stmt\Nop();

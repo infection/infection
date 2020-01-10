@@ -62,6 +62,8 @@ TXT
      * Replaces "+=" with "-="
      *
      * @param Node\Expr\AssignOp\Plus $node
+     *
+     * @return Generator<Node\Expr\AssignOp\Minus>
      */
     public function mutate(Node $node): Generator
     {

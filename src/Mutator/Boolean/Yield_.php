@@ -66,6 +66,8 @@ TXT
 
     /**
      * @param Node\Expr\Yield_ $node
+     *
+     * @return Generator<Node\Expr\Yield_>
      */
     public function mutate(Node $node): Generator
     {
@@ -73,6 +75,7 @@ TXT
         $key = $node->key;
         /** @var Node\Expr $value */
         $value = $node->value;
+
         $node->value = new Node\Expr\BinaryOp\Greater($key, $value, $node->getAttributes());
         $node->key = null;
 

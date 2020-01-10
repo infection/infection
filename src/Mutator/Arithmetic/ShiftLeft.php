@@ -60,6 +60,8 @@ TXT
 
     /**
      * @param Node\Expr\BinaryOp\ShiftLeft $node
+     *
+     * @return Generator<Node\Expr\BinaryOp\ShiftRight>
      */
     public function mutate(Node $node): Generator
     {

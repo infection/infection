@@ -62,6 +62,11 @@ final class TrueValue extends Mutator
         );
     }
 
+    /**
+     * @param Node\Expr\ConstFetch $node
+     *
+     * @return Generator<Node\Expr\ConstFetch>
+     */
     public function mutate(Node $node): Generator
     {
         yield new Node\Expr\ConstFetch(new Node\Name('false'));

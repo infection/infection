@@ -75,6 +75,8 @@ TXT
 
     /**
      * @param Node\Stmt\Foreach_ $node
+     *
+     * @return Generator<Node\Stmt\Foreach_>
      */
     public function mutate(Node $node): Generator
     {

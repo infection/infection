@@ -60,6 +60,8 @@ TXT
 
     /**
      * @param Node\Stmt\Return_ $node
+     *
+     * @return Generator<Node\Stmt\Return_>
      */
     public function mutate(Node $node): Generator
     {

@@ -67,6 +67,8 @@ final class DecrementInteger extends AbstractNumberMutator
 
     /**
      * @param Node\Scalar\LNumber $node
+     *
+     * @return Generator<Node\Scalar\LNumber>
      */
     public function mutate(Node $node): Generator
     {

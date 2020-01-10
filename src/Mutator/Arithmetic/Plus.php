@@ -40,7 +40,6 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
-use PhpParser\Node\Expr\Array_;
 
 /**
  * @internal
@@ -61,6 +60,8 @@ TXT
 
     /**
      * @param Node\Expr\BinaryOp\Plus $node
+     *
+     * @return Generator<Node\Expr\BinaryOp\Minus>
      */
     public function mutate(Node $node): Generator
     {
@@ -73,7 +74,7 @@ TXT
             return false;
         }
 
-        if ($node->left instanceof Array_ || $node->right instanceof Array_) {
+        if ($node->left instanceof Node\Expr\Array_ || $node->right instanceof Node\Expr\Array_) {
             return false;
         }
 

@@ -75,6 +75,8 @@ TXT
 
     /**
      * @param Node\Stmt\For_ $node
+     *
+     * @return Generator<Node\Stmt\For_>
      */
     public function mutate(Node $node): Generator
     {

@@ -47,6 +47,10 @@ final class Break_ extends Mutator
 {
     /**
      * Replaces "break;" with "continue;"
+     *
+     * @param Node\Stmt\Break_ $node
+     *
+     * @return Generator<Node\Stmt\Continue_>
      */
     public function mutate(Node $node): Generator
     {

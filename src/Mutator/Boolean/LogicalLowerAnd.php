@@ -59,6 +59,8 @@ final class LogicalLowerAnd extends Mutator
      * Replaces "and" with "or"
      *
      * @param Node\Expr\BinaryOp\LogicalAnd $node
+     *
+     * @return Generator<Node\Expr\BinaryOp\LogicalOr>
      */
     public function mutate(Node $node): Generator
     {

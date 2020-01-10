@@ -57,6 +57,8 @@ final class BitwiseOr extends Mutator
 
     /**
      * @param Node\Expr\BinaryOp\BitwiseOr $node
+     *
+     * @return Generator<Node\Expr\BinaryOp\BitwiseAnd>
      */
     public function mutate(Node $node): Generator
     {

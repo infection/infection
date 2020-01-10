@@ -52,6 +52,8 @@ final class ArrayOneItem extends Mutator
      * Replaces "return $collection;" with "return count($collection) > 1 ? array_slice($collection, 0, 1, true) : $collection;"
      *
      * @param Node\Stmt\Return_ $node
+     *
+     * @return Generator<Node\Stmt\Return_>
      */
     public function mutate(Node $node): Generator
     {

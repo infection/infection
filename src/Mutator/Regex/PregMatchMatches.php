@@ -49,6 +49,8 @@ final class PregMatchMatches extends Mutator
      * Replaces "preg_match('/a/', 'b', $foo);" with "(int) $foo = array();"
      *
      * @param Node\Expr\FuncCall $node
+     *
+     * @return Generator<Node\Expr\Cast\Int_>
      */
     public function mutate(Node $node): Generator
     {

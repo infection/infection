@@ -50,6 +50,8 @@ final class IdenticalEqual extends Mutator
      * Replaces "===" with "=="
      *
      * @param Node\Expr\BinaryOp\Identical $node
+     *
+     * @return Generator<Node\Expr\BinaryOp\Equal>
      */
     public function mutate(Node $node): Generator
     {

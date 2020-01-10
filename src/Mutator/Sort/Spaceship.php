@@ -60,6 +60,8 @@ TXT
 
     /**
      * @param Node\Expr\BinaryOp\Spaceship $node
+     *
+     * @return Generator<Node\Expr\BinaryOp\Spaceship>
      */
     public function mutate(Node $node): Generator
     {

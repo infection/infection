@@ -46,6 +46,8 @@ abstract class AbstractCastMutator extends Mutator
 {
     /**
      * @param Node\Expr\Cast $node
+     *
+     * @return Generator<Node\Expr>
      */
     public function mutate(Node $node): Generator
     {

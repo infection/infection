@@ -57,6 +57,11 @@ final class Finally_ extends Mutator
         );
     }
 
+    /**
+     * @param Node\Stmt\Finally_ $node
+     *
+     * @return Generator<Node\Stmt\Nop>
+     */
     public function mutate(Node $node): Generator
     {
         yield new Node\Stmt\Nop();

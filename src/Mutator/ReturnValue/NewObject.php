@@ -83,6 +83,8 @@ TXT
 
     /**
      * @param Node\Stmt\Return_ $node
+     *
+     * @return Generator<array<Node\Stmt\Expression|Node\Stmt\Return_>>
      */
     public function mutate(Node $node): Generator
     {

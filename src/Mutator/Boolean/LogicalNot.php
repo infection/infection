@@ -57,6 +57,8 @@ final class LogicalNot extends Mutator
 
     /**
      * @param Node\Expr\BooleanNot $node
+     *
+     * @return Generator<Node\Expr>
      */
     public function mutate(Node $node): Generator
     {

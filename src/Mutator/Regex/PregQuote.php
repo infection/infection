@@ -48,6 +48,8 @@ final class PregQuote extends Mutator
      * Replaces "$a = preg_quote($b);" with "$a = $b;"
      *
      * @param Node\Expr\FuncCall $node
+     *
+     * @return Generator<Node\Arg>
      */
     public function mutate(Node $node): Generator
     {

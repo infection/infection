@@ -67,6 +67,8 @@ TXT
 
     /**
      * @param Node\Expr\FuncCall $node
+     *
+     * @return Generator<Node\Expr\FuncCall>
      */
     public function mutate(Node $node): Generator
     {

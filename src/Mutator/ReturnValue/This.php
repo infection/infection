@@ -57,6 +57,10 @@ final class This extends AbstractValueToNullReturnValue
 
     /**
      * Replaces "return $this;" with "return null;"
+     *
+     * @param Node\Stmt\Return_ $node
+     *
+     * @return Generator<Node\Stmt\Return_>
      */
     public function mutate(Node $node): Generator
     {

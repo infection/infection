@@ -57,6 +57,8 @@ final class Modulus extends Mutator
 
     /**
      * @param Node\Expr\BinaryOp\Mod $node
+     *
+     * @return Generator<Node\Expr\BinaryOp\Mul>
      */
     public function mutate(Node $node): Generator
     {

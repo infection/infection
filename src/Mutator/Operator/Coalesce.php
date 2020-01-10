@@ -48,6 +48,8 @@ final class Coalesce extends Mutator
      * Replaces "'someValue' ?? 'otherValue';" with "'otherValue'"
      *
      * @param Node\Expr\BinaryOp\Coalesce $node
+     *
+     * @return Generator<Node\Expr>
      */
     public function mutate(Node $node): Generator
     {

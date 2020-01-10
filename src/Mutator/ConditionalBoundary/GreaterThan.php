@@ -62,6 +62,8 @@ TXT
 
     /**
      * @param Node\Expr\BinaryOp\Greater $node
+     *
+     * @return Generator<Node\Expr\BinaryOp\GreaterOrEqual>
      */
     public function mutate(Node $node): Generator
     {

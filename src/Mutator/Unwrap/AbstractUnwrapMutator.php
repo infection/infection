@@ -47,6 +47,8 @@ abstract class AbstractUnwrapMutator extends Mutator
 {
     /**
      * @param Node\Expr\FuncCall $node
+     *
+     * @return Generator<Node\Arg>
      */
     final public function mutate(Node $node): Generator
     {

@@ -57,6 +57,8 @@ final class CloneRemoval extends Mutator
 
     /**
      * @param Node\Expr\Clone_ $node
+     *
+     * @return Generator<Node\Expr>
      */
     public function mutate(Node $node): Generator
     {

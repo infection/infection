@@ -48,6 +48,8 @@ final class Throw_ extends Mutator
      * Replaces "throw new Exception();" with "new Exception();"
      *
      * @param Node\Stmt\Throw_ $node
+     *
+     * @return Generator<Node\Stmt\Expression>
      */
     public function mutate(Node $node): Generator
     {
