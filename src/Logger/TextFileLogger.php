@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
-use Infection\Process\MutantProcessInterface;
+use Infection\Process\MutantProcess;
 use function strlen;
 
 /**
@@ -61,7 +61,7 @@ final class TextFileLogger extends FileLogger
     }
 
     /**
-     * @param MutantProcessInterface[] $processes
+     * @param MutantProcess[] $processes
      */
     private function getLogParts(array $processes, string $headlinePrefix): string
     {
@@ -97,7 +97,7 @@ final class TextFileLogger extends FileLogger
         ];
     }
 
-    private function getMutatorFirstLine(int $index, MutantProcessInterface $mutantProcess): string
+    private function getMutatorFirstLine(int $index, MutantProcess $mutantProcess): string
     {
         return sprintf(
             '%d) %s:%d    [M] %s',

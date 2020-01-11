@@ -40,7 +40,6 @@ use function count;
 use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutantProcessFinished;
 use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessInterface;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
@@ -55,12 +54,12 @@ final class ParallelProcessRunner
     private $eventDispatcher;
 
     /**
-     * @var MutantProcessInterface[]
+     * @var MutantProcess[]
      */
     private $processesQueue;
 
     /**
-     * @var MutantProcessInterface[]
+     * @var MutantProcess[]
      */
     private $currentProcesses = [];
 
@@ -70,7 +69,7 @@ final class ParallelProcessRunner
     }
 
     /**
-     * @param MutantProcessInterface[] $processes
+     * @param MutantProcess[] $processes
      *
      * @throws RuntimeException
      * @throws LogicException
@@ -124,7 +123,7 @@ final class ParallelProcessRunner
     private function startProcess(): bool
     {
         $mutantProcess = array_shift($this->processesQueue);
-        assert($mutantProcess instanceof MutantProcessInterface);
+        assert($mutantProcess instanceof MutantProcess);
 
         $mutant = $mutantProcess->getMutant();
 

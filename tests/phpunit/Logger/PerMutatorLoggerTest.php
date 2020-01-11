@@ -40,7 +40,6 @@ use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\Regex\PregQuote;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -88,21 +87,21 @@ TXT;
         $processes = [];
 
         for ($i = 0; $i < 10; ++$i) {
-            $mutantFor = $this->createMock(MutantProcessInterface::class);
+            $mutantFor = $this->createMock(MutantProcess::class);
             $mutantFor->expects($this->once())->method('getMutatorName')->willReturn(For_::getName());
             $mutantFor->expects($this->exactly(2))->method('getResultCode')->willReturn(MutantProcess::CODE_KILLED);
             $processes[] = $mutantFor;
         }
 
         for ($i = 0; $i < 5; ++$i) {
-            $mutantFor = $this->createMock(MutantProcessInterface::class);
+            $mutantFor = $this->createMock(MutantProcess::class);
             $mutantFor->expects($this->once())->method('getMutatorName')->willReturn(For_::getName());
             $mutantFor->expects($this->exactly(2))->method('getResultCode')->willReturn(MutantProcess::CODE_NOT_COVERED);
             $processes[] = $mutantFor;
         }
 
         for ($i = 0; $i < 5; ++$i) {
-            $mutantFor = $this->createMock(MutantProcessInterface::class);
+            $mutantFor = $this->createMock(MutantProcess::class);
             $mutantFor->expects($this->once())->method('getMutatorName')->willReturn(PregQuote::getName());
             $mutantFor->expects($this->exactly(2))->method('getResultCode')->willReturn(MutantProcess::CODE_NOT_COVERED);
             $processes[] = $mutantFor;

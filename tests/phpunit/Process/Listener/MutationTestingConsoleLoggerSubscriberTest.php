@@ -43,7 +43,7 @@ use Infection\Events\MutationTestingFinished;
 use Infection\Events\MutationTestingStarted;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Listener\MutationTestingConsoleLoggerSubscriber;
-use Infection\Process\MutantProcessInterface;
+use Infection\Process\MutantProcess;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -115,7 +115,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             false
         ));
 
-        $dispatcher->dispatch(new MutantProcessFinished($this->createMock(MutantProcessInterface::class)));
+        $dispatcher->dispatch(new MutantProcessFinished($this->createMock(MutantProcess::class)));
     }
 
     public function test_it_reacts_on_mutation_testing_finished(): void

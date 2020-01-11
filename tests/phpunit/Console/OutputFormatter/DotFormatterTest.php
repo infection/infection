@@ -37,7 +37,6 @@ namespace Infection\Tests\Console\OutputFormatter;
 
 use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -115,7 +114,7 @@ final class DotFormatterTest extends TestCase
         $mutants = [];
 
         for ($i = 0; $i < $count; ++$i) {
-            $mutant = $this->createMock(MutantProcessInterface::class);
+            $mutant = $this->createMock(MutantProcess::class);
             $mutant->expects($this->once())->method('getResultCode')->willReturn($mutantCode);
             $mutants[] = $mutant;
         }
