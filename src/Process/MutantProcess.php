@@ -43,8 +43,9 @@ use Symfony\Component\Process\Process;
 
 /**
  * @internal
+ * @final
  */
-final class MutantProcess implements MutantProcessInterface
+class MutantProcess
 {
     public const CODE_KILLED = 0;
     public const CODE_ESCAPED = 1;

@@ -37,7 +37,7 @@ namespace Infection\Logger;
 
 use function in_array;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Process\MutantProcessInterface;
+use Infection\Process\MutantProcess;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -99,11 +99,11 @@ abstract class FileLogger implements MutationTestingResultsLogger
     abstract protected function getLogLines(): array;
 
     /**
-     * @param MutantProcessInterface[] $processes
+     * @param MutantProcess[] $processes
      */
     final protected function sortProcesses(array &$processes): void
     {
-        usort($processes, static function (MutantProcessInterface $a, MutantProcessInterface $b): int {
+        usort($processes, static function (MutantProcess $a, MutantProcess $b): int {
             if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
                 return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
             }

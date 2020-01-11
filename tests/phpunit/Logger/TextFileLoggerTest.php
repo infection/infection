@@ -41,7 +41,6 @@ use Infection\Mutant\Mutant;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -318,7 +317,7 @@ TXT;
             $mutant = $this->createMock(Mutant::class);
             $mutant->expects($this->once())->method('getDiff')->willReturn('Diff Diff');
 
-            $process = $this->createMock(MutantProcessInterface::class);
+            $process = $this->createMock(MutantProcess::class);
             $process->method('getProcess')->willReturn($phpProcess);
             $process->expects($this->once())->method('getMutant')->willReturn($mutant);
 
@@ -338,7 +337,7 @@ TXT;
             $mutant = $this->createMock(Mutant::class);
             $mutant->expects($this->once())->method('getDiff')->willReturn('Diff Diff Diff');
 
-            $process = $this->createMock(MutantProcessInterface::class);
+            $process = $this->createMock(MutantProcess::class);
             $process->method('getProcess')->willReturn($phpProcess);
             $process->expects($this->once())->method('getMutant')->willReturn($mutant);
 
@@ -359,7 +358,7 @@ TXT;
             $mutant = $this->createMock(Mutant::class);
             $mutant->expects($this->once())->method('getDiff')->willReturn('Diff Diff');
 
-            $process = $this->createMock(MutantProcessInterface::class);
+            $process = $this->createMock(MutantProcess::class);
             $process->method('getProcess')->willReturn($phpProcess);
             $process->expects($this->once())->method('getMutant')->willReturn($mutant);
 
@@ -379,7 +378,7 @@ TXT;
             $mutant = $this->createMock(Mutant::class);
             $mutant->expects($this->atMost(1))->method('getDiff')->willReturn('Diff Diff');
 
-            $process = $this->createMock(MutantProcessInterface::class);
+            $process = $this->createMock(MutantProcess::class);
             $process->method('getProcess')->willReturn($phpProcess);
             $process->expects($this->atMost(1))->method('getMutant')->willReturn($mutant);
 
