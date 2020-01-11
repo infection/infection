@@ -36,7 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutator\Operator;
 
 use Generator;
-use Infection\Mutator\DefaultMutatorSettings;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
@@ -46,7 +47,12 @@ use PhpParser\Node;
  */
 final class Break_ implements Mutator
 {
-    use DefaultMutatorSettings;
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
+    {
+        return null;
+    }
 
     /**
      * Replaces "break;" with "continue;"

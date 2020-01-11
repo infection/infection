@@ -37,8 +37,8 @@ namespace Infection\Mutator\Number;
 
 use Generator;
 use function in_array;
-use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
@@ -48,7 +48,7 @@ use PhpParser\Node;
  */
 final class DecrementInteger extends AbstractNumberMutator
 {
-    use DefaultMutatorSettings;
+    use GetMutatorName;
 
     private const COUNT_NAMES = [
         'count',

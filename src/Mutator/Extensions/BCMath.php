@@ -39,8 +39,8 @@ use function array_diff_key;
 use function array_filter;
 use function count;
 use Generator;
-use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\MutatorConfig;
@@ -51,7 +51,7 @@ use PhpParser\Node;
  */
 final class BCMath implements Mutator
 {
-    use DefaultMutatorSettings;
+    use GetMutatorName;
 
     private $converters;
 

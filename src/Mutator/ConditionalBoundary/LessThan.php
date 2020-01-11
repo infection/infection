@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutator\ConditionalBoundary;
 
 use Generator;
-use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
@@ -47,7 +47,7 @@ use PhpParser\Node;
  */
 final class LessThan implements Mutator
 {
-    use DefaultMutatorSettings;
+    use GetMutatorName;
 
     public static function getDefinition(): ?Definition
     {

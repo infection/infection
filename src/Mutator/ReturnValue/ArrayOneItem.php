@@ -36,7 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutator\ReturnValue;
 
 use Generator;
-use Infection\Mutator\DefaultMutatorSettings;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Visitor\ReflectionVisitor;
 use function is_string;
@@ -47,7 +48,12 @@ use PhpParser\Node;
  */
 final class ArrayOneItem implements Mutator
 {
-    use DefaultMutatorSettings;
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
+    {
+        return null;
+    }
 
     /**
      * Leaves only one item in the returned array

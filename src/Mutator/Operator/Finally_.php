@@ -37,8 +37,8 @@ namespace Infection\Mutator\Operator;
 
 use function count;
 use Generator;
-use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Visitor\ParentConnectorVisitor;
@@ -49,7 +49,7 @@ use PhpParser\Node;
  */
 final class Finally_ implements Mutator
 {
-    use DefaultMutatorSettings;
+    use GetMutatorName;
 
     public static function getDefinition(): ?Definition
     {

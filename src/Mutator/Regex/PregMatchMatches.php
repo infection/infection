@@ -37,7 +37,8 @@ namespace Infection\Mutator\Regex;
 
 use function count;
 use Generator;
-use Infection\Mutator\DefaultMutatorSettings;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
@@ -46,7 +47,12 @@ use PhpParser\Node;
  */
 final class PregMatchMatches implements Mutator
 {
-    use DefaultMutatorSettings;
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
+    {
+        return null;
+    }
 
     /**
      * Replaces "preg_match('/a/', 'b', $foo);" with "(int) $foo = array();"

@@ -36,7 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutator\Boolean;
 
 use Generator;
-use Infection\Mutator\DefaultMutatorSettings;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
@@ -47,7 +48,12 @@ use PhpParser\Node;
  */
 final class NotIdenticalNotEqual implements Mutator
 {
-    use DefaultMutatorSettings;
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
+    {
+        return null;
+    }
 
     /**
      * Replaces "!==" with "!="

@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutator\Number;
 
 use Generator;
-use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
@@ -46,7 +46,7 @@ use PhpParser\Node;
  */
 final class OneZeroInteger extends AbstractNumberMutator
 {
-    use DefaultMutatorSettings;
+    use GetMutatorName;
 
     public static function getDefinition(): ?Definition
     {

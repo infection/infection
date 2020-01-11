@@ -41,7 +41,8 @@ use Generator;
 use function gettype;
 use function in_array;
 use Infection\Config\Exception\InvalidConfigException;
-use Infection\Mutator\DefaultMutatorSettings;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use function is_numeric;
@@ -58,7 +59,7 @@ use function strtoupper;
  */
 final class ArrayItemRemoval implements Mutator
 {
-    use DefaultMutatorSettings;
+    use GetMutatorName;
 
     private const DEFAULT_SETTINGS = [
         'remove' => 'first',
@@ -81,6 +82,11 @@ final class ArrayItemRemoval implements Mutator
 
         $this->remove = $settings['remove'];
         $this->limit = $settings['limit'];
+    }
+
+    public static function getDefinition(): ?Definition
+    {
+        return null;
     }
 
     /**

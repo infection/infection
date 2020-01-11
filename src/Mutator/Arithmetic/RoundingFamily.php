@@ -37,8 +37,8 @@ namespace Infection\Mutator\Arithmetic;
 
 use Generator;
 use function in_array;
-use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
@@ -48,7 +48,7 @@ use PhpParser\Node;
  */
 final class RoundingFamily implements Mutator
 {
-    use DefaultMutatorSettings;
+    use GetMutatorName;
 
     private const MUTATORS_MAP = [
         'floor',

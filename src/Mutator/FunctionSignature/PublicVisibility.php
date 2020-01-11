@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutator\FunctionSignature;
 
 use Generator;
-use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Visitor\ReflectionVisitor;
@@ -50,7 +50,7 @@ use ReflectionException;
  */
 final class PublicVisibility implements Mutator
 {
-    use DefaultMutatorSettings;
+    use GetMutatorName;
 
     public static function getDefinition(): ?Definition
     {

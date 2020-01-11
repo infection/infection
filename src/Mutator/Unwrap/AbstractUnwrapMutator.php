@@ -37,7 +37,7 @@ namespace Infection\Mutator\Unwrap;
 
 use function array_key_exists;
 use Generator;
-use Infection\Mutator\DefaultMutatorSettings;
+use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
@@ -46,7 +46,7 @@ use PhpParser\Node;
  */
 abstract class AbstractUnwrapMutator implements Mutator
 {
-    use DefaultMutatorSettings;
+    use GetMutatorName;
 
     /**
      * @param Node\Expr\FuncCall $node

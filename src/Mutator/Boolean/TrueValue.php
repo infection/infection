@@ -37,8 +37,8 @@ namespace Infection\Mutator\Boolean;
 
 use function array_key_exists;
 use Generator;
-use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\MutatorConfig;
@@ -50,7 +50,7 @@ use PhpParser\Node;
  */
 final class TrueValue implements Mutator
 {
-    use DefaultMutatorSettings;
+    use GetMutatorName;
 
     private const DEFAULT_SETTINGS = [
         'array_search' => false,

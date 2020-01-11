@@ -42,8 +42,8 @@ use function constant;
 use function count;
 use function defined;
 use Generator;
-use Infection\Mutator\DefaultMutatorSettings;
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\MutatorConfig;
@@ -54,7 +54,7 @@ use PhpParser\Node;
  */
 final class MBString implements Mutator
 {
-    use DefaultMutatorSettings;
+    use GetMutatorName;
 
     private $converters;
 

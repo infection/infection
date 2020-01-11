@@ -41,15 +41,8 @@ use function explode;
 /**
  * @internal
  */
-trait DefaultMutatorSettings
+trait GetMutatorName
 {
-    // TODO: declare the definitions downstream so eventually this method can be removed from here
-    //  and the trait be renamed `GetMutatorName`
-    public static function getDefinition(): ?Definition
-    {
-        return null;
-    }
-
     final public static function getName(): string
     {
         $parts = explode('\\', static::class);
