@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Codeception\Adapter;
 
 use Infection\TestFramework\CommandLineBuilder;
-use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
+use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkAdapterFactory;
 use Infection\TestFramework\TestFrameworkConfigParseException;

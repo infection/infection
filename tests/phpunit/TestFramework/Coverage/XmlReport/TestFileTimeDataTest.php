@@ -33,44 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
+use Infection\TestFramework\Coverage\XmlReport\TestFileTimeData;
 use PHPUnit\Framework\TestCase;
 
-final class JUnitTestCaseSorterTest extends TestCase
+final class TestFileTimeDataTest extends TestCase
 {
-    public function test_it_returns_unique_and_sorted_by_time_test_cases(): void
+    public function test_it_creates_self_object_with_named_constructor(): void
     {
-        $coverageTestCases = [
-            CoverageLineData::with(
-                'testMethod1',
-                '/path/to/test-file-1',
-                0.000234
-            ),
-            CoverageLineData::with(
-                'testMethod2',
-                '/path/to/test-file-2',
-                0.600221
-            ),
-            CoverageLineData::with(
-                'testMethod3_1',
-                '/path/to/test-file-3',
-                0.000022
-            ),
-            CoverageLineData::with(
-                'testMethod3_2',
-                '/path/to/test-file-3',
-                0.010022
-            ),
-        ];
+        $testFileTimeData = new TestFileTimeData(
+            '/path/to/Test.php',
+            2.345
+        );
 
-        $sorter = new JUnitTestCaseSorter();
-
-        $uniqueSortedFileNames = $sorter->getUniqueSortedFileNames($coverageTestCases);
-
-        $this->assertCount(3, $uniqueSortedFileNames);
-        $this->assertSame('/path/to/test-file-3', $uniqueSortedFileNames[0]);
+        $this->assertSame('/path/to/Test.php', $testFileTimeData->path);
+        $this->assertSame(2.345, $testFileTimeData->time);
     }
 }

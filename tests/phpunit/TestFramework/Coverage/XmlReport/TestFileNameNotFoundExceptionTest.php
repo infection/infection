@@ -33,9 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\Coverage\TestFileNameNotFoundException;
+use Infection\TestFramework\Coverage\XmlReport\TestFileNameNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 final class TestFileNameNotFoundExceptionTest extends TestCase

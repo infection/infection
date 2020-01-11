@@ -33,33 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use function array_key_exists;
+use Infection\TestFramework\Coverage\XmlReport\MemoizedTestFileDataProvider;
+use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
+use Infection\TestFramework\Coverage\XmlReport\TestFileTimeData;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class MemoizedTestFileDataProvider implements TestFileDataProvider
+final class MemoizedTestFileDataProviderTest extends TestCase
 {
-    private $provider;
-
-    /**
-     * @var array<string, TestFileTimeData>
-     */
-    private $cache = [];
-
-    public function __construct(TestFileDataProvider $decoratedProvider)
+    public function test_it_memoize_get_test_file_info_calls(): void
     {
-        $this->provider = $decoratedProvider;
-    }
+        $class = 'Test\Class';
+        $expectedTestInfo = new TestFileTimeData('path/to/Test.php', 4.567);
 
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
-    {
-        if (!array_key_exists($fullyQualifiedClassName, $this->cache)) {
-            $this->cache[$fullyQualifiedClassName] = $this->provider->getTestFileInfo($fullyQualifiedClassName);
-        }
+        $providerMock = $this->createMock(TestFileDataProvider::class);
+        $providerMock
+            ->expects($this->once())
+            ->method('getTestFileInfo')
+            ->with($class)
+            ->willReturn($expectedTestInfo)
+        ;
 
-        return $this->cache[$fullyQualifiedClassName];
+        $infoProvider = new MemoizedTestFileDataProvider($providerMock);
+
+        $testInfo0 = $infoProvider->getTestFileInfo($class);
+        $testInfo1 = $infoProvider->getTestFileInfo($class);
+
+        $this->assertSame($expectedTestInfo, $testInfo0);
+        $this->assertSame($expectedTestInfo, $testInfo1);
     }
 }

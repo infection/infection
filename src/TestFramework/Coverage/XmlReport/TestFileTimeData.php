@@ -33,21 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\Coverage\TestFileTimeData;
-use PHPUnit\Framework\TestCase;
-
-final class TestFileTimeDataTest extends TestCase
+/**
+ * @internal
+ */
+final class TestFileTimeData
 {
-    public function test_it_creates_self_object_with_named_constructor(): void
-    {
-        $testFileTimeData = new TestFileTimeData(
-            '/path/to/Test.php',
-            2.345
-        );
+    public $path;
+    public $time;
 
-        $this->assertSame('/path/to/Test.php', $testFileTimeData->path);
-        $this->assertSame(2.345, $testFileTimeData->time);
+    public function __construct(string $path, float $time)
+    {
+        $this->path = $path;
+        $this->time = $time;
     }
 }

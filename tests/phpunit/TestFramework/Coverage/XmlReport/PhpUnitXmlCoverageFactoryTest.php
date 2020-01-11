@@ -33,18 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use const DIRECTORY_SEPARATOR;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\MethodLocationData;
-use Infection\TestFramework\Coverage\PhpUnitXmlCoverageFactory;
-use Infection\TestFramework\Coverage\TestFileDataProvider;
-use Infection\TestFramework\Coverage\TestFileTimeData;
+use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
+use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
+use Infection\TestFramework\Coverage\XmlReport\TestFileTimeData;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkTypes;
+use Infection\Tests\TestFramework\Coverage\CoverageHelper;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 
@@ -53,12 +54,7 @@ use function Safe\realpath;
  */
 final class PhpUnitXmlCoverageFactoryTest extends TestCase
 {
-    private const COVERAGE_DIR = __DIR__ . '/../../Fixtures/Files/phpunit/coverage/coverage-xml';
-
-    /**
-     * @var PhpUnitXmlCoverageFactory
-     */
-    private $coverageFactory;
+    private const COVERAGE_DIR = __DIR__ . '/../../../Fixtures/Files/phpunit/coverage/coverage-xml';
 
     public function test_it_can_parse_and_enrich_the_coverage_data(): void
     {

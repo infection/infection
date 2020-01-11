@@ -38,7 +38,7 @@ namespace Infection\Tests\TestFramework\Codeception\Adapter;
 use Generator;
 use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
 use Infection\TestFramework\CommandLineBuilder;
-use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
+use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\FileSystem\FileSystemTestCase;

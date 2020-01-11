@@ -52,7 +52,7 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\Coverage\PhpUnitXmlCoverageFactory;
+use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
 use Infection\TestFramework\HasExtraNodeVisitors;
 use Infection\TestFramework\TestFrameworkAdapter;
 use const PHP_EOL;
