@@ -101,13 +101,13 @@ class NodeMutationGenerator
     private function generateForMutator(Node $node, IgnoreMutator $mutator, array $mutations): array
     {
         try {
-            if (!$mutator->shouldMutate($node)) {
+            if (!$mutator->canMutate($node)) {
                 return $mutations;
             }
         } catch (Throwable $throwable) {
             throw InvalidMutator::create(
                 $this->filePath,
-                $mutator->getMutator()::getName(),
+                $mutator->getMutatorName(),
                 $throwable
             );
         }
@@ -138,7 +138,7 @@ class NodeMutationGenerator
             $mutations[] = new Mutation(
                 $this->filePath,
                 $this->fileNodes,
-                $mutator->getMutator()::getName(),
+                $mutator->getMutatorName(),
                 $node->getAttributes(),
                 get_class($node),
                 MutatedNode::wrap($mutatedNode),
