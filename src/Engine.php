@@ -54,7 +54,7 @@ use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
-use Infection\TestFramework\HasExtraNodeVisitors;
+use Infection\TestFramework\IgnoresAdditional;
 use const PHP_EOL;
 use function Safe\sprintf;
 use Symfony\Component\Filesystem\Filesystem;
@@ -138,8 +138,8 @@ final class Engine
     {
         $mutations = $this->mutationGenerator->generate(
             $this->config->mutateOnlyCoveredCode(),
-            $this->adapter instanceof HasExtraNodeVisitors
-                ? $this->adapter->getMutationsCollectionNodeVisitors()
+            $this->adapter instanceof IgnoresAdditional
+                ? $this->adapter->getAdditionalIgnores()
                 : []
         );
 

@@ -33,22 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutation;
+namespace Infection\Tests\Visitor\IgnoreNode;
 
-use Infection\Mutation\NodeTraverserFactory;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitorAbstract;
-use PHPUnit\Framework\TestCase;
+use Infection\Visitor\IgnoreNode\IgnoreInterface;
+use Infection\Visitor\IgnoreNode\IgnoresNode;
 
-final class NodeTraverserFactoryTest extends TestCase
+final class IgnoreInterfaceTest extends IgnoresNodeTestCase
 {
-    public function test_it_can_create_a_traverser(): void
+    public function test_it_ignores_interfaces(): void
     {
-        $traverser = (new NodeTraverserFactory())->create(new NodeVisitorA(), []);
-        $this->assertInstanceOf(NodeTraverser::class, $traverser);
+        $this->parseAndTraverse(<<<'PHP'
+<?php
+
+interface Bar
+{
+    public function nope(Bar $ignored): void;
+}
+PHP
+        , $this->createSpy());
+    }
+
+    public function test_it_doesnt_ignore_others(): void
+    {
+        $this->parseAndTraverse(<<<'PHP'
+<?php
+
+class Bar
+{
+    public function nope(Bar $counted)
+    {
+        $counted = true;
     }
 }
+PHP
+            , $spy = $this->createSpy());
+        $this->assertSame(2, $spy->nodeCounter);
+    }
 
-final class NodeVisitorA extends NodeVisitorAbstract
-{
+    protected function getIgnore(): IgnoresNode
+    {
+        return new IgnoreInterface();
+    }
 }

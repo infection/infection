@@ -35,15 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use function array_key_exists;
-use function get_class;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\Visitor\IgnoreNode\IgnoresNode;
 use Infection\Visitor\MutationsCollectorVisitor;
-use InvalidArgumentException;
-use PhpParser\NodeVisitor;
-use function Safe\sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
@@ -53,8 +49,6 @@ use Webmozart\Assert\Assert;
  */
 class FileMutationGenerator
 {
-    private const MUTATION_COLLECTOR_VISITOR_PRIORITY = 10;
-
     private $parser;
     private $traverserFactory;
 
@@ -67,10 +61,15 @@ class FileMutationGenerator
     }
 
     /**
+<<<<<<< HEAD
      * @param Mutator[] $mutators
      * @param NodeVisitor[] $extraNodeVisitors
      *
      * @throws UnparsableFile
+=======
+     * @param Mutator[]     $mutators
+     * @param IgnoresNode[] $additionalIgnoredNodes
+>>>>>>> Simplify ignoring additional nodes
      *
      * @return Mutation[]
      */
@@ -79,10 +78,10 @@ class FileMutationGenerator
         bool $onlyCovered,
         LineCodeCoverage $codeCoverage,
         array $mutators,
-        array $extraNodeVisitors
+        array $additionalIgnoredNodes
     ): array {
         Assert::allIsInstanceOf($mutators, Mutator::class);
-        Assert::allIsInstanceOf($extraNodeVisitors, NodeVisitor::class);
+        Assert::allIsInstanceOf($additionalIgnoredNodes, IgnoresNode::class);
 
         $filePath = $fileInfo->getRealPath() === false
             ? $fileInfo->getPathname()
@@ -91,16 +90,6 @@ class FileMutationGenerator
 
         if ($onlyCovered && !$codeCoverage->hasTests($filePath)) {
             return [];
-        }
-
-        if (array_key_exists(self::MUTATION_COLLECTOR_VISITOR_PRIORITY, $extraNodeVisitors)) {
-            throw new InvalidArgumentException(sprintf(
-                'Did not expect to find a visitor for the priority "%d". Found "%s". Please'
-                . ' free that priority as it is reserved for "%s".',
-                self::MUTATION_COLLECTOR_VISITOR_PRIORITY,
-                get_class($extraNodeVisitors[self::MUTATION_COLLECTOR_VISITOR_PRIORITY]),
-                MutationsCollectorVisitor::class
-            ));
         }
 
         $initialStatements = $this->parser->parse($fileInfo);
@@ -115,9 +104,7 @@ class FileMutationGenerator
             )
         );
 
-        $extraNodeVisitors[self::MUTATION_COLLECTOR_VISITOR_PRIORITY] = $mutationsCollectorVisitor;
-
-        $traverser = $this->traverserFactory->create($extraNodeVisitors);
+        $traverser = $this->traverserFactory->create($mutationsCollectorVisitor, $additionalIgnoredNodes);
 
         $traverser->traverse($initialStatements);
 

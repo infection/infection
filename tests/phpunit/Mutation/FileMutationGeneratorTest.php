@@ -36,23 +36,20 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use function current;
-use function func_get_args;
 use Generator;
 use Infection\Container;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\FileParser;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\NodeTraverserFactory;
-use Infection\Mutation\PrioritizedVisitorsNodeTraverser;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\Tests\Fixtures\PhpParser\FakeIgnores;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
-use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use Infection\Tests\Mutator\MutatorName;
-use Infection\Visitor\MutationsCollectorVisitor;
-use InvalidArgumentException;
+use PhpParser\NodeTraverser;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
@@ -127,7 +124,7 @@ final class FileMutationGeneratorTest extends TestCase
         LineCodeCoverage $codeCoverage,
         string $expectedFilePath
     ): void {
-        $extraVisitors = [2 => new FakeVisitor()];
+        $extraVisitors = [new FakeIgnores()];
 
         $this->fileParserMock
             ->expects($this->once())
@@ -139,7 +136,7 @@ final class FileMutationGeneratorTest extends TestCase
             ])
         ;
 
-        $traverserMock = $this->createMock(PrioritizedVisitorsNodeTraverser::class);
+        $traverserMock = $this->createMock(NodeTraverser::class);
         $traverserMock
             ->expects($this->once())
             ->method('traverse')
@@ -149,18 +146,6 @@ final class FileMutationGeneratorTest extends TestCase
         $this->traverserFactoryMock
             ->expects($this->once())
             ->method('create')
-            ->with($this->callback(function (array $passedExtraNodeVisitors) use ($extraVisitors) {
-                $this->assertSame([$passedExtraNodeVisitors], func_get_args());
-
-                $this->assertArrayHasKey(10, $passedExtraNodeVisitors);
-                $this->assertInstanceOf(MutationsCollectorVisitor::class, $passedExtraNodeVisitors[10]);
-
-                unset($passedExtraNodeVisitors[10]);
-
-                $this->assertSame($extraVisitors, $passedExtraNodeVisitors);
-
-                return true;
-            }))
             ->willReturn($traverserMock)
         ;
 
@@ -214,52 +199,6 @@ final class FileMutationGeneratorTest extends TestCase
         );
 
         $this->assertSame([], $mutations);
-    }
-
-    public function test_it_cannot_generate_mutations_if_a_visitor_is_already_registered_instead_of_the_mutation_collector_visitor(): void
-    {
-        $fileInfo = new SplFileInfo('/path/to/file', 'relativePath', 'relativePathName');
-
-        $extraVisitors = [10 => new FakeVisitor()];
-
-        $fileParserMock = $this->createMock(FileParser::class);
-        $fileParserMock
-            ->expects($this->never())
-            ->method('parse')
-        ;
-
-        $traverserFactoryMock = $this->createMock(NodeTraverserFactory::class);
-        $traverserFactoryMock
-            ->expects($this->never())
-            ->method('create')
-        ;
-
-        $mutationGenerator = new FileMutationGenerator(
-            $fileParserMock,
-            $traverserFactoryMock
-        );
-
-        try {
-            $mutationGenerator->generate(
-                $fileInfo,
-                false,
-                $this->createMock(LineCodeCoverage::class),
-                [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
-                $extraVisitors
-            );
-
-            $this->fail('Expected an exception to be thrown.');
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                sprintf(
-                    'Did not expect to find a visitor for the priority "10". Found "%s". '
-                    . 'Please free that priority as it is reserved for "%s".',
-                    FakeVisitor::class,
-                    MutationsCollectorVisitor::class
-                ),
-                $exception->getMessage()
-            );
-        }
     }
 
     public function parsedFilesProvider(): Generator

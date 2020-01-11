@@ -42,7 +42,7 @@ use Infection\Event\MutationGenerationWasFinished;
 use Infection\Event\MutationGenerationWasStarted;
 use Infection\Mutator\Mutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
-use PhpParser\NodeVisitor;
+use Infection\Visitor\IgnoreNode\IgnoresNode;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
@@ -87,14 +87,19 @@ final class MutationGenerator
     }
 
     /**
+<<<<<<< HEAD
      * @param bool $onlyCovered Mutates only covered by tests lines of code
      * @param NodeVisitor[] $extraNodeVisitors
+=======
+     * @param bool          $onlyCovered Mutates only covered by tests lines of code
+     * @param IgnoresNode[] $extraNodeVisitors
+>>>>>>> Simplify ignoring additional nodes
      *
      * @throws UnparsableFile
      *
      * @return Mutation[]
      */
-    public function generate(bool $onlyCovered, array $extraNodeVisitors = []): array
+    public function generate(bool $onlyCovered, array $extraNodeVisitors): array
     {
         $allFilesMutations = [[]];
 

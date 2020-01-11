@@ -33,34 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Visitor;
+namespace Infection\Tests\Visitor\IgnoreNode;
 
-use PhpParser\Node;
-use PhpParser\Node\Stmt;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitorAbstract;
+use Infection\Visitor\IgnoreNode\IgnoreAbstractMethod;
+use Infection\Visitor\IgnoreNode\IgnoresNode;
 
-/**
- * @internal
- */
-final class PhpUnitClassCodeCoverageIgnoreVisitor extends NodeVisitorAbstract
+final class IgnoreAbstractMethodTest extends IgnoresNodeTestCase
 {
-    public function enterNode(Node $node)
+    public function test_it_ignores_abstract_methods(): void
     {
-        if (!$node instanceof Stmt\ClassLike) {
-            return null;
-        }
+        $this->parseAndTraverse(<<<'PHP'
+<?php
 
-        $docComment = $node->getDocComment();
+abstract class Foo
+{
+    public function bar(string $counted)
+    {
+    }
+    abstract public function shoulbeIgnored($ignored);
+}
 
-        if ($docComment === null) {
-            return null;
-        }
+PHP
+        , $spy = $this->createSpy());
 
-        if (strpos($docComment->getText(), '@codeCoverageIgnore') !== false) {
-            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
-        }
+        $this->assertSame(1, $spy->nodeCounter);
+    }
 
-        return null;
+    protected function getIgnore(): IgnoresNode
+    {
+        return new IgnoreAbstractMethod();
     }
 }

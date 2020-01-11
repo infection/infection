@@ -33,33 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Visitor;
+namespace Infection\Visitor\IgnoreNode;
 
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitorAbstract;
+use PhpParser\Node\Stmt;
 
 /**
  * @internal
  */
-final class PhpUnitMethodCodeCoverageIgnoreVisitor extends NodeVisitorAbstract
+final class IgnoreCodeCoverageAnnotation implements IgnoresNode
 {
-    public function enterNode(Node $node)
+    public function ignores(Node $node): bool
     {
-        if (!$node instanceof Node\Stmt\ClassMethod) {
-            return null;
+        if (!$node instanceof Stmt\ClassLike && !$node instanceof Stmt\ClassMethod) {
+            return false;
         }
 
         $docComment = $node->getDocComment();
 
-        if ($docComment === null) {
-            return null;
-        }
-
-        if (strpos($docComment->getText(), '@codeCoverageIgnore') !== false) {
-            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
-        }
-
-        return null;
+        return $docComment !== null && strpos($docComment->getText(), '@codeCoverageIgnore') !== false;
     }
 }

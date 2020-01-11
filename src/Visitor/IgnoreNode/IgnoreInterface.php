@@ -33,17 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\Visitor\IgnoreNode;
 
-use PhpParser\NodeVisitorAbstract;
+use PhpParser\Node;
 
 /**
  * @internal
  */
-interface HasExtraNodeVisitors
+final class IgnoreInterface implements IgnoresNode
 {
-    /**
-     * @return NodeVisitorAbstract[]
-     */
-    public function getMutationsCollectionNodeVisitors(): array;
+    public function ignores(Node $node): bool
+    {
+        return $node instanceof Node\Stmt\Interface_;
+    }
 }

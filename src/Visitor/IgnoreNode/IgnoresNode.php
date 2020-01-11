@@ -33,22 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutation;
+namespace Infection\Visitor\IgnoreNode;
 
-use Infection\Mutation\NodeTraverserFactory;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitorAbstract;
-use PHPUnit\Framework\TestCase;
+use PhpParser\Node;
 
-final class NodeTraverserFactoryTest extends TestCase
+/**
+ * @internal
+ */
+interface IgnoresNode
 {
-    public function test_it_can_create_a_traverser(): void
-    {
-        $traverser = (new NodeTraverserFactory())->create(new NodeVisitorA(), []);
-        $this->assertInstanceOf(NodeTraverser::class, $traverser);
-    }
-}
-
-final class NodeVisitorA extends NodeVisitorAbstract
-{
+    public function ignores(Node $node): bool;
 }

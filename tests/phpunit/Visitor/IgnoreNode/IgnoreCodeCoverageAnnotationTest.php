@@ -33,22 +33,72 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutation;
+namespace Infection\Tests\Visitor\IgnoreNode;
 
-use Infection\Mutation\NodeTraverserFactory;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitorAbstract;
-use PHPUnit\Framework\TestCase;
+use Infection\Visitor\IgnoreNode\IgnoreCodeCoverageAnnotation;
+use Infection\Visitor\IgnoreNode\IgnoresNode;
 
-final class NodeTraverserFactoryTest extends TestCase
+final class IgnoreCodeCoverageAnnotationTest extends IgnoresNodeTestCase
 {
-    public function test_it_can_create_a_traverser(): void
+    public function test_it_ignores_annotated_class(): void
     {
-        $traverser = (new NodeTraverserFactory())->create(new NodeVisitorA(), []);
-        $this->assertInstanceOf(NodeTraverser::class, $traverser);
+        $this->parseAndTraverse(<<<'PHP'
+<?php
+
+/**
+ * @codeCoverageIgnore
+ */
+class IgnoredClass
+{
+    public function foo()
+    {
+        $ignored = true;
     }
 }
+PHP
+        , $this->createSpy());
+    }
 
-final class NodeVisitorA extends NodeVisitorAbstract
+    public function test_it_ignores_annotated_method(): void
+    {
+        $this->parseAndTraverse(<<<'PHP'
+<?php
+
+
+class IgnoredClass
 {
+    /**
+     * @codeCoverageIgnore
+     */
+    public function foo()
+    {
+        $ignored = true;
+    }
+}
+PHP
+            , $this->createSpy());
+    }
+
+    public function test_it_does_not_ignore_non_annotated_code(): void
+    {
+        $this->parseAndTraverse(<<<'PHP'
+<?php
+
+
+class IgnoredClass
+{
+    public function foo($counted)
+    {
+        $counted = true;
+    }
+}
+PHP
+            , $spy = $this->createSpy());
+        $this->assertSame(2, $spy->nodeCounter);
+    }
+
+    protected function getIgnore(): IgnoresNode
+    {
+        return new IgnoreCodeCoverageAnnotation();
+    }
 }

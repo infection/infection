@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Visitor;
 
+use Infection\Visitor\IgnoreNode\IgnoresNode;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
@@ -44,14 +45,25 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class NotMutableIgnoreVisitor extends NodeVisitorAbstract
 {
+    /**
+     * @var IgnoresNode[]
+     */
+    private $ignoreNodes;
+
+    /**
+     * @param IgnoresNode[] $ignoreNodes
+     */
+    public function __construct(array $ignoreNodes)
+    {
+        $this->ignoreNodes = $ignoreNodes;
+    }
+
     public function enterNode(Node $node)
     {
-        if ($node instanceof Node\Stmt\Interface_) {
-            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
-        }
-
-        if ($node instanceof Node\Stmt\ClassMethod && $node->isAbstract()) {
-            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+        foreach ($this->ignoreNodes as $ignoreNode) {
+            if ($ignoreNode->ignores($node)) {
+                return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+            }
         }
 
         return null;

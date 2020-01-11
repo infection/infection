@@ -37,14 +37,13 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Infection\TestFramework\HasExtraNodeVisitors;
-use Infection\Visitor\PhpUnitClassCodeCoverageIgnoreVisitor;
-use Infection\Visitor\PhpUnitMethodCodeCoverageIgnoreVisitor;
+use Infection\TestFramework\IgnoresAdditional;
+use Infection\Visitor\IgnoreNode\IgnoreCodeCoverageAnnotation;
 
 /**
  * @internal
  */
-final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements HasExtraNodeVisitors, MemoryUsageAware
+final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAdditional, MemoryUsageAware
 {
     public const COVERAGE_DIR = 'coverage-xml';
 
@@ -84,14 +83,6 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements HasEx
         return -1;
     }
 
-    public function getMutationsCollectionNodeVisitors(): array
-    {
-        return [
-            100 => new PhpUnitClassCodeCoverageIgnoreVisitor(),
-            15 => new PhpUnitMethodCodeCoverageIgnoreVisitor(),
-        ];
-    }
-
     public function getName(): string
     {
         return 'PHPUnit';
@@ -112,5 +103,12 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements HasEx
         }
 
         return $recommendations;
+    }
+
+    public function getAdditionalIgnores(): array
+    {
+        return [
+            new IgnoreCodeCoverageAnnotation(),
+        ];
     }
 }

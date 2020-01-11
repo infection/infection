@@ -33,22 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutation;
+namespace Infection\Tests\Visitor\IgnoreNode;
 
-use Infection\Mutation\NodeTraverserFactory;
-use PhpParser\NodeTraverser;
+use PhpParser\Node;
+use PhpParser\Node\Expr\Variable;
 use PhpParser\NodeVisitorAbstract;
-use PHPUnit\Framework\TestCase;
 
-final class NodeTraverserFactoryTest extends TestCase
+final class IgnoreSpyVisitor extends NodeVisitorAbstract
 {
-    public function test_it_can_create_a_traverser(): void
+    public $nodeCounter = 0;
+
+    private $failureCallBack;
+
+    public function __construct(callable $failureCallBack)
     {
-        $traverser = (new NodeTraverserFactory())->create(new NodeVisitorA(), []);
-        $this->assertInstanceOf(NodeTraverser::class, $traverser);
+        $this->failureCallBack = $failureCallBack;
     }
-}
 
-final class NodeVisitorA extends NodeVisitorAbstract
-{
+    public function enterNode(Node $node): void
+    {
+        if (!$node instanceof Variable) {
+            return;
+        }
+        $name = $node->name;
+
+        if (!is_string($name)) {
+            return;
+        }
+
+        if ($name === 'ignored') {
+            ($this->failureCallBack)();
+        }
+
+        if ($name === 'counted') {
+            ++$this->nodeCounter;
+        }
+    }
 }
