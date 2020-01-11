@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -55,11 +56,13 @@ final class LogicalNot extends Mutator
     }
 
     /**
-     * @param Node&Node\Expr\BooleanNot $node
+     * @param Node\Expr\BooleanNot $node
+     *
+     * @return Generator<Node\Expr>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return $node->expr;
+        yield $node->expr;
     }
 
     protected function mutatesNode(Node $node): bool

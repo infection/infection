@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalBoundary;
 
+use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -60,13 +61,13 @@ TXT
     }
 
     /**
-     * @param Node&Node\Expr\BinaryOp\Greater $node
+     * @param Node\Expr\BinaryOp\Greater $node
      *
-     * @return Node\Expr\BinaryOp\GreaterOrEqual
+     * @return Generator<Node\Expr\BinaryOp\GreaterOrEqual>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return new Node\Expr\BinaryOp\GreaterOrEqual($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\GreaterOrEqual($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
+use Generator;
 use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
@@ -47,11 +48,13 @@ final class Continue_ extends Mutator
     /**
      * Replaces "continue;" with "break;"
      *
-     * @return Node\Stmt\Break_
+     * @param Node\Stmt\Continue_ $node
+     *
+     * @return Generator<Node\Stmt\Break_>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return new Node\Stmt\Break_();
+        yield new Node\Stmt\Break_();
     }
 
     protected function mutatesNode(Node $node): bool

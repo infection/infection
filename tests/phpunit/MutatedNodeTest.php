@@ -33,29 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\Tests;
 
-use Infection\Mutant\Mutant;
-use Symfony\Component\Process\Process;
+use Generator;
+use Infection\MutatedNode;
+use PhpParser\Node;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- *
- * @see MutantProcess
- */
-interface MutantProcessInterface
+final class MutatedNodeTest extends TestCase
 {
-    public function getProcess(): Process;
+    /**
+     * @dataProvider nodeProvider
+     *
+     * @param Node|Node[] $node
+     */
+    public function test_it_can_be_instantiated($node): void
+    {
+        $mutatedNode = MutatedNode::wrap($node);
 
-    public function getMutant(): Mutant;
+        $this->assertSame($node, $mutatedNode->unwrap());
+    }
 
-    public function markTimeout();
+    public function nodeProvider(): Generator
+    {
+        yield 'single node' => [new Node\Scalar\LNumber(1)];
 
-    public function getResultCode(): int;
-
-    public function getMutatorName(): string;
-
-    public function getOriginalFilePath(): string;
-
-    public function getOriginalStartingLine(): int;
+        yield 'multiple nodes' => [
+            [
+                new Node\Scalar\LNumber(1),
+                new Node\Scalar\LNumber(-1),
+            ],
+        ];
+    }
 }

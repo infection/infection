@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -58,13 +59,13 @@ TXT
     }
 
     /**
-     * @param Node&Node\Expr\BinaryOp\ShiftLeft $node
+     * @param Node\Expr\BinaryOp\ShiftLeft $node
      *
-     * @return Node\Expr\BinaryOp\ShiftRight
+     * @return Generator<Node\Expr\BinaryOp\ShiftRight>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return new Node\Expr\BinaryOp\ShiftRight($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\ShiftRight($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool

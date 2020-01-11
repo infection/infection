@@ -46,11 +46,11 @@ use PhpParser\Node;
 abstract class AbstractUnwrapMutator extends Mutator
 {
     /**
-     * @param Node&Node\Expr\FuncCall $node
+     * @param Node\Expr\FuncCall $node
      *
-     * @return Node\Arg[]|Generator;
+     * @return Generator<Node\Arg>
      */
-    final public function mutate(Node $node)
+    final public function mutate(Node $node): Generator
     {
         foreach ($this->getParameterIndexes($node) as $index) {
             if ($node->args[$index]->unpack) {

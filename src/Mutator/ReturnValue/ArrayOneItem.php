@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
+use Generator;
 use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ReflectionVisitor;
 use function is_string;
@@ -50,18 +51,18 @@ final class ArrayOneItem extends Mutator
      *
      * Replaces "return $collection;" with "return count($collection) > 1 ? array_slice($collection, 0, 1, true) : $collection;"
      *
-     * @param Node&Node\Stmt\Return_ $node
+     * @param Node\Stmt\Return_ $node
      *
-     * @return Node\Stmt\Return_
+     * @return Generator<Node\Stmt\Return_>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
         /** @var Node\Expr\Variable $expression */
         $expression = $node->expr;
 
         $arrayVariable = new Node\Expr\Variable($expression->name);
 
-        return new Node\Stmt\Return_(
+        yield new Node\Stmt\Return_(
             new Node\Expr\Ternary(
                 new Node\Expr\BinaryOp\Greater(
                     new Node\Expr\FuncCall(new Node\Name('count'), [new Node\Arg($arrayVariable)]),

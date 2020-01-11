@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
+use Generator;
 use function in_array;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
@@ -65,13 +66,13 @@ final class DecrementInteger extends AbstractNumberMutator
     }
 
     /**
-     * @param Node&Node\Scalar\LNumber $node
+     * @param Node\Scalar\LNumber $node
      *
-     * @return Node\Scalar\LNumber
+     * @return Generator<Node\Scalar\LNumber>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return new Node\Scalar\LNumber($node->value - 1);
+        yield new Node\Scalar\LNumber($node->value - 1);
     }
 
     protected function mutatesNode(Node $node): bool

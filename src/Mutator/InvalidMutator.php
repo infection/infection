@@ -33,41 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\OutputFormatter;
+namespace Infection\Mutator;
 
-use Infection\Process\MutantProcess;
-use Symfony\Component\Console\Helper\ProgressBar;
+use function array_keys;
+use RuntimeException;
+use function Safe\sprintf;
+use Throwable;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class ProgressFormatter extends AbstractOutputFormatter
+final class InvalidMutator extends RuntimeException
 {
-    private $progressBar;
+    private const GITHUB_BUG_LINK = 'https://github.com/infection/infection/issues/new?template=Bug_report.md';
 
-    public function __construct(ProgressBar $progressBar)
+    public static function create(string $filePath, string $mutatorName, Throwable $previous): self
     {
-        $this->progressBar = $progressBar;
-    }
+        Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
 
-    public function start(int $mutationCount): void
-    {
-        parent::start($mutationCount);
-
-        $this->progressBar->start($mutationCount);
-    }
-
-    public function advance(MutantProcess $mutantProcess, int $mutationCount): void
-    {
-        parent::advance($mutantProcess, $mutationCount);
-
-        $this->progressBar->advance();
-    }
-
-    public function finish(): void
-    {
-        parent::finish();
-
-        $this->progressBar->finish();
+        return new self(
+            sprintf(
+                <<<'TXT'
+Encountered an error with the "%s" mutator in the "%s" file. This is most likely a bug in Infection.
+Please consider reporting this this in our issue tracker: %s
+TXT
+                ,
+                $mutatorName,
+                $filePath,
+                self::GITHUB_BUG_LINK
+            ),
+            0,
+            $previous
+        );
     }
 }

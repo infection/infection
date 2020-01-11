@@ -37,14 +37,15 @@ namespace Infection\Process;
 
 use function in_array;
 use Infection\Mutant\Mutant;
-use Infection\Mutation;
+use Infection\Mutation\Mutation;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
+ * @final
  */
-final class MutantProcess implements MutantProcessInterface
+class MutantProcess
 {
     public const CODE_KILLED = 0;
     public const CODE_ESCAPED = 1;

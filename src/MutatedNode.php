@@ -33,41 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\OutputFormatter;
+namespace Infection;
 
-use Infection\Process\MutantProcess;
-use Symfony\Component\Console\Helper\ProgressBar;
+use function is_array;
+use PhpParser\Node;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class ProgressFormatter extends AbstractOutputFormatter
+final class MutatedNode
 {
-    private $progressBar;
+    private $value;
 
-    public function __construct(ProgressBar $progressBar)
+    /**
+     * @param Node|Node[] $value
+     */
+    private function __construct($value)
     {
-        $this->progressBar = $progressBar;
+        if (is_array($value)) {
+            Assert::allIsInstanceOf($value, Node::class);
+        } else {
+            Assert::isInstanceOf($value, Node::class);
+        }
+
+        $this->value = $value;
     }
 
-    public function start(int $mutationCount): void
+    /**
+     * @param Node|Node[] $value
+     */
+    public static function wrap($value): self
     {
-        parent::start($mutationCount);
-
-        $this->progressBar->start($mutationCount);
+        return new self($value);
     }
 
-    public function advance(MutantProcess $mutantProcess, int $mutationCount): void
+    /**
+     * @return Node|Node[]
+     */
+    public function unwrap()
     {
-        parent::advance($mutantProcess, $mutationCount);
-
-        $this->progressBar->advance();
-    }
-
-    public function finish(): void
-    {
-        parent::finish();
-
-        $this->progressBar->finish();
+        return $this->value;
     }
 }

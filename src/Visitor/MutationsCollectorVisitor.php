@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Visitor;
 
-use Infection\Mutation;
+use Infection\Mutation\Mutation;
 use Infection\Mutator\NodeMutationGenerator;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;

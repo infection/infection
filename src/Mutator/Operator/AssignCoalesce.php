@@ -35,12 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
+use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
-use PhpParser\Node\Expr\Assign;
-use PhpParser\Node\Expr\AssignOp\Coalesce;
 
 /**
  * @internal
@@ -60,17 +59,17 @@ TXT
     }
 
     /**
-     * @param Coalesce $node
+     * @param Node\Expr\AssignOp\Coalesce $node
      *
-     * @return Assign
+     * @return Generator<Node\Expr\Assign>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return new Assign($node->var, $node->expr, $node->getAttributes());
+        yield new Node\Expr\Assign($node->var, $node->expr, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool
     {
-        return $node instanceof Coalesce;
+        return $node instanceof Node\Expr\AssignOp\Coalesce;
     }
 }

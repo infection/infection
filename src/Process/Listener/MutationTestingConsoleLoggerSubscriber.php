@@ -42,7 +42,7 @@ use Infection\Events\MutantProcessFinished;
 use Infection\Events\MutationTestingFinished;
 use Infection\Events\MutationTestingStarted;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Process\MutantProcessInterface;
+use Infection\Process\MutantProcess;
 use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -54,7 +54,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInt
     private const PAD_LENGTH = 8;
 
     /**
-     * @var MutantProcessInterface[]
+     * @var MutantProcess[]
      */
     private $mutantProcesses = [];
 
@@ -119,7 +119,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInt
     }
 
     /**
-     * @param MutantProcessInterface[] $processes
+     * @param MutantProcess[] $processes
      */
     private function showMutations(array $processes, string $headlinePrefix): void
     {
@@ -142,7 +142,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInt
                     $index + 1,
                     $mutation->getOriginalFilePath(),
                     (int) $mutation->getAttributes()['startLine'],
-                    $mutation->getMutatorName()::getName()
+                    $mutation->getMutatorName()
                 ),
             ]);
 

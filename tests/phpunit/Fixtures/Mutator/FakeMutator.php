@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures\Mutator;
 
+use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
 use LogicException;
@@ -57,7 +58,7 @@ final class FakeMutator implements Mutator
         throw new LogicException('Not expected to be called');
     }
 
-    public function mutate(Node $node): void
+    public function mutate(Node $node): Generator
     {
         throw new LogicException('Not expected to be called');
     }

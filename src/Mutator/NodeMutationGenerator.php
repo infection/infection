@@ -37,14 +37,14 @@ namespace Infection\Mutator;
 
 use function array_reduce;
 use function count;
-use Generator;
 use function get_class;
-use Infection\Exception\InvalidMutatorException;
-use Infection\Mutation;
+use Infection\MutatedNode;
+use Infection\Mutation\Mutation;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
+use function iterator_to_array;
 use PhpParser\Node;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -101,13 +101,13 @@ class NodeMutationGenerator
     private function generateForMutator(Node $node, IgnoreMutator $mutator, array $mutations): array
     {
         try {
-            if (!$mutator->shouldMutate($node)) {
+            if (!$mutator->canMutate($node)) {
                 return $mutations;
             }
         } catch (Throwable $throwable) {
-            throw InvalidMutatorException::create(
+            throw InvalidMutator::create(
                 $this->filePath,
-                $mutator->getMutator(),
+                $mutator->getMutatorName(),
                 $throwable
             );
         }
@@ -130,18 +130,18 @@ class NodeMutationGenerator
             return $mutations;
         }
 
-        $mutatedResult = $mutator->mutate($node);
-
-        $mutatedNodes = $mutatedResult instanceof Generator ? $mutatedResult : [$mutatedResult];
+        // It is important to not rely on the keys here. It might otherwise result in some elements
+        // being overridden, see https://3v4l.org/JLN73
+        $mutatedNodes = iterator_to_array($mutator->mutate($node), false);
 
         foreach ($mutatedNodes as $mutationByMutatorIndex => $mutatedNode) {
             $mutations[] = new Mutation(
                 $this->filePath,
                 $this->fileNodes,
-                $mutator->getMutator()::getName(),
+                $mutator->getMutatorName(),
                 $node->getAttributes(),
                 get_class($node),
-                $mutatedNode,
+                MutatedNode::wrap($mutatedNode),
                 $mutationByMutatorIndex,
                 $tests
             );

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -55,11 +56,13 @@ final class FalseValue extends Mutator
     }
 
     /**
-     * @return Node\Expr\ConstFetch
+     * @param Node\Expr\ConstFetch $node
+     *
+     * @return Generator<Node\Expr\ConstFetch>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return new Node\Expr\ConstFetch(new Node\Name('true'));
+        yield new Node\Expr\ConstFetch(new Node\Name('true'));
     }
 
     protected function mutatesNode(Node $node): bool

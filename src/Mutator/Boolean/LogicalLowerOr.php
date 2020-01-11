@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\Mutator;
@@ -55,13 +56,13 @@ final class LogicalLowerOr extends Mutator
     }
 
     /**
-     * @param Node&Node\Expr\BinaryOp\LogicalOr $node
+     * @param Node\Expr\BinaryOp\LogicalOr $node
      *
-     * @return Node\Expr\BinaryOp\LogicalAnd
+     * @return Generator<Node\Expr\BinaryOp\LogicalAnd>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return new Node\Expr\BinaryOp\LogicalAnd($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\LogicalAnd($node->left, $node->right, $node->getAttributes());
     }
 
     protected function mutatesNode(Node $node): bool

@@ -37,7 +37,6 @@ namespace Infection\Tests\Mutant;
 
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
@@ -93,7 +92,7 @@ final class MetricsCalculatorTest extends TestCase
 
     private function addMutantProcess(MetricsCalculator $calculator, int $resultCode, int $count = 1): void
     {
-        $mutantProcess = $this->createMock(MutantProcessInterface::class);
+        $mutantProcess = $this->createMock(MutantProcess::class);
         $mutantProcess->expects($this->exactly($count))
             ->method('getResultCode')
             ->willReturn($resultCode);

@@ -33,41 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\OutputFormatter;
+namespace Infection\Mutant;
 
-use Infection\Process\MutantProcess;
-use Symfony\Component\Console\Helper\ProgressBar;
+use Infection\Mutation\Mutation;
+use Infection\Visitor\CloneVisitor;
+use Infection\Visitor\MutatorVisitor;
+use PhpParser\NodeTraverser;
+use PhpParser\PrettyPrinterAbstract;
 
 /**
  * @internal
+ * @final
  */
-final class ProgressFormatter extends AbstractOutputFormatter
+class MutantCodeFactory
 {
-    private $progressBar;
+    private $printer;
 
-    public function __construct(ProgressBar $progressBar)
+    public function __construct(PrettyPrinterAbstract $prettyPrinter)
     {
-        $this->progressBar = $progressBar;
+        $this->printer = $prettyPrinter;
     }
 
-    public function start(int $mutationCount): void
+    public function createCode(Mutation $mutation): string
     {
-        parent::start($mutationCount);
+        $traverser = new NodeTraverser();
 
-        $this->progressBar->start($mutationCount);
-    }
+        $traverser->addVisitor(new CloneVisitor());
+        $traverser->addVisitor(new MutatorVisitor($mutation));
 
-    public function advance(MutantProcess $mutantProcess, int $mutationCount): void
-    {
-        parent::advance($mutantProcess, $mutationCount);
+        $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
 
-        $this->progressBar->advance();
-    }
-
-    public function finish(): void
-    {
-        parent::finish();
-
-        $this->progressBar->finish();
+        return $this->printer->prettyPrintFile($mutatedStatements);
     }
 }

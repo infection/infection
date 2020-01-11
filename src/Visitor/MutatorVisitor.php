@@ -37,7 +37,7 @@ namespace Infection\Visitor;
 
 use function array_key_exists;
 use function get_class;
-use Infection\Mutation;
+use Infection\Mutation\Mutation;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -67,7 +67,7 @@ final class MutatorVisitor extends NodeVisitorAbstract
             && $attributes['endTokenPos'] === $mutatedAttributes['endTokenPos'];
 
         if ($samePosition && $this->mutation->getMutatedNodeClass() === get_class($node)) {
-            return $this->mutation->getMutatedNode();
+            return $this->mutation->getMutatedNode()->unwrap();
             // TODO STOP TRAVERSING
             // TODO check all built-in visitors, in particular FirstFindingVisitor
             // TODO beforeTraverse - FirstFindingVisitor
