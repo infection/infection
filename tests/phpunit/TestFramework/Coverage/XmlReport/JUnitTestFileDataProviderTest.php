@@ -33,11 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\PhpUnit;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\Coverage\PhpUnit\JUnitTestFileDataProvider;
-use Infection\TestFramework\Coverage\PhpUnit\TestFileNameNotFoundException;
+use Infection\TestFramework\Coverage\XmlReport\JUnitTestFileDataProvider;
+use Infection\TestFramework\Coverage\XmlReport\TestFileNameNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 /**

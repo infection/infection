@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\PhpUnit;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
 use DOMDocument;
 use DOMElement;

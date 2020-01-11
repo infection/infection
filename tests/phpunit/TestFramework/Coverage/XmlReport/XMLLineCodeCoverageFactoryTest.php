@@ -33,11 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\PhpUnit;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Generator;
-use Infection\TestFramework\Coverage\PhpUnit\TestFileDataProvider;
-use Infection\TestFramework\Coverage\PhpUnit\XMLLineCodeCoverageFactory;
+use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
+use Infection\TestFramework\Coverage\XmlReport\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;

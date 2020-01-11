@@ -33,44 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\PhpUnit;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\PhpUnit\JUnitTestCaseSorter;
-use PHPUnit\Framework\TestCase;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
+use Infection\TestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\TestFrameworkTypes;
+use Webmozart\Assert\Assert;
 
-final class JUnitTestCaseSorterTest extends TestCase
+/**
+ * @internal
+ */
+final class XMLLineCodeCoverageFactory
 {
-    public function test_it_returns_unique_and_sorted_by_time_test_cases(): void
-    {
-        $coverageTestCases = [
-            CoverageLineData::with(
-                'testMethod1',
-                '/path/to/test-file-1',
-                0.000234
-            ),
-            CoverageLineData::with(
-                'testMethod2',
-                '/path/to/test-file-2',
-                0.600221
-            ),
-            CoverageLineData::with(
-                'testMethod3_1',
-                '/path/to/test-file-3',
-                0.000022
-            ),
-            CoverageLineData::with(
-                'testMethod3_2',
-                '/path/to/test-file-3',
-                0.010022
-            ),
-        ];
+    private $coverageDir;
+    private $coverageXmlParser;
+    private $testFileDataProvider;
 
-        $sorter = new JUnitTestCaseSorter();
+    public function __construct(
+        string $coverageDir,
+        IndexXmlCoverageParser $coverageXmlParser,
+        TestFileDataProvider $testFileDataProvider
+    ) {
+        $this->coverageDir = $coverageDir;
+        $this->coverageXmlParser = $coverageXmlParser;
+        $this->testFileDataProvider = $testFileDataProvider;
+    }
 
-        $uniqueSortedFileNames = $sorter->getUniqueSortedFileNames($coverageTestCases);
+    public function create(
+        string $testFrameworkKey,
+        TestFrameworkAdapter $adapter
+    ): XMLLineCodeCoverage {
+        Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
 
-        $this->assertCount(3, $uniqueSortedFileNames);
-        $this->assertSame('/path/to/test-file-3', $uniqueSortedFileNames[0]);
+        $testFileDataProviderService = $adapter->hasJUnitReport()
+            ? $this->testFileDataProvider
+            : null
+        ;
+
+        return new XMLLineCodeCoverage(
+            new PhpUnitXmlCoverageFactory(
+                $this->coverageDir,
+                $this->coverageXmlParser,
+                $testFrameworkKey,
+                $testFileDataProviderService
+            )
+        );
     }
 }

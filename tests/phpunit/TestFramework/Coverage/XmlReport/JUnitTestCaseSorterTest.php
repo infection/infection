@@ -33,18 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\PhpUnit;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\Coverage\PhpUnit\TestFileNameNotFoundException;
+use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use PHPUnit\Framework\TestCase;
 
-final class TestFileNameNotFoundExceptionTest extends TestCase
+final class JUnitTestCaseSorterTest extends TestCase
 {
-    public function test_from_fqn(): void
+    public function test_it_returns_unique_and_sorted_by_time_test_cases(): void
     {
-        $exception = TestFileNameNotFoundException::notFoundFromFQN('Foo\Bar', '/path/to/junit/xml');
+        $coverageTestCases = [
+            CoverageLineData::with(
+                'testMethod1',
+                '/path/to/test-file-1',
+                0.000234
+            ),
+            CoverageLineData::with(
+                'testMethod2',
+                '/path/to/test-file-2',
+                0.600221
+            ),
+            CoverageLineData::with(
+                'testMethod3_1',
+                '/path/to/test-file-3',
+                0.000022
+            ),
+            CoverageLineData::with(
+                'testMethod3_2',
+                '/path/to/test-file-3',
+                0.010022
+            ),
+        ];
 
-        $this->assertInstanceOf(TestFileNameNotFoundException::class, $exception);
-        $this->assertSame('For FQCN: Foo\Bar. Junit report: /path/to/junit/xml', $exception->getMessage());
+        $sorter = new JUnitTestCaseSorter();
+
+        $uniqueSortedFileNames = $sorter->getUniqueSortedFileNames($coverageTestCases);
+
+        $this->assertCount(3, $uniqueSortedFileNames);
+        $this->assertSame('/path/to/test-file-3', $uniqueSortedFileNames[0]);
     }
 }

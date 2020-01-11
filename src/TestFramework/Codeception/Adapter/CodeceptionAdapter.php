@@ -41,7 +41,7 @@ use function dirname;
 use Infection\TestFramework\Codeception\Stringifier;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\PhpUnit\JUnitTestCaseSorter;
+use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;

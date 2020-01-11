@@ -33,50 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\PhpUnit;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\TestFrameworkTypes;
-use Webmozart\Assert\Assert;
+use Infection\TestFramework\Coverage\XmlReport\MemoizedTestFileDataProvider;
+use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
+use Infection\TestFramework\Coverage\XmlReport\TestFileTimeData;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class XMLLineCodeCoverageFactory
+final class MemoizedTestFileDataProviderTest extends TestCase
 {
-    private $coverageDir;
-    private $coverageXmlParser;
-    private $testFileDataProvider;
+    public function test_it_memoize_get_test_file_info_calls(): void
+    {
+        $class = 'Test\Class';
+        $expectedTestInfo = new TestFileTimeData('path/to/Test.php', 4.567);
 
-    public function __construct(
-        string $coverageDir,
-        IndexXmlCoverageParser $coverageXmlParser,
-        TestFileDataProvider $testFileDataProvider
-    ) {
-        $this->coverageDir = $coverageDir;
-        $this->coverageXmlParser = $coverageXmlParser;
-        $this->testFileDataProvider = $testFileDataProvider;
-    }
-
-    public function create(
-        string $testFrameworkKey,
-        TestFrameworkAdapter $adapter
-    ): XMLLineCodeCoverage {
-        Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
-
-        $testFileDataProviderService = $adapter->hasJUnitReport()
-            ? $this->testFileDataProvider
-            : null
+        $providerMock = $this->createMock(TestFileDataProvider::class);
+        $providerMock
+            ->expects($this->once())
+            ->method('getTestFileInfo')
+            ->with($class)
+            ->willReturn($expectedTestInfo)
         ;
 
-        return new XMLLineCodeCoverage(
-            new PhpUnitXmlCoverageFactory(
-                $this->coverageDir,
-                $this->coverageXmlParser,
-                $testFrameworkKey,
-                $testFileDataProviderService
-            )
-        );
+        $infoProvider = new MemoizedTestFileDataProvider($providerMock);
+
+        $testInfo0 = $infoProvider->getTestFileInfo($class);
+        $testInfo1 = $infoProvider->getTestFileInfo($class);
+
+        $this->assertSame($expectedTestInfo, $testInfo0);
+        $this->assertSame($expectedTestInfo, $testInfo1);
     }
 }

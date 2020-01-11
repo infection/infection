@@ -33,17 +33,62 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\PhpUnit;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Exception;
+use function assert;
+use function in_array;
+use Infection\TestFramework\Coverage\CoverageLineData;
+use function is_string;
 
 /**
  * @internal
  */
-final class TestFileNameNotFoundException extends Exception
+final class JUnitTestCaseSorter
 {
-    public static function notFoundFromFQN(string $fqn, string $jUnitFilePath): self
+    /**
+     * @param CoverageLineData[] $coverageTestCases
+     *
+     * @return string[]
+     */
+    public function getUniqueSortedFileNames(array $coverageTestCases): array
     {
-        return new self(sprintf('For FQCN: %s. Junit report: %s', $fqn, $jUnitFilePath));
+        $uniqueCoverageTests = $this->uniqueByTestFile($coverageTestCases);
+
+        // sort tests to run the fastest first
+        usort(
+            $uniqueCoverageTests,
+            static function (CoverageLineData $a, CoverageLineData $b) {
+                return $a->time <=> $b->time;
+            }
+        );
+
+        return array_map(
+            static function (CoverageLineData $coverageLineData): string {
+                assert(is_string($coverageLineData->testFilePath));
+
+                return $coverageLineData->testFilePath;
+            },
+            $uniqueCoverageTests
+        );
+    }
+
+    /**
+     * @param CoverageLineData[] $coverageTestCases
+     *
+     * @return CoverageLineData[]
+     */
+    private function uniqueByTestFile(array $coverageTestCases): array
+    {
+        $usedFileNames = [];
+        $uniqueTests = [];
+
+        foreach ($coverageTestCases as $coverageTestCase) {
+            if (!in_array($coverageTestCase->testFilePath, $usedFileNames, true)) {
+                $uniqueTests[] = $coverageTestCase;
+                $usedFileNames[] = $coverageTestCase->testFilePath;
+            }
+        }
+
+        return $uniqueTests;
     }
 }

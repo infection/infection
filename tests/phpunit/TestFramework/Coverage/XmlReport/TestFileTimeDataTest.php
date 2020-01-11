@@ -33,9 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\PhpUnit;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\Coverage\PhpUnit\TestFileTimeData;
+use Infection\TestFramework\Coverage\XmlReport\TestFileTimeData;
 use PHPUnit\Framework\TestCase;
 
 final class TestFileTimeDataTest extends TestCase

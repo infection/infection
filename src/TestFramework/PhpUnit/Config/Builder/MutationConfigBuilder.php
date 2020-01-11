@@ -42,7 +42,7 @@ use DOMNode;
 use DOMXPath;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\PhpUnit\JUnitTestCaseSorter;
+use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 
 /**

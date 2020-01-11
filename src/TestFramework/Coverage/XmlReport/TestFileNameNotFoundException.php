@@ -33,22 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\PhpUnit;
+namespace Infection\TestFramework\Coverage\XmlReport;
+
+use Exception;
 
 /**
  * @internal
  */
-interface TestFileDataProvider
+final class TestFileNameNotFoundException extends Exception
 {
-    /**
-     * Provides 1) file name of the test file that contains passed as a parameter test class
-     *          2) Time test was executed with
-     *
-     * Example for file name:
-     *      param:  '\NameSpace\Sub\TestClass'
-     *      return: '/path/to/NameSpace/Sub/TestClass.php'
-     *
-     * @return TestFileTimeData file path and time
-     */
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData;
+    public static function notFoundFromFQN(string $fqn, string $jUnitFilePath): self
+    {
+        return new self(sprintf('For FQCN: %s. Junit report: %s', $fqn, $jUnitFilePath));
+    }
 }

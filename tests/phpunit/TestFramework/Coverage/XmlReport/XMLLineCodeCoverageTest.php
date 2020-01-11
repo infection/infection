@@ -33,15 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\PhpUnit;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\PhpUnit\PhpUnitXmlCoverageFactory;
-use Infection\TestFramework\Coverage\PhpUnit\XMLLineCodeCoverage;
+use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
+use Infection\TestFramework\Coverage\XmlReport\XMLLineCodeCoverage;
 use Infection\Tests\TestFramework\Coverage\CoverageHelper;
 use PHPUnit\Framework\TestCase;
 
