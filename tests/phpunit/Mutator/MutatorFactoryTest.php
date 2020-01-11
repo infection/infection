@@ -92,7 +92,7 @@ final class MutatorFactoryTest extends TestCase
     public function test_it_can_creates_the_profile_mutators_with_the_given_settings(): void
     {
         // TODO: refactor this test to check the mutator configuration directly instead of relying
-        // on the shouldMutate() API which ends up testing other stuff and is also more cumbersome
+        // on the canMutate() API which ends up testing other stuff and is also more cumbersome
         // to employ.
 
         $mutators = $this->mutatorFactory->create([
@@ -116,9 +116,9 @@ final class MutatorFactoryTest extends TestCase
         $falseNode = $this->createBoolNode('false', 'B', $reflectionMock);
         $trueNode = $this->createBoolNode('true', 'B', $reflectionMock);
 
-        $this->assertTrue($mutators[Plus::getName()]->shouldMutate($plusNode));
-        $this->assertFalse($mutators[TrueValue::getName()]->shouldMutate($trueNode));
-        $this->assertFalse($mutators[FalseValue::getName()]->shouldMutate($falseNode));
+        $this->assertTrue($mutators[Plus::getName()]->canMutate($plusNode));
+        $this->assertFalse($mutators[TrueValue::getName()]->canMutate($trueNode));
+        $this->assertFalse($mutators[FalseValue::getName()]->canMutate($falseNode));
     }
 
     public function test_it_can_ignore_a_profile(): void
@@ -188,7 +188,7 @@ final class MutatorFactoryTest extends TestCase
     public function test_it_can_create_a_mutator_with_the_given_settings(): void
     {
         // TODO: refactor this test to check the mutator configuration directly instead of relying
-        // on the shouldMutate() API which ends up testing other stuff and is also more cumbersome
+        // on the canMutate() API which ends up testing other stuff and is also more cumbersome
         // to employ.
 
         $mutators = $this->mutatorFactory->create([
@@ -211,8 +211,8 @@ final class MutatorFactoryTest extends TestCase
         $falseNode = $this->createBoolNode('false', 'B', $reflectionMock);
         $trueNode = $this->createBoolNode('true', 'B', $reflectionMock);
 
-        $this->assertFalse($mutators[TrueValue::getName()]->shouldMutate($trueNode));
-        $this->assertTrue($mutators[FalseValue::getName()]->shouldMutate($falseNode));
+        $this->assertFalse($mutators[TrueValue::getName()]->canMutate($trueNode));
+        $this->assertTrue($mutators[FalseValue::getName()]->canMutate($falseNode));
     }
 
     public function test_it_can_ignore_a_mutator(): void
