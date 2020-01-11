@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
-use Infection\Process\MutantProcessInterface;
+use Infection\Process\MutantProcess;
 use function strlen;
 
 /**
@@ -78,7 +78,7 @@ final class DebugFileLogger extends FileLogger
     }
 
     /**
-     * @param MutantProcessInterface[] $processes
+     * @param MutantProcess[] $processes
      */
     private function convertProcess(array $processes, string $headlinePrefix): string
     {

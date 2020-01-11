@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Events;
 
-use Infection\Process\MutantProcessInterface;
+use Infection\Process\MutantProcess;
 
 /**
  * @internal
@@ -44,12 +44,12 @@ final class MutantProcessFinished
 {
     private $mutantProcess;
 
-    public function __construct(MutantProcessInterface $mutantProcess)
+    public function __construct(MutantProcess $mutantProcess)
     {
         $this->mutantProcess = $mutantProcess;
     }
 
-    public function getMutantProcess(): MutantProcessInterface
+    public function getMutantProcess(): MutantProcess
     {
         return $this->mutantProcess;
     }
