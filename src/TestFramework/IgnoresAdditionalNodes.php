@@ -40,7 +40,7 @@ use Infection\Visitor\IgnoreNode\IgnoresNode;
 /**
  * @internal
  */
-interface IgnoresAdditional
+interface IgnoresAdditionalNodes
 {
     /**
      * @return IgnoresNode[]

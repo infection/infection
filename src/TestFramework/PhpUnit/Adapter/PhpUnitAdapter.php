@@ -37,13 +37,13 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Infection\TestFramework\IgnoresAdditional;
+use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\Visitor\IgnoreNode\IgnoreCodeCoverageAnnotation;
 
 /**
  * @internal
  */
-final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAdditional, MemoryUsageAware
+final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAdditionalNodes, MemoryUsageAware
 {
     public const COVERAGE_DIR = 'coverage-xml';
 
