@@ -115,7 +115,7 @@ final class ConfigureCommand extends BaseCommand
         }
 
         /** @var Filesystem $fileSystem */
-        $fileSystem = $this->getApplication()->getContainer()['filesystem'];
+        $fileSystem = $this->getApplication()->getContainer()[Filesystem::class];
 
         $excludeDirsProvider = new ExcludeDirsProvider(
             $consoleHelper,

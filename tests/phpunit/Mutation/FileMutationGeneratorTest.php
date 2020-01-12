@@ -91,10 +91,8 @@ final class FileMutationGeneratorTest extends TestCase
     {
         $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
 
-        $container = InfectionContainer::create();
-
         /** @var FileMutationGenerator $mutationGenerator */
-        $mutationGenerator = $container[FileMutationGenerator::class];
+        $mutationGenerator = InfectionContainer::create()[FileMutationGenerator::class];
 
         $mutatorConfig = new MutatorConfig([]);
 
