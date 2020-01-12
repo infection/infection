@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Visitor\IgnoreNode;
 
-use Infection\Visitor\IgnoreNode\IgnoreInterface;
+use Infection\Visitor\IgnoreNode\IgnoreInterfaceNode;
 use Infection\Visitor\IgnoreNode\IgnoresNode;
 
-final class IgnoreInterfaceTest extends IgnoresNodeTestCase
+final class IgnoreInterfaceNodeTest extends IgnoresNodeTestCase
 {
     public function test_it_ignores_interfaces(): void
     {
@@ -50,7 +50,9 @@ interface Bar
     public function nope(Bar $ignored): void;
 }
 PHP
-        , $this->createSpy());
+        ,
+            $this->createSpy()
+        );
     }
 
     public function test_it_doesnt_ignore_others(): void
@@ -66,12 +68,14 @@ class Bar
     }
 }
 PHP
-            , $spy = $this->createSpy());
+            ,
+            $spy = $this->createSpy()
+        );
         $this->assertSame(2, $spy->nodeCounter);
     }
 
     protected function getIgnore(): IgnoresNode
     {
-        return new IgnoreInterface();
+        return new IgnoreInterfaceNode();
     }
 }

@@ -40,7 +40,7 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class IgnoreInterface implements IgnoresNode
+final class IgnoreInterfaceNode implements IgnoresNode
 {
     public function ignores(Node $node): bool
     {

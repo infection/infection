@@ -56,7 +56,9 @@ class IgnoredClass
     }
 }
 PHP
-        , $this->createSpy());
+        ,
+            $this->createSpy()
+        );
     }
 
     public function test_it_ignores_annotated_method(): void
@@ -76,7 +78,9 @@ class IgnoredClass
     }
 }
 PHP
-            , $this->createSpy());
+            ,
+            $this->createSpy()
+        );
     }
 
     public function test_it_does_not_ignore_non_annotated_code(): void
@@ -93,7 +97,9 @@ class IgnoredClass
     }
 }
 PHP
-            , $spy = $this->createSpy());
+            ,
+            $spy = $this->createSpy()
+        );
         $this->assertSame(2, $spy->nodeCounter);
     }
 

@@ -54,7 +54,9 @@ abstract class Foo
 }
 
 PHP
-        , $spy = $this->createSpy());
+        ,
+            $spy = $this->createSpy()
+        );
 
         $this->assertSame(1, $spy->nodeCounter);
     }

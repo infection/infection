@@ -37,7 +37,7 @@ namespace Infection\Mutation;
 
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\IgnoreNode\IgnoreAbstractMethod;
-use Infection\Visitor\IgnoreNode\IgnoreInterface;
+use Infection\Visitor\IgnoreNode\IgnoreInterfaceNode;
 use Infection\Visitor\IgnoreNode\IgnoresNode;
 use Infection\Visitor\NotMutableIgnoreVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
@@ -58,7 +58,7 @@ class NodeTraverserFactory
     {
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new NotMutableIgnoreVisitor(
-            array_merge($additionalIgnoredNodes, [new IgnoreInterface(), new IgnoreAbstractMethod()]))
+            array_merge($additionalIgnoredNodes, [new IgnoreInterfaceNode(), new IgnoreAbstractMethod()]))
         );
         $traverser->addVisitor(new ParentConnectorVisitor());
         $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
