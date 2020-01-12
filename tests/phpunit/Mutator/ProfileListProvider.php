@@ -39,8 +39,8 @@ use function array_filter;
 use const ARRAY_FILTER_USE_KEY;
 use function array_values;
 use Generator;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
-use Infection\Mutator\Util\Mutator;
 use function ksort;
 use ReflectionClass;
 use function Safe\realpath;
@@ -70,8 +70,8 @@ final class ProfileListProvider
 
     public static function mutatorNameAndClassProvider(): Generator
     {
-        foreach (ProfileList::ALL_MUTATORS as $name => $class) {
-            yield [$name, $class];
+        foreach (self::implementedMutatorProvider() as [$filePath, $className, $shortClassName]) {
+            yield [$shortClassName, $className];
         }
     }
 
@@ -103,7 +103,7 @@ final class ProfileListProvider
                 continue;
             }
 
-            if (!self::extendsMutator($mutatorReflection)) {
+            if (!$mutatorReflection->implementsInterface(Mutator::class)) {
                 continue;
             }
 
@@ -162,16 +162,5 @@ final class ProfileListProvider
             'Infection\%s',
             str_replace('/', '\\', $cleanedRelativePath)
         );
-    }
-
-    private static function extendsMutator(ReflectionClass $mutatorReflection): bool
-    {
-        $mutatorParentReflection = $mutatorReflection->getParentClass();
-
-        if (false === $mutatorParentReflection) {
-            return Mutator::class === $mutatorReflection->getName();
-        }
-
-        return self::extendsMutator($mutatorParentReflection);
     }
 }
