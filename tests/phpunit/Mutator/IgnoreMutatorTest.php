@@ -170,9 +170,7 @@ final class IgnoreMutatorTest extends TestCase
 
     public function test_it_exposes_its_decorated_mutator_name(): void
     {
-        $config = new MutatorConfig([]);
-
-        $ignoreMutator = new IgnoreMutator($config, new Plus($config));
+        $ignoreMutator = new IgnoreMutator(new MutatorConfig([]), new Plus());
 
         $this->assertSame(Plus::getName(), $ignoreMutator->getMutatorName());
     }
