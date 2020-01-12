@@ -41,6 +41,7 @@ use Infection\Mutant\MutantCodeFactory;
 use Infection\MutatedNode;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
+use Infection\Tests\Mutator\MutatorName;
 use PhpParser\Node;
 use PhpParser\NodeDumper;
 use PHPUnit\Framework\TestCase;
@@ -138,7 +139,7 @@ final class MutantCodeFactoryTest extends TestCase
                         'kind' => 1,
                     ]
                 )],
-                Plus::getName(),
+                MutatorName::getName(Plus::class),
                 [
                     'startLine' => 5,
                     'startTokenPos' => 9,

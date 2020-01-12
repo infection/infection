@@ -45,7 +45,7 @@ interface Mutator
 {
     public static function getDefinition(): ?Definition;
 
-    public static function getName(): string;
+    public function getName(): string;
 
     public function canMutate(Node $node): bool;
 

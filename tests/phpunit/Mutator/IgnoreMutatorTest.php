@@ -174,6 +174,9 @@ final class IgnoreMutatorTest extends TestCase
 
         $ignoreMutator = new IgnoreMutator($config, new Plus($config));
 
-        $this->assertSame(Plus::getName(), $ignoreMutator->getMutatorName());
+        $this->assertSame(
+            MutatorName::getName(Plus::class),
+            $ignoreMutator->getName()
+        );
     }
 }

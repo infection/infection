@@ -177,7 +177,7 @@ final class MutatorFactory
             /** @var Mutator $mutator */
             $mutator = new $mutatorClass($mutatorConfig);
 
-            $mutators[$mutator::getName()] = new IgnoreMutator($mutatorConfig, $mutator);
+            $mutators[$mutator->getName()] = new IgnoreMutator($mutatorConfig, $mutator);
         }
 
         return $mutators;

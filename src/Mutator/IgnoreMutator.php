@@ -92,8 +92,8 @@ final class IgnoreMutator
         return $this->mutator->mutate($node);
     }
 
-    public function getMutatorName(): string
+    public function getName(): string
     {
-        return $this->mutator::getName();
+        return $this->mutator->getName();
     }
 }

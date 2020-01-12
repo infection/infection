@@ -48,7 +48,7 @@ final class InvalidMutatorTest extends TestCase
 
         $exception = InvalidMutator::create(
             '/path/to/acme/Foo.php',
-            Plus::getName(),
+            MutatorName::getName(Plus::class),
             $previous
         );
 
