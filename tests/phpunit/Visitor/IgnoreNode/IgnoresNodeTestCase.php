@@ -67,7 +67,7 @@ abstract class IgnoresNodeTestCase extends TestCase
     protected function createSpy(): IgnoreSpyVisitor
     {
         return new IgnoreSpyVisitor(static function (): void {
-            self::fail('An variable that should have been ignored was still parsed by the next visitor.');
+            self::fail('A variable that should have been ignored was still parsed by the next visitor.');
         });
     }
 
