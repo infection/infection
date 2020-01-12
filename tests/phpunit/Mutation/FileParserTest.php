@@ -151,6 +151,12 @@ PHP
             ),
             <<<'AST'
 array(
+<<<<<<< HEAD
+=======
+    0: Stmt_InlineHTML(
+        value: <?php
+    )
+>>>>>>> Add test back that was deleted during dev
 )
 AST
         ];
