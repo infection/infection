@@ -33,11 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function dirname;
 use function explode;
 use function file_exists;
+use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
+use Infection\TestFramework\Coverage\CoverageFileData;
+use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use function Safe\file_get_contents;
 

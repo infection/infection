@@ -33,22 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\TestFramework\Coverage\XmlReport;
+
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
+use Infection\TestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\TestFrameworkTypes;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-interface TestFileDataProvider
+final class XMLLineCodeCoverageFactory
 {
-    /**
-     * Provides 1) file name of the test file that contains passed as a parameter test class
-     *          2) Time test was executed with
-     *
-     * Example for file name:
-     *      param:  '\NameSpace\Sub\TestClass'
-     *      return: '/path/to/NameSpace/Sub/TestClass.php'
-     *
-     * @return TestFileTimeData file path and time
-     */
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData;
+    private $coverageDir;
+    private $coverageXmlParser;
+    private $testFileDataProvider;
+
+    public function __construct(
+        string $coverageDir,
+        IndexXmlCoverageParser $coverageXmlParser,
+        TestFileDataProvider $testFileDataProvider
+    ) {
+        $this->coverageDir = $coverageDir;
+        $this->coverageXmlParser = $coverageXmlParser;
+        $this->testFileDataProvider = $testFileDataProvider;
+    }
+
+    public function create(
+        string $testFrameworkKey,
+        TestFrameworkAdapter $adapter
+    ): XMLLineCodeCoverage {
+        Assert::oneOf($testFrameworkKey, TestFrameworkTypes::TYPES);
+
+        $testFileDataProviderService = $adapter->hasJUnitReport()
+            ? $this->testFileDataProvider
+            : null
+        ;
+
+        return new XMLLineCodeCoverage(
+            new PhpUnitXmlCoverageFactory(
+                $this->coverageDir,
+                $this->coverageXmlParser,
+                $testFrameworkKey,
+                $testFileDataProviderService
+            )
+        );
+    }
 }
