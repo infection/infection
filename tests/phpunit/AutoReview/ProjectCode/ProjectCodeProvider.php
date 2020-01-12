@@ -75,7 +75,6 @@ use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
-use Infection\Utils\VersionParser;
 use function iterator_to_array;
 use ReflectionClass;
 use const SORT_STRING;
@@ -122,7 +121,6 @@ final class ProjectCodeProvider
         PhpSpecMutationConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
         IndexXmlCoverageParser::class,
-        VersionParser::class,
     ];
 
     /**

@@ -129,7 +129,7 @@ OUTPUT;
             $this->createMock(InitialConfigBuilder::class),
             $this->createMock(MutationConfigBuilder::class),
             $this->createMock(CommandLineArgumentsAndOptionsBuilder::class),
-            $this->createMock(VersionParser::class),
+            new VersionParser(),
             new CommandLineBuilder()
         );
     }
