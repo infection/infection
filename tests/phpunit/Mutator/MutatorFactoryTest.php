@@ -116,9 +116,9 @@ final class MutatorFactoryTest extends TestCase
         $falseNode = $this->createBoolNode('false', 'B', $reflectionMock);
         $trueNode = $this->createBoolNode('true', 'B', $reflectionMock);
 
-        $this->assertTrue($mutators[Plus::getName()]->canMutate($plusNode));
-        $this->assertFalse($mutators[TrueValue::getName()]->canMutate($trueNode));
-        $this->assertFalse($mutators[FalseValue::getName()]->canMutate($falseNode));
+        $this->assertTrue($mutators[MutatorName::getName(Plus::class)]->canMutate($plusNode));
+        $this->assertFalse($mutators[MutatorName::getName(TrueValue::class)]->canMutate($trueNode));
+        $this->assertFalse($mutators[MutatorName::getName(FalseValue::class)]->canMutate($falseNode));
     }
 
     public function test_it_can_ignore_a_profile(): void
@@ -156,8 +156,8 @@ final class MutatorFactoryTest extends TestCase
     public function test_it_can_create_mutators_from_their_names(): void
     {
         $mutators = $this->mutatorFactory->create([
-            Plus::getName() => true,
-            Minus::getName() => true,
+            MutatorName::getName(Plus::class) => true,
+            MutatorName::getName(Minus::class) => true,
         ]);
 
         $this->assertSameMutatorsByClass(
@@ -172,8 +172,8 @@ final class MutatorFactoryTest extends TestCase
     public function test_it_can_create_mutators_with_empty_settings_from_their_names(): void
     {
         $mutators = $this->mutatorFactory->create([
-            Plus::getName() => [],
-            Minus::getName() => [],
+            MutatorName::getName(Plus::class) => [],
+            MutatorName::getName(Minus::class) => [],
         ]);
 
         $this->assertSameMutatorsByClass(
@@ -193,7 +193,7 @@ final class MutatorFactoryTest extends TestCase
 
         $mutators = $this->mutatorFactory->create([
             '@boolean' => true,
-            TrueValue::getName() => [
+            MutatorName::getName(TrueValue::class) => [
                 'ignore' => ['A::B'],
             ],
         ]);
@@ -211,13 +211,13 @@ final class MutatorFactoryTest extends TestCase
         $falseNode = $this->createBoolNode('false', 'B', $reflectionMock);
         $trueNode = $this->createBoolNode('true', 'B', $reflectionMock);
 
-        $this->assertFalse($mutators[TrueValue::getName()]->canMutate($trueNode));
-        $this->assertTrue($mutators[FalseValue::getName()]->canMutate($falseNode));
+        $this->assertFalse($mutators[MutatorName::getName(TrueValue::class)]->canMutate($trueNode));
+        $this->assertTrue($mutators[MutatorName::getName(FalseValue::class)]->canMutate($falseNode));
     }
 
     public function test_it_can_ignore_a_mutator(): void
     {
-        $mutators = $this->mutatorFactory->create([Plus::getName() => false]);
+        $mutators = $this->mutatorFactory->create([MutatorName::getName(Plus::class) => false]);
 
         $this->assertCount(0, $mutators);
     }
@@ -226,7 +226,7 @@ final class MutatorFactoryTest extends TestCase
     {
         $mutators = $this->mutatorFactory->create([
             '@equal' => true,
-            IdenticalEqual::getName() => false,
+            MutatorName::getName(IdenticalEqual::class) => false,
         ]);
 
         $this->assertSameMutatorsByClass(
@@ -238,7 +238,7 @@ final class MutatorFactoryTest extends TestCase
     public function test_it_will_not_remove_the_ignored_mutators_if_they_were_included_afterwards(): void
     {
         $mutators = $this->mutatorFactory->create([
-            IdenticalEqual::getName() => false,
+            MutatorName::getName(IdenticalEqual::class) => false,
             '@equal' => true,
         ]);
 
@@ -248,9 +248,9 @@ final class MutatorFactoryTest extends TestCase
     public function test_a_mutator_will_be_created_only_once_even_if_included_multiple_times(): void
     {
         $mutators = $this->mutatorFactory->create([
-            IdenticalEqual::getName() => true,
+            MutatorName::getName(IdenticalEqual::class) => true,
             '@equal' => true,
-            NotIdenticalNotEqual::getName() => true,
+            MutatorName::getName(NotIdenticalNotEqual::class) => true,
         ]);
 
         $this->assertSameMutatorsByClass(ProfileList::EQUAL_PROFILE, $mutators);

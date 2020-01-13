@@ -40,6 +40,7 @@ use Infection\Mutation\Mutation;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -168,7 +169,7 @@ final class MutantProcessTest extends TestCase
         $mutation = $this->createMock(Mutation::class);
         $mutation->expects($this->once())
             ->method('getMutatorName')
-            ->willReturn(For_::getName());
+            ->willReturn(MutatorName::getName(For_::class));
 
         $this->mutant
             ->expects($this->once())

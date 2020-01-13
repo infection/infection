@@ -210,7 +210,7 @@ abstract class AbstractMutatorTestCase extends TestCase
             $returnCode,
             sprintf(
                 'Mutator %s produces invalid code',
-                $this->createMutator()::getName()
+                $this->createMutator()->getName()
             )
         );
     }

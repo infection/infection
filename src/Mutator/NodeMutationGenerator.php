@@ -107,7 +107,7 @@ class NodeMutationGenerator
         } catch (Throwable $throwable) {
             throw InvalidMutator::create(
                 $this->filePath,
-                $mutator->getMutatorName(),
+                $mutator->getName(),
                 $throwable
             );
         }
@@ -138,7 +138,7 @@ class NodeMutationGenerator
             $mutations[] = new Mutation(
                 $this->filePath,
                 $this->fileNodes,
-                $mutator->getMutatorName(),
+                $mutator->getName(),
                 $node->getAttributes(),
                 get_class($node),
                 MutatedNode::wrap($mutatedNode),

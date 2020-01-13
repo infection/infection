@@ -82,7 +82,7 @@ final class MutatorRobustnessTest extends TestCase
         } catch (Throwable $throwable) {
             $this->fail(sprintf(
                'The mutator "%s" could not parse the file "%s": %s.',
-               $mutator::getName(),
+               $mutator->getName(),
                $fileName,
                $throwable->getMessage()
             ));
