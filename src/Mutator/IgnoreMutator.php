@@ -35,11 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use DomainException;
 use Generator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 use ReflectionClass;
+use function Safe\sprintf;
 
 /**
  * The mutators implement the ignore + canMutator pattern. The downside of this pattern is that
@@ -53,7 +55,7 @@ use ReflectionClass;
  *
  * @internal
  */
-final class IgnoreMutator
+final class IgnoreMutator implements Mutator
 {
     private $config;
     private $mutator;
@@ -62,6 +64,17 @@ final class IgnoreMutator
     {
         $this->config = $config;
         $this->mutator = $mutator;
+    }
+
+    public static function getDefinition(): ?Definition
+    {
+        // Since we do not use `getDefinition()` in our source code yet (only in tests for
+        // documentation purposes), we do not worry about this one for now. If needed, this one
+        // can also be made non-static to return the definition of the decorated mutator.
+        throw new DomainException(sprintf(
+            'The class "%s" does not have a definition',
+            self::class
+        ));
     }
 
     public function canMutate(Node $node): bool
