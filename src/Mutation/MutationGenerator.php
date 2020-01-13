@@ -40,7 +40,7 @@ use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\MutableFileProcessed;
 use Infection\Events\MutationGeneratingFinished;
 use Infection\Events\MutationGeneratingStarted;
-use Infection\Mutator\IgnoreMutator;
+use Infection\Mutator\Mutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use PhpParser\NodeVisitor;
 use Symfony\Component\Finder\SplFileInfo;
@@ -57,7 +57,7 @@ final class MutationGenerator
     private $sourceFiles;
 
     /**
-     * @var IgnoreMutator[]
+     * @var Mutator[]
      */
     private $mutators;
 
@@ -67,7 +67,7 @@ final class MutationGenerator
 
     /**
      * @param SplFileInfo[] $sourceFiles
-     * @param IgnoreMutator[] $mutators
+     * @param Mutator[] $mutators
      */
     public function __construct(
         array $sourceFiles,
@@ -77,7 +77,7 @@ final class MutationGenerator
         FileMutationGenerator $fileMutationGenerator
     ) {
         Assert::allIsInstanceOf($sourceFiles, SplFileInfo::class);
-        Assert::allIsInstanceOf($mutators, IgnoreMutator::class);
+        Assert::allIsInstanceOf($mutators, Mutator::class);
 
         $this->sourceFiles = $sourceFiles;
         $this->codeCoverageData = $codeCoverageData;
