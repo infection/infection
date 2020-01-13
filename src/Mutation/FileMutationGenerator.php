@@ -37,7 +37,7 @@ namespace Infection\Mutation;
 
 use function array_key_exists;
 use function get_class;
-use Infection\Mutator\IgnoreMutator;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Visitor\MutationsCollectorVisitor;
@@ -67,7 +67,7 @@ class FileMutationGenerator
     }
 
     /**
-     * @param IgnoreMutator[]     $mutators
+     * @param Mutator[]     $mutators
      * @param NodeVisitor[] $extraNodeVisitors
      *
      * @throws UnparsableFile
@@ -81,7 +81,7 @@ class FileMutationGenerator
         array $mutators,
         array $extraNodeVisitors
     ): array {
-        Assert::allIsInstanceOf($mutators, IgnoreMutator::class);
+        Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::allIsInstanceOf($extraNodeVisitors, NodeVisitor::class);
 
         $filePath = false === $fileInfo->getRealPath()

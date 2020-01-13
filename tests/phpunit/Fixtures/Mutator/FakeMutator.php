@@ -48,7 +48,7 @@ final class FakeMutator implements Mutator
         throw new LogicException('Not expected to be called');
     }
 
-    public static function getName(): string
+    public function getName(): string
     {
         throw new LogicException('Not expected to be called');
     }

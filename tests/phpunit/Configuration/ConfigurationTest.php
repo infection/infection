@@ -41,6 +41,7 @@ use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Mutator\IgnoreMutator;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
@@ -57,7 +58,7 @@ final class ConfigurationTest extends TestCase
      *
      * @param string[]      $sourceDirectories
      * @param SplFileInfo[] $sourceFiles
-     * @param IgnoreMutator[] $mutators
+     * @param Mutator[] $mutators
      */
     public function test_it_can_be_instantiated(
         ?int $timeout,

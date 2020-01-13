@@ -39,6 +39,7 @@ use Generator;
 use Infection\MutatedNode;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
+use Infection\Tests\Mutator\MutatorName;
 use Infection\Tests\StringNormalizer;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\Lexer;
@@ -108,7 +109,7 @@ PHP
                 new Mutation(
                     'path/to/file',
                     $nodes,
-                    PublicVisibility::getName(),
+                    MutatorName::getName(PublicVisibility::class),
                     [
                         'startTokenPos' => 29,
                         'endTokenPos' => 48,
@@ -160,7 +161,7 @@ PHP
                 new Mutation(
                     'path/to/file',
                     $nodes,
-                    PublicVisibility::getName(),
+                    MutatorName::getName(PublicVisibility::class),
                     [
                         'startTokenPos' => 29,
                         'endTokenPos' => 48,
@@ -214,7 +215,7 @@ PHP
                 new Mutation(
                     'path/to/file',
                     $nodes,
-                    PublicVisibility::getName(),
+                    MutatorName::getName(PublicVisibility::class),
                     [
                         'startTokenPos' => 29,
                         'endTokenPos' => 50,
@@ -282,7 +283,7 @@ PHP
                 new Mutation(
                     'path/to/file',
                     $nodes,
-                    PublicVisibility::getName(),
+                    MutatorName::getName(PublicVisibility::class),
                     [
                         'startTokenPos' => 29,
                         'endTokenPos' => 48,
@@ -291,7 +292,7 @@ PHP
                         'startFilePos' => -1,
                         'endFilePos' => -1,
                     ],
-                    PublicVisibility::getName(),
+                    MutatorName::getName(PublicVisibility::class),
                     MutatedNode::wrap(new Nop()),
                     0,
                     []

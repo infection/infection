@@ -50,7 +50,7 @@ final class MutatorFactory
     /**
      * @param array<string, bool|array<string, string>> $mutatorSettings
      *
-     * @return array<string, IgnoreMutator>
+     * @return array<string, Mutator>
      */
     public function create(array $mutatorSettings): array
     {
@@ -165,7 +165,7 @@ final class MutatorFactory
     /**
      * @param array<string, array<string, string>> $mutatorNames
      *
-     * @return array<string, IgnoreMutator>
+     * @return array<string, Mutator>
      */
     private static function createFromNames(array $mutatorNames): array
     {
@@ -177,7 +177,7 @@ final class MutatorFactory
             /** @var Mutator $mutator */
             $mutator = new $mutatorClass($mutatorConfig);
 
-            $mutators[$mutator::getName()] = new IgnoreMutator($mutatorConfig, $mutator);
+            $mutators[$mutator->getName()] = new IgnoreMutator($mutatorConfig, $mutator);
         }
 
         return $mutators;

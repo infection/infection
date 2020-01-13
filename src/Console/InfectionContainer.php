@@ -108,7 +108,7 @@ final class InfectionContainer extends Container
     {
         return new self([
             'project.dir' => getcwd(),
-            'filesystem' => static function (): Filesystem {
+            Filesystem::class => static function (): Filesystem {
                 return new Filesystem();
             },
             TmpDirProvider::class => static function (): TmpDirProvider {
@@ -147,44 +147,59 @@ final class InfectionContainer extends Container
                 );
             },
             RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
-                return new RootsFileOrDirectoryLocator(
-                    [$container['project.dir']],
-                    $container['filesystem']
-                );
+                /** @var string $projectDir */
+                $projectDir = $container['project.dir'];
+
+                /** @var Filesystem $filesystem */
+                $filesystem = $container[Filesystem::class];
+
+                return new RootsFileOrDirectoryLocator([$projectDir], $filesystem);
             },
-            'path.replacer' => static function (self $container): PathReplacer {
+            PathReplacer::class => static function (self $container): PathReplacer {
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
-                return new PathReplacer(
-                    $container['filesystem'],
-                    $config->getPhpUnit()->getConfigDir()
-                );
+                /** @var Filesystem $filesystem */
+                $filesystem = $container[Filesystem::class];
+
+                return new PathReplacer($filesystem, $config->getPhpUnit()->getConfigDir());
             },
-            'test.framework.factory' => static function (self $container): Factory {
+            Factory::class => static function (self $container): Factory {
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
+
+                /** @var string $projectDir */
+                $projectDir = $container['project.dir'];
+
+                /** @var TestFrameworkConfigLocator $testFrameworkConfigLocator */
+                $testFrameworkConfigLocator = $container[TestFrameworkConfigLocator::class];
+
+                /** @var string $jUnitFilePath */
+                $jUnitFilePath = $container['junit.file.path'];
 
                 return new Factory(
                     $config->getTmpDir(),
-                    $container['project.dir'],
-                    $container['testframework.config.locator'],
-                    $container['junit.file.path'],
-                    $container[Configuration::class]
+                    $projectDir,
+                    $testFrameworkConfigLocator,
+                    $jUnitFilePath,
+                    $config
                 );
             },
-            'xml.configuration.helper' => static function (self $container): XmlConfigurationHelper {
+            XmlConfigurationHelper::class => static function (self $container): XmlConfigurationHelper {
+                /** @var PathReplacer $pathReplacer */
+                $pathReplacer = $container[PathReplacer::class];
+
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
                 return new XmlConfigurationHelper(
-                    $container['path.replacer'],
+                    $pathReplacer,
                     (string) $config->getPhpUnit()->getConfigDir()
                 );
             },
             MutantCodeFactory::class => static function (self $container): MutantCodeFactory {
                 /** @var PrettyPrinterAbstract $printer */
-                $printer = $container['pretty.printer'];
+                $printer = $container[PrettyPrinterAbstract::class];
 
                 return new MutantCodeFactory($printer);
             },
@@ -196,7 +211,7 @@ final class InfectionContainer extends Container
                 $differ = $container[Differ::class];
 
                 /** @var PrettyPrinterAbstract $printer */
-                $printer = $container['pretty.printer'];
+                $printer = $container[PrettyPrinterAbstract::class];
 
                 /** @var MutantCodeFactory $codeFactory */
                 $codeFactory = $container[MutantCodeFactory::class];
@@ -211,13 +226,16 @@ final class InfectionContainer extends Container
             Differ::class => static function (): Differ {
                 return new Differ(new BaseDiffer());
             },
-            'dispatcher' => static function (): EventDispatcherInterface {
+            EventDispatcherInterface::class => static function (): EventDispatcherInterface {
                 return new EventDispatcher();
             },
-            'parallel.process.runner' => static function (self $container): ParallelProcessRunner {
-                return new ParallelProcessRunner($container['dispatcher']);
+            ParallelProcessRunner::class => static function (self $container): ParallelProcessRunner {
+                /** @var EventDispatcherInterface $eventDispatcher */
+                $eventDispatcher = $container[EventDispatcherInterface::class];
+
+                return new ParallelProcessRunner($eventDispatcher);
             },
-            'testframework.config.locator' => static function (self $container): TestFrameworkConfigLocator {
+            TestFrameworkConfigLocator::class => static function (self $container): TestFrameworkConfigLocator {
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
@@ -229,8 +247,11 @@ final class InfectionContainer extends Container
                 return new DiffColorizer();
             },
             MemoizedTestFileDataProvider::class => static function (self $container): TestFileDataProvider {
+                /** @var string $jUnitFilePath */
+                $jUnitFilePath = $container['junit.file.path'];
+
                 return new MemoizedTestFileDataProvider(
-                    new JUnitTestFileDataProvider($container['junit.file.path'])
+                    new JUnitTestFileDataProvider($jUnitFilePath)
                 );
             },
             VersionParser::class => static function (): VersionParser {
@@ -254,24 +275,24 @@ final class InfectionContainer extends Container
 
                 return new FileParser($phpParser);
             },
-            'pretty.printer' => static function (): Standard {
+            PrettyPrinterAbstract::class => static function (): Standard {
                 return new Standard();
             },
-            'metrics' => static function (): MetricsCalculator {
+            MetricsCalculator::class => static function (): MetricsCalculator {
                 return new MetricsCalculator();
             },
-            'timer' => static function (): Timer {
+            Timer::class => static function (): Timer {
                 return new Timer();
             },
-            'time.formatter' => static function (): TimeFormatter {
+            TimeFormatter::class => static function (): TimeFormatter {
                 return new TimeFormatter();
             },
-            'memory.formatter' => static function (): MemoryFormatter {
+            MemoryFormatter::class => static function (): MemoryFormatter {
                 return new MemoryFormatter();
             },
-            'memory.limit.applier' => static function (self $container): MemoryLimiter {
+            MemoryLimiter::class => static function (self $container): MemoryLimiter {
                 /** @var Filesystem $fileSystem */
-                $fileSystem = $container['filesystem'];
+                $fileSystem = $container[Filesystem::class];
 
                 return new MemoryLimiter($fileSystem, php_ini_loaded_file());
             },
@@ -289,7 +310,7 @@ final class InfectionContainer extends Container
                 $projectDir = $container['project.dir'];
 
                 /** @var Filesystem $fileSystem */
-                $fileSystem = $container['filesystem'];
+                $fileSystem = $container[Filesystem::class];
 
                 return new RootsFileLocator([$projectDir], $fileSystem);
             },
@@ -334,7 +355,7 @@ final class InfectionContainer extends Container
             MutatorParser::class => static function (): MutatorParser {
                 return new MutatorParser();
             },
-            'coverage.checker' => static function (self $container): CoverageRequirementChecker {
+            CoverageRequirementChecker::class => static function (self $container): CoverageRequirementChecker {
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
@@ -343,12 +364,12 @@ final class InfectionContainer extends Container
                     $config->getInitialTestsPhpOptions() ?? ''
                 );
             },
-            'test.run.constraint.checker' => static function (self $container): TestRunConstraintChecker {
+            TestRunConstraintChecker::class => static function (self $container): TestRunConstraintChecker {
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
                 /** @var MetricsCalculator $metricsCalculator */
-                $metricsCalculator = $container['metrics'];
+                $metricsCalculator = $container[MetricsCalculator::class];
 
                 return new TestRunConstraintChecker(
                     $metricsCalculator,
@@ -357,7 +378,7 @@ final class InfectionContainer extends Container
                     (float) $config->getMinCoveredMsi()
                 );
             },
-            'subscriber.builder' => static function (self $container): SubscriberBuilder {
+            SubscriberBuilder::class => static function (self $container): SubscriberBuilder {
                 /** @var Configuration $config */
                 $config = $container[Configuration::class];
 
@@ -365,25 +386,25 @@ final class InfectionContainer extends Container
                 $loggerFactory = $container[LoggerFactory::class];
 
                 /** @var MetricsCalculator $metricsCalculator */
-                $metricsCalculator = $container['metrics'];
+                $metricsCalculator = $container[MetricsCalculator::class];
 
                 /** @var EventDispatcherInterface $eventDispatcher */
-                $eventDispatcher = $container['dispatcher'];
+                $eventDispatcher = $container[EventDispatcherInterface::class];
 
                 /** @var DiffColorizer $diffColorizer */
                 $diffColorizer = $container[DiffColorizer::class];
 
                 /** @var Filesystem $fileSystem */
-                $fileSystem = $container['filesystem'];
+                $fileSystem = $container[Filesystem::class];
 
                 /** @var Timer $timer */
-                $timer = $container['timer'];
+                $timer = $container[Timer::class];
 
                 /** @var TimeFormatter $timeFormatter */
-                $timeFormatter = $container['time.formatter'];
+                $timeFormatter = $container[TimeFormatter::class];
 
                 /** @var MemoryFormatter $memoryFormatter */
-                $memoryFormatter = $container['memory.formatter'];
+                $memoryFormatter = $container[MemoryFormatter::class];
 
                 return new SubscriberBuilder(
                     $config->showMutations(),
@@ -425,10 +446,10 @@ final class InfectionContainer extends Container
                 $config = $container[Configuration::class];
 
                 /** @var MetricsCalculator $metricsCalculator */
-                $metricsCalculator = $container['metrics'];
+                $metricsCalculator = $container[MetricsCalculator::class];
 
                 /** @var Filesystem $fileSystem */
-                $fileSystem = $container['filesystem'];
+                $fileSystem = $container[Filesystem::class];
 
                 return new LoggerFactory(
                     $metricsCalculator,
@@ -443,7 +464,7 @@ final class InfectionContainer extends Container
                 $config = $container[Configuration::class];
 
                 /** @var Factory $testFrameworkFactory */
-                $testFrameworkFactory = $container['test.framework.factory'];
+                $testFrameworkFactory = $container[Factory::class];
 
                 return $testFrameworkFactory->create(
                     $config->getTestFramework(),
@@ -461,7 +482,7 @@ final class InfectionContainer extends Container
             },
             InitialTestsRunner::class => static function (self $container): InitialTestsRunner {
                 /** @var EventDispatcherInterface $eventDispatcher */
-                $eventDispatcher = $container['dispatcher'];
+                $eventDispatcher = $container[EventDispatcherInterface::class];
 
                 /** @var InitialTestRunProcessBuilder $processBuilder */
                 $processBuilder = $container[InitialTestRunProcessBuilder::class];
@@ -492,7 +513,7 @@ final class InfectionContainer extends Container
                 $config = $container[Configuration::class];
 
                 /** @var EventDispatcherInterface $eventDispatcher */
-                $eventDispatcher = $container['dispatcher'];
+                $eventDispatcher = $container[EventDispatcherInterface::class];
 
                 /** @var XMLLineCodeCoverageFactory $codeCoverageFactory */
                 $codeCoverageFactory = $container[XMLLineCodeCoverageFactory::class];
@@ -510,13 +531,13 @@ final class InfectionContainer extends Container
             },
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
                 /** @var EventDispatcherInterface $eventDispatcher */
-                $eventDispatcher = $container['dispatcher'];
+                $eventDispatcher = $container[EventDispatcherInterface::class];
 
                 /** @var MutantProcessBuilder $processBuilder */
                 $processBuilder = $container[MutantProcessBuilder::class];
 
                 /** @var ParallelProcessRunner $parallelProcessRunner */
-                $parallelProcessRunner = $container['parallel.process.runner'];
+                $parallelProcessRunner = $container[ParallelProcessRunner::class];
 
                 /** @var MutantFactory $mutantFactory */
                 $mutantFactory = $container[MutantFactory::class];

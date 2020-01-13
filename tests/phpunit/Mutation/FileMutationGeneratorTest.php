@@ -50,6 +50,7 @@ use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
+use Infection\Tests\Mutator\MutatorName;
 use Infection\Visitor\MutationsCollectorVisitor;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -91,10 +92,8 @@ final class FileMutationGeneratorTest extends TestCase
     {
         $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
 
-        $container = InfectionContainer::create();
-
         /** @var FileMutationGenerator $mutationGenerator */
-        $mutationGenerator = $container[FileMutationGenerator::class];
+        $mutationGenerator = InfectionContainer::create()[FileMutationGenerator::class];
 
         $mutatorConfig = new MutatorConfig([]);
 
@@ -116,7 +115,10 @@ final class FileMutationGeneratorTest extends TestCase
         /** @var Mutation $mutation */
         $mutation = current($mutations);
 
-        $this->assertSame(Plus::getName(), $mutation->getMutatorName());
+        $this->assertSame(
+            MutatorName::getName(Plus::class),
+            $mutation->getMutatorName()
+        );
     }
 
     /**

@@ -206,28 +206,28 @@ final class InfectionCommand extends BaseCommand
         $this->startUp();
 
         /** @var CoverageRequirementChecker $coverageChecker */
-        $coverageChecker = $this->container['coverage.checker'];
+        $coverageChecker = $this->container[CoverageRequirementChecker::class];
 
         /** @var Configuration $config */
         $config = $this->container[Configuration::class];
 
         /** @var Filesystem $fileSystem */
-        $fileSystem = $this->container['filesystem'];
+        $fileSystem = $this->container[Filesystem::class];
 
         /** @var TestFrameworkAdapter $adapter */
         $adapter = $this->container[TestFrameworkAdapter::class];
 
         /** @var SubscriberBuilder $subscriberBuilder */
-        $subscriberBuilder = $this->container['subscriber.builder'];
+        $subscriberBuilder = $this->container[SubscriberBuilder::class];
 
         /** @var EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = $this->container['dispatcher'];
+        $eventDispatcher = $this->container[EventDispatcherInterface::class];
 
         /** @var InitialTestsRunner $initialTestsRunner */
         $initialTestsRunner = $this->container[InitialTestsRunner::class];
 
         /** @var MemoryLimiter $memoryLimitApplier */
-        $memoryLimitApplier = $this->container['memory.limit.applier'];
+        $memoryLimitApplier = $this->container[MemoryLimiter::class];
 
         /** @var MutationGenerator $mutationGenerator */
         $mutationGenerator = $this->container[MutationGenerator::class];
@@ -236,10 +236,10 @@ final class InfectionCommand extends BaseCommand
         $mutationTestingRunner = $this->container[MutationTestingRunner::class];
 
         /** @var TestRunConstraintChecker $constraintChecker */
-        $constraintChecker = $this->container['test.run.constraint.checker'];
+        $constraintChecker = $this->container[TestRunConstraintChecker::class];
 
         /** @var MetricsCalculator $metricsCalculator */
-        $metricsCalculator = $this->container['metrics'];
+        $metricsCalculator = $this->container[MetricsCalculator::class];
 
         $engine = new Engine(
             $coverageChecker,
@@ -290,7 +290,7 @@ final class InfectionCommand extends BaseCommand
         Assert::notNull($this->container);
 
         /** @var CoverageRequirementChecker $coverageChecker */
-        $coverageChecker = $this->container['coverage.checker'];
+        $coverageChecker = $this->container[CoverageRequirementChecker::class];
 
         if (!$coverageChecker->hasDebuggerOrCoverageOption()) {
             throw CoverageDoesNotExistException::unableToGenerate();
@@ -302,7 +302,7 @@ final class InfectionCommand extends BaseCommand
         $this->includeUserBootstrap($config);
 
         /** @var Filesystem $fileSystem */
-        $fileSystem = $this->container['filesystem'];
+        $fileSystem = $this->container[Filesystem::class];
 
         $fileSystem->mkdir($config->getTmpDir());
 
@@ -312,11 +312,11 @@ final class InfectionCommand extends BaseCommand
         LogVerbosity::convertVerbosityLevel($this->input, $this->consoleOutput);
 
         /** @var SubscriberBuilder $subscriberBuilder */
-        $subscriberBuilder = $this->container['subscriber.builder'];
+        $subscriberBuilder = $this->container[SubscriberBuilder::class];
         $subscriberBuilder->registerSubscribers($adapter, $this->output);
 
         /** @var EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = $this->container['dispatcher'];
+        $eventDispatcher = $this->container[EventDispatcherInterface::class];
 
         $eventDispatcher->dispatch(new ApplicationExecutionStarted());
     }
