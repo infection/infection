@@ -68,6 +68,9 @@ final class IgnoreMutator implements Mutator
 
     public static function getDefinition(): ?Definition
     {
+        // Since we do not use `getDefinition()` in our source code yet (only in tests for
+        // documentation purposes), we do not worry about this one for now. If needed, this one
+        // can also be made non-static to return the definition of the decorated mutator.
         throw new DomainException(sprintf(
             'The class "%s" does not have a definition',
             self::class
