@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use Infection\Mutator\IgnoreMutator;
 use function array_filter;
 use const ARRAY_FILTER_USE_KEY;
 use function array_values;
@@ -96,6 +97,10 @@ final class ProfileListProvider
             /** @var SplFileInfo $file */
             $shortClassName = substr($file->getFilename(), 0, -4);
             $className = self::getMutatorClassNameFromPath($file->getPathname());
+
+            if ($className === IgnoreMutator::class) {
+                continue;
+            }
 
             $mutatorReflection = new ReflectionClass($className);
 
