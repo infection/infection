@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use Infection\Mutator\IgnoreMutator;
 use function array_filter;
 use const ARRAY_FILTER_USE_KEY;
 use function array_values;
 use Generator;
+use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
 use function ksort;
