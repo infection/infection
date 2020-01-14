@@ -40,6 +40,7 @@ use function dirname;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\PhpSpec\Config\MutationYamlConfiguration;
+use function Safe\file_put_contents;
 use Symfony\Component\Yaml\Yaml;
 
 /**

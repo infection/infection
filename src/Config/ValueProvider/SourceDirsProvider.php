@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Config\ValueProvider;
 
 use function count;
+use function implode;
 use function in_array;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;

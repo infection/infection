@@ -38,6 +38,7 @@ namespace Infection\TestFramework\Codeception\Adapter;
 use function array_key_exists;
 use function assert;
 use function dirname;
+use function implode;
 use Infection\TestFramework\Codeception\Stringifier;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Coverage\CoverageLineData;

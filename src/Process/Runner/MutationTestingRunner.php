@@ -37,15 +37,9 @@ namespace Infection\Process\Runner;
 
 use function count;
 use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\MutantCreated;
-use Infection\Events\MutantsCreatingFinished;
-use Infection\Events\MutantsCreatingStarted;
 use Infection\Events\MutationTestingFinished;
 use Infection\Events\MutationTestingStarted;
-use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
-use Infection\Process\Builder\MutantProcessBuilder;
-use Infection\Process\MutantProcess;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 
 /**
@@ -53,19 +47,16 @@ use Infection\Process\Runner\Parallel\ParallelProcessRunner;
  */
 final class MutationTestingRunner
 {
-    private $processBuilder;
-    private $mutantCreator;
+    private $mutantProcessFactory;
     private $parallelProcessManager;
     private $eventDispatcher;
 
     public function __construct(
-        MutantProcessBuilder $processBuilder,
+        MutantProcessFactory $mutantProcessFactory,
         ParallelProcessRunner $parallelProcessManager,
-        MutantFactory $mutantCreator,
         EventDispatcherInterface $eventDispatcher
     ) {
-        $this->processBuilder = $processBuilder;
-        $this->mutantCreator = $mutantCreator;
+        $this->mutantProcessFactory = $mutantProcessFactory;
         $this->parallelProcessManager = $parallelProcessManager;
         $this->eventDispatcher = $eventDispatcher;
     }
@@ -75,26 +66,9 @@ final class MutationTestingRunner
      */
     public function run(array $mutations, int $threadCount, string $testFrameworkExtraOptions): void
     {
-        $mutantCount = count($mutations);
+        $processes = $this->mutantProcessFactory->create($mutations, $testFrameworkExtraOptions);
 
-        $this->eventDispatcher->dispatch(new MutantsCreatingStarted($mutantCount));
-
-        $processes = array_map(
-            function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcess {
-                $mutant = $this->mutantCreator->create($mutation);
-
-                $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
-
-                $this->eventDispatcher->dispatch(new MutantCreated());
-
-                return $process;
-            },
-            $mutations
-        );
-
-        $this->eventDispatcher->dispatch(new MutantsCreatingFinished());
-
-        $this->eventDispatcher->dispatch(new MutationTestingStarted($mutantCount));
+        $this->eventDispatcher->dispatch(new MutationTestingStarted(count($processes)));
 
         $this->parallelProcessManager->run($processes, $threadCount);
 

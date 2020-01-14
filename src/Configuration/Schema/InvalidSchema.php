@@ -37,6 +37,7 @@ namespace Infection\Configuration\Schema;
 
 use function array_filter;
 use function array_map;
+use function implode;
 use function sprintf;
 use UnexpectedValueException;
 use Webmozart\Assert\Assert;

@@ -37,6 +37,7 @@ namespace Infection\TestFramework;
 
 use Infection\Finder\Exception\FinderException;
 use const PHP_SAPI;
+use function substr;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**

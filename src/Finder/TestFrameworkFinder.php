@@ -41,6 +41,7 @@ use Infection\TestFramework\TestFrameworkTypes;
 use RuntimeException;
 use function Safe\file_get_contents;
 use function Safe\realpath;
+use function substr;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 

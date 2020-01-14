@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Json\Exception;
 
 use function count;
+use function implode;
 use JsonSchema\Exception\ValidationException;
 
 /**

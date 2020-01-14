@@ -35,46 +35,61 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use Exception;
-use function implode;
-use Infection\TestFramework\TestFrameworkAdapter;
-use Symfony\Component\Process\Process;
+use function array_map;
+use function count;
+use Infection\EventDispatcher\EventDispatcherInterface;
+use Infection\Events\MutantCreated;
+use Infection\Events\MutantsCreatingFinished;
+use Infection\Events\MutantsCreatingStarted;
+use Infection\Mutant\MutantFactory;
+use Infection\Mutation\Mutation;
+use Infection\Process\Builder\MutantProcessBuilder;
+use Infection\Process\MutantProcess;
 
 /**
  * @internal
+ * @final
  */
-final class InitialTestsFailed extends Exception
+class MutantProcessFactory
 {
-    public static function fromProcessAndAdapter(
-        Process $initialTestSuitProcess,
-        TestFrameworkAdapter $testFrameworkAdapter
-    ): self {
-        $testFrameworkKey = $testFrameworkAdapter->getName();
+    private $processBuilder;
+    private $mutantFactory;
+    private $eventDispatcher;
 
-        $lines = [
-            'Project tests must be in a passing state before running Infection.',
-            $testFrameworkAdapter->getInitialTestsFailRecommendations($initialTestSuitProcess->getCommandLine()),
-            sprintf(
-                '%s reported an exit code of %d.',
-                $testFrameworkKey,
-                $initialTestSuitProcess->getExitCode()
-            ),
-            sprintf(
-                'Refer to the %s\'s output below:',
-                $testFrameworkKey
-            ),
-        ];
+    public function __construct(
+        MutantProcessBuilder $processBuilder,
+        MutantFactory $mutantFactory,
+        EventDispatcherInterface $eventDispatcher
+    ) {
+        $this->processBuilder = $processBuilder;
+        $this->mutantFactory = $mutantFactory;
+        $this->eventDispatcher = $eventDispatcher;
+    }
 
-        if ($stdOut = $initialTestSuitProcess->getOutput()) {
-            $lines[] = 'STDOUT:';
-            $lines[] = $stdOut;
-        }
+    /**
+     * @param Mutation[] $mutations
+     *
+     * @return MutantProcess[]
+     */
+    public function create(array $mutations, string $testFrameworkExtraOptions): array
+    {
+        $this->eventDispatcher->dispatch(new MutantsCreatingStarted(count($mutations)));
 
-        if ($stdError = $initialTestSuitProcess->getErrorOutput()) {
-            $lines[] = 'STDERR:';
-            $lines[] = $stdError;
-        }
+        $processes = array_map(
+            function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcess {
+                $mutant = $this->mutantFactory->create($mutation);
 
-        return new self(implode("\n", $lines));
+                $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
+
+                $this->eventDispatcher->dispatch(new MutantCreated());
+
+                return $process;
+            },
+            $mutations
+        );
+
+        $this->eventDispatcher->dispatch(new MutantsCreatingFinished());
+
+        return $processes;
     }
 }

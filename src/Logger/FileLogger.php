@@ -38,6 +38,7 @@ namespace Infection\Logger;
 use function in_array;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
+use function Safe\file_put_contents;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;

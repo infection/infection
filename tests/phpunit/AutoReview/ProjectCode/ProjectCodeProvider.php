@@ -61,7 +61,6 @@ use Infection\Mutator\Util\Mutator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
-use Infection\Process\Runner\MutationTestingRunner;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\MethodLocationData;
@@ -99,7 +98,6 @@ final class ProjectCodeProvider
         ResultsLoggerTypes::class,
         MutantCreatingConsoleLoggerSubscriber::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
-        MutationTestingRunner::class,
         TestFrameworkTypes::class,
         NodeMutationGenerator::class,
         FilterableFinder::class,

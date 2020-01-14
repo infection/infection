@@ -44,8 +44,9 @@ use Symfony\Component\Process\Process;
 
 /**
  * @internal
+ * @final
  */
-final class MutantProcessBuilder
+class MutantProcessBuilder
 {
     private $testFrameworkAdapter;
     private $timeout;

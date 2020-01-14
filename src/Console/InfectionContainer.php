@@ -71,6 +71,7 @@ use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Coverage\CoverageRequirementChecker;
 use Infection\Process\Runner\InitialTestsRunner;
+use Infection\Process\Runner\MutantProcessFactory;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
@@ -529,23 +530,34 @@ final class InfectionContainer extends Container
                     $fileMutationGenerator
                 );
             },
-            MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
+            MutantProcessFactory::class => static function (self $container): MutantProcessFactory {
                 /** @var EventDispatcherInterface $eventDispatcher */
                 $eventDispatcher = $container[EventDispatcherInterface::class];
 
                 /** @var MutantProcessBuilder $processBuilder */
                 $processBuilder = $container[MutantProcessBuilder::class];
 
-                /** @var ParallelProcessRunner $parallelProcessRunner */
-                $parallelProcessRunner = $container[ParallelProcessRunner::class];
-
                 /** @var MutantFactory $mutantFactory */
                 $mutantFactory = $container[MutantFactory::class];
 
-                return new MutationTestingRunner(
+                return new MutantProcessFactory(
                     $processBuilder,
-                    $parallelProcessRunner,
                     $mutantFactory,
+                    $eventDispatcher
+                );
+            },
+            MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
+                /** @var MutantProcessFactory $mutantProcessFactory */
+                $mutantProcessFactory = $container[MutantProcessFactory::class];
+
+                /** @var ParallelProcessRunner $parallelProcessRunner */
+                $parallelProcessRunner = $container[ParallelProcessRunner::class];
+                /** @var EventDispatcherInterface $eventDispatcher */
+                $eventDispatcher = $container[EventDispatcherInterface::class];
+
+                return new MutationTestingRunner(
+                    $mutantProcessFactory,
+                    $parallelProcessRunner,
                     $eventDispatcher
                 );
             },
