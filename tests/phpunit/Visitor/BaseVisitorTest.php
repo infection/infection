@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Visitor;
 
-use Infection\Console\InfectionContainer;
+use Infection\Container;
 use PhpParser\Node;
 use PhpParser\NodeDumper;
 use PhpParser\NodeTraverser;
@@ -113,7 +113,7 @@ abstract class BaseVisitorTest extends TestCase
     private function getParser(): Parser
     {
         if (null === self::$parser) {
-            self::$parser = InfectionContainer::create()[Parser::class];
+            self::$parser = Container::create()->getParser();
         }
 
         return self::$parser;

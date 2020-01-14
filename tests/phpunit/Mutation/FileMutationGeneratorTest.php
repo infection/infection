@@ -38,7 +38,7 @@ namespace Infection\Tests\Mutation;
 use function current;
 use function func_get_args;
 use Generator;
-use Infection\Console\InfectionContainer;
+use Infection\Container;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\FileParser;
 use Infection\Mutation\Mutation;
@@ -92,8 +92,7 @@ final class FileMutationGeneratorTest extends TestCase
     {
         $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
 
-        /** @var FileMutationGenerator $mutationGenerator */
-        $mutationGenerator = InfectionContainer::create()[FileMutationGenerator::class];
+        $mutationGenerator = Container::create()->getFileMutationGenerator();
 
         $mutatorConfig = new MutatorConfig([]);
 

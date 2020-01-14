@@ -33,64 +33,57 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Console;
+namespace Infection\Tests;
 
-use Infection\Configuration\Configuration;
-use Infection\Console\InfectionContainer;
+use Infection\Container;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 /**
  * @group integration Requires some I/O operations
  */
-final class InfectionContainerTest extends TestCase
+final class ContainerTest extends TestCase
 {
     public function test_it_can_be_instantiated_without_any_services(): void
     {
-        $container = new InfectionContainer();
+        $container = new Container([]);
 
-        $this->assertSame([], $container->keys());
-    }
+        try {
+            $container->getFileSystem();
 
-    public function test_it_can_be_instantiated_with_services(): void
-    {
-        $syntheticService = (object) ['synthetic' => true];
-        $regularService = static function (): stdClass {
-            return (object) [
-                'regular' => true,
-            ];
-        };
-
-        $container = new InfectionContainer([
-            'synthetic service' => $syntheticService,
-            'regular service' => $regularService,
-        ]);
-
-        $this->assertSame(
-            [
-                'synthetic service',
-                'regular service',
-            ],
-            $container->keys()
-        );
-
-        $this->assertSame($syntheticService, $container['synthetic service']);
-        $this->assertTrue($container['regular service']->regular);
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Unknown service "Symfony\Component\Filesystem\Filesystem"',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function test_it_can_be_instantiated_with_the_project_services(): void
     {
-        $container = InfectionContainer::create();
+        $container = Container::create();
 
-        $this->assertNotSame([], $container->keys());
+        $container->getFileSystem();
+
+        $this->addToAssertionCount(1);
     }
 
     public function test_it_can_build_dynamic_services(): void
     {
-        $container = new InfectionContainer();
+        $container = Container::create();
 
         // Sanity check
-        $this->assertFalse($container->offsetExists(Configuration::class));
+        try {
+            $container->getConfiguration();
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Unknown service "Infection\Configuration\Configuration"',
+                $exception->getMessage()
+            );
+        }
 
         $newContainer = $container->withDynamicParameters(
             null,
@@ -111,7 +104,8 @@ final class InfectionContainerTest extends TestCase
             ''
         );
 
-        $this->assertFalse($container->offsetExists(Configuration::class));
-        $this->assertTrue($newContainer->offsetExists(Configuration::class));
+        $newContainer->getSchemaConfiguration();
+
+        $this->addToAssertionCount(1);
     }
 }

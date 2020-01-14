@@ -41,24 +41,13 @@ use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Exception\ConfigurationException;
 use Infection\Console\Exception\InfectionException;
-use Infection\Console\InfectionContainer;
 use Infection\Console\LogVerbosity;
+use Infection\Container;
 use Infection\Engine;
-use Infection\EventDispatcher\EventDispatcherInterface;
 use Infection\Events\ApplicationExecutionStarted;
 use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\Locator\Locator;
-use Infection\Locator\RootsFileOrDirectoryLocator;
-use Infection\Mutant\MetricsCalculator;
-use Infection\Mutation\MutationGenerator;
-use Infection\Performance\Limiter\MemoryLimiter;
-use Infection\Process\Builder\SubscriberBuilder;
-use Infection\Process\Coverage\CoverageRequirementChecker;
-use Infection\Process\Runner\InitialTestsRunner;
-use Infection\Process\Runner\MutationTestingRunner;
-use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_numeric;
 use function Safe\sprintf;
@@ -67,7 +56,6 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use function trim;
 use Webmozart\Assert\Assert;
 
@@ -82,7 +70,7 @@ final class InfectionCommand extends BaseCommand
     private $consoleOutput;
 
     /**
-     * @var InfectionContainer
+     * @var Container
      */
     private $container;
 
@@ -205,56 +193,20 @@ final class InfectionCommand extends BaseCommand
     {
         $this->startUp();
 
-        /** @var CoverageRequirementChecker $coverageChecker */
-        $coverageChecker = $this->container[CoverageRequirementChecker::class];
-
-        /** @var Configuration $config */
-        $config = $this->container[Configuration::class];
-
-        /** @var Filesystem $fileSystem */
-        $fileSystem = $this->container[Filesystem::class];
-
-        /** @var TestFrameworkAdapter $adapter */
-        $adapter = $this->container[TestFrameworkAdapter::class];
-
-        /** @var SubscriberBuilder $subscriberBuilder */
-        $subscriberBuilder = $this->container[SubscriberBuilder::class];
-
-        /** @var EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = $this->container[EventDispatcherInterface::class];
-
-        /** @var InitialTestsRunner $initialTestsRunner */
-        $initialTestsRunner = $this->container[InitialTestsRunner::class];
-
-        /** @var MemoryLimiter $memoryLimitApplier */
-        $memoryLimitApplier = $this->container[MemoryLimiter::class];
-
-        /** @var MutationGenerator $mutationGenerator */
-        $mutationGenerator = $this->container[MutationGenerator::class];
-
-        /** @var MutationTestingRunner $mutationTestingRunner */
-        $mutationTestingRunner = $this->container[MutationTestingRunner::class];
-
-        /** @var TestRunConstraintChecker $constraintChecker */
-        $constraintChecker = $this->container[TestRunConstraintChecker::class];
-
-        /** @var MetricsCalculator $metricsCalculator */
-        $metricsCalculator = $this->container[MetricsCalculator::class];
-
         $engine = new Engine(
-            $coverageChecker,
-            $config,
-            $fileSystem,
-            $adapter,
-            $subscriberBuilder,
-            $eventDispatcher,
-            $initialTestsRunner,
-            $memoryLimitApplier,
-            $mutationGenerator,
-            $mutationTestingRunner,
-            $constraintChecker,
+            $this->container->getCoverageRequirementChecker(),
+            $this->container->getConfiguration(),
+            $this->container->getFileSystem(),
+            $this->container->getTestFrameworkAdapter(),
+            $this->container->getSubscriberBuilder(),
+            $this->container->getEventDispatcher(),
+            $this->container->getInitialTestsRunner(),
+            $this->container->getMemoryLimiter(),
+            $this->container->getMutationGenerator(),
+            $this->container->getMutationTestingRunner(),
+            $this->container->getTestRunConstraintChecker(),
             $this->consoleOutput,
-            $metricsCalculator
+            $this->container->getMetricsCalculator()
         );
 
         $result = $engine->execute((int) $this->input->getOption('threads'));
@@ -273,8 +225,7 @@ final class InfectionCommand extends BaseCommand
 
         $this->initContainer($input);
 
-        /** @var RootsFileOrDirectoryLocator $locator */
-        $locator = $this->container[RootsFileOrDirectoryLocator::class];
+        $locator = $this->container->getRootsFileOrDirectoryLocator();
 
         if ($customConfigPath = (string) $input->getOption('configuration')) {
             $locator->locate($customConfigPath);
@@ -289,36 +240,26 @@ final class InfectionCommand extends BaseCommand
     {
         Assert::notNull($this->container);
 
-        /** @var CoverageRequirementChecker $coverageChecker */
-        $coverageChecker = $this->container[CoverageRequirementChecker::class];
+        $coverageChecker = $this->container->getCoverageRequirementChecker();
 
         if (!$coverageChecker->hasDebuggerOrCoverageOption()) {
             throw CoverageDoesNotExistException::unableToGenerate();
         }
 
-        /** @var Configuration $config */
-        $config = $this->container[Configuration::class];
+        $config = $this->container->getConfiguration();
 
         $this->includeUserBootstrap($config);
 
-        /** @var Filesystem $fileSystem */
-        $fileSystem = $this->container[Filesystem::class];
-
-        $fileSystem->mkdir($config->getTmpDir());
-
-        /** @var TestFrameworkAdapter $adapter */
-        $adapter = $this->container[TestFrameworkAdapter::class];
+        $this->container->getFileSystem()->mkdir($config->getTmpDir());
 
         LogVerbosity::convertVerbosityLevel($this->input, $this->consoleOutput);
 
-        /** @var SubscriberBuilder $subscriberBuilder */
-        $subscriberBuilder = $this->container[SubscriberBuilder::class];
-        $subscriberBuilder->registerSubscribers($adapter, $this->output);
+        $this->container->getSubscriberBuilder()->registerSubscribers(
+            $this->container->getTestFrameworkAdapter(),
+            $this->output
+        );
 
-        /** @var EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = $this->container[EventDispatcherInterface::class];
-
-        $eventDispatcher->dispatch(new ApplicationExecutionStarted());
+        $this->container->getEventDispatcher()->dispatch(new ApplicationExecutionStarted());
     }
 
     private function initContainer(InputInterface $input): void
