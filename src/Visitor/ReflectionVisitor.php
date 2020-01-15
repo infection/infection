@@ -37,6 +37,7 @@ namespace Infection\Visitor;
 
 use function array_pop;
 use function count;
+use Infection\Reflection\CoreInfectionReflectionClass;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
@@ -59,7 +60,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
     private $functionScopeStack = [];
 
     /**
-     * @var ReflectionClass[]|null[]
+     * @var CoreInfectionReflectionClass[]|null[]
      */
     private $classScopeStack = [];
 
@@ -81,7 +82,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
     {
         if ($node instanceof Node\Stmt\ClassLike) {
             if ($attribute = $node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)) {
-                $this->classScopeStack[] = new ReflectionClass($attribute->toString());
+                $this->classScopeStack[] = new CoreInfectionReflectionClass(new ReflectionClass($attribute->toString()));
             } else {
                 // Anonymous class
                 $this->classScopeStack[] = null;

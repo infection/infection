@@ -40,10 +40,10 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Reflection\InfectionReflectionClass;
+use Infection\Reflection\Visibility;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
-use ReflectionClass;
-use ReflectionException;
 
 /**
  * @internal
@@ -100,18 +100,14 @@ final class PublicVisibility implements Mutator
 
     private function hasSamePublicParentMethod(Node\Stmt\ClassMethod $node): bool
     {
-        /** @var ReflectionClass|null $reflection */
+        /** @var InfectionReflectionClass|null $reflection */
         $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
 
-        if (!$reflection instanceof ReflectionClass) {
+        if (!$reflection instanceof InfectionReflectionClass) {
             // assuming the worst where an interface has the same method
             return true;
         }
 
-        try {
-            return $reflection->getMethod($node->name->name)->getPrototype()->isPublic();
-        } catch (ReflectionException $e) {
-            return false;
-        }
+        return $reflection->hasParentOfVisibility($node->name->name, Visibility::asPublic());
     }
 }

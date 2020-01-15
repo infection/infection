@@ -37,9 +37,9 @@ namespace Infection\Mutator;
 
 use DomainException;
 use Generator;
+use Infection\Reflection\InfectionReflectionClass;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
-use ReflectionClass;
 use function Safe\sprintf;
 
 /**
@@ -82,10 +82,10 @@ final class IgnoreMutator implements Mutator
             return false;
         }
 
-        /** @var ReflectionClass|false $reflectionClass */
-        $reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY, false);
+        /** @var InfectionReflectionClass|null $reflectionClass */
+        $reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
 
-        if ($reflectionClass === false) {
+        if (!$reflectionClass instanceof InfectionReflectionClass) {
             return true;
         }
 

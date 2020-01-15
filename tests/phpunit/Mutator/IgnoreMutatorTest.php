@@ -41,6 +41,7 @@ use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
+use Infection\Reflection\CoreInfectionReflectionClass;
 use Infection\Visitor\ReflectionVisitor;
 use function iterator_to_array;
 use PhpParser\Node;
@@ -136,7 +137,7 @@ final class IgnoreMutatorTest extends TestCase
                 [ReflectionVisitor::FUNCTION_NAME, '']
             )
             ->willReturnOnConsecutiveCalls(
-                new ReflectionClass(self::class),
+                new CoreInfectionReflectionClass(new ReflectionClass(self::class)),
                 'foo'
             )
         ;

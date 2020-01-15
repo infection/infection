@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Visitor;
 
 use Generator;
+use Infection\Reflection\InfectionReflectionClass;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
@@ -156,7 +157,7 @@ final class ReflectionVisitorTest extends BaseVisitorTest
 
         $this->parseAndTraverse($code, $reflectionSpyVisitor);
 
-        $this->assertInstanceOf(ReflectionClass::class, $reflectionSpyVisitor->reflectionClass);
+        $this->assertInstanceOf(InfectionReflectionClass::class, $reflectionSpyVisitor->reflectionClass);
         $this->assertSame(Foo::class, $reflectionSpyVisitor->reflectionClass->getName());
     }
 
@@ -170,7 +171,7 @@ final class ReflectionVisitorTest extends BaseVisitorTest
 
         $this->assertNull($reflectionSpyVisitor->fooReflectionClass);
 
-        $this->assertInstanceOf(ReflectionClass::class, $reflectionSpyVisitor->createAnonymousClassReflectionClass);
+        $this->assertInstanceOf(InfectionReflectionClass::class, $reflectionSpyVisitor->createAnonymousClassReflectionClass);
         $this->assertSame(Bug::class, $reflectionSpyVisitor->createAnonymousClassReflectionClass->getName());
     }
 
