@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use DomainException;
 use Generator;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\IgnoreMutator;
@@ -63,6 +64,20 @@ final class IgnoreMutatorTest extends TestCase
     {
         $this->mutatorMock = $this->createMock(Mutator::class);
         $this->nodeMock = $this->createMock(Node::class);
+    }
+
+    public function test_it_cannot_give_a_definition(): void
+    {
+        try {
+            IgnoreMutator::getDefinition();
+
+            $this->fail();
+        } catch (DomainException $exception) {
+            $this->assertSame(
+                'The class "Infection\Mutator\IgnoreMutator" does not have a definition',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function test_it_should_not_mutate_node_if_its_decorated_mutator_cannot(): void
@@ -172,6 +187,9 @@ final class IgnoreMutatorTest extends TestCase
     {
         $ignoreMutator = new IgnoreMutator(new MutatorConfig([]), new Plus());
 
-        $this->assertSame(Plus::getName(), $ignoreMutator->getMutatorName());
+        $this->assertSame(
+            MutatorName::getName(Plus::class),
+            $ignoreMutator->getName()
+        );
     }
 }

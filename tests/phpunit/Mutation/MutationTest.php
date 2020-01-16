@@ -41,6 +41,7 @@ use Infection\MutatedNode;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\Tests\Mutator\MutatorName;
 use function md5;
 use PhpParser\Node;
 use PHPUnit\Framework\TestCase;
@@ -105,7 +106,7 @@ final class MutationTest extends TestCase
         yield 'empty' => [
             '',
             [],
-            Plus::getName(),
+            MutatorName::getName(Plus::class),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
             MutatedNode::wrap(new Node\Scalar\LNumber(1)),
@@ -122,7 +123,7 @@ final class MutationTest extends TestCase
                 new Node\Name('Acme'),
                 [new Node\Scalar\LNumber(0)]
             )],
-            Plus::getName(),
+            MutatorName::getName(Plus::class),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
             MutatedNode::wrap(new Node\Scalar\LNumber(1)),
@@ -145,7 +146,7 @@ final class MutationTest extends TestCase
                 new Node\Name('Acme'),
                 [new Node\Scalar\LNumber(0)]
             )],
-            Plus::getName(),
+            MutatorName::getName(Plus::class),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
             MutatedNode::wrap(new Node\Scalar\LNumber(1)),
@@ -168,7 +169,7 @@ final class MutationTest extends TestCase
                 new Node\Name('Acme'),
                 [new Node\Scalar\LNumber(0)]
             )],
-            Plus::getName(),
+            MutatorName::getName(Plus::class),
             array_merge($nominalAttributes, ['foo' => 100, 'bar' => 1000]),
             Node\Scalar\LNumber::class,
             MutatedNode::wrap(new Node\Scalar\LNumber(1)),
@@ -191,7 +192,7 @@ final class MutationTest extends TestCase
                 new Node\Name('Acme'),
                 [new Node\Scalar\LNumber(0)]
             )],
-            Plus::getName(),
+            MutatorName::getName(Plus::class),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
             MutatedNode::wrap(new Node\Scalar\LNumber(1)),
@@ -208,7 +209,7 @@ final class MutationTest extends TestCase
                 new Node\Name('Acme'),
                 [new Node\Scalar\LNumber(0)]
             )],
-            Plus::getName(),
+            MutatorName::getName(Plus::class),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
             MutatedNode::wrap([

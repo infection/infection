@@ -39,6 +39,7 @@ use function array_filter;
 use const ARRAY_FILTER_USE_KEY;
 use function array_values;
 use Generator;
+use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
 use function ksort;
@@ -70,8 +71,8 @@ final class ProfileListProvider
 
     public static function mutatorNameAndClassProvider(): Generator
     {
-        foreach (ProfileList::ALL_MUTATORS as $name => $class) {
-            yield [$name, $class];
+        foreach (self::implementedMutatorProvider() as [$filePath, $className, $shortClassName]) {
+            yield [$shortClassName, $className];
         }
     }
 
@@ -96,6 +97,10 @@ final class ProfileListProvider
             /** @var SplFileInfo $file */
             $shortClassName = substr($file->getFilename(), 0, -4);
             $className = self::getMutatorClassNameFromPath($file->getPathname());
+
+            if ($className === IgnoreMutator::class) {
+                continue;
+            }
 
             $mutatorReflection = new ReflectionClass($className);
 

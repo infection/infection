@@ -48,6 +48,7 @@ use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\IgnoreMutator;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\Removal\MethodCallRemoval;
@@ -110,7 +111,7 @@ final class ConfigurationFactoryTest extends TestCase
      *
      * @param SplFileInfo[] $expectedSourceDirectories
      * @param SplFileInfo[] $expectedSourceFiles
-     * @param IgnoreMutator[] $expectedMutators
+     * @param Mutator[] $expectedMutators
      */
     public function test_it_can_create_a_configuration(
         SchemaConfiguration $schema,
@@ -1213,7 +1214,7 @@ final class ConfigurationFactoryTest extends TestCase
     }
 
     /**
-     * @param array<string,IgnoreMutator> $expectedMutators
+     * @param array<string, Mutator> $expectedMutators
      */
     private static function createValueForMutators(
         array $configMutators,
@@ -1287,7 +1288,7 @@ final class ConfigurationFactoryTest extends TestCase
     }
 
     /**
-     * @return array<string, IgnoreMutator>
+     * @return array<string, Mutator>
      */
     private static function getDefaultMutators(): array
     {

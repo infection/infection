@@ -38,7 +38,7 @@ namespace Infection\Tests\Mutation;
 use function current;
 use function func_get_args;
 use Generator;
-use Infection\Console\InfectionContainer;
+use Infection\Container;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\FileParser;
 use Infection\Mutation\Mutation;
@@ -50,6 +50,7 @@ use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
+use Infection\Tests\Mutator\MutatorName;
 use Infection\Visitor\MutationsCollectorVisitor;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -91,10 +92,7 @@ final class FileMutationGeneratorTest extends TestCase
     {
         $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
 
-        $container = InfectionContainer::create();
-
-        /** @var FileMutationGenerator $mutationGenerator */
-        $mutationGenerator = $container[FileMutationGenerator::class];
+        $mutationGenerator = Container::create()->getFileMutationGenerator();
 
         $mutations = $mutationGenerator->generate(
             new SplFileInfo(self::FIXTURES_DIR . '/Mutation/OneFile/OneFile.php', '', ''),
@@ -114,7 +112,10 @@ final class FileMutationGeneratorTest extends TestCase
         /** @var Mutation $mutation */
         $mutation = current($mutations);
 
-        $this->assertSame(Plus::getName(), $mutation->getMutatorName());
+        $this->assertSame(
+            MutatorName::getName(Plus::class),
+            $mutation->getMutatorName()
+        );
     }
 
     /**

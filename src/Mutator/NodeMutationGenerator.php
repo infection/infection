@@ -62,7 +62,7 @@ class NodeMutationGenerator
     private $onlyCovered;
 
     /**
-     * @param IgnoreMutator[] $mutators
+     * @param Mutator[] $mutators
      * @param Node[]    $fileNodes
      */
     public function __construct(
@@ -72,7 +72,7 @@ class NodeMutationGenerator
         LineCodeCoverage $codeCoverageData,
         bool $onlyCovered
     ) {
-        Assert::allIsInstanceOf($mutators, IgnoreMutator::class);
+        Assert::allIsInstanceOf($mutators, Mutator::class);
 
         $this->mutators = $mutators;
         $this->filePath = $filePath;
@@ -88,7 +88,7 @@ class NodeMutationGenerator
     {
         return array_reduce(
             $this->mutators,
-            function (array $mutations, IgnoreMutator $mutator) use ($node): array {
+            function (array $mutations, Mutator $mutator) use ($node): array {
                 return $this->generateForMutator($node, $mutator, $mutations);
             },
             []
@@ -98,7 +98,7 @@ class NodeMutationGenerator
     /**
      * @return Mutation[]
      */
-    private function generateForMutator(Node $node, IgnoreMutator $mutator, array $mutations): array
+    private function generateForMutator(Node $node, Mutator $mutator, array $mutations): array
     {
         try {
             if (!$mutator->canMutate($node)) {
@@ -107,7 +107,7 @@ class NodeMutationGenerator
         } catch (Throwable $throwable) {
             throw InvalidMutator::create(
                 $this->filePath,
-                $mutator->getMutatorName(),
+                $mutator->getName(),
                 $throwable
             );
         }
@@ -138,7 +138,7 @@ class NodeMutationGenerator
             $mutations[] = new Mutation(
                 $this->filePath,
                 $this->fileNodes,
-                $mutator->getMutatorName(),
+                $mutator->getName(),
                 $node->getAttributes(),
                 get_class($node),
                 MutatedNode::wrap($mutatedNode),

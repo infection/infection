@@ -43,6 +43,7 @@ use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\Tests\FileSystem\FileSystemTestCase;
+use Infection\Tests\Mutator\MutatorName;
 use PhpParser\Node;
 use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -234,7 +235,7 @@ final class MutantFactoryTest extends FileSystemTestCase
         return new Mutation(
             '/path/to/acme/Foo.php',
             $originalNodes,
-            Plus::getName(),
+            MutatorName::getName(Plus::class),
             [
                 'startLine' => 3,
                 'endLine' => 5,

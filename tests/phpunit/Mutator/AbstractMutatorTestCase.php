@@ -40,7 +40,7 @@ use function count;
 use function escapeshellarg;
 use function exec;
 use function get_class;
-use Infection\Console\InfectionContainer;
+use Infection\Container;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
@@ -162,7 +162,7 @@ abstract class AbstractMutatorTestCase extends TestCase
     private static function getParser(): Parser
     {
         if (null === self::$parser) {
-            self::$parser = InfectionContainer::create()[Parser::class];
+            self::$parser = Container::create()->getParser();
         }
 
         return self::$parser;
@@ -210,7 +210,7 @@ abstract class AbstractMutatorTestCase extends TestCase
             $returnCode,
             sprintf(
                 'Mutator %s produces invalid code',
-                $this->createMutator()::getName()
+                $this->createMutator()->getName()
             )
         );
     }

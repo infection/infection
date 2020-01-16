@@ -33,43 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\Sort;
+namespace Infection\Tests\Mutator;
 
-use Generator;
-use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use function array_flip;
+use Infection\Mutator\ProfileList;
+use Webmozart\Assert\Assert;
 
-final class SpaceshipTest extends AbstractMutatorTestCase
+final class MutatorName
 {
-    public function test_get_name(): void
+    private function __construct()
     {
-        $this->assertSame('Spaceship', $this->createMutator()->getName());
     }
 
-    /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
-     */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public static function getName(string $mutatorClass): string
     {
-        $this->doTest($input, $expected);
-    }
+        Assert::oneOf($mutatorClass, ProfileList::ALL_MUTATORS);
 
-    public function mutationsProvider(): Generator
-    {
-        yield 'It swaps spaceship operators' => [
-            <<<'PHP'
-<?php
-
-$a <=> $b;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$b <=> $a;
-PHP
-            ,
-        ];
+        return array_flip(ProfileList::ALL_MUTATORS)[$mutatorClass];
     }
 }

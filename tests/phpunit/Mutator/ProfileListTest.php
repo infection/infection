@@ -52,7 +52,7 @@ final class ProfileListTest extends TestCase
         string $expectedMutatorName,
         string $mutatorClass
     ): void {
-        $actualMutatorName = $mutatorClass::getName();
+        $actualMutatorName = MutatorName::getName($mutatorClass);
 
         $this->assertSame(
             $expectedMutatorName,
