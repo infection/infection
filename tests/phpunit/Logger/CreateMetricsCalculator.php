@@ -41,7 +41,9 @@ use Infection\Mutator\Regex\PregQuote;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\Tests\Mutator\MutatorName;
+use const PHP_EOL;
 use PHPUnit\Framework\MockObject\MockObject;
+use function str_replace;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
 
@@ -163,7 +165,7 @@ trait CreateMetricsCalculator
         $mutantMock = $this->createMock(Mutant::class);
         $mutantMock
             ->method('getDiff')
-            ->willReturn(<<<DIFF
+            ->willReturn(self::normalizeString(<<<DIFF
 --- Original
 +++ New
 @@ @@
@@ -172,7 +174,7 @@ trait CreateMetricsCalculator
 + echo '$echoMutatedMessage';
 
 DIFF
-            )
+            ))
         ;
 
         $mutantProcessMock = $this->createMock(MutantProcess::class);
@@ -202,5 +204,10 @@ DIFF
         ;
 
         return $mutantProcessMock;
+    }
+
+    private static function normalizeString(string $value): string
+    {
+        return str_replace("\n", PHP_EOL, $value);
     }
 }
