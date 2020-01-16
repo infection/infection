@@ -37,12 +37,10 @@ namespace Infection\Tests\Logger;
 
 use Infection\Logger\PerMutatorLogger;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Mutator\Regex\PregQuote;
-use Infection\Mutator\ZeroIteration\For_;
-use Infection\Process\MutantProcess;
-use Infection\Tests\Mutator\MutatorName;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -50,32 +48,50 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class PerMutatorLoggerTest extends TestCase
 {
+    use CreateMetricsCalculator;
+
+    private const LOG_FILE_PATH = '/path/to/text.log';
+
+    /**
+     * @var Filesystem|MockObject
+     */
+    private $fileSystemMock;
+
+    /**
+     * @var OutputInterface|MockObject
+     */
+    private $outputMock;
+
+    protected function setUp(): void
+    {
+        $this->fileSystemMock = $this->createMock(Filesystem::class);
+        $this->outputMock = $this->createMock(OutputInterface::class);
+    }
+
     public function test_it_correctly_build_log_lines(): void
     {
-        $content = <<<'TXT'
+        $expectedContent = <<<'TXT'
 # Effects per Mutator
 
 | Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |
 | ------- | --------- | ------ | ------- |------- | --------- | --- | ----------- |
-| For_ | 15 | 10 | 0 | 0 | 0 | 66| 100|
-| PregQuote | 5 | 0 | 0 | 0 | 0 | 0| 0|
+| For_ | 4 | 1 | 1 | 0 | 1 | 50| 66|
+| PregQuote | 4 | 1 | 1 | 0 | 1 | 50| 66|
 TXT;
-        $content = str_replace("\n", PHP_EOL, $content);
 
-        $output = $this->createMock(OutputInterface::class);
-        $fs = $this->createMock(Filesystem::class);
-        $fs->expects($this->once())
+        $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
+
+        $this->fileSystemMock
+            ->expects($this->once())
             ->method('dumpFile')
-            ->with(
-                sys_get_temp_dir() . '/fake-file.md',
-                $content
-            );
+            ->with(self::LOG_FILE_PATH, $expectedContent)
+        ;
 
         $perMutatorLogger = new PerMutatorLogger(
-            $output,
-            sys_get_temp_dir() . '/fake-file.md',
-            $this->createMetricsCalculator(),
-            $fs,
+            $this->outputMock,
+            self::LOG_FILE_PATH,
+            $this->createCompleteMetricsCalculator(),
+            $this->fileSystemMock,
             true,
             true
         );
@@ -83,31 +99,49 @@ TXT;
         $perMutatorLogger->log();
     }
 
-    private function createMetricsCalculator(): MetricsCalculator
+    public function test_it_cannot_log_on_invalid_streams(): void
     {
-        $processes = [];
+        $this->outputMock
+            ->expects($this->once())
+            ->method('writeln')
+            ->with('<error>The only streams supported are php://stdout and php://stderr</error>')
+        ;
 
-        for ($i = 0; $i < 10; ++$i) {
-            $mutantFor = $this->createMock(MutantProcess::class);
-            $mutantFor->expects($this->once())->method('getMutatorName')->willReturn(MutatorName::getName(For_::class));
-            $mutantFor->expects($this->exactly(2))->method('getResultCode')->willReturn(MutantProcess::CODE_KILLED);
-            $processes[] = $mutantFor;
-        }
+        $debugFileLogger = new PerMutatorLogger(
+            $this->outputMock,
+            'php://memory',
+            new MetricsCalculator(),
+            $this->fileSystemMock,
+            false,
+            false
+        );
 
-        for ($i = 0; $i < 5; ++$i) {
-            $mutantFor = $this->createMock(MutantProcess::class);
-            $mutantFor->expects($this->once())->method('getMutatorName')->willReturn(MutatorName::getName(For_::class));
-            $mutantFor->expects($this->exactly(2))->method('getResultCode')->willReturn(MutantProcess::CODE_NOT_COVERED);
-            $processes[] = $mutantFor;
-        }
+        $debugFileLogger->log();
+    }
 
-        for ($i = 0; $i < 5; ++$i) {
-            $mutantFor = $this->createMock(MutantProcess::class);
-            $mutantFor->expects($this->once())->method('getMutatorName')->willReturn(MutatorName::getName(PregQuote::class));
-            $mutantFor->expects($this->exactly(2))->method('getResultCode')->willReturn(MutantProcess::CODE_NOT_COVERED);
-            $processes[] = $mutantFor;
-        }
+    public function test_it_fails_if_cannot_write_file(): void
+    {
+        $this->fileSystemMock
+            ->expects($this->once())
+            ->method('dumpFile')
+            ->with(self::LOG_FILE_PATH, $this->anything())
+            ->willThrowException(new IOException('Cannot write in directory X'));
 
-        return MetricsCalculator::createFromArray($processes);
+        $this->outputMock
+            ->expects($this->once())
+            ->method('writeln')
+            ->with('<error>Cannot write in directory X</error>')
+        ;
+
+        $debugFileLogger = new PerMutatorLogger(
+            $this->outputMock,
+            self::LOG_FILE_PATH,
+            new MetricsCalculator(),
+            $this->fileSystemMock,
+            false,
+            false
+        );
+
+        $debugFileLogger->log();
     }
 }
