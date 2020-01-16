@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator;
 
 use function array_values;
 use Generator;
-use Infection\Console\InfectionContainer;
+use Infection\Container;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\ProfileList;
 use Infection\Mutator\Util\Mutator;
@@ -107,7 +107,7 @@ final class MutatorRobustnessTest extends TestCase
     private static function getParser(): Parser
     {
         if (null === self::$parser) {
-            self::$parser = InfectionContainer::create()[Parser::class];
+            self::$parser = Container::create()->getParser();
         }
 
         return self::$parser;
