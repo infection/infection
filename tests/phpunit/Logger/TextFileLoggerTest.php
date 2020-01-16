@@ -38,23 +38,19 @@ namespace Infection\Tests\Logger;
 use Generator;
 use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Mutant\Mutant;
-use Infection\Mutator\ZeroIteration\For_;
-use Infection\Process\MutantProcess;
-use Infection\Tests\Mutator\MutatorName;
-use Symfony\Component\Filesystem\Exception\IOException;
-use function sprintf;
 use const PHP_EOL;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function str_replace;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\Process;
-use Webmozart\Assert\Assert;
 
 /**
  * @group integration Requires some I/O operations
+ *
+ * @covers \Infection\Logger\TextFileLogger
+ * @covers \Infection\Logger\FileLogger
  */
 final class TextFileLoggerTest extends TestCase
 {

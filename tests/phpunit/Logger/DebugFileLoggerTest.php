@@ -36,22 +36,20 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use Infection\Logger\DebugFileLogger;
-use Infection\Logger\SummaryFileLogger;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Mutator\Boolean\TrueValue;
-use Infection\Mutator\ZeroIteration\For_;
-use Infection\Process\MutantProcess;
-use Infection\Tests\Mutator\MutatorName;
+use const PHP_EOL;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function str_replace;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
-use function str_replace;
-use const PHP_EOL;
 
 /**
  * @group integration Requires some I/O operations
+ *
+ * @covers \Infection\Logger\DebugFileLogger
+ * @covers \Infection\Logger\FileLogger
  */
 final class DebugFileLoggerTest extends TestCase
 {

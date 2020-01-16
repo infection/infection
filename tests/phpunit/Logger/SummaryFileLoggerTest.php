@@ -36,15 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use Infection\Logger\SummaryFileLogger;
-use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
+use const PHP_EOL;
 use PHPUnit\Framework\MockObject\MockObject;
+use function str_replace;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
-use function str_replace;
-use const PHP_EOL;
 
 /**
  * @group integration Requires some I/O operations

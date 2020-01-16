@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use function current;
 use Generator;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
@@ -46,6 +47,7 @@ use Infection\Logger\PerMutatorLogger;
 use Infection\Logger\SummaryFileLogger;
 use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -55,11 +57,21 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class LoggerFactoryTest extends TestCase
 {
+    /**
+     * @var Filesystem|MockObject
+     */
+    private $fileSystemMock;
+
+    protected function setUp(): void
+    {
+        $this->fileSystemMock = $this->createMock(Filesystem::class);
+    }
+
     public function test_it_does_not_create_any_logger_for_no_verbosity_level(): void
     {
         $factory = new LoggerFactory(
             new MetricsCalculator(),
-            new Filesystem(),
+            $this->fileSystemMock,
             LogVerbosity::NONE,
             true,
             true
@@ -83,7 +95,7 @@ final class LoggerFactoryTest extends TestCase
     {
         $factory = new LoggerFactory(
             new MetricsCalculator(),
-            new Filesystem(),
+            $this->fileSystemMock,
             LogVerbosity::NONE,
             true,
             true
@@ -99,13 +111,13 @@ final class LoggerFactoryTest extends TestCase
     }
 
     /**
-     * @dataProvider provideLogTypesAndClasses
+     * @dataProvider logTypesAndClassesProvider
      */
     public function test_it_creates_a_logger_for_log_type(Logs $logs, string $expectedLoggerClass): void
     {
         $factory = new LoggerFactory(
             new MetricsCalculator(),
-            new Filesystem(),
+            $this->fileSystemMock,
             LogVerbosity::NORMAL,
             true,
             true
@@ -121,13 +133,13 @@ final class LoggerFactoryTest extends TestCase
     }
 
     /**
-     * @dataProvider provideLogsAndCount
+     * @dataProvider logsAndCountProvider
      */
     public function test_it_creates_multiple_loggers(Logs $logs, int $expectedLoggerCount): void
     {
         $factory = new LoggerFactory(
             new MetricsCalculator(),
-            new Filesystem(),
+            $this->fileSystemMock,
             LogVerbosity::NORMAL,
             true,
             true
@@ -141,7 +153,7 @@ final class LoggerFactoryTest extends TestCase
         $this->assertCount($expectedLoggerCount, $loggers);
     }
 
-    public function provideLogTypesAndClasses(): Generator
+    public function logTypesAndClassesProvider(): Generator
     {
         yield 'text logger' => [
             new Logs(
@@ -199,7 +211,7 @@ final class LoggerFactoryTest extends TestCase
         ];
     }
 
-    public function provideLogsAndCount(): Generator
+    public function logsAndCountProvider(): Generator
     {
         yield 'no logger' => [
             new Logs(
