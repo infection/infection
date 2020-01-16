@@ -43,7 +43,7 @@ use function explode;
  */
 trait GetMutatorName
 {
-    final public static function getName(): string
+    final public function getName(): string
     {
         $parts = explode('\\', static::class);
 
