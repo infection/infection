@@ -38,8 +38,6 @@ namespace Infection\Tests\Logger;
 use Infection\Logger\FileLogger;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use function ob_get_clean;
-use function ob_start;
 use const PHP_EOL;
 use PHPUnit\Framework\MockObject\MockObject;
 use function str_replace;

@@ -41,6 +41,7 @@ use Infection\Mutator\Regex\PregQuote;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\Tests\Mutator\MutatorName;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
 
@@ -138,12 +139,15 @@ trait CreateMetricsCalculator
         return $calculator;
     }
 
+    /**
+     * @return MutantProcess|MockObject
+     */
     private function createMutantProcess(
         int $i,
         string $mutatorClassName,
         int $resultCode,
         string $echoMutatedMessage
-    ): MutantProcess {
+    ) {
         Assert::oneOf($resultCode, MutantProcess::RESULT_CODES);
 
         $processMock = $this->createMock(Process::class);

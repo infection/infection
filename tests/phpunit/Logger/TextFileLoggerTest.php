@@ -49,8 +49,8 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * @group integration Requires some I/O operations
  *
- * @covers \Infection\Logger\TextFileLogger
  * @covers \Infection\Logger\FileLogger
+ * @covers \Infection\Logger\TextFileLogger
  */
 final class TextFileLoggerTest extends TestCase
 {

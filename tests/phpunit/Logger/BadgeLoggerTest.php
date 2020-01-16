@@ -35,15 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use function getenv;
 use Infection\Http\BadgeApiClient;
 use Infection\Logger\BadgeLogger;
 use Infection\Mutant\MetricsCalculator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use stdClass;
-use Symfony\Component\Console\Output\OutputInterface;
-use function getenv;
 use function Safe\putenv;
+use Symfony\Component\Console\Output\OutputInterface;
 
 final class BadgeLoggerTest extends TestCase
 {
