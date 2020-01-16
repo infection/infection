@@ -42,6 +42,8 @@ use Infection\Mutant\Mutant;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\Tests\Mutator\MutatorName;
+use Symfony\Component\Filesystem\Exception\IOException;
+use function sprintf;
 use const PHP_EOL;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -56,6 +58,8 @@ use Webmozart\Assert\Assert;
  */
 final class TextFileLoggerTest extends TestCase
 {
+    use CreateMetricsCalculator;
+
     private const LOG_FILE_PATH = '/path/to/text.log';
 
     /**
@@ -128,6 +132,52 @@ final class TextFileLoggerTest extends TestCase
         );
 
         $logger->log();
+    }
+
+    public function test_it_cannot_log_on_invalid_streams(): void
+    {
+        $this->outputMock
+            ->expects($this->once())
+            ->method('writeln')
+            ->with('<error>The only streams supported are php://stdout and php://stderr</error>')
+        ;
+
+        $debugFileLogger = new TextFileLogger(
+            $this->outputMock,
+            'php://memory',
+            new MetricsCalculator(),
+            $this->fileSystemMock,
+            false,
+            false
+        );
+
+        $debugFileLogger->log();
+    }
+
+    public function test_it_fails_if_cannot_write_file(): void
+    {
+        $this->fileSystemMock
+            ->expects($this->once())
+            ->method('dumpFile')
+            ->with(self::LOG_FILE_PATH, $this->anything())
+            ->willThrowException(new IOException('Cannot write in directory X'));
+
+        $this->outputMock
+            ->expects($this->once())
+            ->method('writeln')
+            ->with('<error>Cannot write in directory X</error>')
+        ;
+
+        $debugFileLogger = new TextFileLogger(
+            $this->outputMock,
+            self::LOG_FILE_PATH,
+            new MetricsCalculator(),
+            $this->fileSystemMock,
+            false,
+            false
+        );
+
+        $debugFileLogger->log();
     }
 
     public function emptyMetricsProvider(): Generator
@@ -219,7 +269,7 @@ Escaped mutants:
 ================
 
 
-1) foo/bar:9    [M] For_
+1) foo/bar:9    [M] PregQuote
 
 --- Original
 +++ New
@@ -242,7 +292,7 @@ Timed Out mutants:
 ==================
 
 
-1) foo/bar:9    [M] For_
+1) foo/bar:9    [M] PregQuote
 
 --- Original
 +++ New
@@ -265,7 +315,7 @@ Not Covered mutants:
 ====================
 
 
-1) foo/bar:9    [M] For_
+1) foo/bar:9    [M] PregQuote
 
 --- Original
 +++ New
@@ -295,7 +345,7 @@ Escaped mutants:
 ================
 
 
-1) foo/bar:9    [M] For_
+1) foo/bar:9    [M] PregQuote
 
 --- Original
 +++ New
@@ -320,7 +370,7 @@ Timed Out mutants:
 ==================
 
 
-1) foo/bar:9    [M] For_
+1) foo/bar:9    [M] PregQuote
 
 --- Original
 +++ New
@@ -345,7 +395,7 @@ Killed mutants:
 ===============
 
 
-1) foo/bar:9    [M] For_
+1) foo/bar:9    [M] PregQuote
 
 --- Original
 +++ New
@@ -370,7 +420,7 @@ Errors mutants:
 ===============
 
 
-1) foo/bar:9    [M] For_
+1) foo/bar:9    [M] PregQuote
 
 --- Original
 +++ New
@@ -395,7 +445,7 @@ Not Covered mutants:
 ====================
 
 
-1) foo/bar:9    [M] For_
+1) foo/bar:9    [M] PregQuote
 
 --- Original
 +++ New
@@ -427,7 +477,7 @@ Escaped mutants:
 ================
 
 
-1) foo/bar:9    [M] For_
+1) foo/bar:9    [M] PregQuote
 bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
 --- Original
 +++ New
@@ -450,7 +500,7 @@ Timed Out mutants:
 ==================
 
 
-1) foo/bar:9    [M] For_
+1) foo/bar:9    [M] PregQuote
 bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
 --- Original
 +++ New
@@ -473,7 +523,7 @@ Not Covered mutants:
 ====================
 
 
-1) foo/bar:9    [M] For_
+1) foo/bar:9    [M] PregQuote
 bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
 --- Original
 +++ New
@@ -503,7 +553,7 @@ Escaped mutants:
 ================
 
 
-1) foo/bar:9    [M] For_
+1) foo/bar:9    [M] PregQuote
 bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
 --- Original
 +++ New
@@ -528,7 +578,7 @@ Timed Out mutants:
 ==================
 
 
-1) foo/bar:9    [M] For_
+1) foo/bar:9    [M] PregQuote
 bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
 --- Original
 +++ New
@@ -553,7 +603,7 @@ Killed mutants:
 ===============
 
 
-1) foo/bar:9    [M] For_
+1) foo/bar:9    [M] PregQuote
 bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
 --- Original
 +++ New
@@ -578,7 +628,7 @@ Errors mutants:
 ===============
 
 
-1) foo/bar:9    [M] For_
+1) foo/bar:9    [M] PregQuote
 bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
 --- Original
 +++ New
@@ -603,7 +653,7 @@ Not Covered mutants:
 ====================
 
 
-1) foo/bar:9    [M] For_
+1) foo/bar:9    [M] PregQuote
 bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
 --- Original
 +++ New
@@ -626,149 +676,5 @@ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTe
 
 TXT
         ];
-    }
-
-    public function test_it_cannot_log_on_invalid_streams(): void
-    {
-        $this->outputMock
-            ->expects($this->once())
-            ->method('writeln')
-            ->with('<error>The only streams supported are php://stdout and php://stderr</error>')
-        ;
-
-        $debugFileLogger = new TextFileLogger(
-            $this->outputMock,
-            'php://memory',
-            new MetricsCalculator(),
-            $this->fileSystemMock,
-            false,
-            false
-        );
-
-        $debugFileLogger->log();
-    }
-
-    private function createCompleteMetricsCalculator(): MetricsCalculator
-    {
-        $calculator = new MetricsCalculator();
-
-        for ($i = 0; $i < 2; ++$i) {
-            $calculator->collect(
-                $this->createMutantProcess(
-                    $i,
-                    MutantProcess::CODE_ESCAPED,
-                    'escaped#' . $i
-                )
-            );
-        }
-
-        for ($i = 0; $i < 2; ++$i) {
-            $calculator->collect(
-                $this->createMutantProcess(
-                    $i,
-                    MutantProcess::CODE_TIMED_OUT,
-                    'timedOut#' . $i
-                )
-            );
-        }
-
-        for ($i = 0; $i < 2; ++$i) {
-            $calculator->collect(
-                $this->createMutantProcess(
-                    $i,
-                    MutantProcess::CODE_KILLED,
-                    'killed#' . $i
-                )
-            );
-        }
-
-        for ($i = 0; $i < 2; ++$i) {
-            $calculator->collect(
-                $this->createMutantProcess(
-                    $i,
-                    MutantProcess::CODE_ERROR,
-                    'error#' . $i
-                )
-            );
-        }
-
-        for ($i = 0; $i < 2; ++$i) {
-            $calculator->collect(
-                $this->createMutantProcess(
-                    $i,
-                    MutantProcess::CODE_NOT_COVERED,
-                    'notCovered#' . $i
-                )
-            );
-        }
-
-        return $calculator;
-    }
-
-    private function createMutantProcess(
-        int $i,
-        int $resultCode,
-        string $echoMutatedMessage
-    ): MutantProcess {
-        Assert::oneOf($resultCode, MutantProcess::RESULT_CODES);
-
-        $processMock = $this->createMock(Process::class);
-        $processMock
-            ->expects($this->atMost(1))
-            ->method('getCommandLine')
-            ->willReturn('bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"')
-        ;
-        $processMock
-            ->expects($this->atMost(1))
-            ->method('isStarted')
-            ->willReturn(true)
-        ;
-
-        $mutantMock = $this->createMock(Mutant::class);
-        $mutantMock
-            ->expects($this->atMost(1))
-            ->method('getDiff')
-            ->willReturn(<<<DIFF
---- Original
-+++ New
-@@ @@
-
-- echo 'original';
-+ echo '$echoMutatedMessage';
-
-DIFF
-            )
-        ;
-
-        $mutantProcessMock = $this->createMock(MutantProcess::class);
-        $mutantProcessMock
-            ->method('getProcess')
-            ->willReturn($processMock)
-        ;
-        $mutantProcessMock
-            ->expects($this->atMost(1))
-            ->method('getMutant')
-            ->willReturn($mutantMock)
-        ;
-        $mutantProcessMock
-            ->expects($this->atMost(1))
-            ->method('getMutatorName')
-            ->willReturn(MutatorName::getName(For_::class))
-        ;
-        $mutantProcessMock
-            ->expects($this->atMost(1))
-            ->method('getResultCode')
-            ->willReturn($resultCode)
-        ;
-        $mutantProcessMock
-            ->method('getOriginalStartingLine')
-            ->willReturn(10 - $i)
-        ;
-        $mutantProcessMock
-            ->method('getOriginalFilePath')
-            ->willReturn('foo/bar')
-        ;
-
-        return $mutantProcessMock;
     }
 }
