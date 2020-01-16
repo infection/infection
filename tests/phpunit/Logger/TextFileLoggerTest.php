@@ -38,8 +38,10 @@ namespace Infection\Tests\Logger;
 use Generator;
 use Infection\Logger\TextFileLogger;
 use Infection\Mutant\MetricsCalculator;
+use const PHP_EOL;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function str_replace;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -80,6 +82,8 @@ final class TextFileLoggerTest extends TestCase
         bool $debugMode,
         string $expectedContent
     ): void {
+        $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
+
         $this->fileSystemMock
             ->expects($this->once())
             ->method('dumpFile')
@@ -106,6 +110,8 @@ final class TextFileLoggerTest extends TestCase
         bool $debugMode,
         string $expectedContent
     ): void {
+        $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
+
         $this->fileSystemMock
             ->expects($this->once())
             ->method('dumpFile')
