@@ -70,7 +70,7 @@ final class SummaryFileLoggerTest extends FileSystemTestCase
 
     public function test_it_logs_the_correct_lines_with_no_mutations(): void
     {
-        $content = <<<'TXT'
+        $expectedContent = <<<'TXT'
 Total: 0
 Killed: 0
 Errored: 0
@@ -79,12 +79,12 @@ Timed Out: 0
 Not Covered: 0
 TXT;
 
-        $content = str_replace("\n", PHP_EOL, $content);
+        $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
 
         $this->fileSystemMock
             ->expects($this->once())
             ->method('dumpFile')
-            ->with(self::LOG_FILE_PATH, $content)
+            ->with(self::LOG_FILE_PATH, $expectedContent)
         ;
 
         $debugFileLogger = new SummaryFileLogger(
@@ -133,7 +133,7 @@ TXT;
             ->willReturn(0)
         ;
 
-        $content = <<<'TXT'
+        $expectedContent = <<<'TXT'
 Total: 6
 Killed: 8
 Errored: 7
@@ -142,12 +142,12 @@ Timed Out: 2
 Not Covered: 0
 TXT;
 
-        $content = str_replace("\n", PHP_EOL, $content);
+        $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
 
         $this->fileSystemMock
             ->expects($this->once())
             ->method('dumpFile')
-            ->with(self::LOG_FILE_PATH, $content)
+            ->with(self::LOG_FILE_PATH, $expectedContent)
         ;
 
         $debugFileLogger = new SummaryFileLogger(

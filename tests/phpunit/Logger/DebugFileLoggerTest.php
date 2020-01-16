@@ -75,7 +75,7 @@ final class DebugFileLoggerTest extends TestCase
 
     public function test_it_logs_correctly_with_no_mutations(): void
     {
-        $content = <<<'TXT'
+        $expectedContent = <<<'TXT'
 Total: 0
 Killed mutants:
 ===============
@@ -99,12 +99,12 @@ Not Covered mutants:
 
 TXT;
 
-        $content = str_replace("\n", PHP_EOL, $content);
+        $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
 
         $this->fileSystemMock
             ->expects($this->once())
             ->method('dumpFile')
-            ->with(self::LOG_FILE_PATH, $content)
+            ->with(self::LOG_FILE_PATH, $expectedContent)
         ;
 
         $debugFileLogger = new DebugFileLogger(
@@ -121,7 +121,7 @@ TXT;
 
     public function test_it_log_correctly_with_mutations(): void
     {
-        $content = <<<'TXT'
+        $expectedContent = <<<'TXT'
 Total: 10
 Killed mutants:
 ===============
@@ -175,12 +175,12 @@ Line 10
 
 TXT;
 
-        $content = str_replace("\n", PHP_EOL, $content);
+        $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
 
         $this->fileSystemMock
             ->expects($this->once())
             ->method('dumpFile')
-            ->with(self::LOG_FILE_PATH, $content)
+            ->with(self::LOG_FILE_PATH, $expectedContent)
         ;
 
         $debugFileLogger = new DebugFileLogger(

@@ -70,7 +70,7 @@ final class PerMutatorLoggerTest extends TestCase
 
     public function test_it_correctly_build_log_lines(): void
     {
-        $content = <<<'TXT'
+        $expectedContent = <<<'TXT'
 # Effects per Mutator
 
 | Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |
@@ -79,12 +79,12 @@ final class PerMutatorLoggerTest extends TestCase
 | PregQuote | 4 | 1 | 1 | 0 | 1 | 50| 66|
 TXT;
 
-        $content = str_replace("\n", PHP_EOL, $content);
+        $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
 
         $this->fileSystemMock
             ->expects($this->once())
             ->method('dumpFile')
-            ->with(self::LOG_FILE_PATH, $content)
+            ->with(self::LOG_FILE_PATH, $expectedContent)
         ;
 
         $perMutatorLogger = new PerMutatorLogger(

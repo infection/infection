@@ -72,17 +72,17 @@ final class FileLoggerTest extends FileSystemTestCase
 
     public function test_it_logs_the_correct_lines_with_no_mutations(): void
     {
-        $content = <<<'TXT'
+        $expectedContent = <<<'TXT'
 foo
 bar
 TXT;
 
-        $content = str_replace("\n", PHP_EOL, $content);
+        $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
 
         $this->fileSystemMock
             ->expects($this->once())
             ->method('dumpFile')
-            ->with(self::LOG_FILE_PATH, $content)
+            ->with(self::LOG_FILE_PATH, $expectedContent)
         ;
 
         $debugFileLogger = new DummyFileLogger(
