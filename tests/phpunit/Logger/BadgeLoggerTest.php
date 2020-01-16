@@ -42,23 +42,25 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\Console\Output\OutputInterface;
+use function getenv;
+use function Safe\putenv;
 
 final class BadgeLoggerTest extends TestCase
 {
     /**
      * @var OutputInterface|MockObject
      */
-    private $output;
+    private $outputMock;
 
     /**
      * @var BadgeApiClient|MockObject
      */
-    private $badgeApiClient;
+    private $badgeApiClientMock;
 
     /**
      * @var MetricsCalculator|MockObject
      */
-    private $metricsCalculator;
+    private $metricsCalculatorMock;
 
     /**
      * @var BadgeLogger
@@ -98,16 +100,18 @@ final class BadgeLoggerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->output = $this->createMock(OutputInterface::class);
-        $this->badgeApiClient = $this->createMock(BadgeApiClient::class);
-        $this->metricsCalculator = $this->createMock(MetricsCalculator::class);
-        $config = new stdClass();
-        $config->branch = 'master';
+        $this->outputMock = $this->createMock(OutputInterface::class);
+        $this->badgeApiClientMock = $this->createMock(BadgeApiClient::class);
+        $this->metricsCalculatorMock = $this->createMock(MetricsCalculator::class);
+
+        $config = (object) [
+            'branch' => 'master',
+        ];
 
         $this->badgeLogger = new BadgeLogger(
-            $this->output,
-            $this->badgeApiClient,
-            $this->metricsCalculator,
+            $this->outputMock,
+            $this->badgeApiClientMock,
+            $this->metricsCalculatorMock,
             $config
         );
     }
@@ -115,13 +119,16 @@ final class BadgeLoggerTest extends TestCase
     public function test_it_skips_logging_when_it_is_not_travis(): void
     {
         putenv('TRAVIS');
-        $this->output
-            ->method('writeln')
-            ->with('Dashboard report has not been sent: it is not a Travis CI');
 
-        $this->badgeApiClient
+        $this->outputMock
+            ->method('writeln')
+            ->with('Dashboard report has not been sent: it is not a Travis CI')
+        ;
+
+        $this->badgeApiClientMock
             ->expects($this->never())
-            ->method('sendReport');
+            ->method('sendReport')
+        ;
 
         $this->badgeLogger->log();
     }
@@ -130,13 +137,16 @@ final class BadgeLoggerTest extends TestCase
     {
         putenv('TRAVIS=true');
         putenv('TRAVIS_PULL_REQUEST=123');
-        $this->output
-            ->method('writeln')
-            ->with('Dashboard report has not been sent: build is for a pull request (TRAVIS_PULL_REQUEST=123)');
 
-        $this->badgeApiClient
+        $this->outputMock
+            ->method('writeln')
+            ->with('Dashboard report has not been sent: build is for a pull request (TRAVIS_PULL_REQUEST=123)')
+        ;
+
+        $this->badgeApiClientMock
             ->expects($this->never())
-            ->method('sendReport');
+            ->method('sendReport')
+        ;
 
         $this->badgeLogger->log();
     }
@@ -148,11 +158,12 @@ final class BadgeLoggerTest extends TestCase
         putenv('TRAVIS_REPO_SLUG=a/b');
         putenv('TRAVIS_BRANCH');
 
-        $this->output
+        $this->outputMock
             ->method('writeln')
-            ->with('Dashboard report has not been sent: repository slug nor current branch were found; not a Travis build?');
+            ->with('Dashboard report has not been sent: repository slug nor current branch were found; not a Travis build?')
+        ;
 
-        $this->badgeApiClient
+        $this->badgeApiClientMock
             ->expects($this->never())
             ->method('sendReport');
 
@@ -166,13 +177,15 @@ final class BadgeLoggerTest extends TestCase
         putenv('TRAVIS_REPO_SLUG');
         putenv('TRAVIS_BRANCH=foo');
 
-        $this->output
+        $this->outputMock
             ->method('writeln')
-            ->with('Dashboard report has not been sent: repository slug nor current branch were found; not a Travis build?');
+            ->with('Dashboard report has not been sent: repository slug nor current branch were found; not a Travis build?')
+        ;
 
-        $this->badgeApiClient
+        $this->badgeApiClientMock
             ->expects($this->never())
-            ->method('sendReport');
+            ->method('sendReport')
+        ;
 
         $this->badgeLogger->log();
     }
@@ -183,13 +196,16 @@ final class BadgeLoggerTest extends TestCase
         putenv('TRAVIS_PULL_REQUEST=false');
         putenv('TRAVIS_REPO_SLUG=a/b');
         putenv('TRAVIS_BRANCH=foo');
-        $this->output
-            ->method('writeln')
-            ->with('Dashboard report has not been sent: expected branch "master", found "foo"');
 
-        $this->badgeApiClient
+        $this->outputMock
+            ->method('writeln')
+            ->with('Dashboard report has not been sent: expected branch "master", found "foo"')
+        ;
+
+        $this->badgeApiClientMock
             ->expects($this->never())
-            ->method('sendReport');
+            ->method('sendReport')
+        ;
 
         $this->badgeLogger->log();
     }
@@ -204,13 +220,15 @@ final class BadgeLoggerTest extends TestCase
         putenv(BadgeLogger::ENV_INFECTION_BADGE_API_KEY);
         putenv(BadgeLogger::ENV_STRYKER_DASHBOARD_API_KEY);
 
-        $this->output
+        $this->outputMock
             ->method('writeln')
-            ->with('Dashboard report has not been sent: neither INFECTION_BADGE_API_KEY nor STRYKER_DASHBOARD_API_KEY were found in the environment');
+            ->with('Dashboard report has not been sent: neither INFECTION_BADGE_API_KEY nor STRYKER_DASHBOARD_API_KEY were found in the environment')
+        ;
 
-        $this->badgeApiClient
+        $this->badgeApiClientMock
             ->expects($this->never())
-            ->method('sendReport');
+            ->method('sendReport')
+        ;
 
         $this->badgeLogger->log();
     }
@@ -223,18 +241,21 @@ final class BadgeLoggerTest extends TestCase
         putenv('TRAVIS_REPO_SLUG=a/b');
         putenv('TRAVIS_BRANCH=master');
 
-        $this->output
+        $this->outputMock
             ->method('writeln')
-            ->with('Sending dashboard report...');
+            ->with('Sending dashboard report...')
+        ;
 
-        $this->badgeApiClient
+        $this->badgeApiClientMock
             ->expects($this->once())
             ->method('sendReport')
-            ->with('abc', 'github.com/a/b', 'master', 33.3);
+            ->with('abc', 'github.com/a/b', 'master', 33.3)
+        ;
 
-        $this->metricsCalculator
+        $this->metricsCalculatorMock
             ->method('getMutationScoreIndicator')
-            ->willReturn(33.3);
+            ->willReturn(33.3)
+        ;
 
         $this->badgeLogger->log();
     }
@@ -247,18 +268,21 @@ final class BadgeLoggerTest extends TestCase
         putenv('TRAVIS_REPO_SLUG=a/b');
         putenv('TRAVIS_BRANCH=master');
 
-        $this->output
+        $this->outputMock
             ->method('writeln')
-            ->with('Sending dashboard report...');
+            ->with('Sending dashboard report...')
+        ;
 
-        $this->badgeApiClient
+        $this->badgeApiClientMock
             ->expects($this->once())
             ->method('sendReport')
-            ->with('abc', 'github.com/a/b', 'master', 33.3);
+            ->with('abc', 'github.com/a/b', 'master', 33.3)
+        ;
 
-        $this->metricsCalculator
+        $this->metricsCalculatorMock
             ->method('getMutationScoreIndicator')
-            ->willReturn(33.3);
+            ->willReturn(33.3)
+        ;
 
         $this->badgeLogger->log();
     }
