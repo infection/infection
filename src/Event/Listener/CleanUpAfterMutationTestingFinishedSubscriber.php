@@ -33,62 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Performance\Listener;
+namespace Infection\Event\Listener;
 
-use Infection\Event\Event\ApplicationExecutionFinished;
-use Infection\Event\Event\ApplicationExecutionStarted;
+use Infection\Event\Event\MutationTestingFinished;
 use Infection\Event\EventDispatcher\EventSubscriberInterface;
-use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
  */
-final class PerformanceLoggerSubscriber implements EventSubscriberInterface
+final class CleanUpAfterMutationTestingFinishedSubscriber implements EventSubscriberInterface
 {
-    private $timer;
-    private $output;
-    private $timeFormatter;
-    private $memoryFormatter;
+    private $filesystem;
+    private $tmpDir;
 
-    public function __construct(
-        Timer $timer,
-        TimeFormatter $timeFormatter,
-        MemoryFormatter $memoryFormatter,
-        OutputInterface $output
-    ) {
-        $this->timer = $timer;
-        $this->timeFormatter = $timeFormatter;
-        $this->output = $output;
-        $this->memoryFormatter = $memoryFormatter;
+    public function __construct(Filesystem $filesystem, string $tmpDir)
+    {
+        $this->filesystem = $filesystem;
+        $this->tmpDir = $tmpDir;
     }
 
     public function getSubscribedEvents(): array
     {
         return [
-            ApplicationExecutionStarted::class => [$this, 'onApplicationExecutionStarted'],
-            ApplicationExecutionFinished::class => [$this, 'onApplicationExecutionFinished'],
+            MutationTestingFinished::class => [$this, 'onMutationTestingFinished'],
         ];
     }
 
-    public function onApplicationExecutionStarted(): void
+    public function onMutationTestingFinished(MutationTestingFinished $event): void
     {
-        $this->timer->start();
-    }
-
-    public function onApplicationExecutionFinished(): void
-    {
-        $time = $this->timer->stop();
-
-        $this->output->writeln([
-            '',
-            sprintf(
-                'Time: %s. Memory: %s',
-                $this->timeFormatter->toHumanReadableString($time),
-                $this->memoryFormatter->toHumanReadableString(memory_get_peak_usage(true))
-            ),
-        ]);
+        $this->filesystem->remove($this->tmpDir);
     }
 }

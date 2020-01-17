@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Mutation;
 
 use function count;
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\MutableFileProcessed;
-use Infection\Events\MutationGeneratingFinished;
-use Infection\Events\MutationGeneratingStarted;
+use Infection\Event\Event\MutableFileProcessed;
+use Infection\Event\Event\MutationGeneratingFinished;
+use Infection\Event\Event\MutationGeneratingStarted;
+use Infection\Event\EventDispatcher\EventDispatcherInterface;
 use Infection\Mutator\Mutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use PhpParser\NodeVisitor;

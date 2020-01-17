@@ -7,7 +7,7 @@
 
 namespace Infection\Tests\Fixtures;
 
-use Infection\EventDispatcher\EventSubscriberInterface;
+use Infection\Event\EventDispatcher\EventSubscriberInterface;
 
 class UserEventSubscriber implements EventSubscriberInterface
 {

@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner\Parallel;
 
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\MutantProcessFinished;
+use Infection\Event\Event\MutantProcessFinished;
+use Infection\Event\EventDispatcher\EventDispatcherInterface;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;

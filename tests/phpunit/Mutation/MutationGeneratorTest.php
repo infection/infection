@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\MutableFileProcessed;
-use Infection\Events\MutationGeneratingFinished;
-use Infection\Events\MutationGeneratingStarted;
+use Infection\Event\Event\MutableFileProcessed;
+use Infection\Event\Event\MutationGeneratingFinished;
+use Infection\Event\Event\MutationGeneratingStarted;
+use Infection\Event\EventDispatcher\EventDispatcherInterface;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationGenerator;

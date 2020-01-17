@@ -33,61 +33,51 @@
 
 declare(strict_types=1);
 
-namespace Infection\Performance\Listener;
+namespace Infection\Event\Listener;
 
-use Infection\Event\Event\ApplicationExecutionFinished;
-use Infection\Event\Event\ApplicationExecutionStarted;
+use Infection\Event\Event\InitialTestSuiteStarted;
 use Infection\Event\EventDispatcher\EventSubscriberInterface;
-use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
+use Infection\TestFramework\TestFrameworkAdapter;
+use InvalidArgumentException;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class PerformanceLoggerSubscriber implements EventSubscriberInterface
+final class CiInitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
 {
-    private $timer;
     private $output;
-    private $timeFormatter;
-    private $memoryFormatter;
+    private $testFrameworkAdapter;
 
-    public function __construct(
-        Timer $timer,
-        TimeFormatter $timeFormatter,
-        MemoryFormatter $memoryFormatter,
-        OutputInterface $output
-    ) {
-        $this->timer = $timer;
-        $this->timeFormatter = $timeFormatter;
+    public function __construct(OutputInterface $output, TestFrameworkAdapter $testFrameworkAdapter)
+    {
         $this->output = $output;
-        $this->memoryFormatter = $memoryFormatter;
+        $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
 
     public function getSubscribedEvents(): array
     {
         return [
-            ApplicationExecutionStarted::class => [$this, 'onApplicationExecutionStarted'],
-            ApplicationExecutionFinished::class => [$this, 'onApplicationExecutionFinished'],
+            InitialTestSuiteStarted::class => [$this, 'onInitialTestSuiteStarted'],
         ];
     }
 
-    public function onApplicationExecutionStarted(): void
+    public function onInitialTestSuiteStarted(InitialTestSuiteStarted $event): void
     {
-        $this->timer->start();
-    }
-
-    public function onApplicationExecutionFinished(): void
-    {
-        $time = $this->timer->stop();
+        try {
+            $version = $this->testFrameworkAdapter->getVersion();
+        } catch (InvalidArgumentException $e) {
+            $version = 'unknown';
+        }
 
         $this->output->writeln([
             '',
+            'Running initial test suite...',
+            '',
             sprintf(
-                'Time: %s. Memory: %s',
-                $this->timeFormatter->toHumanReadableString($time),
-                $this->memoryFormatter->toHumanReadableString(memory_get_peak_usage(true))
+                '%s version: %s',
+                $this->testFrameworkAdapter->getName(),
+                $version
             ),
         ]);
     }

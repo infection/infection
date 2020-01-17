@@ -33,49 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Performance\Listener;
+namespace Infection\Tests\Event\Listener;
 
-use Infection\Event\Event\ApplicationExecutionFinished;
-use Infection\Event\Event\ApplicationExecutionStarted;
+use Infection\Event\Event\MutationTestingFinished;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Performance\Listener\PerformanceLoggerSubscriber;
-use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
-use function is_array;
-use PHPUnit\Framework\MockObject\MockObject;
+use Infection\Event\Listener\MutationTestingResultsLoggerSubscriber;
+use Infection\Logger\MutationTestingResultsLogger;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
 
-final class PerformanceLoggerSubscriberTest extends TestCase
+final class MutationTestingResultsLoggerSubscriberTest extends TestCase
 {
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $output;
-
-    protected function setUp(): void
+    public function test_it_reacts_on_mutation_testing_finished(): void
     {
-        $this->output = $this->createMock(OutputInterface::class);
-    }
-
-    public function test_it_reacts_on_application_execution_events(): void
-    {
-        $this->output->expects($this->once())
-            ->method('writeln')
-            ->with($this->callback(static function ($parameter) {
-                return is_array($parameter) && '' === $parameter[0] && 0 === strpos($parameter[1], 'Time:');
-            }));
-
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new PerformanceLoggerSubscriber(
-            new Timer(),
-            new TimeFormatter(),
-            new MemoryFormatter(),
-            $this->output
-        ));
+        $logger = $this->createMock(MutationTestingResultsLogger::class);
+        $logger->expects($this->once())->method('log');
+        $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber([$logger]));
 
-        $dispatcher->dispatch(new ApplicationExecutionStarted());
-        $dispatcher->dispatch(new ApplicationExecutionFinished());
+        $dispatcher->dispatch(new MutationTestingFinished());
     }
 }

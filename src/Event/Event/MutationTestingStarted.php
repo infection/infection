@@ -33,62 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Performance\Listener;
-
-use Infection\Event\Event\ApplicationExecutionFinished;
-use Infection\Event\Event\ApplicationExecutionStarted;
-use Infection\Event\EventDispatcher\EventSubscriberInterface;
-use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
-use Symfony\Component\Console\Output\OutputInterface;
+namespace Infection\Event\Event;
 
 /**
  * @internal
  */
-final class PerformanceLoggerSubscriber implements EventSubscriberInterface
+final class MutationTestingStarted
 {
-    private $timer;
-    private $output;
-    private $timeFormatter;
-    private $memoryFormatter;
+    private $mutationCount;
 
-    public function __construct(
-        Timer $timer,
-        TimeFormatter $timeFormatter,
-        MemoryFormatter $memoryFormatter,
-        OutputInterface $output
-    ) {
-        $this->timer = $timer;
-        $this->timeFormatter = $timeFormatter;
-        $this->output = $output;
-        $this->memoryFormatter = $memoryFormatter;
+    public function __construct(int $mutationCount)
+    {
+        $this->mutationCount = $mutationCount;
     }
 
-    public function getSubscribedEvents(): array
+    public function getMutationCount(): int
     {
-        return [
-            ApplicationExecutionStarted::class => [$this, 'onApplicationExecutionStarted'],
-            ApplicationExecutionFinished::class => [$this, 'onApplicationExecutionFinished'],
-        ];
-    }
-
-    public function onApplicationExecutionStarted(): void
-    {
-        $this->timer->start();
-    }
-
-    public function onApplicationExecutionFinished(): void
-    {
-        $time = $this->timer->stop();
-
-        $this->output->writeln([
-            '',
-            sprintf(
-                'Time: %s. Memory: %s',
-                $this->timeFormatter->toHumanReadableString($time),
-                $this->memoryFormatter->toHumanReadableString(memory_get_peak_usage(true))
-            ),
-        ]);
+        return $this->mutationCount;
     }
 }

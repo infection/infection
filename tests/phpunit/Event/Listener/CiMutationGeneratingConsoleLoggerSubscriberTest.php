@@ -33,62 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Performance\Listener;
+namespace Infection\Tests\Event\Listener;
 
-use Infection\Event\Event\ApplicationExecutionFinished;
-use Infection\Event\Event\ApplicationExecutionStarted;
-use Infection\Event\EventDispatcher\EventSubscriberInterface;
-use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
+use Infection\Event\Event\MutationGeneratingStarted;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\Listener\CiMutationGeneratingConsoleLoggerSubscriber;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @internal
- */
-final class PerformanceLoggerSubscriber implements EventSubscriberInterface
+final class CiMutationGeneratingConsoleLoggerSubscriberTest extends TestCase
 {
-    private $timer;
+    /**
+     * @var OutputInterface|MockObject
+     */
     private $output;
-    private $timeFormatter;
-    private $memoryFormatter;
 
-    public function __construct(
-        Timer $timer,
-        TimeFormatter $timeFormatter,
-        MemoryFormatter $memoryFormatter,
-        OutputInterface $output
-    ) {
-        $this->timer = $timer;
-        $this->timeFormatter = $timeFormatter;
-        $this->output = $output;
-        $this->memoryFormatter = $memoryFormatter;
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->output = $this->createMock(OutputInterface::class);
     }
 
-    public function getSubscribedEvents(): array
+    public function test_it_reacts_on_mutation_generating_started_event(): void
     {
-        return [
-            ApplicationExecutionStarted::class => [$this, 'onApplicationExecutionStarted'],
-            ApplicationExecutionFinished::class => [$this, 'onApplicationExecutionFinished'],
-        ];
-    }
+        $this->output->expects($this->once())
+            ->method('writeln')
+            ->with([
+                '',
+                'Generate mutants...',
+                '',
+                'Processing source code files: 123',
+            ]);
 
-    public function onApplicationExecutionStarted(): void
-    {
-        $this->timer->start();
-    }
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new CiMutationGeneratingConsoleLoggerSubscriber($this->output));
 
-    public function onApplicationExecutionFinished(): void
-    {
-        $time = $this->timer->stop();
-
-        $this->output->writeln([
-            '',
-            sprintf(
-                'Time: %s. Memory: %s',
-                $this->timeFormatter->toHumanReadableString($time),
-                $this->memoryFormatter->toHumanReadableString(memory_get_peak_usage(true))
-            ),
-        ]);
+        $dispatcher->dispatch(new MutationGeneratingStarted(123));
     }
 }

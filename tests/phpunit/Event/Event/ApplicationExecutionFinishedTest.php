@@ -33,62 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Performance\Listener;
+namespace Infection\Tests\Event\Event;
 
 use Infection\Event\Event\ApplicationExecutionFinished;
-use Infection\Event\Event\ApplicationExecutionStarted;
-use Infection\Event\EventDispatcher\EventSubscriberInterface;
-use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
-use Symfony\Component\Console\Output\OutputInterface;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class PerformanceLoggerSubscriber implements EventSubscriberInterface
+final class ApplicationExecutionFinishedTest extends TestCase
 {
-    private $timer;
-    private $output;
-    private $timeFormatter;
-    private $memoryFormatter;
-
-    public function __construct(
-        Timer $timer,
-        TimeFormatter $timeFormatter,
-        MemoryFormatter $memoryFormatter,
-        OutputInterface $output
-    ) {
-        $this->timer = $timer;
-        $this->timeFormatter = $timeFormatter;
-        $this->output = $output;
-        $this->memoryFormatter = $memoryFormatter;
-    }
-
-    public function getSubscribedEvents(): array
+    /**
+     * This class is only used to fire events, and the only functionality it needs is being instantiated
+     */
+    public function test_it_can_be_initialzed(): void
     {
-        return [
-            ApplicationExecutionStarted::class => [$this, 'onApplicationExecutionStarted'],
-            ApplicationExecutionFinished::class => [$this, 'onApplicationExecutionFinished'],
-        ];
-    }
-
-    public function onApplicationExecutionStarted(): void
-    {
-        $this->timer->start();
-    }
-
-    public function onApplicationExecutionFinished(): void
-    {
-        $time = $this->timer->stop();
-
-        $this->output->writeln([
-            '',
-            sprintf(
-                'Time: %s. Memory: %s',
-                $this->timeFormatter->toHumanReadableString($time),
-                $this->memoryFormatter->toHumanReadableString(memory_get_peak_usage(true))
-            ),
-        ]);
+        $class = new ApplicationExecutionFinished();
+        $this->assertInstanceOf(ApplicationExecutionFinished::class, $class);
     }
 }

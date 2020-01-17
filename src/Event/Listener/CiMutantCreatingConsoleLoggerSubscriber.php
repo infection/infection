@@ -33,62 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Performance\Listener;
+namespace Infection\Event\Listener;
 
-use Infection\Event\Event\ApplicationExecutionFinished;
-use Infection\Event\Event\ApplicationExecutionStarted;
+use Infection\Event\Event\MutantsCreatingStarted;
 use Infection\Event\EventDispatcher\EventSubscriberInterface;
-use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class PerformanceLoggerSubscriber implements EventSubscriberInterface
+final class CiMutantCreatingConsoleLoggerSubscriber implements EventSubscriberInterface
 {
-    private $timer;
     private $output;
-    private $timeFormatter;
-    private $memoryFormatter;
 
-    public function __construct(
-        Timer $timer,
-        TimeFormatter $timeFormatter,
-        MemoryFormatter $memoryFormatter,
-        OutputInterface $output
-    ) {
-        $this->timer = $timer;
-        $this->timeFormatter = $timeFormatter;
+    public function __construct(OutputInterface $output)
+    {
         $this->output = $output;
-        $this->memoryFormatter = $memoryFormatter;
     }
 
     public function getSubscribedEvents(): array
     {
         return [
-            ApplicationExecutionStarted::class => [$this, 'onApplicationExecutionStarted'],
-            ApplicationExecutionFinished::class => [$this, 'onApplicationExecutionFinished'],
+            MutantsCreatingStarted::class => [$this, 'onMutantsCreatingStarted'],
         ];
     }
 
-    public function onApplicationExecutionStarted(): void
+    public function onMutantsCreatingStarted(MutantsCreatingStarted $event): void
     {
-        $this->timer->start();
-    }
-
-    public function onApplicationExecutionFinished(): void
-    {
-        $time = $this->timer->stop();
-
         $this->output->writeln([
             '',
-            sprintf(
-                'Time: %s. Memory: %s',
-                $this->timeFormatter->toHumanReadableString($time),
-                $this->memoryFormatter->toHumanReadableString(memory_get_peak_usage(true))
-            ),
+            sprintf('Creating mutated files and processes: %s', $event->getMutantCount()),
         ]);
     }
 }

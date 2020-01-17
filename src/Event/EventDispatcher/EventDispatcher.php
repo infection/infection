@@ -33,62 +33,41 @@
 
 declare(strict_types=1);
 
-namespace Infection\Performance\Listener;
+namespace Infection\Event\EventDispatcher;
 
-use Infection\Event\Event\ApplicationExecutionFinished;
-use Infection\Event\Event\ApplicationExecutionStarted;
-use Infection\Event\EventDispatcher\EventSubscriberInterface;
-use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
-use Symfony\Component\Console\Output\OutputInterface;
+use function get_class;
 
 /**
  * @internal
  */
-final class PerformanceLoggerSubscriber implements EventSubscriberInterface
+final class EventDispatcher implements EventDispatcherInterface
 {
-    private $timer;
-    private $output;
-    private $timeFormatter;
-    private $memoryFormatter;
+    /**
+     * @var callable[][]
+     */
+    private $listeners = [];
 
-    public function __construct(
-        Timer $timer,
-        TimeFormatter $timeFormatter,
-        MemoryFormatter $memoryFormatter,
-        OutputInterface $output
-    ) {
-        $this->timer = $timer;
-        $this->timeFormatter = $timeFormatter;
-        $this->output = $output;
-        $this->memoryFormatter = $memoryFormatter;
+    public function dispatch($event): void
+    {
+        $name = get_class($event);
+
+        foreach ($this->getListeners($name) as $listener) {
+            $listener($event);
+        }
     }
 
-    public function getSubscribedEvents(): array
+    public function addSubscriber(EventSubscriberInterface $eventSubscriber): void
     {
-        return [
-            ApplicationExecutionStarted::class => [$this, 'onApplicationExecutionStarted'],
-            ApplicationExecutionFinished::class => [$this, 'onApplicationExecutionFinished'],
-        ];
+        foreach ($eventSubscriber->getSubscribedEvents() as $eventName => $listener) {
+            $this->listeners[$eventName][] = $listener;
+        }
     }
 
-    public function onApplicationExecutionStarted(): void
+    /**
+     * @return callable[]
+     */
+    private function getListeners(string $eventName): array
     {
-        $this->timer->start();
-    }
-
-    public function onApplicationExecutionFinished(): void
-    {
-        $time = $this->timer->stop();
-
-        $this->output->writeln([
-            '',
-            sprintf(
-                'Time: %s. Memory: %s',
-                $this->timeFormatter->toHumanReadableString($time),
-                $this->memoryFormatter->toHumanReadableString(memory_get_peak_usage(true))
-            ),
-        ]);
+        return $this->listeners[$eventName] ?? [];
     }
 }
