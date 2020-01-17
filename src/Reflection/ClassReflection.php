@@ -38,7 +38,7 @@ namespace Infection\Reflection;
 /**
  * @internal
  */
-interface InfectionReflectionClass
+interface ClassReflection
 {
     public function hasParentOfVisibility(string $methodName, Visibility $visibility): bool;
 

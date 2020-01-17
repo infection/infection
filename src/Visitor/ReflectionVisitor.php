@@ -37,11 +37,13 @@ namespace Infection\Visitor;
 
 use function array_pop;
 use function count;
-use Infection\Reflection\CoreInfectionReflectionClass;
+use Infection\Reflection\AnonymousClassReflection;
+use Infection\Reflection\ClassReflection;
+use Infection\Reflection\CoreClassReflection;
+use Infection\Reflection\NullReflection;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
-use ReflectionClass;
 
 /**
  * @internal
@@ -60,7 +62,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
     private $functionScopeStack = [];
 
     /**
-     * @var CoreInfectionReflectionClass[]|null[]
+     * @var ClassReflection[]
      */
     private $classScopeStack = [];
 
@@ -81,12 +83,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
     public function enterNode(Node $node)
     {
         if ($node instanceof Node\Stmt\ClassLike) {
-            if ($attribute = $node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY)) {
-                $this->classScopeStack[] = new CoreInfectionReflectionClass(new ReflectionClass($attribute->toString()));
-            } else {
-                // Anonymous class
-                $this->classScopeStack[] = null;
-            }
+            $this->classScopeStack[] = $this->getClassReflectionForNode($node);
         }
 
         // No need to traverse outside of classes
@@ -184,5 +181,27 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         }
 
         return false;
+    }
+
+    private function getClassReflectionForNode(Node\Stmt\ClassLike $node): ClassReflection
+    {
+        /** @var Node\Name|null $fqn */
+        $fqn = $node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY);
+
+        if ($fqn instanceof Node\Name) {
+            return CoreClassReflection::fromClassName($fqn->toString());
+        }
+
+        assert($node instanceof Node\Stmt\Class_);
+        $extends = $node->extends;
+
+        if ($node->extends !== null) {
+            $name = $extends->getAttribute('resolvedName');
+            assert($name instanceof Node\Name);
+
+            return AnonymousClassReflection::fromClassName($name->toString());
+        }
+
+        return new NullReflection();
     }
 }

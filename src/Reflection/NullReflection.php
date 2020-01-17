@@ -33,41 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutation;
-
-use Infection\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\Visitor\NotMutableIgnoreVisitor;
-use Infection\Visitor\ParentConnectorVisitor;
-use Infection\Visitor\ReflectionVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
+namespace Infection\Reflection;
 
 /**
  * @internal
- * @final
  */
-class NodeTraverserFactory
+final class NullReflection implements ClassReflection
 {
-    /**
-     * @param NodeVisitor[] $extraVisitors
-     */
-    public function create(array $extraVisitors): PrioritizedVisitorsNodeTraverser
+    public function hasParentOfVisibility(string $methodName, Visibility $visibility): bool
     {
-        $traverser = new PrioritizedVisitorsNodeTraverser(new NodeTraverser());
+        return false;
+    }
 
-        $traverser->addPrioritizedVisitor(new NotMutableIgnoreVisitor(), 50);
-        $traverser->addPrioritizedVisitor(new NodeVisitor\NameResolver(null, [
-            'preserveOriginalNames' => true,
-            'replaceNodes' => false,
-        ]), 45);
-        $traverser->addPrioritizedVisitor(new ParentConnectorVisitor(), 40);
-        $traverser->addPrioritizedVisitor(new FullyQualifiedClassNameVisitor(), 30);
-        $traverser->addPrioritizedVisitor(new ReflectionVisitor(), 20);
-
-        foreach ($extraVisitors as $priority => $visitor) {
-            $traverser->addPrioritizedVisitor($visitor, $priority);
-        }
-
-        return $traverser;
+    public function getName(): string
+    {
+        return '';
     }
 }

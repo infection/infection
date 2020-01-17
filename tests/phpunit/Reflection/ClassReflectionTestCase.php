@@ -36,24 +36,17 @@ declare(strict_types=1);
 namespace Infection\Tests\Reflection;
 
 use Generator;
-use Infection\Reflection\CoreInfectionReflectionClass;
+use Infection\Reflection\ClassReflection;
 use Infection\Reflection\Visibility;
 use Infection\Visitor\CloneVisitor;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
-final class CoreInfectionReflectionClassTest extends TestCase
+abstract class ClassReflectionTestCase extends TestCase
 {
-    public function test_it_wraps_the_name(): void
-    {
-        $reflection = new CoreInfectionReflectionClass(new ReflectionClass($this));
-        $this->assertSame($reflection->getName(), get_class($this));
-    }
-
     /**
      * @dataProvider provideParentMethodCases
      */
-    public function test_it_knows_if_a_function_is_inherited(CoreInfectionReflectionClass $reflection, string $method, Visibility $visibility, bool $hasParent): void
+    public function test_it_knows_if_a_function_is_inherited(ClassReflection $reflection, string $method, Visibility $visibility, bool $hasParent): void
     {
         $this->assertSame($hasParent, $reflection->hasParentOfVisibility($method, $visibility));
     }
@@ -61,47 +54,49 @@ final class CoreInfectionReflectionClassTest extends TestCase
     public function provideParentMethodCases(): Generator
     {
         yield [
-            new CoreInfectionReflectionClass(new ReflectionClass(new CloneVisitor())),
+            $this->createFromName(CloneVisitor::class),
             'enterNode',
             Visibility::asPublic(),
             true,
         ];
 
         yield [
-            new CoreInfectionReflectionClass(new ReflectionClass(new CloneVisitor())),
+            $this->createFromName(CloneVisitor::class),
             'enterNode',
             Visibility::asProtected(),
             false,
         ];
 
         yield [
-            new CoreInfectionReflectionClass(new ReflectionClass($this)),
+            $this->createFromName(get_class($this)),
             'foo',
             Visibility::asProtected(),
             false,
         ];
 
         yield [
-            new CoreInfectionReflectionClass(new ReflectionClass($this)),
+            $this->createFromName(get_class($this)),
             'foo',
             Visibility::asPublic(),
             false,
         ];
 
         yield [
-            new CoreInfectionReflectionClass(new ReflectionClass(ProtChild::class)),
+            $this->createFromName(ProtChild::class),
             'foo',
             Visibility::asPublic(),
             false,
         ];
 
         yield [
-            new CoreInfectionReflectionClass(new ReflectionClass(ProtChild::class)),
+            $this->createFromName(ProtChild::class),
             'foo',
             Visibility::asProtected(),
             true,
         ];
     }
+
+    abstract protected function createFromName(string $name): ClassReflection;
 }
 
 class ProtParent

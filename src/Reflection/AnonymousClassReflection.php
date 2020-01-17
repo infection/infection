@@ -36,37 +36,83 @@ declare(strict_types=1);
 namespace Infection\Reflection;
 
 use ReflectionClass;
-use ReflectionException;
 
 /**
  * @internal
  */
-final class CoreInfectionReflectionClass implements InfectionReflectionClass
+final class AnonymousClassReflection implements ClassReflection
 {
+    /**
+     * @var ReflectionClass
+     */
     private $reflectionClass;
 
-    public function __construct(ReflectionClass $reflectionClass)
+    private function __construct(ReflectionClass $reflectionClass)
     {
         $this->reflectionClass = $reflectionClass;
     }
 
+    public static function fromClassName(string $className): self
+    {
+        return new self(new ReflectionClass($className));
+    }
+
     public function hasParentOfVisibility(string $methodName, Visibility $visibility): bool
     {
-        try {
-            $method = $this->reflectionClass->getMethod($methodName)->getPrototype();
-        } catch (ReflectionException $e) {
+        if (self::hasMethodRecursively($this->reflectionClass, $methodName, $visibility)) {
+            return true;
+        }
+
+        if ($visibility->isProtected()) {
             return false;
         }
 
-        if ($visibility->isPublic()) {
-            return $method->isPublic();
+        foreach ($this->reflectionClass->getInterfaces() as $reflectionInterface) {
+            if (self::hasMethod($reflectionInterface, $methodName, $visibility)) {
+                return true;
+            }
         }
 
-        return $method->isProtected();
+        return false;
     }
 
     public function getName(): string
     {
-        return $this->reflectionClass->getName();
+        return '';
+    }
+
+    private static function hasMethodRecursively(
+        ReflectionClass $reflectionClass,
+        string $methodName,
+        Visibility $visibility
+    ): bool {
+        if (self::hasMethod($reflectionClass, $methodName, $visibility)) {
+            return true;
+        }
+        $parent = $reflectionClass->getParentClass();
+
+        if ($parent === false) {
+            return false;
+        }
+
+        return self::hasMethodRecursively($parent, $methodName, $visibility);
+    }
+
+    private static function hasMethod(
+        ReflectionClass $reflectionClass,
+        string $methodName,
+        Visibility $visibility
+    ): bool {
+        if ($reflectionClass->hasMethod($methodName)) {
+            $method = $reflectionClass->getMethod($methodName);
+
+            if ($visibility->isPublic()) {
+                return $method->isPublic();
+            }
+
+            return $method->isProtected();
+        }
+
+        return false;
     }
 }

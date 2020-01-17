@@ -33,41 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutation;
+namespace Infection\Reflection;
 
-use Infection\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\Visitor\NotMutableIgnoreVisitor;
-use Infection\Visitor\ParentConnectorVisitor;
-use Infection\Visitor\ReflectionVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
+use ReflectionClass;
+use ReflectionException;
 
 /**
  * @internal
- * @final
  */
-class NodeTraverserFactory
+final class CoreClassReflection implements ClassReflection
 {
-    /**
-     * @param NodeVisitor[] $extraVisitors
-     */
-    public function create(array $extraVisitors): PrioritizedVisitorsNodeTraverser
+    private $reflectionClass;
+
+    private function __construct(ReflectionClass $reflectionClass)
     {
-        $traverser = new PrioritizedVisitorsNodeTraverser(new NodeTraverser());
+        $this->reflectionClass = $reflectionClass;
+    }
 
-        $traverser->addPrioritizedVisitor(new NotMutableIgnoreVisitor(), 50);
-        $traverser->addPrioritizedVisitor(new NodeVisitor\NameResolver(null, [
-            'preserveOriginalNames' => true,
-            'replaceNodes' => false,
-        ]), 45);
-        $traverser->addPrioritizedVisitor(new ParentConnectorVisitor(), 40);
-        $traverser->addPrioritizedVisitor(new FullyQualifiedClassNameVisitor(), 30);
-        $traverser->addPrioritizedVisitor(new ReflectionVisitor(), 20);
+    public static function fromClassName(string $className): self
+    {
+        return new self(new ReflectionClass($className));
+    }
 
-        foreach ($extraVisitors as $priority => $visitor) {
-            $traverser->addPrioritizedVisitor($visitor, $priority);
+    public function hasParentOfVisibility(string $methodName, Visibility $visibility): bool
+    {
+        try {
+            $method = $this->reflectionClass->getMethod($methodName)->getPrototype();
+        } catch (ReflectionException $e) {
+            return false;
         }
 
-        return $traverser;
+        if ($visibility->isPublic()) {
+            return $method->isPublic();
+        }
+
+        return $method->isProtected();
+    }
+
+    public function getName(): string
+    {
+        return $this->reflectionClass->getName();
     }
 }

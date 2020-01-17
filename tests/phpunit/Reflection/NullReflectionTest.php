@@ -33,41 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutation;
+namespace Infection\Tests\Reflection;
 
-use Infection\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\Visitor\NotMutableIgnoreVisitor;
-use Infection\Visitor\ParentConnectorVisitor;
-use Infection\Visitor\ReflectionVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
+use Infection\Reflection\NullReflection;
+use Infection\Reflection\Visibility;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- * @final
- */
-class NodeTraverserFactory
+final class NullReflectionTest extends TestCase
 {
-    /**
-     * @param NodeVisitor[] $extraVisitors
-     */
-    public function create(array $extraVisitors): PrioritizedVisitorsNodeTraverser
+    public function test_it_has_no_name(): void
     {
-        $traverser = new PrioritizedVisitorsNodeTraverser(new NodeTraverser());
+        $reflection = new NullReflection();
+        $this->assertSame('', $reflection->getName());
+    }
 
-        $traverser->addPrioritizedVisitor(new NotMutableIgnoreVisitor(), 50);
-        $traverser->addPrioritizedVisitor(new NodeVisitor\NameResolver(null, [
-            'preserveOriginalNames' => true,
-            'replaceNodes' => false,
-        ]), 45);
-        $traverser->addPrioritizedVisitor(new ParentConnectorVisitor(), 40);
-        $traverser->addPrioritizedVisitor(new FullyQualifiedClassNameVisitor(), 30);
-        $traverser->addPrioritizedVisitor(new ReflectionVisitor(), 20);
-
-        foreach ($extraVisitors as $priority => $visitor) {
-            $traverser->addPrioritizedVisitor($visitor, $priority);
-        }
-
-        return $traverser;
+    public function test_it_has_no_parent(): void
+    {
+        $reflection = new NullReflection();
+        $this->assertFalse($reflection->hasParentOfVisibility('foo', Visibility::asPublic()));
     }
 }
