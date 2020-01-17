@@ -37,6 +37,9 @@ namespace Infection\Performance\Time;
 
 use Webmozart\Assert\Assert;
 
+// Cannot import this one as it would remove the ability to mock it
+// use function microtime
+
 /**
  * @internal
  */
