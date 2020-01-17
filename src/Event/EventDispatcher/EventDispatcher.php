@@ -57,7 +57,7 @@ class EventDispatcher
         }
     }
 
-    public function addSubscriber(EventSubscriberInterface $eventSubscriber): void
+    public function addSubscriber(EventSubscriber $eventSubscriber): void
     {
         foreach ($eventSubscriber->getSubscribedEvents() as $eventName => $listener) {
             $this->listeners[$eventName][] = $listener;

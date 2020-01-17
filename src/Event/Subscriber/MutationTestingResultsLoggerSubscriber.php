@@ -35,22 +35,26 @@ declare(strict_types=1);
 
 namespace Infection\Event\Listener;
 
-use Infection\Event\EventDispatcher\EventSubscriberInterface;
+use Infection\Event\EventDispatcher\EventSubscriber;
 use Infection\Event\MutationTestingFinished;
-use Symfony\Component\Filesystem\Filesystem;
+use Infection\Logger\MutationTestingResultsLogger;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class CleanUpAfterMutationTestingFinishedSubscriber implements EventSubscriberInterface
+final class MutationTestingResultsLoggerSubscriber implements EventSubscriber
 {
-    private $filesystem;
-    private $tmpDir;
+    private $loggers;
 
-    public function __construct(Filesystem $filesystem, string $tmpDir)
+    /**
+     * @param MutationTestingResultsLogger[] $loggers
+     */
+    public function __construct(array $loggers)
     {
-        $this->filesystem = $filesystem;
-        $this->tmpDir = $tmpDir;
+        Assert::allIsInstanceOf($loggers, MutationTestingResultsLogger::class);
+
+        $this->loggers = $loggers;
     }
 
     public function getSubscribedEvents(): array
@@ -62,6 +66,8 @@ final class CleanUpAfterMutationTestingFinishedSubscriber implements EventSubscr
 
     public function onMutationTestingFinished(MutationTestingFinished $event): void
     {
-        $this->filesystem->remove($this->tmpDir);
+        foreach ($this->loggers as $logger) {
+            $logger->log();
+        }
     }
 }

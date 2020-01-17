@@ -35,51 +35,35 @@ declare(strict_types=1);
 
 namespace Infection\Event\Listener;
 
-use Infection\Event\EventDispatcher\EventSubscriberInterface;
-use Infection\Event\MutantCreated;
-use Infection\Event\MutantsCreatingFinished;
-use Infection\Event\MutantsCreatingStarted;
-use Symfony\Component\Console\Helper\ProgressBar;
+use Infection\Event\MutationGeneratingStarted;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class MutantCreatingConsoleLoggerSubscriber implements EventSubscriberInterface
+final class CiMutationGeneratingConsoleLoggerSubscriber implements EventSubscriber
 {
     private $output;
-    private $progressBar;
 
     public function __construct(OutputInterface $output)
     {
         $this->output = $output;
-
-        $this->progressBar = new ProgressBar($this->output);
-        $this->progressBar->setFormat('Creating mutated files and processes: %current%/%max%');
     }
 
     public function getSubscribedEvents(): array
     {
         return [
-            MutantsCreatingStarted::class => [$this, 'onMutantsCreatingStarted'],
-            MutantCreated::class => [$this, 'onMutantCreated'],
-            MutantsCreatingFinished::class => [$this, 'onMutantsCreatingFinished'],
+            MutationGeneratingStarted::class => [$this, 'onMutationGeneratingStarted'],
         ];
     }
 
-    public function onMutantsCreatingStarted(MutantsCreatingStarted $event): void
+    public function onMutationGeneratingStarted(MutationGeneratingStarted $event): void
     {
-        $this->output->writeln(['']);
-        $this->progressBar->start($event->getMutantCount());
-    }
-
-    public function onMutantCreated(MutantCreated $event): void
-    {
-        $this->progressBar->advance();
-    }
-
-    public function onMutantsCreatingFinished(MutantsCreatingFinished $event): void
-    {
-        $this->progressBar->finish();
+        $this->output->writeln([
+            '',
+            'Generate mutants...',
+            '',
+            sprintf('Processing source code files: %s', $event->getMutableFilesCount()),
+        ]);
     }
 }

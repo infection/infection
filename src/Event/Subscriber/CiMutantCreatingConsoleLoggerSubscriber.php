@@ -35,50 +35,34 @@ declare(strict_types=1);
 
 namespace Infection\Event\Listener;
 
-use Infection\Event\EventDispatcher\EventSubscriberInterface;
-use Infection\Event\InitialTestSuiteStarted;
-use Infection\TestFramework\TestFrameworkAdapter;
-use InvalidArgumentException;
+use Infection\Event\EventDispatcher\EventSubscriber;
+use Infection\Event\MutantsCreatingStarted;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class CiInitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
+final class CiMutantCreatingConsoleLoggerSubscriber implements EventSubscriber
 {
     private $output;
-    private $testFrameworkAdapter;
 
-    public function __construct(OutputInterface $output, TestFrameworkAdapter $testFrameworkAdapter)
+    public function __construct(OutputInterface $output)
     {
         $this->output = $output;
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
 
     public function getSubscribedEvents(): array
     {
         return [
-            InitialTestSuiteStarted::class => [$this, 'onInitialTestSuiteStarted'],
+            MutantsCreatingStarted::class => [$this, 'onMutantsCreatingStarted'],
         ];
     }
 
-    public function onInitialTestSuiteStarted(InitialTestSuiteStarted $event): void
+    public function onMutantsCreatingStarted(MutantsCreatingStarted $event): void
     {
-        try {
-            $version = $this->testFrameworkAdapter->getVersion();
-        } catch (InvalidArgumentException $e) {
-            $version = 'unknown';
-        }
-
         $this->output->writeln([
             '',
-            'Running initial test suite...',
-            '',
-            sprintf(
-                '%s version: %s',
-                $this->testFrameworkAdapter->getName(),
-                $version
-            ),
+            sprintf('Creating mutated files and processes: %s', $event->getMutantCount()),
         ]);
     }
 }

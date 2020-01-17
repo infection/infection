@@ -35,36 +35,77 @@ declare(strict_types=1);
 
 namespace Infection\Event\Listener;
 
-use Infection\Event\EventDispatcher\EventSubscriberInterface;
-use Infection\Event\MutationGeneratingStarted;
+use Infection\Event\EventDispatcher\EventSubscriber;
+use Infection\Event\InitialTestCaseCompleted;
+use Infection\Event\InitialTestSuiteFinished;
+use Infection\Event\InitialTestSuiteStarted;
+use Infection\TestFramework\TestFrameworkAdapter;
+use InvalidArgumentException;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class CiMutationGeneratingConsoleLoggerSubscriber implements EventSubscriberInterface
+final class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
 {
     private $output;
+    private $progressBar;
+    private $testFrameworkAdapter;
+    private $debug;
 
-    public function __construct(OutputInterface $output)
+    public function __construct(OutputInterface $output, TestFrameworkAdapter $testFrameworkAdapter, bool $debug)
     {
         $this->output = $output;
+        $this->testFrameworkAdapter = $testFrameworkAdapter;
+        $this->debug = $debug;
+
+        $this->progressBar = new ProgressBar($this->output);
+        $this->progressBar->setFormat('verbose');
     }
 
     public function getSubscribedEvents(): array
     {
         return [
-            MutationGeneratingStarted::class => [$this, 'onMutationGeneratingStarted'],
+            InitialTestSuiteStarted::class => [$this, 'onInitialTestSuiteStarted'],
+            InitialTestSuiteFinished::class => [$this, 'onInitialTestSuiteFinished'],
+            InitialTestCaseCompleted::class => [$this, 'onInitialTestCaseCompleted'],
         ];
     }
 
-    public function onMutationGeneratingStarted(MutationGeneratingStarted $event): void
+    public function onInitialTestSuiteStarted(InitialTestSuiteStarted $event): void
     {
+        try {
+            $version = $this->testFrameworkAdapter->getVersion();
+        } catch (InvalidArgumentException $e) {
+            $version = 'unknown';
+        }
+
         $this->output->writeln([
             '',
-            'Generate mutants...',
+            'Running initial test suite...',
             '',
-            sprintf('Processing source code files: %s', $event->getMutableFilesCount()),
+            sprintf(
+                '%s version: %s',
+                $this->testFrameworkAdapter->getName(),
+                $version
+            ),
+            '',
         ]);
+        $this->progressBar->start();
+    }
+
+    public function onInitialTestSuiteFinished(InitialTestSuiteFinished $event): void
+    {
+        $this->progressBar->finish();
+
+        if ($this->debug) {
+            $this->output->writeln(PHP_EOL . $event->getOutputText());
+        }
+    }
+
+    public function onInitialTestCaseCompleted(InitialTestCaseCompleted $event): void
+    {
+        $this->progressBar->advance();
     }
 }

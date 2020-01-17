@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures\Event;
 
-use Infection\Event\EventDispatcher\EventSubscriberInterface;
+use Infection\Event\EventDispatcher\EventSubscriber;
 use LogicException;
 
-final class UnknownEventSubscriber implements EventSubscriberInterface
+final class UnknownEventSubscriber implements EventSubscriber
 {
     public function getSubscribedEvents(): array
     {

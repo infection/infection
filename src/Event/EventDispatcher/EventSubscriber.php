@@ -38,7 +38,7 @@ namespace Infection\Event\EventDispatcher;
 /**
  * @internal
  */
-interface EventSubscriberInterface
+interface EventSubscriber
 {
     /**
      * @return array<string, callable>

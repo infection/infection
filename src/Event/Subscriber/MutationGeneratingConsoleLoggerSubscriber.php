@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Listener;
 
-use Infection\Event\EventDispatcher\EventSubscriberInterface;
+use Infection\Event\EventDispatcher\EventSubscriber;
 use Infection\Event\MutableFileProcessed;
 use Infection\Event\MutationGeneratingFinished;
 use Infection\Event\MutationGeneratingStarted;
@@ -45,7 +45,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final class MutationGeneratingConsoleLoggerSubscriber implements EventSubscriberInterface
+final class MutationGeneratingConsoleLoggerSubscriber implements EventSubscriber
 {
     private $output;
     private $progressBar;
