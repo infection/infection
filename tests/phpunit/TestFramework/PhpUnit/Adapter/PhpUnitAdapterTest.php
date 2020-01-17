@@ -57,14 +57,13 @@ final class PhpUnitAdapterTest extends TestCase
         $initialConfigBuilder = $this->createMock(InitialConfigBuilder::class);
         $mutationConfigBuilder = $this->createMock(MutationConfigBuilder::class);
         $cliArgumentsBuilder = $this->createMock(CommandLineArgumentsAndOptionsBuilder::class);
-        $versionParser = $this->createMock(VersionParser::class);
 
         $this->adapter = new PhpUnitAdapter(
             '/path/to/phpunit',
             $initialConfigBuilder,
             $mutationConfigBuilder,
             $cliArgumentsBuilder,
-            $versionParser,
+            new VersionParser(),
             new CommandLineBuilder()
         );
     }
