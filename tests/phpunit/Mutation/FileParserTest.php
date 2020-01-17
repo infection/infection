@@ -146,13 +146,11 @@ AST
                 '/unknown',
                 <<<'PHP'
 <?php
+
 PHP
             ),
             <<<'AST'
 array(
-    0: Stmt_InlineHTML(
-        value: <?php
-    )
 )
 AST
         ];
