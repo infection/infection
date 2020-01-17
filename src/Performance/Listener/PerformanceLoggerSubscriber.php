@@ -39,8 +39,8 @@ use Infection\Event\ApplicationExecutionFinished;
 use Infection\Event\ApplicationExecutionStarted;
 use Infection\Event\EventDispatcher\EventSubscriberInterface;
 use Infection\Performance\Memory\MemoryFormatter;
+use Infection\Performance\Time\Stopwatch;
 use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -54,7 +54,7 @@ final class PerformanceLoggerSubscriber implements EventSubscriberInterface
     private $memoryFormatter;
 
     public function __construct(
-        Timer $timer,
+        Stopwatch $timer,
         TimeFormatter $timeFormatter,
         MemoryFormatter $memoryFormatter,
         OutputInterface $output
