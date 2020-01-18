@@ -45,6 +45,7 @@ use Infection\Mutation\Mutation;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutation\PrioritizedVisitorsNodeTraverser;
 use Infection\Mutator\Arithmetic\Plus;
+use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
@@ -98,7 +99,7 @@ final class FileMutationGeneratorTest extends TestCase
             new SplFileInfo(self::FIXTURES_DIR . '/Mutation/OneFile/OneFile.php', '', ''),
             false,
             $codeCoverageMock,
-            [new IgnoreMutator(new MutatorConfig([]), new Plus())],
+            [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
             []
         );
 
@@ -173,7 +174,7 @@ final class FileMutationGeneratorTest extends TestCase
             $fileInfo,
             $onlyCovered,
             $codeCoverage,
-            [new IgnoreMutator(new MutatorConfig([]), new Plus())],
+            [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
             $extraVisitors
         );
 
@@ -244,7 +245,7 @@ final class FileMutationGeneratorTest extends TestCase
                 $fileInfo,
                 false,
                 $this->createMock(LineCodeCoverage::class),
-                [new IgnoreMutator(new MutatorConfig([]), new Plus())],
+                [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
                 $extraVisitors
             );
 

@@ -47,6 +47,7 @@ use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
+use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
@@ -464,10 +465,8 @@ final class ConfigurationFactoryTest extends TestCase
             '',
             [
                 'MethodCallRemoval' => new IgnoreMutator(
-                    new MutatorConfig([
-                        'ignore' => [
-                            'Infection\Finder\SourceFilesFinder::__construct::63',
-                        ],
+                    new IgnoreConfig([
+                        'Infection\Finder\SourceFilesFinder::__construct::63',
                     ]),
                     new MethodCallRemoval()
                 ),
@@ -488,8 +487,14 @@ final class ConfigurationFactoryTest extends TestCase
                 $config = new MutatorConfig([]);
 
                 return [
-                    'AssignmentEqual' => new IgnoreMutator($config, new AssignmentEqual()),
-                    'EqualIdentical' => new IgnoreMutator($config, new EqualIdentical()),
+                    'AssignmentEqual' => new IgnoreMutator(
+                        new IgnoreConfig([]),
+                        new AssignmentEqual(new MutatorConfig([]))
+                    ),
+                    'EqualIdentical' => new IgnoreMutator(
+                        new IgnoreConfig([]),
+                        new EqualIdentical(new MutatorConfig([]))
+                    ),
                 ];
             })()
         );
@@ -620,10 +625,11 @@ final class ConfigurationFactoryTest extends TestCase
                 'config/phpunit'
             ),
             (static function (): array {
-                $config = new MutatorConfig([]);
-
                 return [
-                    'TrueValue' => new IgnoreMutator($config, new TrueValue($config)),
+                    'TrueValue' => new IgnoreMutator(
+                        new IgnoreConfig([]),
+                        new TrueValue(new MutatorConfig([]))
+                    ),
                 ];
             })(),
             'phpspec',

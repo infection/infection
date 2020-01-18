@@ -41,8 +41,9 @@ use function in_array;
 
 /**
  * @internal
+ * @final
  */
-final class IgnoreConfig
+class IgnoreConfig
 {
     private $ignored;
 

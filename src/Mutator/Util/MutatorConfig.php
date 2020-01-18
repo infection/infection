@@ -44,11 +44,6 @@ class MutatorConfig
     /**
      * @var array
      */
-    private $ignoreConfig;
-
-    /**
-     * @var array
-     */
     private $mutatorSettings;
 
     public function __construct(array $config)
