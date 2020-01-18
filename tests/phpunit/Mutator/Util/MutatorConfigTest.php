@@ -45,7 +45,7 @@ final class MutatorConfigTest extends TestCase
     {
         $settings = new stdClass();
         $settings->foo = 'bar';
-        $config = new MutatorConfig(['settings' => $settings]);
+        $config = new MutatorConfig($settings);
         $this->assertSame(['foo' => 'bar'], $config->getMutatorSettings());
     }
 

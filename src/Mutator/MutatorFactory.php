@@ -174,7 +174,9 @@ final class MutatorFactory
         foreach ($mutatorNames as $mutatorClass => $settings) {
             // TODO: only pass the mutator config if necessary
             /** @var Mutator $mutator */
-            $mutator = new $mutatorClass(new MutatorConfig($settings));
+            $mutator = new $mutatorClass(
+                new MutatorConfig($settings['settings'] ?? [])
+            );
 
             $mutators[$mutator->getName()] = new IgnoreMutator(
                 new IgnoreConfig($settings['ignore'] ?? []),

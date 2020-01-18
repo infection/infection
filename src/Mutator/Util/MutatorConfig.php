@@ -46,9 +46,9 @@ class MutatorConfig
      */
     private $mutatorSettings;
 
-    public function __construct(array $config)
+    public function __construct(array $settings)
     {
-        $this->mutatorSettings = (array) ($config['settings'] ?? []);
+        $this->mutatorSettings = $settings;
     }
 
     public function getMutatorSettings(): array
