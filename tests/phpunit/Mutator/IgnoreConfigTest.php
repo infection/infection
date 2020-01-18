@@ -39,6 +39,9 @@ use Generator;
 use Infection\Mutator\IgnoreConfig;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group integration This is probably a false-positive of the IO checker regarding `fnmatch()`
+ */
 final class IgnoreConfigTest extends TestCase
 {
     /**

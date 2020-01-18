@@ -41,9 +41,6 @@ namespace Infection\Mutator\Util;
  */
 class MutatorConfig
 {
-    /**
-     * @var array
-     */
     private $mutatorSettings;
 
     public function __construct(array $settings)

@@ -489,11 +489,11 @@ final class ConfigurationFactoryTest extends TestCase
                 return [
                     'AssignmentEqual' => new IgnoreMutator(
                         new IgnoreConfig([]),
-                        new AssignmentEqual(new MutatorConfig([]))
+                        new AssignmentEqual()
                     ),
                     'EqualIdentical' => new IgnoreMutator(
                         new IgnoreConfig([]),
-                        new EqualIdentical(new MutatorConfig([]))
+                        new EqualIdentical()
                     ),
                 ];
             })()
