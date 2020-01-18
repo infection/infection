@@ -33,25 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\Util;
+namespace Infection\Mutator;
 
-use Infection\Mutator\Util\MutatorConfig;
-use PHPUnit\Framework\TestCase;
-use stdClass;
+use const FNM_NOESCAPE;
+use function fnmatch;
+use function in_array;
 
-final class MutatorConfigTest extends TestCase
+/**
+ * @internal
+ */
+final class IgnoreConfig
 {
-    public function test_it_correctly_converts_settings(): void
+    private $ignored;
+
+    /**
+     * @param string[] $ignored
+     */
+    public function __construct(array $ignored)
     {
-        $settings = new stdClass();
-        $settings->foo = 'bar';
-        $config = new MutatorConfig(['settings' => $settings]);
-        $this->assertSame(['foo' => 'bar'], $config->getMutatorSettings());
+        $this->ignored = $ignored;
     }
 
-    public function test_it_can_deal_with_empty_settings(): void
+    public function isIgnored(string $class, string $method, ?int $lineNumber): bool
     {
-        $config = new MutatorConfig([]);
-        $this->assertSame([], $config->getMutatorSettings());
+        if (in_array($class, $this->ignored, true)) {
+            return true;
+        }
+
+        $classMethod = $class . '::' . $method;
+
+        if (in_array($classMethod, $this->ignored, true)) {
+            return true;
+        }
+
+        foreach ($this->ignored as $ignorePattern) {
+            if (fnmatch($ignorePattern, $class, FNM_NOESCAPE)
+                || fnmatch($ignorePattern, $classMethod, FNM_NOESCAPE)
+                || ($lineNumber !== null && fnmatch($ignorePattern, $classMethod . '::' . $lineNumber, FNM_NOESCAPE))
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

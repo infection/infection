@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
-use function in_array;
-
 /**
  * @internal
  * @final
@@ -55,30 +53,7 @@ class MutatorConfig
 
     public function __construct(array $config)
     {
-        $this->ignoreConfig = $config['ignore'] ?? [];
         $this->mutatorSettings = (array) ($config['settings'] ?? []);
-    }
-
-    public function isIgnored(string $class, string $method, ?int $lineNumber = null): bool
-    {
-        if (in_array($class, $this->ignoreConfig)) {
-            return true;
-        }
-
-        if (in_array($class . '::' . $method, $this->ignoreConfig)) {
-            return true;
-        }
-
-        foreach ($this->ignoreConfig as $ignorePattern) {
-            if (fnmatch($ignorePattern, $class, FNM_NOESCAPE)
-                || fnmatch($ignorePattern, $class . '::' . $method, FNM_NOESCAPE)
-                || ($lineNumber !== null && fnmatch($ignorePattern, $class . '::' . $method . '::' . $lineNumber, FNM_NOESCAPE))
-            ) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public function getMutatorSettings(): array
