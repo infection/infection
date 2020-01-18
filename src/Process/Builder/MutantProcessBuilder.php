@@ -70,7 +70,7 @@ final class MutantProcessBuilder
             )
         );
 
-        $process->setTimeout($this->timeout);
+        $process->setTimeout((float) $this->timeout);
 
         $symfonyProcessVersion = $this->versionParser->parse(Versions::getVersion('symfony/process'));
 
