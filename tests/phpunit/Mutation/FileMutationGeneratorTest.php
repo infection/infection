@@ -47,7 +47,6 @@ use Infection\Mutation\PrioritizedVisitorsNodeTraverser;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
-use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
@@ -210,7 +209,7 @@ final class FileMutationGeneratorTest extends TestCase
                 $expectedFilePath,
                 false
             ),
-            [new IgnoreMutator(new MutatorConfig([]), new Plus())],
+            [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
             []
         );
 

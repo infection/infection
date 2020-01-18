@@ -190,7 +190,7 @@ final class BCMathTest extends AbstractMutatorTestCase
         yield "It does not convert $bcFunc when disabled" => [
             "<?php $bcFunc($validArgumentsExpression);",
             null,
-            ['settings' => [$bcFunc => false]],
+            [$bcFunc => false],
         ];
     }
 
