@@ -35,23 +35,27 @@ declare(strict_types=1);
 
 namespace Infection\Utils;
 
-use InvalidArgumentException;
+use function Safe\preg_match;
+use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-class VersionParser
+final class VersionParser
 {
-    private const VERSION_REGEX = '/(?<version>[0-9]+\.[0-9]+\.?[0-9]*)(?<prerelease>-[0-9a-zA-Z.]+)?(?<build>\+[0-9a-zA-Z.]+)?/';
+    private const VERSION_REGEX = '/(?<version>\d+\.\d+\.?\d*)(?<prerelease>-[0-9a-zA-Z.]+)?(?<build>\+[0-9a-zA-Z.]+)?/';
 
     public function parse(string $content): string
     {
         $matches = [];
         $matched = preg_match(self::VERSION_REGEX, $content, $matches);
 
-        if (!$matched) {
-            throw new InvalidArgumentException('Parameter does not contain a valid SemVer (sub)string.');
-        }
+        Assert::notSame(
+            $matched,
+            0,
+            sprintf('Expected "%s" to be contain a valid SemVer (sub)string value.', $content)
+        );
 
         return $matches[0];
     }

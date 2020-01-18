@@ -353,12 +353,10 @@ final class CodeceptionAdapterTest extends FileSystemTestCase
 
     private function createAdapter(?array $config = null): CodeceptionAdapter
     {
-        $versionParser = $this->createMock(VersionParser::class);
-
         return new CodeceptionAdapter(
             '/path/to/codeception',
             new CommandLineBuilder(),
-            $versionParser,
+            new VersionParser(),
             new JUnitTestCaseSorter(),
             new Filesystem(),
             'path/to/junit',

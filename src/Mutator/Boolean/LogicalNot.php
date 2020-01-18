@@ -37,15 +37,18 @@ namespace Infection\Mutator\Boolean;
 
 use Generator;
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class LogicalNot extends Mutator
+final class LogicalNot implements Mutator
 {
+    use GetMutatorName;
+
     public static function getDefinition(): ?Definition
     {
         return new Definition(
@@ -65,7 +68,7 @@ final class LogicalNot extends Mutator
         yield $node->expr;
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!($node instanceof Node\Expr\BooleanNot)) {
             return false;

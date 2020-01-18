@@ -36,14 +36,23 @@ declare(strict_types=1);
 namespace Infection\Mutator\Regex;
 
 use Generator;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class PregQuote extends Mutator
+final class PregQuote implements Mutator
 {
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
+    {
+        return null;
+    }
+
     /**
      * Replaces "$a = preg_quote($b);" with "$a = $b;"
      *
@@ -56,7 +65,7 @@ final class PregQuote extends Mutator
         yield $node->args[0];
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\FuncCall &&
             $node->name instanceof Node\Name &&

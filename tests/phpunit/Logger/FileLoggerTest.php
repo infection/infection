@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use Infection\Logger\SummaryFileLogger;
+use Infection\Logger\FileLogger;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use const PHP_EOL;
@@ -48,7 +48,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * @group integration Requires some I/O operations
  */
-final class SummaryFileLoggerTest extends FileSystemTestCase
+final class FileLoggerTest extends FileSystemTestCase
 {
     private const LOG_FILE_PATH = '/path/to/text.log';
 
@@ -71,12 +71,8 @@ final class SummaryFileLoggerTest extends FileSystemTestCase
     public function test_it_logs_the_correct_lines_with_no_mutations(): void
     {
         $expectedContent = <<<'TXT'
-Total: 0
-Killed: 0
-Errored: 0
-Escaped: 0
-Timed Out: 0
-Not Covered: 0
+foo
+bar
 TXT;
 
         $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
@@ -87,7 +83,8 @@ TXT;
             ->with(self::LOG_FILE_PATH, $expectedContent)
         ;
 
-        $debugFileLogger = new SummaryFileLogger(
+        $debugFileLogger = new DummyFileLogger(
+            ['foo', 'bar'],
             $this->outputMock,
             self::LOG_FILE_PATH,
             new MetricsCalculator(),
@@ -99,67 +96,21 @@ TXT;
         $debugFileLogger->log();
     }
 
-    public function test_it_logs_the_correct_lines_with_mutations(): void
+    public function test_it_can_log_on_valid_streams(): void
     {
-        $calculatorMock = $this->createMock(MetricsCalculator::class);
-        $calculatorMock
-            ->expects($this->once())
-            ->method('getTotalMutantsCount')
-            ->willReturn(6)
-        ;
-        $calculatorMock
-            ->expects($this->once())
-            ->method('getKilledCount')
-            ->willReturn(8)
-        ;
-        $calculatorMock
-            ->expects($this->once())
-            ->method('getErrorCount')
-            ->willReturn(7)
-        ;
-        $calculatorMock
-            ->expects($this->once())
-            ->method('getEscapedCount')
-            ->willReturn(30216)
-        ;
-        $calculatorMock
-            ->expects($this->once())
-            ->method('getTimedOutCount')
-            ->willReturn(2)
-        ;
-        $calculatorMock
-            ->expects($this->once())
-            ->method('getNotCoveredByTestsCount')
-            ->willReturn(0)
-        ;
-
-        $expectedContent = <<<'TXT'
-Total: 6
-Killed: 8
-Errored: 7
-Escaped: 30216
-Timed Out: 2
-Not Covered: 0
-TXT;
-
-        $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
-
-        $this->fileSystemMock
-            ->expects($this->once())
-            ->method('dumpFile')
-            ->with(self::LOG_FILE_PATH, $expectedContent)
-        ;
-
-        $debugFileLogger = new SummaryFileLogger(
+        $debugFileLogger = new DummyFileLogger(
+            [],
             $this->outputMock,
-            self::LOG_FILE_PATH,
-            $calculatorMock,
+            'php://stdout',
+            new MetricsCalculator(),
             $this->fileSystemMock,
             false,
             false
         );
 
         $debugFileLogger->log();
+
+        $this->addToAssertionCount(1);
     }
 
     public function test_it_cannot_log_on_invalid_streams(): void
@@ -170,7 +121,8 @@ TXT;
             ->with('<error>The only streams supported are php://stdout and php://stderr</error>')
         ;
 
-        $debugFileLogger = new SummaryFileLogger(
+        $debugFileLogger = new DummyFileLogger(
+            ['foo', 'bar'],
             $this->outputMock,
             'php://memory',
             new MetricsCalculator(),
@@ -196,7 +148,8 @@ TXT;
             ->with('<error>Cannot write in directory X</error>')
         ;
 
-        $debugFileLogger = new SummaryFileLogger(
+        $debugFileLogger = new DummyFileLogger(
+            [],
             $this->outputMock,
             self::LOG_FILE_PATH,
             new MetricsCalculator(),
@@ -206,5 +159,41 @@ TXT;
         );
 
         $debugFileLogger->log();
+    }
+}
+
+final class DummyFileLogger extends FileLogger
+{
+    private $logLines;
+
+    /**
+     * @param string[] $logLines
+     */
+    public function __construct(
+        array $logLines,
+        OutputInterface $output,
+        string $logFilePath,
+        MetricsCalculator $metricsCalculator,
+        Filesystem $fileSystem,
+        bool $isDebugVerbosity,
+        bool $isDebugMode,
+        bool $isOnlyCoveredMode = false
+    ) {
+        parent::__construct(
+            $output,
+            $logFilePath,
+            $metricsCalculator,
+            $fileSystem,
+            $isDebugVerbosity,
+            $isDebugMode,
+            $isOnlyCoveredMode
+        );
+
+        $this->logLines = $logLines;
+    }
+
+    protected function getLogLines(): array
+    {
+        return $this->logLines;
     }
 }

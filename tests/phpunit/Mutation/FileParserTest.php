@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use Generator;
-use Infection\Console\InfectionContainer;
+use Infection\Container;
 use Infection\Mutation\FileParser;
 use Infection\Mutation\UnparsableFile;
 use Infection\Tests\StringNormalizer;
@@ -78,10 +78,7 @@ final class FileParserTest extends TestCase
      */
     public function test_it_can_parse_a_file(SplFileInfo $fileInfo, string $expectedPrintedParsedContents): void
     {
-        /** @var FileParser $parser */
-        $parser = InfectionContainer::create()[FileParser::class];
-
-        $statements = $parser->parse($fileInfo);
+        $statements = Container::create()->getFileParser()->parse($fileInfo);
 
         foreach ($statements as $statement) {
             $this->assertInstanceOf(Node::class, $statement);
@@ -97,8 +94,7 @@ final class FileParserTest extends TestCase
 
     public function test_it_throws_upon_failure(): void
     {
-        /** @var FileParser $parser */
-        $parser = InfectionContainer::create()[FileParser::class];
+        $parser = Container::create()->getFileParser();
 
         try {
             $parser->parse(self::createFileInfo('/unknown', '<?php use foo as self;'));
@@ -150,13 +146,11 @@ AST
                 '/unknown',
                 <<<'PHP'
 <?php
+
 PHP
             ),
             <<<'AST'
 array(
-    0: Stmt_InlineHTML(
-        value: <?php
-    )
 )
 AST
         ];

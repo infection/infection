@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Utils;
 
+use Generator;
 use Infection\Utils\VersionParser;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -63,22 +64,52 @@ final class VersionParserTest extends TestCase
 
     public function test_it_throws_exception_when_content_has_no_version_substring(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        try {
+            $this->versionParser->parse('abc');
 
-        $this->versionParser->parse('abc');
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Expected "abc" to be contain a valid SemVer (sub)string value.',
+                $exception->getMessage()
+            );
+        }
     }
 
-    public function versionProvider()
+    public function versionProvider(): Generator
     {
-        return [
-            ['Codeception 3.1.0', '3.1.0'],
-            ['phpspec version 1.2.3', '1.2.3'],
-            ['PHPUnit 1.2.3 by Sebastian Bergmann and contributors.', '1.2.3'],
-            ['1.2.3', '1.2.3'],
-            ['10.20.13', '10.20.13'],
-            ['a 1.2.3-patch b', '1.2.3-patch'],
-            ['v1.2.3', '1.2.3'],
-            ['6.5-abcde', '6.5-abcde'],
-        ];
+        yield 'nominal stable' => ['7.0.2', '7.0.2'];
+
+        yield 'nominal development' => ['0.2.8', '0.2.8'];
+
+        yield 'stable variant' => ['v7.0.2', '7.0.2'];
+
+        yield 'development variant' => ['v0.2.8', '0.2.8'];
+
+        yield 'patch' => ['7.0.2-patch', '7.0.2-patch'];
+
+        yield 'versioned patch' => ['7.0.2-patch.0', '7.0.2-patch.0'];
+
+        yield 'RC' => ['7.0.2-rc', '7.0.2-rc'];
+
+        yield 'uppercase RC' => ['7.0.2-RC', '7.0.2-RC'];
+
+        yield 'versioned RC' => ['7.0.2-rc.0', '7.0.2-rc.0'];
+
+        yield 'with spaces' => [' 7.0.2 ', '7.0.2'];
+
+        yield 'nonsense suffix 0' => ['7.0.2foo', '7.0.2'];
+
+        yield 'nonsense suffix 1' => ['7.0.2-foo', '7.0.2-foo'];
+
+        yield 'Hoa' => ['3.17.05.02', '3.17.05'];
+
+        yield 'Codeception' => ['Codeception 3.1.0', '3.1.0'];
+
+        yield 'phpspec stable' => ['phpspec version 1.2.3', '1.2.3'];
+
+        yield 'phpspec RC' => ['phpspec version 5.0.0-rc1', '5.0.0-rc1'];
+
+        yield 'PHPUnit' => ['PHPUnit 7.5.11 by Sebastian Bergmann and contributors.', '7.5.11'];
     }
 }

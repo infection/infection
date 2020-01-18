@@ -57,7 +57,6 @@ use Infection\Http\BadgeApiClient;
 use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\Mutator\Util\Mutator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
@@ -74,7 +73,6 @@ use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
-use Infection\Utils\VersionParser;
 use function iterator_to_array;
 use ReflectionClass;
 use const SORT_STRING;
@@ -120,14 +118,12 @@ final class ProjectCodeProvider
         PhpSpecMutationConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
         IndexXmlCoverageParser::class,
-        VersionParser::class,
     ];
 
     /**
      * This array contains all classes that can be extended by our users.
      */
     public const EXTENSION_POINTS = [
-        Mutator::class,
         OutputFormatter::class,
         SchemaConfigurationFactory::class,
         SchemaConfigurationFileLoader::class,

@@ -36,14 +36,23 @@ declare(strict_types=1);
 namespace Infection\Mutator\Operator;
 
 use Generator;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Coalesce extends Mutator
+final class Coalesce implements Mutator
 {
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
+    {
+        return null;
+    }
+
     /**
      * Replaces "'someValue' ?? 'otherValue';" with "'otherValue'"
      *
@@ -56,7 +65,7 @@ final class Coalesce extends Mutator
         yield $node->right;
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\Coalesce;
     }
