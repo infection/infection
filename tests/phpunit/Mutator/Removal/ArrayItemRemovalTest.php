@@ -134,7 +134,7 @@ final class ArrayItemRemovalTest extends AbstractMutatorTestCase
         ];
 
         yield 'remove is not valid' => [
-            'remove', 'INVALID', 'INVALID',
+            'remove', 'INVALID', 'invalid',
         ];
 
         yield 'remove is not string' => [

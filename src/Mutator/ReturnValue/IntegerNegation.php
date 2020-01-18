@@ -37,15 +37,18 @@ namespace Infection\Mutator\ReturnValue;
 
 use Generator;
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class IntegerNegation extends Mutator
+final class IntegerNegation implements Mutator
 {
+    use GetMutatorName;
+
     public static function getDefinition(): ?Definition
     {
         return new Definition(
@@ -70,7 +73,7 @@ TXT
         );
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Stmt\Return_) {
             return false;

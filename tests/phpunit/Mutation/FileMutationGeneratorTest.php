@@ -94,13 +94,11 @@ final class FileMutationGeneratorTest extends TestCase
 
         $mutationGenerator = Container::create()->getFileMutationGenerator();
 
-        $mutatorConfig = new MutatorConfig([]);
-
         $mutations = $mutationGenerator->generate(
             new SplFileInfo(self::FIXTURES_DIR . '/Mutation/OneFile/OneFile.php', '', ''),
             false,
             $codeCoverageMock,
-            [new IgnoreMutator($mutatorConfig, new Plus($mutatorConfig))],
+            [new IgnoreMutator(new MutatorConfig([]), new Plus())],
             []
         );
 
@@ -171,13 +169,11 @@ final class FileMutationGeneratorTest extends TestCase
             $this->traverserFactoryMock
         );
 
-        $mutatorConfig = new MutatorConfig([]);
-
         $mutations = $mutationGenerator->generate(
             $fileInfo,
             $onlyCovered,
             $codeCoverage,
-            [new IgnoreMutator($mutatorConfig, new Plus($mutatorConfig))],
+            [new IgnoreMutator(new MutatorConfig([]), new Plus())],
             $extraVisitors
         );
 
@@ -206,8 +202,6 @@ final class FileMutationGeneratorTest extends TestCase
             $this->traverserFactoryMock
         );
 
-        $mutatorConfig = new MutatorConfig([]);
-
         $mutations = $mutationGenerator->generate(
             $fileInfo,
             true,
@@ -215,7 +209,7 @@ final class FileMutationGeneratorTest extends TestCase
                 $expectedFilePath,
                 false
             ),
-            [new IgnoreMutator($mutatorConfig, new Plus($mutatorConfig))],
+            [new IgnoreMutator(new MutatorConfig([]), new Plus())],
             []
         );
 
@@ -245,14 +239,12 @@ final class FileMutationGeneratorTest extends TestCase
             $traverserFactoryMock
         );
 
-        $mutatorConfig = new MutatorConfig([]);
-
         try {
             $mutationGenerator->generate(
                 $fileInfo,
                 false,
                 $this->createMock(LineCodeCoverage::class),
-                [new IgnoreMutator($mutatorConfig, new Plus($mutatorConfig))],
+                [new IgnoreMutator(new MutatorConfig([]), new Plus())],
                 $extraVisitors
             );
 

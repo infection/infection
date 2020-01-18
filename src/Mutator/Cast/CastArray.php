@@ -53,7 +53,7 @@ final class CastArray extends AbstractCastMutator
         );
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\Cast\Array_;
     }

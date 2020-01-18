@@ -57,7 +57,6 @@ use Infection\Http\BadgeApiClient;
 use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\Mutator\Util\Mutator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
 use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
@@ -127,7 +126,6 @@ final class ProjectCodeProvider
      * This array contains all classes that can be extended by our users.
      */
     public const EXTENSION_POINTS = [
-        Mutator::class,
         OutputFormatter::class,
         SchemaConfigurationFactory::class,
         SchemaConfigurationFileLoader::class,

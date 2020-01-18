@@ -38,6 +38,7 @@ namespace Infection\Mutator\Unwrap;
 use function array_slice;
 use function count;
 use Generator;
+use Infection\Mutator\Definition;
 use PhpParser\Node;
 
 /**
@@ -45,6 +46,11 @@ use PhpParser\Node;
  */
 final class UnwrapArrayIntersectUassoc extends AbstractUnwrapMutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return null;
+    }
+
     protected function getFunctionName(): string
     {
         return 'array_intersect_uassoc';

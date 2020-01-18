@@ -36,14 +36,17 @@ declare(strict_types=1);
 namespace Infection\Mutator\Cast;
 
 use Generator;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-abstract class AbstractCastMutator extends Mutator
+abstract class AbstractCastMutator implements Mutator
 {
+    use GetMutatorName;
+
     /**
      * @param Node\Expr\Cast $node
      *

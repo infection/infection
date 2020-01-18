@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use Infection\Visitor\ReflectionVisitor;
 use function is_string;
 use PhpParser\Node;
@@ -42,8 +44,10 @@ use PhpParser\Node;
 /**
  * @internal
  */
-abstract class AbstractValueToNullReturnValue extends Mutator
+abstract class AbstractValueToNullReturnValue implements Mutator
 {
+    use GetMutatorName;
+
     protected function isNullReturnValueAllowed(Node $node): bool
     {
         /** @var Node\Stmt\Function_|null $functionScope */

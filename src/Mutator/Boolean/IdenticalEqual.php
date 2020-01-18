@@ -36,7 +36,9 @@ declare(strict_types=1);
 namespace Infection\Mutator\Boolean;
 
 use Generator;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
 /**
@@ -44,8 +46,15 @@ use PhpParser\Node;
  *
  * @deprecated This mutator is a semantic addition
  */
-final class IdenticalEqual extends Mutator
+final class IdenticalEqual implements Mutator
 {
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
+    {
+        return null;
+    }
+
     /**
      * Replaces "===" with "=="
      *
@@ -58,7 +67,7 @@ final class IdenticalEqual extends Mutator
         yield new Node\Expr\BinaryOp\Equal($node->left, $node->right, $node->getAttributes());
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\Identical;
     }

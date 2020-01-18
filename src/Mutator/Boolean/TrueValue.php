@@ -38,20 +38,31 @@ namespace Infection\Mutator\Boolean;
 use function array_key_exists;
 use Generator;
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Util\MutatorConfig;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class TrueValue extends Mutator
+final class TrueValue implements Mutator
 {
+    use GetMutatorName;
+
     private const DEFAULT_SETTINGS = [
         'array_search' => false,
         'in_array' => false,
     ];
+
+    private $settings;
+
+    public function __construct(MutatorConfig $config)
+    {
+        $this->settings = $config->getMutatorSettings();
+    }
 
     public static function getDefinition(): ?Definition
     {
@@ -72,7 +83,7 @@ final class TrueValue extends Mutator
         yield new Node\Expr\ConstFetch(new Node\Name('false'));
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!($node instanceof Node\Expr\ConstFetch)) {
             return false;
@@ -89,7 +100,7 @@ final class TrueValue extends Mutator
             return true;
         }
 
-        $resultSettings = array_merge(self::DEFAULT_SETTINGS, $this->getSettings());
+        $resultSettings = array_merge(self::DEFAULT_SETTINGS, $this->settings);
 
         $functionName = $grandParentNode->name->toLowerString();
 

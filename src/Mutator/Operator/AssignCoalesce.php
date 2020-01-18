@@ -37,15 +37,18 @@ namespace Infection\Mutator\Operator;
 
 use Generator;
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class AssignCoalesce extends Mutator
+final class AssignCoalesce implements Mutator
 {
+    use GetMutatorName;
+
     public static function getDefinition(): ?Definition
     {
         return new Definition(
@@ -68,7 +71,7 @@ TXT
         yield new Node\Expr\Assign($node->var, $node->expr, $node->getAttributes());
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\AssignOp\Coalesce;
     }

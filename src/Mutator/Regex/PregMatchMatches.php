@@ -37,14 +37,23 @@ namespace Infection\Mutator\Regex;
 
 use function count;
 use Generator;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class PregMatchMatches extends Mutator
+final class PregMatchMatches implements Mutator
 {
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
+    {
+        return null;
+    }
+
     /**
      * Replaces "preg_match('/a/', 'b', $foo);" with "(int) $foo = array();"
      *
@@ -57,7 +66,7 @@ final class PregMatchMatches extends Mutator
         yield new Node\Expr\Cast\Int_(new Node\Expr\Assign($node->args[2]->value, new Node\Expr\Array_()));
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Expr\FuncCall) {
             return false;

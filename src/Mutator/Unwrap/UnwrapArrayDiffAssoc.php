@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Unwrap;
 
 use Generator;
+use Infection\Mutator\Definition;
 use PhpParser\Node;
 
 /**
@@ -43,6 +44,11 @@ use PhpParser\Node;
  */
 final class UnwrapArrayDiffAssoc extends AbstractUnwrapMutator
 {
+    public static function getDefinition(): ?Definition
+    {
+        return null;
+    }
+
     protected function getFunctionName(): string
     {
         return 'array_diff_assoc';
