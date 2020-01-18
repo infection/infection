@@ -71,84 +71,127 @@ final class IgnoreConfigTest extends TestCase
 
     public function ignoredValuesProvider(): Generator
     {
-        yield 'full class' => [
-            ['Foo\Bar\Test'],
-            'Foo\Bar\Test',
-            'method',
-            null,
-        ];
+        foreach ([null, 50] as $lineNumber) {
+            $titleSuffix = null === $lineNumber ? '' : ' with line number #' . $lineNumber;
 
-        yield 'full class with method' => [
-            ['Foo\Bar\Test::method'],
-            'Foo\Bar\Test',
-            'method',
-            null,
-        ];
+            yield 'full class' . $titleSuffix => [
+                ['Acme\FooTest'],
+                'Acme\FooTest',
+                'test_it_can_create_instance',
+                $lineNumber,
+            ];
 
-        yield 'pattern of a class' => [
-            ['Foo\*\Test'],
-            'Foo\Bar\Test',
-            'method',
-            null,
-        ];
+            yield 'full class with method' . $titleSuffix => [
+                ['Acme\FooTest::test_it_can_create_instance'],
+                'Acme\FooTest',
+                'test_it_can_create_instance',
+                $lineNumber,
+            ];
 
-        yield 'all classes in the namespace' => [
-            ['Foo\Test\*'],
-            'Foo\Test\Baz',
-            'method',
-            null,
-        ];
+            yield 'pattern of a class' . $titleSuffix => [
+                ['Acme\*\FooTest'],
+                'Acme\Test\FooTest',
+                'test_it_can_create_instance',
+                $lineNumber,
+            ];
 
-        yield 'pattern of a class with method' => [
-            ['Foo\*::method'],
-            'Foo\Bar\Test',
-            'method',
-            null,
-        ];
+            yield 'all classes in the namespace' . $titleSuffix => [
+                ['Acme\Test\*'],
+                'Acme\Test\FooTest',
+                'test_it_can_create_instance',
+                $lineNumber,
+            ];
 
-        yield 'pattern of a method' => [
-            ['Foo\Bar\Test::m?th?d'],
-            'Foo\Bar\Test',
-            'method',
-            null,
-        ];
+            yield 'pattern of a class with method' . $titleSuffix => [
+                ['Acme\Test\*::test_it_can_create_instance'],
+                'Acme\Test\FooTest',
+                'test_it_can_create_instance',
+                $lineNumber,
+            ];
 
-        yield 'specific line number' => [
-            ['Foo\Bar\Test::method::63'],
-            'Foo\Bar\Test',
-            'method',
-            63,
+            yield 'pattern of a method' . $titleSuffix => [
+                ['Acme\Test\FooTest::test_i?_can_create_instanc?'],
+                'Acme\Test\FooTest',
+                'test_it_can_create_instance',
+                $lineNumber,
+            ];
+        }
+
+        yield 'full class with method and line number' => [
+            ['Acme\FooTest::test_it_can_create_instance::50'],
+            'Acme\FooTest',
+            'test_it_can_create_instance',
+            50,
         ];
     }
 
     public function nonIgnoredValuesProvider(): Generator
     {
-        yield 'full class when the methods dont match' => [
-            ['Foo\Bar\Test::otherMethod'],
-            'Foo\Bar\Test',
-            'method',
-            null,
-        ];
+        foreach ([null, 50] as $lineNumber) {
+            $titleSuffix = null === $lineNumber ? '' : ' with line number #' . $lineNumber;
 
-        yield 'class if casing doesnt match' => [
-            ['FoO\BAr\tEst'],
-            'Foo\Bar\Test',
-            'method',
-            null,
-        ];
+            yield 'full class with non-matching class' . $titleSuffix => [
+                ['Acme\FooTest'],
+                'Acme\BarTest',
+                'test_it_can_create_instance',
+                $lineNumber,
+            ];
 
-        yield 'pattern of a class if the method does not match' => [
-            ['Foo\*\Test::other'],
-            'Foo\Bar\Test',
-            'method',
-            null,
-        ];
+            yield 'full class with non-matching case of the class' . $titleSuffix => [
+                ['Acme\FooTest'],
+                'AcmE\FoOTesT',
+                'test_it_can_create_instance',
+                $lineNumber,
+            ];
 
-        yield 'pattern of a class with method if the class doesnt match' => [
-            ['Foo\*::method'],
-            'Bar\Foo\Test',
-            'method',
-            null,
+            yield 'full class with method with non-matching class' . $titleSuffix => [
+                ['Acme\FooTest::test_it_can_create_instance'],
+                'Acme\BarTest',
+                'test_it_can_create_instance',
+                $lineNumber,
+            ];
+
+            yield 'full class with method with non-matching method' . $titleSuffix => [
+                ['Acme\FooTest::test_it_can_create_instance'],
+                'Acme\FooTest',
+                'test_it_is_another_method',
+                $lineNumber,
+            ];
+
+            yield 'full class with method with non-matching case of method' . $titleSuffix => [
+                ['Acme\FooTest::test_it_can_create_instance'],
+                'Acme\FooTest',
+                'test_It_Can_Create_Instance',
+                $lineNumber,
+            ];
+
+            yield 'non-matching pattern of a class' . $titleSuffix => [
+                ['Acme\*\FooTest'],
+                'Acme\FooTest',
+                'test_it_can_create_instance',
+                $lineNumber,
+            ];
+
+            yield 'pattern of a class with non-matching method' . $titleSuffix => [
+                ['Acme\Test\*::test_it_can_create_instance'],
+                'Acme\Test\FooTest',
+                'test_it_is_another_method',
+                $lineNumber,
+            ];
+
+            yield 'non-matching pattern of a method' . $titleSuffix => [
+                ['Acme\Test\FooTest::test_i?_can_create_instanc?'],
+                'Acme\Test\FooTest',
+                'test_it_is_another_method',
+                $lineNumber,
+            ];
+        }
+
+        yield 'full class with method and non-matching line number' => [
+            ['Acme\FooTest::test_it_can_create_instance::50'],
+            'Acme\FooTest',
+            'test_it_can_create_instance',
+            70,
         ];
     }
 }
