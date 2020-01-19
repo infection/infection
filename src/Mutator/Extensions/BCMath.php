@@ -35,18 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Extensions;
 
-use function array_diff_key;
 use function array_fill_keys;
-use function array_filter;
-use Closure;
 use function array_intersect_key;
+use Closure;
 use function count;
 use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\MutatorConfig;
 use PhpParser\Node;
 
 /**

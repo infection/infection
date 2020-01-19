@@ -35,12 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-use Infection\Mutator\Extensions\BCMath;
-use Infection\Mutator\Extensions\BCMathConfig;
 use function array_key_exists;
 use function class_exists;
+use Infection\Mutator\Boolean\TrueValue;
+use Infection\Mutator\Boolean\TrueValueConfig;
+use Infection\Mutator\Extensions\BCMath;
+use Infection\Mutator\Extensions\BCMathConfig;
 use Infection\Mutator\Extensions\MBString;
 use Infection\Mutator\Extensions\MBStringConfig;
+use Infection\Mutator\Removal\ArrayItemRemoval;
+use Infection\Mutator\Removal\ArrayItemRemovalConfig;
 use Infection\Mutator\Util\MutatorConfig;
 use InvalidArgumentException;
 use function sprintf;
@@ -183,20 +187,28 @@ final class MutatorFactory
 
             switch ($mutatorClass) {
                 case BCMath::class:
-                    $config = new BCMathConfig($settings);
+                    $mutator = new BCMath(new BCMathConfig($settings));
                     break;
 
                 case MBString::class:
-                    $config = new MBStringConfig($settings);
+                    $mutator = new MBString(new MBStringConfig($settings));
+
+                    break;
+
+                case TrueValue::class:
+                    $mutator = new TrueValue(new TrueValueConfig($settings));
+
+                    break;
+
+                case ArrayItemRemoval::class:
+                    $mutator = new ArrayItemRemoval(new ArrayItemRemovalConfig($settings));
+
                     break;
 
                 default:
-                    $config = new MutatorConfig($settings);
+                    /** @var Mutator $mutator */
+                    $mutator = new $mutatorClass();
             }
-
-            // TODO: only pass the mutator config if necessary
-            /** @var Mutator $mutator */
-            $mutator = new $mutatorClass($config);
 
             $mutators[$mutator->getName()] = new IgnoreMutator(
                 new IgnoreConfig($ignored),

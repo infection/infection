@@ -35,67 +35,40 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
-use function count;
-use Generator;
-use Infection\Mutator\Definition;
-use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
-use function min;
-use PhpParser\Node;
-use function range;
+use const PHP_INT_MAX;
+use Webmozart\Assert\Assert;
 
-/**
- * @internal
- */
-final class ArrayItemRemoval implements Mutator
+final class ArrayItemRemovalConfig
 {
-    use GetMutatorName;
+    private const REMOVE_VALUES = [
+        'first',
+        'last',
+        'all',
+    ];
 
-    private $config;
-
-    public function __construct(ArrayItemRemovalConfig $config)
-    {
-        $this->config = $config;
-    }
-
-    public static function getDefinition(): ?Definition
-    {
-        return null;
-    }
+    private $remove;
+    private $limit;
 
     /**
-     * @param Node\Expr\Array_  $arrayNode
-     *
-     * @return Generator<Node\Expr\Array_>
+     * @param array<string, bool> $config
      */
-    public function mutate(Node $arrayNode): Generator
+    public function __construct(array $settings)
     {
-        foreach ($this->getItemsIndexes($arrayNode->items) as $indexToRemove) {
-            $newArrayNode = clone $arrayNode;
-            unset($newArrayNode->items[$indexToRemove]);
+        $this->remove = $settings['remove'] ?? 'first';
+        $this->limit = $settings['limit'] ?? PHP_INT_MAX;
 
-            yield $newArrayNode;
-        }
+        Assert::oneOf($this->remove, self::REMOVE_VALUES);
+        Assert::integer($this->limit);
+        Assert::greaterThanEq($this->limit, 1);
     }
 
-    public function canMutate(Node $node): bool
+    public function getRemove(): string
     {
-        return $node instanceof Node\Expr\Array_ && count($node->items);
+        return $this->remove;
     }
 
-    private function getItemsIndexes(array $items): array
+    public function getLimit(): int
     {
-        switch ($this->config->getRemove()) {
-            case 'first':
-                return [0];
-            case 'last':
-                return [count($items) - 1];
-            default:
-                return range(
-                    0,
-                    min(count($items),
-                        $this->config->getLimit()) - 1
-                );
-        }
+        return $this->limit;
     }
 }
