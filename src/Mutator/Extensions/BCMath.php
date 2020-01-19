@@ -36,7 +36,10 @@ declare(strict_types=1);
 namespace Infection\Mutator\Extensions;
 
 use function array_diff_key;
+use function array_fill_keys;
 use function array_filter;
+use Closure;
+use function array_intersect_key;
 use function count;
 use Generator;
 use Infection\Mutator\Definition;
@@ -53,13 +56,14 @@ final class BCMath implements Mutator
 {
     use GetMutatorName;
 
+    /**
+     * @var array<string, Closure>
+     */
     private $converters;
 
-    public function __construct(MutatorConfig $config)
+    public function __construct(BCMathConfig $config)
     {
-        $settings = $config->getMutatorSettings();
-
-        $this->setupConverters($settings);
+        $this->converters = self::createConverters($config->getFunctionsMap());
     }
 
     public static function getDefinition(): ?Definition
@@ -106,46 +110,71 @@ TXT
         return isset($this->converters[$node->name->toLowerString()]);
     }
 
-    private function setupConverters(array $functionsMap): void
+    /**
+     * @return array<string, Closure>
+     */
+    private static function createConverters(array $functionsMap): array
     {
-        $converters = [
-            'bcadd' => $this->makeCheckingMinArgsMapper(2, $this->makeCastToStringMapper(
-                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Plus::class)
-            )),
-            'bcdiv' => $this->makeCheckingMinArgsMapper(2, $this->makeCastToStringMapper(
-                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Div::class)
-            )),
-            'bcmod' => $this->makeCheckingMinArgsMapper(2, $this->makeCastToStringMapper(
-                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Mod::class)
-            )),
-            'bcmul' => $this->makeCheckingMinArgsMapper(2, $this->makeCastToStringMapper(
-                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Mul::class)
-            )),
-            'bcpow' => $this->makeCheckingMinArgsMapper(2, $this->makeCastToStringMapper(
-                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Pow::class)
-            )),
-            'bcsub' => $this->makeCheckingMinArgsMapper(2, $this->makeCastToStringMapper(
-                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Minus::class)
-            )),
-            'bcsqrt' => $this->makeCheckingMinArgsMapper(1, $this->makeCastToStringMapper(
-                $this->makeSquareRootsMapper()
-            )),
-            'bcpowmod' => $this->makeCheckingMinArgsMapper(3, $this->makeCastToStringMapper(
-                $this->makePowerModuloMapper()
-            )),
-            'bccomp' => $this->makeCheckingMinArgsMapper(2,
-                $this->makeBinaryOperatorMapper(Node\Expr\BinaryOp\Spaceship::class)
-            ),
-        ];
-
-        $functionsToRemove = array_filter($functionsMap, static function (bool $isOn): bool {
-            return !$isOn;
-        });
-
-        $this->converters = array_diff_key($converters, $functionsToRemove);
+        return array_intersect_key(
+            [
+                'bcadd' => self::makeCheckingMinArgsMapper(
+                    2,
+                    self::makeCastToStringMapper(
+                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Plus::class)
+                    )
+                ),
+                'bcdiv' => self::makeCheckingMinArgsMapper(
+                    2,
+                    self::makeCastToStringMapper(
+                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Div::class)
+                    )
+                ),
+                'bcmod' => self::makeCheckingMinArgsMapper(
+                    2,
+                    self::makeCastToStringMapper(
+                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Mod::class)
+                    )
+                ),
+                'bcmul' => self::makeCheckingMinArgsMapper(
+                    2,
+                    self::makeCastToStringMapper(
+                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Mul::class)
+                    )
+                ),
+                'bcpow' => self::makeCheckingMinArgsMapper(
+                    2,
+                    self::makeCastToStringMapper(
+                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Pow::class)
+                    )
+                ),
+                'bcsub' => self::makeCheckingMinArgsMapper(
+                    2,
+                    self::makeCastToStringMapper(
+                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Minus::class)
+                    )
+                ),
+                'bcsqrt' => self::makeCheckingMinArgsMapper(
+                    1,
+                    self::makeCastToStringMapper(
+                        self::makeSquareRootsMapper()
+                    )
+                ),
+                'bcpowmod' => self::makeCheckingMinArgsMapper(
+                    3,
+                    self::makeCastToStringMapper(
+                        self::makePowerModuloMapper()
+                    )
+                ),
+                'bccomp' => self::makeCheckingMinArgsMapper(
+                    2,
+                    self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Spaceship::class)
+                ),
+            ],
+            array_fill_keys($functionsMap, null)
+        );
     }
 
-    private function makeCheckingMinArgsMapper(int $minimumArgsCount, callable $converter)
+    private static function makeCheckingMinArgsMapper(int $minimumArgsCount, Closure $converter): Closure
     {
         return static function (Node\Expr\FuncCall $node) use ($minimumArgsCount, $converter): Generator {
             if (count($node->args) >= $minimumArgsCount) {
@@ -154,7 +183,7 @@ TXT
         };
     }
 
-    private function makeCastToStringMapper(callable $converter): callable
+    private static function makeCastToStringMapper(Closure $converter): Closure
     {
         return static function (Node\Expr\FuncCall $node) use ($converter): Generator {
             foreach ($converter($node) as $newNode) {
@@ -163,21 +192,21 @@ TXT
         };
     }
 
-    private function makeBinaryOperatorMapper(string $operator): callable
+    private static function makeBinaryOperatorMapper(string $operator): Closure
     {
         return static function (Node\Expr\FuncCall $node) use ($operator): Generator {
             yield new $operator($node->args[0]->value, $node->args[1]->value);
         };
     }
 
-    private function makeSquareRootsMapper(): callable
+    private static function makeSquareRootsMapper(): Closure
     {
         return static function (Node\Expr\FuncCall $node): Generator {
             yield new Node\Expr\FuncCall(new Node\Name('\sqrt'), [$node->args[0]]);
         };
     }
 
-    private function makePowerModuloMapper(): callable
+    private static function makePowerModuloMapper(): Closure
     {
         return static function (Node\Expr\FuncCall $node): Generator {
             yield new Node\Expr\BinaryOp\Mod(

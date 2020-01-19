@@ -35,8 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use Infection\Mutator\Extensions\BCMath;
+use Infection\Mutator\Extensions\BCMathConfig;
 use function array_key_exists;
 use function class_exists;
+use Infection\Mutator\Extensions\MBString;
+use Infection\Mutator\Extensions\MBStringConfig;
 use Infection\Mutator\Util\MutatorConfig;
 use InvalidArgumentException;
 use function sprintf;
@@ -177,9 +181,22 @@ final class MutatorFactory
             /** @var string[] $ignored */
             $ignored = $config['ignore'] ?? [];
 
+            switch ($mutatorClass) {
+                case BCMath::class:
+                    $config = new BCMathConfig($settings);
+                    break;
+
+                case MBString::class:
+                    $config = new MBStringConfig($settings);
+                    break;
+
+                default:
+                    $config = new MutatorConfig($settings);
+            }
+
             // TODO: only pass the mutator config if necessary
             /** @var Mutator $mutator */
-            $mutator = new $mutatorClass(new MutatorConfig($settings));
+            $mutator = new $mutatorClass($config);
 
             $mutators[$mutator->getName()] = new IgnoreMutator(
                 new IgnoreConfig($ignored),
