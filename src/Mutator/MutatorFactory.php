@@ -45,7 +45,6 @@ use Infection\Mutator\Extensions\MBString;
 use Infection\Mutator\Extensions\MBStringConfig;
 use Infection\Mutator\Removal\ArrayItemRemoval;
 use Infection\Mutator\Removal\ArrayItemRemovalConfig;
-use Infection\Mutator\Util\MutatorConfig;
 use InvalidArgumentException;
 use function sprintf;
 use stdClass;

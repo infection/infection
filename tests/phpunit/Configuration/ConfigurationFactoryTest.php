@@ -47,13 +47,13 @@ use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
+use Infection\Mutator\Boolean\TrueValueConfig;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\Removal\MethodCallRemoval;
-use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
 use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use Infection\TestFramework\TestFrameworkExtraOptions;
@@ -484,8 +484,6 @@ final class ConfigurationFactoryTest extends TestCase
             ],
             'AssignmentEqual,EqualIdentical',
             (static function (): array {
-                $config = new MutatorConfig([]);
-
                 return [
                     'AssignmentEqual' => new IgnoreMutator(
                         new IgnoreConfig([]),
@@ -628,7 +626,7 @@ final class ConfigurationFactoryTest extends TestCase
                 return [
                     'TrueValue' => new IgnoreMutator(
                         new IgnoreConfig([]),
-                        new TrueValue(new MutatorConfig([]))
+                        new TrueValue(new TrueValueConfig([]))
                     ),
                 ];
             })(),

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use Infection\Mutator\MutatorFactory;
 use function array_shift;
 use function count;
 use function escapeshellarg;
@@ -43,7 +44,6 @@ use function get_class;
 use Infection\Container;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\Mutator;
-use Infection\Mutator\Util\MutatorConfig;
 use Infection\Tests\Fixtures\SimpleMutation;
 use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;
 use Infection\Tests\Fixtures\SimpleMutatorVisitor;
@@ -62,11 +62,6 @@ use Webmozart\Assert\Assert;
 abstract class AbstractMutatorTestCase extends TestCase
 {
     /**
-     * @var Mutator
-     */
-    protected $mutator;
-
-    /**
      * @var Parser|null
      */
     private static $parser;
@@ -75,6 +70,16 @@ abstract class AbstractMutatorTestCase extends TestCase
      * @var PrettyPrinterAbstract|null
      */
     private static $printer;
+
+    /**
+     * @var MutatorFactory|null
+     */
+    private static $mutatorFactory;
+
+    /**
+     * @var Mutator
+     */
+    protected $mutator;
 
     protected function setUp(): void
     {
@@ -127,9 +132,13 @@ abstract class AbstractMutatorTestCase extends TestCase
     final protected function createMutator(array $settings = []): Mutator
     {
         $class = get_class($this);
-        $mutator = substr(str_replace('\Tests', '', $class), 0, -4);
+        $mutatorClassName = substr(str_replace('\Tests', '', $class), 0, -4);
+        $mutatorName = MutatorName::getName($mutatorClassName);
 
-        return new $mutator(new MutatorConfig($settings));
+        // TODO: this is a bit ridicule...
+        return $this->getMutatorFactory()->create([
+            $mutatorName => $settings,
+        ])[$mutatorName];
     }
 
     /**
@@ -175,6 +184,15 @@ abstract class AbstractMutatorTestCase extends TestCase
         }
 
         return self::$printer;
+    }
+
+    private static function getMutatorFactory(): MutatorFactory
+    {
+        if (null === self::$mutatorFactory) {
+            self::$mutatorFactory = new MutatorFactory();
+        }
+
+        return self::$mutatorFactory;
     }
 
     /**

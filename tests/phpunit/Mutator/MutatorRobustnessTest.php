@@ -35,18 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use Infection\Mutator\MutatorFactory;
 use function array_values;
 use Generator;
 use Infection\Container;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
-use Infection\Mutator\Util\MutatorConfig;
 use Infection\Tests\Fixtures\NullMutationVisitor;
+use function get_class;
 use function ksort;
 use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
+use function str_replace;
+use function substr;
 use const SORT_STRING;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -91,14 +94,17 @@ final class MutatorRobustnessTest extends TestCase
 
     public function mutatorWithCodeCaseProvider(): Generator
     {
+        $mutatorFactory = new MutatorFactory();
+
         foreach ($this->provideCodeSamples() as [$fileName, $fileContents]) {
             foreach (ProfileList::ALL_MUTATORS as $mutatorClassName) {
                 $title = sprintf('[%s] %s', $mutatorClassName, $fileName);
+                $mutatorName = MutatorName::getName($mutatorClassName);
 
                 yield $title => [
                     $fileName,
                     $fileContents,
-                    new $mutatorClassName(new MutatorConfig([])),
+                    $mutatorFactory->create([$mutatorName => true])[$mutatorName],
                 ];
             }
         }
