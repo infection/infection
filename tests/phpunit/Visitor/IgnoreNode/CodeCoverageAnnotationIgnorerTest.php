@@ -35,14 +35,26 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Visitor\IgnoreNode;
 
-use Infection\Visitor\IgnoreNode\IgnoreCodeCoverageAnnotation;
-use Infection\Visitor\IgnoreNode\IgnoresNode;
+use Generator;
+use Infection\Visitor\IgnoreNode\CodeCoverageAnnotationIgnorer;
+use Infection\Visitor\IgnoreNode\NodeIgnorer;
 
-final class IgnoreCodeCoverageAnnotationTest extends IgnoresNodeTestCase
+final class CodeCoverageAnnotationIgnorerTest extends BaseNodeIgnorerTestCase
 {
-    public function test_it_ignores_annotated_class(): void
+    /**
+     * @dataProvider provideIgnoreCases
+     */
+    public function test_it_ignores_the_right_nodes(string $code, int $count): void
     {
-        $this->parseAndTraverse(<<<'PHP'
+        $spy = $this->createSpy();
+        $this->parseAndTraverse($code, $spy);
+        $this->assertSame($count, $spy->nodeCounter);
+    }
+
+    public function provideIgnoreCases(): Generator
+    {
+        yield 'classes with annotation are ignored' => [
+            <<<'PHP'
 <?php
 
 /**
@@ -56,16 +68,13 @@ class IgnoredClass
     }
 }
 PHP
-        ,
-            $this->createSpy()
-        );
-    }
+            ,
+            0,
+        ];
 
-    public function test_it_ignores_annotated_method(): void
-    {
-        $this->parseAndTraverse(<<<'PHP'
+        yield 'method with annotations are ignored' => [
+            <<<'PHP'
 <?php
-
 
 class IgnoredClass
 {
@@ -76,18 +85,21 @@ class IgnoredClass
     {
         $ignored = true;
     }
+
+    public function bar(): void
+    {
+        $counted = 1;
+    }
+
 }
 PHP
             ,
-            $this->createSpy()
-        );
-    }
+            1,
+        ];
 
-    public function test_it_does_not_ignore_non_annotated_code(): void
-    {
-        $this->parseAndTraverse(<<<'PHP'
+        yield 'methods without comments are not ignored' => [
+            <<<'PHP'
 <?php
-
 
 class IgnoredClass
 {
@@ -98,13 +110,51 @@ class IgnoredClass
 }
 PHP
             ,
-            $spy = $this->createSpy()
-        );
-        $this->assertSame(2, $spy->nodeCounter);
+            2,
+        ];
+
+        yield 'classes without ignore annotation are not ignored' => [
+            <<<'PHP'
+<?php
+
+/**
+ * A comment, but not one that ignores
+ */
+class Foo
+{
+    public function bar($counted)
+    {
+        $counted = 2;
+    }
+}
+PHP
+            ,
+            2,
+        ];
+
+        yield 'methods without ignore annotation are not ignored' => [
+            <<<'PHP'
+<?php
+
+
+class Foo
+{
+    /**
+     * A comment, but not one that ignores
+     */
+    public function bar($counted)
+    {
+        $counted = 2;
+    }
+}
+PHP
+            ,
+            2,
+        ];
     }
 
-    protected function getIgnore(): IgnoresNode
+    protected function getIgnore(): NodeIgnorer
     {
-        return new IgnoreCodeCoverageAnnotation();
+        return new CodeCoverageAnnotationIgnorer();
     }
 }

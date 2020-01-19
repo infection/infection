@@ -33,36 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Visitor\IgnoreNode;
+namespace Infection\Visitor\IgnoreNode;
 
-use Infection\Visitor\IgnoreNode\IgnoreAbstractMethod;
-use Infection\Visitor\IgnoreNode\IgnoresNode;
+use PhpParser\Node;
 
-final class IgnoreAbstractMethodTest extends IgnoresNodeTestCase
+/**
+ * @internal
+ */
+interface NodeIgnorer
 {
-    public function test_it_ignores_abstract_methods(): void
-    {
-        $this->parseAndTraverse(<<<'PHP'
-<?php
-
-abstract class Foo
-{
-    public function bar(string $counted)
-    {
-    }
-    abstract public function shoulbeIgnored($ignored);
-}
-
-PHP
-        ,
-            $spy = $this->createSpy()
-        );
-
-        $this->assertSame(1, $spy->nodeCounter);
-    }
-
-    protected function getIgnore(): IgnoresNode
-    {
-        return new IgnoreAbstractMethod();
-    }
+    public function ignores(Node $node): bool;
 }

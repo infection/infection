@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures\PhpParser;
 
-use Infection\Visitor\IgnoreNode\IgnoresNode;
+use Infection\Visitor\IgnoreNode\NodeIgnorer;
 use PhpParser\Node;
 
-final class FakeIgnores implements IgnoresNode
+final class FakeIgnorer implements NodeIgnorer
 {
     public function ignores(Node $node): bool
     {

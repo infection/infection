@@ -38,7 +38,7 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\IgnoresAdditionalNodes;
-use Infection\Visitor\IgnoreNode\IgnoreCodeCoverageAnnotation;
+use Infection\Visitor\IgnoreNode\CodeCoverageAnnotationIgnorer;
 
 /**
  * @internal
@@ -105,10 +105,8 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Ignor
         return $recommendations;
     }
 
-    public function getAdditionalIgnores(): array
+    public function getNodeIgnorers(): array
     {
-        return [
-            new IgnoreCodeCoverageAnnotation(),
-        ];
+        return [new CodeCoverageAnnotationIgnorer()];
     }
 }

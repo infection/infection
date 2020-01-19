@@ -33,49 +33,73 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Visitor\IgnoreNode;
+namespace Infection\Tests\Visitor;
 
-use Infection\Visitor\IgnoreNode\IgnoreInterfaceNode;
-use Infection\Visitor\IgnoreNode\IgnoresNode;
+use Infection\Visitor\IgnoreNode\NodeIgnorer;
+use Infection\Visitor\NonMutableNodesIgnorerVisitor;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
-final class IgnoreInterfaceNodeTest extends IgnoresNodeTestCase
+/**
+ * @group integration Requires some I/O operations
+ */
+final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTest
 {
-    public function test_it_ignores_interfaces(): void
+    private $spyVisitor;
+
+    protected function setUp(): void
+    {
+        $this->spyVisitor = $this->getSpyVisitor();
+    }
+
+    public function test_it_does_not_traverse_after_ignore(): void
     {
         $this->parseAndTraverse(<<<'PHP'
 <?php
 
-interface Bar
+class Foo
 {
-    public function nope(Bar $ignored): void;
-}
-PHP
-        ,
-            $this->createSpy()
-        );
-    }
-
-    public function test_it_doesnt_ignore_others(): void
+    public function bar(): void
     {
-        $this->parseAndTraverse(<<<'PHP'
-<?php
-
-class Bar
-{
-    public function nope(Bar $counted)
-    {
-        $counted = true;
     }
 }
 PHP
-            ,
-            $spy = $this->createSpy()
         );
-        $this->assertSame(2, $spy->nodeCounter);
+        $this->assertSame(0, $this->spyVisitor->getNumberOfNodesVisited());
     }
 
-    protected function getIgnore(): IgnoresNode
+    private function getSpyVisitor()
     {
-        return new IgnoreInterfaceNode();
+        return new class() extends NodeVisitorAbstract {
+            private $nodesVisitedCount = 0;
+
+            public function leaveNode(Node $node): void
+            {
+                ++$this->nodesVisitedCount;
+            }
+
+            public function getNumberOfNodesVisited(): int
+            {
+                return $this->nodesVisitedCount;
+            }
+        };
+    }
+
+    private function parseAndTraverse(string $code): void
+    {
+        $nodes = $this->parseCode($code);
+
+        $this->traverse(
+            $nodes,
+            [
+                new NonMutableNodesIgnorerVisitor([new class() implements NodeIgnorer {
+                    public function ignores(Node $node): bool
+                    {
+                        return true;
+                    }
+                }]),
+                $this->spyVisitor,
+            ]
+        );
     }
 }

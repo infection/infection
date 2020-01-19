@@ -38,7 +38,7 @@ namespace Infection\Mutation;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
-use Infection\Visitor\IgnoreNode\IgnoresNode;
+use Infection\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\Visitor\MutationsCollectorVisitor;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -68,8 +68,12 @@ class FileMutationGenerator
      * @throws UnparsableFile
 =======
      * @param Mutator[]     $mutators
+<<<<<<< HEAD
      * @param IgnoresNode[] $additionalIgnoredNodes
 >>>>>>> Simplify ignoring additional nodes
+=======
+     * @param NodeIgnorer[] $nodeIgnorers
+>>>>>>> Apply review feedback
      *
      * @return Mutation[]
      */
@@ -78,10 +82,10 @@ class FileMutationGenerator
         bool $onlyCovered,
         LineCodeCoverage $codeCoverage,
         array $mutators,
-        array $additionalIgnoredNodes
+        array $nodeIgnorers
     ): array {
         Assert::allIsInstanceOf($mutators, Mutator::class);
-        Assert::allIsInstanceOf($additionalIgnoredNodes, IgnoresNode::class);
+        Assert::allIsInstanceOf($nodeIgnorers, NodeIgnorer::class);
 
         $filePath = $fileInfo->getRealPath() === false
             ? $fileInfo->getPathname()
@@ -104,7 +108,7 @@ class FileMutationGenerator
             )
         );
 
-        $traverser = $this->traverserFactory->create($mutationsCollectorVisitor, $additionalIgnoredNodes);
+        $traverser = $this->traverserFactory->create($mutationsCollectorVisitor, $nodeIgnorers);
 
         $traverser->traverse($initialStatements);
 

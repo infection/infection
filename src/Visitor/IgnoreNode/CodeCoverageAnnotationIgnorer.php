@@ -33,73 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Visitor;
+namespace Infection\Visitor\IgnoreNode;
 
-use Infection\Visitor\IgnoreNode\IgnoresNode;
-use Infection\Visitor\NotMutableIgnoreVisitor;
 use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use PhpParser\Node\Stmt;
 
 /**
- * @group integration Requires some I/O operations
+ * @internal
  */
-final class NotMutableIgnoreVisitorTest extends BaseVisitorTest
+final class CodeCoverageAnnotationIgnorer implements NodeIgnorer
 {
-    private $spyVisitor;
-
-    protected function setUp(): void
+    public function ignores(Node $node): bool
     {
-        $this->spyVisitor = $this->getSpyVisitor();
-    }
+        if (!$node instanceof Stmt\ClassLike && !$node instanceof Stmt\ClassMethod) {
+            return false;
+        }
 
-    public function test_it_does_not_traverse_after_ignore(): void
-    {
-        $this->parseAndTraverse(<<<'PHP'
-<?php
+        $docComment = $node->getDocComment();
 
-class Foo
-{
-    public function bar(): void
-    {
-    }
-}
-PHP
-        );
-        $this->assertSame(0, $this->spyVisitor->getNumberOfNodesVisited());
-    }
-
-    private function getSpyVisitor()
-    {
-        return new class() extends NodeVisitorAbstract {
-            private $nodesVisitedCount = 0;
-
-            public function leaveNode(Node $node): void
-            {
-                ++$this->nodesVisitedCount;
-            }
-
-            public function getNumberOfNodesVisited(): int
-            {
-                return $this->nodesVisitedCount;
-            }
-        };
-    }
-
-    private function parseAndTraverse(string $code): void
-    {
-        $nodes = $this->parseCode($code);
-
-        $this->traverse(
-            $nodes,
-            [
-                new NotMutableIgnoreVisitor([new class() implements IgnoresNode {
-                    public function ignores(Node $node): bool
-                    {
-                        return true;
-                    }
-                }]),
-                $this->spyVisitor,
-            ]
-        );
+        return $docComment !== null && strpos($docComment->getText(), '@codeCoverageIgnore') !== false;
     }
 }

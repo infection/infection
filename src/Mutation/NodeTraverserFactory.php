@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Mutation;
 
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\Visitor\IgnoreNode\IgnoreAbstractMethod;
-use Infection\Visitor\IgnoreNode\IgnoreInterfaceNode;
-use Infection\Visitor\IgnoreNode\IgnoresNode;
-use Infection\Visitor\NotMutableIgnoreVisitor;
+use Infection\Visitor\IgnoreNode\AbstractMethodIgnorer;
+use Infection\Visitor\IgnoreNode\InterfaceIgnorer;
+use Infection\Visitor\IgnoreNode\NodeIgnorer;
+use Infection\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\NodeTraverser;
@@ -52,14 +52,16 @@ use PhpParser\NodeVisitor;
 class NodeTraverserFactory
 {
     /**
-     * @param IgnoresNode[] $additionalIgnoredNodes
+     * @param NodeIgnorer[] $nodeIgnorers
      */
-    public function create(NodeVisitor $mutationVisitor, array $additionalIgnoredNodes): NodeTraverser
+    public function create(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverser
     {
+        $nodeIgnorers[] = new InterfaceIgnorer();
+        $nodeIgnorers[] = new AbstractMethodIgnorer();
+
         $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NotMutableIgnoreVisitor(
-            array_merge($additionalIgnoredNodes, [new IgnoreInterfaceNode(), new IgnoreAbstractMethod()]))
-        );
+
+        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
         $traverser->addVisitor(new ParentConnectorVisitor());
         $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
         $traverser->addVisitor(new ReflectionVisitor());

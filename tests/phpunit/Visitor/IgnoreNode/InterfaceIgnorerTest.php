@@ -33,17 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\Visitor\IgnoreNode;
+namespace Infection\Tests\Visitor\IgnoreNode;
 
-use PhpParser\Node;
+use Generator;
+use Infection\Visitor\IgnoreNode\InterfaceIgnorer;
+use Infection\Visitor\IgnoreNode\NodeIgnorer;
 
-/**
- * @internal
- */
-final class IgnoreInterfaceNode implements IgnoresNode
+final class InterfaceIgnorerTest extends BaseNodeIgnorerTestCase
 {
-    public function ignores(Node $node): bool
+    /**
+     * @dataProvider provideIgnoreCases
+     */
+    public function test_it_ignores_the_correct_nodes(string $code, int $count): void
     {
-        return $node instanceof Node\Stmt\Interface_;
+        $spy = $this->createSpy();
+        $this->parseAndTraverse($code, $spy);
+        $this->assertSame($count, $spy->nodeCounter);
+    }
+
+    public function provideIgnoreCases(): Generator
+    {
+        yield 'interfaces are ignored' => [
+            <<<'PHP'
+<?php
+
+interface Bar
+{
+    public function nope(Bar $ignored): void;
+}
+PHP
+            ,
+            0,
+        ];
+
+        yield 'classes arent ignored' => [
+            <<<'PHP'
+<?php
+
+class Bar
+{
+    public function nope(Bar $counted)
+    {
+        $counted = true;
+    }
+}
+PHP
+            ,
+            2,
+        ];
+    }
+
+    protected function getIgnore(): NodeIgnorer
+    {
+        return new InterfaceIgnorer();
     }
 }

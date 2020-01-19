@@ -36,21 +36,14 @@ declare(strict_types=1);
 namespace Infection\Visitor\IgnoreNode;
 
 use PhpParser\Node;
-use PhpParser\Node\Stmt;
 
 /**
  * @internal
  */
-final class IgnoreCodeCoverageAnnotation implements IgnoresNode
+final class AbstractMethodIgnorer implements NodeIgnorer
 {
     public function ignores(Node $node): bool
     {
-        if (!$node instanceof Stmt\ClassLike && !$node instanceof Stmt\ClassMethod) {
-            return false;
-        }
-
-        $docComment = $node->getDocComment();
-
-        return $docComment !== null && strpos($docComment->getText(), '@codeCoverageIgnore') !== false;
+        return $node instanceof Node\Stmt\ClassMethod && $node->isAbstract();
     }
 }

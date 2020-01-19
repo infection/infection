@@ -139,7 +139,7 @@ final class Engine
         $mutations = $this->mutationGenerator->generate(
             $this->config->mutateOnlyCoveredCode(),
             $this->adapter instanceof IgnoresAdditionalNodes
-                ? $this->adapter->getAdditionalIgnores()
+                ? $this->adapter->getNodeIgnorers()
                 : []
         );
 

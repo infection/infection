@@ -35,48 +35,34 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Visitor\IgnoreNode;
 
-use Infection\Console\InfectionContainer;
-use Infection\Visitor\IgnoreNode\IgnoresNode;
-use Infection\Visitor\NotMutableIgnoreVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PhpParser\Parser;
-use PHPUnit\Framework\TestCase;
+use Infection\Visitor\IgnoreNode\AbstractMethodIgnorer;
+use Infection\Visitor\IgnoreNode\NodeIgnorer;
 
-abstract class IgnoresNodeTestCase extends TestCase
+final class AbstractMethodIgnorerTest extends BaseNodeIgnorerTestCase
 {
-    /**
-     * @var Parser|null
-     */
-    private static $parser;
-
-    abstract protected function getIgnore(): IgnoresNode;
-
-    final protected function parseAndTraverse(string $code, NodeVisitor $spy): void
+    public function test_it_ignores_abstract_methods(): void
     {
-        $nodes = $this->getParser()->parse($code);
+        $this->parseAndTraverse(<<<'PHP'
+<?php
 
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NotMutableIgnoreVisitor([$this->getIgnore()]));
-        $traverser->addVisitor($spy);
+abstract class Foo
+{
+    public function bar(string $counted)
+    {
+    }
+    abstract public function shouldBeIgnored($ignored);
+}
 
-        $traverser->traverse($nodes);
-        $this->addToAssertionCount(1);
+PHP
+            ,
+            $spy = $this->createSpy()
+        );
+
+        $this->assertSame(1, $spy->nodeCounter);
     }
 
-    protected function createSpy(): IgnoreSpyVisitor
+    protected function getIgnore(): NodeIgnorer
     {
-        return new IgnoreSpyVisitor(static function (): void {
-            self::fail('A variable that should have been ignored was still parsed by the next visitor.');
-        });
-    }
-
-    private function getParser(): Parser
-    {
-        if (null === self::$parser) {
-            self::$parser = InfectionContainer::create()[Parser::class];
-        }
-
-        return self::$parser;
+        return new AbstractMethodIgnorer();
     }
 }

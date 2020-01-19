@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use Infection\Visitor\IgnoreNode\IgnoresNode;
+use Infection\Visitor\IgnoreNode\NodeIgnorer;
 
 /**
  * @internal
@@ -43,7 +43,7 @@ use Infection\Visitor\IgnoreNode\IgnoresNode;
 interface IgnoresAdditionalNodes
 {
     /**
-     * @return IgnoresNode[]
+     * @return NodeIgnorer[]
      */
-    public function getAdditionalIgnores(): array;
+    public function getNodeIgnorers(): array;
 }

@@ -46,7 +46,7 @@ use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
-use Infection\Tests\Fixtures\PhpParser\FakeIgnores;
+use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
@@ -64,7 +64,7 @@ final class MutationGeneratorTest extends TestCase
         $mutators = ['Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator())];
         $eventDispatcherMock = $this->createMock(EventDispatcher::class);
         $onlyCovered = true;
-        $extraVisitors = [new FakeIgnores()];
+        $extraVisitors = [new FakeIgnorer()];
 
         $mutation0 = $this->createMock(Mutation::class);
         $mutation1 = $this->createMock(Mutation::class);

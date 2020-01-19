@@ -46,10 +46,10 @@ use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
-use Infection\Tests\Fixtures\PhpParser\FakeIgnores;
+use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
 use Infection\Tests\Mutator\MutatorName;
-use PhpParser\NodeTraverser;
+use PhpParser\NodeTraverserInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
@@ -124,7 +124,7 @@ final class FileMutationGeneratorTest extends TestCase
         LineCodeCoverage $codeCoverage,
         string $expectedFilePath
     ): void {
-        $extraVisitors = [new FakeIgnores()];
+        $extraVisitors = [new FakeIgnorer()];
 
         $this->fileParserMock
             ->expects($this->once())
@@ -136,7 +136,7 @@ final class FileMutationGeneratorTest extends TestCase
             ])
         ;
 
-        $traverserMock = $this->createMock(NodeTraverser::class);
+        $traverserMock = $this->createMock(NodeTraverserInterface::class);
         $traverserMock
             ->expects($this->once())
             ->method('traverse')
