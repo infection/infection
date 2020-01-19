@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use Infection\Mutator\MutatorFactory;
 use function array_shift;
 use function count;
 use function escapeshellarg;
@@ -44,6 +43,7 @@ use function get_class;
 use Infection\Container;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorFactory;
 use Infection\Tests\Fixtures\SimpleMutation;
 use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;
 use Infection\Tests\Fixtures\SimpleMutatorVisitor;
@@ -62,6 +62,10 @@ use Webmozart\Assert\Assert;
 abstract class AbstractMutatorTestCase extends TestCase
 {
     /**
+     * @var Mutator
+     */
+    protected $mutator;
+    /**
      * @var Parser|null
      */
     private static $parser;
@@ -75,11 +79,6 @@ abstract class AbstractMutatorTestCase extends TestCase
      * @var MutatorFactory|null
      */
     private static $mutatorFactory;
-
-    /**
-     * @var Mutator
-     */
-    protected $mutator;
 
     protected function setUp(): void
     {

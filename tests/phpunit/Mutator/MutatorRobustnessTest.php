@@ -35,21 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use Infection\Mutator\MutatorFactory;
 use function array_values;
 use Generator;
 use Infection\Container;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\ProfileList;
 use Infection\Tests\Fixtures\NullMutationVisitor;
-use function get_class;
 use function ksort;
 use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
-use function str_replace;
-use function substr;
 use const SORT_STRING;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;

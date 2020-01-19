@@ -187,6 +187,7 @@ final class MutatorFactory
             switch ($mutatorClass) {
                 case BCMath::class:
                     $mutator = new BCMath(new BCMathConfig($settings));
+
                     break;
 
                 case MBString::class:
