@@ -125,7 +125,7 @@ final class MutatorFactoryTest extends TestCase
             $this->fail();
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'Expected settings of the mutator "Infection\Mutator\Arithmetic\Plus" to be an array. Got "boolean" instead',
+                'Expected config of the mutator "Infection\Mutator\Arithmetic\Plus" to be an array. Got "boolean" instead',
                 $exception->getMessage()
             );
         }

@@ -35,56 +35,47 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-use Infection\Mutator\Util\MutatorConfig;
-use function Safe\array_flip;
-use function sprintf;
-use Webmozart\Assert\Assert;
+use const FNM_NOESCAPE;
+use function fnmatch;
+use function in_array;
 
 /**
  * @internal
+ * @final
  */
-final class MutatorFactory
+class IgnoreConfig
 {
+    private $ignored;
+
     /**
-     * @param array<string, array<mixed>> $resolvedMutators
-     *
-     * @return array<string, Mutator>
+     * @param string[] $ignored
      */
-    public function create(array $resolvedMutators): array
+    public function __construct(array $ignored)
     {
-        $mutators = [];
+        $this->ignored = $ignored;
+    }
 
-        $knownMutatorClasses = array_flip(ProfileList::ALL_MUTATORS);
-
-        foreach ($resolvedMutators as $mutatorClass => $config) {
-            Assert::keyExists(
-                $knownMutatorClasses,
-                $mutatorClass,
-                sprintf('Unknown mutator "%s"', $mutatorClass)
-            );
-            Assert::isArray(
-                $config,
-                sprintf(
-                    'Expected config of the mutator "%s" to be an array. Got "%%s" instead',
-                    $mutatorClass
-                )
-            );
-
-            /** @var string[] $settings */
-            $settings = $config['settings'] ?? [];
-            /** @var string[] $ignored */
-            $ignored = $config['ignore'] ?? [];
-
-            // TODO: only pass the mutator config if necessary
-            /** @var Mutator $mutator */
-            $mutator = new $mutatorClass(new MutatorConfig($settings));
-
-            $mutators[$mutator->getName()] = new IgnoreMutator(
-                new IgnoreConfig($ignored),
-                $mutator
-            );
+    public function isIgnored(string $class, string $method, ?int $lineNumber): bool
+    {
+        if (in_array($class, $this->ignored, true)) {
+            return true;
         }
 
-        return $mutators;
+        $classMethod = $class . '::' . $method;
+
+        if (in_array($classMethod, $this->ignored, true)) {
+            return true;
+        }
+
+        foreach ($this->ignored as $ignorePattern) {
+            if (fnmatch($ignorePattern, $class, FNM_NOESCAPE)
+                || fnmatch($ignorePattern, $classMethod, FNM_NOESCAPE)
+                || ($lineNumber !== null && fnmatch($ignorePattern, $classMethod . '::' . $lineNumber, FNM_NOESCAPE))
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

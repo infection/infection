@@ -37,7 +37,6 @@ namespace Infection\Mutator;
 
 use DomainException;
 use Generator;
-use Infection\Mutator\Util\MutatorConfig;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 use ReflectionClass;
@@ -60,7 +59,7 @@ final class IgnoreMutator implements Mutator
     private $config;
     private $mutator;
 
-    public function __construct(MutatorConfig $config, Mutator $mutator)
+    public function __construct(IgnoreConfig $config, Mutator $mutator)
     {
         $this->config = $config;
         $this->mutator = $mutator;
