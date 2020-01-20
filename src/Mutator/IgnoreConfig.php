@@ -33,23 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Mutator;
+
+use const FNM_NOESCAPE;
+use function fnmatch;
+use function in_array;
 
 /**
  * @internal
  * @final
  */
-class MutatorConfig
+class IgnoreConfig
 {
-    private $mutatorSettings;
+    private $ignored;
 
-    public function __construct(array $settings)
+    /**
+     * @param string[] $ignored
+     */
+    public function __construct(array $ignored)
     {
-        $this->mutatorSettings = $settings;
+        $this->ignored = $ignored;
     }
 
-    public function getMutatorSettings(): array
+    public function isIgnored(string $class, string $method, ?int $lineNumber): bool
     {
-        return $this->mutatorSettings;
+        if (in_array($class, $this->ignored, true)) {
+            return true;
+        }
+
+        $classMethod = $class . '::' . $method;
+
+        if (in_array($classMethod, $this->ignored, true)) {
+            return true;
+        }
+
+        foreach ($this->ignored as $ignorePattern) {
+            if (fnmatch($ignorePattern, $class, FNM_NOESCAPE)
+                || fnmatch($ignorePattern, $classMethod, FNM_NOESCAPE)
+                || ($lineNumber !== null && fnmatch($ignorePattern, $classMethod . '::' . $lineNumber, FNM_NOESCAPE))
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
