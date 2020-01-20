@@ -275,6 +275,7 @@ final class Container
             ConfigurationFactory::class => static function (self $container): ConfigurationFactory {
                 return new ConfigurationFactory(
                     $container->getTmpDirProvider(),
+                    $container->getMutatorResolver(),
                     $container->getMutatorFactory(),
                     $container->getMutatorParser(),
                     $container->getSourceFileCollector()

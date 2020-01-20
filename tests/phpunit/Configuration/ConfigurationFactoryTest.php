@@ -51,6 +51,7 @@ use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
+use Infection\Mutator\MutatorResolver;
 use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
@@ -100,6 +101,7 @@ final class ConfigurationFactoryTest extends TestCase
 
         $this->configFactory = new ConfigurationFactory(
             new TmpDirProvider(),
+            new MutatorResolver(),
             new MutatorFactory(),
             new MutatorParser(),
             $sourceFilesCollectorProphecy->reveal()
@@ -1293,7 +1295,9 @@ final class ConfigurationFactoryTest extends TestCase
     private static function getDefaultMutators(): array
     {
         if (null === self::$mutators) {
-            self::$mutators = (new MutatorFactory())->create(['@default' => true]);
+            self::$mutators = (new MutatorFactory())->create(
+                (new MutatorResolver())->resolve(['@default' => true])
+            );
         }
 
         return self::$mutators;
