@@ -64,6 +64,7 @@ use Infection\Mutation\MutationGenerator;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
+use Infection\Mutator\MutatorResolver;
 use Infection\Performance\Limiter\MemoryLimiter;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\TimeFormatter;
@@ -87,7 +88,6 @@ use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkAdapter;
-use Infection\Utils\VersionParser;
 use InvalidArgumentException;
 use function is_callable;
 use function php_ini_loaded_file;
@@ -212,9 +212,6 @@ final class Container
                     new JUnitTestFileDataProvider($container->getJUnitFilePath())
                 );
             },
-            VersionParser::class => static function (): VersionParser {
-                return new VersionParser();
-            },
             Lexer::class => static function (): Lexer {
                 $attributes = Mutation::ATTRIBUTE_KEYS;
                 $attributes[] = 'comments';
@@ -274,10 +271,14 @@ final class Container
             ConfigurationFactory::class => static function (self $container): ConfigurationFactory {
                 return new ConfigurationFactory(
                     $container->getTmpDirProvider(),
+                    $container->getMutatorResolver(),
                     $container->getMutatorFactory(),
                     $container->getMutatorParser(),
                     $container->getSourceFileCollector()
                 );
+            },
+            MutatorResolver::class => static function (): MutatorResolver {
+                return new MutatorResolver();
             },
             MutatorFactory::class => static function (): MutatorFactory {
                 return new MutatorFactory();
@@ -359,8 +360,7 @@ final class Container
             },
             InitialTestRunProcessBuilder::class => static function (self $container): InitialTestRunProcessBuilder {
                 return new InitialTestRunProcessBuilder(
-                    $container->getTestFrameworkAdapter(),
-                    $container->getVersionParser()
+                    $container->getTestFrameworkAdapter()
                 );
             },
             InitialTestsRunner::class => static function (self $container): InitialTestsRunner {
@@ -372,7 +372,6 @@ final class Container
             MutantProcessBuilder::class => static function (self $container): MutantProcessBuilder {
                 return new MutantProcessBuilder(
                     $container->getTestFrameworkAdapter(),
-                    $container->getVersionParser(),
                     $container->getConfiguration()->getProcessTimeout()
                 );
             },
@@ -569,11 +568,6 @@ final class Container
         return $this->get(MemoizedTestFileDataProvider::class);
     }
 
-    public function getVersionParser(): VersionParser
-    {
-        return $this->get(VersionParser::class);
-    }
-
     public function getLexer(): Lexer
     {
         return $this->get(Lexer::class);
@@ -647,6 +641,11 @@ final class Container
     public function getConfigurationFactory(): ConfigurationFactory
     {
         return $this->get(ConfigurationFactory::class);
+    }
+
+    public function getMutatorResolver(): MutatorResolver
+    {
+        return $this->get(MutatorResolver::class);
     }
 
     public function getMutatorFactory(): MutatorFactory

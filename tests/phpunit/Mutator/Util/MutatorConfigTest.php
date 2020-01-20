@@ -33,26 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Builder;
+namespace Infection\Tests\Mutator\Util;
 
-use Infection\Mutant\Mutant;
-use Infection\Process\Builder\MutantProcessBuilder;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\Mutator\Util\MutatorConfig;
 use PHPUnit\Framework\TestCase;
 
-final class MutantProcessBuilderTest extends TestCase
+final class MutatorConfigTest extends TestCase
 {
-    public function test_it_creates_a_process_with_timeout(): void
+    public function test_it_correctly_converts_settings(): void
     {
-        $fwAdapter = $this->createMock(AbstractTestFrameworkAdapter::class);
-        $fwAdapter->method('getMutantCommandLine')
-            ->willReturn(['/usr/bin/php']);
+        $config = new MutatorConfig(['foo' => 'bar']);
+        $this->assertSame(['foo' => 'bar'], $config->getMutatorSettings());
+    }
 
-        $builder = new MutantProcessBuilder($fwAdapter, 100);
-
-        $process = $builder->createProcessForMutant($this->createMock(Mutant::class))->getProcess();
-
-        $this->assertStringContainsString('/usr/bin/php', $process->getCommandLine());
-        $this->assertSame(100.0, $process->getTimeout());
+    public function test_it_can_deal_with_empty_settings(): void
+    {
+        $config = new MutatorConfig([]);
+        $this->assertSame([], $config->getMutatorSettings());
     }
 }

@@ -36,13 +36,16 @@ declare(strict_types=1);
 namespace Infection\Configuration;
 
 use function array_fill_keys;
+use function count;
 use function dirname;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
+use Infection\Mutator\MutatorResolver;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
 use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
 use Infection\TestFramework\TestFrameworkExtraOptions;
@@ -70,17 +73,20 @@ class ConfigurationFactory
     ];
 
     private $tmpDirProvider;
+    private $mutatorResolver;
     private $mutatorFactory;
     private $mutatorParser;
     private $sourceFileCollector;
 
     public function __construct(
         TmpDirProvider $tmpDirProvider,
+        MutatorResolver $mutatorResolver,
         MutatorFactory $mutatorFactory,
         MutatorParser $mutatorParser,
         SourceFileCollector $sourceFileCollector
     ) {
         $this->tmpDirProvider = $tmpDirProvider;
+        $this->mutatorResolver = $mutatorResolver;
         $this->mutatorFactory = $mutatorFactory;
         $this->mutatorParser = $mutatorParser;
         $this->sourceFileCollector = $sourceFileCollector;
@@ -106,8 +112,6 @@ class ConfigurationFactory
     ): Configuration {
         $configDir = dirname($schema->getFile());
 
-        $schemaMutators = $schema->getMutators();
-
         $namespacedTmpDir = $this->retrieveTmpDir($schema, $configDir);
 
         $testFramework = $testFramework ?? $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
@@ -132,14 +136,7 @@ class ConfigurationFactory
             $logVerbosity,
             $namespacedTmpDir,
             $this->retrievePhpUnit($schema, $configDir),
-            $this->mutatorFactory->create(
-                $this->retrieveMutators(
-                    $schemaMutators === []
-                        ? ['@default' => true]
-                        : $schemaMutators,
-                    $mutatorsInput
-                )
-            ),
+            $this->retrieveMutators($schema->getMutators(), $mutatorsInput),
             $testFramework,
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
@@ -189,6 +186,28 @@ class ConfigurationFactory
         return $phpUnit;
     }
 
+    /**
+     * @return array<string, Mutator>
+     */
+    private function retrieveMutators(array $schemaMutators, string $mutatorsInput): array
+    {
+        if (count($schemaMutators) === 0) {
+            $schemaMutators = ['@default' => true];
+        }
+
+        $parsedMutatorsInput = $this->mutatorParser->parse($mutatorsInput);
+
+        if ($parsedMutatorsInput === []) {
+            $mutatorsList = $schemaMutators;
+        } else {
+            $mutatorsList = array_fill_keys($parsedMutatorsInput, true);
+        }
+
+        return $this->mutatorFactory->create(
+            $this->mutatorResolver->resolve($mutatorsList)
+        );
+    }
+
     private static function retrieveCoveragePath(
         string $coverageBasePath,
         string $testFramework
@@ -218,17 +237,6 @@ class ConfigurationFactory
         }
 
         return sprintf('%s/%s', $configDir, $existingCoveragePath);
-    }
-
-    private function retrieveMutators(array $schemaMutators, string $mutatorsInput): array
-    {
-        $parsedMutatorsInput = $this->mutatorParser->parse($mutatorsInput);
-
-        if ([] === $parsedMutatorsInput) {
-            return $schemaMutators;
-        }
-
-        return array_fill_keys($parsedMutatorsInput, true);
     }
 
     private static function retrieveTestFrameworkExtraOptions(
