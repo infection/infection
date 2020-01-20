@@ -50,6 +50,6 @@ final class NullReflectionTest extends TestCase
     public function test_it_has_no_parent(): void
     {
         $reflection = new NullReflection();
-        $this->assertFalse($reflection->hasParentOfVisibility('foo', Visibility::asPublic()));
+        $this->assertFalse($reflection->hasParentMethodWithVisibility('foo', Visibility::asPublic()));
     }
 }

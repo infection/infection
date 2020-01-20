@@ -40,7 +40,7 @@ namespace Infection\Reflection;
  */
 interface ClassReflection
 {
-    public function hasParentOfVisibility(string $methodName, Visibility $visibility): bool;
+    public function hasParentMethodWithVisibility(string $methodName, Visibility $visibility): bool;
 
     public function getName(): string;
 }

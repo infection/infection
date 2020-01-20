@@ -40,7 +40,7 @@ namespace Infection\Reflection;
  */
 final class NullReflection implements ClassReflection
 {
-    public function hasParentOfVisibility(string $methodName, Visibility $visibility): bool
+    public function hasParentMethodWithVisibility(string $methodName, Visibility $visibility): bool
     {
         return false;
     }

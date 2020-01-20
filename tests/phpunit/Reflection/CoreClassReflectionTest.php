@@ -40,7 +40,7 @@ use Infection\Reflection\CoreClassReflection;
 
 final class CoreClassReflectionTest extends ClassReflectionTestCase
 {
-    public function test_it_wraps_the_name(): void
+    public function test_it_exposes_the_class_name(): void
     {
         $reflection = CoreClassReflection::fromClassName(get_class($this));
         $this->assertSame($reflection->getName(), get_class($this));

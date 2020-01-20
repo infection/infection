@@ -46,9 +46,13 @@ abstract class ClassReflectionTestCase extends TestCase
     /**
      * @dataProvider provideParentMethodCases
      */
-    public function test_it_knows_if_a_function_is_inherited(ClassReflection $reflection, string $method, Visibility $visibility, bool $hasParent): void
-    {
-        $this->assertSame($hasParent, $reflection->hasParentOfVisibility($method, $visibility));
+    public function test_it_knows_if_a_function_is_inherited(
+        ClassReflection $reflection,
+        string $method,
+        Visibility $visibility,
+        bool $hasParent
+    ): void {
+        $this->assertSame($hasParent, $reflection->hasParentMethodWithVisibility($method, $visibility));
     }
 
     public function provideParentMethodCases(): Generator

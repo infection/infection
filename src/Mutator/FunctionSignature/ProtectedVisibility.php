@@ -104,6 +104,6 @@ final class ProtectedVisibility implements Mutator
         /** @var ClassReflection $reflection */
         $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
 
-        return $reflection->hasParentOfVisibility($node->name->name, Visibility::asProtected());
+        return $reflection->hasParentMethodWithVisibility($node->name->name, Visibility::asProtected());
     }
 }

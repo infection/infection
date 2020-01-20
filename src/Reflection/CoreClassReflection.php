@@ -55,7 +55,7 @@ final class CoreClassReflection implements ClassReflection
         return new self(new ReflectionClass($className));
     }
 
-    public function hasParentOfVisibility(string $methodName, Visibility $visibility): bool
+    public function hasParentMethodWithVisibility(string $methodName, Visibility $visibility): bool
     {
         try {
             $method = $this->reflectionClass->getMethod($methodName)->getPrototype();
