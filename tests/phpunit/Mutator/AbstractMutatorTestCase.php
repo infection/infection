@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use Infection\Tests\AutoReview\SourceTestClassNameScheme;
 use function array_shift;
 use function count;
 use function escapeshellarg;
@@ -65,6 +66,7 @@ abstract class AbstractMutatorTestCase extends TestCase
      * @var Mutator
      */
     protected $mutator;
+
     /**
      * @var Parser|null
      */
@@ -82,6 +84,7 @@ abstract class AbstractMutatorTestCase extends TestCase
 
     protected function setUp(): void
     {
+        // TODO: refactor this bit...
         $this->mutator = $this->createMutator();
     }
 
@@ -130,14 +133,12 @@ abstract class AbstractMutatorTestCase extends TestCase
 
     final protected function createMutator(array $settings = []): Mutator
     {
-        $class = get_class($this);
-        $mutatorClassName = substr(str_replace('\Tests', '', $class), 0, -4);
-        $mutatorName = MutatorName::getName($mutatorClassName);
+        $mutatorClassName = SourceTestClassNameScheme::getSourceClassName(get_class($this));
 
         // TODO: this is a bit ridicule...
-        return $this->getMutatorFactory()->create([
-            $mutatorName => $settings,
-        ])[$mutatorName];
+        return self::getMutatorFactory()->create([
+            $mutatorClassName => ['settings' => $settings],
+        ])[MutatorName::getName($mutatorClassName)];
     }
 
     /**
