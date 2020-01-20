@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use Infection\Tests\AutoReview\SourceTestClassNameScheme;
 use function array_shift;
 use function count;
 use function escapeshellarg;
@@ -45,6 +44,7 @@ use Infection\Container;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
+use Infection\Tests\AutoReview\SourceTestClassNameScheme;
 use Infection\Tests\Fixtures\SimpleMutation;
 use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;
 use Infection\Tests\Fixtures\SimpleMutatorVisitor;
@@ -56,8 +56,6 @@ use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
-use function str_replace;
-use function substr;
 use Webmozart\Assert\Assert;
 
 abstract class AbstractMutatorTestCase extends TestCase

@@ -43,7 +43,6 @@ use Infection\Mutator\Extensions\MBString;
 use Infection\Mutator\Extensions\MBStringConfig;
 use Infection\Mutator\Removal\ArrayItemRemoval;
 use Infection\Mutator\Removal\ArrayItemRemovalConfig;
-use Infection\Mutator\Util\MutatorConfig;
 use function Safe\array_flip;
 use function sprintf;
 use Webmozart\Assert\Assert;
