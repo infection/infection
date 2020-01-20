@@ -64,6 +64,7 @@ use Infection\Mutation\MutationGenerator;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
+use Infection\Mutator\MutatorResolver;
 use Infection\Performance\Limiter\MemoryLimiter;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\TimeFormatter;
@@ -270,10 +271,14 @@ final class Container
             ConfigurationFactory::class => static function (self $container): ConfigurationFactory {
                 return new ConfigurationFactory(
                     $container->getTmpDirProvider(),
+                    $container->getMutatorResolver(),
                     $container->getMutatorFactory(),
                     $container->getMutatorParser(),
                     $container->getSourceFileCollector()
                 );
+            },
+            MutatorResolver::class => static function (): MutatorResolver {
+                return new MutatorResolver();
             },
             MutatorFactory::class => static function (): MutatorFactory {
                 return new MutatorFactory();
@@ -636,6 +641,11 @@ final class Container
     public function getConfigurationFactory(): ConfigurationFactory
     {
         return $this->get(ConfigurationFactory::class);
+    }
+
+    public function getMutatorResolver(): MutatorResolver
+    {
+        return $this->get(MutatorResolver::class);
     }
 
     public function getMutatorFactory(): MutatorFactory
