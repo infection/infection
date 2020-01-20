@@ -52,7 +52,7 @@ use function trim;
 final class Parser
 {
     /**
-     * @return array<string[]&string[][]>
+     * @return array<string[]|string[][]>
      */
     public static function parse(string $makeFileContents): array
     {
