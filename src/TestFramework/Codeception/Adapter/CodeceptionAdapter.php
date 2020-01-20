@@ -85,7 +85,7 @@ final class CodeceptionAdapter implements MemoryUsageAware, TestFrameworkAdapter
     private $cachedVersion;
 
     /**
-     * @param  array<string, mixed> $originalConfigContentParsed
+     * @param array<string, mixed> $originalConfigContentParsed
      */
     public function __construct(
         string $testFrameworkExecutable,

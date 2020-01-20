@@ -63,7 +63,7 @@ class NodeMutationGenerator
 
     /**
      * @param Mutator[] $mutators
-     * @param Node[]    $fileNodes
+     * @param Node[] $fileNodes
      */
     public function __construct(
         array $mutators,
