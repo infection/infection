@@ -33,46 +33,71 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Boolean;
+namespace Infection\Tests\Mutator\Boolean;
 
-use function Safe\sprintf;
-use Webmozart\Assert\Assert;
+use Generator;
+use Infection\Mutator\Boolean\TrueValueConfig;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
-final class TrueValueConfig
+final class TrueValueConfigTest extends TestCase
 {
-    private const KNOWN_FUNCTIONS = [
-        'array_search',
-        'in_array',
-    ];
-
-    private $functionMap = [];
-
     /**
-     * @param array<string, bool> $config
+     * @dataProvider settingsProvider
      */
-    public function __construct(array $settings)
+    public function test_it_can_create_a_config(array $settings, array $expected): void
     {
-        foreach ($settings as $functionName => $enabled) {
-            Assert::boolean(
-                $enabled,
-                sprintf(
-                    'Expected the value for "%s" to be a boolean. Got "%%s" instead',
-                    $functionName
-                )
-            );
-            Assert::oneOf($functionName, self::KNOWN_FUNCTIONS);
+        $config = new TrueValueConfig($settings);
 
-            if ($enabled) {
-                $this->functionMap[] = $functionName;
-            }
+        $this->assertSame(
+            $expected,
+            $config->getFunctionsMap()
+        );
+    }
+
+    public function test_its_settings_must_be_boolean_values(): void
+    {
+        try {
+            new TrueValueConfig(['foo' => 'bar']);
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Expected the value for "foo" to be a boolean. Got "string" instead',
+                $exception->getMessage()
+            );
         }
     }
 
-    /**
-     * @return string[]
-     */
-    public function getFunctionsMap(): array
+    public function test_it_must_be_a_known_function(): void
     {
-        return $this->functionMap;
+        try {
+            new TrueValueConfig(['foo' => true]);
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Expected one of: "array_search", "in_array". Got: "foo"',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function settingsProvider(): Generator
+    {
+        yield 'default' => [
+            [],
+            [],
+        ];
+
+        yield 'one function enabled' => [
+            ['array_search' => true],
+            ['array_search'],
+        ];
+
+        yield 'one function disabled' => [
+            ['array_search' => false],
+            [],
+        ];
     }
 }
