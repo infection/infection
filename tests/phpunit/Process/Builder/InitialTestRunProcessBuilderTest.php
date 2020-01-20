@@ -37,7 +37,6 @@ namespace Infection\Tests\Process\Builder;
 
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Infection\Utils\VersionParser;
 use PHPUnit\Framework\TestCase;
 
 final class InitialTestRunProcessBuilderTest extends TestCase
@@ -48,7 +47,7 @@ final class InitialTestRunProcessBuilderTest extends TestCase
         $fwAdapter->method('getInitialTestRunCommandLine')
             ->willReturn(['/usr/bin/php']);
 
-        $builder = new InitialTestRunProcessBuilder($fwAdapter, new VersionParser());
+        $builder = new InitialTestRunProcessBuilder($fwAdapter);
 
         $process = $builder->createProcess('', false);
 

@@ -87,7 +87,6 @@ use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkAdapter;
-use Infection\Utils\VersionParser;
 use InvalidArgumentException;
 use function is_callable;
 use function php_ini_loaded_file;
@@ -211,9 +210,6 @@ final class Container
                 return new MemoizedTestFileDataProvider(
                     new JUnitTestFileDataProvider($container->getJUnitFilePath())
                 );
-            },
-            VersionParser::class => static function (): VersionParser {
-                return new VersionParser();
             },
             Lexer::class => static function (): Lexer {
                 $attributes = Mutation::ATTRIBUTE_KEYS;
@@ -359,8 +355,7 @@ final class Container
             },
             InitialTestRunProcessBuilder::class => static function (self $container): InitialTestRunProcessBuilder {
                 return new InitialTestRunProcessBuilder(
-                    $container->getTestFrameworkAdapter(),
-                    $container->getVersionParser()
+                    $container->getTestFrameworkAdapter()
                 );
             },
             InitialTestsRunner::class => static function (self $container): InitialTestsRunner {
@@ -372,7 +367,6 @@ final class Container
             MutantProcessBuilder::class => static function (self $container): MutantProcessBuilder {
                 return new MutantProcessBuilder(
                     $container->getTestFrameworkAdapter(),
-                    $container->getVersionParser(),
                     $container->getConfiguration()->getProcessTimeout()
                 );
             },
@@ -567,11 +561,6 @@ final class Container
     public function getMemoizedTestFileDataProvider(): MemoizedTestFileDataProvider
     {
         return $this->get(MemoizedTestFileDataProvider::class);
-    }
-
-    public function getVersionParser(): VersionParser
-    {
-        return $this->get(VersionParser::class);
     }
 
     public function getLexer(): Lexer
