@@ -153,7 +153,7 @@ final class ProjectCodeProvider
 
     public static function provideSourceClasses(): Generator
     {
-        if (null !== self::$sourceClasses) {
+        if (self::$sourceClasses !== null) {
             yield from self::$sourceClasses;
 
             return;
@@ -208,7 +208,7 @@ final class ProjectCodeProvider
 
     public static function provideSourceClassesToCheckForPublicProperties(): Generator
     {
-        if (null !== self::$sourceClassesToCheckForPublicProperties) {
+        if (self::$sourceClassesToCheckForPublicProperties !== null) {
             yield from self::$sourceClassesToCheckForPublicProperties;
 
             return;
@@ -247,7 +247,7 @@ final class ProjectCodeProvider
 
     public static function provideTestClasses(): Generator
     {
-        if (null !== self::$testClasses) {
+        if (self::$testClasses !== null) {
             yield from self::$testClasses;
 
             return;

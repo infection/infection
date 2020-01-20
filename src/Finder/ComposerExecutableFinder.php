@@ -52,7 +52,7 @@ final class ComposerExecutableFinder extends AbstractExecutableFinder
 
         foreach ($probable as $name) {
             if ($path = $finder->find($name, null, $immediatePaths)) {
-                if (false === strpos($path, '.phar')) {
+                if (strpos($path, '.phar') === false) {
                     return $path;
                 }
 
@@ -66,7 +66,7 @@ final class ComposerExecutableFinder extends AbstractExecutableFinder
          */
         $path = $this->searchNonExecutables($probable, $immediatePaths);
 
-        if (null !== $path) {
+        if ($path !== null) {
             return $this->makeExecutable($path);
         }
 

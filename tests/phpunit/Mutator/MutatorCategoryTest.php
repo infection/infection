@@ -131,7 +131,7 @@ final class MutatorCategoryTest extends TestCase
         array $constants
     ): void {
         foreach (array_keys($constants) as $constantName) {
-            if (self::ALL_CONSTANT_KEY !== $constantName
+            if ($constantName !== self::ALL_CONSTANT_KEY
                 && !in_array($constants[$constantName], $constants[self::ALL_CONSTANT_KEY], true)
             ) {
                 continue;

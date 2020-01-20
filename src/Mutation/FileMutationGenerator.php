@@ -84,7 +84,7 @@ class FileMutationGenerator
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::allIsInstanceOf($extraNodeVisitors, NodeVisitor::class);
 
-        $filePath = false === $fileInfo->getRealPath()
+        $filePath = $fileInfo->getRealPath() === false
             ? $fileInfo->getPathname()
             : $fileInfo->getRealPath()
         ;

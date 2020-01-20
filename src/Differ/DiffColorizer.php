@@ -51,11 +51,11 @@ class DiffColorizer
     {
         $lines = array_map(
             static function (string $line) {
-                if (0 === strpos($line, '-')) {
+                if (strpos($line, '-') === 0) {
                     return sprintf('<diff-del>%s</diff-del>', $line);
                 }
 
-                if (0 === strpos($line, '+')) {
+                if (strpos($line, '+') === 0) {
                     return sprintf('<diff-add>%s</diff-add>', $line);
                 }
 

@@ -70,7 +70,7 @@ class SourceFileCollector
             ->files()
         ;
 
-        if ('' === $filter) {
+        if ($filter === '') {
             $finder->name('*.php');
         } else {
             $finder->filterFiles(
