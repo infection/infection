@@ -78,7 +78,10 @@ final class MutatorFactoryTest extends TestCase
             IdenticalEqual::class => [],
         ]);
 
-        $this->assertSameMutatorsByClass([Plus::class, IdenticalEqual::class], $mutators);
+        $this->assertSameMutatorsByClass(
+            [Plus::class, IdenticalEqual::class],
+            $mutators
+        );
     }
 
     public function test_it_can_create_a_mutator_with_the_given_settings(): void

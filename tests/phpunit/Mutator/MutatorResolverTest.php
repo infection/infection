@@ -38,7 +38,6 @@ namespace Infection\Tests\Mutator;
 use function array_diff;
 use function array_values;
 use function count;
-use function in_array;
 use Infection\Mutator\Arithmetic\Minus;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\IdenticalEqual;
@@ -74,14 +73,20 @@ final class MutatorResolverTest extends TestCase
     {
         $resolvedMutators = $this->mutatorResolver->resolve(['@boolean' => true]);
 
-        $this->assertSameMutatorsByClass(ProfileList::BOOLEAN_PROFILE, $resolvedMutators);
+        $this->assertSameMutatorsByClass(
+            ProfileList::BOOLEAN_PROFILE,
+            $resolvedMutators
+        );
     }
 
     public function test_it_can_resolves_the_mutators_with_empty_settings_for_a_given_profile(): void
     {
         $resolvedMutators = $this->mutatorResolver->resolve(['@boolean' => []]);
 
-        $this->assertSameMutatorsByClass(ProfileList::BOOLEAN_PROFILE, $resolvedMutators);
+        $this->assertSameMutatorsByClass(
+            ProfileList::BOOLEAN_PROFILE,
+            $resolvedMutators
+        );
     }
 
     public function test_it_can_resolves_the_profile_mutators_with_the_given_settings(): void
@@ -93,7 +98,10 @@ final class MutatorResolverTest extends TestCase
             ],
         ]);
 
-        $this->assertSameMutatorsByClass(ProfileList::getDefaultProfileMutators(), $resolvedMutators);
+        $this->assertSameMutatorsByClass(
+            ProfileList::getDefaultProfileMutators(),
+            $resolvedMutators
+        );
 
         foreach (ProfileList::BOOLEAN_PROFILE as $booleanMutatorClassName) {
             $this->assertSame($settings, $resolvedMutators[$booleanMutatorClassName]);
@@ -129,7 +137,10 @@ final class MutatorResolverTest extends TestCase
             '@boolean' => true,
         ]);
 
-        $this->assertSameMutatorsByClass(ProfileList::BOOLEAN_PROFILE, $resolvedMutators);
+        $this->assertSameMutatorsByClass(
+            ProfileList::BOOLEAN_PROFILE,
+            $resolvedMutators
+        );
     }
 
     public function test_it_can_resolve_mutators_from_their_names(): void
@@ -173,14 +184,19 @@ final class MutatorResolverTest extends TestCase
             ],
         ]);
 
-        $this->assertSameMutatorsByClass(ProfileList::BOOLEAN_PROFILE, $resolvedMutators);
+        $this->assertSameMutatorsByClass(
+            ProfileList::BOOLEAN_PROFILE,
+            $resolvedMutators
+        );
 
         $this->assertSame($settings, $resolvedMutators[TrueValue::class]);
     }
 
     public function test_it_can_ignore_a_mutator(): void
     {
-        $resolvedMutators = $this->mutatorResolver->resolve([MutatorName::getName(Plus::class) => false]);
+        $resolvedMutators = $this->mutatorResolver->resolve(
+            [MutatorName::getName(Plus::class) => false]
+        );
 
         $this->assertCount(0, $resolvedMutators);
     }
@@ -205,7 +221,10 @@ final class MutatorResolverTest extends TestCase
             '@equal' => true,
         ]);
 
-        $this->assertSameMutatorsByClass(ProfileList::EQUAL_PROFILE, $resolvedMutators);
+        $this->assertSameMutatorsByClass(
+            ProfileList::EQUAL_PROFILE,
+            $resolvedMutators
+        );
     }
 
     public function test_a_mutator_will_be_resolved_only_once_even_if_included_multiple_times(): void
@@ -216,7 +235,10 @@ final class MutatorResolverTest extends TestCase
             MutatorName::getName(NotIdenticalNotEqual::class) => true,
         ]);
 
-        $this->assertSameMutatorsByClass(ProfileList::EQUAL_PROFILE, $resolvedMutators);
+        $this->assertSameMutatorsByClass(
+            ProfileList::EQUAL_PROFILE,
+            $resolvedMutators
+        );
     }
 
     public function test_it_cannot_resolve_mutators_for_unknown_profiles(): void
@@ -258,7 +280,7 @@ final class MutatorResolverTest extends TestCase
         $index = 0;
 
         foreach ($actualMutators as $mutatorClassName => $settings) {
-            $this->assertTrue(in_array($mutatorClassName, ProfileList::ALL_MUTATORS, true));
+            $this->assertContains($mutatorClassName, ProfileList::ALL_MUTATORS);
 
             $expectedMutatorClass = $expectedMutators[$index];
 

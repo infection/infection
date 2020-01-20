@@ -61,13 +61,21 @@ final class MutatorResolver
 
         foreach ($mutatorSettings as $mutatorOrProfile => $setting) {
             if (array_key_exists($mutatorOrProfile, ProfileList::ALL_PROFILES)) {
-                self::registerFromProfile($mutatorOrProfile, $setting, $mutators);
+                self::registerFromProfile(
+                    $mutatorOrProfile,
+                    $setting,
+                    $mutators
+                );
 
                 continue;
             }
 
             if (array_key_exists($mutatorOrProfile, ProfileList::ALL_MUTATORS)) {
-                self::registerFromName($mutatorOrProfile, $setting, $mutators);
+                self::registerFromName(
+                    $mutatorOrProfile,
+                    $setting,
+                    $mutators
+                );
 
                 continue;
             }
@@ -95,19 +103,28 @@ final class MutatorResolver
 
             // A profile may refer to another collection of profiles
             if (array_key_exists($mutatorOrProfile, ProfileList::ALL_PROFILES)) {
-                self::registerFromProfile($mutatorOrProfile, $settings, $mutators);
+                self::registerFromProfile(
+                    $mutatorOrProfile,
+                    $settings,
+                    $mutators
+                );
 
                 continue;
             }
 
             if (class_exists($mutatorOrProfile, true)) {
-                self::registerFromClass($mutatorOrProfile, $settings, $mutators);
+                self::registerFromClass(
+                    $mutatorOrProfile,
+                    $settings,
+                    $mutators
+                );
 
                 continue;
             }
 
             throw new InvalidArgumentException(sprintf(
-                'The "%s" profile contains the "%s" mutator which was not recognized.',
+                'The "%s" profile contains the "%s" mutator which was '
+                . 'not recognized.',
                 $profile,
                 $mutatorOrProfile
             ));
