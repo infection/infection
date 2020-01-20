@@ -197,7 +197,7 @@ class ConfigurationFactory
 
         $parsedMutatorsInput = $this->mutatorParser->parse($mutatorsInput);
 
-        if ([] === $parsedMutatorsInput) {
+        if ($parsedMutatorsInput === []) {
             $mutatorsList = $schemaMutators;
         } else {
             $mutatorsList = array_fill_keys($parsedMutatorsInput, true);
