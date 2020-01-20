@@ -46,9 +46,9 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Tests\Fixtures\SimpleMutation;
 use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;
-use Infection\Tests\Fixtures\SimpleMutatorVisitor;
 use Infection\Tests\StringNormalizer;
 use Infection\Visitor\CloneVisitor;
+use Infection\Visitor\MutatorVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
@@ -145,7 +145,7 @@ abstract class AbstractMutatorTestCase extends TestCase
         $mutants = [];
 
         foreach ($mutations as $mutation) {
-            $mutatorVisitor = new SimpleMutatorVisitor($mutation);
+            $mutatorVisitor = new MutatorVisitor($mutation);
 
             $traverser->addVisitor($mutatorVisitor);
 
