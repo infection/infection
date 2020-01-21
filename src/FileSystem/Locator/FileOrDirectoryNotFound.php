@@ -33,44 +33,67 @@
 
 declare(strict_types=1);
 
-namespace Infection\Finder;
+namespace Infection\FileSystem\Locator;
 
-use Infection\Finder\Iterator\RealPathFilterIterator;
-use Iterator;
-use Symfony\Component\Finder\Finder;
+use function implode;
+use RuntimeException;
+use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class FilterableFinder extends Finder
+final class FileOrDirectoryNotFound extends RuntimeException
 {
     /**
-     * @var string[]
+     * @param string[] $roots
      */
-    private $filters = [];
-
-    /**
-     * @param string[] $files
-     */
-    public function filterFiles(array $files): void
+    public static function fromFileName(string $file, array $roots): self
     {
-        Assert::allString($files);
+        Assert::allString($roots);
 
-        $this->filters = $files;
+        return new self(sprintf(
+            'Could not locate the file/directory "%s"%s.',
+            $file,
+            [] === $roots
+                ? ''
+                : sprintf(' in "%s"', implode('", "', $roots))
+        ));
     }
 
     /**
-     * @return RealPathFilterIterator|(iterable<\Symfony\Component\Finder\SplFileInfo>&Iterator)
+     * @deprecated
      */
-    public function getIterator(): Iterator
+    public static function multipleFilesDoNotExist(string $path, array $files): self
     {
-        $iterator = parent::getIterator();
+        return new self(
+            sprintf(
+                'The path "%s" does not contain any of the requested files: "%s"',
+                $path,
+                implode('", "', $files)
+            )
+        );
+    }
 
-        if ($this->filters) {
-            $iterator = new RealPathFilterIterator($iterator, $this->filters, []);
-        }
+    /**
+     * @param string[] $files
+     * @param string[] $roots
+     */
+    public static function fromFiles(array $files, array $roots): self
+    {
+        Assert::allString($files);
+        Assert::allString($roots);
 
-        return $iterator;
+        return new self(
+            [] === $files
+                ? 'Could not locate any files (no file provided).'
+                : sprintf(
+                    'Could not locate the files "%s"%s',
+                    implode('", "', $files),
+                    [] === $roots
+                        ? ''
+                        : sprintf(' in "%s"', implode('", "', $roots))
+                )
+        );
     }
 }

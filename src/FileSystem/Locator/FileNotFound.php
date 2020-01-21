@@ -33,26 +33,53 @@
 
 declare(strict_types=1);
 
-namespace Infection\Locator;
+namespace Infection\FileSystem\Locator;
+
+use function implode;
+use RuntimeException;
+use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-interface Locator
+final class FileNotFound extends RuntimeException
 {
     /**
-     * Determine the realpath of the given file or directory located.
-     *
-     * @throws FileNotFound|FileOrDirectoryNotFound
+     * @param string[] $roots
      */
-    public function locate(string $fileName): string;
+    public static function fromFileName(string $file, array $roots): self
+    {
+        Assert::allString($roots);
+
+        return new self(sprintf(
+            'Could not locate the file "%s"%s.',
+            $file,
+            [] === $roots
+                ? ''
+                : sprintf(' in "%s"', implode('", "', $roots))
+        ));
+    }
 
     /**
-     * Determine the realpath of the first file or directory located.
-     *
-     * @param string[] $fileNames
-     *
-     * @throws FileNotFound|FileOrDirectoryNotFound
+     * @param string[] $files
+     * @param string[] $roots
      */
-    public function locateOneOf(array $fileNames): string;
+    public static function fromFiles(array $files, array $roots): self
+    {
+        Assert::allString($files);
+        Assert::allString($roots);
+
+        return new self(
+            [] === $files
+                ? 'Could not locate any files (no file provided).'
+                : sprintf(
+                    'Could not locate the files "%s"%s',
+                    implode('", "', $files),
+                    [] === $roots
+                        ? ''
+                        : sprintf(' in "%s"', implode('", "', $roots))
+                )
+        );
+    }
 }

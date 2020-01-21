@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Locator;
+namespace Infection\Tests\FileSystem\Locator;
 
 use Generator;
-use Infection\Locator\FileOrDirectoryNotFound;
+use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use PHPUnit\Framework\TestCase;
 
 final class FileOrDirectoryNotFoundTest extends TestCase

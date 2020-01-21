@@ -33,12 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Locator;
+namespace Infection\Tests\FileSystem\Locator;
 
 use function defined;
 use Generator;
-use Infection\Locator\FileNotFound;
-use Infection\Locator\RootsFileLocator;
+use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
+use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use function Infection\Tests\normalizePath as p;
 use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
@@ -47,9 +47,9 @@ use function Safe\sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @group integration Requires IO reads
+ * @group integration Requires some I/O operations
  */
-final class RootsFileLocatorTest extends TestCase
+final class RootsFileOrDirectoryLocatorTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../Fixtures/Locator';
 
@@ -65,36 +65,29 @@ final class RootsFileLocatorTest extends TestCase
 
     /**
      * @dataProvider pathsProvider
-     *
-     * @param string[] $roots
      */
-    public function test_it_can_locate_files(
-        array $roots,
-        string $file,
-        string $expected
-    ): void {
-        $path = (new RootsFileLocator($roots, $this->filesystem))->locate($file);
+    public function test_it_can_locate_files(array $roots, string $file, string $expected): void
+    {
+        $path = (new RootsFileOrDirectoryLocator($roots, $this->filesystem))->locate($file);
 
         $this->assertSame(p($expected), p($path));
     }
 
     /**
      * @dataProvider invalidPathsProvider
-     *
-     * @param string[] $roots
      */
     public function test_it_throws_an_exception_if_file_or_folder_does_not_exist(
         array $roots,
         string $file,
         string $expectedErrorMessage
     ): void {
-        $locator = new RootsFileLocator($roots, $this->filesystem);
+        $locator = new RootsFileOrDirectoryLocator($roots, $this->filesystem);
 
         try {
             $locator->locate($file);
 
             $this->fail('Expected an exception to be thrown.');
-        } catch (FileNotFound $exception) {
+        } catch (FileOrDirectoryNotFound $exception) {
             $this->assertSame($expectedErrorMessage, $exception->getMessage());
             $this->assertSame(0, $exception->getCode());
             $this->assertNull($exception->getPrevious());
@@ -103,38 +96,32 @@ final class RootsFileLocatorTest extends TestCase
 
     /**
      * @dataProvider multiplePathsProvider
-     *
-     * @param string[] $roots
-     * @param string[] $files
      */
     public function test_it_can_locate_one_of_the_given_files(
         array $roots,
         array $files,
         string $expected
     ): void {
-        $path = (new RootsFileLocator($roots, $this->filesystem))->locateOneOf($files);
+        $path = (new RootsFileOrDirectoryLocator($roots, $this->filesystem))->locateOneOf($files);
 
         $this->assertSame(p($expected), p($path));
     }
 
     /**
      * @dataProvider multipleInvalidPathsProvider
-     *
-     * @param string[] $roots
-     * @param string[] $files
      */
     public function test_locate_any_throws_exception_if_no_file_could_be_found(
         array $roots,
         array $files,
         string $expectedErrorMessage
     ): void {
-        $locator = new RootsFileLocator($roots, $this->filesystem);
+        $locator = new RootsFileOrDirectoryLocator($roots, $this->filesystem);
 
         try {
             $locator->locateOneOf($files);
 
             $this->fail('Expected an exception to be thrown.');
-        } catch (FileNotFound $exception) {
+        } catch (FileOrDirectoryNotFound $exception) {
             $this->assertSame(
                 $expectedErrorMessage,
                 $exception->getMessage()
@@ -257,6 +244,33 @@ final class RootsFileLocatorTest extends TestCase
             }
         };
 
+        $generators[] = static function () use ($root): Generator {
+            $title = 'one root';
+            $case = 'locate root directory';
+
+            $roots = [$root . '/dir'];
+            $expected = $root . '/dir';
+
+            $paths = [
+                '.',
+                './',
+                './root/sub-dir/../../.',
+                './root/sub-dir/../../',
+                $root . '/dir',
+                $root . '/dir/',
+            ];
+
+            foreach ($paths as $index => $path) {
+                $name = sprintf('[%s][%s] #%s', $title, $case, $index);
+
+                yield $name => [
+                    $roots,
+                    $path,
+                    $expected,
+                ];
+            }
+        };
+
         if (!defined('PHP_WINDOWS_VERSION_MAJOR')) {
             $generators[] = static function () use ($root): Generator {
                 $title = 'one root';
@@ -294,19 +308,19 @@ final class RootsFileLocatorTest extends TestCase
         yield [
             ['/nowhere'],
             'unknown',
-            'Could not locate the file "unknown" in "/nowhere".',
+            'Could not locate the file/directory "unknown" in "/nowhere".',
         ];
 
         yield [
             ['/nowhere'],
             '/unknown',
-            'Could not locate the file "/unknown" in "/nowhere".',
+            'Could not locate the file/directory "/unknown" in "/nowhere".',
         ];
 
         yield [
             ['/nowhere1', '/nowhere2'],
             'unknown',
-            'Could not locate the file "unknown" in "/nowhere1", "/nowhere2".',
+            'Could not locate the file/directory "unknown" in "/nowhere1", "/nowhere2".',
         ];
 
         $fixturesDir = realpath(self::FIXTURES_DIR);
@@ -316,7 +330,7 @@ final class RootsFileLocatorTest extends TestCase
                 [$fixturesDir],
                 'broken-symlink',
                 sprintf(
-                    'Could not locate the file "broken-symlink" in "%s".',
+                    'Could not locate the file/directory "broken-symlink" in "%s".',
                     $fixturesDir
                 ),
             ];

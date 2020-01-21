@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use Infection\Configuration\Configuration;
-use Infection\Finder\TestFrameworkFinder;
+use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
 use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapterFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;

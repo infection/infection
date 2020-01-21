@@ -33,38 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\Finder;
+namespace Infection\Tests\FileSystem\Finder\Iterator;
 
-/**
- * @internal
- */
-abstract class AbstractExecutableFinder
+use Infection\Tests\Fixtures\Autoloaded\Finder\MockRelativePathFinder;
+use Infection\Tests\Fixtures\Finder\MockRealPathFinder;
+use PHPUnit\Framework\TestCase;
+
+final class RealPathFilterIteratorTest extends TestCase
 {
-    abstract public function find(): string;
-
-    protected function searchNonExecutables(array $probableNames, array $extraDirectories = []): ?string
+    /**
+     * @dataProvider providesFinders
+     */
+    public function test_it_differs_from_relative_path(string $finder, int $expectedFilecount): void
     {
-        $path = getenv('PATH') ?: getenv('Path');
+        $sourceFilesFinder = new $finder(['tests/phpunit/Fixtures/Files/Finder']);
 
-        if (!$path) {
-            return null;
+        $filter = ['tests/phpunit/Fixtures/Files/Finder/FirstFile.php'];
+        $files = $sourceFilesFinder->setFilter($filter);
+
+        $iterator = $files->getIterator();
+        $iterator->rewind();
+        $firstFile = $iterator->current();
+
+        $this->assertCount($expectedFilecount, $files);
+
+        if ($expectedFilecount === 1) {
+            $this->assertSame('FirstFile.php', $firstFile->getFilename());
         }
+    }
 
-        $dirs = array_merge(
-            explode(PATH_SEPARATOR, $path),
-            $extraDirectories
-        );
+    public function providesFinders()
+    {
+        yield 'RealPathFileIterator' => [
+            MockRealPathFinder::class,
+            1,
+        ];
 
-        foreach ($dirs as $dir) {
-            foreach ($probableNames as $name) {
-                $fileName = sprintf('%s/%s', $dir, $name);
-
-                if (file_exists($fileName)) {
-                    return $fileName;
-                }
-            }
-        }
-
-        return null;
+        yield 'Symfony PathFileIterator' => [
+            MockRelativePathFinder::class,
+            0,
+        ];
     }
 }

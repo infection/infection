@@ -33,67 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Locator;
+namespace Infection\FileSystem\Finder;
 
-use function implode;
-use RuntimeException;
-use function Safe\sprintf;
+use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
+use Iterator;
+use Symfony\Component\Finder\Finder;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class FileOrDirectoryNotFound extends RuntimeException
+final class FilterableFinder extends Finder
 {
     /**
-     * @param string[] $roots
+     * @var string[]
      */
-    public static function fromFileName(string $file, array $roots): self
-    {
-        Assert::allString($roots);
-
-        return new self(sprintf(
-            'Could not locate the file/directory "%s"%s.',
-            $file,
-            [] === $roots
-                ? ''
-                : sprintf(' in "%s"', implode('", "', $roots))
-        ));
-    }
-
-    /**
-     * @deprecated
-     */
-    public static function multipleFilesDoNotExist(string $path, array $files): self
-    {
-        return new self(
-            sprintf(
-                'The path "%s" does not contain any of the requested files: "%s"',
-                $path,
-                implode('", "', $files)
-            )
-        );
-    }
+    private $filters = [];
 
     /**
      * @param string[] $files
-     * @param string[] $roots
      */
-    public static function fromFiles(array $files, array $roots): self
+    public function filterFiles(array $files): void
     {
         Assert::allString($files);
-        Assert::allString($roots);
 
-        return new self(
-            [] === $files
-                ? 'Could not locate any files (no file provided).'
-                : sprintf(
-                    'Could not locate the files "%s"%s',
-                    implode('", "', $files),
-                    [] === $roots
-                        ? ''
-                        : sprintf(' in "%s"', implode('", "', $roots))
-                )
-        );
+        $this->filters = $files;
+    }
+
+    /**
+     * @return RealPathFilterIterator|(iterable<\Symfony\Component\Finder\SplFileInfo>&Iterator)
+     */
+    public function getIterator(): Iterator
+    {
+        $iterator = parent::getIterator();
+
+        if ($this->filters) {
+            $iterator = new RealPathFilterIterator($iterator, $this->filters, []);
+        }
+
+        return $iterator;
     }
 }

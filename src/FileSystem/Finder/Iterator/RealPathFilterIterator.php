@@ -33,53 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Locator;
+namespace Infection\FileSystem\Finder\Iterator;
 
-use function implode;
-use RuntimeException;
-use function Safe\sprintf;
-use Webmozart\Assert\Assert;
+use const DIRECTORY_SEPARATOR;
+use Symfony\Component\Finder\Iterator\MultiplePcreFilterIterator;
 
 /**
  * @internal
  */
-final class FileNotFound extends RuntimeException
+final class RealPathFilterIterator extends MultiplePcreFilterIterator
 {
     /**
-     * @param string[] $roots
+     * Filters the iterator values.
+     *
+     * @return bool true if the value should be kept, false otherwise
      */
-    public static function fromFileName(string $file, array $roots): self
+    public function accept()
     {
-        Assert::allString($roots);
+        $filename = $this->current()->getRealPath();
 
-        return new self(sprintf(
-            'Could not locate the file "%s"%s.',
-            $file,
-            [] === $roots
-                ? ''
-                : sprintf(' in "%s"', implode('", "', $roots))
-        ));
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $filename = str_replace('\\', '/', $filename);
+        }
+
+        return $this->isAccepted($filename);
     }
 
     /**
-     * @param string[] $files
-     * @param string[] $roots
+     * Converts strings to regexp.
+     *
+     * PCRE patterns are left unchanged.
+     *
+     * Default conversion:
+     *     'lorem/ipsum/dolor' ==>  'lorem\/ipsum\/dolor/'
+     *
+     * Use only / as directory separator (on Windows also).
+     *
+     * @param string $str Pattern: regexp or dirname
+     *
+     * @return string regexp corresponding to a given string or regexp
      */
-    public static function fromFiles(array $files, array $roots): self
+    protected function toRegex($str)
     {
-        Assert::allString($files);
-        Assert::allString($roots);
-
-        return new self(
-            [] === $files
-                ? 'Could not locate any files (no file provided).'
-                : sprintf(
-                    'Could not locate the files "%s"%s',
-                    implode('", "', $files),
-                    [] === $roots
-                        ? ''
-                        : sprintf(' in "%s"', implode('", "', $roots))
-                )
-        );
+        return $this->isRegex($str) ? $str : '/' . preg_quote($str, '/') . '/';
     }
 }

@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Finder;
+namespace Infection\Tests\FileSystem\Finder;
 
 use const DIRECTORY_SEPARATOR;
 use Symfony\Component\Filesystem\Filesystem;

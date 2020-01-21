@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Finder;
+namespace Infection\FileSystem\Finder;
 
 use function dirname;
-use Infection\Finder\Exception\FinderException;
+use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\TestFramework\TestFrameworkTypes;
 use RuntimeException;
 use function Safe\file_get_contents;

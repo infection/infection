@@ -33,45 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Finder\Iterator;
+namespace Infection\FileSystem\Finder\Exception;
 
-use Infection\Tests\Fixtures\Autoloaded\Finder\MockRelativePathFinder;
-use Infection\Tests\Fixtures\Finder\MockRealPathFinder;
-use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
-final class RealPathFilterIteratorTest extends TestCase
+/**
+ * @internal
+ */
+final class FinderException extends RuntimeException
 {
-    /**
-     * @dataProvider providesFinders
-     */
-    public function test_it_differs_from_relative_path(string $finder, int $expectedFilecount): void
+    public static function composerNotFound(): self
     {
-        $sourceFilesFinder = new $finder(['tests/phpunit/Fixtures/Files/Finder']);
-
-        $filter = ['tests/phpunit/Fixtures/Files/Finder/FirstFile.php'];
-        $files = $sourceFilesFinder->setFilter($filter);
-
-        $iterator = $files->getIterator();
-        $iterator->rewind();
-        $firstFile = $iterator->current();
-
-        $this->assertCount($expectedFilecount, $files);
-
-        if ($expectedFilecount === 1) {
-            $this->assertSame('FirstFile.php', $firstFile->getFilename());
-        }
+        return new self(
+            'Unable to locate a Composer executable on local system. Ensure that Composer is installed and available.'
+        );
     }
 
-    public function providesFinders()
+    public static function phpExecutableNotFound(): self
     {
-        yield 'RealPathFileIterator' => [
-            MockRealPathFinder::class,
-            1,
-        ];
+        return new self(
+            'Unable to locate the PHP executable on the local system. Please report this issue, and include details about your setup.'
+        );
+    }
 
-        yield 'Symfony PathFileIterator' => [
-            MockRelativePathFinder::class,
-            0,
-        ];
+    public static function testFrameworkNotFound(string $testFrameworkName): self
+    {
+        return new self(
+            sprintf(
+                'Unable to locate a %s executable on local system. Ensure that %s is installed and available.',
+                $testFrameworkName,
+                $testFrameworkName
+            )
+        );
+    }
+
+    public static function testCustomPathDoesNotExist(string $testFrameworkName, string $customPath): self
+    {
+        return new self(
+            sprintf('The custom path to %s was set as "%s" but this file did not exist.',
+                $testFrameworkName,
+                $customPath
+            )
+        );
     }
 }

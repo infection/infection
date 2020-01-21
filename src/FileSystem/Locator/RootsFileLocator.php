@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Locator;
+namespace Infection\FileSystem\Locator;
 
 use function current;
 use const DIRECTORY_SEPARATOR;

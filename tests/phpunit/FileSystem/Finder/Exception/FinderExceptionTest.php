@@ -33,47 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\Finder\Exception;
+namespace Infection\Tests\FileSystem\Finder\Exception;
 
-use RuntimeException;
+use Infection\FileSystem\Finder\Exception\FinderException;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class FinderException extends RuntimeException
+final class FinderExceptionTest extends TestCase
 {
-    public static function composerNotFound(): self
+    public function test_composer_not_found_exception(): void
     {
-        return new self(
-            'Unable to locate a Composer executable on local system. Ensure that Composer is installed and available.'
+        $exception = FinderException::composerNotFound();
+
+        $this->assertInstanceOf(FinderException::class, $exception);
+        $this->assertStringContainsString(
+            'Unable to locate a Composer executable on local system',
+            $exception->getMessage()
         );
     }
 
-    public static function phpExecutableNotFound(): self
+    public function test_php_executable_not_found(): void
     {
-        return new self(
-            'Unable to locate the PHP executable on the local system. Please report this issue, and include details about your setup.'
+        $exception = FinderException::phpExecutableNotFound();
+
+        $this->assertInstanceOf(FinderException::class, $exception);
+        $this->assertStringContainsString(
+            'Unable to locate the PHP executable on the local system',
+            $exception->getMessage()
         );
     }
 
-    public static function testFrameworkNotFound(string $testFrameworkName): self
+    public function test_test_framework_not_found(): void
     {
-        return new self(
-            sprintf(
-                'Unable to locate a %s executable on local system. Ensure that %s is installed and available.',
-                $testFrameworkName,
-                $testFrameworkName
-            )
+        $exception = FinderException::testFrameworkNotFound('framework');
+
+        $this->assertInstanceOf(FinderException::class, $exception);
+        $this->assertStringContainsString(
+            'Unable to locate a framework executable on local system.',
+            $exception->getMessage()
+        );
+        $this->assertStringContainsString(
+            'Ensure that framework is installed and available.',
+            $exception->getMessage()
         );
     }
 
-    public static function testCustomPathDoesNotExist(string $testFrameworkName, string $customPath): self
+    public function test_test_custom_path_does_not_exsist(): void
     {
-        return new self(
-            sprintf('The custom path to %s was set as "%s" but this file did not exist.',
-                $testFrameworkName,
-                $customPath
-            )
+        $exception = FinderException::testCustomPathDoesNotExist('framework', 'foo/bar/abc');
+
+        $this->assertInstanceOf(FinderException::class, $exception);
+        $this->assertStringContainsString(
+            'The custom path to framework was set as "foo/bar/abc"',
+            $exception->getMessage()
         );
     }
 }
