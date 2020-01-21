@@ -186,7 +186,7 @@ abstract class AbstractMutatorTestCase extends TestCase
 
     private static function getMutatorFactory(): MutatorFactory
     {
-        if (null === self::$mutatorFactory) {
+        if (self::$mutatorFactory === null) {
             self::$mutatorFactory = new MutatorFactory();
         }
 
