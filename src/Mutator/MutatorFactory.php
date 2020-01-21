@@ -77,7 +77,7 @@ final class MutatorFactory
                 )
             );
 
-            /** @var string[] $settings */
+            /** @var mixed[] $settings */
             $settings = $config['settings'] ?? [];
             /** @var string[] $ignored */
             $ignored = $config['ignore'] ?? [];

@@ -48,7 +48,7 @@ abstract class AllowedFunctionsConfig
     private $allowedFunctions;
 
     /**
-     * @param array<string, bool> $config
+     * @param array<string, bool> $settings
      * @param string[] $knownFunctions
      */
     public function __construct(array $settings, array $knownFunctions)

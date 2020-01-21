@@ -65,7 +65,7 @@ final class MBStringConfig extends AllowedFunctionsConfig
     ];
 
     /**
-     * @param array<string, bool> $config
+     * @param array<string, bool> $settings
      */
     public function __construct(array $settings)
     {

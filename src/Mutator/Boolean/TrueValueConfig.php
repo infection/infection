@@ -38,6 +38,9 @@ namespace Infection\Mutator\Boolean;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
+/**
+ * @internal
+ */
 final class TrueValueConfig
 {
     private const KNOWN_FUNCTIONS = [
@@ -48,7 +51,7 @@ final class TrueValueConfig
     private $allowedFunctions = [];
 
     /**
-     * @param array<string, bool> $config
+     * @param array<string, bool> $settings
      */
     public function __construct(array $settings)
     {
