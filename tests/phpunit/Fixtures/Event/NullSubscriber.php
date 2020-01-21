@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures\Event;
 
-use Infection\Event\EventDispatcher\EventSubscriberInterface;
+use Infection\Event\Subscriber\EventSubscriber;
 
-final class NullSubscriber implements EventSubscriberInterface
+final class NullSubscriber implements EventSubscriber
 {
 
     /**

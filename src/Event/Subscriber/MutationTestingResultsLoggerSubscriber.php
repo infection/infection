@@ -33,38 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Listener;
+namespace Infection\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\EventSubscriberInterface;
-use Infection\Event\MutationGeneratingStarted;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Event\MutationTestingFinished;
+use Infection\Logger\MutationTestingResultsLogger;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class CiMutationGeneratingConsoleLoggerSubscriber implements EventSubscriberInterface
+final class MutationTestingResultsLoggerSubscriber implements EventSubscriber
 {
-    private $output;
+    private $loggers;
 
-    public function __construct(OutputInterface $output)
+    /**
+     * @param MutationTestingResultsLogger[] $loggers
+     */
+    public function __construct(array $loggers)
     {
-        $this->output = $output;
+        Assert::allIsInstanceOf($loggers, MutationTestingResultsLogger::class);
+
+        $this->loggers = $loggers;
     }
 
     public function getSubscribedEvents(): array
     {
         return [
-            MutationGeneratingStarted::class => [$this, 'onMutationGeneratingStarted'],
+            MutationTestingFinished::class => [$this, 'onMutationTestingFinished'],
         ];
     }
 
-    public function onMutationGeneratingStarted(MutationGeneratingStarted $event): void
+    public function onMutationTestingFinished(MutationTestingFinished $event): void
     {
-        $this->output->writeln([
-            '',
-            'Generate mutants...',
-            '',
-            sprintf('Processing source code files: %s', $event->getMutableFilesCount()),
-        ]);
+        foreach ($this->loggers as $logger) {
+            $logger->log();
+        }
     }
 }

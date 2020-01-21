@@ -33,53 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Listener;
+namespace Infection\Tests\Event;
 
-use Infection\Event\EventDispatcher\EventSubscriberInterface;
-use Infection\Event\MutantCreated;
-use Infection\Event\MutantsCreatingFinished;
-use Infection\Event\MutantsCreatingStarted;
-use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Tests\Fixtures\Event\NullSubscriber;
+use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
+use Infection\Tests\Fixtures\Event\UserEventSubscriber;
+use Infection\Tests\Fixtures\Event\UserWasCreated;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class MutantCreatingConsoleLoggerSubscriber implements EventSubscriberInterface
+final class EventDispatcherTest extends TestCase
 {
-    private $output;
-    private $progressBar;
-
-    public function __construct(OutputInterface $output)
+    public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void
     {
-        $this->output = $output;
+        $userSubscriber = new UserEventSubscriber();
 
-        $this->progressBar = new ProgressBar($this->output);
-        $this->progressBar->setFormat('Creating mutated files and processes: %current%/%max%');
-    }
+        $dispatcher = new \Infection\Event\EventDispatcher();
+        $dispatcher->addSubscriber($userSubscriber);
+        $dispatcher->addSubscriber(new NullSubscriber());
+        $dispatcher->addSubscriber(new UnknownEventSubscriber());
 
-    public function getSubscribedEvents(): array
-    {
-        return [
-            MutantsCreatingStarted::class => [$this, 'onMutantsCreatingStarted'],
-            MutantCreated::class => [$this, 'onMutantCreated'],
-            MutantsCreatingFinished::class => [$this, 'onMutantsCreatingFinished'],
-        ];
-    }
+        // Sanity check
+        $this->assertSame(0, $userSubscriber->count);
 
-    public function onMutantsCreatingStarted(MutantsCreatingStarted $event): void
-    {
-        $this->output->writeln(['']);
-        $this->progressBar->start($event->getMutantCount());
-    }
+        $dispatcher->dispatch(new UserWasCreated());
+        $dispatcher->dispatch(new UserWasCreated());
 
-    public function onMutantCreated(MutantCreated $event): void
-    {
-        $this->progressBar->advance();
-    }
-
-    public function onMutantsCreatingFinished(MutantsCreatingFinished $event): void
-    {
-        $this->progressBar->finish();
+        $this->assertSame(2, $userSubscriber->count);
     }
 }

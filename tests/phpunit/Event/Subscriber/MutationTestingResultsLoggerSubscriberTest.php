@@ -33,11 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Listener;
+namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Listener\MutationTestingResultsLoggerSubscriber;
+use Infection\Event\EventDispatcher;
 use Infection\Event\MutationTestingFinished;
+use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
 use Infection\Logger\MutationTestingResultsLogger;
 use PHPUnit\Framework\TestCase;
 

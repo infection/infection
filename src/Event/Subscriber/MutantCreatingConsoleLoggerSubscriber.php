@@ -33,42 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\EventDispatcher;
+namespace Infection\Event\Subscriber;
 
-use function get_class;
+use Infection\Event\MutantCreated;
+use Infection\Event\MutantsCreatingFinished;
+use Infection\Event\MutantsCreatingStarted;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
- * @final
  */
-class EventDispatcher
+final class MutantCreatingConsoleLoggerSubscriber implements EventSubscriber
 {
-    /**
-     * @var callable[][]
-     */
-    private $listeners = [];
+    private $output;
+    private $progressBar;
 
-    public function dispatch(object $event): void
+    public function __construct(OutputInterface $output)
     {
-        $name = get_class($event);
+        $this->output = $output;
 
-        foreach ($this->getListeners($name) as $listener) {
-            $listener($event);
-        }
+        $this->progressBar = new ProgressBar($this->output);
+        $this->progressBar->setFormat('Creating mutated files and processes: %current%/%max%');
     }
 
-    public function addSubscriber(EventSubscriberInterface $eventSubscriber): void
+    public function getSubscribedEvents(): array
     {
-        foreach ($eventSubscriber->getSubscribedEvents() as $eventName => $listener) {
-            $this->listeners[$eventName][] = $listener;
-        }
+        return [
+            MutantsCreatingStarted::class => [$this, 'onMutantsCreatingStarted'],
+            MutantCreated::class => [$this, 'onMutantCreated'],
+            MutantsCreatingFinished::class => [$this, 'onMutantsCreatingFinished'],
+        ];
     }
 
-    /**
-     * @return callable[]
-     */
-    private function getListeners(string $eventName): array
+    public function onMutantsCreatingStarted(MutantsCreatingStarted $event): void
     {
-        return $this->listeners[$eventName] ?? [];
+        $this->output->writeln(['']);
+        $this->progressBar->start($event->getMutantCount());
+    }
+
+    public function onMutantCreated(MutantCreated $event): void
+    {
+        $this->progressBar->advance();
+    }
+
+    public function onMutantsCreatingFinished(MutantsCreatingFinished $event): void
+    {
+        $this->progressBar->finish();
     }
 }

@@ -38,7 +38,7 @@ namespace Infection\Tests\Process\Builder;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Differ\DiffColorizer;
-use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\EventDispatcher;
 use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Performance\Memory\MemoryFormatter;

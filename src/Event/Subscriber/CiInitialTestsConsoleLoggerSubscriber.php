@@ -33,43 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Listener;
+namespace Infection\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\EventSubscriberInterface;
-use Infection\Event\InitialTestCaseCompleted;
-use Infection\Event\InitialTestSuiteFinished;
 use Infection\Event\InitialTestSuiteStarted;
 use Infection\TestFramework\TestFrameworkAdapter;
 use InvalidArgumentException;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
+final class CiInitialTestsConsoleLoggerSubscriber implements EventSubscriber
 {
     private $output;
-    private $progressBar;
     private $testFrameworkAdapter;
-    private $debug;
 
-    public function __construct(OutputInterface $output, TestFrameworkAdapter $testFrameworkAdapter, bool $debug)
+    public function __construct(OutputInterface $output, TestFrameworkAdapter $testFrameworkAdapter)
     {
         $this->output = $output;
         $this->testFrameworkAdapter = $testFrameworkAdapter;
-        $this->debug = $debug;
-
-        $this->progressBar = new ProgressBar($this->output);
-        $this->progressBar->setFormat('verbose');
     }
 
     public function getSubscribedEvents(): array
     {
         return [
             InitialTestSuiteStarted::class => [$this, 'onInitialTestSuiteStarted'],
-            InitialTestSuiteFinished::class => [$this, 'onInitialTestSuiteFinished'],
-            InitialTestCaseCompleted::class => [$this, 'onInitialTestCaseCompleted'],
         ];
     }
 
@@ -90,22 +78,6 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriberInterf
                 $this->testFrameworkAdapter->getName(),
                 $version
             ),
-            '',
         ]);
-        $this->progressBar->start();
-    }
-
-    public function onInitialTestSuiteFinished(InitialTestSuiteFinished $event): void
-    {
-        $this->progressBar->finish();
-
-        if ($this->debug) {
-            $this->output->writeln(PHP_EOL . $event->getOutputText());
-        }
-    }
-
-    public function onInitialTestCaseCompleted(InitialTestCaseCompleted $event): void
-    {
-        $this->progressBar->advance();
     }
 }

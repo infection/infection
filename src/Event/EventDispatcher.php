@@ -33,52 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Listener;
+namespace Infection\Event;
 
-use Infection\Event\EventDispatcher\EventSubscriberInterface;
-use Infection\Event\InitialTestSuiteStarted;
-use Infection\TestFramework\TestFrameworkAdapter;
-use InvalidArgumentException;
-use Symfony\Component\Console\Output\OutputInterface;
+use function get_class;
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
+ * @final
  */
-final class CiInitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
+class EventDispatcher
 {
-    private $output;
-    private $testFrameworkAdapter;
+    /**
+     * @var callable[][]
+     */
+    private $listeners = [];
 
-    public function __construct(OutputInterface $output, TestFrameworkAdapter $testFrameworkAdapter)
+    public function dispatch(object $event): void
     {
-        $this->output = $output;
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
-    }
+        $name = get_class($event);
 
-    public function getSubscribedEvents(): array
-    {
-        return [
-            InitialTestSuiteStarted::class => [$this, 'onInitialTestSuiteStarted'],
-        ];
-    }
-
-    public function onInitialTestSuiteStarted(InitialTestSuiteStarted $event): void
-    {
-        try {
-            $version = $this->testFrameworkAdapter->getVersion();
-        } catch (InvalidArgumentException $e) {
-            $version = 'unknown';
+        foreach ($this->getListeners($name) as $listener) {
+            $listener($event);
         }
+    }
 
-        $this->output->writeln([
-            '',
-            'Running initial test suite...',
-            '',
-            sprintf(
-                '%s version: %s',
-                $this->testFrameworkAdapter->getName(),
-                $version
-            ),
-        ]);
+    public function addSubscriber(EventSubscriber $eventSubscriber): void
+    {
+        foreach ($eventSubscriber->getSubscribedEvents() as $eventName => $listener) {
+            $this->listeners[$eventName][] = $listener;
+        }
+    }
+
+    /**
+     * @return callable[]
+     */
+    private function getListeners(string $eventName): array
+    {
+        return $this->listeners[$eventName] ?? [];
     }
 }

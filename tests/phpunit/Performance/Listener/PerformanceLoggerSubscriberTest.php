@@ -37,7 +37,7 @@ namespace Infection\Tests\Performance\Listener;
 
 use Infection\Event\ApplicationExecutionFinished;
 use Infection\Event\ApplicationExecutionStarted;
-use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\EventDispatcher;
 use Infection\Performance\Listener\PerformanceLoggerSubscriber;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\Stopwatch;

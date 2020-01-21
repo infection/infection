@@ -33,26 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Listener;
+namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\Listener\CleanUpAfterMutationTestingFinishedSubscriber;
-use Infection\Event\MutationTestingFinished;
+use Infection\Event\EventDispatcher;
+use Infection\Event\MutationGeneratingStarted;
+use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriber;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @group integration Requires some I/O operations
- */
-final class CleanUpAfterMutationTestingFinishedSubscriberTest extends TestCase
+final class CiMutationGeneratingConsoleLoggerSubscriberTest extends TestCase
 {
-    public function test_it_execute_remove_on_mutation_testing_finished(): void
+    /**
+     * @var OutputInterface|MockObject
+     */
+    private $output;
+
+    protected function setUp(): void
     {
-        $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->expects($this->once())
-            ->method('remove');
+        parent::setUp();
 
-        $subscriber = new CleanUpAfterMutationTestingFinishedSubscriber($filesystem, sys_get_temp_dir());
+        $this->output = $this->createMock(OutputInterface::class);
+    }
 
-        $subscriber->onMutationTestingFinished(new MutationTestingFinished());
+    public function test_it_reacts_on_mutation_generating_started_event(): void
+    {
+        $this->output->expects($this->once())
+            ->method('writeln')
+            ->with([
+                '',
+                'Generate mutants...',
+                '',
+                'Processing source code files: 123',
+            ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new CiMutationGeneratingConsoleLoggerSubscriber($this->output));
+
+        $dispatcher->dispatch(new MutationGeneratingStarted(123));
     }
 }

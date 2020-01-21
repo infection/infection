@@ -33,41 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Listener;
+namespace Infection\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Listener\CiMutantCreatingConsoleLoggerSubscriber;
 use Infection\Event\MutantsCreatingStarted;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class CiMutantCreatingConsoleLoggerSubscriberTest extends TestCase
+/**
+ * @internal
+ */
+final class CiMutantCreatingConsoleLoggerSubscriber implements EventSubscriber
 {
-    /**
-     * @var OutputInterface|MockObject
-     */
     private $output;
 
-    protected function setUp(): void
+    public function __construct(OutputInterface $output)
     {
-        parent::setUp();
-
-        $this->output = $this->createMock(OutputInterface::class);
+        $this->output = $output;
     }
 
-    public function test_it_reacts_on_mutants_creating_event(): void
+    public function getSubscribedEvents(): array
     {
-        $this->output->expects($this->once())
-            ->method('writeln')
-            ->with([
-                '',
-                'Creating mutated files and processes: 123',
-            ]);
+        return [
+            MutantsCreatingStarted::class => [$this, 'onMutantsCreatingStarted'],
+        ];
+    }
 
-        $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new CiMutantCreatingConsoleLoggerSubscriber($this->output));
-
-        $dispatcher->dispatch(new MutantsCreatingStarted(123));
+    public function onMutantsCreatingStarted(MutantsCreatingStarted $event): void
+    {
+        $this->output->writeln([
+            '',
+            sprintf('Creating mutated files and processes: %s', $event->getMutantCount()),
+        ]);
     }
 }
