@@ -37,6 +37,7 @@ namespace Infection\Mutator\Number;
 
 use Generator;
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
@@ -45,6 +46,8 @@ use PhpParser\Node;
  */
 final class IncrementInteger extends AbstractNumberMutator
 {
+    use GetMutatorName;
+
     public static function getDefinition(): ?Definition
     {
         return new Definition(
@@ -64,7 +67,7 @@ final class IncrementInteger extends AbstractNumberMutator
         yield new Node\Scalar\LNumber($node->value + 1);
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Scalar\LNumber
             && $node->value !== 0

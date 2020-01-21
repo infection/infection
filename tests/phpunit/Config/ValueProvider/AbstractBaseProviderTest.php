@@ -79,7 +79,7 @@ abstract class AbstractBaseProviderTest extends TestCase
 
     protected function hasSttyAvailable(): bool
     {
-        if (null !== self::$stty) {
+        if (self::$stty !== null) {
             return self::$stty;
         }
 

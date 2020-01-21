@@ -65,7 +65,7 @@ final class ArrayItemRemovalTest extends AbstractMutatorTestCase
         yield 'It removes only last item when set to do so' => [
             '<?php $a = [1, 2, 3];',
             "<?php\n\n\$a = [1, 2];",
-            ['settings' => ['remove' => 'last']],
+            ['remove' => 'last'],
         ];
 
         yield 'It removes every item on by one when set to `all`' => [
@@ -75,7 +75,7 @@ final class ArrayItemRemovalTest extends AbstractMutatorTestCase
                 "<?php\n\n\$a = [1, 3];",
                 "<?php\n\n\$a = [1, 2];",
             ],
-            ['settings' => ['remove' => 'all']],
+            ['remove' => 'all'],
         ];
 
         yield 'It obeys limit when mutating arrays in `all` mode' => [
@@ -84,7 +84,7 @@ final class ArrayItemRemovalTest extends AbstractMutatorTestCase
                 "<?php\n\n\$a = [2, 3];",
                 "<?php\n\n\$a = [1, 3];",
             ],
-            ['settings' => ['remove' => 'all', 'limit' => 2]],
+            ['remove' => 'all', 'limit' => 2],
         ];
 
         yield 'It mutates arrays having required items count when removing `all` items' => [
@@ -93,7 +93,7 @@ final class ArrayItemRemovalTest extends AbstractMutatorTestCase
                 "<?php\n\n\$a = [2];",
                 "<?php\n\n\$a = [1];",
             ],
-            ['settings' => ['remove' => 'all', 'limit' => 2]],
+            ['remove' => 'all', 'limit' => 2],
         ];
 
         yield 'It mutates correctly for limit value (1)' => [
@@ -101,7 +101,7 @@ final class ArrayItemRemovalTest extends AbstractMutatorTestCase
             [
                 "<?php\n\n\$a = [];",
             ],
-            ['settings' => ['remove' => 'all', 'limit' => 1]],
+            ['remove' => 'all', 'limit' => 1],
         ];
     }
 
@@ -119,7 +119,7 @@ final class ArrayItemRemovalTest extends AbstractMutatorTestCase
         $this->doTest(
             '<?php $a = [1, 2, 3];',
             "<?php\n\n\$a = [2, 3];",
-            ['settings' => [$setting => $value]]
+            [$setting => $value]
         );
     }
 
@@ -134,7 +134,7 @@ final class ArrayItemRemovalTest extends AbstractMutatorTestCase
         ];
 
         yield 'remove is not valid' => [
-            'remove', 'INVALID', 'INVALID',
+            'remove', 'INVALID', 'invalid',
         ];
 
         yield 'remove is not string' => [

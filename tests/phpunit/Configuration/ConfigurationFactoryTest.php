@@ -47,10 +47,12 @@ use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
+use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
+use Infection\Mutator\MutatorResolver;
 use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
@@ -100,6 +102,7 @@ final class ConfigurationFactoryTest extends TestCase
 
         $this->configFactory = new ConfigurationFactory(
             new TmpDirProvider(),
+            new MutatorResolver(),
             new MutatorFactory(),
             new MutatorParser(),
             $sourceFilesCollectorProphecy->reveal()
@@ -462,17 +465,14 @@ final class ConfigurationFactoryTest extends TestCase
                 ],
             ],
             '',
-            (static function (): array {
-                $config = new MutatorConfig([
-                    'ignore' => [
+            [
+                'MethodCallRemoval' => new IgnoreMutator(
+                    new IgnoreConfig([
                         'Infection\Finder\SourceFilesFinder::__construct::63',
-                    ],
-                ]);
-
-                return [
-                    'MethodCallRemoval' => new IgnoreMutator($config, new MethodCallRemoval($config)),
-                ];
-            })()
+                    ]),
+                    new MethodCallRemoval()
+                ),
+            ]
         );
 
         yield 'mutators from config & input' => self::createValueForMutators(
@@ -489,8 +489,14 @@ final class ConfigurationFactoryTest extends TestCase
                 $config = new MutatorConfig([]);
 
                 return [
-                    'AssignmentEqual' => new IgnoreMutator($config, new AssignmentEqual($config)),
-                    'EqualIdentical' => new IgnoreMutator($config, new EqualIdentical($config)),
+                    'AssignmentEqual' => new IgnoreMutator(
+                        new IgnoreConfig([]),
+                        new AssignmentEqual()
+                    ),
+                    'EqualIdentical' => new IgnoreMutator(
+                        new IgnoreConfig([]),
+                        new EqualIdentical()
+                    ),
                 ];
             })()
         );
@@ -621,10 +627,11 @@ final class ConfigurationFactoryTest extends TestCase
                 'config/phpunit'
             ),
             (static function (): array {
-                $config = new MutatorConfig([]);
-
                 return [
-                    'TrueValue' => new IgnoreMutator($config, new TrueValue($config)),
+                    'TrueValue' => new IgnoreMutator(
+                        new IgnoreConfig([]),
+                        new TrueValue(new MutatorConfig([]))
+                    ),
                 ];
             })(),
             'phpspec',
@@ -1293,8 +1300,10 @@ final class ConfigurationFactoryTest extends TestCase
      */
     private static function getDefaultMutators(): array
     {
-        if (null === self::$mutators) {
-            self::$mutators = (new MutatorFactory())->create(['@default' => true]);
+        if (self::$mutators === null) {
+            self::$mutators = (new MutatorFactory())->create(
+                (new MutatorResolver())->resolve(['@default' => true])
+            );
         }
 
         return self::$mutators;

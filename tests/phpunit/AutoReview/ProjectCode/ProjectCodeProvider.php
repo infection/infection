@@ -59,7 +59,6 @@ use Infection\Http\BadgeApiClient;
 use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\Mutator\Util\Mutator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\TestFramework\Coverage\CoverageFileData;
@@ -127,7 +126,6 @@ final class ProjectCodeProvider
      * This array contains all classes that can be extended by our users.
      */
     public const EXTENSION_POINTS = [
-        Mutator::class,
         OutputFormatter::class,
         SchemaConfigurationFactory::class,
         SchemaConfigurationFileLoader::class,
@@ -155,7 +153,7 @@ final class ProjectCodeProvider
 
     public static function provideSourceClasses(): Generator
     {
-        if (null !== self::$sourceClasses) {
+        if (self::$sourceClasses !== null) {
             yield from self::$sourceClasses;
 
             return;
@@ -210,7 +208,7 @@ final class ProjectCodeProvider
 
     public static function provideSourceClassesToCheckForPublicProperties(): Generator
     {
-        if (null !== self::$sourceClassesToCheckForPublicProperties) {
+        if (self::$sourceClassesToCheckForPublicProperties !== null) {
             yield from self::$sourceClassesToCheckForPublicProperties;
 
             return;
@@ -249,7 +247,7 @@ final class ProjectCodeProvider
 
     public static function provideTestClasses(): Generator
     {
-        if (null !== self::$testClasses) {
+        if (self::$testClasses !== null) {
             yield from self::$testClasses;
 
             return;

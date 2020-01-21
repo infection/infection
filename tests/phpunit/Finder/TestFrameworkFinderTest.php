@@ -211,7 +211,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     private static function restorePathEnvironment(): void
     {
         foreach (self::$env as $name => $value) {
-            if (false !== $value) {
+            if ($value !== false) {
                 putenv($name . '=' . $value);
             } else {
                 putenv($name);

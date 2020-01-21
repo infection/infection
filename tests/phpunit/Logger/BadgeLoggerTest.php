@@ -89,7 +89,7 @@ final class BadgeLoggerTest extends TestCase
     {
         // Restore original env state
         foreach (self::$env as $name => $value) {
-            if (false !== $value) {
+            if ($value !== false) {
                 putenv($name . '=' . $value);
             } else {
                 putenv($name);

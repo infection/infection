@@ -52,7 +52,7 @@ trait ConfigurationAssertions
     use TestFrameworkExtraOptionsAssertions;
 
     /**
-     * @param string[]      $expectedSourceDirectories
+     * @param string[] $expectedSourceDirectories
      * @param SplFileInfo[] $expectedSourceFiles
      */
     private function assertConfigurationStateIs(

@@ -72,7 +72,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
 
             $this->cachedPath = realpath($this->findTestFramework());
 
-            if ('.bat' === substr($this->cachedPath, -4)) {
+            if (substr($this->cachedPath, -4) === '.bat') {
                 $this->cachedPath = $this->findFromBatchFile($this->cachedPath);
             }
         }
@@ -114,7 +114,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
             }
         }
 
-        if (null !== $vendorPath) {
+        if ($vendorPath !== null) {
             $pathName = getenv('PATH') ? 'PATH' : 'Path';
             putenv($pathName . '=' . $vendorPath . PATH_SEPARATOR . getenv($pathName));
         }
@@ -161,7 +161,7 @@ class TestFrameworkFinder extends AbstractExecutableFinder
 
         $path = $this->searchNonExecutables($candidates, $extraDirs);
 
-        if (null !== $path) {
+        if ($path !== null) {
             return $path;
         }
 

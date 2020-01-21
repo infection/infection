@@ -37,14 +37,17 @@ namespace Infection\Mutator\Unwrap;
 
 use function array_key_exists;
 use Generator;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-abstract class AbstractUnwrapMutator extends Mutator
+abstract class AbstractUnwrapMutator implements Mutator
 {
+    use GetMutatorName;
+
     /**
      * @param Node\Expr\FuncCall $node
      *
@@ -61,14 +64,7 @@ abstract class AbstractUnwrapMutator extends Mutator
         }
     }
 
-    abstract protected function getFunctionName(): string;
-
-    /**
-     * @return int[]|Generator
-     */
-    abstract protected function getParameterIndexes(Node\Expr\FuncCall $node): Generator;
-
-    final protected function mutatesNode(Node $node): bool
+    final public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Expr\FuncCall || !$node->name instanceof Node\Name) {
             return false;
@@ -82,4 +78,11 @@ abstract class AbstractUnwrapMutator extends Mutator
 
         return $node->name->toLowerString() === strtolower($this->getFunctionName());
     }
+
+    abstract protected function getFunctionName(): string;
+
+    /**
+     * @return int[]|Generator
+     */
+    abstract protected function getParameterIndexes(Node\Expr\FuncCall $node): Generator;
 }

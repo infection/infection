@@ -38,9 +38,9 @@ namespace Infection\Tests\Mutator;
 use DomainException;
 use Generator;
 use Infection\Mutator\Arithmetic\Plus;
+use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
-use Infection\Mutator\Util\MutatorConfig;
 use Infection\Visitor\ReflectionVisitor;
 use function iterator_to_array;
 use PhpParser\Node;
@@ -82,7 +82,7 @@ final class IgnoreMutatorTest extends TestCase
 
     public function test_it_should_not_mutate_node_if_its_decorated_mutator_cannot(): void
     {
-        $ignoreMutator = new IgnoreMutator(new MutatorConfig([]), $this->mutatorMock);
+        $ignoreMutator = new IgnoreMutator(new IgnoreConfig([]), $this->mutatorMock);
 
         $this->mutatorMock
             ->expects($this->once())
@@ -98,7 +98,7 @@ final class IgnoreMutatorTest extends TestCase
 
     public function test_it_should_mutate_node_if_its_decorated_mutator_can_and_no_reflection_class_could_be_found_for_the_node(): void
     {
-        $ignoreMutator = new IgnoreMutator(new MutatorConfig([]), $this->mutatorMock);
+        $ignoreMutator = new IgnoreMutator(new IgnoreConfig([]), $this->mutatorMock);
 
         $this->mutatorMock
             ->expects($this->once())
@@ -147,16 +147,16 @@ final class IgnoreMutatorTest extends TestCase
             ->willReturn(10)
         ;
 
-        $configMock = $this->createMock(MutatorConfig::class);
+        $ignoreConfigMock = $this->createMock(IgnoreConfig::class);
 
-        $configMock
+        $ignoreConfigMock
             ->expects($this->once())
             ->method('isIgnored')
             ->with(self::class, 'foo', 10)
             ->willReturn(true)
         ;
 
-        $ignoreMutator = new IgnoreMutator($configMock, $this->mutatorMock);
+        $ignoreMutator = new IgnoreMutator($ignoreConfigMock, $this->mutatorMock);
 
         $mutate = $ignoreMutator->canMutate($this->nodeMock);
 
@@ -165,7 +165,7 @@ final class IgnoreMutatorTest extends TestCase
 
     public function test_it_mutates_the_node_via_its_decorated_mutator(): void
     {
-        $ignoreMutator = new IgnoreMutator(new MutatorConfig([]), $this->mutatorMock);
+        $ignoreMutator = new IgnoreMutator(new IgnoreConfig([]), $this->mutatorMock);
 
         $mutatedNodeMock = $this->createMock(Node::class);
 
@@ -185,9 +185,7 @@ final class IgnoreMutatorTest extends TestCase
 
     public function test_it_exposes_its_decorated_mutator_name(): void
     {
-        $config = new MutatorConfig([]);
-
-        $ignoreMutator = new IgnoreMutator($config, new Plus($config));
+        $ignoreMutator = new IgnoreMutator(new IgnoreConfig([]), new Plus());
 
         $this->assertSame(
             MutatorName::getName(Plus::class),

@@ -92,7 +92,7 @@ final class ProjectCodeTest extends TestCase
     {
         $testClassName = SourceTestClassNameScheme::getTestClassName($className);
 
-        if (false === in_array($className, ProjectCodeProvider::NON_TESTED_CONCRETE_CLASSES, true)) {
+        if (in_array($className, ProjectCodeProvider::NON_TESTED_CONCRETE_CLASSES, true) === false) {
             $this->assertTrue(
                 class_exists($testClassName, true),
                 sprintf(

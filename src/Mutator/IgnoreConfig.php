@@ -33,29 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Unwrap;
+namespace Infection\Mutator;
 
-use Generator;
-use Infection\Mutator\Definition;
-use PhpParser\Node;
+use const FNM_NOESCAPE;
+use function fnmatch;
+use function in_array;
 
 /**
  * @internal
+ * @final
  */
-final class UnwrapArrayColumn extends AbstractUnwrapMutator
+class IgnoreConfig
 {
-    public static function getDefinition(): ?Definition
+    private $ignored;
+
+    /**
+     * @param string[] $ignored
+     */
+    public function __construct(array $ignored)
     {
-        return null;
+        $this->ignored = $ignored;
     }
 
-    protected function getFunctionName(): string
+    public function isIgnored(string $class, string $method, ?int $lineNumber): bool
     {
-        return 'array_column';
-    }
+        if (in_array($class, $this->ignored, true)) {
+            return true;
+        }
 
-    protected function getParameterIndexes(Node\Expr\FuncCall $node): Generator
-    {
-        yield 0;
+        $classMethod = $class . '::' . $method;
+
+        if (in_array($classMethod, $this->ignored, true)) {
+            return true;
+        }
+
+        foreach ($this->ignored as $ignorePattern) {
+            if (fnmatch($ignorePattern, $class, FNM_NOESCAPE)
+                || fnmatch($ignorePattern, $classMethod, FNM_NOESCAPE)
+                || ($lineNumber !== null && fnmatch($ignorePattern, $classMethod . '::' . $lineNumber, FNM_NOESCAPE))
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -63,7 +63,7 @@ class FileParser
         try {
             return $this->parser->parse($fileInfo->getContents());
         } catch (Throwable $throwable) {
-            $filePath = false === $fileInfo->getRealPath()
+            $filePath = $fileInfo->getRealPath() === false
                 ? $fileInfo->getPathname()
                 : $fileInfo->getRealPath()
             ;

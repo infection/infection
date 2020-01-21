@@ -122,7 +122,7 @@ final class SchemaConfigurationFileTest extends TestCase
                 $exception->getCode()
             );
 
-            if (null === $expectedException->getPrevious()) {
+            if ($expectedException->getPrevious() === null) {
                 $this->assertNull($exception->getPrevious());
             } else {
                 $expectedPrevious = $expectedException->getPrevious();

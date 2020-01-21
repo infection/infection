@@ -124,7 +124,9 @@ return Config::create()
         'ordered_class_elements' => true,
         'ordered_imports' => true,
         'ordered_interfaces' => true,
-        'phpdoc_align' => false,
+        'phpdoc_align' => [
+            'align' => 'left',
+        ],
         'phpdoc_no_empty_return' => true,
         'phpdoc_order' => true,
         'phpdoc_summary' => false,
@@ -143,7 +145,11 @@ return Config::create()
         'single_line_throw' => false,
         'static_lambda' => true,
         'strict_comparison' => true,
-        'yoda_style' => false,
+        'yoda_style' => [
+            'equal' => false,
+            'identical' => false,
+            'less_and_greater' => false,
+        ],
     ])
     ->setFinder($finder)
 ;

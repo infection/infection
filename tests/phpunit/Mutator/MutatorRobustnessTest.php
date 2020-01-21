@@ -39,8 +39,8 @@ use function array_values;
 use Generator;
 use Infection\Container;
 use Infection\Mutation\NodeTraverserFactory;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
-use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Tests\Fixtures\NullMutationVisitor;
 use function ksort;
@@ -106,7 +106,7 @@ final class MutatorRobustnessTest extends TestCase
 
     private static function getParser(): Parser
     {
-        if (null === self::$parser) {
+        if (self::$parser === null) {
             self::$parser = Container::create()->getParser();
         }
 
@@ -115,7 +115,7 @@ final class MutatorRobustnessTest extends TestCase
 
     private function provideCodeSamples(): Generator
     {
-        if (null !== self::$files) {
+        if (self::$files !== null) {
             yield from self::$files;
 
             return;

@@ -52,7 +52,7 @@ use function trim;
 final class Parser
 {
     /**
-     * @return array<string[]&string[][]>
+     * @return array<string[]|string[][]>
      */
     public static function parse(string $makeFileContents): array
     {
@@ -62,7 +62,7 @@ final class Parser
         $target = null;
 
         foreach (explode(PHP_EOL, $makeFileContents) as $line) {
-            if (0 === strpos($line, "\t")
+            if (strpos($line, "\t") === 0
                 || preg_match('/^\S+=.+$/u', $line)) {
                 continue;
             }
@@ -71,15 +71,15 @@ final class Parser
 
             $previousMultiline = $multiline;
 
-            if (false !== strpos($line, ':=')
-                || 0 === strpos($line, '#')
+            if (strpos($line, ':=') !== false
+                || strpos($line, '#') === 0
             ) {
                 continue;
             }
 
-            $multiline = '\\' === substr($line, -1);
+            $multiline = substr($line, -1) === '\\';
 
-            if (false === $previousMultiline) {
+            if ($previousMultiline === false) {
                 $targetParts = explode(':', $line);
 
                 if (count($targetParts) !== 2) {
@@ -111,7 +111,7 @@ final class Parser
      */
     private static function parseDependencies(string $dependencies, bool $multiline): array
     {
-        if (false !== strpos($dependencies, '##')) {
+        if (strpos($dependencies, '##') !== false) {
             return [trim($dependencies)];
         }
 
