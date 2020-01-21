@@ -33,21 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Performance\Listener;
+namespace Infection\Tests\Event\Listener;
 
-use Infection\Event\ApplicationExecutionFinished;
-use Infection\Event\ApplicationExecutionStarted;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Performance\Listener\PerformanceLoggerSubscriber;
-use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
-use function is_array;
+use Infection\Event\Listener\CiMutantCreatingConsoleLoggerSubscriber;
+use Infection\Event\MutantsCreatingStarted;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class PerformanceLoggerSubscriberTest extends TestCase
+final class CiMutantCreatingConsoleLoggerSubscriberTest extends TestCase
 {
     /**
      * @var OutputInterface|MockObject
@@ -56,26 +51,23 @@ final class PerformanceLoggerSubscriberTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->output = $this->createMock(OutputInterface::class);
     }
 
-    public function test_it_reacts_on_application_execution_events(): void
+    public function test_it_reacts_on_mutants_creating_event(): void
     {
         $this->output->expects($this->once())
             ->method('writeln')
-            ->with($this->callback(static function ($parameter) {
-                return is_array($parameter) && $parameter[0] === '' && strpos($parameter[1], 'Time:') === 0;
-            }));
+            ->with([
+                '',
+                'Creating mutated files and processes: 123',
+            ]);
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new PerformanceLoggerSubscriber(
-            new Timer(),
-            new TimeFormatter(),
-            new MemoryFormatter(),
-            $this->output
-        ));
+        $dispatcher->addSubscriber(new CiMutantCreatingConsoleLoggerSubscriber($this->output));
 
-        $dispatcher->dispatch(new ApplicationExecutionStarted());
-        $dispatcher->dispatch(new ApplicationExecutionFinished());
+        $dispatcher->dispatch(new MutantsCreatingStarted(123));
     }
 }

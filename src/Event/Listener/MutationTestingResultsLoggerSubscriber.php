@@ -33,49 +33,41 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Performance\Listener;
+namespace Infection\Event\Listener;
 
-use Infection\Event\ApplicationExecutionFinished;
-use Infection\Event\ApplicationExecutionStarted;
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Performance\Listener\PerformanceLoggerSubscriber;
-use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
-use function is_array;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Event\EventDispatcher\EventSubscriberInterface;
+use Infection\Event\MutationTestingFinished;
+use Infection\Logger\MutationTestingResultsLogger;
+use Webmozart\Assert\Assert;
 
-final class PerformanceLoggerSubscriberTest extends TestCase
+/**
+ * @internal
+ */
+final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $output;
+    private $loggers;
 
-    protected function setUp(): void
+    /**
+     * @param MutationTestingResultsLogger[] $loggers
+     */
+    public function __construct(array $loggers)
     {
-        $this->output = $this->createMock(OutputInterface::class);
+        Assert::allIsInstanceOf($loggers, MutationTestingResultsLogger::class);
+
+        $this->loggers = $loggers;
     }
 
-    public function test_it_reacts_on_application_execution_events(): void
+    public function getSubscribedEvents(): array
     {
-        $this->output->expects($this->once())
-            ->method('writeln')
-            ->with($this->callback(static function ($parameter) {
-                return is_array($parameter) && $parameter[0] === '' && strpos($parameter[1], 'Time:') === 0;
-            }));
+        return [
+            MutationTestingFinished::class => [$this, 'onMutationTestingFinished'],
+        ];
+    }
 
-        $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new PerformanceLoggerSubscriber(
-            new Timer(),
-            new TimeFormatter(),
-            new MemoryFormatter(),
-            $this->output
-        ));
-
-        $dispatcher->dispatch(new ApplicationExecutionStarted());
-        $dispatcher->dispatch(new ApplicationExecutionFinished());
+    public function onMutationTestingFinished(MutationTestingFinished $event): void
+    {
+        foreach ($this->loggers as $logger) {
+            $logger->log();
+        }
     }
 }

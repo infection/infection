@@ -33,49 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Performance\Listener;
+namespace Infection\Event\Listener;
 
-use Infection\Event\ApplicationExecutionFinished;
-use Infection\Event\ApplicationExecutionStarted;
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Performance\Listener\PerformanceLoggerSubscriber;
-use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
-use function is_array;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Infection\Event\EventDispatcher\EventSubscriberInterface;
+use Infection\Event\InitialTestSuiteStarted;
+use Infection\TestFramework\TestFrameworkAdapter;
+use InvalidArgumentException;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class PerformanceLoggerSubscriberTest extends TestCase
+/**
+ * @internal
+ */
+final class CiInitialTestsConsoleLoggerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var OutputInterface|MockObject
-     */
     private $output;
+    private $testFrameworkAdapter;
 
-    protected function setUp(): void
+    public function __construct(OutputInterface $output, TestFrameworkAdapter $testFrameworkAdapter)
     {
-        $this->output = $this->createMock(OutputInterface::class);
+        $this->output = $output;
+        $this->testFrameworkAdapter = $testFrameworkAdapter;
     }
 
-    public function test_it_reacts_on_application_execution_events(): void
+    public function getSubscribedEvents(): array
     {
-        $this->output->expects($this->once())
-            ->method('writeln')
-            ->with($this->callback(static function ($parameter) {
-                return is_array($parameter) && $parameter[0] === '' && strpos($parameter[1], 'Time:') === 0;
-            }));
+        return [
+            InitialTestSuiteStarted::class => [$this, 'onInitialTestSuiteStarted'],
+        ];
+    }
 
-        $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new PerformanceLoggerSubscriber(
-            new Timer(),
-            new TimeFormatter(),
-            new MemoryFormatter(),
-            $this->output
-        ));
+    public function onInitialTestSuiteStarted(InitialTestSuiteStarted $event): void
+    {
+        try {
+            $version = $this->testFrameworkAdapter->getVersion();
+        } catch (InvalidArgumentException $e) {
+            $version = 'unknown';
+        }
 
-        $dispatcher->dispatch(new ApplicationExecutionStarted());
-        $dispatcher->dispatch(new ApplicationExecutionFinished());
+        $this->output->writeln([
+            '',
+            'Running initial test suite...',
+            '',
+            sprintf(
+                '%s version: %s',
+                $this->testFrameworkAdapter->getName(),
+                $version
+            ),
+        ]);
     }
 }

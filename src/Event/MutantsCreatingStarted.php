@@ -33,49 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Performance\Listener;
+namespace Infection\Event;
 
-use Infection\Event\ApplicationExecutionFinished;
-use Infection\Event\ApplicationExecutionStarted;
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Performance\Listener\PerformanceLoggerSubscriber;
-use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
-use function is_array;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
-
-final class PerformanceLoggerSubscriberTest extends TestCase
+/**
+ * @internal
+ */
+final class MutantsCreatingStarted
 {
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $output;
+    private $mutantCount;
 
-    protected function setUp(): void
+    public function __construct(int $mutantCount)
     {
-        $this->output = $this->createMock(OutputInterface::class);
+        $this->mutantCount = $mutantCount;
     }
 
-    public function test_it_reacts_on_application_execution_events(): void
+    public function getMutantCount(): int
     {
-        $this->output->expects($this->once())
-            ->method('writeln')
-            ->with($this->callback(static function ($parameter) {
-                return is_array($parameter) && $parameter[0] === '' && strpos($parameter[1], 'Time:') === 0;
-            }));
-
-        $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new PerformanceLoggerSubscriber(
-            new Timer(),
-            new TimeFormatter(),
-            new MemoryFormatter(),
-            $this->output
-        ));
-
-        $dispatcher->dispatch(new ApplicationExecutionStarted());
-        $dispatcher->dispatch(new ApplicationExecutionFinished());
+        return $this->mutantCount;
     }
 }

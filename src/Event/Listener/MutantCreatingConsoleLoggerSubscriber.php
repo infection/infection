@@ -33,49 +33,53 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Performance\Listener;
+namespace Infection\Event\Listener;
 
-use Infection\Event\ApplicationExecutionFinished;
-use Infection\Event\ApplicationExecutionStarted;
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Performance\Listener\PerformanceLoggerSubscriber;
-use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
-use function is_array;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Infection\Event\EventDispatcher\EventSubscriberInterface;
+use Infection\Event\MutantCreated;
+use Infection\Event\MutantsCreatingFinished;
+use Infection\Event\MutantsCreatingStarted;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class PerformanceLoggerSubscriberTest extends TestCase
+/**
+ * @internal
+ */
+final class MutantCreatingConsoleLoggerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var OutputInterface|MockObject
-     */
     private $output;
+    private $progressBar;
 
-    protected function setUp(): void
+    public function __construct(OutputInterface $output)
     {
-        $this->output = $this->createMock(OutputInterface::class);
+        $this->output = $output;
+
+        $this->progressBar = new ProgressBar($this->output);
+        $this->progressBar->setFormat('Creating mutated files and processes: %current%/%max%');
     }
 
-    public function test_it_reacts_on_application_execution_events(): void
+    public function getSubscribedEvents(): array
     {
-        $this->output->expects($this->once())
-            ->method('writeln')
-            ->with($this->callback(static function ($parameter) {
-                return is_array($parameter) && $parameter[0] === '' && strpos($parameter[1], 'Time:') === 0;
-            }));
+        return [
+            MutantsCreatingStarted::class => [$this, 'onMutantsCreatingStarted'],
+            MutantCreated::class => [$this, 'onMutantCreated'],
+            MutantsCreatingFinished::class => [$this, 'onMutantsCreatingFinished'],
+        ];
+    }
 
-        $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new PerformanceLoggerSubscriber(
-            new Timer(),
-            new TimeFormatter(),
-            new MemoryFormatter(),
-            $this->output
-        ));
+    public function onMutantsCreatingStarted(MutantsCreatingStarted $event): void
+    {
+        $this->output->writeln(['']);
+        $this->progressBar->start($event->getMutantCount());
+    }
 
-        $dispatcher->dispatch(new ApplicationExecutionStarted());
-        $dispatcher->dispatch(new ApplicationExecutionFinished());
+    public function onMutantCreated(MutantCreated $event): void
+    {
+        $this->progressBar->advance();
+    }
+
+    public function onMutantsCreatingFinished(MutantsCreatingFinished $event): void
+    {
+        $this->progressBar->finish();
     }
 }

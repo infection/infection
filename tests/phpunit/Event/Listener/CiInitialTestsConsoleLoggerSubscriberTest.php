@@ -33,49 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Performance\Listener;
+namespace Infection\Tests\Event\Listener;
 
-use Infection\Event\ApplicationExecutionFinished;
-use Infection\Event\ApplicationExecutionStarted;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Performance\Listener\PerformanceLoggerSubscriber;
-use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
-use function is_array;
+use Infection\Event\InitialTestSuiteStarted;
+use Infection\Event\Listener\CiInitialTestsConsoleLoggerSubscriber;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class PerformanceLoggerSubscriberTest extends TestCase
+final class CiInitialTestsConsoleLoggerSubscriberTest extends TestCase
 {
     /**
      * @var OutputInterface|MockObject
      */
     private $output;
 
+    /**
+     * @var AbstractTestFrameworkAdapter|MockObject
+     */
+    private $testFramework;
+
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->output = $this->createMock(OutputInterface::class);
+        $this->testFramework = $this->createMock(AbstractTestFrameworkAdapter::class);
     }
 
-    public function test_it_reacts_on_application_execution_events(): void
+    public function test_it_reacts_on_mutants_creating_event(): void
     {
         $this->output->expects($this->once())
             ->method('writeln')
-            ->with($this->callback(static function ($parameter) {
-                return is_array($parameter) && $parameter[0] === '' && strpos($parameter[1], 'Time:') === 0;
-            }));
+            ->with([
+                '',
+                'Running initial test suite...',
+                '',
+                'PHPUnit version: 6.5.4',
+            ]);
+
+        $this->testFramework->expects($this->once())
+            ->method('getVersion')
+            ->willReturn('6.5.4');
+
+        $this->testFramework->expects($this->once())
+            ->method('getName')
+            ->willReturn('PHPUnit');
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new PerformanceLoggerSubscriber(
-            new Timer(),
-            new TimeFormatter(),
-            new MemoryFormatter(),
-            $this->output
-        ));
+        $dispatcher->addSubscriber(new CiInitialTestsConsoleLoggerSubscriber($this->output, $this->testFramework));
 
-        $dispatcher->dispatch(new ApplicationExecutionStarted());
-        $dispatcher->dispatch(new ApplicationExecutionFinished());
+        $dispatcher->dispatch(new InitialTestSuiteStarted());
     }
 }

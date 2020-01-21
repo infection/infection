@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use function count;
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\MutantCreated;
-use Infection\Events\MutantsCreatingFinished;
-use Infection\Events\MutantsCreatingStarted;
-use Infection\Events\MutationTestingFinished;
-use Infection\Events\MutationTestingStarted;
+use Infection\Event\EventDispatcher\EventDispatcherInterface;
+use Infection\Event\MutantCreated;
+use Infection\Event\MutantsCreatingFinished;
+use Infection\Event\MutantsCreatingStarted;
+use Infection\Event\MutationTestingFinished;
+use Infection\Event\MutationTestingStarted;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Builder\MutantProcessBuilder;

@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\InitialTestCaseCompleted;
-use Infection\Events\InitialTestSuiteFinished;
-use Infection\Events\InitialTestSuiteStarted;
+use Infection\Event\EventDispatcher\EventDispatcherInterface;
+use Infection\Event\InitialTestCaseCompleted;
+use Infection\Event\InitialTestSuiteFinished;
+use Infection\Event\InitialTestSuiteStarted;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Runner\InitialTestsRunner;
 use PHPUnit\Framework\MockObject\MockObject;
