@@ -74,7 +74,7 @@ final class MBStringConfigTest extends TestCase
             $this->fail();
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'Expected one of: "mb_chr", "mb_ord", "mb_parse_str", "mb_send_mail", "mb_strcut", "mb_stripos", "mb_stristr", "mb_strlen", "mb_strpos", "mb_strrchr", "mb_strripos", "mb_strrpos", "mb_strstr", "mb_strtolower", "mb_strtoupper", "mb_substr_count", "mb_substr", "mb_convert_case". Got: "foo"',
+                'Expected one of: "mb_chr", "mb_ord", "mb_parse_str", "mb_send_mail", "mb_strcut", "mb_stripos", "mb_stristr", "mb_strlen", "mb_strpos", "mb_strrchr", "mb_strripos", "mb_strrpos", "mb_strstr", "mb_strtolower", "mb_strtoupper", "mb_str_split", "mb_substr_count", "mb_substr", "mb_convert_case". Got: "foo"',
                 $exception->getMessage()
             );
         }
@@ -100,6 +100,7 @@ final class MBStringConfigTest extends TestCase
                 'mb_strstr',
                 'mb_strtolower',
                 'mb_strtoupper',
+                'mb_str_split',
                 'mb_substr_count',
                 'mb_substr',
                 'mb_convert_case',
@@ -124,6 +125,7 @@ final class MBStringConfigTest extends TestCase
                 'mb_strstr',
                 'mb_strtolower',
                 'mb_strtoupper',
+                'mb_str_split',
                 'mb_substr_count',
                 'mb_substr',
                 'mb_convert_case',
@@ -147,6 +149,7 @@ final class MBStringConfigTest extends TestCase
                 'mb_strstr',
                 'mb_strtolower',
                 'mb_strtoupper',
+                'mb_str_split',
                 'mb_substr_count',
                 'mb_substr',
                 'mb_convert_case',

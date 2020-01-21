@@ -96,12 +96,11 @@ final class MutatorRobustnessTest extends TestCase
         foreach ($this->provideCodeSamples() as [$fileName, $fileContents]) {
             foreach (ProfileList::ALL_MUTATORS as $mutatorClassName) {
                 $title = sprintf('[%s] %s', $mutatorClassName, $fileName);
-                $mutatorName = MutatorName::getName($mutatorClassName);
 
                 yield $title => [
                     $fileName,
                     $fileContents,
-                    $mutatorFactory->create([$mutatorName => true])[$mutatorName],
+                    $mutatorFactory->create([$mutatorClassName => []])[MutatorName::getName($mutatorClassName)],
                 ];
             }
         }
