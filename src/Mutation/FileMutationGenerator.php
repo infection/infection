@@ -67,7 +67,7 @@ class FileMutationGenerator
     }
 
     /**
-     * @param Mutator[]     $mutators
+     * @param Mutator[] $mutators
      * @param NodeVisitor[] $extraNodeVisitors
      *
      * @throws UnparsableFile

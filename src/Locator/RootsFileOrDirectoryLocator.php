@@ -51,7 +51,7 @@ final class RootsFileOrDirectoryLocator implements Locator
     private $filesystem;
 
     /**
-     * @param  string[] $roots
+     * @param string[] $roots
      */
     public function __construct(array $roots, Filesystem $filesystem)
     {

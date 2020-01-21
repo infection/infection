@@ -47,7 +47,7 @@ final class Definition
     private $remedies;
 
     /**
-     * @param string      $description Explanation on what the mutator is about
+     * @param string $description Explanation on what the mutator is about
      * @param string|null $remedies Guidelines or recommendations on how to kill the generated mutations
      */
     public function __construct(

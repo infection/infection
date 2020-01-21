@@ -84,8 +84,8 @@ class Configuration
     private $minCoveredMsi;
 
     /**
-     * @param string[]               $sourceDirectories
-     * @param SplFileInfo[]          $sourceFiles
+     * @param string[] $sourceDirectories
+     * @param SplFileInfo[] $sourceFiles
      * @param array<string, Mutator> $mutators
      */
     public function __construct(
