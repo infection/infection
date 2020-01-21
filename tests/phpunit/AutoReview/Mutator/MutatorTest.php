@@ -33,19 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview;
+namespace Infection\Tests\AutoReview\Mutator;
 
-use function array_column;
 use function array_diff;
 use function array_filter;
 use function array_map;
+use function class_implements;
 use function count;
-use Generator;
 use function implode;
+use function in_array;
+use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
-use function Infection\Tests\generator_to_phpunit_data_provider;
-use Infection\Tests\Mutator\ProfileListProvider;
-use function iterator_to_array;
+use Infection\Mutator\MutatorConfig;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
@@ -68,27 +67,36 @@ final class MutatorTest extends TestCase
         'getDefinition',
         'getName',
         'mutate',
-        'shouldMutate',
+        'canMutate',
     ];
 
     /**
-     * @dataProvider mutatorClassesProvider
+     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::mutatorClassesProvider
      */
     public function test_mutators_do_not_declare_public_methods(string $className): void
     {
         $publicMethods = $this->getPublicMethods(new ReflectionClass($className));
 
+        $knownMutatorPublicMethodNames = self::KNOWN_MUTATOR_PUBLIC_METHODS;
+
+        if (in_array(ConfigurableMutator::class, class_implements($className), true)) {
+            $knownMutatorPublicMethodNames[] = 'getConfigClassName';
+        }
+
         $this->assertCount(
-            count(self::KNOWN_MUTATOR_PUBLIC_METHODS),
+            count($knownMutatorPublicMethodNames),
             $publicMethods,
             sprintf(
-                'The mutator class "%s" has the following non-allowed public method(s) '
-                . 'declared: "%s". Either reconsider if it is necessary for it to be public and make'
-                . ' it protected/private instead or add it to "%s::KNOWN_MUTATOR_PUBLIC_METHODS".',
+                <<<'TXT'
+The mutator class "%s" has the following non-allowed public method(s) declared: "%s". Either
+reconsider if it is necessary for it to be public and make it protected/private instead or add it
+to "%s::KNOWN_MUTATOR_PUBLIC_METHODS".
+TXT
+                ,
                 $className,
                 implode(
                     ', ',
-                    array_diff($publicMethods, self::KNOWN_MUTATOR_PUBLIC_METHODS)
+                    array_diff($publicMethods, $knownMutatorPublicMethodNames)
                 ),
                 self::class
             )
@@ -96,7 +104,7 @@ final class MutatorTest extends TestCase
     }
 
     /**
-     * @dataProvider concreteMutatorClassesProvider
+     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::concreteMutatorClassesProvider
      */
     public function test_mutators_have_a_definition(string $className): void
     {
@@ -112,27 +120,95 @@ final class MutatorTest extends TestCase
         }
 
         $this->addWarning(sprintf(
-            'The mutant "%s" does not have a definition.',
+            'The mutator "%s" does not have a definition.',
             $className
         ));
     }
 
-    public function mutatorClassesProvider(): Generator
+    /**
+     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::concreteMutatorClassesProvider
+     */
+    public function test_configurable_mutators_declare_a_mutator_config(string $className): void
     {
-        yield from generator_to_phpunit_data_provider(array_column(
-            iterator_to_array(ProfileListProvider::mutatorNameAndClassProvider(), true),
-            1
-        ));
+        $mutatorReflection = new ReflectionClass($className);
+
+        $isConfigurable = in_array(
+            ConfigurableMutator::class,
+            class_implements($className),
+            true
+        );
+        $configClassName = $isConfigurable ? $className::getConfigClassName() : null;
+
+        $constructorReflection = $mutatorReflection->getConstructor();
+
+        if ($constructorReflection === null) {
+            $this->assertFalse(
+                $isConfigurable,
+                sprintf(
+                    <<<'TXT'
+The mutator "%s" is a configurable mutator but its constructor does not require a configuration.
+The constructor should either require a "%s" parameter or the mutator should not
+implement "%s".
+TXT
+                    ,
+                    $className,
+                    $configClassName ?: MutatorConfig::class,
+                    ConfigurableMutator::class
+                )
+            );
+        } else {
+            $constructorParameters = $constructorReflection->getParameters();
+
+            $assertionErrorMessage = sprintf(
+                <<<'TXT'
+Expected the mutator "%s" to have the constructor signature "__construct(%s $config)".
+TXT
+                ,
+                $className,
+                $configClassName
+            );
+
+            $this->assertCount(
+                1,
+                $constructorParameters,
+                $assertionErrorMessage . ' The constructor parameter count does not match.'
+            );
+
+            $configParameterType = $constructorParameters[0]->getType();
+
+            $this->assertNotNull(
+                $configParameterType,
+                $assertionErrorMessage . ' The constructor parameter type does not match.'
+            );
+
+            $this->assertSame(
+                $configClassName,
+                $configParameterType->getName(),
+                $assertionErrorMessage . ' The constructor parameter type does not match.'
+            );
+        }
     }
 
-    public function concreteMutatorClassesProvider(): Generator
+    /**
+     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::configurableMutatorClassesProvider
+     */
+    public function test_only_configurable_mutators_have_a_config(string $className): void
     {
-        yield from generator_to_phpunit_data_provider(ConcreteClassReflector::filterByConcreteClasses(
-            array_column(
-                iterator_to_array(ProfileListProvider::mutatorNameAndClassProvider(), true),
-                1
+        $configClassName = $className::getConfigClassName();
+
+        $this->assertContains(
+            MutatorConfig::class,
+            class_implements($configClassName),
+            sprintf(
+                <<<'TXT'
+Expected the mutator configuration class "%s" of the mutator "%s" to be a "%s".
+TXT
+                ,
+                $configClassName,
+                $className,
+                MutatorConfig::class
             )
-        ));
+        );
     }
 
     /**

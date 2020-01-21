@@ -40,18 +40,20 @@ use function array_intersect_key;
 use Closure;
 use function count;
 use Generator;
+use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetConfigClassName;
 use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class BCMath implements Mutator
+final class BCMath implements ConfigurableMutator
 {
     use GetMutatorName;
+    use GetConfigClassName;
 
     /**
      * @var array<string, Closure>

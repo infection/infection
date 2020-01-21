@@ -35,13 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use Infection\Mutator\MutatorConfig;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class TrueValueConfig
+final class TrueValueConfig implements MutatorConfig
 {
     private const KNOWN_FUNCTIONS = [
         'array_search',

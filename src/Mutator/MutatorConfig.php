@@ -33,33 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Extensions;
-
-use Infection\Mutator\AllowedFunctionsConfig;
-use Infection\Mutator\MutatorConfig;
+namespace Infection\Mutator;
 
 /**
  * @internal
  */
-final class BCMathConfig extends AllowedFunctionsConfig implements MutatorConfig
+interface MutatorConfig
 {
-    private const KNOWN_FUNCTIONS = [
-        'bcadd',
-        'bccomp',
-        'bcdiv',
-        'bcmod',
-        'bcmul',
-        'bcpow',
-        'bcsub',
-        'bcsqrt',
-        'bcpowmod',
-    ];
-
     /**
-     * @param array<string, bool> $settings
+     * @param mixed[] $settings
      */
-    public function __construct(array $settings)
-    {
-        parent::__construct($settings, self::KNOWN_FUNCTIONS);
-    }
+    public function __construct(array $settings);
 }
