@@ -38,7 +38,7 @@ namespace Infection\Tests\Process\Builder;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Differ\DiffColorizer;
-use Infection\Event\EventDispatcher\EventDispatcherInterface;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Performance\Memory\MemoryFormatter;
@@ -63,7 +63,7 @@ final class SubscriberBuilderTest extends TestCase
     public function test_it_registers_the_subscribers_when_debugging(): void
     {
         $calculator = new MetricsCalculator();
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher = $this->createMock(EventDispatcher::class);
         $dispatcher->expects($this->exactly(6))->method('addSubscriber');
         $diff = $this->createMock(DiffColorizer::class);
         $config = $this->createMock(Configuration::class);
@@ -96,7 +96,7 @@ final class SubscriberBuilderTest extends TestCase
     public function test_it_registers_the_subscribers_when_not_debugging(): void
     {
         $calculator = new MetricsCalculator();
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher = $this->createMock(EventDispatcher::class);
         $dispatcher->expects($this->exactly(7))->method('addSubscriber');
         $diff = $this->createMock(DiffColorizer::class);
         $config = $this->createMock(Configuration::class);
@@ -129,7 +129,7 @@ final class SubscriberBuilderTest extends TestCase
     public function test_it_throws_an_exception_when_output_formatter_is_invalid(): void
     {
         $calculator = new MetricsCalculator();
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher = $this->createMock(EventDispatcher::class);
         $dispatcher->expects($this->never())->method('addSubscriber');
         $diff = $this->createMock(DiffColorizer::class);
         $config = $this->createMock(Configuration::class);

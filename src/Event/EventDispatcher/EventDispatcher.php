@@ -35,39 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Event\EventDispatcher;
 
-use function get_class;
-
 /**
  * @internal
  */
-final class EventDispatcher implements EventDispatcherInterface
+interface EventDispatcher
 {
-    /**
-     * @var callable[][]
-     */
-    private $listeners = [];
+    public function dispatch(object $event): void;
 
-    public function dispatch($event): void
-    {
-        $name = get_class($event);
-
-        foreach ($this->getListeners($name) as $listener) {
-            $listener($event);
-        }
-    }
-
-    public function addSubscriber(EventSubscriberInterface $eventSubscriber): void
-    {
-        foreach ($eventSubscriber->getSubscribedEvents() as $eventName => $listener) {
-            $this->listeners[$eventName][] = $listener;
-        }
-    }
-
-    /**
-     * @return callable[]
-     */
-    private function getListeners(string $eventName): array
-    {
-        return $this->listeners[$eventName] ?? [];
-    }
+    public function addSubscriber(EventSubscriberInterface $eventSubscriber): void;
 }

@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner\Parallel;
 
-use Infection\Event\EventDispatcher\EventDispatcherInterface;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessFinished;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
@@ -118,10 +118,10 @@ final class ParallelProcessRunnerTest extends TestCase
         $this->runWithAllKindsOfProcesses(-1);
     }
 
-    private function buildEventDispatcherWithEventCount($eventCount): EventDispatcherInterface
+    private function buildEventDispatcherWithEventCount($eventCount): EventDispatcher
     {
-        /** @var MockObject|EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        /** @var MockObject|EventDispatcher $eventDispatcher */
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
         $eventDispatcher->expects($this->exactly($eventCount))
             ->method('dispatch')
             ->with(new MutantProcessFinished($this->createMock(MutantProcess::class)));

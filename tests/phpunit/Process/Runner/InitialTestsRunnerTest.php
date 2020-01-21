@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use Infection\Event\EventDispatcher\EventDispatcherInterface;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\InitialTestCaseCompleted;
 use Infection\Event\InitialTestSuiteFinished;
 use Infection\Event\InitialTestSuiteStarted;
@@ -68,8 +68,8 @@ final class InitialTestsRunnerTest extends TestCase
             ->with('', false, [])
             ->willReturn($process);
 
-        /** @var MockObject|EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        /** @var MockObject|EventDispatcher $eventDispatcher */
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
         $eventDispatcher->expects($this->exactly(3))
             ->method('dispatch')
             ->withConsecutive(

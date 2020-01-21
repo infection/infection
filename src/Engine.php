@@ -41,7 +41,7 @@ use function file_exists;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Event\ApplicationExecutionFinished;
-use Infection\Event\EventDispatcher\EventDispatcherInterface;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutation\MutationGenerator;
 use Infection\Performance\Limiter\MemoryLimiter;
@@ -85,7 +85,7 @@ final class Engine
         Filesystem $fileSystem,
         TestFrameworkAdapter $adapter,
         SubscriberBuilder $subscriberBuilder,
-        EventDispatcherInterface $eventDispatcher,
+        EventDispatcher $eventDispatcher,
         InitialTestsRunner $initialTestsRunner,
         MemoryLimiter $memoryLimitApplier,
         MutationGenerator $mutationGenerator,

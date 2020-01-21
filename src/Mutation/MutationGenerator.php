@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutation;
 
 use function count;
-use Infection\Event\EventDispatcher\EventDispatcherInterface;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutableFileProcessed;
 use Infection\Event\MutationGeneratingFinished;
 use Infection\Event\MutationGeneratingStarted;
@@ -73,7 +73,7 @@ final class MutationGenerator
         array $sourceFiles,
         LineCodeCoverage $codeCoverageData,
         array $mutators,
-        EventDispatcherInterface $eventDispatcher,
+        EventDispatcher $eventDispatcher,
         FileMutationGenerator $fileMutationGenerator
     ) {
         Assert::allIsInstanceOf($sourceFiles, SplFileInfo::class);
