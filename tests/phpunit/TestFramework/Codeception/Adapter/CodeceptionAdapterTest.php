@@ -41,11 +41,11 @@ use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\TestFrameworkTypes;
+use Infection\TestFramework\VersionParser;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use function Infection\Tests\normalizePath as p;
-use Infection\Utils\VersionParser;
-use function realpath;
 use Symfony\Component\Filesystem\Filesystem;
+use function Infection\Tests\normalizePath as p;
+use function realpath;
 
 /**
  * @group integration Requires some I/O operations

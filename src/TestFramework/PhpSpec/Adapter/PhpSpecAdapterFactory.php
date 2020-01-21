@@ -41,7 +41,7 @@ use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkAdapterFactory;
-use Infection\Utils\VersionParser;
+use Infection\TestFramework\VersionParser;
 
 /**
  * @internal

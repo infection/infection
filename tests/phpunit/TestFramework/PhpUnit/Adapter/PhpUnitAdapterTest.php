@@ -41,7 +41,7 @@ use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
-use Infection\Utils\VersionParser;
+use Infection\TestFramework\VersionParser;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
