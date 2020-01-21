@@ -35,20 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\EventDispatcher;
 
-use Infection\Event\EventDispatcher\SimpleEventDispatcher;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Tests\Fixtures\Event\NullSubscriber;
 use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
 use Infection\Tests\Fixtures\Event\UserEventSubscriber;
 use Infection\Tests\Fixtures\Event\UserWasCreated;
 use PHPUnit\Framework\TestCase;
 
-final class SimpleEventDispatcherTest extends TestCase
+final class EventDispatcherTest extends TestCase
 {
     public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void
     {
         $userSubscriber = new UserEventSubscriber();
 
-        $dispatcher = new SimpleEventDispatcher();
+        $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber($userSubscriber);
         $dispatcher->addSubscriber(new NullSubscriber());
         $dispatcher->addSubscriber(new UnknownEventSubscriber());

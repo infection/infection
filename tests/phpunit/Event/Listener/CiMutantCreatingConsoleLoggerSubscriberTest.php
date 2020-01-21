@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Listener;
 
-use Infection\Event\EventDispatcher\SimpleEventDispatcher;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Listener\CiMutantCreatingConsoleLoggerSubscriber;
 use Infection\Event\MutantsCreatingStarted;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -65,7 +65,7 @@ final class CiMutantCreatingConsoleLoggerSubscriberTest extends TestCase
                 'Creating mutated files and processes: 123',
             ]);
 
-        $dispatcher = new SimpleEventDispatcher();
+        $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new CiMutantCreatingConsoleLoggerSubscriber($this->output));
 
         $dispatcher->dispatch(new MutantsCreatingStarted(123));

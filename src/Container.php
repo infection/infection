@@ -48,7 +48,6 @@ use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\EventDispatcher\SimpleEventDispatcher;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Locator\RootsFileLocator;
@@ -194,7 +193,7 @@ final class Container
                 return new Differ(new BaseDiffer());
             },
             EventDispatcher::class => static function (): EventDispatcher {
-                return new SimpleEventDispatcher();
+                return new EventDispatcher();
             },
             ParallelProcessRunner::class => static function (self $container): ParallelProcessRunner {
                 return new ParallelProcessRunner($container->getEventDispatcher());

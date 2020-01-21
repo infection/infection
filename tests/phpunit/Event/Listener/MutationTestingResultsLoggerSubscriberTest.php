@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Listener;
 
-use Infection\Event\EventDispatcher\SimpleEventDispatcher;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Listener\MutationTestingResultsLoggerSubscriber;
 use Infection\Event\MutationTestingFinished;
 use Infection\Logger\MutationTestingResultsLogger;
@@ -45,7 +45,7 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
 {
     public function test_it_reacts_on_mutation_testing_finished(): void
     {
-        $dispatcher = new SimpleEventDispatcher();
+        $dispatcher = new EventDispatcher();
         $logger = $this->createMock(MutationTestingResultsLogger::class);
         $logger->expects($this->once())->method('log');
         $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber([$logger]));

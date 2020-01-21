@@ -68,7 +68,6 @@ final class InitialTestsRunnerTest extends TestCase
             ->with('', false, [])
             ->willReturn($process);
 
-        /** @var MockObject|EventDispatcher $eventDispatcher */
         $eventDispatcher = $this->createMock(EventDispatcher::class);
         $eventDispatcher->expects($this->exactly(3))
             ->method('dispatch')

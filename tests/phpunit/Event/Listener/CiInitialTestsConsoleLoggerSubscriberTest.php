@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Listener;
 
-use Infection\Event\EventDispatcher\SimpleEventDispatcher;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\InitialTestSuiteStarted;
 use Infection\Event\Listener\CiInitialTestsConsoleLoggerSubscriber;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
@@ -82,7 +82,7 @@ final class CiInitialTestsConsoleLoggerSubscriberTest extends TestCase
             ->method('getName')
             ->willReturn('PHPUnit');
 
-        $dispatcher = new SimpleEventDispatcher();
+        $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new CiInitialTestsConsoleLoggerSubscriber($this->output, $this->testFramework));
 
         $dispatcher->dispatch(new InitialTestSuiteStarted());
