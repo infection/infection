@@ -160,7 +160,7 @@ class ConfigurationFactory
     ): string {
         $tmpDir = (string) $schema->getTmpDir();
 
-        if ('' === $tmpDir) {
+        if ($tmpDir === '') {
             $tmpDir = sys_get_temp_dir();
         } elseif (!Path::isAbsolute($tmpDir)) {
             $tmpDir = sprintf('%s/%s', $configDir, $tmpDir);
@@ -175,7 +175,7 @@ class ConfigurationFactory
 
         $phpUnitConfigDir = $phpUnit->getConfigDir();
 
-        if (null === $phpUnitConfigDir) {
+        if ($phpUnitConfigDir === null) {
             $phpUnit->setConfigDir($configDir);
         } elseif (!Path::isAbsolute($phpUnitConfigDir)) {
             $phpUnit->setConfigDir(sprintf(
@@ -246,7 +246,7 @@ class ConfigurationFactory
     ): TestFrameworkExtraOptions {
         $extraOptions = $testFrameworkExtraOptions ?? $schema->getTestFrameworkExtraOptions();
 
-        return TestFrameworkTypes::PHPUNIT === $testFramework
+        return $testFramework === TestFrameworkTypes::PHPUNIT
             ? new PhpUnitExtraOptions($extraOptions)
             : new PhpSpecExtraOptions($extraOptions)
         ;

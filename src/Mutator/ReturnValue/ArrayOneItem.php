@@ -106,7 +106,7 @@ final class ArrayOneItem implements Mutator
         /** @var \PhpParser\Node\Stmt\Function_|null $functionScope */
         $functionScope = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY, null);
 
-        if (null === $functionScope) {
+        if ($functionScope === null) {
             return false;
         }
 

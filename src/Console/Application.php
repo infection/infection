@@ -86,11 +86,11 @@ final class Application extends BaseApplication
 
     public function run(?InputInterface $input = null, ?OutputInterface $output = null): int
     {
-        if (null === $input) {
+        if ($input === null) {
             $input = new ArgvInput();
         }
 
-        if (null === $output) {
+        if ($output === null) {
             $output = new ConsoleOutput();
         }
 

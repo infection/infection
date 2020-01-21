@@ -80,7 +80,7 @@ final class MutatorParser
                 true
             );
 
-            if (false !== $mutatorShortName) {
+            if ($mutatorShortName !== false) {
                 $parsedMutators[$index] = $mutatorShortName;
 
                 continue;

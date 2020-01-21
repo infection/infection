@@ -57,7 +57,7 @@ trait LogsAssertions
 
         $badge = $logs->getBadge();
 
-        if (null === $expectedBadge) {
+        if ($expectedBadge === null) {
             $this->assertNull($badge);
         } else {
             $this->assertNotNull($badge);

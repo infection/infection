@@ -56,7 +56,7 @@ class SchemaValidator
         $schemaFile = self::SCHEMA_FILE;
 
         // Prepend with file:// only when not using a special schema already (e.g. in the PHAR)
-        if (false === strpos($schemaFile, '://')) {
+        if (strpos($schemaFile, '://') === false) {
             $schemaFile = 'file://' . $schemaFile;
         }
 

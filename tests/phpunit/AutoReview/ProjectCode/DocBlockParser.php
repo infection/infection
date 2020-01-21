@@ -51,7 +51,7 @@ final class DocBlockParser
     {
         $docblock = trim($docblock);
 
-        if ('' === $docblock) {
+        if ($docblock === '') {
             return '';
         }
 

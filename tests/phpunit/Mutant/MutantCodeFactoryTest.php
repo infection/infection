@@ -179,7 +179,7 @@ PHP
 
     private function getDumper(): NodeDumper
     {
-        if (null === self::$dumper) {
+        if (self::$dumper === null) {
             self::$dumper = new NodeDumper();
         }
 
