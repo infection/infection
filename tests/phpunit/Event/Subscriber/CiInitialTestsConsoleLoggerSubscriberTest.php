@@ -33,11 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Listener;
+namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\EventDispatcher;
 use Infection\Event\InitialTestSuiteStarted;
-use Infection\Event\Listener\CiInitialTestsConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriber;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

@@ -37,7 +37,7 @@ namespace Infection\Performance\Listener;
 
 use Infection\Event\ApplicationExecutionFinished;
 use Infection\Event\ApplicationExecutionStarted;
-use Infection\Event\EventDispatcher\EventSubscriber;
+use Infection\Event\Subscriber\EventSubscriber;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\TimeFormatter;
 use Infection\Performance\Time\Timer;

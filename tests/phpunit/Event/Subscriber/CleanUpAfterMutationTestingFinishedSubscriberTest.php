@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Listener;
+namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\Listener\CleanUpAfterMutationTestingFinishedSubscriber;
 use Infection\Event\MutationTestingFinished;
+use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 

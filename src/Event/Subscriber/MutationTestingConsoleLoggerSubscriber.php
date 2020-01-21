@@ -33,11 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Listener;
+namespace Infection\Event\Subscriber;
 
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
-use Infection\Event\EventDispatcher\EventSubscriber;
 use Infection\Event\MutantProcessFinished;
 use Infection\Event\MutationTestingFinished;
 use Infection\Event\MutationTestingStarted;

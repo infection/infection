@@ -33,9 +33,8 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Listener;
+namespace Infection\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\EventSubscriber;
 use Infection\Event\InitialTestSuiteStarted;
 use Infection\TestFramework\TestFrameworkAdapter;
 use InvalidArgumentException;

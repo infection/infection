@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use function count;
-use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\EventDispatcher;
 use Infection\Event\MutantCreated;
 use Infection\Event\MutantsCreatingFinished;
 use Infection\Event\MutantsCreatingStarted;

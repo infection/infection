@@ -33,9 +33,8 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Listener;
+namespace Infection\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\EventSubscriber;
 use Infection\Event\MutableFileProcessed;
 use Infection\Event\MutationGeneratingFinished;
 use Infection\Event\MutationGeneratingStarted;
