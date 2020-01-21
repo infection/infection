@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use Infection\Mutator\ProfileList;
+use function array_fill_keys;
 use function array_values;
 use function count;
 use function get_class;
@@ -73,23 +75,19 @@ final class MutatorFactoryTest extends TestCase
 
     public function test_it_can_create_the_mutators_with_empty_settings(): void
     {
-        $mutators = $this->mutatorFactory->create([
-            Plus::class => [],
-            IdenticalEqual::class => [],
-        ]);
+        $mutators = $this->mutatorFactory->create(array_fill_keys(
+            ProfileList::ALL_MUTATORS,
+            []
+        ));
 
         $this->assertSameMutatorsByClass(
-            [Plus::class, IdenticalEqual::class],
+            array_values(ProfileList::ALL_MUTATORS),
             $mutators
         );
     }
 
     public function test_it_can_create_a_mutator_with_the_given_settings(): void
     {
-        // TODO: refactor this test to check the mutator configuration directly instead of relying
-        // on the canMutate() API which ends up testing other stuff and is also more cumbersome
-        // to employ.
-
         $mutators = $this->mutatorFactory->create([
             TrueValue::class => [
                 'ignore' => ['A::B'],
