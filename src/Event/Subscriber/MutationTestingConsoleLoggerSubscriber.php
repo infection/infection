@@ -33,11 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Listener;
+namespace Infection\Event\Subscriber;
 
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
-use Infection\Event\EventDispatcher\EventSubscriberInterface;
 use Infection\Event\MutantProcessFinished;
 use Infection\Event\MutationTestingFinished;
 use Infection\Event\MutationTestingStarted;
@@ -49,7 +48,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final class MutationTestingConsoleLoggerSubscriber implements EventSubscriberInterface
+final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 {
     private const PAD_LENGTH = 8;
 

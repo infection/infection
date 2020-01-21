@@ -33,41 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Listener;
+namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\EventSubscriberInterface;
 use Infection\Event\MutationTestingFinished;
-use Infection\Logger\MutationTestingResultsLogger;
-use Webmozart\Assert\Assert;
+use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @internal
+ * @group integration Requires some I/O operations
  */
-final class MutationTestingResultsLoggerSubscriber implements EventSubscriberInterface
+final class CleanUpAfterMutationTestingFinishedSubscriberTest extends TestCase
 {
-    private $loggers;
-
-    /**
-     * @param MutationTestingResultsLogger[] $loggers
-     */
-    public function __construct(array $loggers)
+    public function test_it_execute_remove_on_mutation_testing_finished(): void
     {
-        Assert::allIsInstanceOf($loggers, MutationTestingResultsLogger::class);
+        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem->expects($this->once())
+            ->method('remove');
 
-        $this->loggers = $loggers;
-    }
+        $subscriber = new CleanUpAfterMutationTestingFinishedSubscriber($filesystem, sys_get_temp_dir());
 
-    public function getSubscribedEvents(): array
-    {
-        return [
-            MutationTestingFinished::class => [$this, 'onMutationTestingFinished'],
-        ];
-    }
-
-    public function onMutationTestingFinished(MutationTestingFinished $event): void
-    {
-        foreach ($this->loggers as $logger) {
-            $logger->log();
-        }
+        $subscriber->onMutationTestingFinished(new MutationTestingFinished());
     }
 }

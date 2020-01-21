@@ -33,15 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\EventDispatcher;
+namespace Infection\Event\Subscriber;
+
+use Infection\Event\MutableFileProcessed;
+use Infection\Event\MutationGeneratingFinished;
+use Infection\Event\MutationGeneratingStarted;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-interface EventSubscriberInterface
+final class MutationGeneratingConsoleLoggerSubscriber implements EventSubscriber
 {
-    /**
-     * @return array<string, callable>
-     */
-    public function getSubscribedEvents(): array;
+    private $output;
+    private $progressBar;
+
+    public function __construct(OutputInterface $output)
+    {
+        $this->output = $output;
+
+        $this->progressBar = new ProgressBar($this->output);
+        $this->progressBar->setFormat('Processing source code files: %current%/%max%');
+    }
+
+    public function getSubscribedEvents(): array
+    {
+        return [
+            MutationGeneratingStarted::class => [$this, 'onMutationGeneratingStarted'],
+            MutableFileProcessed::class => [$this, 'onMutableFileProcessed'],
+            MutationGeneratingFinished::class => [$this, 'onMutationGeneratingFinished'],
+        ];
+    }
+
+    public function onMutationGeneratingStarted(MutationGeneratingStarted $event): void
+    {
+        $this->output->writeln(['', '', 'Generate mutants...', '']);
+        $this->progressBar->start($event->getMutableFilesCount());
+    }
+
+    public function onMutableFileProcessed(MutableFileProcessed $event): void
+    {
+        $this->progressBar->advance();
+    }
+
+    public function onMutationGeneratingFinished(MutationGeneratingFinished $event): void
+    {
+        $this->progressBar->finish();
+    }
 }

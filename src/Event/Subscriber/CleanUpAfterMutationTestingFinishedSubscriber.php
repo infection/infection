@@ -33,58 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Listener;
+namespace Infection\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\InitialTestSuiteStarted;
-use Infection\Event\Listener\CiInitialTestsConsoleLoggerSubscriber;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Event\MutationTestingFinished;
+use Symfony\Component\Filesystem\Filesystem;
 
-final class CiInitialTestsConsoleLoggerSubscriberTest extends TestCase
+/**
+ * @internal
+ */
+final class CleanUpAfterMutationTestingFinishedSubscriber implements EventSubscriber
 {
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $output;
+    private $filesystem;
+    private $tmpDir;
 
-    /**
-     * @var AbstractTestFrameworkAdapter|MockObject
-     */
-    private $testFramework;
-
-    protected function setUp(): void
+    public function __construct(Filesystem $filesystem, string $tmpDir)
     {
-        parent::setUp();
-
-        $this->output = $this->createMock(OutputInterface::class);
-        $this->testFramework = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $this->filesystem = $filesystem;
+        $this->tmpDir = $tmpDir;
     }
 
-    public function test_it_reacts_on_mutants_creating_event(): void
+    public function getSubscribedEvents(): array
     {
-        $this->output->expects($this->once())
-            ->method('writeln')
-            ->with([
-                '',
-                'Running initial test suite...',
-                '',
-                'PHPUnit version: 6.5.4',
-            ]);
+        return [
+            MutationTestingFinished::class => [$this, 'onMutationTestingFinished'],
+        ];
+    }
 
-        $this->testFramework->expects($this->once())
-            ->method('getVersion')
-            ->willReturn('6.5.4');
-
-        $this->testFramework->expects($this->once())
-            ->method('getName')
-            ->willReturn('PHPUnit');
-
-        $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new CiInitialTestsConsoleLoggerSubscriber($this->output, $this->testFramework));
-
-        $dispatcher->dispatch(new InitialTestSuiteStarted());
+    public function onMutationTestingFinished(MutationTestingFinished $event): void
+    {
+        $this->filesystem->remove($this->tmpDir);
     }
 }

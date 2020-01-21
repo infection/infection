@@ -33,16 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Listener;
+namespace Infection\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\EventSubscriberInterface;
-use Infection\Event\MutantsCreatingStarted;
+use Infection\Event\MutationGeneratingStarted;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class CiMutantCreatingConsoleLoggerSubscriber implements EventSubscriberInterface
+final class CiMutationGeneratingConsoleLoggerSubscriber implements EventSubscriber
 {
     private $output;
 
@@ -54,15 +53,17 @@ final class CiMutantCreatingConsoleLoggerSubscriber implements EventSubscriberIn
     public function getSubscribedEvents(): array
     {
         return [
-            MutantsCreatingStarted::class => [$this, 'onMutantsCreatingStarted'],
+            MutationGeneratingStarted::class => [$this, 'onMutationGeneratingStarted'],
         ];
     }
 
-    public function onMutantsCreatingStarted(MutantsCreatingStarted $event): void
+    public function onMutationGeneratingStarted(MutationGeneratingStarted $event): void
     {
         $this->output->writeln([
             '',
-            sprintf('Creating mutated files and processes: %s', $event->getMutantCount()),
+            'Generate mutants...',
+            '',
+            sprintf('Processing source code files: %s', $event->getMutableFilesCount()),
         ]);
     }
 }

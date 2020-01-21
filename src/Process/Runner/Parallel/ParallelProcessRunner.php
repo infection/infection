@@ -37,7 +37,7 @@ namespace Infection\Process\Runner\Parallel;
 
 use function assert;
 use function count;
-use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\EventDispatcher;
 use Infection\Event\MutantProcessFinished;
 use Infection\Process\MutantProcess;
 use Symfony\Component\Process\Exception\LogicException;

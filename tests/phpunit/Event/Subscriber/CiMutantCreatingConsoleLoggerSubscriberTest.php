@@ -33,16 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Listener;
+namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Listener\CiMutationGeneratingConsoleLoggerSubscriber;
-use Infection\Event\MutationGeneratingStarted;
+use Infection\Event\EventDispatcher;
+use Infection\Event\MutantsCreatingStarted;
+use Infection\Event\Subscriber\CiMutantCreatingConsoleLoggerSubscriber;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class CiMutationGeneratingConsoleLoggerSubscriberTest extends TestCase
+final class CiMutantCreatingConsoleLoggerSubscriberTest extends TestCase
 {
     /**
      * @var OutputInterface|MockObject
@@ -56,20 +56,18 @@ final class CiMutationGeneratingConsoleLoggerSubscriberTest extends TestCase
         $this->output = $this->createMock(OutputInterface::class);
     }
 
-    public function test_it_reacts_on_mutation_generating_started_event(): void
+    public function test_it_reacts_on_mutants_creating_event(): void
     {
         $this->output->expects($this->once())
             ->method('writeln')
             ->with([
                 '',
-                'Generate mutants...',
-                '',
-                'Processing source code files: 123',
+                'Creating mutated files and processes: 123',
             ]);
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new CiMutationGeneratingConsoleLoggerSubscriber($this->output));
+        $dispatcher->addSubscriber(new CiMutantCreatingConsoleLoggerSubscriber($this->output));
 
-        $dispatcher->dispatch(new MutationGeneratingStarted(123));
+        $dispatcher->dispatch(new MutantsCreatingStarted(123));
     }
 }

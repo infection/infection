@@ -40,17 +40,17 @@ use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Differ\DiffColorizer;
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\EventDispatcher\EventSubscriberInterface;
-use Infection\Event\Listener\CiInitialTestsConsoleLoggerSubscriber;
-use Infection\Event\Listener\CiMutantCreatingConsoleLoggerSubscriber;
-use Infection\Event\Listener\CiMutationGeneratingConsoleLoggerSubscriber;
-use Infection\Event\Listener\CleanUpAfterMutationTestingFinishedSubscriber;
-use Infection\Event\Listener\InitialTestsConsoleLoggerSubscriber;
-use Infection\Event\Listener\MutantCreatingConsoleLoggerSubscriber;
-use Infection\Event\Listener\MutationGeneratingConsoleLoggerSubscriber;
-use Infection\Event\Listener\MutationTestingConsoleLoggerSubscriber;
-use Infection\Event\Listener\MutationTestingResultsLoggerSubscriber;
+use Infection\Event\EventDispatcher;
+use Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\CiMutantCreatingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
+use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\MutantCreatingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
 use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Performance\Listener\PerformanceLoggerSubscriber;
@@ -176,7 +176,7 @@ final class SubscriberBuilder
         throw new InvalidArgumentException('Incorrect formatter. Possible values: "dot", "progress"');
     }
 
-    private function getMutantCreatingConsoleLoggerSubscriber(OutputInterface $output): EventSubscriberInterface
+    private function getMutantCreatingConsoleLoggerSubscriber(OutputInterface $output): EventSubscriber
     {
         if ($this->shouldSkipProgressBars()) {
             return new CiMutantCreatingConsoleLoggerSubscriber($output);
@@ -185,7 +185,7 @@ final class SubscriberBuilder
         return new MutantCreatingConsoleLoggerSubscriber($output);
     }
 
-    private function getMutantGeneratingConsoleLoggerSubscriber(OutputInterface $output): EventSubscriberInterface
+    private function getMutantGeneratingConsoleLoggerSubscriber(OutputInterface $output): EventSubscriber
     {
         if ($this->shouldSkipProgressBars()) {
             return new CiMutationGeneratingConsoleLoggerSubscriber($output);
@@ -194,7 +194,7 @@ final class SubscriberBuilder
         return new MutationGeneratingConsoleLoggerSubscriber($output);
     }
 
-    private function getInitialTestsConsoleLoggerSubscriber(TestFrameworkAdapter $testFrameworkAdapter, OutputInterface $output): EventSubscriberInterface
+    private function getInitialTestsConsoleLoggerSubscriber(TestFrameworkAdapter $testFrameworkAdapter, OutputInterface $output): EventSubscriber
     {
         if ($this->shouldSkipProgressBars()) {
             return new CiInitialTestsConsoleLoggerSubscriber($output, $testFrameworkAdapter);

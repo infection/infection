@@ -33,15 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Listener;
+namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Listener\MutationTestingConsoleLoggerSubscriber;
+use Infection\Event\EventDispatcher;
 use Infection\Event\MutantProcessFinished;
 use Infection\Event\MutationTestingFinished;
 use Infection\Event\MutationTestingStarted;
+use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
 use PHPUnit\Framework\MockObject\MockObject;
