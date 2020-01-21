@@ -60,7 +60,7 @@ final class BCMath implements Mutator
 
     public function __construct(BCMathConfig $config)
     {
-        $this->converters = self::createConverters($config->getFunctionsMap());
+        $this->converters = self::createConverters($config->getAllowedFunctions());
     }
 
     public static function getDefinition(): ?Definition

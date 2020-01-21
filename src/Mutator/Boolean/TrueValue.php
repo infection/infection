@@ -56,7 +56,7 @@ final class TrueValue implements Mutator
 
     public function __construct(TrueValueConfig $config)
     {
-        $this->allowedFunctions = array_flip($config->getFunctionsMap());
+        $this->allowedFunctions = array_flip($config->getAllowedFunctions());
     }
 
     public static function getDefinition(): ?Definition

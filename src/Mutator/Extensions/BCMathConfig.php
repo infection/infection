@@ -40,6 +40,7 @@ use function array_fill_keys;
 use function array_filter;
 use function array_keys;
 use Webmozart\Assert\Assert;
+use function Safe\sprintf;
 
 /**
  * @internal
@@ -58,27 +59,38 @@ final class BCMathConfig
         'bcpowmod',
     ];
 
-    private $functionMap;
+    private $allowedFunctions;
 
     /**
      * @param array<string, bool> $config
      */
     public function __construct(array $settings)
     {
-        Assert::allBoolean($settings);
-        Assert::allOneOf(array_keys($settings), self::KNOWN_FUNCTIONS);
+        $filteredSettings = array_fill_keys(self::KNOWN_FUNCTIONS, true);
 
-        $this->functionMap = array_diff_key(
-            array_fill_keys(self::KNOWN_FUNCTIONS, true),
-            array_filter($settings, static function ($enabled) { return !$enabled; })
-        );
+        foreach ($settings as $functionName => $enabled) {
+            Assert::boolean(
+                $enabled,
+                sprintf(
+                    'Expected the value for "%s" to be a boolean. Got "%%s" instead',
+                    $functionName
+                )
+            );
+            Assert::oneOf($functionName, self::KNOWN_FUNCTIONS);
+
+            if (!$enabled) {
+                unset($filteredSettings[$functionName]);
+            }
+        }
+
+        $this->allowedFunctions = array_keys($filteredSettings);
     }
 
     /**
      * @return string[]
      */
-    public function getFunctionsMap(): array
+    public function getAllowedFunctions(): array
     {
-        return $this->functionMap;
+        return $this->allowedFunctions;
     }
 }

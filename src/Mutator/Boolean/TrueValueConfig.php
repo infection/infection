@@ -45,7 +45,7 @@ final class TrueValueConfig
         'in_array',
     ];
 
-    private $functionMap = [];
+    private $allowedFunctions = [];
 
     /**
      * @param array<string, bool> $config
@@ -63,7 +63,7 @@ final class TrueValueConfig
             Assert::oneOf($functionName, self::KNOWN_FUNCTIONS);
 
             if ($enabled) {
-                $this->functionMap[] = $functionName;
+                $this->allowedFunctions[] = $functionName;
             }
         }
     }
@@ -71,8 +71,8 @@ final class TrueValueConfig
     /**
      * @return string[]
      */
-    public function getFunctionsMap(): array
+    public function getAllowedFunctions(): array
     {
-        return $this->functionMap;
+        return $this->allowedFunctions;
     }
 }

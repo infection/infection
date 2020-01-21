@@ -51,7 +51,7 @@ final class TrueValueConfigTest extends TestCase
 
         $this->assertSame(
             $expected,
-            $config->getFunctionsMap()
+            $config->getAllowedFunctions()
         );
     }
 
