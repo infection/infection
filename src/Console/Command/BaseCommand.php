@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Command;
+namespace Infection\Console\Command;
 
 use Infection\Console\Application;
 use Symfony\Component\Console\Command\Command;

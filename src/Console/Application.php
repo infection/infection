@@ -37,8 +37,8 @@ namespace Infection\Console;
 
 use Composer\XdebugHandler\XdebugHandler;
 use function extension_loaded;
-use Infection\Command\ConfigureCommand;
-use Infection\Command\InfectionCommand;
+use Infection\Console\Command\ConfigureCommand;
+use Infection\Console\Command\InfectionCommand;
 use Infection\Console\ConsoleOutput as InfectionConsoleOutput;
 use Infection\Container;
 use PackageVersions\Versions;

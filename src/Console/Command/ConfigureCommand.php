@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Command;
+namespace Infection\Console\Command;
 
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
