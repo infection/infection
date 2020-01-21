@@ -65,6 +65,8 @@ final class MBString implements Mutator
     public function __construct(MBStringConfig $config)
     {
         $this->converters = self::createConverters($config->getAllowedFunctions());
+
+        $x = '';
     }
 
     public static function getDefinition(): ?Definition
@@ -113,11 +115,11 @@ TXT
     }
 
     /**
-     * @param string[] $functionsMap
+     * @param string[] $allowedFunctions
      *
      * @return array<string, Closure>
      */
-    private static function createConverters(array $functionsMap): array
+    private static function createConverters(array $allowedFunctions): array
     {
         return array_intersect_key(
             [
@@ -141,7 +143,7 @@ TXT
                 'mb_substr' => self::makeFunctionAndRemoveExtraArgsMapper('substr', 3),
                 'mb_convert_case' => self::makeConvertCaseMapper(),
             ],
-            array_fill_keys($functionsMap, null)
+            array_fill_keys($allowedFunctions, null)
         );
     }
 

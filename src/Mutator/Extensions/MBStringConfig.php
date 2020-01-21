@@ -35,12 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Extensions;
 
-use function array_diff_key;
 use function array_fill_keys;
-use function array_filter;
 use function array_keys;
-use Webmozart\Assert\Assert;
 use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -63,6 +61,7 @@ final class MBStringConfig
         'mb_strstr',
         'mb_strtolower',
         'mb_strtoupper',
+        'mb_str_split',
         'mb_substr_count',
         'mb_substr',
         'mb_convert_case',

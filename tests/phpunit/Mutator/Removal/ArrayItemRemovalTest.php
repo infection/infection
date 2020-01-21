@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Removal;
 
 use Generator;
-use Infection\Config\Exception\InvalidConfigException;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
 
 final class ArrayItemRemovalTest extends AbstractMutatorTestCase
@@ -102,63 +101,6 @@ final class ArrayItemRemovalTest extends AbstractMutatorTestCase
                 "<?php\n\n\$a = [];",
             ],
             ['remove' => 'all', 'limit' => 1],
-        ];
-    }
-
-    /**
-     * @dataProvider provideInvalidConfigurationCases
-     */
-    public function test_settings_validation(string $setting, $value, string $valueInError): void
-    {
-        $this->expectException(InvalidConfigException::class);
-        $this->expectExceptionMessage(sprintf(
-            'Invalid configuration of ArrayItemRemoval mutator. Setting `%s` is invalid (%s)',
-            $setting,
-            $valueInError
-        ));
-        $this->doTest(
-            '<?php $a = [1, 2, 3];',
-            "<?php\n\n\$a = [2, 3];",
-            [$setting => $value]
-        );
-    }
-
-    public function provideInvalidConfigurationCases(): Generator
-    {
-        yield 'remove is null' => [
-            'remove', null, '<NULL>',
-        ];
-
-        yield 'remove is array' => [
-            'remove', [], '<ARRAY>',
-        ];
-
-        yield 'remove is not valid' => [
-            'remove', 'INVALID', 'invalid',
-        ];
-
-        yield 'remove is not string' => [
-            'remove', 1, '1',
-        ];
-
-        yield 'limit is null' => [
-            'limit', null, '<NULL>',
-        ];
-
-        yield 'limit is array' => [
-            'limit', [], '<ARRAY>',
-        ];
-
-        yield 'limit is zero' => [
-            'limit', 0, '0',
-        ];
-
-        yield 'limit is negative' => [
-            'limit', -1, '-1',
-        ];
-
-        yield 'limit is not numeric' => [
-            'limit', 'INVALID', 'INVALID',
         ];
     }
 }

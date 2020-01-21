@@ -88,8 +88,10 @@ final class ArrayItemRemoval implements Mutator
         switch ($this->config->getRemove()) {
             case 'first':
                 return [0];
+
             case 'last':
                 return [count($items) - 1];
+
             default:
                 return range(
                     0,
