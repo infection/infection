@@ -64,7 +64,7 @@ final class MBString implements Mutator
 
     public function __construct(MBStringConfig $config)
     {
-        $this->converters = self::createConverters($config->getFunctionsMap());
+        $this->converters = self::createConverters($config->getAllowedFunctions());
     }
 
     public static function getDefinition(): ?Definition
