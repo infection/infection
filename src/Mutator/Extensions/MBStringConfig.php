@@ -35,15 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Extensions;
 
-use function array_fill_keys;
-use function array_keys;
-use function Safe\sprintf;
-use Webmozart\Assert\Assert;
+use Infection\Mutator\AllowedFunctionsConfig;
 
 /**
  * @internal
  */
-final class MBStringConfig
+final class MBStringConfig extends AllowedFunctionsConfig
 {
     private const KNOWN_FUNCTIONS = [
         'mb_chr',
@@ -67,38 +64,11 @@ final class MBStringConfig
         'mb_convert_case',
     ];
 
-    private $allowedFunctions;
-
     /**
      * @param array<string, bool> $config
      */
     public function __construct(array $settings)
     {
-        $filteredSettings = array_fill_keys(self::KNOWN_FUNCTIONS, true);
-
-        foreach ($settings as $functionName => $enabled) {
-            Assert::boolean(
-                $enabled,
-                sprintf(
-                    'Expected the value for "%s" to be a boolean. Got "%%s" instead',
-                    $functionName
-                )
-            );
-            Assert::oneOf($functionName, self::KNOWN_FUNCTIONS);
-
-            if (!$enabled) {
-                unset($filteredSettings[$functionName]);
-            }
-        }
-
-        $this->allowedFunctions = array_keys($filteredSettings);
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getAllowedFunctions(): array
-    {
-        return $this->allowedFunctions;
+        parent::__construct($settings, self::KNOWN_FUNCTIONS);
     }
 }

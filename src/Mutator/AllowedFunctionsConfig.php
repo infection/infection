@@ -33,32 +33,51 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Extensions;
+namespace Infection\Mutator;
 
-use Infection\Mutator\AllowedFunctionsConfig;
+use function array_fill_keys;
+use function array_keys;
+use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class BCMathConfig extends AllowedFunctionsConfig
+abstract class AllowedFunctionsConfig
 {
-    private const KNOWN_FUNCTIONS = [
-        'bcadd',
-        'bccomp',
-        'bcdiv',
-        'bcmod',
-        'bcmul',
-        'bcpow',
-        'bcsub',
-        'bcsqrt',
-        'bcpowmod',
-    ];
+    private $allowedFunctions;
 
     /**
      * @param array<string, bool> $config
+     * @param string[] $knownFunctions
      */
-    public function __construct(array $settings)
+    public function __construct(array $settings, array $knownFunctions)
     {
-        parent::__construct($settings, self::KNOWN_FUNCTIONS);
+        $filteredSettings = array_fill_keys($knownFunctions, true);
+
+        foreach ($settings as $functionName => $enabled) {
+            Assert::boolean(
+                $enabled,
+                sprintf(
+                    'Expected the value for "%s" to be a boolean. Got "%%s" instead',
+                    $functionName
+                )
+            );
+            Assert::oneOf($functionName, $knownFunctions);
+
+            if (!$enabled) {
+                unset($filteredSettings[$functionName]);
+            }
+        }
+
+        $this->allowedFunctions = array_keys($filteredSettings);
+    }
+
+    /**
+     * @return string[]
+     */
+    final public function getAllowedFunctions(): array
+    {
+        return $this->allowedFunctions;
     }
 }

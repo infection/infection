@@ -35,17 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use Infection\Mutator\ProfileList;
 use function array_fill_keys;
 use function array_values;
 use function count;
 use function get_class;
 use Infection\Mutator\Arithmetic\Plus;
-use Infection\Mutator\Boolean\IdenticalEqual;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
+use Infection\Mutator\ProfileList;
 use Infection\Visitor\ReflectionVisitor;
 use InvalidArgumentException;
 use PhpParser\Node;
