@@ -64,7 +64,7 @@ final class ArrayItemRemoval implements Mutator
     }
 
     /**
-     * @param Node\Expr\Array_  $arrayNode
+     * @param Node\Expr\Array_ $arrayNode
      *
      * @return Generator<Node\Expr\Array_>
      */

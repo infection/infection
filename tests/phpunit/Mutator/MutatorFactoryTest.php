@@ -166,7 +166,7 @@ final class MutatorFactoryTest extends TestCase
     }
 
     /**
-     * @param string[]               $expectedMutatorClassNames
+     * @param string[] $expectedMutatorClassNames
      * @param array<string, Mutator> $actualMutators
      */
     private function assertSameMutatorsByClass(

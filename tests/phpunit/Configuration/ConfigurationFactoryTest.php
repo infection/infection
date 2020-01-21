@@ -1298,7 +1298,7 @@ final class ConfigurationFactoryTest extends TestCase
      */
     private static function getDefaultMutators(): array
     {
-        if (null === self::$mutators) {
+        if (self::$mutators === null) {
             self::$mutators = (new MutatorFactory())->create(
                 (new MutatorResolver())->resolve(['@default' => true])
             );

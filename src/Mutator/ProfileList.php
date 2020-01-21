@@ -437,7 +437,7 @@ final class ProfileList
      */
     public static function getDefaultProfileMutators(): array
     {
-        if (null !== self::$defaultProfileMutators) {
+        if (self::$defaultProfileMutators !== null) {
             return self::$defaultProfileMutators;
         }
 

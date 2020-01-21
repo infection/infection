@@ -75,7 +75,7 @@ final class IgnoreConfigTest extends TestCase
     public function ignoredValuesProvider(): Generator
     {
         foreach ([null, 50] as $lineNumber) {
-            $titleSuffix = null === $lineNumber ? '' : ' with line number #' . $lineNumber;
+            $titleSuffix = $lineNumber === null ? '' : ' with line number #' . $lineNumber;
 
             yield 'full class' . $titleSuffix => [
                 ['Acme\FooTest'],
@@ -131,7 +131,7 @@ final class IgnoreConfigTest extends TestCase
     public function nonIgnoredValuesProvider(): Generator
     {
         foreach ([null, 50] as $lineNumber) {
-            $titleSuffix = null === $lineNumber ? '' : ' with line number #' . $lineNumber;
+            $titleSuffix = $lineNumber === null ? '' : ' with line number #' . $lineNumber;
 
             yield 'full class with non-matching class' . $titleSuffix => [
                 ['Acme\FooTest'],

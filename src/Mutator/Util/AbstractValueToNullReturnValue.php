@@ -53,7 +53,7 @@ abstract class AbstractValueToNullReturnValue implements Mutator
         /** @var Node\Stmt\Function_|null $functionScope */
         $functionScope = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY, null);
 
-        if (null === $functionScope) {
+        if ($functionScope === null) {
             return true;
         }
 
@@ -64,7 +64,7 @@ abstract class AbstractValueToNullReturnValue implements Mutator
         }
 
         // no return value specified
-        if (null === $returnType) {
+        if ($returnType === null) {
             return true;
         }
 

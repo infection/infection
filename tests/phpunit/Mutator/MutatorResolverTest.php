@@ -270,7 +270,7 @@ final class MutatorResolverTest extends TestCase
     }
 
     /**
-     * @param string[]               $expectedMutators
+     * @param string[] $expectedMutators
      * @param array<string, Mutator> $actualMutators
      */
     private function assertSameMutatorsByClass(array $expectedMutators, array $actualMutators): void

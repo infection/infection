@@ -56,7 +56,7 @@ final class ConfigurationTest extends TestCase
     /**
      * @dataProvider valueProvider
      *
-     * @param string[]      $sourceDirectories
+     * @param string[] $sourceDirectories
      * @param SplFileInfo[] $sourceFiles
      * @param Mutator[] $mutators
      */

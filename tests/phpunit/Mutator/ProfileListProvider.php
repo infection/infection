@@ -78,7 +78,7 @@ final class ProfileListProvider
 
     public static function implementedMutatorProvider(): Generator
     {
-        if (null !== self::$mutators) {
+        if (self::$mutators !== null) {
             yield from self::$mutators;
 
             return;
@@ -128,7 +128,7 @@ final class ProfileListProvider
 
     public static function getProfiles(): array
     {
-        if (null !== self::$profileConstants) {
+        if (self::$profileConstants !== null) {
             return self::$profileConstants;
         }
 

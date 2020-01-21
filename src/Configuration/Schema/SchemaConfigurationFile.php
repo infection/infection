@@ -79,7 +79,7 @@ final class SchemaConfigurationFile
      */
     private function initDecodedContents(): void
     {
-        if (null !== $this->decodedContents) {
+        if ($this->decodedContents !== null) {
             return;
         }
 

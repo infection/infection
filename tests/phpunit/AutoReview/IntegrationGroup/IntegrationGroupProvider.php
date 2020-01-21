@@ -81,7 +81,7 @@ final class IntegrationGroupProvider
      */
     public static function provideIoTestCaseTuple(): Generator
     {
-        if (null !== self::$ioTestCaseClassesTuple) {
+        if (self::$ioTestCaseClassesTuple !== null) {
             yield from self::$ioTestCaseClassesTuple;
 
             return;

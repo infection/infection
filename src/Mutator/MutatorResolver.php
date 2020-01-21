@@ -90,7 +90,7 @@ final class MutatorResolver
     }
 
     /**
-     * @param array<string, string>|bool           $settings
+     * @param array<string, string>|bool $settings
      * @param array<string, array<string, string>> $mutators
      */
     private static function registerFromProfile(
@@ -132,7 +132,7 @@ final class MutatorResolver
     }
 
     /**
-     * @param array<string, string>|bool           $settings
+     * @param array<string, string>|bool $settings
      * @param array<string, array<string, string>> $mutators
      */
     private static function registerFromName(
@@ -155,7 +155,7 @@ final class MutatorResolver
     }
 
     /**
-     * @param array<string, string>|bool|stdClass  $settings
+     * @param array<string, string>|bool|stdClass $settings
      * @param array<string, array<string, string>> $mutators
      */
     private static function registerFromClass(
