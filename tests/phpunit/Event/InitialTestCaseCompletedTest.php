@@ -33,11 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Event;
+namespace Infection\Tests\Event;
 
-/**
- * @internal
- */
-final class InitialTestSuiteStarted
+use Infection\Event\InitialTestCaseCompleted;
+use PHPUnit\Framework\TestCase;
+
+final class InitialTestCaseCompletedTest extends TestCase
 {
+    /**
+     * This class is only used to fire events, and the only functionality it needs is being instantiated
+     */
+    public function test_it_can_be_initialzed(): void
+    {
+        $class = new InitialTestCaseCompleted();
+        $this->assertInstanceOf(InitialTestCaseCompleted::class, $class);
+    }
 }

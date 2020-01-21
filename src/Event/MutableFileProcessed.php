@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Event;
+namespace Infection\Event;
 
 /**
  * @internal

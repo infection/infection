@@ -44,7 +44,7 @@ use Infection\Console\Exception\InfectionException;
 use Infection\Console\LogVerbosity;
 use Infection\Container;
 use Infection\Engine;
-use Infection\Event\Event\ApplicationExecutionStarted;
+use Infection\Event\ApplicationExecutionStarted;
 use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\Locator\Locator;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;

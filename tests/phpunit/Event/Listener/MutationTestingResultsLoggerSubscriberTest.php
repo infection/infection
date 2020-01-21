@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Listener;
 
-use Infection\Event\Event\MutationTestingFinished;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Listener\MutationTestingResultsLoggerSubscriber;
+use Infection\Event\MutationTestingFinished;
 use Infection\Logger\MutationTestingResultsLogger;
 use PHPUnit\Framework\TestCase;
 

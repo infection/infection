@@ -33,19 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Event;
+namespace Infection\Event;
 
-use Infection\Event\Event\InitialTestSuiteFinished;
-use PHPUnit\Framework\TestCase;
-
-final class InitialTestSuiteFinishedTest extends TestCase
+/**
+ * @internal
+ */
+final class MutationGeneratingFinished
 {
-    public function test_it_passes_the_output_along(): void
-    {
-        $text = 'foo-bar-baz';
-
-        $class = new InitialTestSuiteFinished($text);
-
-        $this->assertSame($text, $class->getOutputText());
-    }
 }

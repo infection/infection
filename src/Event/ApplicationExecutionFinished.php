@@ -33,22 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Event;
+namespace Infection\Event;
 
 /**
  * @internal
  */
-final class MutationGeneratingStarted
+final class ApplicationExecutionFinished
 {
-    private $mutableFilesCount;
-
-    public function __construct(int $mutableFilesCount)
-    {
-        $this->mutableFilesCount = $mutableFilesCount;
-    }
-
-    public function getMutableFilesCount(): int
-    {
-        return $this->mutableFilesCount;
-    }
 }

@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Event\Listener;
 
-use Infection\Event\Event\InitialTestCaseCompleted;
-use Infection\Event\Event\InitialTestSuiteFinished;
-use Infection\Event\Event\InitialTestSuiteStarted;
 use Infection\Event\EventDispatcher\EventSubscriberInterface;
+use Infection\Event\InitialTestCaseCompleted;
+use Infection\Event\InitialTestSuiteFinished;
+use Infection\Event\InitialTestSuiteStarted;
 use Infection\TestFramework\TestFrameworkAdapter;
 use InvalidArgumentException;
 use Symfony\Component\Console\Helper\ProgressBar;

@@ -37,10 +37,10 @@ namespace Infection\Event\Listener;
 
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
-use Infection\Event\Event\MutantProcessFinished;
-use Infection\Event\Event\MutationTestingFinished;
-use Infection\Event\Event\MutationTestingStarted;
 use Infection\Event\EventDispatcher\EventSubscriberInterface;
+use Infection\Event\MutantProcessFinished;
+use Infection\Event\MutationTestingFinished;
+use Infection\Event\MutationTestingStarted;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
 use function strlen;

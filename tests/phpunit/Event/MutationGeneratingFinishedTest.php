@@ -33,18 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Event;
+namespace Infection\Tests\Event;
 
-use Infection\Event\Event\MutationGeneratingStarted;
+use Infection\Event\MutationGeneratingFinished;
 use PHPUnit\Framework\TestCase;
 
-final class MutationGeneratingStartedTest extends TestCase
+final class MutationGeneratingFinishedTest extends TestCase
 {
-    public function test_it_passes_along_its_mutable_file_count_without_changing_it(): void
+    /**
+     * This class is only used to fire events, and the only functionality it needs is being instantiated
+     */
+    public function test_it_can_be_initialzed(): void
     {
-        $count = 5;
-        $event = new MutationGeneratingStarted($count);
-
-        $this->assertSame($count, $event->getMutableFilesCount());
+        $class = new MutationGeneratingFinished();
+        $this->assertInstanceOf(MutationGeneratingFinished::class, $class);
     }
 }

@@ -40,7 +40,7 @@ use function explode;
 use function file_exists;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
-use Infection\Event\Event\ApplicationExecutionFinished;
+use Infection\Event\ApplicationExecutionFinished;
 use Infection\Event\EventDispatcher\EventDispatcherInterface;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutation\MutationGenerator;

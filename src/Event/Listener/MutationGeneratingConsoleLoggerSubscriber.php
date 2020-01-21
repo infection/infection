@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Event\Listener;
 
-use Infection\Event\Event\MutableFileProcessed;
-use Infection\Event\Event\MutationGeneratingFinished;
-use Infection\Event\Event\MutationGeneratingStarted;
 use Infection\Event\EventDispatcher\EventSubscriberInterface;
+use Infection\Event\MutableFileProcessed;
+use Infection\Event\MutationGeneratingFinished;
+use Infection\Event\MutationGeneratingStarted;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 

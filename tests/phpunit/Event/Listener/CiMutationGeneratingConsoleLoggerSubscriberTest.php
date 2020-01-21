@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Listener;
 
-use Infection\Event\Event\MutationGeneratingStarted;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Listener\CiMutationGeneratingConsoleLoggerSubscriber;
+use Infection\Event\MutationGeneratingStarted;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;

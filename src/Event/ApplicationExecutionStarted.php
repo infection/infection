@@ -33,19 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Event;
+namespace Infection\Event;
 
-use Infection\Event\Event\MutationGeneratingFinished;
-use PHPUnit\Framework\TestCase;
-
-final class MutationGeneratingFinishedTest extends TestCase
+/**
+ * @internal
+ */
+final class ApplicationExecutionStarted
 {
-    /**
-     * This class is only used to fire events, and the only functionality it needs is being instantiated
-     */
-    public function test_it_can_be_initialzed(): void
-    {
-        $class = new MutationGeneratingFinished();
-        $this->assertInstanceOf(MutationGeneratingFinished::class, $class);
-    }
 }

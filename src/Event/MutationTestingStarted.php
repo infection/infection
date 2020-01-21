@@ -33,11 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Event;
+namespace Infection\Event;
 
 /**
  * @internal
  */
-final class MutantCreated
+final class MutationTestingStarted
 {
+    private $mutationCount;
+
+    public function __construct(int $mutationCount)
+    {
+        $this->mutationCount = $mutationCount;
+    }
+
+    public function getMutationCount(): int
+    {
+        return $this->mutationCount;
+    }
 }

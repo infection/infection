@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Performance\Listener;
 
-use Infection\Event\Event\ApplicationExecutionFinished;
-use Infection\Event\Event\ApplicationExecutionStarted;
+use Infection\Event\ApplicationExecutionFinished;
+use Infection\Event\ApplicationExecutionStarted;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Performance\Listener\PerformanceLoggerSubscriber;
 use Infection\Performance\Memory\MemoryFormatter;

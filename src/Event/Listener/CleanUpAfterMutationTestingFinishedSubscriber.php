@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Event\Listener;
 
-use Infection\Event\Event\MutationTestingFinished;
 use Infection\Event\EventDispatcher\EventSubscriberInterface;
+use Infection\Event\MutationTestingFinished;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**

@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use Infection\Event\Event\InitialTestCaseCompleted;
-use Infection\Event\Event\InitialTestSuiteFinished;
-use Infection\Event\Event\InitialTestSuiteStarted;
 use Infection\Event\EventDispatcher\EventDispatcherInterface;
+use Infection\Event\InitialTestCaseCompleted;
+use Infection\Event\InitialTestSuiteFinished;
+use Infection\Event\InitialTestSuiteStarted;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Symfony\Component\Process\Process;
 

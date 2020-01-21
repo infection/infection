@@ -33,11 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Event;
+namespace Infection\Tests\Event;
 
-/**
- * @internal
- */
-final class MutantsCreatingFinished
+use Infection\Event\InitialTestSuiteStarted;
+use PHPUnit\Framework\TestCase;
+
+final class InitialTestSuiteStartedTest extends TestCase
 {
+    /**
+     * This class is only used to fire events, and the only functionality it needs is being instantiated
+     */
+    public function test_it_can_be_initialzed(): void
+    {
+        $class = new InitialTestSuiteStarted();
+        $this->assertInstanceOf(InitialTestSuiteStarted::class, $class);
+    }
 }

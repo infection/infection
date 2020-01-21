@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Performance\Listener;
 
-use Infection\Event\Event\ApplicationExecutionFinished;
-use Infection\Event\Event\ApplicationExecutionStarted;
+use Infection\Event\ApplicationExecutionFinished;
+use Infection\Event\ApplicationExecutionStarted;
 use Infection\Event\EventDispatcher\EventSubscriberInterface;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\TimeFormatter;

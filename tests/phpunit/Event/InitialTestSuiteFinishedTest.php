@@ -33,18 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Event;
+namespace Infection\Tests\Event;
 
-use Infection\Event\Event\MutantsCreatingStarted;
+use Infection\Event\InitialTestSuiteFinished;
 use PHPUnit\Framework\TestCase;
 
-final class MutantsCreatingStartedTest extends TestCase
+final class InitialTestSuiteFinishedTest extends TestCase
 {
-    public function test_it_passes_along_its_mutation_count_without_changing_it(): void
+    public function test_it_passes_the_output_along(): void
     {
-        $count = 5;
-        $event = new MutantsCreatingStarted($count);
+        $text = 'foo-bar-baz';
 
-        $this->assertSame($count, $event->getMutantCount());
+        $class = new InitialTestSuiteFinished($text);
+
+        $this->assertSame($text, $class->getOutputText());
     }
 }

@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Listener;
 
-use Infection\Event\Event\InitialTestSuiteFinished;
-use Infection\Event\Event\InitialTestSuiteStarted;
 use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\InitialTestSuiteFinished;
+use Infection\Event\InitialTestSuiteStarted;
 use Infection\Event\Listener\InitialTestsConsoleLoggerSubscriber;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use InvalidArgumentException;

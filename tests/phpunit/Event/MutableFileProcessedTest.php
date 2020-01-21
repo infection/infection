@@ -33,22 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Event;
+namespace Infection\Tests\Event;
 
-/**
- * @internal
- */
-final class MutationTestingStarted
+use Infection\Event\MutableFileProcessed;
+use PHPUnit\Framework\TestCase;
+
+final class MutableFileProcessedTest extends TestCase
 {
-    private $mutationCount;
-
-    public function __construct(int $mutationCount)
+    /**
+     * This class is only used to fire events, and the only functionality it needs is being instantiated
+     */
+    public function test_it_can_be_initialzed(): void
     {
-        $this->mutationCount = $mutationCount;
-    }
-
-    public function getMutationCount(): int
-    {
-        return $this->mutationCount;
+        $class = new MutableFileProcessed();
+        $this->assertInstanceOf(MutableFileProcessed::class, $class);
     }
 }

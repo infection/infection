@@ -33,19 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Event;
+namespace Infection\Event;
 
-use Infection\Event\Event\ApplicationExecutionStarted;
-use PHPUnit\Framework\TestCase;
-
-final class ApplicationExecutionStartedTest extends TestCase
+/**
+ * @internal
+ */
+final class MutationGeneratingStarted
 {
-    /**
-     * This class is only used to fire events, and the only functionality it needs is being instantiated
-     */
-    public function test_it_can_be_initialzed(): void
+    private $mutableFilesCount;
+
+    public function __construct(int $mutableFilesCount)
     {
-        $class = new ApplicationExecutionStarted();
-        $this->assertInstanceOf(ApplicationExecutionStarted::class, $class);
+        $this->mutableFilesCount = $mutableFilesCount;
+    }
+
+    public function getMutableFilesCount(): int
+    {
+        return $this->mutableFilesCount;
     }
 }

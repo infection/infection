@@ -33,19 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Event;
+namespace Infection\Tests\Event;
 
-use Infection\Event\Event\MutantCreated;
+use Infection\Event\MutantProcessFinished;
+use Infection\Process\MutantProcess;
 use PHPUnit\Framework\TestCase;
 
-final class MutantCreatedTest extends TestCase
+final class MutantProcessFinishedTest extends TestCase
 {
-    /**
-     * This class is only used to fire events, and the only functionality it needs is being instantiated
-     */
-    public function test_it_can_be_initialzed(): void
+    public function test_it_passes_around_its_mutant_process_without_changing_it(): void
     {
-        $class = new MutantCreated();
-        $this->assertInstanceOf(MutantCreated::class, $class);
+        $process = $this->createMock(MutantProcess::class);
+        $process->expects($this->never())->method($this->anything());
+
+        $event = new MutantProcessFinished($process);
+        $this->assertSame($process, $event->getMutantProcess());
     }
 }
