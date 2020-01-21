@@ -37,7 +37,7 @@ namespace Infection\Process\Runner\Parallel;
 
 use function assert;
 use function count;
-use Infection\Event\EventDispatcher\EventDispatcherInterface;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessFinished;
 use Infection\Process\MutantProcess;
 use Symfony\Component\Process\Exception\LogicException;
@@ -63,7 +63,7 @@ final class ParallelProcessRunner
      */
     private $currentProcesses = [];
 
-    public function __construct(EventDispatcherInterface $eventDispatcher)
+    public function __construct(EventDispatcher $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
     }

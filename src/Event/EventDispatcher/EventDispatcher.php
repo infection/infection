@@ -39,15 +39,16 @@ use function get_class;
 
 /**
  * @internal
+ * @final
  */
-final class EventDispatcher implements EventDispatcherInterface
+class EventDispatcher
 {
     /**
      * @var callable[][]
      */
     private $listeners = [];
 
-    public function dispatch($event): void
+    public function dispatch(object $event): void
     {
         $name = get_class($event);
 

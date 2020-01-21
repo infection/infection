@@ -48,7 +48,6 @@ use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\EventDispatcher\EventDispatcherInterface;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Locator\RootsFileLocator;
@@ -193,7 +192,7 @@ final class Container
             Differ::class => static function (): Differ {
                 return new Differ(new BaseDiffer());
             },
-            EventDispatcherInterface::class => static function (): EventDispatcherInterface {
+            EventDispatcher::class => static function (): EventDispatcher {
                 return new EventDispatcher();
             },
             ParallelProcessRunner::class => static function (self $container): ParallelProcessRunner {
@@ -543,9 +542,9 @@ final class Container
         return $this->get(Differ::class);
     }
 
-    public function getEventDispatcher(): EventDispatcherInterface
+    public function getEventDispatcher(): EventDispatcher
     {
-        return $this->get(EventDispatcherInterface::class);
+        return $this->get(EventDispatcher::class);
     }
 
     public function getParallelProcessRunner(): ParallelProcessRunner

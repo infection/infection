@@ -40,7 +40,7 @@ use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Differ\DiffColorizer;
-use Infection\Event\EventDispatcher\EventDispatcherInterface;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\EventSubscriberInterface;
 use Infection\Event\Listener\CiInitialTestsConsoleLoggerSubscriber;
 use Infection\Event\Listener\CiMutantCreatingConsoleLoggerSubscriber;
@@ -89,7 +89,7 @@ final class SubscriberBuilder
         string $formatter,
         bool $noProgress,
         MetricsCalculator $metricsCalculator,
-        EventDispatcherInterface $eventDispatcher,
+        EventDispatcher $eventDispatcher,
         DiffColorizer $diffColorizer,
         Configuration $infectionConfig,
         Filesystem $fs,

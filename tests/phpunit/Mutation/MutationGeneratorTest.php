@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
-use Infection\Event\EventDispatcher\EventDispatcherInterface;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutableFileProcessed;
 use Infection\Event\MutationGeneratingFinished;
 use Infection\Event\MutationGeneratingStarted;
@@ -62,7 +62,7 @@ final class MutationGeneratorTest extends TestCase
 
         $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
         $mutators = ['Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator())];
-        $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcherMock = $this->createMock(EventDispatcher::class);
         $onlyCovered = true;
         $extraVisitors = [2 => new FakeVisitor()];
 
@@ -116,7 +116,7 @@ final class MutationGeneratorTest extends TestCase
 
         $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
 
-        $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcherMock = $this->createMock(EventDispatcher::class);
         $eventDispatcherMock
             ->expects($this->exactly(4))
             ->method('dispatch')

@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use Infection\Event\EventDispatcher\EventDispatcherInterface;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\InitialTestCaseCompleted;
 use Infection\Event\InitialTestSuiteFinished;
 use Infection\Event\InitialTestSuiteStarted;
@@ -50,7 +50,7 @@ final class InitialTestsRunner
     private $processBuilder;
     private $eventDispatcher;
 
-    public function __construct(InitialTestRunProcessBuilder $processBuilder, EventDispatcherInterface $eventDispatcher)
+    public function __construct(InitialTestRunProcessBuilder $processBuilder, EventDispatcher $eventDispatcher)
     {
         $this->processBuilder = $processBuilder;
         $this->eventDispatcher = $eventDispatcher;
