@@ -43,9 +43,9 @@ use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\TestFramework\VersionParser;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use Symfony\Component\Filesystem\Filesystem;
 use function Infection\Tests\normalizePath as p;
 use function realpath;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @group integration Requires some I/O operations

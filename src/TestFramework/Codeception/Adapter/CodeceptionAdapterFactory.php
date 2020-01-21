@@ -42,11 +42,11 @@ use Infection\TestFramework\TestFrameworkAdapterFactory;
 use Infection\TestFramework\TestFrameworkConfigParseException;
 use Infection\TestFramework\VersionParser;
 use LogicException;
+use function Safe\file_get_contents;
+use function Safe\sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
-use function Safe\file_get_contents;
-use function Safe\sprintf;
 
 /**
  * @internal

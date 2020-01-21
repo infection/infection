@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use Webmozart\Assert\Assert;
 use function Safe\preg_match;
 use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal

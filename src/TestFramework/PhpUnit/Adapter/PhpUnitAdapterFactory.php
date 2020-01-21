@@ -45,8 +45,8 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkAdapterFactory;
 use Infection\TestFramework\VersionParser;
-use Symfony\Component\Filesystem\Filesystem;
 use function Safe\file_get_contents;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal

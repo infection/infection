@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Codeception\Adapter;
 
+use function array_key_exists;
+use function assert;
+use function dirname;
 use Infection\TestFramework\Codeception\Stringifier;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Coverage\CoverageLineData;
@@ -44,14 +47,11 @@ use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\TestFramework\VersionParser;
 use InvalidArgumentException;
+use function is_string;
 use Phar;
+use function Safe\file_put_contents;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
-use function array_key_exists;
-use function assert;
-use function dirname;
-use function is_string;
-use function Safe\file_put_contents;
 
 /**
  * @internal
