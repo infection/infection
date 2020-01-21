@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use Infection\Exception\InvalidTypeException;
-use Infection\Mutant\Exception\MsiCalculationException;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Mutagen\Mutant\Exception\MsiCalculationException;
+use Infection\Mutagen\Mutant\MetricsCalculator;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use Symfony\Component\Console\Style\SymfonyStyle;
 

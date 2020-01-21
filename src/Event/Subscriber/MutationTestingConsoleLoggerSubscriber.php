@@ -40,7 +40,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\Event\MutantProcessFinished;
 use Infection\Event\MutationTestingFinished;
 use Infection\Event\MutationTestingStarted;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Mutagen\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
 use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;

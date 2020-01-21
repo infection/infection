@@ -49,7 +49,7 @@ use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
-use Infection\Mutator\ProfileList;
+use Infection\Mutagen\Mutator\ProfileList;
 use Infection\TestFramework\TestFrameworkTypes;
 use JsonSchema\Validator;
 use const PHP_EOL;

@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
-use Infection\Tests\Mutator\MutatorName;
+use Infection\Tests\Mutagen\Mutator\MutatorName;
 use PHPUnit\Framework\TestCase;
 
 final class MutatorNameTest extends TestCase
 {
     /**
-     * @dataProvider \Infection\Tests\Mutator\ProfileListProvider::mutatorNameAndClassProvider
+     * @dataProvider \Infection\Tests\Mutagen\Mutator\ProfileListProvider::mutatorNameAndClassProvider
      */
     public function test_it_can_provide_the_mutator_name(string $expectedName, string $mutatorClassName): void
     {

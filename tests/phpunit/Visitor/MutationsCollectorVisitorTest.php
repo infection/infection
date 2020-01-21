@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Visitor;
 
-use Infection\Mutator\NodeMutationGenerator;
+use Infection\Mutagen\Mutator\NodeMutationGenerator;
 use Infection\Visitor\MutationsCollectorVisitor;
 use PhpParser\Node;
 use Prophecy\Argument;

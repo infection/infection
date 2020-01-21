@@ -37,7 +37,7 @@ namespace Infection\Tests\Process\Runner\Parallel;
 
 use Infection\Event\EventDispatcher;
 use Infection\Event\MutantProcessFinished;
-use Infection\Mutant\Mutant;
+use Infection\Mutagen\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use PHPUnit\Framework\MockObject\MockObject;

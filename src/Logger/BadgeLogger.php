@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use Infection\Http\BadgeApiClient;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Mutagen\Mutant\MetricsCalculator;
 use stdClass;
 use Symfony\Component\Console\Output\OutputInterface;
 

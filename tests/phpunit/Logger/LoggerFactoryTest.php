@@ -46,7 +46,7 @@ use Infection\Logger\LoggerFactory;
 use Infection\Logger\PerMutatorLogger;
 use Infection\Logger\SummaryFileLogger;
 use Infection\Logger\TextFileLogger;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Mutagen\Mutant\MetricsCalculator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;

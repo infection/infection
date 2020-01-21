@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use Infection\Mutant\MetricsCalculator;
+use Infection\Mutagen\Mutant\MetricsCalculator;
 
 /**
  * @internal

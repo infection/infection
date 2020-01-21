@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Process;
 
 use function in_array;
-use Infection\Mutant\Mutant;
-use Infection\Mutation\Mutation;
+use Infection\Mutagen\Mutant\Mutant;
+use Infection\Mutagen\Mutation\Mutation;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Symfony\Component\Process\Process;
 

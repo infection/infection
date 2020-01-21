@@ -38,7 +38,7 @@ namespace Infection\Tests\Logger;
 use function getenv;
 use Infection\Http\BadgeApiClient;
 use Infection\Logger\BadgeLogger;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Mutagen\Mutant\MetricsCalculator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\putenv;

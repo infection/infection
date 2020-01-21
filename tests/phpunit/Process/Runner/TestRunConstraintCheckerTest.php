@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Runner;
 
 use Generator;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Mutagen\Mutant\MetricsCalculator;
 use Infection\Process\Runner\TestRunConstraintChecker;
 use PHPUnit\Framework\TestCase;
 

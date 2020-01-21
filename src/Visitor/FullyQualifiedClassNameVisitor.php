@@ -45,7 +45,7 @@ use PhpParser\NodeVisitorAbstract;
  *
  * Adds FullyQualifiedClassName (FQCN) string to class node:
  *      $node->name                                                  // Plus
- *      $node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY) // Infection\Mutator\Plus
+ *      $node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY) // Infection\Mutagen\Mutator\Plus
  */
 final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
 {

@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Fixtures\Mutator;
 
 use Generator;
-use Infection\Mutator\Definition;
-use Infection\Mutator\Mutator;
+use Infection\Mutagen\Mutator\Definition;
+use Infection\Mutagen\Mutator\Mutator;
 use LogicException;
 use PhpParser\Node;
 

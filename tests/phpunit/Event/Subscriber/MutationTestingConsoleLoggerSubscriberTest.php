@@ -42,7 +42,7 @@ use Infection\Event\MutantProcessFinished;
 use Infection\Event\MutationTestingFinished;
 use Infection\Event\MutationTestingStarted;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Mutagen\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

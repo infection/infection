@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use Infection\Logger\SummaryFileLogger;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Mutagen\Mutant\MetricsCalculator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use const PHP_EOL;
 use PHPUnit\Framework\MockObject\MockObject;

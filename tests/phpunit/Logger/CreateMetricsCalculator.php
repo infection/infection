@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use Infection\Mutant\MetricsCalculator;
-use Infection\Mutant\Mutant;
-use Infection\Mutator\Regex\PregQuote;
-use Infection\Mutator\ZeroIteration\For_;
+use Infection\Mutagen\Mutant\MetricsCalculator;
+use Infection\Mutagen\Mutant\Mutant;
+use Infection\Mutagen\Mutator\Regex\PregQuote;
+use Infection\Mutagen\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
-use Infection\Tests\Mutator\MutatorName;
+use Infection\Tests\Mutagen\Mutator\MutatorName;
 use const PHP_EOL;
 use PHPUnit\Framework\MockObject\MockObject;
 use function str_replace;

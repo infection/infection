@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Visitor;
 
 use Generator;
+use Infection\Mutagen\Mutation\Mutation;
+use Infection\Mutagen\Mutator\FunctionSignature\PublicVisibility;
 use Infection\MutatedNode;
-use Infection\Mutation\Mutation;
-use Infection\Mutator\FunctionSignature\PublicVisibility;
-use Infection\Tests\Mutator\MutatorName;
+use Infection\Tests\Mutagen\Mutator\MutatorName;
 use Infection\Tests\StringNormalizer;
 use Infection\Visitor\MutatorVisitor;
 use PhpParser\Lexer;

@@ -37,7 +37,7 @@ namespace Infection\Tests\Logger;
 
 use Generator;
 use Infection\Logger\TextFileLogger;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Mutagen\Mutant\MetricsCalculator;
 use const PHP_EOL;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

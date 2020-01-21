@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use function in_array;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Mutagen\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOException;

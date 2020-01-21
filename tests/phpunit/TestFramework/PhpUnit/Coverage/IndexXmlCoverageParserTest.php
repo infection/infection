@@ -121,38 +121,38 @@ final class IndexXmlCoverageParserTest extends TestCase
                     'byLine' => [
                         26 => [
                             [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
+                                'testMethod' => 'Infection\Tests\Mutagen\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
                                 'testFilePath' => null,
                                 'time' => null,
                             ],
                             [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
+                                'testMethod' => 'Infection\Tests\Mutagen\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
                                 'testFilePath' => null,
                                 'time' => null,
                             ],
                         ],
                         30 => [
                             [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
+                                'testMethod' => 'Infection\Tests\Mutagen\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
                                 'testFilePath' => null,
                                 'time' => null,
                             ],
                             [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
+                                'testMethod' => 'Infection\Tests\Mutagen\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
                                 'testFilePath' => null,
                                 'time' => null,
                             ],
                         ],
                         31 => [
                             [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
+                                'testMethod' => 'Infection\Tests\Mutagen\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
                                 'testFilePath' => null,
                                 'time' => null,
                             ],
                         ],
                         34 => [
                             [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
+                                'testMethod' => 'Infection\Tests\Mutagen\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
                                 'testFilePath' => null,
                                 'time' => null,
                             ],
@@ -173,12 +173,12 @@ final class IndexXmlCoverageParserTest extends TestCase
                     'byLine' => [
                         11 => [
                             [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
+                                'testMethod' => 'Infection\Tests\Mutagen\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
                                 'testFilePath' => null,
                                 'time' => null,
                             ],
                             [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
+                                'testMethod' => 'Infection\Tests\Mutagen\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
                                 'testFilePath' => null,
                                 'time' => null,
                             ],
@@ -199,12 +199,12 @@ final class IndexXmlCoverageParserTest extends TestCase
                     'byLine' => [
                         11 => [
                             [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
+                                'testMethod' => 'Infection\Tests\Mutagen\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
                                 'testFilePath' => null,
                                 'time' => null,
                             ],
                             [
-                                'testMethod' => 'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
+                                'testMethod' => 'Infection\Tests\Mutagen\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
                                 'testFilePath' => null,
                                 'time' => null,
                             ],
@@ -245,8 +245,8 @@ final class IndexXmlCoverageParserTest extends TestCase
   </build>
   <project source="/path/to/src">
     <tests>
-      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
-      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
+      <test name="Infection\Tests\Mutagen\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
+      <test name="Infection\Tests\Mutagen\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
     </tests>
     <directory name="/absolute/path">
       <totals>
@@ -380,8 +380,8 @@ XML;
   </build>
   <project source="/path/to/src">
     <tests>
-      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
-      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
+      <test name="Infection\Tests\Mutagen\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
+      <test name="Infection\Tests\Mutagen\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
     </tests>
     <directory name="/">
       <totals>
@@ -403,8 +403,8 @@ XML
   </build>
   <project source="/path/to/src">
     <tests>
-      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
-      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
+      <test name="Infection\Tests\Mutagen\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
+      <test name="Infection\Tests\Mutagen\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
     </tests>
     <directory name="/">
       <totals>

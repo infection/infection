@@ -37,7 +37,7 @@ namespace Infection\Visitor;
 
 use function array_key_exists;
 use function get_class;
-use Infection\Mutation\Mutation;
+use Infection\Mutagen\Mutation\Mutation;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 

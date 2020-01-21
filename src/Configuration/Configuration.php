@@ -37,7 +37,7 @@ namespace Infection\Configuration;
 
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Mutator\Mutator;
+use Infection\Mutagen\Mutator\Mutator;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
 use Symfony\Component\Finder\SplFileInfo;

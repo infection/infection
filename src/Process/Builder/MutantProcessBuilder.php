@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Builder;
 
-use Infection\Mutant\Mutant;
+use Infection\Mutagen\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\TestFrameworkAdapter;
 use function method_exists;

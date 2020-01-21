@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
-use Infection\Mutant\Mutant;
-use Infection\Mutation\Mutation;
-use Infection\Mutator\ZeroIteration\For_;
+use Infection\Mutagen\Mutant\Mutant;
+use Infection\Mutagen\Mutation\Mutation;
+use Infection\Mutagen\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Infection\Tests\Mutator\MutatorName;
+use Infection\Tests\Mutagen\Mutator\MutatorName;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;

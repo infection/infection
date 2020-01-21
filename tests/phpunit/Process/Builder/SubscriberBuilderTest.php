@@ -40,7 +40,7 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher;
 use Infection\Logger\LoggerFactory;
-use Infection\Mutant\MetricsCalculator;
+use Infection\Mutagen\Mutant\MetricsCalculator;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\TimeFormatter;
 use Infection\Performance\Time\Timer;

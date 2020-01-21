@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Builder;
 
-use Infection\Mutant\Mutant;
+use Infection\Mutagen\Mutant\Mutant;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\TestCase;

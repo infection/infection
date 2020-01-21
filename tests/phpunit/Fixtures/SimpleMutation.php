@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures;
 
-use Infection\Mutator\Mutator;
+use Infection\Mutagen\Mutator\Mutator;
 use PhpParser\Node;
 
 class SimpleMutation

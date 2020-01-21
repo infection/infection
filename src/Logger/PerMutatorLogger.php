@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
-use Infection\Mutant\MetricsCalculator;
+use Infection\Mutagen\Mutant\MetricsCalculator;
 
 /**
  * @internal
