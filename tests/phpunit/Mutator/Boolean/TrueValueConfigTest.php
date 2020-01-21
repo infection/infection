@@ -49,10 +49,7 @@ final class TrueValueConfigTest extends TestCase
     {
         $config = new TrueValueConfig($settings);
 
-        $this->assertSame(
-            $expected,
-            $config->getAllowedFunctions()
-        );
+        $this->assertSame($expected, $config->getAllowedFunctions());
     }
 
     public function test_its_settings_must_be_boolean_values(): void

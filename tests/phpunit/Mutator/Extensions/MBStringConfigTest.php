@@ -18,10 +18,7 @@ final class MBStringConfigTest extends TestCase
     {
         $config = new MBStringConfig($settings);
 
-        $this->assertSame(
-            $expected,
-            $config->getAllowedFunctions()
-        );
+        $this->assertSame($expected, $config->getAllowedFunctions());
     }
 
     public function test_its_settings_must_be_boolean_values(): void
