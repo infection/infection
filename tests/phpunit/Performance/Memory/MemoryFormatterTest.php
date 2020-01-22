@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Performance\Memory;
 
+use Generator;
 use Infection\Performance\Memory\MemoryFormatter;
 use PHPUnit\Framework\TestCase;
 
@@ -53,19 +54,27 @@ final class MemoryFormatterTest extends TestCase
     /**
      * @dataProvider bytesProvider
      */
-    public function test_it_converts_bytes_to_string(float $bytes, string $expectedString): void
+    public function test_it_converts_bytes_to_human_readable_time(float $bytes, string $expectedString): void
     {
         $timeString = $this->memoryFormatter->toHumanReadableString($bytes);
 
         $this->assertSame($expectedString, $timeString);
     }
 
-    public function bytesProvider()
+    public function bytesProvider(): Generator
     {
-        yield [1048576, '1.00MB'];
+        yield [10, '10.00B'];
 
-        yield [1572864, '1.50MB'];
+        yield [1024, '1.00KB'];
 
-        yield [116737966, '111.33MB'];
+        yield [1024 ** 2, '1.00MB'];
+
+        yield [1024 ** 3, '1.00GB'];
+
+        yield [1024 ** 4, '1.00TB'];
+
+        yield [1024 ** 5, '1.00PB'];
+
+        yield [1024 ** 6, '1.00EB'];
     }
 }
