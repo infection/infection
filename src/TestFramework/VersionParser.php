@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Utils;
+namespace Infection\TestFramework;
 
 use function Safe\preg_match;
 use function Safe\sprintf;

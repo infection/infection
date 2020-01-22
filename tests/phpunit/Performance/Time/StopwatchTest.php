@@ -33,28 +33,79 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Json\Exception;
+namespace Infection\Tests\Performance\Time;
 
-use Infection\Json\Exception\ParseException;
+use Generator;
+use Infection\Performance\Time\Stopwatch;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
-final class ParseExceptionTest extends TestCase
+// Cannot import this one as it would remove the ability to mock it
+// use function usleep()
+
+/**
+ * @group time-sensitive
+ */
+final class StopwatchTest extends TestCase
 {
-    public function test_invalid_json(): void
+    /**
+     * @var Stopwatch
+     */
+    private $stopwatch;
+
+    protected function setUp(): void
     {
-        $path = '/tmp/config.json';
-        $errorMessage = 'Syntax error';
+        $this->stopwatch = new Stopwatch();
+    }
 
-        $exception = ParseException::invalidJson($path, $errorMessage);
+    /**
+     * @dataProvider timeProvider
+     */
+    public function test_it_returns_the_time_took_on_stop(int $sleepTime, float $expectedTime): void
+    {
+        $this->stopwatch->start();
 
-        $this->assertInstanceOf(ParseException::class, $exception);
+        usleep($sleepTime);
 
-        $expected = sprintf(
-            'The "%s" file does not contain valid JSON: %s.',
-            $path,
-            $errorMessage
-        );
+        $actualTimeInSeconds = $this->stopwatch->stop();
 
-        $this->assertSame($expected, $exception->getMessage());
+        $this->assertSame($expectedTime, $actualTimeInSeconds);
+    }
+
+    public function test_it_cannot_be_started_twice(): void
+    {
+        $this->stopwatch->start();
+
+        try {
+            $this->stopwatch->start();
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Timer can not be started again without stopping.',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_it_cannot_stop_if_was_not_started(): void
+    {
+        try {
+            $this->stopwatch->stop();
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Timer must be started before stopping.',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function timeProvider(): Generator
+    {
+        yield 'no time' => [0, 0.];
+
+        yield 'nominal' => [10000000, 10.0];
     }
 }

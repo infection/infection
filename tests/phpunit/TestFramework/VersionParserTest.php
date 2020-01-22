@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Utils;
+namespace Infection\Tests\TestFramework;
 
 use Generator;
-use Infection\Utils\VersionParser;
+use Infection\TestFramework\VersionParser;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 

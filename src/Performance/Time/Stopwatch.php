@@ -33,22 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Json\Exception;
+namespace Infection\Performance\Time;
 
-use function count;
-use JsonSchema\Exception\ValidationException;
+use Webmozart\Assert\Assert;
+
+// Cannot import this one as it would remove the ability to mock it
+// use function microtime
 
 /**
  * @internal
  */
-final class JsonValidationException extends ValidationException
+final class Stopwatch
 {
-    public static function doesNotMatchSchema(string $path, array $errors = []): self
-    {
-        $message = count($errors)
-            ? '"' . $path . '" does not match the expected JSON schema:' . PHP_EOL . ' - ' . implode(PHP_EOL . ' - ', $errors)
-            : '"' . $path . '" does not match the expected JSON schema.';
+    /**
+     * @var float|null
+     */
+    private $microTime;
 
-        return new self($message);
+    public function start(): void
+    {
+        Assert::null($this->microTime, 'Timer can not be started again without stopping.');
+
+        $this->microTime = microtime(true);
+    }
+
+    public function stop(): float
+    {
+        Assert::notNull($this->microTime, 'Timer must be started before stopping.');
+
+        $microTime = $this->microTime;
+        $this->microTime = null;
+
+        return microtime(true) - $microTime;
     }
 }
