@@ -37,6 +37,7 @@ namespace Infection\Tests\Performance\Memory;
 
 use Generator;
 use Infection\Performance\Memory\MemoryFormatter;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 final class MemoryFormatterTest extends TestCase
@@ -61,15 +62,27 @@ final class MemoryFormatterTest extends TestCase
         $this->assertSame($expectedString, $timeString);
     }
 
+    public function test_it_cannot_convert_negative_bytes(): void
+    {
+        try {
+            $this->memoryFormatter->toHumanReadableString(-1.);
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Expected a positive or null amount of bytes. Got: -1',
+                $exception->getMessage()
+            );
+        }
+    }
+
     public function bytesProvider(): Generator
     {
-        yield [-10, '-10.00B'];
+        yield [0., '0.00B'];
 
-        yield [0, '0.00B'];
+        yield [10., '10.00B'];
 
-        yield [10, '10.00B'];
-
-        yield [1024, '1.00KB'];
+        yield [1024., '1.00KB'];
 
         yield [1024 ** 2, '1.00MB'];
 
@@ -80,7 +93,5 @@ final class MemoryFormatterTest extends TestCase
         yield [1024 ** 5, '1.00PB'];
 
         yield [1024 ** 6, '1.00EB'];
-
-        yield [-1024 ** 6, '-1.00EB'];
     }
 }

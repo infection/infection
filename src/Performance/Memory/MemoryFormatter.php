@@ -39,6 +39,7 @@ use function floor;
 use function log;
 use function number_format;
 use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -59,18 +60,16 @@ final class MemoryFormatter
 
     public function toHumanReadableString(float $bytes): string
     {
-        $sign = '';
-
-        if ($bytes < 0) {
-            $sign = '-';
-            $bytes = -$bytes;
-        }
+        Assert::greaterThanEq(
+            $bytes,
+            0.,
+            'Expected a positive or null amount of bytes. Got: %s'
+        );
 
         $power = $bytes > 0 ? (int) floor(log($bytes, 1024)) : 0;
 
         return sprintf(
-            '%s%s%s',
-            $sign,
+            '%s%s',
             number_format(
                 $bytes / (1024 ** $power),
                 2,
