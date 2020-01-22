@@ -66,8 +66,8 @@ use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\Performance\Limiter\MemoryLimiter;
 use Infection\Performance\Memory\MemoryFormatter;
+use Infection\Performance\Time\Stopwatch;
 use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
@@ -231,8 +231,8 @@ final class Container
             MetricsCalculator::class => static function (): MetricsCalculator {
                 return new MetricsCalculator();
             },
-            Timer::class => static function (): Timer {
-                return new Timer();
+            Stopwatch::class => static function (): Stopwatch {
+                return new Stopwatch();
             },
             TimeFormatter::class => static function (): TimeFormatter {
                 return new TimeFormatter();
@@ -317,7 +317,7 @@ final class Container
                     $config,
                     $container->getFileSystem(),
                     $config->getTmpDir(),
-                    $container->getTimer(),
+                    $container->getStopwatch(),
                     $container->getTimeFormatter(),
                     $container->getMemoryFormatter(),
                     $container->getLoggerFactory()
@@ -592,9 +592,9 @@ final class Container
         return $this->get(MetricsCalculator::class);
     }
 
-    public function getTimer(): Timer
+    public function getStopwatch(): Stopwatch
     {
-        return $this->get(Timer::class);
+        return $this->get(Stopwatch::class);
     }
 
     public function getTimeFormatter(): TimeFormatter

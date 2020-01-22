@@ -38,7 +38,6 @@ namespace Infection\TestFramework;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\TestFramework\Coverage\CoverageLineData;
-use Infection\Utils\VersionParser;
 use InvalidArgumentException;
 use Symfony\Component\Process\Process;
 
