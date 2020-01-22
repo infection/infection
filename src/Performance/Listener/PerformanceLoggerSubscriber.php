@@ -48,18 +48,18 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class PerformanceLoggerSubscriber implements EventSubscriber
 {
-    private $timer;
+    private $stopwatch;
     private $output;
     private $timeFormatter;
     private $memoryFormatter;
 
     public function __construct(
-        Stopwatch $timer,
+        Stopwatch $stopwatch,
         TimeFormatter $timeFormatter,
         MemoryFormatter $memoryFormatter,
         OutputInterface $output
     ) {
-        $this->timer = $timer;
+        $this->stopwatch = $stopwatch;
         $this->timeFormatter = $timeFormatter;
         $this->output = $output;
         $this->memoryFormatter = $memoryFormatter;
@@ -75,12 +75,12 @@ final class PerformanceLoggerSubscriber implements EventSubscriber
 
     public function onApplicationExecutionStarted(): void
     {
-        $this->timer->start();
+        $this->stopwatch->start();
     }
 
     public function onApplicationExecutionFinished(): void
     {
-        $time = $this->timer->stop();
+        $time = $this->stopwatch->stop();
 
         $this->output->writeln([
             '',

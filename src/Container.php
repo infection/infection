@@ -317,7 +317,7 @@ final class Container
                     $config,
                     $container->getFileSystem(),
                     $config->getTmpDir(),
-                    $container->getTimer(),
+                    $container->getStopwatch(),
                     $container->getTimeFormatter(),
                     $container->getMemoryFormatter(),
                     $container->getLoggerFactory()
@@ -592,7 +592,7 @@ final class Container
         return $this->get(MetricsCalculator::class);
     }
 
-    public function getTimer(): Stopwatch
+    public function getStopwatch(): Stopwatch
     {
         return $this->get(Stopwatch::class);
     }

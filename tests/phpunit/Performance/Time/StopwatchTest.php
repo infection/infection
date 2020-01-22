@@ -51,11 +51,11 @@ final class StopwatchTest extends TestCase
     /**
      * @var Stopwatch
      */
-    private $timer;
+    private $stopwatch;
 
     protected function setUp(): void
     {
-        $this->timer = new Stopwatch();
+        $this->stopwatch = new Stopwatch();
     }
 
     /**
@@ -63,21 +63,21 @@ final class StopwatchTest extends TestCase
      */
     public function test_it_returns_the_time_took_on_stop(int $sleepTime, float $expectedTime): void
     {
-        $this->timer->start();
+        $this->stopwatch->start();
 
         usleep($sleepTime);
 
-        $actualTimeInSeconds = $this->timer->stop();
+        $actualTimeInSeconds = $this->stopwatch->stop();
 
         $this->assertSame($expectedTime, $actualTimeInSeconds);
     }
 
     public function test_it_cannot_be_started_twice(): void
     {
-        $this->timer->start();
+        $this->stopwatch->start();
 
         try {
-            $this->timer->start();
+            $this->stopwatch->start();
 
             $this->fail();
         } catch (InvalidArgumentException $exception) {
@@ -91,7 +91,7 @@ final class StopwatchTest extends TestCase
     public function test_it_cannot_stop_if_was_not_started(): void
     {
         try {
-            $this->timer->stop();
+            $this->stopwatch->stop();
 
             $this->fail();
         } catch (InvalidArgumentException $exception) {
