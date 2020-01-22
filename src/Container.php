@@ -47,8 +47,7 @@ use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
-use Infection\EventDispatcher\EventDispatcher;
-use Infection\EventDispatcher\EventDispatcherInterface;
+use Infection\Event\EventDispatcher;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Locator\RootsFileLocator;
@@ -64,6 +63,7 @@ use Infection\Mutation\MutationGenerator;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
+use Infection\Mutator\MutatorResolver;
 use Infection\Performance\Limiter\MemoryLimiter;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\TimeFormatter;
@@ -88,7 +88,6 @@ use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkAdapter;
-use Infection\Utils\VersionParser;
 use InvalidArgumentException;
 use function is_callable;
 use function php_ini_loaded_file;
@@ -194,7 +193,7 @@ final class Container
             Differ::class => static function (): Differ {
                 return new Differ(new BaseDiffer());
             },
-            EventDispatcherInterface::class => static function (): EventDispatcherInterface {
+            EventDispatcher::class => static function (): EventDispatcher {
                 return new EventDispatcher();
             },
             ParallelProcessRunner::class => static function (self $container): ParallelProcessRunner {
@@ -212,9 +211,6 @@ final class Container
                 return new MemoizedTestFileDataProvider(
                     new JUnitTestFileDataProvider($container->getJUnitFilePath())
                 );
-            },
-            VersionParser::class => static function (): VersionParser {
-                return new VersionParser();
             },
             Lexer::class => static function (): Lexer {
                 $attributes = Mutation::ATTRIBUTE_KEYS;
@@ -275,10 +271,14 @@ final class Container
             ConfigurationFactory::class => static function (self $container): ConfigurationFactory {
                 return new ConfigurationFactory(
                     $container->getTmpDirProvider(),
+                    $container->getMutatorResolver(),
                     $container->getMutatorFactory(),
                     $container->getMutatorParser(),
                     $container->getSourceFileCollector()
                 );
+            },
+            MutatorResolver::class => static function (): MutatorResolver {
+                return new MutatorResolver();
             },
             MutatorFactory::class => static function (): MutatorFactory {
                 return new MutatorFactory();
@@ -360,8 +360,7 @@ final class Container
             },
             InitialTestRunProcessBuilder::class => static function (self $container): InitialTestRunProcessBuilder {
                 return new InitialTestRunProcessBuilder(
-                    $container->getTestFrameworkAdapter(),
-                    $container->getVersionParser()
+                    $container->getTestFrameworkAdapter()
                 );
             },
             InitialTestsRunner::class => static function (self $container): InitialTestsRunner {
@@ -373,7 +372,6 @@ final class Container
             MutantProcessBuilder::class => static function (self $container): MutantProcessBuilder {
                 return new MutantProcessBuilder(
                     $container->getTestFrameworkAdapter(),
-                    $container->getVersionParser(),
                     $container->getConfiguration()->getProcessTimeout()
                 );
             },
@@ -551,9 +549,9 @@ final class Container
         return $this->get(Differ::class);
     }
 
-    public function getEventDispatcher(): EventDispatcherInterface
+    public function getEventDispatcher(): EventDispatcher
     {
-        return $this->get(EventDispatcherInterface::class);
+        return $this->get(EventDispatcher::class);
     }
 
     public function getParallelProcessRunner(): ParallelProcessRunner
@@ -574,11 +572,6 @@ final class Container
     public function getMemoizedTestFileDataProvider(): MemoizedTestFileDataProvider
     {
         return $this->get(MemoizedTestFileDataProvider::class);
-    }
-
-    public function getVersionParser(): VersionParser
-    {
-        return $this->get(VersionParser::class);
     }
 
     public function getLexer(): Lexer
@@ -654,6 +647,11 @@ final class Container
     public function getConfigurationFactory(): ConfigurationFactory
     {
         return $this->get(ConfigurationFactory::class);
+    }
+
+    public function getMutatorResolver(): MutatorResolver
+    {
+        return $this->get(MutatorResolver::class);
     }
 
     public function getMutatorFactory(): MutatorFactory

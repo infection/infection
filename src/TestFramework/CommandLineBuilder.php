@@ -116,6 +116,6 @@ final class CommandLineBuilder
 
     private function isBatchFile(string $path): bool
     {
-        return '.bat' === substr($path, -4);
+        return substr($path, -4) === '.bat';
     }
 }

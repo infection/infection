@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Performance\Listener;
 
-use Infection\EventDispatcher\EventDispatcher;
-use Infection\Events\ApplicationExecutionFinished;
-use Infection\Events\ApplicationExecutionStarted;
+use Infection\Event\ApplicationExecutionFinished;
+use Infection\Event\ApplicationExecutionStarted;
+use Infection\Event\EventDispatcher;
 use Infection\Performance\Listener\PerformanceLoggerSubscriber;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\TimeFormatter;
@@ -64,7 +64,7 @@ final class PerformanceLoggerSubscriberTest extends TestCase
         $this->output->expects($this->once())
             ->method('writeln')
             ->with($this->callback(static function ($parameter) {
-                return is_array($parameter) && '' === $parameter[0] && 0 === strpos($parameter[1], 'Time:');
+                return is_array($parameter) && $parameter[0] === '' && strpos($parameter[1], 'Time:') === 0;
             }));
 
         $dispatcher = new EventDispatcher();

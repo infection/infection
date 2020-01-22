@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Performance\Listener;
 
-use Infection\EventDispatcher\EventSubscriberInterface;
-use Infection\Events\ApplicationExecutionFinished;
-use Infection\Events\ApplicationExecutionStarted;
+use Infection\Event\ApplicationExecutionFinished;
+use Infection\Event\ApplicationExecutionStarted;
+use Infection\Event\Subscriber\EventSubscriber;
 use Infection\Performance\Memory\MemoryFormatter;
 use Infection\Performance\Time\TimeFormatter;
 use Infection\Performance\Time\Timer;
@@ -46,7 +46,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final class PerformanceLoggerSubscriber implements EventSubscriberInterface
+final class PerformanceLoggerSubscriber implements EventSubscriber
 {
     private $timer;
     private $output;

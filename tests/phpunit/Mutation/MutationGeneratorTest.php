@@ -35,15 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\MutableFileProcessed;
-use Infection\Events\MutationGeneratingFinished;
-use Infection\Events\MutationGeneratingStarted;
+use Infection\Event\EventDispatcher;
+use Infection\Event\MutableFileProcessed;
+use Infection\Event\MutationGeneratingFinished;
+use Infection\Event\MutationGeneratingStarted;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationGenerator;
+use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
-use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
@@ -61,8 +61,8 @@ final class MutationGeneratorTest extends TestCase
         ];
 
         $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
-        $mutators = ['Fake' => new IgnoreMutator(new MutatorConfig([]), new FakeMutator())];
-        $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
+        $mutators = ['Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator())];
+        $eventDispatcherMock = $this->createMock(EventDispatcher::class);
         $onlyCovered = true;
         $extraVisitors = [2 => new FakeVisitor()];
 
@@ -116,7 +116,7 @@ final class MutationGeneratorTest extends TestCase
 
         $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
 
-        $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcherMock = $this->createMock(EventDispatcher::class);
         $eventDispatcherMock
             ->expects($this->exactly(4))
             ->method('dispatch')

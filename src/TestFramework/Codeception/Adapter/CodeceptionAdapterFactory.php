@@ -40,7 +40,7 @@ use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkAdapterFactory;
 use Infection\TestFramework\TestFrameworkConfigParseException;
-use Infection\Utils\VersionParser;
+use Infection\TestFramework\VersionParser;
 use LogicException;
 use function Safe\file_get_contents;
 use function Safe\sprintf;

@@ -36,9 +36,13 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use function count;
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\MutationTestingFinished;
-use Infection\Events\MutationTestingStarted;
+use Infection\Event\EventDispatcher;
+use Infection\Event\MutantCreated;
+use Infection\Event\MutantsCreatingFinished;
+use Infection\Event\MutantsCreatingStarted;
+use Infection\Event\MutationTestingFinished;
+use Infection\Event\MutationTestingStarted;
+use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 
@@ -54,7 +58,7 @@ final class MutationTestingRunner
     public function __construct(
         MutantProcessFactory $mutantProcessFactory,
         ParallelProcessRunner $parallelProcessManager,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcher $eventDispatcher
     ) {
         $this->mutantProcessFactory = $mutantProcessFactory;
         $this->parallelProcessManager = $parallelProcessManager;

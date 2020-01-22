@@ -161,7 +161,7 @@ abstract class AbstractMutatorTestCase extends TestCase
 
     private static function getParser(): Parser
     {
-        if (null === self::$parser) {
+        if (self::$parser === null) {
             self::$parser = Container::create()->getParser();
         }
 
@@ -170,7 +170,7 @@ abstract class AbstractMutatorTestCase extends TestCase
 
     private static function getPrinter(): PrettyPrinterAbstract
     {
-        if (null === self::$printer) {
+        if (self::$printer === null) {
             self::$printer = new Standard();
         }
 
@@ -190,7 +190,7 @@ abstract class AbstractMutatorTestCase extends TestCase
         );
 
         (new NodeTraverserFactory())
-            ->create([100 => $mutationsCollectorVisitor])
+            ->create([10 => $mutationsCollectorVisitor])
             ->traverse($nodes)
         ;
 

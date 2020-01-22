@@ -50,6 +50,8 @@ use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\Util\PhpProcess;
 use Infection\Engine;
+use Infection\Event\Subscriber\MutantCreatingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Finder\ComposerExecutableFinder;
 use Infection\Finder\FilterableFinder;
 use Infection\Finder\TestFrameworkFinder;
@@ -58,8 +60,7 @@ use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
-use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
-use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
+use Infection\Process\Runner\MutationTestingRunner;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\MethodLocationData;
@@ -151,7 +152,7 @@ final class ProjectCodeProvider
 
     public static function provideSourceClasses(): Generator
     {
-        if (null !== self::$sourceClasses) {
+        if (self::$sourceClasses !== null) {
             yield from self::$sourceClasses;
 
             return;
@@ -206,7 +207,7 @@ final class ProjectCodeProvider
 
     public static function provideSourceClassesToCheckForPublicProperties(): Generator
     {
-        if (null !== self::$sourceClassesToCheckForPublicProperties) {
+        if (self::$sourceClassesToCheckForPublicProperties !== null) {
             yield from self::$sourceClassesToCheckForPublicProperties;
 
             return;
@@ -245,7 +246,7 @@ final class ProjectCodeProvider
 
     public static function provideTestClasses(): Generator
     {
-        if (null !== self::$testClasses) {
+        if (self::$testClasses !== null) {
             yield from self::$testClasses;
 
             return;

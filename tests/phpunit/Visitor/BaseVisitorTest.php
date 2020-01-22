@@ -112,7 +112,7 @@ abstract class BaseVisitorTest extends TestCase
 
     private function getParser(): Parser
     {
-        if (null === self::$parser) {
+        if (self::$parser === null) {
             self::$parser = Container::create()->getParser();
         }
 
@@ -121,7 +121,7 @@ abstract class BaseVisitorTest extends TestCase
 
     private function getDumper(): NodeDumper
     {
-        if (null === self::$dumper) {
+        if (self::$dumper === null) {
             self::$dumper = new NodeDumper();
         }
 
@@ -130,7 +130,7 @@ abstract class BaseVisitorTest extends TestCase
 
     private function getPrinter(): PrettyPrinterAbstract
     {
-        if (null === self::$printer) {
+        if (self::$printer === null) {
             self::$printer = new Standard();
         }
 

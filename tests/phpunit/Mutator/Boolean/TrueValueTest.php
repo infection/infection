@@ -171,9 +171,7 @@ PHP
 \in_array($a, $b, false);
 PHP
                 ,
-                [
-                    'settings' => ['in_array' => true],
-                ],
+                ['in_array' => true],
             ];
 
         yield 'It does not mutate when used in "\in_array" function and explicitly disabled' => [
@@ -184,9 +182,7 @@ PHP
 PHP
                 ,
                 [],
-                [
-                    'settings' => ['in_array' => false],
-                ],
+                ['in_array' => false],
             ];
 
         yield 'It does not mutate when used in "array_search" function by default' => [
@@ -235,9 +231,7 @@ PHP
 array_search($a, $b, false);
 PHP
             ,
-            [
-                'settings' => ['array_search' => true],
-            ],
+            ['array_search' => true],
         ];
 
         yield 'It does not mutate when used in "\array_search" function and explicitly disabled' => [
@@ -248,9 +242,7 @@ PHP
 PHP
             ,
             [],
-            [
-                'settings' => ['array_search' => false],
-            ],
+            ['array_search' => false],
         ];
 
         yield 'It does not mutate when used in "\array_search" function and explicitly disabled and function is wrongly capitalized' => [
@@ -261,9 +253,7 @@ PHP
 PHP
             ,
             [],
-            [
-                'settings' => ['array_search' => false],
-            ],
+            ['array_search' => false],
         ];
     }
 

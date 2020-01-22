@@ -76,7 +76,7 @@ final class JsonFile
 
         $data = json_decode(file_get_contents($this->path));
 
-        if (null === $data && JSON_ERROR_NONE !== json_last_error()) {
+        if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
             throw ParseException::invalidJson($this->path, json_last_error_msg());
         }
 
@@ -90,7 +90,7 @@ final class JsonFile
         $schemaFile = self::SCHEMA_FILE;
 
         // Prepend with file:// only when not using a special schema already (e.g. in the phar)
-        if (false === strpos($schemaFile, '://')) {
+        if (strpos($schemaFile, '://') === false) {
             $schemaFile = 'file://' . $schemaFile;
         }
 

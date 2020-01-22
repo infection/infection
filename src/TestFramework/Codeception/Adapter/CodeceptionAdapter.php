@@ -46,7 +46,7 @@ use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;
-use Infection\Utils\VersionParser;
+use Infection\TestFramework\VersionParser;
 use InvalidArgumentException;
 use function is_string;
 use Phar;
@@ -86,7 +86,7 @@ final class CodeceptionAdapter implements MemoryUsageAware, TestFrameworkAdapter
     private $cachedVersion;
 
     /**
-     * @param  array<string, mixed> $originalConfigContentParsed
+     * @param array<string, mixed> $originalConfigContentParsed
      */
     public function __construct(
         string $testFrameworkExecutable,
@@ -265,7 +265,7 @@ final class CodeceptionAdapter implements MemoryUsageAware, TestFrameworkAdapter
     {
         $infectionPhar = '';
 
-        if (0 === strpos(__FILE__, 'phar:')) {
+        if (strpos(__FILE__, 'phar:') === 0) {
             $infectionPhar = sprintf(
                 '\Phar::loadPhar("%s", "%s");',
                 str_replace('phar://', '', Phar::running(true)),

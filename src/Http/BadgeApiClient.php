@@ -82,7 +82,7 @@ class BadgeApiClient
         $responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        if (self::CREATED_RESPONSE_CODE !== $responseCode) {
+        if ($responseCode !== self::CREATED_RESPONSE_CODE) {
             $this->output->writeln(sprintf('Stryker dashboard returned an unexpected response code: %s', $responseCode));
         }
 

@@ -106,7 +106,7 @@ final class MutatorRobustnessTest extends TestCase
 
     private static function getParser(): Parser
     {
-        if (null === self::$parser) {
+        if (self::$parser === null) {
             self::$parser = Container::create()->getParser();
         }
 
@@ -115,7 +115,7 @@ final class MutatorRobustnessTest extends TestCase
 
     private function provideCodeSamples(): Generator
     {
-        if (null !== self::$files) {
+        if (self::$files !== null) {
             yield from self::$files;
 
             return;

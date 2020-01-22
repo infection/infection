@@ -96,7 +96,7 @@ final class DotFormatter extends AbstractOutputFormatter
         }
 
         $remainder = $this->callsCount % self::DOTS_PER_ROW;
-        $endOfRow = 0 === $remainder;
+        $endOfRow = $remainder === 0;
         $lastDot = $mutationCount === $this->callsCount;
 
         if ($lastDot && !$endOfRow) {

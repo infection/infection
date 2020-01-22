@@ -113,7 +113,7 @@ class SchemaConfigurationFactory
         ?array $values,
         ?array $default = []
     ): ?array {
-        if (null === $values) {
+        if ($values === null) {
             return $default;
         }
 
@@ -126,7 +126,7 @@ class SchemaConfigurationFactory
         ?string $value,
         ?string $default = null
     ): ?string {
-        if (null === $value) {
+        if ($value === null) {
             return $default;
         }
 

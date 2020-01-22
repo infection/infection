@@ -79,7 +79,7 @@ abstract class FileLogger implements MutationTestingResultsLogger
         $content = implode(PHP_EOL, $this->getLogLines());
 
         // If the output should be written to a stream then just write it directly
-        if (0 === strpos($this->logFilePath, 'php://')) {
+        if (strpos($this->logFilePath, 'php://') === 0) {
             if (in_array($this->logFilePath, ['php://stdout', 'php://stderr'], true)) {
                 file_put_contents($this->logFilePath, $content);
             } else {

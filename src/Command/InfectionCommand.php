@@ -44,7 +44,7 @@ use Infection\Console\Exception\InfectionException;
 use Infection\Console\LogVerbosity;
 use Infection\Container;
 use Infection\Engine;
-use Infection\Events\ApplicationExecutionStarted;
+use Infection\Event\ApplicationExecutionStarted;
 use Infection\Locator\FileOrDirectoryNotFound;
 use Infection\Locator\Locator;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
@@ -277,18 +277,18 @@ final class InfectionCommand extends BaseCommand
 
         $minMsi = $input->getOption('min-msi');
 
-        if (null !== $minMsi && !is_numeric($minMsi)) {
+        if ($minMsi !== null && !is_numeric($minMsi)) {
             throw new InvalidArgumentException(sprintf('Expected min-msi to be a float. Got "%s"', $minMsi));
         }
 
         $minCoveredMsi = $input->getOption('min-covered-msi');
 
-        if (null !== $minCoveredMsi && !is_numeric($minCoveredMsi)) {
+        if ($minCoveredMsi !== null && !is_numeric($minCoveredMsi)) {
             throw new InvalidArgumentException(sprintf('Expected min-covered-msi to be a float. Got "%s"', $minCoveredMsi));
         }
 
         $this->container = $this->getApplication()->getContainer()->withDynamicParameters(
-            '' === $configFile ? null : $configFile,
+            $configFile === '' ? null : $configFile,
             trim((string) $input->getOption('mutators')),
             $input->getOption('show-mutations'),
             trim((string) $input->getOption('log-verbosity')),
@@ -296,13 +296,13 @@ final class InfectionCommand extends BaseCommand
             $input->getOption('only-covered'),
             trim((string) $input->getOption('formatter')),
             $input->getOption('no-progress'),
-            '' === $coverage ? null : $coverage,
-            '' === $initialTestsPhpOptions ? null : $initialTestsPhpOptions,
+            $coverage === '' ? null : $coverage,
+            $initialTestsPhpOptions === '' ? null : $initialTestsPhpOptions,
             $input->getOption('ignore-msi-with-no-mutations'),
-            null === $minMsi ? null : (float) $minMsi,
-            null === $minCoveredMsi ? null : (float) $minCoveredMsi,
-            '' === $testFramework ? null : $testFramework,
-            '' === $testFrameworkExtraOptions ? null : $testFrameworkExtraOptions,
+            $minMsi === null ? null : (float) $minMsi,
+            $minCoveredMsi === null ? null : (float) $minCoveredMsi,
+            $testFramework === '' ? null : $testFramework,
+            $testFrameworkExtraOptions === '' ? null : $testFrameworkExtraOptions,
             trim((string) $input->getOption('filter'))
         );
     }
@@ -311,7 +311,7 @@ final class InfectionCommand extends BaseCommand
     {
         $bootstrap = $config->getBootstrap();
 
-        if (null === $bootstrap) {
+        if ($bootstrap === null) {
             return;
         }
 
