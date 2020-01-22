@@ -63,6 +63,10 @@ final class MemoryFormatterTest extends TestCase
 
     public function bytesProvider(): Generator
     {
+        yield [-10, '-10.00B'];
+
+        yield [0, '0.00B'];
+
         yield [10, '10.00B'];
 
         yield [1024, '1.00KB'];
@@ -76,5 +80,7 @@ final class MemoryFormatterTest extends TestCase
         yield [1024 ** 5, '1.00PB'];
 
         yield [1024 ** 6, '1.00EB'];
+
+        yield [-1024 ** 6, '-1.00EB'];
     }
 }

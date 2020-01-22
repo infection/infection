@@ -59,14 +59,18 @@ final class MemoryFormatter
 
     public function toHumanReadableString(float $bytes): string
     {
-        if ($bytes === -1.) {
-            return '-1';
+        $sign = '';
+
+        if ($bytes < 0) {
+            $sign = '-';
+            $bytes = -$bytes;
         }
 
         $power = $bytes > 0 ? (int) floor(log($bytes, 1024)) : 0;
 
         return sprintf(
-            '%s%s',
+            '%s%s%s',
+            $sign,
             number_format(
                 $bytes / (1024 ** $power),
                 2,
