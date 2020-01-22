@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Performance\Time;
 
+use Generator;
 use Infection\Performance\Time\TimeFormatter;
 use PHPUnit\Framework\TestCase;
 
@@ -51,16 +52,31 @@ final class TimeFormatterTest extends TestCase
     }
 
     /**
-     * @dataProvider secondsProvider
+     * @dataProvider timeProvider
      */
-    public function test_it_converts_seconds_to_seconds_string(float $seconds, string $expectedString): void
+    public function test_it_converts_time_to_human_readable_time(float $seconds, string $expectedString): void
     {
         $timeString = $this->timeFormatter->toHumanReadableString($seconds);
 
         $this->assertSame($expectedString, $timeString);
     }
 
-    public function secondsProvider()
+    public function timeProvider(): Generator
+    {
+        foreach (self::secondsProvider() as $i => $set) {
+            yield 'seconds#' . $i => $set;
+        }
+
+        foreach (self::minutesProvider() as $i => $set) {
+            yield 'minutes#' . $i => $set;
+        }
+
+        foreach (self::hoursProvider() as $i => $set) {
+            yield 'hours#' . $i => $set;
+        }
+    }
+
+    private static function secondsProvider(): Generator
     {
         yield [0, '0s'];
 
@@ -77,17 +93,7 @@ final class TimeFormatterTest extends TestCase
         yield [31.01, '31s'];
     }
 
-    /**
-     * @dataProvider minutesProvider
-     */
-    public function test_it_converts_seconds_to_minutes_string(float $seconds, string $expectedString): void
-    {
-        $timeString = $this->timeFormatter->toHumanReadableString($seconds);
-
-        $this->assertSame($expectedString, $timeString);
-    }
-
-    public function minutesProvider()
+    private static function minutesProvider(): Generator
     {
         yield [60, '1m'];
 
@@ -100,23 +106,13 @@ final class TimeFormatterTest extends TestCase
         yield [122.9, '2m 2s'];
     }
 
-    /**
-     * @dataProvider minutesProvider
-     */
-    public function test_it_converts_seconds_to_hours_string(float $seconds, string $expectedString): void
-    {
-        $timeString = $this->timeFormatter->toHumanReadableString($seconds);
-
-        $this->assertSame($expectedString, $timeString);
-    }
-
-    public function hoursProvider()
+    private static function hoursProvider(): Generator
     {
         yield [3600, '1h'];
 
         yield [3600.99, '1h'];
 
-        yield [3601, '1h 0m 1s'];
+        yield [3601, '1h 1s'];
 
         yield [7302, '2h 1m 42s'];
 
