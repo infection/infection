@@ -40,7 +40,7 @@ use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Differ\DiffColorizer;
-use Infection\Event\EventDispatcher;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\CiMutantCreatingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriber;

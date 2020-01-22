@@ -37,16 +37,16 @@ namespace Infection\Tests\Process\Runner;
 
 use function count;
 use function get_class;
-use Infection\Events\MutantCreated;
-use Infection\Events\MutantsCreatingFinished;
-use Infection\Events\MutantsCreatingStarted;
+use Infection\Event\MutantCreated;
+use Infection\Event\MutantsCreatingFinished;
+use Infection\Event\MutantsCreatingStarted;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\MutantProcessFactory;
-use Infection\Tests\Fixtures\Process\EventDispatcherCollector;
+use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

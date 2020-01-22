@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
-use Infection\Event\EventDispatcher;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutableFileProcessed;
 use Infection\Event\MutationGeneratingFinished;
 use Infection\Event\MutationGeneratingStarted;

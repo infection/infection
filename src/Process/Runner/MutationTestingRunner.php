@@ -36,13 +36,9 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use function count;
-use Infection\Event\EventDispatcher;
-use Infection\Event\MutantCreated;
-use Infection\Event\MutantsCreatingFinished;
-use Infection\Event\MutantsCreatingStarted;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutationTestingFinished;
 use Infection\Event\MutationTestingStarted;
-use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 

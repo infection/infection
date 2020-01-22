@@ -37,14 +37,14 @@ namespace Infection\Tests\Process\Runner;
 
 use function count;
 use function get_class;
-use Infection\Events\MutationTestingFinished;
-use Infection\Events\MutationTestingStarted;
+use Infection\Event\MutationTestingFinished;
+use Infection\Event\MutationTestingStarted;
 use Infection\Mutation\Mutation;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\MutantProcessFactory;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
-use Infection\Tests\Fixtures\Process\EventDispatcherCollector;
+use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -61,7 +61,7 @@ final class MutationTestingRunnerTest extends TestCase
     private $parallelProcessRunnerMock;
 
     /**
-     * @var EventDispatcherCollector
+     * @var \Infection\Tests\Fixtures\Event\EventDispatcherCollector
      */
     private $eventDispatcher;
 

@@ -37,7 +37,7 @@ namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
-use Infection\Event\EventDispatcher;
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\MutantProcessFinished;
 use Infection\Event\MutationTestingFinished;
 use Infection\Event\MutationTestingStarted;
@@ -84,7 +84,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             ->expects($this->once())
             ->method('start');
 
-        $dispatcher = new EventDispatcher();
+        $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $this->output,
             $this->outputFormatter,
@@ -106,7 +106,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             ->expects($this->once())
             ->method('advance');
 
-        $dispatcher = new EventDispatcher();
+        $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $this->output,
             $this->outputFormatter,
@@ -124,7 +124,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             ->expects($this->once())
             ->method('finish');
 
-        $dispatcher = new EventDispatcher();
+        $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $this->output,
             $this->outputFormatter,
@@ -145,7 +145,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             ->expects($this->once())
             ->method('finish');
 
-        $dispatcher = new EventDispatcher();
+        $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $this->output,
             $this->outputFormatter,

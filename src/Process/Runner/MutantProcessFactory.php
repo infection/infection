@@ -37,10 +37,10 @@ namespace Infection\Process\Runner;
 
 use function array_map;
 use function count;
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\MutantCreated;
-use Infection\Events\MutantsCreatingFinished;
-use Infection\Events\MutantsCreatingStarted;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\MutantCreated;
+use Infection\Event\MutantsCreatingFinished;
+use Infection\Event\MutantsCreatingStarted;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Builder\MutantProcessBuilder;
@@ -59,7 +59,7 @@ class MutantProcessFactory
     public function __construct(
         MutantProcessBuilder $processBuilder,
         MutantFactory $mutantFactory,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcher $eventDispatcher
     ) {
         $this->processBuilder = $processBuilder;
         $this->mutantFactory = $mutantFactory;
