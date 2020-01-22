@@ -176,6 +176,6 @@ CODE
 
     private function getFileContent(string $file): string
     {
-        return file_get_contents(sprintf(__DIR__ . '/../../Fixtures/Autoloaded/NewObject/%s', $file));
+        return file_get_contents(sprintf(__DIR__ . '/../../../Fixtures/Autoloaded/NewObject/%s', $file));
     }
 }

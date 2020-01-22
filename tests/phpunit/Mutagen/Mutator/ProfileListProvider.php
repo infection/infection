@@ -87,7 +87,7 @@ final class ProfileListProvider
         $finder = Finder::create()
             ->files()
             ->name('*.php')
-            ->in(__DIR__ . '/../../../src/Mutator')
+            ->in(__DIR__ . '/../../../../src/Mutagen/Mutator')
             ->exclude('Util')
         ;
 
@@ -158,7 +158,7 @@ final class ProfileListProvider
     private static function getMutatorClassNameFromPath(string $path): string
     {
         $cleanedRelativePath = substr(
-            Path::makeRelative($path, __DIR__ . '/../../../src'),
+            Path::makeRelative($path, __DIR__ . '/../../../../src'),
             0,
             -4
         );

@@ -122,7 +122,7 @@ final class MutatorRobustnessTest extends TestCase
         }
 
         $finder = Finder::create()
-            ->in(__DIR__ . '/../Fixtures/CodeSamples')
+            ->in(__DIR__ . '/../../Fixtures/CodeSamples')
             ->name('*.php')
             ->files()
         ;
