@@ -42,8 +42,8 @@ use Infection\Event\EventDispatcher;
 use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Performance\Memory\MemoryFormatter;
+use Infection\Performance\Time\Stopwatch;
 use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use InvalidArgumentException;
@@ -85,7 +85,7 @@ final class SubscriberBuilderTest extends TestCase
             $config,
             $fs,
             sys_get_temp_dir(),
-            new Timer(),
+            new Stopwatch(),
             new TimeFormatter(),
             new MemoryFormatter(),
             new LoggerFactory($calculator, $fs, 'all', false, false)
@@ -118,7 +118,7 @@ final class SubscriberBuilderTest extends TestCase
             $config,
             $fs,
             sys_get_temp_dir(),
-            new Timer(),
+            new Stopwatch(),
             new TimeFormatter(),
             new MemoryFormatter(),
             new LoggerFactory($calculator, $fs, 'all', false, false)
@@ -148,7 +148,7 @@ final class SubscriberBuilderTest extends TestCase
             $config,
             $fs,
             sys_get_temp_dir(),
-            new Timer(),
+            new Stopwatch(),
             new TimeFormatter(),
             new MemoryFormatter(),
             new LoggerFactory($calculator, $fs, 'all', false, false)

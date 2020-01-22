@@ -33,34 +33,79 @@
 
 declare(strict_types=1);
 
-namespace Infection\Performance\Time;
+namespace Infection\Tests\Performance\Time;
 
-use Webmozart\Assert\Assert;
+use Generator;
+use Infection\Performance\Time\Stopwatch;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+
+// Cannot import this one as it would remove the ability to mock it
+// use function usleep()
 
 /**
- * @internal
+ * @group time-sensitive
  */
-final class Timer
+final class StopwatchTest extends TestCase
 {
     /**
-     * @var float|null
+     * @var Stopwatch
      */
-    private $microTime;
+    private $stopwatch;
 
-    public function start(): void
+    protected function setUp(): void
     {
-        Assert::null($this->microTime, 'Timer can not be started again without stopping.');
-
-        $this->microTime = microtime(true);
+        $this->stopwatch = new Stopwatch();
     }
 
-    public function stop(): float
+    /**
+     * @dataProvider timeProvider
+     */
+    public function test_it_returns_the_time_took_on_stop(int $sleepTime, float $expectedTime): void
     {
-        Assert::notNull($this->microTime, 'Timer must be started before stopping.');
+        $this->stopwatch->start();
 
-        $microTime = $this->microTime;
-        $this->microTime = null;
+        usleep($sleepTime);
 
-        return microtime(true) - $microTime;
+        $actualTimeInSeconds = $this->stopwatch->stop();
+
+        $this->assertSame($expectedTime, $actualTimeInSeconds);
+    }
+
+    public function test_it_cannot_be_started_twice(): void
+    {
+        $this->stopwatch->start();
+
+        try {
+            $this->stopwatch->start();
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Timer can not be started again without stopping.',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_it_cannot_stop_if_was_not_started(): void
+    {
+        try {
+            $this->stopwatch->stop();
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Timer must be started before stopping.',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function timeProvider(): Generator
+    {
+        yield 'no time' => [0, 0.];
+
+        yield 'nominal' => [10000000, 10.0];
     }
 }

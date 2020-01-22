@@ -33,45 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Performance\Time;
+namespace Infection\Performance\Time;
 
-use Infection\Performance\Time\Timer;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
+use Webmozart\Assert\Assert;
 
-final class TimerTest extends TestCase
+// Cannot import this one as it would remove the ability to mock it
+// use function microtime
+
+/**
+ * @internal
+ */
+final class Stopwatch
 {
     /**
-     * @var Timer
+     * @var float|null
      */
-    private $timer;
+    private $microTime;
 
-    protected function setUp(): void
+    public function start(): void
     {
-        $this->timer = new Timer();
+        Assert::null($this->microTime, 'Timer can not be started again without stopping.');
+
+        $this->microTime = microtime(true);
     }
 
-    public function test_it_returns_return_seconds_on_stop(): void
+    public function stop(): float
     {
-        $this->timer->start();
-        $timeInSeconds = $this->timer->stop();
+        Assert::notNull($this->microTime, 'Timer must be started before stopping.');
 
-        $this->assertIsFloat($timeInSeconds);
-        $this->assertGreaterThanOrEqual(0, $timeInSeconds);
-    }
+        $microTime = $this->microTime;
+        $this->microTime = null;
 
-    public function test_it_throws_an_exception_when_started_twice_without_stopping(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        $this->timer->start();
-        $this->timer->start();
-    }
-
-    public function test_it_throws_an_exception_when_stopped_without_starting(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        $this->timer->stop();
+        return microtime(true) - $microTime;
     }
 }

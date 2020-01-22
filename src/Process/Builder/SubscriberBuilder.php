@@ -55,8 +55,8 @@ use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Performance\Listener\PerformanceLoggerSubscriber;
 use Infection\Performance\Memory\MemoryFormatter;
+use Infection\Performance\Time\Stopwatch;
 use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
 use Infection\TestFramework\TestFrameworkAdapter;
 use InvalidArgumentException;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -78,7 +78,7 @@ final class SubscriberBuilder
     private $infectionConfig;
     private $fs;
     private $tmpDir;
-    private $timer;
+    private $stopwatch;
     private $timeFormatter;
     private $memoryFormatter;
     private $loggerFactory;
@@ -94,7 +94,7 @@ final class SubscriberBuilder
         Configuration $infectionConfig,
         Filesystem $fs,
         string $tmpDir,
-        Timer $timer,
+        Stopwatch $stopwatch,
         TimeFormatter $timeFormatter,
         MemoryFormatter $memoryFormatter,
         LoggerFactory $loggerFactory
@@ -109,7 +109,7 @@ final class SubscriberBuilder
         $this->infectionConfig = $infectionConfig;
         $this->fs = $fs;
         $this->tmpDir = $tmpDir;
-        $this->timer = $timer;
+        $this->stopwatch = $stopwatch;
         $this->timeFormatter = $timeFormatter;
         $this->memoryFormatter = $memoryFormatter;
         $this->loggerFactory = $loggerFactory;
@@ -146,7 +146,7 @@ final class SubscriberBuilder
                 )
             ),
             new PerformanceLoggerSubscriber(
-                $this->timer,
+                $this->stopwatch,
                 $this->timeFormatter,
                 $this->memoryFormatter,
                 $output
