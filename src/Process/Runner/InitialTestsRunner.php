@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\InitialTestCaseCompleted;
-use Infection\Events\InitialTestSuiteFinished;
-use Infection\Events\InitialTestSuiteStarted;
+use Infection\Event\EventDispatcher;
+use Infection\Event\InitialTestCaseCompleted;
+use Infection\Event\InitialTestSuiteFinished;
+use Infection\Event\InitialTestSuiteStarted;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Symfony\Component\Process\Process;
 
@@ -50,7 +50,7 @@ final class InitialTestsRunner
     private $processBuilder;
     private $eventDispatcher;
 
-    public function __construct(InitialTestRunProcessBuilder $processBuilder, EventDispatcherInterface $eventDispatcher)
+    public function __construct(InitialTestRunProcessBuilder $processBuilder, EventDispatcher $eventDispatcher)
     {
         $this->processBuilder = $processBuilder;
         $this->eventDispatcher = $eventDispatcher;

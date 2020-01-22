@@ -40,23 +40,23 @@ use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Differ\DiffColorizer;
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\EventDispatcher\EventSubscriberInterface;
+use Infection\Event\EventDispatcher;
+use Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\CiMutantCreatingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
+use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\MutantCreatingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
 use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Performance\Listener\PerformanceLoggerSubscriber;
 use Infection\Performance\Memory\MemoryFormatter;
+use Infection\Performance\Time\Stopwatch;
 use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
-use Infection\Process\Listener\CiInitialTestsConsoleLoggerSubscriber;
-use Infection\Process\Listener\CiMutantCreatingConsoleLoggerSubscriber;
-use Infection\Process\Listener\CiMutationGeneratingConsoleLoggerSubscriber;
-use Infection\Process\Listener\CleanUpAfterMutationTestingFinishedSubscriber;
-use Infection\Process\Listener\InitialTestsConsoleLoggerSubscriber;
-use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
-use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
-use Infection\Process\Listener\MutationTestingConsoleLoggerSubscriber;
-use Infection\Process\Listener\MutationTestingResultsLoggerSubscriber;
 use Infection\TestFramework\TestFrameworkAdapter;
 use InvalidArgumentException;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -78,7 +78,7 @@ final class SubscriberBuilder
     private $infectionConfig;
     private $fs;
     private $tmpDir;
-    private $timer;
+    private $stopwatch;
     private $timeFormatter;
     private $memoryFormatter;
     private $loggerFactory;
@@ -89,12 +89,12 @@ final class SubscriberBuilder
         string $formatter,
         bool $noProgress,
         MetricsCalculator $metricsCalculator,
-        EventDispatcherInterface $eventDispatcher,
+        EventDispatcher $eventDispatcher,
         DiffColorizer $diffColorizer,
         Configuration $infectionConfig,
         Filesystem $fs,
         string $tmpDir,
-        Timer $timer,
+        Stopwatch $stopwatch,
         TimeFormatter $timeFormatter,
         MemoryFormatter $memoryFormatter,
         LoggerFactory $loggerFactory
@@ -109,7 +109,7 @@ final class SubscriberBuilder
         $this->infectionConfig = $infectionConfig;
         $this->fs = $fs;
         $this->tmpDir = $tmpDir;
-        $this->timer = $timer;
+        $this->stopwatch = $stopwatch;
         $this->timeFormatter = $timeFormatter;
         $this->memoryFormatter = $memoryFormatter;
         $this->loggerFactory = $loggerFactory;
@@ -146,7 +146,7 @@ final class SubscriberBuilder
                 )
             ),
             new PerformanceLoggerSubscriber(
-                $this->timer,
+                $this->stopwatch,
                 $this->timeFormatter,
                 $this->memoryFormatter,
                 $output
@@ -176,7 +176,7 @@ final class SubscriberBuilder
         throw new InvalidArgumentException('Incorrect formatter. Possible values: "dot", "progress"');
     }
 
-    private function getMutantCreatingConsoleLoggerSubscriber(OutputInterface $output): EventSubscriberInterface
+    private function getMutantCreatingConsoleLoggerSubscriber(OutputInterface $output): EventSubscriber
     {
         if ($this->shouldSkipProgressBars()) {
             return new CiMutantCreatingConsoleLoggerSubscriber($output);
@@ -185,7 +185,7 @@ final class SubscriberBuilder
         return new MutantCreatingConsoleLoggerSubscriber($output);
     }
 
-    private function getMutantGeneratingConsoleLoggerSubscriber(OutputInterface $output): EventSubscriberInterface
+    private function getMutantGeneratingConsoleLoggerSubscriber(OutputInterface $output): EventSubscriber
     {
         if ($this->shouldSkipProgressBars()) {
             return new CiMutationGeneratingConsoleLoggerSubscriber($output);
@@ -194,7 +194,7 @@ final class SubscriberBuilder
         return new MutationGeneratingConsoleLoggerSubscriber($output);
     }
 
-    private function getInitialTestsConsoleLoggerSubscriber(TestFrameworkAdapter $testFrameworkAdapter, OutputInterface $output): EventSubscriberInterface
+    private function getInitialTestsConsoleLoggerSubscriber(TestFrameworkAdapter $testFrameworkAdapter, OutputInterface $output): EventSubscriber
     {
         if ($this->shouldSkipProgressBars()) {
             return new CiInitialTestsConsoleLoggerSubscriber($output, $testFrameworkAdapter);

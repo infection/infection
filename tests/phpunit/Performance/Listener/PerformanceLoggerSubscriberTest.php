@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Performance\Listener;
 
-use Infection\EventDispatcher\EventDispatcher;
-use Infection\Events\ApplicationExecutionFinished;
-use Infection\Events\ApplicationExecutionStarted;
+use Infection\Event\ApplicationExecutionFinished;
+use Infection\Event\ApplicationExecutionStarted;
+use Infection\Event\EventDispatcher;
 use Infection\Performance\Listener\PerformanceLoggerSubscriber;
 use Infection\Performance\Memory\MemoryFormatter;
+use Infection\Performance\Time\Stopwatch;
 use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
 use function is_array;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -69,7 +69,7 @@ final class PerformanceLoggerSubscriberTest extends TestCase
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new PerformanceLoggerSubscriber(
-            new Timer(),
+            new Stopwatch(),
             new TimeFormatter(),
             new MemoryFormatter(),
             $this->output

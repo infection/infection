@@ -47,8 +47,7 @@ use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
-use Infection\EventDispatcher\EventDispatcher;
-use Infection\EventDispatcher\EventDispatcherInterface;
+use Infection\Event\EventDispatcher;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Locator\RootsFileLocator;
@@ -67,8 +66,8 @@ use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\Performance\Limiter\MemoryLimiter;
 use Infection\Performance\Memory\MemoryFormatter;
+use Infection\Performance\Time\Stopwatch;
 use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
@@ -193,7 +192,7 @@ final class Container
             Differ::class => static function (): Differ {
                 return new Differ(new BaseDiffer());
             },
-            EventDispatcherInterface::class => static function (): EventDispatcherInterface {
+            EventDispatcher::class => static function (): EventDispatcher {
                 return new EventDispatcher();
             },
             ParallelProcessRunner::class => static function (self $container): ParallelProcessRunner {
@@ -232,8 +231,8 @@ final class Container
             MetricsCalculator::class => static function (): MetricsCalculator {
                 return new MetricsCalculator();
             },
-            Timer::class => static function (): Timer {
-                return new Timer();
+            Stopwatch::class => static function (): Stopwatch {
+                return new Stopwatch();
             },
             TimeFormatter::class => static function (): TimeFormatter {
                 return new TimeFormatter();
@@ -318,7 +317,7 @@ final class Container
                     $config,
                     $container->getFileSystem(),
                     $config->getTmpDir(),
-                    $container->getTimer(),
+                    $container->getStopwatch(),
                     $container->getTimeFormatter(),
                     $container->getMemoryFormatter(),
                     $container->getLoggerFactory()
@@ -543,9 +542,9 @@ final class Container
         return $this->get(Differ::class);
     }
 
-    public function getEventDispatcher(): EventDispatcherInterface
+    public function getEventDispatcher(): EventDispatcher
     {
-        return $this->get(EventDispatcherInterface::class);
+        return $this->get(EventDispatcher::class);
     }
 
     public function getParallelProcessRunner(): ParallelProcessRunner
@@ -593,9 +592,9 @@ final class Container
         return $this->get(MetricsCalculator::class);
     }
 
-    public function getTimer(): Timer
+    public function getStopwatch(): Stopwatch
     {
-        return $this->get(Timer::class);
+        return $this->get(Stopwatch::class);
     }
 
     public function getTimeFormatter(): TimeFormatter
