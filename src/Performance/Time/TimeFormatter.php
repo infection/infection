@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Performance\Time;
 
+use function trim;
+
 /**
  * @internal
  */
@@ -46,6 +48,9 @@ final class TimeFormatter
         's' => 1,
     ];
 
+    /**
+     * Formats time in seconds to a more human-friendly format.
+     */
     public function toHumanReadableString(float $seconds): string
     {
         if ($seconds < 1) {
