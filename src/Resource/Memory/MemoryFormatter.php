@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Performance\Memory;
+namespace Infection\Resource\Memory;
 
 use function floor;
 use function log;

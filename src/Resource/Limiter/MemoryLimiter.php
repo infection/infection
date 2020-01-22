@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Performance\Limiter;
+namespace Infection\Resource\Limiter;
 
 use Composer\XdebugHandler\XdebugHandler;
 use Infection\TestFramework\MemoryUsageAware;

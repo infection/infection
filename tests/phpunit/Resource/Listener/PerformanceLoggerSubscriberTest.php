@@ -33,65 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Performance\Memory;
+namespace Infection\Tests\Resource\Listener;
 
-use Generator;
-use Infection\Performance\Memory\MemoryFormatter;
-use InvalidArgumentException;
+use Infection\Event\ApplicationExecutionFinished;
+use Infection\Event\ApplicationExecutionStarted;
+use Infection\Event\EventDispatcher;
+use Infection\Resource\Listener\PerformanceLoggerSubscriber;
+use Infection\Resource\Memory\MemoryFormatter;
+use Infection\Resource\Time\Stopwatch;
+use Infection\Resource\Time\TimeFormatter;
+use function is_array;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
 
-final class MemoryFormatterTest extends TestCase
+final class PerformanceLoggerSubscriberTest extends TestCase
 {
     /**
-     * @var MemoryFormatter
+     * @var OutputInterface|MockObject
      */
-    private $memoryFormatter;
+    private $output;
 
     protected function setUp(): void
     {
-        $this->memoryFormatter = new MemoryFormatter();
+        $this->output = $this->createMock(OutputInterface::class);
     }
 
-    /**
-     * @dataProvider bytesProvider
-     */
-    public function test_it_converts_bytes_to_human_readable_time(float $bytes, string $expectedString): void
+    public function test_it_reacts_on_application_execution_events(): void
     {
-        $timeString = $this->memoryFormatter->toHumanReadableString($bytes);
+        $this->output->expects($this->once())
+            ->method('writeln')
+            ->with($this->callback(static function ($parameter) {
+                return is_array($parameter) && $parameter[0] === '' && strpos($parameter[1], 'Time:') === 0;
+            }));
 
-        $this->assertSame($expectedString, $timeString);
-    }
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new PerformanceLoggerSubscriber(
+            new Stopwatch(),
+            new TimeFormatter(),
+            new MemoryFormatter(),
+            $this->output
+        ));
 
-    public function test_it_cannot_convert_negative_bytes(): void
-    {
-        try {
-            $this->memoryFormatter->toHumanReadableString(-1.);
-
-            $this->fail();
-        } catch (InvalidArgumentException $exception) {
-            $this->assertSame(
-                'Expected a positive or null amount of bytes. Got: -1',
-                $exception->getMessage()
-            );
-        }
-    }
-
-    public function bytesProvider(): Generator
-    {
-        yield [0., '0.00B'];
-
-        yield [10., '10.00B'];
-
-        yield [1024., '1.00KB'];
-
-        yield [1024 ** 2, '1.00MB'];
-
-        yield [1024 ** 3, '1.00GB'];
-
-        yield [1024 ** 4, '1.00TB'];
-
-        yield [1024 ** 5, '1.00PB'];
-
-        yield [1024 ** 6, '1.00EB'];
+        $dispatcher->dispatch(new ApplicationExecutionStarted());
+        $dispatcher->dispatch(new ApplicationExecutionFinished());
     }
 }

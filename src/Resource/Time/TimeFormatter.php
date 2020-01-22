@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Performance\Time;
+namespace Infection\Resource\Time;
 
 use function trim;
 

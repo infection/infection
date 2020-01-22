@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Performance\Limiter;
+namespace Infection\Tests\Resource\Limiter;
 
 use Composer\XdebugHandler\XdebugHandler;
-use Infection\Performance\Limiter\MemoryLimiter;
+use Infection\Resource\Limiter\MemoryLimiter;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use LogicException;
 use Memory_Aware\FakeAwareAdapter;
