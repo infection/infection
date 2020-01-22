@@ -35,15 +35,48 @@ declare(strict_types=1);
 
 namespace Infection\Performance\Memory;
 
+use function floor;
+use function log;
+use function number_format;
+use function Safe\sprintf;
+use Webmozart\Assert\Assert;
+
 /**
  * @internal
  */
 final class MemoryFormatter
 {
-    private const BYTES_IN_MEGABYTE = 1024 * 1024;
+    private const UNITS = [
+        'B',
+        'KB',
+        'MB',
+        'GB',
+        'TB',
+        'PB',
+        'EB',
+        'ZB',
+        'YB',
+    ];
 
     public function toHumanReadableString(float $bytes): string
     {
-        return sprintf('%.2fMB', $bytes / self::BYTES_IN_MEGABYTE);
+        Assert::greaterThanEq(
+            $bytes,
+            0.,
+            'Expected a positive or null amount of bytes. Got: %s'
+        );
+
+        $power = $bytes > 0 ? (int) floor(log($bytes, 1024)) : 0;
+
+        return sprintf(
+            '%s%s',
+            number_format(
+                $bytes / (1024 ** $power),
+                2,
+                '.',
+                ','
+            ),
+            self::UNITS[$power]
+        );
     }
 }

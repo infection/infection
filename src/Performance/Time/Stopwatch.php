@@ -33,28 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Json\Exception;
+namespace Infection\Performance\Time;
 
-use Infection\Json\Exception\ParseException;
-use PHPUnit\Framework\TestCase;
+use Webmozart\Assert\Assert;
 
-final class ParseExceptionTest extends TestCase
+// Cannot import this one as it would remove the ability to mock it
+// use function microtime
+
+/**
+ * @internal
+ */
+final class Stopwatch
 {
-    public function test_invalid_json(): void
+    /**
+     * @var float|null
+     */
+    private $microTime;
+
+    public function start(): void
     {
-        $path = '/tmp/config.json';
-        $errorMessage = 'Syntax error';
+        Assert::null($this->microTime, 'Timer can not be started again without stopping.');
 
-        $exception = ParseException::invalidJson($path, $errorMessage);
+        $this->microTime = microtime(true);
+    }
 
-        $this->assertInstanceOf(ParseException::class, $exception);
+    public function stop(): float
+    {
+        Assert::notNull($this->microTime, 'Timer must be started before stopping.');
 
-        $expected = sprintf(
-            'The "%s" file does not contain valid JSON: %s.',
-            $path,
-            $errorMessage
-        );
+        $microTime = $this->microTime;
+        $this->microTime = null;
 
-        $this->assertSame($expected, $exception->getMessage());
+        return microtime(true) - $microTime;
     }
 }
