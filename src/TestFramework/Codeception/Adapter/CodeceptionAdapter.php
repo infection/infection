@@ -45,7 +45,7 @@ use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;
-use Infection\Utils\VersionParser;
+use Infection\TestFramework\VersionParser;
 use InvalidArgumentException;
 use function is_string;
 use Phar;
