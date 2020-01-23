@@ -44,8 +44,8 @@ use PHPUnit\Framework\TestCase;
 use Webmozart\PathUtil\Path;
 
 /**
+ * @covers \Infection\FileSystem\Finder\FilterableFinder
  * @covers \Infection\FileSystem\SourceFileCollector
- * @covers \Infection\Finder\FilterableFinder
  */
 final class SourceFileCollectorTest extends TestCase
 {

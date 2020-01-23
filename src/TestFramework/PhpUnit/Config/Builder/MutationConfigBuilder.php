@@ -36,14 +36,15 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
 use function assert;
-use function dirname;
 use DOMDocument;
 use DOMNode;
 use DOMXPath;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
-use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use ReflectionClass;
 
 /**
  * @internal
@@ -120,7 +121,9 @@ class MutationConfigBuilder extends ConfigBuilder
 
     private function createCustomAutoloadWithInterceptor(string $originalFilePath, string $mutantFilePath, string $originalAutoloadFile): string
     {
-        $interceptorPath = dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
+        $class = new ReflectionClass(IncludeInterceptor::class);
+        /** @var string $interceptorPath */
+        $interceptorPath = $class->getFileName();
 
         $customAutoload = <<<AUTOLOAD
 <?php

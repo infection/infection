@@ -460,7 +460,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '@default' => false,
                 'MethodCallRemoval' => (object) [
                     'ignore' => [
-                        'Infection\Finder\SourceFilesFinder::__construct::63',
+                        'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
                     ],
                 ],
             ],
@@ -468,7 +468,7 @@ final class ConfigurationFactoryTest extends TestCase
             [
                 'MethodCallRemoval' => new IgnoreMutator(
                     new IgnoreConfig([
-                        'Infection\Finder\SourceFilesFinder::__construct::63',
+                        'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
                     ]),
                     new MethodCallRemoval()
                 ),
@@ -480,7 +480,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '@default' => true,
                 'MethodCallRemoval' => (object) [
                     'ignore' => [
-                        'Infection\Finder\SourceFilesFinder::__construct::63',
+                        'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
                     ],
                 ],
             ],

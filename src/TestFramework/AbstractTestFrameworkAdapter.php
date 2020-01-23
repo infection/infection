@@ -35,9 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
-use Infection\TestFramework\Coverage\CoverageLineData;
 use InvalidArgumentException;
 use Symfony\Component\Process\Process;
 

@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpSpec\Adapter;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\PhpSpec\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
-use Infection\TestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\TestFrameworkAdapterFactory;
 use Infection\TestFramework\VersionParser;
 
 /**
@@ -66,5 +66,15 @@ final class PhpSpecAdapterFactory implements TestFrameworkAdapterFactory
             new VersionParser(),
             new CommandLineBuilder()
         );
+    }
+
+    public static function getAdapterName(): string
+    {
+        return 'phpspec';
+    }
+
+    public static function getExecutableName(): string
+    {
+        return 'phpspec';
     }
 }
