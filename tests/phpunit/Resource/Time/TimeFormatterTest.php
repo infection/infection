@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Performance\Time;
+namespace Infection\Tests\Resource\Time;
 
 use Generator;
-use Infection\Performance\Time\TimeFormatter;
+use Infection\Resource\Time\TimeFormatter;
 use PHPUnit\Framework\TestCase;
 
 final class TimeFormatterTest extends TestCase

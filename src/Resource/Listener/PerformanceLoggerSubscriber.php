@@ -33,14 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Performance\Listener;
+namespace Infection\Resource\Listener;
 
 use Infection\Event\ApplicationExecutionFinished;
 use Infection\Event\ApplicationExecutionStarted;
 use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Time\Stopwatch;
-use Infection\Performance\Time\TimeFormatter;
+use Infection\Resource\Memory\MemoryFormatter;
+use Infection\Resource\Time\Stopwatch;
+use Infection\Resource\Time\TimeFormatter;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
