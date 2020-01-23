@@ -33,9 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Finder;
+namespace Infection\FileSystem\Finder;
 
-use Infection\Finder\Exception\FinderException;
+use Infection\FileSystem\Finder\Exception\FinderException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\PhpExecutableFinder;
 

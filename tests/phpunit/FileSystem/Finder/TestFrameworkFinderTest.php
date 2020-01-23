@@ -33,11 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Finder;
+namespace Infection\Tests\FileSystem\Finder;
 
 use const DIRECTORY_SEPARATOR;
-use Infection\Finder\Exception\FinderException;
-use Infection\Finder\TestFrameworkFinder;
+use Infection\FileSystem\Finder\Exception\FinderException;
+use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath;

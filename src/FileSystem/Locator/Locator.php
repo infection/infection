@@ -33,48 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Finder\Iterator;
-
-use const DIRECTORY_SEPARATOR;
-use Symfony\Component\Finder\Iterator\MultiplePcreFilterIterator;
+namespace Infection\FileSystem\Locator;
 
 /**
  * @internal
  */
-final class RealPathFilterIterator extends MultiplePcreFilterIterator
+interface Locator
 {
     /**
-     * Filters the iterator values.
+     * Determine the realpath of the given file or directory located.
      *
-     * @return bool true if the value should be kept, false otherwise
+     * @throws FileNotFound|FileOrDirectoryNotFound
      */
-    public function accept()
-    {
-        $filename = $this->current()->getRealPath();
-
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            $filename = str_replace('\\', '/', $filename);
-        }
-
-        return $this->isAccepted($filename);
-    }
+    public function locate(string $fileName): string;
 
     /**
-     * Converts strings to regexp.
+     * Determine the realpath of the first file or directory located.
      *
-     * PCRE patterns are left unchanged.
+     * @param string[] $fileNames
      *
-     * Default conversion:
-     *     'lorem/ipsum/dolor' ==>  'lorem\/ipsum\/dolor/'
-     *
-     * Use only / as directory separator (on Windows also).
-     *
-     * @param string $str Pattern: regexp or dirname
-     *
-     * @return string regexp corresponding to a given string or regexp
+     * @throws FileNotFound|FileOrDirectoryNotFound
      */
-    protected function toRegex($str)
-    {
-        return $this->isRegex($str) ? $str : '/' . preg_quote($str, '/') . '/';
-    }
+    public function locateOneOf(array $fileNames): string;
 }
