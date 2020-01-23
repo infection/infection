@@ -1,4 +1,4 @@
 helpr:
-    opened: 'has PR'
+    opened: 'Has PR'
     merged: 'PR merged'
     rejected: 'PR rejected'
