@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\InitialTestCaseCompleted;
 use Infection\Event\InitialTestSuiteFinished;
 use Infection\Event\InitialTestSuiteStarted;
-use Infection\TestFramework\TestFrameworkAdapter;
 use InvalidArgumentException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;

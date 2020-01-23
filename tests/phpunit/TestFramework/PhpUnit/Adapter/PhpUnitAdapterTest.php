@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
+use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\CommandLineBuilder;
-use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;

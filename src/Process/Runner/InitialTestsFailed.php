@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use Exception;
-use Infection\TestFramework\TestFrameworkAdapter;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Symfony\Component\Process\Process;
 
 /**

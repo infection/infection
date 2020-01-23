@@ -36,11 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutant;
 
 use Generator;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\Mutant\Mutant;
 use Infection\MutatedNode;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
-use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\Tests\Mutator\MutatorName;
 use PhpParser\Node;
 use PHPUnit\Framework\TestCase;

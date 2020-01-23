@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7c1a48351de90dbfc26afbcc0cc8b2f1",
+    "content-hash": "690efb8e5d9de88ac788ca4655b99637",
     "packages": [
         {
             "name": "composer/xdebug-handler",
@@ -49,6 +49,132 @@
                 "performance"
             ],
             "time": "2019-05-27T17:52:04+00:00"
+        },
+        {
+            "name": "infection/abstract-testframework-adapter",
+            "version": "0.2.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/infection/abstract-testframework-adapter.git",
+                "reference": "5235ec702bae66a5ee46bad28d571497708d7dac"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/infection/abstract-testframework-adapter/zipball/5235ec702bae66a5ee46bad28d571497708d7dac",
+                "reference": "5235ec702bae66a5ee46bad28d571497708d7dac",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Infection\\AbstractTestFramework\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Maks Rafalko",
+                    "email": "maks.rafalko@gmail.com"
+                }
+            ],
+            "description": "Abstract Test Framework Adapter for Infection",
+            "time": "2020-01-16T21:29:02+00:00"
+        },
+        {
+            "name": "infection/codeception-adapter",
+            "version": "0.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/infection/codeception-adapter.git",
+                "reference": "6ba9944830a510d10bad9f95e2a1e04d91b9e2a5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/infection/codeception-adapter/zipball/6ba9944830a510d10bad9f95e2a1e04d91b9e2a5",
+                "reference": "6ba9944830a510d10bad9f95e2a1e04d91b9e2a5",
+                "shasum": ""
+            },
+            "require": {
+                "infection/abstract-testframework-adapter": "^0.2.3",
+                "infection/include-interceptor": "^0.2.0",
+                "symfony/filesystem": "^3.4.29 || ^4.0 || ^5.0",
+                "symfony/process": "^3.4.29 || ^4.0 || ^5.0",
+                "symfony/yaml": "^3.4.29 || ^4.0 || ^5.0",
+                "thecodingmachine/safe": "^1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.5"
+            },
+            "type": "infection-extension",
+            "extra": {
+                "infection": {
+                    "class": "Infection\\TestFramework\\Codeception\\CodeceptionAdapterFactory"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Infection\\TestFramework\\Codeception\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Maks Rafalko",
+                    "email": "maks.rafalko@gmail.com"
+                }
+            ],
+            "description": "Codeception Test Framework Adapter for Infection",
+            "time": "2020-01-19T20:11:57+00:00"
+        },
+        {
+            "name": "infection/include-interceptor",
+            "version": "0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/infection/include-interceptor.git",
+                "reference": "02f9f90ef598bb09a2bbbe7cf7a6adeabf7b3158"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/infection/include-interceptor/zipball/02f9f90ef598bb09a2bbbe7cf7a6adeabf7b3158",
+                "reference": "02f9f90ef598bb09a2bbbe7cf7a6adeabf7b3158",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Infection\\StreamWrapper\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Infection\\Tests\\StreamWrapper\\": "tests/"
+                }
+            },
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Maks Rafalko",
+                    "email": "maks.rafalko@gmail.com"
+                }
+            ],
+            "description": "Stream Wrapper: Include Interceptor. Allows to replace included (autoloaded) file with another one.",
+            "support": {
+                "source": "https://github.com/maks-rafalko/infection-include-interceptor/tree/master",
+                "issues": "https://github.com/maks-rafalko/infection-include-interceptor/issues"
+            },
+            "time": "2020-01-17T21:20:28+00:00"
         },
         {
             "name": "justinrainbow/json-schema",

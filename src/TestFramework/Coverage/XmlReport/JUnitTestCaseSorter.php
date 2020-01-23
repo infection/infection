@@ -37,7 +37,7 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function assert;
 use function in_array;
-use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use function is_string;
 
 /**
