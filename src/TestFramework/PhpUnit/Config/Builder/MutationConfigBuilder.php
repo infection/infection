@@ -44,8 +44,8 @@ use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
-use function Safe\file_put_contents;
 use ReflectionClass;
+use function Safe\file_put_contents;
 
 /**
  * @internal

@@ -40,8 +40,8 @@ use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\MutationYamlConfiguration;
-use function Safe\file_put_contents;
 use ReflectionClass;
+use function Safe\file_put_contents;
 use Symfony\Component\Yaml\Yaml;
 
 /**
