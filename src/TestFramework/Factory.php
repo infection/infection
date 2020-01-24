@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use function implode;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
-use Infection\Finder\TestFrameworkFinder;
-use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
-use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapterFactory;
+use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\TestFramework\Codeception\CodeceptionAdapterFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapterFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
@@ -110,7 +110,7 @@ final class Factory
             $codeceptionConfigPath = $this->configLocator->locate(TestFrameworkTypes::CODECEPTION);
 
             return CodeceptionAdapterFactory::create(
-                (new TestFrameworkFinder(CodeceptionAdapter::EXECUTABLE))->find(),
+                (new TestFrameworkFinder('codecept'))->find(),
                 $this->tmpDir,
                 $codeceptionConfigPath,
                 null,

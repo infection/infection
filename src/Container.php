@@ -38,6 +38,7 @@ namespace Infection;
 use function array_filter;
 use function array_key_exists;
 use Closure;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfiguration;
@@ -49,10 +50,10 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\FileSystem\Locator\RootsFileLocator;
+use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
-use Infection\Locator\RootsFileLocator;
-use Infection\Locator\RootsFileOrDirectoryLocator;
 use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCodeFactory;
@@ -65,10 +66,6 @@ use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
-use Infection\Performance\Limiter\MemoryLimiter;
-use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Time\Stopwatch;
-use Infection\Performance\Time\TimeFormatter;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
@@ -77,6 +74,10 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
+use Infection\Resource\Limiter\MemoryLimiter;
+use Infection\Resource\Memory\MemoryFormatter;
+use Infection\Resource\Time\Stopwatch;
+use Infection\Resource\Time\TimeFormatter;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestFileDataProvider;
@@ -87,7 +88,6 @@ use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\TestFrameworkAdapter;
 use InvalidArgumentException;
 use function is_callable;
 use function php_ini_loaded_file;
@@ -545,7 +545,7 @@ final class Container
 
     public function getEventDispatcher(): EventDispatcher
     {
-        return $this->get(SyncEventDispatcher::class);
+        return $this->get(EventDispatcher::class);
     }
 
     public function getParallelProcessRunner(): ParallelProcessRunner

@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Schema;
 
-use Infection\Locator\Locator;
+use Infection\FileSystem\Locator\Locator;
 
 /**
  * @internal

@@ -9,7 +9,3 @@ parameters:
             path: '%currentWorkingDirectory%/src/Process/Runner/Parallel/ParallelProcessRunner.php'
             message: '#Left side of [\&]{2} is always true#'
         - '#Method Infection\Configuration\Schema\SchemaConfigurationFile::getDecodedContents() should return stdClass but returns stdClass|null.#'
-
-        -
-            path: '%currentWorkingDirectory%/src/TestFramework/Codeception/Adapter/CodeceptionAdapterFactory.php'
-            message: '#Access to constant VERSION on an unknown class Codeception\\Codecept#'
