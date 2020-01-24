@@ -33,50 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
+namespace Infection\FileSystem\Finder\Exception;
 
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use function Safe\realpath;
+use RuntimeException;
 
 /**
  * @internal
  */
-final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
+final class FinderException extends RuntimeException
 {
-    private const DEFAULT_EXTENSIONS = [
-        'xml',
-        'yml',
-        'xml.dist',
-        'yml.dist',
-        'dist.xml',
-        'dist.yml',
-    ];
-
-    /**
-     * @var string
-     */
-    private $configDir;
-
-    public function __construct(string $configDir)
+    public static function composerNotFound(): self
     {
-        $this->configDir = $configDir;
+        return new self(
+            'Unable to locate a Composer executable on local system. Ensure that Composer is installed and available.'
+        );
     }
 
-    public function locate(string $testFrameworkName, ?string $customDir = null): string
+    public static function phpExecutableNotFound(): self
     {
-        $dir = $customDir ?: $this->configDir;
-        $triedFiles = [];
+        return new self(
+            'Unable to locate the PHP executable on the local system. Please report this issue, and include details about your setup.'
+        );
+    }
 
-        foreach (self::DEFAULT_EXTENSIONS as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
+    public static function testFrameworkNotFound(string $testFrameworkName): self
+    {
+        return new self(
+            sprintf(
+                'Unable to locate a %s executable on local system. Ensure that %s is installed and available.',
+                $testFrameworkName,
+                $testFrameworkName
+            )
+        );
+    }
 
-            if (file_exists($conf)) {
-                return realpath($conf);
-            }
-
-            $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
-        }
-
-        throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);
+    public static function testCustomPathDoesNotExist(string $testFrameworkName, string $customPath): self
+    {
+        return new self(
+            sprintf('The custom path to %s was set as "%s" but this file did not exist.',
+                $testFrameworkName,
+                $customPath
+            )
+        );
     }
 }

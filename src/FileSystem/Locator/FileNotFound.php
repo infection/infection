@@ -33,50 +33,53 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
+namespace Infection\FileSystem\Locator;
 
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use function Safe\realpath;
+use function implode;
+use RuntimeException;
+use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
+final class FileNotFound extends RuntimeException
 {
-    private const DEFAULT_EXTENSIONS = [
-        'xml',
-        'yml',
-        'xml.dist',
-        'yml.dist',
-        'dist.xml',
-        'dist.yml',
-    ];
-
     /**
-     * @var string
+     * @param string[] $roots
      */
-    private $configDir;
-
-    public function __construct(string $configDir)
+    public static function fromFileName(string $file, array $roots): self
     {
-        $this->configDir = $configDir;
+        Assert::allString($roots);
+
+        return new self(sprintf(
+            'Could not locate the file "%s"%s.',
+            $file,
+            [] === $roots
+                ? ''
+                : sprintf(' in "%s"', implode('", "', $roots))
+        ));
     }
 
-    public function locate(string $testFrameworkName, ?string $customDir = null): string
+    /**
+     * @param string[] $files
+     * @param string[] $roots
+     */
+    public static function fromFiles(array $files, array $roots): self
     {
-        $dir = $customDir ?: $this->configDir;
-        $triedFiles = [];
+        Assert::allString($files);
+        Assert::allString($roots);
 
-        foreach (self::DEFAULT_EXTENSIONS as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
-
-            if (file_exists($conf)) {
-                return realpath($conf);
-            }
-
-            $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
-        }
-
-        throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);
+        return new self(
+            [] === $files
+                ? 'Could not locate any files (no file provided).'
+                : sprintf(
+                    'Could not locate the files "%s"%s',
+                    implode('", "', $files),
+                    [] === $roots
+                        ? ''
+                        : sprintf(' in "%s"', implode('", "', $roots))
+                )
+        );
     }
 }

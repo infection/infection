@@ -33,50 +33,65 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
+namespace Infection\Tests\Resource\Memory;
 
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use function Safe\realpath;
+use Generator;
+use Infection\Resource\Memory\MemoryFormatter;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
+final class MemoryFormatterTest extends TestCase
 {
-    private const DEFAULT_EXTENSIONS = [
-        'xml',
-        'yml',
-        'xml.dist',
-        'yml.dist',
-        'dist.xml',
-        'dist.yml',
-    ];
-
     /**
-     * @var string
+     * @var MemoryFormatter
      */
-    private $configDir;
+    private $memoryFormatter;
 
-    public function __construct(string $configDir)
+    protected function setUp(): void
     {
-        $this->configDir = $configDir;
+        $this->memoryFormatter = new MemoryFormatter();
     }
 
-    public function locate(string $testFrameworkName, ?string $customDir = null): string
+    /**
+     * @dataProvider bytesProvider
+     */
+    public function test_it_converts_bytes_to_human_readable_time(float $bytes, string $expectedString): void
     {
-        $dir = $customDir ?: $this->configDir;
-        $triedFiles = [];
+        $timeString = $this->memoryFormatter->toHumanReadableString($bytes);
 
-        foreach (self::DEFAULT_EXTENSIONS as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
+        $this->assertSame($expectedString, $timeString);
+    }
 
-            if (file_exists($conf)) {
-                return realpath($conf);
-            }
+    public function test_it_cannot_convert_negative_bytes(): void
+    {
+        try {
+            $this->memoryFormatter->toHumanReadableString(-1.);
 
-            $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Expected a positive or null amount of bytes. Got: -1',
+                $exception->getMessage()
+            );
         }
+    }
 
-        throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);
+    public function bytesProvider(): Generator
+    {
+        yield [0., '0.00B'];
+
+        yield [10., '10.00B'];
+
+        yield [1024., '1.00KB'];
+
+        yield [1024 ** 2, '1.00MB'];
+
+        yield [1024 ** 3, '1.00GB'];
+
+        yield [1024 ** 4, '1.00TB'];
+
+        yield [1024 ** 5, '1.00PB'];
+
+        yield [1024 ** 6, '1.00EB'];
     }
 }

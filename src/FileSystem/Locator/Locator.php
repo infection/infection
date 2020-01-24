@@ -33,50 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
-
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use function Safe\realpath;
+namespace Infection\FileSystem\Locator;
 
 /**
  * @internal
  */
-final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
+interface Locator
 {
-    private const DEFAULT_EXTENSIONS = [
-        'xml',
-        'yml',
-        'xml.dist',
-        'yml.dist',
-        'dist.xml',
-        'dist.yml',
-    ];
+    /**
+     * Determine the realpath of the given file or directory located.
+     *
+     * @throws FileNotFound|FileOrDirectoryNotFound
+     */
+    public function locate(string $fileName): string;
 
     /**
-     * @var string
+     * Determine the realpath of the first file or directory located.
+     *
+     * @param string[] $fileNames
+     *
+     * @throws FileNotFound|FileOrDirectoryNotFound
      */
-    private $configDir;
-
-    public function __construct(string $configDir)
-    {
-        $this->configDir = $configDir;
-    }
-
-    public function locate(string $testFrameworkName, ?string $customDir = null): string
-    {
-        $dir = $customDir ?: $this->configDir;
-        $triedFiles = [];
-
-        foreach (self::DEFAULT_EXTENSIONS as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
-
-            if (file_exists($conf)) {
-                return realpath($conf);
-            }
-
-            $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
-        }
-
-        throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);
-    }
+    public function locateOneOf(array $fileNames): string;
 }

@@ -33,50 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
+namespace Infection\Resource\Memory;
 
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use function Safe\realpath;
+use function floor;
+use function log;
+use function number_format;
+use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
+final class MemoryFormatter
 {
-    private const DEFAULT_EXTENSIONS = [
-        'xml',
-        'yml',
-        'xml.dist',
-        'yml.dist',
-        'dist.xml',
-        'dist.yml',
+    private const UNITS = [
+        'B',
+        'KB',
+        'MB',
+        'GB',
+        'TB',
+        'PB',
+        'EB',
+        'ZB',
+        'YB',
     ];
 
-    /**
-     * @var string
-     */
-    private $configDir;
-
-    public function __construct(string $configDir)
+    public function toHumanReadableString(float $bytes): string
     {
-        $this->configDir = $configDir;
-    }
+        Assert::greaterThanEq(
+            $bytes,
+            0.,
+            'Expected a positive or null amount of bytes. Got: %s'
+        );
 
-    public function locate(string $testFrameworkName, ?string $customDir = null): string
-    {
-        $dir = $customDir ?: $this->configDir;
-        $triedFiles = [];
+        $power = $bytes > 0 ? (int) floor(log($bytes, 1024)) : 0;
 
-        foreach (self::DEFAULT_EXTENSIONS as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
-
-            if (file_exists($conf)) {
-                return realpath($conf);
-            }
-
-            $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
-        }
-
-        throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);
+        return sprintf(
+            '%s%s',
+            number_format(
+                $bytes / (1024 ** $power),
+                2,
+                '.',
+                ','
+            ),
+            self::UNITS[$power]
+        );
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Infection\Tests\Fixtures\Finder;
 
-use Infection\Finder\Iterator\RealPathFilterIterator;
+use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
 use Symfony\Component\Finder\Finder;
 
 class MockRealPathFinder extends Finder

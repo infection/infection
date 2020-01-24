@@ -33,50 +33,89 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
+namespace Infection\Tests\Resource\Time;
 
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use function Safe\realpath;
+use Generator;
+use Infection\Resource\Time\TimeFormatter;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
+final class TimeFormatterTest extends TestCase
 {
-    private const DEFAULT_EXTENSIONS = [
-        'xml',
-        'yml',
-        'xml.dist',
-        'yml.dist',
-        'dist.xml',
-        'dist.yml',
-    ];
-
     /**
-     * @var string
+     * @var TimeFormatter
      */
-    private $configDir;
+    private $timeFormatter;
 
-    public function __construct(string $configDir)
+    protected function setUp(): void
     {
-        $this->configDir = $configDir;
+        $this->timeFormatter = new TimeFormatter();
     }
 
-    public function locate(string $testFrameworkName, ?string $customDir = null): string
+    /**
+     * @dataProvider timeProvider
+     */
+    public function test_it_converts_time_to_human_readable_time(float $seconds, string $expectedString): void
     {
-        $dir = $customDir ?: $this->configDir;
-        $triedFiles = [];
+        $timeString = $this->timeFormatter->toHumanReadableString($seconds);
 
-        foreach (self::DEFAULT_EXTENSIONS as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
+        $this->assertSame($expectedString, $timeString);
+    }
 
-            if (file_exists($conf)) {
-                return realpath($conf);
-            }
-
-            $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
+    public function timeProvider(): Generator
+    {
+        foreach (self::secondsProvider() as $i => $set) {
+            yield 'seconds#' . $i => $set;
         }
 
-        throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);
+        foreach (self::minutesProvider() as $i => $set) {
+            yield 'minutes#' . $i => $set;
+        }
+
+        foreach (self::hoursProvider() as $i => $set) {
+            yield 'hours#' . $i => $set;
+        }
+    }
+
+    private static function secondsProvider(): Generator
+    {
+        yield [0, '0s'];
+
+        yield [0.3, '0s'];
+
+        yield [1, '1s'];
+
+        yield [1.19, '1s'];
+
+        yield [3, '3s'];
+
+        yield [31, '31s'];
+
+        yield [31.01, '31s'];
+    }
+
+    private static function minutesProvider(): Generator
+    {
+        yield [60, '1m'];
+
+        yield [60.1, '1m'];
+
+        yield [61, '1m 1s'];
+
+        yield [122, '2m 2s'];
+
+        yield [122.9, '2m 2s'];
+    }
+
+    private static function hoursProvider(): Generator
+    {
+        yield [3600, '1h'];
+
+        yield [3600.99, '1h'];
+
+        yield [3601, '1h 1s'];
+
+        yield [7302, '2h 1m 42s'];
+
+        yield [7302.88, '2h 1m 42s'];
     }
 }

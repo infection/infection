@@ -33,50 +33,62 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
+namespace Infection\Resource\Listener;
 
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use function Safe\realpath;
+use Infection\Event\ApplicationExecutionFinished;
+use Infection\Event\ApplicationExecutionStarted;
+use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Resource\Memory\MemoryFormatter;
+use Infection\Resource\Time\Stopwatch;
+use Infection\Resource\Time\TimeFormatter;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
+final class PerformanceLoggerSubscriber implements EventSubscriber
 {
-    private const DEFAULT_EXTENSIONS = [
-        'xml',
-        'yml',
-        'xml.dist',
-        'yml.dist',
-        'dist.xml',
-        'dist.yml',
-    ];
+    private $stopwatch;
+    private $output;
+    private $timeFormatter;
+    private $memoryFormatter;
 
-    /**
-     * @var string
-     */
-    private $configDir;
-
-    public function __construct(string $configDir)
-    {
-        $this->configDir = $configDir;
+    public function __construct(
+        Stopwatch $stopwatch,
+        TimeFormatter $timeFormatter,
+        MemoryFormatter $memoryFormatter,
+        OutputInterface $output
+    ) {
+        $this->stopwatch = $stopwatch;
+        $this->timeFormatter = $timeFormatter;
+        $this->output = $output;
+        $this->memoryFormatter = $memoryFormatter;
     }
 
-    public function locate(string $testFrameworkName, ?string $customDir = null): string
+    public function getSubscribedEvents(): array
     {
-        $dir = $customDir ?: $this->configDir;
-        $triedFiles = [];
+        return [
+            ApplicationExecutionStarted::class => [$this, 'onApplicationExecutionStarted'],
+            ApplicationExecutionFinished::class => [$this, 'onApplicationExecutionFinished'],
+        ];
+    }
 
-        foreach (self::DEFAULT_EXTENSIONS as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
+    public function onApplicationExecutionStarted(): void
+    {
+        $this->stopwatch->start();
+    }
 
-            if (file_exists($conf)) {
-                return realpath($conf);
-            }
+    public function onApplicationExecutionFinished(): void
+    {
+        $time = $this->stopwatch->stop();
 
-            $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
-        }
-
-        throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);
+        $this->output->writeln([
+            '',
+            sprintf(
+                'Time: %s. Memory: %s',
+                $this->timeFormatter->toHumanReadableString($time),
+                $this->memoryFormatter->toHumanReadableString(memory_get_peak_usage(true))
+            ),
+        ]);
     }
 }

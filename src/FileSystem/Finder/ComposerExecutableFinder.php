@@ -33,50 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
+namespace Infection\FileSystem\Finder;
 
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use function Safe\realpath;
+use Infection\FileSystem\Finder\Exception\FinderException;
+use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
  * @internal
  */
-final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
+final class ComposerExecutableFinder extends AbstractExecutableFinder
 {
-    private const DEFAULT_EXTENSIONS = [
-        'xml',
-        'yml',
-        'xml.dist',
-        'yml.dist',
-        'dist.xml',
-        'dist.yml',
-    ];
-
-    /**
-     * @var string
-     */
-    private $configDir;
-
-    public function __construct(string $configDir)
+    public function find(): string
     {
-        $this->configDir = $configDir;
-    }
+        $probable = ['composer', 'composer.phar'];
+        $finder = new ExecutableFinder();
+        $immediatePaths = [getcwd(), realpath(getcwd() . '/../'), realpath(getcwd() . '/../../')];
 
-    public function locate(string $testFrameworkName, ?string $customDir = null): string
-    {
-        $dir = $customDir ?: $this->configDir;
-        $triedFiles = [];
+        foreach ($probable as $name) {
+            if ($path = $finder->find($name, null, $immediatePaths)) {
+                if (strpos($path, '.phar') === false) {
+                    return $path;
+                }
 
-        foreach (self::DEFAULT_EXTENSIONS as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
-
-            if (file_exists($conf)) {
-                return realpath($conf);
+                return $this->makeExecutable($path);
             }
-
-            $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
         }
 
-        throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);
+        /**
+         * Check for options without execute permissions and prefix the PHP
+         * executable instead.
+         */
+        $path = $this->searchNonExecutables($probable, $immediatePaths);
+
+        if ($path !== null) {
+            return $this->makeExecutable($path);
+        }
+
+        throw FinderException::composerNotFound();
+    }
+
+    private function makeExecutable(string $path): string
+    {
+        return sprintf(
+            '%s %s',
+            (new PhpExecutableFinder())->find(),
+            $path
+        );
     }
 }

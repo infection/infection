@@ -33,50 +33,79 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
+namespace Infection\Tests\Resource\Time;
 
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use function Safe\realpath;
+use Generator;
+use Infection\Resource\Time\Stopwatch;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+
+// Cannot import this one as it would remove the ability to mock it
+// use function usleep()
 
 /**
- * @internal
+ * @group time-sensitive
  */
-final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
+final class StopwatchTest extends TestCase
 {
-    private const DEFAULT_EXTENSIONS = [
-        'xml',
-        'yml',
-        'xml.dist',
-        'yml.dist',
-        'dist.xml',
-        'dist.yml',
-    ];
-
     /**
-     * @var string
+     * @var Stopwatch
      */
-    private $configDir;
+    private $stopwatch;
 
-    public function __construct(string $configDir)
+    protected function setUp(): void
     {
-        $this->configDir = $configDir;
+        $this->stopwatch = new Stopwatch();
     }
 
-    public function locate(string $testFrameworkName, ?string $customDir = null): string
+    /**
+     * @dataProvider timeProvider
+     */
+    public function test_it_returns_the_time_took_on_stop(int $sleepTime, float $expectedTime): void
     {
-        $dir = $customDir ?: $this->configDir;
-        $triedFiles = [];
+        $this->stopwatch->start();
 
-        foreach (self::DEFAULT_EXTENSIONS as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
+        usleep($sleepTime);
 
-            if (file_exists($conf)) {
-                return realpath($conf);
-            }
+        $actualTimeInSeconds = $this->stopwatch->stop();
 
-            $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
+        $this->assertSame($expectedTime, $actualTimeInSeconds);
+    }
+
+    public function test_it_cannot_be_started_twice(): void
+    {
+        $this->stopwatch->start();
+
+        try {
+            $this->stopwatch->start();
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Timer can not be started again without stopping.',
+                $exception->getMessage()
+            );
         }
+    }
 
-        throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);
+    public function test_it_cannot_stop_if_was_not_started(): void
+    {
+        try {
+            $this->stopwatch->stop();
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Timer must be started before stopping.',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function timeProvider(): Generator
+    {
+        yield 'no time' => [0, 0.];
+
+        yield 'nominal' => [10000000, 10.0];
     }
 }

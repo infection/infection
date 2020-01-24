@@ -33,50 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
+namespace Infection\FileSystem\Finder\Iterator;
 
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use function Safe\realpath;
+use const DIRECTORY_SEPARATOR;
+use Symfony\Component\Finder\Iterator\MultiplePcreFilterIterator;
 
 /**
  * @internal
  */
-final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
+final class RealPathFilterIterator extends MultiplePcreFilterIterator
 {
-    private const DEFAULT_EXTENSIONS = [
-        'xml',
-        'yml',
-        'xml.dist',
-        'yml.dist',
-        'dist.xml',
-        'dist.yml',
-    ];
-
     /**
-     * @var string
+     * Filters the iterator values.
+     *
+     * @return bool true if the value should be kept, false otherwise
      */
-    private $configDir;
-
-    public function __construct(string $configDir)
+    public function accept()
     {
-        $this->configDir = $configDir;
-    }
+        $filename = $this->current()->getRealPath();
 
-    public function locate(string $testFrameworkName, ?string $customDir = null): string
-    {
-        $dir = $customDir ?: $this->configDir;
-        $triedFiles = [];
-
-        foreach (self::DEFAULT_EXTENSIONS as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
-
-            if (file_exists($conf)) {
-                return realpath($conf);
-            }
-
-            $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $filename = str_replace('\\', '/', $filename);
         }
 
-        throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);
+        return $this->isAccepted($filename);
+    }
+
+    /**
+     * Converts strings to regexp.
+     *
+     * PCRE patterns are left unchanged.
+     *
+     * Default conversion:
+     *     'lorem/ipsum/dolor' ==>  'lorem\/ipsum\/dolor/'
+     *
+     * Use only / as directory separator (on Windows also).
+     *
+     * @param string $str Pattern: regexp or dirname
+     *
+     * @return string regexp corresponding to a given string or regexp
+     */
+    protected function toRegex($str)
+    {
+        return $this->isRegex($str) ? $str : '/' . preg_quote($str, '/') . '/';
     }
 }

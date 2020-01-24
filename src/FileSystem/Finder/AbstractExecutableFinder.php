@@ -33,50 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
-
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use function Safe\realpath;
+namespace Infection\FileSystem\Finder;
 
 /**
  * @internal
  */
-final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
+abstract class AbstractExecutableFinder
 {
-    private const DEFAULT_EXTENSIONS = [
-        'xml',
-        'yml',
-        'xml.dist',
-        'yml.dist',
-        'dist.xml',
-        'dist.yml',
-    ];
+    abstract public function find(): string;
 
-    /**
-     * @var string
-     */
-    private $configDir;
-
-    public function __construct(string $configDir)
+    protected function searchNonExecutables(array $probableNames, array $extraDirectories = []): ?string
     {
-        $this->configDir = $configDir;
-    }
+        $path = getenv('PATH') ?: getenv('Path');
 
-    public function locate(string $testFrameworkName, ?string $customDir = null): string
-    {
-        $dir = $customDir ?: $this->configDir;
-        $triedFiles = [];
-
-        foreach (self::DEFAULT_EXTENSIONS as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
-
-            if (file_exists($conf)) {
-                return realpath($conf);
-            }
-
-            $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
+        if (!$path) {
+            return null;
         }
 
-        throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);
+        $dirs = array_merge(
+            explode(PATH_SEPARATOR, $path),
+            $extraDirectories
+        );
+
+        foreach ($dirs as $dir) {
+            foreach ($probableNames as $name) {
+                $fileName = sprintf('%s/%s', $dir, $name);
+
+                if (file_exists($fileName)) {
+                    return $fileName;
+                }
+            }
+        }
+
+        return null;
     }
 }

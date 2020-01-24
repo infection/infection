@@ -33,50 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
+namespace Infection\Resource\Time;
 
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use function Safe\realpath;
+use Webmozart\Assert\Assert;
+
+// Cannot import this one as it would remove the ability to mock it
+// use function microtime
 
 /**
  * @internal
  */
-final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
+final class Stopwatch
 {
-    private const DEFAULT_EXTENSIONS = [
-        'xml',
-        'yml',
-        'xml.dist',
-        'yml.dist',
-        'dist.xml',
-        'dist.yml',
-    ];
-
     /**
-     * @var string
+     * @var float|null
      */
-    private $configDir;
+    private $microTime;
 
-    public function __construct(string $configDir)
+    public function start(): void
     {
-        $this->configDir = $configDir;
+        Assert::null($this->microTime, 'Timer can not be started again without stopping.');
+
+        $this->microTime = microtime(true);
     }
 
-    public function locate(string $testFrameworkName, ?string $customDir = null): string
+    public function stop(): float
     {
-        $dir = $customDir ?: $this->configDir;
-        $triedFiles = [];
+        Assert::notNull($this->microTime, 'Timer must be started before stopping.');
 
-        foreach (self::DEFAULT_EXTENSIONS as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
+        $microTime = $this->microTime;
+        $this->microTime = null;
 
-            if (file_exists($conf)) {
-                return realpath($conf);
-            }
-
-            $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
-        }
-
-        throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);
+        return microtime(true) - $microTime;
     }
 }

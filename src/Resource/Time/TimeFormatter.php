@@ -33,50 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
+namespace Infection\Resource\Time;
 
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use function Safe\realpath;
+use function trim;
 
 /**
  * @internal
  */
-final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
+final class TimeFormatter
 {
-    private const DEFAULT_EXTENSIONS = [
-        'xml',
-        'yml',
-        'xml.dist',
-        'yml.dist',
-        'dist.xml',
-        'dist.yml',
+    private const TIME_HORIZONS = [
+        'h' => 3600,
+        'm' => 60,
+        's' => 1,
     ];
 
     /**
-     * @var string
+     * Formats time in seconds to a more human-friendly format.
      */
-    private $configDir;
-
-    public function __construct(string $configDir)
+    public function toHumanReadableString(float $seconds): string
     {
-        $this->configDir = $configDir;
-    }
-
-    public function locate(string $testFrameworkName, ?string $customDir = null): string
-    {
-        $dir = $customDir ?: $this->configDir;
-        $triedFiles = [];
-
-        foreach (self::DEFAULT_EXTENSIONS as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
-
-            if (file_exists($conf)) {
-                return realpath($conf);
-            }
-
-            $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
+        if ($seconds < 1) {
+            return '0s';
         }
 
-        throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);
+        $resultString = '';
+
+        foreach (self::TIME_HORIZONS as $unit => $unitValue) {
+            $intQuotient = (int) ($seconds / $unitValue);
+
+            if ($intQuotient !== 0) {
+                $resultString .= $intQuotient . $unit . ' ';
+            }
+
+            $seconds -= $unitValue * $intQuotient;
+        }
+
+        return trim($resultString);
     }
 }

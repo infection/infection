@@ -33,50 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
+namespace Infection\Tests\FileSystem\Finder\Iterator;
 
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use function Safe\realpath;
+use Infection\Tests\Fixtures\Autoloaded\Finder\MockRelativePathFinder;
+use Infection\Tests\Fixtures\Finder\MockRealPathFinder;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
+final class RealPathFilterIteratorTest extends TestCase
 {
-    private const DEFAULT_EXTENSIONS = [
-        'xml',
-        'yml',
-        'xml.dist',
-        'yml.dist',
-        'dist.xml',
-        'dist.yml',
-    ];
-
     /**
-     * @var string
+     * @dataProvider providesFinders
      */
-    private $configDir;
-
-    public function __construct(string $configDir)
+    public function test_it_differs_from_relative_path(string $finder, int $expectedFilecount): void
     {
-        $this->configDir = $configDir;
+        $sourceFilesFinder = new $finder(['tests/phpunit/Fixtures/Files/Finder']);
+
+        $filter = ['tests/phpunit/Fixtures/Files/Finder/FirstFile.php'];
+        $files = $sourceFilesFinder->setFilter($filter);
+
+        $iterator = $files->getIterator();
+        $iterator->rewind();
+        $firstFile = $iterator->current();
+
+        $this->assertCount($expectedFilecount, $files);
+
+        if ($expectedFilecount === 1) {
+            $this->assertSame('FirstFile.php', $firstFile->getFilename());
+        }
     }
 
-    public function locate(string $testFrameworkName, ?string $customDir = null): string
+    public function providesFinders()
     {
-        $dir = $customDir ?: $this->configDir;
-        $triedFiles = [];
+        yield 'RealPathFileIterator' => [
+            MockRealPathFinder::class,
+            1,
+        ];
 
-        foreach (self::DEFAULT_EXTENSIONS as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
-
-            if (file_exists($conf)) {
-                return realpath($conf);
-            }
-
-            $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
-        }
-
-        throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);
+        yield 'Symfony PathFileIterator' => [
+            MockRelativePathFinder::class,
+            0,
+        ];
     }
 }

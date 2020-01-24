@@ -37,7 +37,7 @@ namespace Infection\TestFramework;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
-use Infection\Finder\TestFrameworkFinder;
+use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Codeception\CodeceptionAdapterFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapterFactory;

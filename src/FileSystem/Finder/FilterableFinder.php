@@ -33,50 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
+namespace Infection\FileSystem\Finder;
 
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use function Safe\realpath;
+use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
+use Iterator;
+use Symfony\Component\Finder\Finder;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
+final class FilterableFinder extends Finder
 {
-    private const DEFAULT_EXTENSIONS = [
-        'xml',
-        'yml',
-        'xml.dist',
-        'yml.dist',
-        'dist.xml',
-        'dist.yml',
-    ];
+    /**
+     * @var string[]
+     */
+    private $filters = [];
 
     /**
-     * @var string
+     * @param string[] $files
      */
-    private $configDir;
-
-    public function __construct(string $configDir)
+    public function filterFiles(array $files): void
     {
-        $this->configDir = $configDir;
+        Assert::allString($files);
+
+        $this->filters = $files;
     }
 
-    public function locate(string $testFrameworkName, ?string $customDir = null): string
+    /**
+     * @return RealPathFilterIterator|(iterable<\Symfony\Component\Finder\SplFileInfo>&Iterator)
+     */
+    public function getIterator(): Iterator
     {
-        $dir = $customDir ?: $this->configDir;
-        $triedFiles = [];
+        $iterator = parent::getIterator();
 
-        foreach (self::DEFAULT_EXTENSIONS as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
-
-            if (file_exists($conf)) {
-                return realpath($conf);
-            }
-
-            $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
+        if ($this->filters) {
+            $iterator = new RealPathFilterIterator($iterator, $this->filters, []);
         }
 
-        throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);
+        return $iterator;
     }
 }

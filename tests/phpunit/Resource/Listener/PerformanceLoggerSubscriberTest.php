@@ -33,50 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Config;
+namespace Infection\Tests\Resource\Listener;
 
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use function Safe\realpath;
+use Infection\Event\ApplicationExecutionFinished;
+use Infection\Event\ApplicationExecutionStarted;
+use Infection\Event\EventDispatcher;
+use Infection\Resource\Listener\PerformanceLoggerSubscriber;
+use Infection\Resource\Memory\MemoryFormatter;
+use Infection\Resource\Time\Stopwatch;
+use Infection\Resource\Time\TimeFormatter;
+use function is_array;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @internal
- */
-final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
+final class PerformanceLoggerSubscriberTest extends TestCase
 {
-    private const DEFAULT_EXTENSIONS = [
-        'xml',
-        'yml',
-        'xml.dist',
-        'yml.dist',
-        'dist.xml',
-        'dist.yml',
-    ];
-
     /**
-     * @var string
+     * @var OutputInterface|MockObject
      */
-    private $configDir;
+    private $output;
 
-    public function __construct(string $configDir)
+    protected function setUp(): void
     {
-        $this->configDir = $configDir;
+        $this->output = $this->createMock(OutputInterface::class);
     }
 
-    public function locate(string $testFrameworkName, ?string $customDir = null): string
+    public function test_it_reacts_on_application_execution_events(): void
     {
-        $dir = $customDir ?: $this->configDir;
-        $triedFiles = [];
+        $this->output->expects($this->once())
+            ->method('writeln')
+            ->with($this->callback(static function ($parameter) {
+                return is_array($parameter) && $parameter[0] === '' && strpos($parameter[1], 'Time:') === 0;
+            }));
 
-        foreach (self::DEFAULT_EXTENSIONS as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new PerformanceLoggerSubscriber(
+            new Stopwatch(),
+            new TimeFormatter(),
+            new MemoryFormatter(),
+            $this->output
+        ));
 
-            if (file_exists($conf)) {
-                return realpath($conf);
-            }
-
-            $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
-        }
-
-        throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);
+        $dispatcher->dispatch(new ApplicationExecutionStarted());
+        $dispatcher->dispatch(new ApplicationExecutionFinished());
     }
 }
