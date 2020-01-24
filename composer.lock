@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7a9bc546d2b97ffe5cab4dd3c41ed301",
+    "content-hash": "da1ca960b2e2f98fe5c4b69911d05b7f",
     "packages": [
         {
             "name": "composer/xdebug-handler",
@@ -131,6 +131,49 @@
             ],
             "description": "Codeception Test Framework Adapter for Infection",
             "time": "2020-01-19T20:11:57+00:00"
+        },
+        {
+            "name": "infection/extension-installer",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/infection/extension-installer.git",
+                "reference": "c8aebfcbef3015f3869c64fb1a0b02f6dbc51564"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/infection/extension-installer/zipball/c8aebfcbef3015f3869c64fb1a0b02f6dbc51564",
+                "reference": "c8aebfcbef3015f3869c64fb1a0b02f6dbc51564",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.1"
+            },
+            "require-dev": {
+                "composer/composer": "^1.9",
+                "phpunit/phpunit": "^8.5"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Infection\\ExtensionInstaller\\Plugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Infection\\ExtensionInstaller\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Maks Rafalko",
+                    "email": "maks.rafalko@gmail.com"
+                }
+            ],
+            "description": "Infection Extension Installer",
+            "time": "2020-01-24T07:44:13+00:00"
         },
         {
             "name": "infection/include-interceptor",
