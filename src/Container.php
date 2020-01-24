@@ -545,7 +545,7 @@ final class Container
 
     public function getEventDispatcher(): EventDispatcher
     {
-        return $this->get(EventDispatcher::class);
+        return $this->get(SyncEventDispatcher::class);
     }
 
     public function getParallelProcessRunner(): ParallelProcessRunner
