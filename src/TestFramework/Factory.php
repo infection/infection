@@ -39,6 +39,7 @@ use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
+use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapterFactory;
@@ -110,32 +111,26 @@ final class Factory
             );
         }
 
-        $extensionsClassExists = class_exists('\Infection\ExtensionInstaller\GeneratedExtensionsConfig');
+        foreach (GeneratedExtensionsConfig::EXTENSIONS as $packageName => $installedExtension) {
+            $factory = $installedExtension['extra']['class'];
 
-        if ($extensionsClassExists) {
-            $installedExtensions = \Infection\ExtensionInstaller\GeneratedExtensionsConfig::EXTENSIONS;
+            Assert::classExists($factory);
 
-            foreach ($installedExtensions as $packageName => $installedExtension) {
-                $factory = $installedExtension['extra']['class'];
+            if (!is_a($factory, TestFrameworkAdapterFactory::class, true)) {
+                continue;
+            }
 
-                Assert::classExists($factory);
-
-                if (!is_a($factory, TestFrameworkAdapterFactory::class, true)) {
-                    continue;
-                }
-
-                if ($adapterName === $factory::getAdapterName()) {
-                    return $factory::create(
-                        $this->testFrameworkFinder->find($factory::getExecutableName())
-                        $this->tmpDir,
-                        $this->configLocator->locate($factory::getAdapterName()),
-                        null,
-                        $this->jUnitFilePath,
-                        $this->projectDir,
-                        $this->infectionConfig->getSourceDirectories(),
-                        $skipCoverage
-                    );
-                }
+            if ($adapterName === $factory::getAdapterName()) {
+                return $factory::create(
+                    $this->testFrameworkFinder->find($factory::getExecutableName())
+                    $this->tmpDir,
+                    $this->configLocator->locate($factory::getAdapterName()),
+                    null,
+                    $this->jUnitFilePath,
+                    $this->projectDir,
+                    $this->infectionConfig->getSourceDirectories(),
+                    $skipCoverage
+                );
             }
         }
 
