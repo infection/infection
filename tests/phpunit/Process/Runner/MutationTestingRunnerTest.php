@@ -35,25 +35,38 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
+use function array_map;
 use function count;
 use function get_class;
+use function implode;
+use Infection\Event\MutantCreated;
+use Infection\Event\MutantsCreatingFinished;
+use Infection\Event\MutantsCreatingStarted;
 use Infection\Event\MutationTestingFinished;
 use Infection\Event\MutationTestingStarted;
+use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
+use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\MutantProcess;
-use Infection\Process\Runner\MutantProcessFactory;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function Safe\sprintf;
 
 final class MutationTestingRunnerTest extends TestCase
 {
     /**
-     * @var MutantProcessFactory|MockObject
+     * @var MutantProcessBuilder|MockObject
      */
-    private $mutantProcessFactoryMock;
+    private $processBuilderMock;
+
+    /**
+     * @var MutantFactory|MockObject
+     */
+    private $mutantFactoryMock;
 
     /**
      * @var ParallelProcessRunner|MockObject
@@ -61,7 +74,7 @@ final class MutationTestingRunnerTest extends TestCase
     private $parallelProcessRunnerMock;
 
     /**
-     * @var \Infection\Tests\Fixtures\Event\EventDispatcherCollector
+     * @var EventDispatcherCollector
      */
     private $eventDispatcher;
 
@@ -72,46 +85,91 @@ final class MutationTestingRunnerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mutantProcessFactoryMock = $this->createMock(MutantProcessFactory::class);
+        $this->processBuilderMock = $this->createMock(MutantProcessBuilder::class);
+        $this->mutantFactoryMock = $this->createMock(MutantFactory::class);
         $this->parallelProcessRunnerMock = $this->createMock(ParallelProcessRunner::class);
         $this->eventDispatcher = new EventDispatcherCollector();
 
         $this->runner = new MutationTestingRunner(
-            $this->mutantProcessFactoryMock,
+            $this->processBuilderMock,
+            $this->mutantFactoryMock,
             $this->parallelProcessRunnerMock,
             $this->eventDispatcher
         );
     }
 
-    public function test_it_applies_and_run_the_mutations(): void
+    public function test_it_does_not_create_processes_when_there_is_not_mutations(): void
     {
-        $mutations = [
-            $this->createMock(Mutation::class),
-            $this->createMock(Mutation::class),
-        ];
+        $mutations = [];
         $threadCount = 4;
         $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
-
-        $this->mutantProcessFactoryMock
-            ->expects($this->once())
-            ->method('create')
-            ->with($mutations, $testFrameworkExtraOptions)
-            ->willReturn($processes = [
-                $this->createMock(MutantProcess::class),
-                $this->createMock(MutantProcess::class),
-            ])
-        ;
 
         $this->parallelProcessRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with($processes, $threadCount)
+            ->with([], $threadCount)
         ;
 
         $this->runner->run($mutations, $threadCount, $testFrameworkExtraOptions);
 
         $this->assertAreSameEvents(
             [
+                new MutantsCreatingStarted(0),
+                new MutantsCreatingFinished(),
+                new MutationTestingStarted(0),
+                new MutationTestingFinished(),
+            ],
+            $this->eventDispatcher->getEvents()
+        );
+    }
+
+    public function test_it_applies_and_run_the_mutations(): void
+    {
+        $mutations = [
+            $mutation0 = $this->createMock(Mutation::class),
+            $mutation1 = $this->createMock(Mutation::class),
+        ];
+        $threadCount = 4;
+        $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
+
+        $this->mutantFactoryMock
+            ->method('create')
+            ->withConsecutive(
+                [$mutation0],
+                [$mutation1]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $mutant0 = new Mutant('/path/to/mutant0', $mutation0, ''),
+                $mutant1 = new Mutant('/path/to/mutant1', $mutation1, '')
+            )
+        ;
+
+        $this->processBuilderMock
+            ->method('createProcessForMutant')
+            ->withConsecutive(
+                [$mutant0, $testFrameworkExtraOptions],
+                [$mutant1, $testFrameworkExtraOptions]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $process0 = $this->createMock(MutantProcess::class),
+                $process1 = $this->createMock(MutantProcess::class)
+            )
+        ;
+
+        $this->parallelProcessRunnerMock
+            ->expects($this->once())
+            ->method('run')
+            ->with([$process0, $process1], $threadCount)
+        ;
+
+        $this->runner->run($mutations, $threadCount, $testFrameworkExtraOptions);
+
+        $this->assertAreSameEvents(
+            [
+                new MutantsCreatingStarted(2),
+                new MutantCreated(),
+                new MutantCreated(),
+                new MutantsCreatingFinished(),
                 new MutationTestingStarted(2),
                 new MutationTestingFinished(),
             ],
@@ -125,7 +183,7 @@ final class MutationTestingRunnerTest extends TestCase
         $threadCount = 4;
         $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
-        $this->mutantProcessFactoryMock
+        $this->mutantFactoryMock
             ->expects($this->once())
             ->method('create')
             ->with($mutations, $testFrameworkExtraOptions)
@@ -150,17 +208,41 @@ final class MutationTestingRunnerTest extends TestCase
     }
 
     /**
-     * @param array<MutationTestingStarted|MutationTestingFinished> $expectedEvents
-     * @param array<MutationTestingStarted|MutationTestingFinished> $actualEvents
+     * @param array<MutationTestingStarted|MutationTestingFinished|MutantsCreatingStarted|MutantCreated|MutantsCreatingFinished> $expectedEvents
+     * @param array<MutationTestingStarted|MutationTestingFinished|MutantsCreatingStarted|MutantCreated|MutantsCreatingFinished> $actualEvents
      */
     private function assertAreSameEvents(array $expectedEvents, array $actualEvents): void
     {
+        $expectedClasses = [
+            MutationTestingStarted::class,
+            MutationTestingFinished::class,
+            MutantsCreatingStarted::class,
+            MutantCreated::class,
+            MutantsCreatingFinished::class,
+        ];
+
+        $assertionErrorMessage = sprintf(
+            "Expected the following list of events (by class):%s\nGot:%s",
+            $this->formatExpectedEvents($expectedEvents),
+            $this->formatExpectedEvents($actualEvents)
+        );
+
         foreach ($expectedEvents as $index => $expectedEvent) {
-            $this->assertArrayHasKey($index, $actualEvents);
+            $this->assertIsInstanceOfAny($expectedClasses, $expectedEvent);
+            $this->assertArrayHasKey($index, $actualEvents, $assertionErrorMessage);
 
             $event = $actualEvents[$index];
+            $this->assertInstanceOf(
+                get_class($expectedEvent),
+                $event,
+                $assertionErrorMessage
+            );
 
-            $this->assertInstanceOf(get_class($expectedEvent), $event);
+            if ($expectedEvent instanceof MutantsCreatingStarted) {
+                $this->assertSame($expectedEvent->getMutantCount(), $event->getMutantCount());
+
+                continue;
+            }
 
             if ($expectedEvent instanceof MutationTestingStarted) {
                 $this->assertSame($expectedEvent->getMutationCount(), $event->getMutationCount());
@@ -168,5 +250,46 @@ final class MutationTestingRunnerTest extends TestCase
         }
 
         $this->assertCount(count($expectedEvents), $actualEvents);
+    }
+
+    /**
+     * @param string[] $expectedClasses
+     */
+    private function assertIsInstanceOfAny(array $expectedClasses, object $value): void
+    {
+        $this->assertGreaterThan(
+            0,
+            count($expectedClasses),
+            'Expected to have at least one expected class'
+        );
+
+        foreach ($expectedClasses as $expectedClass) {
+            if ($value instanceof $expectedClass) {
+                $this->addToAssertionCount(1);
+
+                return;
+            }
+        }
+
+        $this->fail(sprintf(
+            'Expected to be an instance of any of "%s" but got "%s" instead',
+            implode('", "', $expectedClasses),
+            get_class($value)
+        ));
+    }
+
+    /**
+     * @param object[] $events
+     */
+    private function formatExpectedEvents(array $events): string
+    {
+        if (count($events) === 0) {
+            return ' Ø (no events)';
+        }
+
+        return "\n - " . implode(
+            "\n - ",
+            array_map('get_class', $events)
+        );
     }
 }

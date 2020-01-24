@@ -74,7 +74,6 @@ use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Coverage\CoverageRequirementChecker;
 use Infection\Process\Runner\InitialTestsRunner;
-use Infection\Process\Runner\MutantProcessFactory;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
@@ -390,16 +389,10 @@ final class Container
                     $container->getFileMutationGenerator()
                 );
             },
-            MutantProcessFactory::class => static function (self $container): MutantProcessFactory {
-                return new MutantProcessFactory(
-                    $container->getMutantProcessBuilder(),
-                    $container->getMutantFactory(),
-                    $container->getEventDispatcher()
-                );
-            },
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
                 return new MutationTestingRunner(
-                    $container->getMutantProcessFactory(),
+                    $container->getMutantProcessBuilder(),
+                    $container->getMutantFactory(),
                     $container->getParallelProcessRunner(),
                     $container->getEventDispatcher()
                 );
@@ -728,11 +721,6 @@ final class Container
     public function getMutationGenerator(): MutationGenerator
     {
         return $this->get(MutationGenerator::class);
-    }
-
-    public function getMutantProcessFactory(): MutantProcessFactory
-    {
-        return $this->get(MutantProcessFactory::class);
     }
 
     public function getMutationTestingRunner(): MutationTestingRunner
