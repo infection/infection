@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Builder;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\OutputFormatter;
@@ -53,11 +54,10 @@ use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
 use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Performance\Listener\PerformanceLoggerSubscriber;
-use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Time\Stopwatch;
-use Infection\Performance\Time\TimeFormatter;
-use Infection\TestFramework\TestFrameworkAdapter;
+use Infection\Resource\Listener\PerformanceLoggerSubscriber;
+use Infection\Resource\Memory\MemoryFormatter;
+use Infection\Resource\Time\Stopwatch;
+use Infection\Resource\Time\TimeFormatter;
 use InvalidArgumentException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;

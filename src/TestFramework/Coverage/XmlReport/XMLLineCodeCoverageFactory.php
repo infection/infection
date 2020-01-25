@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
-use Infection\TestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\TestFrameworkTypes;
 use Webmozart\Assert\Assert;
 

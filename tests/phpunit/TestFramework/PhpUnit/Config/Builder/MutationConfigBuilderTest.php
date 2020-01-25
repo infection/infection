@@ -38,7 +38,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 use DOMDocument;
 use DOMNodeList;
 use DOMXPath;
-use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;

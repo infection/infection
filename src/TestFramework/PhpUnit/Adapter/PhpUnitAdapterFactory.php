@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
@@ -42,8 +44,6 @@ use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
-use Infection\TestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\TestFrameworkAdapterFactory;
 use Infection\TestFramework\VersionParser;
 use function Safe\file_get_contents;
 use Symfony\Component\Filesystem\Filesystem;
@@ -88,5 +88,15 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
             new VersionParser(),
             new CommandLineBuilder()
         );
+    }
+
+    public static function getAdapterName(): string
+    {
+        return 'phpunit';
+    }
+
+    public static function getExecutableName(): string
+    {
+        return 'phpunit';
     }
 }

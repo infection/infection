@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\InitialTestSuiteStarted;
-use Infection\TestFramework\TestFrameworkAdapter;
 use InvalidArgumentException;
 use Symfony\Component\Console\Output\OutputInterface;
 
