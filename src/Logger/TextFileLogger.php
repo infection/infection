@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use function implode;
 use Infection\Process\MutantProcess;
+use function str_repeat;
 use function strlen;
 
 /**

@@ -33,21 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event;
+namespace Infection\Tests\Event\EventDispatcher;
 
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Tests\Fixtures\Event\NullSubscriber;
 use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
 use Infection\Tests\Fixtures\Event\UserEventSubscriber;
 use Infection\Tests\Fixtures\Event\UserWasCreated;
 use PHPUnit\Framework\TestCase;
 
-final class EventDispatcherTest extends TestCase
+final class SyncEventDispatcherTest extends TestCase
 {
     public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void
     {
         $userSubscriber = new UserEventSubscriber();
 
-        $dispatcher = new \Infection\Event\EventDispatcher();
+        $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber($userSubscriber);
         $dispatcher->addSubscriber(new NullSubscriber());
         $dispatcher->addSubscriber(new UnknownEventSubscriber());

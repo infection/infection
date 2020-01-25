@@ -42,7 +42,7 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Event\ApplicationExecutionFinished;
-use Infection\Event\EventDispatcher;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutation\MutationGenerator;
 use Infection\Process\Builder\SubscriberBuilder;

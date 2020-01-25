@@ -44,8 +44,9 @@ use function Safe\file_put_contents;
 
 /**
  * @internal
+ * @final
  */
-final class MutantFactory
+class MutantFactory
 {
     private $tmpDir;
     private $differ;

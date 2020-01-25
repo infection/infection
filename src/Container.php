@@ -48,7 +48,8 @@ use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
-use Infection\Event\EventDispatcher;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\SourceFileCollector;
@@ -192,8 +193,8 @@ final class Container
             Differ::class => static function (): Differ {
                 return new Differ(new BaseDiffer());
             },
-            EventDispatcher::class => static function (): EventDispatcher {
-                return new EventDispatcher();
+            SyncEventDispatcher::class => static function (): SyncEventDispatcher {
+                return new SyncEventDispatcher();
             },
             ParallelProcessRunner::class => static function (self $container): ParallelProcessRunner {
                 return new ParallelProcessRunner($container->getEventDispatcher());
@@ -391,8 +392,8 @@ final class Container
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
                 return new MutationTestingRunner(
                     $container->getMutantProcessBuilder(),
-                    $container->getParallelProcessRunner(),
                     $container->getMutantFactory(),
+                    $container->getParallelProcessRunner(),
                     $container->getEventDispatcher()
                 );
             },
@@ -544,7 +545,7 @@ final class Container
 
     public function getEventDispatcher(): EventDispatcher
     {
-        return $this->get(EventDispatcher::class);
+        return $this->get(SyncEventDispatcher::class);
     }
 
     public function getParallelProcessRunner(): ParallelProcessRunner

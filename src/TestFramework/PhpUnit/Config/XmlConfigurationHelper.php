@@ -38,6 +38,7 @@ namespace Infection\TestFramework\PhpUnit\Config;
 use function assert;
 use DOMElement;
 use DOMXPath;
+use function implode;
 use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use LibXMLError;

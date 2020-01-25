@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use Infection\Event\EventDispatcher;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\InitialTestCaseCompleted;
 use Infection\Event\InitialTestSuiteFinished;
 use Infection\Event\InitialTestSuiteStarted;
