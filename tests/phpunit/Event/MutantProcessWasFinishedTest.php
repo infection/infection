@@ -33,11 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Tests\Event;
 
-/**
- * @internal
- */
-final class InitialTestCaseCompleted
+use Infection\Event\MutantProcessWasFinished;
+use Infection\Process\MutantProcess;
+use PHPUnit\Framework\TestCase;
+
+final class MutantProcessWasFinishedTest extends TestCase
 {
+    public function test_it_exposes_its_mutant_process(): void
+    {
+        $processMock = $this->createMock(MutantProcess::class);
+
+        $event = new MutantProcessWasFinished($processMock);
+
+        $this->assertSame($processMock, $event->getMutantProcess());
+    }
 }

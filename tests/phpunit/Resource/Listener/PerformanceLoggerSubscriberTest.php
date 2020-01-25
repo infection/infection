@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Resource\Listener;
 
-use Infection\Event\ApplicationExecutionFinished;
-use Infection\Event\ApplicationExecutionStarted;
+use Infection\Event\ApplicationExecutionWasFinished;
+use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Resource\Listener\PerformanceLoggerSubscriber;
 use Infection\Resource\Memory\MemoryFormatter;
@@ -75,7 +75,7 @@ final class PerformanceLoggerSubscriberTest extends TestCase
             $this->output
         ));
 
-        $dispatcher->dispatch(new ApplicationExecutionStarted());
-        $dispatcher->dispatch(new ApplicationExecutionFinished());
+        $dispatcher->dispatch(new ApplicationExecutionWasStarted());
+        $dispatcher->dispatch(new ApplicationExecutionWasFinished());
     }
 }

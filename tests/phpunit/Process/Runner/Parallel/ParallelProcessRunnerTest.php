@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Runner\Parallel;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\MutantProcessFinished;
+use Infection\Event\MutantProcessWasFinished;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
@@ -123,7 +123,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $eventDispatcher = $this->createMock(EventDispatcher::class);
         $eventDispatcher->expects($this->exactly($eventCount))
             ->method('dispatch')
-            ->with(new MutantProcessFinished($this->createMock(MutantProcess::class)));
+            ->with(new MutantProcessWasFinished($this->createMock(MutantProcess::class)));
 
         return $eventDispatcher;
     }

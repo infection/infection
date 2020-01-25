@@ -33,11 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Tests\Event;
 
-/**
- * @internal
- */
-final class ApplicationExecutionFinished
+use Infection\Event\InitialTestSuiteWasFinished;
+use PHPUnit\Framework\TestCase;
+
+final class InitialTestSuiteWasFinishedTest extends TestCase
 {
+    public function test_it_exposes_its_output(): void
+    {
+        $text = 'foo-bar-baz';
+
+        $class = new InitialTestSuiteWasFinished($text);
+
+        $this->assertSame($text, $class->getOutputText());
+    }
 }

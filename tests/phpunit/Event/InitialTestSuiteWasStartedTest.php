@@ -35,17 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event;
 
-use Infection\Event\ApplicationExecutionStarted;
+use Infection\Event\InitialTestSuiteWasStarted;
 use PHPUnit\Framework\TestCase;
 
-final class ApplicationExecutionStartedTest extends TestCase
+final class InitialTestSuiteWasStartedTest extends TestCase
 {
     /**
      * This class is only used to fire events, and the only functionality it needs is being instantiated
      */
-    public function test_it_can_be_initialzed(): void
+    public function test_it_can_be_instantiated(): void
     {
-        $class = new ApplicationExecutionStarted();
-        $this->assertInstanceOf(ApplicationExecutionStarted::class, $class);
+        $class = new InitialTestSuiteWasStarted();
+
+        $this->assertInstanceOf(InitialTestSuiteWasStarted::class, $class);
     }
 }

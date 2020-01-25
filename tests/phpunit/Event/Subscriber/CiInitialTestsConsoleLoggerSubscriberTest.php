@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\InitialTestSuiteStarted;
+use Infection\Event\InitialTestSuiteWasStarted;
 use Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriber;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -85,6 +85,6 @@ final class CiInitialTestsConsoleLoggerSubscriberTest extends TestCase
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new CiInitialTestsConsoleLoggerSubscriber($this->output, $this->testFramework));
 
-        $dispatcher->dispatch(new InitialTestSuiteStarted());
+        $dispatcher->dispatch(new InitialTestSuiteWasStarted());
     }
 }

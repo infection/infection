@@ -38,11 +38,11 @@ namespace Infection\Process\Runner;
 use function array_map;
 use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\MutantCreated;
-use Infection\Event\MutantsCreatingFinished;
-use Infection\Event\MutantsCreatingStarted;
-use Infection\Event\MutationTestingFinished;
-use Infection\Event\MutationTestingStarted;
+use Infection\Event\MutantsCreationWasFinished;
+use Infection\Event\MutantsCreationWasStarted;
+use Infection\Event\MutantWasCreated;
+use Infection\Event\MutationTestingWasFinished;
+use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Builder\MutantProcessBuilder;
@@ -76,7 +76,7 @@ final class MutationTestingRunner
      */
     public function run(array $mutations, int $threadCount, string $testFrameworkExtraOptions): void
     {
-        $this->eventDispatcher->dispatch(new MutantsCreatingStarted(count($mutations)));
+        $this->eventDispatcher->dispatch(new MutantsCreationWasStarted(count($mutations)));
 
         $processes = array_map(
             function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcess {
@@ -84,19 +84,19 @@ final class MutationTestingRunner
 
                 $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
 
-                $this->eventDispatcher->dispatch(new MutantCreated());
+                $this->eventDispatcher->dispatch(new MutantWasCreated());
 
                 return $process;
             },
             $mutations
         );
 
-        $this->eventDispatcher->dispatch(new MutantsCreatingFinished());
+        $this->eventDispatcher->dispatch(new MutantsCreationWasFinished());
 
-        $this->eventDispatcher->dispatch(new MutationTestingStarted(count($processes)));
+        $this->eventDispatcher->dispatch(new MutationTestingWasStarted(count($processes)));
 
         $this->parallelProcessManager->run($processes, $threadCount);
 
-        $this->eventDispatcher->dispatch(new MutationTestingFinished());
+        $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
     }
 }

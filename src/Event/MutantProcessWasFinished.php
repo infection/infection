@@ -33,19 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event;
+namespace Infection\Event;
 
-use Infection\Event\MutationGeneratingFinished;
-use PHPUnit\Framework\TestCase;
+use Infection\Process\MutantProcess;
 
-final class MutationGeneratingFinishedTest extends TestCase
+/**
+ * @internal
+ */
+final class MutantProcessWasFinished
 {
-    /**
-     * This class is only used to fire events, and the only functionality it needs is being instantiated
-     */
-    public function test_it_can_be_initialzed(): void
+    private $mutantProcess;
+
+    public function __construct(MutantProcess $mutantProcess)
     {
-        $class = new MutationGeneratingFinished();
-        $this->assertInstanceOf(MutationGeneratingFinished::class, $class);
+        $this->mutantProcess = $mutantProcess;
+    }
+
+    public function getMutantProcess(): MutantProcess
+    {
+        return $this->mutantProcess;
     }
 }

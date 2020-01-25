@@ -33,18 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event;
+namespace Infection\Event;
 
-use Infection\Event\MutationTestingStarted;
-use PHPUnit\Framework\TestCase;
-
-final class MutationTestingStartedTest extends TestCase
+/**
+ * @internal
+ */
+final class MutationGenerationWasFinished
 {
-    public function test_it_passes_along_its_mutation_count_without_changing_it(): void
-    {
-        $count = 5;
-        $event = new MutationTestingStarted($count);
-
-        $this->assertSame($count, $event->getMutationCount());
-    }
 }

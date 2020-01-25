@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\MutationGeneratingStarted;
+use Infection\Event\MutationGenerationWasStarted;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -53,11 +53,11 @@ final class CiMutationGeneratingConsoleLoggerSubscriber implements EventSubscrib
     public function getSubscribedEvents(): array
     {
         return [
-            MutationGeneratingStarted::class => [$this, 'onMutationGeneratingStarted'],
+            MutationGenerationWasStarted::class => [$this, 'onMutationGenerationWasStarted'],
         ];
     }
 
-    public function onMutationGeneratingStarted(MutationGeneratingStarted $event): void
+    public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
     {
         $this->output->writeln([
             '',

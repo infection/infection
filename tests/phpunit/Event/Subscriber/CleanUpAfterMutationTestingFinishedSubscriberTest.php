@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\MutationTestingFinished;
+use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
@@ -53,6 +53,6 @@ final class CleanUpAfterMutationTestingFinishedSubscriberTest extends TestCase
 
         $subscriber = new CleanUpAfterMutationTestingFinishedSubscriber($filesystem, sys_get_temp_dir());
 
-        $subscriber->onMutationTestingFinished(new MutationTestingFinished());
+        $subscriber->onMutationTestingWasFinished(new MutationTestingWasFinished());
     }
 }

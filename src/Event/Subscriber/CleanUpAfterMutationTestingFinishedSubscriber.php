@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\MutationTestingFinished;
+use Infection\Event\MutationTestingWasFinished;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -55,11 +55,11 @@ final class CleanUpAfterMutationTestingFinishedSubscriber implements EventSubscr
     public function getSubscribedEvents(): array
     {
         return [
-            MutationTestingFinished::class => [$this, 'onMutationTestingFinished'],
+            MutationTestingWasFinished::class => [$this, 'onMutationTestingWasFinished'],
         ];
     }
 
-    public function onMutationTestingFinished(MutationTestingFinished $event): void
+    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
         $this->filesystem->remove($this->tmpDir);
     }

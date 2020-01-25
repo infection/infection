@@ -33,11 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Tests\Event;
 
-/**
- * @internal
- */
-final class MutationGeneratingFinished
+use Infection\Event\MutantsCreationWasStarted;
+use PHPUnit\Framework\TestCase;
+
+final class MutantsCreationWasStartedTest extends TestCase
 {
+    public function test_it_exposes_its_mutant_count(): void
+    {
+        $count = 5;
+        $event = new MutantsCreationWasStarted($count);
+
+        $this->assertSame($count, $event->getMutantCount());
+    }
 }

@@ -38,6 +38,17 @@ namespace Infection\Event;
 /**
  * @internal
  */
-final class MutantCreated
+final class MutantsCreationWasStarted
 {
+    private $mutantCount;
+
+    public function __construct(int $mutantCount)
+    {
+        $this->mutantCount = $mutantCount;
+    }
+
+    public function getMutantCount(): int
+    {
+        return $this->mutantCount;
+    }
 }

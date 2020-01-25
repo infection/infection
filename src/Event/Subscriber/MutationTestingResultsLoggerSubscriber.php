@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\MutationTestingFinished;
+use Infection\Event\MutationTestingWasFinished;
 use Infection\Logger\MutationTestingResultsLogger;
 use Webmozart\Assert\Assert;
 
@@ -59,11 +59,11 @@ final class MutationTestingResultsLoggerSubscriber implements EventSubscriber
     public function getSubscribedEvents(): array
     {
         return [
-            MutationTestingFinished::class => [$this, 'onMutationTestingFinished'],
+            MutationTestingWasFinished::class => [$this, 'onMutationTestingWasFinished'],
         ];
     }
 
-    public function onMutationTestingFinished(MutationTestingFinished $event): void
+    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
         foreach ($this->loggers as $logger) {
             $logger->log();
