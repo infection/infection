@@ -33,23 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Event\EventDispatcher;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\MutationTestingWasFinished;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
-use Infection\Logger\MutationTestingResultsLogger;
-use PHPUnit\Framework\TestCase;
+use function get_class;
+use Infection\Event\Subscriber\EventSubscriber;
 
-final class MutationTestingResultsLoggerSubscriberTest extends TestCase
+/**
+ * @internal
+ */
+final class SyncEventDispatcher implements EventDispatcher
 {
-    public function test_it_reacts_on_mutation_testing_finished(): void
-    {
-        $dispatcher = new SyncEventDispatcher();
-        $logger = $this->createMock(MutationTestingResultsLogger::class);
-        $logger->expects($this->once())->method('log');
-        $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber([$logger]));
+    /**
+     * @var callable[][]
+     */
+    private $listeners = [];
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+    public function dispatch(object $event): void
+    {
+        $name = get_class($event);
+
+        foreach ($this->getListeners($name) as $listener) {
+            $listener($event);
+        }
+    }
+
+    public function addSubscriber(EventSubscriber $eventSubscriber): void
+    {
+        foreach ($eventSubscriber->getSubscribedEvents() as $eventName => $listener) {
+            $this->listeners[$eventName][] = $listener;
+        }
+    }
+
+    /**
+     * @return callable[]
+     */
+    private function getListeners(string $eventName): array
+    {
+        return $this->listeners[$eventName] ?? [];
     }
 }

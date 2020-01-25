@@ -42,6 +42,7 @@ use DOMXPath;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use function Safe\file_put_contents;
 
 /**
  * @internal

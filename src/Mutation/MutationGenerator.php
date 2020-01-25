@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutation;
 
 use function count;
-use Infection\Event\EventDispatcher;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutableFileWasProcessed;
 use Infection\Event\MutationGenerationWasFinished;
 use Infection\Event\MutationGenerationWasStarted;

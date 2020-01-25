@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\EventDispatcher;
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\InitialTestSuiteWasFinished;
 use Infection\Event\InitialTestSuiteWasStarted;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriber;
@@ -56,7 +56,7 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
         $testFramework->expects($this->once())
             ->method('getVersion');
 
-        $dispatcher = new EventDispatcher();
+        $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, false));
 
         $dispatcher->dispatch(new InitialTestSuiteWasStarted());
@@ -84,7 +84,7 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
         $testFramework->method('getVersion')
             ->will($this->throwException(new InvalidArgumentException()));
 
-        $dispatcher = new EventDispatcher();
+        $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, false));
 
         $dispatcher->dispatch(new InitialTestSuiteWasStarted());
@@ -103,7 +103,7 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
 
         $testFramework = $this->createMock(AbstractTestFrameworkAdapter::class);
 
-        $dispatcher = new EventDispatcher();
+        $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, true));
 
         $dispatcher->dispatch(new InitialTestSuiteWasFinished($processText));

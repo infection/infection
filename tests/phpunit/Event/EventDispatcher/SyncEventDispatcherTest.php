@@ -33,43 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Tests\Event\EventDispatcher;
 
-use function get_class;
-use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Tests\Fixtures\Event\NullSubscriber;
+use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
+use Infection\Tests\Fixtures\Event\UserEventSubscriber;
+use Infection\Tests\Fixtures\Event\UserWasCreated;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- * @final
- */
-class EventDispatcher
+final class SyncEventDispatcherTest extends TestCase
 {
-    /**
-     * @var callable[][]
-     */
-    private $listeners = [];
-
-    public function dispatch(object $event): void
+    public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void
     {
-        $name = get_class($event);
+        $userSubscriber = new UserEventSubscriber();
 
-        foreach ($this->getListeners($name) as $listener) {
-            $listener($event);
-        }
-    }
+        $dispatcher = new SyncEventDispatcher();
+        $dispatcher->addSubscriber($userSubscriber);
+        $dispatcher->addSubscriber(new NullSubscriber());
+        $dispatcher->addSubscriber(new UnknownEventSubscriber());
 
-    public function addSubscriber(EventSubscriber $eventSubscriber): void
-    {
-        foreach ($eventSubscriber->getSubscribedEvents() as $eventName => $listener) {
-            $this->listeners[$eventName][] = $listener;
-        }
-    }
+        // Sanity check
+        $this->assertSame(0, $userSubscriber->count);
 
-    /**
-     * @return callable[]
-     */
-    private function getListeners(string $eventName): array
-    {
-        return $this->listeners[$eventName] ?? [];
+        $dispatcher->dispatch(new UserWasCreated());
+        $dispatcher->dispatch(new UserWasCreated());
+
+        $this->assertSame(2, $userSubscriber->count);
     }
 }
