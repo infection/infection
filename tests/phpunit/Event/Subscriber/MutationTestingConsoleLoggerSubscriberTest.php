@@ -38,9 +38,9 @@ namespace Infection\Tests\Event\Subscriber;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher;
-use Infection\Event\MutantProcessFinished;
-use Infection\Event\MutationTestingFinished;
-use Infection\Event\MutationTestingStarted;
+use Infection\Event\MutantProcessWasFinished;
+use Infection\Event\MutationTestingWasFinished;
+use Infection\Event\MutationTestingWasStarted;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
@@ -93,7 +93,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             false
         ));
 
-        $dispatcher->dispatch(new MutationTestingStarted(1));
+        $dispatcher->dispatch(new MutationTestingWasStarted(1));
     }
 
     public function test_it_reacts_on_mutation_process_finished(): void
@@ -115,7 +115,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             false
         ));
 
-        $dispatcher->dispatch(new MutantProcessFinished($this->createMock(MutantProcess::class)));
+        $dispatcher->dispatch(new MutantProcessWasFinished($this->createMock(MutantProcess::class)));
     }
 
     public function test_it_reacts_on_mutation_testing_finished(): void
@@ -133,7 +133,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             false
         ));
 
-        $dispatcher->dispatch(new MutationTestingFinished());
+        $dispatcher->dispatch(new MutationTestingWasFinished());
     }
 
     public function test_it_reacts_on_mutation_testing_finished_and_show_mutations_on(): void
@@ -154,6 +154,6 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             true
         ));
 
-        $dispatcher->dispatch(new MutationTestingFinished());
+        $dispatcher->dispatch(new MutationTestingWasFinished());
     }
 }

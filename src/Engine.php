@@ -41,7 +41,7 @@ use function file_exists;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
-use Infection\Event\ApplicationExecutionFinished;
+use Infection\Event\ApplicationExecutionWasFinished;
 use Infection\Event\EventDispatcher;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutation\MutationGenerator;
@@ -170,7 +170,7 @@ final class Engine
             );
         }
 
-        $this->eventDispatcher->dispatch(new ApplicationExecutionFinished());
+        $this->eventDispatcher->dispatch(new ApplicationExecutionWasFinished());
 
         return true;
     }

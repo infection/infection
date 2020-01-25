@@ -44,7 +44,7 @@ use Infection\Console\Exception\InfectionException;
 use Infection\Console\LogVerbosity;
 use Infection\Container;
 use Infection\Engine;
-use Infection\Event\ApplicationExecutionStarted;
+use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
@@ -259,7 +259,7 @@ final class InfectionCommand extends BaseCommand
             $this->output
         );
 
-        $this->container->getEventDispatcher()->dispatch(new ApplicationExecutionStarted());
+        $this->container->getEventDispatcher()->dispatch(new ApplicationExecutionWasStarted());
     }
 
     private function initContainer(InputInterface $input): void

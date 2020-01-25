@@ -35,17 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event;
 
-use Infection\Event\InitialTestSuiteFinished;
+use Infection\Event\MutationGenerationWasFinished;
 use PHPUnit\Framework\TestCase;
 
-final class InitialTestSuiteFinishedTest extends TestCase
+final class MutationGenerationWasFinishedTest extends TestCase
 {
-    public function test_it_passes_the_output_along(): void
+    /**
+     * This class is only used to fire events, and the only functionality it needs is being instantiated
+     */
+    public function test_it_can_be_instantiated(): void
     {
-        $text = 'foo-bar-baz';
+        $class = new MutationGenerationWasFinished();
 
-        $class = new InitialTestSuiteFinished($text);
-
-        $this->assertSame($text, $class->getOutputText());
+        $this->assertInstanceOf(MutationGenerationWasFinished::class, $class);
     }
 }

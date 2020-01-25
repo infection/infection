@@ -38,17 +38,17 @@ namespace Infection\Event;
 /**
  * @internal
  */
-final class InitialTestSuiteFinished
+final class MutationGenerationWasStarted
 {
-    private $outputText;
+    private $mutableFilesCount;
 
-    public function __construct(string $outputText)
+    public function __construct(int $mutableFilesCount)
     {
-        $this->outputText = $outputText;
+        $this->mutableFilesCount = $mutableFilesCount;
     }
 
-    public function getOutputText(): string
+    public function getMutableFilesCount(): int
     {
-        return $this->outputText;
+        return $this->mutableFilesCount;
     }
 }

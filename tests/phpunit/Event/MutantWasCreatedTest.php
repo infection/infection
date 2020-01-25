@@ -35,17 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event;
 
-use Infection\Event\MutableFileProcessed;
+use Infection\Event\MutantWasCreated;
 use PHPUnit\Framework\TestCase;
 
-final class MutableFileProcessedTest extends TestCase
+final class MutantWasCreatedTest extends TestCase
 {
     /**
      * This class is only used to fire events, and the only functionality it needs is being instantiated
      */
-    public function test_it_can_be_initialzed(): void
+    public function test_it_can_be_instantiated(): void
     {
-        $class = new MutableFileProcessed();
-        $this->assertInstanceOf(MutableFileProcessed::class, $class);
+        $class = new MutantWasCreated();
+
+        $this->assertInstanceOf(MutantWasCreated::class, $class);
     }
 }

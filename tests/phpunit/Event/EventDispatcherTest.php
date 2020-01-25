@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event;
 
+use Infection\Event\EventDispatcher;
 use Infection\Tests\Fixtures\Event\NullSubscriber;
 use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
 use Infection\Tests\Fixtures\Event\UserEventSubscriber;
@@ -47,7 +48,7 @@ final class EventDispatcherTest extends TestCase
     {
         $userSubscriber = new UserEventSubscriber();
 
-        $dispatcher = new \Infection\Event\EventDispatcher();
+        $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber($userSubscriber);
         $dispatcher->addSubscriber(new NullSubscriber());
         $dispatcher->addSubscriber(new UnknownEventSubscriber());

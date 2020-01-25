@@ -37,9 +37,9 @@ namespace Infection\Event\Subscriber;
 
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
-use Infection\Event\MutantProcessFinished;
-use Infection\Event\MutationTestingFinished;
-use Infection\Event\MutationTestingStarted;
+use Infection\Event\MutantProcessWasFinished;
+use Infection\Event\MutationTestingWasFinished;
+use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
 use function strlen;
@@ -81,20 +81,20 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     public function getSubscribedEvents(): array
     {
         return [
-            MutationTestingStarted::class => [$this, 'onMutationTestingStarted'],
-            MutationTestingFinished::class => [$this, 'onMutationTestingFinished'],
-            MutantProcessFinished::class => [$this, 'onMutantProcessFinished'],
+            MutationTestingWasStarted::class => [$this, 'onMutationTestingWasStarted'],
+            MutationTestingWasFinished::class => [$this, 'onMutantProcessWasFinished'],
+            MutantProcessWasFinished::class => [$this, 'onMutationTestingWasFinished'],
         ];
     }
 
-    public function onMutationTestingStarted(MutationTestingStarted $event): void
+    public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
     {
         $this->mutationCount = $event->getMutationCount();
 
         $this->outputFormatter->start($this->mutationCount);
     }
 
-    public function onMutantProcessFinished(MutantProcessFinished $event): void
+    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
     {
         $this->mutantProcesses[] = $event->getMutantProcess();
         $this->metricsCalculator->collect($event->getMutantProcess());
@@ -102,7 +102,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->outputFormatter->advance($event->getMutantProcess(), $this->mutationCount);
     }
 
-    public function onMutationTestingFinished(MutationTestingFinished $event): void
+    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
         $this->outputFormatter->finish();
 

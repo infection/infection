@@ -38,7 +38,7 @@ namespace Infection\Process\Runner\Parallel;
 use function assert;
 use function count;
 use Infection\Event\EventDispatcher;
-use Infection\Event\MutantProcessFinished;
+use Infection\Event\MutantProcessWasFinished;
 use Infection\Process\MutantProcess;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
@@ -104,7 +104,7 @@ final class ParallelProcessRunner
                 }
 
                 if (!$process->isRunning()) {
-                    $this->eventDispatcher->dispatch(new MutantProcessFinished($mutantProcess));
+                    $this->eventDispatcher->dispatch(new MutantProcessWasFinished($mutantProcess));
 
                     unset($this->currentProcesses[$index]);
 
@@ -128,7 +128,7 @@ final class ParallelProcessRunner
         $mutant = $mutantProcess->getMutant();
 
         if (!$mutant->isCoveredByTest()) {
-            $this->eventDispatcher->dispatch(new MutantProcessFinished($mutantProcess));
+            $this->eventDispatcher->dispatch(new MutantProcessWasFinished($mutantProcess));
 
             return false;
         }

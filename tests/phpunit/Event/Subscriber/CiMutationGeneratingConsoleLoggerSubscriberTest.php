@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher;
-use Infection\Event\MutationGeneratingStarted;
+use Infection\Event\MutationGenerationWasStarted;
 use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriber;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -70,6 +70,6 @@ final class CiMutationGeneratingConsoleLoggerSubscriberTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new CiMutationGeneratingConsoleLoggerSubscriber($this->output));
 
-        $dispatcher->dispatch(new MutationGeneratingStarted(123));
+        $dispatcher->dispatch(new MutationGenerationWasStarted(123));
     }
 }

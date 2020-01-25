@@ -38,6 +38,6 @@ namespace Infection\Event;
 /**
  * @internal
  */
-final class InitialTestSuiteStarted
+final class MutantWasCreated
 {
 }

@@ -33,19 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event;
+namespace Infection\Event;
 
-use Infection\Event\InitialTestSuiteStarted;
-use PHPUnit\Framework\TestCase;
-
-final class InitialTestSuiteStartedTest extends TestCase
+/**
+ * @internal
+ */
+final class MutationTestingWasStarted
 {
-    /**
-     * This class is only used to fire events, and the only functionality it needs is being instantiated
-     */
-    public function test_it_can_be_initialzed(): void
+    private $mutationCount;
+
+    public function __construct(int $mutationCount)
     {
-        $class = new InitialTestSuiteStarted();
-        $this->assertInstanceOf(InitialTestSuiteStarted::class, $class);
+        $this->mutationCount = $mutationCount;
+    }
+
+    public function getMutationCount(): int
+    {
+        return $this->mutationCount;
     }
 }

@@ -35,17 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event;
 
-use Infection\Event\ApplicationExecutionFinished;
+use Infection\Event\MutableFileWasProcessed;
 use PHPUnit\Framework\TestCase;
 
-final class ApplicationExecutionFinishedTest extends TestCase
+final class MutableFileWasProcessedTest extends TestCase
 {
     /**
      * This class is only used to fire events, and the only functionality it needs is being instantiated
      */
-    public function test_it_can_be_initialzed(): void
+    public function test_it_can_be_instantiated(): void
     {
-        $class = new ApplicationExecutionFinished();
-        $this->assertInstanceOf(ApplicationExecutionFinished::class, $class);
+        $class = new MutableFileWasProcessed();
+
+        $this->assertInstanceOf(MutableFileWasProcessed::class, $class);
     }
 }

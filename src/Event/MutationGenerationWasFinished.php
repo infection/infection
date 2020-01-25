@@ -38,17 +38,6 @@ namespace Infection\Event;
 /**
  * @internal
  */
-final class MutationTestingStarted
+final class MutationGenerationWasFinished
 {
-    private $mutationCount;
-
-    public function __construct(int $mutationCount)
-    {
-        $this->mutationCount = $mutationCount;
-    }
-
-    public function getMutationCount(): int
-    {
-        return $this->mutationCount;
-    }
 }

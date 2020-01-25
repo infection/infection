@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher;
-use Infection\Event\InitialTestSuiteFinished;
-use Infection\Event\InitialTestSuiteStarted;
+use Infection\Event\InitialTestSuiteWasFinished;
+use Infection\Event\InitialTestSuiteWasStarted;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriber;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use InvalidArgumentException;
@@ -59,7 +59,7 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, false));
 
-        $dispatcher->dispatch(new InitialTestSuiteStarted());
+        $dispatcher->dispatch(new InitialTestSuiteWasStarted());
     }
 
     public function test_it_sets_test_framework_version_as_unknown_in_case_of_exception(): void
@@ -87,7 +87,7 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, false));
 
-        $dispatcher->dispatch(new InitialTestSuiteStarted());
+        $dispatcher->dispatch(new InitialTestSuiteWasStarted());
     }
 
     public function test_it_outputs_the_initial_process_text_if_in_debug_mode(): void
@@ -106,6 +106,6 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, true));
 
-        $dispatcher->dispatch(new InitialTestSuiteFinished($processText));
+        $dispatcher->dispatch(new InitialTestSuiteWasFinished($processText));
     }
 }

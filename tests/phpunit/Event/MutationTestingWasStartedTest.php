@@ -33,22 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Tests\Event;
 
-/**
- * @internal
- */
-final class MutationGeneratingStarted
+use Infection\Event\MutationTestingWasStarted;
+use PHPUnit\Framework\TestCase;
+
+final class MutationTestingWasStartedTest extends TestCase
 {
-    private $mutableFilesCount;
-
-    public function __construct(int $mutableFilesCount)
+    public function test_it_exposes_its_mutation_count(): void
     {
-        $this->mutableFilesCount = $mutableFilesCount;
-    }
+        $count = 5;
+        $event = new MutationTestingWasStarted($count);
 
-    public function getMutableFilesCount(): int
-    {
-        return $this->mutableFilesCount;
+        $this->assertSame($count, $event->getMutationCount());
     }
 }
