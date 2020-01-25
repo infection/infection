@@ -39,11 +39,11 @@ use function array_map;
 use function count;
 use function get_class;
 use function implode;
-use Infection\Event\MutantCreated;
-use Infection\Event\MutantsCreatingFinished;
-use Infection\Event\MutantsCreatingStarted;
-use Infection\Event\MutationTestingFinished;
-use Infection\Event\MutationTestingStarted;
+use Infection\Event\MutantsCreationWasFinished;
+use Infection\Event\MutantsCreationWasStarted;
+use Infection\Event\MutantWasCreated;
+use Infection\Event\MutationTestingWasFinished;
+use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
@@ -114,10 +114,10 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutantsCreatingStarted(0),
-                new MutantsCreatingFinished(),
-                new MutationTestingStarted(0),
-                new MutationTestingFinished(),
+                new MutantsCreationWasStarted(0),
+                new MutantsCreationWasFinished(),
+                new MutationTestingWasStarted(0),
+                new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()
         );
@@ -166,12 +166,12 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutantsCreatingStarted(2),
-                new MutantCreated(),
-                new MutantCreated(),
-                new MutantsCreatingFinished(),
-                new MutationTestingStarted(2),
-                new MutationTestingFinished(),
+                new MutantsCreationWasStarted(2),
+                new MutantWasCreated(),
+                new MutantWasCreated(),
+                new MutantsCreationWasFinished(),
+                new MutationTestingWasStarted(2),
+                new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()
         );
@@ -200,25 +200,25 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutationTestingStarted(0),
-                new MutationTestingFinished(),
+                new MutationTestingWasStarted(0),
+                new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()
         );
     }
 
     /**
-     * @param array<MutationTestingStarted|MutationTestingFinished|MutantsCreatingStarted|MutantCreated|MutantsCreatingFinished> $expectedEvents
-     * @param array<MutationTestingStarted|MutationTestingFinished|MutantsCreatingStarted|MutantCreated|MutantsCreatingFinished> $actualEvents
+     * @param array<MutationTestingWasStarted|MutationTestingWasFinished|MutantsCreationWasStarted|MutantWasCreated|MutantsCreationWasFinished> $expectedEvents
+     * @param array<MutationTestingWasStarted|MutationTestingWasFinished|MutantsCreationWasStarted|MutantWasCreated|MutantsCreationWasFinished> $actualEvents
      */
     private function assertAreSameEvents(array $expectedEvents, array $actualEvents): void
     {
         $expectedClasses = [
-            MutationTestingStarted::class,
-            MutationTestingFinished::class,
-            MutantsCreatingStarted::class,
-            MutantCreated::class,
-            MutantsCreatingFinished::class,
+            MutationTestingWasStarted::class,
+            MutationTestingWasFinished::class,
+            MutantsCreationWasStarted::class,
+            MutantWasCreated::class,
+            MutantsCreationWasFinished::class,
         ];
 
         $assertionErrorMessage = sprintf(
@@ -238,13 +238,13 @@ final class MutationTestingRunnerTest extends TestCase
                 $assertionErrorMessage
             );
 
-            if ($expectedEvent instanceof MutantsCreatingStarted) {
+            if ($expectedEvent instanceof MutantsCreationWasStarted) {
                 $this->assertSame($expectedEvent->getMutantCount(), $event->getMutantCount());
 
                 continue;
             }
 
-            if ($expectedEvent instanceof MutationTestingStarted) {
+            if ($expectedEvent instanceof MutationTestingWasStarted) {
                 $this->assertSame($expectedEvent->getMutationCount(), $event->getMutationCount());
             }
         }

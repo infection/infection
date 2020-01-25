@@ -40,7 +40,7 @@ use PHPUnit\Framework\TestCase;
 
 final class MutationGenerationWasStartedTest extends TestCase
 {
-    public function it_exposes_its_mutable_files_count(): void
+    public function test_it_exposes_its_mutable_files_count(): void
     {
         $count = 5;
         $event = new MutationGenerationWasStarted($count);

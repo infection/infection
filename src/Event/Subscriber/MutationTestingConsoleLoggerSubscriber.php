@@ -82,8 +82,8 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     {
         return [
             MutationTestingWasStarted::class => [$this, 'onMutationTestingWasStarted'],
-            MutationTestingWasFinished::class => [$this, 'onMutantProcessWasFinished'],
-            MutantProcessWasFinished::class => [$this, 'onMutationTestingWasFinished'],
+            MutationTestingWasFinished::class => [$this, 'onMutationTestingWasFinished'],
+            MutantProcessWasFinished::class => [$this, 'onMutantProcessWasFinished'],
         ];
     }
 
