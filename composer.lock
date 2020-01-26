@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "690efb8e5d9de88ac788ca4655b99637",
+    "content-hash": "9503c7def5c1477834a5f4be58d27002",
     "packages": [
         {
             "name": "composer/xdebug-handler",
@@ -134,16 +134,16 @@
         },
         {
             "name": "infection/include-interceptor",
-            "version": "0.2.0",
+            "version": "0.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/infection/include-interceptor.git",
-                "reference": "02f9f90ef598bb09a2bbbe7cf7a6adeabf7b3158"
+                "reference": "1ee702b7cb512b58a24a96b66e9f94e00a3219e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/infection/include-interceptor/zipball/02f9f90ef598bb09a2bbbe7cf7a6adeabf7b3158",
-                "reference": "02f9f90ef598bb09a2bbbe7cf7a6adeabf7b3158",
+                "url": "https://api.github.com/repos/infection/include-interceptor/zipball/1ee702b7cb512b58a24a96b66e9f94e00a3219e0",
+                "reference": "1ee702b7cb512b58a24a96b66e9f94e00a3219e0",
                 "shasum": ""
             },
             "require-dev": {
@@ -155,11 +155,7 @@
                     "Infection\\StreamWrapper\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Infection\\Tests\\StreamWrapper\\": "tests/"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -170,11 +166,7 @@
                 }
             ],
             "description": "Stream Wrapper: Include Interceptor. Allows to replace included (autoloaded) file with another one.",
-            "support": {
-                "source": "https://github.com/maks-rafalko/infection-include-interceptor/tree/master",
-                "issues": "https://github.com/maks-rafalko/infection-include-interceptor/issues"
-            },
-            "time": "2020-01-17T21:20:28+00:00"
+            "time": "2020-01-26T20:58:01+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
