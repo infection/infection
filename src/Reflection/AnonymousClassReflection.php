@@ -103,16 +103,16 @@ final class AnonymousClassReflection implements ClassReflection
         string $methodName,
         Visibility $visibility
     ): bool {
-        if ($reflectionClass->hasMethod($methodName)) {
-            $method = $reflectionClass->getMethod($methodName);
-
-            if ($visibility->isPublic()) {
-                return $method->isPublic();
-            }
-
-            return $method->isProtected();
+        if (!$reflectionClass->hasMethod($methodName)) {
+            return false;
         }
 
-        return false;
+        $method = $reflectionClass->getMethod($methodName);
+
+        if ($visibility->isPublic()) {
+            return $method->isPublic();
+        }
+
+        return $method->isProtected();
     }
 }

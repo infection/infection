@@ -44,7 +44,6 @@ use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
-use Infection\Mutator\ProfileList;
 use Infection\Reflection\ClassReflection;
 use Infection\Visitor\ReflectionVisitor;
 use InvalidArgumentException;
