@@ -41,6 +41,7 @@ use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
+use PhpParser\NodeVisitor\NameResolver;
 
 /**
  * @internal
@@ -56,7 +57,7 @@ class NodeTraverserFactory
         $traverser = new PrioritizedVisitorsNodeTraverser(new NodeTraverser());
 
         $traverser->addPrioritizedVisitor(new NotMutableIgnoreVisitor(), 50);
-        $traverser->addPrioritizedVisitor(new NodeVisitor\NameResolver(null, [
+        $traverser->addPrioritizedVisitor(new NameResolver(null, [
             'preserveOriginalNames' => true,
             'replaceNodes' => false,
         ]), 45);

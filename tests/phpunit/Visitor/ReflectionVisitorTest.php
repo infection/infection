@@ -48,6 +48,7 @@ use InfectionReflectionClassMethod\Foo;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
+use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitorAbstract;
 use ReflectionClass;
 
@@ -76,7 +77,7 @@ final class ReflectionVisitorTest extends BaseVisitorTest
             $nodes,
             [
                 new ParentConnectorVisitor(),
-                new NodeVisitor\NameResolver(null, [
+                new NameResolver(null, [
                     'preserveOriginalNames' => true,
                     'replaceNodes' => false,
                 ]),
@@ -338,7 +339,7 @@ final class ReflectionVisitorTest extends BaseVisitorTest
         $this->traverse(
             $nodes,
             [
-                new NodeVisitor\NameResolver(null, [
+                new NameResolver(null, [
                     'preserveOriginalNames' => true,
                     'replaceNodes' => false,
                 ]),
