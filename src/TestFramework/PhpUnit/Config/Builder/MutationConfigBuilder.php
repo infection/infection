@@ -122,9 +122,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
     private function createCustomAutoloadWithInterceptor(string $originalFilePath, string $mutantFilePath, string $originalAutoloadFile): string
     {
-        $class = new ReflectionClass(IncludeInterceptor::class);
-        /** @var string $interceptorPath */
-        $interceptorPath = $class->getFileName();
+        $interceptorPath = IncludeInterceptor::LOCATION;
 
         $customAutoload = <<<AUTOLOAD
 <?php
