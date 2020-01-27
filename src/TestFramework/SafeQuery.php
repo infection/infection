@@ -33,51 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Visitor;
+namespace Infection\TestFramework;
 
-use Infection\Mutation\Mutation;
-use Infection\Mutator\NodeMutationGenerator;
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use DOMElement;
+use DOMNodeList;
+use DOMXPath;
+use Webmozart\Assert\Assert;
 
-/**
- * @internal
- */
-final class MutationsCollectorVisitor extends NodeVisitorAbstract
+trait SafeQuery
 {
     /**
-     * @var Mutation[]
+     * @return DOMNodeList|DOMElement[]
+     * @phpstan-return DOMNodeList<DOMElement>
      */
-    private $mutations = [];
-
-    private $mutationGenerator;
-
-    public function __construct(NodeMutationGenerator $mutationGenerator)
+    private static function safeQuery(DOMXPath $xPath, string $query): DOMNodeList
     {
-        $this->mutationGenerator = $mutationGenerator;
-    }
+        $nodes = $xPath->query($query);
 
-    public function beforeTraverse(array $nodes): ?array
-    {
-        $this->mutations = [];
+        Assert::isInstanceOf($nodes, DOMNodeList::class);
 
-        return null;
-    }
-
-    public function leaveNode(Node $node): ?Node
-    {
-        foreach ($this->mutationGenerator->generate($node) as $mutation) {
-            $this->mutations[] = $mutation;
-        }
-
-        return null;
-    }
-
-    /**
-     * @return Mutation[]
-     */
-    public function getMutations(): array
-    {
-        return $this->mutations;
+        return $nodes;
     }
 }

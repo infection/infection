@@ -2,7 +2,7 @@ includes:
     - ../vendor/phpstan/phpstan/conf/bleedingEdge.neon
 
 parameters:
-    level: 6
+    level: 7
     paths:
         - ../src
     inferPrivatePropertyTypeFromConstructor: true
@@ -14,4 +14,3 @@ parameters:
         -
             path: '../src/Process/Runner/Parallel/ParallelProcessRunner.php'
             message: '#Left side of [\&]{2} is always true#'
-        - '#Method Infection\Configuration\Schema\SchemaConfigurationFile::getDecodedContents() should return stdClass but returns stdClass|null.#'

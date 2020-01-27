@@ -162,7 +162,7 @@ TXT
     }
 
     /**
-     * @param array<string|int> $settings
+     * @param array<string, mixed> $settings
      *
      * @return array{remove: string, limit: int}
      */
@@ -171,30 +171,34 @@ TXT
         $settings = array_merge(self::DEFAULT_SETTINGS, $settings);
 
         if (!is_string($settings['remove'])) {
-            $this->throwConfigException($settings, 'remove');
+            throw $this->configException($settings, 'remove');
         }
 
-        $settings['remove'] = strtolower($settings['remove']);
+        $removeSetting = strtolower($settings['remove']);
 
         if (!in_array($settings['remove'], ['first', 'last', 'all'])) {
-            $this->throwConfigException($settings, 'remove');
+            throw $this->configException($settings, 'remove');
         }
 
         if (!is_numeric($settings['limit']) || $settings['limit'] < 1) {
-            $this->throwConfigException($settings, 'limit');
+            throw $this->configException($settings, 'limit');
         }
+        $limit = (int) $settings['limit'];
 
-        return $settings;
+        return [
+            'remove' => $removeSetting,
+            'limit' => $limit,
+        ];
     }
 
     /**
      * @param array<string, mixed> $settings
      */
-    private function throwConfigException(array $settings, string $property): void
+    private function configException(array $settings, string $property): InvalidConfigException
     {
         $value = $settings[$property];
 
-        throw new InvalidConfigException(sprintf(
+        return new InvalidConfigException(sprintf(
             'Invalid configuration of ArrayItemRemoval mutator. Setting `%s` is invalid (%s)',
             $property,
             is_scalar($value) ? $value : '<' . strtoupper(gettype($value)) . '>'

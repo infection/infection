@@ -43,6 +43,7 @@ use DOMXPath;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use Infection\TestFramework\SafeQuery;
 use function Safe\file_put_contents;
 use Webmozart\Assert\Assert;
 
@@ -51,6 +52,7 @@ use Webmozart\Assert\Assert;
  */
 class InitialConfigBuilder implements ConfigBuilder
 {
+    use SafeQuery;
     private $tmpDir;
     private $originalXmlConfigContent;
     private $xmlConfigurationHelper;
@@ -173,7 +175,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function getNode(DOMXPath $xPath, string $nodeName): ?DOMNode
     {
-        $nodeList = $xPath->query(sprintf('/phpunit/%s', $nodeName));
+        $nodeList = self::safeQuery($xPath, sprintf('/phpunit/%s', $nodeName));
 
         if ($nodeList->length) {
             return $nodeList->item(0);
@@ -205,10 +207,10 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function addAttributeIfNotSet(string $attribute, string $value, DOMXPath $xPath): bool
     {
-        $nodeList = $xPath->query(sprintf('/phpunit/@%s', $attribute));
+        $nodeList = self::safeQuery($xPath, sprintf('/phpunit/@%s', $attribute));
 
         if (!$nodeList->length) {
-            $node = $xPath->query('/phpunit')[0];
+            $node = self::safeQuery($xPath, '/phpunit')[0];
             $node->setAttribute($attribute, $value);
 
             return true;

@@ -45,6 +45,7 @@ use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
+use Infection\TestFramework\SafeQuery;
 use function realpath as native_realpath;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
@@ -60,6 +61,7 @@ use Webmozart\Assert\Assert;
  */
 class IndexXmlCoverageParser
 {
+    use SafeQuery;
     private $coverageDir;
 
     public function __construct(string $coverageDir)
@@ -306,18 +308,5 @@ class IndexXmlCoverageParser
 
         // PHPUnit < 6
         return self::safeQuery($xPath, '//project/@name')[0]->nodeValue;
-    }
-
-    /**
-     * @return DOMNodeList|DOMElement[]
-     * @phpstan-return DOMNodeList<DOMElement>
-     */
-    private static function safeQuery(DOMXPath $xPath, string $query): DOMNodeList
-    {
-        $nodes = $xPath->query($query);
-
-        Assert::isInstanceOf($nodes, DOMNodeList::class);
-
-        return $nodes;
     }
 }

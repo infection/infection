@@ -40,6 +40,7 @@ use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\TestFramework\TestFrameworkTypes;
 use RuntimeException;
 use function Safe\file_get_contents;
+use function Safe\getcwd;
 use function Safe\realpath;
 use function substr;
 use Symfony\Component\Process\ExecutableFinder;

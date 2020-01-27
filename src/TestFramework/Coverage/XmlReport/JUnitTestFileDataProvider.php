@@ -36,19 +36,18 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use DOMDocument;
-use DOMElement;
-use DOMNodeList;
 use DOMXPath;
 use function file_exists;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
+use Infection\TestFramework\SafeQuery;
 use function Safe\sprintf;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
 final class JUnitTestFileDataProvider implements TestFileDataProvider
 {
+    use SafeQuery;
     private $jUnitFilePath;
 
     /**
@@ -119,18 +118,5 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
         $dom->load($jUnitPath);
 
         return new DOMXPath($dom);
-    }
-
-    /**
-     * @return DOMNodeList|DOMElement[]
-     * @phpstan-return DOMNodeList<DOMElement>
-     */
-    private static function safeQuery(DOMXPath $xPath, string $query): DOMNodeList
-    {
-        $nodes = $xPath->query($query);
-
-        Assert::isInstanceOf($nodes, DOMNodeList::class);
-
-        return $nodes;
     }
 }
