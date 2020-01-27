@@ -341,6 +341,34 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         ];
     }
 
+    public function test_interceptor_is_included(): void
+    {
+        $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpuit_without_bootstrap.xml';
+        $this->builder = new MutationConfigBuilder(
+            $this->tmp,
+            file_get_contents($phpunitXmlPath),
+            $this->xmlConfigurationHelper,
+            'project/dir',
+            new JUnitTestCaseSorter()
+        );
+
+        $this->builder->build(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::HASH,
+            self::ORIGINAL_FILE_PATH
+        );
+
+        $expectedCustomAutoloadFilePath = sprintf(
+            '%s/interceptor.autoload.%s.infection.php',
+            $this->tmp,
+            self::HASH
+        );
+
+        $this->assertFileExists($expectedCustomAutoloadFilePath);
+        $this->assertStringContainsString('IncludeInterceptor.php', file_get_contents($expectedCustomAutoloadFilePath));
+    }
+
     private function queryXpath(string $xml, string $query)
     {
         $dom = new DOMDocument();

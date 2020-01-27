@@ -44,7 +44,6 @@ use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
-use ReflectionClass;
 use function Safe\file_put_contents;
 
 /**
@@ -122,9 +121,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
     private function createCustomAutoloadWithInterceptor(string $originalFilePath, string $mutantFilePath, string $originalAutoloadFile): string
     {
-        $class = new ReflectionClass(IncludeInterceptor::class);
-        /** @var string $interceptorPath */
-        $interceptorPath = $class->getFileName();
+        $interceptorPath = IncludeInterceptor::LOCATION;
 
         $customAutoload = <<<AUTOLOAD
 <?php
