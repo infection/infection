@@ -40,6 +40,9 @@ use DOMNodeList;
 use DOMXPath;
 use Webmozart\Assert\Assert;
 
+/**
+ * @internal
+ */
 trait SafeQuery
 {
     /**
