@@ -80,6 +80,7 @@ use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
+use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
@@ -336,7 +337,8 @@ final class Container
             FileMutationGenerator::class => static function (self $container): FileMutationGenerator {
                 return new FileMutationGenerator(
                     $container->getFileParser(),
-                    $container->getNodeTraverserFactory()
+                    $container->getNodeTraverserFactory(),
+                    $container->getLineRangeCalculator()
                 );
             },
             LoggerFactory::class => static function (self $container): LoggerFactory {
@@ -396,6 +398,9 @@ final class Container
                     $container->getParallelProcessRunner(),
                     $container->getEventDispatcher()
                 );
+            },
+            LineRangeCalculator::class => static function (): LineRangeCalculator {
+                return new LineRangeCalculator();
             },
         ]);
     }
@@ -736,6 +741,11 @@ final class Container
     public function getConfiguration(): Configuration
     {
         return $this->get(Configuration::class);
+    }
+
+    public function getLineRangeCalculator(): LineRangeCalculator
+    {
+        return $this->get(LineRangeCalculator::class);
     }
 
     /**
