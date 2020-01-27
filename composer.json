@@ -53,7 +53,6 @@
         "justinrainbow/json-schema": "^5.2",
         "nikic/php-parser": "^4.2.2",
         "ocramius/package-versions": "^1.2",
-        "phpstan/phpstan": "^0.12.8",
         "sebastian/diff": "^3.0.2",
         "seld/jsonlint": "^1.7",
         "symfony/console": "^3.4.29 || ^4.0 || ^5.0",
@@ -71,6 +70,7 @@
     "require-dev": {
         "helmich/phpunit-json-assert": "^3.0",
         "phpstan/extension-installer": "^1.0",
+        "phpstan/phpstan": "^0.12.8",
         "phpstan/phpstan-webmozart-assert": "^0.12.2",
         "phpunit/phpunit": "^8.2.5 <8.4",
         "symfony/phpunit-bridge": "^4.3.4 || ^5.0"
