@@ -174,7 +174,7 @@ TXT
             throw $this->configException($settings, 'remove');
         }
 
-        $removeSetting = strtolower($settings['remove']);
+        $settings['remove'] = strtolower($settings['remove']);
 
         if (!in_array($settings['remove'], ['first', 'last', 'all'])) {
             throw $this->configException($settings, 'remove');
@@ -183,11 +183,10 @@ TXT
         if (!is_numeric($settings['limit']) || $settings['limit'] < 1) {
             throw $this->configException($settings, 'limit');
         }
-        $limit = (int) $settings['limit'];
 
         return [
-            'remove' => $removeSetting,
-            'limit' => $limit,
+            'remove' => $settings['remove'],
+            'limit' => (int) $settings['limit'],
         ];
     }
 

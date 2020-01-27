@@ -170,14 +170,18 @@ AUTOLOAD;
         $nodes = self::safeQuery($xPath, '/phpunit/testsuites/testsuite');
 
         foreach ($nodes as $node) {
-            $node->parentNode->removeChild($node);
+            /** @var DOMNode $parent */
+            $parent = $node->parentNode;
+            $parent->removeChild($node);
         }
 
         // handle situation when test suite is directly inside root node
         $nodes = self::safeQuery($xPath, '/phpunit/testsuite');
 
         foreach ($nodes as $node) {
-            $node->parentNode->removeChild($node);
+            /** @var DOMNode $parent */
+            $parent = $node->parentNode;
+            $parent->removeChild($node);
         }
     }
 

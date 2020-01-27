@@ -449,6 +449,6 @@ final class ProfileList
             }
         }
 
-        return self::$defaultProfileMutators;
+        return array_values(self::$defaultProfileMutators);
     }
 }

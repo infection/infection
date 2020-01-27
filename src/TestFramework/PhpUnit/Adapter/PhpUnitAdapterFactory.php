@@ -47,6 +47,7 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\VersionParser;
 use function Safe\file_get_contents;
 use Symfony\Component\Filesystem\Filesystem;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -66,6 +67,8 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         array $sourceDirectories,
         bool $skipCoverage
     ): TestFrameworkAdapter {
+        Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the phpunit adapter');
+
         $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);
 
         $xmlConfigurationHelper = new XmlConfigurationHelper(
