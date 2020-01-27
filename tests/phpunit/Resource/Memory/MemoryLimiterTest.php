@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Resource\Limiter;
+namespace Infection\Tests\Resource\Memory;
 
 use Composer\XdebugHandler\XdebugHandler;
-use Infection\Resource\Limiter\MemoryLimiter;
+use Infection\Resource\Memory\MemoryLimiter;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function ini_get;

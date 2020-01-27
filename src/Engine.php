@@ -51,7 +51,7 @@ use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
-use Infection\Resource\Limiter\MemoryLimiter;
+use Infection\Resource\Memory\MemoryLimiter;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
 use Infection\TestFramework\HasExtraNodeVisitors;

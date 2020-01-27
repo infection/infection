@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Limiter;
+namespace Infection\Resource\Memory;
 
 use Composer\XdebugHandler\XdebugHandler;
 use function file_exists;
