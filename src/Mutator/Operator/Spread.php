@@ -39,6 +39,7 @@ use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -50,12 +51,27 @@ final class Spread implements Mutator
 
     public static function getDefinition(): ?Definition
     {
-        return null;
+        return new Definition(
+            <<<'TXT'
+Replaces a spread operator in an array expression with its first element only. For example:
+
+```php
+$x = [...$collection, 4, 5];
+```
+
+Will be mutated to:
+
+```php
+$x = [[...$collection][0], 4, 5];
+```
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
     /**
-     * Replaces "[...$collection, 4, 5];" with "[[...$collection][0], 4, 5]"
-     *
      * @param Node\Expr\ArrayItem $node
      *
      * @return Generator<Node\Expr\ArrayItem>

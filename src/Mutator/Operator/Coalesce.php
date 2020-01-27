@@ -39,6 +39,7 @@ use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -50,12 +51,27 @@ final class Coalesce implements Mutator
 
     public static function getDefinition(): ?Definition
     {
-        return null;
+        return new Definition(
+            <<<'TXT'
+Replaces a null coalescing operator (`??`) with its second operand. For example:
+
+```php
+$x = $y ?? $z;
+```
+
+Will be mutated to:
+
+```php
+$x = $z;
+```
+TXT
+            ,
+            MutatorCategory::SEMANTIC_ADDITION,
+            null
+        );
     }
 
     /**
-     * Replaces "'someValue' ?? 'otherValue';" with "'otherValue'"
-     *
      * @param Node\Expr\BinaryOp\Coalesce $node
      *
      * @return Generator<Node\Expr>
