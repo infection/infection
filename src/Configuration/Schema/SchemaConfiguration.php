@@ -58,6 +58,9 @@ final class SchemaConfiguration
     private $initialTestsPhpOptions;
     private $testFrameworkExtraOptions;
 
+    /**
+     * @param array<string, array<string>|bool> $mutators
+     */
     public function __construct(
         string $file,
         ?int $timeout,
@@ -117,6 +120,9 @@ final class SchemaConfiguration
         return $this->phpUnit;
     }
 
+    /**
+     * @return array<string, array<string>|bool>
+     */
     public function getMutators(): array
     {
         return $this->mutators;

@@ -93,6 +93,9 @@ class MutationConfigBuilder extends ConfigBuilder
         return $path;
     }
 
+    /**
+     * @param array<mixed> $parsedYaml
+     */
     private function createCustomAutoloadWithInterceptor(string $originalFilePath, string $mutantFilePath, array $parsedYaml): string
     {
         $originalBootstrap = $this->getOriginalBootstrapFilePath($parsedYaml);
@@ -122,6 +125,8 @@ AUTOLOAD;
     }
 
     /**
+     * @param array<mixed> $parsedYaml
+     *
      * @return string|null
      */
     private function getOriginalBootstrapFilePath(array $parsedYaml)

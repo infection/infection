@@ -40,7 +40,13 @@ namespace Infection\TestFramework\Coverage\XmlReport;
  */
 final class TestFileTimeData
 {
+    /**
+     * @var string
+     */
     public $path;
+    /**
+     * @var float
+     */
     public $time;
 
     public function __construct(string $path, float $time)

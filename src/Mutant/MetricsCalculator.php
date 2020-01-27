@@ -42,11 +42,29 @@ use Infection\Process\MutantProcess;
  */
 class MetricsCalculator
 {
+    /**
+     * @var int
+     */
     private $killedCount = 0;
+    /**
+     * @var int
+     */
     private $errorCount = 0;
+    /**
+     * @var int
+     */
     private $escapedCount = 0;
+    /**
+     * @var int
+     */
     private $timedOutCount = 0;
+    /**
+     * @var int
+     */
     private $notCoveredByTestsCount = 0;
+    /**
+     * @var int
+     */
     private $totalMutantsCount = 0;
 
     /**

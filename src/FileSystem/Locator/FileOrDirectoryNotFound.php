@@ -63,6 +63,8 @@ final class FileOrDirectoryNotFound extends RuntimeException
 
     /**
      * @deprecated
+     *
+     * @param array<string> $files
      */
     public static function multipleFilesDoNotExist(string $path, array $files): self
     {

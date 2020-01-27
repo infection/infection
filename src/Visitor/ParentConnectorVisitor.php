@@ -47,7 +47,10 @@ final class ParentConnectorVisitor extends NodeVisitorAbstract
 {
     public const PARENT_KEY = 'parent';
 
-    private $stack;
+    /**
+     * @var array<Node>
+     */
+    private $stack = [];
 
     public function beforeTraverse(array $nodes): ?array
     {

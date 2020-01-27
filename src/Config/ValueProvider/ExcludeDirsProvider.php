@@ -65,6 +65,12 @@ final class ExcludeDirsProvider
         $this->filesystem = $filesystem;
     }
 
+    /**
+     * @param array<string> $dirsInCurrentDir
+     * @param array<string> $sourceDirs
+     *
+     * @return array<string>
+     */
     public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, array $sourceDirs): array
     {
         $output->writeln([
@@ -116,6 +122,9 @@ final class ExcludeDirsProvider
         return array_values(array_unique($excludedDirs));
     }
 
+    /**
+     * @return callable(string): string
+     */
     private function getValidator(Locator $locator)
     {
         return static function ($answer) use ($locator) {

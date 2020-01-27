@@ -95,6 +95,9 @@ final class RootsFileOrDirectoryLocator implements Locator
         return $file;
     }
 
+    /**
+     * @param array<string> $fileNames
+     */
     private function innerLocateOneOf(array $fileNames): ?string
     {
         if ($fileNames === []) {

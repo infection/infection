@@ -46,7 +46,7 @@ use Symfony\Component\Process\PhpExecutableFinder;
 final class CommandLineBuilder
 {
     /**
-     * @var array|null
+     * @var array<string>|null
      */
     private $cachedPhpCmdLine;
 

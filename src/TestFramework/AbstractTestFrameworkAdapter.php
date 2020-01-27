@@ -179,6 +179,8 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     }
 
     /**
+     * @param array<string> $phpExtraArgs
+     *
      * @return string[]
      */
     private function getCommandLine(

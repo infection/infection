@@ -56,7 +56,13 @@ final class TestRunConstraintChecker
     private $ignoreMsiWithNoMutations;
     private $minMsi;
     private $minCoveredMsi;
+    /**
+     * @var string
+     */
     private $failureType = '';
+    /**
+     * @var string
+     */
     private $actualOverRequiredType = '';
 
     public function __construct(

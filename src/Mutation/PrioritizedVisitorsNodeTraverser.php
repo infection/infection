@@ -101,6 +101,8 @@ class PrioritizedVisitorsNodeTraverser implements NodeTraverserInterface
     }
 
     /**
+     * @param Node[] $nodes
+     *
      * @return Node[]
      */
     public function traverse(array $nodes): array

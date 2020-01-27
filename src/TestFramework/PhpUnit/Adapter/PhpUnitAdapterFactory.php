@@ -53,6 +53,9 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
 {
+    /**
+     * @param array<string> $sourceDirectories
+     */
     public static function create(
         string $testFrameworkExecutable,
         string $tmpDir,

@@ -53,6 +53,9 @@ final class BCMath implements Mutator
 {
     use GetMutatorName;
 
+    /**
+     * @var array<string, callable(Node\Expr\FuncCall): Generator<Node\Expr>>
+     */
     private $converters;
 
     public function __construct(MutatorConfig $config)
@@ -87,7 +90,7 @@ TXT
     /**
      * @param Node\Expr\FuncCall $node
      *
-     * @return Generator<Node\Expr\FuncCall>
+     * @return Generator<Node\Expr>
      */
     public function mutate(Node $node): Generator
     {
@@ -106,6 +109,9 @@ TXT
         return isset($this->converters[$node->name->toLowerString()]);
     }
 
+    /**
+     * @param array<string, bool> $functionsMap
+     */
     private function setupConverters(array $functionsMap): void
     {
         $converters = [
@@ -145,7 +151,12 @@ TXT
         $this->converters = array_diff_key($converters, $functionsToRemove);
     }
 
-    private function makeCheckingMinArgsMapper(int $minimumArgsCount, callable $converter)
+    /**
+     * @param callable(Node\Expr\FuncCall): Generator<Node\Expr> $converter
+     *
+     * @return callable(Node\Expr\FuncCall): Generator<Node\Expr>
+     */
+    private function makeCheckingMinArgsMapper(int $minimumArgsCount, callable $converter): callable
     {
         return static function (Node\Expr\FuncCall $node) use ($minimumArgsCount, $converter): Generator {
             if (count($node->args) >= $minimumArgsCount) {
@@ -154,6 +165,11 @@ TXT
         };
     }
 
+    /**
+     * @param callable(Node\Expr\FuncCall): Generator<Node\Expr> $converter
+     *
+     * @return callable(Node\Expr\FuncCall): Generator<Node\Expr\Cast\String_>
+     */
     private function makeCastToStringMapper(callable $converter): callable
     {
         return static function (Node\Expr\FuncCall $node) use ($converter): Generator {
@@ -163,6 +179,11 @@ TXT
         };
     }
 
+    /**
+     * @phpstan-param class-string<Node\Expr\BinaryOp> $operator
+     *
+     * @return callable(Node\Expr\FuncCall): Generator<Node\Expr\BinaryOp>
+     */
     private function makeBinaryOperatorMapper(string $operator): callable
     {
         return static function (Node\Expr\FuncCall $node) use ($operator): Generator {
@@ -170,6 +191,9 @@ TXT
         };
     }
 
+    /**
+     * @return callable(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>
+     */
     private function makeSquareRootsMapper(): callable
     {
         return static function (Node\Expr\FuncCall $node): Generator {
@@ -177,6 +201,9 @@ TXT
         };
     }
 
+    /**
+     * @return callable(Node\Expr\FuncCall): Generator<Node\Expr\BinaryOp\Mod>
+     */
     private function makePowerModuloMapper(): callable
     {
         return static function (Node\Expr\FuncCall $node): Generator {

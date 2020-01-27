@@ -51,6 +51,7 @@ use function is_scalar;
 use function is_string;
 use function min;
 use PhpParser\Node;
+use PhpParser\Node\Expr\ArrayItem;
 use function range;
 use function strtolower;
 use function strtoupper;
@@ -143,6 +144,11 @@ TXT
         return $node instanceof Node\Expr\Array_ && count($node->items);
     }
 
+    /**
+     * @param array<ArrayItem> $items
+     *
+     * @return array<int>
+     */
     private function getItemsIndexes(array $items): array
     {
         switch ($this->remove) {
@@ -155,6 +161,11 @@ TXT
         }
     }
 
+    /**
+     * @param array<string|int> $settings
+     *
+     * @return array{remove: string, limit: int}
+     */
     private function getResultSettings(array $settings): array
     {
         $settings = array_merge(self::DEFAULT_SETTINGS, $settings);
@@ -176,6 +187,9 @@ TXT
         return $settings;
     }
 
+    /**
+     * @param array<string, mixed> $settings
+     */
     private function throwConfigException(array $settings, string $property): void
     {
         $value = $settings[$property];

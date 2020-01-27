@@ -38,11 +38,13 @@ namespace Infection\TestFramework\PhpUnit\Config\Builder;
 use function assert;
 use DOMDocument;
 use DOMElement;
+use DOMNode;
 use DOMXPath;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use function Safe\file_put_contents;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -53,9 +55,12 @@ class InitialConfigBuilder implements ConfigBuilder
     private $originalXmlConfigContent;
     private $xmlConfigurationHelper;
     private $jUnitFilePath;
-    private $srcDirs = [];
+    private $srcDirs;
     private $skipCoverage;
 
+    /**
+     * @param array<string> $srcDirs
+     */
     public function __construct(
         string $tmpDir,
         string $originalXmlConfigContent,
@@ -161,11 +166,12 @@ class InitialConfigBuilder implements ConfigBuilder
         if (!$node) {
             $node = $this->createNode($xPath->document, $nodeName);
         }
+        Assert::isInstanceOf($node, DOMElement::class);
 
         return $node;
     }
 
-    private function getNode(DOMXPath $xPath, string $nodeName)
+    private function getNode(DOMXPath $xPath, string $nodeName): ?DOMNode
     {
         $nodeList = $xPath->query(sprintf('/phpunit/%s', $nodeName));
 

@@ -107,8 +107,17 @@ use Webmozart\PathUtil\Path;
  */
 final class Container
 {
+    /**
+     * @var array<string, true>
+     */
     private $keys = [];
+    /**
+     * @var array<string, Closure|string|int|float|bool|object>
+     */
     private $values = [];
+    /**
+     * @var array<callable>
+     */
     private $factories = [];
 
     /**
@@ -752,6 +761,9 @@ final class Container
         }
     }
 
+    /**
+     * @return string|int|float|bool|object
+     */
     private function get(string $id)
     {
         if (!isset($this->keys[$id])) {

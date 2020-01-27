@@ -62,6 +62,11 @@ final class SourceDirsProvider
         $this->sourceDirGuesser = $sourceDirGuesser;
     }
 
+    /**
+     * @param array<string> $dirsInCurrentDir
+     *
+     * @return array<string>
+     */
     public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir): array
     {
         $output->writeln(['']);

@@ -59,8 +59,8 @@ class Differ
      *
      * Overridden to show just DIFF_MAX_LINES lines of the diff
      *
-     * @param array|string $from
-     * @param array|string $to
+     * @param array<string>|string $from
+     * @param array<string>|string $to
      */
     public function diff($from, $to): string
     {

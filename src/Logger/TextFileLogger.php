@@ -88,6 +88,9 @@ final class TextFileLogger extends FileLogger
         return implode(PHP_EOL, $logParts);
     }
 
+    /**
+     * @return array<string>
+     */
     private function getHeadlineParts(string $headlinePrefix): array
     {
         $headline = sprintf('%s mutants:', $headlinePrefix);

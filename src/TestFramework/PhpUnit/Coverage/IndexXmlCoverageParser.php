@@ -235,6 +235,7 @@ class IndexXmlCoverageParser
 
     /**
      * @param DOMNodeList|DOMElement[] $coveredLineNodes
+     * @phpstan-param DOMNodeList<DOMElement> $coveredLineNodes
      *
      * @return array<int, array<int, CoverageLineData>>
      */
@@ -249,7 +250,7 @@ class IndexXmlCoverageParser
 
             $lineNumber = (int) $lineNumber;
 
-            /** @var DOMNodeList|DOMElement[] $coveredNodes */
+            /** @phpstan-var DOMNodeList<DOMElement> $coveredNodes */
             $coveredNodes = $lineNode->childNodes;
 
             foreach ($coveredNodes as $coveredNode) {
@@ -268,6 +269,7 @@ class IndexXmlCoverageParser
 
     /**
      * @param DOMNodeList|DOMElement[] $methodsCoverageNodes
+     * @phpstan-param DOMNodeList<DOMElement> $methodsCoverageNodes
      *
      * @return MethodLocationData[]
      */

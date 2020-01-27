@@ -2,10 +2,13 @@ includes:
     - ../vendor/phpstan/phpstan/conf/bleedingEdge.neon
 
 parameters:
-    level: 4
+    level: 6
     paths:
         - ../src
+    inferPrivatePropertyTypeFromConstructor: true
     ignoreErrors:
+        - '#.* value type specified in iterable type Symfony\\Component\\Process\\Process#'
+        - '#generic class ReflectionClass (but )?does not specify its types#'
         - '#expects .*, array<string>\|bool\|string\|null given#'
         - '#cast array<string>\|bool\|string\|null to#'
         -

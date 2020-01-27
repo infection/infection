@@ -116,7 +116,7 @@ class Mutation
     }
 
     /**
-     * return Node[]
+     * @return Node[]
      */
     public function getOriginalFileAst(): array
     {

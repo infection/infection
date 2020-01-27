@@ -124,6 +124,9 @@ final class SubscriberBuilder
         }
     }
 
+    /**
+     * @return array<EventSubscriber>
+     */
     private function getSubscribers(
         TestFrameworkAdapter $testFrameworkAdapter,
         OutputInterface $output

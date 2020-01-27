@@ -56,6 +56,9 @@ final class InitialTestsRunner
         $this->eventDispatcher = $eventDispatcher;
     }
 
+    /**
+     * @param array<string> $phpExtraOptions
+     */
     public function run(string $testFrameworkExtraOptions, bool $skipCoverage, array $phpExtraOptions = []): Process
     {
         $process = $this->processBuilder->createProcess(
