@@ -35,105 +35,102 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
+use Generator;
 use Infection\Container;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
+use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
 
 final class LineRangeCalculatorTest extends TestCase
 {
     /**
-     * @see https://github.com/infection/infection/issues/815
+     * @var Parser|null
      */
-    public function test_it_can_find_the_outer_most_array(): void
+    private static $parser;
+
+    /**
+     * @dataProvider provideCodeAndRangeCases
+     */
+    public function test_it_can_find_the_outer_most_array(string $code, array $nodeRange): void
     {
-        $parser = Container::create()->getParser();
-        $code = <<<'PHP'
+        $parser = self::getParser();
+        $nodes = $parser->parse($code);
+
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor(new ParentConnectorVisitor());
+        $spy = $this->createSpyTraverser();
+        $traverser->addVisitor($spy);
+
+        $traverser->traverse($nodes);
+
+        $range = $spy->range;
+
+        $this->assertSame($nodeRange, $range);
+    }
+
+    public function provideCodeAndRangeCases(): Generator
+    {
+        /* @see https://github.com/infection/infection/issues/815 */
+        yield 'Code from original issue 815' => [
+            <<<'PHP'
 <?php
 
-declare(strict_types=1);
-
-namespace App\Config;
-
-use Monolog\Logger;
-
-class ProdConfig extends AbstractConfig
+function getConfig(): array
 {
-    /**
-     * @return array<string, mixed>
-     */
-    public function getConfig(): array
-    {
-        $cacheDir = $this->getCacheDir();
-        $logDir = $this->getLogDir();
-
-        return [// line 19 of code snippet
-            'cors' => [
-                'allow-origin' => [],
-                'allow-methods' => ['DELETE', 'GET', 'POST', 'PUT'],
-                'allow-headers' => [
-                    'Accept',
-                    'Content-Type',
-                ],
-                'allow-credentials' => false,
-                'expose-headers' => [],
-                'max-age' => $findMe,
+    return [// line 5 of code snippet
+        'cors' => [
+            'allow-origin' => [],
+            'allow-methods' => ['DELETE', 'GET', 'POST', 'PUT'],
+            'allow-headers' => [
+                'Accept',
+                'Content-Type',
             ],
-            'debug' => false,
-            'doctrine.dbal.db.options' => [
-                'configuration' => [
-                    'cache.result' => ['type' => 'apcu'],
-                ],
-                'connection' => [
-                    'driver' => 'pdo_pgsql',
-                    'charset' => 'utf8',
-                    'user' => getenv('DATABASE_USER'),
-                    'password' => getenv('DATABASE_PASS'),
-                    'host' => getenv('DATABASE_HOST'),
-                    'port' => getenv('DATABASE_PORT'),
-                    'dbname' => getenv('DATABASE_NAME'),
-                ],
+            'allow-credentials' => false,
+            'expose-headers' => [],
+            'max-age' => $findMe,
+        ],
+        'debug' => false,
+        'doctrine.dbal.db.options' => [
+            'configuration' => [
+                'cache.result' => ['type' => 'apcu'],
             ],
-            'doctrine.orm.em.options' => [
-                'cache.hydration' => ['type' => 'apcu'],
-                'cache.metadata' => ['type' => 'apcu'],
-                'cache.query' => ['type' => 'apcu'],
-                'proxies.dir' => $cacheDir.'/doctrine/proxies',
+            'connection' => [
+                'driver' => 'pdo_pgsql',
+                'charset' => 'utf8',
+                'user' => getenv('DATABASE_USER'),
+                'password' => getenv('DATABASE_PASS'),
+                'host' => getenv('DATABASE_HOST'),
+                'port' => getenv('DATABASE_PORT'),
+                'dbname' => getenv('DATABASE_NAME'),
             ],
-            'monolog' => [
-                'name' => 'petstore',
-                'path' => $logDir.'/application.log',
-                'level' => Logger::NOTICE,
-            ],
-            'routerCacheFile' => $cacheDir.'/routes.php',
-        ]; // line 58 of code snippet
-    }
-
-    public function getEnv(): string
-    {
-        return 'prod';
-    }
+        ],
+        'doctrine.orm.em.options' => [
+            'cache.hydration' => ['type' => 'apcu'],
+            'cache.metadata' => ['type' => 'apcu'],
+            'cache.query' => ['type' => 'apcu'],
+            'proxies.dir' => $cacheDir.'/doctrine/proxies',
+        ],
+        'monolog' => [
+            'name' => 'petstore',
+            'path' => $logDir.'/application.log',
+            'level' => Logger::NOTICE,
+        ],
+        'routerCacheFile' => $cacheDir.'/routes.php',
+    ]; // line 44 of code snippet
 }
 
-PHP;
 
-        $nodes = $parser->parse($code);
-        $traverser = new NodeTraverser();
-        $spy = $this->spyTraverser();
-        $traverser->addVisitor(new ParentConnectorVisitor());
-        $traverser->addVisitor($spy);
-        $traverser->traverse($nodes);
-        $range = $spy->range;
-        $this->assertSame(range(19, 58), $range);
-    }
+PHP
+            ,
+            range(5, 44),
+        ];
 
-    public function test_it_calculates_range_outside_of_array(): void
-    {
-        $parser = Container::create()->getParser();
-        $code = <<<'PHP'
+        yield 'code outside of array' => [
+            <<<'PHP'
 <?php
 
 function foo(): void
@@ -142,20 +139,13 @@ function foo(): void
         $a = $findMe;
     })();
 }
-
-PHP;
-
-        $nodes = $parser->parse($code);
-        $traverser = new NodeTraverser();
-        $spy = $this->spyTraverser();
-        $traverser->addVisitor(new ParentConnectorVisitor());
-        $traverser->addVisitor($spy);
-        $traverser->traverse($nodes);
-        $range = $spy->range;
-        $this->assertSame([6], $range);
+PHP
+            ,
+            [6],
+        ];
     }
 
-    private function spyTraverser()
+    private function createSpyTraverser()
     {
         return new class() extends NodeVisitorAbstract {
             /**
@@ -167,9 +157,14 @@ PHP;
             {
                 if ($node instanceof Node\Expr\Variable && $node->name === 'findMe') {
                     $lineRange = new LineRangeCalculator();
-                    $this->range = $lineRange->getNodeRange($node)->range;
+                    $this->range = $lineRange->calculateRange($node)->range;
                 }
             }
         };
+    }
+
+    private static function getParser(): Parser
+    {
+        return self::$parser ?? self::$parser = Container::create()->getParser();
     }
 }

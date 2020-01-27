@@ -124,7 +124,7 @@ class NodeMutationGenerator
 
         $tests = $this->codeCoverageData->getAllTestsForMutation(
             $this->filePath,
-            $this->lineRangeCalculator->getNodeRange($node),
+            $this->lineRangeCalculator->calculateRange($node),
             $isOnFunctionSignature
         );
 

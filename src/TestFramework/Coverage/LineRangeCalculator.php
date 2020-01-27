@@ -43,7 +43,7 @@ use PhpParser\Node;
  */
 final class LineRangeCalculator
 {
-    public function getNodeRange(Node $node): NodeLineRangeData
+    public function calculateRange(Node $node): NodeLineRangeData
     {
         $node = $this->getOuterMostArrayNode($node);
 
