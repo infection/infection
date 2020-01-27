@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9503c7def5c1477834a5f4be58d27002",
+    "content-hash": "2f4805ddce5cd4d7c9a1a2f7fa7f08c7",
     "packages": [
         {
             "name": "composer/xdebug-handler",
@@ -134,16 +134,16 @@
         },
         {
             "name": "infection/include-interceptor",
-            "version": "0.2.1",
+            "version": "0.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/infection/include-interceptor.git",
-                "reference": "1ee702b7cb512b58a24a96b66e9f94e00a3219e0"
+                "reference": "07d20c33a6c0624b8636adf25ddca7e9e19a5dc9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/infection/include-interceptor/zipball/1ee702b7cb512b58a24a96b66e9f94e00a3219e0",
-                "reference": "1ee702b7cb512b58a24a96b66e9f94e00a3219e0",
+                "url": "https://api.github.com/repos/infection/include-interceptor/zipball/07d20c33a6c0624b8636adf25ddca7e9e19a5dc9",
+                "reference": "07d20c33a6c0624b8636adf25ddca7e9e19a5dc9",
                 "shasum": ""
             },
             "require-dev": {
@@ -166,7 +166,7 @@
                 }
             ],
             "description": "Stream Wrapper: Include Interceptor. Allows to replace included (autoloaded) file with another one.",
-            "time": "2020-01-26T20:58:01+00:00"
+            "time": "2020-01-27T10:28:21+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
