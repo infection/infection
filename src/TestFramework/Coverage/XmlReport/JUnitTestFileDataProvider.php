@@ -123,6 +123,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
 
     /**
      * @return DOMNodeList|DOMElement[]
+     * @phpstan-return DOMNodeList<DOMElement>
      */
     private static function safeQuery(DOMXPath $xPath, string $query): DOMNodeList
     {
