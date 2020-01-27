@@ -36,27 +36,41 @@ declare(strict_types=1);
 namespace Infection\Resource\Limiter;
 
 use Composer\XdebugHandler\XdebugHandler;
+use function file_exists;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use function is_string;
+use function is_writable;
+use const PHP_EOL;
 use const PHP_SAPI;
+use function Safe\ini_get;
+use function Safe\sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
 final class MemoryLimiter
 {
-    private $fs;
+    private $fileSystem;
     private $iniLocation;
 
     /**
      * @param string|false $iniLocation
      */
-    public function __construct(Filesystem $fs, $iniLocation)
+    public function __construct(Filesystem $fileSystem, $iniLocation)
     {
-        $this->fs = $fs;
-        $this->iniLocation = $iniLocation;
+        if (!is_string($iniLocation)) {
+            Assert::false(
+                $iniLocation,
+                'Expected the iniLocation to either be a string or false. Got "%s"'
+            );
+        }
+
+        $this->fileSystem = $fileSystem;
+        $this->iniLocation = (string) $iniLocation;
     }
 
     public function applyMemoryLimitFromProcess(Process $process, TestFrameworkAdapter $adapter): void
@@ -65,9 +79,9 @@ final class MemoryLimiter
             return;
         }
 
-        $tempConfigPath = $this->iniLocation;
+        $tmpConfigPath = $this->iniLocation;
 
-        if (empty($tempConfigPath) || !file_exists($tempConfigPath) || !is_writable($tempConfigPath)) {
+        if ($tmpConfigPath === '' || !file_exists($tmpConfigPath) || !is_writable($tmpConfigPath)) {
             // Cannot add a memory limit: there is no php.ini file or it is not writable
             return;
         }
@@ -80,29 +94,33 @@ final class MemoryLimiter
         }
 
         /*
-         * Since we know how much memory the initial test suite used,
-         * and only if we know, we can enforce a memory limit upon all
-         * mutation processes. Limit is set to be twice the known amount,
-         * because if we know that a normal test suite used X megabytes,
-         * if a mutants uses a lot more, this is a definite error.
+         * Since we know how much memory the initial test suite used, and only if we know, we can
+         * enforce a memory limit upon all mutation processes. Limit is set to be twice the known
+         * amount, because if we know that a normal test suite used X megabytes, if a mutants uses a
+         *  lot more, this is a definite error.
          *
-         * By default we let a mutant process use twice as much more
-         * memory as an initial test suite consumed.
+         * By default we let a mutant process use twice as much more memory as an initial test suite
+         * consumed.
          */
         $memoryLimit *= 2;
-        $this->fs->appendToFile($tempConfigPath, PHP_EOL . sprintf('memory_limit = %dM', $memoryLimit));
+
+        $this->fileSystem->appendToFile(
+            $tmpConfigPath,
+            PHP_EOL . sprintf('memory_limit = %dM', $memoryLimit)
+        );
     }
 
     private function hasMemoryLimitSet(): bool
     {
-        // -1 means no memory limit. Anything else means the user has set their own limits, which we don't want to mess with
+        // -1 means no memory limit. Anything else means the user has set their own limits, which we
+        // don't want to mess with
         return ini_get('memory_limit') !== '-1';
     }
 
     private function isUsingSystemIni(): bool
     {
-        // Under phpdbg we're using a system php.ini, can't add a memory limit there
-        // If there is no skipped version of xdebug handler we are also using the system php ini
+        // Under phpdbg we're using a system php.ini and we can't add a memory limit there. If there
+        // is no skipped version of xdebug handler we are also using the system php ini
         return PHP_SAPI === 'phpdbg' || XdebugHandler::getSkippedVersion() === '';
     }
 }

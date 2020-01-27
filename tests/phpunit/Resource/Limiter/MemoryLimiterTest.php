@@ -40,6 +40,7 @@ use Infection\Resource\Limiter\MemoryLimiter;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function ini_get;
+use InvalidArgumentException;
 use LogicException;
 use Memory_Aware\FakeAwareAdapter;
 use function microtime;
@@ -103,6 +104,20 @@ final class MemoryLimiterTest extends FileSystemTestCase
         $this->fileSystemMock = $this->createMock(Filesystem::class);
         $this->processMock = $this->createMock(Process::class);
         $this->adapterMock = $this->createMock(AbstractTestFrameworkAdapter::class);
+    }
+
+    public function test_it_throws_a_friendly_error_when_the_ini_value_is_incorrect(): void
+    {
+        try {
+            new MemoryLimiter($this->fileSystemMock, true);
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Expected the iniLocation to either be a string or false. Got "true"',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function test_it_does_nothing_when_adapter_is_not_memory_limit_aware(): void
