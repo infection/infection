@@ -39,6 +39,7 @@ use function array_slice;
 use function count;
 use Generator;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -48,7 +49,31 @@ final class UnwrapArrayIntersectUassoc extends AbstractUnwrapMutator
 {
     public static function getDefinition(): ?Definition
     {
-        return null;
+        return new Definition(
+            <<<'TXT'
+Replaces an `array_intersect_uassoc` function call with its operands. For example:
+
+```php
+$x = array_intersect_uassoc($array1, $array2, $keyCompareFunc);
+```
+
+Will be mutated to:
+
+```php
+$x = $array1;
+```
+
+And:
+
+```php
+$x = $array2;
+```
+
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
     protected function getFunctionName(): string

@@ -44,6 +44,7 @@ use Infection\Config\Exception\InvalidConfigException;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\MutatorConfig;
 use function is_numeric;
 use function is_scalar;
@@ -86,7 +87,40 @@ final class ArrayItemRemoval implements Mutator
 
     public static function getDefinition(): ?Definition
     {
-        return null;
+        return new Definition(
+            <<<'TXT'
+Removes an element of an array literal. For example:
+
+```php
+$x = [0, 1, 2];
+```
+
+Will be mutated to:
+
+```php
+$x = [1, 2];
+```
+
+And:
+
+```php
+$x = [0, 2];
+```
+
+And:
+
+```php
+$x = [1, 2];
+```
+
+Which elements it removes or how many elements it will attempt to remove will depend on its
+configuration.
+
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
     /**

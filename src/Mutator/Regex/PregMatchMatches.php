@@ -40,6 +40,7 @@ use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -51,12 +52,32 @@ final class PregMatchMatches implements Mutator
 
     public static function getDefinition(): ?Definition
     {
-        return null;
+        return new Definition(
+            <<<'TXT'
+Replaces a `preg_match` search results with an empty result. For example:
+
+```php
+if (preg_match('/pattern/', $subject, $matches, $flags)) {
+    // ...
+}
+```
+
+Will be mutated to:
+
+```php
+if ((int) $matches = []) {
+    // ...
+}
+```
+
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
     /**
-     * Replaces "preg_match('/a/', 'b', $foo);" with "(int) $foo = array();"
-     *
      * @param Node\Expr\FuncCall $node
      *
      * @return Generator<Node\Expr\Cast\Int_>
