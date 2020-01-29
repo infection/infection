@@ -33,37 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Number;
+namespace Infection\PhpParser\Visitor;
 
-use Infection\Mutator\Mutator;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitorAbstract;
 
 /**
  * @internal
  */
-abstract class AbstractNumberMutator implements Mutator
+final class PhpUnitMethodCodeCoverageIgnoreVisitor extends NodeVisitorAbstract
 {
-    protected function isPartOfSizeComparison(Node $node): bool
+    public function enterNode(Node $node)
     {
-        $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
-
-        if ($parent === null) {
-            return false;
+        if (!$node instanceof Node\Stmt\ClassMethod) {
+            return null;
         }
 
-        return $this->isSizeComparison($parent);
-    }
+        $docComment = $node->getDocComment();
 
-    private function isSizeComparison(Node $parentNode): bool
-    {
-        if ($parentNode instanceof Node\Expr\UnaryMinus) {
-            return $this->isSizeComparison($parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY));
+        if ($docComment === null) {
+            return null;
         }
 
-        return $parentNode instanceof Node\Expr\BinaryOp\Greater
-            || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            || $parentNode instanceof Node\Expr\BinaryOp\Smaller
-            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual;
+        if (strpos($docComment->getText(), '@codeCoverageIgnore') !== false) {
+            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+        }
+
+        return null;
     }
 }

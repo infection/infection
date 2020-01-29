@@ -33,37 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Number;
+namespace Infection\PhpParser;
 
-use Infection\Mutator\Mutator;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
+use function is_array;
 use PhpParser\Node;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-abstract class AbstractNumberMutator implements Mutator
+final class MutatedNode
 {
-    protected function isPartOfSizeComparison(Node $node): bool
-    {
-        $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
+    private $value;
 
-        if ($parent === null) {
-            return false;
+    /**
+     * @param Node|Node[] $value
+     */
+    private function __construct($value)
+    {
+        if (is_array($value)) {
+            Assert::allIsInstanceOf($value, Node::class);
+        } else {
+            Assert::isInstanceOf($value, Node::class);
         }
 
-        return $this->isSizeComparison($parent);
+        $this->value = $value;
     }
 
-    private function isSizeComparison(Node $parentNode): bool
+    /**
+     * @param Node|Node[] $value
+     */
+    public static function wrap($value): self
     {
-        if ($parentNode instanceof Node\Expr\UnaryMinus) {
-            return $this->isSizeComparison($parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY));
-        }
+        return new self($value);
+    }
 
-        return $parentNode instanceof Node\Expr\BinaryOp\Greater
-            || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            || $parentNode instanceof Node\Expr\BinaryOp\Smaller
-            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual;
+    /**
+     * @return Node|Node[]
+     */
+    public function unwrap()
+    {
+        return $this->value;
     }
 }

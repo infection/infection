@@ -33,37 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Number;
+namespace Infection\PhpParser\Visitor;
 
-use Infection\Mutator\Mutator;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
+use PhpParser\Node\Name;
+use PhpParser\Node\Stmt;
+use PhpParser\NodeVisitorAbstract;
 
 /**
  * @internal
+ *
+ * Adds FullyQualifiedClassName (FQCN) string to class node:
+ *      $node->name                                                  // Plus
+ *      $node->getAttribute(FullyQualifiedClassNameVisitor::FQN_KEY) // Infection\Mutator\Plus
  */
-abstract class AbstractNumberMutator implements Mutator
+final class FullyQualifiedClassNameVisitor extends NodeVisitorAbstract
 {
-    protected function isPartOfSizeComparison(Node $node): bool
-    {
-        $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
+    public const FQN_KEY = 'fullyQualifiedClassName';
 
-        if ($parent === null) {
-            return false;
+    /**
+     * @var Node\Name|null
+     */
+    private $namespace;
+
+    public function enterNode(Node $node): ?Node
+    {
+        if ($node instanceof Stmt\Namespace_) {
+            $this->namespace = $node->name;
+        } elseif ($node instanceof Stmt\ClassLike) {
+            // TODO: check the cases of multiple namespaces
+            $node->setAttribute(self::FQN_KEY, $node->name ? Name::concat($this->namespace, $node->name->name) : null);
         }
 
-        return $this->isSizeComparison($parent);
-    }
-
-    private function isSizeComparison(Node $parentNode): bool
-    {
-        if ($parentNode instanceof Node\Expr\UnaryMinus) {
-            return $this->isSizeComparison($parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY));
-        }
-
-        return $parentNode instanceof Node\Expr\BinaryOp\Greater
-            || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            || $parentNode instanceof Node\Expr\BinaryOp\Smaller
-            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual;
+        return null;
     }
 }

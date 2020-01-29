@@ -33,37 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Number;
+namespace Infection\PhpParser;
 
-use Infection\Mutator\Mutator;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
-use PhpParser\Node;
+use RuntimeException;
+use Throwable;
 
 /**
  * @internal
  */
-abstract class AbstractNumberMutator implements Mutator
+final class UnparsableFile extends RuntimeException
 {
-    protected function isPartOfSizeComparison(Node $node): bool
+    public static function fromInvalidFile(string $filePath, Throwable $original): self
     {
-        $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
-
-        if ($parent === null) {
-            return false;
-        }
-
-        return $this->isSizeComparison($parent);
-    }
-
-    private function isSizeComparison(Node $parentNode): bool
-    {
-        if ($parentNode instanceof Node\Expr\UnaryMinus) {
-            return $this->isSizeComparison($parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY));
-        }
-
-        return $parentNode instanceof Node\Expr\BinaryOp\Greater
-            || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            || $parentNode instanceof Node\Expr\BinaryOp\Smaller
-            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual;
+        return new self(
+            sprintf(
+                'Could not parse the file "%s". Check if it is a valid PHP file',
+                $filePath
+            ),
+            0,
+            $original
+        );
     }
 }

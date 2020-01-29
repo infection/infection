@@ -42,7 +42,7 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\MutatorConfig;
-use Infection\Visitor\ParentConnectorVisitor;
+use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**

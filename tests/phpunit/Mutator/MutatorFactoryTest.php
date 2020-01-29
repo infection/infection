@@ -44,7 +44,7 @@ use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
-use Infection\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
 use InvalidArgumentException;
 use PhpParser\Node;
 use PHPUnit\Framework\MockObject\MockObject;

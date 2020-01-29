@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use Infection\AbstractTestFramework\MemoryUsageAware;
+use Infection\PhpParser\Visitor\PhpUnitClassCodeCoverageIgnoreVisitor;
+use Infection\PhpParser\Visitor\PhpUnitMethodCodeCoverageIgnoreVisitor;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\HasExtraNodeVisitors;
-use Infection\Visitor\PhpUnitClassCodeCoverageIgnoreVisitor;
-use Infection\Visitor\PhpUnitMethodCodeCoverageIgnoreVisitor;
 
 /**
  * @internal

@@ -41,7 +41,7 @@ use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
-use Infection\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
 use function iterator_to_array;
 use PhpParser\Node;
 use PHPUnit\Framework\MockObject\MockObject;

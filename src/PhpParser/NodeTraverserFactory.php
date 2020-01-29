@@ -33,37 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Number;
+namespace Infection\PhpParser;
 
-use Infection\Mutator\Mutator;
+use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
+use Infection\PhpParser\Visitor\NotMutableIgnoreVisitor;
 use Infection\PhpParser\Visitor\ParentConnectorVisitor;
-use PhpParser\Node;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor;
 
 /**
  * @internal
+ * @final
  */
-abstract class AbstractNumberMutator implements Mutator
+class NodeTraverserFactory
 {
-    protected function isPartOfSizeComparison(Node $node): bool
+    /**
+     * @param NodeVisitor[] $extraVisitors
+     */
+    public function create(array $extraVisitors): PrioritizedVisitorsNodeTraverser
     {
-        $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
+        $traverser = new PrioritizedVisitorsNodeTraverser(new NodeTraverser());
 
-        if ($parent === null) {
-            return false;
+        $traverser->addPrioritizedVisitor(new NotMutableIgnoreVisitor(), 50);
+        $traverser->addPrioritizedVisitor(new ParentConnectorVisitor(), 40);
+        $traverser->addPrioritizedVisitor(new FullyQualifiedClassNameVisitor(), 30);
+        $traverser->addPrioritizedVisitor(new ReflectionVisitor(), 20);
+
+        foreach ($extraVisitors as $priority => $visitor) {
+            $traverser->addPrioritizedVisitor($visitor, $priority);
         }
 
-        return $this->isSizeComparison($parent);
-    }
-
-    private function isSizeComparison(Node $parentNode): bool
-    {
-        if ($parentNode instanceof Node\Expr\UnaryMinus) {
-            return $this->isSizeComparison($parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY));
-        }
-
-        return $parentNode instanceof Node\Expr\BinaryOp\Greater
-            || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            || $parentNode instanceof Node\Expr\BinaryOp\Smaller
-            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual;
+        return $traverser;
     }
 }

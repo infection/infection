@@ -33,37 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Number;
+namespace Infection\PhpParser;
 
-use Infection\Mutator\Mutator;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
+use PhpParser\Parser;
+use Symfony\Component\Finder\SplFileInfo;
+use Throwable;
 
 /**
  * @internal
+ * @final
  */
-abstract class AbstractNumberMutator implements Mutator
+class FileParser
 {
-    protected function isPartOfSizeComparison(Node $node): bool
+    private $parser;
+
+    public function __construct(Parser $parser)
     {
-        $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
-
-        if ($parent === null) {
-            return false;
-        }
-
-        return $this->isSizeComparison($parent);
+        $this->parser = $parser;
     }
 
-    private function isSizeComparison(Node $parentNode): bool
+    /**
+     * @throws UnparsableFile
+     *
+     * @return Node[]
+     */
+    public function parse(SplFileInfo $fileInfo): array
     {
-        if ($parentNode instanceof Node\Expr\UnaryMinus) {
-            return $this->isSizeComparison($parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY));
-        }
+        try {
+            return $this->parser->parse($fileInfo->getContents());
+        } catch (Throwable $throwable) {
+            $filePath = $fileInfo->getRealPath() === false
+                ? $fileInfo->getPathname()
+                : $fileInfo->getRealPath()
+            ;
 
-        return $parentNode instanceof Node\Expr\BinaryOp\Greater
-            || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            || $parentNode instanceof Node\Expr\BinaryOp\Smaller
-            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual;
+            throw UnparsableFile::fromInvalidFile($filePath, $throwable);
+        }
     }
 }

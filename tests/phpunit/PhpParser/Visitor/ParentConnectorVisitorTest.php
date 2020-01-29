@@ -33,37 +33,63 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Number;
+namespace Infection\Tests\PhpParser\Visitor;
 
-use Infection\Mutator\Mutator;
+use function in_array;
 use Infection\PhpParser\Visitor\ParentConnectorVisitor;
+use function is_array;
 use PhpParser\Node;
 
 /**
- * @internal
+ * @group integration Requires some I/O operations
  */
-abstract class AbstractNumberMutator implements Mutator
+final class ParentConnectorVisitorTest extends BaseVisitorTest
 {
-    protected function isPartOfSizeComparison(Node $node): bool
+    private const CODE = <<<'PHP'
+<?php declare(strict_types=1);
+
+namespace Acme;
+
+function hello()
+{
+    return 'hello';
+}
+PHP;
+
+    public function test_mutating_nodes_during_traverse_mutates_the_original_nodes(): void
     {
-        $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
+        $nodes = $this->traverse(
+            $this->parseCode(self::CODE),
+            [new ParentConnectorVisitor()]
+        );
 
-        if ($parent === null) {
-            return false;
+        foreach ($nodes as $node) {
+            $this->assertHasParentNode($node, $nodes);
         }
-
-        return $this->isSizeComparison($parent);
     }
 
-    private function isSizeComparison(Node $parentNode): bool
+    /**
+     * @param Node[] $roots
+     */
+    private function assertHasParentNode(Node $node, array $roots): void
     {
-        if ($parentNode instanceof Node\Expr\UnaryMinus) {
-            return $this->isSizeComparison($parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY));
+        if (!in_array($node, $roots, true)) {
+            $this->assertTrue($node->hasAttribute(ParentConnectorVisitor::PARENT_KEY));
+            $this->assertInstanceOf(Node::class, $node->getAttribute(ParentConnectorVisitor::PARENT_KEY));
         }
 
-        return $parentNode instanceof Node\Expr\BinaryOp\Greater
-            || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            || $parentNode instanceof Node\Expr\BinaryOp\Smaller
-            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual;
+        foreach ($node->getSubNodeNames() as $subNodeName) {
+            $subNodes = $node->$subNodeName;
+
+            if (!is_array($subNodes)) {
+                $subNodes = [$subNodes];
+            }
+
+            foreach ($subNodes as $subNode) {
+                if ($subNode instanceof Node) {
+                    $this->assertHasParentNode($subNode, $roots);
+                }
+            }
+        }
     }
 }

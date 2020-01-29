@@ -33,37 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Number;
+namespace Infection\PhpParser\Visitor;
 
-use Infection\Mutator\Mutator;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
+use Infection\Mutation\Mutation;
+use Infection\Mutator\NodeMutationGenerator;
 use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
 /**
  * @internal
  */
-abstract class AbstractNumberMutator implements Mutator
+final class MutationsCollectorVisitor extends NodeVisitorAbstract
 {
-    protected function isPartOfSizeComparison(Node $node): bool
+    /**
+     * @var Mutation[]
+     */
+    private $mutations = [];
+
+    private $mutationGenerator;
+
+    public function __construct(NodeMutationGenerator $mutationGenerator)
     {
-        $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
-
-        if ($parent === null) {
-            return false;
-        }
-
-        return $this->isSizeComparison($parent);
+        $this->mutationGenerator = $mutationGenerator;
     }
 
-    private function isSizeComparison(Node $parentNode): bool
+    public function beforeTraverse(array $nodes): void
     {
-        if ($parentNode instanceof Node\Expr\UnaryMinus) {
-            return $this->isSizeComparison($parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY));
+        $this->mutations = [];
+    }
+
+    public function leaveNode(Node $node): ?Node
+    {
+        foreach ($this->mutationGenerator->generate($node) as $mutation) {
+            $this->mutations[] = $mutation;
         }
 
-        return $parentNode instanceof Node\Expr\BinaryOp\Greater
-            || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            || $parentNode instanceof Node\Expr\BinaryOp\Smaller
-            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual;
+        return null;
+    }
+
+    /**
+     * @return Mutation[]
+     */
+    public function getMutations(): array
+    {
+        return $this->mutations;
     }
 }

@@ -33,37 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Number;
+namespace Infection\PhpParser\Visitor;
 
-use Infection\Mutator\Mutator;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
+use function array_key_exists;
+use function get_class;
+use Infection\Mutation\Mutation;
 use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
 /**
  * @internal
  */
-abstract class AbstractNumberMutator implements Mutator
+final class MutatorVisitor extends NodeVisitorAbstract
 {
-    protected function isPartOfSizeComparison(Node $node): bool
+    private $mutation;
+
+    public function __construct(Mutation $mutation)
     {
-        $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
-
-        if ($parent === null) {
-            return false;
-        }
-
-        return $this->isSizeComparison($parent);
+        $this->mutation = $mutation;
     }
 
-    private function isSizeComparison(Node $parentNode): bool
+    public function leaveNode(Node $node)
     {
-        if ($parentNode instanceof Node\Expr\UnaryMinus) {
-            return $this->isSizeComparison($parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY));
+        $attributes = $node->getAttributes();
+
+        if (!array_key_exists('startTokenPos', $attributes)) {
+            return null;
         }
 
-        return $parentNode instanceof Node\Expr\BinaryOp\Greater
-            || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            || $parentNode instanceof Node\Expr\BinaryOp\Smaller
-            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual;
+        $mutatedAttributes = $this->mutation->getAttributes();
+
+        $samePosition = $attributes['startTokenPos'] === $mutatedAttributes['startTokenPos']
+            && $attributes['endTokenPos'] === $mutatedAttributes['endTokenPos'];
+
+        if ($samePosition && $this->mutation->getMutatedNodeClass() === get_class($node)) {
+            return $this->mutation->getMutatedNode()->unwrap();
+            // TODO STOP TRAVERSING
+            // TODO check all built-in visitors, in particular FirstFindingVisitor
+            // TODO beforeTraverse - FirstFindingVisitor
+            // TODO enterNode instead of leaveNode for '<' mutation to not travers children?
+        }
+
+        return null;
     }
 }

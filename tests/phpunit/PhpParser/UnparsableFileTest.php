@@ -33,37 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Number;
+namespace Infection\Tests\PhpParser;
 
-use Infection\Mutator\Mutator;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
-use PhpParser\Node;
+use Exception;
+use Infection\PhpParser\UnparsableFile;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-abstract class AbstractNumberMutator implements Mutator
+final class UnparsableFileTest extends TestCase
 {
-    protected function isPartOfSizeComparison(Node $node): bool
+    public function test_it_can_create_a_user_friendly_error_for_a_given_file(): void
     {
-        $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
+        $previous = new Exception('Unintentional thing');
 
-        if ($parent === null) {
-            return false;
-        }
+        $exception = UnparsableFile::fromInvalidFile('/path/to/file', $previous);
 
-        return $this->isSizeComparison($parent);
-    }
-
-    private function isSizeComparison(Node $parentNode): bool
-    {
-        if ($parentNode instanceof Node\Expr\UnaryMinus) {
-            return $this->isSizeComparison($parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY));
-        }
-
-        return $parentNode instanceof Node\Expr\BinaryOp\Greater
-            || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            || $parentNode instanceof Node\Expr\BinaryOp\Smaller
-            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual;
+        $this->assertSame(
+            'Could not parse the file "/path/to/file". Check if it is a valid PHP file',
+            $exception->getMessage()
+        );
+        $this->assertSame(0, $exception->getCode());
+        $this->assertSame($previous, $exception->getPrevious());
     }
 }

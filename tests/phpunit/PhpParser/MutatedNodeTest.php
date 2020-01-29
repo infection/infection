@@ -33,37 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Number;
+namespace Infection\Tests\PhpParser;
 
-use Infection\Mutator\Mutator;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
+use Generator;
+use Infection\PhpParser\MutatedNode;
 use PhpParser\Node;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-abstract class AbstractNumberMutator implements Mutator
+final class MutatedNodeTest extends TestCase
 {
-    protected function isPartOfSizeComparison(Node $node): bool
+    /**
+     * @dataProvider nodeProvider
+     *
+     * @param Node|Node[] $node
+     */
+    public function test_it_can_be_instantiated($node): void
     {
-        $parent = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
+        $mutatedNode = MutatedNode::wrap($node);
 
-        if ($parent === null) {
-            return false;
-        }
-
-        return $this->isSizeComparison($parent);
+        $this->assertSame($node, $mutatedNode->unwrap());
     }
 
-    private function isSizeComparison(Node $parentNode): bool
+    public function nodeProvider(): Generator
     {
-        if ($parentNode instanceof Node\Expr\UnaryMinus) {
-            return $this->isSizeComparison($parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY));
-        }
+        yield 'single node' => [new Node\Scalar\LNumber(1)];
 
-        return $parentNode instanceof Node\Expr\BinaryOp\Greater
-            || $parentNode instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            || $parentNode instanceof Node\Expr\BinaryOp\Smaller
-            || $parentNode instanceof Node\Expr\BinaryOp\SmallerOrEqual;
+        yield 'multiple nodes' => [
+            [
+                new Node\Scalar\LNumber(1),
+                new Node\Scalar\LNumber(-1),
+            ],
+        ];
     }
 }
