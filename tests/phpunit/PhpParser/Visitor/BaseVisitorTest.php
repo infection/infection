@@ -99,7 +99,7 @@ abstract class BaseVisitorTest extends TestCase
 
     final protected function getFileContent(string $file): string
     {
-        return file_get_contents(sprintf(__DIR__ . '/../Fixtures/Autoloaded/%s', $file));
+        return file_get_contents(sprintf(__DIR__ . '/../../Fixtures/Autoloaded/%s', $file));
     }
 
     /**
