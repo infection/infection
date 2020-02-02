@@ -44,6 +44,7 @@ final class TestFileTimeData
      * @var string
      */
     public $path;
+
     /**
      * @var float
      */

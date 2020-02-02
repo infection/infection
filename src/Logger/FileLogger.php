@@ -52,14 +52,17 @@ abstract class FileLogger implements MutationTestingResultsLogger
      * @var MetricsCalculator
      */
     protected $metricsCalculator;
+
     /**
      * @var bool
      */
     protected $isDebugVerbosity;
+
     /**
      * @var bool
      */
     protected $isDebugMode;
+
     /**
      * @var bool
      */

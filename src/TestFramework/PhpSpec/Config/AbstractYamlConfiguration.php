@@ -46,6 +46,7 @@ abstract class AbstractYamlConfiguration
      * @var string
      */
     protected $tempDirectory;
+
     /**
      * @var array<mixed>
      */

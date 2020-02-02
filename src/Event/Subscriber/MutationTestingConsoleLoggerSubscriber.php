@@ -56,12 +56,12 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
      * @var MutantProcess[]
      */
     private $mutantProcesses = [];
-
     private $output;
     private $outputFormatter;
     private $metricsCalculator;
     private $showMutations;
     private $diffColorizer;
+
     /**
      * @var int
      */
