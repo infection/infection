@@ -77,10 +77,7 @@ final class ReflectionVisitorTest extends BaseVisitorTest
             $nodes,
             [
                 new ParentConnectorVisitor(),
-                new NameResolver(null, [
-                    'preserveOriginalNames' => true,
-                    'replaceNodes' => false,
-                ]),
+                self::createNameResolver(),
                 new FullyQualifiedClassNameVisitor(),
                 new ReflectionVisitor(),
                 $spyVisitor = $this->getPartOfSignatureSpyVisitor($nodeClass),
@@ -339,15 +336,20 @@ final class ReflectionVisitorTest extends BaseVisitorTest
         $this->traverse(
             $nodes,
             [
-                new NameResolver(null, [
-                    'preserveOriginalNames' => true,
-                    'replaceNodes' => false,
-                ]),
+                self::createNameResolver(),
                 new ParentConnectorVisitor(),
                 new FullyQualifiedClassNameVisitor(),
                 new ReflectionVisitor(),
                 $nodeVisitor ?: $this->spyVisitor,
             ]
         );
+    }
+
+    private static function createNameResolver(): NameResolver
+    {
+        return new NameResolver(null, [
+            'preserveOriginalNames' => true,
+            'replaceNodes' => false,
+        ]);
     }
 }
