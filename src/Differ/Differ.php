@@ -57,12 +57,10 @@ class Differ
     /**
      * Returns the diff between two arrays or strings as string.
      *
-     * Overridden to show just DIFF_MAX_LINES lines of the diff
-     *
-     * @param array<string>|string $from
-     * @param array<string>|string $to
+     * Originally this was overridden to show just DIFF_MAX_LINES lines of the diff,
+     * but since v3 of diff this is no longer needed, so this remains as a thin wrapper.
      */
-    public function diff($from, $to): string
+    public function diff(string $from, string $to): string
     {
         return $this->differ->diff($from, $to);
     }
