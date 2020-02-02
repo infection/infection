@@ -59,7 +59,7 @@ final class SchemaConfiguration
     private $testFrameworkExtraOptions;
 
     /**
-     * @param array<string, array<string>|bool> $mutators
+     * @param array<string, mixed> $mutators
      */
     public function __construct(
         string $file,
@@ -121,7 +121,7 @@ final class SchemaConfiguration
     }
 
     /**
-     * @return array<string, array<string>|bool>
+     * @return array<string, mixed>
      */
     public function getMutators(): array
     {

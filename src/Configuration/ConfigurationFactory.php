@@ -187,7 +187,7 @@ class ConfigurationFactory
     }
 
     /**
-     * @param array<string, array<string>|bool> $schemaMutators
+     * @param array<string, mixed> $schemaMutators
      *
      * @return array<string, Mutator>
      */
