@@ -112,7 +112,7 @@ class MutantFactory
     }
 
     /**
-     * @param array<Node> $originalStatements
+     * @param Node[] $originalStatements
      */
     private function getOriginalPrettyPrintedFile(string $originalFilePath, array $originalStatements): string
     {

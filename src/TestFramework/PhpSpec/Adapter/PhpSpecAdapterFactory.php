@@ -49,7 +49,7 @@ use Infection\TestFramework\VersionParser;
 final class PhpSpecAdapterFactory implements TestFrameworkAdapterFactory
 {
     /**
-     * @param array<string> $sourceDirectories
+     * @param string[] $sourceDirectories
      */
     public static function create(
         string $testFrameworkExecutable,

@@ -55,7 +55,7 @@ use Webmozart\Assert\Assert;
 final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
 {
     /**
-     * @param array<string> $sourceDirectories
+     * @param string[] $sourceDirectories
      */
     public static function create(
         string $testFrameworkExecutable,

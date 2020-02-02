@@ -99,7 +99,7 @@ final class RootsFileLocator implements Locator
     }
 
     /**
-     * @param array<string> $fileNames
+     * @param string[] $fileNames
      */
     private function innerLocateOneOf(array $fileNames): ?string
     {

@@ -66,7 +66,7 @@ final class TestFrameworkConfigPathProvider
     }
 
     /**
-     * @param array<string> $dirsInCurrentDir
+     * @param string[] $dirsInCurrentDir
      */
     public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, string $testFramework): ?string
     {
@@ -122,7 +122,7 @@ final class TestFrameworkConfigPathProvider
     }
 
     /**
-     * @param array<string> $dirsInCurrentDir
+     * @param string[] $dirsInCurrentDir
      */
     private function askTestFrameworkConfigLocation(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, string $testFramework, string $defaultValue): string
     {

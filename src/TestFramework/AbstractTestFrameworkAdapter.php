@@ -179,7 +179,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     }
 
     /**
-     * @param array<string> $phpExtraArgs
+     * @param string[] $phpExtraArgs
      *
      * @return string[]
      */

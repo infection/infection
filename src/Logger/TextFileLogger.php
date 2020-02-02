@@ -89,7 +89,7 @@ final class TextFileLogger extends FileLogger
     }
 
     /**
-     * @return array<string>
+     * @return string[]
      */
     private function getHeadlineParts(string $headlinePrefix): array
     {

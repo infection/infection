@@ -55,7 +55,7 @@ class InitialTestRunProcessBuilder
     /**
      * Creates process with enabled debugger as test framework is going to use in the code coverage.
      *
-     * @param array<string> $phpExtraOptions
+     * @param string[] $phpExtraOptions
      */
     public function createProcess(
         string $testFrameworkExtraOptions,

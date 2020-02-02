@@ -63,9 +63,9 @@ final class SourceDirsProvider
     }
 
     /**
-     * @param array<string> $dirsInCurrentDir
+     * @param string[] $dirsInCurrentDir
      *
-     * @return array<string>
+     * @return string[]
      */
     public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir): array
     {

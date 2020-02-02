@@ -41,7 +41,7 @@ namespace Infection\TestFramework;
 interface CommandLineArgumentsAndOptionsBuilder
 {
     /**
-     * @return array<string>
+     * @return string[]
      */
     public function build(string $configPath, string $extraOptions): array;
 }

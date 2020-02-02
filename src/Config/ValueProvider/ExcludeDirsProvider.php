@@ -66,10 +66,10 @@ final class ExcludeDirsProvider
     }
 
     /**
-     * @param array<string> $dirsInCurrentDir
-     * @param array<string> $sourceDirs
+     * @param string[] $dirsInCurrentDir
+     * @param string[] $sourceDirs
      *
-     * @return array<string>
+     * @return string[]
      */
     public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, array $sourceDirs): array
     {

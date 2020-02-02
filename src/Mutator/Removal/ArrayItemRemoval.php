@@ -145,9 +145,9 @@ TXT
     }
 
     /**
-     * @param array<ArrayItem> $items
+     * @param ArrayItem[] $items
      *
-     * @return array<int>
+     * @return int[]
      */
     private function getItemsIndexes(array $items): array
     {

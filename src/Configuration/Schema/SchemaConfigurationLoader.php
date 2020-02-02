@@ -55,7 +55,7 @@ final class SchemaConfigurationLoader
     }
 
     /**
-     * @param array<string> $potentialPaths
+     * @param string[] $potentialPaths
      */
     public function loadConfiguration(array $potentialPaths): SchemaConfiguration
     {

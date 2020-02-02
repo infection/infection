@@ -48,7 +48,7 @@ final class ParentConnectorVisitor extends NodeVisitorAbstract
     public const PARENT_KEY = 'parent';
 
     /**
-     * @var array<Node>
+     * @var Node[]
      */
     private $stack = [];
 

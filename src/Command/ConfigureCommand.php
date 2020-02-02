@@ -149,8 +149,8 @@ final class ConfigureCommand extends BaseCommand
     }
 
     /**
-     * @param array<string> $sourceDirs
-     * @param array<string> $excludedDirs
+     * @param string[] $sourceDirs
+     * @param string[] $excludedDirs
      */
     private function saveConfig(
         array $sourceDirs,

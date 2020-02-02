@@ -58,7 +58,7 @@ final class TextLogFileProvider
     }
 
     /**
-     * @param array<string> $dirsInCurrentDir
+     * @param string[] $dirsInCurrentDir
      */
     public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir): string
     {

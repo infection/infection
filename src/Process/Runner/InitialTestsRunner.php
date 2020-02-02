@@ -57,7 +57,7 @@ final class InitialTestsRunner
     }
 
     /**
-     * @param array<string> $phpExtraOptions
+     * @param string[] $phpExtraOptions
      */
     public function run(string $testFrameworkExtraOptions, bool $skipCoverage, array $phpExtraOptions = []): Process
     {

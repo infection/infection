@@ -61,7 +61,7 @@ class InitialConfigBuilder implements ConfigBuilder
     private $skipCoverage;
 
     /**
-     * @param array<string> $srcDirs
+     * @param string[] $srcDirs
      */
     public function __construct(
         string $tmpDir,

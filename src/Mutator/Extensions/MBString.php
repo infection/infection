@@ -237,7 +237,7 @@ TXT
     }
 
     /**
-     * @param array<Node\Arg> $args
+     * @param Node\Arg[] $args
      */
     private function mapFunctionCall(Node\Expr\FuncCall $node, string $newFuncName, array $args): Node\Expr\FuncCall
     {

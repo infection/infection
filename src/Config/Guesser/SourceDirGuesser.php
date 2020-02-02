@@ -55,7 +55,7 @@ class SourceDirGuesser
     }
 
     /**
-     * @return array<string>|null
+     * @return string[]|null
      */
     public function guess(): ?array
     {
@@ -77,7 +77,7 @@ class SourceDirGuesser
     }
 
     /**
-     * @return array<string>
+     * @return string[]
      */
     private function getValues(string $psr): array
     {
@@ -94,7 +94,7 @@ class SourceDirGuesser
     /**
      * @param array<array<string>|string|mixed> $autoloadDirs
      *
-     * @return array<string>
+     * @return string[]
      */
     private function parsePsrSection(array $autoloadDirs): array
     {
@@ -112,8 +112,8 @@ class SourceDirGuesser
     }
 
     /**
-     * @param array<string>|string $path
-     * @param array<string> $dirs
+     * @param string[]|string $path
+     * @param string[] $dirs
      */
     private function parsePath($path, array &$dirs): void
     {

@@ -110,7 +110,7 @@ abstract class FileLogger implements MutationTestingResultsLogger
     }
 
     /**
-     * @return array<string>
+     * @return string[]
      */
     abstract protected function getLogLines(): array;
 
