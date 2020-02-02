@@ -87,17 +87,8 @@ final class MutationGenerator
     }
 
     /**
-<<<<<<< HEAD
      * @param bool $onlyCovered Mutates only covered by tests lines of code
-     * @param NodeVisitor[] $extraNodeVisitors
-=======
-     * @param bool          $onlyCovered Mutates only covered by tests lines of code
-<<<<<<< HEAD
-     * @param IgnoresNode[] $extraNodeVisitors
->>>>>>> Simplify ignoring additional nodes
-=======
      * @param NodeIgnorer[] $nodeIgnorers
->>>>>>> Apply review feedback
      *
      * @throws UnparsableFile
      *

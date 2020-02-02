@@ -73,7 +73,7 @@ abstract class BaseNodeIgnorerTestCase extends TestCase
 
     private function getParser(): Parser
     {
-        if (null === self::$parser) {
+        if (self::$parser === null) {
             self::$parser = Container::create()->getParser();
         }
 

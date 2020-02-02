@@ -61,19 +61,10 @@ class FileMutationGenerator
     }
 
     /**
-<<<<<<< HEAD
      * @param Mutator[] $mutators
-     * @param NodeVisitor[] $extraNodeVisitors
+     * @param NodeIgnorer[] $nodeIgnorers
      *
      * @throws UnparsableFile
-=======
-     * @param Mutator[]     $mutators
-<<<<<<< HEAD
-     * @param IgnoresNode[] $additionalIgnoredNodes
->>>>>>> Simplify ignoring additional nodes
-=======
-     * @param NodeIgnorer[] $nodeIgnorers
->>>>>>> Apply review feedback
      *
      * @return Mutation[]
      */
