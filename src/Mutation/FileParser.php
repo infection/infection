@@ -61,7 +61,7 @@ class FileParser
     public function parse(SplFileInfo $fileInfo): array
     {
         try {
-            return $this->parser->parse($fileInfo->getContents()) ?? [];
+            return $this->parser->parse($fileInfo->getContents());
         } catch (Throwable $throwable) {
             $filePath = $fileInfo->getRealPath() === false
                 ? $fileInfo->getPathname()

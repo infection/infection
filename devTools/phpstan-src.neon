@@ -14,3 +14,7 @@ parameters:
         -
             path: '../src/Process/Runner/Parallel/ParallelProcessRunner.php'
             message: '#Left side of [\&]{2} is always true#'
+        -
+            path: '../src/Mutation/FileParser.php'
+            message: '#Method Infection\\Mutation\\FileParser::parse\(\) should return array<PhpParser\\Node> but returns array<PhpParser\\Node\\Stmt>\|null\.#'
+            count: 1
