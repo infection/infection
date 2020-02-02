@@ -99,7 +99,6 @@ use function Safe\getcwd;
 use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Filesystem\Filesystem;
-use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
 
 /**
@@ -111,10 +110,12 @@ final class Container
      * @var array<class-string<object>, true>
      */
     private $keys = [];
+
     /**
      * @var array<class-string<object>, object>
      */
     private $values = [];
+
     /**
      * @var array<class-string<object>, callable(self): object>
      */
@@ -771,7 +772,8 @@ final class Container
         } else {
             $value = $this->values[$id] = $this->factories[$id]($this);
         }
-        assert($value instanceof  $id);
+
+        assert($value instanceof $id);
 
         return $value;
     }
