@@ -43,6 +43,7 @@ use Infection\Console\ConsoleOutput as InfectionConsoleOutput;
 use Infection\Container;
 use PackageVersions\Versions;
 use const PHP_SAPI;
+use SebastianBergmann\Environment\Console;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -163,6 +164,14 @@ final class Application extends BaseApplication
         $output->getFormatter()->setStyle('low', new OutputFormatterStyle('red', null, ['bold']));
         $output->getFormatter()->setStyle('medium', new OutputFormatterStyle('yellow', null, ['bold']));
         $output->getFormatter()->setStyle('high', new OutputFormatterStyle('green', null, ['bold']));
+
+        if ($input->isInteractive()) {
+            $console = new Console();
+
+            if (!$console->isInteractive()) {
+                $input->setInteractive(false);
+            }
+        }
     }
 
     private function logRunningWithDebugger(): void
