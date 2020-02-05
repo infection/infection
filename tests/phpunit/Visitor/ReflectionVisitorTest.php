@@ -36,14 +36,19 @@ declare(strict_types=1);
 namespace Infection\Tests\Visitor;
 
 use Generator;
+use Infection\Reflection\AnonymousClassReflection;
+use Infection\Reflection\ClassReflection;
+use Infection\Reflection\NullReflection;
 use Infection\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\Visitor\ParentConnectorVisitor;
 use Infection\Visitor\ReflectionVisitor;
 use InfectionReflectionAnonymousClass\Bug;
+use InfectionReflectionAnonymousClass\Bug2;
 use InfectionReflectionClassMethod\Foo;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
+use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitorAbstract;
 use ReflectionClass;
 
@@ -72,6 +77,7 @@ final class ReflectionVisitorTest extends BaseVisitorTest
             $nodes,
             [
                 new ParentConnectorVisitor(),
+                self::createNameResolver(),
                 new FullyQualifiedClassNameVisitor(),
                 new ReflectionVisitor(),
                 $spyVisitor = $this->getPartOfSignatureSpyVisitor($nodeClass),
@@ -156,7 +162,7 @@ final class ReflectionVisitorTest extends BaseVisitorTest
 
         $this->parseAndTraverse($code, $reflectionSpyVisitor);
 
-        $this->assertInstanceOf(ReflectionClass::class, $reflectionSpyVisitor->reflectionClass);
+        $this->assertInstanceOf(ClassReflection::class, $reflectionSpyVisitor->reflectionClass);
         $this->assertSame(Foo::class, $reflectionSpyVisitor->reflectionClass->getName());
     }
 
@@ -168,10 +174,24 @@ final class ReflectionVisitorTest extends BaseVisitorTest
 
         $this->parseAndTraverse($code, $reflectionSpyVisitor);
 
-        $this->assertNull($reflectionSpyVisitor->fooReflectionClass);
+        $this->assertInstanceOf(NullReflection::class, $reflectionSpyVisitor->fooReflectionClass);
 
-        $this->assertInstanceOf(ReflectionClass::class, $reflectionSpyVisitor->createAnonymousClassReflectionClass);
+        $this->assertInstanceOf(ClassReflection::class, $reflectionSpyVisitor->createAnonymousClassReflectionClass);
         $this->assertSame(Bug::class, $reflectionSpyVisitor->createAnonymousClassReflectionClass->getName());
+    }
+
+    public function test_it_sets_reflection_class_to_nodes_in_anonymous_class_that_extends(): void
+    {
+        $code = $this->getFileContent('Reflection/rv-anonymous-class-inside-class-that-extends.php');
+
+        $reflectionSpyVisitor = $this->getReflectionClassesSpyVisitor();
+
+        $this->parseAndTraverse($code, $reflectionSpyVisitor);
+
+        $this->assertInstanceOf(AnonymousClassReflection::class, $reflectionSpyVisitor->fooReflectionClass);
+
+        $this->assertInstanceOf(ClassReflection::class, $reflectionSpyVisitor->createAnonymousClassReflectionClass);
+        $this->assertSame(Bug2::class, $reflectionSpyVisitor->createAnonymousClassReflectionClass->getName());
     }
 
     public function isPartOfSignatureFlagProvider(): Generator
@@ -316,11 +336,20 @@ final class ReflectionVisitorTest extends BaseVisitorTest
         $this->traverse(
             $nodes,
             [
+                self::createNameResolver(),
                 new ParentConnectorVisitor(),
                 new FullyQualifiedClassNameVisitor(),
                 new ReflectionVisitor(),
                 $nodeVisitor ?: $this->spyVisitor,
             ]
         );
+    }
+
+    private static function createNameResolver(): NameResolver
+    {
+        return new NameResolver(null, [
+            'preserveOriginalNames' => true,
+            'replaceNodes' => false,
+        ]);
     }
 }

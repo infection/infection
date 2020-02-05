@@ -33,42 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutation;
-
-use Infection\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\Visitor\NotMutableIgnoreVisitor;
-use Infection\Visitor\ParentConnectorVisitor;
-use Infection\Visitor\ReflectionVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitor\NameResolver;
+namespace Infection\Reflection;
 
 /**
  * @internal
- * @final
  */
-class NodeTraverserFactory
+final class Visibility
 {
+    public const PUBLIC = 'public';
+    public const PROTECTED = 'protected';
+
     /**
-     * @param NodeVisitor[] $extraVisitors
+     * @var string
      */
-    public function create(array $extraVisitors): PrioritizedVisitorsNodeTraverser
+    private $variant;
+
+    private function __construct(string $variant)
     {
-        $traverser = new PrioritizedVisitorsNodeTraverser(new NodeTraverser());
+        $this->variant = $variant;
+    }
 
-        $traverser->addPrioritizedVisitor(new NotMutableIgnoreVisitor(), 50);
-        $traverser->addPrioritizedVisitor(new NameResolver(null, [
-            'preserveOriginalNames' => true,
-            'replaceNodes' => false,
-        ]), 45);
-        $traverser->addPrioritizedVisitor(new ParentConnectorVisitor(), 40);
-        $traverser->addPrioritizedVisitor(new FullyQualifiedClassNameVisitor(), 30);
-        $traverser->addPrioritizedVisitor(new ReflectionVisitor(), 20);
+    public static function asPublic(): self
+    {
+        return new self(self::PUBLIC);
+    }
 
-        foreach ($extraVisitors as $priority => $visitor) {
-            $traverser->addPrioritizedVisitor($visitor, $priority);
-        }
+    public static function asProtected(): self
+    {
+        return new self(self::PROTECTED);
+    }
 
-        return $traverser;
+    public function isPublic(): bool
+    {
+        return $this->variant === self::PUBLIC;
+    }
+
+    public function isProtected(): bool
+    {
+        return $this->variant === self::PROTECTED;
     }
 }
