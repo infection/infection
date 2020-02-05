@@ -33,42 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutation;
+namespace Infection\Tests\Reflection;
 
-use Infection\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\Visitor\NotMutableIgnoreVisitor;
-use Infection\Visitor\ParentConnectorVisitor;
-use Infection\Visitor\ReflectionVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitor\NameResolver;
+use Infection\Reflection\Visibility;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- * @final
- */
-class NodeTraverserFactory
+final class VisibilityTest extends TestCase
 {
-    /**
-     * @param NodeVisitor[] $extraVisitors
-     */
-    public function create(array $extraVisitors): PrioritizedVisitorsNodeTraverser
+    public function test_it_can_be_public(): void
     {
-        $traverser = new PrioritizedVisitorsNodeTraverser(new NodeTraverser());
+        $visibility = Visibility::asPublic();
 
-        $traverser->addPrioritizedVisitor(new NotMutableIgnoreVisitor(), 50);
-        $traverser->addPrioritizedVisitor(new NameResolver(null, [
-            'preserveOriginalNames' => true,
-            'replaceNodes' => false,
-        ]), 45);
-        $traverser->addPrioritizedVisitor(new ParentConnectorVisitor(), 40);
-        $traverser->addPrioritizedVisitor(new FullyQualifiedClassNameVisitor(), 30);
-        $traverser->addPrioritizedVisitor(new ReflectionVisitor(), 20);
+        $this->assertTrue($visibility->isPublic());
+        $this->assertFalse($visibility->isProtected());
+    }
 
-        foreach ($extraVisitors as $priority => $visitor) {
-            $traverser->addPrioritizedVisitor($visitor, $priority);
-        }
+    public function test_it_can_be_protected(): void
+    {
+        $visibility = Visibility::asProtected();
 
-        return $traverser;
+        $this->assertTrue($visibility->isProtected());
+        $this->assertFalse($visibility->isPublic());
     }
 }
