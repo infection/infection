@@ -50,6 +50,8 @@ use function substr_count;
 
 /**
  * @coversNothing
+ *
+ * @group integration Requires some I/O operations
  */
 final class MakefileTest extends TestCase
 {
@@ -59,7 +61,7 @@ final class MakefileTest extends TestCase
     {
         $output = shell_exec(sprintf(
             '%s make --silent --file %s 2>&1',
-            null !== shell_exec('command -v timeout') ? 'timeout 2s' : '',
+            shell_exec('command -v timeout') !== null ? 'timeout 2s' : '',
             self::MAKEFILE_PATH
         ));
 
@@ -100,7 +102,7 @@ EOF;
         $matchedPhony = true;
 
         foreach ($targets as [$target, $dependencies]) {
-            if ('.PHONY' === $target) {
+            if ($target === '.PHONY') {
                 $this->assertCount(
                     1,
                     $dependencies,
@@ -163,7 +165,7 @@ EOF;
                 continue;
             }
 
-            if (null !== $phony && false === $matchedPhony) {
+            if ($phony !== null && $matchedPhony === false) {
                 $matchedPhony = true;
 
                 $this->assertSame(
@@ -188,7 +190,7 @@ EOF;
         $targetCounts = [];
 
         foreach ($targets as [$target, $dependencies]) {
-            if ('.PHONY' === $target) {
+            if ($target === '.PHONY') {
                 continue;
             }
 

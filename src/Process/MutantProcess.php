@@ -36,22 +36,30 @@ declare(strict_types=1);
 namespace Infection\Process;
 
 use function in_array;
-use Infection\Mutant\MutantInterface;
-use Infection\Mutation;
-use Infection\Mutator\Util\Mutator;
-use Infection\TestFramework\TestFrameworkAdapter;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Mutant\Mutant;
+use Infection\Mutation\Mutation;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
+ * @final
  */
-final class MutantProcess implements MutantProcessInterface
+class MutantProcess
 {
     public const CODE_KILLED = 0;
     public const CODE_ESCAPED = 1;
     public const CODE_ERROR = 2;
     public const CODE_TIMED_OUT = 3;
     public const CODE_NOT_COVERED = 4;
+
+    public const RESULT_CODES = [
+        self::CODE_KILLED,
+        self::CODE_ESCAPED,
+        self::CODE_ERROR,
+        self::CODE_TIMED_OUT,
+        self::CODE_NOT_COVERED,
+    ];
 
     private const PROCESS_OK = 0;
     private const PROCESS_GENERAL_ERROR = 1;
@@ -68,7 +76,7 @@ final class MutantProcess implements MutantProcessInterface
     private $isTimedOut = false;
     private $testFrameworkAdapter;
 
-    public function __construct(Process $process, MutantInterface $mutant, TestFrameworkAdapter $testFrameworkAdapter)
+    public function __construct(Process $process, Mutant $mutant, TestFrameworkAdapter $testFrameworkAdapter)
     {
         $this->process = $process;
         $this->mutant = $mutant;
@@ -80,7 +88,7 @@ final class MutantProcess implements MutantProcessInterface
         return $this->process;
     }
 
-    public function getMutant(): MutantInterface
+    public function getMutant(): Mutant
     {
         return $this->mutant;
     }
@@ -111,9 +119,9 @@ final class MutantProcess implements MutantProcessInterface
         return self::CODE_KILLED;
     }
 
-    public function getMutator(): Mutator
+    public function getMutatorName(): string
     {
-        return $this->getMutation()->getMutator();
+        return $this->getMutation()->getMutatorName();
     }
 
     public function getOriginalFilePath(): string

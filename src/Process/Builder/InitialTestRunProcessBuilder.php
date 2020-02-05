@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Process\Builder;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Console\Util\PhpProcess;
-use Infection\TestFramework\TestFrameworkAdapter;
-use Infection\Utils\VersionParser;
-use PackageVersions\Versions;
+use function method_exists;
 use Symfony\Component\Process\Process;
 
 /**
@@ -47,12 +46,10 @@ use Symfony\Component\Process\Process;
 class InitialTestRunProcessBuilder
 {
     private $testFrameworkAdapter;
-    private $versionParser;
 
-    public function __construct(TestFrameworkAdapter $testFrameworkAdapter, VersionParser $versionParser)
+    public function __construct(TestFrameworkAdapter $testFrameworkAdapter)
     {
         $this->testFrameworkAdapter = $testFrameworkAdapter;
-        $this->versionParser = $versionParser;
     }
 
     /**
@@ -77,9 +74,7 @@ class InitialTestRunProcessBuilder
 
         $process->setTimeout(null); // ignore the default timeout of 60 seconds
 
-        $symfonyProcessVersion = $this->versionParser->parse(Versions::getVersion('symfony/process'));
-
-        if (version_compare($symfonyProcessVersion, '4.4.0', '<')) {
+        if (method_exists($process, 'inheritEnvironmentVariables')) {
             // in version 4.4.0 this method is deprecated and removed in 5.0.0
             $process->inheritEnvironmentVariables();
         }

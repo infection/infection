@@ -37,7 +37,7 @@ namespace Infection\Configuration;
 
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Mutator;
 use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
 use Symfony\Component\Finder\SplFileInfo;
@@ -84,8 +84,8 @@ class Configuration
     private $minCoveredMsi;
 
     /**
-     * @param string[]               $sourceDirectories
-     * @param SplFileInfo[]          $sourceFiles
+     * @param string[] $sourceDirectories
+     * @param SplFileInfo[] $sourceFiles
      * @param array<string, Mutator> $mutators
      */
     public function __construct(

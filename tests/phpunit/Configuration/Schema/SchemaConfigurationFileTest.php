@@ -44,6 +44,9 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Seld\JsonLint\ParsingException;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class SchemaConfigurationFileTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Configuration';
@@ -119,7 +122,7 @@ final class SchemaConfigurationFileTest extends TestCase
                 $exception->getCode()
             );
 
-            if (null === $expectedException->getPrevious()) {
+            if ($expectedException->getPrevious() === null) {
                 $this->assertNull($exception->getPrevious());
             } else {
                 $expectedPrevious = $expectedException->getPrevious();

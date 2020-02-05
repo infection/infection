@@ -35,27 +35,44 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class EqualIdentical extends Mutator
+final class EqualIdentical implements Mutator
 {
-    /**
-     * Replaces "==" with "==="
-     *
-     * @param Node&Node\Expr\BinaryOp\Equal $node
-     *
-     * @return Node\Expr\BinaryOp\Identical
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return new Node\Expr\BinaryOp\Identical($node->left, $node->right, $node->getAttributes());
+        return new Definition(
+            <<<'TXT'
+Replaces a loose comparison (using the equal operator (`==`)) with a strict comparison (using the
+identical operator (`===`)).
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
-    protected function mutatesNode(Node $node): bool
+    /**
+     * @param Node\Expr\BinaryOp\Equal $node
+     *
+     * @return Generator<Node\Expr\BinaryOp\Identical>
+     */
+    public function mutate(Node $node): Generator
+    {
+        yield new Node\Expr\BinaryOp\Identical($node->left, $node->right, $node->getAttributes());
+    }
+
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\Equal;
     }

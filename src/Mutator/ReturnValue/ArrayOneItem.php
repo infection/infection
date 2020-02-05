@@ -35,7 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use Infection\Visitor\ReflectionVisitor;
 use function is_string;
 use PhpParser\Node;
@@ -43,25 +47,49 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class ArrayOneItem extends Mutator
+final class ArrayOneItem implements Mutator
 {
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Leaves only one item in the returned array. For example:
+
+```php
+return $array;
+```
+
+Will be mutated to:
+
+```php
+return count($array) > 1 ?
+    array_slice($array, 0, 1, true) :
+    $array
+;
+```
+
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     /**
-     * Leaves only one item in the returned array
+     * @param Node\Stmt\Return_ $node
      *
-     * Replaces "return $collection;" with "return count($collection) > 1 ? array_slice($collection, 0, 1, true) : $collection;"
-     *
-     * @param Node&Node\Stmt\Return_ $node
-     *
-     * @return Node\Stmt\Return_
+     * @return Generator<Node\Stmt\Return_>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
         /** @var Node\Expr\Variable $expression */
         $expression = $node->expr;
 
         $arrayVariable = new Node\Expr\Variable($expression->name);
 
-        return new Node\Stmt\Return_(
+        yield new Node\Stmt\Return_(
             new Node\Expr\Ternary(
                 new Node\Expr\BinaryOp\Greater(
                     new Node\Expr\FuncCall(new Node\Name('count'), [new Node\Arg($arrayVariable)]),
@@ -78,7 +106,7 @@ final class ArrayOneItem extends Mutator
         );
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Stmt\Return_) {
             return false;
@@ -93,10 +121,10 @@ final class ArrayOneItem extends Mutator
 
     private function returnTypeIsArray(Node $node): bool
     {
-        /** @var \PhpParser\Node\Stmt\Function_|null $functionScope */
+        /** @var Node\Stmt\Function_|null $functionScope */
         $functionScope = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY, null);
 
-        if (null === $functionScope) {
+        if ($functionScope === null) {
             return false;
         }
 

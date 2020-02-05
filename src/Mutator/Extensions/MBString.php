@@ -42,39 +42,66 @@ use function constant;
 use function count;
 use function defined;
 use Generator;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\MutatorConfig;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class MBString extends Mutator
+final class MBString implements Mutator
 {
+    use GetMutatorName;
+
     private $converters;
 
     public function __construct(MutatorConfig $config)
     {
-        parent::__construct($config);
-
-        $settings = $this->getSettings();
+        $settings = $config->getMutatorSettings();
 
         $this->setupConverters($settings);
     }
 
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces a statement making use of the mbstring extension with its vanilla code equivalent. For
+example:
+
+```php
+$x = mb_strlen($str) < 10;
+```
+
+Will be mutated to:
+
+```php
+$x = strlen($str) < 10;
+```
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     /**
-     * @param Node&Node\Expr\FuncCall $node
+     * @param Node\Expr\FuncCall $node
      *
-     * @return Node[]|Generator
+     * @return Generator<Node\Expr\FuncCall>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
         /** @var Node\Name $name */
         $name = $node->name;
+
         yield from $this->converters[$name->toLowerString()]($node);
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Expr\FuncCall || !$node->name instanceof Node\Name) {
             return false;

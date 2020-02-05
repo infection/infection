@@ -38,6 +38,7 @@ namespace Infection\Tests\AutoReview\ProjectCode;
 use const DIRECTORY_SEPARATOR;
 use Generator;
 use function in_array;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\InfectionCommand;
 use Infection\Config\ConsoleHelper;
@@ -49,34 +50,29 @@ use Infection\Console\Application;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\Util\PhpProcess;
-use Infection\Differ\DiffColorizer;
-use Infection\Differ\Differ;
 use Infection\Engine;
-use Infection\Finder\ComposerExecutableFinder;
-use Infection\Finder\FilterableFinder;
-use Infection\Finder\TestFrameworkFinder;
+use Infection\Event\Subscriber\MutantCreatingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
+use Infection\FileSystem\Finder\ComposerExecutableFinder;
+use Infection\FileSystem\Finder\FilterableFinder;
+use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Http\BadgeApiClient;
 use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\Mutator\Util\Mutator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
-use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
-use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
-use Infection\Process\Runner\MutationTestingRunner;
 use Infection\TestFramework\Coverage\CoverageFileData;
-use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\TestFileTimeData;
+use Infection\TestFramework\Coverage\XmlReport\TestFileTimeData;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder as PhpSpecInitalConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder as PhpSpecMutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
-use Infection\TestFramework\PhpUnit\Coverage\CoverageXmlParser;
+use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkTypes;
+use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
-use Infection\Utils\VersionParser;
 use function iterator_to_array;
 use ReflectionClass;
 use const SORT_STRING;
@@ -100,7 +96,6 @@ final class ProjectCodeProvider
         ResultsLoggerTypes::class,
         MutantCreatingConsoleLoggerSubscriber::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
-        MutationTestingRunner::class,
         TestFrameworkTypes::class,
         NodeMutationGenerator::class,
         FilterableFinder::class,
@@ -114,8 +109,6 @@ final class ProjectCodeProvider
     public const NON_FINAL_EXTENSION_CLASSES = [
         ConsoleHelper::class,
         SourceDirGuesser::class,
-        DiffColorizer::class,
-        Differ::class,
         TestFrameworkFinder::class,
         BadgeApiClient::class,
         MetricsCalculator::class,
@@ -124,15 +117,13 @@ final class ProjectCodeProvider
         PhpUnitInitalConfigBuilder::class,
         PhpSpecMutationConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
-        CoverageXmlParser::class,
-        VersionParser::class,
+        IndexXmlCoverageParser::class,
     ];
 
     /**
      * This array contains all classes that can be extended by our users.
      */
     public const EXTENSION_POINTS = [
-        Mutator::class,
         OutputFormatter::class,
         SchemaConfigurationFactory::class,
         SchemaConfigurationFileLoader::class,
@@ -147,6 +138,11 @@ final class ProjectCodeProvider
     /**
      * @var string[]|null
      */
+    private static $sourceClassesToCheckForPublicProperties;
+
+    /**
+     * @var string[]|null
+     */
     private static $testClasses;
 
     private function __construct()
@@ -155,8 +151,10 @@ final class ProjectCodeProvider
 
     public static function provideSourceClasses(): Generator
     {
-        if (null !== self::$sourceClasses) {
+        if (self::$sourceClasses !== null) {
             yield from self::$sourceClasses;
+
+            return;
         }
 
         $finder = Finder::create()
@@ -193,19 +191,10 @@ final class ProjectCodeProvider
 
     public static function provideConcreteSourceClasses(): Generator
     {
-        $sourceClasses = iterator_to_array(self::provideSourceClasses(), true);
-
-        yield from array_filter(
-            $sourceClasses,
-            static function (string $className): bool {
-                $reflectionClass = new ReflectionClass($className);
-
-                return !$reflectionClass->isInterface()
-                    && !$reflectionClass->isAbstract()
-                    && !$reflectionClass->isTrait()
-                ;
-            }
-        );
+        yield from ConcreteClassReflector::filterByConcreteClasses(iterator_to_array(
+            self::provideSourceClasses(),
+            true
+        ));
     }
 
     public static function concreteSourceClassesProvider(): Generator
@@ -217,7 +206,13 @@ final class ProjectCodeProvider
 
     public static function provideSourceClassesToCheckForPublicProperties(): Generator
     {
-        yield from array_filter(
+        if (self::$sourceClassesToCheckForPublicProperties !== null) {
+            yield from self::$sourceClassesToCheckForPublicProperties;
+
+            return;
+        }
+
+        self::$sourceClassesToCheckForPublicProperties = array_filter(
             iterator_to_array(self::provideSourceClasses(), true),
             static function (string $className): bool {
                 $reflectionClass = new ReflectionClass($className);
@@ -237,6 +232,8 @@ final class ProjectCodeProvider
                 ;
             }
         );
+
+        yield from self::$sourceClassesToCheckForPublicProperties;
     }
 
     public static function sourceClassesToCheckForPublicPropertiesProvider(): Generator
@@ -248,8 +245,10 @@ final class ProjectCodeProvider
 
     public static function provideTestClasses(): Generator
     {
-        if (null !== self::$testClasses) {
+        if (self::$testClasses !== null) {
             yield from self::$testClasses;
+
+            return;
         }
 
         $finder = Finder::create()

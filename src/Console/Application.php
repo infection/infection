@@ -40,6 +40,7 @@ use function extension_loaded;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\InfectionCommand;
 use Infection\Console\ConsoleOutput as InfectionConsoleOutput;
+use Infection\Container;
 use PackageVersions\Versions;
 use const PHP_SAPI;
 use Symfony\Component\Console\Application as BaseApplication;
@@ -75,7 +76,7 @@ final class Application extends BaseApplication
      */
     private $consoleOutput;
 
-    public function __construct(InfectionContainer $container)
+    public function __construct(Container $container)
     {
         parent::__construct(self::NAME, Versions::getVersion('infection/infection'));
 
@@ -85,11 +86,11 @@ final class Application extends BaseApplication
 
     public function run(?InputInterface $input = null, ?OutputInterface $output = null): int
     {
-        if (null === $input) {
+        if ($input === null) {
             $input = new ArgvInput();
         }
 
-        if (null === $output) {
+        if ($output === null) {
             $output = new ConsoleOutput();
         }
 
@@ -118,7 +119,7 @@ final class Application extends BaseApplication
         return parent::run($input, $output);
     }
 
-    public function getContainer(): InfectionContainer
+    public function getContainer(): Container
     {
         return $this->container;
     }

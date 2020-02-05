@@ -41,21 +41,21 @@ use function array_map;
 use function in_array;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\Tests\AutoReview\PhpDoc\PHPDocParser;
+use Infection\Tests\AutoReview\SourceTestClassNameScheme;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
 use function Safe\array_flip;
-use function Safe\preg_replace;
 use function Safe\sprintf;
 
 /**
  * @coversNothing
  *
  * This class is responsible for testing that our code base adheres to certain rules,
- * e.g. 'All classes that aren't intended to be used by users should be marked internal'
+ * e.g. 'All classes that aren't intended to be used by users should be marked internal'.
  *
- * The goal is to reduce pr reviews about style issues that can't be automatically fixed.
- * All test failures should be clear in meaning, to help new contributors.
+ * The goal is to reduce PR reviews about style issues that can't be automatically fixed. All test
+ * failures should have a clear explanation to help contributors unfamiliar with the codebase.
  */
 final class ProjectCodeTest extends TestCase
 {
@@ -90,9 +90,9 @@ final class ProjectCodeTest extends TestCase
      */
     public function test_all_concrete_classes_have_tests(string $className): void
     {
-        $testClassName = preg_replace('/Infection/', 'Infection\\Tests', $className, 1) . 'Test';
+        $testClassName = SourceTestClassNameScheme::getTestClassName($className);
 
-        if (false === in_array($className, ProjectCodeProvider::NON_TESTED_CONCRETE_CLASSES, true)) {
+        if (in_array($className, ProjectCodeProvider::NON_TESTED_CONCRETE_CLASSES, true) === false) {
             $this->assertTrue(
                 class_exists($testClassName, true),
                 sprintf(

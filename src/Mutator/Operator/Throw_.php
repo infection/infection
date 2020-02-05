@@ -35,27 +35,56 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Throw_ extends Mutator
+final class Throw_ implements Mutator
 {
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Removes a throw statement (`throw`). For example:
+
+```php
+throw new Exception();
+```
+
+Will be mutated to:
+
+```php
+new Exception();
+```
+
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     /**
      * Replaces "throw new Exception();" with "new Exception();"
      *
-     * @param Node&Node\Stmt\Throw_ $node
+     * @param Node\Stmt\Throw_ $node
      *
-     * @return Node\Stmt\Expression
+     * @return Generator<Node\Stmt\Expression>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return new Node\Stmt\Expression($node->expr);
+        yield new Node\Stmt\Expression($node->expr);
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Stmt\Throw_;
     }

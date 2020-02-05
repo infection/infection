@@ -40,8 +40,11 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Mutator\IgnoreConfig;
+use Infection\Mutator\IgnoreMutator;
+use Infection\Mutator\Mutator;
 use Infection\TestFramework\TestFrameworkExtraOptions;
-use Infection\Tests\Fixtures\Mutator\Fake;
+use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkExtraOptions;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
@@ -53,8 +56,9 @@ final class ConfigurationTest extends TestCase
     /**
      * @dataProvider valueProvider
      *
-     * @param string[]      $sourceDirectories
+     * @param string[] $sourceDirectories
      * @param SplFileInfo[] $sourceFiles
+     * @param Mutator[] $mutators
      */
     public function test_it_can_be_instantiated(
         ?int $timeout,
@@ -183,7 +187,7 @@ final class ConfigurationTest extends TestCase
             'custom-dir',
             new PhpUnit('dist/phpunit', 'bin/phpunit'),
             [
-                'Fake' => new Fake(),
+                'Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator()),
             ],
             'phpunit',
             'bin/bootstrap.php',

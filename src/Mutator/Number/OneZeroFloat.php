@@ -35,6 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -42,23 +46,37 @@ use PhpParser\Node;
  */
 final class OneZeroFloat extends AbstractNumberMutator
 {
-    /**
-     * Replaces "0.0" with "1.0" or "1.0" with "0.0"
-     *
-     * @param Node&Node\Scalar\DNumber $node
-     *
-     * @return Node\Scalar\DNumber
-     */
-    public function mutate(Node $node)
-    {
-        if ($node->value === 0.0) {
-            return new Node\Scalar\DNumber(1.0);
-        }
+    use GetMutatorName;
 
-        return new Node\Scalar\DNumber(0.0);
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces a zero float value (`0.0`) with a non-zero float value (`1.0`) and vice-versa.
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
     }
 
-    protected function mutatesNode(Node $node): bool
+    /**
+     * @param Node\Scalar\DNumber $node
+     *
+     * @return Generator<Node\Scalar\DNumber>
+     */
+    public function mutate(Node $node): Generator
+    {
+        if ($node->value === 0.0) {
+            yield new Node\Scalar\DNumber(1.0);
+
+            return;
+        }
+
+        yield new Node\Scalar\DNumber(0.0);
+    }
+
+    public function canMutate(Node $node): bool
     {
         return
             $node instanceof Node\Scalar\DNumber

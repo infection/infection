@@ -35,32 +35,54 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class ArrayItem extends Mutator
+final class ArrayItem implements Mutator
 {
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces a key-value pair (`[$key => $value]`) array declaration with a value array declaration
+(`[$key > $value]`) where the key or the value are potentially impure (i.e. have a side-effect);
+For example `[foo() => $b->bar]`.
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            <<<'TXT'
+This mutation highlights the reliance of the side-effect(s) of the called key(s) and/or value(s)
+- completely disregarding the actual values of the array. The array content should either be
+checked or the impure calls should be made outside of the scope of the array.
+TXT
+        );
+    }
+
     /**
-     * Replaces "[$a->foo => $b->bar]" with "[$a->foo > $b->bar]"
+     * @param Node\Expr\ArrayItem $node
      *
-     * @param Node&Node\Expr\ArrayItem $node
-     *
-     * @return Node\Expr\BinaryOp\Greater
+     * @return Generator<Node\Expr\BinaryOp\Greater>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
         /** @var Node\Expr $key */
         $key = $node->key;
         /** @var Node\Expr $value */
         $value = $node->value;
 
-        return new Node\Expr\BinaryOp\Greater($key, $value, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\Greater($key, $value, $node->getAttributes());
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\ArrayItem && $node->key && ($this->isNodeWithSideEffects($node->value) || $this->isNodeWithSideEffects($node->key));
     }

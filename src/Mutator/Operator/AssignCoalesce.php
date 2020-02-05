@@ -35,30 +35,44 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
-use PhpParser\Node\Expr\Assign;
-use PhpParser\Node\Expr\AssignOp\Coalesce;
 
 /**
  * @internal
  */
-final class AssignCoalesce extends Mutator
+final class AssignCoalesce implements Mutator
 {
-    /**
-     * Replaces "$array['a'] ??= 'otherValue';" with "$array['a'] = 'otherValue'"
-     *
-     * @param Coalesce $node
-     *
-     * @return Assign
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return new Assign($node->var, $node->expr, $node->getAttributes());
+        return new Definition(
+            <<<'TXT'
+Replaces the null coalescing assignment operator (`??=`) with a plain assignment (`=`).
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
-    protected function mutatesNode(Node $node): bool
+    /**
+     * @param Node\Expr\AssignOp\Coalesce $node
+     *
+     * @return Generator<Node\Expr\Assign>
+     */
+    public function mutate(Node $node): Generator
     {
-        return $node instanceof Coalesce;
+        yield new Node\Expr\Assign($node->var, $node->expr, $node->getAttributes());
+    }
+
+    public function canMutate(Node $node): bool
+    {
+        return $node instanceof Node\Expr\AssignOp\Coalesce;
     }
 }

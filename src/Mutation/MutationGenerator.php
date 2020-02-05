@@ -36,15 +36,15 @@ declare(strict_types=1);
 namespace Infection\Mutation;
 
 use function count;
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\MutableFileProcessed;
-use Infection\Events\MutationGeneratingFinished;
-use Infection\Events\MutationGeneratingStarted;
-use Infection\Mutation;
-use Infection\Mutator\Util\Mutator;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\MutableFileWasProcessed;
+use Infection\Event\MutationGenerationWasFinished;
+use Infection\Event\MutationGenerationWasStarted;
+use Infection\Mutator\Mutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use PhpParser\NodeVisitor;
 use Symfony\Component\Finder\SplFileInfo;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -67,15 +67,18 @@ final class MutationGenerator
 
     /**
      * @param SplFileInfo[] $sourceFiles
-     * @param Mutator[]     $mutators
+     * @param Mutator[] $mutators
      */
     public function __construct(
         array $sourceFiles,
         LineCodeCoverage $codeCoverageData,
         array $mutators,
-        EventDispatcherInterface $eventDispatcher,
+        EventDispatcher $eventDispatcher,
         FileMutationGenerator $fileMutationGenerator
     ) {
+        Assert::allIsInstanceOf($sourceFiles, SplFileInfo::class);
+        Assert::allIsInstanceOf($mutators, Mutator::class);
+
         $this->sourceFiles = $sourceFiles;
         $this->codeCoverageData = $codeCoverageData;
         $this->mutators = $mutators;
@@ -84,7 +87,7 @@ final class MutationGenerator
     }
 
     /**
-     * @param bool          $onlyCovered Mutates only covered by tests lines of code
+     * @param bool $onlyCovered Mutates only covered by tests lines of code
      * @param NodeVisitor[] $extraNodeVisitors
      *
      * @throws UnparsableFile
@@ -95,7 +98,7 @@ final class MutationGenerator
     {
         $allFilesMutations = [[]];
 
-        $this->eventDispatcher->dispatch(new MutationGeneratingStarted(count($this->sourceFiles)));
+        $this->eventDispatcher->dispatch(new MutationGenerationWasStarted(count($this->sourceFiles)));
 
         foreach ($this->sourceFiles as $fileInfo) {
             $allFilesMutations[] = $this->fileMutationGenerator->generate(
@@ -106,10 +109,10 @@ final class MutationGenerator
                 $extraNodeVisitors
             );
 
-            $this->eventDispatcher->dispatch(new MutableFileProcessed());
+            $this->eventDispatcher->dispatch(new MutableFileWasProcessed());
         }
 
-        $this->eventDispatcher->dispatch(new MutationGeneratingFinished());
+        $this->eventDispatcher->dispatch(new MutationGenerationWasFinished());
 
         return array_merge(...$allFilesMutations);
     }

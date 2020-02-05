@@ -36,18 +36,22 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use Generator;
-use Infection\Console\InfectionContainer;
+use Infection\Container;
 use Infection\Mutation\FileParser;
 use Infection\Mutation\UnparsableFile;
+use Infection\Tests\StringNormalizer;
 use PhpParser\Error;
 use PhpParser\Node;
 use PhpParser\NodeDumper;
 use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
-use function realpath;
+use function Safe\realpath;
 use function Safe\sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class FileParserTest extends TestCase
 {
     public function test_it_parses_the_given_file_only_once(): void
@@ -74,10 +78,7 @@ final class FileParserTest extends TestCase
      */
     public function test_it_can_parse_a_file(SplFileInfo $fileInfo, string $expectedPrintedParsedContents): void
     {
-        /** @var FileParser $parser */
-        $parser = InfectionContainer::create()[FileParser::class];
-
-        $statements = $parser->parse($fileInfo);
+        $statements = Container::create()->getFileParser()->parse($fileInfo);
 
         foreach ($statements as $statement) {
             $this->assertInstanceOf(Node::class, $statement);
@@ -85,13 +86,15 @@ final class FileParserTest extends TestCase
 
         $actualPrintedParsedContents = (new NodeDumper())->dump($statements);
 
-        $this->assertSame($expectedPrintedParsedContents, $actualPrintedParsedContents);
+        $this->assertSame(
+            $expectedPrintedParsedContents,
+            StringNormalizer::normalizeString($actualPrintedParsedContents)
+        );
     }
 
     public function test_it_throws_upon_failure(): void
     {
-        /** @var FileParser $parser */
-        $parser = InfectionContainer::create()[FileParser::class];
+        $parser = Container::create()->getFileParser();
 
         try {
             $parser->parse(self::createFileInfo('/unknown', '<?php use foo as self;'));
@@ -143,13 +146,11 @@ AST
                 '/unknown',
                 <<<'PHP'
 <?php
+
 PHP
             ),
             <<<'AST'
 array(
-    0: Stmt_InlineHTML(
-        value: <?php
-    )
 )
 AST
         ];
@@ -180,7 +181,7 @@ PHP
 array(
     0: Stmt_InlineHTML(
         value: #!/usr/bin/env php
-    
+
     )
     1: Stmt_Declare(
         declares: array(

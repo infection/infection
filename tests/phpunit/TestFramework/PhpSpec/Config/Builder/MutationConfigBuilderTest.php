@@ -35,11 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpSpec\Config\Builder;
 
-use Infection\Mutant\MutantInterface;
-use Infection\Mutation;
+use Infection\Mutant\Mutant;
+use Infection\Mutation\Mutation;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class MutationConfigBuilderTest extends FileSystemTestCase
 {
     private const MUTATION_HASH = 'a1b2c3';
@@ -77,10 +80,10 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         $mutation->method('getOriginalFilePath')
             ->willReturn('/original/file/path');
 
-        $mutant = $this->createMock(MutantInterface::class);
+        $mutant = $this->createMock(Mutant::class);
         $mutant->method('getMutation')
             ->willReturn($mutation);
-        $mutant->method('getMutatedFilePath')
+        $mutant->method('getMutantFilePath')
             ->willReturn('/mutated/file/path');
 
         $builder = new MutationConfigBuilder($this->tmp, $originalYamlConfigPath, $projectDir);
@@ -98,5 +101,28 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
             "require_once '/project/dir/bootstrap.php';",
             file_get_contents($this->tmp . '/interceptor.phpspec.autoload.a1b2c3.infection.php')
         );
+    }
+
+    public function test_interceptor_is_included(): void
+    {
+        $projectDir = '/project/dir';
+        $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/phpspec/phpspec.yml';
+
+        $builder = new MutationConfigBuilder($this->tmp, $originalYamlConfigPath, $projectDir);
+
+        $this->assertSame(
+            $this->tmp . '/phpspecConfiguration.a1b2c3.infection.yml',
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::MUTATION_HASH,
+                self::ORIGINAL_FILE_PATH
+            )
+        );
+
+        $this->assertFileExists($this->tmp . '/interceptor.phpspec.autoload.a1b2c3.infection.php');
+        $content = file_get_contents($this->tmp . '/interceptor.phpspec.autoload.a1b2c3.infection.php');
+
+        $this->assertStringContainsString('IncludeInterceptor.php', $content);
     }
 }

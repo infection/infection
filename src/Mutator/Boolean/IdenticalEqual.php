@@ -35,27 +35,46 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @deprecated This mutator is a semantic addition
  */
-final class IdenticalEqual extends Mutator
+final class IdenticalEqual implements Mutator
 {
-    /**
-     * Replaces "===" with "=="
-     *
-     * @param Node&Node\Expr\BinaryOp\Identical $node
-     *
-     * @return Node\Expr\BinaryOp\Equal
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return new Node\Expr\BinaryOp\Equal($node->left, $node->right, $node->getAttributes());
+        return new Definition(
+            <<<'TXT'
+Replaces a strict comparison (using the identical operator (`===`)) with a loose comparison (using
+the loose operator (`==`)).
+TXT
+            ,
+            MutatorCategory::SEMANTIC_ADDITION,
+            null
+        );
     }
 
-    protected function mutatesNode(Node $node): bool
+    /**
+     * @param Node\Expr\BinaryOp\Identical $node
+     *
+     * @return Generator<Node\Expr\BinaryOp\Equal>
+     */
+    public function mutate(Node $node): Generator
+    {
+        yield new Node\Expr\BinaryOp\Equal($node->left, $node->right, $node->getAttributes());
+    }
+
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\Identical;
     }

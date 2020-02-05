@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures;
 
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -26,7 +26,7 @@ final class NullMutationVisitor extends NodeVisitorAbstract
     public function leaveNode(Node $node)
     {
         $clonedNode = clone $node;
-        if (!$this->mutator->shouldMutate($clonedNode)) {
+        if (!$this->mutator->canMutate($clonedNode)) {
             return;
         }
         $this->mutator->mutate($clonedNode);

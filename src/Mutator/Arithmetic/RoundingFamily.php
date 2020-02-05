@@ -37,31 +37,43 @@ namespace Infection\Mutator\Arithmetic;
 
 use Generator;
 use function in_array;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class RoundingFamily extends Mutator
+final class RoundingFamily implements Mutator
 {
+    use GetMutatorName;
+
     private const MUTATORS_MAP = [
         'floor',
         'ceil',
         'round',
     ];
 
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces rounding operations. For example `floor()` will be replaced with `ceil()` and `round()`.
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Mutates from one rounding function to all others:
-     *     1. floor() to ceil() and round()
-     *     2. ceil() to floor() and round()
-     *     3. round() to ceil() and floor()
+     * @param Node\Expr\FuncCall $node
      *
-     * @param Node&Node\Expr\FuncCall $node
-     *
-     * @return Generator
+     * @return Generator<Node\Expr\FuncCall>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
         /** @var Node\Name $name */
         $name = $node->name;
@@ -78,7 +90,7 @@ final class RoundingFamily extends Mutator
         }
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Expr\FuncCall) {
             return false;

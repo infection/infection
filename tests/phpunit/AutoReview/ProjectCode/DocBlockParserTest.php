@@ -84,7 +84,7 @@ PHP
             <<<'PHP'
    /**
  * This is a
- * multi-line  
+ * multi-line
    * doc-block
  * with weird indentation
     */

@@ -35,38 +35,55 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
-use PhpParser\Node\Expr\PostDec;
-use PhpParser\Node\Expr\PostInc;
-use PhpParser\Node\Expr\PreDec;
-use PhpParser\Node\Expr\PreInc;
 
 /**
  * @internal
  */
-final class Increment extends Mutator
+final class Increment implements Mutator
 {
-    /**
-     * Replaces "++" with "--"
-     *
-     * @param Node&(PostInc|PreInc) $node
-     *
-     * @return PostDec|PreDec
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        if ($node instanceof PreInc) {
-            return new PreDec($node->var, $node->getAttributes());
+        return new Definition(
+            <<<'TXT'
+Replaces a pre- or post-increment operator (`++`) with the analogue pre- or post-decrement operator
+(`--`).
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
+    /**
+     * @param Node\Expr\PostInc|Node\Expr\PreInc $node
+     *
+     * @return Generator<Node\Expr\PreDec|Node\Expr\PostDec>
+     */
+    public function mutate(Node $node): Generator
+    {
+        if ($node instanceof Node\Expr\PreInc) {
+            yield new Node\Expr\PreDec($node->var, $node->getAttributes());
+
+            return;
         }
 
-        if ($node instanceof PostInc) {
-            return new PostDec($node->var, $node->getAttributes());
+        if ($node instanceof Node\Expr\PostInc) {
+            yield new Node\Expr\PostDec($node->var, $node->getAttributes());
+
+            return;
         }
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
-        return $node instanceof PreInc || $node instanceof PostInc;
+        return $node instanceof Node\Expr\PreInc || $node instanceof Node\Expr\PostInc;
     }
 }

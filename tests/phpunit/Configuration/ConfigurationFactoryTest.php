@@ -47,10 +47,13 @@ use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
+use Infection\Mutator\IgnoreConfig;
+use Infection\Mutator\IgnoreMutator;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
+use Infection\Mutator\MutatorResolver;
 use Infection\Mutator\Removal\MethodCallRemoval;
-use Infection\Mutator\Util\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
 use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
@@ -61,6 +64,9 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class ConfigurationFactoryTest extends TestCase
 {
     use ConfigurationAssertions;
@@ -96,6 +102,7 @@ final class ConfigurationFactoryTest extends TestCase
 
         $this->configFactory = new ConfigurationFactory(
             new TmpDirProvider(),
+            new MutatorResolver(),
             new MutatorFactory(),
             new MutatorParser(),
             $sourceFilesCollectorProphecy->reveal()
@@ -104,6 +111,10 @@ final class ConfigurationFactoryTest extends TestCase
 
     /**
      * @dataProvider valueProvider
+     *
+     * @param SplFileInfo[] $expectedSourceDirectories
+     * @param SplFileInfo[] $expectedSourceFiles
+     * @param Mutator[] $expectedMutators
      */
     public function test_it_can_create_a_configuration(
         SchemaConfiguration $schema,
@@ -449,17 +460,18 @@ final class ConfigurationFactoryTest extends TestCase
                 '@default' => false,
                 'MethodCallRemoval' => (object) [
                     'ignore' => [
-                        'Infection\Finder\SourceFilesFinder::__construct::63',
+                        'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
                     ],
                 ],
             ],
             '',
             [
-                'MethodCallRemoval' => new MethodCallRemoval(new MutatorConfig([
-                    'ignore' => [
-                        'Infection\Finder\SourceFilesFinder::__construct::63',
-                    ],
-                ])),
+                'MethodCallRemoval' => new IgnoreMutator(
+                    new IgnoreConfig([
+                        'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
+                    ]),
+                    new MethodCallRemoval()
+                ),
             ]
         );
 
@@ -468,15 +480,25 @@ final class ConfigurationFactoryTest extends TestCase
                 '@default' => true,
                 'MethodCallRemoval' => (object) [
                     'ignore' => [
-                        'Infection\Finder\SourceFilesFinder::__construct::63',
+                        'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
                     ],
                 ],
             ],
             'AssignmentEqual,EqualIdentical',
-            [
-                'AssignmentEqual' => new AssignmentEqual(new MutatorConfig([])),
-                'EqualIdentical' => new EqualIdentical(new MutatorConfig([])),
-            ]
+            (static function (): array {
+                $config = new MutatorConfig([]);
+
+                return [
+                    'AssignmentEqual' => new IgnoreMutator(
+                        new IgnoreConfig([]),
+                        new AssignmentEqual()
+                    ),
+                    'EqualIdentical' => new IgnoreMutator(
+                        new IgnoreConfig([]),
+                        new EqualIdentical()
+                    ),
+                ];
+            })()
         );
 
         yield 'with source files' => [
@@ -604,9 +626,14 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to/config/phpunit-dir',
                 'config/phpunit'
             ),
-            [
-                'TrueValue' => new TrueValue(new MutatorConfig([])),
-            ],
+            (static function (): array {
+                return [
+                    'TrueValue' => new IgnoreMutator(
+                        new IgnoreConfig([]),
+                        new TrueValue(new MutatorConfig([]))
+                    ),
+                ];
+            })(),
             'phpspec',
             'config/bootstrap.php',
             '-d zend_extension=xdebug.so',
@@ -1195,7 +1222,7 @@ final class ConfigurationFactoryTest extends TestCase
     }
 
     /**
-     * @param array<string,Mutator> $expectedMutators
+     * @param array<string, Mutator> $expectedMutators
      */
     private static function createValueForMutators(
         array $configMutators,
@@ -1273,8 +1300,10 @@ final class ConfigurationFactoryTest extends TestCase
      */
     private static function getDefaultMutators(): array
     {
-        if (null === self::$mutators) {
-            self::$mutators = (new MutatorFactory())->create(['@default' => true]);
+        if (self::$mutators === null) {
+            self::$mutators = (new MutatorFactory())->create(
+                (new MutatorResolver())->resolve(['@default' => true])
+            );
         }
 
         return self::$mutators;

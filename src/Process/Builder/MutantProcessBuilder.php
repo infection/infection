@@ -35,46 +35,42 @@ declare(strict_types=1);
 
 namespace Infection\Process\Builder;
 
-use Infection\Mutant\MutantInterface;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
-use Infection\TestFramework\TestFrameworkAdapter;
-use Infection\Utils\VersionParser;
-use PackageVersions\Versions;
+use function method_exists;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
+ * @final
  */
-final class MutantProcessBuilder
+class MutantProcessBuilder
 {
     private $testFrameworkAdapter;
     private $timeout;
-    private $versionParser;
 
-    public function __construct(TestFrameworkAdapter $testFrameworkAdapter, VersionParser $versionParser, int $timeout)
+    public function __construct(TestFrameworkAdapter $testFrameworkAdapter, int $timeout)
     {
         $this->testFrameworkAdapter = $testFrameworkAdapter;
         $this->timeout = $timeout;
-        $this->versionParser = $versionParser;
     }
 
-    public function createProcessForMutant(MutantInterface $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
+    public function createProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
     {
         $process = new Process(
             $this->testFrameworkAdapter->getMutantCommandLine(
-                $mutant->getCoverageTests(),
-                $mutant->getMutatedFilePath(),
+                $mutant->getTests(),
+                $mutant->getMutantFilePath(),
                 $mutant->getMutation()->getHash(),
                 $mutant->getMutation()->getOriginalFilePath(),
                 $testFrameworkExtraOptions
             )
         );
 
-        $process->setTimeout($this->timeout);
+        $process->setTimeout((float) $this->timeout);
 
-        $symfonyProcessVersion = $this->versionParser->parse(Versions::getVersion('symfony/process'));
-
-        if (version_compare($symfonyProcessVersion, '4.4.0', '<')) {
+        if (method_exists($process, 'inheritEnvironmentVariables')) {
             // in version 4.4.0 this method is deprecated and removed in 5.0.0
             $process->inheritEnvironmentVariables();
         }

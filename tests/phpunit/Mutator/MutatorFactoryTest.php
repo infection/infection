@@ -35,19 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use function array_diff;
 use function array_values;
 use function count;
 use function get_class;
-use Infection\Mutator\Arithmetic\Minus;
 use Infection\Mutator\Arithmetic\Plus;
-use Infection\Mutator\Boolean\FalseValue;
 use Infection\Mutator\Boolean\IdenticalEqual;
-use Infection\Mutator\Boolean\NotIdenticalNotEqual;
 use Infection\Mutator\Boolean\TrueValue;
+use Infection\Mutator\IgnoreMutator;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
-use Infection\Mutator\ProfileList;
-use Infection\Mutator\Util\Mutator;
 use Infection\Visitor\ReflectionVisitor;
 use InvalidArgumentException;
 use PhpParser\Node;
@@ -72,115 +68,18 @@ final class MutatorFactoryTest extends TestCase
     {
         $mutators = $this->mutatorFactory->create([]);
 
-        $this->assertCount(0, $mutators);
+        $this->assertSame([], $mutators);
     }
 
-    public function test_it_can_creates_the_mutators_for_a_given_profile(): void
-    {
-        $mutators = $this->mutatorFactory->create(['@boolean' => true]);
-
-        $this->assertSameMutatorsByClass(ProfileList::BOOLEAN_PROFILE, $mutators);
-    }
-
-    public function test_it_can_creates_the_mutators_with_empty_settings_for_a_given_profile(): void
-    {
-        $mutators = $this->mutatorFactory->create(['@boolean' => []]);
-
-        $this->assertSameMutatorsByClass(ProfileList::BOOLEAN_PROFILE, $mutators);
-    }
-
-    public function test_it_can_creates_the_profile_mutators_with_the_given_settings(): void
-    {
-        // TODO: refactor this test to check the mutator configuration directly instead of relying
-        // on the shouldMutate() API which ends up testing other stuff and is also more cumbersome
-        // to employ.
-
-        $mutators = $this->mutatorFactory->create([
-            '@default' => true,
-            '@boolean' => [
-                'ignore' => ['A::B'],
-            ],
-        ]);
-
-        $this->assertSameMutatorsByClass(ProfileList::getDefaultProfileMutators(), $mutators);
-
-        /** @var MockObject|ReflectionClass $reflectionMock */
-        $reflectionMock = $this->createMock(ReflectionClass::class);
-        $reflectionMock
-            ->expects($this->exactly(3))
-            ->method('getName')
-            ->willReturn('A')
-        ;
-
-        $plusNode = $this->createPlusNode('B', $reflectionMock);
-        $falseNode = $this->createBoolNode('false', 'B', $reflectionMock);
-        $trueNode = $this->createBoolNode('true', 'B', $reflectionMock);
-
-        $this->assertTrue($mutators[Plus::getName()]->shouldMutate($plusNode));
-        $this->assertFalse($mutators[TrueValue::getName()]->shouldMutate($trueNode));
-        $this->assertFalse($mutators[FalseValue::getName()]->shouldMutate($falseNode));
-    }
-
-    public function test_it_can_ignore_a_profile(): void
-    {
-        $mutators = $this->mutatorFactory->create(['@boolean' => false]);
-
-        $this->assertCount(0, $mutators);
-    }
-
-    public function test_it_will_remove_the_mutators_from_the_ignored_profile_even_if_included_from_a_different_profile(): void
+    public function test_it_can_create_the_mutators_with_empty_settings(): void
     {
         $mutators = $this->mutatorFactory->create([
-             '@default' => true,
-             '@boolean' => false,
-        ]);
-
-        $expectedMutators = array_values(array_diff(
-            ProfileList::getDefaultProfileMutators(),
-            ProfileList::BOOLEAN_PROFILE
-        ));
-
-        $this->assertSameMutatorsByClass($expectedMutators, $mutators);
-    }
-
-    public function test_it_will_not_remove_the_mutators_from_the_ignored_profile_if_its_mutators_are_included_after(): void
-    {
-        $mutators = $this->mutatorFactory->create([
-            '@default' => false,
-            '@boolean' => true,
-        ]);
-
-        $this->assertSameMutatorsByClass(ProfileList::BOOLEAN_PROFILE, $mutators);
-    }
-
-    public function test_it_can_create_mutators_from_their_names(): void
-    {
-        $mutators = $this->mutatorFactory->create([
-            Plus::getName() => true,
-            Minus::getName() => true,
+            Plus::class => [],
+            IdenticalEqual::class => [],
         ]);
 
         $this->assertSameMutatorsByClass(
-            [
-                Plus::class,
-                Minus::class,
-            ],
-            $mutators
-        );
-    }
-
-    public function test_it_can_create_mutators_with_empty_settings_from_their_names(): void
-    {
-        $mutators = $this->mutatorFactory->create([
-            Plus::getName() => [],
-            Minus::getName() => [],
-        ]);
-
-        $this->assertSameMutatorsByClass(
-            [
-                Plus::class,
-                Minus::class,
-            ],
+            [Plus::class, IdenticalEqual::class],
             $mutators
         );
     }
@@ -188,116 +87,78 @@ final class MutatorFactoryTest extends TestCase
     public function test_it_can_create_a_mutator_with_the_given_settings(): void
     {
         // TODO: refactor this test to check the mutator configuration directly instead of relying
-        // on the shouldMutate() API which ends up testing other stuff and is also more cumbersome
+        // on the canMutate() API which ends up testing other stuff and is also more cumbersome
         // to employ.
 
         $mutators = $this->mutatorFactory->create([
-            '@boolean' => true,
-            TrueValue::getName() => [
+            TrueValue::class => [
                 'ignore' => ['A::B'],
             ],
         ]);
 
-        $this->assertSameMutatorsByClass(ProfileList::BOOLEAN_PROFILE, $mutators);
+        $this->assertSameMutatorsByClass([TrueValue::class], $mutators);
 
         /** @var MockObject|ReflectionClass $reflectionMock */
         $reflectionMock = $this->createMock(ReflectionClass::class);
         $reflectionMock
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getName')
             ->willReturn('A')
         ;
 
-        $falseNode = $this->createBoolNode('false', 'B', $reflectionMock);
-        $trueNode = $this->createBoolNode('true', 'B', $reflectionMock);
+        $trueNode = $this->createBoolNode(
+            'true',
+            'B',
+            $reflectionMock
+        );
 
-        $this->assertFalse($mutators[TrueValue::getName()]->shouldMutate($trueNode));
-        $this->assertTrue($mutators[FalseValue::getName()]->shouldMutate($falseNode));
-    }
-
-    public function test_it_can_ignore_a_mutator(): void
-    {
-        $mutators = $this->mutatorFactory->create([Plus::getName() => false]);
-
-        $this->assertCount(0, $mutators);
-    }
-
-    public function test_it_will_remove_the_ignored_mutators_if_they_were_included_previously(): void
-    {
-        $mutators = $this->mutatorFactory->create([
-            '@equal' => true,
-            IdenticalEqual::getName() => false,
-        ]);
-
-        $this->assertSameMutatorsByClass(
-            [NotIdenticalNotEqual::class],
-            $mutators
+        $this->assertFalse(
+            $mutators[MutatorName::getName(TrueValue::class)]->canMutate($trueNode)
         );
     }
 
-    public function test_it_will_not_remove_the_ignored_mutators_if_they_were_included_afterwards(): void
-    {
-        $mutators = $this->mutatorFactory->create([
-            IdenticalEqual::getName() => false,
-            '@equal' => true,
-        ]);
-
-        $this->assertSameMutatorsByClass(ProfileList::EQUAL_PROFILE, $mutators);
-    }
-
-    public function test_a_mutator_will_be_created_only_once_even_if_included_multiple_times(): void
-    {
-        $mutators = $this->mutatorFactory->create([
-            IdenticalEqual::getName() => true,
-            '@equal' => true,
-            NotIdenticalNotEqual::getName() => true,
-        ]);
-
-        $this->assertSameMutatorsByClass(ProfileList::EQUAL_PROFILE, $mutators);
-    }
-
-    public function test_it_cannot_create_mutators_for_unknown_profiles(): void
+    public function test_it_cannot_create_a_mutator_with_invalid_settings(): void
     {
         try {
-            $this->mutatorFactory->create(['@unknown-profile' => true]);
+            $this->mutatorFactory->create([Plus::class => false]);
 
             $this->fail();
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'The profile or mutator "@unknown-profile" was not recognized.',
+                'Expected config of the mutator "Infection\Mutator\Arithmetic\Plus" to be an array. Got "boolean" instead',
                 $exception->getMessage()
             );
         }
+    }
+
+    public function test_it_can_create_the_mutators_with_unknown_settings(): void
+    {
+        $mutators = $this->mutatorFactory->create([
+            Plus::class => ['unknown' => 'dunno'],
+        ]);
+
+        $this->assertSameMutatorsByClass([Plus::class], $mutators);
     }
 
     public function test_it_cannot_create_an_unknown_mutator(): void
     {
         try {
-            $this->mutatorFactory->create(['Unknwon\Mutator' => true]);
+            $this->mutatorFactory->create(['Unknwon\Mutator' => []]);
 
             $this->fail();
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
-                'The profile or mutator "Unknwon\Mutator" was not recognized.',
+                'Unknown mutator "Unknwon\Mutator"',
                 $exception->getMessage()
             );
         }
     }
 
-    private function createPlusNode(string $functionName, ReflectionClass $reflectionMock): Node
-    {
-        return new Node\Expr\BinaryOp\Plus(
-            new Node\Scalar\DNumber(1.23),
-            new Node\Scalar\DNumber(1.23),
-            [
-                ReflectionVisitor::REFLECTION_CLASS_KEY => $reflectionMock,
-                ReflectionVisitor::FUNCTION_NAME => $functionName,
-            ]
-        );
-    }
-
-    private function createBoolNode(string $boolean, string $functionName, ReflectionClass $reflectionMock): Node
-    {
+    private function createBoolNode(
+        string $boolean,
+        string $functionName,
+        ReflectionClass $reflectionMock
+    ): Node {
         return new Node\Expr\ConstFetch(
             new Node\Name($boolean),
             [
@@ -308,16 +169,23 @@ final class MutatorFactoryTest extends TestCase
     }
 
     /**
-     * @param string[]               $expectedMutators
+     * @param string[] $expectedMutatorClassNames
      * @param array<string, Mutator> $actualMutators
      */
-    private function assertSameMutatorsByClass(array $expectedMutators, array $actualMutators): void
-    {
-        $this->assertCount(count($expectedMutators), $actualMutators);
+    private function assertSameMutatorsByClass(
+        array $expectedMutatorClassNames,
+        array $actualMutators
+    ): void {
+        $this->assertCount(count($expectedMutatorClassNames), $actualMutators);
+
+        $decoratedMutatorReflection = (new ReflectionClass(IgnoreMutator::class))->getProperty('mutator');
+        $decoratedMutatorReflection->setAccessible(true);
 
         foreach (array_values($actualMutators) as $index => $mutator) {
-            $expectedMutatorClass = $expectedMutators[$index];
-            $actualMutatorClass = get_class($mutator);
+            $this->assertInstanceOf(IgnoreMutator::class, $mutator);
+
+            $expectedMutatorClass = $expectedMutatorClassNames[$index];
+            $actualMutatorClass = get_class($decoratedMutatorReflection->getValue($mutator));
 
             $this->assertSame(
                 $expectedMutatorClass,

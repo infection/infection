@@ -35,24 +35,34 @@ declare(strict_types=1);
 
 namespace Infection\Differ;
 
+use function array_map;
+use function explode;
+use function implode;
+use function Safe\sprintf;
+use function strpos;
+
 /**
  * @internal
+ * @final
  */
 class DiffColorizer
 {
     public function colorize(string $diff): string
     {
-        $lines = array_map(static function (string $line) {
-            if (0 === strpos($line, '-')) {
-                return  sprintf('<diff-del>%s</diff-del>', $line);
-            }
+        $lines = array_map(
+            static function (string $line) {
+                if (strpos($line, '-') === 0) {
+                    return sprintf('<diff-del>%s</diff-del>', $line);
+                }
 
-            if (0 === strpos($line, '+')) {
-                return sprintf('<diff-add>%s</diff-add>', $line);
-            }
+                if (strpos($line, '+') === 0) {
+                    return sprintf('<diff-add>%s</diff-add>', $line);
+                }
 
-            return $line;
-        }, explode("\n", $diff));
+                return $line;
+            },
+            explode("\n", $diff)
+        );
 
         return sprintf('<code>%s%s</code>', "\n", implode("\n", $lines));
     }

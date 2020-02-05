@@ -35,24 +35,55 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ZeroIteration;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Foreach_ extends Mutator
+final class Foreach_ implements Mutator
 {
-    /**
-     * Replaces "foreach($a as $b)" with "foreach(array() as $b)"
-     *
-     * @param Node&Node\Stmt\Foreach_ $node
-     *
-     * @return Node&Node\Stmt\Foreach_
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return new Node\Stmt\Foreach_(
+        return new Definition(
+            <<<'TXT'
+Replaces the iterable being iterated over with a `foreach` statement with an empty array, preventing
+any statement within the block to be executed. For example:
+
+```php`
+foreach ($a as $b) {
+    // ...
+}
+```
+
+Will be mutated to:
+
+```php
+for ([] as $b]) {
+    // ...
+}
+```
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
+    /**
+     * @param Node\Stmt\Foreach_ $node
+     *
+     * @return Generator<Node\Stmt\Foreach_>
+     */
+    public function mutate(Node $node): Generator
+    {
+        yield new Node\Stmt\Foreach_(
             new Node\Expr\Array_(),
             $node->valueVar,
             [
@@ -64,7 +95,7 @@ final class Foreach_ extends Mutator
         );
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Stmt\Foreach_;
     }

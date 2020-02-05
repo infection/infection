@@ -35,27 +35,40 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Minus extends Mutator
+final class Minus implements Mutator
 {
-    /**
-     * Replaces "-" with "+"
-     *
-     * @param Node&Node\Expr\BinaryOp\Minus $node
-     *
-     * @return Node\Expr\BinaryOp\Plus
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return new Node\Expr\BinaryOp\Plus($node->left, $node->right, $node->getAttributes());
+        return new Definition(
+            'Replaces a subtraction operator (`-`) with an addition operator (`+`).',
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
     }
 
-    protected function mutatesNode(Node $node): bool
+    /**
+     * @param Node\Expr\BinaryOp\Minus $node
+     *
+     * @return Generator<Node\Expr\BinaryOp\Plus>
+     */
+    public function mutate(Node $node): Generator
+    {
+        yield new Node\Expr\BinaryOp\Plus($node->left, $node->right, $node->getAttributes());
+    }
+
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\Minus;
     }

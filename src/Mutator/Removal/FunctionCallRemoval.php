@@ -35,25 +35,42 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class FunctionCallRemoval extends Mutator
+final class FunctionCallRemoval implements Mutator
 {
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            'Removes the function call.',
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     /**
      * Replaces "doSmth()" with ""
      *
-     * @return Node\Stmt\Nop()
+     * @param Node\Stmt\Expression $node
+     *
+     * @return Generator<Node\Stmt\Nop>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return new Node\Stmt\Nop();
+        yield new Node\Stmt\Nop();
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Stmt\Expression) {
             return false;

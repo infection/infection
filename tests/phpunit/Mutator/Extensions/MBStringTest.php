@@ -76,13 +76,13 @@ final class MBStringTest extends AbstractMutatorTestCase
         yield 'It converts mb_strlen with encoding to strlen' => [
             "<?php mb_strlen('test', 'utf-8');",
             "<?php\n\nstrlen('test');",
-            ['settings' => ['mb_strlen' => true]],
+            ['mb_strlen' => true],
         ];
 
         yield 'It does not convert mb_strlen when disabled' => [
             "<?php mb_strlen('test');",
             null,
-            ['settings' => ['mb_strlen' => false]],
+            ['mb_strlen' => false],
         ];
 
         yield from $this->mutationsProviderForChr();

@@ -7,9 +7,9 @@
 
 namespace Infection\Tests\Fixtures;
 
-use Infection\EventDispatcher\EventSubscriberInterface;
+use Infection\Event\Subscriber\EventSubscriber;
 
-class UserEventSubscriber implements EventSubscriberInterface
+class UserEventSubscriber implements EventSubscriber
 {
     public $count = 0;
 

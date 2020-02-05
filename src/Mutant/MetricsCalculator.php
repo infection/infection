@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Mutant;
 
 use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessInterface;
 
 /**
  * @internal
@@ -51,34 +50,34 @@ class MetricsCalculator
     private $totalMutantsCount = 0;
 
     /**
-     * @var MutantProcessInterface[]
+     * @var MutantProcess[]
      */
     private $killedMutantProcesses = [];
 
     /**
-     * @var MutantProcessInterface[]
+     * @var MutantProcess[]
      */
     private $errorProcesses = [];
 
     /**
-     * @var MutantProcessInterface[]
+     * @var MutantProcess[]
      */
     private $escapedMutantProcesses = [];
 
     /**
-     * @var MutantProcessInterface[]
+     * @var MutantProcess[]
      */
     private $timedOutProcesses = [];
 
     /**
-     * @var MutantProcessInterface[]
+     * @var MutantProcess[]
      */
     private $notCoveredMutantProcesses = [];
 
     /**
      * Build a metric calculator with a sub-set of mutators
      *
-     * @param MutantProcessInterface[] $mutantProcesses
+     * @param MutantProcess[] $mutantProcesses
      *
      * @return MetricsCalculator
      */
@@ -93,7 +92,7 @@ class MetricsCalculator
         return $self;
     }
 
-    public function collect(MutantProcessInterface $mutantProcess): void
+    public function collect(MutantProcess $mutantProcess): void
     {
         ++$this->totalMutantsCount;
 
@@ -195,7 +194,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutantProcessInterface[]
+     * @return MutantProcess[]
      */
     public function getEscapedMutantProcesses(): array
     {
@@ -203,7 +202,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutantProcessInterface[]
+     * @return MutantProcess[]
      */
     public function getKilledMutantProcesses(): array
     {
@@ -211,7 +210,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutantProcessInterface[]
+     * @return MutantProcess[]
      */
     public function getTimedOutProcesses(): array
     {
@@ -219,7 +218,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutantProcessInterface[]
+     * @return MutantProcess[]
      */
     public function getNotCoveredMutantProcesses(): array
     {
@@ -227,7 +226,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutantProcessInterface[]
+     * @return MutantProcess[]
      */
     public function getAllMutantProcesses(): array
     {
@@ -245,7 +244,7 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutantProcessInterface[]
+     * @return MutantProcess[]
      */
     public function getErrorProcesses(): array
     {

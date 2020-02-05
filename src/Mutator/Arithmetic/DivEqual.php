@@ -35,27 +35,43 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class DivEqual extends Mutator
+final class DivEqual implements Mutator
 {
-    /**
-     * Replaces "/=" with "*="
-     *
-     * @param Node&Node\Expr\AssignOp\Div $node
-     *
-     * @return Node\Expr\AssignOp\Mul
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return new Node\Expr\AssignOp\Mul($node->var, $node->expr, $node->getAttributes());
+        return new Definition(
+            <<<'TXT'
+Replaces a division assignment operator (`/=`) with a multiplication assignment operator (`*=`).
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
     }
 
-    protected function mutatesNode(Node $node): bool
+    /**
+     * @param Node\Expr\AssignOp\Div $node
+     *
+     * @return Generator<Node\Expr\AssignOp\Mul>
+     */
+    public function mutate(Node $node): Generator
+    {
+        yield new Node\Expr\AssignOp\Mul($node->var, $node->expr, $node->getAttributes());
+    }
+
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\AssignOp\Div;
     }

@@ -50,7 +50,7 @@ final class CoverageDoesNotExistExceptionTest extends TestCase
 
         $this->assertInstanceOf(CoverageDoesNotExistException::class, $exception);
         $this->assertSame(
-            'Code Coverage does not exist. File file-index-path is not found. Check phpunit version Infection was run with and generated config files inside tempdir. Make sure to either: ' . "\n" .
+            'Code Coverage does not exist. File file-index-path is not found. Check phpunit version Infection was run with and generated config files inside tempdir. Make sure to either:' . "\n" .
             '- Enable xdebug and run infection again' . "\n" .
             '- Use phpdbg: phpdbg -qrr infection' . "\n" .
             '- Enable pcov and run infection again' . "\n" .

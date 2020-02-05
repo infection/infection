@@ -35,27 +35,43 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class ShiftRight extends Mutator
+final class ShiftRight implements Mutator
 {
-    /**
-     * Replaces ">>" with "<<"
-     *
-     * @param Node&Node\Expr\BinaryOp\ShiftRight $node
-     *
-     * @return Node\Expr\BinaryOp\ShiftLeft
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return new Node\Expr\BinaryOp\ShiftLeft($node->left, $node->right, $node->getAttributes());
+        return new Definition(
+            <<<'TXT'
+Replaces a bitwise shift left operator (`>>`) with a bitwise shift right operator (`<<`).
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
     }
 
-    protected function mutatesNode(Node $node): bool
+    /**
+     * @param Node\Expr\BinaryOp\ShiftRight $node
+     *
+     * @return Generator<Node\Expr\BinaryOp\ShiftLeft>
+     */
+    public function mutate(Node $node): Generator
+    {
+        yield new Node\Expr\BinaryOp\ShiftLeft($node->left, $node->right, $node->getAttributes());
+    }
+
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\ShiftRight;
     }

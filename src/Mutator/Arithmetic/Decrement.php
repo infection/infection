@@ -35,38 +35,55 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
-use PhpParser\Node\Expr\PostDec;
-use PhpParser\Node\Expr\PostInc;
-use PhpParser\Node\Expr\PreDec;
-use PhpParser\Node\Expr\PreInc;
 
 /**
  * @internal
  */
-final class Decrement extends Mutator
+final class Decrement implements Mutator
 {
-    /**
-     * Replaces "--" with "++"
-     *
-     * @param Node&(PreDec|PostDec) $node
-     *
-     * @return PreInc|PostInc
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        if ($node instanceof PreDec) {
-            return new PreInc($node->var, $node->getAttributes());
+        return new Definition(
+            <<<'TXT'
+Replaces a pre- or post-decrement operator (`--`) with the analogue pre- or post-increment operator
+(`++`).
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
+    /**
+     * @param Node\Expr\PreDec|Node\Expr\PostDec $node
+     *
+     * @return Generator<Node\Expr\PreInc|Node\Expr\PostInc>
+     */
+    public function mutate(Node $node): Generator
+    {
+        if ($node instanceof Node\Expr\PreDec) {
+            yield new Node\Expr\PreInc($node->var, $node->getAttributes());
+
+            return;
         }
 
-        if ($node instanceof PostDec) {
-            return new PostInc($node->var, $node->getAttributes());
+        if ($node instanceof Node\Expr\PostDec) {
+            yield new Node\Expr\PostInc($node->var, $node->getAttributes());
+
+            return;
         }
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
-        return $node instanceof PreDec || $node instanceof PostDec;
+        return $node instanceof Node\Expr\PreDec || $node instanceof Node\Expr\PostDec;
     }
 }

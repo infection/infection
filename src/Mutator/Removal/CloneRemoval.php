@@ -35,27 +35,40 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class CloneRemoval extends Mutator
+final class CloneRemoval implements Mutator
 {
-    /**
-     * Replaces "clone (new stdClass())" with "new stdClass()"
-     *
-     * @param Node&Node\Expr\Clone_ $node
-     *
-     * @return Node\Expr
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return $node->expr;
+        return new Definition(
+            'Removes the clone keyword, e.g. replacing `clone $x` with `$x`.',
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
-    protected function mutatesNode(Node $node): bool
+    /**
+     * @param Node\Expr\Clone_ $node
+     *
+     * @return Generator<Node\Expr>
+     */
+    public function mutate(Node $node): Generator
+    {
+        yield $node->expr;
+    }
+
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\Clone_;
     }

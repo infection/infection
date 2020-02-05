@@ -35,27 +35,43 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ConditionalNegotiation;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class LessThanOrEqualToNegotiation extends Mutator
+final class LessThanOrEqualToNegotiation implements Mutator
 {
-    /**
-     * Replaces "<=" with ">"
-     *
-     * @param Node&Node\Expr\BinaryOp\SmallerOrEqual $node
-     *
-     * @return Node\Expr\BinaryOp\Greater
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return new Node\Expr\BinaryOp\Greater($node->left, $node->right, $node->getAttributes());
+        return new Definition(
+            <<<'TXT'
+Replaces a less-than-or-equal to operator (`<=`) with the greater-than operator (`>`).
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
     }
 
-    protected function mutatesNode(Node $node): bool
+    /**
+     * @param Node\Expr\BinaryOp\SmallerOrEqual $node
+     *
+     * @return Generator<Node\Expr\BinaryOp\Greater>
+     */
+    public function mutate(Node $node): Generator
+    {
+        yield new Node\Expr\BinaryOp\Greater($node->left, $node->right, $node->getAttributes());
+    }
+
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\SmallerOrEqual;
     }

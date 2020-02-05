@@ -38,7 +38,7 @@ namespace Infection\FileSystem;
 use function array_filter;
 use function array_map;
 use function explode;
-use Infection\Finder\FilterableFinder;
+use Infection\FileSystem\Finder\FilterableFinder;
 use function iterator_to_array;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -70,7 +70,7 @@ class SourceFileCollector
             ->files()
         ;
 
-        if ('' === $filter) {
+        if ($filter === '') {
             $finder->name('*.php');
         } else {
             $finder->filterFiles(

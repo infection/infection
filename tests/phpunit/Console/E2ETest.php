@@ -42,9 +42,9 @@ use function function_exists;
 use Generator;
 use Infection\Command\ConfigureCommand;
 use Infection\Console\Application;
-use Infection\Console\InfectionContainer;
-use Infection\Finder\ComposerExecutableFinder;
-use Infection\Finder\Exception\FinderException;
+use Infection\Container;
+use Infection\FileSystem\Finder\ComposerExecutableFinder;
+use Infection\FileSystem\Finder\Exception\FinderException;
 use const PHP_SAPI;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -320,7 +320,7 @@ final class E2ETest extends TestCase
             $this->markTestIncomplete('This build of PHPDBG does not support code coverage');
         }
 
-        $container = InfectionContainer::create();
+        $container = Container::create();
         $input = new ArgvInput(array_merge([
             'bin/infection',
             'run',

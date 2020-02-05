@@ -35,28 +35,43 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Sort;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Spaceship extends Mutator
+final class Spaceship implements Mutator
 {
-    /**
-     * Swaps the arguments in the Spaceship operator <=>
-     * Replaces "$a <=> $b" with "$b <=> $a"
-     *
-     * @param Node&Node\Expr\BinaryOp\Spaceship $node
-     *
-     * @return Node\Expr\BinaryOp\Spaceship
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return new Node\Expr\BinaryOp\Spaceship($node->right, $node->left);
+        return new Definition(
+            <<<'TXT'
+Swaps the spaceship operator (`<=>`) operands, e.g. replaces `$a <=> $b` with `$b <=> $a`.
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
     }
 
-    protected function mutatesNode(Node $node): bool
+    /**
+     * @param Node\Expr\BinaryOp\Spaceship $node
+     *
+     * @return Generator<Node\Expr\BinaryOp\Spaceship>
+     */
+    public function mutate(Node $node): Generator
+    {
+        yield new Node\Expr\BinaryOp\Spaceship($node->right, $node->left);
+    }
+
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\Spaceship;
     }

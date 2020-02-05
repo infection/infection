@@ -35,25 +35,50 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
-use PhpParser\Node\Expr\ArrayItem;
 
 /**
  * @internal
  */
-final class Spread extends Mutator
+final class Spread implements Mutator
 {
-    /**
-     * Replaces "[...$collection, 4, 5];" with "[[...$collection][0], 4, 5]"
-     *
-     * @param ArrayItem $node
-     *
-     * @return ArrayItem
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return new ArrayItem(
+        return new Definition(
+            <<<'TXT'
+Replaces a spread operator in an array expression with its first element only. For example:
+
+```php
+$x = [...$collection, 4, 5];
+```
+
+Will be mutated to:
+
+```php
+$x = [[...$collection][0], 4, 5];
+```
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
+    /**
+     * @param Node\Expr\ArrayItem $node
+     *
+     * @return Generator<Node\Expr\ArrayItem>
+     */
+    public function mutate(Node $node): Generator
+    {
+        yield new Node\Expr\ArrayItem(
             new Node\Expr\ArrayDimFetch(
                 new Node\Expr\Array_(
                     [$node],
@@ -69,7 +94,7 @@ final class Spread extends Mutator
         );
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\ArrayItem && $node->unpack;
     }

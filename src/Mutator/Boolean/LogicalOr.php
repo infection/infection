@@ -35,27 +35,42 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class LogicalOr extends Mutator
+final class LogicalOr implements Mutator
 {
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            'Replaces an OR operator (`||`) with an AND operator (`&&`).',
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
      * Replaces "||" with "&&"
      *
-     * @param Node&Node\Expr\BinaryOp\BooleanOr $node
+     * @param Node\Expr\BinaryOp\BooleanOr $node
      *
-     * @return Node\Expr\BinaryOp\BooleanAnd
+     * @return Generator<Node\Expr\BinaryOp\BooleanAnd>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return new Node\Expr\BinaryOp\BooleanAnd($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\BooleanAnd($node->left, $node->right, $node->getAttributes());
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\BooleanOr;
     }

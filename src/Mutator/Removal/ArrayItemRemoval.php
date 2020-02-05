@@ -41,7 +41,10 @@ use Generator;
 use function gettype;
 use function in_array;
 use Infection\Config\Exception\InvalidConfigException;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\MutatorConfig;
 use function is_numeric;
 use function is_scalar;
@@ -55,8 +58,10 @@ use function strtoupper;
 /**
  * @internal
  */
-final class ArrayItemRemoval extends Mutator
+final class ArrayItemRemoval implements Mutator
 {
+    use GetMutatorName;
+
     private const DEFAULT_SETTINGS = [
         'remove' => 'first',
         'limit' => PHP_INT_MAX,
@@ -74,16 +79,54 @@ final class ArrayItemRemoval extends Mutator
 
     public function __construct(MutatorConfig $config)
     {
-        parent::__construct($config);
-
-        $settings = $this->getResultSettings();
+        $settings = $this->getResultSettings($config->getMutatorSettings());
 
         $this->remove = $settings['remove'];
         $this->limit = $settings['limit'];
     }
 
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Removes an element of an array literal. For example:
+
+```php
+$x = [0, 1, 2];
+```
+
+Will be mutated to:
+
+```php
+$x = [1, 2];
+```
+
+And:
+
+```php
+$x = [0, 2];
+```
+
+And:
+
+```php
+$x = [1, 2];
+```
+
+Which elements it removes or how many elements it will attempt to remove will depend on its
+configuration.
+
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
     /**
-     * @param Node&Node\Expr\Array_  $arrayNode
+     * @param Node\Expr\Array_ $arrayNode
+     *
+     * @return Generator<Node\Expr\Array_>
      */
     public function mutate(Node $arrayNode): Generator
     {
@@ -95,7 +138,7 @@ final class ArrayItemRemoval extends Mutator
         }
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\Array_ && count($node->items);
     }
@@ -112,30 +155,30 @@ final class ArrayItemRemoval extends Mutator
         }
     }
 
-    private function getResultSettings(): array
+    private function getResultSettings(array $settings): array
     {
-        $settings = array_merge(self::DEFAULT_SETTINGS, $this->getSettings());
+        $settings = array_merge(self::DEFAULT_SETTINGS, $settings);
 
         if (!is_string($settings['remove'])) {
-            $this->throwConfigException('remove');
+            $this->throwConfigException($settings, 'remove');
         }
 
         $settings['remove'] = strtolower($settings['remove']);
 
         if (!in_array($settings['remove'], ['first', 'last', 'all'])) {
-            $this->throwConfigException('remove');
+            $this->throwConfigException($settings, 'remove');
         }
 
         if (!is_numeric($settings['limit']) || $settings['limit'] < 1) {
-            $this->throwConfigException('limit');
+            $this->throwConfigException($settings, 'limit');
         }
 
         return $settings;
     }
 
-    private function throwConfigException(string $property): void
+    private function throwConfigException(array $settings, string $property): void
     {
-        $value = $this->getSettings()[$property];
+        $value = $settings[$property];
 
         throw new InvalidConfigException(sprintf(
             'Invalid configuration of ArrayItemRemoval mutator. Setting `%s` is invalid (%s)',

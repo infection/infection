@@ -35,34 +35,57 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Yield_ extends Mutator
+final class Yield_ implements Mutator
 {
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces a key-value pair (`yield $key => $value`) yielded value with the yielded value only
+(without key) where the key or the value are potentially impure (i.e. have a side-effect); For
+example `yield foo() => $b->bar;`.
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            <<<'TXT'
+This mutation highlights the reliance of the side-effect(s) of the called key(s) and/or value(s)
+- completely disregarding the actual yielded pair. The yielded content should either be checked or
+the impure calls should be made outside of the scope of the yielded value.
+TXT
+        );
+    }
+
     /**
-     * Replaces "yield $a => $b;" with "yield $a > $b;"
+     * @param Node\Expr\Yield_ $node
      *
-     * @param Node&Node\Expr\Yield_ $node
-     *
-     * @return Node|Node\Expr\Yield_
+     * @return Generator<Node\Expr\Yield_>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
         /** @var Node\Expr $key */
         $key = $node->key;
         /** @var Node\Expr $value */
         $value = $node->value;
+
         $node->value = new Node\Expr\BinaryOp\Greater($key, $value, $node->getAttributes());
         $node->key = null;
 
-        return $node;
+        yield $node;
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\Yield_ && $node->key;
     }

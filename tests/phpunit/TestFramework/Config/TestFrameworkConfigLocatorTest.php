@@ -35,11 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Config;
 
-use Infection\Locator\FileOrDirectoryNotFound;
+use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class TestFrameworkConfigLocatorTest extends TestCase
 {
     private $baseDir = __DIR__ . '/../../Fixtures/ConfigLocator/';

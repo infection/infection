@@ -40,12 +40,12 @@ use function Safe\sprintf;
 use function trait_exists;
 
 /**
- * @requires ProjectCodeProviderTest
+ * @covers \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider
  */
 final class ProjectCodeProviderTest extends TestCase
 {
     /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesProvider()
+     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesProvider
      */
     public function test_source_class_provider_is_valid(string $className): void
     {

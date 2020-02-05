@@ -62,7 +62,7 @@ TXT
 
         return new self(
             sprintf(
-                $message . ' Make sure to either: %s%s',
+                $message . ' Make sure to either:%s%s',
                 $coverageIndexFilePath,
                 $testFrameworkKey,
                 $tempDir,

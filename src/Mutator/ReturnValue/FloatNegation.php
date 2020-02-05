@@ -35,30 +35,45 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class FloatNegation extends Mutator
+final class FloatNegation implements Mutator
 {
-    /**
-     * Replaces any float with negated float
-     * Replaces "-33.4" with "33.4"
-     *
-     * @param Node&Node\Stmt\Return_ $node
-     *
-     * @return Node\Stmt\Return_
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return new Node\Stmt\Return_(
+        return new Definition(
+            <<<'TXT'
+Replaces a float value with its negated value. For example will replace `-33.4` with `33.4`.
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
+    /**
+     * @param Node\Stmt\Return_ $node
+     *
+     * @return Generator<Node\Stmt\Return_>
+     */
+    public function mutate(Node $node): Generator
+    {
+        yield new Node\Stmt\Return_(
             new Node\Scalar\DNumber(-1 * $this->getFloatValueOfNode($node), $node->getAttributes())
         );
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Stmt\Return_) {
             return false;
@@ -82,7 +97,7 @@ final class FloatNegation extends Mutator
     }
 
     /**
-     * @param Node&Node\Stmt\Return_ $node
+     * @param Node\Stmt\Return_ $node
      */
     private function getFloatValueOfNode(Node $node): float
     {

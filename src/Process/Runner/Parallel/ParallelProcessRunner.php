@@ -37,40 +37,40 @@ namespace Infection\Process\Runner\Parallel;
 
 use function assert;
 use function count;
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\MutantProcessFinished;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\MutantProcessWasFinished;
 use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessInterface;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * @internal
+ * @final
  *
  * This ProcessManager is a simple wrapper to enable parallel processing using Symfony Process component
  */
-final class ParallelProcessRunner
+class ParallelProcessRunner
 {
     private $eventDispatcher;
 
     /**
-     * @var MutantProcessInterface[]
+     * @var MutantProcess[]
      */
     private $processesQueue;
 
     /**
-     * @var MutantProcessInterface[]
+     * @var MutantProcess[]
      */
     private $currentProcesses = [];
 
-    public function __construct(EventDispatcherInterface $eventDispatcher)
+    public function __construct(EventDispatcher $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
-     * @param MutantProcessInterface[] $processes
+     * @param MutantProcess[] $processes
      *
      * @throws RuntimeException
      * @throws LogicException
@@ -105,7 +105,7 @@ final class ParallelProcessRunner
                 }
 
                 if (!$process->isRunning()) {
-                    $this->eventDispatcher->dispatch(new MutantProcessFinished($mutantProcess));
+                    $this->eventDispatcher->dispatch(new MutantProcessWasFinished($mutantProcess));
 
                     unset($this->currentProcesses[$index]);
 
@@ -124,12 +124,12 @@ final class ParallelProcessRunner
     private function startProcess(): bool
     {
         $mutantProcess = array_shift($this->processesQueue);
-        assert($mutantProcess instanceof MutantProcessInterface);
+        assert($mutantProcess instanceof MutantProcess);
 
         $mutant = $mutantProcess->getMutant();
 
         if (!$mutant->isCoveredByTest()) {
-            $this->eventDispatcher->dispatch(new MutantProcessFinished($mutantProcess));
+            $this->eventDispatcher->dispatch(new MutantProcessWasFinished($mutantProcess));
 
             return false;
         }

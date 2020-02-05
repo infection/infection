@@ -40,6 +40,9 @@ use Infection\Visitor\ParentConnectorVisitor;
 use function is_array;
 use PhpParser\Node;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class ParentConnectorVisitorTest extends BaseVisitorTest
 {
     private const CODE = <<<'PHP'
@@ -47,7 +50,7 @@ final class ParentConnectorVisitorTest extends BaseVisitorTest
 
 namespace Acme;
 
-function hello() 
+function hello()
 {
     return 'hello';
 }

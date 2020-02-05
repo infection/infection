@@ -37,7 +37,8 @@ namespace Infection\Logger;
 
 use function in_array;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Process\MutantProcessInterface;
+use Infection\Process\MutantProcess;
+use function Safe\file_put_contents;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -78,7 +79,7 @@ abstract class FileLogger implements MutationTestingResultsLogger
         $content = implode(PHP_EOL, $this->getLogLines());
 
         // If the output should be written to a stream then just write it directly
-        if (0 === strpos($this->logFilePath, 'php://')) {
+        if (strpos($this->logFilePath, 'php://') === 0) {
             if (in_array($this->logFilePath, ['php://stdout', 'php://stderr'], true)) {
                 file_put_contents($this->logFilePath, $content);
             } else {
@@ -99,11 +100,11 @@ abstract class FileLogger implements MutationTestingResultsLogger
     abstract protected function getLogLines(): array;
 
     /**
-     * @param MutantProcessInterface[] $processes
+     * @param MutantProcess[] $processes
      */
     final protected function sortProcesses(array &$processes): void
     {
-        usort($processes, static function (MutantProcessInterface $a, MutantProcessInterface $b): int {
+        usort($processes, static function (MutantProcess $a, MutantProcess $b): int {
             if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
                 return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
             }

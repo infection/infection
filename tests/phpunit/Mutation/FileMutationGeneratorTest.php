@@ -38,17 +38,19 @@ namespace Infection\Tests\Mutation;
 use function current;
 use function func_get_args;
 use Generator;
-use Infection\Console\InfectionContainer;
-use Infection\Mutation;
+use Infection\Container;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\FileParser;
+use Infection\Mutation\Mutation;
 use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutation\PrioritizedVisitorsNodeTraverser;
 use Infection\Mutator\Arithmetic\Plus;
-use Infection\Mutator\Util\MutatorConfig;
+use Infection\Mutator\IgnoreConfig;
+use Infection\Mutator\IgnoreMutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
+use Infection\Tests\Mutator\MutatorName;
 use Infection\Visitor\MutationsCollectorVisitor;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -90,16 +92,13 @@ final class FileMutationGeneratorTest extends TestCase
     {
         $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
 
-        $container = InfectionContainer::create();
-
-        /** @var FileMutationGenerator $mutationGenerator */
-        $mutationGenerator = $container[FileMutationGenerator::class];
+        $mutationGenerator = Container::create()->getFileMutationGenerator();
 
         $mutations = $mutationGenerator->generate(
             new SplFileInfo(self::FIXTURES_DIR . '/Mutation/OneFile/OneFile.php', '', ''),
             false,
             $codeCoverageMock,
-            [new Plus(new MutatorConfig([]))],
+            [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
             []
         );
 
@@ -113,7 +112,10 @@ final class FileMutationGeneratorTest extends TestCase
         /** @var Mutation $mutation */
         $mutation = current($mutations);
 
-        $this->assertInstanceOf(Plus::class, $mutation->getMutator());
+        $this->assertSame(
+            MutatorName::getName(Plus::class),
+            $mutation->getMutatorName()
+        );
     }
 
     /**
@@ -171,7 +173,7 @@ final class FileMutationGeneratorTest extends TestCase
             $fileInfo,
             $onlyCovered,
             $codeCoverage,
-            [new Plus(new MutatorConfig([]))],
+            [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
             $extraVisitors
         );
 
@@ -207,7 +209,7 @@ final class FileMutationGeneratorTest extends TestCase
                 $expectedFilePath,
                 false
             ),
-            [new Plus(new MutatorConfig([]))],
+            [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
             []
         );
 
@@ -242,7 +244,7 @@ final class FileMutationGeneratorTest extends TestCase
                 $fileInfo,
                 false,
                 $this->createMock(LineCodeCoverage::class),
-                [new Plus(new MutatorConfig([]))],
+                [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
                 $extraVisitors
             );
 

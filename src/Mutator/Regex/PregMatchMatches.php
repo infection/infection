@@ -36,27 +36,58 @@ declare(strict_types=1);
 namespace Infection\Mutator\Regex;
 
 use function count;
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class PregMatchMatches extends Mutator
+final class PregMatchMatches implements Mutator
 {
-    /**
-     * Replaces "preg_match('/a/', 'b', $foo);" with "(int) $foo = array();"
-     *
-     * @param Node&Node\Expr\FuncCall $node
-     *
-     * @return Node\Expr\Cast\Int_
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return new Node\Expr\Cast\Int_(new Node\Expr\Assign($node->args[2]->value, new Node\Expr\Array_()));
+        return new Definition(
+            <<<'TXT'
+Replaces a `preg_match` search results with an empty result. For example:
+
+```php
+if (preg_match('/pattern/', $subject, $matches, $flags)) {
+    // ...
+}
+```
+
+Will be mutated to:
+
+```php
+if ((int) $matches = []) {
+    // ...
+}
+```
+
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
-    protected function mutatesNode(Node $node): bool
+    /**
+     * @param Node\Expr\FuncCall $node
+     *
+     * @return Generator<Node\Expr\Cast\Int_>
+     */
+    public function mutate(Node $node): Generator
+    {
+        yield new Node\Expr\Cast\Int_(new Node\Expr\Assign($node->args[2]->value, new Node\Expr\Array_()));
+    }
+
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Expr\FuncCall) {
             return false;

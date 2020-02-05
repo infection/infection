@@ -38,23 +38,23 @@ namespace Infection;
 use function dirname;
 use function explode;
 use function file_exists;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\ApplicationExecutionFinished;
+use Infection\Event\ApplicationExecutionWasFinished;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutation\MutationGenerator;
-use Infection\Performance\Limiter\MemoryLimiter;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Coverage\CoverageRequirementChecker;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
+use Infection\Resource\Memory\MemoryLimiter;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
-use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
 use Infection\TestFramework\HasExtraNodeVisitors;
-use Infection\TestFramework\TestFrameworkAdapter;
 use const PHP_EOL;
 use function Safe\sprintf;
 use Symfony\Component\Filesystem\Filesystem;
@@ -85,7 +85,7 @@ final class Engine
         Filesystem $fileSystem,
         TestFrameworkAdapter $adapter,
         SubscriberBuilder $subscriberBuilder,
-        EventDispatcherInterface $eventDispatcher,
+        EventDispatcher $eventDispatcher,
         InitialTestsRunner $initialTestsRunner,
         MemoryLimiter $memoryLimitApplier,
         MutationGenerator $mutationGenerator,
@@ -170,7 +170,7 @@ final class Engine
             );
         }
 
-        $this->eventDispatcher->dispatch(new ApplicationExecutionFinished());
+        $this->eventDispatcher->dispatch(new ApplicationExecutionWasFinished());
 
         return true;
     }
@@ -179,7 +179,7 @@ final class Engine
     {
         $coverageDir = $this->config->getCoveragePath();
 
-        $coverageIndexFilePath = $coverageDir . '/' . LineCodeCoverage::COVERAGE_INDEX_FILE_NAME;
+        $coverageIndexFilePath = $coverageDir . '/' . PhpUnitXmlCoverageFactory::COVERAGE_INDEX_FILE_NAME;
 
         $processInfo = sprintf(
             '%sCommand line: %s%sProcess Output: %s',

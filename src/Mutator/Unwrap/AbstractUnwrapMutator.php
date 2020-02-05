@@ -37,22 +37,23 @@ namespace Infection\Mutator\Unwrap;
 
 use function array_key_exists;
 use Generator;
-use Infection\Mutator\Util\Mutator;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-abstract class AbstractUnwrapMutator extends Mutator
+abstract class AbstractUnwrapMutator implements Mutator
 {
+    use GetMutatorName;
+
     /**
-     * Replaces "$a = function(arg1, arg2);" with "$a = arg1;"
+     * @param Node\Expr\FuncCall $node
      *
-     * @param Node&Node\Expr\FuncCall $node
-     *
-     * @return Node\Arg[]|Generator;
+     * @return Generator<Node\Arg>
      */
-    final public function mutate(Node $node)
+    final public function mutate(Node $node): Generator
     {
         foreach ($this->getParameterIndexes($node) as $index) {
             if ($node->args[$index]->unpack) {
@@ -63,14 +64,7 @@ abstract class AbstractUnwrapMutator extends Mutator
         }
     }
 
-    abstract protected function getFunctionName(): string;
-
-    /**
-     * @return int[]|Generator
-     */
-    abstract protected function getParameterIndexes(Node\Expr\FuncCall $node): Generator;
-
-    final protected function mutatesNode(Node $node): bool
+    final public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Expr\FuncCall || !$node->name instanceof Node\Name) {
             return false;
@@ -84,4 +78,11 @@ abstract class AbstractUnwrapMutator extends Mutator
 
         return $node->name->toLowerString() === strtolower($this->getFunctionName());
     }
+
+    abstract protected function getFunctionName(): string;
+
+    /**
+     * @return int[]|Generator
+     */
+    abstract protected function getParameterIndexes(Node\Expr\FuncCall $node): Generator;
 }

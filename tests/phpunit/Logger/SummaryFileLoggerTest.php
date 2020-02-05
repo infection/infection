@@ -38,17 +38,39 @@ namespace Infection\Tests\Logger;
 use Infection\Logger\SummaryFileLogger;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
+use const PHP_EOL;
+use PHPUnit\Framework\MockObject\MockObject;
+use function str_replace;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class SummaryFileLoggerTest extends FileSystemTestCase
 {
+    private const LOG_FILE_PATH = '/path/to/text.log';
+
+    /**
+     * @var Filesystem|MockObject
+     */
+    private $fileSystemMock;
+
+    /**
+     * @var OutputInterface|MockObject
+     */
+    private $outputMock;
+
+    protected function setUp(): void
+    {
+        $this->fileSystemMock = $this->createMock(Filesystem::class);
+        $this->outputMock = $this->createMock(OutputInterface::class);
+    }
+
     public function test_it_logs_the_correct_lines_with_no_mutations(): void
     {
-        $logFilePath = $this->tmp . '/foo.txt';
-        $calculator = new MetricsCalculator();
-        $output = $this->createMock(OutputInterface::class);
-        $content = <<<'TXT'
+        $expectedContent = <<<'TXT'
 Total: 0
 Killed: 0
 Errored: 0
@@ -56,30 +78,62 @@ Escaped: 0
 Timed Out: 0
 Not Covered: 0
 TXT;
-        $content = str_replace("\n", PHP_EOL, $content);
 
-        $fs = $this->createMock(Filesystem::class);
-        $fs->expects($this->once())->method('dumpFile')->with(
-            $logFilePath,
-            $content
+        $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
+
+        $this->fileSystemMock
+            ->expects($this->once())
+            ->method('dumpFile')
+            ->with(self::LOG_FILE_PATH, $expectedContent)
+        ;
+
+        $debugFileLogger = new SummaryFileLogger(
+            $this->outputMock,
+            self::LOG_FILE_PATH,
+            new MetricsCalculator(),
+            $this->fileSystemMock,
+            false,
+            false
         );
 
-        $debugFileLogger = new SummaryFileLogger($output, $logFilePath, $calculator, $fs, false, false);
         $debugFileLogger->log();
     }
 
     public function test_it_logs_the_correct_lines_with_mutations(): void
     {
-        $logFilePath = $this->tmp . '/foo.txt';
-        $calculator = $this->createMock(MetricsCalculator::class);
-        $calculator->expects($this->once())->method('getTotalMutantsCount')->willReturn(6);
-        $calculator->expects($this->once())->method('getKilledCount')->willReturn(8);
-        $calculator->expects($this->once())->method('getErrorCount')->willReturn(7);
-        $calculator->expects($this->once())->method('getEscapedCount')->willReturn(30216);
-        $calculator->expects($this->once())->method('getTimedOutCount')->willReturn(2);
-        $calculator->expects($this->once())->method('getNotCoveredByTestsCount')->willReturn(0);
-        $output = $this->createMock(OutputInterface::class);
-        $content = <<<'TXT'
+        $calculatorMock = $this->createMock(MetricsCalculator::class);
+        $calculatorMock
+            ->expects($this->once())
+            ->method('getTotalMutantsCount')
+            ->willReturn(6)
+        ;
+        $calculatorMock
+            ->expects($this->once())
+            ->method('getKilledCount')
+            ->willReturn(8)
+        ;
+        $calculatorMock
+            ->expects($this->once())
+            ->method('getErrorCount')
+            ->willReturn(7)
+        ;
+        $calculatorMock
+            ->expects($this->once())
+            ->method('getEscapedCount')
+            ->willReturn(30216)
+        ;
+        $calculatorMock
+            ->expects($this->once())
+            ->method('getTimedOutCount')
+            ->willReturn(2)
+        ;
+        $calculatorMock
+            ->expects($this->once())
+            ->method('getNotCoveredByTestsCount')
+            ->willReturn(0)
+        ;
+
+        $expectedContent = <<<'TXT'
 Total: 6
 Killed: 8
 Errored: 7
@@ -87,52 +141,70 @@ Escaped: 30216
 Timed Out: 2
 Not Covered: 0
 TXT;
-        $content = str_replace("\n", PHP_EOL, $content);
 
-        $fs = $this->createMock(Filesystem::class);
-        $fs->expects($this->once())->method('dumpFile')->with(
-            $logFilePath,
-            $content
+        $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
+
+        $this->fileSystemMock
+            ->expects($this->once())
+            ->method('dumpFile')
+            ->with(self::LOG_FILE_PATH, $expectedContent)
+        ;
+
+        $debugFileLogger = new SummaryFileLogger(
+            $this->outputMock,
+            self::LOG_FILE_PATH,
+            $calculatorMock,
+            $this->fileSystemMock,
+            false,
+            false
         );
 
-        $debugFileLogger = new SummaryFileLogger($output, $logFilePath, $calculator, $fs, false, false);
         $debugFileLogger->log();
     }
 
-    /**
-     * @requires OSFAMILY Windows Cannot test file permission on Windows
-     */
-    public function test_it_outputs_an_error_when_dir_is_not_writable(): void
+    public function test_it_cannot_log_on_invalid_streams(): void
     {
-        $readOnlyDirPath = $this->tmp . '/invalid';
-        $logFilePath = $readOnlyDirPath . '/foo.txt';
+        $this->outputMock
+            ->expects($this->once())
+            ->method('writeln')
+            ->with('<error>The only streams supported are php://stdout and php://stderr</error>')
+        ;
 
-        // make it readonly
-        (new Filesystem())->mkdir($readOnlyDirPath, 0400);
-
-        if (is_writable($readOnlyDirPath)) {
-            $this->markTestSkipped('Unable to change file permission to 0400');
-        }
-
-        $calculator = $this->createMock(MetricsCalculator::class);
-        $calculator->expects($this->once())->method('getTotalMutantsCount')->willReturn(6);
-        $calculator->expects($this->once())->method('getKilledCount')->willReturn(8);
-        $calculator->expects($this->once())->method('getErrorCount')->willReturn(7);
-        $calculator->expects($this->once())->method('getEscapedCount')->willReturn(30216);
-        $calculator->expects($this->once())->method('getTimedOutCount')->willReturn(2);
-        $calculator->expects($this->once())->method('getNotCoveredByTestsCount')->willReturn(0);
-
-        $output = $this->createMock(OutputInterface::class);
-        $output->expects($this->once())->method('writeln')->with(
-            sprintf(
-                '<error>Unable to write to the "%s" directory.</error>',
-                $readOnlyDirPath
-            )
+        $debugFileLogger = new SummaryFileLogger(
+            $this->outputMock,
+            'php://memory',
+            new MetricsCalculator(),
+            $this->fileSystemMock,
+            false,
+            false
         );
 
-        $fs = new Filesystem();
+        $debugFileLogger->log();
+    }
 
-        $debugFileLogger = new SummaryFileLogger($output, $logFilePath, $calculator, $fs, false, false);
+    public function test_it_fails_if_cannot_write_file(): void
+    {
+        $this->fileSystemMock
+            ->expects($this->once())
+            ->method('dumpFile')
+            ->with(self::LOG_FILE_PATH, $this->anything())
+            ->willThrowException(new IOException('Cannot write in directory X'));
+
+        $this->outputMock
+            ->expects($this->once())
+            ->method('writeln')
+            ->with('<error>Cannot write in directory X</error>')
+        ;
+
+        $debugFileLogger = new SummaryFileLogger(
+            $this->outputMock,
+            self::LOG_FILE_PATH,
+            new MetricsCalculator(),
+            $this->fileSystemMock,
+            false,
+            false
+        );
+
         $debugFileLogger->log();
     }
 }

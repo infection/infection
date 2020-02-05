@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
+use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\CommandLineBuilder;
-use Infection\TestFramework\MemoryUsageAware;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
-use Infection\Utils\VersionParser;
+use Infection\TestFramework\VersionParser;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -57,14 +57,13 @@ final class PhpUnitAdapterTest extends TestCase
         $initialConfigBuilder = $this->createMock(InitialConfigBuilder::class);
         $mutationConfigBuilder = $this->createMock(MutationConfigBuilder::class);
         $cliArgumentsBuilder = $this->createMock(CommandLineArgumentsAndOptionsBuilder::class);
-        $versionParser = $this->createMock(VersionParser::class);
 
         $this->adapter = new PhpUnitAdapter(
             '/path/to/phpunit',
             $initialConfigBuilder,
             $mutationConfigBuilder,
             $cliArgumentsBuilder,
-            $versionParser,
+            new VersionParser(),
             new CommandLineBuilder()
         );
     }

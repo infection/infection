@@ -78,7 +78,7 @@ function generator_to_phpunit_data_provider(iterable $source): Generator
  */
 function make_tmp_dir(string $namespace, string $className): string
 {
-    if (false !== ($pos = strrpos($className, '\\'))) {
+    if (($pos = strrpos($className, '\\')) !== false) {
         $shortClass = substr($className, $pos + 1);
     } else {
         $shortClass = $className;
@@ -105,7 +105,7 @@ function make_tmp_dir(string $namespace, string $className): string
         } catch (IOException $exception) {
             ++$attempts;
         }
-    } while (false === $result && $attempts <= 10);
+    } while ($result === false && $attempts <= 10);
 
     return $tmpDir;
 }

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use function implode;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
@@ -43,7 +44,7 @@ use Infection\Config\ValueProvider\SourceDirsProvider;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Config\ValueProvider\TextLogFileProvider;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
-use Infection\Finder\TestFrameworkFinder;
+use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\TestFrameworkTypes;
 use function Safe\file_get_contents;
@@ -53,7 +54,6 @@ use stdClass;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
@@ -114,8 +114,7 @@ final class ConfigureCommand extends BaseCommand
             return 1;
         }
 
-        /** @var Filesystem $fileSystem */
-        $fileSystem = $this->getApplication()->getContainer()['filesystem'];
+        $fileSystem = $this->getApplication()->getContainer()->getFileSystem();
 
         $excludeDirsProvider = new ExcludeDirsProvider(
             $consoleHelper,

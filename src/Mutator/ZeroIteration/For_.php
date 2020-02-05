@@ -35,24 +35,55 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ZeroIteration;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class For_ extends Mutator
+final class For_ implements Mutator
 {
-    /**
-     * Replaces "for($i=0; $i<10; $i++)" with "for($i=0; false; $i++)"
-     *
-     * @param Node&Node\Stmt\For_ $node
-     *
-     * @return Node\Stmt\For_
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return new Node\Stmt\For_(
+        return new Definition(
+            <<<'TXT'
+Replaces the looping condition of a `for` block statement preventing any statement within the block
+to be executed. For example:
+
+```php`
+for ($i=0; $i<10; $i++) {
+    // ...
+}
+```
+
+Will be mutated to:
+
+```php
+for ($i=0; false; $i++) {
+    // ...
+}
+```
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
+    /**
+     * @param Node\Stmt\For_ $node
+     *
+     * @return Generator<Node\Stmt\For_>
+     */
+    public function mutate(Node $node): Generator
+    {
+        yield new Node\Stmt\For_(
             [
                 'init' => $node->init,
                 'cond' => [new Node\Expr\ConstFetch(new Node\Name('false'))],
@@ -63,7 +94,7 @@ final class For_ extends Mutator
         );
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Stmt\For_;
     }

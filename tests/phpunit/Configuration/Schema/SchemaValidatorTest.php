@@ -58,13 +58,13 @@ final class SchemaValidatorTest extends TestCase
         try {
             (new SchemaValidator())->validate($config);
 
-            if (null !== $expectedErrorMessage) {
+            if ($expectedErrorMessage !== null) {
                 $this->fail('Expected the config to be invalid.');
             } else {
                 $this->addToAssertionCount(1);
             }
         } catch (InvalidSchema $exception) {
-            if (null === $expectedErrorMessage) {
+            if ($expectedErrorMessage === null) {
                 $this->fail('Did not expect the config to be invalid.');
             } else {
                 $this->assertSame(

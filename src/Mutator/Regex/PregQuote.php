@@ -35,25 +35,54 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Regex;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class PregQuote extends Mutator
+final class PregQuote implements Mutator
 {
-    /**
-     * Replaces "$a = preg_quote($b);" with "$a = $b;"
-     *
-     * @param Node&Node\Expr\FuncCall $node
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return $node->args[0];
+        return new Definition(
+            <<<'TXT'
+Removes a `preg_quote` function call with its operand. For example:
+
+```php
+$x = preg_quote($string, $delimiter);
+```
+
+Will be mutated to:
+
+```php
+$x = $string;
+```
+
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
-    protected function mutatesNode(Node $node): bool
+    /**
+     * @param Node\Expr\FuncCall $node
+     *
+     * @return Generator<Node\Arg>
+     */
+    public function mutate(Node $node): Generator
+    {
+        yield $node->args[0];
+    }
+
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\FuncCall &&
             $node->name instanceof Node\Name &&

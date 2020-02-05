@@ -35,25 +35,40 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class LogicalNot extends Mutator
+final class LogicalNot implements Mutator
 {
-    /**
-     * Replaces "!something" with "something"
-     *
-     * @param Node&Node\Expr\BooleanNot $node
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return $node->expr;
+        return new Definition(
+            'Removes a negation operator (`!`), e.g. transforms `!$foo` with `$foo`.',
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
-    protected function mutatesNode(Node $node): bool
+    /**
+     * @param Node\Expr\BooleanNot $node
+     *
+     * @return Generator<Node\Expr>
+     */
+    public function mutate(Node $node): Generator
+    {
+        yield $node->expr;
+    }
+
+    public function canMutate(Node $node): bool
     {
         if (!($node instanceof Node\Expr\BooleanNot)) {
             return false;

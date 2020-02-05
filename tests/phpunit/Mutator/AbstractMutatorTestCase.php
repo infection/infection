@@ -40,26 +40,24 @@ use function count;
 use function escapeshellarg;
 use function exec;
 use function get_class;
-use Infection\Console\InfectionContainer;
-use Infection\Mutator\Util\Mutator;
+use Infection\Container;
+use Infection\Mutation\NodeTraverserFactory;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\Util\MutatorConfig;
 use Infection\Tests\Fixtures\SimpleMutation;
 use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;
 use Infection\Tests\Fixtures\SimpleMutatorVisitor;
+use Infection\Tests\StringNormalizer;
 use Infection\Visitor\CloneVisitor;
-use Infection\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\Visitor\NotMutableIgnoreVisitor;
-use Infection\Visitor\ParentConnectorVisitor;
-use Infection\Visitor\ReflectionVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\TestCase;
-use function rtrim;
 use function Safe\sprintf;
 use function str_replace;
 use function substr;
+use Webmozart\Assert\Assert;
 
 abstract class AbstractMutatorTestCase extends TestCase
 {
@@ -83,11 +81,14 @@ abstract class AbstractMutatorTestCase extends TestCase
         $this->mutator = $this->createMutator();
     }
 
+    /**
+     * @var string[]
+     */
     final public function doTest(string $inputCode, $expectedCode = [], array $settings = []): void
     {
         $expectedCodeSamples = (array) $expectedCode;
 
-        $inputCode = rtrim($inputCode, "\n");
+        $inputCode = StringNormalizer::normalizeString($inputCode);
 
         if ($inputCode === $expectedCode) {
             $this->fail('Input code cant be the same as mutated code');
@@ -106,15 +107,19 @@ abstract class AbstractMutatorTestCase extends TestCase
         );
 
         foreach ($mutants as $realMutatedCode) {
+            /** @var string|null $expectedCodeSample */
             $expectedCodeSample = array_shift($expectedCodeSamples);
 
             if ($expectedCodeSample === null) {
                 $this->fail('The number of expected mutated code samples must equal the number of generated Mutants by mutator.');
             }
 
-            $expectedCodeSample = rtrim($expectedCodeSample, "\n");
+            Assert::string($expectedCodeSample);
 
-            $this->assertSame($expectedCodeSample, $realMutatedCode);
+            $this->assertSame(
+                StringNormalizer::normalizeString($expectedCodeSample),
+                StringNormalizer::normalizeString($realMutatedCode)
+            );
             $this->assertSyntaxIsValid($realMutatedCode);
         }
     }
@@ -156,8 +161,8 @@ abstract class AbstractMutatorTestCase extends TestCase
 
     private static function getParser(): Parser
     {
-        if (null === self::$parser) {
-            self::$parser = InfectionContainer::create()[Parser::class];
+        if (self::$parser === null) {
+            self::$parser = Container::create()->getParser();
         }
 
         return self::$parser;
@@ -165,7 +170,7 @@ abstract class AbstractMutatorTestCase extends TestCase
 
     private static function getPrinter(): PrettyPrinterAbstract
     {
-        if (null === self::$printer) {
+        if (self::$printer === null) {
             self::$printer = new Standard();
         }
 
@@ -179,20 +184,15 @@ abstract class AbstractMutatorTestCase extends TestCase
     {
         $nodes = self::getParser()->parse($code);
 
-        $traverser = new NodeTraverser();
-
         $mutationsCollectorVisitor = new SimpleMutationsCollectorVisitor(
             $this->createMutator($settings),
             $nodes
         );
 
-        $traverser->addVisitor(new NotMutableIgnoreVisitor());
-        $traverser->addVisitor(new ParentConnectorVisitor());
-        $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
-        $traverser->addVisitor(new ReflectionVisitor());
-        $traverser->addVisitor($mutationsCollectorVisitor);
-
-        $traverser->traverse($nodes);
+        (new NodeTraverserFactory())
+            ->create([10 => $mutationsCollectorVisitor])
+            ->traverse($nodes)
+        ;
 
         return $mutationsCollectorVisitor->getMutations();
     }
@@ -210,7 +210,7 @@ abstract class AbstractMutatorTestCase extends TestCase
             $returnCode,
             sprintf(
                 'Mutator %s produces invalid code',
-                $this->createMutator()::getName()
+                $this->createMutator()->getName()
             )
         );
     }

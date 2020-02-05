@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\ReturnValue;
 
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\AbstractValueToNullReturnValue;
 use PhpParser\Node;
 
@@ -43,19 +46,52 @@ use PhpParser\Node;
  */
 final class NewObject extends AbstractValueToNullReturnValue
 {
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces a newly instantiated object with `null` instead. The instantiation statement is kept in order
+to preserve potential side effects. Example:
+
+```php
+class X {
+    function foo(): ?stdClass
+    {
+        return new stdClass();
+    }
+}
+```
+
+Will be mutated to:
+
+```php
+class X {
+    function foo(): ?stdClass
+    {
+        new stdClass();
+        return null;
+    }
+}
+```
+
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
+    }
+
     /**
-     * Replaces "return new Something(anything);" with "new Something(anything); return null;"
+     * @param Node\Stmt\Return_ $node
      *
-     * @param Node&Node\Stmt\Return_ $node
-     *
-     * @return Node[]
+     * @return Generator<array<Node\Stmt\Expression|Node\Stmt\Return_>>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
         /** @var Node\Expr\New_ $expr */
         $expr = $node->expr;
 
-        return [
+        yield [
             new Node\Stmt\Expression($expr),
             new Node\Stmt\Return_(
                 new Node\Expr\ConstFetch(new Node\Name('null'))
@@ -63,7 +99,7 @@ final class NewObject extends AbstractValueToNullReturnValue
         ];
     }
 
-    protected function mutatesNode(Node $node): bool
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Stmt\Return_) {
             return false;

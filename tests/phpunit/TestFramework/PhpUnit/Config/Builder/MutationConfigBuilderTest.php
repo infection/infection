@@ -38,8 +38,8 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 use DOMDocument;
 use DOMNodeList;
 use DOMXPath;
-use Infection\TestFramework\Coverage\CoverageLineData;
-use Infection\TestFramework\Coverage\JUnitTestCaseSorter;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
@@ -47,6 +47,9 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class MutationConfigBuilderTest extends FileSystemTestCase
 {
     public const HASH = 'a1b2c3';
@@ -336,6 +339,34 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
                 ],
             ],
         ];
+    }
+
+    public function test_interceptor_is_included(): void
+    {
+        $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpuit_without_bootstrap.xml';
+        $this->builder = new MutationConfigBuilder(
+            $this->tmp,
+            file_get_contents($phpunitXmlPath),
+            $this->xmlConfigurationHelper,
+            'project/dir',
+            new JUnitTestCaseSorter()
+        );
+
+        $this->builder->build(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::HASH,
+            self::ORIGINAL_FILE_PATH
+        );
+
+        $expectedCustomAutoloadFilePath = sprintf(
+            '%s/interceptor.autoload.%s.infection.php',
+            $this->tmp,
+            self::HASH
+        );
+
+        $this->assertFileExists($expectedCustomAutoloadFilePath);
+        $this->assertStringContainsString('IncludeInterceptor.php', file_get_contents($expectedCustomAutoloadFilePath));
     }
 
     private function queryXpath(string $xml, string $query)

@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
-use Infection\Mutant\MutantInterface;
-use Infection\Mutation;
-use Infection\Mutator\Util\MutatorConfig;
+use Infection\Mutant\Mutant;
+use Infection\Mutation\Mutation;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -58,7 +58,7 @@ final class MutantProcessTest extends TestCase
     private $process;
 
     /**
-     * @var MockObject|MutantInterface
+     * @var MockObject|Mutant
      */
     private $mutant;
 
@@ -70,7 +70,7 @@ final class MutantProcessTest extends TestCase
     protected function setUp(): void
     {
         $this->process = $this->createMock(Process::class);
-        $this->mutant = $this->createMock(MutantInterface::class);
+        $this->mutant = $this->createMock(Mutant::class);
         $this->adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
 
         $this->mutantProcess = new MutantProcess($this->process, $this->mutant, $this->adapter);
@@ -166,19 +166,17 @@ final class MutantProcessTest extends TestCase
 
     public function test_it_knows_its_mutator(): void
     {
-        $mutator = new For_(new MutatorConfig([]));
-
         $mutation = $this->createMock(Mutation::class);
         $mutation->expects($this->once())
-            ->method('getMutator')
-            ->willReturn($mutator);
+            ->method('getMutatorName')
+            ->willReturn(MutatorName::getName(For_::class));
 
         $this->mutant
             ->expects($this->once())
             ->method('getMutation')
             ->willReturn($mutation);
 
-        $this->assertSame($mutator, $this->mutantProcess->getMutator());
+        $this->assertSame('For_', $this->mutantProcess->getMutatorName());
     }
 
     public function test_it_knows_its_original_path(): void

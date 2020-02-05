@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Cast;
 
+use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -42,7 +44,16 @@ use PhpParser\Node;
  */
 final class CastBool extends AbstractCastMutator
 {
-    protected function mutatesNode(Node $node): bool
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            'Removes an boolean cast operator (`(bool)`).',
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
+    }
+
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\Cast\Bool_;
     }

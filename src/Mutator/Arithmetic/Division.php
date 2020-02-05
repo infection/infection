@@ -35,27 +35,40 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Division extends Mutator
+final class Division implements Mutator
 {
-    /**
-     * Replaces "/" with "*"
-     *
-     * @param Node&Node\Expr\BinaryOp\Div $node
-     *
-     * @return Node\Expr\BinaryOp\Mul
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return new Node\Expr\BinaryOp\Mul($node->left, $node->right, $node->getAttributes());
+        return new Definition(
+            'Replaces a division operator (`/`) with a multiplication operator (`*`).',
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
     }
 
-    protected function mutatesNode(Node $node): bool
+    /**
+     * @param Node\Expr\BinaryOp\Div $node
+     *
+     * @return Generator<Node\Expr\BinaryOp\Mul>
+     */
+    public function mutate(Node $node): Generator
+    {
+        yield new Node\Expr\BinaryOp\Mul($node->left, $node->right, $node->getAttributes());
+    }
+
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Expr\BinaryOp\Div) {
             return false;

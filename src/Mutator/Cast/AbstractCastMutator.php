@@ -35,23 +35,25 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Cast;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-abstract class AbstractCastMutator extends Mutator
+abstract class AbstractCastMutator implements Mutator
 {
+    use GetMutatorName;
+
     /**
-     * Replaces "(cast) $foo;" with "$foo;"
+     * @param Node\Expr\Cast $node
      *
-     * @param Node&Node\Expr\Cast $node
-     *
-     * @return Node
+     * @return Generator<Node\Expr>
      */
-    public function mutate(Node $node)
+    public function mutate(Node $node): Generator
     {
-        return $node->expr;
+        yield $node->expr;
     }
 }

@@ -35,8 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use Infection\Finder\Exception\FinderException;
+use Infection\FileSystem\Finder\Exception\FinderException;
 use const PHP_SAPI;
+use function substr;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
@@ -115,6 +116,6 @@ final class CommandLineBuilder
 
     private function isBatchFile(string $path): bool
     {
-        return '.bat' === substr($path, -4);
+        return substr($path, -4) === '.bat';
     }
 }

@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Console\OutputFormatter;
 
 use Infection\Process\MutantProcess;
-use Infection\Process\MutantProcessInterface;
 use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -69,7 +68,7 @@ final class DotFormatter extends AbstractOutputFormatter
         ]);
     }
 
-    public function advance(MutantProcessInterface $mutantProcess, int $mutationCount): void
+    public function advance(MutantProcess $mutantProcess, int $mutationCount): void
     {
         parent::advance($mutantProcess, $mutationCount);
 
@@ -97,7 +96,7 @@ final class DotFormatter extends AbstractOutputFormatter
         }
 
         $remainder = $this->callsCount % self::DOTS_PER_ROW;
-        $endOfRow = 0 === $remainder;
+        $endOfRow = $remainder === 0;
         $lastDot = $mutationCount === $this->callsCount;
 
         if ($lastDot && !$endOfRow) {

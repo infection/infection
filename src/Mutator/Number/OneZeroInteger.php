@@ -35,6 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -42,23 +46,37 @@ use PhpParser\Node;
  */
 final class OneZeroInteger extends AbstractNumberMutator
 {
-    /**
-     * Replaces "0" with "1" or "1" with "0"
-     *
-     * @param Node&Node\Scalar\LNumber $node
-     *
-     * @return Node\Scalar\LNumber
-     */
-    public function mutate(Node $node)
-    {
-        if ($node->value === 0) {
-            return new Node\Scalar\LNumber(1);
-        }
+    use GetMutatorName;
 
-        return new Node\Scalar\LNumber(0);
+    public static function getDefinition(): ?Definition
+    {
+        return new Definition(
+            <<<'TXT'
+Replaces a zero integer value (`0`) with a non-zero integer value (`1`) and vice-versa.
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
     }
 
-    protected function mutatesNode(Node $node): bool
+    /**
+     * @param Node\Scalar\LNumber $node
+     *
+     * @return Generator<Node\Scalar\LNumber>
+     */
+    public function mutate(Node $node): Generator
+    {
+        if ($node->value === 0) {
+            yield new Node\Scalar\LNumber(1);
+
+            return;
+        }
+
+        yield new Node\Scalar\LNumber(0);
+    }
+
+    public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Scalar\LNumber
             && ($node->value === 0 || $node->value === 1)

@@ -35,16 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\MutableFileProcessed;
-use Infection\Events\MutationGeneratingFinished;
-use Infection\Events\MutationGeneratingStarted;
-use Infection\Mutation;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\MutableFileWasProcessed;
+use Infection\Event\MutationGenerationWasFinished;
+use Infection\Event\MutationGenerationWasStarted;
 use Infection\Mutation\FileMutationGenerator;
+use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationGenerator;
-use Infection\Mutator\Arithmetic\Plus;
-use Infection\Mutator\Util\MutatorConfig;
+use Infection\Mutator\IgnoreConfig;
+use Infection\Mutator\IgnoreMutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -60,14 +61,14 @@ final class MutationGeneratorTest extends TestCase
         ];
 
         $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
-        $mutators = [new Plus(new MutatorConfig([]))];
-        $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
+        $mutators = ['Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator())];
+        $eventDispatcherMock = $this->createMock(EventDispatcher::class);
         $onlyCovered = true;
         $extraVisitors = [2 => new FakeVisitor()];
 
-        $mutation0 = self::createMutation();
-        $mutation1 = self::createMutation();
-        $mutation2 = self::createMutation();
+        $mutation0 = $this->createMock(Mutation::class);
+        $mutation1 = $this->createMock(Mutation::class);
+        $mutation2 = $this->createMock(Mutation::class);
 
         /** @var FileMutationGenerator|ObjectProphecy $fileMutationGeneratorProphecy */
         $fileMutationGeneratorProphecy = $this->prophesize(FileMutationGenerator::class);
@@ -115,15 +116,15 @@ final class MutationGeneratorTest extends TestCase
 
         $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
 
-        $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcherMock = $this->createMock(EventDispatcher::class);
         $eventDispatcherMock
             ->expects($this->exactly(4))
             ->method('dispatch')
             ->withConsecutive(
-                [new MutationGeneratingStarted(2)],
-                [new MutableFileProcessed()],
-                [new MutableFileProcessed()],
-                [new MutationGeneratingFinished()]
+                [new MutationGenerationWasStarted(2)],
+                [new MutableFileWasProcessed()],
+                [new MutableFileWasProcessed()],
+                [new MutationGenerationWasFinished()]
             )
         ;
 
@@ -146,19 +147,5 @@ final class MutationGeneratorTest extends TestCase
         );
 
         $mutationGenerator->generate(false, []);
-    }
-
-    private static function createMutation(): Mutation
-    {
-        return new Mutation(
-            '',
-            [],
-            new Plus(new MutatorConfig([])),
-            [],
-            '',
-            null,
-            0,
-            []
-        );
     }
 }

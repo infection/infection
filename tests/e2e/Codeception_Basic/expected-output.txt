@@ -1,6 +1,0 @@
-Total: 4
-Killed: 3
-Errored: 0
-Escaped: 1
-Timed Out: 0
-Not Covered: 0

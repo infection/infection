@@ -35,26 +35,44 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Break_ extends Mutator
+final class Break_ implements Mutator
 {
-    /**
-     * Replaces "break;" with "continue;"
-     *
-     * @return Node\Stmt\Continue_
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return new Node\Stmt\Continue_();
+        return new Definition(
+            <<<'TXT'
+Replaces a break statement (`break`) with its counterpart continue statement (`continue`).
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
     }
 
-    protected function mutatesNode(Node $node): bool
+    /**
+     * @param Node\Stmt\Break_ $node
+     *
+     * @return Generator<Node\Stmt\Continue_>
+     */
+    public function mutate(Node $node): Generator
+    {
+        yield new Node\Stmt\Continue_();
+    }
+
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Stmt\Break_) {
             return false;

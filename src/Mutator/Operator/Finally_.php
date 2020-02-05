@@ -36,26 +36,41 @@ declare(strict_types=1);
 namespace Infection\Mutator\Operator;
 
 use function count;
-use Infection\Mutator\Util\Mutator;
+use Generator;
+use Infection\Mutator\Definition;
+use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class Finally_ extends Mutator
+final class Finally_ implements Mutator
 {
-    /**
-     * Removes "finally{}" blocks
-     *
-     * @return Node\Stmt\Nop
-     */
-    public function mutate(Node $node)
+    use GetMutatorName;
+
+    public static function getDefinition(): ?Definition
     {
-        return new Node\Stmt\Nop();
+        return new Definition(
+            'Removes the `finally` block.',
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
-    protected function mutatesNode(Node $node): bool
+    /**
+     * @param Node\Stmt\Finally_ $node
+     *
+     * @return Generator<Node\Stmt\Nop>
+     */
+    public function mutate(Node $node): Generator
+    {
+        yield new Node\Stmt\Nop();
+    }
+
+    public function canMutate(Node $node): bool
     {
         if (!$node instanceof Node\Stmt\Finally_) {
             return false;
