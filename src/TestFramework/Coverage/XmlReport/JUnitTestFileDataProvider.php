@@ -80,6 +80,12 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
             );
         }
 
+        $feature = preg_replace("/^(.*):+.*$/", "$1.feature", $fullyQualifiedClassName);
+        if (!$nodes->length) {
+          // try another format where the class name is inside `file` attribute of `testcase` tag
+          $nodes = $xPath->query(sprintf('//testcase[contains(@file, "%s")]', $feature));
+        }
+
         if ($nodes->length === 0) {
             throw TestFileNameNotFoundException::notFoundFromFQN(
                 $fullyQualifiedClassName,
