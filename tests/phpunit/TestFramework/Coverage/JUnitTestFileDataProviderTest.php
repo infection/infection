@@ -97,4 +97,15 @@ final class JUnitTestFileDataProviderTest extends TestCase
 
         $this->assertSame('/codeception/tests/unit/SourceClassTest.php', $info1->path);
     }
+
+    public function test_it_works_with_feature_junit_format(): void
+    {
+        $provider = new JUnitTestFileDataProvider(
+            __DIR__ . '/../../Fixtures/Files/phpunit/junit_feature.xml'
+        );
+
+        $testFileInfo = $provider->getTestFileInfo('FeatureA:Scenario A1');
+
+        $this->assertSame('/codeception/tests/bdd/FeatureA.feature', $testFileInfo->path);
+    }
 }
