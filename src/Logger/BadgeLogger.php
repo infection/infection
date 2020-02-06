@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use Infection\Environment\CouldNotResolveStrykerApiKey;
+use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Http\BadgeApiClient;
 use Infection\Mutant\MetricsCalculator;
 use stdClass;
@@ -48,14 +50,21 @@ final class BadgeLogger implements MutationTestingResultsLogger
     public const ENV_INFECTION_BADGE_API_KEY = 'INFECTION_BADGE_API_KEY';
     public const ENV_STRYKER_DASHBOARD_API_KEY = 'STRYKER_DASHBOARD_API_KEY';
 
+    private $output;
+    private $strykerApiKeyResolver;
     private $badgeApiClient;
     private $metricsCalculator;
     private $config;
-    private $output;
 
-    public function __construct(OutputInterface $output, BadgeApiClient $badgeApiClient, MetricsCalculator $metricsCalculator, stdClass $config)
-    {
+    public function __construct(
+        OutputInterface $output,
+        StrykerApiKeyResolver $strykerApiKeyResolver,
+        BadgeApiClient $badgeApiClient,
+        MetricsCalculator $metricsCalculator,
+        stdClass $config
+    ) {
         $this->output = $output;
+        $this->strykerApiKeyResolver = $strykerApiKeyResolver;
         $this->badgeApiClient = $badgeApiClient;
         $this->metricsCalculator = $metricsCalculator;
         $this->config = $config;
@@ -100,24 +109,10 @@ final class BadgeLogger implements MutationTestingResultsLogger
             return;
         }
 
-        $apiKey = getenv(self::ENV_INFECTION_BADGE_API_KEY);
-
-        /*
-         * Original Stryker Dashboard manual warrants a different API key:
-         * fall back to theirs if our isn't present
-         */
-        if ($apiKey === false) {
-            $apiKey = getenv(self::ENV_STRYKER_DASHBOARD_API_KEY);
-        }
-
-        if ($apiKey === false) {
-            $this->showInfo(
-                sprintf(
-                    'neither %s nor %s were found in the environment',
-                    self::ENV_INFECTION_BADGE_API_KEY,
-                    self::ENV_STRYKER_DASHBOARD_API_KEY
-                )
-            );
+        try {
+            $apiKey = $this->strykerApiKeyResolver->resolve(getenv());
+        } catch (CouldNotResolveStrykerApiKey $exception) {
+            $this->showInfo($exception->getMessage());
 
             return;
         }
