@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2f4805ddce5cd4d7c9a1a2f7fa7f08c7",
+    "content-hash": "7a9bc546d2b97ffe5cab4dd3c41ed301",
     "packages": [
         {
             "name": "composer/xdebug-handler",
