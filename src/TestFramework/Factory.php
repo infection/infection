@@ -52,8 +52,9 @@ use function Safe\sprintf;
 final class Factory
 {
     private $tmpDir;
-    private $configLocator;
     private $projectDir;
+    private $configLocator;
+    private $testFrameworkFinder;
     private $jUnitFilePath;
     private $infectionConfig;
 
@@ -61,6 +62,7 @@ final class Factory
         string $tmpDir,
         string $projectDir,
         TestFrameworkConfigLocatorInterface $configLocator,
+        TestFrameworkFinder $testFrameworkFinder,
         string $jUnitFilePath,
         Configuration $infectionConfig
     ) {
@@ -69,6 +71,7 @@ final class Factory
         $this->projectDir = $projectDir;
         $this->jUnitFilePath = $jUnitFilePath;
         $this->infectionConfig = $infectionConfig;
+        $this->testFrameworkFinder = $testFrameworkFinder;
     }
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
@@ -77,10 +80,10 @@ final class Factory
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
             return PhpUnitAdapterFactory::create(
-                (new TestFrameworkFinder(
+                $this->testFrameworkFinder->find(
                     TestFrameworkTypes::PHPUNIT,
                     (string) $this->infectionConfig->getPhpUnit()->getCustomPath()
-                ))->find(),
+                ),
                 $this->tmpDir,
                 $phpUnitConfigPath,
                 (string) $this->infectionConfig->getPhpUnit()->getConfigDir(),
@@ -95,7 +98,7 @@ final class Factory
             $phpSpecConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPSPEC);
 
             return PhpSpecAdapterFactory::create(
-                (new TestFrameworkFinder(TestFrameworkTypes::PHPSPEC))->find(),
+                $this->testFrameworkFinder->find(TestFrameworkTypes::PHPSPEC),
                 $this->tmpDir,
                 $phpSpecConfigPath,
                 null,
@@ -110,7 +113,7 @@ final class Factory
             $codeceptionConfigPath = $this->configLocator->locate(TestFrameworkTypes::CODECEPTION);
 
             return CodeceptionAdapterFactory::create(
-                (new TestFrameworkFinder('codecept'))->find(),
+                $this->testFrameworkFinder->find('codecept'),
                 $this->tmpDir,
                 $codeceptionConfigPath,
                 null,

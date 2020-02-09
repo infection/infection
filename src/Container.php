@@ -50,6 +50,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\SourceFileCollector;
@@ -169,6 +170,7 @@ final class Container
                     $config->getTmpDir(),
                     $container->getProjectDir(),
                     $container->getTestFrameworkConfigLocator(),
+                    $container->getTestFrameworkFinder(),
                     $container->getJUnitFilePath(),
                     $config
                 );
@@ -396,6 +398,9 @@ final class Container
                     $container->getParallelProcessRunner(),
                     $container->getEventDispatcher()
                 );
+            },
+            TestFrameworkFinder::class => static function (): TestFrameworkFinder {
+                return new TestFrameworkFinder();
             },
         ]);
     }
@@ -736,6 +741,11 @@ final class Container
     public function getConfiguration(): Configuration
     {
         return $this->get(Configuration::class);
+    }
+
+    public function getTestFrameworkFinder(): TestFrameworkFinder
+    {
+        return $this->get(TestFrameworkFinder::class);
     }
 
     /**
