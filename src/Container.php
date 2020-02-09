@@ -50,6 +50,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
@@ -172,7 +173,8 @@ final class Container
                     $container->getTestFrameworkConfigLocator(),
                     $container->getTestFrameworkFinder(),
                     $container->getJUnitFilePath(),
-                    $config
+                    $config,
+                    GeneratedExtensionsConfig::EXTENSIONS
                 );
             },
             XmlConfigurationHelper::class => static function (self $container): XmlConfigurationHelper {
