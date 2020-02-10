@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures;
 
-use Generator;
 use Infection\Mutator\Mutator;
+use Infection\PhpParser\MutatedNode;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use function iterator_to_array;
 
 /**
  * @internal
@@ -48,7 +47,9 @@ final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
             $this->mutations[] = new SimpleMutation(
                 $this->fileAst,
                 $this->mutator,
-                $mutatedNode
+                MutatedNode::wrap($mutatedNode),
+                $node->getAttributes(),
+                get_class($node)
             );
         }
     }

@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Event\InitialTestSuiteStarted;
+use Infection\Event\InitialTestSuiteWasStarted;
 use InvalidArgumentException;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -57,11 +57,11 @@ final class CiInitialTestsConsoleLoggerSubscriber implements EventSubscriber
     public function getSubscribedEvents(): array
     {
         return [
-            InitialTestSuiteStarted::class => [$this, 'onInitialTestSuiteStarted'],
+            InitialTestSuiteWasStarted::class => [$this, 'onInitialTestSuiteWasStarted'],
         ];
     }
 
-    public function onInitialTestSuiteStarted(InitialTestSuiteStarted $event): void
+    public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
     {
         try {
             $version = $this->testFrameworkAdapter->getVersion();

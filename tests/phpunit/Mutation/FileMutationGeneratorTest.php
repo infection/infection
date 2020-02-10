@@ -40,18 +40,19 @@ use function func_get_args;
 use Generator;
 use Infection\Container;
 use Infection\Mutation\FileMutationGenerator;
-use Infection\Mutation\FileParser;
 use Infection\Mutation\Mutation;
-use Infection\Mutation\NodeTraverserFactory;
-use Infection\Mutation\PrioritizedVisitorsNodeTraverser;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
+use Infection\PhpParser\FileParser;
+use Infection\PhpParser\NodeTraverserFactory;
+use Infection\PhpParser\PrioritizedVisitorsNodeTraverser;
+use Infection\PhpParser\Visitor\MutationsCollectorVisitor;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use Infection\Tests\Mutator\MutatorName;
-use Infection\Visitor\MutationsCollectorVisitor;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -84,7 +85,8 @@ final class FileMutationGeneratorTest extends TestCase
 
         $this->mutationGenerator = new FileMutationGenerator(
             $this->fileParserMock,
-            $this->traverserFactoryMock
+            $this->traverserFactoryMock,
+            new LineRangeCalculator()
         );
     }
 
@@ -166,7 +168,8 @@ final class FileMutationGeneratorTest extends TestCase
 
         $mutationGenerator = new FileMutationGenerator(
             $this->fileParserMock,
-            $this->traverserFactoryMock
+            $this->traverserFactoryMock,
+            new LineRangeCalculator()
         );
 
         $mutations = $mutationGenerator->generate(
@@ -199,7 +202,8 @@ final class FileMutationGeneratorTest extends TestCase
 
         $mutationGenerator = new FileMutationGenerator(
             $this->fileParserMock,
-            $this->traverserFactoryMock
+            $this->traverserFactoryMock,
+            new LineRangeCalculator()
         );
 
         $mutations = $mutationGenerator->generate(
@@ -236,7 +240,8 @@ final class FileMutationGeneratorTest extends TestCase
 
         $mutationGenerator = new FileMutationGenerator(
             $fileParserMock,
-            $traverserFactoryMock
+            $traverserFactoryMock,
+            new LineRangeCalculator()
         );
 
         try {

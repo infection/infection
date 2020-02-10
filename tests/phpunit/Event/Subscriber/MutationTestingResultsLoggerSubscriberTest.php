@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\EventDispatcher;
-use Infection\Event\MutationTestingFinished;
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
 use Infection\Logger\MutationTestingResultsLogger;
 use PHPUnit\Framework\TestCase;
@@ -45,11 +45,11 @@ final class MutationTestingResultsLoggerSubscriberTest extends TestCase
 {
     public function test_it_reacts_on_mutation_testing_finished(): void
     {
-        $dispatcher = new EventDispatcher();
+        $dispatcher = new SyncEventDispatcher();
         $logger = $this->createMock(MutationTestingResultsLogger::class);
         $logger->expects($this->once())->method('log');
         $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber([$logger]));
 
-        $dispatcher->dispatch(new MutationTestingFinished());
+        $dispatcher->dispatch(new MutationTestingWasFinished());
     }
 }

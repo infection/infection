@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\MutantCreated;
-use Infection\Event\MutantsCreatingFinished;
-use Infection\Event\MutantsCreatingStarted;
+use Infection\Event\MutantsCreationWasFinished;
+use Infection\Event\MutantsCreationWasStarted;
+use Infection\Event\MutantWasCreated;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -60,24 +60,24 @@ final class MutantCreatingConsoleLoggerSubscriber implements EventSubscriber
     public function getSubscribedEvents(): array
     {
         return [
-            MutantsCreatingStarted::class => [$this, 'onMutantsCreatingStarted'],
-            MutantCreated::class => [$this, 'onMutantCreated'],
-            MutantsCreatingFinished::class => [$this, 'onMutantsCreatingFinished'],
+            MutantsCreationWasStarted::class => [$this, 'onMutantsCreationWasStarted'],
+            MutantWasCreated::class => [$this, 'onMutantWasCreated'],
+            MutantsCreationWasFinished::class => [$this, 'onMutantsCreationWasFinished'],
         ];
     }
 
-    public function onMutantsCreatingStarted(MutantsCreatingStarted $event): void
+    public function onMutantsCreationWasStarted(MutantsCreationWasStarted $event): void
     {
         $this->output->writeln(['']);
         $this->progressBar->start($event->getMutantCount());
     }
 
-    public function onMutantCreated(MutantCreated $event): void
+    public function onMutantWasCreated(MutantWasCreated $event): void
     {
         $this->progressBar->advance();
     }
 
-    public function onMutantsCreatingFinished(MutantsCreatingFinished $event): void
+    public function onMutantsCreationWasFinished(MutantsCreationWasFinished $event): void
     {
         $this->progressBar->finish();
     }

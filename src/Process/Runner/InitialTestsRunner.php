@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use Infection\Event\EventDispatcher;
-use Infection\Event\InitialTestCaseCompleted;
-use Infection\Event\InitialTestSuiteFinished;
-use Infection\Event\InitialTestSuiteStarted;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\InitialTestCaseWasCompleted;
+use Infection\Event\InitialTestSuiteWasFinished;
+use Infection\Event\InitialTestSuiteWasStarted;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Symfony\Component\Process\Process;
 
@@ -64,17 +64,17 @@ final class InitialTestsRunner
             $phpExtraOptions
         );
 
-        $this->eventDispatcher->dispatch(new InitialTestSuiteStarted());
+        $this->eventDispatcher->dispatch(new InitialTestSuiteWasStarted());
 
         $process->run(function ($type) use ($process): void {
             if ($process::ERR === $type) {
                 $process->stop();
             }
 
-            $this->eventDispatcher->dispatch(new InitialTestCaseCompleted());
+            $this->eventDispatcher->dispatch(new InitialTestCaseWasCompleted());
         });
 
-        $this->eventDispatcher->dispatch(new InitialTestSuiteFinished($process->getOutput()));
+        $this->eventDispatcher->dispatch(new InitialTestSuiteWasFinished($process->getOutput()));
 
         return $process;
     }

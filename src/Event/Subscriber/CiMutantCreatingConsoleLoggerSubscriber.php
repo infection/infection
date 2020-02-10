@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\MutantsCreatingStarted;
+use Infection\Event\MutantsCreationWasStarted;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -53,11 +53,11 @@ final class CiMutantCreatingConsoleLoggerSubscriber implements EventSubscriber
     public function getSubscribedEvents(): array
     {
         return [
-            MutantsCreatingStarted::class => [$this, 'onMutantsCreatingStarted'],
+            MutantsCreationWasStarted::class => [$this, 'onMutantsCreationWasStarted'],
         ];
     }
 
-    public function onMutantsCreatingStarted(MutantsCreatingStarted $event): void
+    public function onMutantsCreationWasStarted(MutantsCreationWasStarted $event): void
     {
         $this->output->writeln([
             '',

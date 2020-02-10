@@ -41,8 +41,8 @@ use function file_exists;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
-use Infection\Event\ApplicationExecutionFinished;
-use Infection\Event\EventDispatcher;
+use Infection\Event\ApplicationExecutionWasFinished;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutation\MutationGenerator;
 use Infection\Process\Builder\SubscriberBuilder;
@@ -51,7 +51,7 @@ use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
-use Infection\Resource\Limiter\MemoryLimiter;
+use Infection\Resource\Memory\MemoryLimiter;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
 use Infection\TestFramework\HasExtraNodeVisitors;
@@ -170,7 +170,7 @@ final class Engine
             );
         }
 
-        $this->eventDispatcher->dispatch(new ApplicationExecutionFinished());
+        $this->eventDispatcher->dispatch(new ApplicationExecutionWasFinished());
 
         return true;
     }

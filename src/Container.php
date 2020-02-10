@@ -48,7 +48,9 @@ use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
-use Infection\Event\EventDispatcher;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\SourceFileCollector;
@@ -58,13 +60,13 @@ use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\FileMutationGenerator;
-use Infection\Mutation\FileParser;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationGenerator;
-use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
+use Infection\PhpParser\FileParser;
+use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
@@ -73,12 +75,13 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Process\Runner\TestRunConstraintChecker;
-use Infection\Resource\Limiter\MemoryLimiter;
 use Infection\Resource\Memory\MemoryFormatter;
+use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
+use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
@@ -168,6 +171,7 @@ final class Container
                     $config->getTmpDir(),
                     $container->getProjectDir(),
                     $container->getTestFrameworkConfigLocator(),
+                    $container->getTestFrameworkFinder(),
                     $container->getJUnitFilePath(),
                     $config
                 );
@@ -192,8 +196,8 @@ final class Container
             Differ::class => static function (): Differ {
                 return new Differ(new BaseDiffer());
             },
-            EventDispatcher::class => static function (): EventDispatcher {
-                return new EventDispatcher();
+            SyncEventDispatcher::class => static function (): SyncEventDispatcher {
+                return new SyncEventDispatcher();
             },
             ParallelProcessRunner::class => static function (self $container): ParallelProcessRunner {
                 return new ParallelProcessRunner($container->getEventDispatcher());
@@ -335,7 +339,8 @@ final class Container
             FileMutationGenerator::class => static function (self $container): FileMutationGenerator {
                 return new FileMutationGenerator(
                     $container->getFileParser(),
-                    $container->getNodeTraverserFactory()
+                    $container->getNodeTraverserFactory(),
+                    $container->getLineRangeCalculator()
                 );
             },
             LoggerFactory::class => static function (self $container): LoggerFactory {
@@ -391,10 +396,16 @@ final class Container
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
                 return new MutationTestingRunner(
                     $container->getMutantProcessBuilder(),
-                    $container->getParallelProcessRunner(),
                     $container->getMutantFactory(),
+                    $container->getParallelProcessRunner(),
                     $container->getEventDispatcher()
                 );
+            },
+            LineRangeCalculator::class => static function (): LineRangeCalculator {
+                return new LineRangeCalculator();
+            },
+            TestFrameworkFinder::class => static function (): TestFrameworkFinder {
+                return new TestFrameworkFinder();
             },
         ]);
     }
@@ -544,7 +555,7 @@ final class Container
 
     public function getEventDispatcher(): EventDispatcher
     {
-        return $this->get(EventDispatcher::class);
+        return $this->get(SyncEventDispatcher::class);
     }
 
     public function getParallelProcessRunner(): ParallelProcessRunner
@@ -735,6 +746,16 @@ final class Container
     public function getConfiguration(): Configuration
     {
         return $this->get(Configuration::class);
+    }
+
+    public function getLineRangeCalculator(): LineRangeCalculator
+    {
+        return $this->get(LineRangeCalculator::class);
+    }
+
+    public function getTestFrameworkFinder(): TestFrameworkFinder
+    {
+        return $this->get(TestFrameworkFinder::class);
     }
 
     /**

@@ -40,7 +40,7 @@ use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\MutationYamlConfiguration;
-use ReflectionClass;
+use function Safe\file_put_contents;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -97,9 +97,7 @@ class MutationConfigBuilder extends ConfigBuilder
     {
         $originalBootstrap = $this->getOriginalBootstrapFilePath($parsedYaml);
         $autoloadPlaceholder = $originalBootstrap ? "require_once '{$originalBootstrap}';" : '';
-        $class = new ReflectionClass(IncludeInterceptor::class);
-        /** @var string $interceptorPath */
-        $interceptorPath = $class->getFileName();
+        $interceptorPath = IncludeInterceptor::LOCATION;
 
         $customAutoload = <<<AUTOLOAD
 <?php

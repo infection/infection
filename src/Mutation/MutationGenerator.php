@@ -36,11 +36,12 @@ declare(strict_types=1);
 namespace Infection\Mutation;
 
 use function count;
-use Infection\Event\EventDispatcher;
-use Infection\Event\MutableFileProcessed;
-use Infection\Event\MutationGeneratingFinished;
-use Infection\Event\MutationGeneratingStarted;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\MutableFileWasProcessed;
+use Infection\Event\MutationGenerationWasFinished;
+use Infection\Event\MutationGenerationWasStarted;
 use Infection\Mutator\Mutator;
+use Infection\PhpParser\UnparsableFile;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use PhpParser\NodeVisitor;
 use Symfony\Component\Finder\SplFileInfo;
@@ -98,7 +99,7 @@ final class MutationGenerator
     {
         $allFilesMutations = [[]];
 
-        $this->eventDispatcher->dispatch(new MutationGeneratingStarted(count($this->sourceFiles)));
+        $this->eventDispatcher->dispatch(new MutationGenerationWasStarted(count($this->sourceFiles)));
 
         foreach ($this->sourceFiles as $fileInfo) {
             $allFilesMutations[] = $this->fileMutationGenerator->generate(
@@ -109,10 +110,10 @@ final class MutationGenerator
                 $extraNodeVisitors
             );
 
-            $this->eventDispatcher->dispatch(new MutableFileProcessed());
+            $this->eventDispatcher->dispatch(new MutableFileWasProcessed());
         }
 
-        $this->eventDispatcher->dispatch(new MutationGeneratingFinished());
+        $this->eventDispatcher->dispatch(new MutationGenerationWasFinished());
 
         return array_merge(...$allFilesMutations);
     }

@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Resource\Listener;
 
-use Infection\Event\ApplicationExecutionFinished;
-use Infection\Event\ApplicationExecutionStarted;
+use Infection\Event\ApplicationExecutionWasFinished;
+use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\Event\Subscriber\EventSubscriber;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Time\Stopwatch;
@@ -68,17 +68,17 @@ final class PerformanceLoggerSubscriber implements EventSubscriber
     public function getSubscribedEvents(): array
     {
         return [
-            ApplicationExecutionStarted::class => [$this, 'onApplicationExecutionStarted'],
-            ApplicationExecutionFinished::class => [$this, 'onApplicationExecutionFinished'],
+            ApplicationExecutionWasStarted::class => [$this, 'onApplicationExecutionWasStarted'],
+            ApplicationExecutionWasFinished::class => [$this, 'onApplicationExecutionWasFinished'],
         ];
     }
 
-    public function onApplicationExecutionStarted(): void
+    public function onApplicationExecutionWasStarted(): void
     {
         $this->stopwatch->start();
     }
 
-    public function onApplicationExecutionFinished(): void
+    public function onApplicationExecutionWasFinished(): void
     {
         $time = $this->stopwatch->stop();
 

@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Resource\Listener;
 
-use Infection\Event\ApplicationExecutionFinished;
-use Infection\Event\ApplicationExecutionStarted;
-use Infection\Event\EventDispatcher;
+use Infection\Event\ApplicationExecutionWasFinished;
+use Infection\Event\ApplicationExecutionWasStarted;
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Resource\Listener\PerformanceLoggerSubscriber;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Time\Stopwatch;
@@ -67,7 +67,7 @@ final class PerformanceLoggerSubscriberTest extends TestCase
                 return is_array($parameter) && $parameter[0] === '' && strpos($parameter[1], 'Time:') === 0;
             }));
 
-        $dispatcher = new EventDispatcher();
+        $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new PerformanceLoggerSubscriber(
             new Stopwatch(),
             new TimeFormatter(),
@@ -75,7 +75,7 @@ final class PerformanceLoggerSubscriberTest extends TestCase
             $this->output
         ));
 
-        $dispatcher->dispatch(new ApplicationExecutionStarted());
-        $dispatcher->dispatch(new ApplicationExecutionFinished());
+        $dispatcher->dispatch(new ApplicationExecutionWasStarted());
+        $dispatcher->dispatch(new ApplicationExecutionWasFinished());
     }
 }

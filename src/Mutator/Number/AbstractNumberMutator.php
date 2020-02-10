@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Number;
 
 use Infection\Mutator\Mutator;
-use Infection\Visitor\ParentConnectorVisitor;
+use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**

@@ -39,7 +39,8 @@ use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
-use Infection\Visitor\ReflectionVisitor;
+use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
 use function is_string;
 use PhpParser\Node;
 
@@ -52,14 +53,31 @@ final class ArrayOneItem implements Mutator
 
     public static function getDefinition(): ?Definition
     {
-        return null;
+        return new Definition(
+            <<<'TXT'
+Leaves only one item in the returned array. For example:
+
+```php
+return $array;
+```
+
+Will be mutated to:
+
+```php
+return count($array) > 1 ?
+    array_slice($array, 0, 1, true) :
+    $array
+;
+```
+
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
     /**
-     * Leaves only one item in the returned array
-     *
-     * Replaces "return $collection;" with "return count($collection) > 1 ? array_slice($collection, 0, 1, true) : $collection;"
-     *
      * @param Node\Stmt\Return_ $node
      *
      * @return Generator<Node\Stmt\Return_>
@@ -103,7 +121,7 @@ final class ArrayOneItem implements Mutator
 
     private function returnTypeIsArray(Node $node): bool
     {
-        /** @var \PhpParser\Node\Stmt\Function_|null $functionScope */
+        /** @var Node\Stmt\Function_|null $functionScope */
         $functionScope = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY, null);
 
         if ($functionScope === null) {

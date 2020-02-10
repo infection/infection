@@ -39,6 +39,7 @@ use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -50,7 +51,25 @@ final class Throw_ implements Mutator
 
     public static function getDefinition(): ?Definition
     {
-        return null;
+        return new Definition(
+            <<<'TXT'
+Removes a throw statement (`throw`). For example:
+
+```php
+throw new Exception();
+```
+
+Will be mutated to:
+
+```php
+new Exception();
+```
+
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
     /**

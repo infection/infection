@@ -39,6 +39,7 @@ use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -52,12 +53,18 @@ final class IdenticalEqual implements Mutator
 
     public static function getDefinition(): ?Definition
     {
-        return null;
+        return new Definition(
+            <<<'TXT'
+Replaces a strict comparison (using the identical operator (`===`)) with a loose comparison (using
+the loose operator (`==`)).
+TXT
+            ,
+            MutatorCategory::SEMANTIC_ADDITION,
+            null
+        );
     }
 
     /**
-     * Replaces "===" with "=="
-     *
      * @param Node\Expr\BinaryOp\Identical $node
      *
      * @return Generator<Node\Expr\BinaryOp\Equal>

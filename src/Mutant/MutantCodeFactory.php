@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutant;
 
 use Infection\Mutation\Mutation;
-use Infection\Visitor\CloneVisitor;
-use Infection\Visitor\MutatorVisitor;
+use Infection\PhpParser\Visitor\CloneVisitor;
+use Infection\PhpParser\Visitor\MutatorVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\PrettyPrinterAbstract;
 

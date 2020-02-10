@@ -266,14 +266,30 @@ class Child extends NonSameAbstract
 PHP
         ];
 
-        yield 'it does not mutate an anonymous class because reflection is not avalable' => [
+        yield 'it mutates an anonymous class' => [
             <<<'PHP'
 <?php
 
 function something()
 {
-    return new class() {
+    return new class
+    {
         public function anything()
+        {
+            return null;
+        }
+    };
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+function something()
+{
+    return new class
+    {
+        protected function anything()
         {
             return null;
         }

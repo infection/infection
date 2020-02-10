@@ -39,6 +39,7 @@ use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -50,12 +51,28 @@ final class PregQuote implements Mutator
 
     public static function getDefinition(): ?Definition
     {
-        return null;
+        return new Definition(
+            <<<'TXT'
+Removes a `preg_quote` function call with its operand. For example:
+
+```php
+$x = preg_quote($string, $delimiter);
+```
+
+Will be mutated to:
+
+```php
+$x = $string;
+```
+
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
     /**
-     * Replaces "$a = preg_quote($b);" with "$a = $b;"
-     *
      * @param Node\Expr\FuncCall $node
      *
      * @return Generator<Node\Arg>

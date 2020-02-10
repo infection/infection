@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Event\InitialTestCaseCompleted;
-use Infection\Event\InitialTestSuiteFinished;
-use Infection\Event\InitialTestSuiteStarted;
+use Infection\Event\InitialTestCaseWasCompleted;
+use Infection\Event\InitialTestSuiteWasFinished;
+use Infection\Event\InitialTestSuiteWasStarted;
 use InvalidArgumentException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -66,13 +66,13 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
     public function getSubscribedEvents(): array
     {
         return [
-            InitialTestSuiteStarted::class => [$this, 'onInitialTestSuiteStarted'],
-            InitialTestSuiteFinished::class => [$this, 'onInitialTestSuiteFinished'],
-            InitialTestCaseCompleted::class => [$this, 'onInitialTestCaseCompleted'],
+            InitialTestSuiteWasStarted::class => [$this, 'onInitialTestSuiteWasStarted'],
+            InitialTestSuiteWasFinished::class => [$this, 'onInitialTestSuiteWasFinished'],
+            InitialTestCaseWasCompleted::class => [$this, 'onInitialTestCaseWasCompleted'],
         ];
     }
 
-    public function onInitialTestSuiteStarted(InitialTestSuiteStarted $event): void
+    public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
     {
         try {
             $version = $this->testFrameworkAdapter->getVersion();
@@ -94,7 +94,7 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
         $this->progressBar->start();
     }
 
-    public function onInitialTestSuiteFinished(InitialTestSuiteFinished $event): void
+    public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
     {
         $this->progressBar->finish();
 
@@ -103,7 +103,7 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
         }
     }
 
-    public function onInitialTestCaseCompleted(InitialTestCaseCompleted $event): void
+    public function onInitialTestCaseWasCompleted(InitialTestCaseWasCompleted $event): void
     {
         $this->progressBar->advance();
     }

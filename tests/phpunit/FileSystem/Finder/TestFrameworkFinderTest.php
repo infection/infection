@@ -101,9 +101,9 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     {
         $filename = $this->fileSystem->tempnam($this->tmp, 'test');
 
-        $frameworkFinder = new TestFrameworkFinder('not-used', $filename);
+        $frameworkFinder = new TestFrameworkFinder();
 
-        $this->assertSame($filename, $frameworkFinder->find(), 'Should return the custom path');
+        $this->assertSame($filename, $frameworkFinder->find('not-used', $filename), 'Should return the custom path');
     }
 
     public function test_invalid_custom_path_throws_exception(): void
@@ -112,19 +112,19 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         // Remove it so that the file doesn't exist
         $this->fileSystem->remove($filename);
 
-        $frameworkFinder = new TestFrameworkFinder('not-used', $filename);
+        $frameworkFinder = new TestFrameworkFinder();
 
         $this->expectException(FinderException::class);
         $this->expectExceptionMessageRegExp('/custom path/');
 
-        $frameworkFinder->find();
+        $frameworkFinder->find('not-used', $filename);
     }
 
     public function test_it_adds_vendor_bin_to_path_if_needed(): void
     {
         $path = getenv(self::$pathName);
 
-        $frameworkFinder = new TestFrameworkFinder(TestFrameworkTypes::PHPUNIT);
+        $frameworkFinder = new TestFrameworkFinder();
 
         if ('\\' === DIRECTORY_SEPARATOR) {
             // The main script must be found from the .bat file
@@ -135,7 +135,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
         $this->assertSame(
             normalizePath($expected),
-            normalizePath($frameworkFinder->find()),
+            normalizePath($frameworkFinder->find(TestFrameworkTypes::PHPUNIT)),
             'Should return the phpunit path'
         );
 
@@ -163,7 +163,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         putenv(sprintf('%s=%s', self::$pathName, $mock->getVendorBinDir()));
         putenv('PATHEXT=');
 
-        $frameworkFinder = new TestFrameworkFinder($mock::PACKAGE);
+        $frameworkFinder = new TestFrameworkFinder();
 
         if ('\\' === DIRECTORY_SEPARATOR) {
             // This .bat has no code, so main script will not be found
@@ -174,7 +174,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
         $this->assertSame(
             normalizePath(realpath($expected)),
-            normalizePath(realpath($frameworkFinder->find())),
+            normalizePath(realpath($frameworkFinder->find($mock::PACKAGE))),
             'should return the vendor bin link or .bat'
         );
     }
@@ -191,11 +191,11 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         putenv(sprintf('%s=%s', self::$pathName, $mock->getVendorBinDir()));
         putenv('PATHEXT=');
 
-        $frameworkFinder = new TestFrameworkFinder($mock::PACKAGE);
+        $frameworkFinder = new TestFrameworkFinder();
 
         $this->assertSame(
             normalizePath(realpath($mock->getPackageScript())),
-            normalizePath(realpath($frameworkFinder->find())),
+            normalizePath(realpath($frameworkFinder->find($mock::PACKAGE))),
             'should return the package script from .bat'
         );
     }

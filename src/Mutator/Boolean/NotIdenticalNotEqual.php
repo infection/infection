@@ -39,6 +39,7 @@ use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -52,12 +53,18 @@ final class NotIdenticalNotEqual implements Mutator
 
     public static function getDefinition(): ?Definition
     {
-        return null;
+        return new Definition(
+            <<<'TXT'
+Replaces a strict inequality comparison (using a not-identical operator (`!==`)) with a loose
+inequality comparison (using a not-equal operator (`!=`)).
+TXT
+            ,
+            MutatorCategory::SEMANTIC_ADDITION,
+            null
+        );
     }
 
     /**
-     * Replaces "!==" with "!="
-     *
      * @param Node\Expr\BinaryOp\NotIdentical $node
      *
      * @return Generator<Node\Expr\BinaryOp\NotEqual>
