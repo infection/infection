@@ -751,6 +751,7 @@ final class Container
     public function getLineRangeCalculator(): LineRangeCalculator
     {
         return $this->get(LineRangeCalculator::class);
+    }
 
     public function getTestFrameworkFinder(): TestFrameworkFinder
     {
