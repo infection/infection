@@ -33,27 +33,60 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor;
+namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
-use PhpParser\Node;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitorAbstract;
+use Generator;
+use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
+use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 
-/**
- * @internal
- */
-final class NotMutableIgnoreVisitor extends NodeVisitorAbstract
+final class InterfaceIgnorerTest extends BaseNodeIgnorerTestCase
 {
-    public function enterNode(Node $node)
+    /**
+     * @dataProvider provideIgnoreCases
+     */
+    public function test_it_ignores_the_correct_nodes(string $code, int $count): void
     {
-        if ($node instanceof Node\Stmt\Interface_) {
-            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
-        }
+        $spy = $this->createSpy();
 
-        if ($node instanceof Node\Stmt\ClassMethod && $node->isAbstract()) {
-            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
-        }
+        $this->parseAndTraverse($code, $spy);
 
-        return null;
+        $this->assertSame($count, $spy->nodeCounter);
+    }
+
+    public function provideIgnoreCases(): Generator
+    {
+        yield 'interfaces are ignored' => [
+            <<<'PHP'
+<?php
+
+interface Bar
+{
+    public function nope(Bar $ignored): void;
+}
+PHP
+            ,
+            0,
+        ];
+
+        yield 'classes arent ignored' => [
+            <<<'PHP'
+<?php
+
+class Bar
+{
+    public function nope(Bar $counted)
+    {
+        $counted = true;
+    }
+}
+PHP
+            ,
+            2,
+        ];
+    }
+
+    protected function getIgnore(): NodeIgnorer
+    {
+        return new InterfaceIgnorer();
     }
 }

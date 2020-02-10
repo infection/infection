@@ -33,60 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Visitor\IgnoreNode;
+namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
-use Generator;
-use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
+use Infection\Container;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor;
+use PhpParser\Parser;
+use PHPUnit\Framework\TestCase;
 
-final class InterfaceIgnorerTest extends BaseNodeIgnorerTestCase
+abstract class BaseNodeIgnorerTestCase extends TestCase
 {
     /**
-     * @dataProvider provideIgnoreCases
+     * @var Parser|null
      */
-    public function test_it_ignores_the_correct_nodes(string $code, int $count): void
+    private static $parser;
+
+    abstract protected function getIgnore(): NodeIgnorer;
+
+    final protected function parseAndTraverse(string $code, NodeVisitor $spy): void
     {
-        $spy = $this->createSpy();
+        $nodes = $this->getParser()->parse($code);
 
-        $this->parseAndTraverse($code, $spy);
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor([$this->getIgnore()]));
+        $traverser->addVisitor($spy);
+        $traverser->traverse($nodes);
 
-        $this->assertSame($count, $spy->nodeCounter);
+        $this->addToAssertionCount(1);
     }
 
-    public function provideIgnoreCases(): Generator
+    protected function createSpy(): IgnoreSpyVisitor
     {
-        yield 'interfaces are ignored' => [
-            <<<'PHP'
-<?php
-
-interface Bar
-{
-    public function nope(Bar $ignored): void;
-}
-PHP
-            ,
-            0,
-        ];
-
-        yield 'classes arent ignored' => [
-            <<<'PHP'
-<?php
-
-class Bar
-{
-    public function nope(Bar $counted)
-    {
-        $counted = true;
-    }
-}
-PHP
-            ,
-            2,
-        ];
+        return new IgnoreSpyVisitor(static function (): void {
+            self::fail('A variable that should have been ignored was still parsed by the next visitor.');
+        });
     }
 
-    protected function getIgnore(): NodeIgnorer
+    private function getParser(): Parser
     {
-        return new InterfaceIgnorer();
+        if (self::$parser === null) {
+            self::$parser = Container::create()->getParser();
+        }
+
+        return self::$parser;
     }
 }

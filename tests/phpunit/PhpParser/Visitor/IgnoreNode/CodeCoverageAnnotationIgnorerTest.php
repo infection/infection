@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Visitor\IgnoreNode;
+namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
 use Generator;
 use Infection\PhpParser\Visitor\IgnoreNode\CodeCoverageAnnotationIgnorer;

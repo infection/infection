@@ -33,36 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Visitor\IgnoreNode;
+namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
-use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use PhpParser\Node;
+use PhpParser\Node\Expr\Variable;
+use PhpParser\NodeVisitorAbstract;
 
-final class AbstractMethodIgnorerTest extends BaseNodeIgnorerTestCase
+final class IgnoreSpyVisitor extends NodeVisitorAbstract
 {
-    public function test_it_ignores_abstract_methods(): void
+    public $nodeCounter = 0;
+
+    private $failureCallBack;
+
+    public function __construct(callable $failureCallBack)
     {
-        $this->parseAndTraverse(<<<'PHP'
-<?php
-
-abstract class Foo
-{
-    public function bar(string $counted)
-    {
-    }
-    abstract public function shouldBeIgnored($ignored);
-}
-
-PHP
-            ,
-            $spy = $this->createSpy()
-        );
-
-        $this->assertSame(1, $spy->nodeCounter);
+        $this->failureCallBack = $failureCallBack;
     }
 
-    protected function getIgnore(): NodeIgnorer
+    public function enterNode(Node $node): void
     {
-        return new AbstractMethodIgnorer();
+        if (!$node instanceof Variable) {
+            return;
+        }
+        $name = $node->name;
+
+        if (!is_string($name)) {
+            return;
+        }
+
+        if ($name === 'ignored') {
+            ($this->failureCallBack)();
+        }
+
+        if ($name === 'counted') {
+            ++$this->nodeCounter;
+        }
     }
 }

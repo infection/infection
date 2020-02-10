@@ -103,7 +103,7 @@ final class NodeTraverserFactoryTest extends TestCase
             $visitorClasses
         );
 
-        $nodeIgnorersReflection = (new ReflectionClass(NonMutableNodesIgnorerVisitor::class))->getProperty('ignoreNodes');
+        $nodeIgnorersReflection = (new ReflectionClass(NonMutableNodesIgnorerVisitor::class))->getProperty('nodeIgnorers');
         $nodeIgnorersReflection->setAccessible(true);
 
         $actualNodeIgnorers = array_map(
