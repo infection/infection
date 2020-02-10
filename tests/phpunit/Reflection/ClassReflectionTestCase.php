@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Reflection;
 
 use Generator;
+use Infection\PhpParser\Visitor\CloneVisitor;
 use Infection\Reflection\ClassReflection;
 use Infection\Reflection\Visibility;
-use Infection\Visitor\CloneVisitor;
 use PHPUnit\Framework\TestCase;
 
 abstract class ClassReflectionTestCase extends TestCase

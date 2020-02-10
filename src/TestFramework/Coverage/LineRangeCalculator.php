@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Infection\Visitor\ParentConnectorVisitor;
+use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**

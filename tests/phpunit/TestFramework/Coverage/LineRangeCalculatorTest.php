@@ -37,8 +37,8 @@ namespace Infection\Tests\TestFramework\Coverage;
 
 use Generator;
 use Infection\Container;
+use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
-use Infection\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;

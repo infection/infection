@@ -37,9 +37,10 @@ namespace Infection\Mutator;
 
 use DomainException;
 use Generator;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\ClassReflection;
-use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
+use ReflectionClass;
 use function Safe\sprintf;
 
 /**

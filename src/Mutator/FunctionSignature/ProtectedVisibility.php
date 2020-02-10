@@ -40,9 +40,9 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\ClassReflection;
 use Infection\Reflection\Visibility;
-use Infection\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
 /**
