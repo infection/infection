@@ -35,6 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser;
 
+use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
+use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
+use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
+use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
+use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
+use PhpParser\NodeTraverserInterface;
+use PhpParser\NodeVisitor;
+use ReflectionClass;
+use ReflectionProperty;
 use function array_map;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
@@ -42,66 +51,90 @@ use Infection\PhpParser\Visitor\NotMutableIgnoreVisitor;
 use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use PhpParser\NodeVisitor\NameResolver;
+use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 use PHPUnit\Framework\TestCase;
 
 final class NodeTraverserFactoryTest extends TestCase
 {
-    /**
-     * @var NodeTraverserFactory
-     */
-    private $traverserFactory;
-
-    protected function setUp(): void
-    {
-        $this->traverserFactory = new NodeTraverserFactory();
-    }
+    private static $visitorsReflection;
 
     public function test_it_can_create_a_traverser(): void
     {
-        $traverser = $this->traverserFactory->create([]);
+        $traverser = (new NodeTraverserFactory())->create(new FakeVisitor(), []);
 
-        $visitors = array_map('get_class', $traverser->getVisitors());
+        $visitors = array_map(
+            'get_class',
+            self::getVisitorReflection()->getValue($traverser)
+        );
 
         $this->assertSame(
             [
-                50 => NotMutableIgnoreVisitor::class,
-                45 => NameResolver::class,
-                40 => ParentConnectorVisitor::class,
-                30 => FullyQualifiedClassNameVisitor::class,
-                20 => ReflectionVisitor::class,
+                NonMutableNodesIgnorerVisitor::class,
+                NameResolver::class,
+                ParentConnectorVisitor::class,
+                FullyQualifiedClassNameVisitor::class,
+                ReflectionVisitor::class,
+                FakeVisitor::class,
             ],
             $visitors
         );
     }
 
-    public function test_it_can_create_a_traverser_with_extra_visitors(): void
+    public function test_it_can_create_a_traverser_with_node_ignorers(): void
     {
-        $traverser = $this->traverserFactory->create([
-            51 => new NodeVisitorA(),
-            100 => new NodeVisitorB(),
-        ]);
+        $traverser = (new NodeTraverserFactory())->create(
+            new FakeVisitor(),
+            [
+                new FakeIgnorer(),
+                new FakeIgnorer(),
+            ]
+        );
 
-        $visitors = array_map('get_class', $traverser->getVisitors());
+        $visitors = self::getVisitorReflection()->getValue($traverser);
+
+        $visitorClasses = array_map('get_class', $visitors);
 
         $this->assertSame(
             [
-                100 => NodeVisitorB::class,
-                51 => NodeVisitorA::class,
-                50 => NotMutableIgnoreVisitor::class,
-                45 => NameResolver::class,
-                40 => ParentConnectorVisitor::class,
-                30 => FullyQualifiedClassNameVisitor::class,
-                20 => ReflectionVisitor::class,
+                NonMutableNodesIgnorerVisitor::class,
+                NameResolver::class,
+                ParentConnectorVisitor::class,
+                FullyQualifiedClassNameVisitor::class,
+                ReflectionVisitor::class,
+                FakeVisitor::class,
             ],
-            $visitors
+            $visitorClasses
+        );
+
+        $nodeIgnorersReflection = (new ReflectionClass(NonMutableNodesIgnorerVisitor::class))->getProperty('ignoreNodes');
+        $nodeIgnorersReflection->setAccessible(true);
+
+        $actualNodeIgnorers = array_map(
+            'get_class',
+            $nodeIgnorersReflection->getValue($visitors[0])
+        );
+
+        $this->assertSame(
+            [
+                FakeIgnorer::class,
+                FakeIgnorer::class,
+                InterfaceIgnorer::class,
+                AbstractMethodIgnorer::class
+            ],
+            $actualNodeIgnorers
         );
     }
-}
 
-final class NodeVisitorA extends NodeVisitorAbstract
-{
-}
-final class NodeVisitorB extends NodeVisitorAbstract
-{
+    private static function getVisitorReflection(): ReflectionProperty
+    {
+        if (null !== self::$visitorsReflection) {
+            return self::$visitorsReflection;
+        }
+
+        self::$visitorsReflection = (new ReflectionClass(NodeTraverser::class))->getProperty('visitors');
+        self::$visitorsReflection->setAccessible(true);
+
+        return self::$visitorsReflection;
+    }
 }

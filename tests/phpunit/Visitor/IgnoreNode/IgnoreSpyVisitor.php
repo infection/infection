@@ -33,49 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser;
+namespace Infection\Tests\Visitor\IgnoreNode;
 
-use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeTraverserInterface;
-use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitor\NameResolver;
+use PhpParser\Node;
+use PhpParser\Node\Expr\Variable;
+use PhpParser\NodeVisitorAbstract;
 
-/**
- * @internal
- * @final
- */
-class NodeTraverserFactory
+final class IgnoreSpyVisitor extends NodeVisitorAbstract
 {
-    /**
-     * @param NodeIgnorer[] $nodeIgnorers
-     */
-    public function create(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverserInterface
+    public $nodeCounter = 0;
+
+    private $failureCallBack;
+
+    public function __construct(callable $failureCallBack)
     {
-        $nodeIgnorers[] = new InterfaceIgnorer();
-        $nodeIgnorers[] = new AbstractMethodIgnorer();
+        $this->failureCallBack = $failureCallBack;
+    }
 
-        $traverser = new NodeTraverser();
+    public function enterNode(Node $node): void
+    {
+        if (!$node instanceof Variable) {
+            return;
+        }
+        $name = $node->name;
 
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
-        $traverser->addVisitor(new NameResolver(
-            null,
-            [
-                'preserveOriginalNames' => true,
-                'replaceNodes' => false,
-            ])
-        );
-        $traverser->addVisitor(new ParentConnectorVisitor());
-        $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
-        $traverser->addVisitor(new ReflectionVisitor());
-        $traverser->addVisitor($mutationVisitor);
+        if (!is_string($name)) {
+            return;
+        }
 
-        return $traverser;
+        if ($name === 'ignored') {
+            ($this->failureCallBack)();
+        }
+
+        if ($name === 'counted') {
+            ++$this->nodeCounter;
+        }
     }
 }

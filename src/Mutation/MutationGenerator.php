@@ -35,17 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutableFileWasProcessed;
 use Infection\Event\MutationGenerationWasFinished;
 use Infection\Event\MutationGenerationWasStarted;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
+use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
-use PhpParser\NodeVisitor;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
+use function count;
 
 /**
  * @internal
@@ -89,13 +89,13 @@ final class MutationGenerator
 
     /**
      * @param bool $onlyCovered Mutates only covered by tests lines of code
-     * @param NodeVisitor[] $extraNodeVisitors
+     * @param NodeIgnorer[] $nodeIgnorers
      *
      * @throws UnparsableFile
      *
      * @return Mutation[]
      */
-    public function generate(bool $onlyCovered, array $extraNodeVisitors = []): array
+    public function generate(bool $onlyCovered, array $nodeIgnorers): array
     {
         $allFilesMutations = [[]];
 
@@ -107,7 +107,7 @@ final class MutationGenerator
                 $onlyCovered,
                 $this->codeCoverageData,
                 $this->mutators,
-                $extraNodeVisitors
+                $nodeIgnorers
             );
 
             $this->eventDispatcher->dispatch(new MutableFileWasProcessed());

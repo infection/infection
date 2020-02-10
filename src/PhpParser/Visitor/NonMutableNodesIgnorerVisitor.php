@@ -33,49 +33,39 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser;
+namespace Infection\PhpParser\Visitor;
 
-use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
+use PhpParser\Node;
 use PhpParser\NodeTraverser;
-use PhpParser\NodeTraverserInterface;
-use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitor\NameResolver;
+use PhpParser\NodeVisitorAbstract;
 
 /**
  * @internal
- * @final
  */
-class NodeTraverserFactory
+final class NonMutableNodesIgnorerVisitor extends NodeVisitorAbstract
 {
+    /**
+     * @var NodeIgnorer[]
+     */
+    private $nodeIgnorers;
+
     /**
      * @param NodeIgnorer[] $nodeIgnorers
      */
-    public function create(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverserInterface
+    public function __construct(array $nodeIgnorers)
     {
-        $nodeIgnorers[] = new InterfaceIgnorer();
-        $nodeIgnorers[] = new AbstractMethodIgnorer();
+        $this->nodeIgnorers = $nodeIgnorers;
+    }
 
-        $traverser = new NodeTraverser();
+    public function enterNode(Node $node)
+    {
+        foreach ($this->nodeIgnorers as $nodeIgnorer) {
+            if ($nodeIgnorer->ignores($node)) {
+                return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+            }
+        }
 
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
-        $traverser->addVisitor(new NameResolver(
-            null,
-            [
-                'preserveOriginalNames' => true,
-                'replaceNodes' => false,
-            ])
-        );
-        $traverser->addVisitor(new ParentConnectorVisitor());
-        $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
-        $traverser->addVisitor(new ReflectionVisitor());
-        $traverser->addVisitor($mutationVisitor);
-
-        return $traverser;
+        return null;
     }
 }

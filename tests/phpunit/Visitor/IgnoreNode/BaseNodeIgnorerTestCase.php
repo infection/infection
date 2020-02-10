@@ -33,49 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser;
+namespace Infection\Tests\Visitor\IgnoreNode;
 
-use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
+use Infection\Container;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
 use PhpParser\NodeTraverser;
-use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitor\NameResolver;
+use PhpParser\Parser;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- * @final
- */
-class NodeTraverserFactory
+abstract class BaseNodeIgnorerTestCase extends TestCase
 {
     /**
-     * @param NodeIgnorer[] $nodeIgnorers
+     * @var Parser|null
      */
-    public function create(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverserInterface
+    private static $parser;
+
+    abstract protected function getIgnore(): NodeIgnorer;
+
+    final protected function parseAndTraverse(string $code, NodeVisitor $spy): void
     {
-        $nodeIgnorers[] = new InterfaceIgnorer();
-        $nodeIgnorers[] = new AbstractMethodIgnorer();
+        $nodes = $this->getParser()->parse($code);
 
         $traverser = new NodeTraverser();
+        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor([$this->getIgnore()]));
+        $traverser->addVisitor($spy);
+        $traverser->traverse($nodes);
 
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
-        $traverser->addVisitor(new NameResolver(
-            null,
-            [
-                'preserveOriginalNames' => true,
-                'replaceNodes' => false,
-            ])
-        );
-        $traverser->addVisitor(new ParentConnectorVisitor());
-        $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
-        $traverser->addVisitor(new ReflectionVisitor());
-        $traverser->addVisitor($mutationVisitor);
+        $this->addToAssertionCount(1);
+    }
 
-        return $traverser;
+    protected function createSpy(): IgnoreSpyVisitor
+    {
+        return new IgnoreSpyVisitor(static function (): void {
+            self::fail('A variable that should have been ignored was still parsed by the next visitor.');
+        });
+    }
+
+    private function getParser(): Parser
+    {
+        if (self::$parser === null) {
+            self::$parser = Container::create()->getParser();
+        }
+
+        return self::$parser;
     }
 }
