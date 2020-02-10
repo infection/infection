@@ -40,6 +40,7 @@ use const DIRECTORY_SEPARATOR;
 use Infection\Config\ConsoleHelper;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\TestFramework\TestFrameworkTypes;
 use RuntimeException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -65,7 +66,7 @@ final class PhpUnitCustomExecutablePathProvider
     public function get(InputInterface $input, OutputInterface $output)
     {
         try {
-            $this->phpUnitExecutableFinder->find();
+            $this->phpUnitExecutableFinder->find(TestFrameworkTypes::PHPUNIT);
         } catch (FinderException $e) {
             $output->writeln(['']);
 

@@ -38,11 +38,9 @@ namespace Infection\FileSystem\Finder;
 /**
  * @internal
  */
-abstract class AbstractExecutableFinder
+final class NonExecutableFinder
 {
-    abstract public function find(): string;
-
-    protected function searchNonExecutables(array $probableNames, array $extraDirectories = []): ?string
+    public function searchNonExecutables(array $probableNames, array $extraDirectories = []): ?string
     {
         $path = getenv('PATH') ?: getenv('Path');
 
