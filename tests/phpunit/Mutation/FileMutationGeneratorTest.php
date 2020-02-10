@@ -35,9 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
-use PhpParser\NodeTraverserInterface;
 use function current;
-use function func_get_args;
 use Generator;
 use Infection\Container;
 use Infection\Mutation\FileMutationGenerator;
@@ -53,7 +51,7 @@ use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
 use Infection\Tests\Mutator\MutatorName;
-use InvalidArgumentException;
+use PhpParser\NodeTraverserInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;

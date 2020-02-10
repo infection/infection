@@ -35,25 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser;
 
-use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
-use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
-use PhpParser\NodeTraverserInterface;
-use PhpParser\NodeVisitor;
-use ReflectionClass;
-use ReflectionProperty;
 use function array_map;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\PhpParser\Visitor\NotMutableIgnoreVisitor;
+use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
+use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
+use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
-use PhpParser\NodeVisitor\NameResolver;
+use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
+use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitorAbstract;
+use PhpParser\NodeVisitor\NameResolver;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionProperty;
 
 final class NodeTraverserFactoryTest extends TestCase
 {
@@ -120,7 +116,7 @@ final class NodeTraverserFactoryTest extends TestCase
                 FakeIgnorer::class,
                 FakeIgnorer::class,
                 InterfaceIgnorer::class,
-                AbstractMethodIgnorer::class
+                AbstractMethodIgnorer::class,
             ],
             $actualNodeIgnorers
         );
@@ -128,7 +124,7 @@ final class NodeTraverserFactoryTest extends TestCase
 
     private static function getVisitorReflection(): ReflectionProperty
     {
-        if (null !== self::$visitorsReflection) {
+        if (self::$visitorsReflection !== null) {
             return self::$visitorsReflection;
         }
 
