@@ -49,6 +49,7 @@ use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\PrioritizedVisitorsNodeTraverser;
 use Infection\PhpParser\Visitor\MutationsCollectorVisitor;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use Infection\Tests\Mutator\MutatorName;
@@ -84,7 +85,8 @@ final class FileMutationGeneratorTest extends TestCase
 
         $this->mutationGenerator = new FileMutationGenerator(
             $this->fileParserMock,
-            $this->traverserFactoryMock
+            $this->traverserFactoryMock,
+            new LineRangeCalculator()
         );
     }
 
@@ -166,7 +168,8 @@ final class FileMutationGeneratorTest extends TestCase
 
         $mutationGenerator = new FileMutationGenerator(
             $this->fileParserMock,
-            $this->traverserFactoryMock
+            $this->traverserFactoryMock,
+            new LineRangeCalculator()
         );
 
         $mutations = $mutationGenerator->generate(
@@ -199,7 +202,8 @@ final class FileMutationGeneratorTest extends TestCase
 
         $mutationGenerator = new FileMutationGenerator(
             $this->fileParserMock,
-            $this->traverserFactoryMock
+            $this->traverserFactoryMock,
+            new LineRangeCalculator()
         );
 
         $mutations = $mutationGenerator->generate(
@@ -236,7 +240,8 @@ final class FileMutationGeneratorTest extends TestCase
 
         $mutationGenerator = new FileMutationGenerator(
             $fileParserMock,
-            $traverserFactoryMock
+            $traverserFactoryMock,
+            new LineRangeCalculator()
         );
 
         try {
