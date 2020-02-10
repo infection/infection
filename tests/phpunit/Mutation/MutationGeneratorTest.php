@@ -64,7 +64,7 @@ final class MutationGeneratorTest extends TestCase
         $mutators = ['Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator())];
         $eventDispatcherMock = $this->createMock(EventDispatcher::class);
         $onlyCovered = true;
-        $extraVisitors = [new FakeIgnorer()];
+        $nodeIgnorers = [new FakeIgnorer()];
 
         $mutation0 = $this->createMock(Mutation::class);
         $mutation1 = $this->createMock(Mutation::class);
@@ -73,14 +73,14 @@ final class MutationGeneratorTest extends TestCase
         /** @var FileMutationGenerator|ObjectProphecy $fileMutationGeneratorProphecy */
         $fileMutationGeneratorProphecy = $this->prophesize(FileMutationGenerator::class);
         $fileMutationGeneratorProphecy
-            ->generate($fileInfoA, $onlyCovered, $codeCoverageMock, $mutators, $extraVisitors)
+            ->generate($fileInfoA, $onlyCovered, $codeCoverageMock, $mutators, $nodeIgnorers)
             ->willReturn([
                 $mutation0,
                 $mutation1,
             ])
         ;
         $fileMutationGeneratorProphecy
-            ->generate($fileInfoB, $onlyCovered, $codeCoverageMock, $mutators, $extraVisitors)
+            ->generate($fileInfoB, $onlyCovered, $codeCoverageMock, $mutators, $nodeIgnorers)
             ->willReturn([
                 $mutation1,
                 $mutation2,
@@ -102,7 +102,7 @@ final class MutationGeneratorTest extends TestCase
             $fileMutationGeneratorProphecy->reveal()
         );
 
-        $mutations = $mutationGenerator->generate($onlyCovered, $extraVisitors);
+        $mutations = $mutationGenerator->generate($onlyCovered, $nodeIgnorers);
 
         $this->assertSame($expectedMutations, $mutations);
     }
