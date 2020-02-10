@@ -33,53 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem\Finder;
+namespace Infection\Environment;
 
-use Infection\FileSystem\Finder\Exception\FinderException;
-use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\PhpExecutableFinder;
+use RuntimeException;
 
 /**
  * @internal
  */
-final class ComposerExecutableFinder
+final class CouldNotResolveStrykerApiKey extends RuntimeException
 {
-    public function find(): string
+    public static function from(string ...$names): self
     {
-        $probable = ['composer', 'composer.phar'];
-        $finder = new ExecutableFinder();
-        $immediatePaths = [getcwd(), realpath(getcwd() . '/../'), realpath(getcwd() . '/../../')];
-
-        foreach ($probable as $name) {
-            if ($path = $finder->find($name, null, $immediatePaths)) {
-                if (strpos($path, '.phar') === false) {
-                    return $path;
-                }
-
-                return $this->makeExecutable($path);
-            }
-        }
-
-        /**
-         * Check for options without execute permissions and prefix the PHP
-         * executable instead.
-         */
-        $nonExecutableFinder = new NonExecutableFinder();
-        $path = $nonExecutableFinder->searchNonExecutables($probable, $immediatePaths);
-
-        if ($path !== null) {
-            return $this->makeExecutable($path);
-        }
-
-        throw FinderException::composerNotFound();
-    }
-
-    private function makeExecutable(string $path): string
-    {
-        return sprintf(
-            '%s %s',
-            (new PhpExecutableFinder())->find(),
-            $path
-        );
+        return new self(sprintf(
+            'The Stryker API key needs to be configured using one of the environment variables "%s", but could not find any of these.',
+            implode(
+                '" or "',
+                $names
+            )
+        ));
     }
 }

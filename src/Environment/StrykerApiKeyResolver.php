@@ -33,38 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem\Finder;
+namespace Infection\Environment;
 
 /**
  * @internal
+ *
+ * @see https://github.com/stryker-mutator/stryker-handbook/blob/master/dashboard.md#send-a-report-direcly-from-stryker
  */
-abstract class AbstractExecutableFinder
+final class StrykerApiKeyResolver
 {
-    abstract public function find(): string;
-
-    protected function searchNonExecutables(array $probableNames, array $extraDirectories = []): ?string
+    /**
+     * @param array<string, string> $environment
+     *
+     * @throws CouldNotResolveStrykerApiKey
+     */
+    public function resolve(array $environment): string
     {
-        $path = getenv('PATH') ?: getenv('Path');
+        $names = [
+            'INFECTION_BADGE_API_KEY',
+            'STRYKER_DASHBOARD_API_KEY',
+        ];
 
-        if (!$path) {
-            return null;
-        }
-
-        $dirs = array_merge(
-            explode(PATH_SEPARATOR, $path),
-            $extraDirectories
-        );
-
-        foreach ($dirs as $dir) {
-            foreach ($probableNames as $name) {
-                $fileName = sprintf('%s/%s', $dir, $name);
-
-                if (file_exists($fileName)) {
-                    return $fileName;
-                }
+        foreach ($names as $name) {
+            if (!array_key_exists($name, $environment) || !is_string($environment[$name])) {
+                continue;
             }
+
+            return $environment[$name];
         }
 
-        return null;
+        throw CouldNotResolveStrykerApiKey::from(...$names);
     }
 }
