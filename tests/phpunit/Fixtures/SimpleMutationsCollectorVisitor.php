@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures;
 
-use Generator;
-use Infection\MutatedNode;
 use Infection\Mutator\Mutator;
+use Infection\PhpParser\MutatedNode;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use function iterator_to_array;
 
 /**
  * @internal
