@@ -40,6 +40,7 @@ use function get_class;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
+use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\Visitor\MutationsCollectorVisitor;
 use InvalidArgumentException;
 use PhpParser\NodeVisitor;
@@ -57,13 +58,16 @@ class FileMutationGenerator
 
     private $parser;
     private $traverserFactory;
+    private $lineRangeCalculator;
 
     public function __construct(
         FileParser $parser,
-        NodeTraverserFactory $traverserFactory
+        NodeTraverserFactory $traverserFactory,
+        LineRangeCalculator $lineRangeCalculator
     ) {
         $this->parser = $parser;
         $this->traverserFactory = $traverserFactory;
+        $this->lineRangeCalculator = $lineRangeCalculator;
     }
 
     /**
@@ -111,7 +115,8 @@ class FileMutationGenerator
                 $filePath,
                 $initialStatements,
                 $codeCoverage,
-                $onlyCovered
+                $onlyCovered,
+                $this->lineRangeCalculator
             )
         );
 
