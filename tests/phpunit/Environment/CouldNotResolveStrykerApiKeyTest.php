@@ -33,53 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem\Finder;
+namespace Infection\Tests\Environment;
 
-use Infection\FileSystem\Finder\Exception\FinderException;
-use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\PhpExecutableFinder;
+use Infection\Environment\CouldNotResolveStrykerApiKey;
+use PHPUnit\Framework\TestCase;
 
 /**
- * @internal
+ * @covers \Infection\Environment\CouldNotResolveStrykerApiKey
  */
-final class ComposerExecutableFinder
+final class CouldNotResolveStrykerApiKeyTest extends TestCase
 {
-    public function find(): string
+    public function test_from_returns_exception(): void
     {
-        $probable = ['composer', 'composer.phar'];
-        $finder = new ExecutableFinder();
-        $immediatePaths = [getcwd(), realpath(getcwd() . '/../'), realpath(getcwd() . '/../../')];
+        $names = [
+            'FOO',
+            'BAR',
+        ];
 
-        foreach ($probable as $name) {
-            if ($path = $finder->find($name, null, $immediatePaths)) {
-                if (strpos($path, '.phar') === false) {
-                    return $path;
-                }
+        $exception = CouldNotResolveStrykerApiKey::from(...$names);
 
-                return $this->makeExecutable($path);
-            }
-        }
-
-        /**
-         * Check for options without execute permissions and prefix the PHP
-         * executable instead.
-         */
-        $nonExecutableFinder = new NonExecutableFinder();
-        $path = $nonExecutableFinder->searchNonExecutables($probable, $immediatePaths);
-
-        if ($path !== null) {
-            return $this->makeExecutable($path);
-        }
-
-        throw FinderException::composerNotFound();
-    }
-
-    private function makeExecutable(string $path): string
-    {
-        return sprintf(
-            '%s %s',
-            (new PhpExecutableFinder())->find(),
-            $path
+        $message = sprintf(
+            'The Stryker API key needs to be configured using one of the environment variables "%s", but could not find any of these.',
+            implode(
+                '" or "',
+                $names
+            )
         );
+
+        self::assertSame($message, $exception->getMessage());
     }
 }

@@ -183,23 +183,28 @@ final class MutationTestingRunnerTest extends TestCase
         $threadCount = 4;
         $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
+        $this->processBuilderMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
         $this->mutantFactoryMock
-            ->expects($this->once())
-            ->method('create')
-            ->with($mutations, $testFrameworkExtraOptions)
-            ->willReturn($processes = [])
+            ->expects($this->never())
+            ->method($this->anything())
         ;
 
         $this->parallelProcessRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with($processes, $threadCount)
+            ->with([], $threadCount)
         ;
 
         $this->runner->run($mutations, $threadCount, $testFrameworkExtraOptions);
 
         $this->assertAreSameEvents(
             [
+                new MutantsCreationWasStarted(0),
+                new MutantsCreationWasFinished(),
                 new MutationTestingWasStarted(0),
                 new MutationTestingWasFinished(),
             ],

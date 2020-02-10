@@ -33,53 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem\Finder;
-
-use Infection\FileSystem\Finder\Exception\FinderException;
-use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\PhpExecutableFinder;
+namespace Infection\Reflection;
 
 /**
  * @internal
  */
-final class ComposerExecutableFinder
+final class NullReflection implements ClassReflection
 {
-    public function find(): string
+    public function hasParentMethodWithVisibility(string $methodName, Visibility $visibility): bool
     {
-        $probable = ['composer', 'composer.phar'];
-        $finder = new ExecutableFinder();
-        $immediatePaths = [getcwd(), realpath(getcwd() . '/../'), realpath(getcwd() . '/../../')];
-
-        foreach ($probable as $name) {
-            if ($path = $finder->find($name, null, $immediatePaths)) {
-                if (strpos($path, '.phar') === false) {
-                    return $path;
-                }
-
-                return $this->makeExecutable($path);
-            }
-        }
-
-        /**
-         * Check for options without execute permissions and prefix the PHP
-         * executable instead.
-         */
-        $nonExecutableFinder = new NonExecutableFinder();
-        $path = $nonExecutableFinder->searchNonExecutables($probable, $immediatePaths);
-
-        if ($path !== null) {
-            return $this->makeExecutable($path);
-        }
-
-        throw FinderException::composerNotFound();
+        return false;
     }
 
-    private function makeExecutable(string $path): string
+    public function getName(): string
     {
-        return sprintf(
-            '%s %s',
-            (new PhpExecutableFinder())->find(),
-            $path
-        );
+        return '';
     }
 }

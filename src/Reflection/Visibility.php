@@ -33,38 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem\Finder;
+namespace Infection\Reflection;
 
 /**
  * @internal
  */
-abstract class AbstractExecutableFinder
+final class Visibility
 {
-    abstract public function find(): string;
+    public const PUBLIC = 'public';
+    public const PROTECTED = 'protected';
 
-    protected function searchNonExecutables(array $probableNames, array $extraDirectories = []): ?string
+    /**
+     * @var string
+     */
+    private $variant;
+
+    private function __construct(string $variant)
     {
-        $path = getenv('PATH') ?: getenv('Path');
+        $this->variant = $variant;
+    }
 
-        if (!$path) {
-            return null;
-        }
+    public static function asPublic(): self
+    {
+        return new self(self::PUBLIC);
+    }
 
-        $dirs = array_merge(
-            explode(PATH_SEPARATOR, $path),
-            $extraDirectories
-        );
+    public static function asProtected(): self
+    {
+        return new self(self::PROTECTED);
+    }
 
-        foreach ($dirs as $dir) {
-            foreach ($probableNames as $name) {
-                $fileName = sprintf('%s/%s', $dir, $name);
+    public function isPublic(): bool
+    {
+        return $this->variant === self::PUBLIC;
+    }
 
-                if (file_exists($fileName)) {
-                    return $fileName;
-                }
-            }
-        }
-
-        return null;
+    public function isProtected(): bool
+    {
+        return $this->variant === self::PROTECTED;
     }
 }

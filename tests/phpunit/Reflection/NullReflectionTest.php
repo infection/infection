@@ -33,53 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem\Finder;
+namespace Infection\Tests\Reflection;
 
-use Infection\FileSystem\Finder\Exception\FinderException;
-use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\PhpExecutableFinder;
+use Infection\Reflection\NullReflection;
+use Infection\Reflection\Visibility;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class ComposerExecutableFinder
+final class NullReflectionTest extends TestCase
 {
-    public function find(): string
+    public function test_it_has_no_name(): void
     {
-        $probable = ['composer', 'composer.phar'];
-        $finder = new ExecutableFinder();
-        $immediatePaths = [getcwd(), realpath(getcwd() . '/../'), realpath(getcwd() . '/../../')];
-
-        foreach ($probable as $name) {
-            if ($path = $finder->find($name, null, $immediatePaths)) {
-                if (strpos($path, '.phar') === false) {
-                    return $path;
-                }
-
-                return $this->makeExecutable($path);
-            }
-        }
-
-        /**
-         * Check for options without execute permissions and prefix the PHP
-         * executable instead.
-         */
-        $nonExecutableFinder = new NonExecutableFinder();
-        $path = $nonExecutableFinder->searchNonExecutables($probable, $immediatePaths);
-
-        if ($path !== null) {
-            return $this->makeExecutable($path);
-        }
-
-        throw FinderException::composerNotFound();
+        $reflection = new NullReflection();
+        $this->assertSame('', $reflection->getName());
     }
 
-    private function makeExecutable(string $path): string
+    public function test_it_has_no_parent(): void
     {
-        return sprintf(
-            '%s %s',
-            (new PhpExecutableFinder())->find(),
-            $path
-        );
+        $reflection = new NullReflection();
+        $this->assertFalse($reflection->hasParentMethodWithVisibility('foo', Visibility::asPublic()));
     }
 }

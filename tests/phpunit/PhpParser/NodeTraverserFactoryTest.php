@@ -41,6 +41,7 @@ use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\PhpParser\Visitor\NotMutableIgnoreVisitor;
 use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitorAbstract;
 use PHPUnit\Framework\TestCase;
 
@@ -65,6 +66,7 @@ final class NodeTraverserFactoryTest extends TestCase
         $this->assertSame(
             [
                 50 => NotMutableIgnoreVisitor::class,
+                45 => NameResolver::class,
                 40 => ParentConnectorVisitor::class,
                 30 => FullyQualifiedClassNameVisitor::class,
                 20 => ReflectionVisitor::class,
@@ -87,6 +89,7 @@ final class NodeTraverserFactoryTest extends TestCase
                 100 => NodeVisitorB::class,
                 51 => NodeVisitorA::class,
                 50 => NotMutableIgnoreVisitor::class,
+                45 => NameResolver::class,
                 40 => ParentConnectorVisitor::class,
                 30 => FullyQualifiedClassNameVisitor::class,
                 20 => ReflectionVisitor::class,

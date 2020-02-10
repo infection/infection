@@ -42,11 +42,11 @@ use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\Reflection\CoreClassReflection;
 use function iterator_to_array;
 use PhpParser\Node;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
 final class IgnoreMutatorTest extends TestCase
 {
@@ -110,8 +110,8 @@ final class IgnoreMutatorTest extends TestCase
         $this->nodeMock
             ->expects($this->once())
             ->method('getAttribute')
-            ->with(ReflectionVisitor::REFLECTION_CLASS_KEY, false)
-            ->willReturn(false)
+            ->with(ReflectionVisitor::REFLECTION_CLASS_KEY)
+            ->willReturn(null)
         ;
 
         $mutate = $ignoreMutator->canMutate($this->nodeMock);
@@ -136,7 +136,7 @@ final class IgnoreMutatorTest extends TestCase
                 [ReflectionVisitor::FUNCTION_NAME, '']
             )
             ->willReturnOnConsecutiveCalls(
-                new ReflectionClass(self::class),
+                CoreClassReflection::fromClassName(self::class),
                 'foo'
             )
         ;

@@ -127,7 +127,7 @@ final class ConfigureCommand extends BaseCommand
         $phpUnitConfigPathProvider = new TestFrameworkConfigPathProvider($testFrameworkConfigLocator, $consoleHelper, $questionHelper);
         $phpUnitConfigPath = $phpUnitConfigPathProvider->get($input, $output, $dirsInCurrentDir, $input->getOption('test-framework'));
 
-        $phpUnitExecutableFinder = new TestFrameworkFinder(TestFrameworkTypes::PHPUNIT);
+        $phpUnitExecutableFinder = new TestFrameworkFinder();
         $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $consoleHelper, $questionHelper);
         $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($input, $output);
 

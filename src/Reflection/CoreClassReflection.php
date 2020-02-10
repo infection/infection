@@ -33,53 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem\Finder;
+namespace Infection\Reflection;
 
-use Infection\FileSystem\Finder\Exception\FinderException;
-use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\PhpExecutableFinder;
+use ReflectionClass;
+use ReflectionException;
 
 /**
  * @internal
  */
-final class ComposerExecutableFinder
+final class CoreClassReflection implements ClassReflection
 {
-    public function find(): string
+    private $reflectionClass;
+
+    private function __construct(ReflectionClass $reflectionClass)
     {
-        $probable = ['composer', 'composer.phar'];
-        $finder = new ExecutableFinder();
-        $immediatePaths = [getcwd(), realpath(getcwd() . '/../'), realpath(getcwd() . '/../../')];
-
-        foreach ($probable as $name) {
-            if ($path = $finder->find($name, null, $immediatePaths)) {
-                if (strpos($path, '.phar') === false) {
-                    return $path;
-                }
-
-                return $this->makeExecutable($path);
-            }
-        }
-
-        /**
-         * Check for options without execute permissions and prefix the PHP
-         * executable instead.
-         */
-        $nonExecutableFinder = new NonExecutableFinder();
-        $path = $nonExecutableFinder->searchNonExecutables($probable, $immediatePaths);
-
-        if ($path !== null) {
-            return $this->makeExecutable($path);
-        }
-
-        throw FinderException::composerNotFound();
+        $this->reflectionClass = $reflectionClass;
     }
 
-    private function makeExecutable(string $path): string
+    public static function fromClassName(string $className): self
     {
-        return sprintf(
-            '%s %s',
-            (new PhpExecutableFinder())->find(),
-            $path
-        );
+        return new self(new ReflectionClass($className));
+    }
+
+    public function hasParentMethodWithVisibility(string $methodName, Visibility $visibility): bool
+    {
+        try {
+            $method = $this->reflectionClass->getMethod($methodName)->getPrototype();
+        } catch (ReflectionException $e) {
+            return false;
+        }
+
+        if ($visibility->isPublic()) {
+            return $method->isPublic();
+        }
+
+        return $method->isProtected();
+    }
+
+    public function getName(): string
+    {
+        return $this->reflectionClass->getName();
     }
 }

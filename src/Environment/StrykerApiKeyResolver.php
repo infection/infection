@@ -33,53 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem\Finder;
-
-use Infection\FileSystem\Finder\Exception\FinderException;
-use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\PhpExecutableFinder;
+namespace Infection\Environment;
 
 /**
  * @internal
+ *
+ * @see https://github.com/stryker-mutator/stryker-handbook/blob/master/dashboard.md#send-a-report-direcly-from-stryker
  */
-final class ComposerExecutableFinder
+final class StrykerApiKeyResolver
 {
-    public function find(): string
+    /**
+     * @param array<string, string> $environment
+     *
+     * @throws CouldNotResolveStrykerApiKey
+     */
+    public function resolve(array $environment): string
     {
-        $probable = ['composer', 'composer.phar'];
-        $finder = new ExecutableFinder();
-        $immediatePaths = [getcwd(), realpath(getcwd() . '/../'), realpath(getcwd() . '/../../')];
+        $names = [
+            'INFECTION_BADGE_API_KEY',
+            'STRYKER_DASHBOARD_API_KEY',
+        ];
 
-        foreach ($probable as $name) {
-            if ($path = $finder->find($name, null, $immediatePaths)) {
-                if (strpos($path, '.phar') === false) {
-                    return $path;
-                }
-
-                return $this->makeExecutable($path);
+        foreach ($names as $name) {
+            if (!array_key_exists($name, $environment) || !is_string($environment[$name])) {
+                continue;
             }
+
+            return $environment[$name];
         }
 
-        /**
-         * Check for options without execute permissions and prefix the PHP
-         * executable instead.
-         */
-        $nonExecutableFinder = new NonExecutableFinder();
-        $path = $nonExecutableFinder->searchNonExecutables($probable, $immediatePaths);
-
-        if ($path !== null) {
-            return $this->makeExecutable($path);
-        }
-
-        throw FinderException::composerNotFound();
-    }
-
-    private function makeExecutable(string $path): string
-    {
-        return sprintf(
-            '%s %s',
-            (new PhpExecutableFinder())->find(),
-            $path
-        );
+        throw CouldNotResolveStrykerApiKey::from(...$names);
     }
 }

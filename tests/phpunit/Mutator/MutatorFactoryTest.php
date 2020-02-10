@@ -45,6 +45,7 @@ use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\Reflection\ClassReflection;
 use InvalidArgumentException;
 use PhpParser\Node;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -98,8 +99,8 @@ final class MutatorFactoryTest extends TestCase
 
         $this->assertSameMutatorsByClass([TrueValue::class], $mutators);
 
-        /** @var MockObject|ReflectionClass $reflectionMock */
-        $reflectionMock = $this->createMock(ReflectionClass::class);
+        /** @var MockObject|ClassReflection $reflectionMock */
+        $reflectionMock = $this->createMock(ClassReflection::class);
         $reflectionMock
             ->expects($this->once())
             ->method('getName')
@@ -154,11 +155,20 @@ final class MutatorFactoryTest extends TestCase
         }
     }
 
-    private function createBoolNode(
-        string $boolean,
-        string $functionName,
-        ReflectionClass $reflectionMock
-    ): Node {
+    private function createPlusNode(string $functionName, ClassReflection $reflectionMock): Node
+    {
+        return new Node\Expr\BinaryOp\Plus(
+            new Node\Scalar\DNumber(1.23),
+            new Node\Scalar\DNumber(1.23),
+            [
+                ReflectionVisitor::REFLECTION_CLASS_KEY => $reflectionMock,
+                ReflectionVisitor::FUNCTION_NAME => $functionName,
+            ]
+        );
+    }
+
+    private function createBoolNode(string $boolean, string $functionName, ClassReflection $reflectionMock): Node
+    {
         return new Node\Expr\ConstFetch(
             new Node\Name($boolean),
             [

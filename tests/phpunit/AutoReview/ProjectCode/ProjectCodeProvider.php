@@ -55,6 +55,7 @@ use Infection\Event\Subscriber\MutantCreatingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\FilterableFinder;
+use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Http\BadgeApiClient;
 use Infection\Logger\ResultsLoggerTypes;
@@ -100,6 +101,7 @@ final class ProjectCodeProvider
         NodeMutationGenerator::class,
         FilterableFinder::class,
         Engine::class,
+        NonExecutableFinder::class,
     ];
 
     /**
