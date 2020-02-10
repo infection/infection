@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
 use Generator;
-use Infection\PhpParser\Visitor\IgnoreNode\CodeCoverageAnnotationIgnorer;
+use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 
-final class CodeCoverageAnnotationIgnorerTest extends BaseNodeIgnorerTestCase
+final class PhpUnitCodeCoverageAnnotationIgnorerTest extends BaseNodeIgnorerTestCase
 {
     /**
      * @dataProvider provideIgnoreCases
@@ -157,6 +157,6 @@ PHP
 
     protected function getIgnore(): NodeIgnorer
     {
-        return new CodeCoverageAnnotationIgnorer();
+        return new PhpUnitCodeCoverageAnnotationIgnorer();
     }
 }

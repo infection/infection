@@ -42,7 +42,7 @@ use function strpos;
 /**
  * @internal
  */
-final class CodeCoverageAnnotationIgnorer implements NodeIgnorer
+final class PhpUnitCodeCoverageAnnotationIgnorer implements NodeIgnorer
 {
     public function ignores(Node $node): bool
     {
