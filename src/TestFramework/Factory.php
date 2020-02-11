@@ -37,14 +37,15 @@ namespace Infection\TestFramework;
 
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\TestFramework\Codeception\CodeceptionAdapterFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapterFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
 use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -58,13 +59,19 @@ final class Factory
     private $jUnitFilePath;
     private $infectionConfig;
 
+    /**
+     * @var array<string, array<string, mixed>>
+     */
+    private $installedExtensions;
+
     public function __construct(
         string $tmpDir,
         string $projectDir,
         TestFrameworkConfigLocatorInterface $configLocator,
         TestFrameworkFinder $testFrameworkFinder,
         string $jUnitFilePath,
-        Configuration $infectionConfig
+        Configuration $infectionConfig,
+        array $installedExtensions
     ) {
         $this->tmpDir = $tmpDir;
         $this->configLocator = $configLocator;
@@ -72,6 +79,7 @@ final class Factory
         $this->jUnitFilePath = $jUnitFilePath;
         $this->infectionConfig = $infectionConfig;
         $this->testFrameworkFinder = $testFrameworkFinder;
+        $this->installedExtensions = $installedExtensions;
     }
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
@@ -109,19 +117,27 @@ final class Factory
             );
         }
 
-        if ($adapterName === TestFrameworkTypes::CODECEPTION) {
-            $codeceptionConfigPath = $this->configLocator->locate(TestFrameworkTypes::CODECEPTION);
+        foreach ($this->installedExtensions as $packageName => $installedExtension) {
+            $factory = $installedExtension['extra']['class'];
 
-            return CodeceptionAdapterFactory::create(
-                $this->testFrameworkFinder->find('codecept'),
-                $this->tmpDir,
-                $codeceptionConfigPath,
-                null,
-                $this->jUnitFilePath,
-                $this->projectDir,
-                $this->infectionConfig->getSourceDirectories(),
-                $skipCoverage
-            );
+            Assert::classExists($factory);
+
+            if (!is_a($factory, TestFrameworkAdapterFactory::class, true)) {
+                continue;
+            }
+
+            if ($adapterName === $factory::getAdapterName()) {
+                return $factory::create(
+                    $this->testFrameworkFinder->find($factory::getExecutableName()),
+                    $this->tmpDir,
+                    $this->configLocator->locate($factory::getAdapterName()),
+                    null,
+                    $this->jUnitFilePath,
+                    $this->projectDir,
+                    $this->infectionConfig->getSourceDirectories(),
+                    $skipCoverage
+                );
+            }
         }
 
         throw new InvalidArgumentException(sprintf(
