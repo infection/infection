@@ -27,6 +27,9 @@ parameters:
             path: '../src/TestFramework/PhpUnit/Coverage/IndexXmlCoverageParser.php'
             message: '#Function realpath is unsafe to use\.#'
             count: 1
+        -
+            path: '../src/Container.php'
+            message: '#^Method Infection\\Container::get.*\(\) should return .* but returns object\.$#'
     level: max
     paths:
         - ../src

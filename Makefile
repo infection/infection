@@ -186,7 +186,7 @@ $(PHPSTAN): vendor
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
 	$(BOX) validate
-	ulimit -n 4096 && $(BOX) compile
+	$(BOX) compile
 	touch -c $@
 
 vendor: composer.lock

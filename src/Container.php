@@ -103,6 +103,7 @@ use function Safe\getcwd;
 use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Filesystem\Filesystem;
+use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
 
 /**
@@ -796,7 +797,7 @@ final class Container
             $value = $this->values[$id] = $this->factories[$id]($this);
         }
 
-        assert($value instanceof $id);
+        Assert::isInstanceOf($value, $id);
 
         return $value;
     }
