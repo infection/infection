@@ -191,7 +191,7 @@ abstract class AbstractMutatorTestCase extends TestCase
         );
 
         (new NodeTraverserFactory())
-            ->create([10 => $mutationsCollectorVisitor])
+            ->create($mutationsCollectorVisitor, [])
             ->traverse($nodes)
         ;
 
