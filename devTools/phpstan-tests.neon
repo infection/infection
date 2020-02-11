@@ -10,10 +10,6 @@ parameters:
         - '#^Cannot call method willReturn\(\) on array<Infection\\Mutation\\Mutation>\.$#'
         - '#^PHPDoc tag @var for variable \$sourceFilesCollectorProphecy contains unresolvable type#'
         -
-            path: '../tests/phpunit/PhpParser/PrioritizedVisitorsNodeTraverserTest.php'
-            message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
-            count: 1
-        -
             path: '../tests/phpunit/PhpParser/Visitor/MutationsCollectorVisitorTest.php'
             message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
             count: 2
