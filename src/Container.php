@@ -37,7 +37,6 @@ namespace Infection;
 
 use function array_filter;
 use function array_key_exists;
-use function assert;
 use Closure;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
