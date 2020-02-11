@@ -43,11 +43,17 @@ class MutatorConfig
 {
     private $mutatorSettings;
 
+    /**
+     * @param array<mixed> $settings
+     */
     public function __construct(array $settings)
     {
         $this->mutatorSettings = $settings;
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function getMutatorSettings(): array
     {
         return $this->mutatorSettings;

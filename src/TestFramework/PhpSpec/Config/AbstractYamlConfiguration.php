@@ -42,9 +42,19 @@ use function array_key_exists;
  */
 abstract class AbstractYamlConfiguration
 {
+    /**
+     * @var string
+     */
     protected $tempDirectory;
+
+    /**
+     * @var array<mixed>
+     */
     protected $parsedYaml;
 
+    /**
+     * @param array<mixed> $parsedYaml
+     */
     public function __construct(string $tmpDir, array $parsedYaml)
     {
         $this->tempDirectory = $tmpDir;
@@ -58,6 +68,9 @@ abstract class AbstractYamlConfiguration
         return strpos($extensionName, 'CodeCoverage') !== false;
     }
 
+    /**
+     * @param array<mixed> $parsedYaml
+     */
     protected function hasCodeCoverageExtension(array $parsedYaml): bool
     {
         if (!array_key_exists('extensions', $parsedYaml)) {

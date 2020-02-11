@@ -40,6 +40,10 @@ namespace Infection\FileSystem\Finder;
  */
 final class NonExecutableFinder
 {
+    /**
+     * @param string[] $probableNames
+     * @param string[] $extraDirectories
+     */
     public function searchNonExecutables(array $probableNames, array $extraDirectories = []): ?string
     {
         $path = getenv('PATH') ?: getenv('Path');

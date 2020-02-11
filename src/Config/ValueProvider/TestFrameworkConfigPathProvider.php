@@ -65,7 +65,10 @@ final class TestFrameworkConfigPathProvider
         $this->questionHelper = $questionHelper;
     }
 
-    public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, string $testFramework)
+    /**
+     * @param string[] $dirsInCurrentDir
+     */
+    public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, string $testFramework): ?string
     {
         try {
             $this->testFrameworkConfigLocator->locate($testFramework);
@@ -118,6 +121,9 @@ final class TestFrameworkConfigPathProvider
         };
     }
 
+    /**
+     * @param string[] $dirsInCurrentDir
+     */
     private function askTestFrameworkConfigLocation(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, string $testFramework, string $defaultValue): string
     {
         $question = sprintf(

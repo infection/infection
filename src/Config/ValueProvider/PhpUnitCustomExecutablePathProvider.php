@@ -63,7 +63,7 @@ final class PhpUnitCustomExecutablePathProvider
         $this->questionHelper = $questionHelper;
     }
 
-    public function get(InputInterface $input, OutputInterface $output)
+    public function get(InputInterface $input, OutputInterface $output): ?string
     {
         try {
             $this->phpUnitExecutableFinder->find(TestFrameworkTypes::PHPUNIT);

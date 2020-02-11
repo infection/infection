@@ -1,7 +1,11 @@
 parameters:
+    level: 4
+    paths:
+        - ../tests/phpunit
     excludes_analyse:
         - %currentWorkingDirectory%/tests/e2e/*
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
     ignoreErrors:
         - '#Return type \(void\) of method .*[Visitor|Traverser].* should be compatible with return type .* of method PhpParser\\Node.*#'
         - '#^Cannot call method willReturn\(\) on array<Infection\\Mutation\\Mutation>\.$#'
+        - '#^PHPDoc tag @var for variable \$sourceFilesCollectorProphecy contains unresolvable type#'

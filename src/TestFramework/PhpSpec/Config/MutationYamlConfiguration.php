@@ -44,6 +44,9 @@ final class MutationYamlConfiguration extends AbstractYamlConfiguration
 {
     private $customAutoloadFilePath;
 
+    /**
+     * @param array<mixed> $parsedYaml
+     */
     public function __construct(string $tmpDir, array $parsedYaml, string $customAutoloadFilePath)
     {
         parent::__construct($tmpDir, $parsedYaml);
@@ -59,6 +62,11 @@ final class MutationYamlConfiguration extends AbstractYamlConfiguration
         return Yaml::dump($config);
     }
 
+    /**
+     * @param array<mixed> $parsedYaml
+     *
+     * @return array<mixed>
+     */
     private function removeCodeCoverageExtension(array $parsedYaml): array
     {
         if (!$this->hasCodeCoverageExtension($parsedYaml)) {
@@ -76,6 +84,11 @@ final class MutationYamlConfiguration extends AbstractYamlConfiguration
         return array_merge($parsedYaml, ['extensions' => $filteredExtensions]);
     }
 
+    /**
+     * @param array<mixed> $config
+     *
+     * @return array<mixed>
+     */
     private function setCustomAutoLoaderPath(array $config): array
     {
         // bootstrap must be before other keys because of PhpSpec bug with populating container under

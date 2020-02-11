@@ -45,7 +45,7 @@ use stdClass;
 /**
  * @internal
  */
-class SourceDirGuesser implements Guesser
+class SourceDirGuesser
 {
     private $composerJsonContent;
 
@@ -54,7 +54,10 @@ class SourceDirGuesser implements Guesser
         $this->composerJsonContent = $composerJsonContent;
     }
 
-    public function guess()
+    /**
+     * @return string[]|null
+     */
+    public function guess(): ?array
     {
         if (!isset($this->composerJsonContent->autoload)) {
             return null;
@@ -73,6 +76,9 @@ class SourceDirGuesser implements Guesser
         return null;
     }
 
+    /**
+     * @return string[]
+     */
     private function getValues(string $psr): array
     {
         $dirs = $this->parsePsrSection((array) $this->composerJsonContent->autoload->{$psr});
@@ -85,6 +91,11 @@ class SourceDirGuesser implements Guesser
         return $dirs;
     }
 
+    /**
+     * @param array<array<string>|string|mixed> $autoloadDirs
+     *
+     * @return string[]
+     */
     private function parsePsrSection(array $autoloadDirs): array
     {
         $dirs = [];
@@ -101,7 +112,8 @@ class SourceDirGuesser implements Guesser
     }
 
     /**
-     * @param array|string $path
+     * @param string[]|string $path
+     * @param string[] $dirs
      */
     private function parsePath($path, array &$dirs): void
     {

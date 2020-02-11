@@ -20,8 +20,7 @@ PHP_CS_FIXER=./.tools/php-cs-fixer
 PHP_CS_FIXER_URL="https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar"
 PHP_CS_FIXER_CACHE=build/cache/.php_cs.cache
 
-PHPSTAN=./.tools/phpstan
-PHPSTAN_URL="https://github.com/phpstan/phpstan/releases/download/0.11.19/phpstan.phar"
+PHPSTAN=./vendor/bin/phpstan
 
 PHPUNIT=vendor/bin/phpunit
 
@@ -59,8 +58,8 @@ cs: $(PHP_CS_FIXER)
 
 .PHONY: phpstan
 phpstan: vendor $(PHPSTAN)
-	$(PHPSTAN) analyse src --level=max --configuration ./devTools/phpstan-src.neon --no-interaction --no-progress
-	$(PHPSTAN) analyse tests/phpunit --level=4 --configuration ./devTools/phpstan-tests.neon --no-interaction --no-progress
+	$(PHPSTAN) analyse --configuration devTools/phpstan-src.neon --no-interaction --no-progress
+	$(PHPSTAN) analyse --configuration ./devTools/phpstan-tests.neon --no-interaction --no-progress
 
 .PHONY: validate
 validate:
@@ -183,10 +182,7 @@ $(PHP_CS_FIXER): Makefile
 	chmod a+x $(PHP_CS_FIXER)
 	touch $@
 
-$(PHPSTAN): Makefile
-	wget $(PHPSTAN_URL) --output-document=$(PHPSTAN)
-	chmod a+x $(PHPSTAN)
-	touch $@
+$(PHPSTAN): vendor
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
 	$(BOX) validate
