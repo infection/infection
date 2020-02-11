@@ -46,7 +46,7 @@ use Webmozart\Assert\Assert;
 final class MutatorFactory
 {
     /**
-     * @param array<string, array<mixed>> $resolvedMutators
+     * @param array<string, mixed[]> $resolvedMutators
      *
      * @return array<string, Mutator>
      */

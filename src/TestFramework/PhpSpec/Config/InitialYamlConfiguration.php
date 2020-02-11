@@ -46,7 +46,7 @@ final class InitialYamlConfiguration extends AbstractYamlConfiguration
     private $skipCoverage;
 
     /**
-     * @param array<mixed> $parsedYaml
+     * @param mixed[] $parsedYaml
      */
     public function __construct(string $tmpDir, array $parsedYaml, bool $skipCoverage)
     {
@@ -71,7 +71,7 @@ final class InitialYamlConfiguration extends AbstractYamlConfiguration
     }
 
     /**
-     * @param array<mixed> $parsedYaml
+     * @param mixed[] $parsedYaml
      */
     private function updateCodeCoveragePath(array &$parsedYaml): void
     {
@@ -89,7 +89,7 @@ final class InitialYamlConfiguration extends AbstractYamlConfiguration
     }
 
     /**
-     * @param array<mixed> $parsedYaml
+     * @param mixed[] $parsedYaml
      */
     private function removeCoverageExtension(array &$parsedYaml): void
     {

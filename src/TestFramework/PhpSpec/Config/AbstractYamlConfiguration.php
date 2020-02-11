@@ -48,12 +48,12 @@ abstract class AbstractYamlConfiguration
     protected $tempDirectory;
 
     /**
-     * @var array<mixed>
+     * @var mixed[]
      */
     protected $parsedYaml;
 
     /**
-     * @param array<mixed> $parsedYaml
+     * @param mixed[] $parsedYaml
      */
     public function __construct(string $tmpDir, array $parsedYaml)
     {
@@ -69,7 +69,7 @@ abstract class AbstractYamlConfiguration
     }
 
     /**
-     * @param array<mixed> $parsedYaml
+     * @param mixed[] $parsedYaml
      */
     protected function hasCodeCoverageExtension(array $parsedYaml): bool
     {

@@ -95,7 +95,7 @@ class MutationConfigBuilder extends ConfigBuilder
     }
 
     /**
-     * @param array<mixed> $parsedYaml
+     * @param mixed[] $parsedYaml
      */
     private function createCustomAutoloadWithInterceptor(string $originalFilePath, string $mutantFilePath, array $parsedYaml): string
     {
@@ -126,7 +126,7 @@ AUTOLOAD;
     }
 
     /**
-     * @param array<mixed> $parsedYaml
+     * @param mixed[] $parsedYaml
      *
      * @return string|null
      */

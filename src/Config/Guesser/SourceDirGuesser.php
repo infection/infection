@@ -93,7 +93,7 @@ class SourceDirGuesser
     }
 
     /**
-     * @param array<array<string>|string|mixed> $autoloadDirs
+     * @param array<string[]|string|mixed> $autoloadDirs
      *
      * @return string[]
      */

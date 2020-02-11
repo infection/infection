@@ -148,7 +148,7 @@ PHP
     {
         return new class() extends NodeVisitorAbstract {
             /**
-             * @var array<int>
+             * @var int[]
              */
             public $range = [];
 

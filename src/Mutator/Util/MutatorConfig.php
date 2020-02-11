@@ -44,7 +44,7 @@ class MutatorConfig
     private $mutatorSettings;
 
     /**
-     * @param array<mixed> $settings
+     * @param mixed[] $settings
      */
     public function __construct(array $settings)
     {
@@ -52,7 +52,7 @@ class MutatorConfig
     }
 
     /**
-     * @return array<mixed>
+     * @return mixed[]
      */
     public function getMutatorSettings(): array
     {

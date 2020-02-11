@@ -45,7 +45,7 @@ final class MutationYamlConfiguration extends AbstractYamlConfiguration
     private $customAutoloadFilePath;
 
     /**
-     * @param array<mixed> $parsedYaml
+     * @param mixed[] $parsedYaml
      */
     public function __construct(string $tmpDir, array $parsedYaml, string $customAutoloadFilePath)
     {
@@ -63,9 +63,9 @@ final class MutationYamlConfiguration extends AbstractYamlConfiguration
     }
 
     /**
-     * @param array<mixed> $parsedYaml
+     * @param mixed[] $parsedYaml
      *
-     * @return array<mixed>
+     * @return mixed[]
      */
     private function removeCodeCoverageExtension(array $parsedYaml): array
     {
@@ -85,9 +85,9 @@ final class MutationYamlConfiguration extends AbstractYamlConfiguration
     }
 
     /**
-     * @param array<mixed> $config
+     * @param mixed[] $config
      *
-     * @return array<mixed>
+     * @return mixed[]
      */
     private function setCustomAutoLoaderPath(array $config): array
     {
