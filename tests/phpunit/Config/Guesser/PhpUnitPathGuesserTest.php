@@ -38,6 +38,7 @@ namespace Infection\Tests\Config\Guesser;
 use Generator;
 use Infection\Config\Guesser\PhpUnitPathGuesser;
 use PHPUnit\Framework\TestCase;
+use function Safe\json_decode;
 
 final class PhpUnitPathGuesserTest extends TestCase
 {

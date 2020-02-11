@@ -43,6 +43,7 @@ use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigExce
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\SafeQuery;
 use LibXMLError;
+use function Safe\sprintf;
 
 /**
  * @internal

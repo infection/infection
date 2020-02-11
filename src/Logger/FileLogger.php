@@ -35,10 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use function implode;
 use function in_array;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
 use function Safe\file_put_contents;
+use function Safe\sprintf;
+use function Safe\usort;
+use function strpos;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;

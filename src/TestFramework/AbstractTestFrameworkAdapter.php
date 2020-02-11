@@ -40,6 +40,7 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
 use InvalidArgumentException;
+use function Safe\sprintf;
 use Symfony\Component\Process\Process;
 
 /**

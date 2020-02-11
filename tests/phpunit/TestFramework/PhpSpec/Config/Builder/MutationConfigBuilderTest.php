@@ -39,6 +39,7 @@ use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use Infection\Tests\FileSystem\FileSystemTestCase;
+use function Safe\file_get_contents;
 
 /**
  * @group integration Requires some I/O operations

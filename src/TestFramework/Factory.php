@@ -64,6 +64,9 @@ final class Factory
      */
     private $installedExtensions;
 
+    /**
+     * @param array<string, array<string, mixed>> $installedExtensions
+     */
     public function __construct(
         string $tmpDir,
         string $projectDir,

@@ -37,6 +37,7 @@ namespace Infection\Logger;
 
 use function implode;
 use Infection\Process\MutantProcess;
+use function Safe\sprintf;
 use function str_repeat;
 use function strlen;
 

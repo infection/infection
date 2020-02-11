@@ -45,6 +45,7 @@ use InvalidArgumentException;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PHPUnit\Framework\TestCase;
+use function Safe\sprintf;
 
 final class PrioritizedVisitorsNodeTraverserTest extends TestCase
 {

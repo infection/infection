@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Exception;
 
 use Exception;
+use function Safe\sprintf;
 
 /**
  * @internal

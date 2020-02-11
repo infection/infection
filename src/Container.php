@@ -38,6 +38,7 @@ namespace Infection;
 use function array_filter;
 use function array_key_exists;
 use function assert;
+use Closure;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
@@ -120,12 +121,12 @@ final class Container
     private $values = [];
 
     /**
-     * @var array<class-string<object>, callable(self): object>
+     * @var array<class-string<object>, Closure(self): object>
      */
     private $factories = [];
 
     /**
-     * @param array<class-string<object>, callable(self): object> $values
+     * @param array<class-string<object>, Closure(self): object> $values
      */
     public function __construct(array $values)
     {
@@ -768,9 +769,9 @@ final class Container
 
     /**
      * @param class-string<object> $id
-     * @param callable(self): object $value
+     * @param Closure(self): object $value
      */
-    private function offsetAdd(string $id, callable $value): void
+    private function offsetAdd(string $id, Closure $value): void
     {
         $this->keys[$id] = true;
 

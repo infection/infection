@@ -40,6 +40,7 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use PHPUnit\Framework\MockObject\MockObject;
+use function Safe\realpath;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 

@@ -40,6 +40,9 @@ use Infection\PhpParser\Visitor\PhpUnitClassCodeCoverageIgnoreVisitor;
 use Infection\PhpParser\Visitor\PhpUnitMethodCodeCoverageIgnoreVisitor;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\HasExtraNodeVisitors;
+use function Safe\preg_match;
+use function Safe\sprintf;
+use function version_compare;
 
 /**
  * @internal

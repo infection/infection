@@ -45,6 +45,7 @@ use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\SafeQuery;
 use function Safe\file_put_contents;
+use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
 /**

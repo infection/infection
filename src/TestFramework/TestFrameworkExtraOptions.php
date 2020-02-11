@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use function Safe\preg_replace;
+use function Safe\sprintf;
+use function trim;
 use Webmozart\Assert\Assert;
 
 /**

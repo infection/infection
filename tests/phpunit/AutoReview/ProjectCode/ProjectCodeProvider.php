@@ -76,6 +76,8 @@ use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use function iterator_to_array;
 use ReflectionClass;
+use function Safe\sort;
+use function Safe\sprintf;
 use const SORT_STRING;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;

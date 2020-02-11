@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\PhpParser\Visitor;
 
 use function array_pop;
+use function assert;
 use function count;
 use Infection\Reflection\AnonymousClassReflection;
 use Infection\Reflection\ClassReflection;
@@ -195,7 +196,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         assert($node instanceof Node\Stmt\Class_);
         $extends = $node->extends;
 
-        if ($node->extends !== null) {
+        if ($extends !== null) {
             $name = $extends->getAttribute('resolvedName');
             assert($name instanceof Node\Name);
 

@@ -38,10 +38,10 @@ namespace Infection\PhpParser;
 use DomainException;
 use function get_class;
 use InvalidArgumentException;
-use function krsort;
 use PhpParser\Node;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
+use function Safe\krsort;
 use function Safe\sprintf;
 use const SORT_NUMERIC;
 

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
+use function floor;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\MutantProcessWasFinished;
@@ -42,6 +43,9 @@ use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
+use function Safe\sprintf;
+use function str_pad;
+use function str_repeat;
 use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;
 

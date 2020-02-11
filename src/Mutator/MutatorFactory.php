@@ -37,7 +37,7 @@ namespace Infection\Mutator;
 
 use Infection\Mutator\Util\MutatorConfig;
 use function Safe\array_flip;
-use function sprintf;
+use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
 /**

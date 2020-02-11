@@ -2,9 +2,6 @@ includes:
     - ../vendor/phpstan/phpstan/conf/bleedingEdge.neon
 
 parameters:
-    level: max
-    paths:
-        - ../src
     inferPrivatePropertyTypeFromConstructor: true
     ignoreErrors:
         - '#.* value type specified in iterable type Symfony\\Component\\Process\\Process#'
@@ -15,6 +12,21 @@ parameters:
             path: '../src/Process/Runner/Parallel/ParallelProcessRunner.php'
             message: '#Left side of [\&]{2} is always true#'
         -
-            path: '../src/Mutation/FileParser.php'
-            message: '#Method Infection\\Mutation\\FileParser::parse\(\) should return array<PhpParser\\Node> but returns array<PhpParser\\Node\\Stmt>\|null\.#'
+            path: '../src/PhpParser/FileParser.php'
+            message: '#Method Infection\\PhpParser\\FileParser::parse\(\) should return array<PhpParser\\Node> but returns array<PhpParser\\Node\\Stmt>\|null\.#'
             count: 1
+        -
+            path: '../src/Reflection/AnonymousClassReflection.php'
+            message: '#Parameter \#1 \$argument of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object\, string given\.#'
+            count: 1
+        -
+            path: '../src/Reflection/CoreClassReflection.php'
+            message: '#Parameter \#1 \$argument of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object\, string given\.#'
+            count: 1
+        -
+            path: '../src/TestFramework/PhpUnit/Coverage/IndexXmlCoverageParser.php'
+            message: '#Function realpath is unsafe to use\.#'
+            count: 1
+    level: max
+    paths:
+        - ../src

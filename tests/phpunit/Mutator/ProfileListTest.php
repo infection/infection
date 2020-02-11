@@ -39,9 +39,9 @@ use function array_keys;
 use function in_array;
 use Infection\Mutator\ProfileList;
 use PHPUnit\Framework\TestCase;
-use function sort;
+use function Safe\sort;
+use function Safe\sprintf;
 use const SORT_STRING;
-use function sprintf;
 
 final class ProfileListTest extends TestCase
 {

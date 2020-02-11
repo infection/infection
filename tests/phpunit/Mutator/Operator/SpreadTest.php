@@ -43,6 +43,8 @@ final class SpreadTest extends AbstractMutatorTestCase
     /**
      * @requires PHP >= 7.4
      * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $expected
      */
     public function test_it_can_mutate(string $input, $expected = []): void
     {

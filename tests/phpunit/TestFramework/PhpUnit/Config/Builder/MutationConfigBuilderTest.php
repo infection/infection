@@ -45,6 +45,9 @@ use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
+use function Safe\file_get_contents;
+use function Safe\realpath;
+use function Safe\sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -56,14 +59,20 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
     private const ORIGINAL_FILE_PATH = '/original/file/path';
     private const MUTATED_FILE_PATH = '/mutated/file/path';
 
+    /**
+     * @var string
+     */
     private $pathToProject;
+
+    /**
+     * @var XmlConfigurationHelper
+     */
+    private $xmlConfigurationHelper;
 
     /**
      * @var MutationConfigBuilder
      */
     private $builder;
-
-    private $xmlConfigurationHelper;
 
     protected function setUp(): void
     {
@@ -373,8 +382,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
     {
         $dom = new DOMDocument();
         $dom->loadXML($xml);
-        $xPath = new DOMXPath($dom);
 
-        return $xPath->query($query);
+        return (new DOMXPath($dom))->query($query);
     }
 }

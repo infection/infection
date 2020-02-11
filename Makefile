@@ -59,7 +59,7 @@ cs: $(PHP_CS_FIXER)
 .PHONY: phpstan
 phpstan: vendor $(PHPSTAN)
 	$(PHPSTAN) analyse --configuration devTools/phpstan-src.neon --no-interaction --no-progress
-	$(PHPSTAN) analyse --configuration ./devTools/phpstan-tests.neon --no-interaction --no-progress
+	$(PHPSTAN) analyse --configuration devTools/phpstan-tests.neon --no-interaction --no-progress
 
 .PHONY: validate
 validate:

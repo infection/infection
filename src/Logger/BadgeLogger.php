@@ -39,6 +39,7 @@ use Infection\Environment\CouldNotResolveStrykerApiKey;
 use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Http\BadgeApiClient;
 use Infection\Mutant\MetricsCalculator;
+use function Safe\sprintf;
 use stdClass;
 use Symfony\Component\Console\Output\OutputInterface;
 

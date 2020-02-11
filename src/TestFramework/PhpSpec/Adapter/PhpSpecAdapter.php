@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpSpec\Adapter;
 
+use function explode;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use function Safe\preg_match;
 
 /**
  * @internal

@@ -39,6 +39,10 @@ use function assert;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use function is_string;
 use Phar;
+use function Safe\sprintf;
+use function str_replace;
+use function strpos;
+use function strstr;
 
 /**
  * @internal

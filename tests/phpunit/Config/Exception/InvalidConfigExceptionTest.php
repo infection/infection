@@ -38,6 +38,7 @@ namespace Infection\Tests\Config\Exception;
 use Infection\Config\Exception\InvalidConfigException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use function Safe\sprintf;
 
 final class InvalidConfigExceptionTest extends TestCase
 {
