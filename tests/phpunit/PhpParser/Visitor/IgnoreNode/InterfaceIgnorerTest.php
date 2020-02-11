@@ -33,49 +33,60 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser;
+namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
-use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
+use Generator;
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeTraverserInterface;
-use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitor\NameResolver;
 
-/**
- * @internal
- * @final
- */
-class NodeTraverserFactory
+final class InterfaceIgnorerTest extends BaseNodeIgnorerTestCase
 {
     /**
-     * @param NodeIgnorer[] $nodeIgnorers
+     * @dataProvider provideIgnoreCases
      */
-    public function create(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverserInterface
+    public function test_it_ignores_the_correct_nodes(string $code, int $count): void
     {
-        $nodeIgnorers[] = new InterfaceIgnorer();
-        $nodeIgnorers[] = new AbstractMethodIgnorer();
+        $spy = $this->createSpy();
 
-        $traverser = new NodeTraverser();
+        $this->parseAndTraverse($code, $spy);
 
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
-        $traverser->addVisitor(new NameResolver(
-            null,
-            [
-                'preserveOriginalNames' => true,
-                'replaceNodes' => false,
-            ])
-        );
-        $traverser->addVisitor(new ParentConnectorVisitor());
-        $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
-        $traverser->addVisitor(new ReflectionVisitor());
-        $traverser->addVisitor($mutationVisitor);
+        $this->assertSame($count, $spy->nodeCounter);
+    }
 
-        return $traverser;
+    public function provideIgnoreCases(): Generator
+    {
+        yield 'interfaces are ignored' => [
+            <<<'PHP'
+<?php
+
+interface Bar
+{
+    public function nope(Bar $ignored): void;
+}
+PHP
+            ,
+            0,
+        ];
+
+        yield 'classes arent ignored' => [
+            <<<'PHP'
+<?php
+
+class Bar
+{
+    public function nope(Bar $counted)
+    {
+        $counted = true;
+    }
+}
+PHP
+            ,
+            2,
+        ];
+    }
+
+    protected function getIgnore(): NodeIgnorer
+    {
+        return new InterfaceIgnorer();
     }
 }

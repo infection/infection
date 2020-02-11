@@ -33,33 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor;
+namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
+use PhpParser\Node\Expr\Variable;
 use PhpParser\NodeVisitorAbstract;
 
-/**
- * @internal
- */
-final class PhpUnitMethodCodeCoverageIgnoreVisitor extends NodeVisitorAbstract
+final class IgnoreSpyVisitor extends NodeVisitorAbstract
 {
-    public function enterNode(Node $node)
+    public $nodeCounter = 0;
+
+    private $failureCallBack;
+
+    public function __construct(callable $failureCallBack)
     {
-        if (!$node instanceof Node\Stmt\ClassMethod) {
-            return null;
+        $this->failureCallBack = $failureCallBack;
+    }
+
+    public function enterNode(Node $node): void
+    {
+        if (!$node instanceof Variable) {
+            return;
+        }
+        $name = $node->name;
+
+        if (!is_string($name)) {
+            return;
         }
 
-        $docComment = $node->getDocComment();
-
-        if ($docComment === null) {
-            return null;
+        if ($name === 'ignored') {
+            ($this->failureCallBack)();
         }
 
-        if (strpos($docComment->getText(), '@codeCoverageIgnore') !== false) {
-            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+        if ($name === 'counted') {
+            ++$this->nodeCounter;
         }
-
-        return null;
     }
 }
