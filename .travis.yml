@@ -108,6 +108,16 @@ jobs:
     -
       <<: *STANDARD_TEST_JOB
       php: 7.4
+      env: DRIVER="xdebug"
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.4
+      env: DRIVER="pcov"
+
+    -
+      <<: *STANDARD_TEST_JOB
+      php: 7.4
       env: DRIVER="phpdbg"
 
     -
