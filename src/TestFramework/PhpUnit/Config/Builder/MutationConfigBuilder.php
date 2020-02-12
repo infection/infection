@@ -47,6 +47,7 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\SafeQuery;
 use function Safe\file_put_contents;
 use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -210,7 +211,7 @@ AUTOLOAD;
             $testSuite->appendChild($file);
         }
 
-        assert($nodeToAppendTestSuite instanceof DOMNode);
+        Assert::isInstanceOf($nodeToAppendTestSuite, DOMNode::class);
 
         $nodeToAppendTestSuite->appendChild($testSuite);
     }

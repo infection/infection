@@ -43,6 +43,7 @@ use Infection\Process\MutantProcess;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -124,7 +125,7 @@ class ParallelProcessRunner
     private function startProcess(): bool
     {
         $mutantProcess = array_shift($this->processesQueue);
-        assert($mutantProcess instanceof MutantProcess);
+        Assert::isInstanceOf($mutantProcess, MutantProcess::class);
 
         $mutant = $mutantProcess->getMutant();
 

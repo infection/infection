@@ -44,6 +44,7 @@ use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\SafeQuery;
 use LibXMLError;
 use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -78,7 +79,7 @@ final class XmlConfigurationHelper
     {
         foreach (self::safeQuery($xPath, '/phpunit/logging') as $node) {
             $document = $xPath->document->documentElement;
-            assert($document instanceof DOMElement);
+            Assert::isInstanceOf($document, DOMElement::class);
             $document->removeChild($node);
         }
     }
@@ -188,7 +189,7 @@ final class XmlConfigurationHelper
 
         if ($nodeList->length) {
             $document = $xPath->document->documentElement;
-            assert($document instanceof DOMElement);
+            Assert::isInstanceOf($document, DOMElement::class);
             $document->removeAttribute($name);
         }
     }

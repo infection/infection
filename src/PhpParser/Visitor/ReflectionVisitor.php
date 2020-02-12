@@ -45,6 +45,7 @@ use Infection\Reflection\NullReflection;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -193,12 +194,12 @@ final class ReflectionVisitor extends NodeVisitorAbstract
             return CoreClassReflection::fromClassName($fqn->toString());
         }
 
-        assert($node instanceof Node\Stmt\Class_);
+        Assert::isInstanceOf($node, Node\Stmt\Class_::class);
         $extends = $node->extends;
 
         if ($extends !== null) {
             $name = $extends->getAttribute('resolvedName');
-            assert($name instanceof Node\Name);
+            Assert::isInstanceOf($name, Node\Name::class);
 
             return AnonymousClassReflection::fromClassName($name->toString());
         }
