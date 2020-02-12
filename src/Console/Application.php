@@ -163,6 +163,10 @@ final class Application extends BaseApplication
         $output->getFormatter()->setStyle('low', new OutputFormatterStyle('red', null, ['bold']));
         $output->getFormatter()->setStyle('medium', new OutputFormatterStyle('yellow', null, ['bold']));
         $output->getFormatter()->setStyle('high', new OutputFormatterStyle('green', null, ['bold']));
+
+        if ($input->isInteractive() && (getenv('CI') === 'true' || getenv('CONTINUOUS_INTEGRATION') === 'true')) {
+            $input->setInteractive(false);
+        }
     }
 
     private function logRunningWithDebugger(): void

@@ -18,6 +18,8 @@ else
     INFECTION="php ../../../bin/infection"
 fi
 export INFECTION
+unset CI
+unset CONTINUOUS_INTEGRATION
 
 ./do_configure.expect
 
