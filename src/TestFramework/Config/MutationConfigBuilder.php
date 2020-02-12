@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Config;
 
-use function assert;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Phar;
 use function Safe\sprintf;

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
-use function assert;
 use DOMDocument;
 use DOMElement;
 use DOMNode;

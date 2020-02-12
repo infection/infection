@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_map;
-use function assert;
 use function in_array;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use function Safe\usort;

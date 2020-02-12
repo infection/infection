@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\PhpParser\Visitor;
 
 use function array_pop;
-use function assert;
 use function count;
 use Infection\Reflection\AnonymousClassReflection;
 use Infection\Reflection\ClassReflection;

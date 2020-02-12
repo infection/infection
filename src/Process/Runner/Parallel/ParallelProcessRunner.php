@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner\Parallel;
 
-use function assert;
 use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
