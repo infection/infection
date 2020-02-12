@@ -190,7 +190,7 @@ class InitialConfigBuilder implements ConfigBuilder
     {
         $node = $dom->createElement($nodeName);
         $document = $dom->documentElement;
-        Assert::isInstanceOf($node, DOMElement::class);
+        Assert::isInstanceOf($document, DOMElement::class);
         $document->appendChild($node);
 
         return $node;
