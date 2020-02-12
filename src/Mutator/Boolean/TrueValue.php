@@ -42,7 +42,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetConfigClassName;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
-use Infection\Visitor\ParentConnectorVisitor;
+use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 use function Safe\array_flip;
 
@@ -54,6 +54,9 @@ final class TrueValue implements ConfigurableMutator
     use GetMutatorName;
     use GetConfigClassName;
 
+    /**
+     * @var array<string, int>
+     */
     private $allowedFunctions;
 
     public function __construct(TrueValueConfig $config)

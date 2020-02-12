@@ -44,6 +44,7 @@ final class ArrayItemRemovalTest extends AbstractMutatorTestCase
      * @dataProvider mutationsProvider
      *
      * @param string|string[] $expected
+     * @param mixed[] $settings
      */
     public function test_it_can_mutate(string $input, $expected = [], array $settings = []): void
     {

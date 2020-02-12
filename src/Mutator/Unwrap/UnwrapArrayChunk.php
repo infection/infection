@@ -37,6 +37,7 @@ namespace Infection\Mutator\Unwrap;
 
 use Generator;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -46,7 +47,25 @@ final class UnwrapArrayChunk extends AbstractUnwrapMutator
 {
     public static function getDefinition(): ?Definition
     {
-        return null;
+        return new Definition(
+            <<<'TXT'
+Replaces an `array_column` function call with its first operand. For example:
+
+```php
+$x = array_column($array, 'id');
+```
+
+Will be mutated to:
+
+```php
+$x = $array;
+```
+
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
     protected function getFunctionName(): string

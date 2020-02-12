@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use function array_filter;
+use function file_exists;
+use function implode;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
@@ -43,12 +46,15 @@ use Infection\Config\ValueProvider\SourceDirsProvider;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Config\ValueProvider\TextLogFileProvider;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
-use Infection\Finder\TestFrameworkFinder;
+use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\TestFrameworkTypes;
 use function Safe\file_get_contents;
+use function Safe\file_put_contents;
 use function Safe\glob;
 use function Safe\json_decode;
+use function Safe\json_encode;
+use function Safe\sprintf;
 use stdClass;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -126,7 +132,7 @@ final class ConfigureCommand extends BaseCommand
         $phpUnitConfigPathProvider = new TestFrameworkConfigPathProvider($testFrameworkConfigLocator, $consoleHelper, $questionHelper);
         $phpUnitConfigPath = $phpUnitConfigPathProvider->get($input, $output, $dirsInCurrentDir, $input->getOption('test-framework'));
 
-        $phpUnitExecutableFinder = new TestFrameworkFinder(TestFrameworkTypes::PHPUNIT);
+        $phpUnitExecutableFinder = new TestFrameworkFinder();
         $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $consoleHelper, $questionHelper);
         $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($input, $output);
 
@@ -147,6 +153,10 @@ final class ConfigureCommand extends BaseCommand
         return 0;
     }
 
+    /**
+     * @param string[] $sourceDirs
+     * @param string[] $excludedDirs
+     */
     private function saveConfig(
         array $sourceDirs,
         array $excludedDirs,

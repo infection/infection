@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Process;
 
 use function in_array;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
-use Infection\TestFramework\TestFrameworkAdapter;
 use Symfony\Component\Process\Process;
 
 /**
@@ -73,6 +73,10 @@ class MutantProcess
 
     private $process;
     private $mutant;
+
+    /**
+     * @var bool
+     */
     private $isTimedOut = false;
     private $testFrameworkAdapter;
 

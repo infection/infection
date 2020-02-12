@@ -38,14 +38,14 @@ namespace Infection\Tests\Mutator;
 use function array_values;
 use Generator;
 use Infection\Container;
-use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\ProfileList;
+use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Tests\Fixtures\NullMutationVisitor;
-use function ksort;
 use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
+use function Safe\ksort;
 use function Safe\sprintf;
 use const SORT_STRING;
 use Symfony\Component\Finder\Finder;
@@ -151,7 +151,7 @@ final class MutatorRobustnessTest extends TestCase
         $initialStatements = self::getParser()->parse($code);
 
         (new NodeTraverserFactory())
-            ->create([100 => new NullMutationVisitor($mutator)])
+            ->create(new NullMutationVisitor($mutator), [])
             ->traverse($initialStatements)
         ;
     }

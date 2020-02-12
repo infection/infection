@@ -37,6 +37,8 @@ namespace Infection\Tests\Mutator\FunctionSignature;
 
 use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use function Safe\file_get_contents;
+use function Safe\sprintf;
 
 /**
  * @group integration Requires some I/O operations
@@ -46,7 +48,7 @@ final class PublicVisibilityTest extends AbstractMutatorTestCase
     /**
      * @dataProvider blacklistedProvider
      */
-    public function test_it_does_not_modify_blacklisted_functions(string $functionName, string $args = '', string $modifier = ''): void
+    public function test_it_does_not_modify_blacklisted_functions(string $functionName): void
     {
         $code = $this->getFileContent("pv-{$functionName}.php");
 
@@ -266,14 +268,30 @@ class Child extends NonSameAbstract
 PHP
         ];
 
-        yield 'it does not mutate an anonymous class because reflection is not avalable' => [
+        yield 'it mutates an anonymous class' => [
             <<<'PHP'
 <?php
 
 function something()
 {
-    return new class() {
+    return new class
+    {
         public function anything()
+        {
+            return null;
+        }
+    };
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+function something()
+{
+    return new class
+    {
+        protected function anything()
         {
             return null;
         }

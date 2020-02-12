@@ -35,16 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use function array_flip;
 use function array_intersect_key;
 use function array_keys;
 use function count;
 use function implode;
-use Infection\MutatedNode;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\Mutator\ProfileList;
-use Infection\TestFramework\Coverage\CoverageLineData;
+use Infection\PhpParser\MutatedNode;
 use function md5;
 use PhpParser\Node;
+use function Safe\array_flip;
 use Webmozart\Assert\Assert;
 
 /**
@@ -116,7 +116,7 @@ class Mutation
     }
 
     /**
-     * return Node[]
+     * @return Node[]
      */
     public function getOriginalFileAst(): array
     {

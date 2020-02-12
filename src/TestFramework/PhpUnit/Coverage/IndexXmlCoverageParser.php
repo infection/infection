@@ -41,10 +41,11 @@ use DOMElement;
 use DOMNodeList;
 use DOMXPath;
 use function implode;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
-use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\MethodLocationData;
+use Infection\TestFramework\SafeQuery;
 use function realpath as native_realpath;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
@@ -60,6 +61,7 @@ use Webmozart\Assert\Assert;
  */
 class IndexXmlCoverageParser
 {
+    use SafeQuery;
     private $coverageDir;
 
     public function __construct(string $coverageDir)
@@ -235,6 +237,7 @@ class IndexXmlCoverageParser
 
     /**
      * @param DOMNodeList|DOMElement[] $coveredLineNodes
+     * @phpstan-param DOMNodeList<DOMElement> $coveredLineNodes
      *
      * @return array<int, array<int, CoverageLineData>>
      */
@@ -249,7 +252,7 @@ class IndexXmlCoverageParser
 
             $lineNumber = (int) $lineNumber;
 
-            /** @var DOMNodeList|DOMElement[] $coveredNodes */
+            /** @phpstan-var DOMNodeList<DOMElement> $coveredNodes */
             $coveredNodes = $lineNode->childNodes;
 
             foreach ($coveredNodes as $coveredNode) {
@@ -268,6 +271,7 @@ class IndexXmlCoverageParser
 
     /**
      * @param DOMNodeList|DOMElement[] $methodsCoverageNodes
+     * @phpstan-param DOMNodeList<DOMElement> $methodsCoverageNodes
      *
      * @return MethodLocationData[]
      */
@@ -304,17 +308,5 @@ class IndexXmlCoverageParser
 
         // PHPUnit < 6
         return self::safeQuery($xPath, '//project/@name')[0]->nodeValue;
-    }
-
-    /**
-     * @return DOMNodeList|DOMElement[]
-     */
-    private static function safeQuery(DOMXPath $xPath, string $query): DOMNodeList
-    {
-        $nodes = $xPath->query($query);
-
-        Assert::isInstanceOf($nodes, DOMNodeList::class);
-
-        return $nodes;
     }
 }

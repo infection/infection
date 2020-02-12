@@ -56,7 +56,7 @@ final class BCMath implements ConfigurableMutator
     use GetConfigClassName;
 
     /**
-     * @var array<string, Closure>
+     * @var array<string, Closure(Node\Expr\FuncCall): Generator<Node\Expr>>
      */
     private $converters;
 
@@ -90,7 +90,7 @@ TXT
     /**
      * @param Node\Expr\FuncCall $node
      *
-     * @return Generator<Node\Expr\FuncCall>
+     * @return Generator<Node\Expr>
      */
     public function mutate(Node $node): Generator
     {
@@ -110,7 +110,9 @@ TXT
     }
 
     /**
-     * @return array<string, Closure>
+     * @param string[] $functionsMap
+     *
+     * @return array<string, Closure(Node\Expr\FuncCall): Generator<Node\Expr>>
      */
     private static function createConverters(array $functionsMap): array
     {
@@ -173,6 +175,11 @@ TXT
         );
     }
 
+    /**
+     * @param Closure(Node\Expr\FuncCall): Generator<Node\Expr> $converter
+     *
+     * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr>
+     */
     private static function makeCheckingMinArgsMapper(int $minimumArgsCount, Closure $converter): Closure
     {
         return static function (Node\Expr\FuncCall $node) use ($minimumArgsCount, $converter): Generator {
@@ -182,6 +189,11 @@ TXT
         };
     }
 
+    /**
+     * @param Closure(Node\Expr\FuncCall): Generator<Node\Expr> $converter
+     *
+     * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr\Cast\String_>
+     */
     private static function makeCastToStringMapper(Closure $converter): Closure
     {
         return static function (Node\Expr\FuncCall $node) use ($converter): Generator {
@@ -191,6 +203,11 @@ TXT
         };
     }
 
+    /**
+     * @phpstan-param class-string<Node\Expr\BinaryOp> $operator
+     *
+     * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr\BinaryOp>
+     */
     private static function makeBinaryOperatorMapper(string $operator): Closure
     {
         return static function (Node\Expr\FuncCall $node) use ($operator): Generator {
@@ -198,6 +215,9 @@ TXT
         };
     }
 
+    /**
+     * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>
+     */
     private static function makeSquareRootsMapper(): Closure
     {
         return static function (Node\Expr\FuncCall $node): Generator {
@@ -205,6 +225,9 @@ TXT
         };
     }
 
+    /**
+     * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr\BinaryOp\Mod>
+     */
     private static function makePowerModuloMapper(): Closure
     {
         return static function (Node\Expr\FuncCall $node): Generator {

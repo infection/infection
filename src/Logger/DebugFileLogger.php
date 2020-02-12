@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use function implode;
 use Infection\Process\MutantProcess;
+use function Safe\sprintf;
 use function strlen;
 
 /**
@@ -94,6 +96,9 @@ final class DebugFileLogger extends FileLogger
         return implode(PHP_EOL, $logParts) . PHP_EOL;
     }
 
+    /**
+     * @return string[]
+     */
     private function getHeadlineParts(string $headlinePrefix): array
     {
         $headline = sprintf('%s mutants:', $headlinePrefix);

@@ -37,6 +37,7 @@ namespace Infection\Mutator\Unwrap;
 
 use Generator;
 use Infection\Mutator\Definition;
+use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
@@ -46,7 +47,25 @@ final class UnwrapArrayDiffUkey extends AbstractUnwrapMutator
 {
     public static function getDefinition(): ?Definition
     {
-        return null;
+        return new Definition(
+            <<<'TXT'
+Replaces an `array_diff_ukey` function call with its first operand. For example:
+
+```php
+$x = array_diff_ukey($array1, $array2, $keyCompareFunc);
+```
+
+Will be mutated to:
+
+```php
+$x = $array1;
+```
+
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
     protected function getFunctionName(): string

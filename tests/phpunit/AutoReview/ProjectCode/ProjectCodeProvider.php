@@ -38,6 +38,7 @@ namespace Infection\Tests\AutoReview\ProjectCode;
 use const DIRECTORY_SEPARATOR;
 use Generator;
 use function in_array;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\InfectionCommand;
 use Infection\Config\ConsoleHelper;
@@ -50,19 +51,18 @@ use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\Util\PhpProcess;
 use Infection\Engine;
-use Infection\Finder\ComposerExecutableFinder;
-use Infection\Finder\FilterableFinder;
-use Infection\Finder\TestFrameworkFinder;
+use Infection\Event\Subscriber\MutantCreatingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
+use Infection\FileSystem\Finder\ComposerExecutableFinder;
+use Infection\FileSystem\Finder\FilterableFinder;
+use Infection\FileSystem\Finder\NonExecutableFinder;
+use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Http\BadgeApiClient;
 use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
-use Infection\Process\Listener\MutantCreatingConsoleLoggerSubscriber;
-use Infection\Process\Listener\MutationGeneratingConsoleLoggerSubscriber;
-use Infection\Process\Runner\MutationTestingRunner;
 use Infection\TestFramework\Coverage\CoverageFileData;
-use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\XmlReport\TestFileTimeData;
@@ -76,6 +76,8 @@ use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use function iterator_to_array;
 use ReflectionClass;
+use function Safe\sort;
+use function Safe\sprintf;
 use const SORT_STRING;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -97,11 +99,11 @@ final class ProjectCodeProvider
         ResultsLoggerTypes::class,
         MutantCreatingConsoleLoggerSubscriber::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
-        MutationTestingRunner::class,
         TestFrameworkTypes::class,
         NodeMutationGenerator::class,
         FilterableFinder::class,
         Engine::class,
+        NonExecutableFinder::class,
     ];
 
     /**

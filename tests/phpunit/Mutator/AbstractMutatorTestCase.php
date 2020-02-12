@@ -41,15 +41,15 @@ use function escapeshellarg;
 use function exec;
 use function get_class;
 use Infection\Container;
-use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
+use Infection\PhpParser\NodeTraverserFactory;
+use Infection\PhpParser\Visitor\CloneVisitor;
+use Infection\PhpParser\Visitor\MutatorVisitor;
 use Infection\Tests\AutoReview\SourceTestClassNameScheme;
 use Infection\Tests\Fixtures\SimpleMutation;
 use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;
-use Infection\Tests\Fixtures\SimpleMutatorVisitor;
 use Infection\Tests\StringNormalizer;
-use Infection\Visitor\CloneVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
@@ -87,7 +87,8 @@ abstract class AbstractMutatorTestCase extends TestCase
     }
 
     /**
-     * @var string[]
+     * @var string|string[]
+     * @var mixed[] $settings
      */
     final public function doTest(string $inputCode, $expectedCode = [], array $settings = []): void
     {
@@ -152,7 +153,7 @@ abstract class AbstractMutatorTestCase extends TestCase
         $mutants = [];
 
         foreach ($mutations as $mutation) {
-            $mutatorVisitor = new SimpleMutatorVisitor($mutation);
+            $mutatorVisitor = new MutatorVisitor($mutation);
 
             $traverser->addVisitor($mutatorVisitor);
 
@@ -206,7 +207,7 @@ abstract class AbstractMutatorTestCase extends TestCase
         );
 
         (new NodeTraverserFactory())
-            ->create([100 => $mutationsCollectorVisitor])
+            ->create($mutationsCollectorVisitor, [])
             ->traverse($nodes)
         ;
 

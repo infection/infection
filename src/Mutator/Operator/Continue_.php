@@ -39,7 +39,8 @@ use Generator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
-use Infection\Visitor\ParentConnectorVisitor;
+use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
 
 /**
@@ -51,12 +52,17 @@ final class Continue_ implements Mutator
 
     public static function getDefinition(): ?Definition
     {
-        return null;
+        return new Definition(
+            <<<'TXT'
+Replaces a continue statement (`continue`) with its counterpart break statement (`break`).
+TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null
+        );
     }
 
     /**
-     * Replaces "continue;" with "break;"
-     *
      * @param Node\Stmt\Continue_ $node
      *
      * @return Generator<Node\Stmt\Break_>

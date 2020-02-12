@@ -36,12 +36,11 @@ declare(strict_types=1);
 namespace Infection\Mutator\Extensions;
 
 use Infection\Mutator\AllowedFunctionsConfig;
-use Infection\Mutator\MutatorConfig;
 
 /**
  * @internal
  */
-final class BCMathConfig extends AllowedFunctionsConfig implements MutatorConfig
+final class BCMathConfig extends AllowedFunctionsConfig
 {
     private const KNOWN_FUNCTIONS = [
         'bcadd',

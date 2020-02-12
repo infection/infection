@@ -35,10 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Config;
 
-use function assert;
-use Infection\TestFramework\Coverage\CoverageLineData;
-use function is_string;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Phar;
+use function Safe\sprintf;
+use function str_replace;
+use function strpos;
+use function strstr;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -83,7 +86,7 @@ CONTENT;
     private function getInterceptorNamespacePrefix(): string
     {
         $prefix = strstr(__NAMESPACE__, 'Infection', true);
-        assert(is_string($prefix));
+        Assert::string($prefix);
 
         return $prefix;
     }

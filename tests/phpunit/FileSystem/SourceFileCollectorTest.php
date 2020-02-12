@@ -39,13 +39,13 @@ use function array_map;
 use function array_values;
 use Generator;
 use Infection\FileSystem\SourceFileCollector;
-use function natcasesort;
 use PHPUnit\Framework\TestCase;
+use function Safe\natcasesort;
 use Webmozart\PathUtil\Path;
 
 /**
+ * @covers \Infection\FileSystem\Finder\FilterableFinder
  * @covers \Infection\FileSystem\SourceFileCollector
- * @covers \Infection\Finder\FilterableFinder
  */
 final class SourceFileCollectorTest extends TestCase
 {

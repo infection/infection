@@ -35,16 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
+use Infection\AbstractTestFramework\MemoryUsageAware;
+use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Infection\TestFramework\HasExtraNodeVisitors;
-use Infection\TestFramework\MemoryUsageAware;
-use Infection\Visitor\PhpUnitClassCodeCoverageIgnoreVisitor;
-use Infection\Visitor\PhpUnitMethodCodeCoverageIgnoreVisitor;
+use Infection\TestFramework\IgnoresAdditionalNodes;
+use function Safe\preg_match;
+use function Safe\sprintf;
+use function version_compare;
 
 /**
  * @internal
  */
-final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements HasExtraNodeVisitors, MemoryUsageAware
+final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAdditionalNodes, MemoryUsageAware
 {
     public const COVERAGE_DIR = 'coverage-xml';
 
@@ -84,14 +86,6 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements HasEx
         return -1;
     }
 
-    public function getMutationsCollectionNodeVisitors(): array
-    {
-        return [
-            100 => new PhpUnitClassCodeCoverageIgnoreVisitor(),
-            15 => new PhpUnitMethodCodeCoverageIgnoreVisitor(),
-        ];
-    }
-
     public function getName(): string
     {
         return 'PHPUnit';
@@ -112,5 +106,10 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements HasEx
         }
 
         return $recommendations;
+    }
+
+    public function getNodeIgnorers(): array
+    {
+        return [new PhpUnitCodeCoverageAnnotationIgnorer()];
     }
 }

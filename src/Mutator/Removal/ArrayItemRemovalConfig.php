@@ -35,14 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
-use Infection\Mutator\MutatorConfig;
 use const PHP_INT_MAX;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class ArrayItemRemovalConfig implements MutatorConfig
+final class ArrayItemRemovalConfig
 {
     private const REMOVE_VALUES = [
         'first',
@@ -54,7 +53,7 @@ final class ArrayItemRemovalConfig implements MutatorConfig
     private $limit;
 
     /**
-     * @param array<string, bool> $settings
+     * @param array{remove:string, limit: int} $settings
      */
     public function __construct(array $settings)
     {

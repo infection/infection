@@ -35,18 +35,22 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config;
 
-use function assert;
 use DOMElement;
 use DOMXPath;
+use function implode;
 use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
+use Infection\TestFramework\SafeQuery;
 use LibXMLError;
+use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
 final class XmlConfigurationHelper
 {
+    use SafeQuery;
     private $pathReplacer;
     private $phpUnitConfigDir;
 
@@ -65,16 +69,16 @@ final class XmlConfigurationHelper
             '//file',
         ];
 
-        foreach ($xPath->query(implode('|', $queries)) as $node) {
+        foreach (self::safeQuery($xPath, implode('|', $queries)) as $node) {
             $this->pathReplacer->replaceInNode($node);
         }
     }
 
     public function removeExistingLoggers(DOMXPath $xPath): void
     {
-        foreach ($xPath->query('/phpunit/logging') as $node) {
+        foreach (self::safeQuery($xPath, '/phpunit/logging') as $node) {
             $document = $xPath->document->documentElement;
-            assert($document instanceof DOMElement);
+            Assert::isInstanceOf($document, DOMElement::class);
             $document->removeChild($node);
         }
     }
@@ -117,15 +121,15 @@ final class XmlConfigurationHelper
 
     public function validate(DOMXPath $xPath): bool
     {
-        if ($xPath->query('/phpunit')->length === 0) {
+        if (self::safeQuery($xPath, '/phpunit')->length === 0) {
             throw InvalidPhpUnitXmlConfigException::byRootNode();
         }
 
-        if (!$xPath->query('namespace::xsi')->length) {
+        if (!self::safeQuery($xPath, 'namespace::xsi')->length) {
             return true;
         }
 
-        $schema = $xPath->query('/phpunit/@xsi:noNamespaceSchemaLocation');
+        $schema = self::safeQuery($xPath, '/phpunit/@xsi:noNamespaceSchemaLocation');
 
         $original = libxml_use_internal_errors(true);
         $schemaPath = $this->buildSchemaPath($schema[0]->nodeValue);
@@ -177,21 +181,21 @@ final class XmlConfigurationHelper
 
     private function removeAttribute(DOMXPath $xPath, string $name): void
     {
-        $nodeList = $xPath->query(sprintf(
+        $nodeList = self::safeQuery($xPath, sprintf(
             '/phpunit/@%s',
             $name
         ));
 
         if ($nodeList->length) {
             $document = $xPath->document->documentElement;
-            assert($document instanceof DOMElement);
+            Assert::isInstanceOf($document, DOMElement::class);
             $document->removeAttribute($name);
         }
     }
 
     private function setAttributeValue(DOMXPath $xPath, string $name, string $value): void
     {
-        $nodeList = $xPath->query(sprintf(
+        $nodeList = self::safeQuery($xPath, sprintf(
             '/phpunit/@%s',
             $name
         ));
@@ -199,7 +203,7 @@ final class XmlConfigurationHelper
         if ($nodeList->length) {
             $nodeList[0]->nodeValue = $value;
         } else {
-            $node = $xPath->query('/phpunit')[0];
+            $node = self::safeQuery($xPath, '/phpunit')[0];
             $node->setAttribute($name, $value);
         }
     }

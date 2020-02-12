@@ -433,12 +433,12 @@ final class ProfileList
     }
 
     /**
-     * @return string[]
+     * @return array<int, string>
      */
     public static function getDefaultProfileMutators(): array
     {
         if (self::$defaultProfileMutators !== null) {
-            return self::$defaultProfileMutators;
+            return array_values(self::$defaultProfileMutators);
         }
 
         self::$defaultProfileMutators = [];
@@ -449,8 +449,6 @@ final class ProfileList
             }
         }
 
-        self::$defaultProfileMutators = array_values(self::$defaultProfileMutators);
-
-        return self::$defaultProfileMutators;
+        return array_values(self::$defaultProfileMutators);
     }
 }

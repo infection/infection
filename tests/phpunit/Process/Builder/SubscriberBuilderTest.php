@@ -38,13 +38,13 @@ namespace Infection\Tests\Process\Builder;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Differ\DiffColorizer;
-use Infection\EventDispatcher\EventDispatcherInterface;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Performance\Memory\MemoryFormatter;
-use Infection\Performance\Time\TimeFormatter;
-use Infection\Performance\Time\Timer;
 use Infection\Process\Builder\SubscriberBuilder;
+use Infection\Resource\Memory\MemoryFormatter;
+use Infection\Resource\Time\Stopwatch;
+use Infection\Resource\Time\TimeFormatter;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -63,7 +63,7 @@ final class SubscriberBuilderTest extends TestCase
     public function test_it_registers_the_subscribers_when_debugging(): void
     {
         $calculator = new MetricsCalculator();
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher = $this->createMock(EventDispatcher::class);
         $dispatcher->expects($this->exactly(6))->method('addSubscriber');
         $diff = $this->createMock(DiffColorizer::class);
         $config = $this->createMock(Configuration::class);
@@ -85,7 +85,7 @@ final class SubscriberBuilderTest extends TestCase
             $config,
             $fs,
             sys_get_temp_dir(),
-            new Timer(),
+            new Stopwatch(),
             new TimeFormatter(),
             new MemoryFormatter(),
             new LoggerFactory($calculator, $fs, 'all', false, false)
@@ -96,7 +96,7 @@ final class SubscriberBuilderTest extends TestCase
     public function test_it_registers_the_subscribers_when_not_debugging(): void
     {
         $calculator = new MetricsCalculator();
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher = $this->createMock(EventDispatcher::class);
         $dispatcher->expects($this->exactly(7))->method('addSubscriber');
         $diff = $this->createMock(DiffColorizer::class);
         $config = $this->createMock(Configuration::class);
@@ -118,7 +118,7 @@ final class SubscriberBuilderTest extends TestCase
             $config,
             $fs,
             sys_get_temp_dir(),
-            new Timer(),
+            new Stopwatch(),
             new TimeFormatter(),
             new MemoryFormatter(),
             new LoggerFactory($calculator, $fs, 'all', false, false)
@@ -129,7 +129,7 @@ final class SubscriberBuilderTest extends TestCase
     public function test_it_throws_an_exception_when_output_formatter_is_invalid(): void
     {
         $calculator = new MetricsCalculator();
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher = $this->createMock(EventDispatcher::class);
         $dispatcher->expects($this->never())->method('addSubscriber');
         $diff = $this->createMock(DiffColorizer::class);
         $config = $this->createMock(Configuration::class);
@@ -148,7 +148,7 @@ final class SubscriberBuilderTest extends TestCase
             $config,
             $fs,
             sys_get_temp_dir(),
-            new Timer(),
+            new Stopwatch(),
             new TimeFormatter(),
             new MemoryFormatter(),
             new LoggerFactory($calculator, $fs, 'all', false, false)

@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\MutableFileProcessed;
-use Infection\Events\MutationGeneratingFinished;
-use Infection\Events\MutationGeneratingStarted;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\MutableFileWasProcessed;
+use Infection\Event\MutationGenerationWasFinished;
+use Infection\Event\MutationGenerationWasStarted;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationGenerator;
@@ -46,7 +46,7 @@ use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
-use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
+use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
@@ -62,9 +62,9 @@ final class MutationGeneratorTest extends TestCase
 
         $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
         $mutators = ['Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator())];
-        $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcherMock = $this->createMock(EventDispatcher::class);
         $onlyCovered = true;
-        $extraVisitors = [2 => new FakeVisitor()];
+        $nodeIgnorers = [new FakeIgnorer()];
 
         $mutation0 = $this->createMock(Mutation::class);
         $mutation1 = $this->createMock(Mutation::class);
@@ -73,14 +73,14 @@ final class MutationGeneratorTest extends TestCase
         /** @var FileMutationGenerator|ObjectProphecy $fileMutationGeneratorProphecy */
         $fileMutationGeneratorProphecy = $this->prophesize(FileMutationGenerator::class);
         $fileMutationGeneratorProphecy
-            ->generate($fileInfoA, $onlyCovered, $codeCoverageMock, $mutators, $extraVisitors)
+            ->generate($fileInfoA, $onlyCovered, $codeCoverageMock, $mutators, $nodeIgnorers)
             ->willReturn([
                 $mutation0,
                 $mutation1,
             ])
         ;
         $fileMutationGeneratorProphecy
-            ->generate($fileInfoB, $onlyCovered, $codeCoverageMock, $mutators, $extraVisitors)
+            ->generate($fileInfoB, $onlyCovered, $codeCoverageMock, $mutators, $nodeIgnorers)
             ->willReturn([
                 $mutation1,
                 $mutation2,
@@ -102,7 +102,7 @@ final class MutationGeneratorTest extends TestCase
             $fileMutationGeneratorProphecy->reveal()
         );
 
-        $mutations = $mutationGenerator->generate($onlyCovered, $extraVisitors);
+        $mutations = $mutationGenerator->generate($onlyCovered, $nodeIgnorers);
 
         $this->assertSame($expectedMutations, $mutations);
     }
@@ -116,15 +116,15 @@ final class MutationGeneratorTest extends TestCase
 
         $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
 
-        $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcherMock = $this->createMock(EventDispatcher::class);
         $eventDispatcherMock
             ->expects($this->exactly(4))
             ->method('dispatch')
             ->withConsecutive(
-                [new MutationGeneratingStarted(2)],
-                [new MutableFileProcessed()],
-                [new MutableFileProcessed()],
-                [new MutationGeneratingFinished()]
+                [new MutationGenerationWasStarted(2)],
+                [new MutableFileWasProcessed()],
+                [new MutableFileWasProcessed()],
+                [new MutationGenerationWasFinished()]
             )
         ;
 

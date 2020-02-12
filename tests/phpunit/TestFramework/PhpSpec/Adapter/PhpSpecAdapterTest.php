@@ -40,7 +40,7 @@ use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapter;
 use Infection\TestFramework\PhpSpec\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
-use Infection\Utils\VersionParser;
+use Infection\TestFramework\VersionParser;
 use PHPUnit\Framework\TestCase;
 
 final class PhpSpecAdapterTest extends TestCase

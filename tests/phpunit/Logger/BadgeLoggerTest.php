@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use function getenv;
+use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Http\BadgeApiClient;
 use Infection\Logger\BadgeLogger;
 use Infection\Mutant\MetricsCalculator;
@@ -66,6 +67,9 @@ final class BadgeLoggerTest extends TestCase
      */
     private $badgeLogger;
 
+    /**
+     * @var array<string|bool>
+     */
     private static $env = [];
 
     public static function setUpBeforeClass(): void
@@ -76,8 +80,8 @@ final class BadgeLoggerTest extends TestCase
             'TRAVIS_BRANCH',
             'TRAVIS_REPO_SLUG',
             'TRAVIS_PULL_REQUEST',
-            BadgeLogger::ENV_INFECTION_BADGE_API_KEY,
-            BadgeLogger::ENV_STRYKER_DASHBOARD_API_KEY,
+            'INFECTION_BADGE_API_KEY',
+            'STRYKER_DASHBOARD_API_KEY',
         ];
 
         foreach ($names as $name) {
@@ -109,6 +113,7 @@ final class BadgeLoggerTest extends TestCase
 
         $this->badgeLogger = new BadgeLogger(
             $this->outputMock,
+            new StrykerApiKeyResolver(),
             $this->badgeApiClientMock,
             $this->metricsCalculatorMock,
             $config
@@ -215,13 +220,12 @@ final class BadgeLoggerTest extends TestCase
         putenv('TRAVIS_PULL_REQUEST=false');
         putenv('TRAVIS_REPO_SLUG=a/b');
         putenv('TRAVIS_BRANCH=master');
-
-        putenv(BadgeLogger::ENV_INFECTION_BADGE_API_KEY);
-        putenv(BadgeLogger::ENV_STRYKER_DASHBOARD_API_KEY);
+        putenv('INFECTION_BADGE_API_KEY');
+        putenv('STRYKER_DASHBOARD_API_KEY');
 
         $this->outputMock
             ->method('writeln')
-            ->with('Dashboard report has not been sent: neither INFECTION_BADGE_API_KEY nor STRYKER_DASHBOARD_API_KEY were found in the environment')
+            ->with('Dashboard report has not been sent: The Stryker API key needs to be configured using one of the environment variables "INFECTION_BADGE_API_KEY" or "STRYKER_DASHBOARD_API_KEY", but could not find any of these.')
         ;
 
         $this->badgeApiClientMock
@@ -234,7 +238,7 @@ final class BadgeLoggerTest extends TestCase
 
     public function test_it_sends_report_when_everything_is_ok_with_stryker_key(): void
     {
-        putenv(BadgeLogger::ENV_STRYKER_DASHBOARD_API_KEY . '=abc');
+        putenv('STRYKER_DASHBOARD_API_KEY=abc');
         putenv('TRAVIS=true');
         putenv('TRAVIS_PULL_REQUEST=false');
         putenv('TRAVIS_REPO_SLUG=a/b');
@@ -261,7 +265,7 @@ final class BadgeLoggerTest extends TestCase
 
     public function test_it_sends_report_when_everything_is_ok_with_our_key(): void
     {
-        putenv(BadgeLogger::ENV_INFECTION_BADGE_API_KEY . '=abc');
+        putenv('INFECTION_BADGE_API_KEY=abc');
         putenv('TRAVIS=true');
         putenv('TRAVIS_PULL_REQUEST=false');
         putenv('TRAVIS_REPO_SLUG=a/b');

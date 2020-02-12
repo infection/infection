@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use Infection\EventDispatcher\EventDispatcherInterface;
-use Infection\Events\InitialTestCaseCompleted;
-use Infection\Events\InitialTestSuiteFinished;
-use Infection\Events\InitialTestSuiteStarted;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\InitialTestCaseWasCompleted;
+use Infection\Event\InitialTestSuiteWasFinished;
+use Infection\Event\InitialTestSuiteWasStarted;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Symfony\Component\Process\Process;
 
@@ -50,12 +50,15 @@ final class InitialTestsRunner
     private $processBuilder;
     private $eventDispatcher;
 
-    public function __construct(InitialTestRunProcessBuilder $processBuilder, EventDispatcherInterface $eventDispatcher)
+    public function __construct(InitialTestRunProcessBuilder $processBuilder, EventDispatcher $eventDispatcher)
     {
         $this->processBuilder = $processBuilder;
         $this->eventDispatcher = $eventDispatcher;
     }
 
+    /**
+     * @param string[] $phpExtraOptions
+     */
     public function run(string $testFrameworkExtraOptions, bool $skipCoverage, array $phpExtraOptions = []): Process
     {
         $process = $this->processBuilder->createProcess(
@@ -64,17 +67,17 @@ final class InitialTestsRunner
             $phpExtraOptions
         );
 
-        $this->eventDispatcher->dispatch(new InitialTestSuiteStarted());
+        $this->eventDispatcher->dispatch(new InitialTestSuiteWasStarted());
 
         $process->run(function ($type) use ($process): void {
             if ($process::ERR === $type) {
                 $process->stop();
             }
 
-            $this->eventDispatcher->dispatch(new InitialTestCaseCompleted());
+            $this->eventDispatcher->dispatch(new InitialTestCaseWasCompleted());
         });
 
-        $this->eventDispatcher->dispatch(new InitialTestSuiteFinished($process->getOutput()));
+        $this->eventDispatcher->dispatch(new InitialTestSuiteWasFinished($process->getOutput()));
 
         return $process;
     }

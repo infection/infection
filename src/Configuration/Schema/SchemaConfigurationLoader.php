@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Schema;
 
-use Infection\Locator\Locator;
+use Infection\FileSystem\Locator\Locator;
 
 /**
  * @internal
@@ -54,6 +54,9 @@ final class SchemaConfigurationLoader
         $this->fileLoader = $fileLoader;
     }
 
+    /**
+     * @param string[] $potentialPaths
+     */
     public function loadConfiguration(array $potentialPaths): SchemaConfiguration
     {
         return $this->fileLoader->loadFile(

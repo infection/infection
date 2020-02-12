@@ -41,8 +41,10 @@ use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetConfigClassName;
 use Infection\Mutator\GetMutatorName;
+use Infection\Mutator\MutatorCategory;
 use function min;
 use PhpParser\Node;
+use PhpParser\Node\Expr\ArrayItem;
 use function range;
 
 /**
@@ -62,7 +64,40 @@ final class ArrayItemRemoval implements ConfigurableMutator
 
     public static function getDefinition(): ?Definition
     {
-        return null;
+        return new Definition(
+            <<<'TXT'
+Removes an element of an array literal. For example:
+
+```php
+$x = [0, 1, 2];
+```
+
+Will be mutated to:
+
+```php
+$x = [1, 2];
+```
+
+And:
+
+```php
+$x = [0, 2];
+```
+
+And:
+
+```php
+$x = [1, 2];
+```
+
+Which elements it removes or how many elements it will attempt to remove will depend on its
+configuration.
+
+TXT
+            ,
+            MutatorCategory::SEMANTIC_REDUCTION,
+            null
+        );
     }
 
     /**
@@ -85,6 +120,11 @@ final class ArrayItemRemoval implements ConfigurableMutator
         return $node instanceof Node\Expr\Array_ && count($node->items);
     }
 
+    /**
+     * @param ArrayItem[] $items
+     *
+     * @return int[]
+     */
     private function getItemsIndexes(array $items): array
     {
         switch ($this->config->getRemove()) {

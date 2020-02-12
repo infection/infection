@@ -35,15 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use function implode;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
-use Infection\Finder\TestFrameworkFinder;
-use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapter;
-use Infection\TestFramework\Codeception\Adapter\CodeceptionAdapterFactory;
+use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapterFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
 use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -51,23 +53,36 @@ use function Safe\sprintf;
 final class Factory
 {
     private $tmpDir;
-    private $configLocator;
     private $projectDir;
+    private $configLocator;
+    private $testFrameworkFinder;
     private $jUnitFilePath;
     private $infectionConfig;
 
+    /**
+     * @var array<string, array<string, mixed>>
+     */
+    private $installedExtensions;
+
+    /**
+     * @param array<string, array<string, mixed>> $installedExtensions
+     */
     public function __construct(
         string $tmpDir,
         string $projectDir,
         TestFrameworkConfigLocatorInterface $configLocator,
+        TestFrameworkFinder $testFrameworkFinder,
         string $jUnitFilePath,
-        Configuration $infectionConfig
+        Configuration $infectionConfig,
+        array $installedExtensions
     ) {
         $this->tmpDir = $tmpDir;
         $this->configLocator = $configLocator;
         $this->projectDir = $projectDir;
         $this->jUnitFilePath = $jUnitFilePath;
         $this->infectionConfig = $infectionConfig;
+        $this->testFrameworkFinder = $testFrameworkFinder;
+        $this->installedExtensions = $installedExtensions;
     }
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
@@ -76,10 +91,10 @@ final class Factory
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
             return PhpUnitAdapterFactory::create(
-                (new TestFrameworkFinder(
+                $this->testFrameworkFinder->find(
                     TestFrameworkTypes::PHPUNIT,
                     (string) $this->infectionConfig->getPhpUnit()->getCustomPath()
-                ))->find(),
+                ),
                 $this->tmpDir,
                 $phpUnitConfigPath,
                 (string) $this->infectionConfig->getPhpUnit()->getConfigDir(),
@@ -94,7 +109,7 @@ final class Factory
             $phpSpecConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPSPEC);
 
             return PhpSpecAdapterFactory::create(
-                (new TestFrameworkFinder(TestFrameworkTypes::PHPSPEC))->find(),
+                $this->testFrameworkFinder->find(TestFrameworkTypes::PHPSPEC),
                 $this->tmpDir,
                 $phpSpecConfigPath,
                 null,
@@ -105,19 +120,27 @@ final class Factory
             );
         }
 
-        if ($adapterName === TestFrameworkTypes::CODECEPTION) {
-            $codeceptionConfigPath = $this->configLocator->locate(TestFrameworkTypes::CODECEPTION);
+        foreach ($this->installedExtensions as $packageName => $installedExtension) {
+            $factory = $installedExtension['extra']['class'];
 
-            return CodeceptionAdapterFactory::create(
-                (new TestFrameworkFinder(CodeceptionAdapter::EXECUTABLE))->find(),
-                $this->tmpDir,
-                $codeceptionConfigPath,
-                null,
-                $this->jUnitFilePath,
-                $this->projectDir,
-                $this->infectionConfig->getSourceDirectories(),
-                $skipCoverage
-            );
+            Assert::classExists($factory);
+
+            if (!is_a($factory, TestFrameworkAdapterFactory::class, true)) {
+                continue;
+            }
+
+            if ($adapterName === $factory::getAdapterName()) {
+                return $factory::create(
+                    $this->testFrameworkFinder->find($factory::getExecutableName()),
+                    $this->tmpDir,
+                    $this->configLocator->locate($factory::getAdapterName()),
+                    null,
+                    $this->jUnitFilePath,
+                    $this->projectDir,
+                    $this->infectionConfig->getSourceDirectories(),
+                    $skipCoverage
+                );
+            }
         }
 
         throw new InvalidArgumentException(sprintf(

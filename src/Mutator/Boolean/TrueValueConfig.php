@@ -35,20 +35,22 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use Infection\Mutator\MutatorConfig;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class TrueValueConfig implements MutatorConfig
+final class TrueValueConfig
 {
     private const KNOWN_FUNCTIONS = [
         'array_search',
         'in_array',
     ];
 
+    /**
+     * @var string[]
+     */
     private $allowedFunctions = [];
 
     /**

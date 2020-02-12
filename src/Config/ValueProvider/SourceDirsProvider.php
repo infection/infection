@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Config\ValueProvider;
 
 use function count;
+use function implode;
 use function in_array;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
@@ -61,6 +62,11 @@ final class SourceDirsProvider
         $this->sourceDirGuesser = $sourceDirGuesser;
     }
 
+    /**
+     * @param string[] $dirsInCurrentDir
+     *
+     * @return string[]
+     */
     public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir): array
     {
         $output->writeln(['']);

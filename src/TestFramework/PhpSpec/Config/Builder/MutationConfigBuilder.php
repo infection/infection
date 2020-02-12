@@ -36,10 +36,12 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpSpec\Config\Builder;
 
 use function array_key_exists;
-use function dirname;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
-use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\PhpSpec\Config\MutationYamlConfiguration;
+use function Safe\file_put_contents;
+use function Safe\sprintf;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -92,11 +94,14 @@ class MutationConfigBuilder extends ConfigBuilder
         return $path;
     }
 
+    /**
+     * @param mixed[] $parsedYaml
+     */
     private function createCustomAutoloadWithInterceptor(string $originalFilePath, string $mutantFilePath, array $parsedYaml): string
     {
         $originalBootstrap = $this->getOriginalBootstrapFilePath($parsedYaml);
         $autoloadPlaceholder = $originalBootstrap ? "require_once '{$originalBootstrap}';" : '';
-        $interceptorPath = dirname(__DIR__, 4) . '/StreamWrapper/IncludeInterceptor.php';
+        $interceptorPath = IncludeInterceptor::LOCATION;
 
         $customAutoload = <<<AUTOLOAD
 <?php
@@ -121,6 +126,8 @@ AUTOLOAD;
     }
 
     /**
+     * @param mixed[] $parsedYaml
+     *
      * @return string|null
      */
     private function getOriginalBootstrapFilePath(array $parsedYaml)

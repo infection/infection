@@ -39,6 +39,7 @@ use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
 use Infection\TestFramework\PhpSpec\Config\Builder\MutationConfigBuilder;
 use Infection\Tests\FileSystem\FileSystemTestCase;
+use function Safe\file_get_contents;
 
 /**
  * @group integration Requires some I/O operations
@@ -101,5 +102,28 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
             "require_once '/project/dir/bootstrap.php';",
             file_get_contents($this->tmp . '/interceptor.phpspec.autoload.a1b2c3.infection.php')
         );
+    }
+
+    public function test_interceptor_is_included(): void
+    {
+        $projectDir = '/project/dir';
+        $originalYamlConfigPath = __DIR__ . '/../../../../Fixtures/Files/phpspec/phpspec.yml';
+
+        $builder = new MutationConfigBuilder($this->tmp, $originalYamlConfigPath, $projectDir);
+
+        $this->assertSame(
+            $this->tmp . '/phpspecConfiguration.a1b2c3.infection.yml',
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::MUTATION_HASH,
+                self::ORIGINAL_FILE_PATH
+            )
+        );
+
+        $this->assertFileExists($this->tmp . '/interceptor.phpspec.autoload.a1b2c3.infection.php');
+        $content = file_get_contents($this->tmp . '/interceptor.phpspec.autoload.a1b2c3.infection.php');
+
+        $this->assertStringContainsString('IncludeInterceptor.php', $content);
     }
 }

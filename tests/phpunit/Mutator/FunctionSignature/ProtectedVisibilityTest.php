@@ -37,6 +37,8 @@ namespace Infection\Tests\Mutator\FunctionSignature;
 
 use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use function Safe\file_get_contents;
+use function Safe\sprintf;
 
 /**
  * @group integration Requires some I/O operations
@@ -211,14 +213,30 @@ class Child extends ProtectedNonSameAbstract
 PHP
         ];
 
-        yield 'it does not mutate an anonymous class because reflection is not avalable' => [
+        yield 'it mutates an anonymous class' => [
             <<<'PHP'
 <?php
 
 function something()
 {
-    return new class() {
+    return new class
+    {
         protected function anything()
+        {
+            return null;
+        }
+    };
+}
+PHP
+            ,
+            <<<'PHP'
+<?php
+
+function something()
+{
+    return new class
+    {
+        private function anything()
         {
             return null;
         }

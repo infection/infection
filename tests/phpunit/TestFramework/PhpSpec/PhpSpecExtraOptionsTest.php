@@ -58,7 +58,7 @@ final class PhpSpecExtraOptionsTest extends TestCase
         $this->assertSame('', $phpUnitOptions->getForMutantProcess());
     }
 
-    public function mutantProcessProvider()
+    public function mutantProcessProvider(): array
     {
         return [
             ['--filter=someTest#2 --a --b=value'],

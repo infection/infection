@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Process\Builder;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Console\Util\PhpProcess;
-use Infection\TestFramework\TestFrameworkAdapter;
 use function method_exists;
 use Symfony\Component\Process\Process;
 
@@ -54,6 +54,8 @@ class InitialTestRunProcessBuilder
 
     /**
      * Creates process with enabled debugger as test framework is going to use in the code coverage.
+     *
+     * @param string[] $phpExtraOptions
      */
     public function createProcess(
         string $testFrameworkExtraOptions,

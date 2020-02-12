@@ -38,8 +38,8 @@ namespace Infection\Config\ValueProvider;
 use function count;
 use function in_array;
 use Infection\Config\ConsoleHelper;
-use Infection\Locator\Locator;
-use Infection\Locator\RootsFileOrDirectoryLocator;
+use Infection\FileSystem\Locator\Locator;
+use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use function Safe\glob;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -65,6 +65,12 @@ final class ExcludeDirsProvider
         $this->filesystem = $filesystem;
     }
 
+    /**
+     * @param string[] $dirsInCurrentDir
+     * @param string[] $sourceDirs
+     *
+     * @return string[]
+     */
     public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, array $sourceDirs): array
     {
         $output->writeln([
@@ -116,6 +122,9 @@ final class ExcludeDirsProvider
         return array_values(array_unique($excludedDirs));
     }
 
+    /**
+     * @return callable(string): string
+     */
     private function getValidator(Locator $locator)
     {
         return static function ($answer) use ($locator) {

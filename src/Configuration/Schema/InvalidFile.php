@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Schema;
 
-use function sprintf;
+use function Safe\sprintf;
 use Throwable;
 use UnexpectedValueException;
 

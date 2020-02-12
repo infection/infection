@@ -42,15 +42,15 @@ interface OutputFormatter
     /**
      * Triggered when mutation testing is being started
      */
-    public function start(int $mutationCount);
+    public function start(int $mutationCount): void;
 
     /**
      * Triggered each time mutation process is finished for one Mutant
      */
-    public function advance(MutantProcess $mutantProcess, int $mutationCount);
+    public function advance(MutantProcess $mutantProcess, int $mutationCount): void;
 
     /**
      * Triggered when mutation testing is finished
      */
-    public function finish();
+    public function finish(): void;
 }

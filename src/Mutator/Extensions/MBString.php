@@ -60,7 +60,7 @@ final class MBString implements ConfigurableMutator
     use GetConfigClassName;
 
     /**
-     * @var array<string, Closure>
+     * @var array<string, Closure(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>>
      */
     private $converters;
 
@@ -147,6 +147,9 @@ TXT
         );
     }
 
+    /**
+     * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>
+     */
     private static function makeFunctionMapper(string $newFunctionName): Closure
     {
         return static function (Node\Expr\FuncCall $node) use ($newFunctionName): Generator {
@@ -154,6 +157,9 @@ TXT
         };
     }
 
+    /**
+     * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>
+     */
     private static function makeFunctionAndRemoveExtraArgsMapper(string $newFunctionName, int $argsAtMost): Closure
     {
         return static function (Node\Expr\FuncCall $node) use ($newFunctionName, $argsAtMost): Generator {
@@ -161,6 +167,9 @@ TXT
         };
     }
 
+    /**
+     * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>
+     */
     private static function makeConvertCaseMapper(): Closure
     {
         return static function (Node\Expr\FuncCall $node): Generator {
@@ -227,6 +236,9 @@ TXT
         return false;
     }
 
+    /**
+     * @param Node\Arg[] $args
+     */
     private static function mapFunctionCall(Node\Expr\FuncCall $node, string $newFuncName, array $args): Node\Expr\FuncCall
     {
         return new Node\Expr\FuncCall(

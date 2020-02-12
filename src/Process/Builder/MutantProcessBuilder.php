@@ -35,16 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Process\Builder;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
-use Infection\TestFramework\TestFrameworkAdapter;
 use function method_exists;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
+ * @final
  */
-final class MutantProcessBuilder
+class MutantProcessBuilder
 {
     private $testFrameworkAdapter;
     private $timeout;

@@ -38,9 +38,9 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 use function dirname;
 use function explode;
 use function file_exists;
+use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
-use Infection\TestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use function Safe\file_get_contents;
 
@@ -110,17 +110,19 @@ class PhpUnitXmlCoverageFactory
         foreach ($coverage as $sourceFilePath => $fileCoverageData) {
             foreach ($fileCoverageData->byLine as $line => $linesCoverageData) {
                 foreach ($linesCoverageData as $test) {
-                    $this->updateTestExecutionInfo($test);
+                    self::updateTestExecutionInfo($test, $this->testFileDataProvider);
                 }
             }
         }
     }
 
-    private function updateTestExecutionInfo(CoverageLineData $test): void
-    {
+    private static function updateTestExecutionInfo(
+        CoverageLineData $test,
+        TestFileDataProvider $testFileDataProvider
+    ): void {
         $class = explode('::', $test->testMethod, 2)[0];
 
-        $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
+        $testFileData = $testFileDataProvider->getTestFileInfo($class);
 
         $test->testFilePath = $testFileData->path;
         $test->time = $testFileData->time;

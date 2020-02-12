@@ -48,8 +48,8 @@ use Infection\Mutator\MutatorConfig;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
+use function Safe\sort;
 use function Safe\sprintf;
-use function sort;
 use const SORT_STRING;
 
 /**
