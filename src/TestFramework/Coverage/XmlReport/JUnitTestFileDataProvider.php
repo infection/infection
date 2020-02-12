@@ -40,6 +40,7 @@ use DOMXPath;
 use function file_exists;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\SafeQuery;
+use function Safe\preg_replace;
 use function Safe\sprintf;
 
 /**
@@ -80,11 +81,13 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
             );
         }
 
-        $feature = preg_replace('/^(.*):+.*$/', '$1.feature', $fullyQualifiedClassName);
-
         if ($nodes->length === 0) {
+            $feature = preg_replace('/^(.*):+.*$/', '$1.feature', $fullyQualifiedClassName);
             // try another format where the class name is inside `file` attribute of `testcase` tag
-            $nodes = $xPath->query(sprintf('//testcase[contains(@file, "%s")]', $feature));
+            $nodes = self::safeQuery(
+                $xPath,
+                sprintf('//testcase[contains(@file, "%s")]', $feature)
+            );
         }
 
         if ($nodes->length === 0) {
