@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
+use const DIRECTORY_SEPARATOR;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\CoverageFileData;
@@ -47,7 +48,6 @@ use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\TestFramework\Coverage\CoverageHelper;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
-use const DIRECTORY_SEPARATOR;
 
 /**
  * @group integration Requires some I/O operations

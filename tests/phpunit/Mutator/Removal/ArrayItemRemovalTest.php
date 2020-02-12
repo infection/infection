@@ -37,7 +37,6 @@ namespace Infection\Tests\Mutator\Removal;
 
 use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
-use function Safe\sprintf;
 
 final class ArrayItemRemovalTest extends AbstractMutatorTestCase
 {

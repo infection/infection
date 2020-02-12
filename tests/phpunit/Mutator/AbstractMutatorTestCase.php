@@ -56,8 +56,6 @@ use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
-use function Safe\substr;
-use function str_replace;
 use Webmozart\Assert\Assert;
 
 abstract class AbstractMutatorTestCase extends TestCase

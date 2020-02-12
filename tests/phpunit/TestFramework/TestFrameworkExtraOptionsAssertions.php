@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
-use Infection\TestFramework\TestFrameworkExtraOptions;
 use function get_class;
+use Infection\TestFramework\TestFrameworkExtraOptions;
 
 trait TestFrameworkExtraOptionsAssertions
 {

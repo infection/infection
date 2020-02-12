@@ -45,9 +45,6 @@ use function min;
 use PhpParser\Node;
 use PhpParser\Node\Expr\ArrayItem;
 use function range;
-use function Safe\sprintf;
-use function strtolower;
-use function strtoupper;
 
 /**
  * @internal
