@@ -48,9 +48,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class BadgeLogger implements MutationTestingResultsLogger
 {
-    public const ENV_INFECTION_BADGE_API_KEY = 'INFECTION_BADGE_API_KEY';
-    public const ENV_STRYKER_DASHBOARD_API_KEY = 'STRYKER_DASHBOARD_API_KEY';
-
     private $output;
     private $strykerApiKeyResolver;
     private $badgeApiClient;
