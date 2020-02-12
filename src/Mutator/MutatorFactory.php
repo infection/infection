@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-use function class_implements;
 use function in_array;
 use function Safe\array_flip;
+use function Safe\class_implements;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
@@ -77,7 +77,7 @@ final class MutatorFactory
             $ignored = $config['ignore'] ?? [];
 
             if (in_array(ConfigurableMutator::class, class_implements($mutatorClassName), true)) {
-                $configClassName = $mutatorClassName::getConfigClass();
+                $configClassName = $mutatorClassName::getConfigClassName();
 
                 $mutator = new $mutatorClassName(new $configClassName($settings));
             } else {

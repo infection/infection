@@ -36,15 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\Mutator;
 
 use function array_column;
-use function class_implements;
 use Generator;
 use function in_array;
 use Infection\Mutator\ConfigurableMutator;
-use Infection\Mutator\Mutator;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use Infection\Tests\Mutator\ProfileListProvider;
 use function iterator_to_array;
+use function Safe\class_implements;
 
 /**
  * @coversNothing
