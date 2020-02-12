@@ -48,6 +48,9 @@ final class TrueValueConfig
         'in_array',
     ];
 
+    /**
+     * @var string[]
+     */
     private $allowedFunctions = [];
 
     /**

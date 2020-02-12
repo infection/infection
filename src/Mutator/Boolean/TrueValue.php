@@ -52,6 +52,9 @@ final class TrueValue implements Mutator
 {
     use GetMutatorName;
 
+    /**
+     * @var array<string, int>
+     */
     private $allowedFunctions;
 
     public function __construct(TrueValueConfig $config)

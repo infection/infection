@@ -53,7 +53,7 @@ final class ArrayItemRemovalConfig
     private $limit;
 
     /**
-     * @param array<string, bool> $settings
+     * @param array{remove:string, limit: int} $settings
      */
     public function __construct(array $settings)
     {

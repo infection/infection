@@ -108,6 +108,8 @@ TXT
     }
 
     /**
+     * @param string[] $functionsMap
+     *
      * @return array<string, Closure(Node\Expr\FuncCall): Generator<Node\Expr>>
      */
     private static function createConverters(array $functionsMap): array
@@ -176,7 +178,7 @@ TXT
      *
      * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr>
      */
-    private function makeCheckingMinArgsMapper(int $minimumArgsCount, Closure $converter): Closure
+    private static function makeCheckingMinArgsMapper(int $minimumArgsCount, Closure $converter): Closure
     {
         return static function (Node\Expr\FuncCall $node) use ($minimumArgsCount, $converter): Generator {
             if (count($node->args) >= $minimumArgsCount) {

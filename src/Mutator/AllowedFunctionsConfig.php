@@ -45,6 +45,9 @@ use Webmozart\Assert\Assert;
  */
 abstract class AllowedFunctionsConfig
 {
+    /**
+     * @var string[]
+     */
     private $allowedFunctions;
 
     /**
