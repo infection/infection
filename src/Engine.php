@@ -45,8 +45,6 @@ use Infection\Event\ApplicationExecutionWasFinished;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutation\MutationGenerator;
-use Infection\Process\Builder\SubscriberBuilder;
-use Infection\Process\Coverage\CoverageRequirementChecker;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -57,7 +55,6 @@ use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
 use Infection\TestFramework\IgnoresAdditionalNodes;
 use const PHP_EOL;
 use function Safe\sprintf;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
 /**
@@ -65,11 +62,8 @@ use Symfony\Component\Process\Process;
  */
 final class Engine
 {
-    private $coverageChecker;
     private $config;
-    private $fileSystem;
     private $adapter;
-    private $subscriberBuilder;
     private $eventDispatcher;
     private $initialTestsRunner;
     private $memoryLimitApplier;
@@ -80,11 +74,8 @@ final class Engine
     private $metricsCalculator;
 
     public function __construct(
-        CoverageRequirementChecker $coverageChecker,
         Configuration $config,
-        Filesystem $fileSystem,
         TestFrameworkAdapter $adapter,
-        SubscriberBuilder $subscriberBuilder,
         EventDispatcher $eventDispatcher,
         InitialTestsRunner $initialTestsRunner,
         MemoryLimiter $memoryLimitApplier,
@@ -94,11 +85,8 @@ final class Engine
         ConsoleOutput $consoleOutput,
         MetricsCalculator $metricsCalculator
     ) {
-        $this->coverageChecker = $coverageChecker;
         $this->config = $config;
-        $this->fileSystem = $fileSystem;
         $this->adapter = $adapter;
-        $this->subscriberBuilder = $subscriberBuilder;
         $this->eventDispatcher = $eventDispatcher;
         $this->initialTestsRunner = $initialTestsRunner;
         $this->memoryLimitApplier = $memoryLimitApplier;
