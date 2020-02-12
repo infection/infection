@@ -47,6 +47,7 @@ use Infection\TestFramework\SafeQuery;
 use function Safe\file_put_contents;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
+use function version_compare;
 
 /**
  * @internal
@@ -189,7 +190,7 @@ class InitialConfigBuilder implements ConfigBuilder
     {
         $node = $dom->createElement($nodeName);
         $document = $dom->documentElement;
-        assert($document instanceof DOMElement);
+        Assert::isInstanceOf($node, DOMElement::class);
         $document->appendChild($node);
 
         return $node;
