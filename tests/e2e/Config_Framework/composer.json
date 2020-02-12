@@ -1,9 +1,4 @@
 {
-    "config": {
-        "platform": {
-            "php": "7.0"
-        }
-    },
     "autoload": {
         "psr-4": {
             "ConfigFramework\\": "src/"
@@ -15,7 +10,7 @@
         }
     },
     "require-dev": {
-        "phpspec/phpspec": "^4.3",
+        "phpspec/phpspec": "^5.1 || ^6.1",
         "leanphp/phpspec-code-coverage": "^4.0"
     }
 }
