@@ -37,6 +37,7 @@ namespace Infection\Logger;
 
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
+use Infection\Environment\BuildContextResolver;
 use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Http\BadgeApiClient;
 use Infection\Mutant\MetricsCalculator;
@@ -168,6 +169,7 @@ final class LoggerFactory
     {
         return new BadgeLogger(
             $output,
+            new BuildContextResolver(),
             new StrykerApiKeyResolver(),
             new BadgeApiClient($output),
             $this->metricsCalculator,
