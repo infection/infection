@@ -44,9 +44,9 @@ use function count;
 use function explode;
 use function ltrim;
 use const PHP_EOL;
-use function preg_match;
+use function Safe\preg_match;
+use function Safe\substr;
 use function strpos;
-use function substr;
 use function trim;
 
 final class Parser

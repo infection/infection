@@ -547,16 +547,19 @@ XML
         );
     }
 
-    private function assertItChangesStandardConfiguration(Closure $callback, string $resultXml): void
+    private function assertItChangesStandardConfiguration(Closure $callback, string $expectedXml): void
     {
         $dom = $this->getDomDocument();
         $xPath = new DOMXPath($dom);
 
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
+        $xmlConfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
 
-        $callback($xmlconfig, $xPath, $dom);
+        $callback($xmlConfig, $xPath, $dom);
 
-        $this->assertXmlStringEqualsXmlString($resultXml, $dom->saveXML());
+        $actualXml = $dom->saveXML();
+
+        $this->assertNotFalse($actualXml);
+        $this->assertXmlStringEqualsXmlString($expectedXml, $actualXml);
     }
 
     private function assertItChangesXML(string $inputXml, callable $callback, string $expectedXml): void
@@ -567,11 +570,14 @@ XML
         $dom->loadXML($inputXml);
         $xPath = new DOMXPath($dom);
 
-        $xmlconfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
+        $xmlConfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
 
-        $callback($xmlconfig, $xPath, $dom);
+        $callback($xmlConfig, $xPath, $dom);
 
-        $this->assertXmlStringEqualsXmlString($expectedXml, $dom->saveXML());
+        $actualXml = $dom->saveXML();
+
+        $this->assertNotFalse($actualXml);
+        $this->assertXmlStringEqualsXmlString($expectedXml, $actualXml);
     }
 
     private function getDomDocument(): DOMDocument

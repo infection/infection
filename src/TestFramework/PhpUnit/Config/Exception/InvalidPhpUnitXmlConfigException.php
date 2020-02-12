@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Config\Exception;
 
 use RuntimeException;
+use function Safe\sprintf;
 
 /**
  * @internal

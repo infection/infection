@@ -45,7 +45,10 @@ use stdClass;
 
 final class AbstractValueToNullReturnValueTest extends TestCase
 {
-    protected $testSubject;
+    /**
+     * @var AbstractValueToNullReturnValue|MockObject
+     */
+    private $testSubject;
 
     protected function setUp(): void
     {

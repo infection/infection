@@ -42,13 +42,12 @@ use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\VersionParser;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 final class PhpUnitAdapterTest extends TestCase
 {
     /**
-     * @var PhpUnitAdapter|MockObject
+     * @var PhpUnitAdapter
      */
     private $adapter;
 
@@ -76,7 +75,7 @@ final class PhpUnitAdapterTest extends TestCase
     /**
      * @dataProvider passProvider
      */
-    public function test_it_determines_whether_tests_pass_or_not($output, $expectedResult): void
+    public function test_it_determines_whether_tests_pass_or_not(string $output, bool $expectedResult): void
     {
         $result = $this->adapter->testsPass($output);
 
@@ -101,14 +100,14 @@ final class PhpUnitAdapterTest extends TestCase
     /**
      * @dataProvider memoryReportProvider
      */
-    public function test_it_determines_used_memory_amount($output, $expectedResult): void
+    public function test_it_determines_used_memory_amount(string $output, float $expectedResult): void
     {
         $result = $this->adapter->getMemoryUsed($output);
 
         $this->assertSame($expectedResult, $result);
     }
 
-    public function memoryReportProvider()
+    public function memoryReportProvider(): array
     {
         return [
             ['Memory: 8.00MB', 8.0],

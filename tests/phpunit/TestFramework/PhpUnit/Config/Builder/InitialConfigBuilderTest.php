@@ -44,6 +44,9 @@ use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
+use function Safe\file_get_contents;
+use function Safe\realpath;
+use function Safe\sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**

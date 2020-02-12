@@ -37,7 +37,7 @@ namespace Infection\Mutator;
 
 use Infection\Mutator\Util\MutatorConfig;
 use function Safe\array_flip;
-use function sprintf;
+use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -46,7 +46,7 @@ use Webmozart\Assert\Assert;
 final class MutatorFactory
 {
     /**
-     * @param array<string, array<mixed>> $resolvedMutators
+     * @param array<string, mixed[]> $resolvedMutators
      *
      * @return array<string, Mutator>
      */

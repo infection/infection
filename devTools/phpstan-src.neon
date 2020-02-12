@@ -1,11 +1,35 @@
 includes:
-    - phar://%currentWorkingDirectory%/.tools/phpstan/conf/bleedingEdge.neon
+    - ../vendor/phpstan/phpstan/conf/bleedingEdge.neon
 
 parameters:
+    inferPrivatePropertyTypeFromConstructor: true
     ignoreErrors:
+        - '#.* value type specified in iterable type Symfony\\Component\\Process\\Process#'
+        - '#generic class ReflectionClass (but )?does not specify its types#'
         - '#expects .*, array<string>\|bool\|string\|null given#'
         - '#cast array<string>\|bool\|string\|null to#'
         -
-            path: '%currentWorkingDirectory%/src/Process/Runner/Parallel/ParallelProcessRunner.php'
+            path: '../src/Process/Runner/Parallel/ParallelProcessRunner.php'
             message: '#Left side of [\&]{2} is always true#'
-        - '#Method Infection\Configuration\Schema\SchemaConfigurationFile::getDecodedContents() should return stdClass but returns stdClass|null.#'
+        -
+            path: '../src/PhpParser/FileParser.php'
+            message: '#Method Infection\\PhpParser\\FileParser::parse\(\) should return array<PhpParser\\Node> but returns array<PhpParser\\Node\\Stmt>\|null\.#'
+            count: 1
+        -
+            path: '../src/Reflection/AnonymousClassReflection.php'
+            message: '#Parameter \#1 \$argument of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object\, string given\.#'
+            count: 1
+        -
+            path: '../src/Reflection/CoreClassReflection.php'
+            message: '#Parameter \#1 \$argument of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object\, string given\.#'
+            count: 1
+        -
+            path: '../src/TestFramework/PhpUnit/Coverage/IndexXmlCoverageParser.php'
+            message: '#Function realpath is unsafe to use\.#'
+            count: 1
+        -
+            path: '../src/Container.php'
+            message: '#^Method Infection\\Container::get.*\(\) should return .* but returns object\.$#'
+    level: max
+    paths:
+        - ../src

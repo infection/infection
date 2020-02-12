@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use Infection\Event\MutantsCreationWasStarted;
+use function Safe\sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**

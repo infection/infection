@@ -39,8 +39,8 @@ use const DIRECTORY_SEPARATOR;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
 use function microtime;
-use function mkdir;
 use function random_int;
+use function Safe\mkdir;
 use Symfony\Component\Filesystem\Filesystem;
 use function sys_get_temp_dir;
 

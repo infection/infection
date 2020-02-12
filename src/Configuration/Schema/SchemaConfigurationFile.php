@@ -69,18 +69,8 @@ final class SchemaConfigurationFile
      */
     public function getDecodedContents(): stdClass
     {
-        $this->initDecodedContents();
-
-        return $this->decodedContents;
-    }
-
-    /**
-     * @throws InvalidFile
-     */
-    private function initDecodedContents(): void
-    {
-        if ($this->decodedContents !== null) {
-            return;
+        if ($this->decodedContents instanceof stdClass) {
+            return $this->decodedContents;
         }
 
         if (!is_file($this->path)) {
@@ -94,7 +84,7 @@ final class SchemaConfigurationFile
         $contents = file_get_contents($this->path);
 
         try {
-            $this->decodedContents = (new JsonParser())->parse(
+            return $this->decodedContents = (new JsonParser())->parse(
                 $contents,
                 JsonParser::DETECT_KEY_CONFLICTS
             );

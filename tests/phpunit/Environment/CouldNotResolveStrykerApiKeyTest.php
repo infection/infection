@@ -37,6 +37,7 @@ namespace Infection\Tests\Environment;
 
 use Infection\Environment\CouldNotResolveStrykerApiKey;
 use PHPUnit\Framework\TestCase;
+use function Safe\sprintf;
 
 /**
  * @covers \Infection\Environment\CouldNotResolveStrykerApiKey

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures\TestFramework;
 
-use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 
 final class DummyTestFrameworkAdapter implements TestFrameworkAdapter

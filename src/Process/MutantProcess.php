@@ -73,6 +73,10 @@ class MutantProcess
 
     private $process;
     private $mutant;
+
+    /**
+     * @var bool
+     */
     private $isTimedOut = false;
     private $testFrameworkAdapter;
 

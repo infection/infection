@@ -56,6 +56,9 @@ final class MBString implements Mutator
 {
     use GetMutatorName;
 
+    /**
+     * @var array<string, callable(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>>
+     */
     private $converters;
 
     public function __construct(MutatorConfig $config)
@@ -110,6 +113,9 @@ TXT
         return isset($this->converters[$node->name->toLowerString()]);
     }
 
+    /**
+     * @param array<string, bool> $functionsMap
+     */
     private function setupConverters(array $functionsMap): void
     {
         $converters = [
@@ -141,6 +147,9 @@ TXT
         $this->converters = array_diff_key($converters, $functionsToRemove);
     }
 
+    /**
+     * @return callable(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>
+     */
     private function makeFunctionMapper(string $newFunctionName): callable
     {
         return function (Node\Expr\FuncCall $node) use ($newFunctionName): Generator {
@@ -148,6 +157,9 @@ TXT
         };
     }
 
+    /**
+     * @return callable(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>
+     */
     private function makeFunctionAndRemoveExtraArgsMapper(string $newFunctionName, int $argsAtMost): callable
     {
         return function (Node\Expr\FuncCall $node) use ($newFunctionName, $argsAtMost): Generator {
@@ -155,6 +167,9 @@ TXT
         };
     }
 
+    /**
+     * @return callable(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>
+     */
     private function makeConvertCaseMapper(): callable
     {
         return function (Node\Expr\FuncCall $node): Generator {
@@ -221,6 +236,9 @@ TXT
         return false;
     }
 
+    /**
+     * @param Node\Arg[] $args
+     */
     private function mapFunctionCall(Node\Expr\FuncCall $node, string $newFuncName, array $args): Node\Expr\FuncCall
     {
         return new Node\Expr\FuncCall(

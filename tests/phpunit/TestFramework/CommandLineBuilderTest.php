@@ -38,6 +38,9 @@ namespace Infection\Tests\TestFramework;
 use Infection\TestFramework\CommandLineBuilder;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group integration Requires some I/O operations
+ */
 final class CommandLineBuilderTest extends TestCase
 {
     private const PHP_EXTRA_ARGS = ['-d zend_extension=xdebug.so'];

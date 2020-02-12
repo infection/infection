@@ -67,6 +67,9 @@ final class BadgeLoggerTest extends TestCase
      */
     private $badgeLogger;
 
+    /**
+     * @var array<string|bool>
+     */
     private static $env = [];
 
     public static function setUpBeforeClass(): void

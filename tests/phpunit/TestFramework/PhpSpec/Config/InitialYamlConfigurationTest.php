@@ -43,8 +43,14 @@ use Symfony\Component\Yaml\Yaml;
 
 final class InitialYamlConfigurationTest extends TestCase
 {
-    protected $tempDir = '/path/to/tmp';
+    /**
+     * @var string
+     */
+    private $tempDir = '/path/to/tmp';
 
+    /**
+     * @var array<string, mixed>
+     */
     private $defaultConfig = [
         'extensions' => [
             'SomeOtherExtension' => [],
@@ -114,7 +120,7 @@ final class InitialYamlConfigurationTest extends TestCase
         $this->assertSame(['.'], $parsedYaml['extensions']['PhpSpecCodeCoverageExtension']['whitelist']);
     }
 
-    protected function getConfigurationObject(array $configArray = [], bool $skipCoverage = false)
+    private function getConfigurationObject(array $configArray = [], bool $skipCoverage = false): InitialYamlConfiguration
     {
         return new InitialYamlConfiguration($this->tempDir, $configArray ?: $this->defaultConfig, $skipCoverage);
     }

@@ -35,8 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Http;
 
+use function curl_close;
 use function is_string;
+use function Safe\curl_exec;
+use function Safe\curl_getinfo;
 use function Safe\curl_init;
+use function Safe\curl_setopt;
+use function Safe\json_encode;
+use function Safe\sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**

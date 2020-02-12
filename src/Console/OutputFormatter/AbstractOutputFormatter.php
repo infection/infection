@@ -44,6 +44,9 @@ use Infection\Process\MutantProcess;
  */
 abstract class AbstractOutputFormatter implements OutputFormatter
 {
+    /**
+     * @var int
+     */
     protected $callsCount = 0;
 
     public function start(int $mutationCount): void

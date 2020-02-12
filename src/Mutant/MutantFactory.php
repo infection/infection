@@ -38,9 +38,11 @@ namespace Infection\Mutant;
 use Infection\Differ\Differ;
 use Infection\Mutation\Mutation;
 use function is_readable;
+use PhpParser\Node;
 use PhpParser\PrettyPrinterAbstract;
 use function Safe\file_get_contents;
 use function Safe\file_put_contents;
+use function Safe\sprintf;
 
 /**
  * @internal
@@ -110,6 +112,9 @@ class MutantFactory
         return $this->differ->diff($originalPrettyPrintedFile, $mutantCode);
     }
 
+    /**
+     * @param Node[] $originalStatements
+     */
     private function getOriginalPrettyPrintedFile(string $originalFilePath, array $originalStatements): string
     {
         return $this->printedFileCache[$originalFilePath]

@@ -41,6 +41,9 @@ use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath;
+use function Safe\putenv;
+use function Safe\realpath;
+use function Safe\sprintf;
 use function strlen;
 use Symfony\Component\Filesystem\Filesystem;
 

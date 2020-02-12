@@ -57,6 +57,9 @@ final class TextLogFileProvider
         $this->questionHelper = $questionHelper;
     }
 
+    /**
+     * @param string[] $dirsInCurrentDir
+     */
     public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir): string
     {
         $output->writeln(['']);

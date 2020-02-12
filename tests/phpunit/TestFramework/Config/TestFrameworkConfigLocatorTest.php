@@ -39,6 +39,7 @@ use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\TestCase;
+use function Safe\sprintf;
 
 /**
  * @group integration Requires some I/O operations

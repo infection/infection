@@ -51,7 +51,9 @@ use function is_scalar;
 use function is_string;
 use function min;
 use PhpParser\Node;
+use PhpParser\Node\Expr\ArrayItem;
 use function range;
+use function Safe\sprintf;
 use function strtolower;
 use function strtoupper;
 
@@ -143,6 +145,11 @@ TXT
         return $node instanceof Node\Expr\Array_ && count($node->items);
     }
 
+    /**
+     * @param ArrayItem[] $items
+     *
+     * @return int[]
+     */
     private function getItemsIndexes(array $items): array
     {
         switch ($this->remove) {
@@ -155,32 +162,43 @@ TXT
         }
     }
 
+    /**
+     * @param array<string, mixed> $settings
+     *
+     * @return array{remove: string, limit: int}
+     */
     private function getResultSettings(array $settings): array
     {
         $settings = array_merge(self::DEFAULT_SETTINGS, $settings);
 
         if (!is_string($settings['remove'])) {
-            $this->throwConfigException($settings, 'remove');
+            throw $this->configException($settings, 'remove');
         }
 
         $settings['remove'] = strtolower($settings['remove']);
 
         if (!in_array($settings['remove'], ['first', 'last', 'all'])) {
-            $this->throwConfigException($settings, 'remove');
+            throw $this->configException($settings, 'remove');
         }
 
         if (!is_numeric($settings['limit']) || $settings['limit'] < 1) {
-            $this->throwConfigException($settings, 'limit');
+            throw $this->configException($settings, 'limit');
         }
 
-        return $settings;
+        return [
+            'remove' => $settings['remove'],
+            'limit' => (int) $settings['limit'],
+        ];
     }
 
-    private function throwConfigException(array $settings, string $property): void
+    /**
+     * @param array<string, mixed> $settings
+     */
+    private function configException(array $settings, string $property): InvalidConfigException
     {
         $value = $settings[$property];
 
-        throw new InvalidConfigException(sprintf(
+        return new InvalidConfigException(sprintf(
             'Invalid configuration of ArrayItemRemoval mutator. Setting `%s` is invalid (%s)',
             $property,
             is_scalar($value) ? $value : '<' . strtoupper(gettype($value)) . '>'

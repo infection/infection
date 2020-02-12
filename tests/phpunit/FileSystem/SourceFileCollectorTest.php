@@ -39,8 +39,8 @@ use function array_map;
 use function array_values;
 use Generator;
 use Infection\FileSystem\SourceFileCollector;
-use function natcasesort;
 use PHPUnit\Framework\TestCase;
+use function Safe\natcasesort;
 use Webmozart\PathUtil\Path;
 
 /**

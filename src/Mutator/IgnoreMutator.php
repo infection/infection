@@ -40,7 +40,6 @@ use Generator;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\ClassReflection;
 use PhpParser\Node;
-use ReflectionClass;
 use function Safe\sprintf;
 
 /**
