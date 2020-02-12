@@ -203,7 +203,7 @@ TXT
             class_implements($configClassName),
             sprintf(
                 <<<'TXT'
-Expected the mutator configuration class "%s" of the mutator "%s" to be a "%s".
+Expected the mutator configuration class "%s" for the mutator "%s" to be a "%s".
 TXT
                 ,
                 $configClassName,
