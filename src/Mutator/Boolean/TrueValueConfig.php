@@ -35,71 +35,50 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use function array_key_exists;
-use Generator;
-use Infection\Mutator\Definition;
-use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
-use PhpParser\Node;
-use function Safe\array_flip;
+use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class TrueValue implements Mutator
+final class TrueValueConfig
 {
-    use GetMutatorName;
+    private const KNOWN_FUNCTIONS = [
+        'array_search',
+        'in_array',
+    ];
 
     /**
-     * @var array<string, int>
+     * @var string[]
      */
-    private $allowedFunctions;
+    private $allowedFunctions = [];
 
-    public function __construct(TrueValueConfig $config)
+    /**
+     * @param array<string, bool> $settings
+     */
+    public function __construct(array $settings)
     {
-        $this->allowedFunctions = array_flip($config->getAllowedFunctions());
-    }
+        foreach ($settings as $functionName => $enabled) {
+            Assert::boolean(
+                $enabled,
+                sprintf(
+                    'Expected the value for "%s" to be a boolean. Got "%%s" instead',
+                    $functionName
+                )
+            );
+            Assert::oneOf($functionName, self::KNOWN_FUNCTIONS);
 
-    public static function getDefinition(): ?Definition
-    {
-        return new Definition(
-            'Replaces a boolean literal (`true`) with its opposite value (`false`). ',
-            MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
-        );
+            if ($enabled) {
+                $this->allowedFunctions[] = $functionName;
+            }
+        }
     }
 
     /**
-     * @param Node\Expr\ConstFetch $node
-     *
-     * @return Generator<Node\Expr\ConstFetch>
+     * @return string[]
      */
-    public function mutate(Node $node): Generator
+    public function getAllowedFunctions(): array
     {
-        yield new Node\Expr\ConstFetch(new Node\Name('false'));
-    }
-
-    public function canMutate(Node $node): bool
-    {
-        if (!($node instanceof Node\Expr\ConstFetch)) {
-            return false;
-        }
-
-        if ($node->name->toLowerString() !== 'true') {
-            return false;
-        }
-
-        $parentNode = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY);
-        $grandParentNode = $parentNode !== null ? $parentNode->getAttribute(ParentConnectorVisitor::PARENT_KEY) : null;
-
-        if (!$grandParentNode instanceof Node\Expr\FuncCall || !$grandParentNode->name instanceof Node\Name) {
-            return true;
-        }
-
-        $functionName = $grandParentNode->name->toLowerString();
-
-        return array_key_exists($functionName, $this->allowedFunctions);
+        return $this->allowedFunctions;
     }
 }

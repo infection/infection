@@ -33,41 +33,68 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview;
+namespace Infection\Tests\Mutator\Boolean;
 
+use Generator;
+use Infection\Mutator\Boolean\TrueValueConfig;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
-final class SourceTestClassNameSchemeTest extends TestCase
+final class TrueValueConfigTest extends TestCase
 {
-    public function test_it_can_give_the_source_class_name_for_a_test_case_class(): void
+    /**
+     * @dataProvider settingsProvider
+     */
+    public function test_it_can_create_a_config(array $settings, array $expected): void
     {
-        $this->assertSame(
-            'Infection\Acme\Foo',
-            SourceTestClassNameScheme::getSourceClassName('Infection\Tests\Acme\FooTest')
-        );
+        $config = new TrueValueConfig($settings);
+
+        $this->assertSame($expected, $config->getAllowedFunctions());
     }
 
-    public function test_it_can_give_the_source_class_name_for_a_source_class(): void
+    public function test_its_settings_must_be_boolean_values(): void
     {
-        $this->assertSame(
-            'Infection\Acme\Foo',
-            SourceTestClassNameScheme::getSourceClassName('Infection\Acme\Foo')
-        );
+        try {
+            new TrueValueConfig(['foo' => 'bar']);
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Expected the value for "foo" to be a boolean. Got "string" instead',
+                $exception->getMessage()
+            );
+        }
     }
 
-    public function test_it_can_give_the_test_case_class_name_for_a_source_class(): void
+    public function test_it_must_be_a_known_function(): void
     {
-        $this->assertSame(
-            'Infection\Tests\Acme\FooTest',
-            SourceTestClassNameScheme::getTestClassName('Infection\Acme\Foo')
-        );
+        try {
+            new TrueValueConfig(['foo' => true]);
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Expected one of: "array_search", "in_array". Got: "foo"',
+                $exception->getMessage()
+            );
+        }
     }
 
-    public function test_it_can_give_the_test_case_class_name_for_a_test_source_class(): void
+    public function settingsProvider(): Generator
     {
-        $this->assertSame(
-            'Infection\Tests\Acme\FooTest',
-            SourceTestClassNameScheme::getTestClassName('Infection\Tests\Acme\Foo')
-        );
+        yield 'default' => [
+            [],
+            [],
+        ];
+
+        yield 'one function enabled' => [
+            ['array_search' => true],
+            ['array_search'],
+        ];
+
+        yield 'one function disabled' => [
+            ['array_search' => false],
+            [],
+        ];
     }
 }

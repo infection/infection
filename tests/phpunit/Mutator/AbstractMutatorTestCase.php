@@ -42,10 +42,11 @@ use function exec;
 use function get_class;
 use Infection\Container;
 use Infection\Mutator\Mutator;
-use Infection\Mutator\Util\MutatorConfig;
+use Infection\Mutator\MutatorFactory;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\CloneVisitor;
 use Infection\PhpParser\Visitor\MutatorVisitor;
+use Infection\Tests\AutoReview\SourceTestClassNameScheme;
 use Infection\Tests\Fixtures\SimpleMutation;
 use Infection\Tests\Fixtures\SimpleMutationsCollectorVisitor;
 use Infection\Tests\StringNormalizer;
@@ -55,8 +56,6 @@ use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
-use function Safe\substr;
-use function str_replace;
 use Webmozart\Assert\Assert;
 
 abstract class AbstractMutatorTestCase extends TestCase
@@ -76,8 +75,14 @@ abstract class AbstractMutatorTestCase extends TestCase
      */
     private static $printer;
 
+    /**
+     * @var MutatorFactory|null
+     */
+    private static $mutatorFactory;
+
     protected function setUp(): void
     {
+        // TODO: refactor this bit...
         $this->mutator = $this->createMutator();
     }
 
@@ -127,10 +132,12 @@ abstract class AbstractMutatorTestCase extends TestCase
 
     final protected function createMutator(array $settings = []): Mutator
     {
-        $class = get_class($this);
-        $mutator = substr(str_replace('\Tests', '', $class), 0, -4);
+        $mutatorClassName = SourceTestClassNameScheme::getSourceClassName(get_class($this));
 
-        return new $mutator(new MutatorConfig($settings));
+        // TODO: this is a bit ridicule...
+        return self::getMutatorFactory()->create([
+            $mutatorClassName => ['settings' => $settings],
+        ])[MutatorName::getName($mutatorClassName)];
     }
 
     /**
@@ -176,6 +183,15 @@ abstract class AbstractMutatorTestCase extends TestCase
         }
 
         return self::$printer;
+    }
+
+    private static function getMutatorFactory(): MutatorFactory
+    {
+        if (self::$mutatorFactory === null) {
+            self::$mutatorFactory = new MutatorFactory();
+        }
+
+        return self::$mutatorFactory;
     }
 
     /**

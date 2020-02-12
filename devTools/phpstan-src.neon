@@ -30,6 +30,11 @@ parameters:
         -
             path: '../src/Container.php'
             message: '#^Method Infection\\Container::get.*\(\) should return .* but returns object\.$#'
+            count: 1
+        -
+            path: '../src/Mutator/MutatorFactory.php'
+            message: '#^Parameter \#1 \$settings of class Infection\\Mutator\\Removal\\ArrayItemRemovalConfig constructor expects array\(.*\), array given\.$#'
+            count: 1
     level: max
     paths:
         - ../src

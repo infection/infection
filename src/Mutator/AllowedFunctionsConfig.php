@@ -33,22 +33,54 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\Util;
+namespace Infection\Mutator;
 
-use Infection\Mutator\Util\MutatorConfig;
-use PHPUnit\Framework\TestCase;
+use function array_fill_keys;
+use function array_keys;
+use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
-final class MutatorConfigTest extends TestCase
+/**
+ * @internal
+ */
+abstract class AllowedFunctionsConfig
 {
-    public function test_it_correctly_converts_settings(): void
+    /**
+     * @var string[]
+     */
+    private $allowedFunctions;
+
+    /**
+     * @param array<string, bool> $settings
+     * @param string[] $knownFunctions
+     */
+    public function __construct(array $settings, array $knownFunctions)
     {
-        $config = new MutatorConfig(['foo' => 'bar']);
-        $this->assertSame(['foo' => 'bar'], $config->getMutatorSettings());
+        $filteredSettings = array_fill_keys($knownFunctions, true);
+
+        foreach ($settings as $functionName => $enabled) {
+            Assert::boolean(
+                $enabled,
+                sprintf(
+                    'Expected the value for "%s" to be a boolean. Got "%%s" instead',
+                    $functionName
+                )
+            );
+            Assert::oneOf($functionName, $knownFunctions);
+
+            if (!$enabled) {
+                unset($filteredSettings[$functionName]);
+            }
+        }
+
+        $this->allowedFunctions = array_keys($filteredSettings);
     }
 
-    public function test_it_can_deal_with_empty_settings(): void
+    /**
+     * @return string[]
+     */
+    final public function getAllowedFunctions(): array
     {
-        $config = new MutatorConfig([]);
-        $this->assertSame([], $config->getMutatorSettings());
+        return $this->allowedFunctions;
     }
 }

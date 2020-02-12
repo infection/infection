@@ -33,29 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Mutator\Removal;
+
+use const PHP_INT_MAX;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
- * @final
  */
-class MutatorConfig
+final class ArrayItemRemovalConfig
 {
-    private $mutatorSettings;
+    private const REMOVE_VALUES = [
+        'first',
+        'last',
+        'all',
+    ];
+
+    private $remove;
+    private $limit;
 
     /**
-     * @param mixed[] $settings
+     * @param array{remove:string, limit: int} $settings
      */
     public function __construct(array $settings)
     {
-        $this->mutatorSettings = $settings;
+        $this->remove = $settings['remove'] ?? 'first';
+        $this->limit = $settings['limit'] ?? PHP_INT_MAX;
+
+        Assert::oneOf($this->remove, self::REMOVE_VALUES);
+        Assert::integer(
+            $this->limit,
+            'Expected the limit to be an integer. Got "%s" instead'
+        );
+        Assert::greaterThanEq(
+            $this->limit,
+            1,
+            'Expected the limit to be greater or equal than 1. Got "%s" instead'
+        );
     }
 
-    /**
-     * @return mixed[]
-     */
-    public function getMutatorSettings(): array
+    public function getRemove(): string
     {
-        return $this->mutatorSettings;
+        return $this->remove;
+    }
+
+    public function getLimit(): int
+    {
+        return $this->limit;
     }
 }

@@ -35,9 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Extensions;
 
-use function array_diff_key;
-use function array_filter;
+use function array_fill_keys;
+use function array_intersect_key;
+use function array_key_exists;
 use function array_slice;
+use Closure;
 use function constant;
 use function count;
 use function defined;
@@ -46,7 +48,6 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\MutatorConfig;
 use PhpParser\Node;
 
 /**
@@ -57,15 +58,13 @@ final class MBString implements Mutator
     use GetMutatorName;
 
     /**
-     * @var array<string, callable(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>>
+     * @var array<string, Closure(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>>
      */
     private $converters;
 
-    public function __construct(MutatorConfig $config)
+    public function __construct(MBStringConfig $config)
     {
-        $settings = $config->getMutatorSettings();
-
-        $this->setupConverters($settings);
+        $this->converters = self::createConverters($config->getAllowedFunctions());
     }
 
     public static function getDefinition(): ?Definition
@@ -110,86 +109,85 @@ TXT
             return false;
         }
 
-        return isset($this->converters[$node->name->toLowerString()]);
+        return array_key_exists($node->name->toLowerString(), $this->converters);
     }
 
     /**
-     * @param array<string, bool> $functionsMap
+     * @param string[] $allowedFunctions
+     *
+     * @return array<string, Closure>
      */
-    private function setupConverters(array $functionsMap): void
+    private static function createConverters(array $allowedFunctions): array
     {
-        $converters = [
-            'mb_chr' => $this->makeFunctionAndRemoveExtraArgsMapper('chr', 1),
-            'mb_ord' => $this->makeFunctionAndRemoveExtraArgsMapper('ord', 1),
-            'mb_parse_str' => $this->makeFunctionMapper('parse_str'),
-            'mb_send_mail' => $this->makeFunctionMapper('mail'),
-            'mb_strcut' => $this->makeFunctionAndRemoveExtraArgsMapper('substr', 3),
-            'mb_stripos' => $this->makeFunctionAndRemoveExtraArgsMapper('stripos', 3),
-            'mb_stristr' => $this->makeFunctionAndRemoveExtraArgsMapper('stristr', 3),
-            'mb_strlen' => $this->makeFunctionAndRemoveExtraArgsMapper('strlen', 1),
-            'mb_strpos' => $this->makeFunctionAndRemoveExtraArgsMapper('strpos', 3),
-            'mb_strrchr' => $this->makeFunctionAndRemoveExtraArgsMapper('strrchr', 2),
-            'mb_strripos' => $this->makeFunctionAndRemoveExtraArgsMapper('strripos', 3),
-            'mb_strrpos' => $this->makeFunctionAndRemoveExtraArgsMapper('strrpos', 3),
-            'mb_strstr' => $this->makeFunctionAndRemoveExtraArgsMapper('strstr', 3),
-            'mb_strtolower' => $this->makeFunctionAndRemoveExtraArgsMapper('strtolower', 1),
-            'mb_strtoupper' => $this->makeFunctionAndRemoveExtraArgsMapper('strtoupper', 1),
-            'mb_str_split' => $this->makeFunctionAndRemoveExtraArgsMapper('str_split', 2),
-            'mb_substr_count' => $this->makeFunctionAndRemoveExtraArgsMapper('substr_count', 2),
-            'mb_substr' => $this->makeFunctionAndRemoveExtraArgsMapper('substr', 3),
-            'mb_convert_case' => $this->makeConvertCaseMapper(),
-        ];
-
-        $functionsToRemove = array_filter($functionsMap, static function (bool $isOn): bool {
-            return !$isOn;
-        });
-
-        $this->converters = array_diff_key($converters, $functionsToRemove);
+        return array_intersect_key(
+            [
+                'mb_chr' => self::makeFunctionAndRemoveExtraArgsMapper('chr', 1),
+                'mb_ord' => self::makeFunctionAndRemoveExtraArgsMapper('ord', 1),
+                'mb_parse_str' => self::makeFunctionMapper('parse_str'),
+                'mb_send_mail' => self::makeFunctionMapper('mail'),
+                'mb_strcut' => self::makeFunctionAndRemoveExtraArgsMapper('substr', 3),
+                'mb_stripos' => self::makeFunctionAndRemoveExtraArgsMapper('stripos', 3),
+                'mb_stristr' => self::makeFunctionAndRemoveExtraArgsMapper('stristr', 3),
+                'mb_strlen' => self::makeFunctionAndRemoveExtraArgsMapper('strlen', 1),
+                'mb_strpos' => self::makeFunctionAndRemoveExtraArgsMapper('strpos', 3),
+                'mb_strrchr' => self::makeFunctionAndRemoveExtraArgsMapper('strrchr', 2),
+                'mb_strripos' => self::makeFunctionAndRemoveExtraArgsMapper('strripos', 3),
+                'mb_strrpos' => self::makeFunctionAndRemoveExtraArgsMapper('strrpos', 3),
+                'mb_strstr' => self::makeFunctionAndRemoveExtraArgsMapper('strstr', 3),
+                'mb_strtolower' => self::makeFunctionAndRemoveExtraArgsMapper('strtolower', 1),
+                'mb_strtoupper' => self::makeFunctionAndRemoveExtraArgsMapper('strtoupper', 1),
+                'mb_str_split' => self::makeFunctionAndRemoveExtraArgsMapper('str_split', 2),
+                'mb_substr_count' => self::makeFunctionAndRemoveExtraArgsMapper('substr_count', 2),
+                'mb_substr' => self::makeFunctionAndRemoveExtraArgsMapper('substr', 3),
+                'mb_convert_case' => self::makeConvertCaseMapper(),
+            ],
+            array_fill_keys($allowedFunctions, null)
+        );
     }
 
     /**
-     * @return callable(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>
+     * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>
      */
-    private function makeFunctionMapper(string $newFunctionName): callable
+    private static function makeFunctionMapper(string $newFunctionName): Closure
     {
-        return function (Node\Expr\FuncCall $node) use ($newFunctionName): Generator {
-            yield $this->mapFunctionCall($node, $newFunctionName, $node->args);
+        return static function (Node\Expr\FuncCall $node) use ($newFunctionName): Generator {
+            yield self::mapFunctionCall($node, $newFunctionName, $node->args);
         };
     }
 
     /**
-     * @return callable(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>
+     * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>
      */
-    private function makeFunctionAndRemoveExtraArgsMapper(string $newFunctionName, int $argsAtMost): callable
+    private static function makeFunctionAndRemoveExtraArgsMapper(string $newFunctionName, int $argsAtMost): Closure
     {
-        return function (Node\Expr\FuncCall $node) use ($newFunctionName, $argsAtMost): Generator {
-            yield $this->mapFunctionCall($node, $newFunctionName, array_slice($node->args, 0, $argsAtMost));
+        return static function (Node\Expr\FuncCall $node) use ($newFunctionName, $argsAtMost): Generator {
+            yield self::mapFunctionCall($node, $newFunctionName, array_slice($node->args, 0, $argsAtMost));
         };
     }
 
     /**
-     * @return callable(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>
+     * @return Closure(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>
      */
-    private function makeConvertCaseMapper(): callable
+    private static function makeConvertCaseMapper(): Closure
     {
-        return function (Node\Expr\FuncCall $node): Generator {
-            $modeValue = $this->getConvertCaseModeValue($node);
+        return static function (Node\Expr\FuncCall $node): Generator {
+            $modeValue = self::getConvertCaseModeValue($node);
 
             if ($modeValue === null) {
                 return;
             }
 
-            $functionName = $this->getConvertCaseFunctionName($modeValue);
+            $functionName = self::getConvertCaseFunctionName($modeValue);
 
             if ($functionName === null) {
                 return;
             }
 
-            yield $this->mapFunctionCall($node, $functionName, [$node->args[0]]);
+            yield self::mapFunctionCall($node, $functionName, [$node->args[0]]);
         };
     }
 
-    private function getConvertCaseModeValue(Node\Expr\FuncCall $node): ?int
+    private static function getConvertCaseModeValue(Node\Expr\FuncCall $node): ?int
     {
         if (count($node->args) < 2) {
             return null;
@@ -208,24 +206,24 @@ TXT
         return null;
     }
 
-    private function getConvertCaseFunctionName(int $mode): ?string
+    private static function getConvertCaseFunctionName(int $mode): ?string
     {
-        if ($this->isInMbCaseMode($mode, 'MB_CASE_UPPER', 'MB_CASE_UPPER_SIMPLE')) {
+        if (self::isInMbCaseMode($mode, 'MB_CASE_UPPER', 'MB_CASE_UPPER_SIMPLE')) {
             return 'strtoupper';
         }
 
-        if ($this->isInMbCaseMode($mode, 'MB_CASE_LOWER', 'MB_CASE_LOWER_SIMPLE', 'MB_CASE_FOLD', 'MB_CASE_FOLD_SIMPLE')) {
+        if (self::isInMbCaseMode($mode, 'MB_CASE_LOWER', 'MB_CASE_LOWER_SIMPLE', 'MB_CASE_FOLD', 'MB_CASE_FOLD_SIMPLE')) {
             return 'strtolower';
         }
 
-        if ($this->isInMbCaseMode($mode, 'MB_CASE_TITLE', 'MB_CASE_TITLE_SIMPLE')) {
+        if (self::isInMbCaseMode($mode, 'MB_CASE_TITLE', 'MB_CASE_TITLE_SIMPLE')) {
             return 'ucwords';
         }
 
         return null;
     }
 
-    private function isInMbCaseMode(int $mode, string ...$cases): bool
+    private static function isInMbCaseMode(int $mode, string ...$cases): bool
     {
         foreach ($cases as $constant) {
             if (defined($constant) && constant($constant) === $mode) {
@@ -239,7 +237,7 @@ TXT
     /**
      * @param Node\Arg[] $args
      */
-    private function mapFunctionCall(Node\Expr\FuncCall $node, string $newFuncName, array $args): Node\Expr\FuncCall
+    private static function mapFunctionCall(Node\Expr\FuncCall $node, string $newFuncName, array $args): Node\Expr\FuncCall
     {
         return new Node\Expr\FuncCall(
             new Node\Name($newFuncName, $node->name->getAttributes()),

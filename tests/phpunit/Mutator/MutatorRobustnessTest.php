@@ -39,8 +39,8 @@ use function array_values;
 use Generator;
 use Infection\Container;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\ProfileList;
-use Infection\Mutator\Util\MutatorConfig;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Tests\Fixtures\NullMutationVisitor;
 use PhpParser\Parser;
@@ -91,6 +91,8 @@ final class MutatorRobustnessTest extends TestCase
 
     public function mutatorWithCodeCaseProvider(): Generator
     {
+        $mutatorFactory = new MutatorFactory();
+
         foreach ($this->provideCodeSamples() as [$fileName, $fileContents]) {
             foreach (ProfileList::ALL_MUTATORS as $mutatorClassName) {
                 $title = sprintf('[%s] %s', $mutatorClassName, $fileName);
@@ -98,7 +100,7 @@ final class MutatorRobustnessTest extends TestCase
                 yield $title => [
                     $fileName,
                     $fileContents,
-                    new $mutatorClassName(new MutatorConfig([])),
+                    $mutatorFactory->create([$mutatorClassName => []])[MutatorName::getName($mutatorClassName)],
                 ];
             }
         }

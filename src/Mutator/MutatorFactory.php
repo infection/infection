@@ -35,7 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-use Infection\Mutator\Util\MutatorConfig;
+use Infection\Mutator\Boolean\TrueValue;
+use Infection\Mutator\Boolean\TrueValueConfig;
+use Infection\Mutator\Extensions\BCMath;
+use Infection\Mutator\Extensions\BCMathConfig;
+use Infection\Mutator\Extensions\MBString;
+use Infection\Mutator\Extensions\MBStringConfig;
+use Infection\Mutator\Removal\ArrayItemRemoval;
+use Infection\Mutator\Removal\ArrayItemRemovalConfig;
 use function Safe\array_flip;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
@@ -70,14 +77,36 @@ final class MutatorFactory
                 )
             );
 
-            /** @var string[] $settings */
+            /** @var mixed[] $settings */
             $settings = $config['settings'] ?? [];
             /** @var string[] $ignored */
             $ignored = $config['ignore'] ?? [];
 
-            // TODO: only pass the mutator config if necessary
-            /** @var Mutator $mutator */
-            $mutator = new $mutatorClass(new MutatorConfig($settings));
+            switch ($mutatorClass) {
+                case BCMath::class:
+                    $mutator = new BCMath(new BCMathConfig($settings));
+
+                    break;
+
+                case MBString::class:
+                    $mutator = new MBString(new MBStringConfig($settings));
+
+                    break;
+
+                case TrueValue::class:
+                    $mutator = new TrueValue(new TrueValueConfig($settings));
+
+                    break;
+
+                case ArrayItemRemoval::class:
+                    $mutator = new ArrayItemRemoval(new ArrayItemRemovalConfig($settings));
+
+                    break;
+
+                default:
+                    /** @var Mutator $mutator */
+                    $mutator = new $mutatorClass();
+            }
 
             $mutators[$mutator->getName()] = new IgnoreMutator(
                 new IgnoreConfig($ignored),

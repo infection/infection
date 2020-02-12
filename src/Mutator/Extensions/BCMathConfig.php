@@ -33,41 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview;
+namespace Infection\Mutator\Extensions;
 
-use PHPUnit\Framework\TestCase;
+use Infection\Mutator\AllowedFunctionsConfig;
 
-final class SourceTestClassNameSchemeTest extends TestCase
+/**
+ * @internal
+ */
+final class BCMathConfig extends AllowedFunctionsConfig
 {
-    public function test_it_can_give_the_source_class_name_for_a_test_case_class(): void
-    {
-        $this->assertSame(
-            'Infection\Acme\Foo',
-            SourceTestClassNameScheme::getSourceClassName('Infection\Tests\Acme\FooTest')
-        );
-    }
+    private const KNOWN_FUNCTIONS = [
+        'bcadd',
+        'bccomp',
+        'bcdiv',
+        'bcmod',
+        'bcmul',
+        'bcpow',
+        'bcsub',
+        'bcsqrt',
+        'bcpowmod',
+    ];
 
-    public function test_it_can_give_the_source_class_name_for_a_source_class(): void
+    /**
+     * @param array<string, bool> $settings
+     */
+    public function __construct(array $settings)
     {
-        $this->assertSame(
-            'Infection\Acme\Foo',
-            SourceTestClassNameScheme::getSourceClassName('Infection\Acme\Foo')
-        );
-    }
-
-    public function test_it_can_give_the_test_case_class_name_for_a_source_class(): void
-    {
-        $this->assertSame(
-            'Infection\Tests\Acme\FooTest',
-            SourceTestClassNameScheme::getTestClassName('Infection\Acme\Foo')
-        );
-    }
-
-    public function test_it_can_give_the_test_case_class_name_for_a_test_source_class(): void
-    {
-        $this->assertSame(
-            'Infection\Tests\Acme\FooTest',
-            SourceTestClassNameScheme::getTestClassName('Infection\Tests\Acme\Foo')
-        );
+        parent::__construct($settings, self::KNOWN_FUNCTIONS);
     }
 }
