@@ -41,6 +41,8 @@ use Infection\Event\Subscriber\EventSubscriber;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
+use function memory_get_peak_usage;
+use function Safe\sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**

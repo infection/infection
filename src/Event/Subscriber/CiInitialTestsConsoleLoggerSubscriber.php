@@ -38,6 +38,7 @@ namespace Infection\Event\Subscriber;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\InitialTestSuiteWasStarted;
 use InvalidArgumentException;
+use function Safe\sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**

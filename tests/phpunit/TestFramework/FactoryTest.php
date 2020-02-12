@@ -39,6 +39,8 @@ use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
+use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
+use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -55,10 +57,34 @@ final class FactoryTest extends TestCase
             $this->createMock(TestFrameworkConfigLocatorInterface::class),
             $this->createMock(TestFrameworkFinder::class),
             '',
-            $this->createMock(Configuration::class)
+            $this->createMock(Configuration::class),
+            []
         );
 
         $this->expectException(InvalidArgumentException::class);
         $factory->create('Fake Test Framework', false);
+    }
+
+    public function test_it_uses_installed_test_framework_adapters(): void
+    {
+        $factory = new Factory(
+            '',
+            '',
+            $this->createMock(TestFrameworkConfigLocatorInterface::class),
+            $this->createMock(TestFrameworkFinder::class),
+            '',
+            $this->createMock(Configuration::class),
+            [
+                'infection/codeception-adapter' => [
+                        'install_path' => '/path/to/dummy/adapter/factory.php',
+                        'extra' => ['class' => DummyTestFrameworkFactory::class],
+                        'version' => '1.0.0',
+                    ],
+            ]
+        );
+
+        $adapter = $factory->create('dummy', false);
+
+        $this->assertInstanceOf(DummyTestFrameworkAdapter::class, $adapter);
     }
 }

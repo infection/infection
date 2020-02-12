@@ -43,7 +43,6 @@ use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\IdenticalEqual;
 use Infection\Mutator\Boolean\NotIdenticalNotEqual;
 use Infection\Mutator\Boolean\TrueValue;
-use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorResolver;
 use Infection\Mutator\ProfileList;
 use InvalidArgumentException;
@@ -271,7 +270,7 @@ final class MutatorResolverTest extends TestCase
 
     /**
      * @param string[] $expectedMutators
-     * @param array<string, Mutator> $actualMutators
+     * @param array<string, mixed[]> $actualMutators
      */
     private function assertSameMutatorsByClass(array $expectedMutators, array $actualMutators): void
     {

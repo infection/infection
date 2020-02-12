@@ -36,10 +36,14 @@ declare(strict_types=1);
 namespace Infection\PhpParser;
 
 use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\PhpParser\Visitor\NotMutableIgnoreVisitor;
+use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
+use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
+use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\NameResolver;
 
@@ -50,24 +54,27 @@ use PhpParser\NodeVisitor\NameResolver;
 class NodeTraverserFactory
 {
     /**
-     * @param NodeVisitor[] $extraVisitors
+     * @param NodeIgnorer[] $nodeIgnorers
      */
-    public function create(array $extraVisitors): PrioritizedVisitorsNodeTraverser
+    public function create(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverserInterface
     {
-        $traverser = new PrioritizedVisitorsNodeTraverser(new NodeTraverser());
+        $nodeIgnorers[] = new InterfaceIgnorer();
+        $nodeIgnorers[] = new AbstractMethodIgnorer();
 
-        $traverser->addPrioritizedVisitor(new NotMutableIgnoreVisitor(), 50);
-        $traverser->addPrioritizedVisitor(new NameResolver(null, [
-            'preserveOriginalNames' => true,
-            'replaceNodes' => false,
-        ]), 45);
-        $traverser->addPrioritizedVisitor(new ParentConnectorVisitor(), 40);
-        $traverser->addPrioritizedVisitor(new FullyQualifiedClassNameVisitor(), 30);
-        $traverser->addPrioritizedVisitor(new ReflectionVisitor(), 20);
+        $traverser = new NodeTraverser();
 
-        foreach ($extraVisitors as $priority => $visitor) {
-            $traverser->addPrioritizedVisitor($visitor, $priority);
-        }
+        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
+        $traverser->addVisitor(new NameResolver(
+            null,
+            [
+                'preserveOriginalNames' => true,
+                'replaceNodes' => false,
+            ])
+        );
+        $traverser->addVisitor(new ParentConnectorVisitor());
+        $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
+        $traverser->addVisitor(new ReflectionVisitor());
+        $traverser->addVisitor($mutationVisitor);
 
         return $traverser;
     }

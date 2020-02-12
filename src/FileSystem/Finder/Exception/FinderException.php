@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\FileSystem\Finder\Exception;
 
 use RuntimeException;
+use function Safe\sprintf;
 
 /**
  * @internal

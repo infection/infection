@@ -61,7 +61,7 @@ final class ConfigurationTest extends TestCase
      * @param Mutator[] $mutators
      */
     public function test_it_can_be_instantiated(
-        ?int $timeout,
+        int $timeout,
         array $sourceDirectories,
         array $sourceFiles,
         Logs $logs,

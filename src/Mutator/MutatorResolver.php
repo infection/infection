@@ -51,9 +51,9 @@ final class MutatorResolver
      * and profiles into a hashmap of mutator raw settings by their mutator
      * class name.
      *
-     * @param array<string, bool|array<mixed>> $mutatorSettings
+     * @param array<string, bool|mixed[]> $mutatorSettings
      *
-     * @return array<string, array<mixed>>
+     * @return array<string, mixed[]>
      */
     public function resolve(array $mutatorSettings): array
     {

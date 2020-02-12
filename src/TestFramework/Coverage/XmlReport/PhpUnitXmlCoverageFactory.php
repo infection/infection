@@ -110,17 +110,19 @@ class PhpUnitXmlCoverageFactory
         foreach ($coverage as $sourceFilePath => $fileCoverageData) {
             foreach ($fileCoverageData->byLine as $line => $linesCoverageData) {
                 foreach ($linesCoverageData as $test) {
-                    $this->updateTestExecutionInfo($test);
+                    self::updateTestExecutionInfo($test, $this->testFileDataProvider);
                 }
             }
         }
     }
 
-    private function updateTestExecutionInfo(CoverageLineData $test): void
-    {
+    private static function updateTestExecutionInfo(
+        CoverageLineData $test,
+        TestFileDataProvider $testFileDataProvider
+    ): void {
         $class = explode('::', $test->testMethod, 2)[0];
 
-        $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
+        $testFileData = $testFileDataProvider->getTestFileInfo($class);
 
         $test->testFilePath = $testFileData->path;
         $test->time = $testFileData->time;

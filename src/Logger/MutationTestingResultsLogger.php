@@ -43,5 +43,5 @@ interface MutationTestingResultsLogger
     /**
      * Logs results of Mutation Testing to somewhere
      */
-    public function log();
+    public function log(): void;
 }

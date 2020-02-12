@@ -57,14 +57,13 @@ final class LineRangeCalculatorTest extends TestCase
      */
     public function test_it_can_find_the_outer_most_array(string $code, array $nodeRange): void
     {
-        $parser = self::getParser();
-        $nodes = $parser->parse($code);
+        $nodes = self::getParser()->parse($code);
+
+        $spy = $this->createSpyTraverser();
 
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new ParentConnectorVisitor());
-        $spy = $this->createSpyTraverser();
         $traverser->addVisitor($spy);
-
         $traverser->traverse($nodes);
 
         $range = $spy->range;
@@ -149,7 +148,7 @@ PHP
     {
         return new class() extends NodeVisitorAbstract {
             /**
-             * @var array<int>
+             * @var int[]
              */
             public $range = [];
 

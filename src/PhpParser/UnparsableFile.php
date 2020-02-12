@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\PhpParser;
 
 use RuntimeException;
+use function Safe\sprintf;
 use Throwable;
 
 /**

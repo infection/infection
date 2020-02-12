@@ -1,7 +1,22 @@
 parameters:
+    checkGenericClassInNonGenericObjectType: false
+    checkMissingIterableValueType: false
     excludes_analyse:
         - %currentWorkingDirectory%/tests/e2e/*
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
+    inferPrivatePropertyTypeFromConstructor: true
     ignoreErrors:
         - '#Return type \(void\) of method .*[Visitor|Traverser].* should be compatible with return type .* of method PhpParser\\Node.*#'
         - '#^Cannot call method willReturn\(\) on array<Infection\\Mutation\\Mutation>\.$#'
+        - '#^PHPDoc tag @var for variable \$sourceFilesCollectorProphecy contains unresolvable type#'
+        -
+            path: '../tests/phpunit/PhpParser/Visitor/MutationsCollectorVisitorTest.php'
+            message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
+            count: 2
+        -
+            path: '../tests/phpunit/TestFramework/Coverage/XmlReport/XMLLineCodeCoverageTest.php'
+            message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
+            count: 2
+    level: 4
+    paths:
+        - ../tests/phpunit

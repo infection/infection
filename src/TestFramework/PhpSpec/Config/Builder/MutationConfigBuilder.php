@@ -41,6 +41,7 @@ use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpSpec\Config\MutationYamlConfiguration;
 use function Safe\file_put_contents;
+use function Safe\sprintf;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -93,6 +94,9 @@ class MutationConfigBuilder extends ConfigBuilder
         return $path;
     }
 
+    /**
+     * @param mixed[] $parsedYaml
+     */
     private function createCustomAutoloadWithInterceptor(string $originalFilePath, string $mutantFilePath, array $parsedYaml): string
     {
         $originalBootstrap = $this->getOriginalBootstrapFilePath($parsedYaml);
@@ -122,6 +126,8 @@ AUTOLOAD;
     }
 
     /**
+     * @param mixed[] $parsedYaml
+     *
      * @return string|null
      */
     private function getOriginalBootstrapFilePath(array $parsedYaml)

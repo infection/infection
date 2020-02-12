@@ -37,6 +37,8 @@ namespace Infection\Tests\Mutator\ReturnValue;
 
 use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use function Safe\file_get_contents;
+use function Safe\sprintf;
 
 /**
  * @group integration Requires some I/O operations
@@ -48,7 +50,7 @@ final class NewObjectTest extends AbstractMutatorTestCase
      *
      * @param string|string[] $expected
      */
-    public function test_it_can_mutate($input, $expected = [], bool $allowed = true, $message = ''): void
+    public function test_it_can_mutate(string $input, $expected = [], bool $allowed = true, string $message = ''): void
     {
         if (!$allowed) {
             $this->markTestSkipped($message);

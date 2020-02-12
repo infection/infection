@@ -42,7 +42,8 @@ use function current;
 use function end;
 use function explode;
 use function implode;
-use function substr;
+use function Safe\substr;
+use function strlen;
 use function trim;
 
 final class DocBlockParser
@@ -77,7 +78,11 @@ final class DocBlockParser
         /** @var string $lastLine */
         $lastLine = current($lines);
 
-        $lines[$nbrOfLines - 1] = substr($lastLine, 0, -2);
+        if (strlen($lastLine) > 1) {
+            $lines[$nbrOfLines - 1] = substr($lastLine, 0, -2);
+        } elseif (strlen($lastLine) === 1) {
+            $lines[$nbrOfLines - 1] = substr($lastLine, 0, -1);
+        }
 
         return implode(
             "\n",

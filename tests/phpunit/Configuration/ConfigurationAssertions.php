@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
-use function array_map;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
@@ -44,6 +43,7 @@ use Infection\Tests\Configuration\Entry\LogsAssertions;
 use Infection\Tests\Configuration\Entry\PhpUnitAssertions;
 use Infection\Tests\TestFramework\TestFrameworkExtraOptionsAssertions;
 use Symfony\Component\Finder\SplFileInfo;
+use function array_map;
 
 trait ConfigurationAssertions
 {

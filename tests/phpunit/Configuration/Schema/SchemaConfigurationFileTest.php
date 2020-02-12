@@ -42,6 +42,7 @@ use Infection\Configuration\Schema\InvalidFile;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use function Safe\sprintf;
 use Seld\JsonLint\ParsingException;
 
 /**

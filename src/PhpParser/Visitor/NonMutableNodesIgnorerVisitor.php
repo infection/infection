@@ -35,30 +35,35 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
+use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use PhpParser\Node;
-use PhpParser\Node\Stmt;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 
 /**
  * @internal
  */
-final class PhpUnitClassCodeCoverageIgnoreVisitor extends NodeVisitorAbstract
+final class NonMutableNodesIgnorerVisitor extends NodeVisitorAbstract
 {
+    /**
+     * @var NodeIgnorer[]
+     */
+    private $nodeIgnorers;
+
+    /**
+     * @param NodeIgnorer[] $nodeIgnorers
+     */
+    public function __construct(array $nodeIgnorers)
+    {
+        $this->nodeIgnorers = $nodeIgnorers;
+    }
+
     public function enterNode(Node $node)
     {
-        if (!$node instanceof Stmt\ClassLike) {
-            return null;
-        }
-
-        $docComment = $node->getDocComment();
-
-        if ($docComment === null) {
-            return null;
-        }
-
-        if (strpos($docComment->getText(), '@codeCoverageIgnore') !== false) {
-            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+        foreach ($this->nodeIgnorers as $nodeIgnorer) {
+            if ($nodeIgnorer->ignores($node)) {
+                return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+            }
         }
 
         return null;

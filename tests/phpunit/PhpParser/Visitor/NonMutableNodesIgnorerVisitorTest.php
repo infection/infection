@@ -35,14 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
-use Infection\PhpParser\Visitor\NotMutableIgnoreVisitor;
+use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
 /**
  * @group integration Requires some I/O operations
  */
-final class NotMutableIgnoreVisitorTest extends BaseVisitorTest
+final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTest
 {
     private $spyVisitor;
 
@@ -51,52 +52,20 @@ final class NotMutableIgnoreVisitorTest extends BaseVisitorTest
         $this->spyVisitor = $this->getSpyVisitor();
     }
 
-    public function test_it_does_not_traverse_interface_methods(): void
+    public function test_it_does_not_traverse_after_ignore(): void
     {
         $this->parseAndTraverse(<<<'PHP'
 <?php
 
-interface Foo
+class Foo
 {
-    public function foo(): array;
-    public function bar(int $number): string;
-}
-PHP
-        );
-
-        $this->assertSame(0, $this->spyVisitor->getNumberOfClassMethodsVisited());
+    public function bar(): void
+    {
     }
-
-    public function test_it_does_not_traverse_abstract_methods(): void
-    {
-        $this->parseAndTraverse(<<<'PHP'
-<?php
-
-abstract class Foo
-{
-    abstract public function foo(): array;
-    abstract public function bar(int $number): string;
 }
 PHP
         );
-
-        $this->assertSame(0, $this->spyVisitor->getNumberOfClassMethodsVisited());
-    }
-
-    public function test_it_traverses_normal_methods_in_abstract_classes(): void
-    {
-        $this->parseAndTraverse(<<<'PHP'
-<?php
-
-abstract class Foo
-{
-    abstract public function foo(): array;
-    public function bar(int $number): string { return ''; }
-}
-PHP
-        );
-
-        $this->assertSame(1, $this->spyVisitor->getNumberOfClassMethodsVisited());
+        $this->assertSame(0, $this->spyVisitor->getNumberOfNodesVisited());
     }
 
     private function getSpyVisitor()
@@ -106,12 +75,10 @@ PHP
 
             public function leaveNode(Node $node): void
             {
-                if ($node instanceof Node\Stmt\ClassMethod) {
-                    ++$this->nodesVisitedCount;
-                }
+                ++$this->nodesVisitedCount;
             }
 
-            public function getNumberOfClassMethodsVisited(): int
+            public function getNumberOfNodesVisited(): int
             {
                 return $this->nodesVisitedCount;
             }
@@ -125,7 +92,12 @@ PHP
         $this->traverse(
             $nodes,
             [
-                new NotMutableIgnoreVisitor(),
+                new NonMutableNodesIgnorerVisitor([new class() implements NodeIgnorer {
+                    public function ignores(Node $node): bool
+                    {
+                        return true;
+                    }
+                }]),
                 $this->spyVisitor,
             ]
         );

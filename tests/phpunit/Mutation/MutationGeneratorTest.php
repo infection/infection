@@ -46,7 +46,7 @@ use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
-use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
+use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
@@ -64,7 +64,7 @@ final class MutationGeneratorTest extends TestCase
         $mutators = ['Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator())];
         $eventDispatcherMock = $this->createMock(EventDispatcher::class);
         $onlyCovered = true;
-        $extraVisitors = [2 => new FakeVisitor()];
+        $nodeIgnorers = [new FakeIgnorer()];
 
         $mutation0 = $this->createMock(Mutation::class);
         $mutation1 = $this->createMock(Mutation::class);
@@ -73,14 +73,14 @@ final class MutationGeneratorTest extends TestCase
         /** @var FileMutationGenerator|ObjectProphecy $fileMutationGeneratorProphecy */
         $fileMutationGeneratorProphecy = $this->prophesize(FileMutationGenerator::class);
         $fileMutationGeneratorProphecy
-            ->generate($fileInfoA, $onlyCovered, $codeCoverageMock, $mutators, $extraVisitors)
+            ->generate($fileInfoA, $onlyCovered, $codeCoverageMock, $mutators, $nodeIgnorers)
             ->willReturn([
                 $mutation0,
                 $mutation1,
             ])
         ;
         $fileMutationGeneratorProphecy
-            ->generate($fileInfoB, $onlyCovered, $codeCoverageMock, $mutators, $extraVisitors)
+            ->generate($fileInfoB, $onlyCovered, $codeCoverageMock, $mutators, $nodeIgnorers)
             ->willReturn([
                 $mutation1,
                 $mutation2,
@@ -102,7 +102,7 @@ final class MutationGeneratorTest extends TestCase
             $fileMutationGeneratorProphecy->reveal()
         );
 
-        $mutations = $mutationGenerator->generate($onlyCovered, $extraVisitors);
+        $mutations = $mutationGenerator->generate($onlyCovered, $nodeIgnorers);
 
         $this->assertSame($expectedMutations, $mutations);
     }

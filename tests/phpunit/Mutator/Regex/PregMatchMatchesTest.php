@@ -42,6 +42,8 @@ final class PregMatchMatchesTest extends AbstractMutatorTestCase
 {
     /**
      * @dataProvider mutationsProvider
+     *
+     * @param string|string[] $output
      */
     public function test_it_can_mutate(string $input, $output = []): void
     {

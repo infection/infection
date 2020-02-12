@@ -43,7 +43,11 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use function min;
 use PhpParser\Node;
+use PhpParser\Node\Expr\ArrayItem;
 use function range;
+use function Safe\sprintf;
+use function strtolower;
+use function strtoupper;
 
 /**
  * @internal
@@ -117,6 +121,11 @@ TXT
         return $node instanceof Node\Expr\Array_ && count($node->items);
     }
 
+    /**
+     * @param ArrayItem[] $items
+     *
+     * @return int[]
+     */
     private function getItemsIndexes(array $items): array
     {
         switch ($this->config->getRemove()) {
