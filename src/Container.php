@@ -692,11 +692,6 @@ final class Container
         return $this->get(SubscriberBuilder::class);
     }
 
-    public function getCommandLineBuilder(): CommandLineBuilder
-    {
-        return $this->get(CommandLineBuilder::class);
-    }
-
     public function getSourceFileCollector(): SourceFileCollector
     {
         return $this->get(SourceFileCollector::class);
