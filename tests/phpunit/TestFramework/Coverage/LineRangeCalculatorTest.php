@@ -158,7 +158,7 @@ PHP
                     $lineRange = new LineRangeCalculator();
                     $this->range = $lineRange->calculateRange($node)->range;
                 }
-                
+
                 return null;
             }
         };
