@@ -39,7 +39,6 @@ use function array_map;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\Tests\Configuration\Entry\LogsAssertions;
 use Infection\Tests\Configuration\Entry\PhpUnitAssertions;
 use Infection\Tests\TestFramework\TestFrameworkExtraOptionsAssertions;
@@ -49,7 +48,6 @@ trait ConfigurationAssertions
 {
     use LogsAssertions;
     use PhpUnitAssertions;
-    use TestFrameworkExtraOptionsAssertions;
 
     /**
      * @param string[] $expectedSourceDirectories
@@ -68,7 +66,7 @@ trait ConfigurationAssertions
         string $expectedTestFramework,
         ?string $expectedBootstrap,
         ?string $expectedInitialTestsPhpOptions,
-        TestFrameworkExtraOptions $expectedTestFrameworkExtraOptions,
+        string $expectedTestFrameworkExtraOptions,
         string $expectedCoveragePath,
         bool $expectedSkipCoverage,
         bool $expectedDebug,
@@ -105,7 +103,7 @@ trait ConfigurationAssertions
         $this->assertSame($expectedTestFramework, $configuration->getTestFramework());
         $this->assertSame($expectedBootstrap, $configuration->getBootstrap());
         $this->assertSame($expectedInitialTestsPhpOptions, $configuration->getInitialTestsPhpOptions());
-        $this->assertTestFrameworkExtraOptionsStateIs(
+        $this->assertSame(
             $expectedTestFrameworkExtraOptions,
             $configuration->getTestFrameworkExtraOptions()
         );

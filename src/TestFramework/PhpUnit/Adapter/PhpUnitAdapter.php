@@ -39,6 +39,7 @@ use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\IgnoresAdditionalNodes;
+use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use function Safe\preg_match;
 use function Safe\sprintf;
 use function version_compare;
@@ -46,7 +47,7 @@ use function version_compare;
 /**
  * @internal
  */
-final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAdditionalNodes, MemoryUsageAware
+final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAdditionalNodes, MemoryUsageAware, ProvidesInitialRunOnlyOptions
 {
     public const COVERAGE_DIR = 'coverage-xml';
 
@@ -111,5 +112,13 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Ignor
     public function getNodeIgnorers(): array
     {
         return [new PhpUnitCodeCoverageAnnotationIgnorer()];
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getInitialRunOnlyOptions(): array
+    {
+        return ['--configuration', '--filter', '--testsuite'];
     }
 }

@@ -91,6 +91,7 @@ use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use InvalidArgumentException;
 use function php_ini_loaded_file;
 use PhpParser\Lexer;
@@ -409,6 +410,9 @@ final class Container
             },
             TestFrameworkFinder::class => static function (): TestFrameworkFinder {
                 return new TestFrameworkFinder();
+            },
+            TestFrameworkExtraOptionsFilter::class => static function (): TestFrameworkExtraOptionsFilter {
+                return new TestFrameworkExtraOptionsFilter();
             },
         ]);
     }
@@ -760,6 +764,11 @@ final class Container
     public function getTestFrameworkFinder(): TestFrameworkFinder
     {
         return $this->get(TestFrameworkFinder::class);
+    }
+
+    public function getTestFrameworkExtraOptionsFilter(): TestFrameworkExtraOptionsFilter
+    {
+        return $this->get(TestFrameworkExtraOptionsFilter::class);
     }
 
     /**

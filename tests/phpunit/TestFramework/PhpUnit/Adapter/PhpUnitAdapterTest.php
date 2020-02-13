@@ -107,6 +107,16 @@ final class PhpUnitAdapterTest extends TestCase
         $this->assertSame($expectedResult, $result);
     }
 
+    public function test_it_provides_initial_run_only_options(): void
+    {
+        $options = $this->adapter->getInitialRunOnlyOptions();
+
+        $this->assertSame(
+            ['--configuration', '--filter', '--testsuite'],
+            $options
+        );
+    }
+
     public function memoryReportProvider(): array
     {
         return [

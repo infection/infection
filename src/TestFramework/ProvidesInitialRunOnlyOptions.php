@@ -33,20 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpSpec;
-
-use Infection\TestFramework\TestFrameworkExtraOptions;
+namespace Infection\TestFramework;
 
 /**
  * @internal
  */
-final class PhpSpecExtraOptions extends TestFrameworkExtraOptions
+interface ProvidesInitialRunOnlyOptions
 {
     /**
      * @return string[]
      */
-    protected function getInitialRunOnlyOptions(): array
-    {
-        return [];
-    }
+    public function getInitialRunOnlyOptions(): array;
 }

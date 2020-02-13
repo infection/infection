@@ -43,9 +43,7 @@ use Infection\Configuration\Entry\PhpUnit;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
-use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
-use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkExtraOptions;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -72,7 +70,7 @@ final class ConfigurationTest extends TestCase
         string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
-        TestFrameworkExtraOptions $testFrameworkExtraOptions,
+        string $testFrameworkExtraOptions,
         string $coveragePath,
         bool $skipCoverage,
         bool $debug,
@@ -156,7 +154,7 @@ final class ConfigurationTest extends TestCase
             'phpunit',
             null,
             null,
-            new DummyTestFrameworkExtraOptions(),
+            '',
             '',
             false,
             false,
@@ -192,7 +190,7 @@ final class ConfigurationTest extends TestCase
             'phpunit',
             'bin/bootstrap.php',
             '-d zend_extension=xdebug.so',
-            new DummyTestFrameworkExtraOptions(),
+            '',
             'coverage/',
             true,
             true,

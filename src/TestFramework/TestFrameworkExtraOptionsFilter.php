@@ -33,37 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpSpec;
+namespace Infection\TestFramework;
 
-use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
-use PHPUnit\Framework\TestCase;
+use function Safe\preg_replace;
+use function Safe\sprintf;
+use function trim;
+use Webmozart\Assert\Assert;
 
-final class PhpSpecExtraOptionsTest extends TestCase
+/**
+ * @internal
+ */
+final class TestFrameworkExtraOptionsFilter
 {
     /**
-     * @dataProvider mutantProcessProvider
+     * @param string[] $initialRunOnlyOptions
+     *
+     * @throws \Safe\Exceptions\PcreException
+     * @throws \Safe\Exceptions\StringsException
      */
-    public function test_it_does_not_change_extra_options_mutant_process(string $sourceExtraOptions): void
+    public function filterForMutantProcess(string $actualExtraOptions, array $initialRunOnlyOptions): string
     {
-        $phpUnitOptions = new PhpSpecExtraOptions($sourceExtraOptions);
+        foreach ($initialRunOnlyOptions as $initialRunOnlyOption) {
+            $actualExtraOptions = preg_replace(sprintf('/%s[\=| ](?:\"[^\"]*\"|\'[^\']*\'|[^\ ]*)/', $initialRunOnlyOption), '', $actualExtraOptions);
+            Assert::notNull($actualExtraOptions);
+        }
 
-        $this->assertSame($sourceExtraOptions, $phpUnitOptions->getForMutantProcess());
-    }
-
-    public function test_it_returns_empty_string_when_source_options_are_null(): void
-    {
-        $phpUnitOptions = new PhpSpecExtraOptions(null);
-
-        $this->assertSame('', $phpUnitOptions->getForInitialProcess());
-        $this->assertSame('', $phpUnitOptions->getForMutantProcess());
-    }
-
-    public function mutantProcessProvider(): array
-    {
-        return [
-            ['--filter=someTest#2 --a --b=value'],
-            ['--a --filter=someTest#2 --b=value'],
-            ['--a --filter someTest#2 --b=value'],
-        ];
+        return (string) preg_replace('/\s+/', ' ', trim($actualExtraOptions));
     }
 }
