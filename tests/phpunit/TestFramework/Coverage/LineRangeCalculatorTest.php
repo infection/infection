@@ -152,7 +152,7 @@ PHP
              */
             public $range = [];
 
-            public function leaveNode(Node $node): void
+            public function leaveNode(Node $node)
             {
                 if ($node instanceof Node\Expr\Variable && $node->name === 'findMe') {
                     $lineRange = new LineRangeCalculator();
