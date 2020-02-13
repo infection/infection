@@ -41,7 +41,6 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Tests\Configuration\Entry\LogsAssertions;
 use Infection\Tests\Configuration\Entry\PhpUnitAssertions;
-use Infection\Tests\TestFramework\TestFrameworkExtraOptionsAssertions;
 use Symfony\Component\Finder\SplFileInfo;
 
 trait ConfigurationAssertions
