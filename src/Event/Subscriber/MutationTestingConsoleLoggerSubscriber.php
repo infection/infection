@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
+use function floor;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\MutantProcessWasFinished;
@@ -42,6 +43,9 @@ use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\MutantProcess;
+use function Safe\sprintf;
+use function str_pad;
+use function str_repeat;
 use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -56,12 +60,15 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
      * @var MutantProcess[]
      */
     private $mutantProcesses = [];
-
     private $output;
     private $outputFormatter;
     private $metricsCalculator;
     private $showMutations;
     private $diffColorizer;
+
+    /**
+     * @var int
+     */
     private $mutationCount = 0;
 
     public function __construct(
@@ -185,6 +192,9 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->output->writeln(['', 'Please note that some mutants will inevitably be harmless (i.e. false positives).']);
     }
 
+    /**
+     * @param int|string $subject
+     */
     private function getPadded($subject, int $padLength = self::PAD_LENGTH): string
     {
         return str_pad((string) $subject, $padLength, ' ', STR_PAD_LEFT);
@@ -195,7 +205,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         return str_repeat(' ', self::PAD_LENGTH + 1) . $string;
     }
 
-    private function getPercentageTag(float $percentage)
+    private function getPercentageTag(float $percentage): string
     {
         if ($percentage >= 0 && $percentage < 50) {
             return 'low';

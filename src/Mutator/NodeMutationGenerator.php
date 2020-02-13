@@ -98,6 +98,8 @@ class NodeMutationGenerator
     }
 
     /**
+     * @param Mutation[] $mutations
+     *
      * @return Mutation[]
      */
     private function generateForMutator(Node $node, Mutator $mutator, array $mutations): array

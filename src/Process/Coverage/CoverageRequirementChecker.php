@@ -38,6 +38,7 @@ namespace Infection\Process\Coverage;
 use Composer\XdebugHandler\XdebugHandler;
 use function extension_loaded;
 use const PHP_SAPI;
+use function Safe\preg_match;
 
 /**
  * @internal

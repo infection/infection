@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Environment;
 
+use function implode;
 use RuntimeException;
+use function Safe\sprintf;
 
 /**
  * @internal

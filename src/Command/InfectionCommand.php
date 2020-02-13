@@ -194,11 +194,8 @@ final class InfectionCommand extends BaseCommand
         $this->startUp();
 
         $engine = new Engine(
-            $this->container->getCoverageRequirementChecker(),
             $this->container->getConfiguration(),
-            $this->container->getFileSystem(),
             $this->container->getTestFrameworkAdapter(),
-            $this->container->getSubscriberBuilder(),
             $this->container->getEventDispatcher(),
             $this->container->getInitialTestsRunner(),
             $this->container->getMemoryLimiter(),

@@ -40,6 +40,7 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
 use InvalidArgumentException;
+use function Safe\sprintf;
 use Symfony\Component\Process\Process;
 
 /**
@@ -179,6 +180,8 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     }
 
     /**
+     * @param string[] $phpExtraArgs
+     *
      * @return string[]
      */
     private function getCommandLine(

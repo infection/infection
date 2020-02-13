@@ -244,12 +244,14 @@ final class MutationTestingRunnerTest extends TestCase
             );
 
             if ($expectedEvent instanceof MutantsCreationWasStarted) {
+                /* @var MutantsCreationWasStarted $event */
                 $this->assertSame($expectedEvent->getMutantCount(), $event->getMutantCount());
 
                 continue;
             }
 
             if ($expectedEvent instanceof MutationTestingWasStarted) {
+                /* @var MutationTestingWasStarted $event */
                 $this->assertSame($expectedEvent->getMutationCount(), $event->getMutationCount());
             }
         }

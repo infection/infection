@@ -35,10 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use function assert;
+use function array_map;
 use function in_array;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
-use function is_string;
+use function Safe\usort;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -64,9 +65,10 @@ final class JUnitTestCaseSorter
 
         return array_map(
             static function (CoverageLineData $coverageLineData): string {
-                assert(is_string($coverageLineData->testFilePath));
+                $testFilePath = $coverageLineData->testFilePath;
+                Assert::string($testFilePath);
 
-                return $coverageLineData->testFilePath;
+                return $testFilePath;
             },
             $uniqueCoverageTests
         );

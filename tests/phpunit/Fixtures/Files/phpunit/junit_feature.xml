@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="acceptance" tests="4" assertions="11" errors="0" failures="0" skipped="0" time="0.604773">
+    <testcase file="/codeception/tests/bdd/FeatureA.feature" name="Feature A: Scenario A1" assertions="6" time="0.039365"/>
+    <testcase file="/codeception/tests/bdd/FeatureB.feature" name="Feature B: Scenario B2" assertions="2" time="0.022857"/>
+    <testcase file="/codeception/tests/bdd/FeatureA.feature" name="Feature A: Scenario A2" assertions="1" time="0.029354"/>
+    <testcase file="/codeception/tests/bdd/FeatureA.feature" name="Feature A: Scenario A3" assertions="2" time="0.025091"/>
+  </testsuite>
+</testsuites>

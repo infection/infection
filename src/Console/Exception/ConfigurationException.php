@@ -40,7 +40,7 @@ namespace Infection\Console\Exception;
  */
 final class ConfigurationException extends InfectionException
 {
-    public static function configurationAborted()
+    public static function configurationAborted(): self
     {
         return new self('Configuration aborted');
     }

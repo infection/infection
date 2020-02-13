@@ -187,6 +187,8 @@ class ConfigurationFactory
     }
 
     /**
+     * @param array<string, mixed> $schemaMutators
+     *
      * @return array<string, Mutator>
      */
     private function retrieveMutators(array $schemaMutators, string $mutatorsInput): array

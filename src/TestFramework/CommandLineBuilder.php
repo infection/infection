@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use function array_filter;
+use function array_merge;
 use Infection\FileSystem\Finder\Exception\FinderException;
+use function is_executable;
 use const PHP_SAPI;
-use function substr;
+use function Safe\substr;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
@@ -46,7 +49,7 @@ use Symfony\Component\Process\PhpExecutableFinder;
 final class CommandLineBuilder
 {
     /**
-     * @var array|null
+     * @var string[]|null
      */
     private $cachedPhpCmdLine;
 

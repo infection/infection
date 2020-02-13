@@ -118,7 +118,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $this->runWithAllKindsOfProcesses(-1);
     }
 
-    private function buildEventDispatcherWithEventCount($eventCount)
+    private function buildEventDispatcherWithEventCount(int $eventCount)
     {
         $eventDispatcher = $this->createMock(EventDispatcher::class);
         $eventDispatcher->expects($this->exactly($eventCount))
@@ -203,7 +203,7 @@ final class ParallelProcessRunnerTest extends TestCase
         return $mutantProcess;
     }
 
-    private function runWithAllKindsOfProcesses($threadCount): void
+    private function runWithAllKindsOfProcesses(int $threadCount): void
     {
         $processes = [];
 

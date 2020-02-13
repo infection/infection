@@ -38,6 +38,8 @@ namespace Infection\Configuration\Schema;
 use function array_map;
 use JsonSchema\Validator;
 use const PHP_EOL;
+use function Safe\sprintf;
+use function strpos;
 
 /**
  * @final

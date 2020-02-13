@@ -39,6 +39,7 @@ use Infection\Exception\InvalidTypeException;
 use Infection\Mutant\Exception\MsiCalculationException;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Process\Runner\TestRunConstraintChecker;
+use function Safe\sprintf;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**

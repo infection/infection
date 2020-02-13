@@ -291,6 +291,9 @@ AST
     private static function createFileInfo(string $path, string $contents): SplFileInfo
     {
         return new class($path, $contents) extends SplFileInfo {
+            /**
+             * @var string
+             */
             private $contents;
 
             public function __construct(string $path, string $contents)

@@ -37,14 +37,14 @@ namespace Infection\Tests\AutoReview\Makefile;
 
 use function array_filter;
 use function array_key_exists;
-use function array_replace;
 use function array_shift;
 use function current;
-use function file_get_contents;
 use function implode;
 use PHPUnit\Framework\TestCase;
+use function Safe\array_replace;
+use function Safe\file_get_contents;
+use function Safe\sprintf;
 use function shell_exec;
-use function sprintf;
 use function strpos;
 use function substr_count;
 

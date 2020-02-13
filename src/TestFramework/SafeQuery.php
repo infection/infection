@@ -33,12 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Config\Guesser;
+namespace Infection\TestFramework;
+
+use DOMElement;
+use DOMNodeList;
+use DOMXPath;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-interface Guesser
+trait SafeQuery
 {
-    public function guess();
+    /**
+     * @return DOMNodeList|DOMElement[]
+     * @phpstan-return DOMNodeList<DOMElement>
+     */
+    private static function safeQuery(DOMXPath $xPath, string $query): DOMNodeList
+    {
+        $nodes = $xPath->query($query);
+
+        Assert::isInstanceOf($nodes, DOMNodeList::class);
+
+        return $nodes;
+    }
 }

@@ -72,7 +72,7 @@ final class FileMutationGeneratorTest extends TestCase
     private $traverserFactoryMock;
 
     /**
-     * @var FileMutationGenerator|MockObject
+     * @var FileMutationGenerator
      */
     private $mutationGenerator;
 

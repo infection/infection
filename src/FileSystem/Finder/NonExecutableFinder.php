@@ -35,11 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem\Finder;
 
+use function array_merge;
+use function explode;
+use function file_exists;
+use function getenv;
+use function Safe\sprintf;
+
 /**
  * @internal
  */
 final class NonExecutableFinder
 {
+    /**
+     * @param string[] $probableNames
+     * @param string[] $extraDirectories
+     */
     public function searchNonExecutables(array $probableNames, array $extraDirectories = []): ?string
     {
         $path = getenv('PATH') ?: getenv('Path');

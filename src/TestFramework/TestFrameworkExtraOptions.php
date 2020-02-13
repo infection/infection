@@ -35,16 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use function Safe\preg_replace;
+use function Safe\sprintf;
+use function trim;
+use Webmozart\Assert\Assert;
+
 /**
  * @internal
  */
 abstract class TestFrameworkExtraOptions
 {
+    /**
+     * @var string
+     */
     private $extraOptions;
 
     public function __construct(?string $extraOptions = null)
     {
-        $this->extraOptions = $extraOptions ?: '';
+        $this->extraOptions = $extraOptions ?? '';
     }
 
     public function getForInitialProcess(): string
@@ -58,6 +66,7 @@ abstract class TestFrameworkExtraOptions
 
         foreach ($this->getInitialRunOnlyOptions() as $initialRunOnlyOption) {
             $extraOptions = preg_replace(sprintf('/%s[\=| ](?:\"[^\"]*\"|\'[^\']*\'|[^\ ]*)/', $initialRunOnlyOption), '', $extraOptions);
+            Assert::notNull($extraOptions);
         }
 
         return (string) preg_replace('/\s+/', ' ', trim($extraOptions));

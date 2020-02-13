@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Extensions;
 
-use function define;
 use function defined;
 use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use function Safe\define;
 
 final class MBStringTest extends AbstractMutatorTestCase
 {

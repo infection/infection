@@ -39,6 +39,7 @@ use Infection\Environment\CouldNotResolveStrykerApiKey;
 use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Http\BadgeApiClient;
 use Infection\Mutant\MetricsCalculator;
+use function Safe\sprintf;
 use stdClass;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -47,9 +48,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class BadgeLogger implements MutationTestingResultsLogger
 {
-    public const ENV_INFECTION_BADGE_API_KEY = 'INFECTION_BADGE_API_KEY';
-    public const ENV_STRYKER_DASHBOARD_API_KEY = 'STRYKER_DASHBOARD_API_KEY';
-
     private $output;
     private $strykerApiKeyResolver;
     private $badgeApiClient;

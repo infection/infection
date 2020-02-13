@@ -37,6 +37,8 @@ namespace Infection\Tests\Mutator\FunctionSignature;
 
 use Generator;
 use Infection\Tests\Mutator\AbstractMutatorTestCase;
+use function Safe\file_get_contents;
+use function Safe\sprintf;
 
 /**
  * @group integration Requires some I/O operations

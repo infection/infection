@@ -3,8 +3,8 @@
 namespace Memory_Aware;
 
 use ErrorException;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\AbstractTestFramework\MemoryUsageAware;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
 
 class FakeAwareAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware
 {

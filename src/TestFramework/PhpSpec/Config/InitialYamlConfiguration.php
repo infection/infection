@@ -45,6 +45,9 @@ final class InitialYamlConfiguration extends AbstractYamlConfiguration
 {
     private $skipCoverage;
 
+    /**
+     * @param mixed[] $parsedYaml
+     */
     public function __construct(string $tmpDir, array $parsedYaml, bool $skipCoverage)
     {
         parent::__construct($tmpDir, $parsedYaml);
@@ -67,6 +70,9 @@ final class InitialYamlConfiguration extends AbstractYamlConfiguration
         return Yaml::dump($this->parsedYaml);
     }
 
+    /**
+     * @param mixed[] $parsedYaml
+     */
     private function updateCodeCoveragePath(array &$parsedYaml): void
     {
         foreach ($parsedYaml['extensions'] as $extensionName => &$options) {
@@ -82,6 +88,9 @@ final class InitialYamlConfiguration extends AbstractYamlConfiguration
         unset($options);
     }
 
+    /**
+     * @param mixed[] $parsedYaml
+     */
     private function removeCoverageExtension(array &$parsedYaml): void
     {
         foreach ($parsedYaml['extensions'] as $extensionName => &$options) {

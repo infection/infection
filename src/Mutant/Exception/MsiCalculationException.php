@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutant\Exception;
 
 use LogicException;
+use function Safe\sprintf;
 
 /**
  * @internal

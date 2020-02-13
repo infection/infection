@@ -39,6 +39,9 @@ use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\IgnoresAdditionalNodes;
+use function Safe\preg_match;
+use function Safe\sprintf;
+use function version_compare;
 
 /**
  * @internal

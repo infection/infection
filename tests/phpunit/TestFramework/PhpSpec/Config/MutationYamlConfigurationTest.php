@@ -41,10 +41,19 @@ use Symfony\Component\Yaml\Yaml;
 
 final class MutationYamlConfigurationTest extends TestCase
 {
-    protected $tempDir = '/path/to/tmp';
+    /**
+     * @var string
+     */
+    private $tempDir = '/path/to/tmp';
 
+    /**
+     * @var string
+     */
     private $customAutoloadFilePath = '/custom/path';
 
+    /**
+     * @var array<string, mixed>
+     */
     private $defaultConfig = [
         'extensions' => [
             'FirstExtension' => [],
@@ -88,7 +97,7 @@ final class MutationYamlConfigurationTest extends TestCase
         $this->assertSame($this->customAutoloadFilePath, $parsedYaml['bootstrap']);
     }
 
-    protected function getConfigurationObject(array $configArray = [])
+    private function getConfigurationObject(array $configArray = []): MutationYamlConfiguration
     {
         return new MutationYamlConfiguration(
             $this->tempDir,

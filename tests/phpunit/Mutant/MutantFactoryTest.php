@@ -74,7 +74,7 @@ final class MutantFactoryTest extends FileSystemTestCase
     private $differMock;
 
     /**
-     * @var MutantFactory|MockObject
+     * @var MutantFactory
      */
     private $mutantFactory;
 
