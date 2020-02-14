@@ -59,14 +59,14 @@ final class BadgeLogger implements MutationTestingResultsLogger
 
     public function __construct(
         OutputInterface $output,
-        BuildContextResolver $platformResolver,
+        BuildContextResolver $buildContextResolver,
         StrykerApiKeyResolver $strykerApiKeyResolver,
         BadgeApiClient $badgeApiClient,
         MetricsCalculator $metricsCalculator,
         stdClass $config
     ) {
         $this->output = $output;
-        $this->buildContextResolver = $platformResolver;
+        $this->buildContextResolver = $buildContextResolver;
         $this->strykerApiKeyResolver = $strykerApiKeyResolver;
         $this->badgeApiClient = $badgeApiClient;
         $this->metricsCalculator = $metricsCalculator;

@@ -37,8 +37,8 @@ namespace Infection\Logger;
 
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
-use Infection\Environment\BuildContextResolver;
 use Infection\Environment\StrykerApiKeyResolver;
+use Infection\Environment\TravisCiResolver;
 use Infection\Http\BadgeApiClient;
 use Infection\Mutant\MetricsCalculator;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -169,7 +169,7 @@ final class LoggerFactory
     {
         return new BadgeLogger(
             $output,
-            new BuildContextResolver(),
+            new TravisCiResolver(),
             new StrykerApiKeyResolver(),
             new BadgeApiClient($output),
             $this->metricsCalculator,
