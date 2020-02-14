@@ -92,4 +92,9 @@ TXT
             self::INFECTION_USAGE_SUGGESTION
         );
     }
+
+    public static function mustAlreadyExist(): self
+    {
+        return new self('When skipping the initial test suite run, existing code coverage must be provided using --coverage');
+    }
 }

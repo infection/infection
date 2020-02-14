@@ -246,6 +246,10 @@ final class InfectionCommand extends BaseCommand
 
         $coverageChecker = $this->container->getCoverageRequirementChecker();
 
+        if ($coverageChecker->hasSkipInitialTestsWithoutCoverageOption()) {
+            throw CoverageDoesNotExistException::mustAlreadyExist();
+        }
+
         if (!$coverageChecker->hasDebuggerOrCoverageOption()) {
             throw CoverageDoesNotExistException::unableToGenerate();
         }

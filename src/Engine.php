@@ -113,6 +113,7 @@ final class Engine
     private function runInitialTestSuite(): void
     {
         if ($this->config->shouldSkipInitialTests()) {
+            $this->consoleOutput->logSkippingInitialTests();
             $this->assertCodeCoverageExists($this->config->getTestFramework());
 
             return;

@@ -290,7 +290,8 @@ final class Container
                 $config = $container->getConfiguration();
 
                 return new CoverageRequirementChecker(
-                    $config->getCoveragePath() !== '',
+                    $config->shouldSkipCoverage(),
+                    $config->shouldSkipInitialTests(),
                     $config->getInitialTestsPhpOptions() ?? ''
                 );
             },
