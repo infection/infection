@@ -38,7 +38,6 @@ namespace Infection\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Mutator\Mutator;
-use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -100,7 +99,7 @@ class Configuration
         string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
-        TestFrameworkExtraOptions $testFrameworkExtraOptions,
+        string $testFrameworkExtraOptions,
         string $coveragePath,
         bool $skipCoverage,
         bool $debug,
@@ -209,7 +208,7 @@ class Configuration
         return $this->initialTestsPhpOptions;
     }
 
-    public function getTestFrameworkExtraOptions(): TestFrameworkExtraOptions
+    public function getTestFrameworkExtraOptions(): string
     {
         return $this->testFrameworkExtraOptions;
     }
