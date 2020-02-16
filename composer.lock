@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "95b87437f390d923c2daf955e4aadd0c",
+    "content-hash": "d3a8fa091b0044699663b92039e79aa8",
     "packages": [
         {
             "name": "composer/xdebug-handler",
@@ -987,25 +987,25 @@
         },
         {
             "name": "thecodingmachine/safe",
-            "version": "v0.1.16",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thecodingmachine/safe.git",
-                "reference": "4e8f840f0a0a2ea167813c3994a7fc527c3c2182"
+                "reference": "6662d0bef91fe5d44178cb2c38d51c5d16b65d23"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thecodingmachine/safe/zipball/4e8f840f0a0a2ea167813c3994a7fc527c3c2182",
-                "reference": "4e8f840f0a0a2ea167813c3994a7fc527c3c2182",
+                "url": "https://api.github.com/repos/thecodingmachine/safe/zipball/6662d0bef91fe5d44178cb2c38d51c5d16b65d23",
+                "reference": "6662d0bef91fe5d44178cb2c38d51c5d16b65d23",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.1"
+                "php": ">=7.2"
             },
             "require-dev": {
-                "phpstan/phpstan": "^0.10.3",
+                "phpstan/phpstan": "^0.12",
                 "squizlabs/php_codesniffer": "^3.2",
-                "thecodingmachine/phpstan-strict-rules": "^0.10.3"
+                "thecodingmachine/phpstan-strict-rules": "^0.12"
             },
             "type": "library",
             "extra": {
@@ -1115,7 +1115,7 @@
                 "MIT"
             ],
             "description": "PHP core functions that throw exceptions instead of returning FALSE on error",
-            "time": "2019-06-25T08:45:33+00:00"
+            "time": "2020-01-20T08:44:36+00:00"
         },
         {
             "name": "webmozart/assert",
