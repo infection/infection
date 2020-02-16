@@ -162,11 +162,45 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertSame($this->projectPath . '/*Bundle', p($directories[0]->nodeValue));
     }
 
+    public function test_it_stops_on_failure(): void
+    {
+        $xml = file_get_contents($this->builder->build('6.5'));
+
+        $value = $this->queryXpath($xml, '/phpunit/@stopOnFailure')[0]->nodeValue;
+
+        $this->assertSame('true', $value);
+    }
+
+    public function test_it_deactivates_the_colors(): void
+    {
+        $xml = file_get_contents($this->builder->build('6.5'));
+
+        $value = $this->queryXpath($xml, '/phpunit/@colors')[0]->nodeValue;
+
+        $this->assertSame('false', $value);
+    }
+
+    public function test_it_disables_caching(): void
+    {
+        $xml = file_get_contents($this->builder->build('6.5'));
+
+        $value = $this->queryXpath($xml, '/phpunit/@cacheResult')[0]->nodeValue;
+
+        $this->assertSame('false', $value);
+    }
+
+    public function test_it_deactivates_stderr_redirection(): void
+    {
+        $xml = file_get_contents($this->builder->build('6.5'));
+
+        $value = $this->queryXpath($xml, '/phpunit/@stderr')[0]->nodeValue;
+
+        $this->assertSame('false', $value);
+    }
+
     public function test_it_replaces_bootstrap_file(): void
     {
-        $configurationPath = $this->builder->build('6.5');
-
-        $xml = file_get_contents($configurationPath);
+        $xml = file_get_contents($this->builder->build('6.5'));
 
         $value = p($this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue);
 
@@ -175,9 +209,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_removes_original_loggers(): void
     {
-        $configurationPath = $this->builder->build('6.5');
-
-        $xml = file_get_contents($configurationPath);
+        $xml = file_get_contents($this->builder->build('6.5'));
 
         $nodeList = $this->queryXpath($xml, '/phpunit/logging/log[@type="coverage-html"]');
 
@@ -186,17 +218,21 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_adds_needed_loggers(): void
     {
-        $configurationPath = $this->builder->build('6.5');
+        $xml = file_get_contents($this->builder->build('6.5'));
 
-        $xml = file_get_contents($configurationPath);
-
-        /** @var DOMNodeList $logEntries */
         $logEntries = $this->queryXpath($xml, '/phpunit/logging/log');
 
+        $this->assertInstanceOf(DOMNodeList::class, $logEntries);
+
         $this->assertSame(2, $logEntries->length);
+
+        // XML coverage logger
         $this->assertSame($this->tmp . '/coverage-xml', $logEntries[0]->getAttribute('target'));
         $this->assertSame('coverage-xml', $logEntries[0]->getAttribute('type'));
+
+        // JUnit coverage logger
         $this->assertSame('junit', $logEntries[1]->getAttribute('type'));
+        $this->assertSame('/path/to/junit.xml', $logEntries[1]->getAttribute('target'));
     }
 
     public function test_it_does_not_add_coverage_loggers_if_should_be_skipped(): void
@@ -205,8 +241,9 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
         $xml = file_get_contents($builder->build('6.5'));
 
-        /** @var DOMNodeList $logEntries */
         $logEntries = $this->queryXpath($xml, '/phpunit/logging/log');
+
+        $this->assertInstanceOf(DOMNodeList::class, $logEntries);
 
         $this->assertSame(0, $logEntries->length);
     }
@@ -217,46 +254,50 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
         $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath)->build('6.5'));
 
-        /** @var DOMNodeList $filterNodes */
         $filterNodes = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
+
+        $this->assertInstanceOf(DOMNodeList::class, $filterNodes);
 
         $this->assertSame(2, $filterNodes->length);
     }
 
     public function test_it_does_not_create_coverage_filter_whitelist_node_if_already_exist(): void
     {
-        $configurationPath = $this->builder->build('6.5');
+        $xml = file_get_contents($this->builder->build('6.5'));
 
-        $xml = file_get_contents($configurationPath);
-
-        /** @var DOMNodeList $filterNodes */
         $filterNodes = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
+
+        $this->assertInstanceOf(DOMNodeList::class, $filterNodes);
 
         $this->assertSame(1, $filterNodes->length);
     }
 
     public function test_it_removes_printer_class(): void
     {
-        $configurationPath = $this->builder->build('6.5');
+        $xml = file_get_contents($this->builder->build('6.5'));
 
-        $xml = file_get_contents($configurationPath);
-
-        /** @var DOMNodeList $filterNodes */
         $filterNodes = $this->queryXpath($xml, '/phpunit/@printerClass');
+
+        $this->assertInstanceOf(DOMNodeList::class, $filterNodes);
+
         $this->assertSame(0, $filterNodes->length);
     }
 
     /**
      * @dataProvider executionOrderProvider
      */
-    public function test_it_adds_execution_order_for_proper_phpunit_versions(string $version, string $attributeName, int $expectedNodeCount): void
+    public function test_it_adds_execution_order_for_proper_phpunit_versions(
+        string $version,
+        string $attributeName,
+        int $expectedNodeCount
+    ): void
     {
-        $configurationPath = $this->builder->build($version);
+        $xml = file_get_contents($this->builder->build($version));
 
-        $xml = file_get_contents($configurationPath);
-
-        /** @var DOMNodeList $filterNodes */
         $filterNodes = $this->queryXpath($xml, sprintf('/phpunit/@%s', $attributeName));
+
+        $this->assertInstanceOf(DOMNodeList::class, $filterNodes);
+
         $this->assertSame($expectedNodeCount, $filterNodes->length);
     }
 
@@ -268,27 +309,69 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
         $xml = file_get_contents($builder->build('7.2'));
 
-        /** @var DOMNodeList $filterNodes */
         $filterNodes = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'executionOrder'));
+
+        $this->assertInstanceOf(DOMNodeList::class, $filterNodes);
+
         $this->assertSame('reverse', $filterNodes[0]->value);
 
         $filterNodes = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'resolveDependencies'));
+
         $this->assertSame(0, $filterNodes->length);
+    }
+
+    public function test_it_creates_a_configuration(): void
+    {
+        $builder = $this->createConfigBuilder(
+            self::FIXTURES.'/phpunit.xml',
+            true
+        );
+
+        $configurationPath = $builder->build('6.5');
+
+        $this->assertFileEquals(
+            self::FIXTURES.'/expected-phpunitConfiguration.initial.infection.xml',
+            $configurationPath
+        );
     }
 
     public function executionOrderProvider(): Generator
     {
-        yield 'PHPUnit 7.1.99 runs without random test order' => ['7.1.99', 'executionOrder', 0];
+        yield 'PHPUnit 7.1.99 runs without random test order' => [
+            '7.1.99',
+            'executionOrder',
+            0
+        ];
 
-        yield 'PHPUnit 7.2 runs with random test order' => ['7.2', 'executionOrder', 1];
+        yield 'PHPUnit 7.2 runs with random test order' => [
+            '7.2',
+            'executionOrder',
+            1
+        ];
 
-        yield 'PHPUnit 7.3.1 runs with random test order' => ['7.3.1', 'executionOrder', 1];
+        yield 'PHPUnit 7.3.1 runs with random test order' => [
+            '7.3.1',
+            'executionOrder',
+            1
+        ];
 
-        yield 'PHPUnit 7.1.99 runs without dependency resolver' => ['7.1.99', 'resolveDependencies', 0];
+        yield 'PHPUnit 7.1.99 runs without dependency resolver' => [
+            '7.1.99',
+            'resolveDependencies',
+            0
+        ];
 
-        yield 'PHPUnit 7.2 runs with dependency resolver' => ['7.2', 'resolveDependencies', 1];
+        yield 'PHPUnit 7.2 runs with dependency resolver' => [
+            '7.2',
+            'resolveDependencies',
+            1
+        ];
 
-        yield 'PHPUnit 7.3.1 runs dependency resolver' => ['7.3.1', 'resolveDependencies', 1];
+        yield 'PHPUnit 7.3.1 runs dependency resolver' => [
+            '7.3.1',
+            'resolveDependencies',
+            1
+        ];
     }
 
     private function queryXpath(string $xml, string $query)

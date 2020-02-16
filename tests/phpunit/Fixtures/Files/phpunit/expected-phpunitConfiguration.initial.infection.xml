@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2017 Maks Rafalko
+  ~
+  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+  -->
+<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="/Users/tfidry/Project/Humbug/infection/tests/phpunit/Fixtures/Files/phpunit/project-path/app/autoload2.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" defaultTestSuite="unit" stopOnFailure="true" cacheResult="false" stderr="false">
+  <testsuites>
+    <testsuite name="Application Test Suite">
+      <directory>/Users/tfidry/Project/Humbug/infection/tests/phpunit/Fixtures/Files/phpunit/project-path/*Bundle</directory>
+    </testsuite>
+  </testsuites>
+  <filter>
+    <whitelist>
+      <directory>/Users/tfidry/Project/Humbug/infection/tests/phpunit/Fixtures/Files/phpunit/project-path/src/</directory>
+      <!--<exclude>-->
+      <!--<directory>src/*Bundle/Resources</directory>-->
+      <!--<directory>src/*/*Bundle/Resources</directory>-->
+      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
+      <!--</exclude>-->
+    </whitelist>
+  </filter>
+</phpunit>
