@@ -54,6 +54,7 @@ use Webmozart\Assert\Assert;
 class InitialConfigBuilder implements ConfigBuilder
 {
     use SafeQuery;
+
     private $tmpDir;
     private $originalXmlConfigContent;
     private $xmlConfigurationHelper;
@@ -72,6 +73,11 @@ class InitialConfigBuilder implements ConfigBuilder
         array $srcDirs,
         bool $skipCoverage
     ) {
+        Assert::notEmpty(
+            $originalXmlConfigContent,
+            'The original XML config content cannot be an empty string'
+        );
+
         $this->tmpDir = $tmpDir;
         $this->originalXmlConfigContent = $originalXmlConfigContent;
         $this->xmlConfigurationHelper = $xmlConfigurationHelper;

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit cacheResult="false"
+         colors="false"
+         
+         stderr="false" stopOnFailure="true">
+
+    <testsuites>
+        <testsuite name="Application Test Suite">
+            <directory>/path/to/src</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory>/path/to/src/</directory>
+        </whitelist>
+    </filter>
+
+    <!-- comment -->
+</phpunit>

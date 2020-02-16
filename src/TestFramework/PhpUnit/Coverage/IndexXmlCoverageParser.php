@@ -62,6 +62,7 @@ use Webmozart\Assert\Assert;
 class IndexXmlCoverageParser
 {
     use SafeQuery;
+
     private $coverageDir;
 
     public function __construct(string $coverageDir)

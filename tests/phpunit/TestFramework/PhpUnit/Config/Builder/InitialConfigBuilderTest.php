@@ -40,26 +40,31 @@ use DOMNodeList;
 use DOMXPath;
 use Generator;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
+use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Tests\FileSystem\FileSystemTestCase;
+use InvalidArgumentException;
 use function Infection\Tests\normalizePath as p;
 use function Safe\file_get_contents;
 use function Safe\realpath;
 use function Safe\sprintf;
 use Symfony\Component\Filesystem\Filesystem;
+use function simplexml_load_string;
 
 /**
  * @group integration Requires some I/O operations
  */
 final class InitialConfigBuilderTest extends FileSystemTestCase
 {
+    private const FIXTURES = __DIR__ . '/../../../../Fixtures/Files/phpunit';
+
     public const HASH = 'a1b2c3';
 
     /**
      * @var string
      */
-    private $pathToProject;
+    private $projectPath;
 
     /**
      * @var InitialConfigBuilder
@@ -70,22 +75,91 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     {
         parent::setUp();
 
-        $this->pathToProject = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
+        $this->projectPath = p(realpath(self::FIXTURES.'/project-path'));
 
-        $this->createConfigBuilder();
+        $this->builder = $this->createConfigBuilder();
+    }
+
+    public function test_it_builds_and_dump_the_XML_configuration(): void
+    {
+        $configurationPath = $this->builder->build('6.5');
+
+        $this->assertSame(
+            $this->tmp.'/phpunitConfiguration.initial.infection.xml',
+            $configurationPath
+        );
+
+        $this->assertFileExists($configurationPath);
+
+        $xml = file_get_contents($configurationPath);
+
+        $this->assertNotFalse(
+            @simplexml_load_string($xml),
+            'Expected dumped configuration content to be a valid XML file.'
+        );
+    }
+
+    public function test_it_preserves_white_spaces_and_formatting(): void
+    {
+        $builder = $this->createConfigBuilder(
+            self::FIXTURES.'/format-whitespace/original-phpunit.xml',
+            true
+        );
+
+        $configurationPath = $builder->build('6.5');
+
+        $this->assertFileEquals(
+            self::FIXTURES.'/format-whitespace/expected-phpunit.xml',
+            $configurationPath
+        );
+    }
+
+    public function test_the_original_XML_config_must_be_a_valid_XML_file(): void
+    {
+        try {
+            $this->createConfigBuilder(
+                self::FIXTURES.'/invalid/empty-phpunit.xml',
+                true
+            );
+
+            $this->fail('Expected an exception to be thrown.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'The original XML config content cannot be an empty string',
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function test_the_original_XML_config_must_be_a_valid_PHPUnit_config_file(): void
+    {
+        $builder = $this->createConfigBuilder(
+            self::FIXTURES.'/invalid/invalid-phpunit.xml',
+            true
+        );
+
+        try {
+            $builder->build('x');
+
+            $this->fail('Expected an exception to be thrown.');
+        } catch (InvalidPhpUnitXmlConfigException $exception) {
+            $this->assertSame(
+                'phpunit.xml does not contain a valid PHPUnit configuration.',
+                $exception->getMessage()
+            );
+        }
     }
 
     public function test_it_replaces_relative_path_to_absolute_path(): void
     {
-        $configurationPath = $this->builder->build('6.5');
+        $xml = file_get_contents($this->builder->build('6.5'));
 
-        $xml = file_get_contents($configurationPath);
-
-        /** @var DOMNodeList $directories */
         $directories = $this->queryXpath($xml, '/phpunit/testsuites/testsuite/directory');
 
+        $this->assertInstanceOf(DOMNodeList::class, $directories);
+
         $this->assertSame(1, $directories->length);
-        $this->assertSame($this->pathToProject . '/*Bundle', p($directories[0]->nodeValue));
+        $this->assertSame($this->projectPath . '/*Bundle', p($directories[0]->nodeValue));
     }
 
     public function test_it_replaces_bootstrap_file(): void
@@ -96,7 +170,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
         $value = p($this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue);
 
-        $this->assertSame($this->pathToProject . '/app/autoload2.php', $value);
+        $this->assertSame($this->projectPath . '/app/autoload2.php', $value);
     }
 
     public function test_it_removes_original_loggers(): void
@@ -127,10 +201,9 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_does_not_add_coverage_loggers_if_should_be_skipped(): void
     {
-        $this->createConfigBuilder(null, true);
-        $configurationPath = $this->builder->build('6.5');
+        $builder = $this->createConfigBuilder(null, true);
 
-        $xml = file_get_contents($configurationPath);
+        $xml = file_get_contents($builder->build('6.5'));
 
         /** @var DOMNodeList $logEntries */
         $logEntries = $this->queryXpath($xml, '/phpunit/logging/log');
@@ -140,12 +213,9 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_creates_coverage_filter_whitelist_node_if_does_not_exist(): void
     {
-        $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit_without_coverage_whitelist.xml';
-        $this->createConfigBuilder($phpunitXmlPath);
+        $phpunitXmlPath = self::FIXTURES.'/phpunit_without_coverage_whitelist.xml';
 
-        $configurationPath = $this->builder->build('6.5');
-
-        $xml = file_get_contents($configurationPath);
+        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath)->build('6.5'));
 
         /** @var DOMNodeList $filterNodes */
         $filterNodes = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
@@ -192,12 +262,11 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_does_not_update_order_if_it_is_already_set(): void
     {
-        $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit_with_order_set.xml';
-        $this->createConfigBuilder($phpunitXmlPath);
+        $phpunitXmlPath = self::FIXTURES.'/phpunit_with_order_set.xml';
 
-        $configurationPath = $this->builder->build('7.2');
+        $builder = $this->createConfigBuilder($phpunitXmlPath);
 
-        $xml = file_get_contents($configurationPath);
+        $xml = file_get_contents($builder->build('7.2'));
 
         /** @var DOMNodeList $filterNodes */
         $filterNodes = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'executionOrder'));
@@ -226,21 +295,23 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     {
         $dom = new DOMDocument();
         $dom->loadXML($xml);
-        $xPath = new DOMXPath($dom);
 
-        return $xPath->query($query);
+        return (new DOMXPath($dom))->query($query);
     }
 
-    private function createConfigBuilder(?string $phpUnitXmlConfigPath = null, bool $skipCoverage = false): void
+    private function createConfigBuilder(
+        ?string $originalPhpUnitXmlConfigPath = null,
+        bool $skipCoverage = false
+    ): InitialConfigBuilder
     {
-        $phpunitXmlPath = $phpUnitXmlConfigPath ?: __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit.xml';
+        $phpunitXmlPath = $originalPhpUnitXmlConfigPath ?: self::FIXTURES.'/phpunit.xml';
 
         $jUnitFilePath = '/path/to/junit.xml';
         $srcDirs = ['src', 'app'];
 
-        $replacer = new PathReplacer(new Filesystem(), $this->pathToProject);
+        $replacer = new PathReplacer(new Filesystem(), $this->projectPath);
 
-        $this->builder = new InitialConfigBuilder(
+        return new InitialConfigBuilder(
             $this->tmp,
             file_get_contents($phpunitXmlPath),
             new XmlConfigurationHelper($replacer, ''),

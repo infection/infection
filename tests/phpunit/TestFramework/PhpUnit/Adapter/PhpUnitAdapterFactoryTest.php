@@ -44,7 +44,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class PhpUnitAdapterFactoryTest extends TestCase
 {
-    public function test_it_creates_phpunit_adapter(): void
+    public function test_it_can_create_an_adapter(): void
     {
         $adapter = PhpUnitAdapterFactory::create(
             '/path/to/phpunit',
@@ -57,6 +57,6 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             true
         );
 
-        $this->assertInstanceOf(PhpUnitAdapter::class, $adapter);
+        $this->assertSame('PHPUnit', $adapter->getName());
     }
 }
