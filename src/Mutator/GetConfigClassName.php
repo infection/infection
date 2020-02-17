@@ -33,33 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Extensions;
-
-use Infection\Mutator\AllowedFunctionsConfig;
-use Infection\Mutator\MutatorConfig;
+namespace Infection\Mutator;
 
 /**
  * @internal
  */
-final class BCMathConfig extends AllowedFunctionsConfig implements MutatorConfig
+trait GetConfigClassName
 {
-    private const KNOWN_FUNCTIONS = [
-        'bcadd',
-        'bccomp',
-        'bcdiv',
-        'bcmod',
-        'bcmul',
-        'bcpow',
-        'bcsub',
-        'bcsqrt',
-        'bcpowmod',
-    ];
-
-    /**
-     * @param array<string, bool> $settings
-     */
-    public function __construct(array $settings)
+    public static function getConfigClassName(): string
     {
-        parent::__construct($settings, self::KNOWN_FUNCTIONS);
+        return self::class . 'Config';
     }
 }

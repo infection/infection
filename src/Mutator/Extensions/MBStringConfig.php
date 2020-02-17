@@ -36,11 +36,12 @@ declare(strict_types=1);
 namespace Infection\Mutator\Extensions;
 
 use Infection\Mutator\AllowedFunctionsConfig;
+use Infection\Mutator\MutatorConfig;
 
 /**
  * @internal
  */
-final class MBStringConfig extends AllowedFunctionsConfig
+final class MBStringConfig extends AllowedFunctionsConfig implements MutatorConfig
 {
     private const KNOWN_FUNCTIONS = [
         'mb_chr',
