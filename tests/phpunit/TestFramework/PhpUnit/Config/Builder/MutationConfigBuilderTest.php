@@ -120,6 +120,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         );
 
         $tmp = $this->tmp;
+        $projectPath = $this->projectPath;
 
         $this->assertSame(
             <<<XML
@@ -135,7 +136,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
   </testsuites>
   <filter>
     <whitelist>
-      <directory>/Users/tfidry/Project/Humbug/infection/tests/phpunit/Fixtures/Files/phpunit/project-path/src/</directory>
+      <directory>$projectPath/src/</directory>
       <!--<exclude>-->
       <!--<directory>src/*Bundle/Resources</directory>-->
       <!--<directory>src/*/*Bundle/Resources</directory>-->
@@ -154,6 +155,7 @@ XML
     public function test_it_can_build_the_config_for_multiple_mutations(): void
     {
         $tmp = $this->tmp;
+        $projectPath = $this->projectPath;
 
         $this->assertSame(
             <<<XML
@@ -171,7 +173,7 @@ XML
   </testsuites>
   <filter>
     <whitelist>
-      <directory>/Users/tfidry/Project/Humbug/infection/tests/phpunit/Fixtures/Files/phpunit/project-path/src/</directory>
+      <directory>$projectPath/src/</directory>
       <!--<exclude>-->
       <!--<directory>src/*Bundle/Resources</directory>-->
       <!--<directory>src/*/*Bundle/Resources</directory>-->
@@ -215,7 +217,7 @@ XML
   </testsuites>
   <filter>
     <whitelist>
-      <directory>/Users/tfidry/Project/Humbug/infection/tests/phpunit/Fixtures/Files/phpunit/project-path/src/</directory>
+      <directory>$projectPath/src/</directory>
       <!--<exclude>-->
       <!--<directory>src/*Bundle/Resources</directory>-->
       <!--<directory>src/*/*Bundle/Resources</directory>-->
