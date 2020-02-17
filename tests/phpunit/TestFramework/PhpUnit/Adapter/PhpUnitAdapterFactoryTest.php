@@ -58,4 +58,14 @@ final class PhpUnitAdapterFactoryTest extends TestCase
 
         $this->assertSame('PHPUnit', $adapter->getName());
     }
+
+    public function test_it_has_a_name(): void
+    {
+        $this->assertSame('phpunit', PhpUnitAdapterFactory::getAdapterName());
+    }
+
+    public function test_it_has_an_executable(): void
+    {
+        $this->assertSame('phpunit', PhpUnitAdapterFactory::getExecutableName());
+    }
 }

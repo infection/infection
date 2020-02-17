@@ -58,7 +58,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     /**
      * @var string|null
      */
-    private $cachedVersion;
+    private $version;
 
     public function __construct(
         string $testFrameworkExecutable,
@@ -125,8 +125,8 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
 
     public function getVersion(): string
     {
-        if ($this->cachedVersion !== null) {
-            return $this->cachedVersion;
+        if ($this->version !== null) {
+            return $this->version;
         }
 
         $testFrameworkVersionExecutable = $this->commandLineBuilder->build(
@@ -145,10 +145,10 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         } catch (InvalidArgumentException $e) {
             $version = 'unknown';
         } finally {
-            $this->cachedVersion = $version;
+            $this->version = $version;
         }
 
-        return $this->cachedVersion;
+        return $this->version;
     }
 
     public function getInitialTestsFailRecommendations(string $commandLine): string
