@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eafa5fb9823a78b021ba2f630c6bacff",
+    "content-hash": "0a202aa9e1e11d9c9cb647e7fe1dc3c2",
     "packages": [
         {
             "name": "composer/xdebug-handler",
@@ -210,6 +210,64 @@
             ],
             "description": "Stream Wrapper: Include Interceptor. Allows to replace included (autoloaded) file with another one.",
             "time": "2020-01-27T10:28:21+00:00"
+        },
+        {
+            "name": "infection/phpspec-adapter",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/infection/phpspec-adapter.git",
+                "reference": "b859bd80d3349bdcb17dae7016f081ca296267bc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/infection/phpspec-adapter/zipball/b859bd80d3349bdcb17dae7016f081ca296267bc",
+                "reference": "b859bd80d3349bdcb17dae7016f081ca296267bc",
+                "shasum": ""
+            },
+            "require": {
+                "infection/abstract-testframework-adapter": "^0.2.3",
+                "infection/include-interceptor": "^0.2.3",
+                "symfony/filesystem": "^3.4.29 || ^4.0 || ^5.0",
+                "symfony/process": "^3.4.29 || ^4.0 || ^5.0",
+                "symfony/yaml": "^3.4.29 || ^4.0 || ^5.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.16",
+                "infection/infection": "^0.15.2",
+                "php-coveralls/php-coveralls": "^2.2",
+                "phpstan/extension-installer": "^1.0",
+                "phpstan/phpstan": "^0.12.10",
+                "phpstan/phpstan-phpunit": "^0.12.6",
+                "phpstan/phpstan-strict-rules": "^0.12.2",
+                "phpstan/phpstan-webmozart-assert": "^0.12.2",
+                "phpunit/phpunit": "^8.5",
+                "thecodingmachine/safe": "^0.1.16",
+                "vimeo/psalm": "^3.8"
+            },
+            "type": "infection-extension",
+            "extra": {
+                "infection": {
+                    "class": "Infection\\TestFramework\\PhpSpec\\PhpSpecAdapterFactory"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Infection\\TestFramework\\PhpSpec\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Maks Rafalko",
+                    "email": "maks.rafalko@gmail.com"
+                }
+            ],
+            "description": "PHPSpec Test Framework Adapter for Infection",
+            "time": "2020-02-16T12:44:11+00:00"
         },
         {
             "name": "justinrainbow/json-schema",

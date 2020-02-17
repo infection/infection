@@ -1,7 +1,0 @@
-suites:
-  source_suite:
-    namespace: TestFrameworks
-    psr4_prefix: TestFrameworks
-
-extensions:
-  LeanPHP\PhpSpec\CodeCoverage\CodeCoverageExtension: ~
