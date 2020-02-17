@@ -37,9 +37,10 @@ namespace Infection\Mutator\Removal;
 
 use function count;
 use Generator;
+use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetConfigClassName;
 use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use function min;
 use PhpParser\Node;
@@ -49,9 +50,10 @@ use function range;
 /**
  * @internal
  */
-final class ArrayItemRemoval implements Mutator
+final class ArrayItemRemoval implements ConfigurableMutator
 {
     use GetMutatorName;
+    use GetConfigClassName;
 
     private $config;
 

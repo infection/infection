@@ -35,15 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-use Infection\Mutator\Boolean\TrueValue;
-use Infection\Mutator\Boolean\TrueValueConfig;
-use Infection\Mutator\Extensions\BCMath;
-use Infection\Mutator\Extensions\BCMathConfig;
-use Infection\Mutator\Extensions\MBString;
-use Infection\Mutator\Extensions\MBStringConfig;
-use Infection\Mutator\Removal\ArrayItemRemoval;
-use Infection\Mutator\Removal\ArrayItemRemovalConfig;
+use function in_array;
 use function Safe\array_flip;
+use function Safe\class_implements;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
@@ -61,19 +55,19 @@ final class MutatorFactory
     {
         $mutators = [];
 
-        $knownMutatorClasses = array_flip(ProfileList::ALL_MUTATORS);
+        $knownMutatorClassNames = array_flip(ProfileList::ALL_MUTATORS);
 
-        foreach ($resolvedMutators as $mutatorClass => $config) {
+        foreach ($resolvedMutators as $mutatorClassName => $config) {
             Assert::keyExists(
-                $knownMutatorClasses,
-                $mutatorClass,
-                sprintf('Unknown mutator "%s"', $mutatorClass)
+                $knownMutatorClassNames,
+                $mutatorClassName,
+                sprintf('Unknown mutator "%s"', $mutatorClassName)
             );
             Assert::isArray(
                 $config,
                 sprintf(
                     'Expected config of the mutator "%s" to be an array. Got "%%s" instead',
-                    $mutatorClass
+                    $mutatorClassName
                 )
             );
 
@@ -82,33 +76,16 @@ final class MutatorFactory
             /** @var string[] $ignored */
             $ignored = $config['ignore'] ?? [];
 
-            switch ($mutatorClass) {
-                case BCMath::class:
-                    $mutator = new BCMath(new BCMathConfig($settings));
+            if (in_array(ConfigurableMutator::class, class_implements($mutatorClassName), true)) {
+                $configClassName = $mutatorClassName::getConfigClassName();
 
-                    break;
-
-                case MBString::class:
-                    $mutator = new MBString(new MBStringConfig($settings));
-
-                    break;
-
-                case TrueValue::class:
-                    $mutator = new TrueValue(new TrueValueConfig($settings));
-
-                    break;
-
-                case ArrayItemRemoval::class:
-                    $mutator = new ArrayItemRemoval(new ArrayItemRemovalConfig($settings));
-
-                    break;
-
-                default:
-                    /** @var Mutator $mutator */
-                    $mutator = new $mutatorClass();
+                $mutator = new $mutatorClassName(new $configClassName($settings));
+            } else {
+                $mutator = new $mutatorClassName();
             }
+            /* @var Mutator $mutator */
 
-            $mutators[$mutator->getName()] = new IgnoreMutator(
+            $mutators[(string) $mutator->getName()] = new IgnoreMutator(
                 new IgnoreConfig($ignored),
                 $mutator
             );

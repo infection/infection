@@ -44,18 +44,20 @@ use function constant;
 use function count;
 use function defined;
 use Generator;
+use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetConfigClassName;
 use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
 
 /**
  * @internal
  */
-final class MBString implements Mutator
+final class MBString implements ConfigurableMutator
 {
     use GetMutatorName;
+    use GetConfigClassName;
 
     /**
      * @var array<string, Closure(Node\Expr\FuncCall): Generator<Node\Expr\FuncCall>>
