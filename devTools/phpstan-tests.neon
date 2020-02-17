@@ -17,6 +17,14 @@ parameters:
             path: '../tests/phpunit/TestFramework/Coverage/XmlReport/XMLLineCodeCoverageTest.php'
             message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
             count: 2
+        -
+            path: '../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php'
+            message: '#Function simplexml_load_string is unsafe to use#'
+            count: 1
+        -
+            path: '../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php'
+            message: '#Function simplexml_load_string is unsafe to use#'
+            count: 1
     level: 4
     paths:
         - ../tests/phpunit

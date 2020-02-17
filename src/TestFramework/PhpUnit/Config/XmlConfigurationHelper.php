@@ -41,9 +41,9 @@ use function implode;
 use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\SafeQuery;
-use LibXMLError;
 use function libxml_get_errors;
 use function libxml_use_internal_errors;
+use LibXMLError;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
