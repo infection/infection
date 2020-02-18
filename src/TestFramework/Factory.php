@@ -41,7 +41,6 @@ use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\PhpSpec\Adapter\PhpSpecAdapterFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
 use function Safe\sprintf;
@@ -105,20 +104,7 @@ final class Factory
             );
         }
 
-        if ($adapterName === TestFrameworkTypes::PHPSPEC) {
-            $phpSpecConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPSPEC);
-
-            return PhpSpecAdapterFactory::create(
-                $this->testFrameworkFinder->find(TestFrameworkTypes::PHPSPEC),
-                $this->tmpDir,
-                $phpSpecConfigPath,
-                null,
-                $this->jUnitFilePath,
-                $this->projectDir,
-                $this->infectionConfig->getSourceDirectories(),
-                $skipCoverage
-            );
-        }
+        $availableTestFrameworks = [TestFrameworkTypes::PHPUNIT];
 
         foreach ($this->installedExtensions as $packageName => $installedExtension) {
             $factory = $installedExtension['extra']['class'];
@@ -128,6 +114,8 @@ final class Factory
             if (!is_a($factory, TestFrameworkAdapterFactory::class, true)) {
                 continue;
             }
+
+            $availableTestFrameworks[] = $factory::getAdapterName();
 
             if ($adapterName === $factory::getAdapterName()) {
                 return $factory::create(
@@ -146,7 +134,7 @@ final class Factory
         throw new InvalidArgumentException(sprintf(
             'Invalid name of test framework "%s". Available names are: %s',
             $adapterName,
-            implode(', ', [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PHPSPEC, TestFrameworkTypes::CODECEPTION])
+            implode(', ', $availableTestFrameworks)
         ));
     }
 }
