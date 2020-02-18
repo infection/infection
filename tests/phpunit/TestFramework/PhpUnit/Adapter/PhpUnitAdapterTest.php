@@ -121,11 +121,6 @@ final class PhpUnitAdapterTest extends TestCase
         );
     }
 
-    public function test_it_can_provide_the_test_framework_version(): void
-    {
-        $this->assertSame('', $this->adapter->getVersion());
-    }
-
     public function outputProvider(): Generator
     {
         yield ['OK, but incomplete, skipped, or risky tests!', true];
