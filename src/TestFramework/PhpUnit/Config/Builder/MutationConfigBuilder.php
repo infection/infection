@@ -91,7 +91,7 @@ class MutationConfigBuilder extends ConfigBuilder
         string $mutationHash,
         string $mutationOriginalFilePath
     ): string {
-        $dom = $this->getDom();
+        $dom = clone $this->getDom();
         $xPath = new DOMXPath($dom);
 
         $this->xmlConfigurationHelper->replaceWithAbsolutePaths($xPath);

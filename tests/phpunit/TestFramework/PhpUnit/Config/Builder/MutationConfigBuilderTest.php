@@ -42,6 +42,7 @@ use DOMNodeList;
 use DOMXPath;
 use Generator;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
@@ -156,6 +157,7 @@ XML
     {
         $tmp = $this->tmp;
         $projectPath = $this->projectPath;
+        $interceptorPath = IncludeInterceptor::LOCATION;
 
         $this->assertSame(
             <<<XML
@@ -200,6 +202,23 @@ XML
                 )
             )
         );
+        $this->assertSame(
+            <<<PHP
+<?php
+
+
+require_once '$interceptorPath';
+
+use Infection\StreamWrapper\IncludeInterceptor;
+
+IncludeInterceptor::intercept('/original/file/path', '/mutated/file/path');
+IncludeInterceptor::enable();
+require_once '$projectPath/app/autoload2.php';
+
+PHP
+            ,
+            file_get_contents($this->tmp . '/interceptor.autoload.hash1.infection.php')
+        );
 
         $this->assertSame(
             <<<XML
@@ -243,6 +262,23 @@ XML
                     self::ORIGINAL_FILE_PATH
                 )
             )
+        );
+        $this->assertSame(
+            <<<PHP
+<?php
+
+
+require_once '$interceptorPath';
+
+use Infection\StreamWrapper\IncludeInterceptor;
+
+IncludeInterceptor::intercept('/original/file/path', '/mutated/file/path');
+IncludeInterceptor::enable();
+require_once '$projectPath/app/autoload2.php';
+
+PHP
+            ,
+            file_get_contents($this->tmp . '/interceptor.autoload.hash2.infection.php')
         );
     }
 
