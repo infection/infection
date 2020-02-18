@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Config;
 
+use function Safe\sprintf;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -50,7 +51,7 @@ class ConsoleHelper
         $this->formatterHelper = $formatterHelper;
     }
 
-    public function writeSection(OutputInterface $output, $text, $style = 'bg=blue;fg=white'): void
+    public function writeSection(OutputInterface $output, string $text, string $style = 'bg=blue;fg=white'): void
     {
         $output->writeln([
             '',
@@ -59,7 +60,7 @@ class ConsoleHelper
         ]);
     }
 
-    public function getQuestion($question, $default = null, $sep = ':'): string
+    public function getQuestion(string $question, ?string $default = null, string $sep = ':'): string
     {
         return $default
             ? sprintf('<info>%s</info> [<comment>%s</comment>]%s ', $question, $default, $sep)

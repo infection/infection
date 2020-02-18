@@ -45,8 +45,6 @@ use Infection\Event\ApplicationExecutionWasFinished;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutation\MutationGenerator;
-use Infection\Process\Builder\SubscriberBuilder;
-use Infection\Process\Coverage\CoverageRequirementChecker;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -54,10 +52,11 @@ use Infection\Process\Runner\TestRunConstraintChecker;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\TestFramework\Coverage\CoverageDoesNotExistException;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageFactory;
-use Infection\TestFramework\HasExtraNodeVisitors;
+use Infection\TestFramework\IgnoresAdditionalNodes;
+use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use const PHP_EOL;
 use function Safe\sprintf;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
 /**
@@ -65,11 +64,8 @@ use Symfony\Component\Process\Process;
  */
 final class Engine
 {
-    private $coverageChecker;
     private $config;
-    private $fileSystem;
     private $adapter;
-    private $subscriberBuilder;
     private $eventDispatcher;
     private $initialTestsRunner;
     private $memoryLimitApplier;
@@ -78,13 +74,11 @@ final class Engine
     private $constraintChecker;
     private $consoleOutput;
     private $metricsCalculator;
+    private $testFrameworkExtraOptionsFilter;
 
     public function __construct(
-        CoverageRequirementChecker $coverageChecker,
         Configuration $config,
-        Filesystem $fileSystem,
         TestFrameworkAdapter $adapter,
-        SubscriberBuilder $subscriberBuilder,
         EventDispatcher $eventDispatcher,
         InitialTestsRunner $initialTestsRunner,
         MemoryLimiter $memoryLimitApplier,
@@ -92,13 +86,11 @@ final class Engine
         MutationTestingRunner $mutationTestingRunner,
         TestRunConstraintChecker $constraintChecker,
         ConsoleOutput $consoleOutput,
-        MetricsCalculator $metricsCalculator
+        MetricsCalculator $metricsCalculator,
+        TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter
     ) {
-        $this->coverageChecker = $coverageChecker;
         $this->config = $config;
-        $this->fileSystem = $fileSystem;
         $this->adapter = $adapter;
-        $this->subscriberBuilder = $subscriberBuilder;
         $this->eventDispatcher = $eventDispatcher;
         $this->initialTestsRunner = $initialTestsRunner;
         $this->memoryLimitApplier = $memoryLimitApplier;
@@ -107,6 +99,7 @@ final class Engine
         $this->constraintChecker = $constraintChecker;
         $this->consoleOutput = $consoleOutput;
         $this->metricsCalculator = $metricsCalculator;
+        $this->testFrameworkExtraOptionsFilter = $testFrameworkExtraOptionsFilter;
     }
 
     public function execute(int $threads): bool
@@ -120,7 +113,7 @@ final class Engine
     private function runInitialTestSuite(): void
     {
         $initialTestSuitProcess = $this->initialTestsRunner->run(
-            $this->config->getTestFrameworkExtraOptions()->getForInitialProcess(),
+            $this->config->getTestFrameworkExtraOptions(),
             $this->config->shouldSkipCoverage(),
             explode(' ', (string) $this->config->getInitialTestsPhpOptions())
         );
@@ -138,16 +131,18 @@ final class Engine
     {
         $mutations = $this->mutationGenerator->generate(
             $this->config->mutateOnlyCoveredCode(),
-            $this->adapter instanceof HasExtraNodeVisitors
-                ? $this->adapter->getMutationsCollectionNodeVisitors()
+            $this->adapter instanceof IgnoresAdditionalNodes
+                ? $this->adapter->getNodeIgnorers()
                 : []
         );
 
-        $this->mutationTestingRunner->run(
-            $mutations,
-            $threads,
-            $this->config->getTestFrameworkExtraOptions()->getForMutantProcess()
-        );
+        $actualExtraOptions = $this->config->getTestFrameworkExtraOptions();
+
+        $filteredExtraOptionsForMutant = $this->adapter instanceof ProvidesInitialRunOnlyOptions
+            ? $this->testFrameworkExtraOptionsFilter->filterForMutantProcess($actualExtraOptions, $this->adapter->getInitialRunOnlyOptions())
+            : $actualExtraOptions;
+
+        $this->mutationTestingRunner->run($mutations, $threads, $filteredExtraOptionsForMutant);
     }
 
     private function checkMetrics(): bool

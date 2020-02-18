@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Console\OutputFormatter;
 
 use Infection\Process\MutantProcess;
+use function Safe\sprintf;
+use function str_repeat;
 use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;
 

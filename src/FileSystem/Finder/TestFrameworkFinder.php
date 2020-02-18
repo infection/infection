@@ -35,63 +35,66 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem\Finder;
 
+use function array_key_exists;
 use function dirname;
+use function file_exists;
+use function getenv;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\TestFramework\TestFrameworkTypes;
+use function ltrim;
+use function rtrim;
 use RuntimeException;
 use function Safe\file_get_contents;
+use function Safe\getcwd;
+use function Safe\preg_match;
+use function Safe\putenv;
 use function Safe\realpath;
-use function substr;
+use function Safe\substr;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
+use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-class TestFrameworkFinder extends AbstractExecutableFinder
+class TestFrameworkFinder
 {
-    private $testFrameworkName;
-    private $customPath;
-
     /**
-     * @var string
+     * @var array<string, string>
      */
-    private $cachedPath;
+    private $cachedPath = [];
 
-    public function __construct(string $testFrameworkName, string $customPath = '')
+    public function find(string $testFrameworkName, string $customPath = ''): string
     {
-        $this->testFrameworkName = $testFrameworkName;
-        $this->customPath = $customPath;
-    }
-
-    public function find(): string
-    {
-        if (!isset($this->cachedPath)) {
-            if (!$this->shouldUseCustomPath()) {
+        if (!array_key_exists($testFrameworkName, $this->cachedPath)) {
+            if (!$this->shouldUseCustomPath($testFrameworkName, $customPath)) {
                 $this->addVendorBinToPath();
             }
 
-            $this->cachedPath = realpath($this->findTestFramework());
+            $this->cachedPath[$testFrameworkName] = realpath($this->findTestFramework($testFrameworkName, $customPath));
 
-            if (substr($this->cachedPath, -4) === '.bat') {
-                $this->cachedPath = $this->findFromBatchFile($this->cachedPath);
+            Assert::string($this->cachedPath[$testFrameworkName]);
+
+            if (substr($this->cachedPath[$testFrameworkName], -4) === '.bat') {
+                $this->cachedPath[$testFrameworkName] = $this->findFromBatchFile($this->cachedPath[$testFrameworkName]);
             }
         }
 
-        return $this->cachedPath;
+        return $this->cachedPath[$testFrameworkName];
     }
 
-    private function shouldUseCustomPath(): bool
+    private function shouldUseCustomPath(string $testFrameworkName, string $customPath): bool
     {
-        if (!$this->customPath) {
+        if (!$customPath) {
             return false;
         }
 
-        if (file_exists($this->customPath)) {
+        if (file_exists($customPath)) {
             return true;
         }
 
-        throw FinderException::testCustomPathDoesNotExist($this->testFrameworkName, $this->customPath);
+        throw FinderException::testCustomPathDoesNotExist($testFrameworkName, $customPath);
     }
 
     private function addVendorBinToPath(): void
@@ -126,10 +129,10 @@ class TestFrameworkFinder extends AbstractExecutableFinder
         return (new ComposerExecutableFinder())->find();
     }
 
-    private function findTestFramework(): string
+    private function findTestFramework(string $testFrameworkName, string $customPath): string
     {
-        if ($this->shouldUseCustomPath()) {
-            return $this->customPath;
+        if ($this->shouldUseCustomPath($testFrameworkName, $customPath)) {
+            return $customPath;
         }
 
         /*
@@ -138,12 +141,12 @@ class TestFrameworkFinder extends AbstractExecutableFinder
          * Therefore we have to explicitly look for a .bat first.
          */
         $candidates = [
-            $this->testFrameworkName . '.bat',
-            $this->testFrameworkName,
-            $this->testFrameworkName . '.phar',
+            $testFrameworkName . '.bat',
+            $testFrameworkName,
+            $testFrameworkName . '.phar',
         ];
 
-        if ($this->testFrameworkName === TestFrameworkTypes::PHPUNIT) {
+        if ($testFrameworkName === TestFrameworkTypes::PHPUNIT) {
             $candidates[] = 'simple-phpunit.bat';
             $candidates[] = 'simple-phpunit';
             $candidates[] = 'simple-phpunit.phar';
@@ -160,13 +163,14 @@ class TestFrameworkFinder extends AbstractExecutableFinder
             }
         }
 
-        $path = $this->searchNonExecutables($candidates, $extraDirs);
+        $nonExecutableFinder = new NonExecutableFinder();
+        $path = $nonExecutableFinder->searchNonExecutables($candidates, $extraDirs);
 
         if ($path !== null) {
             return $path;
         }
 
-        throw FinderException::testFrameworkNotFound($this->testFrameworkName);
+        throw FinderException::testFrameworkNotFound($testFrameworkName);
     }
 
     private function findFromBatchFile(string $path): string

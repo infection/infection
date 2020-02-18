@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
-use function assert;
 use DOMDocument;
 use DOMNode;
 use DOMXPath;
@@ -44,13 +43,17 @@ use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use Infection\TestFramework\SafeQuery;
 use function Safe\file_put_contents;
+use function Safe\sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
 class MutationConfigBuilder extends ConfigBuilder
 {
+    use SafeQuery;
     private $tempDirectory;
     private $projectDir;
     private $xmlConfigurationHelper;
@@ -143,12 +146,12 @@ AUTOLOAD;
 
     private function setCustomBootstrapPath(string $customAutoloadFilePath, DOMXPath $xPath): void
     {
-        $nodeList = $xPath->query('/phpunit/@bootstrap');
+        $nodeList = self::safeQuery($xPath, '/phpunit/@bootstrap');
 
         if ($nodeList->length) {
             $nodeList[0]->nodeValue = $customAutoloadFilePath;
         } else {
-            $node = $xPath->query('/phpunit')[0];
+            $node = self::safeQuery($xPath, '/phpunit')[0];
             $node->setAttribute('bootstrap', $customAutoloadFilePath);
         }
     }
@@ -165,17 +168,21 @@ AUTOLOAD;
 
     private function removeExistingTestSuite(DOMXPath $xPath): void
     {
-        $nodes = $xPath->query('/phpunit/testsuites/testsuite');
+        $nodes = self::safeQuery($xPath, '/phpunit/testsuites/testsuite');
 
         foreach ($nodes as $node) {
-            $node->parentNode->removeChild($node);
+            /** @var DOMNode $parent */
+            $parent = $node->parentNode;
+            $parent->removeChild($node);
         }
 
         // handle situation when test suite is directly inside root node
-        $nodes = $xPath->query('/phpunit/testsuite');
+        $nodes = self::safeQuery($xPath, '/phpunit/testsuite');
 
         foreach ($nodes as $node) {
-            $node->parentNode->removeChild($node);
+            /** @var DOMNode $parent */
+            $parent = $node->parentNode;
+            $parent->removeChild($node);
         }
     }
 
@@ -184,12 +191,12 @@ AUTOLOAD;
      */
     private function addTestSuiteWithFilteredTestFiles(array $coverageTestCases, DOMDocument $dom, DOMXPath $xPath): void
     {
-        $testSuites = $xPath->query('/phpunit/testsuites');
+        $testSuites = self::safeQuery($xPath, '/phpunit/testsuites');
         $nodeToAppendTestSuite = $testSuites->item(0);
 
         // if there is no `testsuites` node, append to root
         if (!$nodeToAppendTestSuite) {
-            $nodeToAppendTestSuite = $testSuites = $xPath->query('/phpunit')->item(0);
+            $nodeToAppendTestSuite = $testSuites = self::safeQuery($xPath, '/phpunit')->item(0);
         }
 
         $testSuite = $dom->createElement('testsuite');
@@ -203,14 +210,14 @@ AUTOLOAD;
             $testSuite->appendChild($file);
         }
 
-        assert($nodeToAppendTestSuite instanceof DOMNode);
+        Assert::isInstanceOf($nodeToAppendTestSuite, DOMNode::class);
 
         $nodeToAppendTestSuite->appendChild($testSuite);
     }
 
     private function getOriginalBootstrapFilePath(DOMXPath $xPath): string
     {
-        $nodeList = $xPath->query('/phpunit/@bootstrap');
+        $nodeList = self::safeQuery($xPath, '/phpunit/@bootstrap');
 
         if ($nodeList->length) {
             return $nodeList[0]->nodeValue;

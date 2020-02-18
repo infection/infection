@@ -37,14 +37,19 @@ namespace Infection\Config\ValueProvider;
 
 use Closure;
 use const DIRECTORY_SEPARATOR;
+use function file_exists;
 use Infection\Config\ConsoleHelper;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\TestFramework\TestFrameworkTypes;
 use RuntimeException;
+use function Safe\sprintf;
+use function str_replace;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
+use function trim;
 
 /**
  * @internal
@@ -62,10 +67,10 @@ final class PhpUnitCustomExecutablePathProvider
         $this->questionHelper = $questionHelper;
     }
 
-    public function get(InputInterface $input, OutputInterface $output)
+    public function get(InputInterface $input, OutputInterface $output): ?string
     {
         try {
-            $this->phpUnitExecutableFinder->find();
+            $this->phpUnitExecutableFinder->find(TestFrameworkTypes::PHPUNIT);
         } catch (FinderException $e) {
             $output->writeln(['']);
 

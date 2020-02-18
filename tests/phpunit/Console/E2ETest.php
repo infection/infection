@@ -35,18 +35,32 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Console;
 
+use function array_merge;
+use function basename;
 use Composer\Autoload\ClassLoader;
 use const DIRECTORY_SEPARATOR;
 use function extension_loaded;
+use function file_exists;
 use function function_exists;
 use Generator;
+use function getenv;
+use function implode;
 use Infection\Command\ConfigureCommand;
 use Infection\Console\Application;
 use Infection\Container;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
+use function is_readable;
 use const PHP_SAPI;
 use PHPUnit\Framework\TestCase;
+use function Safe\chdir;
+use function Safe\copy;
+use function Safe\file_get_contents;
+use function Safe\getcwd;
+use function Safe\ini_get;
+use function Safe\sprintf;
+use function str_replace;
+use function strpos;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Finder\Finder;
@@ -62,6 +76,9 @@ final class E2ETest extends TestCase
     private const EXPECT_ERROR = 1;
     private const EXPECT_SUCCESS = 0;
 
+    /**
+     * @var string
+     */
     private $cwd;
 
     /**

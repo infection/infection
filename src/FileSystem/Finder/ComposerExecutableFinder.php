@@ -36,13 +36,16 @@ declare(strict_types=1);
 namespace Infection\FileSystem\Finder;
 
 use Infection\FileSystem\Finder\Exception\FinderException;
+use function Safe\getcwd;
+use function Safe\realpath;
+use function Safe\sprintf;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
  * @internal
  */
-final class ComposerExecutableFinder extends AbstractExecutableFinder
+final class ComposerExecutableFinder
 {
     public function find(): string
     {
@@ -64,7 +67,8 @@ final class ComposerExecutableFinder extends AbstractExecutableFinder
          * Check for options without execute permissions and prefix the PHP
          * executable instead.
          */
-        $path = $this->searchNonExecutables($probable, $immediatePaths);
+        $nonExecutableFinder = new NonExecutableFinder();
+        $path = $nonExecutableFinder->searchNonExecutables($probable, $immediatePaths);
 
         if ($path !== null) {
             return $this->makeExecutable($path);

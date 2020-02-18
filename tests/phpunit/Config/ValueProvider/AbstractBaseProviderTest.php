@@ -35,7 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Config\ValueProvider;
 
+use function exec;
 use PHPUnit\Framework\TestCase;
+use function Safe\fopen;
+use function Safe\fwrite;
+use function Safe\rewind;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\StreamOutput;

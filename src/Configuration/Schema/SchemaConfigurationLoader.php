@@ -54,6 +54,9 @@ final class SchemaConfigurationLoader
         $this->fileLoader = $fileLoader;
     }
 
+    /**
+     * @param string[] $potentialPaths
+     */
     public function loadConfiguration(array $potentialPaths): SchemaConfiguration
     {
         return $this->fileLoader->loadFile(

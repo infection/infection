@@ -39,6 +39,7 @@ use DOMDocument;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\TestCase;
+use function Safe\realpath;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**

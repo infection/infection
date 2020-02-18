@@ -40,7 +40,7 @@ use stdClass;
 /**
  * @internal
  */
-final class PhpUnitPathGuesser implements Guesser
+final class PhpUnitPathGuesser
 {
     private const CURRENT_DIR_PATH = '.';
 
@@ -51,7 +51,7 @@ final class PhpUnitPathGuesser implements Guesser
         $this->composerJsonContent = $composerJsonContent;
     }
 
-    public function guess()
+    public function guess(): string
     {
         if (!isset($this->composerJsonContent->autoload)) {
             return self::CURRENT_DIR_PATH;
@@ -70,7 +70,10 @@ final class PhpUnitPathGuesser implements Guesser
         return self::CURRENT_DIR_PATH;
     }
 
-    private function getPhpUnitDir(array $parsedPaths)
+    /**
+     * @param array<string, string> $parsedPaths
+     */
+    private function getPhpUnitDir(array $parsedPaths): string
     {
         foreach ($parsedPaths as $namespace => $parsedPath) {
             // for old Symfony projects (<=2.7) phpunit.xml is located in ./app folder

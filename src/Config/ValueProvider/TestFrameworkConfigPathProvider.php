@@ -41,9 +41,11 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\PhpUnitPathGuesser;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\TestFrameworkTypes;
+use function is_dir;
 use RuntimeException;
 use function Safe\file_get_contents;
 use function Safe\json_decode;
+use function Safe\sprintf;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -65,7 +67,10 @@ final class TestFrameworkConfigPathProvider
         $this->questionHelper = $questionHelper;
     }
 
-    public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, string $testFramework)
+    /**
+     * @param string[] $dirsInCurrentDir
+     */
+    public function get(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, string $testFramework): ?string
     {
         try {
             $this->testFrameworkConfigLocator->locate($testFramework);
@@ -118,6 +123,9 @@ final class TestFrameworkConfigPathProvider
         };
     }
 
+    /**
+     * @param string[] $dirsInCurrentDir
+     */
     private function askTestFrameworkConfigLocation(InputInterface $input, OutputInterface $output, array $dirsInCurrentDir, string $testFramework, string $defaultValue): string
     {
         $question = sprintf(

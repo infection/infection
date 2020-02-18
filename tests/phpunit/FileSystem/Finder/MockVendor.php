@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem\Finder;
 
 use const DIRECTORY_SEPARATOR;
+use function Safe\file_put_contents;
 use Symfony\Component\Filesystem\Filesystem;
 
 final class MockVendor

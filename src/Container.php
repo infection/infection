@@ -50,6 +50,8 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
+use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\SourceFileCollector;
@@ -59,13 +61,13 @@ use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\FileMutationGenerator;
-use Infection\Mutation\FileParser;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationGenerator;
-use Infection\Mutation\NodeTraverserFactory;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
+use Infection\PhpParser\FileParser;
+use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
@@ -80,6 +82,7 @@ use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
+use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
@@ -88,8 +91,8 @@ use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use InvalidArgumentException;
-use function is_callable;
 use function php_ini_loaded_file;
 use PhpParser\Lexer;
 use PhpParser\Parser;
@@ -100,6 +103,7 @@ use function Safe\getcwd;
 use function Safe\sprintf;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Filesystem\Filesystem;
+use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
 
 /**
@@ -107,12 +111,23 @@ use Webmozart\PathUtil\Path;
  */
 final class Container
 {
+    /**
+     * @var array<class-string<object>, true>
+     */
     private $keys = [];
+
+    /**
+     * @var array<class-string<object>, object>
+     */
     private $values = [];
+
+    /**
+     * @var array<class-string<object>, Closure(self): object>
+     */
     private $factories = [];
 
     /**
-     * @param array<string, Closure|string|int|float|bool|object> $values
+     * @param array<class-string<object>, Closure(self): object> $values
      */
     public function __construct(array $values)
     {
@@ -124,21 +139,11 @@ final class Container
     public static function create(): self
     {
         return new self([
-            'project.dir' => getcwd(),
             Filesystem::class => static function (): Filesystem {
                 return new Filesystem();
             },
             TmpDirProvider::class => static function (): TmpDirProvider {
                 return new TmpDirProvider();
-            },
-            'junit.file.path' => static function (self $container) {
-                return sprintf(
-                    '%s/%s',
-                    Path::canonicalize(
-                        $container->getConfiguration()->getCoveragePath() . '/..'
-                    ),
-                    TestFrameworkAdapter::JUNIT_FILE_NAME
-                );
             },
             IndexXmlCoverageParser::class => static function (self $container): IndexXmlCoverageParser {
                 return new IndexXmlCoverageParser($container->getConfiguration()->getCoveragePath());
@@ -169,8 +174,10 @@ final class Container
                     $config->getTmpDir(),
                     $container->getProjectDir(),
                     $container->getTestFrameworkConfigLocator(),
+                    $container->getTestFrameworkFinder(),
                     $container->getJUnitFilePath(),
-                    $config
+                    $config,
+                    GeneratedExtensionsConfig::EXTENSIONS
                 );
             },
             XmlConfigurationHelper::class => static function (self $container): XmlConfigurationHelper {
@@ -336,7 +343,8 @@ final class Container
             FileMutationGenerator::class => static function (self $container): FileMutationGenerator {
                 return new FileMutationGenerator(
                     $container->getFileParser(),
-                    $container->getNodeTraverserFactory()
+                    $container->getNodeTraverserFactory(),
+                    $container->getLineRangeCalculator()
                 );
             },
             LoggerFactory::class => static function (self $container): LoggerFactory {
@@ -396,6 +404,15 @@ final class Container
                     $container->getParallelProcessRunner(),
                     $container->getEventDispatcher()
                 );
+            },
+            LineRangeCalculator::class => static function (): LineRangeCalculator {
+                return new LineRangeCalculator();
+            },
+            TestFrameworkFinder::class => static function (): TestFrameworkFinder {
+                return new TestFrameworkFinder();
+            },
+            TestFrameworkExtraOptionsFilter::class => static function (): TestFrameworkExtraOptionsFilter {
+                return new TestFrameworkExtraOptionsFilter();
             },
         ]);
     }
@@ -480,7 +497,7 @@ final class Container
 
     public function getProjectDir(): string
     {
-        return $this->get('project.dir');
+        return getcwd();
     }
 
     public function getFileSystem(): Filesystem
@@ -495,7 +512,13 @@ final class Container
 
     public function getJUnitFilePath(): string
     {
-        return $this->get('junit.file.path');
+        return sprintf(
+            '%s/%s',
+            Path::canonicalize(
+                $this->getConfiguration()->getCoveragePath() . '/..'
+            ),
+            TestFrameworkAdapter::JUNIT_FILE_NAME
+        );
     }
 
     public function getIndexXmlCoverageParser(): IndexXmlCoverageParser
@@ -673,11 +696,6 @@ final class Container
         return $this->get(SubscriberBuilder::class);
     }
 
-    public function getCommandLineBuilder(): CommandLineBuilder
-    {
-        return $this->get(CommandLineBuilder::class);
-    }
-
     public function getSourceFileCollector(): SourceFileCollector
     {
         return $this->get(SourceFileCollector::class);
@@ -738,30 +756,52 @@ final class Container
         return $this->get(Configuration::class);
     }
 
+    public function getLineRangeCalculator(): LineRangeCalculator
+    {
+        return $this->get(LineRangeCalculator::class);
+    }
+
+    public function getTestFrameworkFinder(): TestFrameworkFinder
+    {
+        return $this->get(TestFrameworkFinder::class);
+    }
+
+    public function getTestFrameworkExtraOptionsFilter(): TestFrameworkExtraOptionsFilter
+    {
+        return $this->get(TestFrameworkExtraOptionsFilter::class);
+    }
+
     /**
-     * @param Closure|string|int|float|bool|object $value
+     * @param class-string<object> $id
+     * @param Closure(self): object $value
      */
-    private function offsetAdd(string $id, $value): void
+    private function offsetAdd(string $id, Closure $value): void
     {
         $this->keys[$id] = true;
 
-        if (is_callable($value)) {
-            $this->factories[$id] = $value;
-        } else {
-            $this->values[$id] = $value;
-        }
+        $this->factories[$id] = $value;
     }
 
-    private function get(string $id)
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $id
+     * @phpstan-return T
+     */
+    private function get(string $id): object
     {
         if (!isset($this->keys[$id])) {
             throw new InvalidArgumentException(sprintf('Unknown service "%s"', $id));
         }
 
         if (array_key_exists($id, $this->values)) {
-            return $this->values[$id];
+            $value = $this->values[$id];
+        } else {
+            $value = $this->values[$id] = $this->factories[$id]($this);
         }
 
-        return $this->values[$id] = $this->factories[$id]($this);
+        Assert::isInstanceOf($value, $id);
+
+        return $value;
     }
 }

@@ -47,6 +47,7 @@ final class JUnitTestFileDataProviderTest extends TestCase
 {
     private const JUNIT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit.xml';
     private const JUNIT_DIFF_FORMAT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit2.xml';
+    private const JUNIT_FEATURE_FORMAT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit_feature.xml';
 
     /**
      * @var JUnitTestFileDataProvider
@@ -98,5 +99,14 @@ final class JUnitTestFileDataProviderTest extends TestCase
         $testFileInfo = $provider->getTestFileInfo('App\Tests\unit\SourceClassTest');
 
         $this->assertSame('/codeception/tests/unit/SourceClassTest.php', $testFileInfo->path);
+    }
+
+    public function test_it_works_with_feature_junit_format(): void
+    {
+        $provider = new JUnitTestFileDataProvider(self::JUNIT_FEATURE_FORMAT);
+
+        $testFileInfo = $provider->getTestFileInfo('FeatureA:Scenario A1');
+
+        $this->assertSame('/codeception/tests/bdd/FeatureA.feature', $testFileInfo->path);
     }
 }

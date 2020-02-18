@@ -38,12 +38,11 @@ namespace Infection\Mutator;
 use function array_reduce;
 use function count;
 use function get_class;
-use Infection\MutatedNode;
 use Infection\Mutation\Mutation;
+use Infection\PhpParser\MutatedNode;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
-use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\Visitor\ParentConnectorVisitor;
-use Infection\Visitor\ReflectionVisitor;
+use Infection\TestFramework\Coverage\LineRangeCalculator;
 use function iterator_to_array;
 use PhpParser\Node;
 use Throwable;
@@ -60,6 +59,7 @@ class NodeMutationGenerator
     private $fileNodes;
     private $codeCoverageData;
     private $onlyCovered;
+    private $lineRangeCalculator;
 
     /**
      * @param Mutator[] $mutators
@@ -70,7 +70,8 @@ class NodeMutationGenerator
         string $filePath,
         array $fileNodes,
         LineCodeCoverage $codeCoverageData,
-        bool $onlyCovered
+        bool $onlyCovered,
+        LineRangeCalculator $lineRangeCalculator
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
 
@@ -79,6 +80,7 @@ class NodeMutationGenerator
         $this->fileNodes = $fileNodes;
         $this->codeCoverageData = $codeCoverageData;
         $this->onlyCovered = $onlyCovered;
+        $this->lineRangeCalculator = $lineRangeCalculator;
     }
 
     /**
@@ -96,6 +98,8 @@ class NodeMutationGenerator
     }
 
     /**
+     * @param Mutation[] $mutations
+     *
      * @return Mutation[]
      */
     private function generateForMutator(Node $node, Mutator $mutator, array $mutations): array
@@ -122,7 +126,7 @@ class NodeMutationGenerator
 
         $tests = $this->codeCoverageData->getAllTestsForMutation(
             $this->filePath,
-            $this->getNodeRange($node, $isOnFunctionSignature),
+            $this->lineRangeCalculator->calculateRange($node),
             $isOnFunctionSignature
         );
 
@@ -148,31 +152,5 @@ class NodeMutationGenerator
         }
 
         return $mutations;
-    }
-
-    /**
-     * If the node is part of an array, this will find the outermost array.
-     * Otherwise this will return the node itself
-     */
-    private function getOuterMostArrayNode(Node $node): Node
-    {
-        $outerMostArrayParent = $node;
-
-        do {
-            if ($node instanceof Node\Expr\Array_) {
-                $outerMostArrayParent = $node;
-            }
-        } while ($node = $node->getAttribute(ParentConnectorVisitor::PARENT_KEY));
-
-        return $outerMostArrayParent;
-    }
-
-    private function getNodeRange(Node $node, bool $isOnFunctionSignature): NodeLineRangeData
-    {
-        if ($isOnFunctionSignature) {
-            $node = $this->getOuterMostArrayNode($node);
-        }
-
-        return new NodeLineRangeData($node->getStartLine(), $node->getEndLine());
     }
 }

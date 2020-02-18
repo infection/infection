@@ -39,8 +39,10 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\PhpUnitCustomExecutablePathProvider;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\TestFramework\TestFrameworkTypes;
 use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\MockObject\MockObject;
+use function Safe\realpath;
 use Symfony\Component\Console\Exception\RuntimeException as SymfonyRuntimeException;
 
 /**
@@ -73,7 +75,8 @@ final class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProvider
     {
         $this->finderMock
             ->expects($this->once())
-            ->method('find');
+            ->method('find')
+            ->with(TestFrameworkTypes::PHPUNIT);
 
         $this->assertNull(
             $this->provider->get($this->createStreamableInputInterfaceMock(), $this->createOutputInterface())
@@ -85,6 +88,7 @@ final class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProvider
         $this->finderMock
             ->expects($this->once())
             ->method('find')
+            ->with(TestFrameworkTypes::PHPUNIT)
             ->will($this->throwException(new FinderException()));
 
         $customExecutable = p(realpath(__DIR__ . '/../../Fixtures/Files/phpunit/phpunit.phar'));
@@ -106,6 +110,7 @@ final class PhpUnitCustomExecutablePathProviderTest extends AbstractBaseProvider
         $this->finderMock
             ->expects($this->once())
             ->method('find')
+            ->with(TestFrameworkTypes::PHPUNIT)
             ->will($this->throwException(new FinderException()));
 
         $this->expectException(SymfonyRuntimeException::class);

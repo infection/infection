@@ -194,11 +194,8 @@ final class InfectionCommand extends BaseCommand
         $this->startUp();
 
         $engine = new Engine(
-            $this->container->getCoverageRequirementChecker(),
             $this->container->getConfiguration(),
-            $this->container->getFileSystem(),
             $this->container->getTestFrameworkAdapter(),
-            $this->container->getSubscriberBuilder(),
             $this->container->getEventDispatcher(),
             $this->container->getInitialTestsRunner(),
             $this->container->getMemoryLimiter(),
@@ -206,7 +203,8 @@ final class InfectionCommand extends BaseCommand
             $this->container->getMutationTestingRunner(),
             $this->container->getTestRunConstraintChecker(),
             $this->consoleOutput,
-            $this->container->getMetricsCalculator()
+            $this->container->getMetricsCalculator(),
+            $this->container->getTestFrameworkExtraOptionsFilter()
         );
 
         $result = $engine->execute((int) $this->input->getOption('threads'));

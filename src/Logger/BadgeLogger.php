@@ -35,8 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use Infection\Environment\BuildContextResolver;
+use Infection\Environment\CouldNotResolveBuildContext;
+use Infection\Environment\CouldNotResolveStrykerApiKey;
+use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Http\BadgeApiClient;
 use Infection\Mutant\MetricsCalculator;
+use function Safe\sprintf;
 use stdClass;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -45,17 +50,24 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class BadgeLogger implements MutationTestingResultsLogger
 {
-    public const ENV_INFECTION_BADGE_API_KEY = 'INFECTION_BADGE_API_KEY';
-    public const ENV_STRYKER_DASHBOARD_API_KEY = 'STRYKER_DASHBOARD_API_KEY';
-
+    private $output;
+    private $buildContextResolver;
+    private $strykerApiKeyResolver;
     private $badgeApiClient;
     private $metricsCalculator;
     private $config;
-    private $output;
 
-    public function __construct(OutputInterface $output, BadgeApiClient $badgeApiClient, MetricsCalculator $metricsCalculator, stdClass $config)
-    {
+    public function __construct(
+        OutputInterface $output,
+        BuildContextResolver $platformResolver,
+        StrykerApiKeyResolver $strykerApiKeyResolver,
+        BadgeApiClient $badgeApiClient,
+        MetricsCalculator $metricsCalculator,
+        stdClass $config
+    ) {
         $this->output = $output;
+        $this->buildContextResolver = $platformResolver;
+        $this->strykerApiKeyResolver = $strykerApiKeyResolver;
         $this->badgeApiClient = $badgeApiClient;
         $this->metricsCalculator = $metricsCalculator;
         $this->config = $config;
@@ -63,61 +75,28 @@ final class BadgeLogger implements MutationTestingResultsLogger
 
     public function log(): void
     {
-        $travisBuild = getenv('TRAVIS');
-
-        if ($travisBuild !== 'true') {
-            $this->showInfo('it is not a Travis CI');
-
-            return;
-        }
-
-        $pullRequest = getenv('TRAVIS_PULL_REQUEST');
-
-        if ($pullRequest !== 'false') {
-            $this->showInfo("build is for a pull request (TRAVIS_PULL_REQUEST={$pullRequest})");
+        try {
+            $buildContext = $this->buildContextResolver->resolve(getenv());
+        } catch (CouldNotResolveBuildContext $exception) {
+            $this->showInfo($exception->getMessage());
 
             return;
         }
 
-        $repositorySlug = getenv('TRAVIS_REPO_SLUG');
-        $currentBranch = getenv('TRAVIS_BRANCH');
-
-        if ($repositorySlug === false || $currentBranch === false) {
-            $this->showInfo('repository slug nor current branch were found; not a Travis build?');
-
-            return;
-        }
-
-        if ($currentBranch !== $this->config->branch) {
-            $this->showInfo(
-                sprintf(
-                    'expected branch "%s", found "%s"',
-                    $this->config->branch,
-                    $currentBranch
-                )
-            );
+        if ($buildContext->branch() !== $this->config->branch) {
+            $this->showInfo(sprintf(
+                'expected branch "%s", found "%s"',
+                $this->config->branch,
+                $buildContext->branch()
+            ));
 
             return;
         }
 
-        $apiKey = getenv(self::ENV_INFECTION_BADGE_API_KEY);
-
-        /*
-         * Original Stryker Dashboard manual warrants a different API key:
-         * fall back to theirs if our isn't present
-         */
-        if ($apiKey === false) {
-            $apiKey = getenv(self::ENV_STRYKER_DASHBOARD_API_KEY);
-        }
-
-        if ($apiKey === false) {
-            $this->showInfo(
-                sprintf(
-                    'neither %s nor %s were found in the environment',
-                    self::ENV_INFECTION_BADGE_API_KEY,
-                    self::ENV_STRYKER_DASHBOARD_API_KEY
-                )
-            );
+        try {
+            $apiKey = $this->strykerApiKeyResolver->resolve(getenv());
+        } catch (CouldNotResolveStrykerApiKey $exception) {
+            $this->showInfo($exception->getMessage());
 
             return;
         }
@@ -129,8 +108,8 @@ final class BadgeLogger implements MutationTestingResultsLogger
 
         $this->badgeApiClient->sendReport(
             $apiKey,
-            'github.com/' . $repositorySlug,
-            $currentBranch,
+            'github.com/' . $buildContext->repositorySlug(),
+            $buildContext->branch(),
             $this->metricsCalculator->getMutationScoreIndicator()
         );
     }

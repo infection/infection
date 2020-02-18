@@ -35,9 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-use Infection\Mutator\Util\MutatorConfig;
+use function in_array;
 use function Safe\array_flip;
-use function sprintf;
+use function Safe\class_implements;
+use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -46,7 +47,7 @@ use Webmozart\Assert\Assert;
 final class MutatorFactory
 {
     /**
-     * @param array<string, array<mixed>> $resolvedMutators
+     * @param array<string, mixed[]> $resolvedMutators
      *
      * @return array<string, Mutator>
      */
@@ -54,32 +55,37 @@ final class MutatorFactory
     {
         $mutators = [];
 
-        $knownMutatorClasses = array_flip(ProfileList::ALL_MUTATORS);
+        $knownMutatorClassNames = array_flip(ProfileList::ALL_MUTATORS);
 
-        foreach ($resolvedMutators as $mutatorClass => $config) {
+        foreach ($resolvedMutators as $mutatorClassName => $config) {
             Assert::keyExists(
-                $knownMutatorClasses,
-                $mutatorClass,
-                sprintf('Unknown mutator "%s"', $mutatorClass)
+                $knownMutatorClassNames,
+                $mutatorClassName,
+                sprintf('Unknown mutator "%s"', $mutatorClassName)
             );
             Assert::isArray(
                 $config,
                 sprintf(
                     'Expected config of the mutator "%s" to be an array. Got "%%s" instead',
-                    $mutatorClass
+                    $mutatorClassName
                 )
             );
 
-            /** @var string[] $settings */
+            /** @var mixed[] $settings */
             $settings = $config['settings'] ?? [];
             /** @var string[] $ignored */
             $ignored = $config['ignore'] ?? [];
 
-            // TODO: only pass the mutator config if necessary
-            /** @var Mutator $mutator */
-            $mutator = new $mutatorClass(new MutatorConfig($settings));
+            if (in_array(ConfigurableMutator::class, class_implements($mutatorClassName), true)) {
+                $configClassName = $mutatorClassName::getConfigClassName();
 
-            $mutators[$mutator->getName()] = new IgnoreMutator(
+                $mutator = new $mutatorClassName(new $configClassName($settings));
+            } else {
+                $mutator = new $mutatorClassName();
+            }
+            /* @var Mutator $mutator */
+
+            $mutators[(string) $mutator->getName()] = new IgnoreMutator(
                 new IgnoreConfig($ignored),
                 $mutator
             );

@@ -39,6 +39,22 @@ use PHPUnit\Framework\TestCase;
 
 final class SourceTestClassNameSchemeTest extends TestCase
 {
+    public function test_it_can_give_the_source_class_name_for_a_test_case_class(): void
+    {
+        $this->assertSame(
+            'Infection\Acme\Foo',
+            SourceTestClassNameScheme::getSourceClassName('Infection\Tests\Acme\FooTest')
+        );
+    }
+
+    public function test_it_can_give_the_source_class_name_for_a_source_class(): void
+    {
+        $this->assertSame(
+            'Infection\Acme\Foo',
+            SourceTestClassNameScheme::getSourceClassName('Infection\Acme\Foo')
+        );
+    }
+
     public function test_it_can_give_the_test_case_class_name_for_a_source_class(): void
     {
         $this->assertSame(

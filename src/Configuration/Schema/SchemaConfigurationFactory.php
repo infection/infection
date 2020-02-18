@@ -70,8 +70,8 @@ class SchemaConfigurationFactory
     private static function createSource(stdClass $source): Source
     {
         return new Source(
-            (array) self::normalizeStringArray($source->directories ?? []),
-            (array) self::normalizeStringArray($source->excludes ?? [])
+            self::normalizeStringArray($source->directories ?? []),
+            self::normalizeStringArray($source->excludes ?? [])
         );
     }
 
@@ -105,33 +105,25 @@ class SchemaConfigurationFactory
     }
 
     /**
-     * @param string[]|null $values
+     * @param string[] $values
      *
-     * @return string[]|null
+     * @return string[]
      */
-    private static function normalizeStringArray(
-        ?array $values,
-        ?array $default = []
-    ): ?array {
-        if ($values === null) {
-            return $default;
-        }
-
+    private static function normalizeStringArray(array $values): array
+    {
         $normalizedValue = array_filter(array_map('trim', $values));
 
-        return $normalizedValue === [] ? $default : array_values($normalizedValue);
+        return array_values($normalizedValue);
     }
 
-    private static function normalizeString(
-        ?string $value,
-        ?string $default = null
-    ): ?string {
+    private static function normalizeString(?string $value): ?string
+    {
         if ($value === null) {
-            return $default;
+            return null;
         }
 
         $normalizedValue = trim($value);
 
-        return $normalizedValue === '' ? $default : $normalizedValue;
+        return $normalizedValue === '' ? null : $normalizedValue;
     }
 }

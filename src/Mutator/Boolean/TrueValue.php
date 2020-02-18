@@ -37,31 +37,31 @@ namespace Infection\Mutator\Boolean;
 
 use function array_key_exists;
 use Generator;
+use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Definition;
+use Infection\Mutator\GetConfigClassName;
 use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\MutatorConfig;
-use Infection\Visitor\ParentConnectorVisitor;
+use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use PhpParser\Node;
+use function Safe\array_flip;
 
 /**
  * @internal
  */
-final class TrueValue implements Mutator
+final class TrueValue implements ConfigurableMutator
 {
     use GetMutatorName;
+    use GetConfigClassName;
 
-    private const DEFAULT_SETTINGS = [
-        'array_search' => false,
-        'in_array' => false,
-    ];
+    /**
+     * @var array<string, int>
+     */
+    private $allowedFunctions;
 
-    private $settings;
-
-    public function __construct(MutatorConfig $config)
+    public function __construct(TrueValueConfig $config)
     {
-        $this->settings = $config->getMutatorSettings();
+        $this->allowedFunctions = array_flip($config->getAllowedFunctions());
     }
 
     public static function getDefinition(): ?Definition
@@ -100,10 +100,8 @@ final class TrueValue implements Mutator
             return true;
         }
 
-        $resultSettings = array_merge(self::DEFAULT_SETTINGS, $this->settings);
-
         $functionName = $grandParentNode->name->toLowerString();
 
-        return array_key_exists($functionName, $resultSettings) && $resultSettings[$functionName] !== false;
+        return array_key_exists($functionName, $this->allowedFunctions);
     }
 }
