@@ -35,15 +35,42 @@ declare(strict_types=1);
 
 namespace Infection\Environment;
 
+use function Safe\sprintf;
+
 /**
  * @internal
+ *
+ * @see https://docs.travis-ci.com/user/environment-variables/#default-environment-variables
  */
-interface BuildContextResolver
+final class TravisCiResolver implements BuildContextResolver
 {
-    /**
-     * @param array<string, string> $environment
-     *
-     * @throws CouldNotResolveBuildContext
-     */
-    public function resolve(array $environment): BuildContext;
+    public function resolve(array $environment): BuildContext
+    {
+        if (
+            !array_key_exists('TRAVIS', $environment)
+            || !array_key_exists('TRAVIS_PULL_REQUEST', $environment)
+            || $environment['TRAVIS'] !== 'true'
+        ) {
+            throw CouldNotResolveBuildContext::create('it is not a Travis CI');
+        }
+
+        if ($environment['TRAVIS_PULL_REQUEST'] !== 'false') {
+            throw CouldNotResolveBuildContext::create(sprintf(
+                'build is for a pull request (TRAVIS_PULL_REQUEST=%s)',
+                $environment['TRAVIS_PULL_REQUEST']
+            ));
+        }
+
+        if (
+            !array_key_exists('TRAVIS_REPO_SLUG', $environment)
+            || !array_key_exists('TRAVIS_BRANCH', $environment)
+        ) {
+            throw CouldNotResolveBuildContext::create('repository slug nor current branch were found; not a Travis build?');
+        }
+
+        return new BuildContext(
+            $environment['TRAVIS_REPO_SLUG'],
+            $environment['TRAVIS_BRANCH']
+        );
+    }
 }
