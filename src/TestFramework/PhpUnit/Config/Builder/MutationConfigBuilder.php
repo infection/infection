@@ -122,12 +122,15 @@ class MutationConfigBuilder extends ConfigBuilder
         $this->setCustomBootstrapPath($customAutoloadFilePath, $xPath);
         $this->setFilteredTestsToRun($coverageTests, $dom, $xPath);
 
+        $originalBootstrapFile = $this->originalBootstrapFile;
+        Assert::string($originalBootstrapFile);
+
         file_put_contents(
             $customAutoloadFilePath,
             $this->createCustomAutoloadWithInterceptor(
                 $mutationOriginalFilePath,
                 $mutantFilePath,
-                $this->originalBootstrapFile
+                $originalBootstrapFile
             )
         );
 
