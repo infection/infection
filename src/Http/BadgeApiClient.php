@@ -35,14 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Http;
 
-use function curl_close;
 use function is_string;
-use function Safe\curl_exec;
-use function Safe\curl_getinfo;
-use function Safe\curl_init;
-use function Safe\curl_setopt;
-use function Safe\json_encode;
+use function iterator_to_array;
 use function Safe\sprintf;
+use function Safe\curl_init;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -54,6 +50,9 @@ class BadgeApiClient
 
     private const CREATED_RESPONSE_CODE = 201;
 
+    /**
+     * @var OutputInterface
+     */
     private $output;
 
     public function __construct(OutputInterface $output)
@@ -80,7 +79,7 @@ class BadgeApiClient
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, iterator_to_array($this->createHeaders($apiKey)));
         curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
         curl_setopt($ch, CURLOPT_HEADER, true);
 
@@ -88,13 +87,29 @@ class BadgeApiClient
         $responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        if ($responseCode !== self::CREATED_RESPONSE_CODE) {
+        if (self::CREATED_RESPONSE_CODE !== $responseCode) {
             $this->output->writeln(sprintf('Stryker dashboard returned an unexpected response code: %s', $responseCode));
         }
 
         if (is_string($response)) {
             $this->output->writeln('Dashboard response:', OutputInterface::VERBOSITY_VERBOSE);
             $this->output->writeln($response, OutputInterface::VERBOSITY_VERBOSE);
+        }
+    }
+
+    /**
+     * @param string $apiKey
+     * @return iterable<string>
+     */
+    private function createHeaders(string $apiKey): iterable
+    {
+        $headers = [
+            'Content-Type' => 'application/json',
+            'X-Api-Key' => $apiKey,
+        ];
+
+        foreach ($headers as $key => $value) {
+            yield sprintf('%s: %s', $key, $value);
         }
     }
 }
