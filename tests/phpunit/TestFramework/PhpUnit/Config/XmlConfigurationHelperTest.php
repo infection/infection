@@ -44,6 +44,7 @@ use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use const PHP_OS_FAMILY;
 use PHPUnit\Framework\TestCase;
+use function Safe\sprintf;
 use function str_replace;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\PathUtil\Path;
