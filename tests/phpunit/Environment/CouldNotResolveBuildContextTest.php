@@ -38,9 +38,6 @@ namespace Infection\Tests\Environment;
 use Infection\Environment\CouldNotResolveBuildContext;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Infection\Environment\CouldNotResolveBuildContext
- */
 final class CouldNotResolveBuildContextTest extends TestCase
 {
     public function test_create_returns_exception(): void

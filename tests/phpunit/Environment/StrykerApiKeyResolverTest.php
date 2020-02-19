@@ -40,9 +40,6 @@ use Infection\Environment\StrykerApiKeyResolver;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-/**
- * @covers \Infection\Environment\StrykerApiKeyResolver
- */
 final class StrykerApiKeyResolverTest extends TestCase
 {
     public function test_resolve_throws_when_environment_is_empty_array(): void
