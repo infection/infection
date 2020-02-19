@@ -69,6 +69,7 @@
         "symfony/console": "=4.1.5"
     },
     "require-dev": {
+        "ext-simplexml": "*",
         "helmich/phpunit-json-assert": "^3.0",
         "phpstan/extension-installer": "^1.0",
         "phpstan/phpstan": "^0.12.8",

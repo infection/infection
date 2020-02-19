@@ -41,6 +41,8 @@ use function implode;
 use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\SafeQuery;
+use function libxml_get_errors;
+use function libxml_use_internal_errors;
 use LibXMLError;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
@@ -51,6 +53,7 @@ use Webmozart\Assert\Assert;
 final class XmlConfigurationHelper
 {
     use SafeQuery;
+
     private $pathReplacer;
     private $phpUnitConfigDir;
 
@@ -122,6 +125,9 @@ final class XmlConfigurationHelper
     public function validate(DOMXPath $xPath): bool
     {
         if (self::safeQuery($xPath, '/phpunit')->length === 0) {
+            // TODO: should have the PHPUnit config path passed otherwise we blindly assume
+            //  "phpunit.xml" without neither the path neither guarantee this is the file name
+            //  (it could be a different one passed with the --configuration option)
             throw InvalidPhpUnitXmlConfigException::byRootNode();
         }
 
