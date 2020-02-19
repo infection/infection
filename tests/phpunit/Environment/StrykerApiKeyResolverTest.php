@@ -94,7 +94,7 @@ final class StrykerApiKeyResolverTest extends TestCase
 
         $resolver = new StrykerApiKeyResolver();
 
-        self::assertSame('bar', $resolver->resolve($environment));
+        $this->assertSame('bar', $resolver->resolve($environment));
     }
 
     public function test_resolve_returns_value_of_stryker_dashboard_api_key_when_available(): void
@@ -106,6 +106,6 @@ final class StrykerApiKeyResolverTest extends TestCase
 
         $resolver = new StrykerApiKeyResolver();
 
-        self::assertSame('baz', $resolver->resolve($environment));
+        $this->assertSame('baz', $resolver->resolve($environment));
     }
 }
