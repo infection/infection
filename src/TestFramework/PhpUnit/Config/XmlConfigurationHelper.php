@@ -37,12 +37,12 @@ namespace Infection\TestFramework\PhpUnit\Config;
 
 use DOMElement;
 use DOMXPath;
+use const FILTER_VALIDATE_URL;
 use function filter_var;
 use function implode;
 use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\SafeQuery;
-use const FILTER_VALIDATE_URL;
 use const LIBXML_ERR_ERROR;
 use const LIBXML_ERR_FATAL;
 use const LIBXML_ERR_WARNING;

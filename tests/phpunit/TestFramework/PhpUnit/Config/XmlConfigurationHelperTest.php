@@ -43,7 +43,9 @@ use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigExce
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use PHPUnit\Framework\TestCase;
+use function str_replace;
 use Symfony\Component\Filesystem\Filesystem;
+use Webmozart\PathUtil\Path;
 
 /**
  * @group integration Requires some I/O operations
@@ -511,16 +513,36 @@ XML
 <phpunit
     xsi:noNamespaceSchemaLocation="$xsdSchema"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    foo="bar"
 >
     <invalid></invalid>
 </phpunit>
 XML
         );
 
-        $this->expectException(InvalidPhpUnitXmlConfigException::class);
-        $this->expectExceptionMessageRegExp('/\[Error\] Element \'invalid\': This element is not expected\.[\n ]+in .*? \(line 6, col 0\)$/');
+        try {
+            $this->configHelper->validate($xPath);
 
-        $this->configHelper->validate($xPath);
+            $this->fail('Expected exception to be thrown');
+        } catch (InvalidPhpUnitXmlConfigException $exception) {
+            $errorMessage = str_replace(
+                Path::canonicalize(__DIR__ . '/../../../../../'),
+                '/path/to/infection',
+                $exception->getMessage()
+            );
+
+            $this->assertSame(
+                <<<'EOF'
+phpunit.xml file does not pass XSD schema validation. [Error] Element 'phpunit', attribute 'foo': The attribute 'foo' is not allowed.
+ in /path/to/infection/ (line 6, col 0)
+[Error] Element 'invalid': This element is not expected.
+ in /path/to/infection/ (line 7, col 0)
+
+EOF
+                ,
+                $errorMessage
+            );
+        }
     }
 
     /**
@@ -547,7 +569,7 @@ XML
     {
         $configHelper = new XmlConfigurationHelper(
             new PathReplacer(new Filesystem()),
-            __DIR__.'/../../../../..'
+            __DIR__ . '/../../../../..'
         );
 
         $xPath = $this->createXPath(<<<XML
