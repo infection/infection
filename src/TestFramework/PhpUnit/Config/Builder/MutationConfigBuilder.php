@@ -63,6 +63,11 @@ class MutationConfigBuilder extends ConfigBuilder
     private $jUnitTestCaseSorter;
 
     /**
+     * @var string|null
+     */
+    private $originalBootstrapFile;
+
+    /**
      * @var DOMDocument|null
      */
     private $dom;
@@ -91,10 +96,15 @@ class MutationConfigBuilder extends ConfigBuilder
         string $mutationHash,
         string $mutationOriginalFilePath
     ): string {
-        $dom = clone $this->getDom();
+        $dom = $this->getDom();
         $xPath = new DOMXPath($dom);
 
         $this->xmlConfigurationHelper->replaceWithAbsolutePaths($xPath);
+
+        if ($this->originalBootstrapFile === null) {
+            $this->originalBootstrapFile = $this->getOriginalBootstrapFilePath($xPath);
+        }
+
         $this->xmlConfigurationHelper->setStopOnFailure($xPath);
         $this->xmlConfigurationHelper->deactivateColours($xPath);
         $this->xmlConfigurationHelper->deactivateResultCaching($xPath);
@@ -109,8 +119,6 @@ class MutationConfigBuilder extends ConfigBuilder
             $mutationHash
         );
 
-        $originalAutoloadFile = $this->getOriginalBootstrapFilePath($xPath);
-
         $this->setCustomBootstrapPath($customAutoloadFilePath, $xPath);
         $this->setFilteredTestsToRun($coverageTests, $dom, $xPath);
 
@@ -119,7 +127,7 @@ class MutationConfigBuilder extends ConfigBuilder
             $this->createCustomAutoloadWithInterceptor(
                 $mutationOriginalFilePath,
                 $mutantFilePath,
-                $originalAutoloadFile
+                $this->originalBootstrapFile
             )
         );
 
