@@ -56,7 +56,6 @@ class InitialConfigBuilder implements ConfigBuilder
     use SafeQuery;
 
     private $tmpDir;
-    private $configPath;
     private $originalXmlConfigContent;
     private $xmlConfigurationHelper;
     private $jUnitFilePath;
@@ -68,7 +67,6 @@ class InitialConfigBuilder implements ConfigBuilder
      */
     public function __construct(
         string $tmpDir,
-        string $configPath,
         string $originalXmlConfigContent,
         XmlConfigurationHelper $xmlConfigurationHelper,
         string $jUnitFilePath,
@@ -81,7 +79,6 @@ class InitialConfigBuilder implements ConfigBuilder
         );
 
         $this->tmpDir = $tmpDir;
-        $this->configPath = $configPath;
         $this->originalXmlConfigContent = $originalXmlConfigContent;
         $this->xmlConfigurationHelper = $xmlConfigurationHelper;
         $this->jUnitFilePath = $jUnitFilePath;
@@ -100,7 +97,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
         $xPath = new DOMXPath($dom);
 
-        $this->xmlConfigurationHelper->validate($this->configPath, $xPath);
+        $this->xmlConfigurationHelper->validate($path, $xPath);
 
         $this->addCoverageFilterWhitelistIfDoesNotExist($xPath);
         $this->addRandomTestsOrderAttributesIfNotSet($version, $xPath);

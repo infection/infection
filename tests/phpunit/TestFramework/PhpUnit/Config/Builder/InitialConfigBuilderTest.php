@@ -420,7 +420,6 @@ XML
 
         return new InitialConfigBuilder(
             $this->tmp,
-            '/path/to/phpunit.xml',
             file_get_contents($phpunitXmlPath),
             new XmlConfigurationHelper($replacer, ''),
             $jUnitFilePath,

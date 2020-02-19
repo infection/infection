@@ -84,7 +84,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
             new InitialConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
-                $testFrameworkConfigPath,
                 $xmlConfigurationHelper,
                 $jUnitFilePath,
                 $sourceDirectories,
