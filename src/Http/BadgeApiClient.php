@@ -79,7 +79,7 @@ class BadgeApiClient
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, iterator_to_array($this->createHeaders($apiKey)));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $this->createHeaders($apiKey));
         curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
         curl_setopt($ch, CURLOPT_HEADER, true);
 
@@ -87,7 +87,7 @@ class BadgeApiClient
         $responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        if (self::CREATED_RESPONSE_CODE !== $responseCode) {
+        if ($responseCode !== self::CREATED_RESPONSE_CODE) {
             $this->output->writeln(sprintf('Stryker dashboard returned an unexpected response code: %s', $responseCode));
         }
 
@@ -99,17 +99,20 @@ class BadgeApiClient
 
     /**
      * @param string $apiKey
-     * @return iterable<string>
+     * @return array<string>
      */
-    private function createHeaders(string $apiKey): iterable
+    private function createHeaders(string $apiKey): array
     {
+        $return = [];
         $headers = [
             'Content-Type' => 'application/json',
             'X-Api-Key' => $apiKey,
         ];
 
         foreach ($headers as $key => $value) {
-            yield sprintf('%s: %s', $key, $value);
+            $return[] = sprintf('%s: %s', $key, $value);
         }
+
+        return $return;
     }
 }
