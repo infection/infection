@@ -37,6 +37,7 @@ namespace Infection\TestFramework\PhpUnit\Config;
 
 use DOMElement;
 use DOMXPath;
+use LogicException;
 use function implode;
 use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
@@ -46,6 +47,9 @@ use function libxml_use_internal_errors;
 use LibXMLError;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
+use const LIBXML_ERR_ERROR;
+use const LIBXML_ERR_FATAL;
+use const LIBXML_ERR_WARNING;
 
 /**
  * @internal
@@ -163,7 +167,7 @@ final class XmlConfigurationHelper
         $errors = libxml_get_errors();
 
         foreach ($errors as $key => $error) {
-            $level = $this->getErrorLevelString($error);
+            $level = $this->getErrorLevelName($error);
             $errorsString .= sprintf('[%s] %s', $level, $error->message);
 
             if ($error->file) {
@@ -214,7 +218,7 @@ final class XmlConfigurationHelper
         }
     }
 
-    private function getErrorLevelString(LibXMLError $error): string
+    private function getErrorLevelName(LibXMLError $error): string
     {
         if ($error->level === LIBXML_ERR_WARNING) {
             return 'Warning';
@@ -224,6 +228,10 @@ final class XmlConfigurationHelper
             return 'Error';
         }
 
-        return 'Fatal';
+        if ($error->level === LIBXML_ERR_FATAL) {
+            return 'Fatal';
+        }
+
+        throw new LogicException(sprintf('Unknown lib XML error level "%s"', $error->level));
     }
 }

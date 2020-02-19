@@ -50,11 +50,26 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class XmlConfigurationHelperTest extends TestCase
 {
+    /**
+     * @var XmlConfigurationHelper
+     */
+    private $configHelper;
+
+    protected function setUp(): void
+    {
+        $this->configHelper = new XmlConfigurationHelper(
+            new PathReplacer(new Filesystem()),
+            ''
+        );
+    }
+
     public function test_it_replaces_with_absolute_paths(): void
     {
-        $this->assertItChangesStandardConfiguration(static function (XmlConfigurationHelper $xmlconfig, DOMXPath $xPath, DOMDocument $dom): void {
-            $xmlconfig->replaceWithAbsolutePaths($xPath);
-        }, <<<XML
+        $this->assertItChangesStandardConfiguration(
+            static function (XmlConfigurationHelper $configHelper, DOMXPath $xPath): void {
+                $configHelper->replaceWithAbsolutePaths($xPath);
+            },
+            <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -89,9 +104,11 @@ XML
 
     public function test_it_removes_existing_loggers(): void
     {
-        $this->assertItChangesStandardConfiguration(static function (XmlConfigurationHelper $xmlconfig, DOMXPath $xPath, DOMDocument $dom): void {
-            $xmlconfig->removeExistingLoggers($xPath);
-        }, <<<XML
+        $this->assertItChangesStandardConfiguration(
+            static function (XmlConfigurationHelper $configHelper, DOMXPath $xPath): void {
+                $configHelper->removeExistingLoggers($xPath);
+            },
+            <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -123,9 +140,11 @@ XML
 
     public function test_it_sets_set_stop_on_failure(): void
     {
-        $this->assertItChangesStandardConfiguration(static function (XmlConfigurationHelper $xmlconfig, DOMXPath $xPath, DOMDocument $dom): void {
-            $xmlconfig->setStopOnFailure($xPath);
-        }, <<<XML
+        $this->assertItChangesStandardConfiguration(
+            static function (XmlConfigurationHelper $configHelper, DOMXPath $xPath): void {
+                $configHelper->setStopOnFailure($xPath);
+            },
+            <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -161,7 +180,7 @@ XML
 
     public function test_it_sets_set_stop_on_failure_when_it_is_already_present(): void
     {
-        $this->assertItChangesXML(<<<XML
+        $this->assertItChangesXML(<<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -178,9 +197,11 @@ XML
 >
 </phpunit>
 XML
-        , static function (XmlConfigurationHelper $xmlconfig, DOMXPath $xPath, DOMDocument $dom): void {
-            $xmlconfig->setStopOnFailure($xPath);
-        }, <<<XML
+            ,
+            static function (XmlConfigurationHelper $configHelper, DOMXPath $xPath): void {
+                $configHelper->setStopOnFailure($xPath);
+            },
+            <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -202,9 +223,11 @@ XML
 
     public function test_it_deactivates_colors(): void
     {
-        $this->assertItChangesStandardConfiguration(static function (XmlConfigurationHelper $xmlconfig, DOMXPath $xPath, DOMDocument $dom): void {
-            $xmlconfig->deactivateColours($xPath);
-        }, <<<XML
+        $this->assertItChangesStandardConfiguration(
+            static function (XmlConfigurationHelper $configHelper, DOMXPath $xPath): void {
+                $configHelper->deactivateColours($xPath);
+            },
+            <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -239,7 +262,7 @@ XML
 
     public function test_it_deactivates_colors_when_it_is_not_already_present(): void
     {
-        $this->assertItChangesXML(<<<XML
+        $this->assertItChangesXML(<<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -255,9 +278,11 @@ XML
 >
 </phpunit>
 XML
-            , static function (XmlConfigurationHelper $xmlconfig, DOMXPath $xPath, DOMDocument $dom): void {
-                $xmlconfig->deactivateColours($xPath);
-            }, <<<XML
+            ,
+            static function (XmlConfigurationHelper $configHelper, DOMXPath $xPath): void {
+                $configHelper->deactivateColours($xPath);
+            },
+            <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -279,7 +304,7 @@ XML
 
     public function test_it_sets_cache_result_to_false_when_it_exists(): void
     {
-        $this->assertItChangesXML(<<<XML
+        $this->assertItChangesXML(<<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -297,9 +322,11 @@ XML
 </phpunit>
 
 XML
-        , static function (XmlConfigurationHelper $xmlconfig, DOMXPath $xPath, DOMDocument $dom): void {
-            $xmlconfig->deactivateResultCaching($xPath);
-        }, <<<XML
+            ,
+            static function (XmlConfigurationHelper $configHelper, DOMXPath $xPath): void {
+                $configHelper->deactivateResultCaching($xPath);
+            },
+            <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -321,7 +348,7 @@ XML
 
     public function test_it_sets_cache_result_to_false_when_it_does_not_exist(): void
     {
-        $this->assertItChangesXML(<<<XML
+        $this->assertItChangesXML(<<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -337,9 +364,11 @@ XML
 >
 </phpunit>
 XML
-        , static function (XmlConfigurationHelper $xmlconfig, DOMXPath $xPath, DOMDocument $dom): void {
-            $xmlconfig->deactivateResultCaching($xPath);
-        }, <<<XML
+            ,
+            static function (XmlConfigurationHelper $configHelper, DOMXPath $xPath): void {
+                $configHelper->deactivateResultCaching($xPath);
+            },
+            <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -361,7 +390,7 @@ XML
 
     public function test_it_sets_stderr_to_false_when_it_exists(): void
     {
-        $this->assertItChangesXML(<<<XML
+        $this->assertItChangesXML(<<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     stderr="true"
@@ -369,9 +398,11 @@ XML
 >
 </phpunit>
 XML
-        , static function (XmlConfigurationHelper $xmlconfig, DOMXPath $xPath, DOMDocument $dom): void {
-            $xmlconfig->deactivateStderrRedirection($xPath);
-        }, <<<XML
+            ,
+            static function (XmlConfigurationHelper $configHelper, DOMXPath $xPath): void {
+                $configHelper->deactivateStderrRedirection($xPath);
+            },
+            <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     stderr="false"
@@ -384,16 +415,18 @@ XML
 
     public function test_it_sets_stderr_to_false_when_it_does_not_exist(): void
     {
-        $this->assertItChangesXML(<<<XML
+        $this->assertItChangesXML(<<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     syntaxCheck="false"
 >
 </phpunit>
 XML
-            , static function (XmlConfigurationHelper $xmlconfig, DOMXPath $xPath, DOMDocument $dom): void {
-                $xmlconfig->deactivateStderrRedirection($xPath);
-            }, <<<XML
+            ,
+            static function (XmlConfigurationHelper $configHelper, DOMXPath $xPath): void {
+                $configHelper->deactivateStderrRedirection($xPath);
+            },
+            <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     stderr="false"
@@ -406,7 +439,7 @@ XML
 
     public function test_it_removes_existing_printers(): void
     {
-        $this->assertItChangesXML(<<<XML
+        $this->assertItChangesXML(<<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -422,9 +455,11 @@ XML
 >
 </phpunit>
 XML
-            , static function (XmlConfigurationHelper $xmlconfig, DOMXPath $xPath, DOMDocument $dom): void {
-                $xmlconfig->removeExistingPrinters($xPath);
-            }, <<<XML
+            ,
+            static function (XmlConfigurationHelper $configHelper, DOMXPath $xPath): void {
+                $configHelper->removeExistingPrinters($xPath);
+            },
+            <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -448,13 +483,13 @@ XML
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
         $dom->loadXML('<invalid></invalid>');
+
         $xPath = new DOMXPath($dom);
-        $xmlHelper = new XmlConfigurationHelper($this->getPathReplacer(), '');
 
         $this->expectException(InvalidPhpUnitXmlConfigException::class);
         $this->expectExceptionMessage('phpunit.xml does not contain a valid PHPUnit configuration.');
 
-        $xmlHelper->validate($xPath);
+        $this->configHelper->validate($xPath);
     }
 
     /**
@@ -477,20 +512,13 @@ XML
 </phpunit>
 XML
         );
+
         $xPath = new DOMXPath($dom);
-        $xmlHelper = new XmlConfigurationHelper($this->getPathReplacer(), '');
 
         $this->expectException(InvalidPhpUnitXmlConfigException::class);
         $this->expectExceptionMessageRegExp('/Element \'invalid\'\: This element is not expected/');
 
-        $xmlHelper->validate($xPath);
-    }
-
-    public function schemaProvider(): Generator
-    {
-        yield 'Remote XSD' => ['https://raw.githubusercontent.com/sebastianbergmann/phpunit/7.4.0/phpunit.xsd'];
-
-        yield 'Local XSD' => ['./vendor/phpunit/phpunit/phpunit.xsd'];
+        $this->configHelper->validate($xPath);
     }
 
     /**
@@ -512,16 +540,15 @@ XML
 </phpunit>
 XML
         );
+
         $xPath = new DOMXPath($dom);
 
-        $xmlHelper = new XmlConfigurationHelper($this->getPathReplacer(), '');
-
-        $this->assertTrue($xmlHelper->validate($xPath));
+        $this->assertTrue($this->configHelper->validate($xPath));
     }
 
     public function test_it_removes_default_test_suite(): void
     {
-        $this->assertItChangesXML(<<<XML
+        $this->assertItChangesXML(<<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     defaultTestSuite="unit"
@@ -532,9 +559,11 @@ XML
 </phpunit>
 
 XML
-            , static function (XmlConfigurationHelper $xmlconfig, DOMXPath $xPath, DOMDocument $dom): void {
-                $xmlconfig->removeDefaultTestSuite($xPath);
-            }, <<<XML
+            ,
+            static function (XmlConfigurationHelper $configHelper, DOMXPath $xPath): void {
+                $configHelper->removeDefaultTestSuite($xPath);
+            },
+            <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     printerClass="Fake\Printer\Class"
@@ -547,14 +576,19 @@ XML
         );
     }
 
+    public function schemaProvider(): Generator
+    {
+        yield 'Remote XSD' => ['https://raw.githubusercontent.com/sebastianbergmann/phpunit/7.4.0/phpunit.xsd'];
+
+        yield 'Local XSD' => ['./vendor/phpunit/phpunit/phpunit.xsd'];
+    }
+
     private function assertItChangesStandardConfiguration(Closure $callback, string $expectedXml): void
     {
         $dom = $this->getDomDocument();
         $xPath = new DOMXPath($dom);
 
-        $xmlConfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
-
-        $callback($xmlConfig, $xPath, $dom);
+        $callback($this->configHelper, $xPath, $dom);
 
         $actualXml = $dom->saveXML();
 
@@ -562,7 +596,7 @@ XML
         $this->assertXmlStringEqualsXmlString($expectedXml, $actualXml);
     }
 
-    private function assertItChangesXML(string $inputXml, callable $callback, string $expectedXml): void
+    private function assertItChangesXML(string $inputXml, Closure $callback, string $expectedXml): void
     {
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
@@ -570,9 +604,7 @@ XML
         $dom->loadXML($inputXml);
         $xPath = new DOMXPath($dom);
 
-        $xmlConfig = new XmlConfigurationHelper($this->getPathReplacer(), '');
-
-        $callback($xmlConfig, $xPath, $dom);
+        $callback($this->configHelper, $xPath, $dom);
 
         $actualXml = $dom->saveXML();
 
@@ -585,19 +617,7 @@ XML
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
-        $dom->loadXML($this->getPHPUnitXMLConfig());
-
-        return $dom;
-    }
-
-    private function getPathReplacer(): PathReplacer
-    {
-        return new PathReplacer(new Filesystem());
-    }
-
-    private function getPHPUnitXMLConfig(): string
-    {
-        return <<<XML
+        $dom->loadXML(<<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -628,6 +648,9 @@ XML
         <log type="coverage-html" target="/path/to/tmp"/>
     </logging>
 </phpunit>
-XML;
+XML
+        );
+
+        return $dom;
     }
 }
