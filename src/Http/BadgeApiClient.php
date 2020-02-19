@@ -37,7 +37,7 @@ namespace Infection\Http;
 
 use function is_string;
 use function iterator_to_array;
-use function sprintf;
+use function Safe\sprintf;
 use function Safe\curl_init;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -99,7 +99,7 @@ class BadgeApiClient
 
     /**
      * @param string $apiKey
-     * @return iterable
+     * @return iterable<string>
      */
     private function createHeaders(string $apiKey): iterable
     {
