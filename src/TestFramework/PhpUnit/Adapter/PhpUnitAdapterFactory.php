@@ -43,7 +43,7 @@ use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
-use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\VersionParser;
 use function Safe\file_get_contents;
 use Symfony\Component\Filesystem\Filesystem;
@@ -71,7 +71,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
 
         $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);
 
-        $xmlConfigurationHelper = new XmlConfigurationHelper(
+        $configManipulator = new XmlConfigurationManipulator(
             new PathReplacer(
                 new Filesystem(),
                 $testFrameworkConfigDir
@@ -84,7 +84,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
             new InitialConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
-                $xmlConfigurationHelper,
+                $configManipulator,
                 $jUnitFilePath,
                 $sourceDirectories,
                 $skipCoverage
@@ -92,7 +92,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
             new MutationConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
-                $xmlConfigurationHelper,
+                $configManipulator,
                 $projectDir,
                 new JUnitTestCaseSorter()
             ),

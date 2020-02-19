@@ -43,7 +43,7 @@ use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
-use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\SafeQuery;
 use function Safe\file_put_contents;
 use function Safe\sprintf;
@@ -75,7 +75,7 @@ class MutationConfigBuilder extends ConfigBuilder
     public function __construct(
         string $tmpDir,
         string $originalXmlConfigContent,
-        XmlConfigurationHelper $xmlConfigurationHelper,
+        XmlConfigurationManipulator $xmlConfigurationHelper,
         string $projectDir,
         JUnitTestCaseSorter $jUnitTestCaseSorter
     ) {

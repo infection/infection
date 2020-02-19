@@ -41,7 +41,7 @@ use DOMNode;
 use DOMXPath;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
-use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\SafeQuery;
 use function Safe\file_put_contents;
 use function Safe\sprintf;
@@ -68,7 +68,7 @@ class InitialConfigBuilder implements ConfigBuilder
     public function __construct(
         string $tmpDir,
         string $originalXmlConfigContent,
-        XmlConfigurationHelper $xmlConfigurationHelper,
+        XmlConfigurationManipulator $xmlConfigurationHelper,
         string $jUnitFilePath,
         array $srcDirs,
         bool $skipCoverage

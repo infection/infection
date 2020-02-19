@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Config\Exception;
+namespace Infection\TestFramework\PhpUnit\Config;
 
 use const PHP_EOL;
 use RuntimeException;
@@ -42,7 +42,7 @@ use function Safe\sprintf;
 /**
  * @internal
  */
-final class InvalidPhpUnitXmlConfigException extends RuntimeException
+final class InvalidPhpUnitConfiguration extends RuntimeException
 {
     public static function byRootNode(string $configPath): self
     {

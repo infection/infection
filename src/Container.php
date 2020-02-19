@@ -89,7 +89,7 @@ use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
-use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use InvalidArgumentException;
@@ -180,8 +180,8 @@ final class Container
                     GeneratedExtensionsConfig::EXTENSIONS
                 );
             },
-            XmlConfigurationHelper::class => static function (self $container): XmlConfigurationHelper {
-                return new XmlConfigurationHelper(
+            XmlConfigurationManipulator::class => static function (self $container): XmlConfigurationManipulator {
+                return new XmlConfigurationManipulator(
                     $container->getPathReplacer(),
                     (string) $container->getConfiguration()->getPhpUnit()->getConfigDir()
                 );
@@ -544,11 +544,6 @@ final class Container
     public function getFactory(): Factory
     {
         return $this->get(Factory::class);
-    }
-
-    public function getXmlConfigurationHelper(): XmlConfigurationHelper
-    {
-        return $this->get(XmlConfigurationHelper::class);
     }
 
     public function getMutantCodeFactory(): MutantCodeFactory
