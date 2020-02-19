@@ -477,7 +477,7 @@ XML
         );
     }
 
-    public function test_it_validates_xml_by_root_node(): void
+    public function test_it_cannot_validate_invalid_PHPUnit_XML_configuration(): void
     {
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
@@ -492,12 +492,29 @@ XML
         $this->configHelper->validate($xPath);
     }
 
+    public function test_it_consider_as_valid_a_PHPUnit_XML_configuration_without_XSD(): void
+    {
+        $dom = new DOMDocument();
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML(<<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit>
+</phpunit>
+XML
+        );
+
+        $xPath = new DOMXPath($dom);
+
+        $this->assertTrue($this->configHelper->validate($xPath));
+    }
+
     /**
      * @dataProvider schemaProvider
      *
      * @group integration Might require an external connection to download the XSD
      */
-    public function test_it_validates_xml_by_xsd(string $xsdSchema): void
+    public function test_it_validates_XML_by_XSD(string $xsdSchema): void
     {
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
@@ -516,7 +533,7 @@ XML
         $xPath = new DOMXPath($dom);
 
         $this->expectException(InvalidPhpUnitXmlConfigException::class);
-        $this->expectExceptionMessageRegExp('/Element \'invalid\'\: This element is not expected/');
+        $this->expectExceptionMessageRegExp('/^\[Error\] Element \'invalid\': This element is not expected\.\n in .*? \(line 6, col 0\)$/');
 
         $this->configHelper->validate($xPath);
     }
@@ -526,7 +543,7 @@ XML
      *
      * @group integration Might require an external connection to download the XSD
      */
-    public function test_it_passes_validation_by_xsd(string $xsdSchema): void
+    public function test_it_passes_validation_by_XSD(string $xsdSchema): void
     {
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
@@ -544,6 +561,31 @@ XML
         $xPath = new DOMXPath($dom);
 
         $this->assertTrue($this->configHelper->validate($xPath));
+    }
+
+    public function test_it_uses_the_configured_PHPUnit_config_dir_to_build_schema_paths(): void
+    {
+        $configHelper = new XmlConfigurationHelper(
+            new PathReplacer(new Filesystem()),
+            __DIR__.'/../../../../..'
+        );
+
+        $dom = new DOMDocument();
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML(<<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+</phpunit>
+XML
+        );
+
+        $xPath = new DOMXPath($dom);
+
+        $this->assertTrue($configHelper->validate($xPath));
     }
 
     public function test_it_removes_default_test_suite(): void
@@ -578,9 +620,9 @@ XML
 
     public function schemaProvider(): Generator
     {
-        yield 'Remote XSD' => ['https://raw.githubusercontent.com/sebastianbergmann/phpunit/7.4.0/phpunit.xsd'];
+        yield 'remote XSD' => ['https://raw.githubusercontent.com/sebastianbergmann/phpunit/7.4.0/phpunit.xsd'];
 
-        yield 'Local XSD' => ['./vendor/phpunit/phpunit/phpunit.xsd'];
+        yield 'local XSD' => ['./vendor/phpunit/phpunit/phpunit.xsd'];
     }
 
     private function assertItChangesStandardConfiguration(Closure $callback, string $expectedXml): void
