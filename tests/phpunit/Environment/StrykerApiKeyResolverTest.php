@@ -40,9 +40,6 @@ use Infection\Environment\StrykerApiKeyResolver;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-/**
- * @covers \Infection\Environment\StrykerApiKeyResolver
- */
 final class StrykerApiKeyResolverTest extends TestCase
 {
     public function test_resolve_throws_when_environment_is_empty_array(): void
@@ -94,7 +91,7 @@ final class StrykerApiKeyResolverTest extends TestCase
 
         $resolver = new StrykerApiKeyResolver();
 
-        self::assertSame('bar', $resolver->resolve($environment));
+        $this->assertSame('bar', $resolver->resolve($environment));
     }
 
     public function test_resolve_returns_value_of_stryker_dashboard_api_key_when_available(): void
@@ -106,6 +103,6 @@ final class StrykerApiKeyResolverTest extends TestCase
 
         $resolver = new StrykerApiKeyResolver();
 
-        self::assertSame('baz', $resolver->resolve($environment));
+        $this->assertSame('baz', $resolver->resolve($environment));
     }
 }

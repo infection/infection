@@ -39,9 +39,6 @@ use Infection\Environment\CouldNotResolveStrykerApiKey;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
 
-/**
- * @covers \Infection\Environment\CouldNotResolveStrykerApiKey
- */
 final class CouldNotResolveStrykerApiKeyTest extends TestCase
 {
     public function test_from_returns_exception(): void
@@ -61,6 +58,6 @@ final class CouldNotResolveStrykerApiKeyTest extends TestCase
             )
         );
 
-        self::assertSame($message, $exception->getMessage());
+        $this->assertSame($message, $exception->getMessage());
     }
 }
