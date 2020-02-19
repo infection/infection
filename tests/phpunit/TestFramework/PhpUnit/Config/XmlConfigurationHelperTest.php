@@ -479,12 +479,7 @@ XML
 
     public function test_it_cannot_validate_invalid_PHPUnit_XML_configuration(): void
     {
-        $dom = new DOMDocument();
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $dom->loadXML('<invalid></invalid>');
-
-        $xPath = new DOMXPath($dom);
+        $xPath = $this->createXPath('<invalid></invalid>');
 
         $this->expectException(InvalidPhpUnitXmlConfigException::class);
         $this->expectExceptionMessage('phpunit.xml does not contain a valid PHPUnit configuration.');
@@ -494,17 +489,12 @@ XML
 
     public function test_it_consider_as_valid_a_PHPUnit_XML_configuration_without_XSD(): void
     {
-        $dom = new DOMDocument();
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $dom->loadXML(<<<XML
+        $xPath = $this->createXPath(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit>
 </phpunit>
 XML
         );
-
-        $xPath = new DOMXPath($dom);
 
         $this->assertTrue($this->configHelper->validate($xPath));
     }
@@ -516,10 +506,7 @@ XML
      */
     public function test_it_validates_XML_by_XSD(string $xsdSchema): void
     {
-        $dom = new DOMDocument();
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $dom->loadXML(<<<"XML"
+        $xPath = $this->createXPath(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     xsi:noNamespaceSchemaLocation="$xsdSchema"
@@ -530,10 +517,8 @@ XML
 XML
         );
 
-        $xPath = new DOMXPath($dom);
-
         $this->expectException(InvalidPhpUnitXmlConfigException::class);
-        $this->expectExceptionMessageRegExp('/^\[Error\] Element \'invalid\': This element is not expected\.\n in .*? \(line 6, col 0\)$/');
+        $this->expectExceptionMessageRegExp('/\[Error\] Element \'invalid\': This element is not expected\.[\n ]+in .*? \(line 6, col 0\)$/');
 
         $this->configHelper->validate($xPath);
     }
@@ -545,10 +530,7 @@ XML
      */
     public function test_it_passes_validation_by_XSD(string $xsdSchema): void
     {
-        $dom = new DOMDocument();
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $dom->loadXML(<<<XML
+        $xPath = $this->createXPath(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     xsi:noNamespaceSchemaLocation="$xsdSchema"
@@ -557,8 +539,6 @@ XML
 </phpunit>
 XML
         );
-
-        $xPath = new DOMXPath($dom);
 
         $this->assertTrue($this->configHelper->validate($xPath));
     }
@@ -570,10 +550,7 @@ XML
             __DIR__.'/../../../../..'
         );
 
-        $dom = new DOMDocument();
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $dom->loadXML(<<<XML
+        $xPath = $this->createXPath(<<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
@@ -582,8 +559,6 @@ XML
 </phpunit>
 XML
         );
-
-        $xPath = new DOMXPath($dom);
 
         $this->assertTrue($configHelper->validate($xPath));
     }
@@ -625,41 +600,9 @@ XML
         yield 'local XSD' => ['./vendor/phpunit/phpunit/phpunit.xsd'];
     }
 
-    private function assertItChangesStandardConfiguration(Closure $callback, string $expectedXml): void
+    private function assertItChangesStandardConfiguration(Closure $changeXml, string $expectedXml): void
     {
-        $dom = $this->getDomDocument();
-        $xPath = new DOMXPath($dom);
-
-        $callback($this->configHelper, $xPath, $dom);
-
-        $actualXml = $dom->saveXML();
-
-        $this->assertNotFalse($actualXml);
-        $this->assertXmlStringEqualsXmlString($expectedXml, $actualXml);
-    }
-
-    private function assertItChangesXML(string $inputXml, Closure $callback, string $expectedXml): void
-    {
-        $dom = new DOMDocument();
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $dom->loadXML($inputXml);
-        $xPath = new DOMXPath($dom);
-
-        $callback($this->configHelper, $xPath, $dom);
-
-        $actualXml = $dom->saveXML();
-
-        $this->assertNotFalse($actualXml);
-        $this->assertXmlStringEqualsXmlString($expectedXml, $actualXml);
-    }
-
-    private function getDomDocument(): DOMDocument
-    {
-        $dom = new DOMDocument();
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $dom->loadXML(<<<'XML'
+        $xPath = $this->createXPath(<<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     backupGlobals="false"
@@ -693,6 +636,33 @@ XML
 XML
         );
 
-        return $dom;
+        $changeXml($this->configHelper, $xPath);
+
+        $actualXml = $xPath->document->saveXML();
+
+        $this->assertNotFalse($actualXml);
+        $this->assertXmlStringEqualsXmlString($expectedXml, $actualXml);
+    }
+
+    private function assertItChangesXML(string $inputXml, Closure $changeXml, string $expectedXml): void
+    {
+        $xPath = $this->createXPath($inputXml);
+
+        $changeXml($this->configHelper, $xPath);
+
+        $actualXml = $xPath->document->saveXML();
+
+        $this->assertNotFalse($actualXml);
+        $this->assertXmlStringEqualsXmlString($expectedXml, $actualXml);
+    }
+
+    private function createXPath(string $xml): DOMXPath
+    {
+        $dom = new DOMDocument();
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($xml);
+
+        return new DOMXPath($dom);
     }
 }
