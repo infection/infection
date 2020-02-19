@@ -38,11 +38,7 @@ namespace Infection\Tests\Environment;
 use Infection\Environment\CouldNotResolveBuildContext;
 use Infection\Environment\TravisCiResolver;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
 
-/**
- * @covers \Infection\Environment\BuildContextResolver
- */
 final class TravisCiResolverTest extends TestCase
 {
     public function test_resolve_throws_when_travis_key_does_not_exist_in_environment(): void
@@ -56,7 +52,7 @@ final class TravisCiResolverTest extends TestCase
         $buildContextResolver = new TravisCiResolver();
 
         $this->expectException(CouldNotResolveBuildContext::class);
-        $this->expectExceptionMessage('it is not a Travis CI');
+        $this->expectExceptionMessage('The current process is not executed in a Travis CI build');
 
         $buildContextResolver->resolve($environment);
     }
@@ -73,7 +69,7 @@ final class TravisCiResolverTest extends TestCase
         $buildContextResolver = new TravisCiResolver();
 
         $this->expectException(CouldNotResolveBuildContext::class);
-        $this->expectExceptionMessage('it is not a Travis CI');
+        $this->expectExceptionMessage('The current process is not executed in a Travis CI build');
 
         $buildContextResolver->resolve($environment);
     }
@@ -89,7 +85,7 @@ final class TravisCiResolverTest extends TestCase
         $buildContextResolver = new TravisCiResolver();
 
         $this->expectException(CouldNotResolveBuildContext::class);
-        $this->expectExceptionMessage('it is not a Travis CI');
+        $this->expectExceptionMessage('The current process is not executed in a Travis CI build');
 
         $buildContextResolver->resolve($environment);
     }
@@ -106,10 +102,7 @@ final class TravisCiResolverTest extends TestCase
         $buildContextResolver = new TravisCiResolver();
 
         $this->expectException(CouldNotResolveBuildContext::class);
-        $this->expectExceptionMessage(sprintf(
-            'build is for a pull request (TRAVIS_PULL_REQUEST=%s)',
-            $environment['TRAVIS_PULL_REQUEST']
-        ));
+        $this->expectExceptionMessage('The current process is a pull request build (TRAVIS_PULL_REQUEST=9001)');
 
         $buildContextResolver->resolve($environment);
     }
@@ -125,7 +118,7 @@ final class TravisCiResolverTest extends TestCase
         $buildContextResolver = new TravisCiResolver();
 
         $this->expectException(CouldNotResolveBuildContext::class);
-        $this->expectExceptionMessage('repository slug nor current branch were found; not a Travis build?');
+        $this->expectExceptionMessage('Could not find the repository slug (TRAVIS_REPO_SLUG) or branch (TRAVIS_BRANCH)');
 
         $buildContextResolver->resolve($environment);
     }
@@ -141,7 +134,7 @@ final class TravisCiResolverTest extends TestCase
         $buildContextResolver = new TravisCiResolver();
 
         $this->expectException(CouldNotResolveBuildContext::class);
-        $this->expectExceptionMessage('repository slug nor current branch were found; not a Travis build?');
+        $this->expectExceptionMessage('Could not find the repository slug (TRAVIS_REPO_SLUG) or branch (TRAVIS_BRANCH)');
 
         $buildContextResolver->resolve($environment);
     }
@@ -159,7 +152,7 @@ final class TravisCiResolverTest extends TestCase
 
         $buildContext = $buildContextResolver->resolve($environment);
 
-        self::assertSame($environment['TRAVIS_REPO_SLUG'], $buildContext->repositorySlug());
-        self::assertSame($environment['TRAVIS_BRANCH'], $buildContext->branch());
+        $this->assertSame($environment['TRAVIS_REPO_SLUG'], $buildContext->repositorySlug());
+        $this->assertSame($environment['TRAVIS_BRANCH'], $buildContext->branch());
     }
 }
