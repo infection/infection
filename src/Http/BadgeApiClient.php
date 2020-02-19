@@ -36,9 +36,8 @@ declare(strict_types=1);
 namespace Infection\Http;
 
 use function is_string;
-use function iterator_to_array;
-use function Safe\sprintf;
 use function Safe\curl_init;
+use function Safe\sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -97,10 +96,6 @@ class BadgeApiClient
         }
     }
 
-    /**
-     * @param string $apiKey
-     * @return array<string>
-     */
     private function createHeaders(string $apiKey): array
     {
         $return = [];
