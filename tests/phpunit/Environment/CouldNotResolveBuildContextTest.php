@@ -46,6 +46,6 @@ final class CouldNotResolveBuildContextTest extends TestCase
 
         $exception = CouldNotResolveBuildContext::create($message);
 
-        self::assertSame($message, $exception->getMessage());
+        $this->assertSame($message, $exception->getMessage());
     }
 }

@@ -58,6 +58,6 @@ final class CouldNotResolveStrykerApiKeyTest extends TestCase
             )
         );
 
-        self::assertSame($message, $exception->getMessage());
+        $this->assertSame($message, $exception->getMessage());
     }
 }

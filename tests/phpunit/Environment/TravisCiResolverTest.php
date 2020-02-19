@@ -156,7 +156,7 @@ final class TravisCiResolverTest extends TestCase
 
         $buildContext = $buildContextResolver->resolve($environment);
 
-        self::assertSame($environment['TRAVIS_REPO_SLUG'], $buildContext->repositorySlug());
-        self::assertSame($environment['TRAVIS_BRANCH'], $buildContext->branch());
+        $this->assertSame($environment['TRAVIS_REPO_SLUG'], $buildContext->repositorySlug());
+        $this->assertSame($environment['TRAVIS_BRANCH'], $buildContext->branch());
     }
 }
