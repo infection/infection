@@ -42,19 +42,28 @@ final class InvalidPhpUnitXmlConfigExceptionTest extends TestCase
 {
     public function test_for_root_node(): void
     {
-        $exception = InvalidPhpUnitXmlConfigException::byRootNode();
+        $exception = InvalidPhpUnitXmlConfigException::byRootNode('/path/to/phpunit.xml');
 
-        $this->assertInstanceOf(InvalidPhpUnitXmlConfigException::class, $exception);
-
-        $this->assertSame('phpunit.xml does not contain a valid PHPUnit configuration.', $exception->getMessage());
+        $this->assertSame(
+            'The file "/path/to/phpunit.xml" is not a valid PHPUnit configuration file',
+            $exception->getMessage()
+        );
     }
 
     public function test_for_xsd_schema(): void
     {
-        $exception = InvalidPhpUnitXmlConfigException::byXsdSchema('Invalid');
+        $exception = InvalidPhpUnitXmlConfigException::byXsdSchema(
+            '/path/to/phpunit.xml',
+            '<lib-xml-errors>'
+        );
 
-        $this->assertInstanceOf(InvalidPhpUnitXmlConfigException::class, $exception);
-
-        $this->assertStringContainsString('phpunit.xml file does not pass XSD schema validation.', $exception->getMessage());
+        $this->assertSame(
+            <<<'TXT'
+The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
+<lib-xml-errors>
+TXT
+            ,
+            $exception->getMessage()
+        );
     }
 }

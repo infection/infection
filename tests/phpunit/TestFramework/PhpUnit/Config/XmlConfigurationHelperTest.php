@@ -484,9 +484,9 @@ XML
         $xPath = $this->createXPath('<invalid></invalid>');
 
         $this->expectException(InvalidPhpUnitXmlConfigException::class);
-        $this->expectExceptionMessage('phpunit.xml does not contain a valid PHPUnit configuration.');
+        $this->expectExceptionMessage('The file "/path/to/phpunit.xml" is not a valid PHPUnit configuration file');
 
-        $this->configHelper->validate($xPath);
+        $this->configHelper->validate('/path/to/phpunit.xml', $xPath);
     }
 
     public function test_it_consider_as_valid_a_PHPUnit_XML_configuration_without_XSD(): void
@@ -498,7 +498,7 @@ XML
 XML
         );
 
-        $this->assertTrue($this->configHelper->validate($xPath));
+        $this->assertTrue($this->configHelper->validate('/path/to/phpunit.xml', $xPath));
     }
 
     /**
@@ -521,7 +521,7 @@ XML
         );
 
         try {
-            $this->configHelper->validate($xPath);
+            $this->configHelper->validate('/path/to/phpunit.xml', $xPath);
 
             $this->fail('Expected exception to be thrown');
         } catch (InvalidPhpUnitXmlConfigException $exception) {
@@ -533,7 +533,8 @@ XML
 
             $this->assertSame(
                 <<<'EOF'
-phpunit.xml file does not pass XSD schema validation. [Error] Element 'phpunit', attribute 'foo': The attribute 'foo' is not allowed.
+The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
+[Error] Element 'phpunit', attribute 'foo': The attribute 'foo' is not allowed.
  in /path/to/infection/ (line 6, col 0)
 [Error] Element 'invalid': This element is not expected.
  in /path/to/infection/ (line 7, col 0)
@@ -562,7 +563,7 @@ EOF
 XML
         );
 
-        $this->assertTrue($this->configHelper->validate($xPath));
+        $this->assertTrue($this->configHelper->validate('/path/to/phpunit.xml', $xPath));
     }
 
     public function test_it_uses_the_configured_PHPUnit_config_dir_to_build_schema_paths(): void
@@ -582,7 +583,7 @@ XML
 XML
         );
 
-        $this->assertTrue($configHelper->validate($xPath));
+        $this->assertTrue($configHelper->validate('/path/to/phpunit.xml', $xPath));
     }
 
     public function test_it_removes_default_test_suite(): void

@@ -142,7 +142,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
             $this->fail('Expected an exception to be thrown.');
         } catch (InvalidPhpUnitXmlConfigException $exception) {
             $this->assertSame(
-                'phpunit.xml does not contain a valid PHPUnit configuration.',
+                'The file "/path/to/phpunit.xml" is not a valid PHPUnit configuration file',
                 $exception->getMessage()
             );
         }
@@ -420,6 +420,7 @@ XML
 
         return new InitialConfigBuilder(
             $this->tmp,
+            '/path/to/phpunit.xml',
             file_get_contents($phpunitXmlPath),
             new XmlConfigurationHelper($replacer, ''),
             $jUnitFilePath,
