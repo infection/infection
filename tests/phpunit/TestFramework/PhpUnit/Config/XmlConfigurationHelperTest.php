@@ -42,6 +42,7 @@ use Generator;
 use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use const PHP_OS_FAMILY;
 use PHPUnit\Framework\TestCase;
 use function str_replace;
 use Symfony\Component\Filesystem\Filesystem;
@@ -525,8 +526,14 @@ XML
 
             $this->fail('Expected exception to be thrown');
         } catch (InvalidPhpUnitXmlConfigException $exception) {
+            $infectionPath = sprintf(
+                '%s%s',
+                PHP_OS_FAMILY === 'Windows' ? 'file:/' : '',
+                Path::canonicalize(__DIR__ . '/../../../../../')
+            );
+
             $errorMessage = str_replace(
-                Path::canonicalize(__DIR__ . '/../../../../../'),
+                $infectionPath,
                 '/path/to/infection',
                 $exception->getMessage()
             );
