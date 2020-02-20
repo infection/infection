@@ -68,7 +68,7 @@ final class SubscriberBuilderTest extends TestCase
         $diff = $this->createMock(DiffColorizer::class);
         $config = $this->createMock(Configuration::class);
         $config->expects($this->once())->method('getLogs')->willReturn(
-            new Logs(null, null, null, null, null)
+            new Logs(null, null, null, null, null, null)
         );
         $fs = $this->createMock(Filesystem::class);
         $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
@@ -101,7 +101,7 @@ final class SubscriberBuilderTest extends TestCase
         $diff = $this->createMock(DiffColorizer::class);
         $config = $this->createMock(Configuration::class);
         $config->expects($this->once())->method('getLogs')->willReturn(
-            new Logs(null, null, null, null, null)
+            new Logs(null, null, null, null, null, null)
         );
         $fs = $this->createMock(Filesystem::class);
         $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);

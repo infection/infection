@@ -82,6 +82,7 @@ class SchemaConfigurationFactory
             self::normalizeString($logs->summary ?? null),
             self::normalizeString($logs->debug ?? null),
             self::normalizeString($logs->perMutator ?? null),
+            self::normalizeString($logs->sarb ?? null),
             self::createBadge($logs->badge ?? null)
         );
     }

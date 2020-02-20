@@ -35,19 +35,32 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use Infection\Process\MutantProcess;
+use function Safe\json_encode;
+
 /**
  * @internal
  */
-final class ResultsLoggerTypes
+final class SarbLogger extends FileLogger
 {
-    public const TEXT_FILE = 'text';
-    public const SUMMARY_FILE = 'summary';
-    public const DEBUG_FILE = 'debug';
-    public const BADGE = 'badge';
-    public const PER_MUTATOR = 'perMutator';
-    public const SARB = 'sarb';
+    protected function getLogLines(): array
+    {
+        $processes = array_merge(
+            $this->metricsCalculator->getEscapedMutantProcesses(),
+            $this->metricsCalculator->getNotCoveredMutantProcesses()
+        );
 
-    public const ALLOWED_WITHOUT_LOGGING = [
-        self::BADGE,
-    ];
+        $this->sortProcesses($processes);
+
+        $output = array_map(static function (MutantProcess $process): array {
+            return [
+                'file' => $process->getOriginalFilePath(),
+                'line' => $process->getOriginalStartingLine(),
+                'type' => $process->getMutatorName()
+                    . '|' . MutantProcess::RESULT_TO_STRING_MAP[$process->getResultCode()],
+            ];
+        }, $processes);
+
+        return [json_encode($output, JSON_PRETTY_PRINT)];
+    }
 }
