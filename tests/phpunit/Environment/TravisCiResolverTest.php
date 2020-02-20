@@ -40,9 +40,6 @@ use Infection\Environment\TravisCiResolver;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
 
-/**
- * @covers \Infection\Environment\BuildContextResolver
- */
 final class TravisCiResolverTest extends TestCase
 {
     public function test_resolve_throws_when_travis_key_does_not_exist_in_environment(): void
@@ -159,7 +156,7 @@ final class TravisCiResolverTest extends TestCase
 
         $buildContext = $buildContextResolver->resolve($environment);
 
-        self::assertSame($environment['TRAVIS_REPO_SLUG'], $buildContext->repositorySlug());
-        self::assertSame($environment['TRAVIS_BRANCH'], $buildContext->branch());
+        $this->assertSame($environment['TRAVIS_REPO_SLUG'], $buildContext->repositorySlug());
+        $this->assertSame($environment['TRAVIS_BRANCH'], $buildContext->branch());
     }
 }
