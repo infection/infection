@@ -40,12 +40,10 @@ use PHPUnit\Framework\TestCase;
 
 final class CouldNotResolveBuildContextTest extends TestCase
 {
-    public function test_create_returns_exception(): void
+    public function test_it_can_be_instantiated(): void
     {
-        $message = "Well, it's really not a good time right now.";
+        $exception = new CouldNotResolveBuildContext('Hello');
 
-        $exception = CouldNotResolveBuildContext::create($message);
-
-        $this->assertSame($message, $exception->getMessage());
+        $this->assertSame('Hello', $exception->getMessage());
     }
 }
