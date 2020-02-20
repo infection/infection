@@ -42,6 +42,7 @@ use Generator;
 use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use function Infection\Tests\normalizeLineReturn;
 use const PHP_OS_FAMILY;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
@@ -537,7 +538,7 @@ XML
             $errorMessage = str_replace(
                 $infectionPath,
                 '/path/to/infection',
-                $exception->getMessage()
+                normalizeLineReturn($exception->getMessage())
             );
 
             $this->assertSame(
