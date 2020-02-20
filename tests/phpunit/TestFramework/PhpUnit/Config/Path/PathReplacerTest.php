@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Path;
 
 use DOMDocument;
+use Generator;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\TestCase;
@@ -60,8 +61,10 @@ final class PathReplacerTest extends TestCase
     /**
      * @dataProvider pathProvider
      */
-    public function test_it_replaces_path_with_absolute_path(string $originalPath, string $expectedPath): void
-    {
+    public function test_it_replaces_relative_path_with_absolute_path(
+        string $originalPath,
+        string $expectedPath
+    ): void {
         $pathReplacer = new PathReplacer(new Filesystem());
 
         $dom = new DOMDocument();
@@ -73,14 +76,16 @@ final class PathReplacerTest extends TestCase
         $this->assertSame($expectedPath, p($node->nodeValue));
     }
 
-    public function pathProvider(): array
+    public function pathProvider(): Generator
     {
-        return [
-            ['autoload.php', $this->projectPath . '/autoload.php'],
-            ['./autoload.php', $this->projectPath . '/autoload.php'],
-            ['../autoload.php', $this->projectPath . '/../autoload.php'],
-            ['/autoload.php', '/autoload.php'],
-            ['./*Bundle', $this->projectPath . '/*Bundle'],
-        ];
+        yield ['autoload.php', $this->projectPath . '/autoload.php'];
+
+        yield ['./autoload.php', $this->projectPath . '/autoload.php'];
+
+        yield ['../autoload.php', $this->projectPath . '/../autoload.php'];
+
+        yield ['/autoload.php', '/autoload.php'];
+
+        yield ['./*Bundle', $this->projectPath . '/*Bundle'];
     }
 }

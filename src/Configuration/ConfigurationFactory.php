@@ -46,9 +46,6 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
-use Infection\TestFramework\PhpSpec\PhpSpecExtraOptions;
-use Infection\TestFramework\PhpUnit\PhpUnitExtraOptions;
-use Infection\TestFramework\TestFrameworkExtraOptions;
 use Infection\TestFramework\TestFrameworkTypes;
 use function Safe\sprintf;
 use function sys_get_temp_dir;
@@ -140,7 +137,7 @@ class ConfigurationFactory
             $testFramework,
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
-            self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema, $testFramework),
+            self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema),
             self::retrieveCoveragePath($coverageBasePath, $testFramework),
             $skipCoverage,
             $debug,
@@ -243,14 +240,8 @@ class ConfigurationFactory
 
     private static function retrieveTestFrameworkExtraOptions(
         ?string $testFrameworkExtraOptions,
-        SchemaConfiguration $schema,
-        string $testFramework
-    ): TestFrameworkExtraOptions {
-        $extraOptions = $testFrameworkExtraOptions ?? $schema->getTestFrameworkExtraOptions();
-
-        return $testFramework === TestFrameworkTypes::PHPUNIT
-            ? new PhpUnitExtraOptions($extraOptions)
-            : new PhpSpecExtraOptions($extraOptions)
-        ;
+        SchemaConfiguration $schema
+    ): string {
+        return $testFrameworkExtraOptions ?? $schema->getTestFrameworkExtraOptions() ?? '';
     }
 }

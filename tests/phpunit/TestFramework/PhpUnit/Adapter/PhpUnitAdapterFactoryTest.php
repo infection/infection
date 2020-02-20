@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -44,7 +43,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class PhpUnitAdapterFactoryTest extends TestCase
 {
-    public function test_it_creates_phpunit_adapter(): void
+    public function test_it_can_create_an_adapter(): void
     {
         $adapter = PhpUnitAdapterFactory::create(
             '/path/to/phpunit',
@@ -57,6 +56,16 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             true
         );
 
-        $this->assertInstanceOf(PhpUnitAdapter::class, $adapter);
+        $this->assertSame('PHPUnit', $adapter->getName());
+    }
+
+    public function test_it_has_a_name(): void
+    {
+        $this->assertSame('phpunit', PhpUnitAdapterFactory::getAdapterName());
+    }
+
+    public function test_it_has_an_executable(): void
+    {
+        $this->assertSame('phpunit', PhpUnitAdapterFactory::getExecutableName());
     }
 }

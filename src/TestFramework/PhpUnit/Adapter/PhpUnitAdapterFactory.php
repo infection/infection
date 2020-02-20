@@ -89,7 +89,13 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $sourceDirectories,
                 $skipCoverage
             ),
-            new MutationConfigBuilder($tmpDir, $testFrameworkConfigContent, $xmlConfigurationHelper, $projectDir, new JUnitTestCaseSorter()),
+            new MutationConfigBuilder(
+                $tmpDir,
+                $testFrameworkConfigContent,
+                $xmlConfigurationHelper,
+                $projectDir,
+                new JUnitTestCaseSorter()
+            ),
             new ArgumentsAndOptionsBuilder(),
             new VersionParser(),
             new CommandLineBuilder()

@@ -40,10 +40,32 @@ use PHPUnit\Framework\TestCase;
 
 final class ArgumentsAndOptionsBuilderTest extends TestCase
 {
-    public function test_it_builds_correct_command(): void
+    /**
+     * @var ArgumentsAndOptionsBuilder
+     */
+    private $builder;
+
+    protected function setUp(): void
+    {
+        $this->builder = new ArgumentsAndOptionsBuilder();
+    }
+
+    public function test_it_can_build_the_command_without_extra_options(): void
     {
         $configPath = '/config/path';
-        $builder = new ArgumentsAndOptionsBuilder();
+
+        $this->assertSame(
+            [
+                '--configuration',
+                $configPath,
+            ],
+            $this->builder->build($configPath, '')
+        );
+    }
+
+    public function test_it_can_build_the_command_with_extra_options(): void
+    {
+        $configPath = '/config/path';
 
         $this->assertSame(
             [
@@ -52,21 +74,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--verbose',
                 '--debug',
             ],
-            $builder->build($configPath, '--verbose --debug')
-        );
-    }
-
-    public function test_it_removes_empty_extra_options(): void
-    {
-        $configPath = '/config/path';
-        $builder = new ArgumentsAndOptionsBuilder();
-
-        $this->assertSame(
-            [
-                '--configuration',
-                $configPath,
-            ],
-            $builder->build($configPath, '')
+            $this->builder->build($configPath, '--verbose --debug')
         );
     }
 }

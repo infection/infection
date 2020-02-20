@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use Infection\Environment\BuildContextResolver;
+use Infection\Environment\CouldNotResolveBuildContext;
 use Infection\Environment\CouldNotResolveStrykerApiKey;
 use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Http\BadgeApiClient;
@@ -49,6 +51,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class BadgeLogger implements MutationTestingResultsLogger
 {
     private $output;
+    private $buildContextResolver;
     private $strykerApiKeyResolver;
     private $badgeApiClient;
     private $metricsCalculator;
@@ -56,12 +59,14 @@ final class BadgeLogger implements MutationTestingResultsLogger
 
     public function __construct(
         OutputInterface $output,
+        BuildContextResolver $buildContextResolver,
         StrykerApiKeyResolver $strykerApiKeyResolver,
         BadgeApiClient $badgeApiClient,
         MetricsCalculator $metricsCalculator,
         stdClass $config
     ) {
         $this->output = $output;
+        $this->buildContextResolver = $buildContextResolver;
         $this->strykerApiKeyResolver = $strykerApiKeyResolver;
         $this->badgeApiClient = $badgeApiClient;
         $this->metricsCalculator = $metricsCalculator;
@@ -70,39 +75,20 @@ final class BadgeLogger implements MutationTestingResultsLogger
 
     public function log(): void
     {
-        $travisBuild = getenv('TRAVIS');
-
-        if ($travisBuild !== 'true') {
-            $this->showInfo('it is not a Travis CI');
-
-            return;
-        }
-
-        $pullRequest = getenv('TRAVIS_PULL_REQUEST');
-
-        if ($pullRequest !== 'false') {
-            $this->showInfo("build is for a pull request (TRAVIS_PULL_REQUEST={$pullRequest})");
+        try {
+            $buildContext = $this->buildContextResolver->resolve(getenv());
+        } catch (CouldNotResolveBuildContext $exception) {
+            $this->showInfo($exception->getMessage());
 
             return;
         }
 
-        $repositorySlug = getenv('TRAVIS_REPO_SLUG');
-        $currentBranch = getenv('TRAVIS_BRANCH');
-
-        if ($repositorySlug === false || $currentBranch === false) {
-            $this->showInfo('repository slug nor current branch were found; not a Travis build?');
-
-            return;
-        }
-
-        if ($currentBranch !== $this->config->branch) {
-            $this->showInfo(
-                sprintf(
-                    'expected branch "%s", found "%s"',
-                    $this->config->branch,
-                    $currentBranch
-                )
-            );
+        if ($buildContext->branch() !== $this->config->branch) {
+            $this->showInfo(sprintf(
+                'expected branch "%s", found "%s"',
+                $this->config->branch,
+                $buildContext->branch()
+            ));
 
             return;
         }
@@ -122,8 +108,8 @@ final class BadgeLogger implements MutationTestingResultsLogger
 
         $this->badgeApiClient->sendReport(
             $apiKey,
-            'github.com/' . $repositorySlug,
-            $currentBranch,
+            'github.com/' . $buildContext->repositorySlug(),
+            $buildContext->branch(),
             $this->metricsCalculator->getMutationScoreIndicator()
         );
     }

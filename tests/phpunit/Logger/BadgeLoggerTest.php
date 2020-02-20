@@ -37,6 +37,7 @@ namespace Infection\Tests\Logger;
 
 use function getenv;
 use Infection\Environment\StrykerApiKeyResolver;
+use Infection\Environment\TravisCiResolver;
 use Infection\Http\BadgeApiClient;
 use Infection\Logger\BadgeLogger;
 use Infection\Mutant\MetricsCalculator;
@@ -113,6 +114,7 @@ final class BadgeLoggerTest extends TestCase
 
         $this->badgeLogger = new BadgeLogger(
             $this->outputMock,
+            new TravisCiResolver(),
             new StrykerApiKeyResolver(),
             $this->badgeApiClientMock,
             $this->metricsCalculatorMock,

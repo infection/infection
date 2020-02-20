@@ -51,6 +51,7 @@
         "infection/codeception-adapter": "^0.3.0",
         "infection/extension-installer": "^0.1.0",
         "infection/include-interceptor": "^0.2.2",
+        "infection/phpspec-adapter": "^0.1.0",
         "justinrainbow/json-schema": "^5.2",
         "nikic/php-parser": "^4.2.2",
         "ocramius/package-versions": "^1.2",
@@ -60,7 +61,6 @@
         "symfony/filesystem": "^3.4.29 || ^4.0 || ^5.0",
         "symfony/finder": "^3.4.29 || ^4.0 || ^5.0",
         "symfony/process": "^3.4.29 || ^4.0 || ^5.0",
-        "symfony/yaml": "^3.4.29 || ^4.0 || ^5.0",
         "thecodingmachine/safe": "^1.0",
         "webmozart/assert": "^1.3",
         "webmozart/path-util": "^2.3"
@@ -69,6 +69,7 @@
         "symfony/console": "=4.1.5"
     },
     "require-dev": {
+        "ext-simplexml": "*",
         "helmich/phpunit-json-assert": "^3.0",
         "phpstan/extension-installer": "^1.0",
         "phpstan/phpstan": "^0.12.8",

@@ -203,7 +203,8 @@ final class InfectionCommand extends BaseCommand
             $this->container->getMutationTestingRunner(),
             $this->container->getTestRunConstraintChecker(),
             $this->consoleOutput,
-            $this->container->getMetricsCalculator()
+            $this->container->getMetricsCalculator(),
+            $this->container->getTestFrameworkExtraOptionsFilter()
         );
 
         $result = $engine->execute((int) $this->input->getOption('threads'));

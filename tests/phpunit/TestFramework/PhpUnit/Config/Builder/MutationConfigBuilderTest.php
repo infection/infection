@@ -35,16 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
+use function array_map;
 use DOMDocument;
+use DOMNode;
 use DOMNodeList;
 use DOMXPath;
+use Generator;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
+use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
+use function iterator_to_array;
 use function Safe\file_get_contents;
 use function Safe\realpath;
 use function Safe\sprintf;
@@ -56,18 +61,15 @@ use Symfony\Component\Filesystem\Filesystem;
 final class MutationConfigBuilderTest extends FileSystemTestCase
 {
     public const HASH = 'a1b2c3';
+
+    private const FIXTURES = __DIR__ . '/../../../../Fixtures/Files/phpunit';
     private const ORIGINAL_FILE_PATH = '/original/file/path';
     private const MUTATED_FILE_PATH = '/mutated/file/path';
 
     /**
      * @var string
      */
-    private $pathToProject;
-
-    /**
-     * @var XmlConfigurationHelper
-     */
-    private $xmlConfigurationHelper;
+    private $projectPath;
 
     /**
      * @var MutationConfigBuilder
@@ -78,22 +80,205 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
     {
         parent::setUp();
 
-        $this->pathToProject = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
+        $this->projectPath = p(realpath(self::FIXTURES . '/project-path'));
 
-        $projectDir = '/project/dir';
-        $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit.xml';
+        $this->builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit.xml');
+    }
 
-        $this->xmlConfigurationHelper = new XmlConfigurationHelper(
-            new PathReplacer(new Filesystem(), $this->pathToProject),
-            ''
+    public function test_it_builds_and_dump_the_XML_configuration(): void
+    {
+        $configurationPath = $this->builder->build(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::HASH,
+            self::ORIGINAL_FILE_PATH
         );
 
-        $this->builder = new MutationConfigBuilder(
-            $this->tmp,
-            file_get_contents($phpunitXmlPath),
-            $this->xmlConfigurationHelper,
-            $projectDir,
-            new JUnitTestCaseSorter()
+        $this->assertSame(
+            $this->tmp . '/phpunitConfiguration.a1b2c3.infection.xml',
+            $configurationPath
+        );
+
+        $this->assertFileExists($configurationPath);
+
+        $xml = file_get_contents($configurationPath);
+
+        $this->assertNotFalse(
+            @simplexml_load_string($xml),
+            'Expected dumped configuration content to be a valid XML file.'
+        );
+
+        $this->assertFileExists($this->tmp . '/interceptor.autoload.a1b2c3.infection.php');
+    }
+
+    public function test_it_preserves_white_spaces_and_formatting(): void
+    {
+        $configurationPath = $this->builder->build(
+            [],
+            self::MUTATED_FILE_PATH,
+            self::HASH,
+            self::ORIGINAL_FILE_PATH
+        );
+
+        $tmp = $this->tmp;
+        $projectPath = $this->projectPath;
+
+        $this->assertSame(
+            <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2017 Maks Rafalko
+  ~
+  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+  -->
+<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.a1b2c3.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" stopOnFailure="true" cacheResult="false" stderr="false">
+  <testsuites>
+    <testsuite name="Infection testsuite with filtered tests"/>
+  </testsuites>
+  <filter>
+    <whitelist>
+      <directory>$projectPath/src/</directory>
+      <!--<exclude>-->
+      <!--<directory>src/*Bundle/Resources</directory>-->
+      <!--<directory>src/*/*Bundle/Resources</directory>-->
+      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
+      <!--</exclude>-->
+    </whitelist>
+  </filter>
+</phpunit>
+
+XML
+            ,
+            file_get_contents($configurationPath)
+        );
+    }
+
+    public function test_it_can_build_the_config_for_multiple_mutations(): void
+    {
+        $tmp = $this->tmp;
+        $projectPath = $this->projectPath;
+        $interceptorPath = IncludeInterceptor::LOCATION;
+
+        $this->assertSame(
+            <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2017 Maks Rafalko
+  ~
+  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+  -->
+<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash1.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" stopOnFailure="true" cacheResult="false" stderr="false">
+  <testsuites>
+    <testsuite name="Infection testsuite with filtered tests">
+      <file>/path/to/FooTest.php</file>
+    </testsuite>
+  </testsuites>
+  <filter>
+    <whitelist>
+      <directory>$projectPath/src/</directory>
+      <!--<exclude>-->
+      <!--<directory>src/*Bundle/Resources</directory>-->
+      <!--<directory>src/*/*Bundle/Resources</directory>-->
+      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
+      <!--</exclude>-->
+    </whitelist>
+  </filter>
+</phpunit>
+
+XML
+            ,
+            file_get_contents(
+                $this->builder->build(
+                    [
+                        CoverageLineData::with(
+                            'FooTest::test_foo',
+                            '/path/to/FooTest.php',
+                            1.
+                        ),
+                    ],
+                    self::MUTATED_FILE_PATH,
+                    'hash1',
+                    self::ORIGINAL_FILE_PATH
+                )
+            )
+        );
+        $this->assertSame(
+            <<<PHP
+<?php
+
+
+require_once '$interceptorPath';
+
+use Infection\StreamWrapper\IncludeInterceptor;
+
+IncludeInterceptor::intercept('/original/file/path', '/mutated/file/path');
+IncludeInterceptor::enable();
+require_once '$projectPath/app/autoload2.php';
+
+PHP
+            ,
+            file_get_contents($this->tmp . '/interceptor.autoload.hash1.infection.php')
+        );
+
+        $this->assertSame(
+            <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2017 Maks Rafalko
+  ~
+  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+  -->
+<phpunit backupGlobals="false" backupStaticAttributes="false" bootstrap="$tmp/interceptor.autoload.hash2.infection.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" syntaxCheck="false" stopOnFailure="true" cacheResult="false" stderr="false">
+  <testsuites>
+    <testsuite name="Infection testsuite with filtered tests">
+      <file>/path/to/BarTest.php</file>
+    </testsuite>
+  </testsuites>
+  <filter>
+    <whitelist>
+      <directory>$projectPath/src/</directory>
+      <!--<exclude>-->
+      <!--<directory>src/*Bundle/Resources</directory>-->
+      <!--<directory>src/*/*Bundle/Resources</directory>-->
+      <!--<directory>src/*/Bundle/*Bundle/Resources</directory>-->
+      <!--</exclude>-->
+    </whitelist>
+  </filter>
+</phpunit>
+
+XML
+            ,
+            file_get_contents(
+                $this->builder->build(
+                    [
+                        CoverageLineData::with(
+                            'BarTest::test_bar_1',
+                            '/path/to/BarTest.php',
+                            1.
+                        ),
+                    ],
+                    self::MUTATED_FILE_PATH,
+                    'hash2',
+                    self::ORIGINAL_FILE_PATH
+                )
+            )
+        );
+        $this->assertSame(
+            <<<PHP
+<?php
+
+
+require_once '$interceptorPath';
+
+use Infection\StreamWrapper\IncludeInterceptor;
+
+IncludeInterceptor::intercept('/original/file/path', '/mutated/file/path');
+IncludeInterceptor::enable();
+require_once '$projectPath/app/autoload2.php';
+
+PHP
+            ,
+            file_get_contents($this->tmp . '/interceptor.autoload.hash2.infection.php')
         );
     }
 
@@ -112,14 +297,14 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_sets_custom_autoloader(): void
     {
-        $configurationPath = $this->builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH
+        $xml = file_get_contents(
+            $this->builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH
+            )
         );
-
-        $xml = file_get_contents($configurationPath);
 
         $resultAutoLoaderFilePath = $this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue;
 
@@ -130,28 +315,24 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         );
 
         $this->assertSame($expectedCustomAutoloadFilePath, $resultAutoLoaderFilePath);
-        $this->assertStringContainsString('app/autoload2.php', file_get_contents($expectedCustomAutoloadFilePath));
+        $this->assertStringContainsString(
+            'app/autoload2.php',
+            file_get_contents($expectedCustomAutoloadFilePath)
+        );
     }
 
     public function test_it_sets_custom_autoloader_when_attribute_is_absent(): void
     {
-        $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpuit_without_bootstrap.xml';
-        $this->builder = new MutationConfigBuilder(
-            $this->tmp,
-            file_get_contents($phpunitXmlPath),
-            $this->xmlConfigurationHelper,
-            'project/dir',
-            new JUnitTestCaseSorter()
-        );
+        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_without_bootstrap.xml');
 
-        $configurationPath = $this->builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH
+        $xml = file_get_contents(
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH
+            )
         );
-
-        $xml = file_get_contents($configurationPath);
 
         $resultAutoLoaderFilePath = $this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue;
 
@@ -162,206 +343,152 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         );
 
         $this->assertSame($expectedCustomAutoloadFilePath, $resultAutoLoaderFilePath);
-        $this->assertStringContainsString('vendor/autoload.php', file_get_contents($expectedCustomAutoloadFilePath));
+        $this->assertStringContainsString(
+            'vendor/autoload.php',
+            file_get_contents($expectedCustomAutoloadFilePath)
+        );
     }
 
-    public function test_it_sets_stop_on_failure_flag(): void
+    public function test_it_sets_stops_on_failure(): void
     {
-        $configurationPath = $this->builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH
+        $xml = file_get_contents(
+            $this->builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH
+            )
         );
 
-        $xml = file_get_contents($configurationPath);
+        $stopOnFailure = $this->queryXpath($xml, '/phpunit/@stopOnFailure')[0]->nodeValue;
 
-        $value = $this->queryXpath($xml, '/phpunit/@stopOnFailure')[0]->nodeValue;
-
-        $this->assertSame('true', $value);
+        $this->assertSame('true', $stopOnFailure);
     }
 
-    public function test_it_sets_colors_flag(): void
+    public function test_it_deactivates_the_colors(): void
     {
-        $configurationPath = $this->builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH
+        $xml = file_get_contents(
+            $this->builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH
+            )
         );
 
-        $xml = file_get_contents($configurationPath);
+        $colors = $this->queryXpath($xml, '/phpunit/@colors')[0]->nodeValue;
 
-        $value = $this->queryXpath($xml, '/phpunit/@colors')[0]->nodeValue;
-
-        $this->assertSame('false', $value);
+        $this->assertSame('false', $colors);
     }
 
     public function test_it_handles_root_test_suite(): void
     {
-        $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpunit_root_test_suite.xml';
-        $replacer = new PathReplacer(new Filesystem(), $this->pathToProject);
-        $xmlConfigurationHelper = new XmlConfigurationHelper($replacer, '');
+        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_root_test_suite.xml');
 
-        $this->builder = new MutationConfigBuilder(
-            $this->tmp,
-            file_get_contents($phpunitXmlPath),
-            $xmlConfigurationHelper,
-            $this->pathToProject,
-            new JUnitTestCaseSorter()
-        );
-
-        $configurationPath = $this->builder->build(
+        $configurationPath = $builder->build(
             [],
             self::MUTATED_FILE_PATH,
             self::HASH,
             self::ORIGINAL_FILE_PATH
         );
 
-        $this->assertSame(1, $this->queryXpath(file_get_contents($configurationPath), '/phpunit/testsuite')->length);
+        $testSuite = $this->queryXpath(
+            file_get_contents($configurationPath),
+            '/phpunit/testsuite'
+        );
+
+        $this->assertInstanceOf(DOMNodeList::class, $testSuite);
+        $this->assertSame(1, $testSuite->length);
     }
 
     public function test_it_removes_original_loggers(): void
     {
-        $configurationPath = $this->builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH
+        $xml = file_get_contents(
+            $this->builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH
+            )
         );
 
-        $xml = file_get_contents($configurationPath);
-        $nodeList = $this->queryXpath($xml, '/phpunit/logging/log[@type="coverage-html"]');
+        $logEntries = $this->queryXpath($xml, '/phpunit/logging/log[@type="coverage-html"]');
 
-        $this->assertSame(0, $nodeList->length);
+        $this->assertInstanceOf(DOMNodeList::class, $logEntries);
+        $this->assertSame(0, $logEntries->length);
     }
 
     public function test_it_removes_printer_class(): void
     {
-        $configurationPath = $this->builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH
+        $xml = file_get_contents(
+            $this->builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH
+            )
         );
 
-        $xml = file_get_contents($configurationPath);
+        $printerClass = $this->queryXpath($xml, '/phpunit/@printerClass');
 
-        /** @var DOMNodeList $filterNodes */
-        $filterNodes = $this->queryXpath($xml, '/phpunit/@printerClass');
-        $this->assertSame(0, $filterNodes->length);
+        $this->assertInstanceOf(DOMNodeList::class, $printerClass);
+        $this->assertSame(0, $printerClass->length);
     }
 
     /**
      * @dataProvider coverageTestsProvider
+     *
+     * @param CoverageLineData[] $coverageTests
+     * @param string[] $expectedFiles
      */
-    public function test_it_sets_sorted_list_of_test_files(array $coverageTests, array $expectedFiles): void
-    {
-        $configurationPath = $this->builder->build(
-            $coverageTests,
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH
+    public function test_it_sets_sorted_list_of_test_files(
+        array $coverageTests,
+        array $expectedFiles
+    ): void {
+        $xml = file_get_contents(
+            $this->builder->build(
+                $coverageTests,
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH
+            )
         );
 
-        $xml = file_get_contents($configurationPath);
-
-        $files = [];
-        $nodes = $this->queryXpath($xml, '/phpunit/testsuites/testsuite/file');
-
-        foreach ($nodes as $node) {
-            $files[] = $node->nodeValue;
-        }
+        $files = array_map(
+            static function (DOMNode $file): string {
+                return $file->nodeValue;
+            },
+            iterator_to_array(
+                $this->queryXpath($xml, '/phpunit/testsuites/testsuite/file'),
+                false
+            )
+        );
 
         $this->assertSame($expectedFiles, $files);
     }
 
     public function test_it_removes_default_test_suite(): void
     {
-        $configurationPath = $this->builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH
+        $xml = file_get_contents(
+            $this->builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH
+            )
         );
 
-        $xml = file_get_contents($configurationPath);
+        $defaultTestSuite = $this->queryXpath($xml, '/phpunit/@defaultTestSuite');
 
-        $value = $this->queryXpath($xml, '/phpunit/@defaultTestSuite');
-
-        $this->assertCount(0, $value);
-    }
-
-    public function coverageTestsProvider(): array
-    {
-        return [
-            [
-                [
-                    CoverageLineData::with(
-                        'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #5',
-                        '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
-                        0.086178
-                    ),
-                    CoverageLineData::with(
-                        'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #6',
-                        '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
-                        0.086178
-                    ),
-                    CoverageLineData::with(
-                        'SimpleHabits\\Domain\\Model\\Goal\\GoalStepTest::it_correctly_returns_id',
-                        '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
-                        0.035935
-                    ),
-                    CoverageLineData::with(
-                        'SimpleHabits\\Domain\\Model\\Goal\\GoalStepTest::it_correctly_returns_recorded_at_date',
-                        '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
-                        0.035935
-                    ),
-                ],
-                [
-                    '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
-                    '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
-                ],
-            ],
-            [
-                [
-                    CoverageLineData::with(
-                        'Path\\To\\A::test_a',
-                        '/path/to/A.php',
-                        0.186178
-                    ),
-                    CoverageLineData::with(
-                        'Path\\To\\B::test_b',
-                        '/path/to/B.php',
-                        0.086178
-                    ),
-                    CoverageLineData::with(
-                        'Path\\To\\C::test_c',
-                        '/path/to/C.php',
-                        0.016178
-                    ),
-                ],
-                [
-                    '/path/to/C.php',
-                    '/path/to/B.php',
-                    '/path/to/A.php',
-                ],
-            ],
-        ];
+        $this->assertInstanceOf(DOMNodeList::class, $defaultTestSuite);
+        $this->assertCount(0, $defaultTestSuite);
     }
 
     public function test_interceptor_is_included(): void
     {
-        $phpunitXmlPath = __DIR__ . '/../../../../Fixtures/Files/phpunit/phpuit_without_bootstrap.xml';
-        $this->builder = new MutationConfigBuilder(
-            $this->tmp,
-            file_get_contents($phpunitXmlPath),
-            $this->xmlConfigurationHelper,
-            'project/dir',
-            new JUnitTestCaseSorter()
-        );
+        $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_without_bootstrap.xml');
 
-        $this->builder->build(
+        $builder->build(
             [],
             self::MUTATED_FILE_PATH,
             self::HASH,
@@ -375,7 +502,67 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         );
 
         $this->assertFileExists($expectedCustomAutoloadFilePath);
-        $this->assertStringContainsString('IncludeInterceptor.php', file_get_contents($expectedCustomAutoloadFilePath));
+        $this->assertStringContainsString(
+            'IncludeInterceptor.php',
+            file_get_contents($expectedCustomAutoloadFilePath)
+        );
+    }
+
+    public function coverageTestsProvider(): Generator
+    {
+        yield [
+            [
+                CoverageLineData::with(
+                    'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #5',
+                    '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
+                    0.086178
+                ),
+                CoverageLineData::with(
+                    'SimpleHabits\\Domain\\Model\\Goal\\GoalTest::it_calculates_percentage with data set #6',
+                    '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
+                    0.086178
+                ),
+                CoverageLineData::with(
+                    'SimpleHabits\\Domain\\Model\\Goal\\GoalStepTest::it_correctly_returns_id',
+                    '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
+                    0.035935
+                ),
+                CoverageLineData::with(
+                    'SimpleHabits\\Domain\\Model\\Goal\\GoalStepTest::it_correctly_returns_recorded_at_date',
+                    '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
+                    0.035935
+                ),
+            ],
+            [
+                '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalStepTest.php',
+                '/path/to/siteSimpleHabits/Domain/Model/Goal/GoalTest.php',
+            ],
+        ];
+
+        yield [
+            [
+                CoverageLineData::with(
+                    'Path\\To\\A::test_a',
+                    '/path/to/A.php',
+                    0.186178
+                ),
+                CoverageLineData::with(
+                    'Path\\To\\B::test_b',
+                    '/path/to/B.php',
+                    0.086178
+                ),
+                CoverageLineData::with(
+                    'Path\\To\\C::test_c',
+                    '/path/to/C.php',
+                    0.016178
+                ),
+            ],
+            [
+                '/path/to/C.php',
+                '/path/to/B.php',
+                '/path/to/A.php',
+            ],
+        ];
     }
 
     private function queryXpath(string $xml, string $query)
@@ -384,5 +571,21 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         $dom->loadXML($xml);
 
         return (new DOMXPath($dom))->query($query);
+    }
+
+    private function createConfigBuilder(
+        ?string $originalPhpUnitXmlConfigPath = null
+    ): MutationConfigBuilder {
+        $phpunitXmlPath = $originalPhpUnitXmlConfigPath ?: self::FIXTURES . '/phpunit.xml';
+
+        $replacer = new PathReplacer(new Filesystem(), $this->projectPath);
+
+        return new MutationConfigBuilder(
+            $this->tmp,
+            file_get_contents($phpunitXmlPath),
+            new XmlConfigurationHelper($replacer, ''),
+            'project/dir',
+            new JUnitTestCaseSorter()
+        );
     }
 }
