@@ -33,31 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Environment;
+namespace Infection\Environment;
 
-use Infection\Environment\CouldNotResolveStrykerApiKey;
-use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
-
-final class CouldNotResolveStrykerApiKeyTest extends TestCase
+/**
+ * @internal
+ */
+final class ChainBuildContextResolver implements BuildContextResolver
 {
-    public function test_from_returns_exception(): void
+    private $buildContextResolvers;
+
+    public function __construct(BuildContextResolver ...$buildContextResolvers)
     {
-        $names = [
-            'FOO',
-            'BAR',
-        ];
+        $this->buildContextResolvers = $buildContextResolvers;
+    }
 
-        $exception = CouldNotResolveStrykerApiKey::from(...$names);
+    public function resolve(array $environment): BuildContext
+    {
+        foreach ($this->buildContextResolvers as $buildContextResolver) {
+            try {
+                $buildContext = $buildContextResolver->resolve($environment);
+            } catch (CouldNotResolveBuildContext $exception) {
+                continue;
+            }
 
-        $message = sprintf(
-            'The Stryker API key needs to be configured using one of the environment variables "%s", but could not find any of these.',
-            implode(
-                '" or "',
-                $names
-            )
-        );
+            return $buildContext;
+        }
 
-        $this->assertSame($message, $exception->getMessage());
+        throw new CouldNotResolveBuildContext('Build context could not be resolved.');
     }
 }

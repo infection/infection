@@ -33,31 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Environment;
+namespace Infection\Environment;
 
-use Infection\Environment\CouldNotResolveStrykerApiKey;
-use PHPUnit\Framework\TestCase;
+use function array_key_exists;
 use function Safe\sprintf;
 
-final class CouldNotResolveStrykerApiKeyTest extends TestCase
+/**
+ * @internal
+ *
+ * @see https://docs.travis-ci.com/user/environment-variables/#default-environment-variables
+ */
+final class TravisCiResolver implements BuildContextResolver
 {
-    public function test_from_returns_exception(): void
+    public function resolve(array $environment): BuildContext
     {
-        $names = [
-            'FOO',
-            'BAR',
-        ];
+        if (
+            !array_key_exists('TRAVIS', $environment)
+            || !array_key_exists('TRAVIS_PULL_REQUEST', $environment)
+            || $environment['TRAVIS'] !== 'true'
+        ) {
+            throw new CouldNotResolveBuildContext(
+                'The current process is not executed in a Travis CI build'
+            );
+        }
 
-        $exception = CouldNotResolveStrykerApiKey::from(...$names);
+        if ($environment['TRAVIS_PULL_REQUEST'] !== 'false') {
+            throw new CouldNotResolveBuildContext(sprintf(
+                'The current process is a pull request build (TRAVIS_PULL_REQUEST=%s)',
+                $environment['TRAVIS_PULL_REQUEST']
+            ));
+        }
 
-        $message = sprintf(
-            'The Stryker API key needs to be configured using one of the environment variables "%s", but could not find any of these.',
-            implode(
-                '" or "',
-                $names
-            )
+        if (
+            !array_key_exists('TRAVIS_REPO_SLUG', $environment)
+            || !array_key_exists('TRAVIS_BRANCH', $environment)
+        ) {
+            throw new CouldNotResolveBuildContext(
+                'Could not find the repository slug (TRAVIS_REPO_SLUG) or branch (TRAVIS_BRANCH)'
+            );
+        }
+
+        return new BuildContext(
+            $environment['TRAVIS_REPO_SLUG'],
+            $environment['TRAVIS_BRANCH']
         );
-
-        $this->assertSame($message, $exception->getMessage());
     }
 }

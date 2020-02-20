@@ -42,8 +42,4 @@ use RuntimeException;
  */
 final class CouldNotResolveBuildContext extends RuntimeException
 {
-    public static function create(string $message): self
-    {
-        return new self($message);
-    }
 }
