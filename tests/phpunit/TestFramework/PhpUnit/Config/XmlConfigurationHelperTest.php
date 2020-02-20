@@ -493,14 +493,17 @@ XML
 
     public function test_it_consider_as_valid_a_PHPUnit_XML_configuration_without_XSD(): void
     {
-        $xPath = $this->createXPath(<<<XML
+        $xPath = $this->createXPath(
+            <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit>
 </phpunit>
 XML
         );
 
-        $this->assertTrue($this->configHelper->validate($xPath));
+        $this->assertTrue($this->configHelper->validate('/path/to/phpunit.xml', $xPath));
+    }
+
     /**
      * @dataProvider schemaProvider
      *
