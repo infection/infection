@@ -45,7 +45,7 @@ use function range;
 
 final class ChainBuildContextResolverTest extends TestCase
 {
-    public function test_resolve_throws_could_not_resolve_build_context_when_chain_is_empty(): void
+    public function test_it_cannot_resolve_build_context_when_the_chain_is_empty(): void
     {
         $environment = [
             'foo' => 'bar',
@@ -60,7 +60,7 @@ final class ChainBuildContextResolverTest extends TestCase
         $buildContextResolver->resolve($environment);
     }
 
-    public function test_resolve_throws_could_not_resolve_build_context_when_none_of_the_build_context_resolvers_could_resolve_the_build_context(): void
+    public function test_it_cannot_resolve_build_context_when_no_build_context_resolver_cannot_resolve_build_context(): void
     {
         $environment = [
             'foo' => 'bar',
@@ -87,7 +87,7 @@ final class ChainBuildContextResolverTest extends TestCase
         $buildContextResolver->resolve($environment);
     }
 
-    public function test_resolve_returns_build_context_of_first_build_context_resolver_that_could_resolve_the_build_context(): void
+    public function test_it_returns_the_first_resolved_build_context(): void
     {
         $environment = [
             'foo' => 'bar',
