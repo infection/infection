@@ -104,10 +104,6 @@ class MutantProcess
 
     public function getResultCode(): int
     {
-        if (!$this->getMutant()->isCoveredByTest()) {
-            return self::CODE_NOT_COVERED;
-        }
-
         if ($this->isTimedOut()) {
             return self::CODE_TIMED_OUT;
         }

@@ -126,14 +126,6 @@ class ParallelProcessRunner
         $mutantProcess = array_shift($this->processesQueue);
         Assert::isInstanceOf($mutantProcess, MutantProcess::class);
 
-        $mutant = $mutantProcess->getMutant();
-
-        if (!$mutant->isCoveredByTest()) {
-            $this->eventDispatcher->dispatch(new MutantProcessWasFinished($mutantProcess));
-
-            return false;
-        }
-
         $mutantProcess->getProcess()->start();
 
         $this->currentProcesses[] = $mutantProcess;

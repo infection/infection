@@ -146,7 +146,6 @@ final class MutantFactoryTest extends FileSystemTestCase
             $expectedMutantFilePath,
             $mutation,
             'code diff',
-            true,
             $tests
         );
 
@@ -189,7 +188,6 @@ final class MutantFactoryTest extends FileSystemTestCase
             $expectedMutantFilePath,
             $mutation,
             'code diff',
-            false,
             []
         );
     }
