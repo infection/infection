@@ -211,6 +211,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     null,
+                    null,
                     null
                 ),
                 '',
@@ -240,6 +241,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             [],
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -506,6 +508,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     null,
+                    null,
                     null
                 ),
                 '',
@@ -542,6 +545,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 null
             ),
             'none',
@@ -574,6 +578,7 @@ final class ConfigurationFactoryTest extends TestCase
                     'summary.log',
                     'debug.log',
                     'mutator.log',
+                    'foo.json',
                     new Badge('master')
                 ),
                 'config/tmp',
@@ -613,6 +618,7 @@ final class ConfigurationFactoryTest extends TestCase
                 'summary.log',
                 'debug.log',
                 'mutator.log',
+                'sarb.json',
                 new Badge('master')
             ),
             'none',
@@ -660,6 +666,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     null,
+                    null,
                     null
                 ),
                 '',
@@ -689,6 +696,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             [],
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -730,6 +738,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     null,
+                    null,
                     null
                 ),
                 $configTmpDir,
@@ -759,6 +768,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             [],
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -801,6 +811,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     null,
+                    null,
                     null
                 ),
                 '',
@@ -830,6 +841,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             [],
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -871,6 +883,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     null,
+                    null,
                     null
                 ),
                 '',
@@ -900,6 +913,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             [],
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -944,6 +958,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     null,
+                    null,
                     null
                 ),
                 '',
@@ -973,6 +988,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             [],
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -1015,6 +1031,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     null,
+                    null,
                     null
                 ),
                 '',
@@ -1044,6 +1061,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             [],
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -1088,6 +1106,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     null,
+                    null,
                     null
                 ),
                 '',
@@ -1117,6 +1136,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             [],
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -1160,6 +1180,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     null,
+                    null,
                     null
                 ),
                 '',
@@ -1189,6 +1210,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             [],
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -1234,6 +1256,7 @@ final class ConfigurationFactoryTest extends TestCase
                     null,
                     null,
                     null,
+                    null,
                     null
                 ),
                 null,
@@ -1263,6 +1286,7 @@ final class ConfigurationFactoryTest extends TestCase
             [],
             [],
             new Logs(
+                null,
                 null,
                 null,
                 null,

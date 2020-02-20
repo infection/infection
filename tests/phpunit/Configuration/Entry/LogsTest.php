@@ -52,6 +52,7 @@ final class LogsTest extends TestCase
         ?string $summaryLogFilePath,
         ?string $debugLogFilePath,
         ?string $perMutatorFilePath,
+        ?string $sarbFilePath,
         ?Badge $badge
     ): void {
         $logs = new Logs(
@@ -59,6 +60,7 @@ final class LogsTest extends TestCase
             $summaryLogFilePath,
             $debugLogFilePath,
             $perMutatorFilePath,
+            $sarbFilePath,
             $badge
         );
 
@@ -68,6 +70,7 @@ final class LogsTest extends TestCase
             $summaryLogFilePath,
             $debugLogFilePath,
             $perMutatorFilePath,
+            $sarbFilePath,
             $badge
         );
     }
@@ -87,6 +90,7 @@ final class LogsTest extends TestCase
             'summary.log',
             'debug.log',
             'perMutator.log',
+            'sarb.json',
             new Badge('master'),
         ];
     }

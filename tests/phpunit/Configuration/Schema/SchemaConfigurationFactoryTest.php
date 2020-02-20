@@ -230,6 +230,7 @@ JSON
                     null,
                     null,
                     null,
+                    null,
                     null
                 ),
             ]),
@@ -252,6 +253,7 @@ JSON
                 'logs' => new Logs(
                     null,
                     'summary.log',
+                    null,
                     null,
                     null,
                     null
@@ -278,6 +280,7 @@ JSON
                     null,
                     'debug.log',
                     null,
+                    null,
                     null
                 ),
             ]),
@@ -302,6 +305,7 @@ JSON
                     null,
                     null,
                     'perMutator.log',
+                    null,
                     null
                 ),
             ]),
@@ -324,6 +328,7 @@ JSON
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
+                    null,
                     null,
                     null,
                     null,
@@ -358,6 +363,7 @@ JSON
                     'summary.log',
                     'debug.log',
                     'perMutator.log',
+                    'sarb.json',
                     new Badge('master')
                 ),
             ]),
@@ -384,6 +390,7 @@ JSON
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
+                    null,
                     null,
                     null,
                     null,
@@ -418,6 +425,7 @@ JSON
                     'summary.log',
                     'debug.log',
                     'perMutator.log',
+                    'sarb.json',
                     new Badge('master')
                 ),
             ]),
@@ -2025,6 +2033,7 @@ JSON
                     'summary.log',
                     'debug.log',
                     'perMutator.log',
+                    'sarb.json',
                     new Badge('master')
                 ),
                 'tmpDir' => 'custom-tmp',
@@ -2234,6 +2243,7 @@ JSON
             'timeout' => null,
             'source' => new Source([], []),
             'logs' => new Logs(
+                null,
                 null,
                 null,
                 null,

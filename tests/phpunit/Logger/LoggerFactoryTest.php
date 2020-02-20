@@ -83,6 +83,7 @@ final class LoggerFactoryTest extends TestCase
                 '/a/file',
                 '/a/file',
                 '/a/file',
+                '/a/file',
                 null
             ),
             $this->createMock(OutputInterface::class)
@@ -102,7 +103,7 @@ final class LoggerFactoryTest extends TestCase
         );
 
         $loggers = $factory->createFromLogEntries(
-            new Logs(null, null, null, null, new Badge('branch_name')),
+            new Logs(null, null, null, null, null, new Badge('branch_name')),
             $this->createMock(OutputInterface::class)
         );
 
@@ -161,6 +162,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 null
             ),
             TextFileLogger::class,
@@ -170,6 +172,7 @@ final class LoggerFactoryTest extends TestCase
             new Logs(
                 null,
                 'summary_file',
+                null,
                 null,
                 null,
                 null
@@ -183,6 +186,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 'debug_file',
                 null,
+                null,
                 null
             ),
             DebugFileLogger::class,
@@ -194,6 +198,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 'per_muator',
+                null,
                 null
             ),
             PerMutatorLogger::class,
@@ -201,6 +206,7 @@ final class LoggerFactoryTest extends TestCase
 
         yield 'badge logger' => [
             new Logs(
+                null,
                 null,
                 null,
                 null,
@@ -219,6 +225,7 @@ final class LoggerFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
                 null
             ),
             0,
@@ -230,9 +237,10 @@ final class LoggerFactoryTest extends TestCase
                 'summary',
                 'debug',
                 'per_mutator',
+                'sarb',
                 new Badge('branch')
             ),
-            5,
+            6,
         ];
     }
 }

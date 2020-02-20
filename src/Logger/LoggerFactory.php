@@ -81,6 +81,7 @@ final class LoggerFactory
         $perMutator = $logs->getPerMutatorFilePath();
         $summary = $logs->getSummaryLogFilePath();
         $text = $logs->getTextLogFilePath();
+        $sarb = $logs->getSarbFilePath();
 
         /** @var MutationTestingResultsLogger[] $loggers */
         $loggers = array_filter([
@@ -99,6 +100,9 @@ final class LoggerFactory
             ResultsLoggerTypes::TEXT_FILE => $text === null
                 ? null
                 : $this->createTextLogger($output, $text, $isDebugVerbosity),
+            ResultsLoggerTypes::SARB => $sarb === null
+                ? null
+                : $this->createSarbLogger($output, $sarb, $isDebugVerbosity),
         ]);
 
         return array_filter($loggers, [$this, 'isAllowedToLog'], ARRAY_FILTER_USE_KEY);
@@ -157,6 +161,21 @@ final class LoggerFactory
         bool $isDebugVerbosity
     ): PerMutatorLogger {
         return new PerMutatorLogger(
+            $output,
+            $location,
+            $this->metricsCalculator,
+            $this->filesystem,
+            $isDebugVerbosity,
+            $this->debugMode
+        );
+    }
+
+    private function createSarbLogger(
+        OutputInterface $output,
+        string $location,
+        bool $isDebugVerbosity
+    ): SarbLogger {
+        return new SarbLogger(
             $output,
             $location,
             $this->metricsCalculator,

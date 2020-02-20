@@ -61,6 +61,14 @@ class MutantProcess
         self::CODE_NOT_COVERED,
     ];
 
+    public const RESULT_TO_STRING_MAP = [
+        self::CODE_KILLED => 'Killed',
+        self::CODE_ESCAPED => 'Escaped',
+        self::CODE_ERROR => 'Error',
+        self::CODE_TIMED_OUT => 'Timed Out',
+        self::CODE_NOT_COVERED => 'Not Covered',
+    ];
+
     private const PROCESS_OK = 0;
     private const PROCESS_GENERAL_ERROR = 1;
     private const PROCESS_MISUSE_SHELL_BUILTINS = 2;
