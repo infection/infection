@@ -74,7 +74,6 @@ class Configuration
     private $coveragePath;
     private $skipCoverage;
     private $debug;
-    private $onlyCovered;
     private $formatter;
     private $noProgress;
     private $ignoreMsiWithNoMutations;
@@ -103,7 +102,6 @@ class Configuration
         string $coveragePath,
         bool $skipCoverage,
         bool $debug,
-        bool $onlyCovered,
         string $formatter,
         bool $noProgress,
         bool $ignoreMsiWithNoMutations,
@@ -135,7 +133,6 @@ class Configuration
         $this->coveragePath = $coveragePath;
         $this->skipCoverage = $skipCoverage;
         $this->debug = $debug;
-        $this->onlyCovered = $onlyCovered;
         $this->formatter = $formatter;
         $this->noProgress = $noProgress;
         $this->ignoreMsiWithNoMutations = $ignoreMsiWithNoMutations;
@@ -226,11 +223,6 @@ class Configuration
     public function isDebugEnabled(): bool
     {
         return $this->debug;
-    }
-
-    public function mutateOnlyCoveredCode(): bool
-    {
-        return $this->onlyCovered;
     }
 
     public function getFormatter(): string

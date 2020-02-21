@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use const E_USER_DEPRECATED;
 use Exception;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
@@ -56,6 +57,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use function trigger_error;
 use function trim;
 use Webmozart\Assert\Assert;
 
@@ -285,13 +287,19 @@ final class InfectionCommand extends BaseCommand
             throw new InvalidArgumentException(sprintf('Expected min-covered-msi to be a float. Got "%s"', $minCoveredMsi));
         }
 
+        if ($input->getOption('only-covered')) {
+            @trigger_error(
+                E_USER_DEPRECATED,
+                'The option "only-covered" is enabled by default and will be removed in future versions'
+            );
+        }
+
         $this->container = $this->getApplication()->getContainer()->withDynamicParameters(
             $configFile === '' ? null : $configFile,
             trim((string) $input->getOption('mutators')),
             $input->getOption('show-mutations'),
             trim((string) $input->getOption('log-verbosity')),
             $input->getOption('debug'),
-            $input->getOption('only-covered'),
             trim((string) $input->getOption('formatter')),
             $input->getOption('no-progress'),
             $coverage === '' ? null : $coverage,

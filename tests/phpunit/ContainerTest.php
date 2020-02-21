@@ -91,7 +91,6 @@ final class ContainerTest extends TestCase
             false,
             '',
             false,
-            false,
             '',
             false,
             '/path/to/coverage',

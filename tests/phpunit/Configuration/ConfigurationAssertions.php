@@ -69,7 +69,6 @@ trait ConfigurationAssertions
         string $expectedCoveragePath,
         bool $expectedSkipCoverage,
         bool $expectedDebug,
-        bool $expectedOnlyCovered,
         string $expectedFormatter,
         bool $expectedNoProgress,
         bool $expectedIgnoreMsiWithNoMutations,
@@ -109,7 +108,6 @@ trait ConfigurationAssertions
         $this->assertSame($expectedCoveragePath, $configuration->getCoveragePath());
         $this->assertSame($expectedSkipCoverage, $configuration->shouldSkipCoverage());
         $this->assertSame($expectedDebug, $configuration->isDebugEnabled());
-        $this->assertSame($expectedOnlyCovered, $configuration->mutateOnlyCoveredCode());
         $this->assertSame($expectedFormatter, $configuration->getFormatter());
         $this->assertSame($expectedNoProgress, $configuration->showProgress());
         $this->assertSame($expectedIgnoreMsiWithNoMutations, $configuration->ignoreMsiWithNoMutations());
