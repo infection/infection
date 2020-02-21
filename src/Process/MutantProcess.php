@@ -58,7 +58,6 @@ class MutantProcess
         self::CODE_ESCAPED,
         self::CODE_ERROR,
         self::CODE_TIMED_OUT,
-        self::CODE_NOT_COVERED,
     ];
 
     private const PROCESS_OK = 0;

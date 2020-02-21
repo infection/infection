@@ -122,7 +122,7 @@ TXT;
     public function test_it_log_correctly_with_mutations(): void
     {
         $expectedContent = <<<'TXT'
-Total: 10
+Total: 8
 Killed mutants:
 ===============
 
@@ -166,12 +166,6 @@ Line 10
 Not Covered mutants:
 ====================
 
-
-Mutator: PregQuote
-Line 9
-
-Mutator: For_
-Line 10
 
 TXT;
 

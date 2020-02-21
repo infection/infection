@@ -310,26 +310,6 @@ Timed Out mutants:
 Not Covered mutants:
 ====================
 
-
-1) foo/bar:9    [M] PregQuote
-
---- Original
-+++ New
-@@ @@
-
-- echo 'original';
-+ echo 'notCovered#1';
-
-
-2) foo/bar:10    [M] For_
-
---- Original
-+++ New
-@@ @@
-
-- echo 'original';
-+ echo 'notCovered#0';
-
 TXT
         ];
 
@@ -440,28 +420,6 @@ Errors mutants:
 Not Covered mutants:
 ====================
 
-
-1) foo/bar:9    [M] PregQuote
-
---- Original
-+++ New
-@@ @@
-
-- echo 'original';
-+ echo 'notCovered#1';
-
-
-
-2) foo/bar:10    [M] For_
-
---- Original
-+++ New
-@@ @@
-
-- echo 'original';
-+ echo 'notCovered#0';
-
-
 TXT
         ];
 
@@ -517,26 +475,6 @@ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTe
 
 Not Covered mutants:
 ====================
-
-
-1) foo/bar:9    [M] PregQuote
-bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
---- Original
-+++ New
-@@ @@
-
-- echo 'original';
-+ echo 'notCovered#1';
-
-
-2) foo/bar:10    [M] For_
-bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
---- Original
-+++ New
-@@ @@
-
-- echo 'original';
-+ echo 'notCovered#0';
 
 TXT
         ];
@@ -647,28 +585,6 @@ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTe
 
 Not Covered mutants:
 ====================
-
-
-1) foo/bar:9    [M] PregQuote
-bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
---- Original
-+++ New
-@@ @@
-
-- echo 'original';
-+ echo 'notCovered#1';
-
-
-
-2) foo/bar:10    [M] For_
-bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
---- Original
-+++ New
-@@ @@
-
-- echo 'original';
-+ echo 'notCovered#0';
-
 
 TXT
         ];

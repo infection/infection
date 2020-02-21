@@ -121,23 +121,6 @@ trait CreateMetricsCalculator
             )
         );
 
-        $calculator->collect(
-            $this->createMutantProcess(
-                0,
-                For_::class,
-                MutantProcess::CODE_NOT_COVERED,
-                'notCovered#0'
-            )
-        );
-        $calculator->collect(
-            $this->createMutantProcess(
-                1,
-                PregQuote::class,
-                MutantProcess::CODE_NOT_COVERED,
-                'notCovered#1'
-            )
-        );
-
         return $calculator;
     }
 

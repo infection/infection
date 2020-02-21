@@ -125,11 +125,6 @@ class MetricsCalculator
                 $this->killedMutantProcesses[] = $mutantProcess;
 
                 break;
-            case MutantProcess::CODE_NOT_COVERED:
-                $this->notCoveredByTestsCount++;
-                $this->notCoveredMutantProcesses[] = $mutantProcess;
-
-                break;
             case MutantProcess::CODE_ESCAPED:
                 $this->escapedCount++;
                 $this->escapedMutantProcesses[] = $mutantProcess;

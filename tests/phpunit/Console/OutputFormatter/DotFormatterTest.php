@@ -49,7 +49,6 @@ final class DotFormatterTest extends TestCase
             '',
             '<killed>.</killed>: killed, '
             . '<escaped>M</escaped>: escaped, '
-            . '<uncovered>S</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '
             . '<timeout>T</timeout>: timed out',
             '',
@@ -99,16 +98,6 @@ final class DotFormatterTest extends TestCase
         $dot->advance($this->getMutantsOfType(MutantProcess::CODE_TIMED_OUT)[0], 10);
     }
 
-    public function test_not_covered_correctly_in_console(): void
-    {
-        $outputNotcovered = $this->getStartOutputFormatter();
-        $outputNotcovered->expects($this->once())->method('write')->with('<uncovered>S</uncovered>');
-
-        $dot = new DotFormatter($outputNotcovered);
-        $dot->start(10);
-        $dot->advance($this->getMutantsOfType(MutantProcess::CODE_NOT_COVERED)[0], 10);
-    }
-
     private function getMutantsOfType(int $mutantCode, int $count = 1): array
     {
         $mutants = [];
@@ -129,7 +118,6 @@ final class DotFormatterTest extends TestCase
             '',
             '<killed>.</killed>: killed, '
             . '<escaped>M</escaped>: escaped, '
-            . '<uncovered>S</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '
             . '<timeout>T</timeout>: timed out',
             '',

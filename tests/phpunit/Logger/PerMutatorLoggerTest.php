@@ -75,8 +75,8 @@ final class PerMutatorLoggerTest extends TestCase
 
 | Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |
 | ------- | --------- | ------ | ------- |------- | --------- | --- | ----------- |
-| For_ | 4 | 1 | 1 | 0 | 1 | 50| 66|
-| PregQuote | 4 | 1 | 1 | 0 | 1 | 50| 66|
+| For_ | 3 | 1 | 1 | 0 | 1 | 66| 66|
+| PregQuote | 3 | 1 | 1 | 0 | 1 | 66| 66|
 TXT;
 
         $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
