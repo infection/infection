@@ -99,13 +99,4 @@ final class MutationTestingRunner
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
     }
-
-    private function createProcess(Mutation $mutation, string $testFrameworkExtraOptions): MutantProcess
-    {
-        $mutant = $this->mutantFactory->create($mutation);
-
-        $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
-
-        return $process;
-    }
 }
