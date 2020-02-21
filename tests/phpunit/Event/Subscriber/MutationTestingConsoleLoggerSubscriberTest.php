@@ -138,9 +138,6 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_on_mutation_testing_finished_and_show_mutations_on(): void
     {
-        $this->output->expects($this->once())
-            ->method('getVerbosity');
-
         $this->outputFormatter
             ->expects($this->once())
             ->method('finish');
