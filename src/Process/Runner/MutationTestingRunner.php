@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use function array_map;
 use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantsCreationWasFinished;
@@ -77,20 +78,18 @@ final class MutationTestingRunner
     {
         $this->eventDispatcher->dispatch(new MutantsCreationWasStarted(count($mutations)));
 
-        $processes = [];
+        $processes = array_map(
+            function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcess {
+                $mutant = $this->mutantFactory->create($mutation);
 
-        foreach ($mutations as $mutation) {
-            $process = $this->createProcess($mutation, $testFrameworkExtraOptions);
+                $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
 
-            if ($process !== null) {
-                $processes[] = $process;
-            }
+                $this->eventDispatcher->dispatch(new MutantWasCreated());
 
-            // We dispatch this event regardless of whether or not a mutant has been created. Indeed
-            // this event is only used for the progress bar (the max count being the count of
-            // mutations) hence doing a distinction would not bring any additional value
-            $this->eventDispatcher->dispatch(new MutantWasCreated());
-        }
+                return $process;
+            },
+            $mutations
+        );
 
         $this->eventDispatcher->dispatch(new MutantsCreationWasFinished());
 
@@ -101,12 +100,8 @@ final class MutationTestingRunner
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
     }
 
-    private function createProcess(Mutation $mutation, string $testFrameworkExtraOptions): ?MutantProcess
+    private function createProcess(Mutation $mutation, string $testFrameworkExtraOptions): MutantProcess
     {
-        if (!$mutation->isCoveredByTest()) {
-            return null;
-        }
-
         $mutant = $this->mutantFactory->create($mutation);
 
         $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);

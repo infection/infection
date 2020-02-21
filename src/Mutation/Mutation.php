@@ -94,6 +94,7 @@ class Mutation
     ) {
         Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
         Assert::allIsInstanceOf($tests, CoverageLineData::class);
+        Assert::greaterThanEq(count($tests), 'Expected mutation to have at least one test');
 
         foreach (self::ATTRIBUTE_KEYS as $key) {
             Assert::keyExists($attributes, $key);
@@ -144,11 +145,6 @@ class Mutation
     public function getMutatedNode(): MutatedNode
     {
         return $this->mutatedNode;
-    }
-
-    public function isCoveredByTest(): bool
-    {
-        return $this->coveredByTests;
     }
 
     /**

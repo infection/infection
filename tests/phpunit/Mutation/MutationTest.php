@@ -66,7 +66,6 @@ final class MutationTest extends TestCase
         int $mutationByMutatorIndex,
         array $tests,
         array $expectedAttributes,
-        bool $expectedCoveredByTests,
         string $expectedHash
     ): void {
         $mutation = new Mutation(
@@ -87,7 +86,6 @@ final class MutationTest extends TestCase
         $this->assertSame($mutatedNodeClass, $mutation->getMutatedNodeClass());
         $this->assertSame($mutatedNode, $mutation->getMutatedNode());
         $this->assertSame($tests, $mutation->getAllTests());
-        $this->assertSame($expectedCoveredByTests, $mutation->isCoveredByTest());
 
         $this->assertSame($expectedHash, $mutation->getHash());
     }
@@ -113,7 +111,6 @@ final class MutationTest extends TestCase
             -1,
             [],
             $nominalAttributes,
-            false,
             md5('_Plus_-1_3_5_21_31_43_53'),
         ];
 
@@ -136,7 +133,6 @@ final class MutationTest extends TestCase
                 ),
             ],
             $nominalAttributes,
-            true,
             md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
         ];
 
@@ -159,7 +155,6 @@ final class MutationTest extends TestCase
                 ),
             ],
             $nominalAttributes,
-            true,
             md5('/path/to/acme/Foo.php_Plus_99_3_5_21_31_43_53'),
         ];
 
@@ -182,7 +177,6 @@ final class MutationTest extends TestCase
                 ),
             ],
             $nominalAttributes,
-            true,
             md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
         ];
 
@@ -199,7 +193,6 @@ final class MutationTest extends TestCase
             0,
             [],
             $nominalAttributes,
-            false,
             md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
         ];
 
@@ -225,7 +218,6 @@ final class MutationTest extends TestCase
                 ),
             ],
             $nominalAttributes,
-            true,
             md5('/path/to/acme/Foo.php_Plus_0_3_5_21_31_43_53'),
         ];
     }

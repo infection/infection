@@ -123,21 +123,11 @@ final class MutationTestingRunnerTest extends TestCase
         );
     }
 
-    public function test_it_applies_and_run_the_mutations_skipping_uncovered_mutants(): void
+    public function test_it_applies_and_run_the_mutations(): void
     {
         $mutations = [
-            $mutation0 = $this->createConfiguredMock(
-                Mutation::class,
-                ['isCoveredByTest' => true]
-            ),
-            $mutation1 = $this->createConfiguredMock(
-                Mutation::class,
-                ['isCoveredByTest' => false]
-            ),
-            $mutation2 = $this->createConfiguredMock(
-                Mutation::class,
-                ['isCoveredByTest' => true]
-            ),
+            $mutation0 = $this->createMock(Mutation::class),
+            $mutation1 = $this->createMock(Mutation::class),
         ];
         $threadCount = 4;
         $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
@@ -146,11 +136,11 @@ final class MutationTestingRunnerTest extends TestCase
             ->method('create')
             ->withConsecutive(
                 [$mutation0],
-                [$mutation2]
+                [$mutation1]
             )
             ->willReturnOnConsecutiveCalls(
                 $mutant0 = new Mutant('/path/to/mutant0', $mutation0, ''),
-                $mutant2 = new Mutant('/path/to/mutant2', $mutation1, '')
+                $mutant1 = new Mutant('/path/to/mutant1', $mutation1, '')
             )
         ;
 
@@ -158,26 +148,25 @@ final class MutationTestingRunnerTest extends TestCase
             ->method('createProcessForMutant')
             ->withConsecutive(
                 [$mutant0, $testFrameworkExtraOptions],
-                [$mutant2, $testFrameworkExtraOptions]
+                [$mutant1, $testFrameworkExtraOptions]
             )
             ->willReturnOnConsecutiveCalls(
                 $process0 = $this->createMock(MutantProcess::class),
-                $process2 = $this->createMock(MutantProcess::class)
+                $process1 = $this->createMock(MutantProcess::class)
             )
         ;
 
         $this->parallelProcessRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with([$process0, $process2], $threadCount)
+            ->with([$process0, $process1], $threadCount)
         ;
 
         $this->runner->run($mutations, $threadCount, $testFrameworkExtraOptions);
 
         $this->assertAreSameEvents(
             [
-                new MutantsCreationWasStarted(3),
-                new MutantWasCreated(),
+                new MutantsCreationWasStarted(2),
                 new MutantWasCreated(),
                 new MutantWasCreated(),
                 new MutantsCreationWasFinished(),
