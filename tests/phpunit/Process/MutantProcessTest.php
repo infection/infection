@@ -76,23 +76,8 @@ final class MutantProcessTest extends TestCase
         $this->mutantProcess = new MutantProcess($this->process, $this->mutant, $this->adapter);
     }
 
-    public function test_it_handles_not_covered_mutant(): void
-    {
-        $this->mutant
-            ->expects($this->once())
-            ->method('isCoveredByTest')
-            ->willReturn(false);
-
-        $this->assertSame(MutantProcess::CODE_NOT_COVERED, $this->mutantProcess->getResultCode());
-    }
-
     public function test_it_handles_timeout(): void
     {
-        $this->mutant
-            ->expects($this->once())
-            ->method('isCoveredByTest')
-            ->willReturn(true);
-
         $this->mutantProcess->markTimeout();
 
         $this->assertSame(MutantProcess::CODE_TIMED_OUT, $this->mutantProcess->getResultCode());
@@ -100,11 +85,6 @@ final class MutantProcessTest extends TestCase
 
     public function test_it_handles_error(): void
     {
-        $this->mutant
-            ->expects($this->once())
-            ->method('isCoveredByTest')
-            ->willReturn(true);
-
         $this->process
             ->expects($this->once())
             ->method('getExitCode')
@@ -115,11 +95,6 @@ final class MutantProcessTest extends TestCase
 
     public function test_it_handles_escaped_mutant(): void
     {
-        $this->mutant
-            ->expects($this->once())
-            ->method('isCoveredByTest')
-            ->willReturn(true);
-
         $this->process
             ->expects($this->once())
             ->method('getExitCode')
@@ -140,11 +115,6 @@ final class MutantProcessTest extends TestCase
 
     public function test_it_handles_killed_mutant(): void
     {
-        $this->mutant
-            ->expects($this->once())
-            ->method('isCoveredByTest')
-            ->willReturn(true);
-
         $this->process
             ->expects($this->once())
             ->method('getExitCode')

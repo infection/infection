@@ -289,8 +289,8 @@ final class InfectionCommand extends BaseCommand
 
         if ($input->getOption('only-covered')) {
             @trigger_error(
-                E_USER_DEPRECATED,
-                'The option "only-covered" is enabled by default and will be removed in future versions'
+                'The option "only-covered" is enabled by default and will be removed in future versions',
+                E_USER_DEPRECATED
             );
         }
 
