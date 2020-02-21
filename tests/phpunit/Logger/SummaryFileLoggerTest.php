@@ -76,7 +76,6 @@ Killed: 0
 Errored: 0
 Escaped: 0
 Timed Out: 0
-Not Covered: 0
 TXT;
 
         $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
@@ -127,11 +126,6 @@ TXT;
             ->method('getTimedOutCount')
             ->willReturn(2)
         ;
-        $calculatorMock
-            ->expects($this->once())
-            ->method('getNotCoveredByTestsCount')
-            ->willReturn(0)
-        ;
 
         $expectedContent = <<<'TXT'
 Total: 6
@@ -139,7 +133,6 @@ Killed: 8
 Errored: 7
 Escaped: 30216
 Timed Out: 2
-Not Covered: 0
 TXT;
 
         $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
