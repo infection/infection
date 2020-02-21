@@ -58,7 +58,6 @@ class NodeMutationGenerator
     private $filePath;
     private $fileNodes;
     private $codeCoverageData;
-    private $onlyCovered;
     private $lineRangeCalculator;
 
     /**
@@ -70,7 +69,6 @@ class NodeMutationGenerator
         string $filePath,
         array $fileNodes,
         LineCodeCoverage $codeCoverageData,
-        bool $onlyCovered,
         LineRangeCalculator $lineRangeCalculator
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
@@ -79,7 +77,6 @@ class NodeMutationGenerator
         $this->filePath = $filePath;
         $this->fileNodes = $fileNodes;
         $this->codeCoverageData = $codeCoverageData;
-        $this->onlyCovered = $onlyCovered;
         $this->lineRangeCalculator = $lineRangeCalculator;
     }
 
@@ -130,7 +127,7 @@ class NodeMutationGenerator
             $isOnFunctionSignature
         );
 
-        if ($this->onlyCovered && count($tests) === 0) {
+        if (count($tests) === 0) {
             return $mutations;
         }
 

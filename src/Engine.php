@@ -130,7 +130,6 @@ final class Engine
     private function runMutationAnalysis(int $threads): void
     {
         $mutations = $this->mutationGenerator->generate(
-            $this->config->mutateOnlyCoveredCode(),
             $this->adapter instanceof IgnoresAdditionalNodes
                 ? $this->adapter->getNodeIgnorers()
                 : []

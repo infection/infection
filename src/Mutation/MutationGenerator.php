@@ -88,14 +88,13 @@ final class MutationGenerator
     }
 
     /**
-     * @param bool $onlyCovered Mutates only covered by tests lines of code
      * @param NodeIgnorer[] $nodeIgnorers
      *
      * @throws UnparsableFile
      *
      * @return Mutation[]
      */
-    public function generate(bool $onlyCovered, array $nodeIgnorers): array
+    public function generate(array $nodeIgnorers): array
     {
         $allFilesMutations = [[]];
 
@@ -104,7 +103,6 @@ final class MutationGenerator
         foreach ($this->sourceFiles as $fileInfo) {
             $allFilesMutations[] = $this->fileMutationGenerator->generate(
                 $fileInfo,
-                $onlyCovered,
                 $this->codeCoverageData,
                 $this->mutators,
                 $nodeIgnorers

@@ -35,11 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation;
 
-use function current;
 use Generator;
-use Infection\Container;
 use Infection\Mutation\FileMutationGenerator;
-use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
@@ -50,7 +47,6 @@ use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
-use Infection\Tests\Mutator\MutatorName;
 use PhpParser\NodeTraverserInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -59,8 +55,6 @@ use Symfony\Component\Finder\SplFileInfo;
 
 final class FileMutationGeneratorTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/../Fixtures/Files';
-
     /**
      * @var FileParser|MockObject
      */
@@ -88,42 +82,11 @@ final class FileMutationGeneratorTest extends TestCase
         );
     }
 
-    public function test_it_generates_mutations_for_a_given_file(): void
-    {
-        $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
-
-        $mutationGenerator = Container::create()->getFileMutationGenerator();
-
-        $mutations = $mutationGenerator->generate(
-            new SplFileInfo(self::FIXTURES_DIR . '/Mutation/OneFile/OneFile.php', '', ''),
-            false,
-            $codeCoverageMock,
-            [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
-            []
-        );
-
-        foreach ($mutations as $mutation) {
-            $this->assertInstanceOf(Mutation::class, $mutation);
-        }
-
-        $this->assertCount(1, $mutations);
-        $this->assertArrayHasKey(0, $mutations);
-
-        /** @var Mutation $mutation */
-        $mutation = current($mutations);
-
-        $this->assertSame(
-            MutatorName::getName(Plus::class),
-            $mutation->getMutatorName()
-        );
-    }
-
     /**
      * @dataProvider parsedFilesProvider
      */
     public function test_it_attempts_to_generate_mutations_for_the_file_if_covered_or_not_only_covered_code(
         SplFileInfo $fileInfo,
-        bool $onlyCovered,
         LineCodeCoverage $codeCoverage,
         string $expectedFilePath
     ): void {
@@ -155,7 +118,6 @@ final class FileMutationGeneratorTest extends TestCase
 
         $mutations = $this->mutationGenerator->generate(
             $fileInfo,
-            $onlyCovered,
             $codeCoverage,
             [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
             $nodeIgnorers
@@ -189,7 +151,6 @@ final class FileMutationGeneratorTest extends TestCase
 
         $mutations = $mutationGenerator->generate(
             $fileInfo,
-            true,
             $this->createCodeCoverageMock(
                 $expectedFilePath,
                 false
@@ -205,13 +166,12 @@ final class FileMutationGeneratorTest extends TestCase
     {
         foreach ($this->provideBoolean() as $hasTests) {
             $title = sprintf(
-                'path - only covered: false - has tests: %s',
+                'path - has tests: %s',
                 $hasTests ? 'true' : 'false'
             );
 
             yield $title => [
                 new SplFileInfo('/path/to/file', 'relativePath', 'relativePathName'),
-                false,
                 $this->createCodeCoverageMock(
                     '/path/to/file',
                     true
@@ -222,13 +182,12 @@ final class FileMutationGeneratorTest extends TestCase
 
         foreach ($this->provideBoolean() as $hasTests) {
             $title = sprintf(
-                'real path - only covered: false - has tests: %s',
+                'real path - has tests: %s',
                 $hasTests ? 'true' : 'false'
             );
 
             yield $title => [
                 new SplFileInfo(__FILE__, 'relativePath', 'relativePathName'),
-                false,
                 $this->createCodeCoverageMock(
                     __FILE__,
                     true
@@ -236,36 +195,16 @@ final class FileMutationGeneratorTest extends TestCase
                 __FILE__,
             ];
         }
-
-        yield 'path - only covered: true - has tests: %s' => [
-            new SplFileInfo('/path/to/file', 'relativePath', 'relativePathName'),
-            true,
-            $this->createCodeCoverageMock(
-                '/path/to/file',
-                true
-            ),
-            '/path/to/file',
-        ];
-
-        yield 'real path - only covered: true - has tests: %s' => [
-            new SplFileInfo(__FILE__, 'relativePath', 'relativePathName'),
-            true,
-            $this->createCodeCoverageMock(
-                __FILE__,
-                true
-            ),
-            __FILE__,
-        ];
     }
 
     public function skippedFilesProvider(): Generator
     {
-        yield 'path - only covered: true - has tests: %s' => [
+        yield 'path - has tests: %s' => [
             new SplFileInfo('/path/to/file', 'relativePath', 'relativePathName'),
             '/path/to/file',
         ];
 
-        yield 'real path - only covered: true - has tests: %s' => [
+        yield 'real path - has tests: %s' => [
             new SplFileInfo(__FILE__, 'relativePath', 'relativePathName'),
             __FILE__,
         ];

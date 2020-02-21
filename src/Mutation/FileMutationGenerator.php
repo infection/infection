@@ -77,7 +77,6 @@ class FileMutationGenerator
      */
     public function generate(
         SplFileInfo $fileInfo,
-        bool $onlyCovered,
         LineCodeCoverage $codeCoverage,
         array $mutators,
         array $nodeIgnorers
@@ -90,7 +89,7 @@ class FileMutationGenerator
             : $fileInfo->getRealPath()
         ;
 
-        if ($onlyCovered && !$codeCoverage->hasTests($filePath)) {
+        if (!$codeCoverage->hasTests($filePath)) {
             return [];
         }
 
@@ -102,7 +101,6 @@ class FileMutationGenerator
                 $filePath,
                 $initialStatements,
                 $codeCoverage,
-                $onlyCovered,
                 $this->lineRangeCalculator
             )
         );
