@@ -56,10 +56,6 @@ final class TextFileLogger extends FileLogger
             $logs[] = $this->getLogParts($this->metricsCalculator->getErrorProcesses(), 'Errors');
         }
 
-        if (!$this->isOnlyCoveredMode) {
-            $logs[] = $this->getLogParts($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not Covered');
-        }
-
         return $logs;
     }
 

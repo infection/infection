@@ -93,10 +93,6 @@ Timed Out mutants:
 ==================
 
 
-Not Covered mutants:
-====================
-
-
 TXT;
 
         $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
@@ -162,10 +158,6 @@ Line 9
 
 Mutator: For_
 Line 10
-
-Not Covered mutants:
-====================
-
 
 TXT;
 

@@ -188,9 +188,6 @@ Escaped mutants:
 Timed Out mutants:
 ==================
 
-Not Covered mutants:
-====================
-
 TXT
         ];
 
@@ -210,9 +207,6 @@ Killed mutants:
 Errors mutants:
 ===============
 
-Not Covered mutants:
-====================
-
 TXT
         ];
 
@@ -225,9 +219,6 @@ Escaped mutants:
 
 Timed Out mutants:
 ==================
-
-Not Covered mutants:
-====================
 
 TXT
         ];
@@ -247,9 +238,6 @@ Killed mutants:
 
 Errors mutants:
 ===============
-
-Not Covered mutants:
-====================
 
 TXT
         ];
@@ -307,9 +295,6 @@ Timed Out mutants:
 - echo 'original';
 + echo 'timedOut#0';
 
-Not Covered mutants:
-====================
-
 TXT
         ];
 
@@ -417,9 +402,6 @@ Errors mutants:
 + echo 'error#0';
 
 
-Not Covered mutants:
-====================
-
 TXT
         ];
 
@@ -472,9 +454,6 @@ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTe
 
 - echo 'original';
 + echo 'timedOut#0';
-
-Not Covered mutants:
-====================
 
 TXT
         ];
@@ -582,9 +561,6 @@ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTe
 - echo 'original';
 + echo 'error#0';
 
-
-Not Covered mutants:
-====================
 
 TXT
         ];
