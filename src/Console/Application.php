@@ -151,7 +151,6 @@ final class Application extends BaseApplication
         parent::configureIO($input, $output);
 
         $output->getFormatter()->setStyle('with-error', new OutputFormatterStyle('green'));
-        $output->getFormatter()->setStyle('uncovered', new OutputFormatterStyle('blue', null, ['bold']));
         $output->getFormatter()->setStyle('timeout', new OutputFormatterStyle('yellow'));
         $output->getFormatter()->setStyle('escaped', new OutputFormatterStyle('red', null, ['bold']));
         $output->getFormatter()->setStyle('killed', new OutputFormatterStyle('green'));
