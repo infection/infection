@@ -77,12 +77,9 @@ final class ConsoleOutput
         $this->io->error(
             sprintf(
                 self::CI_FLAG_ERROR,
-                ($type === TestRunConstraintChecker::MSI_FAILURE ? 'MSI' : 'Covered Code MSI'),
+                'MSI',
                 $minMsi,
-                ($type === TestRunConstraintChecker::MSI_FAILURE ?
-                    $metricsCalculator->getMutationScoreIndicator() :
-                    $metricsCalculator->getCoveredCodeMutationScoreIndicator()
-                )
+                $metricsCalculator->getMutationScoreIndicator()
             )
         );
     }
@@ -92,17 +89,12 @@ final class ConsoleOutput
      */
     public function logMinMsiCanGetIncreasedNotice(MetricsCalculator $metricsCalculator, float $minMsi, string $type): void
     {
-        if ($type !== TestRunConstraintChecker::MSI_OVER_MIN_MSI && $type !== TestRunConstraintChecker::COVERED_MSI_OVER_MIN_MSI) {
+        if ($type !== TestRunConstraintChecker::MSI_OVER_MIN_MSI) {
             throw InvalidTypeException::create($type);
         }
 
-        if ($type === TestRunConstraintChecker::MSI_OVER_MIN_MSI) {
-            $typeString = 'MSI';
-            $msi = $metricsCalculator->getMutationScoreIndicator();
-        } else {
-            $typeString = 'Covered Code MSI';
-            $msi = $metricsCalculator->getCoveredCodeMutationScoreIndicator();
-        }
+        $typeString = 'MSI';
+        $msi = $metricsCalculator->getMutationScoreIndicator();
 
         $msiDifference = $msi - $minMsi;
 

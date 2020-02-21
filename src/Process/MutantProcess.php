@@ -51,7 +51,6 @@ class MutantProcess
     public const CODE_ESCAPED = 1;
     public const CODE_ERROR = 2;
     public const CODE_TIMED_OUT = 3;
-    public const CODE_NOT_COVERED = 4;
 
     public const RESULT_CODES = [
         self::CODE_KILLED,

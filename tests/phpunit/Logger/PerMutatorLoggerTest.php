@@ -73,10 +73,10 @@ final class PerMutatorLoggerTest extends TestCase
         $expectedContent = <<<'TXT'
 # Effects per Mutator
 
-| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |
-| ------- | --------- | ------ | ------- |------- | --------- | --- | ----------- |
-| For_ | 3 | 1 | 1 | 0 | 1 | 66| 66|
-| PregQuote | 3 | 1 | 1 | 0 | 1 | 66| 66|
+| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI |
+| ------- | --------- | ------ | ------- |------- | --------- | --- |
+| For_ | 3 | 1 | 1 | 0 | 1 | 66| 
+| PregQuote | 3 | 1 | 1 | 0 | 1 | 66| 
 TXT;
 
         $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);

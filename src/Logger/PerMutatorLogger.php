@@ -57,8 +57,8 @@ final class PerMutatorLogger extends FileLogger
 
         $logs[] = '# Effects per Mutator' . PHP_EOL;
 
-        $logs[] = '| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI | Covered MSI |';
-        $logs[] = '| ------- | --------- | ------ | ------- |------- | --------- | --- | ----------- |';
+        $logs[] = '| Mutator | Mutations | Killed | Escaped | Errors | Timed Out | MSI |';
+        $logs[] = '| ------- | --------- | ------ | ------- |------- | --------- | --- |';
 
         foreach ($this->calculatorPerMutator as $mutator => $calculator) {
             $logs[] = '| ' . $mutator . ' | ' .
@@ -67,8 +67,7 @@ final class PerMutatorLogger extends FileLogger
                 $calculator->getEscapedCount() . ' | ' .
                 $calculator->getErrorCount() . ' | ' .
                 $calculator->getTimedOutCount() . ' | ' .
-                floor($calculator->getMutationScoreIndicator()) . '| ' .
-                floor($calculator->getCoveredCodeMutationScoreIndicator()) . '|';
+                floor($calculator->getMutationScoreIndicator()) . '| ';
         }
 
         return $logs;

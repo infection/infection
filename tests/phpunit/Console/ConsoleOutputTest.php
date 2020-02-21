@@ -90,18 +90,6 @@ final class ConsoleOutputTest extends TestCase
         $consoleOutput->logBadMsiErrorMessage(new MetricsCalculator(), 0.0, 'min-msi');
     }
 
-    public function test_log_bad_covered_msi_error_message(): void
-    {
-        $metrics = $this->createMock(MetricsCalculator::class);
-        $metrics->expects($this->once())->method('getCoveredCodeMutationScoreIndicator')->willReturn(75.0);
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('error')->with(
-            'The minimum required Covered Code MSI percentage should be 25%, but actual is 75%. Improve your tests!'
-        );
-        $console = new ConsoleOutput($io);
-        $console->logBadMsiErrorMessage($metrics, 25.0, 'min-covered-msi');
-    }
-
     public function test_log_running_with_debugger(): void
     {
         $io = $this->createMock(SymfonyStyle::class);
@@ -143,25 +131,5 @@ final class ConsoleOutputTest extends TestCase
 
         $consoleOutput = new ConsoleOutput($io);
         $consoleOutput->logMinMsiCanGetIncreasedNotice($metricsCalculator, $minMsi, TestRunConstraintChecker::MSI_OVER_MIN_MSI);
-    }
-
-    public function test_log_min_msi_can_get_increased_notice_for_covered_msi(): void
-    {
-        $actualMsi = 10.0;
-        $minMsi = 5.0;
-        $msiDifference = $actualMsi - $minMsi;
-
-        $io = $this->createMock(SymfonyStyle::class);
-        $io->expects($this->once())->method('note')
-            ->with(
-                'The Covered Code MSI is ' . $msiDifference . '% percent points over the required Covered Code MSI. ' .
-                'Consider increasing the required Covered Code MSI percentage the next time you run infection.');
-        $metricsCalculator = $this->createMock(MetricsCalculator::class);
-
-        $metricsCalculator->expects($this->once())->method('getCoveredCodeMutationScoreIndicator')
-            ->willReturn($actualMsi);
-
-        $consoleOutput = new ConsoleOutput($io);
-        $consoleOutput->logMinMsiCanGetIncreasedNotice($metricsCalculator, $minMsi, TestRunConstraintChecker::COVERED_MSI_OVER_MIN_MSI);
     }
 }

@@ -44,10 +44,16 @@ final class TestRunConstraintChecker
 {
     public const MSI_FAILURE = 'min-msi';
 
+    /**
+     * @deprecated
+     */
     public const COVERED_MSI_FAILURE = 'min-covered-msi';
 
     public const MSI_OVER_MIN_MSI = 'msi-over-min-msi';
 
+    /**
+     * @deprecated
+     */
     public const COVERED_MSI_OVER_MIN_MSI = 'covered-msi-over-min-msi';
 
     private const VALUE_OVER_REQUIRED_TOLERANCE = 0.1;
@@ -89,12 +95,6 @@ final class TestRunConstraintChecker
             return false;
         }
 
-        if ($this->hasBadCoveredMsi()) {
-            $this->failureType = self::COVERED_MSI_FAILURE;
-
-            return false;
-        }
-
         return true;
     }
 
@@ -102,12 +102,6 @@ final class TestRunConstraintChecker
     {
         if ($this->hasMsiOverRequired()) {
             $this->actualOverRequiredType = self::MSI_OVER_MIN_MSI;
-
-            return true;
-        }
-
-        if ($this->hasCoveredMsiOverRequired()) {
-            $this->actualOverRequiredType = self::COVERED_MSI_OVER_MIN_MSI;
 
             return true;
         }
@@ -137,11 +131,6 @@ final class TestRunConstraintChecker
         return $this->minMsi && ($this->metricsCalculator->getMutationScoreIndicator() < $this->minMsi);
     }
 
-    private function hasBadCoveredMsi(): bool
-    {
-        return $this->minCoveredMsi && ($this->metricsCalculator->getCoveredCodeMutationScoreIndicator() < $this->minCoveredMsi);
-    }
-
     private function hasMsiOverRequired(): bool
     {
         if ($this->minMsi === 0.0) {
@@ -149,14 +138,5 @@ final class TestRunConstraintChecker
         }
 
         return $this->metricsCalculator->getMutationScoreIndicator() > $this->minMsi + self::VALUE_OVER_REQUIRED_TOLERANCE;
-    }
-
-    private function hasCoveredMsiOverRequired(): bool
-    {
-        if ($this->minCoveredMsi === 0.0) {
-            return false;
-        }
-
-        return $this->metricsCalculator->getCoveredCodeMutationScoreIndicator() > $this->minCoveredMsi + self::VALUE_OVER_REQUIRED_TOLERANCE;
     }
 }

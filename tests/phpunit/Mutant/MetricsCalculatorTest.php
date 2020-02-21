@@ -50,17 +50,13 @@ final class MetricsCalculatorTest extends TestCase
         $this->assertSame(0, $calculator->getKilledCount());
         $this->assertSame(0, $calculator->getErrorCount());
         $this->assertSame(0, $calculator->getTimedOutCount());
-        $this->assertSame(0, $calculator->getNotCoveredByTestsCount());
         $this->assertSame(0, $calculator->getTotalMutantsCount());
         $this->assertSame([], $calculator->getEscapedMutantProcesses());
         $this->assertSame([], $calculator->getKilledMutantProcesses());
         $this->assertSame([], $calculator->getErrorProcesses());
         $this->assertSame([], $calculator->getTimedOutProcesses());
-        $this->assertSame([], $calculator->getNotCoveredMutantProcesses());
 
         $this->assertSame(0.0, $calculator->getMutationScoreIndicator());
-        $this->assertSame(0.0, $calculator->getCoverageRate());
-        $this->assertSame(0.0, $calculator->getCoveredCodeMutationScoreIndicator());
     }
 
     public function test_it_collects_all_values(): void
@@ -69,9 +65,6 @@ final class MetricsCalculatorTest extends TestCase
         $process->method('stop');
 
         $calculator = new MetricsCalculator();
-
-        $this->addMutantProcess($calculator, MutantProcess::CODE_NOT_COVERED);
-        $this->assertSame(0, $calculator->getNotCoveredByTestsCount());
 
         $this->addMutantProcess($calculator, MutantProcess::CODE_ESCAPED, 2);
         $this->assertSame(2, $calculator->getEscapedCount());
@@ -85,9 +78,7 @@ final class MetricsCalculatorTest extends TestCase
         $this->addMutantProcess($calculator, MutantProcess::CODE_ERROR, 2);
         $this->assertSame(2, $calculator->getErrorCount());
 
-        $this->assertSame(78.57142857142857, $calculator->getMutationScoreIndicator());
-        $this->assertSame(100.0, $calculator->getCoverageRate());
-        $this->assertSame(78.57142857142857, $calculator->getCoveredCodeMutationScoreIndicator());
+        $this->assertSame(84.61538461538461, $calculator->getMutationScoreIndicator());
     }
 
     private function addMutantProcess(MetricsCalculator $calculator, int $resultCode, int $count = 1): void

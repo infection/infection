@@ -65,11 +65,6 @@ class MetricsCalculator
     /**
      * @var int
      */
-    private $notCoveredByTestsCount = 0;
-
-    /**
-     * @var int
-     */
     private $totalMutantsCount = 0;
 
     /**
@@ -91,11 +86,6 @@ class MetricsCalculator
      * @var MutantProcess[]
      */
     private $timedOutProcesses = [];
-
-    /**
-     * @var MutantProcess[]
-     */
-    private $notCoveredMutantProcesses = [];
 
     /**
      * Build a metric calculator with a sub-set of mutators
@@ -158,34 +148,6 @@ class MetricsCalculator
         return $detectionRateAll;
     }
 
-    /**
-     * Mutation coverage percentage
-     */
-    public function getCoverageRate(): float
-    {
-        $coveredRate = 0;
-        $coveredByTestsTotal = $this->totalMutantsCount - $this->notCoveredByTestsCount;
-
-        if ($this->totalMutantsCount) {
-            $coveredRate = 100 * $coveredByTestsTotal / $this->totalMutantsCount;
-        }
-
-        return $coveredRate;
-    }
-
-    public function getCoveredCodeMutationScoreIndicator(): float
-    {
-        $detectionRateTested = 0;
-        $coveredByTestsTotal = $this->totalMutantsCount - $this->notCoveredByTestsCount;
-        $defeatedTotal = $this->killedCount + $this->timedOutCount + $this->errorCount;
-
-        if ($coveredByTestsTotal) {
-            $detectionRateTested = 100 * $defeatedTotal / $coveredByTestsTotal;
-        }
-
-        return $detectionRateTested;
-    }
-
     public function getKilledCount(): int
     {
         return $this->killedCount;
@@ -199,11 +161,6 @@ class MetricsCalculator
     public function getTimedOutCount(): int
     {
         return $this->timedOutCount;
-    }
-
-    public function getNotCoveredByTestsCount(): int
-    {
-        return $this->notCoveredByTestsCount;
     }
 
     public function getTotalMutantsCount(): int
@@ -238,21 +195,12 @@ class MetricsCalculator
     /**
      * @return MutantProcess[]
      */
-    public function getNotCoveredMutantProcesses(): array
-    {
-        return $this->notCoveredMutantProcesses;
-    }
-
-    /**
-     * @return MutantProcess[]
-     */
     public function getAllMutantProcesses(): array
     {
         return array_merge(
             $this->escapedMutantProcesses,
             $this->killedMutantProcesses,
-            $this->timedOutProcesses,
-            $this->notCoveredMutantProcesses
+            $this->timedOutProcesses
         );
     }
 

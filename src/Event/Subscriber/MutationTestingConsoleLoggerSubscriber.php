@@ -115,10 +115,6 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 
         if ($this->showMutations) {
             $this->showMutations($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped');
-
-            if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
-                $this->showMutations($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not covered');
-            }
         }
 
         $this->showMetrics();
