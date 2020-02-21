@@ -73,7 +73,6 @@ final class LoggerFactoryTest extends TestCase
             new MetricsCalculator(),
             $this->fileSystemMock,
             LogVerbosity::NONE,
-            true,
             true
         );
 
@@ -97,7 +96,6 @@ final class LoggerFactoryTest extends TestCase
             new MetricsCalculator(),
             $this->fileSystemMock,
             LogVerbosity::NONE,
-            true,
             true
         );
 
@@ -119,7 +117,6 @@ final class LoggerFactoryTest extends TestCase
             new MetricsCalculator(),
             $this->fileSystemMock,
             LogVerbosity::NORMAL,
-            true,
             true
         );
 
@@ -141,7 +138,6 @@ final class LoggerFactoryTest extends TestCase
             new MetricsCalculator(),
             $this->fileSystemMock,
             LogVerbosity::NORMAL,
-            true,
             true
         );
 

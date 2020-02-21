@@ -88,7 +88,7 @@ final class SubscriberBuilderTest extends TestCase
             new Stopwatch(),
             new TimeFormatter(),
             new MemoryFormatter(),
-            new LoggerFactory($calculator, $fs, 'all', false, false)
+            new LoggerFactory($calculator, $fs, 'all', false)
         );
         $subscriberBuilder->registerSubscribers($adapter, $output);
     }
@@ -121,7 +121,7 @@ final class SubscriberBuilderTest extends TestCase
             new Stopwatch(),
             new TimeFormatter(),
             new MemoryFormatter(),
-            new LoggerFactory($calculator, $fs, 'all', false, false)
+            new LoggerFactory($calculator, $fs, 'all', false)
         );
         $subscriberBuilder->registerSubscribers($adapter, $output);
     }
@@ -151,7 +151,7 @@ final class SubscriberBuilderTest extends TestCase
             new Stopwatch(),
             new TimeFormatter(),
             new MemoryFormatter(),
-            new LoggerFactory($calculator, $fs, 'all', false, false)
+            new LoggerFactory($calculator, $fs, 'all', false)
         );
 
         $this->expectException(InvalidArgumentException::class);

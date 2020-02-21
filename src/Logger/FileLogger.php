@@ -67,10 +67,6 @@ abstract class FileLogger implements MutationTestingResultsLogger
      */
     protected $isDebugMode;
 
-    /**
-     * @var bool
-     */
-    protected $isOnlyCoveredMode;
     private $logFilePath;
     private $fs;
     private $output;
@@ -81,8 +77,7 @@ abstract class FileLogger implements MutationTestingResultsLogger
         MetricsCalculator $metricsCalculator,
         Filesystem $fs,
         bool $isDebugVerbosity,
-        bool $isDebugMode,
-        bool $isOnlyCoveredMode = false
+        bool $isDebugMode
     ) {
         $this->logFilePath = $logFilePath;
         $this->metricsCalculator = $metricsCalculator;
@@ -90,7 +85,6 @@ abstract class FileLogger implements MutationTestingResultsLogger
         $this->isDebugVerbosity = $isDebugVerbosity;
         $this->isDebugMode = $isDebugMode;
         $this->output = $output;
-        $this->isOnlyCoveredMode = $isOnlyCoveredMode;
     }
 
     public function log(): void

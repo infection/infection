@@ -54,20 +54,17 @@ final class LoggerFactory
     private $filesystem;
     private $logVerbosity;
     private $debugMode;
-    private $onlyCoveredCode;
 
     public function __construct(
         MetricsCalculator $metricsCalculator,
         Filesystem $filesystem,
         string $logVerbosity,
-        bool $debugMode,
-        bool $onlyCoveredCode
+        bool $debugMode
     ) {
         $this->metricsCalculator = $metricsCalculator;
         $this->filesystem = $filesystem;
         $this->logVerbosity = $logVerbosity;
         $this->debugMode = $debugMode;
-        $this->onlyCoveredCode = $onlyCoveredCode;
     }
 
     /**
@@ -115,8 +112,7 @@ final class LoggerFactory
             $this->metricsCalculator,
             $this->filesystem,
             $isDebugVerbosity,
-            $this->debugMode,
-            $this->onlyCoveredCode
+            $this->debugMode
         );
     }
 
@@ -146,8 +142,7 @@ final class LoggerFactory
             $this->metricsCalculator,
             $this->filesystem,
             $isDebugVerbosity,
-            $this->debugMode,
-            $this->onlyCoveredCode
+            $this->debugMode
         );
     }
 

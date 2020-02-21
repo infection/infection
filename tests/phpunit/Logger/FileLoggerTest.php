@@ -176,8 +176,7 @@ final class DummyFileLogger extends FileLogger
         MetricsCalculator $metricsCalculator,
         Filesystem $fileSystem,
         bool $isDebugVerbosity,
-        bool $isDebugMode,
-        bool $isOnlyCoveredMode = false
+        bool $isDebugMode
     ) {
         parent::__construct(
             $output,
@@ -185,8 +184,7 @@ final class DummyFileLogger extends FileLogger
             $metricsCalculator,
             $fileSystem,
             $isDebugVerbosity,
-            $isDebugMode,
-            $isOnlyCoveredMode
+            $isDebugMode
         );
 
         $this->logLines = $logLines;

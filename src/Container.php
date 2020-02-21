@@ -354,8 +354,7 @@ final class Container
                     $container->getMetricsCalculator(),
                     $container->getFileSystem(),
                     $config->getLogVerbosity(),
-                    $config->isDebugEnabled(),
-                    $config->mutateOnlyCoveredCode()
+                    $config->isDebugEnabled()
                 );
             },
             TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
