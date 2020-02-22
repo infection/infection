@@ -43,6 +43,11 @@ use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 interface LineCodeCoverage
 {
     /**
+     * @return float Total coverage in percent
+     */
+    public function getTotalCoverage(): float;
+
+    /**
      * @throws CoverageDoesNotExistException
      */
     public function hasTests(string $filePath): bool;

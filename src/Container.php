@@ -82,6 +82,7 @@ use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
+use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\XmlReport\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\MemoizedTestFileDataProvider;
@@ -153,6 +154,12 @@ final class Container
                     $container->getConfiguration()->getCoveragePath(),
                     $container->getIndexXmlCoverageParser(),
                     $container->getMemoizedTestFileDataProvider()
+                );
+            },
+            LineCodeCoverage::class => static function (self $container): LineCodeCoverage {
+                return $container->getXMLLineCodeCoverageFactory()->create(
+                    $container->getConfiguration()->getTestFramework(),
+                    $container->getTestFrameworkAdapter()
                 );
             },
             RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
@@ -374,7 +381,8 @@ final class Container
             InitialTestsRunner::class => static function (self $container): InitialTestsRunner {
                 return new InitialTestsRunner(
                     $container->getInitialTestRunProcessBuilder(),
-                    $container->getEventDispatcher()
+                    $container->getEventDispatcher(),
+                    $container->getLineCodeCoverage()
                 );
             },
             MutantProcessBuilder::class => static function (self $container): MutantProcessBuilder {
@@ -388,10 +396,7 @@ final class Container
 
                 return new MutationGenerator(
                     $config->getSourceFiles(),
-                    $container->getXMLLineCodeCoverageFactory()->create(
-                        $config->getTestFramework(),
-                        $container->getTestFrameworkAdapter()
-                    ),
+                    $container->getLineCodeCoverage(),
                     $config->getMutators(),
                     $container->getEventDispatcher(),
                     $container->getFileMutationGenerator()
@@ -529,6 +534,11 @@ final class Container
     public function getXMLLineCodeCoverageFactory(): XMLLineCodeCoverageFactory
     {
         return $this->get(XMLLineCodeCoverageFactory::class);
+    }
+
+    public function getLineCodeCoverage(): LineCodeCoverage
+    {
+        return $this->get(LineCodeCoverage::class);
     }
 
     public function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator

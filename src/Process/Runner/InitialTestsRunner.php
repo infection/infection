@@ -40,6 +40,7 @@ use Infection\Event\InitialTestCaseWasCompleted;
 use Infection\Event\InitialTestSuiteWasFinished;
 use Infection\Event\InitialTestSuiteWasStarted;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
+use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Symfony\Component\Process\Process;
 
 /**
@@ -49,11 +50,16 @@ final class InitialTestsRunner
 {
     private $processBuilder;
     private $eventDispatcher;
+    private $coverage;
 
-    public function __construct(InitialTestRunProcessBuilder $processBuilder, EventDispatcher $eventDispatcher)
-    {
+    public function __construct(
+        InitialTestRunProcessBuilder $processBuilder,
+        EventDispatcher $eventDispatcher,
+        LineCodeCoverage $coverage
+    ) {
         $this->processBuilder = $processBuilder;
         $this->eventDispatcher = $eventDispatcher;
+        $this->coverage = $coverage;
     }
 
     /**
@@ -77,7 +83,10 @@ final class InitialTestsRunner
             $this->eventDispatcher->dispatch(new InitialTestCaseWasCompleted());
         });
 
-        $this->eventDispatcher->dispatch(new InitialTestSuiteWasFinished($process->getOutput()));
+        $this->eventDispatcher->dispatch(new InitialTestSuiteWasFinished(
+            $process->getOutput(),
+            $this->coverage->getTotalCoverage()
+        ));
 
         return $process;
     }

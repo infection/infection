@@ -44,12 +44,18 @@ use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use function range;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
 final class XMLLineCodeCoverage implements LineCodeCoverage
 {
+    /**
+     * @var float|null
+     */
+    private $totalCoverage;
+
     /**
      * @var array<string, CoverageFileData>|null
      */
@@ -78,6 +84,15 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
         );
 
         return count($coveredLineTestMethods) > 0;
+    }
+
+    public function getTotalCoverage(): float
+    {
+        $this->getCoverage();
+
+        Assert::notNull($this->totalCoverage);
+
+        return $this->totalCoverage;
     }
 
     public function getAllTestsForMutation(
@@ -162,7 +177,11 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
     private function getCoverage(): array
     {
         if ($this->coverage === null) {
-            $this->coverage = $this->coverageFactory->createCoverage();
+            $coverage = $this->coverageFactory->createCoverage();
+
+            $this->totalCoverage = $coverage['totalCoverage'];
+            unset($coverage['totalCoverage']);
+            $this->coverage = $coverage;
         }
 
         return $this->coverage;

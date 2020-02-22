@@ -98,6 +98,11 @@ class MetricsCalculator
     private $notCoveredMutantProcesses = [];
 
     /**
+     * @var float|null
+     */
+    private $totalCoverage;
+
+    /**
      * Build a metric calculator with a sub-set of mutators
      *
      * @param MutantProcess[] $mutantProcesses
@@ -113,6 +118,11 @@ class MetricsCalculator
         }
 
         return $self;
+    }
+
+    public function registerTotalCoverage(float $totalCoverage): void
+    {
+        $this->totalCoverage = $totalCoverage;
     }
 
     public function collect(MutantProcess $mutantProcess): void

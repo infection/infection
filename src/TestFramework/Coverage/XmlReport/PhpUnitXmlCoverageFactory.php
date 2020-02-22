@@ -108,6 +108,10 @@ class PhpUnitXmlCoverageFactory
         }
 
         foreach ($coverage as $sourceFilePath => $fileCoverageData) {
+            if ($sourceFilePath === 'totalCoverage') {
+                continue;
+            }
+
             foreach ($fileCoverageData->byLine as $line => $linesCoverageData) {
                 foreach ($linesCoverageData as $test) {
                     self::updateTestExecutionInfo($test, $this->testFileDataProvider);

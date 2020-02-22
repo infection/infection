@@ -38,6 +38,7 @@ namespace Infection\TestFramework\PhpUnit\Coverage;
 use function array_filter;
 use DOMDocument;
 use DOMElement;
+use DOMNode;
 use DOMNodeList;
 use DOMXPath;
 use function implode;
@@ -84,13 +85,13 @@ class IndexXmlCoverageParser
     {
         $xPath = self::createXPath($coverageXmlContent);
 
-        self::assertHasCoverage($xPath);
+        $totalCoverage = self::retrieveTotalCoverage($xPath);
 
         $nodes = self::safeQuery($xPath, '//file');
 
         $projectSource = self::getProjectSource($xPath);
 
-        $data = [];
+        $data = ['totalCoverage' => $totalCoverage];
 
         foreach ($nodes as $node) {
             $relativeFilePath = $node->getAttribute('href');
@@ -125,7 +126,7 @@ class IndexXmlCoverageParser
     /**
      * @throws NoLineExecuted
      */
-    private static function assertHasCoverage(DOMXPath $xPath): void
+    private static function retrieveTotalCoverage(DOMXPath $xPath): float
     {
         $lineCoverage = self::safeQuery($xPath, '/phpunit/project/directory[1]/totals/lines')->item(0);
 
@@ -136,6 +137,8 @@ class IndexXmlCoverageParser
         ) {
             throw NoLineExecuted::create();
         }
+
+        return self::parsePercentage($lineCoverage);
     }
 
     /**
@@ -156,22 +159,7 @@ class IndexXmlCoverageParser
 
         $linesNode = self::safeQuery($xPath, '/phpunit/file/totals/lines')[0];
 
-        $percentage = $linesNode->getAttribute('percent');
-
-        if (substr($percentage, -1) === '%') {
-            // In PHPUnit <6 the percentage value would take the form "0.00%" in _some_ cases.
-            // For example could find both with percentage and without in
-            // https://github.com/maks-rafalko/tactician-domain-events/tree/1eb23434d3a833dedb6180ead75ff983ef09a2e9
-            $percentage = substr($percentage, 0, -1);
-        }
-
-        if ($percentage === '') {
-            $percentage = .0;
-        } else {
-            Assert::numeric($percentage);
-
-            $percentage = (float) $percentage;
-        }
+        $percentage = self::parsePercentage($linesNode);
 
         if ($percentage === .0) {
             $data[$sourceFilePath] = new CoverageFileData();
@@ -309,5 +297,27 @@ class IndexXmlCoverageParser
 
         // PHPUnit < 6
         return self::safeQuery($xPath, '//project/@name')[0]->nodeValue;
+    }
+
+    private static function parsePercentage(DOMNode $node): float
+    {
+        $percentage = $node->getAttribute('percent');
+
+        if (substr($percentage, -1) === '%') {
+            // In PHPUnit <6 the percentage value would take the form "0.00%" in _some_ cases.
+            // For example could find both with percentage and without in
+            // https://github.com/maks-rafalko/tactician-domain-events/tree/1eb23434d3a833dedb6180ead75ff983ef09a2e9
+            $percentage = substr($percentage, 0, -1);
+        }
+
+        if ($percentage === '') {
+            return .0;
+        }
+
+        Assert::numeric($percentage);
+
+        $percentage = (float) $percentage;
+
+        return $percentage;
     }
 }

@@ -39,6 +39,7 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\InitialTestCaseWasCompleted;
 use Infection\Event\InitialTestSuiteWasFinished;
 use Infection\Event\InitialTestSuiteWasStarted;
+use Infection\Mutant\MetricsCalculator;
 use InvalidArgumentException;
 use function Safe\sprintf;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -53,12 +54,18 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
     private $progressBar;
     private $testFrameworkAdapter;
     private $debug;
+    private $metricsCalculator;
 
-    public function __construct(OutputInterface $output, TestFrameworkAdapter $testFrameworkAdapter, bool $debug)
-    {
+    public function __construct(
+        OutputInterface $output,
+        TestFrameworkAdapter $testFrameworkAdapter,
+        bool $debug,
+        MetricsCalculator $metricsCalculator
+    ) {
         $this->output = $output;
         $this->testFrameworkAdapter = $testFrameworkAdapter;
         $this->debug = $debug;
+        $this->metricsCalculator = $metricsCalculator;
 
         $this->progressBar = new ProgressBar($this->output);
         $this->progressBar->setFormat('verbose');
@@ -95,17 +102,20 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
         $this->progressBar->start();
     }
 
+    public function onInitialTestCaseWasCompleted(InitialTestCaseWasCompleted $event): void
+    {
+        $this->progressBar->advance();
+    }
+
     public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
     {
         $this->progressBar->finish();
 
         if ($this->debug) {
             $this->output->writeln(PHP_EOL . $event->getOutputText());
+            $this->output->writeln(sprintf('Code coverage: %.2f', $event->getTotalCoverage()));
         }
-    }
 
-    public function onInitialTestCaseWasCompleted(InitialTestCaseWasCompleted $event): void
-    {
-        $this->progressBar->advance();
+        $this->metricsCalculator->registerTotalCoverage($event->getTotalCoverage());
     }
 }

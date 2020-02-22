@@ -41,14 +41,21 @@ namespace Infection\Event;
 final class InitialTestSuiteWasFinished
 {
     private $outputText;
+    private $totalCoverage;
 
-    public function __construct(string $outputText)
+    public function __construct(string $outputText, float $totalCoverage)
     {
         $this->outputText = $outputText;
+        $this->totalCoverage = $totalCoverage;
     }
 
     public function getOutputText(): string
     {
         return $this->outputText;
+    }
+
+    public function getTotalCoverage(): float
+    {
+        return $this->totalCoverage;
     }
 }
