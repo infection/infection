@@ -55,6 +55,9 @@ final class SchemaConfigurationTest extends TestCase
         Logs $logs,
         ?string $tmpDir,
         PhpUnit $phpUnit,
+        ?bool $ignoreMsiWithNoMutations,
+        $minMsi,
+        $minCoveredMsi,
         array $mutators,
         ?string $testFramework,
         ?string $bootstrap,
@@ -68,6 +71,9 @@ final class SchemaConfigurationTest extends TestCase
             $logs,
             $tmpDir,
             $phpUnit,
+            $ignoreMsiWithNoMutations,
+            $minMsi,
+            $minCoveredMsi,
             $mutators,
             $testFramework,
             $bootstrap,
@@ -81,6 +87,9 @@ final class SchemaConfigurationTest extends TestCase
         $this->assertSame($logs, $config->getLogs());
         $this->assertSame($tmpDir, $config->getTmpDir());
         $this->assertSame($phpUnit, $config->getPhpUnit());
+        $this->assertSame($ignoreMsiWithNoMutations, $config->getIgnoreMsiWithNoMutations());
+        $this->assertSame($minMsi, $config->getMinMsi());
+        $this->assertSame($minCoveredMsi, $config->getMinCoveredMsi());
         $this->assertSame($mutators, $config->getMutators());
         $this->assertSame($testFramework, $config->getTestFramework());
         $this->assertSame($bootstrap, $config->getBootstrap());
@@ -103,6 +112,9 @@ final class SchemaConfigurationTest extends TestCase
             ),
             null,
             new PhpUnit(null, null),
+            null,
+            null,
+            null,
             [],
             null,
             null,
@@ -123,6 +135,35 @@ final class SchemaConfigurationTest extends TestCase
             ),
             'path/to/tmp',
             new PhpUnit('dist/phpunit', 'bin/phpunit'),
+            true,
+            12,
+            35,
+            [
+                '@arithmetic' => true,
+                '@cast' => false,
+            ],
+            'phpunit',
+            'bin/bootstrap.php',
+            '-d zend_extension=xdebug.so',
+            '--debug',
+        ];
+
+        yield 'complete-with-float' => [
+            '/path/to/config',
+            10,
+            new Source(['src', 'lib'], ['fixtures', 'tests']),
+            new Logs(
+                'text.log',
+                'summary.log',
+                'debug.log',
+                'mutator.log',
+                new Badge('master')
+            ),
+            'path/to/tmp',
+            new PhpUnit('dist/phpunit', 'bin/phpunit'),
+            true,
+            12.3,
+            35.5,
             [
                 '@arithmetic' => true,
                 '@cast' => false,

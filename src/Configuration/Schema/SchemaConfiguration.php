@@ -52,6 +52,15 @@ final class SchemaConfiguration
     private $logs;
     private $tmpDir;
     private $phpUnit;
+    private $ignoreMsiWithNoMutations;
+    /**
+     * @var float|int
+     */
+    private $minMsi;
+    /**
+     * @var float|int
+     */
+    private $minCoveredMsi;
     private $mutators;
     private $testFramework;
     private $bootstrap;
@@ -59,6 +68,8 @@ final class SchemaConfiguration
     private $testFrameworkExtraOptions;
 
     /**
+     * @param float|int $minMsi
+     * @param float|int $minCoveredMsi
      * @param array<string, mixed> $mutators
      */
     public function __construct(
@@ -68,6 +79,9 @@ final class SchemaConfiguration
         Logs $logs,
         ?string $tmpDir,
         PhpUnit $phpUnit,
+        ?bool $ignoreMsiWithNoMutations,
+        $minMsi,
+        $minCoveredMsi,
         array $mutators,
         ?string $testFramework,
         ?string $bootstrap,
@@ -77,12 +91,23 @@ final class SchemaConfiguration
         Assert::nullOrGreaterThanEq($timeout, 1);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
 
+        if ($minMsi !== null) {
+            Assert::true(is_int($minMsi) || is_float($minMsi));
+        }
+
+        if ($minCoveredMsi !== null) {
+            Assert::true(is_int($minCoveredMsi) || is_float($minCoveredMsi));
+        }
+
         $this->file = $file;
         $this->timeout = $timeout;
         $this->source = $source;
         $this->logs = $logs;
         $this->tmpDir = $tmpDir;
         $this->phpUnit = $phpUnit;
+        $this->ignoreMsiWithNoMutations = $ignoreMsiWithNoMutations;
+        $this->minMsi = $minMsi;
+        $this->minCoveredMsi = $minCoveredMsi;
         $this->mutators = $mutators;
         $this->testFramework = $testFramework;
         $this->bootstrap = $bootstrap;
@@ -118,6 +143,27 @@ final class SchemaConfiguration
     public function getPhpUnit(): PhpUnit
     {
         return $this->phpUnit;
+    }
+
+    public function getIgnoreMsiWithNoMutations(): ?bool
+    {
+        return $this->ignoreMsiWithNoMutations;
+    }
+
+    /**
+     * @return float|int|null
+     */
+    public function getMinMsi()
+    {
+        return $this->minMsi;
+    }
+
+    /**
+     * @return float|int|null
+     */
+    public function getMinCoveredMsi()
+    {
+        return $this->minCoveredMsi;
     }
 
     /**

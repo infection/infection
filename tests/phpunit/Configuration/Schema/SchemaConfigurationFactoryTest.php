@@ -573,6 +573,102 @@ JSON
             ]),
         ];
 
+        yield '[ignoreMsiWithNoMutations] is true' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "ignoreMsiWithNoMutations": true
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'ignoreMsiWithNoMutations' => true,
+            ]),
+        ];
+
+        yield '[ignoreMsiWithNoMutations] is false' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "ignoreMsiWithNoMutations": false
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'ignoreMsiWithNoMutations' => false,
+            ]),
+        ];
+
+        yield '[minMsi] is float' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "minMsi": 3.14
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'minMsi' => 3.14,
+            ]),
+        ];
+
+        yield '[minMsi] is int' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "minMsi": 32
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'minMsi' => 32,
+            ]),
+        ];
+
+        yield '[minCoveredMsi] is float' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "minCoveredMsi": 3.14
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'minCoveredMsi' => 3.14,
+            ]),
+        ];
+
+        yield '[minCoveredMsi] is int' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "minCoveredMsi": 32
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'minCoveredMsi' => 32,
+            ]),
+        ];
+
         yield '[testFramework] nominal' => [
             <<<'JSON'
 {
@@ -2242,6 +2338,9 @@ JSON
             ),
             'tmpDir' => null,
             'phpunit' => new PhpUnit(null, null),
+            'ignoreMsiWithNoMutations' => null,
+            'minMsi' => null,
+            'minCoveredMsi' => null,
             'mutators' => [],
             'testFramework' => null,
             'bootstrap' => null,
