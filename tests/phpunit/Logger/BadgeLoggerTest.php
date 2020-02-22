@@ -43,6 +43,7 @@ use Infection\Logger\BadgeLogger;
 use Infection\Mutant\MetricsCalculator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function Safe\json_encode;
 use function Safe\putenv;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -77,6 +78,8 @@ final class BadgeLoggerTest extends TestCase
     {
         // Save current env state
         $names = [
+            'GITHUB_ACTIONS',
+            'GITHUB_CONTEXT',
             'TRAVIS',
             'TRAVIS_BRANCH',
             'TRAVIS_REPO_SLUG',
@@ -238,7 +241,7 @@ final class BadgeLoggerTest extends TestCase
         $this->badgeLogger->log();
     }
 
-    public function test_it_sends_report_when_everything_is_ok_with_stryker_key(): void
+    public function test_it_sends_report_when_everything_is_ok_with_stryker_key_on_travis_ci(): void
     {
         putenv('STRYKER_DASHBOARD_API_KEY=abc');
         putenv('TRAVIS=true');
@@ -272,6 +275,62 @@ final class BadgeLoggerTest extends TestCase
         putenv('TRAVIS_PULL_REQUEST=false');
         putenv('TRAVIS_REPO_SLUG=a/b');
         putenv('TRAVIS_BRANCH=master');
+
+        $this->outputMock
+            ->method('writeln')
+            ->with('Sending dashboard report...')
+        ;
+
+        $this->badgeApiClientMock
+            ->expects($this->once())
+            ->method('sendReport')
+            ->with('abc', 'github.com/a/b', 'master', 33.3)
+        ;
+
+        $this->metricsCalculatorMock
+            ->method('getMutationScoreIndicator')
+            ->willReturn(33.3)
+        ;
+
+        $this->badgeLogger->log();
+    }
+
+    public function test_it_sends_report_when_everything_is_ok_with_stryker_key_on_github_actions(): void
+    {
+        putenv('STRYKER_DASHBOARD_API_KEY=abc');
+        putenv('GITHUB_ACTIONS=true');
+        putenv('GITHUB_CONTEXT=' . json_encode([
+                'ref' => 'refs/heads/master',
+                'repository' => 'a/b',
+            ]));
+
+        $this->outputMock
+            ->method('writeln')
+            ->with('Sending dashboard report...')
+        ;
+
+        $this->badgeApiClientMock
+            ->expects($this->once())
+            ->method('sendReport')
+            ->with('abc', 'github.com/a/b', 'master', 33.3)
+        ;
+
+        $this->metricsCalculatorMock
+            ->method('getMutationScoreIndicator')
+            ->willReturn(33.3)
+        ;
+
+        $this->badgeLogger->log();
+    }
+
+    public function test_it_sends_report_when_everything_is_ok_with_our_key_on_github_actions(): void
+    {
+        putenv('INFECTION_BADGE_API_KEY=abc');
+        putenv('GITHUB_ACTIONS=true');
+        putenv('GITHUB_CONTEXT=' . json_encode([
+            'ref' => 'refs/heads/master',
+            'repository' => 'a/b',
+        ]));
 
         $this->outputMock
             ->method('writeln')
