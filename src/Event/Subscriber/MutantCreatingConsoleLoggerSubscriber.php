@@ -57,15 +57,6 @@ final class MutantCreatingConsoleLoggerSubscriber implements EventSubscriber
         $this->progressBar->setFormat('Creating mutated files and processes: %current%/%max%');
     }
 
-    public function getSubscribedEvents(): array
-    {
-        return [
-            MutantsCreationWasStarted::class => [$this, 'onMutantsCreationWasStarted'],
-            MutantWasCreated::class => [$this, 'onMutantWasCreated'],
-            MutantsCreationWasFinished::class => [$this, 'onMutantsCreationWasFinished'],
-        ];
-    }
-
     public function onMutantsCreationWasStarted(MutantsCreationWasStarted $event): void
     {
         $this->output->writeln(['']);

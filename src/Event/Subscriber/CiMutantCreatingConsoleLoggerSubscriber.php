@@ -51,13 +51,6 @@ final class CiMutantCreatingConsoleLoggerSubscriber implements EventSubscriber
         $this->output = $output;
     }
 
-    public function getSubscribedEvents(): array
-    {
-        return [
-            MutantsCreationWasStarted::class => [$this, 'onMutantsCreationWasStarted'],
-        ];
-    }
-
     public function onMutantsCreationWasStarted(MutantsCreationWasStarted $event): void
     {
         $this->output->writeln([

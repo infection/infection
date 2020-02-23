@@ -37,7 +37,6 @@ namespace Infection\Tests\AutoReview\Event;
 
 use function array_keys;
 use function implode;
-use Infection\Event\Subscriber\EventSubscriber;
 use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -64,21 +63,6 @@ final class SubscriberTest extends TestCase
 
             $this->assertIsSubscriptionMethod($subscriberClass, $method);
         }
-    }
-
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberClassesProvider
-     *
-     * @param class-string $subscriberClass
-     */
-    public function test_the_subscribed_methods_can_all_be_collected(string $subscriberClass): void
-    {
-        /** @var EventSubscriber $subscriber */
-        $subscriber = (new ReflectionClass($subscriberClass))->newInstanceWithoutConstructor();
-
-        $subscriber->getSubscribedEvents();
-
-        $this->addToAssertionCount(1);
     }
 
     /**

@@ -37,6 +37,9 @@ namespace Infection\Event\EventDispatcher;
 
 use function get_class;
 use Infection\Event\Subscriber\EventSubscriber;
+use function method_exists;
+use function Safe\substr;
+use function strrchr;
 
 /**
  * @internal
@@ -44,31 +47,23 @@ use Infection\Event\Subscriber\EventSubscriber;
 final class SyncEventDispatcher implements EventDispatcher
 {
     /**
-     * @var callable[][]
+     * @var EventSubscriber[]
      */
-    private $listeners = [];
+    private $subscriber = [];
 
     public function dispatch(object $event): void
     {
-        $name = get_class($event);
+        $subscription = 'on' . substr((string) strrchr(get_class($event), '\\'), 1);
 
-        foreach ($this->getListeners($name) as $listener) {
-            $listener($event);
+        foreach ($this->subscriber as $subscriber) {
+            if (method_exists($subscriber, $subscription)) {
+                $subscriber->$subscription($event);
+            }
         }
     }
 
     public function addSubscriber(EventSubscriber $eventSubscriber): void
     {
-        foreach ($eventSubscriber->getSubscribedEvents() as $eventName => $listener) {
-            $this->listeners[$eventName][] = $listener;
-        }
-    }
-
-    /**
-     * @return callable[]
-     */
-    private function getListeners(string $eventName): array
-    {
-        return $this->listeners[$eventName] ?? [];
+        $this->subscriber[] = $eventSubscriber;
     }
 }

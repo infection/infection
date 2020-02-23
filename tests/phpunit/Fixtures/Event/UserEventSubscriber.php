@@ -13,14 +13,7 @@ class UserEventSubscriber implements EventSubscriber
 {
     public $count = 0;
 
-    public function getSubscribedEvents(): array
-    {
-        return [
-            UserWasCreated::class => [$this, '__invoke'],
-        ];
-    }
-
-    public function __invoke()
+    public function onUserWasCreated(UserWasCreated $event): void
     {
         ++$this->count;
     }

@@ -8,12 +8,4 @@ use Infection\Event\Subscriber\EventSubscriber;
 
 final class NullSubscriber implements EventSubscriber
 {
-
-    /**
-     * @return array<string, callable>
-     */
-    public function getSubscribedEvents(): array
-    {
-        return [];
-    }
 }

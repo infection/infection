@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\Event;
 
 use function array_filter;
-use function array_keys;
 use function array_map;
 use function array_values;
 use Generator;
@@ -45,8 +44,8 @@ use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use function iterator_to_array;
 use ReflectionClass;
-use function Safe\sprintf;
-use Webmozart\Assert\Assert;
+use ReflectionMethod;
+use function strpos;
 
 final class SubscriberProvider
 {
@@ -94,25 +93,9 @@ final class SubscriberProvider
 
         self::$subscriberMethods = array_values(array_map(
             static function (string $subscriberClass): array {
-                /** @var EventSubscriber $subscriber */
-                $subscriber = (new ReflectionClass($subscriberClass))->newInstanceWithoutConstructor();
-
                 return [
                     $subscriberClass,
-                    array_map(
-                        static function (string $eventClass): string {
-                            Assert::classExists(
-                                $eventClass,
-                                sprintf(
-                                    'Expected "%s" to be a valid event FQCN',
-                                    $eventClass
-                                )
-                            );
-
-                            return 'on' . (new ReflectionClass($eventClass))->getShortName();
-                        },
-                        array_keys($subscriber->getSubscribedEvents())
-                    ),
+                    self::retrieveSubscriberSubscriptions(new ReflectionClass($subscriberClass)),
                 ];
             },
             iterator_to_array(self::provideSubscriberClasses(), true)
@@ -129,5 +112,25 @@ final class SubscriberProvider
     public static function subscriberSubscriptionMethodsProvider(): Generator
     {
         yield from self::provideSubscriberSubscriptionMethods();
+    }
+
+    /**
+     * @return string[]
+     */
+    private static function retrieveSubscriberSubscriptions(ReflectionClass $subscriberReflection): array
+    {
+        $methods = array_filter(
+            $subscriberReflection->getMethods(ReflectionMethod::IS_PUBLIC),
+            static function (ReflectionMethod $method): bool {
+                return strpos($method->getName(), 'on') === 0;
+            }
+        );
+
+        return array_map(
+            static function (ReflectionMethod $method): string {
+                return $method->getName();
+            },
+            $methods
+        );
     }
 }
