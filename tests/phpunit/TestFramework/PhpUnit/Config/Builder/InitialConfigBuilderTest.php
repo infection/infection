@@ -142,7 +142,10 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
             $this->fail('Expected an exception to be thrown.');
         } catch (InvalidPhpUnitConfiguration $exception) {
             $this->assertSame(
-                'The file "/path/to/phpunit.xml" is not a valid PHPUnit configuration file',
+                sprintf(
+                    'The file "%s/phpunitConfiguration.initial.infection.xml" is not a valid PHPUnit configuration file',
+                    $this->tmp
+                ),
                 $exception->getMessage()
             );
         }
