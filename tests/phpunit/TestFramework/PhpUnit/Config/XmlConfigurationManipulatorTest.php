@@ -45,8 +45,8 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use function Infection\Tests\normalizeLineReturn;
 use const PHP_OS_FAMILY;
 use PHPUnit\Framework\TestCase;
-use function str_replace;
 use function Safe\sprintf;
+use function str_replace;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\PathUtil\Path;
 
@@ -528,10 +528,16 @@ XML
 
             $this->fail('Expected exception to be thrown');
         } catch (InvalidPhpUnitConfiguration $exception) {
+            $infectionPath = sprintf(
+                '%s%s',
+                PHP_OS_FAMILY === 'Windows' ? 'file:/' : '',
+                Path::canonicalize(__DIR__ . '/../../../../../')
+            );
+
             $errorMessage = str_replace(
-                Path::canonicalize(__DIR__ . '/../../../../../'),
+                $infectionPath,
                 '/path/to/infection',
-                $exception->getMessage()
+                normalizeLineReturn($exception->getMessage())
             );
 
             $this->assertSame(

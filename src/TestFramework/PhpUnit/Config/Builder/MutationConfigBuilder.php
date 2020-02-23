@@ -59,7 +59,7 @@ class MutationConfigBuilder extends ConfigBuilder
     private $tmpDir;
     private $projectDir;
     private $originalXmlConfigContent;
-    private $xmlConfigurationHelper;
+    private $configManipulator;
     private $jUnitTestCaseSorter;
 
     /**
@@ -75,7 +75,7 @@ class MutationConfigBuilder extends ConfigBuilder
     public function __construct(
         string $tmpDir,
         string $originalXmlConfigContent,
-        XmlConfigurationManipulator $xmlConfigurationHelper,
+        XmlConfigurationManipulator $configManipulator,
         string $projectDir,
         JUnitTestCaseSorter $jUnitTestCaseSorter
     ) {
@@ -83,7 +83,7 @@ class MutationConfigBuilder extends ConfigBuilder
         $this->projectDir = $projectDir;
 
         $this->originalXmlConfigContent = $originalXmlConfigContent;
-        $this->xmlConfigurationHelper = $xmlConfigurationHelper;
+        $this->configManipulator = $configManipulator;
         $this->jUnitTestCaseSorter = $jUnitTestCaseSorter;
     }
 
@@ -99,19 +99,19 @@ class MutationConfigBuilder extends ConfigBuilder
         $dom = $this->getDom();
         $xPath = new DOMXPath($dom);
 
-        $this->xmlConfigurationHelper->replaceWithAbsolutePaths($xPath);
+        $this->configManipulator->replaceWithAbsolutePaths($xPath);
 
         if ($this->originalBootstrapFile === null) {
             $this->originalBootstrapFile = $this->getOriginalBootstrapFilePath($xPath);
         }
 
-        $this->xmlConfigurationHelper->setStopOnFailure($xPath);
-        $this->xmlConfigurationHelper->deactivateColours($xPath);
-        $this->xmlConfigurationHelper->deactivateResultCaching($xPath);
-        $this->xmlConfigurationHelper->deactivateStderrRedirection($xPath);
-        $this->xmlConfigurationHelper->removeExistingLoggers($xPath);
-        $this->xmlConfigurationHelper->removeExistingPrinters($xPath);
-        $this->xmlConfigurationHelper->removeDefaultTestSuite($xPath);
+        $this->configManipulator->setStopOnFailure($xPath);
+        $this->configManipulator->deactivateColours($xPath);
+        $this->configManipulator->deactivateResultCaching($xPath);
+        $this->configManipulator->deactivateStderrRedirection($xPath);
+        $this->configManipulator->removeExistingLoggers($xPath);
+        $this->configManipulator->removeExistingPrinters($xPath);
+        $this->configManipulator->removeDefaultTestSuite($xPath);
 
         $customAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',

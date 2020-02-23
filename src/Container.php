@@ -89,7 +89,6 @@ use Infection\TestFramework\Coverage\XmlReport\TestFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\XMLLineCodeCoverageFactory;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
-use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Coverage\IndexXmlCoverageParser;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use InvalidArgumentException;
@@ -178,12 +177,6 @@ final class Container
                     $container->getJUnitFilePath(),
                     $config,
                     GeneratedExtensionsConfig::EXTENSIONS
-                );
-            },
-            XmlConfigurationManipulator::class => static function (self $container): XmlConfigurationManipulator {
-                return new XmlConfigurationManipulator(
-                    $container->getPathReplacer(),
-                    (string) $container->getConfiguration()->getPhpUnit()->getConfigDir()
                 );
             },
             MutantCodeFactory::class => static function (self $container): MutantCodeFactory {

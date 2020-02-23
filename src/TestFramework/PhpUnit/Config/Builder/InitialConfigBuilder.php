@@ -57,7 +57,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private $tmpDir;
     private $originalXmlConfigContent;
-    private $xmlConfigurationHelper;
+    private $configManipulator;
     private $jUnitFilePath;
     private $srcDirs;
     private $skipCoverage;
@@ -68,7 +68,7 @@ class InitialConfigBuilder implements ConfigBuilder
     public function __construct(
         string $tmpDir,
         string $originalXmlConfigContent,
-        XmlConfigurationManipulator $xmlConfigurationHelper,
+        XmlConfigurationManipulator $configManipulator,
         string $jUnitFilePath,
         array $srcDirs,
         bool $skipCoverage
@@ -80,7 +80,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
         $this->tmpDir = $tmpDir;
         $this->originalXmlConfigContent = $originalXmlConfigContent;
-        $this->xmlConfigurationHelper = $xmlConfigurationHelper;
+        $this->configManipulator = $configManipulator;
         $this->jUnitFilePath = $jUnitFilePath;
         $this->srcDirs = $srcDirs;
         $this->skipCoverage = $skipCoverage;
@@ -97,17 +97,17 @@ class InitialConfigBuilder implements ConfigBuilder
 
         $xPath = new DOMXPath($dom);
 
-        $this->xmlConfigurationHelper->validate($path, $xPath);
+        $this->configManipulator->validate($path, $xPath);
 
         $this->addCoverageFilterWhitelistIfDoesNotExist($xPath);
         $this->addRandomTestsOrderAttributesIfNotSet($version, $xPath);
-        $this->xmlConfigurationHelper->replaceWithAbsolutePaths($xPath);
-        $this->xmlConfigurationHelper->setStopOnFailure($xPath);
-        $this->xmlConfigurationHelper->deactivateColours($xPath);
-        $this->xmlConfigurationHelper->deactivateResultCaching($xPath);
-        $this->xmlConfigurationHelper->deactivateStderrRedirection($xPath);
-        $this->xmlConfigurationHelper->removeExistingLoggers($xPath);
-        $this->xmlConfigurationHelper->removeExistingPrinters($xPath);
+        $this->configManipulator->replaceWithAbsolutePaths($xPath);
+        $this->configManipulator->setStopOnFailure($xPath);
+        $this->configManipulator->deactivateColours($xPath);
+        $this->configManipulator->deactivateResultCaching($xPath);
+        $this->configManipulator->deactivateStderrRedirection($xPath);
+        $this->configManipulator->removeExistingLoggers($xPath);
+        $this->configManipulator->removeExistingPrinters($xPath);
 
         if (!$this->skipCoverage) {
             $this->addCodeCoverageLogger($xPath);
