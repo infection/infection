@@ -53,13 +53,7 @@ final class SchemaConfiguration
     private $tmpDir;
     private $phpUnit;
     private $ignoreMsiWithNoMutations;
-    /**
-     * @var float|int
-     */
     private $minMsi;
-    /**
-     * @var float|int
-     */
     private $minCoveredMsi;
     private $mutators;
     private $testFramework;
@@ -68,8 +62,6 @@ final class SchemaConfiguration
     private $testFrameworkExtraOptions;
 
     /**
-     * @param float|int $minMsi
-     * @param float|int $minCoveredMsi
      * @param array<string, mixed> $mutators
      */
     public function __construct(
@@ -80,8 +72,8 @@ final class SchemaConfiguration
         ?string $tmpDir,
         PhpUnit $phpUnit,
         ?bool $ignoreMsiWithNoMutations,
-        $minMsi,
-        $minCoveredMsi,
+        ?float $minMsi,
+        ?float $minCoveredMsi,
         array $mutators,
         ?string $testFramework,
         ?string $bootstrap,
@@ -90,14 +82,6 @@ final class SchemaConfiguration
     ) {
         Assert::nullOrGreaterThanEq($timeout, 1);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::TYPES);
-
-        if ($minMsi !== null) {
-            Assert::true(is_int($minMsi) || is_float($minMsi));
-        }
-
-        if ($minCoveredMsi !== null) {
-            Assert::true(is_int($minCoveredMsi) || is_float($minCoveredMsi));
-        }
 
         $this->file = $file;
         $this->timeout = $timeout;
@@ -150,18 +134,12 @@ final class SchemaConfiguration
         return $this->ignoreMsiWithNoMutations;
     }
 
-    /**
-     * @return float|int|null
-     */
-    public function getMinMsi()
+    public function getMinMsi(): ?float
     {
         return $this->minMsi;
     }
 
-    /**
-     * @return float|int|null
-     */
-    public function getMinCoveredMsi()
+    public function getMinCoveredMsi(): ?float
     {
         return $this->minCoveredMsi;
     }
