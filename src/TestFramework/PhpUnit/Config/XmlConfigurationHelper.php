@@ -128,13 +128,10 @@ final class XmlConfigurationHelper
         );
     }
 
-    public function validate(DOMXPath $xPath): bool
+    public function validate(string $configPath, DOMXPath $xPath): bool
     {
         if (self::safeQuery($xPath, '/phpunit')->length === 0) {
-            // TODO: should have the PHPUnit config path passed otherwise we blindly assume
-            //  "phpunit.xml" without neither the path neither guarantee this is the file name
-            //  (it could be a different one passed with the --configuration option)
-            throw InvalidPhpUnitXmlConfigException::byRootNode();
+            throw InvalidPhpUnitXmlConfigException::byRootNode($configPath);
         }
 
         if (self::safeQuery($xPath, 'namespace::xsi')->length === 0) {
@@ -149,7 +146,10 @@ final class XmlConfigurationHelper
         // TODO: schemaValidate will throw a weird error if schemaPath is invalid, e.g. ''
         // check what happens with invalid URL or invalid path
         if ($schema->length && !$xPath->document->schemaValidate($schemaPath)) {
-            throw InvalidPhpUnitXmlConfigException::byXsdSchema($this->getXmlErrorsString());
+            throw InvalidPhpUnitXmlConfigException::byXsdSchema(
+                $configPath,
+                $this->getXmlErrorsString()
+            );
         }
 
         libxml_use_internal_errors($original);
