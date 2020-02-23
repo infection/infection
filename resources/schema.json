@@ -101,7 +101,7 @@
         },
         "minCoveredMsi": {
             "type": "number",
-            "description": "Minimum Mutation Score Indicator (MSI) percentage value. Should be used in CI server."
+            "description": "Minimum Covered Code Mutation Score Indicator (MSI) percentage value. Should be used in CI server."
         },
         "mutators": {
             "type": "object",
