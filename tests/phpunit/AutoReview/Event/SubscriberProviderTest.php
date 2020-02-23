@@ -33,64 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Listener;
+namespace Infection\Tests\AutoReview\Event;
 
-use Infection\Event\ApplicationExecutionWasFinished;
-use Infection\Event\ApplicationExecutionWasStarted;
+use function in_array;
 use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Resource\Memory\MemoryFormatter;
-use Infection\Resource\Time\Stopwatch;
-use Infection\Resource\Time\TimeFormatter;
-use function memory_get_peak_usage;
+use PHPUnit\Framework\TestCase;
+use function Safe\class_implements;
 use function Safe\sprintf;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * @internal
+ * @covers \Infection\Tests\AutoReview\Event\SubscriberProvider
  */
-final class PerformanceLoggerSubscriber implements EventSubscriber
+final class SubscriberProviderTest extends TestCase
 {
-    private $stopwatch;
-    private $output;
-    private $timeFormatter;
-    private $memoryFormatter;
-
-    public function __construct(
-        Stopwatch $stopwatch,
-        TimeFormatter $timeFormatter,
-        MemoryFormatter $memoryFormatter,
-        OutputInterface $output
-    ) {
-        $this->stopwatch = $stopwatch;
-        $this->timeFormatter = $timeFormatter;
-        $this->output = $output;
-        $this->memoryFormatter = $memoryFormatter;
-    }
-
-    public function getSubscribedEvents(): array
+    /**
+     * @dataProvider \Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberClassesProvider()
+     */
+    public function test_subscriber_class_provider_is_valid(string $className): void
     {
-        return [
-            ApplicationExecutionWasStarted::class => [$this, 'onApplicationExecutionWasStarted'],
-            ApplicationExecutionWasFinished::class => [$this, 'onApplicationExecutionWasFinished'],
-        ];
-    }
-
-    public function onApplicationExecutionWasStarted(ApplicationExecutionWasStarted $event): void
-    {
-        $this->stopwatch->start();
-    }
-
-    public function onApplicationExecutionWasFinished(ApplicationExecutionWasFinished $event): void
-    {
-        $time = $this->stopwatch->stop();
-
-        $this->output->writeln([
-            '',
+        $this->assertTrue(
+            class_exists($className, true)
+            && in_array(EventSubscriber::class, class_implements($className), true),
             sprintf(
-                'Time: %s. Memory: %s',
-                $this->timeFormatter->toHumanReadableString($time),
-                $this->memoryFormatter->toHumanReadableString(memory_get_peak_usage(true))
-            ),
-        ]);
+                'The "%s" class was expected to be an event subscriber, but it is not a ' .
+                '"%s".',
+                $className,
+                EventSubscriber::class
+            )
+        );
+    }
+
+    /**
+     * @dataProvider \Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberSubscriptionMethodsProvider()
+     *
+     * @param class-string $className
+     * @param string[] $subscriptionMethods
+     */
+    public function test_subscriber_subscription_methods_provider_is_valid(
+        string $className,
+        array $subscriptionMethods
+    ): void {
+        foreach ($subscriptionMethods as $subscriptionMethod) {
+            $this->assertIsString($subscriptionMethod);
+        }
     }
 }
