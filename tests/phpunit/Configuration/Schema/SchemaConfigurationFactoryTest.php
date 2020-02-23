@@ -633,7 +633,7 @@ JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
-                'minMsi' => 32,
+                'minMsi' => 32.0,
             ]),
         ];
 
@@ -665,7 +665,7 @@ JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
-                'minCoveredMsi' => 32,
+                'minCoveredMsi' => 32.0,
             ]),
         ];
 
