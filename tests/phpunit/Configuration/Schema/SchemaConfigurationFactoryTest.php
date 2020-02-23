@@ -60,11 +60,11 @@ use stdClass;
 use function var_export;
 
 /**
- * @covers \Infection\Configuration\Schema\SchemaConfigurationFactory
  * @covers \Infection\Configuration\Entry\Badge
  * @covers \Infection\Configuration\Entry\Logs
  * @covers \Infection\Configuration\Entry\PhpUnit
  * @covers \Infection\Configuration\Entry\Source
+ * @covers \Infection\Configuration\Schema\SchemaConfigurationFactory
  */
 final class SchemaConfigurationFactoryTest extends TestCase
 {
