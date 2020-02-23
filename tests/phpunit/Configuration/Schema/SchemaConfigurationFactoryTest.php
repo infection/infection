@@ -59,7 +59,7 @@ use function Safe\sprintf;
 use stdClass;
 use function var_export;
 
-/**g
+/**
  * @covers \Infection\Configuration\Schema\SchemaConfigurationFactory
  * @covers \Infection\Configuration\Entry\Badge
  * @covers \Infection\Configuration\Entry\Logs
