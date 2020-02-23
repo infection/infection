@@ -48,6 +48,8 @@ use function strlen;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
+ * @backupGlobals enabled
+ *
  * @group integration Requires I/O read & writes via the MockVendor
  *
  * @see MockVendor
@@ -58,11 +60,6 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
      * @var string
      */
     private static $pathName;
-
-    /**
-     * @var array
-     */
-    private static $env;
 
     /**
      * @var array
@@ -80,17 +77,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     public static function setUpBeforeClass(): void
     {
         self::$pathName = getenv('PATH') ? 'PATH' : 'Path';
-        self::$env = [];
         self::$names = [self::$pathName, 'PATHEXT'];
-
-        foreach (self::$names as $name) {
-            self::$env[$name] = getenv($name);
-        }
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        self::restorePathEnvironment();
     }
 
     protected function setUp(): void
@@ -209,16 +196,5 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
             'composer-bat' => ['setUpComposerBatchTest'],
             'project-bat' => ['setUpProjectBatchTest'],
         ];
-    }
-
-    private static function restorePathEnvironment(): void
-    {
-        foreach (self::$env as $name => $value) {
-            if ($value !== false) {
-                putenv($name . '=' . $value);
-            } else {
-                putenv($name);
-            }
-        }
     }
 }

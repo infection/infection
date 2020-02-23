@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use function getenv;
 use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Environment\TravisCiResolver;
 use Infection\Http\BadgeApiClient;
@@ -46,6 +45,9 @@ use PHPUnit\Framework\TestCase;
 use function Safe\putenv;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @backupGlobals enabled
+ */
 final class BadgeLoggerTest extends TestCase
 {
     /**
@@ -67,40 +69,6 @@ final class BadgeLoggerTest extends TestCase
      * @var BadgeLogger
      */
     private $badgeLogger;
-
-    /**
-     * @var array<string|bool>
-     */
-    private static $env = [];
-
-    public static function setUpBeforeClass(): void
-    {
-        // Save current env state
-        $names = [
-            'TRAVIS',
-            'TRAVIS_BRANCH',
-            'TRAVIS_REPO_SLUG',
-            'TRAVIS_PULL_REQUEST',
-            'INFECTION_BADGE_API_KEY',
-            'STRYKER_DASHBOARD_API_KEY',
-        ];
-
-        foreach ($names as $name) {
-            self::$env[$name] = getenv($name);
-        }
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        // Restore original env state
-        foreach (self::$env as $name => $value) {
-            if ($value !== false) {
-                putenv($name . '=' . $value);
-            } else {
-                putenv($name);
-            }
-        }
-    }
 
     protected function setUp(): void
     {
