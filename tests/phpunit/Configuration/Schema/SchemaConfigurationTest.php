@@ -136,34 +136,8 @@ final class SchemaConfigurationTest extends TestCase
             'path/to/tmp',
             new PhpUnit('dist/phpunit', 'bin/phpunit'),
             true,
-            12,
-            35,
-            [
-                '@arithmetic' => true,
-                '@cast' => false,
-            ],
-            'phpunit',
-            'bin/bootstrap.php',
-            '-d zend_extension=xdebug.so',
-            '--debug',
-        ];
-
-        yield 'complete-with-float' => [
-            '/path/to/config',
-            10,
-            new Source(['src', 'lib'], ['fixtures', 'tests']),
-            new Logs(
-                'text.log',
-                'summary.log',
-                'debug.log',
-                'mutator.log',
-                new Badge('master')
-            ),
-            'path/to/tmp',
-            new PhpUnit('dist/phpunit', 'bin/phpunit'),
-            true,
-            12.3,
-            35.5,
+            12.0,
+            35.0,
             [
                 '@arithmetic' => true,
                 '@cast' => false,
