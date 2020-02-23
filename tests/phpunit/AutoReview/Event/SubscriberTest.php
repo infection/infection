@@ -49,7 +49,7 @@ use function Safe\sprintf;
 final class SubscriberTest extends TestCase
 {
     /**
-     * @dataProvider Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberClassesProvider
+     * @dataProvider \Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberClassesProvider
      *
      * @param class-string $subscriberClass
      */
@@ -67,7 +67,7 @@ final class SubscriberTest extends TestCase
     }
 
     /**
-     * @dataProvider Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberClassesProvider
+     * @dataProvider \Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberClassesProvider
      *
      * @param class-string $subscriberClass
      */
@@ -82,7 +82,7 @@ final class SubscriberTest extends TestCase
     }
 
     /**
-     * @dataProvider Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberSubscriptionMethodsProvider
+     * @dataProvider \Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberSubscriptionMethodsProvider
      *
      * @param class-string $subscriberClass
      */
