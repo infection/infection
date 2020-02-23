@@ -71,8 +71,8 @@ final class XmlConfigurationManipulatorTest extends TestCase
     public function test_it_replaces_with_absolute_paths(): void
     {
         $this->assertItChangesStandardConfiguration(
-            static function (XmlConfigurationManipulator $configHelper, DOMXPath $xPath): void {
-                $configHelper->replaceWithAbsolutePaths($xPath);
+            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+                $configManipulator->replaceWithAbsolutePaths($xPath);
             },
             <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -110,8 +110,8 @@ XML
     public function test_it_removes_existing_loggers(): void
     {
         $this->assertItChangesStandardConfiguration(
-            static function (XmlConfigurationManipulator $configHelper, DOMXPath $xPath): void {
-                $configHelper->removeExistingLoggers($xPath);
+            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+                $configManipulator->removeExistingLoggers($xPath);
             },
             <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -146,8 +146,8 @@ XML
     public function test_it_sets_set_stop_on_failure(): void
     {
         $this->assertItChangesStandardConfiguration(
-            static function (XmlConfigurationManipulator $configHelper, DOMXPath $xPath): void {
-                $configHelper->setStopOnFailure($xPath);
+            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+                $configManipulator->setStopOnFailure($xPath);
             },
             <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -203,8 +203,8 @@ XML
 </phpunit>
 XML
             ,
-            static function (XmlConfigurationManipulator $configHelper, DOMXPath $xPath): void {
-                $configHelper->setStopOnFailure($xPath);
+            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+                $configManipulator->setStopOnFailure($xPath);
             },
             <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -229,8 +229,8 @@ XML
     public function test_it_deactivates_colors(): void
     {
         $this->assertItChangesStandardConfiguration(
-            static function (XmlConfigurationManipulator $configHelper, DOMXPath $xPath): void {
-                $configHelper->deactivateColours($xPath);
+            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+                $configManipulator->deactivateColours($xPath);
             },
             <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -284,8 +284,8 @@ XML
 </phpunit>
 XML
             ,
-            static function (XmlConfigurationManipulator $configHelper, DOMXPath $xPath): void {
-                $configHelper->deactivateColours($xPath);
+            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+                $configManipulator->deactivateColours($xPath);
             },
             <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -328,8 +328,8 @@ XML
 
 XML
             ,
-            static function (XmlConfigurationManipulator $configHelper, DOMXPath $xPath): void {
-                $configHelper->deactivateResultCaching($xPath);
+            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+                $configManipulator->deactivateResultCaching($xPath);
             },
             <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -370,8 +370,8 @@ XML
 </phpunit>
 XML
             ,
-            static function (XmlConfigurationManipulator $configHelper, DOMXPath $xPath): void {
-                $configHelper->deactivateResultCaching($xPath);
+            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+                $configManipulator->deactivateResultCaching($xPath);
             },
             <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -404,8 +404,8 @@ XML
 </phpunit>
 XML
             ,
-            static function (XmlConfigurationManipulator $configHelper, DOMXPath $xPath): void {
-                $configHelper->deactivateStderrRedirection($xPath);
+            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+                $configManipulator->deactivateStderrRedirection($xPath);
             },
             <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -428,8 +428,8 @@ XML
 </phpunit>
 XML
             ,
-            static function (XmlConfigurationManipulator $configHelper, DOMXPath $xPath): void {
-                $configHelper->deactivateStderrRedirection($xPath);
+            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+                $configManipulator->deactivateStderrRedirection($xPath);
             },
             <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -461,8 +461,8 @@ XML
 </phpunit>
 XML
             ,
-            static function (XmlConfigurationManipulator $configHelper, DOMXPath $xPath): void {
-                $configHelper->removeExistingPrinters($xPath);
+            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+                $configManipulator->removeExistingPrinters($xPath);
             },
             <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -609,8 +609,8 @@ XML
 
 XML
             ,
-            static function (XmlConfigurationManipulator $configHelper, DOMXPath $xPath): void {
-                $configHelper->removeDefaultTestSuite($xPath);
+            static function (XmlConfigurationManipulator $configManipulator, DOMXPath $xPath): void {
+                $configManipulator->removeDefaultTestSuite($xPath);
             },
             <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
