@@ -3,12 +3,15 @@
 !/build/cache/.gitkeep
 .phpunit.result.cache
 /*.phar
+/.box_dump/
 /.ci/keys.asc
 /.composer/
 /.idea
 /.php_cs.cache
 /.tools/
 /build/
+/clover.xml
+/coverage/
 /devTools/Docker*.json
 /infection-cache
 /infection.json

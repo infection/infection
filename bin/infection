@@ -37,11 +37,11 @@
 namespace Infection;
 
 use function in_array;
-use function Safe\getcwd;
 use Infection\Console\Application;
 use const PHP_EOL;
 use const PHP_SAPI;
 use RuntimeException;
+use function Safe\getcwd;
 use const STDERR;
 
 if (in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) === false) {
