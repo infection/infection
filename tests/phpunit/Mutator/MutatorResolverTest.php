@@ -45,6 +45,7 @@ use Infection\Mutator\Boolean\NotIdenticalNotEqual;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\MutatorResolver;
 use Infection\Mutator\ProfileList;
+use Infection\Tests\SingletonContainer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
@@ -58,7 +59,7 @@ final class MutatorResolverTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mutatorResolver = new MutatorResolver();
+        $this->mutatorResolver = SingletonContainer::getContainer()->getMutatorResolver();
     }
 
     public function test_it_resolves_no_mutator_if_no_profile_or_mutator_is_passed(): void

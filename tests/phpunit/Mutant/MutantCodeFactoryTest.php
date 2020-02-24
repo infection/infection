@@ -89,56 +89,50 @@ final class MutantCodeFactoryTest extends TestCase
         yield [
             new Mutation(
                 '/path/to/acme/Foo.php',
-                [
-                    new Node\Stmt\Namespace_(
-                        new Node\Name(
-                            'Acme',
-                            [
-                                'startLine' => 3,
-                                'startTokenPos' => 4,
-                                'startFilePos' => 17,
-                                'endLine' => 3,
-                                'endTokenPos' => 4,
-                                'endFilePos' => 20,
-                            ]
-                        ),
-                        [
-                            new Node\Stmt\Echo_(
-                                [
-                                    new Node\Scalar\LNumber(
-                                        10,
-                                        [
-                                            'startLine' => 5,
-                                            'startTokenPos' => 9,
-                                            'startFilePos' => 29,
-                                            'endLine' => 5,
-                                            'endTokenPos' => 9,
-                                            'endFilePos' => 30,
-                                            'kind' => 10,
-                                        ]
-                                    ),
-                                ],
-                                [
-                                    'startLine' => 5,
-                                    'startTokenPos' => 7,
-                                    'startFilePos' => 24,
-                                    'endLine' => 5,
-                                    'endTokenPos' => 10,
-                                    'endFilePos' => 31,
-                                ]
-                            ),
-                        ],
+                [new Node\Stmt\Namespace_(
+                    new Node\Name(
+                        'Acme',
                         [
                             'startLine' => 3,
-                            'startTokenPos' => 2,
-                            'startFilePos' => 7,
+                            'startTokenPos' => 4,
+                            'startFilePos' => 17,
+                            'endLine' => 3,
+                            'endTokenPos' => 4,
+                            'endFilePos' => 20,
+                        ]
+                    ),
+                    [new Node\Stmt\Echo_(
+                        [new Node\Scalar\LNumber(
+                            10,
+                            [
+                                'startLine' => 5,
+                                'startTokenPos' => 9,
+                                'startFilePos' => 29,
+                                'endLine' => 5,
+                                'endTokenPos' => 9,
+                                'endFilePos' => 30,
+                                'kind' => 10,
+                            ]
+                        )],
+                        [
+                            'startLine' => 5,
+                            'startTokenPos' => 7,
+                            'startFilePos' => 24,
                             'endLine' => 5,
                             'endTokenPos' => 10,
                             'endFilePos' => 31,
-                            'kind' => 1,
                         ]
-                    ),
-                ],
+                    )],
+                    [
+                        'startLine' => 3,
+                        'startTokenPos' => 2,
+                        'startFilePos' => 7,
+                        'endLine' => 5,
+                        'endTokenPos' => 10,
+                        'endFilePos' => 31,
+                        'kind' => 1,
+                    ]
+                )],
                 MutatorName::getName(Plus::class),
                 [
                     'startLine' => 5,

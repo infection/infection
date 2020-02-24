@@ -52,7 +52,6 @@ use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorParser;
-use Infection\Mutator\MutatorResolver;
 use Infection\Mutator\Removal\MethodCallRemoval;
 use function Infection\Tests\normalizePath;
 use Infection\Tests\SingletonContainer;
@@ -102,7 +101,7 @@ final class ConfigurationFactoryTest extends TestCase
 
         $this->configFactory = new ConfigurationFactory(
             new TmpDirProvider(),
-            new MutatorResolver(),
+            SingletonContainer::getContainer()->getMutatorResolver(),
             SingletonContainer::getContainer()->getMutatorFactory(),
             new MutatorParser(),
             $sourceFilesCollectorProphecy->reveal()
@@ -1299,10 +1298,13 @@ final class ConfigurationFactoryTest extends TestCase
     private static function getDefaultMutators(): array
     {
         if (self::$mutators === null) {
-            // TODO: check elsewhere
             self::$mutators = SingletonContainer::getContainer()
                 ->getMutatorFactory()
-                ->create((new MutatorResolver())->resolve(['@default' => true]))
+                ->create(
+                    SingletonContainer::getContainer()
+                        ->getMutatorResolver()
+                        ->resolve(['@default' => true])
+                )
             ;
         }
 
