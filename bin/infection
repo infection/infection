@@ -34,15 +34,9 @@
 
 // Disable strict types for now: https://github.com/infection/infection/pull/720#issuecomment-506546284
 
-namespace Infection;
-
-use function in_array;
 use Infection\Console\Application;
-use const PHP_EOL;
-use const PHP_SAPI;
-use RuntimeException;
+use Infection\Container;
 use function Safe\getcwd;
-use const STDERR;
 
 if (in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) === false) {
     echo PHP_EOL . 'Infection may only be invoked from a command line, got "' . PHP_SAPI . '"' . PHP_EOL;
