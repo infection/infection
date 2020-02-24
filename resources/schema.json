@@ -91,6 +91,22 @@
                 }
             }
         },
+        "ignoreMsiWithNoMutations": {
+            "type": "boolean",
+            "description": "Ignore MSI violations with zero mutations."
+        },
+        "minMsi": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Minimum Mutation Score Indicator (MSI) percentage value. Should be used in CI server."
+        },
+        "minCoveredMsi": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Minimum Covered Code Mutation Score Indicator (MSI) percentage value. Should be used in CI server."
+        },
         "mutators": {
             "type": "object",
             "additionalProperties": false,
