@@ -40,21 +40,15 @@ use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
-use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
 
 abstract class BaseNodeIgnorerTestCase extends TestCase
 {
-    /**
-     * @var Parser|null
-     */
-    private static $parser;
-
     abstract protected function getIgnore(): NodeIgnorer;
 
     final protected function parseAndTraverse(string $code, NodeVisitor $spy): void
     {
-        $nodes = $this->getParser()->parse($code);
+        $nodes = Container::create()->getParser()->parse($code);
 
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new NonMutableNodesIgnorerVisitor([$this->getIgnore()]));
@@ -69,14 +63,5 @@ abstract class BaseNodeIgnorerTestCase extends TestCase
         return new IgnoreSpyVisitor(static function (): void {
             self::fail('A variable that should have been ignored was still parsed by the next visitor.');
         });
-    }
-
-    private function getParser(): Parser
-    {
-        if (self::$parser === null) {
-            self::$parser = Container::create()->getParser();
-        }
-
-        return self::$parser;
     }
 }

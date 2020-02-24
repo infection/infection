@@ -36,23 +36,17 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutant;
 
 use Generator;
-use Infection\Container;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
 use Infection\Tests\Mutator\MutatorName;
+use Infection\Tests\SingletonContainer;
 use PhpParser\Node;
-use PhpParser\NodeDumper;
 use PHPUnit\Framework\TestCase;
 
 final class MutantCodeFactoryTest extends TestCase
 {
-    /**
-     * @var NodeDumper|null
-     */
-    private static $dumper;
-
     /**
      * @var MutantCodeFactory
      */
@@ -60,7 +54,7 @@ final class MutantCodeFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->codeFactory = Container::create()->getMutantCodeFactory();
+        $this->codeFactory = SingletonContainer::getContainer()->getMutantCodeFactory();
     }
 
     /**
@@ -81,11 +75,11 @@ final class MutantCodeFactoryTest extends TestCase
     public function test_it_creates_the_mutant_code_without_altering_the_original_nodes(
         Mutation $mutation
     ): void {
-        $originalNodesDump = $this->getDumper()->dump($mutation->getOriginalFileAst());
+        $originalNodesDump = SingletonContainer::getNodeDumper()->dump($mutation->getOriginalFileAst());
 
         $this->codeFactory->createCode($mutation);
 
-        $originalNodesDumpAfterMutation = $this->getDumper()->dump($mutation->getOriginalFileAst());
+        $originalNodesDumpAfterMutation = SingletonContainer::getNodeDumper()->dump($mutation->getOriginalFileAst());
 
         $this->assertSame($originalNodesDump, $originalNodesDumpAfterMutation);
     }
@@ -95,50 +89,56 @@ final class MutantCodeFactoryTest extends TestCase
         yield [
             new Mutation(
                 '/path/to/acme/Foo.php',
-                [new Node\Stmt\Namespace_(
-                    new Node\Name(
-                        'Acme',
+                [
+                    new Node\Stmt\Namespace_(
+                        new Node\Name(
+                            'Acme',
+                            [
+                                'startLine' => 3,
+                                'startTokenPos' => 4,
+                                'startFilePos' => 17,
+                                'endLine' => 3,
+                                'endTokenPos' => 4,
+                                'endFilePos' => 20,
+                            ]
+                        ),
+                        [
+                            new Node\Stmt\Echo_(
+                                [
+                                    new Node\Scalar\LNumber(
+                                        10,
+                                        [
+                                            'startLine' => 5,
+                                            'startTokenPos' => 9,
+                                            'startFilePos' => 29,
+                                            'endLine' => 5,
+                                            'endTokenPos' => 9,
+                                            'endFilePos' => 30,
+                                            'kind' => 10,
+                                        ]
+                                    ),
+                                ],
+                                [
+                                    'startLine' => 5,
+                                    'startTokenPos' => 7,
+                                    'startFilePos' => 24,
+                                    'endLine' => 5,
+                                    'endTokenPos' => 10,
+                                    'endFilePos' => 31,
+                                ]
+                            ),
+                        ],
                         [
                             'startLine' => 3,
-                            'startTokenPos' => 4,
-                            'startFilePos' => 17,
-                            'endLine' => 3,
-                            'endTokenPos' => 4,
-                            'endFilePos' => 20,
-                        ]
-                    ),
-                    [new Node\Stmt\Echo_(
-                        [new Node\Scalar\LNumber(
-                            10,
-                            [
-                                'startLine' => 5,
-                                'startTokenPos' => 9,
-                                'startFilePos' => 29,
-                                'endLine' => 5,
-                                'endTokenPos' => 9,
-                                'endFilePos' => 30,
-                                'kind' => 10,
-                            ]
-                        )],
-                        [
-                            'startLine' => 5,
-                            'startTokenPos' => 7,
-                            'startFilePos' => 24,
+                            'startTokenPos' => 2,
+                            'startFilePos' => 7,
                             'endLine' => 5,
                             'endTokenPos' => 10,
                             'endFilePos' => 31,
+                            'kind' => 1,
                         ]
-                    )],
-                    [
-                        'startLine' => 3,
-                        'startTokenPos' => 2,
-                        'startFilePos' => 7,
-                        'endLine' => 5,
-                        'endTokenPos' => 10,
-                        'endFilePos' => 31,
-                        'kind' => 1,
-                    ]
-                )],
+                    ),
+                ],
                 MutatorName::getName(Plus::class),
                 [
                     'startLine' => 5,
@@ -175,14 +175,5 @@ namespace Acme;
 echo 15;
 PHP
         ];
-    }
-
-    private function getDumper(): NodeDumper
-    {
-        if (self::$dumper === null) {
-            self::$dumper = new NodeDumper();
-        }
-
-        return self::$dumper;
     }
 }

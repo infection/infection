@@ -47,6 +47,7 @@ use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\ProfileList;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\ClassReflection;
+use Infection\Tests\SingletonContainer;
 use InvalidArgumentException;
 use PhpParser\Node;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -63,7 +64,7 @@ final class MutatorFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mutatorFactory = new MutatorFactory();
+        $this->mutatorFactory = SingletonContainer::getContainer()->getMutatorFactory();
     }
 
     public function test_it_creates_no_mutator_if_no_profile_or_mutator_is_passed(): void
@@ -150,18 +151,6 @@ final class MutatorFactoryTest extends TestCase
                 $exception->getMessage()
             );
         }
-    }
-
-    private function createPlusNode(string $functionName, ClassReflection $reflectionMock): Node
-    {
-        return new Node\Expr\BinaryOp\Plus(
-            new Node\Scalar\DNumber(1.23),
-            new Node\Scalar\DNumber(1.23),
-            [
-                ReflectionVisitor::REFLECTION_CLASS_KEY => $reflectionMock,
-                ReflectionVisitor::FUNCTION_NAME => $functionName,
-            ]
-        );
     }
 
     private function createBoolNode(string $boolean, string $functionName, ClassReflection $reflectionMock): Node

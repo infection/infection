@@ -47,9 +47,9 @@ use function getenv;
 use function implode;
 use Infection\Command\ConfigureCommand;
 use Infection\Console\Application;
-use Infection\Container;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
+use Infection\Tests\SingletonContainer;
 use function is_readable;
 use const PHP_SAPI;
 use PHPUnit\Framework\TestCase;
@@ -337,7 +337,7 @@ final class E2ETest extends TestCase
             $this->markTestIncomplete('This build of PHPDBG does not support code coverage');
         }
 
-        $container = Container::create();
+        $container = SingletonContainer::getContainer();
         $input = new ArgvInput(array_merge([
             'bin/infection',
             'run',

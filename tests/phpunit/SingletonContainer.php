@@ -33,45 +33,62 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor;
+namespace Infection\Tests;
 
-use Infection\Tests\SingletonContainer;
-use PhpParser\Node;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PHPUnit\Framework\TestCase;
-use function Safe\file_get_contents;
-use function Safe\sprintf;
+use Infection\Container;
+use Infection\Tests\AutoReview\PhpDoc\PHPDocParser;
+use PhpParser\NodeDumper;
+use PhpParser\PrettyPrinter\Standard;
+use PhpParser\PrettyPrinterAbstract;
 
-abstract class BaseVisitorTest extends TestCase
+/**
+ * Singleton for the container and a few services (used for tests). The goal is to avoid
+ * instantiating multiple times stateless services across the tests to reduce the memory footprint
+ * and remove some redundant code.
+ */
+final class SingletonContainer
 {
     /**
-     * @return Node[]
+     * @var Container|null
      */
-    final protected function parseCode(string $code): array
-    {
-        return (array) SingletonContainer::getContainer()->getParser()->parse($code);
-    }
+    private static $container;
 
     /**
-     * @param Node[] $nodes
-     * @param NodeVisitor[] $visitors
-     *
-     * @return Node[]
+     * @var NodeDumper|null
      */
-    final protected function traverse(array $nodes, array $visitors): array
-    {
-        $traverser = new NodeTraverser();
+    private static $dumper;
 
-        foreach ($visitors as $visitor) {
-            $traverser->addVisitor($visitor);
+    /**
+     * @var PrettyPrinterAbstract|null
+     */
+    private static $printer;
+
+    /**
+     * @var PHPDocParser|null
+     */
+    private static $phpDocParser;
+
+    public static function getContainer(): Container
+    {
+        if (self::$container === null) {
+            self::$container = Container::create();
         }
 
-        return $traverser->traverse($nodes);
+        return self::$container;
     }
 
-    final protected function getFileContent(string $file): string
+    public static function getNodeDumper(): NodeDumper
     {
-        return file_get_contents(sprintf(__DIR__ . '/../../Fixtures/Autoloaded/%s', $file));
+        return self::$dumper ?? self::$dumper = new NodeDumper();
+    }
+
+    public static function getPrinter(): PrettyPrinterAbstract
+    {
+        return self::$printer ?? self::$printer = new Standard();
+    }
+
+    public static function getPHPDocParser(): PHPDocParser
+    {
+        return self::$phpDocParser ?? self::$phpDocParser = new PHPDocParser();
     }
 }

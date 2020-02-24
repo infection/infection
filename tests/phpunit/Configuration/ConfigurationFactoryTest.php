@@ -51,11 +51,11 @@ use Infection\Mutator\Boolean\TrueValueConfig;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\Mutator\Removal\MethodCallRemoval;
 use function Infection\Tests\normalizePath;
+use Infection\Tests\SingletonContainer;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
@@ -68,6 +68,9 @@ final class ConfigurationFactoryTest extends TestCase
 {
     use ConfigurationAssertions;
 
+    /**
+     * @var array<string, Mutator>|null
+     */
     private static $mutators;
 
     /**
@@ -100,7 +103,7 @@ final class ConfigurationFactoryTest extends TestCase
         $this->configFactory = new ConfigurationFactory(
             new TmpDirProvider(),
             new MutatorResolver(),
-            new MutatorFactory(),
+            SingletonContainer::getContainer()->getMutatorFactory(),
             new MutatorParser(),
             $sourceFilesCollectorProphecy->reveal()
         );
@@ -1296,9 +1299,11 @@ final class ConfigurationFactoryTest extends TestCase
     private static function getDefaultMutators(): array
     {
         if (self::$mutators === null) {
-            self::$mutators = (new MutatorFactory())->create(
-                (new MutatorResolver())->resolve(['@default' => true])
-            );
+            // TODO: check elsewhere
+            self::$mutators = SingletonContainer::getContainer()
+                ->getMutatorFactory()
+                ->create((new MutatorResolver())->resolve(['@default' => true]))
+            ;
         }
 
         return self::$mutators;
