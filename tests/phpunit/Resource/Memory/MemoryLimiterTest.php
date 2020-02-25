@@ -185,13 +185,13 @@ final class MemoryLimiterTest extends FileSystemTestCase
     private function configureEnvironmentToBeCalledAtLeastOnce(): void
     {
         $this->environmentMock
-            ->expects($this->atLeastOnce())
+            ->expects($this->once())
             ->method('hasMemoryLimitSet')
             ->willReturn(false)
         ;
 
         $this->environmentMock
-            ->expects($this->atLeastOnce())
+            ->expects($this->once())
             ->method('isUsingSystemIni')
             ->willReturn(false)
         ;
