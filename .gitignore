@@ -10,8 +10,6 @@
 /.php_cs.cache
 /.tools/
 /build/
-/clover.xml
-/coverage/
 /devTools/Docker*.json
 /infection-cache
 /infection.json
