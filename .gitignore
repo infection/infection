@@ -3,6 +3,7 @@
 !/build/cache/.gitkeep
 .phpunit.result.cache
 /*.phar
+/.box_dump/
 /.ci/keys.asc
 /.composer/
 /.idea
