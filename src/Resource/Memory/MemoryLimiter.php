@@ -55,11 +55,12 @@ final class MemoryLimiter
 {
     private $fileSystem;
     private $iniLocation;
+    private $environment;
 
     /**
      * @param string|false $iniLocation
      */
-    public function __construct(Filesystem $fileSystem, $iniLocation)
+    public function __construct(Filesystem $fileSystem, $iniLocation, ?MemoryLimiterEnvironment $environment = null)
     {
         if (!is_string($iniLocation)) {
             Assert::false(
@@ -70,17 +71,23 @@ final class MemoryLimiter
 
         $this->fileSystem = $fileSystem;
         $this->iniLocation = (string) $iniLocation;
+        $this->environment = $environment ?? new MemoryLimiterEnvironment();
     }
 
     public function applyMemoryLimitFromProcess(Process $process, TestFrameworkAdapter $adapter): void
     {
-        if (!$adapter instanceof MemoryUsageAware || $this->hasMemoryLimitSet() || $this->isUsingSystemIni()) {
+        if (!$adapter instanceof MemoryUsageAware || $this->environment->hasMemoryLimitSet() || $this->environment->isUsingSystemIni()) {
             return;
         }
 
         $tmpConfigPath = $this->iniLocation;
 
-        if ($tmpConfigPath === '' || !$this->fileSystem->exists($tmpConfigPath)) {
+        if ($tmpConfigPath === '') {
+            // Cannot add a memory limit: there is no php.ini file
+            return;
+        }
+
+        if (!$this->fileSystem->exists($tmpConfigPath)) {
             // Cannot add a memory limit: there is no php.ini file
             return;
         }
@@ -110,7 +117,6 @@ final class MemoryLimiter
             );
         } catch (IOException $e) {
             // Cannot add a memory limit: file is not writable
-            return;
         }
     }
 
