@@ -72,11 +72,26 @@ final class MemoryLimiterTest extends FileSystemTestCase
      */
     private $adapterMock;
 
+    public static function setUpBeforeClass(): void
+    {
+        if (XdebugHandler::getSkippedVersion() === '') {
+            $skipped = (new ReflectionClass(XdebugHandler::class))->getProperty('skipped');
+            $skipped->setAccessible(true);
+            $skipped->setValue('infection-fake');
+        }
+
+        if (XdebugHandler::getSkippedVersion() !== 'infection-fake') {
+            throw new LogicException('Did not expect the Xdebug handler to be active during the tests');
+        }
+    }
+
     public static function tearDownAfterClass(): void
     {
         $skipped = (new ReflectionClass(XdebugHandler::class))->getProperty('skipped');
         $skipped->setAccessible(true);
         $skipped->setValue(null);
+
+        parent::tearDownAfterClass();
     }
 
     protected function setUp(): void
@@ -89,21 +104,11 @@ final class MemoryLimiterTest extends FileSystemTestCase
             $this->markTestSkipped('Unable to run tests if PHPDBG is used');
         }
 
-        if (XdebugHandler::getSkippedVersion() === '') {
-            $skipped = (new ReflectionClass(XdebugHandler::class))->getProperty('skipped');
-            $skipped->setAccessible(true);
-            $skipped->setValue('infection-fake');
-
-            return;
-        }
-
-        if (XdebugHandler::getSkippedVersion() !== 'infection-fake') {
-            throw new LogicException('Did not expect the Xdebug handler to be active during the tests');
-        }
-
         $this->fileSystemMock = $this->createMock(Filesystem::class);
         $this->processMock = $this->createMock(Process::class);
         $this->adapterMock = $this->createMock(AbstractTestFrameworkAdapter::class);
+
+        parent::setUp();
     }
 
     public function test_it_throws_a_friendly_error_when_the_ini_value_is_incorrect(): void
