@@ -166,7 +166,7 @@ final class MemoryLimiterTest extends FileSystemTestCase
 
         $memoryLimiter = new MemoryLimiter($this->fileSystemMock, $filename, $this->environmentMock);
 
-        $result = $memoryLimiter->applyMemoryLimitFromProcess($this->processMock, $adapter);
+        $memoryLimiter->applyMemoryLimitFromProcess($this->processMock, $adapter);
     }
 
     public function test_it_does_nothing_when_memory_used_is_zero(): void
