@@ -36,11 +36,9 @@ declare(strict_types=1);
 namespace Infection\Resource\Memory;
 
 use Composer\XdebugHandler\XdebugHandler;
-use function file_exists;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use function is_string;
-use function is_writable;
 use const PHP_EOL;
 use const PHP_SAPI;
 use function Safe\ini_get;
