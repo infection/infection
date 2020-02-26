@@ -290,7 +290,8 @@ final class Container
                 $config = $container->getConfiguration();
 
                 return new CoverageRequirementChecker(
-                    $config->getCoveragePath() !== '',
+                    $config->shouldSkipCoverage(),
+                    $config->shouldSkipInitialTests(),
                     $config->getInitialTestsPhpOptions() ?? ''
                 );
             },
@@ -421,6 +422,7 @@ final class Container
         bool $noProgress,
         ?string $existingCoveragePath,
         ?string $initialTestsPhpOptions,
+        bool $skipInitialTests,
         bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
         ?float $minCoveredMsi,
@@ -450,6 +452,7 @@ final class Container
             static function (self $container) use (
                 $existingCoveragePath,
                 $initialTestsPhpOptions,
+                $skipInitialTests,
                 $logVerbosity,
                 $debug,
                 $onlyCovered,
@@ -468,6 +471,7 @@ final class Container
                     $container->getSchemaConfiguration(),
                     $existingCoveragePath,
                     $initialTestsPhpOptions,
+                    $skipInitialTests,
                     $logVerbosity,
                     $debug,
                     $onlyCovered,

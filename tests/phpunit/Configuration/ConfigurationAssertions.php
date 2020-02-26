@@ -68,6 +68,7 @@ trait ConfigurationAssertions
         string $expectedTestFrameworkExtraOptions,
         string $expectedCoveragePath,
         bool $expectedSkipCoverage,
+        bool $expectedSkipInitialTests,
         bool $expectedDebug,
         bool $expectedOnlyCovered,
         string $expectedFormatter,
@@ -108,6 +109,7 @@ trait ConfigurationAssertions
         );
         $this->assertSame($expectedCoveragePath, $configuration->getCoveragePath());
         $this->assertSame($expectedSkipCoverage, $configuration->shouldSkipCoverage());
+        $this->assertSame($expectedSkipInitialTests, $configuration->shouldSkipInitialTests());
         $this->assertSame($expectedDebug, $configuration->isDebugEnabled());
         $this->assertSame($expectedOnlyCovered, $configuration->mutateOnlyCoveredCode());
         $this->assertSame($expectedFormatter, $configuration->getFormatter());

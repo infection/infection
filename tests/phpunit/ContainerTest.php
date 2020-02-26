@@ -97,6 +97,7 @@ final class ContainerTest extends TestCase
             '/path/to/coverage',
             '',
             false,
+            false,
             .0,
             .0,
             'phpunit',
