@@ -70,11 +70,7 @@ final class SingletonContainer
 
     public static function getContainer(): Container
     {
-        if (self::$container === null) {
-            self::$container = Container::create();
-        }
-
-        return self::$container;
+        return self::$container ?? self::$container = Container::create();
     }
 
     public static function getNodeDumper(): NodeDumper
