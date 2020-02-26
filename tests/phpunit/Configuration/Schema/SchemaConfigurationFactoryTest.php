@@ -59,12 +59,12 @@ use function Safe\sprintf;
 use stdClass;
 use function var_export;
 
-/**g
- * @covers \Infection\Configuration\Schema\SchemaConfigurationFactory
+/**
  * @covers \Infection\Configuration\Entry\Badge
  * @covers \Infection\Configuration\Entry\Logs
  * @covers \Infection\Configuration\Entry\PhpUnit
  * @covers \Infection\Configuration\Entry\Source
+ * @covers \Infection\Configuration\Schema\SchemaConfigurationFactory
  */
 final class SchemaConfigurationFactoryTest extends TestCase
 {
@@ -570,6 +570,102 @@ JSON
                     null,
                     'bin/phpunit'
                 ),
+            ]),
+        ];
+
+        yield '[ignoreMsiWithNoMutations] is true' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "ignoreMsiWithNoMutations": true
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'ignoreMsiWithNoMutations' => true,
+            ]),
+        ];
+
+        yield '[ignoreMsiWithNoMutations] is false' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "ignoreMsiWithNoMutations": false
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'ignoreMsiWithNoMutations' => false,
+            ]),
+        ];
+
+        yield '[minMsi] is float' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "minMsi": 3.14
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'minMsi' => 3.14,
+            ]),
+        ];
+
+        yield '[minMsi] is int' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "minMsi": 32
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'minMsi' => 32.0,
+            ]),
+        ];
+
+        yield '[minCoveredMsi] is float' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "minCoveredMsi": 3.14
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'minCoveredMsi' => 3.14,
+            ]),
+        ];
+
+        yield '[minCoveredMsi] is int' => [
+            <<<'JSON'
+{
+    "source": {
+        "directories": ["src"]
+    },
+    "minCoveredMsi": 32
+}
+JSON
+            ,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'minCoveredMsi' => 32.0,
             ]),
         ];
 
@@ -2242,6 +2338,9 @@ JSON
             ),
             'tmpDir' => null,
             'phpunit' => new PhpUnit(null, null),
+            'ignoreMsiWithNoMutations' => null,
+            'minMsi' => null,
+            'minCoveredMsi' => null,
             'mutators' => [],
             'testFramework' => null,
             'bootstrap' => null,
