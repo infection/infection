@@ -38,7 +38,7 @@ namespace Infection\Logger;
 use function implode;
 use function in_array;
 use Infection\Mutant\MetricsCalculator;
-use Infection\Process\MutantProcess;
+use Infection\Mutant\MutantExecutionResult;
 use function Safe\file_put_contents;
 use function Safe\sprintf;
 use function Safe\usort;
@@ -122,11 +122,11 @@ abstract class FileLogger implements MutationTestingResultsLogger
     abstract protected function getLogLines(): array;
 
     /**
-     * @param MutantProcess[] $processes
+     * @param MutantExecutionResult[] $executionResults
      */
-    final protected function sortProcesses(array &$processes): void
+    final protected function sortProcesses(array &$executionResults): void
     {
-        usort($processes, static function (MutantProcess $a, MutantProcess $b): int {
+        usort($executionResults, static function (MutantExecutionResult $a, MutantExecutionResult $b): int {
             if ($a->getOriginalFilePath() === $b->getOriginalFilePath()) {
                 return $a->getOriginalStartingLine() <=> $b->getOriginalStartingLine();
             }

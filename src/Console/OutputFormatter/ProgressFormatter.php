@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Console\OutputFormatter;
 
-use Infection\Process\MutantProcess;
+use Infection\Mutant\MutantExecutionResult;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
@@ -57,9 +57,9 @@ final class ProgressFormatter extends AbstractOutputFormatter
         $this->progressBar->start($mutationCount);
     }
 
-    public function advance(MutantProcess $mutantProcess, int $mutationCount): void
+    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
     {
-        parent::advance($mutantProcess, $mutationCount);
+        parent::advance($executionResult, $mutationCount);
 
         $this->progressBar->advance();
     }

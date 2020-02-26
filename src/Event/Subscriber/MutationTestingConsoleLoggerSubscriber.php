@@ -42,6 +42,7 @@ use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutant\MetricsCalculator;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\MutantProcess;
 use function Safe\sprintf;
 use function str_pad;
@@ -57,9 +58,9 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     private const PAD_LENGTH = 8;
 
     /**
-     * @var MutantProcess[]
+     * @var MutantExecutionResult[]
      */
-    private $mutantProcesses = [];
+    private $mutantExecutionResults = [];
     private $output;
     private $outputFormatter;
     private $metricsCalculator;
@@ -103,10 +104,10 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 
     public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
     {
-        $this->mutantProcesses[] = $event->getMutantProcess();
-        $this->metricsCalculator->collect($event->getMutantProcess());
+        $this->mutantExecutionResults[] = $event->getExecutionResult();
+        $this->metricsCalculator->collect($event->getExecutionResult());
 
-        $this->outputFormatter->advance($event->getMutantProcess(), $this->mutationCount);
+        $this->outputFormatter->advance($event->getExecutionResult(), $this->mutationCount);
     }
 
     public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
@@ -114,10 +115,10 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->outputFormatter->finish();
 
         if ($this->showMutations) {
-            $this->showMutations($this->metricsCalculator->getEscapedMutantProcesses(), 'Escaped');
+            $this->showMutations($this->metricsCalculator->getEscapedMutantExecutionResults(), 'Escaped');
 
             if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
-                $this->showMutations($this->metricsCalculator->getNotCoveredMutantProcesses(), 'Not covered');
+                $this->showMutations($this->metricsCalculator->getNotCoveredMutantExecutionResults(), 'Not covered');
             }
         }
 

@@ -47,6 +47,6 @@ final class MutantProcessWasFinishedTest extends TestCase
 
         $event = new MutantProcessWasFinished($processMock);
 
-        $this->assertSame($processMock, $event->getMutantProcess());
+        $this->assertSame($processMock, $event->getExecutionResult());
     }
 }
