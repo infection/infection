@@ -46,9 +46,9 @@ use PhpParser\NodeVisitorAbstract;
 final class MutationsCollectorVisitor extends NodeVisitorAbstract
 {
     /**
-     * @var Mutation[]
+     * @var iterable[]
      */
-    private $mutations = [];
+    private $iterators = [];
 
     private $mutationGenerator;
 
@@ -59,25 +59,25 @@ final class MutationsCollectorVisitor extends NodeVisitorAbstract
 
     public function beforeTraverse(array $nodes): ?array
     {
-        $this->mutations = [];
+        $this->iterators = [];
 
         return null;
     }
 
     public function leaveNode(Node $node): ?Node
     {
-        foreach ($this->mutationGenerator->generate($node) as $mutation) {
-            $this->mutations[] = $mutation;
-        }
+        $this->iterators[] = $this->mutationGenerator->generate($node);
 
         return null;
     }
 
     /**
-     * @return Mutation[]
+     * @return iterable|Mutation[]
      */
-    public function getMutations(): array
+    public function getMutations(): iterable
     {
-        return $this->mutations;
+        foreach ($this->iterators as $iterator) {
+            yield from $iterator;
+        }
     }
 }
