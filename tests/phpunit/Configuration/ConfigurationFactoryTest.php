@@ -122,7 +122,7 @@ final class ConfigurationFactoryTest extends TestCase
         bool $inputOnlyCovered,
         string $inputFormatter,
         bool $inputNoProgress,
-        bool $inputIgnoreMsiWithNoMutations,
+        ?bool $inputIgnoreMsiWithNoMutations,
         ?float $inputMinMsi,
         bool $inputShowMutations,
         ?float $inputMinCoveredMsi,
@@ -215,6 +215,9 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
                 '',
                 new PhpUnit(null, null),
+                null,
+                null,
+                null,
                 [],
                 null,
                 null,
@@ -327,6 +330,96 @@ final class ConfigurationFactoryTest extends TestCase
         yield 'absolute PHPUnit config dir' => self::createValueForPhpUnitConfigDir(
             '/path/to/phpunit/config',
             '/path/to/phpunit/config'
+        );
+
+        yield 'ignoreMsiWithNoMutations not specified in schema and not specified in input' => self::createValueForIgnoreMsiWithNoMutations(
+            null,
+            null,
+            false
+        );
+
+        yield 'ignoreMsiWithNoMutations not specified in schema and true in input' => self::createValueForIgnoreMsiWithNoMutations(
+            null,
+            true,
+            true
+        );
+
+        yield 'ignoreMsiWithNoMutations not specified in schema and false in input' => self::createValueForIgnoreMsiWithNoMutations(
+            null,
+            false,
+            false
+        );
+
+        yield 'ignoreMsiWithNoMutations true in schema and not specified in input' => self::createValueForIgnoreMsiWithNoMutations(
+            true,
+            null,
+            true
+        );
+
+        yield 'ignoreMsiWithNoMutations false in schema and not specified in input' => self::createValueForIgnoreMsiWithNoMutations(
+            false,
+            null,
+            false
+        );
+
+        yield 'ignoreMsiWithNoMutations true in schema and false in input' => self::createValueForIgnoreMsiWithNoMutations(
+            true,
+            false,
+            false
+        );
+
+        yield 'ignoreMsiWithNoMutations false in schema and true in input' => self::createValueForIgnoreMsiWithNoMutations(
+            false,
+            true,
+            true
+        );
+
+        yield 'minMsi not specified in schema and not specified in input' => self::createValueForMinMsi(
+            null,
+            null,
+            null
+        );
+
+        yield 'minMsi specified in schema and not specified in input' => self::createValueForMinMsi(
+            33.3,
+            null,
+            33.3
+        );
+
+        yield 'minMsi not specified in schema and specified in input' => self::createValueForMinMsi(
+            null,
+            21.2,
+            21.2
+        );
+
+        yield 'minMsi specified in schema and specified in input' => self::createValueForMinMsi(
+            33.3,
+            21.2,
+            21.2
+        );
+
+        yield 'minCoveredMsi not specified in schema and not specified in input' => self::createValueForminCoveredMsi(
+            null,
+            null,
+            null
+        );
+
+        yield 'minCoveredMsi specified in schema and not specified in input' => self::createValueForminCoveredMsi(
+            33.3,
+            null,
+            33.3
+        );
+
+        yield 'minCoveredMsi not specified in schema and specified in input' => self::createValueForminCoveredMsi(
+            null,
+            21.2,
+            21.2
+        );
+
+        yield 'minCoveredMsi specified in schema and specified in input' => self::createValueForminCoveredMsi(
+            33.3,
+            21.2,
+            21.2
         );
 
         yield 'no test framework' => self::createValueForTestFramework(
@@ -510,6 +603,9 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
                 '',
                 new PhpUnit(null, null),
+                null,
+                null,
+                null,
                 [],
                 null,
                 null,
@@ -581,6 +677,9 @@ final class ConfigurationFactoryTest extends TestCase
                     'config/phpunit-dir',
                     'config/phpunit'
                 ),
+                null,
+                null,
+                null,
                 ['@default' => true],
                 'phpunit',
                 'config/bootstrap.php',
@@ -664,6 +763,9 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
                 '',
                 new PhpUnit(null, null),
+                null,
+                null,
+                null,
                 [],
                 null,
                 null,
@@ -734,6 +836,9 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
                 $configTmpDir,
                 new PhpUnit(null, null),
+                null,
+                null,
+                null,
                 [],
                 null,
                 null,
@@ -805,6 +910,9 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
                 '',
                 new PhpUnit(null, null),
+                null,
+                null,
+                null,
                 [],
                 null,
                 null,
@@ -875,6 +983,9 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
                 '',
                 new PhpUnit($phpUnitConfigDir, null),
+                null,
+                null,
+                null,
                 [],
                 null,
                 null,
@@ -927,6 +1038,228 @@ final class ConfigurationFactoryTest extends TestCase
         ];
     }
 
+    private static function createValueForIgnoreMsiWithNoMutations(
+        ?bool $ignoreMsiWithNoMutationsFromSchemaConfiguration,
+        ?bool $ignoreMsiWithNoMutationsFromInput,
+        ?bool $expectedIgnoreMsiWithNoMutations
+    ): array {
+        return [
+            new SchemaConfiguration(
+                '/path/to/infection.json',
+                null,
+                new Source([], []),
+                new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                '',
+                new PhpUnit('/path/to', null),
+                $ignoreMsiWithNoMutationsFromSchemaConfiguration,
+                null,
+                null,
+                [],
+                null,
+                null,
+                null,
+                null
+            ),
+            null,
+            null,
+            'none',
+            false,
+            false,
+            'progress',
+            false,
+            $ignoreMsiWithNoMutationsFromInput,
+            null,
+            false,
+            null,
+            '',
+            null,
+            null,
+            '',
+            10,
+            [],
+            [],
+            new Logs(
+                null,
+                null,
+                null,
+                null,
+                null
+            ),
+            'none',
+            sys_get_temp_dir() . '/infection',
+            new PhpUnit('/path/to', null),
+            self::getDefaultMutators(),
+            'phpunit',
+            null,
+            null,
+            '',
+            sys_get_temp_dir() . '/infection/coverage-xml',
+            false,
+            false,
+            false,
+            'progress',
+            false,
+            $expectedIgnoreMsiWithNoMutations,
+            null,
+            false,
+            null,
+        ];
+    }
+
+    private static function createValueForMinMsi(
+        ?float $minMsiFromSchemaConfiguration,
+        ?float $minMsiFromInput,
+        ?float $expectedMinMsi
+    ): array {
+        return [
+            new SchemaConfiguration(
+                '/path/to/infection.json',
+                null,
+                new Source([], []),
+                new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                '',
+                new PhpUnit('/path/to', null),
+                null,
+                $minMsiFromSchemaConfiguration,
+                null,
+                [],
+                null,
+                null,
+                null,
+                null
+            ),
+            null,
+            null,
+            'none',
+            false,
+            false,
+            'progress',
+            false,
+            null,
+            $minMsiFromInput,
+            false,
+            null,
+            '',
+            null,
+            null,
+            '',
+            10,
+            [],
+            [],
+            new Logs(
+                null,
+                null,
+                null,
+                null,
+                null
+            ),
+            'none',
+            sys_get_temp_dir() . '/infection',
+            new PhpUnit('/path/to', null),
+            self::getDefaultMutators(),
+            'phpunit',
+            null,
+            null,
+            '',
+            sys_get_temp_dir() . '/infection/coverage-xml',
+            false,
+            false,
+            false,
+            'progress',
+            false,
+            false,
+            $expectedMinMsi,
+            false,
+            null,
+        ];
+    }
+
+    private static function createValueForMinCoveredMsi(
+        ?float $minCoveredMsiFromSchemaConfiguration,
+        ?float $minCoveredMsiFromInput,
+        ?float $expectedMinCoveredMsi
+    ): array {
+        return [
+            new SchemaConfiguration(
+                '/path/to/infection.json',
+                null,
+                new Source([], []),
+                new Logs(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                '',
+                new PhpUnit('/path/to', null),
+                null,
+                null,
+                $minCoveredMsiFromSchemaConfiguration,
+                [],
+                null,
+                null,
+                null,
+                null
+            ),
+            null,
+            null,
+            'none',
+            false,
+            false,
+            'progress',
+            false,
+            null,
+            null,
+            false,
+            $minCoveredMsiFromInput,
+            '',
+            null,
+            null,
+            '',
+            10,
+            [],
+            [],
+            new Logs(
+                null,
+                null,
+                null,
+                null,
+                null
+            ),
+            'none',
+            sys_get_temp_dir() . '/infection',
+            new PhpUnit('/path/to', null),
+            self::getDefaultMutators(),
+            'phpunit',
+            null,
+            null,
+            '',
+            sys_get_temp_dir() . '/infection/coverage-xml',
+            false,
+            false,
+            false,
+            'progress',
+            false,
+            false,
+            null,
+            false,
+            $expectedMinCoveredMsi,
+        ];
+    }
+
     private static function createValueForTestFramework(
         ?string $configTestFramework,
         ?string $inputTestFramework,
@@ -948,6 +1281,9 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
                 '',
                 new PhpUnit(null, null),
+                null,
+                null,
+                null,
                 [],
                 $configTestFramework,
                 null,
@@ -1019,6 +1355,9 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
                 '',
                 new PhpUnit(null, null),
+                null,
+                null,
+                null,
                 [],
                 null,
                 null,
@@ -1092,6 +1431,9 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
                 '',
                 new PhpUnit(null, null),
+                null,
+                null,
+                null,
                 [],
                 $configTestFramework,
                 null,
@@ -1164,6 +1506,9 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
                 '',
                 new PhpUnit(null, null),
+                null,
+                null,
+                null,
                 [],
                 $configTestFramework,
                 null,
@@ -1238,6 +1583,9 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
                 null,
                 new PhpUnit(null, null),
+                null,
+                null,
+                null,
                 $configMutators,
                 null,
                 null,

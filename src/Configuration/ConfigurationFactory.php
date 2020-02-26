@@ -98,7 +98,7 @@ class ConfigurationFactory
         bool $onlyCovered,
         string $formatter,
         bool $noProgress,
-        bool $ignoreMsiWithNoMutations,
+        ?bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
         bool $showMutations,
         ?float $minCoveredMsi,
@@ -144,10 +144,10 @@ class ConfigurationFactory
             $onlyCovered,
             $formatter,
             $noProgress,
-            $ignoreMsiWithNoMutations,
-            $minMsi,
+            self::retrieveIgnoreMsiWithNoMutations($ignoreMsiWithNoMutations, $schema),
+            self::retrieveMinMsi($minMsi, $schema),
             $showMutations,
-            $minCoveredMsi
+            self::retrieveMinCoveredMsi($minCoveredMsi, $schema)
         );
     }
 
@@ -243,5 +243,22 @@ class ConfigurationFactory
         SchemaConfiguration $schema
     ): string {
         return $testFrameworkExtraOptions ?? $schema->getTestFrameworkExtraOptions() ?? '';
+    }
+
+    private static function retrieveIgnoreMsiWithNoMutations(
+        ?bool $ignoreMsiWithNoMutations,
+        SchemaConfiguration $schema
+    ): bool {
+        return $ignoreMsiWithNoMutations ?? $schema->getIgnoreMsiWithNoMutations() ?? false;
+    }
+
+    private static function retrieveMinMsi(?float $minMsi, SchemaConfiguration $schema): ?float
+    {
+        return $minMsi ?? $schema->getMinMsi();
+    }
+
+    private static function retrieveMinCoveredMsi(?float $minCoveredMsi, SchemaConfiguration $schema): ?float
+    {
+        return $minCoveredMsi ?? $schema->getMinCoveredMsi();
     }
 }
