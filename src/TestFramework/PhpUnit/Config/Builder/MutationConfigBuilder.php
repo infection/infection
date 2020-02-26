@@ -101,8 +101,10 @@ class MutationConfigBuilder extends ConfigBuilder
 
         $this->configManipulator->replaceWithAbsolutePaths($xPath);
 
-        if ($this->originalBootstrapFile === null) {
-            $this->originalBootstrapFile = $this->getOriginalBootstrapFilePath($xPath);
+        $originalBootstrapFile = $this->originalBootstrapFile;
+
+        if ($originalBootstrapFile === null) {
+            $originalBootstrapFile = $this->originalBootstrapFile = $this->getOriginalBootstrapFilePath($xPath);
         }
 
         $this->configManipulator->setStopOnFailure($xPath);
@@ -121,9 +123,6 @@ class MutationConfigBuilder extends ConfigBuilder
 
         $this->setCustomBootstrapPath($customAutoloadFilePath, $xPath);
         $this->setFilteredTestsToRun($coverageTests, $dom, $xPath);
-
-        $originalBootstrapFile = $this->originalBootstrapFile;
-        Assert::string($originalBootstrapFile);
 
         file_put_contents(
             $customAutoloadFilePath,

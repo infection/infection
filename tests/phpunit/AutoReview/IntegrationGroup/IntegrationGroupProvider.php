@@ -51,20 +51,6 @@ use Webmozart\Assert\Assert;
 
 final class IntegrationGroupProvider
 {
-    private const IO_STATEMENTS = [
-        'file_get_contents',
-        'file_put_contents',
-        'file_exists',
-        'rmdir',
-        'rename(',
-        'fopen',
-        'getcwd',
-        'realpath',
-        'use Symfony\Component\Filesystem\Filesystem',
-        'STDIN',
-        'STDOUT',
-    ];
-
     /**
      * @var string[][]|null
      */
@@ -88,7 +74,9 @@ final class IntegrationGroupProvider
         }
 
         self::$ioTestCaseClassesTuple = array_values(array_filter(array_map(
-            [self::class, 'checkIoOperations'],
+            static function (string $className): ?array {
+                return self::checkIoOperations($className);
+            },
             iterator_to_array(ProjectCodeProvider::provideSourceClasses(), true)
         )));
 

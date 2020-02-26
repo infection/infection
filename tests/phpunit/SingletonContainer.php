@@ -33,35 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
+namespace Infection\Tests;
 
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\Tests\SingletonContainer;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PHPUnit\Framework\TestCase;
+use Infection\Container;
+use Infection\Tests\AutoReview\PhpDoc\PHPDocParser;
+use PhpParser\NodeDumper;
+use PhpParser\PrettyPrinter\Standard;
+use PhpParser\PrettyPrinterAbstract;
 
-abstract class BaseNodeIgnorerTestCase extends TestCase
+/**
+ * Singleton for the container and a few services (used for tests). The goal is to avoid
+ * instantiating multiple times stateless services across the tests to reduce the memory footprint
+ * and remove some redundant code.
+ */
+final class SingletonContainer
 {
-    abstract protected function getIgnore(): NodeIgnorer;
+    /**
+     * @var Container|null
+     */
+    private static $container;
 
-    final protected function parseAndTraverse(string $code, NodeVisitor $spy): void
+    /**
+     * @var NodeDumper|null
+     */
+    private static $dumper;
+
+    /**
+     * @var PrettyPrinterAbstract|null
+     */
+    private static $printer;
+
+    /**
+     * @var PHPDocParser|null
+     */
+    private static $phpDocParser;
+
+    public static function getContainer(): Container
     {
-        $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
-
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor([$this->getIgnore()]));
-        $traverser->addVisitor($spy);
-        $traverser->traverse($nodes);
-
-        $this->addToAssertionCount(1);
+        return self::$container ?? self::$container = Container::create();
     }
 
-    protected function createSpy(): IgnoreSpyVisitor
+    public static function getNodeDumper(): NodeDumper
     {
-        return new IgnoreSpyVisitor(static function (): void {
-            self::fail('A variable that should have been ignored was still parsed by the next visitor.');
-        });
+        return self::$dumper ?? self::$dumper = new NodeDumper();
+    }
+
+    public static function getPrinter(): PrettyPrinterAbstract
+    {
+        return self::$printer ?? self::$printer = new Standard();
+    }
+
+    public static function getPHPDocParser(): PHPDocParser
+    {
+        return self::$phpDocParser ?? self::$phpDocParser = new PHPDocParser();
     }
 }
