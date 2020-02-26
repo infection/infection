@@ -541,7 +541,7 @@ XML
         } catch (InvalidArgumentException | InvalidPhpUnitConfiguration $exception) {
             $this->assertSame(
                 $errorMessage,
-                $exception->getMessage()
+                normalizeLineReturn($exception->getMessage())
             );
         } finally {
             restore_error_handler();
