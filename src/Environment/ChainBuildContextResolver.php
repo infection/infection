@@ -33,35 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
+namespace Infection\Environment;
 
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\Tests\SingletonContainer;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PHPUnit\Framework\TestCase;
-
-abstract class BaseNodeIgnorerTestCase extends TestCase
+/**
+ * @internal
+ */
+final class ChainBuildContextResolver implements BuildContextResolver
 {
-    abstract protected function getIgnore(): NodeIgnorer;
+    private $buildContextResolvers;
 
-    final protected function parseAndTraverse(string $code, NodeVisitor $spy): void
+    public function __construct(BuildContextResolver ...$buildContextResolvers)
     {
-        $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
-
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor([$this->getIgnore()]));
-        $traverser->addVisitor($spy);
-        $traverser->traverse($nodes);
-
-        $this->addToAssertionCount(1);
+        $this->buildContextResolvers = $buildContextResolvers;
     }
 
-    protected function createSpy(): IgnoreSpyVisitor
+    public function resolve(array $environment): BuildContext
     {
-        return new IgnoreSpyVisitor(static function (): void {
-            self::fail('A variable that should have been ignored was still parsed by the next visitor.');
-        });
+        foreach ($this->buildContextResolvers as $buildContextResolver) {
+            try {
+                $buildContext = $buildContextResolver->resolve($environment);
+            } catch (CouldNotResolveBuildContext $exception) {
+                continue;
+            }
+
+            return $buildContext;
+        }
+
+        throw new CouldNotResolveBuildContext('Build context could not be resolved.');
     }
 }

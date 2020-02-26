@@ -33,28 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Config\Exception;
+namespace Infection\Tests;
 
-use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
-use PHPUnit\Framework\TestCase;
+use Infection\Container;
+use Infection\Tests\AutoReview\PhpDoc\PHPDocParser;
+use PhpParser\NodeDumper;
+use PhpParser\PrettyPrinter\Standard;
+use PhpParser\PrettyPrinterAbstract;
 
-final class InvalidPhpUnitXmlConfigExceptionTest extends TestCase
+/**
+ * Singleton for the container and a few services (used for tests). The goal is to avoid
+ * instantiating multiple times stateless services across the tests to reduce the memory footprint
+ * and remove some redundant code.
+ */
+final class SingletonContainer
 {
-    public function test_for_root_node(): void
+    /**
+     * @var Container|null
+     */
+    private static $container;
+
+    /**
+     * @var NodeDumper|null
+     */
+    private static $dumper;
+
+    /**
+     * @var PrettyPrinterAbstract|null
+     */
+    private static $printer;
+
+    /**
+     * @var PHPDocParser|null
+     */
+    private static $phpDocParser;
+
+    public static function getContainer(): Container
     {
-        $exception = InvalidPhpUnitXmlConfigException::byRootNode();
-
-        $this->assertInstanceOf(InvalidPhpUnitXmlConfigException::class, $exception);
-
-        $this->assertSame('phpunit.xml does not contain a valid PHPUnit configuration.', $exception->getMessage());
+        return self::$container ?? self::$container = Container::create();
     }
 
-    public function test_for_xsd_schema(): void
+    public static function getNodeDumper(): NodeDumper
     {
-        $exception = InvalidPhpUnitXmlConfigException::byXsdSchema('Invalid');
+        return self::$dumper ?? self::$dumper = new NodeDumper();
+    }
 
-        $this->assertInstanceOf(InvalidPhpUnitXmlConfigException::class, $exception);
+    public static function getPrinter(): PrettyPrinterAbstract
+    {
+        return self::$printer ?? self::$printer = new Standard();
+    }
 
-        $this->assertStringContainsString('phpunit.xml file does not pass XSD schema validation.', $exception->getMessage());
+    public static function getPHPDocParser(): PHPDocParser
+    {
+        return self::$phpDocParser ?? self::$phpDocParser = new PHPDocParser();
     }
 }

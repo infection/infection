@@ -75,12 +75,12 @@ final class PerformanceLoggerSubscriber implements EventSubscriber
         ];
     }
 
-    public function onApplicationExecutionWasStarted(): void
+    public function onApplicationExecutionWasStarted(ApplicationExecutionWasStarted $event): void
     {
         $this->stopwatch->start();
     }
 
-    public function onApplicationExecutionWasFinished(): void
+    public function onApplicationExecutionWasFinished(ApplicationExecutionWasFinished $event): void
     {
         $time = $this->stopwatch->stop();
 

@@ -36,23 +36,17 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutant;
 
 use Generator;
-use Infection\Container;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
 use Infection\Tests\Mutator\MutatorName;
+use Infection\Tests\SingletonContainer;
 use PhpParser\Node;
-use PhpParser\NodeDumper;
 use PHPUnit\Framework\TestCase;
 
 final class MutantCodeFactoryTest extends TestCase
 {
-    /**
-     * @var NodeDumper|null
-     */
-    private static $dumper;
-
     /**
      * @var MutantCodeFactory
      */
@@ -60,7 +54,7 @@ final class MutantCodeFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->codeFactory = Container::create()->getMutantCodeFactory();
+        $this->codeFactory = SingletonContainer::getContainer()->getMutantCodeFactory();
     }
 
     /**
@@ -81,11 +75,11 @@ final class MutantCodeFactoryTest extends TestCase
     public function test_it_creates_the_mutant_code_without_altering_the_original_nodes(
         Mutation $mutation
     ): void {
-        $originalNodesDump = $this->getDumper()->dump($mutation->getOriginalFileAst());
+        $originalNodesDump = SingletonContainer::getNodeDumper()->dump($mutation->getOriginalFileAst());
 
         $this->codeFactory->createCode($mutation);
 
-        $originalNodesDumpAfterMutation = $this->getDumper()->dump($mutation->getOriginalFileAst());
+        $originalNodesDumpAfterMutation = SingletonContainer::getNodeDumper()->dump($mutation->getOriginalFileAst());
 
         $this->assertSame($originalNodesDump, $originalNodesDumpAfterMutation);
     }
@@ -175,14 +169,5 @@ namespace Acme;
 echo 15;
 PHP
         ];
-    }
-
-    private function getDumper(): NodeDumper
-    {
-        if (self::$dumper === null) {
-            self::$dumper = new NodeDumper();
-        }
-
-        return self::$dumper;
     }
 }

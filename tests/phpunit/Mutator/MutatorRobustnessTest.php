@@ -37,13 +37,11 @@ namespace Infection\Tests\Mutator;
 
 use function array_values;
 use Generator;
-use Infection\Container;
 use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\ProfileList;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Tests\Fixtures\NullMutationVisitor;
-use PhpParser\Parser;
+use Infection\Tests\SingletonContainer;
 use PHPUnit\Framework\TestCase;
 use function Safe\ksort;
 use function Safe\sprintf;
@@ -61,11 +59,6 @@ final class MutatorRobustnessTest extends TestCase
      * @var string[][]|null
      */
     private static $files;
-
-    /**
-     * @var Parser|null
-     */
-    private static $parser;
 
     /**
      * This test only proves that the mutators do not crash on more 'exotic' code. It does not care
@@ -91,7 +84,7 @@ final class MutatorRobustnessTest extends TestCase
 
     public function mutatorWithCodeCaseProvider(): Generator
     {
-        $mutatorFactory = new MutatorFactory();
+        $mutatorFactory = SingletonContainer::getContainer()->getMutatorFactory();
 
         foreach ($this->provideCodeSamples() as [$fileName, $fileContents]) {
             foreach (ProfileList::ALL_MUTATORS as $mutatorClassName) {
@@ -104,15 +97,6 @@ final class MutatorRobustnessTest extends TestCase
                 ];
             }
         }
-    }
-
-    private static function getParser(): Parser
-    {
-        if (self::$parser === null) {
-            self::$parser = Container::create()->getParser();
-        }
-
-        return self::$parser;
     }
 
     private function provideCodeSamples(): Generator
@@ -148,7 +132,7 @@ final class MutatorRobustnessTest extends TestCase
 
     private function mutatesCode(string $code, Mutator $mutator): void
     {
-        $initialStatements = self::getParser()->parse($code);
+        $initialStatements = SingletonContainer::getContainer()->getParser()->parse($code);
 
         (new NodeTraverserFactory())
             ->create(new NullMutationVisitor($mutator), [])

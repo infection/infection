@@ -33,35 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
+namespace Infection\Resource\Memory;
 
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\Tests\SingletonContainer;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PHPUnit\Framework\TestCase;
+use Composer\XdebugHandler\XdebugHandler;
+use const PHP_SAPI;
+use function Safe\ini_get;
 
-abstract class BaseNodeIgnorerTestCase extends TestCase
+/**
+ * @internal
+ */
+class MemoryLimiterEnvironment
 {
-    abstract protected function getIgnore(): NodeIgnorer;
-
-    final protected function parseAndTraverse(string $code, NodeVisitor $spy): void
+    public function hasMemoryLimitSet(): bool
     {
-        $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
-
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor([$this->getIgnore()]));
-        $traverser->addVisitor($spy);
-        $traverser->traverse($nodes);
-
-        $this->addToAssertionCount(1);
+        // -1 means no memory limit. Anything else means the user has set their own limits, which we
+        // don't want to mess with
+        return ini_get('memory_limit') !== '-1';
     }
 
-    protected function createSpy(): IgnoreSpyVisitor
+    public function isUsingSystemIni(): bool
     {
-        return new IgnoreSpyVisitor(static function (): void {
-            self::fail('A variable that should have been ignored was still parsed by the next visitor.');
-        });
+        // Under phpdbg we're using a system php.ini and we can't add a memory limit there. If there
+        // is no skipped version of xdebug handler we are also using the system php ini
+        return PHP_SAPI === 'phpdbg' || XdebugHandler::getSkippedVersion() === '';
     }
 }

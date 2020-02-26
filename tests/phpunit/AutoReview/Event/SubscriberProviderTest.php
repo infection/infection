@@ -33,35 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
+namespace Infection\Tests\AutoReview\Event;
 
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\Tests\SingletonContainer;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
+use function in_array;
+use Infection\Event\Subscriber\EventSubscriber;
 use PHPUnit\Framework\TestCase;
+use function Safe\class_implements;
+use function Safe\sprintf;
 
-abstract class BaseNodeIgnorerTestCase extends TestCase
+/**
+ * @covers \Infection\Tests\AutoReview\Event\SubscriberProvider
+ */
+final class SubscriberProviderTest extends TestCase
 {
-    abstract protected function getIgnore(): NodeIgnorer;
-
-    final protected function parseAndTraverse(string $code, NodeVisitor $spy): void
+    /**
+     * @dataProvider \Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberClassesProvider()
+     */
+    public function test_subscriber_class_provider_is_valid(string $className): void
     {
-        $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
-
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor([$this->getIgnore()]));
-        $traverser->addVisitor($spy);
-        $traverser->traverse($nodes);
-
-        $this->addToAssertionCount(1);
+        $this->assertTrue(
+            class_exists($className, true)
+            && in_array(EventSubscriber::class, class_implements($className), true),
+            sprintf(
+                'The "%s" class was expected to be an event subscriber, but it is not a ' .
+                '"%s".',
+                $className,
+                EventSubscriber::class
+            )
+        );
     }
 
-    protected function createSpy(): IgnoreSpyVisitor
-    {
-        return new IgnoreSpyVisitor(static function (): void {
-            self::fail('A variable that should have been ignored was still parsed by the next visitor.');
-        });
+    /**
+     * @dataProvider \Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberSubscriptionMethodsProvider()
+     *
+     * @param class-string $className
+     * @param string[] $subscriptionMethods
+     */
+    public function test_subscriber_subscription_methods_provider_is_valid(
+        string $className,
+        array $subscriptionMethods
+    ): void {
+        foreach ($subscriptionMethods as $subscriptionMethod) {
+            $this->assertIsString($subscriptionMethod);
+        }
     }
 }

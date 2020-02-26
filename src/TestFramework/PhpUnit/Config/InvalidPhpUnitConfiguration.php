@@ -33,35 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
+namespace Infection\TestFramework\PhpUnit\Config;
 
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\Tests\SingletonContainer;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PHPUnit\Framework\TestCase;
+use const PHP_EOL;
+use RuntimeException;
+use function Safe\sprintf;
 
-abstract class BaseNodeIgnorerTestCase extends TestCase
+/**
+ * @internal
+ */
+final class InvalidPhpUnitConfiguration extends RuntimeException
 {
-    abstract protected function getIgnore(): NodeIgnorer;
-
-    final protected function parseAndTraverse(string $code, NodeVisitor $spy): void
+    public static function byRootNode(string $configPath): self
     {
-        $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
-
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor([$this->getIgnore()]));
-        $traverser->addVisitor($spy);
-        $traverser->traverse($nodes);
-
-        $this->addToAssertionCount(1);
+        return new self(sprintf(
+            'The file "%s" is not a valid PHPUnit configuration file',
+            $configPath
+        ));
     }
 
-    protected function createSpy(): IgnoreSpyVisitor
+    public static function byXsdSchema(string $configPath, string $libXmlErrorsString): self
     {
-        return new IgnoreSpyVisitor(static function (): void {
-            self::fail('A variable that should have been ignored was still parsed by the next visitor.');
-        });
+        return new self(sprintf(
+            'The file "%s" does not pass the XSD schema validation.%s%s',
+            $configPath,
+            PHP_EOL,
+            $libXmlErrorsString
+        ));
     }
 }

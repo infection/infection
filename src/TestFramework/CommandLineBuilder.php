@@ -98,23 +98,27 @@ final class CommandLineBuilder
      */
     private function findPhp(): array
     {
-        if ($this->cachedPhpCmdLine === null) {
-            $phpExec = (new PhpExecutableFinder())->find(false);
+        $cachedPhpCmdLine = $this->cachedPhpCmdLine;
 
-            if ($phpExec === false) {
-                throw FinderException::phpExecutableNotFound();
-            }
-
-            $phpCmd[] = $phpExec;
-
-            if (PHP_SAPI === 'phpdbg') {
-                $phpCmd[] = '-qrr';
-            }
-
-            $this->cachedPhpCmdLine = $phpCmd;
+        if ($cachedPhpCmdLine !== null) {
+            return $cachedPhpCmdLine;
         }
 
-        return $this->cachedPhpCmdLine;
+        $phpExec = (new PhpExecutableFinder())->find(false);
+
+        if ($phpExec === false) {
+            throw FinderException::phpExecutableNotFound();
+        }
+
+        $cachedPhpCmdLine[] = $phpExec;
+
+        if (PHP_SAPI === 'phpdbg') {
+            $cachedPhpCmdLine[] = '-qrr';
+        }
+
+        $this->cachedPhpCmdLine = $cachedPhpCmdLine;
+
+        return $cachedPhpCmdLine;
     }
 
     private function isBatchFile(string $path): bool

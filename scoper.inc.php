@@ -33,35 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
-
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\Tests\SingletonContainer;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PHPUnit\Framework\TestCase;
-
-abstract class BaseNodeIgnorerTestCase extends TestCase
-{
-    abstract protected function getIgnore(): NodeIgnorer;
-
-    final protected function parseAndTraverse(string $code, NodeVisitor $spy): void
-    {
-        $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
-
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor([$this->getIgnore()]));
-        $traverser->addVisitor($spy);
-        $traverser->traverse($nodes);
-
-        $this->addToAssertionCount(1);
-    }
-
-    protected function createSpy(): IgnoreSpyVisitor
-    {
-        return new IgnoreSpyVisitor(static function (): void {
-            self::fail('A variable that should have been ignored was still parsed by the next visitor.');
-        });
-    }
-}
+return [
+    'whitelist' => [
+        \Composer\Autoload\ClassLoader::class,
+        'Safe\*',
+    ],
+    'whitelist-global-constants' => false,
+    'whitelist-global-classes' => false,
+    'whitelist-global-functions' => false,
+];
