@@ -35,13 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
+use function array_keys;
+use Infection\Mutator\ProfileList;
 use Infection\Process\MutantProcess;
 use Webmozart\Assert\Assert;
-use function in_array;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Mutant\Mutant;
-use Infection\Mutation\Mutation;
-use Symfony\Component\Process\Process;
 
 /**
  * @internal
@@ -57,19 +54,6 @@ class MutantExecutionResult
     private $originalFilePath;
     private $originalStartingLine;
 
-    public static function createFromProcess(MutantProcess $process): self
-    {
-        return new self(
-            $process->getProcess()->getCommandLine(),
-            $process->getProcess()->getOutput(),
-            $process->getResultCode(),
-            $process->getMutant()->getDiff(),
-            $process->getMutant()->getMutation()->getMutatorName(),
-            $process->getOriginalFilePath(),
-            $process->getOriginalStartingLine(),
-        );
-    }
-
     public function __construct(
         string $processCommandLine,
         string $processOutput,
@@ -80,6 +64,7 @@ class MutantExecutionResult
         int $originalStartingLine
     ) {
         Assert::oneOf($processResultCode, MutantProcess::RESULT_CODES);
+        Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
 
         $this->processCommandLine = $processCommandLine;
         $this->processOutput = $processOutput;
@@ -88,6 +73,19 @@ class MutantExecutionResult
         $this->mutatorName = $mutatorName;
         $this->originalFilePath = $originalFilePath;
         $this->originalStartingLine = $originalStartingLine;
+    }
+
+    public static function createFromProcess(MutantProcess $process): self
+    {
+        return new self(
+            $process->getProcess()->getCommandLine(),
+            $process->getProcess()->getOutput(),
+            $process->getResultCode(),
+            $process->getMutant()->getDiff(),
+            $process->getMutant()->getMutation()->getMutatorName(),
+            $process->getOriginalFilePath(),
+            $process->getOriginalStartingLine()
+        );
     }
 
     public function getProcessCommandLine(): string

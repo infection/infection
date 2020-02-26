@@ -33,20 +33,51 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event;
+namespace Infection\Tests\Mutant;
 
-use Infection\Event\MutantProcessWasFinished;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutator\ZeroIteration\For_;
+use Infection\Process\MutantProcess;
+use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\TestCase;
 
-final class MutantProcessWasFinishedTest extends TestCase
+class MutantExecutionResultTest extends TestCase
 {
-    public function test_it_exposes_its_mutant_process(): void
+    public function test_it_can_be_instantiated(): void
     {
-        $executionResultMock = $this->createMock(MutantExecutionResult::class);
+        $processCommandLine = 'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"';
+        $processOutput = 'Passed!';
+        $processResultCode = MutantProcess::CODE_ESCAPED;
+        $mutantDiff = <<<'DIFF'
+--- Original
++++ New
+@@ @@
 
-        $event = new MutantProcessWasFinished($executionResultMock);
+- echo 'original';
++ echo 'notCovered#0';
 
-        $this->assertSame($executionResultMock, $event->getExecutionResult());
+DIFF;
+
+        $mutatorName = MutatorName::getName(For_::class);
+        $originalFilePath = 'path/to/Foo.php';
+        $originalStartingLine = 10;
+
+        $result = new MutantExecutionResult(
+            $processCommandLine,
+            $processOutput,
+            $processResultCode,
+            $mutantDiff,
+            $mutatorName,
+            $originalFilePath,
+            $originalStartingLine
+        );
+
+        $this->assertSame($processCommandLine, $result->getProcessCommandLine());
+        $this->assertSame($processOutput, $result->getProcessOutput());
+        $this->assertSame($processResultCode, $result->getProcessResultCode());
+        $this->assertSame($mutantDiff, $result->getMutantDiff());
+        $this->assertSame($mutatorName, $result->getMutatorName());
+        $this->assertSame($originalFilePath, $result->getOriginalFilePath());
+        $this->assertSame($originalStartingLine, $result->getOriginalStartingLine());
     }
 }

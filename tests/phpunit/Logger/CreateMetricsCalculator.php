@@ -36,16 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use Infection\Mutant\MetricsCalculator;
-use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Regex\PregQuote;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\Tests\Mutator\MutatorName;
-use const PHP_EOL;
 use PHPUnit\Framework\MockObject\MockObject;
-use function str_replace;
-use Symfony\Component\Process\Process;
-use Webmozart\Assert\Assert;
 
 trait CreateMetricsCalculator
 {
@@ -54,7 +50,7 @@ trait CreateMetricsCalculator
         $calculator = new MetricsCalculator();
 
         $calculator->collect(
-            $this->createMutantProcess(
+            $this->createMutantExecutionResult(
                 0,
                 For_::class,
                 MutantProcess::CODE_ESCAPED,
@@ -62,7 +58,7 @@ trait CreateMetricsCalculator
             )
         );
         $calculator->collect(
-            $this->createMutantProcess(
+            $this->createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 MutantProcess::CODE_ESCAPED,
@@ -71,7 +67,7 @@ trait CreateMetricsCalculator
         );
 
         $calculator->collect(
-            $this->createMutantProcess(
+            $this->createMutantExecutionResult(
                 0,
                 For_::class,
                 MutantProcess::CODE_TIMED_OUT,
@@ -79,7 +75,7 @@ trait CreateMetricsCalculator
             )
         );
         $calculator->collect(
-            $this->createMutantProcess(
+            $this->createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 MutantProcess::CODE_TIMED_OUT,
@@ -88,7 +84,7 @@ trait CreateMetricsCalculator
         );
 
         $calculator->collect(
-            $this->createMutantProcess(
+            $this->createMutantExecutionResult(
                 0,
                 For_::class,
                 MutantProcess::CODE_KILLED,
@@ -96,7 +92,7 @@ trait CreateMetricsCalculator
             )
         );
         $calculator->collect(
-            $this->createMutantProcess(
+            $this->createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 MutantProcess::CODE_KILLED,
@@ -105,7 +101,7 @@ trait CreateMetricsCalculator
         );
 
         $calculator->collect(
-            $this->createMutantProcess(
+            $this->createMutantExecutionResult(
                 0,
                 For_::class,
                 MutantProcess::CODE_ERROR,
@@ -113,7 +109,7 @@ trait CreateMetricsCalculator
             )
         );
         $calculator->collect(
-            $this->createMutantProcess(
+            $this->createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 MutantProcess::CODE_ERROR,
@@ -122,7 +118,7 @@ trait CreateMetricsCalculator
         );
 
         $calculator->collect(
-            $this->createMutantProcess(
+            $this->createMutantExecutionResult(
                 0,
                 For_::class,
                 MutantProcess::CODE_NOT_COVERED,
@@ -130,7 +126,7 @@ trait CreateMetricsCalculator
             )
         );
         $calculator->collect(
-            $this->createMutantProcess(
+            $this->createMutantExecutionResult(
                 1,
                 PregQuote::class,
                 MutantProcess::CODE_NOT_COVERED,
@@ -142,30 +138,19 @@ trait CreateMetricsCalculator
     }
 
     /**
-     * @return MutantProcess|MockObject
+     * @return MutantExecutionResult|MockObject
      */
-    private function createMutantProcess(
+    private function createMutantExecutionResult(
         int $i,
         string $mutatorClassName,
         int $resultCode,
         string $echoMutatedMessage
     ) {
-        Assert::oneOf($resultCode, MutantProcess::RESULT_CODES);
-
-        $processMock = $this->createMock(Process::class);
-        $processMock
-            ->method('getCommandLine')
-            ->willReturn('bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"')
-        ;
-        $processMock
-            ->method('isStarted')
-            ->willReturn(true)
-        ;
-
-        $mutantMock = $this->createMock(Mutant::class);
-        $mutantMock
-            ->method('getDiff')
-            ->willReturn(self::normalizeString(<<<DIFF
+        return new MutantExecutionResult(
+            'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
+            'process output',
+            $resultCode,
+            <<<DIFF
 --- Original
 +++ New
 @@ @@
@@ -174,40 +159,10 @@ trait CreateMetricsCalculator
 + echo '$echoMutatedMessage';
 
 DIFF
-            ))
-        ;
-
-        $mutantProcessMock = $this->createMock(MutantProcess::class);
-        $mutantProcessMock
-            ->method('getProcess')
-            ->willReturn($processMock)
-        ;
-        $mutantProcessMock
-            ->method('getMutant')
-            ->willReturn($mutantMock)
-        ;
-        $mutantProcessMock
-            ->method('getMutatorName')
-            ->willReturn(MutatorName::getName($mutatorClassName))
-        ;
-        $mutantProcessMock
-            ->method('getResultCode')
-            ->willReturn($resultCode)
-        ;
-        $mutantProcessMock
-            ->method('getOriginalStartingLine')
-            ->willReturn(10 - $i)
-        ;
-        $mutantProcessMock
-            ->method('getOriginalFilePath')
-            ->willReturn('foo/bar')
-        ;
-
-        return $mutantProcessMock;
-    }
-
-    private static function normalizeString(string $value): string
-    {
-        return str_replace("\n", PHP_EOL, $value);
+            ,
+            MutatorName::getName($mutatorClassName),
+            'foo/bar',
+            10 - $i
+        );
     }
 }
