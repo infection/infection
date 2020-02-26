@@ -95,14 +95,12 @@ final class MutationGenerator
      *
      * @return Mutation[]
      */
-    public function generate(bool $onlyCovered, array $nodeIgnorers): array
+    public function generate(bool $onlyCovered, array $nodeIgnorers): iterable
     {
-        $allFilesMutations = [[]];
-
         $this->eventDispatcher->dispatch(new MutationGenerationWasStarted(count($this->sourceFiles)));
 
         foreach ($this->sourceFiles as $fileInfo) {
-            $allFilesMutations[] = $this->fileMutationGenerator->generate(
+            yield from $this->fileMutationGenerator->generate(
                 $fileInfo,
                 $onlyCovered,
                 $this->codeCoverageData,
@@ -114,7 +112,5 @@ final class MutationGenerator
         }
 
         $this->eventDispatcher->dispatch(new MutationGenerationWasFinished());
-
-        return array_merge(...$allFilesMutations);
     }
 }
