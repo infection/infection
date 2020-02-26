@@ -43,9 +43,7 @@ use InvalidArgumentException;
 use Memory_Aware\FakeAwareAdapter;
 use function microtime;
 use const PHP_EOL;
-use const PHP_SAPI;
 use PHPUnit\Framework\MockObject\MockObject;
-use function Safe\ini_get;
 use function Safe\sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
@@ -77,14 +75,6 @@ final class MemoryLimiterTest extends FileSystemTestCase
 
     protected function setUp(): void
     {
-        if (ini_get('memory_limit') !== '-1') {
-            $this->markTestSkipped('Unable to test if a memory limit is already set');
-        }
-
-        if (PHP_SAPI === 'phpdbg') {
-            $this->markTestSkipped('Unable to run tests if PHPDBG is used');
-        }
-
         $this->fileSystemMock = $this->createMock(Filesystem::class);
         $this->processMock = $this->createMock(Process::class);
         $this->adapterMock = $this->createMock(AbstractTestFrameworkAdapter::class);
