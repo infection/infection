@@ -43,7 +43,6 @@ use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Process\MutantProcess;
 use function Safe\sprintf;
 use function str_pad;
 use function str_repeat;
@@ -126,9 +125,9 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     }
 
     /**
-     * @param MutantProcess[] $processes
+     * @param MutantExecutionResult[] $executionResults
      */
-    private function showMutations(array $processes, string $headlinePrefix): void
+    private function showMutations(array $executionResults, string $headlinePrefix): void
     {
         $headline = sprintf('%s mutants:', $headlinePrefix);
 
@@ -139,21 +138,19 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
             '',
         ]);
 
-        foreach ($processes as $index => $mutantProcess) {
-            $mutation = $mutantProcess->getMutant()->getMutation();
-
+        foreach ($executionResults as $index => $executionResult) {
             $this->output->writeln([
                 '',
                 sprintf(
                     '%d) %s:%d    [M] %s',
                     $index + 1,
-                    $mutation->getOriginalFilePath(),
-                    (int) $mutation->getAttributes()['startLine'],
-                    $mutation->getMutatorName()
+                    $executionResult->getOriginalFilePath(),
+                    $executionResult->getOriginalStartingLine(),
+                    $executionResult->getMutatorName()
                 ),
             ]);
 
-            $this->output->writeln($this->diffColorizer->colorize($mutantProcess->getMutant()->getDiff()));
+            $this->output->writeln($this->diffColorizer->colorize($executionResult->getMutantDiff()));
         }
     }
 

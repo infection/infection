@@ -41,7 +41,7 @@ use Infection\Process\MutantProcess;
 use Infection\Tests\Mutator\MutatorName;
 use PHPUnit\Framework\TestCase;
 
-class MutantExecutionResultTest extends TestCase
+final class MutantExecutionResultTest extends TestCase
 {
     public function test_it_can_be_instantiated(): void
     {

@@ -41,7 +41,6 @@ use Infection\Mutator\Regex\PregQuote;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\Tests\Mutator\MutatorName;
-use PHPUnit\Framework\MockObject\MockObject;
 
 trait CreateMetricsCalculator
 {
@@ -137,15 +136,12 @@ trait CreateMetricsCalculator
         return $calculator;
     }
 
-    /**
-     * @return MutantExecutionResult|MockObject
-     */
     private function createMutantExecutionResult(
         int $i,
         string $mutatorClassName,
         int $resultCode,
         string $echoMutatedMessage
-    ) {
+    ): MutantExecutionResult {
         return new MutantExecutionResult(
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             'process output',
