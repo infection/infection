@@ -161,10 +161,6 @@ final class XMLLineCodeCoverage implements LineCodeCoverage
      */
     private function getCoverage(): array
     {
-        if ($this->coverage === null) {
-            $this->coverage = $this->coverageFactory->createCoverage();
-        }
-
-        return $this->coverage;
+        return $this->coverage ?? $this->coverage = $this->coverageFactory->createCoverage();
     }
 }

@@ -161,11 +161,7 @@ class Mutation
 
     public function getHash(): string
     {
-        if ($this->hash === null) {
-            $this->hash = $this->createHash();
-        }
-
-        return $this->hash;
+        return $this->hash ?? $this->hash = $this->createHash();
     }
 
     private function createHash(): string

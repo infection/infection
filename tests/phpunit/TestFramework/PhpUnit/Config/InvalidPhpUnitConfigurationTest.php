@@ -33,35 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
+namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\Tests\SingletonContainer;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
+use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
+use function Infection\Tests\normalizeLineReturn;
 use PHPUnit\Framework\TestCase;
 
-abstract class BaseNodeIgnorerTestCase extends TestCase
+final class InvalidPhpUnitConfigurationTest extends TestCase
 {
-    abstract protected function getIgnore(): NodeIgnorer;
-
-    final protected function parseAndTraverse(string $code, NodeVisitor $spy): void
+    public function test_for_root_node(): void
     {
-        $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
+        $exception = InvalidPhpUnitConfiguration::byRootNode('/path/to/phpunit.xml');
 
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor([$this->getIgnore()]));
-        $traverser->addVisitor($spy);
-        $traverser->traverse($nodes);
-
-        $this->addToAssertionCount(1);
+        $this->assertSame(
+            'The file "/path/to/phpunit.xml" is not a valid PHPUnit configuration file',
+            $exception->getMessage()
+        );
     }
 
-    protected function createSpy(): IgnoreSpyVisitor
+    public function test_for_xsd_schema(): void
     {
-        return new IgnoreSpyVisitor(static function (): void {
-            self::fail('A variable that should have been ignored was still parsed by the next visitor.');
-        });
+        $exception = InvalidPhpUnitConfiguration::byXsdSchema(
+            '/path/to/phpunit.xml',
+            '<lib-xml-errors>'
+        );
+
+        $this->assertSame(
+            <<<'TXT'
+The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
+<lib-xml-errors>
+TXT
+            ,
+            normalizeLineReturn($exception->getMessage())
+        );
     }
 }

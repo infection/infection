@@ -33,45 +33,74 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor;
+namespace Infection\Tests\AutoReview;
 
+use function array_map;
+use function in_array;
 use Infection\Tests\SingletonContainer;
-use PhpParser\Node;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use function Safe\file_get_contents;
 use function Safe\sprintf;
+use function strpos;
+use Webmozart\PathUtil\Path;
 
-abstract class BaseVisitorTest extends TestCase
+final class ContainerTest extends TestCase
 {
     /**
-     * @return Node[]
+     * @var string[]|null
      */
-    final protected function parseCode(string $code): array
+    private static $containerFiles;
+
+    /**
+     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::classesTestProvider
+     *
+     * @param class-string $className
+     */
+    public function test_source_class_provider_is_valid(string $className): void
     {
-        return (array) SingletonContainer::getContainer()->getParser()->parse($code);
+        $classFile = (new ReflectionClass($className))->getFileName();
+
+        $this->assertNotFalse(
+            $classFile,
+            sprintf('Expected the class "%s" to have a file', $className)
+        );
+
+        if (in_array($classFile, $this->getContainerFiles(), true)) {
+            return;
+        }
+
+        $this->assertFalse(
+            strpos(file_get_contents($classFile), 'use Infection\Container;'),
+            sprintf(
+                'Did not expect to find a usage of the Infection container in "%s". Please use'
+                . ' "%s::getContainer() instead',
+                $classFile,
+                SingletonContainer::class
+            )
+        );
     }
 
     /**
-     * @param Node[] $nodes
-     * @param NodeVisitor[] $visitors
-     *
-     * @return Node[]
+     * @return string[]
      */
-    final protected function traverse(array $nodes, array $visitors): array
+    public function getContainerFiles(): array
     {
-        $traverser = new NodeTraverser();
-
-        foreach ($visitors as $visitor) {
-            $traverser->addVisitor($visitor);
+        if (self::$containerFiles !== null) {
+            return self::$containerFiles;
         }
 
-        return $traverser->traverse($nodes);
-    }
+        self::$containerFiles = array_map(
+            static function (string $path): string {
+                return Path::canonicalize($path);
+            },
+            [
+                __DIR__ . '/ContainerTest.php',
+                __DIR__ . '/../ContainerTest.php',
+                __DIR__ . '/../SingletonContainer.php',
+            ]
+        );
 
-    final protected function getFileContent(string $file): string
-    {
-        return file_get_contents(sprintf(__DIR__ . '/../../Fixtures/Autoloaded/%s', $file));
+        return self::$containerFiles;
     }
 }

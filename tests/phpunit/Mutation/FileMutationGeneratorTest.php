@@ -37,7 +37,6 @@ namespace Infection\Tests\Mutation;
 
 use function current;
 use Generator;
-use Infection\Container;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
@@ -51,6 +50,7 @@ use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
 use Infection\Tests\Mutator\MutatorName;
+use Infection\Tests\SingletonContainer;
 use PhpParser\NodeTraverserInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -92,7 +92,7 @@ final class FileMutationGeneratorTest extends TestCase
     {
         $codeCoverageMock = $this->createMock(LineCodeCoverage::class);
 
-        $mutationGenerator = Container::create()->getFileMutationGenerator();
+        $mutationGenerator = SingletonContainer::getContainer()->getFileMutationGenerator();
 
         $mutations = $mutationGenerator->generate(
             new SplFileInfo(self::FIXTURES_DIR . '/Mutation/OneFile/OneFile.php', '', ''),
