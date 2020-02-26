@@ -33,17 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Config\Exception;
+namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
-use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
+use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use function Infection\Tests\normalizeLineReturn;
 use PHPUnit\Framework\TestCase;
 
-final class InvalidPhpUnitXmlConfigExceptionTest extends TestCase
+final class InvalidPhpUnitConfigurationTest extends TestCase
 {
     public function test_for_root_node(): void
     {
-        $exception = InvalidPhpUnitXmlConfigException::byRootNode('/path/to/phpunit.xml');
+        $exception = InvalidPhpUnitConfiguration::byRootNode('/path/to/phpunit.xml');
 
         $this->assertSame(
             'The file "/path/to/phpunit.xml" is not a valid PHPUnit configuration file',
@@ -53,7 +53,7 @@ final class InvalidPhpUnitXmlConfigExceptionTest extends TestCase
 
     public function test_for_xsd_schema(): void
     {
-        $exception = InvalidPhpUnitXmlConfigException::byXsdSchema(
+        $exception = InvalidPhpUnitConfiguration::byXsdSchema(
             '/path/to/phpunit.xml',
             '<lib-xml-errors>'
         );

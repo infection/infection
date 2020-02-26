@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 /**
  * This code is licensed under the BSD 3-Clause License.
@@ -32,52 +31,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Disable strict types for now: https://github.com/infection/infection/pull/720#issuecomment-506546284
+declare(strict_types=1);
 
-use Infection\Console\Application;
-use Infection\Container;
-use function Safe\getcwd;
+namespace Infection\TestFramework\PhpUnit\Config;
 
-if (in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) === false) {
-    echo PHP_EOL . 'Infection may only be invoked from a command line, got "' . PHP_SAPI . '"' . PHP_EOL;
+use const PHP_EOL;
+use RuntimeException;
+use function Safe\sprintf;
 
-    exit(1);
+/**
+ * @internal
+ */
+final class InvalidPhpUnitConfiguration extends RuntimeException
+{
+    public static function byRootNode(string $configPath): self
+    {
+        return new self(sprintf(
+            'The file "%s" is not a valid PHPUnit configuration file',
+            $configPath
+        ));
+    }
+
+    public static function byXsdSchema(string $configPath, string $libXmlErrorsString): self
+    {
+        return new self(sprintf(
+            'The file "%s" does not pass the XSD schema validation.%s%s',
+            $configPath,
+            PHP_EOL,
+            $libXmlErrorsString
+        ));
+    }
 }
-
-// Infection autoloading
-(static function (): void {
-    if (file_exists($autoload = __DIR__ . '/../../../autoload.php')) {
-        // Is installed via Composer
-        include_once $autoload;
-
-        return;
-    }
-
-    if (file_exists($autoload = __DIR__ . '/../vendor/autoload.php')) {
-        // Is installed locally
-        include_once $autoload;
-
-        return;
-    }
-
-    fwrite(
-        STDERR,
-        <<<'ERROR'
-You need to set up the project dependencies using Composer:
-    $ composer install
-You can learn all about Composer on https://getcomposer.org/.
-
-ERROR
-    );
-
-    throw new RuntimeException('Unable to find the Composer autoloader.');
-})();
-
-// Project (third-party) autoloading
-(static function (): void {
-    if (file_exists($autoload = getcwd() . '/vendor/autoload.php')) {
-        include_once $autoload;
-    }
-})();
-
-(new Application(Container::create()))->run();

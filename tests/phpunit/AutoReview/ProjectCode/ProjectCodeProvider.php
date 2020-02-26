@@ -62,6 +62,7 @@ use Infection\Logger\ResultsLoggerTypes;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Builder\InitialTestRunProcessBuilder;
+use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\TestFramework\Coverage\CoverageFileData;
 use Infection\TestFramework\Coverage\MethodLocationData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
@@ -122,6 +123,7 @@ final class ProjectCodeProvider
         PhpSpecMutationConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
         IndexXmlCoverageParser::class,
+        MemoryLimiterEnvironment::class,
     ];
 
     /**

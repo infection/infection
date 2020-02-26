@@ -33,32 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit\Config\Exception;
+namespace Infection\Tests\Resource\Memory;
 
-use const PHP_EOL;
-use RuntimeException;
-use function Safe\sprintf;
+use Composer\XdebugHandler\XdebugHandler;
+use Infection\Resource\Memory\MemoryLimiterEnvironment;
+use const PHP_SAPI;
+use PHPUnit\Framework\TestCase;
+use function Safe\ini_get;
 
 /**
- * @internal
+ * @group integration Requires some I/O operations
+ * @covers \Infection\Resource\Memory\MemoryLimiterEnvironment
  */
-final class InvalidPhpUnitXmlConfigException extends RuntimeException
+final class MemoryLimiterEnvironmentTest extends TestCase
 {
-    public static function byRootNode(string $configPath): self
+    public function test_it_recognizes_memory_limit(): void
     {
-        return new self(sprintf(
-            'The file "%s" is not a valid PHPUnit configuration file',
-            $configPath
-        ));
+        $environment = new MemoryLimiterEnvironment();
+        $this->assertSame(ini_get('memory_limit') !== '-1', $environment->hasMemoryLimitSet());
     }
 
-    public static function byXsdSchema(string $configPath, string $libXmlErrorsString): self
+    public function test_it_detects_phpdbg(): void
     {
-        return new self(sprintf(
-            'The file "%s" does not pass the XSD schema validation.%s%s',
-            $configPath,
-            PHP_EOL,
-            $libXmlErrorsString
-        ));
+        if (PHP_SAPI !== 'phpdbg') {
+            $this->markTestSkipped('This test requires PHPDBG');
+        }
+
+        $environment = new MemoryLimiterEnvironment();
+        $this->assertTrue($environment->isUsingSystemIni());
+    }
+
+    public function test_it_detects_xdebug_handler(): void
+    {
+        if (PHP_SAPI === 'phpdbg') {
+            $this->markTestSkipped('This test requires running without PHPDBG');
+        }
+
+        $environment = new MemoryLimiterEnvironment();
+        $this->assertSame(XdebugHandler::getSkippedVersion() === '', $environment->isUsingSystemIni());
     }
 }

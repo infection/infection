@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 /**
  * This code is licensed under the BSD 3-Clause License.
@@ -32,52 +31,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Disable strict types for now: https://github.com/infection/infection/pull/720#issuecomment-506546284
+declare(strict_types=1);
 
-use Infection\Console\Application;
-use Infection\Container;
-use function Safe\getcwd;
+namespace Infection\Resource\Memory;
 
-if (in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) === false) {
-    echo PHP_EOL . 'Infection may only be invoked from a command line, got "' . PHP_SAPI . '"' . PHP_EOL;
+use Composer\XdebugHandler\XdebugHandler;
+use const PHP_SAPI;
+use function Safe\ini_get;
 
-    exit(1);
+/**
+ * @internal
+ */
+class MemoryLimiterEnvironment
+{
+    public function hasMemoryLimitSet(): bool
+    {
+        // -1 means no memory limit. Anything else means the user has set their own limits, which we
+        // don't want to mess with
+        return ini_get('memory_limit') !== '-1';
+    }
+
+    public function isUsingSystemIni(): bool
+    {
+        // Under phpdbg we're using a system php.ini and we can't add a memory limit there. If there
+        // is no skipped version of xdebug handler we are also using the system php ini
+        return PHP_SAPI === 'phpdbg' || XdebugHandler::getSkippedVersion() === '';
+    }
 }
-
-// Infection autoloading
-(static function (): void {
-    if (file_exists($autoload = __DIR__ . '/../../../autoload.php')) {
-        // Is installed via Composer
-        include_once $autoload;
-
-        return;
-    }
-
-    if (file_exists($autoload = __DIR__ . '/../vendor/autoload.php')) {
-        // Is installed locally
-        include_once $autoload;
-
-        return;
-    }
-
-    fwrite(
-        STDERR,
-        <<<'ERROR'
-You need to set up the project dependencies using Composer:
-    $ composer install
-You can learn all about Composer on https://getcomposer.org/.
-
-ERROR
-    );
-
-    throw new RuntimeException('Unable to find the Composer autoloader.');
-})();
-
-// Project (third-party) autoloading
-(static function (): void {
-    if (file_exists($autoload = getcwd() . '/vendor/autoload.php')) {
-        include_once $autoload;
-    }
-})();
-
-(new Application(Container::create()))->run();
