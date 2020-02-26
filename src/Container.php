@@ -50,6 +50,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Event\MutantProcessWasFinished;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\Locator\RootsFileLocator;
@@ -72,6 +73,7 @@ use Infection\Process\Builder\InitialTestRunProcessBuilder;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\Builder\SubscriberBuilder;
 use Infection\Process\Coverage\CoverageRequirementChecker;
+use Infection\Process\MutantProcess;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
@@ -197,7 +199,9 @@ final class Container
                 return new SyncEventDispatcher();
             },
             ParallelProcessRunner::class => static function (self $container): ParallelProcessRunner {
-                return new ParallelProcessRunner($container->getEventDispatcher());
+                return new ParallelProcessRunner(static function (MutantProcess $mutantProcess) use ($container): void {
+                    $container->getEventDispatcher()->dispatch(new MutantProcessWasFinished($mutantProcess));
+                });
             },
             TestFrameworkConfigLocator::class => static function (self $container): TestFrameworkConfigLocator {
                 return new TestFrameworkConfigLocator(

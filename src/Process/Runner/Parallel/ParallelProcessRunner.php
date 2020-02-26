@@ -35,10 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner\Parallel;
 
-use function count;
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\MutantProcessWasFinished;
-use Infection\Process\MutantProcess;
+use Closure;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
@@ -51,25 +48,25 @@ use Symfony\Component\Process\Exception\RuntimeException;
  */
 class ParallelProcessRunner
 {
-    private $eventDispatcher;
+    private $processHandler;
 
     /**
-     * @var MutantProcess[]
+     * @var ProcessBearer[]
      */
     private $processesQueue;
 
     /**
-     * @var MutantProcess[]
+     * @var ProcessBearer[]
      */
     private $currentProcesses = [];
 
-    public function __construct(EventDispatcher $eventDispatcher)
+    public function __construct(Closure $processHandler)
     {
-        $this->eventDispatcher = $eventDispatcher;
+        $this->processHandler = $processHandler;
     }
 
     /**
-     * @param MutantProcess[] $processes
+     * @param ProcessBearer[] $processes
      *
      * @throws RuntimeException
      * @throws LogicException
@@ -99,18 +96,18 @@ class ParallelProcessRunner
     private function cleanFinished(): bool
     {
         // remove any finished process from the stack
-        foreach ($this->currentProcesses as $index => $mutantProcess) {
-            /** @var MutantProcess $mutantProcess */
-            $process = $mutantProcess->getProcess();
+        foreach ($this->currentProcesses as $index => $processBearer) {
+            /** @var ProcessBearer $processBearer */
+            $process = $processBearer->getProcess();
 
             try {
                 $process->checkTimeout();
             } catch (ProcessTimedOutException $e) {
-                $mutantProcess->markTimeout();
+                $processBearer->markTimeout();
             }
 
             if (!$process->isRunning()) {
-                $this->eventDispatcher->dispatch(new MutantProcessWasFinished($mutantProcess));
+                ($this->processHandler)($processBearer);
 
                 unset($this->currentProcesses[$index]);
 
@@ -121,19 +118,11 @@ class ParallelProcessRunner
         return false;
     }
 
-    private function startProcess(MutantProcess $mutantProcess): bool
+    private function startProcess(ProcessBearer $processBearer): bool
     {
-        $mutant = $mutantProcess->getMutant();
+        $processBearer->getProcess()->start();
 
-        if (!$mutant->isCoveredByTest()) {
-            $this->eventDispatcher->dispatch(new MutantProcessWasFinished($mutantProcess));
-
-            return false;
-        }
-
-        $mutantProcess->getProcess()->start();
-
-        $this->currentProcesses[] = $mutantProcess;
+        $this->currentProcesses[] = $processBearer;
 
         return true;
     }
