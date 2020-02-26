@@ -33,38 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Config\Exception;
+namespace Infection\TestFramework\PhpUnit\Config;
 
-use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
-use function Infection\Tests\normalizeLineReturn;
-use PHPUnit\Framework\TestCase;
+use const PHP_EOL;
+use RuntimeException;
+use function Safe\sprintf;
 
-final class InvalidPhpUnitXmlConfigExceptionTest extends TestCase
+/**
+ * @internal
+ */
+final class InvalidPhpUnitConfiguration extends RuntimeException
 {
-    public function test_for_root_node(): void
+    public static function byRootNode(string $configPath): self
     {
-        $exception = InvalidPhpUnitXmlConfigException::byRootNode('/path/to/phpunit.xml');
-
-        $this->assertSame(
-            'The file "/path/to/phpunit.xml" is not a valid PHPUnit configuration file',
-            $exception->getMessage()
-        );
+        return new self(sprintf(
+            'The file "%s" is not a valid PHPUnit configuration file',
+            $configPath
+        ));
     }
 
-    public function test_for_xsd_schema(): void
+    public static function byXsdSchema(string $configPath, string $libXmlErrorsString): self
     {
-        $exception = InvalidPhpUnitXmlConfigException::byXsdSchema(
-            '/path/to/phpunit.xml',
-            '<lib-xml-errors>'
-        );
-
-        $this->assertSame(
-            <<<'TXT'
-The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
-<lib-xml-errors>
-TXT
-            ,
-            normalizeLineReturn($exception->getMessage())
-        );
+        return new self(sprintf(
+            'The file "%s" does not pass the XSD schema validation.%s%s',
+            $configPath,
+            PHP_EOL,
+            $libXmlErrorsString
+        ));
     }
 }

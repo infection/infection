@@ -40,9 +40,9 @@ use DOMNodeList;
 use DOMXPath;
 use Generator;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
-use Infection\TestFramework\PhpUnit\Config\Exception\InvalidPhpUnitXmlConfigException;
+use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
-use Infection\TestFramework\PhpUnit\Config\XmlConfigurationHelper;
+use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath as p;
 use InvalidArgumentException;
@@ -140,7 +140,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
             $builder->build('x');
 
             $this->fail('Expected an exception to be thrown.');
-        } catch (InvalidPhpUnitXmlConfigException $exception) {
+        } catch (InvalidPhpUnitConfiguration $exception) {
             $this->assertSame(
                 sprintf(
                     'The file "%s/phpunitConfiguration.initial.infection.xml" is not a valid PHPUnit configuration file',
@@ -424,7 +424,7 @@ XML
         return new InitialConfigBuilder(
             $this->tmp,
             file_get_contents($phpunitXmlPath),
-            new XmlConfigurationHelper($replacer, ''),
+            new XmlConfigurationManipulator($replacer, ''),
             $jUnitFilePath,
             $srcDirs,
             $skipCoverage
