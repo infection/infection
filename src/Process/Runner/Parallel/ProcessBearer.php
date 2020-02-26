@@ -43,4 +43,6 @@ use Symfony\Component\Process\Process;
 interface ProcessBearer
 {
     public function getProcess(): Process;
+
+    public function markTimeout(): void;
 }

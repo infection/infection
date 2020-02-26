@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use function array_map;
-use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutantsCreationWasFinished;
 use Infection\Event\MutantsCreationWasStarted;
 use Infection\Event\MutantWasCreated;
@@ -48,6 +47,7 @@ use Infection\Mutation\Mutation;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
+use function Pipeline\take;
 
 /**
  * @internal
@@ -74,26 +74,34 @@ final class MutationTestingRunner
     /**
      * @param Mutation[] $mutations
      */
-    public function run(array $mutations, int $threadCount, string $testFrameworkExtraOptions): void
+    public function run(iterable $mutations, int $threadCount, string $testFrameworkExtraOptions): void
     {
-        $this->eventDispatcher->dispatch(new MutantsCreationWasStarted(count($mutations)));
+        $this->eventDispatcher->dispatch(new MutantsCreationWasStarted(0));
+        $this->eventDispatcher->dispatch(new MutationTestingWasStarted(0));
 
-        $processes = array_map(
-            function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcess {
-                $mutant = $this->mutantFactory->create($mutation);
+        $processes = take($mutations);
+        $processes->map(function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcess {
+            $mutant = $this->mutantFactory->create($mutation);
 
-                $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
+            $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
 
-                $this->eventDispatcher->dispatch(new MutantWasCreated());
+            $this->eventDispatcher->dispatch(new MutantWasCreated());
 
-                return $process;
-            },
-            $mutations
-        );
+            return $process;
+        });
 
         $this->eventDispatcher->dispatch(new MutantsCreationWasFinished());
 
-        $this->eventDispatcher->dispatch(new MutationTestingWasStarted(count($processes)));
+        // We filter these here because it is beyond responsibilities of a process manager to care about types of processes
+        $processes->filter(function (MutantProcess $mutantProcess) {
+            if ($mutantProcess->getMutant()->isCoveredByTest()) {
+                return true;
+            }
+
+            $this->eventDispatcher->dispatch(new MutantProcessWasFinished($mutantProcess));
+
+            return false;
+        });
 
         $this->parallelProcessManager->run($processes, $threadCount);
 

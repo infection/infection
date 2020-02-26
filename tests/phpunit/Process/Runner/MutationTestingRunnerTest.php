@@ -107,7 +107,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->parallelProcessRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with([], $threadCount)
+            ->with($this->emptyIterable(), $threadCount)
         ;
 
         $this->runner->run($mutations, $threadCount, $testFrameworkExtraOptions);
@@ -115,8 +115,8 @@ final class MutationTestingRunnerTest extends TestCase
         $this->assertAreSameEvents(
             [
                 new MutantsCreationWasStarted(0),
-                new MutantsCreationWasFinished(),
                 new MutationTestingWasStarted(0),
+                new MutantsCreationWasFinished(),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()
@@ -151,26 +151,26 @@ final class MutationTestingRunnerTest extends TestCase
                 [$mutant1, $testFrameworkExtraOptions]
             )
             ->willReturnOnConsecutiveCalls(
-                $process0 = $this->createMock(MutantProcess::class),
-                $process1 = $this->createMock(MutantProcess::class)
+                $process0 = $this->buildCoveredMutantProcess(),
+                $process1 = $this->buildCoveredMutantProcess()
             )
         ;
 
         $this->parallelProcessRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with([$process0, $process1], $threadCount)
+            ->with($this->iterableContaining([$process0, $process1]), $threadCount)
         ;
 
         $this->runner->run($mutations, $threadCount, $testFrameworkExtraOptions);
 
         $this->assertAreSameEvents(
             [
-                new MutantsCreationWasStarted(2),
-                new MutantWasCreated(),
-                new MutantWasCreated(),
+                new MutantsCreationWasStarted(0),
+                new MutationTestingWasStarted(0),
                 new MutantsCreationWasFinished(),
-                new MutationTestingWasStarted(2),
+                new MutantWasCreated(),
+                new MutantWasCreated(),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()
@@ -196,7 +196,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->parallelProcessRunnerMock
             ->expects($this->once())
             ->method('run')
-            ->with([], $threadCount)
+            ->with($this->emptyIterable(), $threadCount)
         ;
 
         $this->runner->run($mutations, $threadCount, $testFrameworkExtraOptions);
@@ -204,8 +204,8 @@ final class MutationTestingRunnerTest extends TestCase
         $this->assertAreSameEvents(
             [
                 new MutantsCreationWasStarted(0),
-                new MutantsCreationWasFinished(),
                 new MutationTestingWasStarted(0),
+                new MutantsCreationWasFinished(),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()
@@ -298,5 +298,56 @@ final class MutationTestingRunnerTest extends TestCase
             "\n - ",
             array_map('get_class', $events)
         );
+    }
+
+    private function buildCoveredMutantProcess(): MutantProcess
+    {
+        $mutant = $this->createMock(Mutant::class);
+        $mutant->expects($this->once())
+            ->method('isCoveredByTest')
+            ->willReturn(true);
+
+        /** @var MockObject|MutantProcess $mutantProcess */
+        $mutantProcess = $this->createMock(MutantProcess::class);
+        $mutantProcess->expects($this->once())
+            ->method('getMutant')
+            ->willReturn($mutant);
+
+        return $mutantProcess;
+    }
+
+    private function someIterable(?callable $callback = null)
+    {
+        return $this->callback(static function (iterable $subject) use ($callback) {
+            if ($callback !== null) {
+                return call_user_func($callback, $subject);
+            }
+
+            return true;
+        });
+    }
+
+    private function emptyIterable()
+    {
+        return $this->someIterable(static function (iterable $subject) {
+            foreach ($subject as $value) {
+                return false;
+            }
+
+            return true;
+        });
+    }
+
+    private function iterableContaining(array $expected)
+    {
+        return $this->someIterable(static function (iterable $subject) use ($expected) {
+            $actual = [];
+
+            foreach ($subject as $value) {
+                $actual[] = $value;
+            }
+
+            return $expected === $actual;
+        });
     }
 }
