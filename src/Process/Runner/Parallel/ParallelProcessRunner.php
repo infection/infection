@@ -43,7 +43,6 @@ use Infection\Process\MutantProcess;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -76,59 +75,57 @@ class ParallelProcessRunner
      * @throws RuntimeException
      * @throws LogicException
      */
-    public function run(array $processes, int $threadCount, int $poll = 1000): void
+    public function run(iterable $processes, int $threadCount, int $poll = 1000): void
     {
-        if (!$this->processesQueue = $processes) {
-            // nothing to do here
-            return;
-        }
-
-        // fix maxParallel to be max the number of processes or positive
-        $maxParallel = min(max($threadCount, 1), count($this->processesQueue));
+        $threadCount = max(1, $threadCount);
 
         // start the initial batch of processes
-        do {
-            $this->startProcess();
-        } while ($this->processesQueue && count($this->currentProcesses) < $maxParallel);
+        foreach ($processes as $process) {
+            $this->startProcess($process);
+
+            if (count($this->currentProcesses) >= $threadCount) {
+                do {
+                    usleep($poll);
+                } while (!$this->cleanFinished());
+            }
+        }
 
         do {
             usleep($poll);
-
-            // remove all finished processes from the stack
-            foreach ($this->currentProcesses as $index => $mutantProcess) {
-                /** @var MutantProcess $mutantProcess */
-                $process = $mutantProcess->getProcess();
-
-                try {
-                    $process->checkTimeout();
-                } catch (ProcessTimedOutException $e) {
-                    $mutantProcess->markTimeout();
-                }
-
-                if (!$process->isRunning()) {
-                    $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                        MutantExecutionResult::createFromProcess($mutantProcess)
-                    ));
-
-                    unset($this->currentProcesses[$index]);
-
-                    // directly add and start a new process after the previous finished
-                    while ($this->processesQueue) {
-                        if ($this->startProcess()) {
-                            break;
-                        }
-                    }
-                }
-            }
+            $this->cleanFinished();
             // continue loop while there are processes being executed or waiting for execution
         } while ($this->currentProcesses);
     }
 
-    private function startProcess(): bool
+    private function cleanFinished(): bool
     {
-        $mutantProcess = array_shift($this->processesQueue);
-        Assert::isInstanceOf($mutantProcess, MutantProcess::class);
+        // remove any finished process from the stack
+        foreach ($this->currentProcesses as $index => $mutantProcess) {
+            /** @var MutantProcess $mutantProcess */
+            $process = $mutantProcess->getProcess();
 
+            try {
+                $process->checkTimeout();
+            } catch (ProcessTimedOutException $e) {
+                $mutantProcess->markTimeout();
+            }
+
+            if (!$process->isRunning()) {
+                $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                    MutantExecutionResult::createFromProcess($mutantProcess)
+                ));
+
+                unset($this->currentProcesses[$index]);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function startProcess(MutantProcess $mutantProcess): bool
+    {
         $mutant = $mutantProcess->getMutant();
 
         if (!$mutant->isCoveredByTest()) {
