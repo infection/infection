@@ -71,7 +71,7 @@ PHP;
             [$visitor]
         );
 
-        $this->assertSame([$mutation, $mutation], iterator_to_array($visitor->getMutations(), false));
+        $this->assertSame([$mutation, $mutation], $visitor->getMutations());
     }
 
     public function test_it_resets_its_state_between_two_traverse(): void
@@ -108,14 +108,14 @@ PHP;
             [$visitor]
         );
 
-        $this->assertSame([$mutation0], iterator_to_array($visitor->getMutations(), false));
+        $this->assertSame([$mutation0], $visitor->getMutations());
 
         $this->traverse(
             [$node2, $node3],
             [$visitor]
         );
 
-        $this->assertSame([$mutation2, $mutation3], iterator_to_array($visitor->getMutations(), false));
+        $this->assertSame([$mutation2, $mutation3], $visitor->getMutations());
     }
 
     private static function createExactArgument(object $value): TokenInterface

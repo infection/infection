@@ -43,12 +43,10 @@ use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriber;
-use Infection\Event\Subscriber\CiMutantCreatingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
 use Infection\Event\Subscriber\EventSubscriber;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriber;
-use Infection\Event\Subscriber\MutantCreatingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
@@ -134,7 +132,6 @@ final class SubscriberBuilder
         $subscribers = [
             $this->getInitialTestsConsoleLoggerSubscriber($testFrameworkAdapter, $output),
             $this->getMutantGeneratingConsoleLoggerSubscriber($output),
-            $this->getMutantCreatingConsoleLoggerSubscriber($output),
             new MutationTestingConsoleLoggerSubscriber(
                 $output,
                 $this->getOutputFormatter($output),
@@ -177,15 +174,6 @@ final class SubscriberBuilder
         }
 
         throw new InvalidArgumentException('Incorrect formatter. Possible values: "dot", "progress"');
-    }
-
-    private function getMutantCreatingConsoleLoggerSubscriber(OutputInterface $output): EventSubscriber
-    {
-        if ($this->shouldSkipProgressBars()) {
-            return new CiMutantCreatingConsoleLoggerSubscriber($output);
-        }
-
-        return new MutantCreatingConsoleLoggerSubscriber($output);
     }
 
     private function getMutantGeneratingConsoleLoggerSubscriber(OutputInterface $output): EventSubscriber

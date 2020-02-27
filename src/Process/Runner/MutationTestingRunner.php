@@ -35,19 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
-use Infection\Event\MutantsCreationWasFinished;
-use Infection\Event\MutantsCreationWasStarted;
-use Infection\Event\MutantWasCreated;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
-use function count;
 use function Pipeline\take;
 
 /**
@@ -77,8 +75,7 @@ final class MutationTestingRunner
      */
     public function run(array $mutations, int $threadCount, string $testFrameworkExtraOptions): void
     {
-        $this->eventDispatcher->dispatch(new MutantsCreationWasStarted(count($mutations)));
-        $this->eventDispatcher->dispatch(new MutationTestingWasStarted(0));
+        $this->eventDispatcher->dispatch(new MutationTestingWasStarted(count($mutations)));
 
         $processes = take($mutations);
         $processes->map(function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcess {
@@ -86,12 +83,8 @@ final class MutationTestingRunner
 
             $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
 
-            $this->eventDispatcher->dispatch(new MutantWasCreated());
-
             return $process;
         });
-
-        $this->eventDispatcher->dispatch(new MutantsCreationWasFinished());
 
         // We filter these here because it is beyond responsibilities of a process manager to care about types of processes
         $processes->filter(function (MutantProcess $mutantProcess) {
@@ -99,7 +92,9 @@ final class MutationTestingRunner
                 return true;
             }
 
-            $this->eventDispatcher->dispatch(new MutantProcessWasFinished($mutantProcess));
+            $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                MutantExecutionResult::createFromProcess($mutantProcess)
+            ));
 
             return false;
         });

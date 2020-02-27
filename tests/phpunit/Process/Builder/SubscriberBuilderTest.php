@@ -64,7 +64,7 @@ final class SubscriberBuilderTest extends TestCase
     {
         $calculator = new MetricsCalculator();
         $dispatcher = $this->createMock(EventDispatcher::class);
-        $dispatcher->expects($this->exactly(4))->method('addSubscriber');
+        $dispatcher->expects($this->exactly(5))->method('addSubscriber');
         $diff = $this->createMock(DiffColorizer::class);
         $config = $this->createMock(Configuration::class);
         $config->expects($this->once())->method('getLogs')->willReturn(
@@ -97,7 +97,7 @@ final class SubscriberBuilderTest extends TestCase
     {
         $calculator = new MetricsCalculator();
         $dispatcher = $this->createMock(EventDispatcher::class);
-        $dispatcher->expects($this->exactly(5))->method('addSubscriber');
+        $dispatcher->expects($this->exactly(6))->method('addSubscriber');
         $diff = $this->createMock(DiffColorizer::class);
         $config = $this->createMock(Configuration::class);
         $config->expects($this->once())->method('getLogs')->willReturn(

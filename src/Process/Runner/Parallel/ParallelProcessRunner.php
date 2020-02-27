@@ -53,11 +53,6 @@ class ParallelProcessRunner
     /**
      * @var ProcessBearer[]
      */
-    private $processesQueue;
-
-    /**
-     * @var ProcessBearer[]
-     */
     private $currentProcesses = [];
 
     public function __construct(Closure $processHandler)

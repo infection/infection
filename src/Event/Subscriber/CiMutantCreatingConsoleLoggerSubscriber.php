@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\MutantsCreationWasStarted;
-use function Safe\sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -53,16 +51,6 @@ final class CiMutantCreatingConsoleLoggerSubscriber implements EventSubscriber
 
     public function getSubscribedEvents(): array
     {
-        return [
-            MutantsCreationWasStarted::class => [$this, 'onMutantsCreationWasStarted'],
-        ];
-    }
-
-    public function onMutantsCreationWasStarted(MutantsCreationWasStarted $event): void
-    {
-        $this->output->writeln([
-            '',
-            sprintf('Creating mutated files and processes: %s', $event->getMutantCount()),
-        ]);
+        return [];
     }
 }
