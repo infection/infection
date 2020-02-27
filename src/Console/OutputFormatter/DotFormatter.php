@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Console\OutputFormatter;
 
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\MutantProcess;
 use function Safe\sprintf;
 use function str_repeat;
@@ -70,7 +71,7 @@ final class DotFormatter extends AbstractOutputFormatter
         ]);
     }
 
-    public function advance(MutantProcess $executionResult, int $mutationCount): void
+    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
     {
         parent::advance($executionResult, $mutationCount);
 
