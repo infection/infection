@@ -41,6 +41,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
+ *
+ * @deprecated
  */
 final class CiMutationGeneratingConsoleLoggerSubscriber implements EventSubscriber
 {

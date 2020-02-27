@@ -43,9 +43,13 @@ use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\CiMutantCreatingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
 use Infection\Event\Subscriber\EventSubscriber;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\MutantCreatingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
 use Infection\Logger\LoggerFactory;
@@ -126,38 +130,43 @@ final class SubscriberBuilder
     private function getSubscribers(
         TestFrameworkAdapter $testFrameworkAdapter,
         OutputInterface $output
-    ): array {
-        $subscribers = [
-            $this->getInitialTestsConsoleLoggerSubscriber($testFrameworkAdapter, $output),
-            new MutationTestingConsoleLoggerSubscriber(
-                $output,
-                $this->getOutputFormatter($output),
-                $this->metricsCalculator,
-                $this->diffColorizer,
-                $this->showMutations
-            ),
-            new MutationTestingResultsLoggerSubscriber(
-                $this->loggerFactory->createFromLogEntries(
-                    $this->infectionConfig->getLogs(),
-                    $output
-                )
-            ),
-            new PerformanceLoggerSubscriber(
-                $this->stopwatch,
-                $this->timeFormatter,
-                $this->memoryFormatter,
+    ): iterable {
+        yield $this->getInitialTestsConsoleLoggerSubscriber($testFrameworkAdapter, $output);
+
+        if ($this->noProgress === false) {
+            yield $this->getMutantGeneratingConsoleLoggerSubscriber($output);
+
+            yield $this->getMutantCreatingConsoleLoggerSubscriber($output);
+        }
+
+        yield new MutationTestingConsoleLoggerSubscriber(
+            $output,
+            $this->getOutputFormatter($output),
+            $this->metricsCalculator,
+            $this->diffColorizer,
+            $this->showMutations
+        );
+
+        yield new MutationTestingResultsLoggerSubscriber(
+            $this->loggerFactory->createFromLogEntries(
+                $this->infectionConfig->getLogs(),
                 $output
-            ),
-        ];
+            )
+        );
+
+        yield new PerformanceLoggerSubscriber(
+            $this->stopwatch,
+            $this->timeFormatter,
+            $this->memoryFormatter,
+            $output
+        );
 
         if (!$this->debug) {
-            $subscribers[] = new CleanUpAfterMutationTestingFinishedSubscriber(
+            yield new CleanUpAfterMutationTestingFinishedSubscriber(
                 $this->fs,
                 $this->tmpDir
             );
         }
-
-        return $subscribers;
     }
 
     private function getOutputFormatter(OutputInterface $output): OutputFormatter
@@ -173,6 +182,24 @@ final class SubscriberBuilder
         throw new InvalidArgumentException('Incorrect formatter. Possible values: "dot", "progress"');
     }
 
+    private function getMutantCreatingConsoleLoggerSubscriber(OutputInterface $output): EventSubscriber
+    {
+        if ($this->shouldSkipProgressBars()) {
+            return new CiMutantCreatingConsoleLoggerSubscriber($output);
+        }
+
+        return new MutantCreatingConsoleLoggerSubscriber($output);
+    }
+
+    private function getMutantGeneratingConsoleLoggerSubscriber(OutputInterface $output): EventSubscriber
+    {
+        if ($this->shouldSkipProgressBars()) {
+            return new CiMutationGeneratingConsoleLoggerSubscriber($output);
+        }
+
+        return new MutationGeneratingConsoleLoggerSubscriber($output);
+    }
+
     private function getInitialTestsConsoleLoggerSubscriber(TestFrameworkAdapter $testFrameworkAdapter, OutputInterface $output): EventSubscriber
     {
         if ($this->shouldSkipProgressBars()) {
@@ -184,6 +211,7 @@ final class SubscriberBuilder
 
     private function shouldSkipProgressBars(): bool
     {
+        // This really does not belong here. How's that going to be tested?..
         return $this->noProgress
             || getenv('CI') === 'true'
             || getenv('CONTINUOUS_INTEGRATION') === 'true';

@@ -62,86 +62,59 @@ final class SubscriberBuilderTest extends TestCase
 {
     public function test_it_registers_the_subscribers_when_debugging(): void
     {
-        $calculator = new MetricsCalculator();
-        $dispatcher = $this->createMock(EventDispatcher::class);
-        $dispatcher->expects($this->exactly(4))->method('addSubscriber');
-        $diff = $this->createMock(DiffColorizer::class);
-        $config = $this->createMock(Configuration::class);
-        $config->expects($this->once())->method('getLogs')->willReturn(
-            new Logs(null, null, null, null, null)
-        );
-        $fs = $this->createMock(Filesystem::class);
         $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $subscriberBuilder = new SubscriberBuilder(
-            true,
-            true,
-            'progress',
-            true,
-            $calculator,
-            $dispatcher,
-            $diff,
-            $config,
-            $fs,
-            sys_get_temp_dir(),
-            new Stopwatch(),
-            new TimeFormatter(),
-            new MemoryFormatter(),
-            new LoggerFactory($calculator, $fs, 'all', false, false)
-        );
+        $subscriberBuilder = $this->makeSubscriberBuilder(true, 'progress', false, 6);
         $subscriberBuilder->registerSubscribers($adapter, $output);
     }
 
     public function test_it_registers_the_subscribers_when_not_debugging(): void
     {
-        $calculator = new MetricsCalculator();
-        $dispatcher = $this->createMock(EventDispatcher::class);
-        $dispatcher->expects($this->exactly(5))->method('addSubscriber');
-        $diff = $this->createMock(DiffColorizer::class);
-        $config = $this->createMock(Configuration::class);
-        $config->expects($this->once())->method('getLogs')->willReturn(
-            new Logs(null, null, null, null, null)
-        );
-        $fs = $this->createMock(Filesystem::class);
         $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $subscriberBuilder = new SubscriberBuilder(
-            true,
-            false,
-            'progress',
-            true,
-            $calculator,
-            $dispatcher,
-            $diff,
-            $config,
-            $fs,
-            sys_get_temp_dir(),
-            new Stopwatch(),
-            new TimeFormatter(),
-            new MemoryFormatter(),
-            new LoggerFactory($calculator, $fs, 'all', false, false)
-        );
+        $subscriberBuilder = $this->makeSubscriberBuilder(false, 'progress', false, 7);
+        $subscriberBuilder->registerSubscribers($adapter, $output);
+    }
+
+    public function test_it_registers_the_subscribers_without_progress(): void
+    {
+        $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $output = $this->createMock(OutputInterface::class);
+
+        $subscriberBuilder = $this->makeSubscriberBuilder(false, 'progress', true, 5);
         $subscriberBuilder->registerSubscribers($adapter, $output);
     }
 
     public function test_it_throws_an_exception_when_output_formatter_is_invalid(): void
     {
-        $calculator = new MetricsCalculator();
-        $dispatcher = $this->createMock(EventDispatcher::class);
-        $dispatcher->expects($this->never())->method('addSubscriber');
-        $diff = $this->createMock(DiffColorizer::class);
-        $config = $this->createMock(Configuration::class);
-        $fs = $this->createMock(Filesystem::class);
         $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $subscriberBuilder = new SubscriberBuilder(
+        $subscriberBuilder = $this->makeSubscriberBuilder(true, 'invalid', false, 3, 0);
+
+        $this->expectException(InvalidArgumentException::class);
+        $subscriberBuilder->registerSubscribers($adapter, $output);
+    }
+
+    private function makeSubscriberBuilder(bool $debug, string $formatter, bool $noProgress, int $addSubscriber, int $getLogs = 1): SubscriberBuilder
+    {
+        $calculator = new MetricsCalculator();
+        $dispatcher = $this->createMock(EventDispatcher::class);
+        $dispatcher->expects($this->exactly($addSubscriber))->method('addSubscriber');
+        $diff = $this->createMock(DiffColorizer::class);
+        $config = $this->createMock(Configuration::class);
+        $config->expects($this->exactly($getLogs))->method('getLogs')->willReturn(
+            new Logs(null, null, null, null, null)
+        );
+        $fs = $this->createMock(Filesystem::class);
+
+        return new SubscriberBuilder(
             true,
-            true,
-            'foo',
-            true,
+            $debug,
+            $formatter,
+            $noProgress,
             $calculator,
             $dispatcher,
             $diff,
@@ -153,8 +126,5 @@ final class SubscriberBuilderTest extends TestCase
             new MemoryFormatter(),
             new LoggerFactory($calculator, $fs, 'all', false, false)
         );
-
-        $this->expectException(InvalidArgumentException::class);
-        $subscriberBuilder->registerSubscribers($adapter, $output);
     }
 }
