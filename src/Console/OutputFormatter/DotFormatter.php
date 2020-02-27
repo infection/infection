@@ -107,10 +107,14 @@ final class DotFormatter extends AbstractOutputFormatter
         }
 
         if ($lastDot || $endOfRow) {
-            $length = strlen((string) $mutationCount);
-            $format = sprintf('   (%%%dd / %%%dd)', $length, $length);
+            if ($mutationCount === 0) {
+                $this->output->write(sprintf('   (%5d)', $this->callsCount)); // 5 because folks with over 10k mutations have more important problems
+            } else {
+                $length = strlen((string) $mutationCount);
+                $format = sprintf('   (%%%dd / %%%dd)', $length, $length);
 
-            $this->output->write(sprintf($format, $this->callsCount, $mutationCount === 0 ? $this->callsCount : $mutationCount));
+                $this->output->write(sprintf($format, $this->callsCount, $mutationCount));
+            }
 
             if ($this->callsCount !== $mutationCount) {
                 $this->output->writeln('');
