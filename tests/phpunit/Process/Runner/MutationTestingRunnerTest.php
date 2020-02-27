@@ -53,6 +53,7 @@ use Infection\Process\MutantProcess;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
+use Iterator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\sprintf;
@@ -179,7 +180,7 @@ final class MutationTestingRunnerTest extends TestCase
         );
     }
 
-    public function test_it_passes_through_mutations_when_concurent_execution_requested(): void
+    public function test_it_applies_and_run_the_mutations_when_concurent_execution_requested(): void
     {
         $mutations = new ArrayIterator([
             $mutation0 = $this->createMock(Mutation::class),
@@ -240,6 +241,43 @@ final class MutationTestingRunnerTest extends TestCase
             ],
             $this->eventDispatcher->getEvents()
         );
+    }
+
+    public function test_it_passes_through_iterables_when_concurent_execution_requested(): void
+    {
+        $mutations = $this->createMock(Iterator::class);
+        $mutations
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
+        $threadCount = 4;
+
+        $this->mutantFactoryMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
+        $this->processBuilderMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
+        $this->parallelProcessRunnerMock
+            ->expects($this->once())
+            ->method('run')
+            ->with($this->someIterable(), $threadCount)
+        ;
+
+        $this->runner = new MutationTestingRunner(
+            $this->processBuilderMock,
+            $this->mutantFactoryMock,
+            $this->parallelProcessRunnerMock,
+            $this->eventDispatcher,
+            true
+        );
+
+        $this->runner->run($mutations, $threadCount, '');
     }
 
     public function test_it_dispatches_events_even_when_no_mutations_is_given(): void
