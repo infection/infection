@@ -142,8 +142,6 @@ final class XmlConfigurationManipulator
         $original = libxml_use_internal_errors(true);
         $schemaPath = $this->buildSchemaPath($schema[0]->nodeValue);
 
-        // TODO: schemaValidate will throw a weird error if schemaPath is invalid, e.g. ''
-        // check what happens with invalid URL or invalid path
         if ($schema->length && !$xPath->document->schemaValidate($schemaPath)) {
             throw InvalidPhpUnitConfiguration::byXsdSchema(
                 $configPath,
@@ -185,11 +183,19 @@ final class XmlConfigurationManipulator
 
     private function buildSchemaPath(string $nodeValue): string
     {
-        if ($this->phpUnitConfigDir === '' || filter_var($nodeValue, FILTER_VALIDATE_URL)) {
+        if (filter_var($nodeValue, FILTER_VALIDATE_URL)) {
             return $nodeValue;
         }
 
-        return sprintf('%s/%s', $this->phpUnitConfigDir, $nodeValue);
+        if ($this->phpUnitConfigDir === '') {
+            $schemaPath = $nodeValue;
+        } else {
+            $schemaPath = sprintf('%s/%s', $this->phpUnitConfigDir, $nodeValue);
+        }
+
+        Assert::fileExists($schemaPath, 'Invalid schema path found %s');
+
+        return $schemaPath;
     }
 
     private function removeAttribute(DOMXPath $xPath, string $name): void
