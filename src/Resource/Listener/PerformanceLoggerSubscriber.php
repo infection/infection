@@ -69,10 +69,7 @@ final class PerformanceLoggerSubscriber implements EventSubscriber
 
     public function getSubscribedEvents(): array
     {
-        return [
-            ApplicationExecutionWasStarted::class => [$this, 'onApplicationExecutionWasStarted'],
-            ApplicationExecutionWasFinished::class => [$this, 'onApplicationExecutionWasFinished'],
-        ];
+        return [];
     }
 
     public function onApplicationExecutionWasStarted(ApplicationExecutionWasStarted $event): void
