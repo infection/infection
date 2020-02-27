@@ -75,16 +75,19 @@ class MutantExecutionResult
         $this->originalStartingLine = $originalStartingLine;
     }
 
-    public static function createFromProcess(MutantProcess $process): self
+    public static function createFromProcess(MutantProcess $mutantProcess): self
     {
+        $process = $mutantProcess->getProcess();
+        $mutant = $mutantProcess->getMutant();
+
         return new self(
-            $process->getProcess()->getCommandLine(),
-            $process->getProcess()->getOutput(),
-            $process->getResultCode(),
-            $process->getMutant()->getDiff(),
-            $process->getMutant()->getMutation()->getMutatorName(),
-            $process->getOriginalFilePath(),
-            $process->getOriginalStartingLine()
+            $process->getCommandLine(),
+            $process->isStarted() ? $process->getOutput() : '',
+            $mutantProcess->getResultCode(),
+            $mutant->getDiff(),
+            $mutant->getMutation()->getMutatorName(),
+            $mutantProcess->getOriginalFilePath(),
+            $mutantProcess->getOriginalStartingLine()
         );
     }
 

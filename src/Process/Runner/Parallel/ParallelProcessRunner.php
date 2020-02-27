@@ -43,6 +43,7 @@ use Infection\Process\MutantProcess;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
+use function usleep;
 
 /**
  * @internal
@@ -53,11 +54,6 @@ use Symfony\Component\Process\Exception\RuntimeException;
 class ParallelProcessRunner
 {
     private $eventDispatcher;
-
-    /**
-     * @var MutantProcess[]
-     */
-    private $processesQueue;
 
     /**
      * @var MutantProcess[]
@@ -106,7 +102,7 @@ class ParallelProcessRunner
 
             try {
                 $process->checkTimeout();
-            } catch (ProcessTimedOutException $e) {
+            } catch (ProcessTimedOutException $exception) {
                 $mutantProcess->markTimeout();
             }
 
