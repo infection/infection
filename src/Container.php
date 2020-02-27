@@ -60,6 +60,7 @@ use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\LoggerFactory;
 use Infection\Mutant\MetricsCalculator;
 use Infection\Mutant\MutantCodeFactory;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
@@ -200,7 +201,9 @@ final class Container
             },
             ParallelProcessRunner::class => static function (self $container): ParallelProcessRunner {
                 return new ParallelProcessRunner(static function (MutantProcess $mutantProcess) use ($container): void {
-                    $container->getEventDispatcher()->dispatch(new MutantProcessWasFinished($mutantProcess));
+                    $container->getEventDispatcher()->dispatch(new MutantProcessWasFinished(
+                        MutantExecutionResult::createFromProcess($mutantProcess)
+                    ));
                 });
             },
             TestFrameworkConfigLocator::class => static function (self $container): TestFrameworkConfigLocator {

@@ -39,6 +39,7 @@ use Closure;
 use Generator;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -111,7 +112,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $eventDispatcher = $this->createMock(EventDispatcher::class);
         $eventDispatcher->expects($this->exactly($eventCount))
             ->method('dispatch')
-            ->with(new MutantProcessWasFinished($this->createMock(MutantProcess::class)));
+            ->with(new MutantProcessWasFinished($this->createMock(MutantExecutionResult::class)));
 
         return $eventDispatcher;
     }
@@ -175,10 +176,13 @@ final class ParallelProcessRunnerTest extends TestCase
         $runner->run($processes, $threadCount, 0);
     }
 
-    private static function makeEventAccounter(EventDispatcher $eventDispatcher): Closure
+    private function makeEventAccounter(EventDispatcher $eventDispatcher): Closure
     {
-        return static function (MutantProcess $mutantProcess) use ($eventDispatcher): void {
-            $eventDispatcher->dispatch(new MutantProcessWasFinished($mutantProcess));
+        return function (MutantProcess $mutantProcess) use ($eventDispatcher): void {
+            $eventDispatcher->dispatch(new MutantProcessWasFinished(
+                // We're not testing MutantExecutionResult::createFromProcess() here
+                $this->createMock(MutantExecutionResult::class)
+            ));
         };
     }
 }

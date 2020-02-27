@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use function implode;
-use Infection\Process\MutantProcess;
+use Infection\Mutant\MutantExecutionResult;
 use function Safe\sprintf;
 use function strlen;
 
@@ -52,26 +52,26 @@ final class DebugFileLogger extends FileLogger
         $logs = [];
 
         $logs[] = 'Total: ' . $this->metricsCalculator->getTotalMutantsCount();
-        $logs[] = $this->convertProcess(
-            $this->metricsCalculator->getKilledMutantProcesses(),
+        $logs[] = $this->converExecutionResult(
+            $this->metricsCalculator->getKilledMutantExecutionResults(),
             'Killed'
         );
-        $logs[] = $this->convertProcess(
-            $this->metricsCalculator->getErrorProcesses(),
+        $logs[] = $this->converExecutionResult(
+            $this->metricsCalculator->getErrorMutantExecutionResults(),
             'Errors'
         );
-        $logs[] = $this->convertProcess(
-            $this->metricsCalculator->getEscapedMutantProcesses(),
+        $logs[] = $this->converExecutionResult(
+            $this->metricsCalculator->getEscapedMutantExecutionResults(),
             'Escaped'
         );
-        $logs[] = $this->convertProcess(
-            $this->metricsCalculator->getTimedOutProcesses(),
+        $logs[] = $this->converExecutionResult(
+            $this->metricsCalculator->getTimedOutMutantExecutionResults(),
             'Timed Out'
         );
 
         if (!$this->isOnlyCoveredMode) {
-            $logs[] = $this->convertProcess(
-                $this->metricsCalculator->getNotCoveredMutantProcesses(),
+            $logs[] = $this->converExecutionResult(
+                $this->metricsCalculator->getNotCoveredMutantExecutionResults(),
                 'Not Covered'
             );
         }
@@ -80,17 +80,17 @@ final class DebugFileLogger extends FileLogger
     }
 
     /**
-     * @param MutantProcess[] $processes
+     * @param MutantExecutionResult[] $executionResults
      */
-    private function convertProcess(array $processes, string $headlinePrefix): string
+    private function converExecutionResult(array $executionResults, string $headlinePrefix): string
     {
         $logParts = $this->getHeadlineParts($headlinePrefix);
-        $this->sortProcesses($processes);
+        $this->sortProcesses($executionResults);
 
-        foreach ($processes as $mutantProcess) {
+        foreach ($executionResults as $executionResult) {
             $logParts[] = '';
-            $logParts[] = 'Mutator: ' . $mutantProcess->getMutatorName();
-            $logParts[] = 'Line ' . $mutantProcess->getOriginalStartingLine();
+            $logParts[] = 'Mutator: ' . $executionResult->getMutatorName();
+            $logParts[] = 'Line ' . $executionResult->getOriginalStartingLine();
         }
 
         return implode(PHP_EOL, $logParts) . PHP_EOL;

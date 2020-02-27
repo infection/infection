@@ -73,76 +73,76 @@ class MetricsCalculator
     private $totalMutantsCount = 0;
 
     /**
-     * @var MutantProcess[]
+     * @var MutantExecutionResult[]
      */
-    private $killedMutantProcesses = [];
+    private $killedMutantExecutionResults = [];
 
     /**
-     * @var MutantProcess[]
+     * @var MutantExecutionResult[]
      */
-    private $errorProcesses = [];
+    private $errorMutantExecutionResults = [];
 
     /**
-     * @var MutantProcess[]
+     * @var MutantExecutionResult[]
      */
-    private $escapedMutantProcesses = [];
+    private $escapedMutantExecutionResults = [];
 
     /**
-     * @var MutantProcess[]
+     * @var MutantExecutionResult[]
      */
-    private $timedOutProcesses = [];
+    private $timedOutMutantExecutionResults = [];
 
     /**
-     * @var MutantProcess[]
+     * @var MutantExecutionResult[]
      */
-    private $notCoveredMutantProcesses = [];
+    private $notCoveredMutantExecutionResults = [];
 
     /**
      * Build a metric calculator with a sub-set of mutators
      *
-     * @param MutantProcess[] $mutantProcesses
+     * @param MutantExecutionResult[] $executionResults
      *
      * @return MetricsCalculator
      */
-    public static function createFromArray(array $mutantProcesses): self
+    public static function createFromArray(array $executionResults): self
     {
         $self = new self();
 
-        foreach ($mutantProcesses as $process) {
+        foreach ($executionResults as $process) {
             $self->collect($process);
         }
 
         return $self;
     }
 
-    public function collect(MutantProcess $mutantProcess): void
+    public function collect(MutantExecutionResult $executionResult): void
     {
         ++$this->totalMutantsCount;
 
-        switch ($mutantProcess->getResultCode()) {
+        switch ($executionResult->getProcessResultCode()) {
             case MutantProcess::CODE_KILLED:
                 $this->killedCount++;
-                $this->killedMutantProcesses[] = $mutantProcess;
+                $this->killedMutantExecutionResults[] = $executionResult;
 
                 break;
             case MutantProcess::CODE_NOT_COVERED:
                 $this->notCoveredByTestsCount++;
-                $this->notCoveredMutantProcesses[] = $mutantProcess;
+                $this->notCoveredMutantExecutionResults[] = $executionResult;
 
                 break;
             case MutantProcess::CODE_ESCAPED:
                 $this->escapedCount++;
-                $this->escapedMutantProcesses[] = $mutantProcess;
+                $this->escapedMutantExecutionResults[] = $executionResult;
 
                 break;
             case MutantProcess::CODE_TIMED_OUT:
                 $this->timedOutCount++;
-                $this->timedOutProcesses[] = $mutantProcess;
+                $this->timedOutMutantExecutionResults[] = $executionResult;
 
                 break;
             case MutantProcess::CODE_ERROR:
                 $this->errorCount++;
-                $this->errorProcesses[] = $mutantProcess;
+                $this->errorMutantExecutionResults[] = $executionResult;
 
                 break;
         }
@@ -217,47 +217,47 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutantProcess[]
+     * @return MutantExecutionResult[]
      */
-    public function getEscapedMutantProcesses(): array
+    public function getEscapedMutantExecutionResults(): array
     {
-        return $this->escapedMutantProcesses;
+        return $this->escapedMutantExecutionResults;
     }
 
     /**
-     * @return MutantProcess[]
+     * @return MutantExecutionResult[]
      */
-    public function getKilledMutantProcesses(): array
+    public function getKilledMutantExecutionResults(): array
     {
-        return $this->killedMutantProcesses;
+        return $this->killedMutantExecutionResults;
     }
 
     /**
-     * @return MutantProcess[]
+     * @return MutantExecutionResult[]
      */
-    public function getTimedOutProcesses(): array
+    public function getTimedOutMutantExecutionResults(): array
     {
-        return $this->timedOutProcesses;
+        return $this->timedOutMutantExecutionResults;
     }
 
     /**
-     * @return MutantProcess[]
+     * @return MutantExecutionResult[]
      */
-    public function getNotCoveredMutantProcesses(): array
+    public function getNotCoveredMutantExecutionResults(): array
     {
-        return $this->notCoveredMutantProcesses;
+        return $this->notCoveredMutantExecutionResults;
     }
 
     /**
-     * @return MutantProcess[]
+     * @return MutantExecutionResult[]
      */
-    public function getAllMutantProcesses(): array
+    public function getAllMutantExecutionResults(): array
     {
         return array_merge(
-            $this->escapedMutantProcesses,
-            $this->killedMutantProcesses,
-            $this->timedOutProcesses,
-            $this->notCoveredMutantProcesses
+            $this->escapedMutantExecutionResults,
+            $this->killedMutantExecutionResults,
+            $this->timedOutMutantExecutionResults,
+            $this->notCoveredMutantExecutionResults
         );
     }
 
@@ -267,10 +267,10 @@ class MetricsCalculator
     }
 
     /**
-     * @return MutantProcess[]
+     * @return MutantExecutionResult[]
      */
-    public function getErrorProcesses(): array
+    public function getErrorMutantExecutionResults(): array
     {
-        return $this->errorProcesses;
+        return $this->errorMutantExecutionResults;
     }
 }

@@ -36,9 +36,11 @@ declare(strict_types=1);
 namespace Infection\Process\Runner\Parallel;
 
 use Closure;
+use function count;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
+use function usleep;
 
 /**
  * @internal
@@ -49,11 +51,6 @@ use Symfony\Component\Process\Exception\RuntimeException;
 class ParallelProcessRunner
 {
     private $processHandler;
-
-    /**
-     * @var ProcessBearer[]
-     */
-    private $processesQueue;
 
     /**
      * @var ProcessBearer[]
@@ -102,7 +99,7 @@ class ParallelProcessRunner
 
             try {
                 $process->checkTimeout();
-            } catch (ProcessTimedOutException $e) {
+            } catch (ProcessTimedOutException $exception) {
                 $processBearer->markTimeout();
             }
 

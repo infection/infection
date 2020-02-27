@@ -42,6 +42,7 @@ use Infection\Event\MutantsCreationWasStarted;
 use Infection\Event\MutantWasCreated;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Builder\MutantProcessBuilder;
@@ -98,7 +99,9 @@ final class MutationTestingRunner
                 return true;
             }
 
-            $this->eventDispatcher->dispatch(new MutantProcessWasFinished($mutantProcess));
+            $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                MutantExecutionResult::createFromProcess($mutantProcess)
+            ));
 
             return false;
         });
