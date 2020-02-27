@@ -41,6 +41,8 @@ use Infection\Mutator\Regex\PregQuote;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\Tests\Mutator\MutatorName;
+use function str_replace;
+use const PHP_EOL;
 
 trait CreateMetricsCalculator
 {
@@ -146,7 +148,10 @@ trait CreateMetricsCalculator
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             'process output',
             $resultCode,
-            <<<DIFF
+            str_replace(
+                "\n",
+                PHP_EOL,
+                <<<DIFF
 --- Original
 +++ New
 @@ @@
@@ -155,7 +160,7 @@ trait CreateMetricsCalculator
 + echo '$echoMutatedMessage';
 
 DIFF
-            ,
+            ),
             MutatorName::getName($mutatorClassName),
             'foo/bar',
             10 - $i
