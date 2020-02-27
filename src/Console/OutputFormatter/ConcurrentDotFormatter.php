@@ -35,17 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Console\OutputFormatter;
 
-use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\MutantProcess;
 use function Safe\sprintf;
-use function str_repeat;
-use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class DotFormatter extends AbstractOutputFormatter
+final class ConcurrentDotFormatter extends AbstractOutputFormatter
 {
     private const DOTS_PER_ROW = 50;
 
@@ -71,11 +68,11 @@ final class DotFormatter extends AbstractOutputFormatter
         ]);
     }
 
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
+    public function advance(MutantProcess $mutantProcess, int $mutationCount): void
     {
-        parent::advance($executionResult, $mutationCount);
+        parent::advance($mutantProcess, $mutationCount);
 
-        switch ($executionResult->getProcessResultCode()) {
+        switch ($mutantProcess->getResultCode()) {
             case MutantProcess::CODE_KILLED:
                 $this->output->write('<killed>.</killed>');
 
@@ -100,21 +97,9 @@ final class DotFormatter extends AbstractOutputFormatter
 
         $remainder = $this->callsCount % self::DOTS_PER_ROW;
         $endOfRow = $remainder === 0;
-        $lastDot = $mutationCount === $this->callsCount;
 
-        if ($lastDot && !$endOfRow) {
-            $this->output->write(str_repeat(' ', self::DOTS_PER_ROW - $remainder));
-        }
-
-        if ($lastDot || $endOfRow) {
-            $length = strlen((string) $mutationCount);
-            $format = sprintf('   (%%%dd / %%%dd)', $length, $length);
-
-            $this->output->write(sprintf($format, $this->callsCount, $mutationCount));
-
-            if ($this->callsCount !== $mutationCount) {
-                $this->output->writeln('');
-            }
+        if ($endOfRow) {
+            $this->output->writeln(sprintf('   (%5d)', $this->callsCount));
         }
     }
 }
