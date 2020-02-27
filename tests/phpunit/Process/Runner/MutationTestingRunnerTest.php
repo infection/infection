@@ -170,10 +170,10 @@ final class MutationTestingRunnerTest extends TestCase
         $this->assertAreSameEvents(
             [
                 new MutantsCreationWasStarted(2),
-                new MutantWasCreated(),
-                new MutantWasCreated(),
                 new MutantsCreationWasFinished(),
                 new MutationTestingWasStarted(2),
+                new MutantWasCreated(),
+                new MutantWasCreated(),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()
