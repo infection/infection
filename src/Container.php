@@ -399,11 +399,14 @@ final class Container
                 );
             },
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
+                $config = $container->getConfiguration();
+
                 return new MutationTestingRunner(
                     $container->getMutantProcessBuilder(),
                     $container->getMutantFactory(),
                     $container->getParallelProcessRunner(),
-                    $container->getEventDispatcher()
+                    $container->getEventDispatcher(),
+                    $config->showProgress()
                 );
             },
             LineRangeCalculator::class => static function (): LineRangeCalculator {

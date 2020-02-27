@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use ArrayIterator;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutantsCreationWasFinished;
@@ -59,17 +60,20 @@ final class MutationTestingRunner
     private $parallelProcessManager;
     private $eventDispatcher;
     private $processBuilder;
+    private $concurrent;
 
     public function __construct(
         MutantProcessBuilder $mutantProcessBuilder,
         MutantFactory $mutantFactory,
         ParallelProcessRunner $parallelProcessManager,
-        EventDispatcher $eventDispatcher
+        EventDispatcher $eventDispatcher,
+        bool $concurrent
     ) {
         $this->processBuilder = $mutantProcessBuilder;
         $this->mutantFactory = $mutantFactory;
         $this->parallelProcessManager = $parallelProcessManager;
         $this->eventDispatcher = $eventDispatcher;
+        $this->concurrent = $concurrent;
     }
 
     /**
@@ -77,8 +81,7 @@ final class MutationTestingRunner
      */
     public function run(iterable $mutations, int $threadCount, string $testFrameworkExtraOptions): void
     {
-        $this->eventDispatcher->dispatch(new MutantsCreationWasStarted(0));
-        $this->eventDispatcher->dispatch(new MutationTestingWasStarted(0));
+        $this->eventDispatcher->dispatch(new MutantsCreationWasStarted($this->bufferAndCount($mutations)));
 
         $processes = take($mutations);
         $processes->map(function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcess {
@@ -91,10 +94,13 @@ final class MutationTestingRunner
             return $process;
         });
 
+        $numberOfMutants = $this->bufferAndCount($processes);
+
         $this->eventDispatcher->dispatch(new MutantsCreationWasFinished());
+        $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
 
         // We filter these here because it is beyond responsibilities of a process manager to care about types of processes
-        $processes->filter(function (MutantProcess $mutantProcess) {
+        $processes = take($processes)->filter(function (MutantProcess $mutantProcess) {
             if ($mutantProcess->getMutant()->isCoveredByTest()) {
                 return true;
             }
@@ -109,5 +115,28 @@ final class MutationTestingRunner
         $this->parallelProcessManager->run($processes, $threadCount);
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
+    }
+
+    /**
+     * @param iterable|mixed[] $subjects
+     */
+    private function bufferAndCount(iterable &$subjects): int
+    {
+        if ($this->concurrent) {
+            return 0;
+        }
+
+        $buffer = [];
+
+        // iterator_to_array wants \Traversable, we can have anything else
+        foreach ($subjects as $subject) {
+            $buffer[] = $subject;
+            // TODO in PHP 7.4 use [...$subjects];
+        }
+
+        // Wrap with an iterator to avoid copying by value
+        $subjects = new ArrayIterator($buffer);
+
+        return $subjects->count();
     }
 }

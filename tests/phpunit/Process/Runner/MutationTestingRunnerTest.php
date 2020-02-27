@@ -94,7 +94,8 @@ final class MutationTestingRunnerTest extends TestCase
             $this->processBuilderMock,
             $this->mutantFactoryMock,
             $this->parallelProcessRunnerMock,
-            $this->eventDispatcher
+            $this->eventDispatcher,
+            false
         );
     }
 
@@ -115,8 +116,8 @@ final class MutationTestingRunnerTest extends TestCase
         $this->assertAreSameEvents(
             [
                 new MutantsCreationWasStarted(0),
-                new MutationTestingWasStarted(0),
                 new MutantsCreationWasFinished(),
+                new MutationTestingWasStarted(0),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()
@@ -166,11 +167,11 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutantsCreationWasStarted(0),
-                new MutationTestingWasStarted(0),
+                new MutantsCreationWasStarted(2),
+                new MutantWasCreated(),
+                new MutantWasCreated(),
                 new MutantsCreationWasFinished(),
-                new MutantWasCreated(),
-                new MutantWasCreated(),
+                new MutationTestingWasStarted(2),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()
@@ -204,8 +205,8 @@ final class MutationTestingRunnerTest extends TestCase
         $this->assertAreSameEvents(
             [
                 new MutantsCreationWasStarted(0),
-                new MutationTestingWasStarted(0),
                 new MutantsCreationWasFinished(),
+                new MutationTestingWasStarted(0),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()
