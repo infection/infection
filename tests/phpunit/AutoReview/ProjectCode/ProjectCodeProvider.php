@@ -51,6 +51,8 @@ use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\Util\PhpProcess;
 use Infection\Engine;
+use Infection\Event\Subscriber\MutantCreatingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\FilterableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
@@ -96,6 +98,8 @@ final class ProjectCodeProvider
         ComposerExecutableFinder::class,
         BadgeApiClient::class,
         ResultsLoggerTypes::class,
+        MutantCreatingConsoleLoggerSubscriber::class,
+        MutationGeneratingConsoleLoggerSubscriber::class,
         TestFrameworkTypes::class,
         NodeMutationGenerator::class,
         FilterableFinder::class,
