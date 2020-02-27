@@ -9,9 +9,6 @@ parameters:
         - '#expects .*, array<string>\|bool\|string\|null given#'
         - '#cast array<string>\|bool\|string\|null to#'
         -
-            path: '../src/Process/Runner/Parallel/ParallelProcessRunner.php'
-            message: '#Left side of [\&]{2} is always true#'
-        -
             path: '../src/PhpParser/FileParser.php'
             message: '#Method Infection\\PhpParser\\FileParser::parse\(\) should return array<PhpParser\\Node> but returns array<PhpParser\\Node\\Stmt>\|null\.#'
             count: 1
