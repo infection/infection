@@ -65,7 +65,7 @@ final class SubscriberBuilderTest extends TestCase
         $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $subscriberBuilder = $this->makeSubscriberBuilder(true, 'progress', false, 6);
+        $subscriberBuilder = $this->makeSubscriberBuilder(true, 'progress', false, 5);
         $subscriberBuilder->registerSubscribers($adapter, $output);
     }
 
@@ -74,7 +74,7 @@ final class SubscriberBuilderTest extends TestCase
         $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $subscriberBuilder = $this->makeSubscriberBuilder(false, 'progress', false, 7);
+        $subscriberBuilder = $this->makeSubscriberBuilder(false, 'progress', false, 6);
         $subscriberBuilder->registerSubscribers($adapter, $output);
     }
 
@@ -92,7 +92,7 @@ final class SubscriberBuilderTest extends TestCase
         $adapter = $this->createMock(AbstractTestFrameworkAdapter::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $subscriberBuilder = $this->makeSubscriberBuilder(true, 'invalid', false, 3, 0);
+        $subscriberBuilder = $this->makeSubscriberBuilder(true, 'invalid', false, 2, 0);
 
         $this->expectException(InvalidArgumentException::class);
         $subscriberBuilder->registerSubscribers($adapter, $output);
