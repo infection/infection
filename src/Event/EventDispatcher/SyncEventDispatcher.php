@@ -62,7 +62,7 @@ final class SyncEventDispatcher implements EventDispatcher
 
     public function addSubscriber(EventSubscriber $eventSubscriber): void
     {
-        foreach ($this->guessSubscribedEvents($eventSubscriber) as $eventName => $listener) {
+        foreach ($this->inferSubscribedEvents($eventSubscriber) as $eventName => $listener) {
             $this->listeners[$eventName][] = $listener;
         }
 
@@ -75,7 +75,7 @@ final class SyncEventDispatcher implements EventDispatcher
     /**
      * @return iterable|callable[]
      */
-    private function guessSubscribedEvents(EventSubscriber $eventSubscriber): iterable
+    private function inferSubscribedEvents(EventSubscriber $eventSubscriber): iterable
     {
         $class = new ReflectionClass($eventSubscriber);
         $methods = $class->getMethods(ReflectionMethod::IS_PUBLIC);
