@@ -110,7 +110,7 @@ final class DotFormatter extends AbstractOutputFormatter
             $length = strlen((string) $mutationCount);
             $format = sprintf('   (%%%dd / %%%dd)', $length, $length);
 
-            $this->output->write(sprintf($format, $this->callsCount, $mutationCount));
+            $this->output->write(sprintf($format, $this->callsCount, $mutationCount === 0 ? $this->callsCount : $mutationCount));
 
             if ($this->callsCount !== $mutationCount) {
                 $this->output->writeln('');
