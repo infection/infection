@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Runner;
 
 use function array_map;
+use ArrayIterator;
 use function count;
 use function get_class;
 use function implode;
@@ -172,6 +173,69 @@ final class MutationTestingRunnerTest extends TestCase
                 new MutantWasCreated(),
                 new MutantsCreationWasFinished(),
                 new MutationTestingWasStarted(2),
+                new MutationTestingWasFinished(),
+            ],
+            $this->eventDispatcher->getEvents()
+        );
+    }
+
+    public function test_it_passes_through_mutations_when_concurent_execution_requested(): void
+    {
+        $mutations = new ArrayIterator([
+            $mutation0 = $this->createMock(Mutation::class),
+            $mutation1 = $this->createMock(Mutation::class),
+        ]);
+
+        $threadCount = 4;
+        $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
+
+        $this->mutantFactoryMock
+            ->method('create')
+            ->withConsecutive(
+                [$mutation0],
+                [$mutation1]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $mutant0 = new Mutant('/path/to/mutant0', $mutation0, ''),
+                $mutant1 = new Mutant('/path/to/mutant1', $mutation1, '')
+            )
+        ;
+
+        $this->processBuilderMock
+            ->method('createProcessForMutant')
+            ->withConsecutive(
+                [$mutant0, $testFrameworkExtraOptions],
+                [$mutant1, $testFrameworkExtraOptions]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $process0 = $this->buildCoveredMutantProcess(),
+                $process1 = $this->buildCoveredMutantProcess()
+            )
+        ;
+
+        $this->parallelProcessRunnerMock
+            ->expects($this->once())
+            ->method('run')
+            ->with($this->iterableContaining([$process0, $process1]), $threadCount)
+        ;
+
+        $this->runner = new MutationTestingRunner(
+            $this->processBuilderMock,
+            $this->mutantFactoryMock,
+            $this->parallelProcessRunnerMock,
+            $this->eventDispatcher,
+            true
+        );
+
+        $this->runner->run($mutations, $threadCount, $testFrameworkExtraOptions);
+
+        $this->assertAreSameEvents(
+            [
+                new MutantsCreationWasStarted(0),
+                new MutantsCreationWasFinished(),
+                new MutationTestingWasStarted(0),
+                new MutantWasCreated(),
+                new MutantWasCreated(),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents()
