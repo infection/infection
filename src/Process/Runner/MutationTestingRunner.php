@@ -47,6 +47,7 @@ use Infection\Mutation\Mutation;
 use Infection\Process\Builder\MutantProcessBuilder;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\Parallel\ParallelProcessRunner;
+use function count;
 use function Pipeline\take;
 
 /**
@@ -74,9 +75,9 @@ final class MutationTestingRunner
     /**
      * @param Mutation[] $mutations
      */
-    public function run(iterable $mutations, int $threadCount, string $testFrameworkExtraOptions): void
+    public function run(array $mutations, int $threadCount, string $testFrameworkExtraOptions): void
     {
-        $this->eventDispatcher->dispatch(new MutantsCreationWasStarted(0));
+        $this->eventDispatcher->dispatch(new MutantsCreationWasStarted(count($mutations)));
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted(0));
 
         $processes = take($mutations);

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use function array_reduce;
 use function count;
 use function get_class;
 use Infection\Mutation\Mutation;
@@ -42,8 +43,8 @@ use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\TestFramework\Coverage\LineCodeCoverage;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
+use function iterator_to_array;
 use PhpParser\Node;
-use function Pipeline\take;
 use Throwable;
 use Webmozart\Assert\Assert;
 
@@ -85,21 +86,27 @@ class NodeMutationGenerator
     /**
      * @return Mutation[]
      */
-    public function generate(Node $node): iterable
+    public function generate(Node $node): array
     {
-        yield from take($this->mutators)->map(function (Mutator $mutator) use ($node) {
-            yield from $this->generateForMutator($node, $mutator);
-        });
+        return array_reduce(
+            $this->mutators,
+            function (array $mutations, Mutator $mutator) use ($node): array {
+                return $this->generateForMutator($node, $mutator, $mutations);
+            },
+            []
+        );
     }
 
     /**
-     * @return iterable|Mutation[]
+     * @param Mutation[] $mutations
+     *
+     * @return Mutation[]
      */
-    private function generateForMutator(Node $node, Mutator $mutator): iterable
+    private function generateForMutator(Node $node, Mutator $mutator, array $mutations): array
     {
         try {
             if (!$mutator->canMutate($node)) {
-                return;
+                return $mutations;
             }
         } catch (Throwable $throwable) {
             throw InvalidMutator::create(
@@ -114,7 +121,7 @@ class NodeMutationGenerator
         if (!$isOnFunctionSignature
             && !$node->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY)
         ) {
-            return;
+            return $mutations;
         }
 
         $tests = $this->codeCoverageData->getAllTestsForMutation(
@@ -124,13 +131,15 @@ class NodeMutationGenerator
         );
 
         if ($this->onlyCovered && count($tests) === 0) {
-            return;
+            return $mutations;
         }
 
-        $mutationByMutatorIndex = 0;
+        // It is important to not rely on the keys here. It might otherwise result in some elements
+        // being overridden, see https://3v4l.org/JLN73
+        $mutatedNodes = iterator_to_array($mutator->mutate($node), false);
 
-        foreach ($mutator->mutate($node) as $mutatedNode) {
-            yield new Mutation(
+        foreach ($mutatedNodes as $mutationByMutatorIndex => $mutatedNode) {
+            $mutations[] = new Mutation(
                 $this->filePath,
                 $this->fileNodes,
                 $mutator->getName(),
@@ -140,8 +149,8 @@ class NodeMutationGenerator
                 $mutationByMutatorIndex,
                 $tests
             );
-
-            ++$mutationByMutatorIndex;
         }
+
+        return $mutations;
     }
 }

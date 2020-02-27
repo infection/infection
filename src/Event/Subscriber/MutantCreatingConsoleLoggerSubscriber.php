@@ -33,51 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor;
+namespace Infection\Event\Subscriber;
 
-use Infection\Mutation\Mutation;
-use Infection\Mutator\NodeMutationGenerator;
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use Infection\Event\MutantsCreationWasFinished;
+use Infection\Event\MutantsCreationWasStarted;
+use Infection\Event\MutantWasCreated;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class MutationsCollectorVisitor extends NodeVisitorAbstract
+final class MutantCreatingConsoleLoggerSubscriber implements EventSubscriber
 {
-    /**
-     * @var Mutation[]
-     */
-    private $mutations = [];
+    private $output;
+    private $progressBar;
 
-    private $mutationGenerator;
-
-    public function __construct(NodeMutationGenerator $mutationGenerator)
+    public function __construct(OutputInterface $output)
     {
-        $this->mutationGenerator = $mutationGenerator;
+        $this->output = $output;
+
+        $this->progressBar = new ProgressBar($this->output);
+        $this->progressBar->setFormat('Creating mutated files and processes: %current%/%max%');
     }
 
-    public function beforeTraverse(array $nodes): ?array
+    public function getSubscribedEvents(): array
     {
-        $this->mutations = [];
-
-        return null;
+        return [
+            MutantsCreationWasStarted::class => [$this, 'onMutantsCreationWasStarted'],
+            MutantWasCreated::class => [$this, 'onMutantWasCreated'],
+            MutantsCreationWasFinished::class => [$this, 'onMutantsCreationWasFinished'],
+        ];
     }
 
-    public function leaveNode(Node $node): ?Node
+    public function onMutantsCreationWasStarted(MutantsCreationWasStarted $event): void
     {
-        foreach ($this->mutationGenerator->generate($node) as $mutation) {
-            $this->mutations[] = $mutation;
-        }
-
-        return null;
+        $this->output->writeln(['']);
+        $this->progressBar->start($event->getMutantCount());
     }
 
-    /**
-     * @return Mutation[]
-     */
-    public function getMutations(): array
+    public function onMutantWasCreated(MutantWasCreated $event): void
     {
-        return $this->mutations;
+        $this->progressBar->advance();
+    }
+
+    public function onMutantsCreationWasFinished(MutantsCreationWasFinished $event): void
+    {
+        $this->progressBar->finish();
     }
 }

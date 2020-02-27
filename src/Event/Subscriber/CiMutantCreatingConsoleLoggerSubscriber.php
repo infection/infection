@@ -33,51 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor;
+namespace Infection\Event\Subscriber;
 
-use Infection\Mutation\Mutation;
-use Infection\Mutator\NodeMutationGenerator;
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use Infection\Event\MutantsCreationWasStarted;
+use function Safe\sprintf;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class MutationsCollectorVisitor extends NodeVisitorAbstract
+final class CiMutantCreatingConsoleLoggerSubscriber implements EventSubscriber
 {
-    /**
-     * @var Mutation[]
-     */
-    private $mutations = [];
+    private $output;
 
-    private $mutationGenerator;
-
-    public function __construct(NodeMutationGenerator $mutationGenerator)
+    public function __construct(OutputInterface $output)
     {
-        $this->mutationGenerator = $mutationGenerator;
+        $this->output = $output;
     }
 
-    public function beforeTraverse(array $nodes): ?array
+    public function getSubscribedEvents(): array
     {
-        $this->mutations = [];
-
-        return null;
+        return [
+            MutantsCreationWasStarted::class => [$this, 'onMutantsCreationWasStarted'],
+        ];
     }
 
-    public function leaveNode(Node $node): ?Node
+    public function onMutantsCreationWasStarted(MutantsCreationWasStarted $event): void
     {
-        foreach ($this->mutationGenerator->generate($node) as $mutation) {
-            $this->mutations[] = $mutation;
-        }
-
-        return null;
-    }
-
-    /**
-     * @return Mutation[]
-     */
-    public function getMutations(): array
-    {
-        return $this->mutations;
+        $this->output->writeln([
+            '',
+            sprintf('Creating mutated files and processes: %s', $event->getMutantCount()),
+        ]);
     }
 }
