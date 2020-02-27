@@ -41,8 +41,8 @@ use Infection\Mutator\Regex\PregQuote;
 use Infection\Mutator\ZeroIteration\For_;
 use Infection\Process\MutantProcess;
 use Infection\Tests\Mutator\MutatorName;
-use function str_replace;
 use const PHP_EOL;
+use function str_replace;
 
 trait CreateMetricsCalculator
 {
