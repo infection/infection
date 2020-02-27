@@ -43,7 +43,6 @@ use function Safe\ini_get;
 
 /**
  * @group integration Requires some I/O operations
- * @covers \Infection\Resource\Memory\MemoryLimiterEnvironment
  */
 final class MemoryLimiterEnvironmentTest extends TestCase
 {

@@ -46,11 +46,13 @@ use function Safe\preg_match;
 final class CoverageRequirementChecker
 {
     private $skipCoverage;
+    private $skipInitialTests;
     private $initialTestPhpOptions;
 
-    public function __construct(bool $skipCoverage, string $initialTestPhpOptions)
+    public function __construct(bool $skipCoverage, bool $skipInitialTests, string $initialTestPhpOptions)
     {
         $this->skipCoverage = $skipCoverage;
+        $this->skipInitialTests = $skipInitialTests;
         $this->initialTestPhpOptions = $initialTestPhpOptions;
     }
 
@@ -63,6 +65,11 @@ final class CoverageRequirementChecker
             || XdebugHandler::getSkippedVersion()
             || $this->isXdebugIncludedInInitialTestPhpOptions()
             || $this->isPcovIncludedInInitialTestPhpOptions();
+    }
+
+    public function hasSkipInitialTestsWithoutCoverageOption(): bool
+    {
+        return $this->skipInitialTests && !$this->skipCoverage;
     }
 
     private function isXdebugIncludedInInitialTestPhpOptions(): bool

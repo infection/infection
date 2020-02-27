@@ -55,7 +55,7 @@ final class CoverageRequirementCheckerTest extends TestCase
         $this->requireNoXdebug();
         $this->requireNoPcov();
 
-        $coverageChecker = new CoverageRequirementChecker(false, '');
+        $coverageChecker = new CoverageRequirementChecker(false, false, '');
 
         $this->assertTrue($coverageChecker->hasDebuggerOrCoverageOption());
     }
@@ -66,7 +66,7 @@ final class CoverageRequirementCheckerTest extends TestCase
         $this->requireNoXdebug();
         $this->requirePcov();
 
-        $coverageChecker = new CoverageRequirementChecker(false, '');
+        $coverageChecker = new CoverageRequirementChecker(false, false, '');
 
         $this->assertTrue($coverageChecker->hasDebuggerOrCoverageOption());
     }
@@ -77,7 +77,7 @@ final class CoverageRequirementCheckerTest extends TestCase
         $this->requireNoPcov();
         $this->requireXdebug();
 
-        $coverageChecker = new CoverageRequirementChecker(false, '');
+        $coverageChecker = new CoverageRequirementChecker(false, false, '');
 
         $this->assertTrue($coverageChecker->hasDebuggerOrCoverageOption());
     }
@@ -88,7 +88,7 @@ final class CoverageRequirementCheckerTest extends TestCase
         $this->requireNoXdebug();
         $this->requireNoPcov();
 
-        $coverageChecker = new CoverageRequirementChecker(true, '');
+        $coverageChecker = new CoverageRequirementChecker(true, false, '');
 
         $this->assertTrue($coverageChecker->hasDebuggerOrCoverageOption());
     }
@@ -99,7 +99,7 @@ final class CoverageRequirementCheckerTest extends TestCase
         $this->requireNoXdebug();
         $this->requireNoPcov();
 
-        $coverageChecker = new CoverageRequirementChecker(false, '-d zend_extension=xdebug.so');
+        $coverageChecker = new CoverageRequirementChecker(false, false, '-d zend_extension=xdebug.so');
 
         $this->assertTrue($coverageChecker->hasDebuggerOrCoverageOption());
     }
@@ -110,7 +110,7 @@ final class CoverageRequirementCheckerTest extends TestCase
         $this->requireNoXdebug();
         $this->requireNoPcov();
 
-        $coverageChecker = new CoverageRequirementChecker(false, '-d extension=pcov.so');
+        $coverageChecker = new CoverageRequirementChecker(false, false, '-d extension=pcov.so');
 
         $this->assertTrue($coverageChecker->hasDebuggerOrCoverageOption());
     }
@@ -121,9 +121,37 @@ final class CoverageRequirementCheckerTest extends TestCase
         $this->requireNoXdebug();
         $this->requireNoPcov();
 
-        $coverageChecker = new CoverageRequirementChecker(false, '--help');
+        $coverageChecker = new CoverageRequirementChecker(false, false, '--help');
 
         $this->assertFalse($coverageChecker->hasDebuggerOrCoverageOption());
+    }
+
+    public function test_it_has_skip_initial_tests_without_coverage(): void
+    {
+        $coverageChecker = new CoverageRequirementChecker(false, true, '');
+
+        $this->assertTrue($coverageChecker->hasSkipInitialTestsWithoutCoverageOption());
+    }
+
+    public function test_it_has_skip_initial_tests_with_coverage(): void
+    {
+        $coverageChecker = new CoverageRequirementChecker(true, true, '');
+
+        $this->assertFalse($coverageChecker->hasSkipInitialTestsWithoutCoverageOption());
+    }
+
+    public function test_it_doesnt_have_skip_initial_tests_without_coverage(): void
+    {
+        $coverageChecker = new CoverageRequirementChecker(false, false, '');
+
+        $this->assertFalse($coverageChecker->hasSkipInitialTestsWithoutCoverageOption());
+    }
+
+    public function test_it_doesnt_have_skip_initial_tests_with_coverage(): void
+    {
+        $coverageChecker = new CoverageRequirementChecker(true, false, '');
+
+        $this->assertFalse($coverageChecker->hasSkipInitialTestsWithoutCoverageOption());
     }
 
     private function requirePhpDbg(): void
