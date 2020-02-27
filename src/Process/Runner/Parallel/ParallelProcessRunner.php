@@ -37,6 +37,7 @@ namespace Infection\Process\Runner\Parallel;
 
 use Closure;
 use function count;
+use Generator;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
@@ -46,10 +47,18 @@ use function usleep;
  * @internal
  * @final
  *
- * This ProcessManager is a simple wrapper to enable parallel processing using Symfony Process component
+ * This ProcessManager is an elaborate wrapper to enable parallel processing using Symfony Process component
  */
 class ParallelProcessRunner
 {
+    /**
+     * If it takes 100000 ms for a process to finish, and 5000 ms to make it,
+     * then we can make as much as 20 processes while we wait. But let's not
+     * get greedy and settle on a smaller number to make sure we're not stuck
+     * making processes where we should be starting them.
+     */
+    private const MUTATOR_TO_PROCESS_RATIO = 10;
+
     private $processHandler;
 
     /**
@@ -70,17 +79,38 @@ class ParallelProcessRunner
      */
     public function run(iterable $processes, int $threadCount, int $poll = 1000): void
     {
+        /*
+         * It takes about 100000 ms for a mutated process to finish, where it takes
+         * about 5000 ms to make it. Therefore instead of just waiting we can produce
+         * new processes so that when a process or several finish, we would have
+         * additional jobs on hand, without a need to wait for them to be created.
+         *
+         * For our purposes we need to make sure we only see one process only once.
+         */
+        $generator = self::makeGenerator($processes);
+
+        // Bucket for processes to be executed
+        $bucket = [];
+
+        // Load the first process from the queue to buy us some time.
+        self::fillBucket($bucket, $generator, 1);
+
         $threadCount = max(1, $threadCount);
 
         // start the initial batch of processes
-        foreach ($processes as $process) {
+        while ($process = array_shift($bucket)) {
             $this->startProcess($process);
 
             if (count($this->currentProcesses) >= $threadCount) {
                 do {
+                    // Now fill the bucket up to the top
+                    self::fillBucket($bucket, $generator);
                     usleep($poll);
                 } while (!$this->cleanFinished());
             }
+
+            // In any case load a least one process to the bucket
+            self::fillBucket($bucket, $generator, 1);
         }
 
         do {
@@ -122,5 +152,31 @@ class ParallelProcessRunner
         $this->currentProcesses[] = $processBearer;
 
         return true;
+    }
+
+    /**
+     * @param ProcessBearer[] $bucket
+     * @param Generator|ProcessBearer[] $input
+     */
+    private static function fillBucket(array &$bucket, Generator $input, int $level = self::MUTATOR_TO_PROCESS_RATIO): void
+    {
+        if (count($bucket) === $level) {
+            return;
+        }
+
+        while ($input->valid() && count($bucket) < $level) {
+            $bucket[] = $input->current();
+            $input->next();
+        }
+    }
+
+    /**
+     * @param iterable|ProcessBearer[] $input
+     *
+     * @return Generator|ProcessBearer[]
+     */
+    private static function makeGenerator(iterable &$input): Generator
+    {
+        yield from $input;
     }
 }
