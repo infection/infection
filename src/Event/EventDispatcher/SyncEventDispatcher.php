@@ -37,6 +37,9 @@ namespace Infection\Event\EventDispatcher;
 
 use function get_class;
 use Infection\Event\Subscriber\EventSubscriber;
+use ReflectionClass;
+use ReflectionMethod;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -59,8 +62,42 @@ final class SyncEventDispatcher implements EventDispatcher
 
     public function addSubscriber(EventSubscriber $eventSubscriber): void
     {
+        foreach ($this->guessSubscribedEvents($eventSubscriber) as $eventName => $listener) {
+            $this->listeners[$eventName][] = $listener;
+        }
+
+        // Handle explicit event subscriptions
         foreach ($eventSubscriber->getSubscribedEvents() as $eventName => $listener) {
             $this->listeners[$eventName][] = $listener;
+        }
+    }
+
+    /**
+     * @return iterable|callable[]
+     */
+    private function guessSubscribedEvents(EventSubscriber $eventSubscriber): iterable
+    {
+        $class = new ReflectionClass($eventSubscriber);
+        $methods = $class->getMethods(ReflectionMethod::IS_PUBLIC);
+
+        foreach ($methods as $method) {
+            /** @var ReflectionMethod $method */
+            if (strpos($method->name, 'on') !== 0) {
+                continue;
+            }
+
+            foreach ($method->getParameters() as $param) {
+                $paramClass = $param->getClass();
+                Assert::notNull($paramClass);
+
+                $closure = $method->getClosure($eventSubscriber);
+                Assert::notNull($closure);
+
+                // Returning a closure instead of array [$eventSubscriber, $method->name], should work the same
+                yield $paramClass->name => $closure;
+
+                break;
+            }
         }
     }
 

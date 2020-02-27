@@ -59,11 +59,7 @@ final class MutationGeneratingConsoleLoggerSubscriber implements EventSubscriber
 
     public function getSubscribedEvents(): array
     {
-        return [
-            MutationGenerationWasStarted::class => [$this, 'onMutationGenerationWasStarted'],
-            MutableFileWasProcessed::class => [$this, 'onMutableFileWasProcessed'],
-            MutationGenerationWasFinished::class => [$this, 'onMutationGenerationWasFinished'],
-        ];
+        return [];
     }
 
     public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void

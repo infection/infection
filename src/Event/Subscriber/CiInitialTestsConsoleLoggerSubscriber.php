@@ -57,9 +57,7 @@ final class CiInitialTestsConsoleLoggerSubscriber implements EventSubscriber
 
     public function getSubscribedEvents(): array
     {
-        return [
-            InitialTestSuiteWasStarted::class => [$this, 'onInitialTestSuiteWasStarted'],
-        ];
+        return [];
     }
 
     public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void

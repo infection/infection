@@ -54,9 +54,7 @@ final class CleanUpAfterMutationTestingFinishedSubscriber implements EventSubscr
 
     public function getSubscribedEvents(): array
     {
-        return [
-            MutationTestingWasFinished::class => [$this, 'onMutationTestingWasFinished'],
-        ];
+        return [];
     }
 
     public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void

@@ -66,11 +66,7 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
 
     public function getSubscribedEvents(): array
     {
-        return [
-            InitialTestSuiteWasStarted::class => [$this, 'onInitialTestSuiteWasStarted'],
-            InitialTestSuiteWasFinished::class => [$this, 'onInitialTestSuiteWasFinished'],
-            InitialTestCaseWasCompleted::class => [$this, 'onInitialTestCaseWasCompleted'],
-        ];
+        return [];
     }
 
     public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
