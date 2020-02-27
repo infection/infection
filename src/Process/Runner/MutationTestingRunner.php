@@ -77,30 +77,45 @@ final class MutationTestingRunner
     {
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted(count($mutations)));
 
-        $processes = take($mutations);
-        $processes->map(function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcess {
-            $mutant = $this->mutantFactory->create($mutation);
-
-            $process = $this->processBuilder->createProcessForMutant($mutant, $testFrameworkExtraOptions);
-
-            return $process;
-        });
-
-        // We filter these here because it is beyond responsibilities of a process manager to care about types of processes
-        $processes->filter(function (MutantProcess $mutantProcess) {
-            if ($mutantProcess->getMutant()->isCoveredByTest()) {
-                return true;
-            }
-
-            $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                MutantExecutionResult::createFromProcess($mutantProcess)
-            ));
-
-            return false;
-        });
-
-        $this->parallelProcessManager->run($processes, $threadCount);
+        $this->parallelProcessManager->run(
+            $this->createProcesses($mutations, $testFrameworkExtraOptions),
+            $threadCount
+        );
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
+    }
+
+    /**
+     * @param Mutation[] $mutations
+     *
+     * @return iterable<MutantProcess>
+     */
+    private function createProcesses(array $mutations, string $testFrameworkExtraOptions): iterable
+    {
+        return take($mutations)
+            ->map(function (Mutation $mutation) use ($testFrameworkExtraOptions): MutantProcess {
+                $mutant = $this->mutantFactory->create($mutation);
+
+                $process = $this->processBuilder->createProcessForMutant(
+                    $mutant,
+                    $testFrameworkExtraOptions
+                );
+
+                return $process;
+            })
+            // We filter these here because it is beyond responsibilities of a process manager to
+            // care about types of processes
+            ->filter(function (MutantProcess $mutantProcess) {
+                if ($mutantProcess->getMutant()->isCoveredByTest()) {
+                    return true;
+                }
+
+                $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                    MutantExecutionResult::createFromProcess($mutantProcess)
+                ));
+
+                return false;
+            })
+        ;
     }
 }

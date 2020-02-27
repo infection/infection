@@ -102,11 +102,7 @@ final class MutationGeneratorTest extends TestCase
             $fileMutationGeneratorProphecy->reveal()
         );
 
-        $mutations = [];
-
-        foreach ($mutationGenerator->generate($onlyCovered, $nodeIgnorers) as $mutation) {
-            $mutations[] = $mutation;
-        }
+        $mutations = $mutationGenerator->generate($onlyCovered, $nodeIgnorers);
 
         $this->assertSame($expectedMutations, $mutations);
     }
@@ -150,7 +146,6 @@ final class MutationGeneratorTest extends TestCase
             $fileMutationGeneratorMock
         );
 
-        foreach ($mutationGenerator->generate(false, []) as $_) {
-        }
+        $mutationGenerator->generate(false, []);
     }
 }

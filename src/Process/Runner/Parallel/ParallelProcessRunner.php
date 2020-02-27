@@ -36,9 +36,12 @@ declare(strict_types=1);
 namespace Infection\Process\Runner\Parallel;
 
 use Closure;
+use function count;
+use function max;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
+use function usleep;
 
 /**
  * @internal
@@ -53,7 +56,7 @@ class ParallelProcessRunner
     /**
      * @var ProcessBearer[]
      */
-    private $currentProcesses = [];
+    private $runningProcesses = [];
 
     public function __construct(Closure $processHandler)
     {
@@ -66,59 +69,57 @@ class ParallelProcessRunner
      * @throws RuntimeException
      * @throws LogicException
      */
-    public function run(iterable $processes, int $threadCount, int $poll = 1000): void
+    public function run(iterable $processes, int $threadCount, int $poll = 100): void
     {
         $threadCount = max(1, $threadCount);
 
-        // start the initial batch of processes
+        // Start the initial batch of processes
         foreach ($processes as $process) {
             $this->startProcess($process);
 
-            if (count($this->currentProcesses) >= $threadCount) {
+            if (count($this->runningProcesses) >= $threadCount) {
                 do {
                     usleep($poll);
-                } while (!$this->cleanFinished());
+                } while (!$this->freeTerminatedProcesses());
             }
         }
 
         do {
             usleep($poll);
-            $this->cleanFinished();
-            // continue loop while there are processes being executed or waiting for execution
-        } while ($this->currentProcesses);
+
+            $this->freeTerminatedProcesses();
+            // Continue loop while there are processes being executed or waiting for execution
+        } while (count($this->runningProcesses) !== 0);
     }
 
-    private function cleanFinished(): bool
+    private function startProcess(ProcessBearer $processBearer): void
     {
-        // remove any finished process from the stack
-        foreach ($this->currentProcesses as $index => $processBearer) {
-            /** @var ProcessBearer $processBearer */
+        $processBearer->getProcess()->start();
+
+        $this->runningProcesses[] = $processBearer;
+    }
+
+    private function freeTerminatedProcesses(): bool
+    {
+        // Remove any finished process from the stack
+        foreach ($this->runningProcesses as $index => $processBearer) {
             $process = $processBearer->getProcess();
 
             try {
                 $process->checkTimeout();
-            } catch (ProcessTimedOutException $e) {
+            } catch (ProcessTimedOutException $exception) {
                 $processBearer->markTimeout();
             }
 
             if (!$process->isRunning()) {
                 ($this->processHandler)($processBearer);
 
-                unset($this->currentProcesses[$index]);
+                unset($this->runningProcesses[$index]);
 
                 return true;
             }
         }
 
         return false;
-    }
-
-    private function startProcess(ProcessBearer $processBearer): bool
-    {
-        $processBearer->getProcess()->start();
-
-        $this->currentProcesses[] = $processBearer;
-
-        return true;
     }
 }
