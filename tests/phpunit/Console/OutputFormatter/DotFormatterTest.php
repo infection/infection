@@ -39,10 +39,14 @@ use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\MutantProcess;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class DotFormatterTest extends TestCase
 {
+    /** @see DotFormatter::DOTS_PER_ROW */
+    private const DOTS_PER_ROW = 50;
+
     public function test_start_logs_initial_starting_text(): void
     {
         $output = $this->createMock(OutputInterface::class);
@@ -108,6 +112,58 @@ final class DotFormatterTest extends TestCase
         $dot = new DotFormatter($outputNotcovered);
         $dot->start(10);
         $dot->advance($this->createMutantExecutionResultsOfType(MutantProcess::CODE_NOT_COVERED)[0], 10);
+    }
+
+    public function test_it_prints_total_number_of_pending_mutations(): void
+    {
+        $totalMutations = (int) (self::DOTS_PER_ROW * 2 + self::DOTS_PER_ROW / 2);
+
+        $buffer = new BufferedOutput();
+        $dot = new DotFormatter($buffer);
+        $dot->start($totalMutations);
+
+        for ($i = 0; $i < $totalMutations; ++$i) {
+            $dot->advance($this->createMutantExecutionResultsOfType(MutantProcess::CODE_KILLED)[0], $totalMutations);
+        }
+
+        $this->assertSame(
+            <<<'TXT'
+
+.: killed, M: escaped, S: uncovered, E: fatal error, T: timed out
+
+..................................................   ( 50 / 125)
+..................................................   (100 / 125)
+.........................                            (125 / 125)
+TXT
+            ,
+            strip_tags($buffer->fetch())
+        );
+    }
+
+    public function test_it_prints_current_number_of_pending_mutations(): void
+    {
+        $totalMutations = (int) (self::DOTS_PER_ROW * 2 + self::DOTS_PER_ROW / 2);
+
+        $buffer = new BufferedOutput();
+        $dot = new DotFormatter($buffer);
+        $dot->start(0);
+
+        for ($i = 0; $i < $totalMutations; ++$i) {
+            $dot->advance($this->createMutantExecutionResultsOfType(MutantProcess::CODE_KILLED)[0], 0);
+        }
+
+        $this->assertSame(
+            <<<'TXT'
+
+.: killed, M: escaped, S: uncovered, E: fatal error, T: timed out
+
+..................................................   (50 / 50)
+..................................................   (100 / 100)
+.........................
+TXT
+            ,
+            strip_tags($buffer->fetch())
+        );
     }
 
     private function createMutantExecutionResultsOfType(int $processCode, int $count = 1): array
