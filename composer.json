@@ -50,7 +50,6 @@
         "infection/abstract-testframework-adapter": "^0.2.3",
         "infection/extension-installer": "^0.1.0",
         "infection/include-interceptor": "^0.2.2",
-        "infection/phpspec-adapter": "^0.1.0",
         "justinrainbow/json-schema": "^5.2",
         "nikic/php-parser": "^4.2.2",
         "ocramius/package-versions": "^1.2",
