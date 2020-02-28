@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutantsCreationWasFinished;

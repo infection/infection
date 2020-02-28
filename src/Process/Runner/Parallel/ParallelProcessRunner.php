@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner\Parallel;
 
+use function array_shift;
 use Closure;
 use function count;
 use Generator;
@@ -64,7 +65,7 @@ class ParallelProcessRunner
     /**
      * @var ProcessBearer[]
      */
-    private $currentProcesses = [];
+    private $runningProcesses = [];
 
     public function __construct(Closure $processHandler)
     {
@@ -87,7 +88,7 @@ class ParallelProcessRunner
          *
          * For our purposes we need to make sure we only see one process only once.
          */
-        $generator = self::makeGenerator($processes);
+        $generator = self::toGenerator($processes);
 
         // Bucket for processes to be executed
         $bucket = [];
@@ -101,12 +102,12 @@ class ParallelProcessRunner
         while ($process = array_shift($bucket)) {
             $this->startProcess($process);
 
-            if (count($this->currentProcesses) >= $threadCount) {
+            if (count($this->runningProcesses) >= $threadCount) {
                 do {
                     // Now fill the bucket up to the top
                     self::fillBucket($bucket, $generator);
                     usleep($poll);
-                } while (!$this->cleanFinished());
+                } while (!$this->freeTerminatedProcesses());
             }
 
             // In any case load a least one process to the bucket
@@ -115,16 +116,15 @@ class ParallelProcessRunner
 
         do {
             usleep($poll);
-            $this->cleanFinished();
+            $this->freeTerminatedProcesses();
             // continue loop while there are processes being executed or waiting for execution
-        } while ($this->currentProcesses);
+        } while ($this->runningProcesses);
     }
 
-    private function cleanFinished(): bool
+    private function freeTerminatedProcesses(): bool
     {
         // remove any finished process from the stack
-        foreach ($this->currentProcesses as $index => $processBearer) {
-            /** @var ProcessBearer $processBearer */
+        foreach ($this->runningProcesses as $index => $processBearer) {
             $process = $processBearer->getProcess();
 
             try {
@@ -136,7 +136,7 @@ class ParallelProcessRunner
             if (!$process->isRunning()) {
                 ($this->processHandler)($processBearer);
 
-                unset($this->currentProcesses[$index]);
+                unset($this->runningProcesses[$index]);
 
                 return true;
             }
@@ -145,13 +145,11 @@ class ParallelProcessRunner
         return false;
     }
 
-    private function startProcess(ProcessBearer $processBearer): bool
+    private function startProcess(ProcessBearer $processBearer): void
     {
         $processBearer->getProcess()->start();
 
-        $this->currentProcesses[] = $processBearer;
-
-        return true;
+        $this->runningProcesses[] = $processBearer;
     }
 
     /**
@@ -175,7 +173,7 @@ class ParallelProcessRunner
      *
      * @return Generator|ProcessBearer[]
      */
-    private static function makeGenerator(iterable &$input): Generator
+    private static function toGenerator(iterable &$input): Generator
     {
         yield from $input;
     }

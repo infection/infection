@@ -38,7 +38,9 @@ namespace Infection\Tests\Console\OutputFormatter;
 use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\MutantProcess;
+use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
+use function strip_tags;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -114,7 +116,7 @@ final class DotFormatterTest extends TestCase
         $dot->advance($this->createMutantExecutionResultsOfType(MutantProcess::CODE_NOT_COVERED)[0], 10);
     }
 
-    public function test_it_prints_total_number_of_pending_mutations(): void
+    public function test_it_prints_total_number_of_mutations(): void
     {
         $totalMutations = (int) (self::DOTS_PER_ROW * 2 + self::DOTS_PER_ROW / 2);
 
