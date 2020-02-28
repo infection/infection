@@ -160,7 +160,7 @@ class ParallelProcessRunner
      */
     private static function fillBucket(array &$bucket, Generator $input, int $level = self::MUTATOR_TO_PROCESS_RATIO): void
     {
-        if (count($bucket) === $level) {
+        if (count($bucket) >= $level) {
             return;
         }
 
