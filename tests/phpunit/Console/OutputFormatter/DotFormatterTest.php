@@ -46,9 +46,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class DotFormatterTest extends TestCase
 {
-    /** @see DotFormatter::DOTS_PER_ROW */
-    private const DOTS_PER_ROW = 50;
-
     public function test_start_logs_initial_starting_text(): void
     {
         $output = $this->createMock(OutputInterface::class);
@@ -118,7 +115,7 @@ final class DotFormatterTest extends TestCase
 
     public function test_it_prints_total_number_of_mutations(): void
     {
-        $totalMutations = (int) (self::DOTS_PER_ROW * 2 + self::DOTS_PER_ROW / 2);
+        $totalMutations = 127; // prime
 
         $buffer = new BufferedOutput();
         $dot = new DotFormatter($buffer);
@@ -133,9 +130,9 @@ final class DotFormatterTest extends TestCase
 
 .: killed, M: escaped, S: uncovered, E: fatal error, T: timed out
 
-..................................................   ( 50 / 125)
-..................................................   (100 / 125)
-.........................                            (125 / 125)
+..................................................   ( 50 / 127)
+..................................................   (100 / 127)
+...........................                          (127 / 127)
 TXT
             ),
             strip_tags($buffer->fetch())
@@ -144,7 +141,7 @@ TXT
 
     public function test_it_prints_current_number_of_pending_mutations(): void
     {
-        $totalMutations = (int) (self::DOTS_PER_ROW * 2 + self::DOTS_PER_ROW / 2);
+        $totalMutations = 127; // prime
 
         $buffer = new BufferedOutput();
         $dot = new DotFormatter($buffer);
@@ -161,7 +158,7 @@ TXT
 
 ..................................................   (   50)
 ..................................................   (  100)
-.........................
+...........................
 TXT
             ),
             strip_tags($buffer->fetch())
