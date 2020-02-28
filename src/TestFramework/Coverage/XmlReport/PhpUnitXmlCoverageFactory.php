@@ -120,7 +120,7 @@ class PhpUnitXmlCoverageFactory
         CoverageLineData $test,
         TestFileDataProvider $testFileDataProvider
     ): void {
-        $class = explode('::', $test->testMethod, 2)[0];
+        $class = explode(':', $test->testMethod, 2)[0];
 
         $testFileData = $testFileDataProvider->getTestFileInfo($class);
 
