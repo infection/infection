@@ -126,7 +126,7 @@ final class DotFormatterTest extends TestCase
             $dot->advance($this->createMutantExecutionResultsOfType(MutantProcess::CODE_KILLED)[0], $totalMutations);
         }
 
-        $this->assertSame(
+        $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
 .: killed, M: escaped, S: uncovered, E: fatal error, T: timed out
@@ -135,7 +135,7 @@ final class DotFormatterTest extends TestCase
 ..................................................   (100 / 125)
 .........................                            (125 / 125)
 TXT
-            ,
+            ),
             strip_tags($buffer->fetch())
         );
     }
@@ -152,7 +152,7 @@ TXT
             $dot->advance($this->createMutantExecutionResultsOfType(MutantProcess::CODE_KILLED)[0], 0);
         }
 
-        $this->assertSame(
+        $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
 .: killed, M: escaped, S: uncovered, E: fatal error, T: timed out
@@ -161,7 +161,7 @@ TXT
 ..................................................   (  100)
 .........................
 TXT
-            ,
+            ),
             strip_tags($buffer->fetch())
         );
     }
