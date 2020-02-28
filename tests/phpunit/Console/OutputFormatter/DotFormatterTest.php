@@ -46,6 +46,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class DotFormatterTest extends TestCase
 {
+    private const ANY_PRIME_NUMBER = 127;
+
     public function test_start_logs_initial_starting_text(): void
     {
         $output = $this->createMock(OutputInterface::class);
@@ -115,7 +117,7 @@ final class DotFormatterTest extends TestCase
 
     public function test_it_prints_total_number_of_mutations(): void
     {
-        $totalMutations = 127; // prime
+        $totalMutations = self::ANY_PRIME_NUMBER;
 
         $buffer = new BufferedOutput();
         $dot = new DotFormatter($buffer);
@@ -141,7 +143,7 @@ TXT
 
     public function test_it_prints_current_number_of_pending_mutations(): void
     {
-        $totalMutations = 127; // prime
+        $totalMutations = self::ANY_PRIME_NUMBER;
 
         $buffer = new BufferedOutput();
         $dot = new DotFormatter($buffer);
