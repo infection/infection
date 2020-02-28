@@ -43,6 +43,7 @@ use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
 use Infection\Event\Subscriber\EventSubscriber;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriber;
@@ -131,7 +132,7 @@ final class SubscriberBuilder
         yield $this->getInitialTestsConsoleLoggerSubscriber($testFrameworkAdapter, $output);
 
         if ($this->noProgress === false) {
-            yield new MutationGeneratingConsoleLoggerSubscriber($output);
+            yield $this->getMutationGeneratingConsoleLoggerSubscriber($output);
         }
 
         yield new MutationTestingConsoleLoggerSubscriber(
@@ -175,6 +176,15 @@ final class SubscriberBuilder
         }
 
         throw new InvalidArgumentException('Incorrect formatter. Possible values: "dot", "progress"');
+    }
+
+    private function getMutationGeneratingConsoleLoggerSubscriber(OutputInterface $output): EventSubscriber
+    {
+        if ($this->shouldSkipProgressBars()) {
+            return new CiMutationGeneratingConsoleLoggerSubscriber($output);
+        }
+
+        return new MutationGeneratingConsoleLoggerSubscriber($output);
     }
 
     private function getInitialTestsConsoleLoggerSubscriber(TestFrameworkAdapter $testFrameworkAdapter, OutputInterface $output): EventSubscriber
