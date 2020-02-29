@@ -39,7 +39,7 @@ use Infection\Environment\BuildContextResolver;
 use Infection\Environment\CouldNotResolveBuildContext;
 use Infection\Environment\CouldNotResolveStrykerApiKey;
 use Infection\Environment\StrykerApiKeyResolver;
-use Infection\Http\BadgeApiClient;
+use Infection\Http\StrykerDashboardClient;
 use Infection\Mutant\MetricsCalculator;
 use function Safe\sprintf;
 use stdClass;
@@ -61,7 +61,7 @@ final class BadgeLogger implements MutationTestingResultsLogger
         OutputInterface $output,
         BuildContextResolver $buildContextResolver,
         StrykerApiKeyResolver $strykerApiKeyResolver,
-        BadgeApiClient $badgeApiClient,
+        StrykerDashboardClient $badgeApiClient,
         MetricsCalculator $metricsCalculator,
         stdClass $config
     ) {
@@ -78,14 +78,14 @@ final class BadgeLogger implements MutationTestingResultsLogger
         try {
             $buildContext = $this->buildContextResolver->resolve(getenv());
         } catch (CouldNotResolveBuildContext $exception) {
-            $this->showInfo($exception->getMessage());
+            $this->logError($exception->getMessage());
 
             return;
         }
 
         if ($buildContext->branch() !== $this->config->branch) {
-            $this->showInfo(sprintf(
-                'expected branch "%s", found "%s"',
+            $this->logError(sprintf(
+                'Expected branch "%s", found "%s"',
                 $this->config->branch,
                 $buildContext->branch()
             ));
@@ -96,14 +96,12 @@ final class BadgeLogger implements MutationTestingResultsLogger
         try {
             $apiKey = $this->strykerApiKeyResolver->resolve(getenv());
         } catch (CouldNotResolveStrykerApiKey $exception) {
-            $this->showInfo($exception->getMessage());
+            $this->logError($exception->getMessage());
 
             return;
         }
 
-        /*
-         * All clear!
-         */
+        // All clear!
         $this->output->writeln('Sending dashboard report...');
 
         $this->badgeApiClient->sendReport(
@@ -114,7 +112,7 @@ final class BadgeLogger implements MutationTestingResultsLogger
         );
     }
 
-    private function showInfo(string $message): void
+    private function logError(string $message): void
     {
         $this->output->writeln(sprintf('Dashboard report has not been sent: %s', $message));
     }

@@ -38,7 +38,7 @@ namespace Infection\Tests\Logger;
 use function getenv;
 use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Environment\TravisCiResolver;
-use Infection\Http\BadgeApiClient;
+use Infection\Http\StrykerDashboardClient;
 use Infection\Logger\BadgeLogger;
 use Infection\Mutant\MetricsCalculator;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -54,7 +54,7 @@ final class BadgeLoggerTest extends TestCase
     private $outputMock;
 
     /**
-     * @var BadgeApiClient|MockObject
+     * @var StrykerDashboardClient|MockObject
      */
     private $badgeApiClientMock;
 
@@ -105,7 +105,7 @@ final class BadgeLoggerTest extends TestCase
     protected function setUp(): void
     {
         $this->outputMock = $this->createMock(OutputInterface::class);
-        $this->badgeApiClientMock = $this->createMock(BadgeApiClient::class);
+        $this->badgeApiClientMock = $this->createMock(StrykerDashboardClient::class);
         $this->metricsCalculatorMock = $this->createMock(MetricsCalculator::class);
 
         $config = (object) [
