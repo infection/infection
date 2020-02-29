@@ -74,15 +74,13 @@ final class JUnitTestCaseSorter
      */
     private function uniqueByTestFile(iterable $coverageTestCases): array
     {
-        $usedFileNames = [];
         $uniqueTests = [];
 
         foreach ($coverageTestCases as $coverageTestCase) {
             Assert::string($coverageTestCase->testFilePath);
 
-            if (!array_key_exists($coverageTestCase->testFilePath, $usedFileNames)) {
-                $uniqueTests[] = $coverageTestCase;
-                $usedFileNames[$coverageTestCase->testFilePath] = true;
+            if (!array_key_exists($coverageTestCase->testFilePath, $uniqueTests)) {
+                $uniqueTests[$coverageTestCase->testFilePath] = $coverageTestCase;
             }
         }
 
