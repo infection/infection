@@ -35,9 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use function array_key_exists;
 use const FNM_NOESCAPE;
 use function fnmatch;
-use function in_array;
+use function Safe\array_flip;
 
 /**
  * @internal
@@ -45,29 +46,39 @@ use function in_array;
  */
 class IgnoreConfig
 {
-    private $ignored;
+    private $patterns;
+    /** @var int[] */
+    private $hashtable = [];
 
     /**
      * @param string[] $ignored
      */
     public function __construct(array $ignored)
     {
-        $this->ignored = $ignored;
+        $this->patterns = $ignored;
+
+        if ($ignored !== []) {
+            $this->hashtable = array_flip($ignored);
+        }
     }
 
     public function isIgnored(string $class, string $method, ?int $lineNumber): bool
     {
-        if (in_array($class, $this->ignored, true)) {
+        if ($this->patterns === []) {
+            return false;
+        }
+
+        if (array_key_exists($class, $this->hashtable)) {
             return true;
         }
 
         $classMethod = $class . '::' . $method;
 
-        if (in_array($classMethod, $this->ignored, true)) {
+        if (array_key_exists($classMethod, $this->hashtable)) {
             return true;
         }
 
-        foreach ($this->ignored as $ignorePattern) {
+        foreach ($this->patterns as $ignorePattern) {
             if (fnmatch($ignorePattern, $class, FNM_NOESCAPE)
                 || fnmatch($ignorePattern, $classMethod, FNM_NOESCAPE)
                 || ($lineNumber !== null && fnmatch($ignorePattern, $classMethod . '::' . $lineNumber, FNM_NOESCAPE))
