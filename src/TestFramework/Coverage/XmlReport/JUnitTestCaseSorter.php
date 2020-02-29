@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_key_exists;
+use function count;
 use Infection\AbstractTestFramework\Coverage\CoverageLineData;
 use function Safe\usort;
 use Webmozart\Assert\Assert;
@@ -50,8 +51,16 @@ final class JUnitTestCaseSorter
      *
      * @return string[]
      */
-    public function getUniqueSortedFileNames(iterable $coverageTestCases): iterable
+    public function getUniqueSortedFileNames(array $coverageTestCases): iterable
     {
+        if (count($coverageTestCases) === 1) {
+            Assert::string($coverageTestCases[0]->testFilePath);
+
+            yield $coverageTestCases[0]->testFilePath;
+
+            return;
+        }
+
         $uniqueCoverageTests = $this->uniqueByTestFile($coverageTestCases);
 
         // sort tests to run the fastest first
